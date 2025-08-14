@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 namespace Inventory
 {
@@ -33,6 +34,8 @@ namespace Inventory
         private void CreateUI()
         {
             uiRoot = new GameObject("InventoryUI", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            uiRoot.transform.SetParent(transform);
+
             var canvas = uiRoot.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
@@ -102,10 +105,15 @@ namespace Inventory
 
         void Update()
         {
-            if (uiRoot != null && Input.GetKeyDown(KeyCode.I))
-            {
+            if (uiRoot == null)
+                return;
+
+            bool toggle = Input.GetKeyDown(KeyCode.I);
+            if (Keyboard.current != null && Keyboard.current.iKey.wasPressedThisFrame)
+                toggle = true;
+
+            if (toggle)
                 uiRoot.SetActive(!uiRoot.activeSelf);
-            }
         }
     }
 }
