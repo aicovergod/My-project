@@ -142,7 +142,7 @@ namespace Player
 
         void FixedUpdate()
         {
-            rb.linearVelocity = moveDir * moveSpeed;
+            rb.velocity = moveDir * moveSpeed;
         }
     }
 }
