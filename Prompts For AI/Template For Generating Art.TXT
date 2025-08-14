@@ -1,0 +1,2 @@
+64x64 pixel art sprite for a top-down 2D fantasy RPG inspired by early RuneScape. Bright but slightly muted color palette, retro style with simple shading, clean outlines, no anti-aliasing. Fully visible, cropped exactly to 64x64 pixels. Keep perspective consistent with a top-down RPG camera angle.
+[Describe environment tile: terrain type, details, variations]
