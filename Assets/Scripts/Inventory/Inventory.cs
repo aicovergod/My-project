@@ -149,9 +149,9 @@ namespace Inventory
 
             var layout = tooltip.GetComponent<VerticalLayoutGroup>();
             layout.childAlignment = TextAnchor.UpperLeft;
-            layout.childControlWidth = true;
+            layout.childControlWidth = false;
             layout.childControlHeight = false;
-            layout.childForceExpandWidth = true;
+            layout.childForceExpandWidth = false;
             layout.childForceExpandHeight = false;
             layout.padding = new RectOffset(4, 4, 4, 4);
             layout.spacing = 2f;
