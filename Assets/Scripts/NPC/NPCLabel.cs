@@ -11,6 +11,7 @@ namespace NPC
         public float fontSize = 2f;
         public float yOffset = 1f;
         [Range(0f,1f)] public float visibleAlpha = 1f;
+        public TMP_FontAsset font;
 
         [Header("Float")]
         public float floatAmplitude = 0.05f;
@@ -62,13 +63,23 @@ namespace NPC
             }
 
             _labelTf = t;
-           _labelTf.localPosition = new Vector3(0, yOffset, 0);
-            _baseLocalPos = _labelTf.localPosition;
+            if (_labelTf != null)
+            {
+                _labelTf.localPosition = new Vector3(0, yOffset, 0);
+                _baseLocalPos = _labelTf.localPosition;
+            }
+            else
+            {
+                Debug.LogError("[NPCLabel] Failed to create label transform", this);
+                enabled = false;
+                return;
+            }
 
             // Configure TMP once (so you can see Text change in Play)
             _tmp.text = labelText;
             _tmp.color = textColor;
             _tmp.fontSize = fontSize;
+            if (font != null) _tmp.font = font;
             _tmp.alignment = TextAlignmentOptions.Center;
             _tmp.enableWordWrapping = false;
             _tmp.isOverlay = false;
