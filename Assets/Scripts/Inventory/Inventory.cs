@@ -66,8 +66,15 @@ namespace Inventory
         private int draggingIndex = -1;
         private GameObject draggingIcon;
 
+        // Cached default font to avoid repeated builtin lookups that may throw
+        private Font defaultFont;
+
         private void Awake()
         {
+            // Ensure at least one slot and cache the builtin font once
+            size = Mathf.Max(1, size);
+            defaultFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+
             items = new InventoryEntry[size];
             EnsureLegacyEventSystem();
             CreateUI();
@@ -121,51 +128,63 @@ namespace Inventory
             // Generate visible slot images
             slotImages = new Image[size];
             slotCountTexts = new Text[size];
-            for (int i = 0; i < size; i++)
+
+            try
             {
-                GameObject slot = new GameObject($"Slot{i}", typeof(Image));
-                slot.transform.SetParent(panel.transform, false);
-
-                var img = slot.GetComponent<Image>();
-                if (slotFrameSprite != null)
+                for (int i = 0; i < size; i++)
                 {
-                    img.sprite = slotFrameSprite;
-                    img.type = Image.Type.Sliced; // use 9-slice if the sprite supports it
-                    img.color = emptySlotColor;    // tint
+                    GameObject slot = new GameObject($"Slot{i}", typeof(Image));
+                    slot.transform.SetParent(panel.transform, false);
+
+                    var img = slot.GetComponent<Image>();
+                    if (slotFrameSprite != null)
+                    {
+                        img.sprite = slotFrameSprite;
+                        img.type = Image.Type.Sliced; // use 9-slice if the sprite supports it
+                        img.color = emptySlotColor;    // tint
+                    }
+                    else
+                    {
+                        // No sprite? Show a simple tinted square.
+                        img.sprite = null;
+                        img.color = emptySlotColor;
+                        // Optional: give it a subtle outline by adding a child Image here if you want.
+                    }
+
+                    // IMPORTANT: keep enabled so you can see the empty slot
+                    img.enabled = true;
+
+                    // Add quantity text
+                    GameObject countGO = new GameObject("Count", typeof(Text));
+                    countGO.transform.SetParent(slot.transform, false);
+                    var countText = countGO.GetComponent<Text>();
+                    if (defaultFont != null)
+                        countText.font = defaultFont;
+                    countText.alignment = TextAnchor.LowerRight;
+                    countText.raycastTarget = false;
+                    countText.color = Color.white;
+                    countText.text = string.Empty;
+                    var countRect = countGO.GetComponent<RectTransform>();
+                    countRect.anchorMin = Vector2.zero;
+                    countRect.anchorMax = Vector2.one;
+                    countRect.offsetMin = Vector2.zero;
+                    countRect.offsetMax = Vector2.zero;
+
+                    // Add hover handler
+                    var slotComponent = slot.AddComponent<InventorySlot>();
+                    if (slotComponent != null)
+                    {
+                        slotComponent.inventory = this;
+                        slotComponent.index = i;
+                    }
+
+                    slotImages[i] = img;
+                    slotCountTexts[i] = countText;
                 }
-                else
-                {
-                    // No sprite? Show a simple tinted square.
-                    img.sprite = null;
-                    img.color = emptySlotColor;
-                    // Optional: give it a subtle outline by adding a child Image here if you want.
-                }
-
-                // IMPORTANT: keep enabled so you can see the empty slot
-                img.enabled = true;
-
-                // Add quantity text
-                GameObject countGO = new GameObject("Count", typeof(Text));
-                countGO.transform.SetParent(slot.transform, false);
-                var countText = countGO.GetComponent<Text>();
-                countText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-                countText.alignment = TextAnchor.LowerRight;
-                countText.raycastTarget = false;
-                countText.color = Color.white;
-                countText.text = string.Empty;
-                var countRect = countGO.GetComponent<RectTransform>();
-                countRect.anchorMin = Vector2.zero;
-                countRect.anchorMax = Vector2.one;
-                countRect.offsetMin = Vector2.zero;
-                countRect.offsetMax = Vector2.zero;
-
-                // Add hover handler
-                var slotComponent = slot.AddComponent<InventorySlot>();
-                slotComponent.inventory = this;
-                slotComponent.index = i;
-
-                slotImages[i] = img;
-                slotCountTexts[i] = countText;
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"Inventory UI generation failed: {ex}");
             }
 
             // Force a layout rebuild so slots are positioned before the UI is hidden
@@ -196,7 +215,7 @@ namespace Inventory
             tooltipNameText = nameGO.GetComponent<Text>();
             tooltipNameText.font = tooltipNameFont != null
                 ? tooltipNameFont
-                : Resources.GetBuiltinResource<Font>("Arial.ttf");
+                : defaultFont;
             tooltipNameText.alignment = TextAnchor.UpperLeft;
             tooltipNameText.color = tooltipNameColor;
             tooltipNameText.raycastTarget = false;
@@ -208,7 +227,7 @@ namespace Inventory
             tooltipDescriptionText = descGO.GetComponent<Text>();
             tooltipDescriptionText.font = tooltipDescriptionFont != null
                 ? tooltipDescriptionFont
-                : Resources.GetBuiltinResource<Font>("Arial.ttf");
+                : defaultFont;
             tooltipDescriptionText.alignment = TextAnchor.UpperLeft;
             tooltipDescriptionText.color = tooltipDescriptionColor;
             tooltipDescriptionText.raycastTarget = false;
