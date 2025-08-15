@@ -71,21 +71,40 @@ namespace NPC
 
         void EnsureLabel()
         {
-            if (_labelTf != null) return;
+            // If we already have a label transform and its GameObject still exists,
+            // there's nothing to do. Unity "missing" objects compare equal to null,
+            // but a stale reference might still have a GameObject that has been
+            // destroyed, so check that explicitly.
+            if (_labelTf != null && _labelTf.gameObject != null)
+                return;
 
+            // Clear potentially stale references if the previous label was removed.
+            _labelTf = null;
+            _tmp = null;
+
+            // Try to find an existing child first.
             var t = transform.Find(ChildName);
-            if (t == null)
+            if (t == null || t.gameObject == null)
             {
+                // No valid child found – create one now.
                 var go = new GameObject(ChildName);
                 t = go.transform;
                 t.SetParent(transform, false);
             }
 
             _labelTf = t;
-            if (_labelTf == null) return;
+            if (_labelTf == null || _labelTf.gameObject == null)
+                return;
 
+            // Cache or create the TextMeshPro component used for rendering.
             _tmp = _labelTf.GetComponent<TextMeshPro>();
-            if (_tmp == null) _tmp = _labelTf.gameObject.AddComponent<TextMeshPro>();
+            if (_tmp == null)
+                _tmp = _labelTf.gameObject.AddComponent<TextMeshPro>();
+
+            // Guard against the label transform being destroyed during component
+            // creation. If it survived, update its position information.
+            if (_labelTf == null || _labelTf.gameObject == null)
+                return;
 
             _labelTf.localPosition = new Vector3(0, yOffset, 0);
             _baseLocalPos = _labelTf.localPosition;
