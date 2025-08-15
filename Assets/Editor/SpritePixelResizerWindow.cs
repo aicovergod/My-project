@@ -25,7 +25,7 @@ namespace Editor
         private Vector2 scroll;
         private readonly List<UnityEngine.Object> queuedObjects = new List<UnityEngine.Object>();
 
-        [MenuItem("Tools/2DScape/Pixel Resizer")]
+        [MenuItem("Tools/Images/Pixel Resizer")]
         public static void Open()
         {
             var w = GetWindow<SpritePixelResizerWindow>("Pixel Resizer");
