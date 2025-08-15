@@ -47,31 +47,11 @@ namespace NPC
                 if (p) player = p.transform;
             }
 
-            // Find or create the label child under THIS NPC only
-            var t = transform.Find(ChildName);
-            if (t == null)
-            {
-                var go = new GameObject(ChildName);
-                go.transform.SetParent(transform, false);
-                t = go.transform;
-                _tmp = go.AddComponent<TextMeshPro>();
-            }
-            else
-            {
-                _tmp = t.GetComponent<TextMeshPro>();
-                if (_tmp == null) _tmp = t.gameObject.AddComponent<TextMeshPro>();
-            }
+            EnsureLabel();
 
-            _labelTf = t;
-            if (_labelTf != null)
-            {
-                _labelTf.localPosition = new Vector3(0, yOffset, 0);
-                _baseLocalPos = _labelTf.localPosition;
-            }
-            else
+            if (_labelTf == null || _tmp == null)
             {
                 Debug.LogError("[NPCLabel] Failed to create label transform", this);
-                enabled = false;
                 return;
             }
 
@@ -89,9 +69,32 @@ namespace NPC
             ApplyAlpha(0f, toggleRenderer:false);
         }
 
+        void EnsureLabel()
+        {
+            if (_labelTf != null) return;
+
+            var t = transform.Find(ChildName);
+            if (t == null)
+            {
+                var go = new GameObject(ChildName);
+                t = go.transform;
+                t.SetParent(transform, false);
+            }
+
+            _labelTf = t;
+            if (_labelTf == null) return;
+
+            _tmp = _labelTf.GetComponent<TextMeshPro>();
+            if (_tmp == null) _tmp = _labelTf.gameObject.AddComponent<TextMeshPro>();
+
+            _labelTf.localPosition = new Vector3(0, yOffset, 0);
+            _baseLocalPos = _labelTf.localPosition;
+        }
+
         void OnEnable()
         {
             Debug.Log($"[NPCLabel] OnEnable on '{name}'");
+            EnsureLabel();
         }
 
         void Start()
