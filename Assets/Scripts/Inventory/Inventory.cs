@@ -168,6 +168,9 @@ namespace Inventory
                 slotCountTexts[i] = countText;
             }
 
+            // Force a layout rebuild so slots are positioned before the UI is hidden
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+
             // Tooltip setup
             tooltip = new GameObject("Tooltip", typeof(Image), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
             tooltip.transform.SetParent(uiRoot.transform, false);
