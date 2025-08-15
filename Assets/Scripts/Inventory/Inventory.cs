@@ -142,6 +142,7 @@ namespace Inventory
             tooltipText.font = tooltipFont != null
                 ? tooltipFont
                 : Resources.GetBuiltinResource<Font>("Arial.ttf");
+            tooltipText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             tooltipText.alignment = TextAnchor.MiddleLeft;
             tooltipText.color = Color.white;
 
