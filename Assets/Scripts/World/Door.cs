@@ -49,7 +49,7 @@ namespace World
             }
         }
 
-        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             if (playerToMove != null && !string.IsNullOrEmpty(nextSpawnPoint))
             {
