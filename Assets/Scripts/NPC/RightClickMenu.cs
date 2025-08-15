@@ -12,7 +12,7 @@ namespace NPC
         public Button shopButton;
         public Button examineButton;
 
-        private NPCInteractable current;
+        private NpcInteractable current;
 
         private void Awake()
         {
@@ -25,7 +25,7 @@ namespace NPC
                 examineButton.onClick.AddListener(() => { current?.Examine(); Hide(); });
         }
 
-        public void Show(NPCInteractable npc, Vector2 position)
+        public void Show(NpcInteractable npc, Vector2 position)
         {
             current = npc;
             transform.position = position;

@@ -7,7 +7,7 @@ namespace NPC
     /// Allows the player to interact with an NPC via right-click context menu.
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
-    public class NPCInteractable : MonoBehaviour
+    public class NpcInteractable : MonoBehaviour
     {
         [Tooltip("Optional shop component for this NPC.")]
         public Shop shop;

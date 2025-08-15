@@ -114,7 +114,7 @@ namespace ShopSystem
             grid.spacing = slotSpacing;
             grid.childAlignment = TextAnchor.UpperLeft;
             grid.startCorner = GridLayoutGroup.Corner.UpperLeft;
-            grid.constraint = GridLayoutGroup.Constraint.FixedColumns;
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             grid.constraintCount = 6;
 
             slotImages = new Image[Shop.MaxSlots];
