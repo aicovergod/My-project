@@ -149,6 +149,8 @@ namespace Inventory
             tooltipText.alignment = TextAnchor.UpperLeft;
             tooltipText.color = Color.white;
             tooltipText.raycastTarget = false;
+            tooltipText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            tooltipText.verticalOverflow = VerticalWrapMode.Overflow;
 
             var tooltipRect = tooltip.GetComponent<RectTransform>();
             tooltipRect.pivot = new Vector2(0f, 1f);
