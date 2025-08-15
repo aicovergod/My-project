@@ -22,6 +22,8 @@ namespace ShopSystem
         [Header("Window")]
         public Color windowColor = new Color(0.15f, 0.15f, 0.15f, 0.95f);
         public Vector2 windowPadding = new Vector2(8f, 8f);
+        [Tooltip("Additional height applied to the window so the close button isn't overlapped.")]
+        public float extraWindowHeight = 33f;
 
         [Header("Price Display")]
         public Font priceFont;
@@ -194,10 +196,11 @@ namespace ShopSystem
             }
 
             int rows = Mathf.CeilToInt((float)Shop.MaxSlots / grid.constraintCount);
+            float panelHeight = rows * slotSize.y + (rows - 1) * slotSpacing.y;
             float width = grid.constraintCount * slotSize.x + (grid.constraintCount - 1) * slotSpacing.x + windowPadding.x * 2f;
-            float height = rows * slotSize.y + (rows - 1) * slotSpacing.y + windowPadding.y * 2f;
-            windowRect.sizeDelta = new Vector2(width, height);
-            rect.sizeDelta = new Vector2(width - windowPadding.x * 2f, height - windowPadding.y * 2f);
+            float windowHeight = panelHeight + windowPadding.y * 2f + extraWindowHeight;
+            windowRect.sizeDelta = new Vector2(width, windowHeight);
+            rect.sizeDelta = new Vector2(width - windowPadding.x * 2f, panelHeight);
         }
 
         private void Refresh()
