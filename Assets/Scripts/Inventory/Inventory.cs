@@ -334,6 +334,71 @@ namespace Inventory
         }
 
         /// <summary>
+        /// Returns the total number of a given item currently in the inventory.
+        /// </summary>
+        public int GetItemCount(ItemData item)
+        {
+            int count = 0;
+            if (item == null) return count;
+            for (int i = 0; i < items.Length; i++)
+            {
+                if (items[i].item == item)
+                    count += items[i].count;
+            }
+            return count;
+        }
+
+        /// <summary>
+        /// Returns true if there is room to add at least one of the given item.
+        /// </summary>
+        public bool CanAddItem(ItemData item)
+        {
+            if (item == null)
+                return false;
+
+            if (item.stackable)
+            {
+                for (int i = 0; i < items.Length; i++)
+                {
+                    if (items[i].item == item && items[i].count < item.maxStack)
+                        return true;
+                }
+            }
+
+            for (int i = 0; i < items.Length; i++)
+            {
+                if (items[i].item == null)
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Removes up to 'count' of the specified item from the inventory.
+        /// Returns true if the requested amount was removed.
+        /// </summary>
+        public bool RemoveItem(ItemData item, int count)
+        {
+            if (item == null || count <= 0)
+                return false;
+
+            for (int i = 0; i < items.Length && count > 0; i++)
+            {
+                if (items[i].item == item)
+                {
+                    int remove = Mathf.Min(count, items[i].count);
+                    items[i].count -= remove;
+                    count -= remove;
+                    if (items[i].count <= 0)
+                        items[i].item = null;
+                    UpdateSlotVisual(i);
+                }
+            }
+
+            return count <= 0;
+        }
+
+        /// <summary>
         /// Checks whether the inventory contains an item by ID.
         /// </summary>
         public bool HasItem(string id)
