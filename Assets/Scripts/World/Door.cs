@@ -31,7 +31,24 @@ namespace World
         private static GameObject inventoryUIToMove;
         private static GameObject eventSystemToMove;
 
-        private void OnMouseDown() => StartCoroutine(UseDoor());
+        private void Update()
+        {
+            if (!Input.GetMouseButtonDown(0))
+                return;
+
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
+
+            var worldPoint = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            foreach (var col in Physics2D.OverlapPointAll(worldPoint))
+            {
+                if (col.gameObject == gameObject)
+                {
+                    StartCoroutine(UseDoor());
+                    break;
+                }
+            }
+        }
 
         private IEnumerator UseDoor()
         {
