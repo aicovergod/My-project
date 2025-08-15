@@ -18,6 +18,8 @@ namespace Inventory
     [DisallowMultipleComponent]
     public class InventoryDebugMenu : MonoBehaviour
     {
+        public static InventoryDebugMenu Instance;
+
         [Tooltip("Inventory to add items to. If not set the component tries to find one in the scene.")]
         public Inventory inventory;
 
@@ -27,6 +29,15 @@ namespace Inventory
 
         private void Awake()
         {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+
             if (inventory == null)
             {
                 inventory = FindObjectOfType<Inventory>();
