@@ -8,6 +8,12 @@ using UnityEngine.InputSystem;
 
 namespace Inventory
 {
+    public struct InventoryEntry
+    {
+        public ItemData item;
+        public int count;
+    }
+
     /// <summary>
     /// Runtime inventory UI generator (Screen Space Overlay) that toggles with the OLD
     /// Input Manager (Input.GetKeyDown). The UI is created at scene root, starts inactive,
@@ -46,7 +52,8 @@ namespace Inventory
         public Color tooltipDescriptionColor = Color.white;
         
         private Image[] slotImages;
-        private ItemData[] items;
+        private Text[] slotCountTexts;
+        private InventoryEntry[] items;
 
         private GameObject tooltip;
         private Text tooltipNameText;
@@ -61,7 +68,7 @@ namespace Inventory
 
         private void Awake()
         {
-            items = new ItemData[size];
+            items = new InventoryEntry[size];
             EnsureLegacyEventSystem();
             CreateUI();
 
@@ -113,6 +120,7 @@ namespace Inventory
 
             // Generate visible slot images
             slotImages = new Image[size];
+            slotCountTexts = new Text[size];
             for (int i = 0; i < size; i++)
             {
                 GameObject slot = new GameObject($"Slot{i}", typeof(Image));
@@ -136,12 +144,28 @@ namespace Inventory
                 // IMPORTANT: keep enabled so you can see the empty slot
                 img.enabled = true;
 
+                // Add quantity text
+                GameObject countGO = new GameObject("Count", typeof(Text));
+                countGO.transform.SetParent(slot.transform, false);
+                var countText = countGO.GetComponent<Text>();
+                countText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                countText.alignment = TextAnchor.LowerRight;
+                countText.raycastTarget = false;
+                countText.color = Color.white;
+                countText.text = string.Empty;
+                var countRect = countGO.GetComponent<RectTransform>();
+                countRect.anchorMin = Vector2.zero;
+                countRect.anchorMax = Vector2.one;
+                countRect.offsetMin = Vector2.zero;
+                countRect.offsetMax = Vector2.zero;
+
                 // Add hover handler
                 var slotComponent = slot.AddComponent<InventorySlot>();
                 slotComponent.inventory = this;
                 slotComponent.index = i;
 
                 slotImages[i] = img;
+                slotCountTexts[i] = countText;
             }
 
             // Tooltip setup
@@ -199,7 +223,8 @@ namespace Inventory
             if (slotImages == null || index < 0 || index >= slotImages.Length || slotImages[index] == null)
                 return;
 
-            var item = items[index];
+            var entry = items[index];
+            var item = entry.item;
             if (item != null)
             {
                 slotImages[index].sprite = item.icon ? item.icon : slotFrameSprite;
@@ -207,6 +232,11 @@ namespace Inventory
                     ? Image.Type.Sliced : Image.Type.Simple;
                 slotImages[index].color = Color.white;
                 slotImages[index].enabled = true;
+                if (slotCountTexts != null && slotCountTexts.Length > index && slotCountTexts[index] != null)
+                {
+                    slotCountTexts[index].text = entry.count > 1 ? entry.count.ToString() : string.Empty;
+                    slotCountTexts[index].enabled = true;
+                }
             }
             else
             {
@@ -214,19 +244,41 @@ namespace Inventory
                 slotImages[index].type = (slotFrameSprite != null) ? Image.Type.Sliced : Image.Type.Simple;
                 slotImages[index].color = emptySlotColor;
                 slotImages[index].enabled = true;
+                if (slotCountTexts != null && slotCountTexts.Length > index && slotCountTexts[index] != null)
+                {
+                    slotCountTexts[index].text = string.Empty;
+                    slotCountTexts[index].enabled = false;
+                }
             }
         }
 
         /// <summary>
-        /// Adds an item to the first empty slot. Returns true if added.
+        /// Adds an item, stacking when possible. Returns true if added.
         /// </summary>
         public bool AddItem(ItemData item)
         {
+            if (item == null)
+                return false;
+
+            if (item.stackable)
+            {
+                for (int i = 0; i < items.Length; i++)
+                {
+                    if (items[i].item == item && items[i].count < item.maxStack)
+                    {
+                        items[i].count++;
+                        UpdateSlotVisual(i);
+                        return true;
+                    }
+                }
+            }
+
             for (int i = 0; i < items.Length; i++)
             {
-                if (items[i] == null)
+                if (items[i].item == null)
                 {
-                    items[i] = item;
+                    items[i].item = item;
+                    items[i].count = 1;
                     UpdateSlotVisual(i);
 
                     return true;
@@ -241,9 +293,9 @@ namespace Inventory
         /// </summary>
         public bool HasItem(string id)
         {
-            foreach (var item in items)
+            foreach (var entry in items)
             {
-                if (item != null && item.id == id)
+                if (entry.item != null && entry.item.id == id)
                     return true;
             }
             return false;
@@ -257,9 +309,11 @@ namespace Inventory
         {
             for (int i = 0; i < items.Length; i++)
             {
-                if (items[i] != null && items[i].id == id)
+                if (items[i].item != null && items[i].item.id == id)
                 {
-                    items[i] = null;
+                    items[i].count--;
+                    if (items[i].count <= 0)
+                        items[i].item = null;
                     UpdateSlotVisual(i);
 
                     return true;
@@ -275,9 +329,13 @@ namespace Inventory
         public void DropItem(int slotIndex)
         {
             if (slotIndex < 0 || slotIndex >= items.Length) return;
-            if (items[slotIndex] == null) return;
+            var entry = items[slotIndex];
+            if (entry.item == null) return;
 
-            items[slotIndex] = null;
+            entry.count--;
+            if (entry.count <= 0)
+                entry.item = null;
+            items[slotIndex] = entry;
             UpdateSlotVisual(slotIndex);
             HideTooltip();
         }
@@ -285,7 +343,7 @@ namespace Inventory
         public void ShowTooltip(int slotIndex, RectTransform slotRect)
         {
             if (slotIndex < 0 || slotIndex >= items.Length) return;
-            var item = items[slotIndex];
+            var item = items[slotIndex].item;
             if (item == null || tooltip == null || tooltipNameText == null || tooltipDescriptionText == null) return;
 
             string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
@@ -308,7 +366,8 @@ namespace Inventory
         public void BeginDrag(int slotIndex)
         {
             if (slotIndex < 0 || slotIndex >= items.Length) return;
-            var item = items[slotIndex];
+            var entry = items[slotIndex];
+            var item = entry.item;
             if (item == null) return;
 
             HideTooltip();
@@ -325,6 +384,8 @@ namespace Inventory
 
             if (slotImages != null && slotIndex < slotImages.Length && slotImages[slotIndex] != null)
                 slotImages[slotIndex].enabled = false;
+            if (slotCountTexts != null && slotIndex < slotCountTexts.Length && slotCountTexts[slotIndex] != null)
+                slotCountTexts[slotIndex].enabled = false;
         }
 
         public void Drag(PointerEventData eventData)

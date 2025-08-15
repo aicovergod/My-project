@@ -18,4 +18,11 @@ public class ItemData : ScriptableObject
     [Header("Description")]
     [TextArea]
     public string description;
+
+    [Header("Stacking")]
+    [Tooltip("If true, multiple items can occupy a single inventory slot.")]
+    public bool stackable;
+
+    [Tooltip("Maximum number of items per stack when stackable.")]
+    public int maxStack = 1;
 }
