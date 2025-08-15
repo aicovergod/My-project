@@ -19,6 +19,12 @@ namespace World
         [Tooltip("Optional item ID required to use this door.  Leave empty for no requirement.")]
         public string requiredItemId;
 
+        [Tooltip("If true, the required item will be removed from the player's inventory when used.")]
+        public bool removeItemOnUse;
+
+        [Tooltip("Text to display if the player lacks the required item.")]
+        public string missingItemMessage;
+
         [Tooltip("Name of the spawn point in the target scene where the player should appear.")]
         public string spawnPointName;
 
@@ -63,9 +69,13 @@ namespace World
             {
                 if (inv == null || !inv.HasItem(requiredItemId))
                 {
-                    // Player doesn't have the required item
+                    if (!string.IsNullOrEmpty(missingItemMessage))
+                        PopupText.Show(missingItemMessage, player.transform);
                     yield break;
                 }
+
+                if (removeItemOnUse && inv != null)
+                    inv.RemoveItem(requiredItemId);
             }
 
             if (!string.IsNullOrEmpty(sceneToLoad))

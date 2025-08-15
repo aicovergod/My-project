@@ -160,6 +160,33 @@ namespace Inventory
             return false;
         }
 
+        /// <summary>
+        /// Removes the first occurrence of an item with the given ID.
+        /// Returns true if an item was removed.
+        /// </summary>
+        public bool RemoveItem(string id)
+        {
+            for (int i = 0; i < items.Length; i++)
+            {
+                if (items[i] != null && items[i].id == id)
+                {
+                    items[i] = null;
+
+                    if (slotImages != null && i < slotImages.Length && slotImages[i] != null)
+                    {
+                        slotImages[i].sprite = slotFrameSprite;
+                        slotImages[i].type = (slotFrameSprite != null) ? Image.Type.Sliced : Image.Type.Simple;
+                        slotImages[i].color = emptySlotColor;
+                        slotImages[i].enabled = true;
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void Update()
         {
             // OLD INPUT MANAGER
