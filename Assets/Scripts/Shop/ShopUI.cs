@@ -260,12 +260,12 @@ namespace ShopSystem
                 if (currentShop != null && i < currentShop.stock.Length)
                 {
                     var entry = currentShop.stock[i];
-                    if (entry.item != null)
+                    if (entry.item != null && entry.quantity > 0)
                     {
                         img.sprite = entry.item.icon != null ? entry.item.icon : slotFrameSprite;
                         img.color = Color.white;
                         img.enabled = true;
-                        price.text = entry.price.ToString();
+                        price.text = $"{entry.price} ({entry.quantity})";
                         continue;
                     }
                 }
