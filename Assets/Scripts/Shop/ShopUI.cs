@@ -37,6 +37,7 @@ namespace ShopSystem
         private Image[] slotImages;
         private Text[] slotPriceTexts;
         private Text tooltipText;
+        private Text shopNameText;
         private Shop currentShop;
         private PlayerMover playerMover;
         private NpcRandomMovement npcMover;
@@ -73,6 +74,8 @@ namespace ShopSystem
         {
             uiRoot?.SetActive(false);
             currentShop = null;
+            if (shopNameText != null)
+                shopNameText.text = string.Empty;
             if (playerMover != null)
                 playerMover.enabled = true;
             if (npcMover != null)
@@ -213,6 +216,21 @@ namespace ShopSystem
             float windowHeight = panelHeight + windowPadding.y * 2f + extraWindowHeight + tooltipHeight;
             windowRect.sizeDelta = new Vector2(width, windowHeight);
             rect.sizeDelta = new Vector2(width - windowPadding.x * 2f, panelHeight);
+            float nameHeight = 20f;
+            GameObject nameGO = new GameObject("Name", typeof(Text));
+            nameGO.transform.SetParent(window.transform, false);
+            shopNameText = nameGO.GetComponent<Text>();
+            shopNameText.font = priceFont != null ? priceFont : Resources.GetBuiltinResource<Font>("Arial.ttf");
+            shopNameText.color = priceColor;
+            shopNameText.alignment = TextAnchor.MiddleLeft;
+            shopNameText.text = string.Empty;
+            shopNameText.raycastTarget = false;
+            var nameRect = nameGO.GetComponent<RectTransform>();
+            nameRect.anchorMin = new Vector2(0f, 1f);
+            nameRect.anchorMax = new Vector2(1f, 1f);
+            nameRect.pivot = new Vector2(0.5f, 1f);
+            nameRect.offsetMin = new Vector2(windowPadding.x, -windowPadding.y - nameHeight);
+            nameRect.offsetMax = new Vector2(-windowPadding.x - closeRect.sizeDelta.x - 4f, -windowPadding.y);
 
             GameObject tooltipGO = new GameObject("Tooltip", typeof(Text));
             tooltipGO.transform.SetParent(window.transform, false);
@@ -233,6 +251,8 @@ namespace ShopSystem
         private void Refresh()
         {
             HideTooltip();
+            if (shopNameText != null)
+                shopNameText.text = currentShop != null ? currentShop.shopName : string.Empty;
             for (int i = 0; i < slotImages.Length; i++)
             {
                 var img = slotImages[i];

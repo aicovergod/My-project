@@ -20,6 +20,9 @@ namespace ShopSystem
     {
         public const int MaxSlots = 30;
 
+        [Header("Info")]
+        public string shopName;
+
         [Header("Currency")]
         public ItemData currency;
 
