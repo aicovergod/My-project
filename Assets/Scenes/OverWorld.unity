@@ -222,6 +222,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneToLoad: House1Interior
   requiredItemId: 
+  removeItemOnUse: 0
+  missingItemMessage: You don't have the required key
   spawnPointName: House1EntranceSpawn
   useRadius: 2
 --- !u!61 &77621671
@@ -5102,7 +5104,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -5121,7 +5123,7 @@ Transform:
   m_GameObject: {fileID: 852707366}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.53, y: -0.58, z: 0}
+  m_LocalPosition: {x: -7.74, y: 2.98, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
