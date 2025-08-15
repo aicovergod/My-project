@@ -32,6 +32,10 @@ namespace Inventory
         [Tooltip("Color/tint for empty slots if no frame sprite, or tint over the frame.")]
         public Color emptySlotColor = new Color(1f, 1f, 1f, 0.25f); // light translucent
 
+        [Header("Tooltip")]
+        [Tooltip("Optional: custom font for tooltip text. Uses Arial if null.")]
+        public Font tooltipFont;
+
         private Image[] slotImages;
         private ItemData[] items;
 
@@ -135,6 +139,9 @@ namespace Inventory
             var textGO = new GameObject("Text", typeof(Text));
             textGO.transform.SetParent(tooltip.transform, false);
             tooltipText = textGO.GetComponent<Text>();
+            tooltipText.font = tooltipFont != null
+                ? tooltipFont
+                : Resources.GetBuiltinResource<Font>("Arial.ttf");
             tooltipText.alignment = TextAnchor.MiddleLeft;
             tooltipText.color = Color.white;
 
