@@ -36,6 +36,7 @@ namespace ShopSystem
         private GameObject uiRoot;
         private Image[] slotImages;
         private Text[] slotPriceTexts;
+        private Text tooltipText;
         private Shop currentShop;
         private PlayerMover playerMover;
         private NpcRandomMovement npcMover;
@@ -208,13 +209,30 @@ namespace ShopSystem
             int rows = Mathf.CeilToInt((float)Shop.MaxSlots / grid.constraintCount);
             float panelHeight = rows * slotSize.y + (rows - 1) * slotSpacing.y;
             float width = grid.constraintCount * slotSize.x + (grid.constraintCount - 1) * slotSpacing.x + windowPadding.x * 2f;
-            float windowHeight = panelHeight + windowPadding.y * 2f + extraWindowHeight;
+            float tooltipHeight = 20f;
+            float windowHeight = panelHeight + windowPadding.y * 2f + extraWindowHeight + tooltipHeight;
             windowRect.sizeDelta = new Vector2(width, windowHeight);
             rect.sizeDelta = new Vector2(width - windowPadding.x * 2f, panelHeight);
+
+            GameObject tooltipGO = new GameObject("Tooltip", typeof(Text));
+            tooltipGO.transform.SetParent(window.transform, false);
+            tooltipText = tooltipGO.GetComponent<Text>();
+            tooltipText.font = priceFont != null ? priceFont : Resources.GetBuiltinResource<Font>("Arial.ttf");
+            tooltipText.color = priceColor;
+            tooltipText.alignment = TextAnchor.MiddleLeft;
+            tooltipText.text = string.Empty;
+            tooltipText.raycastTarget = false;
+            var tooltipRect = tooltipGO.GetComponent<RectTransform>();
+            tooltipRect.anchorMin = new Vector2(0f, 0f);
+            tooltipRect.anchorMax = new Vector2(1f, 0f);
+            tooltipRect.pivot = new Vector2(0.5f, 0f);
+            tooltipRect.offsetMin = new Vector2(windowPadding.x, windowPadding.y);
+            tooltipRect.offsetMax = new Vector2(-windowPadding.x, windowPadding.y + tooltipHeight);
         }
 
         private void Refresh()
         {
+            HideTooltip();
             for (int i = 0; i < slotImages.Length; i++)
             {
                 var img = slotImages[i];
@@ -235,6 +253,24 @@ namespace ShopSystem
                 img.color = emptySlotColor;
                 price.text = string.Empty;
             }
+        }
+
+        public void ShowTooltip(int index)
+        {
+            if (tooltipText == null || currentShop == null) return;
+            if (index < 0 || index >= currentShop.stock.Length) return;
+
+            var entry = currentShop.stock[index];
+            if (entry.item == null) return;
+
+            string currencyName = currentShop.currency != null ? currentShop.currency.itemName : "Coins";
+            tooltipText.text = $"This \"{entry.item.itemName}\" costs {entry.price} amount of {currencyName}";
+        }
+
+        public void HideTooltip()
+        {
+            if (tooltipText != null)
+                tooltipText.text = string.Empty;
         }
     }
 }
