@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Inventory;
+using Player;
 
 namespace ShopSystem
 {
@@ -33,6 +34,7 @@ namespace ShopSystem
         private Image[] slotImages;
         private Text[] slotPriceTexts;
         private Shop currentShop;
+        private PlayerMover playerMover;
 
         private void Awake()
         {
@@ -50,6 +52,10 @@ namespace ShopSystem
             currentShop = shop;
             Refresh();
             uiRoot.SetActive(true);
+            if (playerMover == null)
+                playerMover = FindObjectOfType<PlayerMover>();
+            if (playerMover != null)
+                playerMover.enabled = false;
         }
 
         /// <summary>
@@ -59,6 +65,8 @@ namespace ShopSystem
         {
             uiRoot?.SetActive(false);
             currentShop = null;
+            if (playerMover != null)
+                playerMover.enabled = true;
         }
 
         /// <summary>
@@ -99,6 +107,32 @@ namespace ShopSystem
 
             var windowImg = window.GetComponent<Image>();
             windowImg.color = windowColor;
+
+            GameObject closeButtonGO = new GameObject("CloseButton", typeof(RectTransform), typeof(Image), typeof(Button));
+            closeButtonGO.transform.SetParent(window.transform, false);
+            var closeRect = closeButtonGO.GetComponent<RectTransform>();
+            closeRect.anchorMin = new Vector2(1f, 1f);
+            closeRect.anchorMax = new Vector2(1f, 1f);
+            closeRect.pivot = new Vector2(1f, 1f);
+            closeRect.anchoredPosition = new Vector2(-4f, -4f);
+            closeRect.sizeDelta = new Vector2(16f, 16f);
+            var closeImg = closeButtonGO.GetComponent<Image>();
+            closeImg.color = Color.red;
+            var closeBtn = closeButtonGO.GetComponent<Button>();
+            closeBtn.onClick.AddListener(Close);
+
+            GameObject closeTextGO = new GameObject("Text", typeof(Text));
+            closeTextGO.transform.SetParent(closeButtonGO.transform, false);
+            var closeText = closeTextGO.GetComponent<Text>();
+            closeText.font = priceFont != null ? priceFont : Resources.GetBuiltinResource<Font>("Arial.ttf");
+            closeText.text = "X";
+            closeText.alignment = TextAnchor.MiddleCenter;
+            closeText.color = Color.white;
+            var closeTextRect = closeTextGO.GetComponent<RectTransform>();
+            closeTextRect.anchorMin = Vector2.zero;
+            closeTextRect.anchorMax = Vector2.one;
+            closeTextRect.offsetMin = Vector2.zero;
+            closeTextRect.offsetMax = Vector2.zero;
 
             GameObject panel = new GameObject("Slots", typeof(RectTransform), typeof(GridLayoutGroup));
             panel.transform.SetParent(window.transform, false);
