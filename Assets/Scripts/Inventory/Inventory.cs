@@ -186,7 +186,6 @@ namespace Inventory
 
             var tooltipRect = tooltip.GetComponent<RectTransform>();
             tooltipRect.pivot = new Vector2(0f, 1f);
-            tooltipRect.sizeDelta = new Vector2(160f, 0f);
 
             tooltip.SetActive(false);
         }
@@ -268,8 +267,12 @@ namespace Inventory
             string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
             tooltipNameText.text = name;
             tooltipDescriptionText.text = item.description;
-            tooltip.SetActive(true);
+
+            var tooltipRect = tooltip.GetComponent<RectTransform>();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
+
             tooltip.transform.position = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
+            tooltip.SetActive(true);
         }
 
         public void HideTooltip()
