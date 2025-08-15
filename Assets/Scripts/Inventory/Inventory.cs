@@ -59,6 +59,7 @@ namespace Inventory
             uiRoot = new GameObject("InventoryUI", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             // Put UI at the SCENE ROOT so it never behaves like a world object
             uiRoot.transform.SetParent(null, false);
+            DontDestroyOnLoad(uiRoot);
 
             // Optional: assign UI layer if it exists (no error if it doesn't)
             int uiLayer = LayerMask.NameToLayer("UI");
@@ -175,10 +176,15 @@ namespace Inventory
         private static void EnsureLegacyEventSystem()
         {
             var existing = Object.FindObjectOfType<EventSystem>();
-            if (existing != null) return;
+            if (existing != null)
+            {
+                DontDestroyOnLoad(existing.gameObject);
+                return;
+            }
 
             var go = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
             go.transform.SetParent(null, false);
+            DontDestroyOnLoad(go);
         }
     }
 }

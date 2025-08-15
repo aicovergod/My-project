@@ -23,7 +23,11 @@ namespace Player
         private Vector3 velocity;
         private Camera cam;
 
-        void Awake() { cam = GetComponent<Camera>(); }
+        void Awake()
+        {
+            cam = GetComponent<Camera>();
+            DontDestroyOnLoad(gameObject);
+        }
 
         void LateUpdate()
         {
