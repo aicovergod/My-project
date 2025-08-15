@@ -36,14 +36,21 @@ namespace Inventory
         public Color emptySlotColor = new Color(1f, 1f, 1f, 0.25f); // light translucent
 
         [Header("Tooltip")]
-        [Tooltip("Optional: custom font for tooltip text. Uses Arial if null.")]
-        public Font tooltipFont;
+        [Tooltip("Optional: custom font for the tooltip item name. Uses Arial if null.")]
+        public Font tooltipNameFont;
+        [Tooltip("Color for the tooltip item name text.")]
+        public Color tooltipNameColor = Color.white;
+        [Tooltip("Optional: custom font for the tooltip description. Uses Arial if null.")]
+        public Font tooltipDescriptionFont;
+        [Tooltip("Color for the tooltip description text.")]
+        public Color tooltipDescriptionColor = Color.white;
         
         private Image[] slotImages;
         private ItemData[] items;
 
         private GameObject tooltip;
-        private Text tooltipText;
+        private Text tooltipNameText;
+        private Text tooltipDescriptionText;
 
         // UI
         private GameObject uiRoot; // Canvas root
@@ -134,33 +141,52 @@ namespace Inventory
             }
 
             // Tooltip setup
-            tooltip = new GameObject("Tooltip", typeof(Image));
+            tooltip = new GameObject("Tooltip", typeof(Image), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
             tooltip.transform.SetParent(uiRoot.transform, false);
             var bg = tooltip.GetComponent<Image>();
             bg.color = new Color(0f, 0f, 0f, 0.75f);
             bg.raycastTarget = false;
 
-            var textGO = new GameObject("Text", typeof(Text));
-            textGO.transform.SetParent(tooltip.transform, false);
-            tooltipText = textGO.GetComponent<Text>();
-            tooltipText.font = tooltipFont != null
-                ? tooltipFont
+            var layout = tooltip.GetComponent<VerticalLayoutGroup>();
+            layout.childAlignment = TextAnchor.UpperLeft;
+            layout.childControlWidth = true;
+            layout.childControlHeight = false;
+            layout.childForceExpandWidth = true;
+            layout.childForceExpandHeight = false;
+            layout.padding = new RectOffset(4, 4, 4, 4);
+            layout.spacing = 2f;
+
+            var fitter = tooltip.GetComponent<ContentSizeFitter>();
+            fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            var nameGO = new GameObject("Name", typeof(Text));
+            nameGO.transform.SetParent(tooltip.transform, false);
+            tooltipNameText = nameGO.GetComponent<Text>();
+            tooltipNameText.font = tooltipNameFont != null
+                ? tooltipNameFont
                 : Resources.GetBuiltinResource<Font>("Arial.ttf");
-            tooltipText.alignment = TextAnchor.UpperLeft;
-            tooltipText.color = Color.white;
-            tooltipText.raycastTarget = false;
-            tooltipText.horizontalOverflow = HorizontalWrapMode.Wrap;
-            tooltipText.verticalOverflow = VerticalWrapMode.Overflow;
+            tooltipNameText.alignment = TextAnchor.UpperLeft;
+            tooltipNameText.color = tooltipNameColor;
+            tooltipNameText.raycastTarget = false;
+            tooltipNameText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            tooltipNameText.verticalOverflow = VerticalWrapMode.Overflow;
+
+            var descGO = new GameObject("Description", typeof(Text));
+            descGO.transform.SetParent(tooltip.transform, false);
+            tooltipDescriptionText = descGO.GetComponent<Text>();
+            tooltipDescriptionText.font = tooltipDescriptionFont != null
+                ? tooltipDescriptionFont
+                : Resources.GetBuiltinResource<Font>("Arial.ttf");
+            tooltipDescriptionText.alignment = TextAnchor.UpperLeft;
+            tooltipDescriptionText.color = tooltipDescriptionColor;
+            tooltipDescriptionText.raycastTarget = false;
+            tooltipDescriptionText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            tooltipDescriptionText.verticalOverflow = VerticalWrapMode.Overflow;
 
             var tooltipRect = tooltip.GetComponent<RectTransform>();
             tooltipRect.pivot = new Vector2(0f, 1f);
-            tooltipRect.sizeDelta = new Vector2(160f, 40f);
-
-            var textRect = tooltipText.GetComponent<RectTransform>();
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = new Vector2(4f, 4f);
-            textRect.offsetMax = new Vector2(-4f, -4f);
+            tooltipRect.sizeDelta = new Vector2(160f, 0f);
 
             tooltip.SetActive(false);
         }
@@ -237,10 +263,11 @@ namespace Inventory
         {
             if (slotIndex < 0 || slotIndex >= items.Length) return;
             var item = items[slotIndex];
-            if (item == null || tooltip == null || tooltipText == null) return;
+            if (item == null || tooltip == null || tooltipNameText == null || tooltipDescriptionText == null) return;
 
             string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
-            tooltipText.text = $"{name}\n{item.description}";
+            tooltipNameText.text = name;
+            tooltipDescriptionText.text = item.description;
             tooltip.SetActive(true);
             tooltip.transform.position = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
         }
