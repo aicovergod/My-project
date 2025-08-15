@@ -135,6 +135,7 @@ namespace Inventory
             var textGO = new GameObject("Text", typeof(Text));
             textGO.transform.SetParent(tooltip.transform, false);
             tooltipText = textGO.GetComponent<Text>();
+            tooltipText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             tooltipText.alignment = TextAnchor.MiddleLeft;
             tooltipText.color = Color.white;
 
