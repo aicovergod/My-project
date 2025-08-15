@@ -12,7 +12,8 @@ namespace Inventory
         IBeginDragHandler,
         IDragHandler,
         IEndDragHandler,
-        IDropHandler
+        IDropHandler,
+        IPointerClickHandler
     {
         [HideInInspector]
         public Inventory inventory;
@@ -47,6 +48,14 @@ namespace Inventory
         public void OnDrop(PointerEventData eventData)
         {
             inventory?.Drop(index);
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (eventData.button == PointerEventData.InputButton.Right)
+            {
+                inventory?.DropItem(index);
+            }
         }
     }
 }

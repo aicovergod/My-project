@@ -269,6 +269,19 @@ namespace Inventory
             return false;
         }
 
+        /// <summary>
+        /// Drops the item from the specified slot.
+        /// </summary>
+        public void DropItem(int slotIndex)
+        {
+            if (slotIndex < 0 || slotIndex >= items.Length) return;
+            if (items[slotIndex] == null) return;
+
+            items[slotIndex] = null;
+            UpdateSlotVisual(slotIndex);
+            HideTooltip();
+        }
+
         public void ShowTooltip(int slotIndex, RectTransform slotRect)
         {
             if (slotIndex < 0 || slotIndex >= items.Length) return;
