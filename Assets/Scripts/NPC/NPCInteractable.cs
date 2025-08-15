@@ -43,7 +43,7 @@ namespace NPC
             var ui = FindObjectOfType<ShopSystem.ShopUI>();
             if (ui != null)
             {
-                ui.Open(shop);
+                ui.Open(shop, GetComponent<NpcRandomMovement>());
             }
         }
 
