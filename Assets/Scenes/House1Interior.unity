@@ -936,6 +936,7 @@ MonoBehaviour:
   sceneToLoad: OverWorld
   requiredItemId: 
   spawnPointName: House1
+  useRadius: 2
 --- !u!61 &413998900
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1023,8 +1024,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 826101265
-  m_SortingLayer: -4
+  m_SortingLayerID: 150374869
+  m_SortingLayer: -6
   m_SortingOrder: 2
   m_Sprite: {fileID: 4891934378223028482, guid: fc4249f80ec32dc4c8ca155752a0ea58, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1127,7 +1128,7 @@ TilemapRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 150374869
-  m_SortingLayer: -5
+  m_SortingLayer: -6
   m_SortingOrder: 1
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}

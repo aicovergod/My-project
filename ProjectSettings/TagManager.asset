@@ -47,6 +47,9 @@ TagManager:
   - name: Props
     uniqueID: 826101265
     locked: 0
+  - name: Interactable
+    uniqueID: 2185824803
+    locked: 0
   - name: Characters
     uniqueID: 2202900243
     locked: 0
