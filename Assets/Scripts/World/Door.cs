@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
@@ -21,16 +22,24 @@ namespace World
         [Tooltip("Name of the spawn point in the target scene where the player should appear.")]
         public string spawnPointName;
 
+        [Tooltip("How close the player must be in tiles to use the door.")]
+        public float useRadius = 2f;
+
         private static string nextSpawnPoint;
         private static Transform playerToMove;
         private static GameObject cameraToMove;
         private static GameObject inventoryUIToMove;
         private static GameObject eventSystemToMove;
 
-        private void OnMouseDown()
+        private void OnMouseDown() => StartCoroutine(UseDoor());
+
+        private IEnumerator UseDoor()
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
-            if (player == null) return;
+            if (player == null) yield break;
+
+            if (Vector2.Distance(player.transform.position, transform.position) > useRadius)
+                yield break;
 
             Inventory.Inventory inv = player.GetComponent<Inventory.Inventory>();
             if (!string.IsNullOrEmpty(requiredItemId))
@@ -38,12 +47,18 @@ namespace World
                 if (inv == null || !inv.HasItem(requiredItemId))
                 {
                     // Player doesn't have the required item
-                    return;
+                    yield break;
                 }
             }
 
             if (!string.IsNullOrEmpty(sceneToLoad))
             {
+                if (ScreenFader.Instance == null)
+                    new GameObject("ScreenFader").AddComponent<ScreenFader>();
+
+                if (ScreenFader.Instance != null)
+                    yield return ScreenFader.Instance.FadeOut();
+
                 nextSpawnPoint = spawnPointName;
                 playerToMove = player.transform;
                 DontDestroyOnLoad(player);
@@ -128,6 +143,9 @@ namespace World
             cameraToMove = null;
             inventoryUIToMove = null;
             eventSystemToMove = null;
+
+            if (ScreenFader.Instance != null)
+                ScreenFader.Instance.StartCoroutine(ScreenFader.Instance.FadeIn());
         }
     }
 }
