@@ -2,6 +2,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace Inventory
 {
@@ -135,6 +138,7 @@ namespace Inventory
             tooltip.transform.SetParent(uiRoot.transform, false);
             var bg = tooltip.GetComponent<Image>();
             bg.color = new Color(0f, 0f, 0f, 0.75f);
+            bg.raycastTarget = false;
 
             var textGO = new GameObject("Text", typeof(Text));
             textGO.transform.SetParent(tooltip.transform, false);
@@ -144,6 +148,7 @@ namespace Inventory
                 : Resources.GetBuiltinResource<Font>("Arial.ttf");
             tooltipText.alignment = TextAnchor.UpperLeft;
             tooltipText.color = Color.white;
+            tooltipText.raycastTarget = false;
 
             var tooltipRect = tooltip.GetComponent<RectTransform>();
             tooltipRect.pivot = new Vector2(0f, 1f);
@@ -246,12 +251,14 @@ namespace Inventory
 
         private void Update()
         {
-            // OLD INPUT MANAGER
-            if (Input.GetKeyDown(KeyCode.I))
-            {
-                if (uiRoot != null)
-                    uiRoot.SetActive(!uiRoot.activeSelf);
-            }
+#if ENABLE_INPUT_SYSTEM
+            bool toggle = Keyboard.current != null && Keyboard.current.iKey.wasPressedThisFrame;
+            toggle |= Input.GetKeyDown(KeyCode.I);
+#else
+            bool toggle = Input.GetKeyDown(KeyCode.I);
+#endif
+            if (toggle && uiRoot != null)
+                uiRoot.SetActive(!uiRoot.activeSelf);
         }
 
         /// <summary>
