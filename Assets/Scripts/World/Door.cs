@@ -64,6 +64,15 @@ namespace World
                 }
 
                 SceneManager.MoveGameObjectToScene(playerToMove.gameObject, scene);
+
+                var players = GameObject.FindGameObjectsWithTag("Player");
+                foreach (var p in players)
+                {
+                    if (p != playerToMove.gameObject)
+                    {
+                        Destroy(p);
+                    }
+                }
             }
 
             SceneManager.sceneLoaded -= OnSceneLoaded;
