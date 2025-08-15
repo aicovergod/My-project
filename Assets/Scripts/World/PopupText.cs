@@ -18,14 +18,30 @@ namespace World
         {
             if (target == null || string.IsNullOrEmpty(message)) return;
 
-            var go = new GameObject("PopupText");
-            go.transform.SetParent(target, false);
+            PopupText popup;
+            TextMeshPro tmp;
 
-            var popup = go.AddComponent<PopupText>();
+            if (PopupTextPool.Instance != null)
+            {
+                popup = PopupTextPool.Instance.Get();
+                tmp = popup.GetComponent<TextMeshPro>();
+            }
+            else
+            {
+                var goNew = new GameObject("PopupText");
+                popup = goNew.AddComponent<PopupText>();
+                tmp = goNew.AddComponent<TextMeshPro>();
+                tmp.alignment = TextAlignmentOptions.Center;
+                tmp.fontSize = 2f;
+            }
+
+            var go = popup.gameObject;
+            go.transform.SetParent(target, false);
+            go.SetActive(true);
+
             popup._life = duration;
             popup._offset = new Vector3(0f, 1f, 0f);
 
-            var tmp = go.AddComponent<TextMeshPro>();
             tmp.text = message;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.fontSize = 2f;
@@ -38,7 +54,12 @@ namespace World
 
             _life -= Time.deltaTime;
             if (_life <= 0f)
-                Destroy(gameObject);
+            {
+                if (PopupTextPool.Instance != null)
+                    PopupTextPool.Instance.Return(this);
+                else
+                    Destroy(gameObject);
+            }
         }
     }
 }
