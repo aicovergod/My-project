@@ -142,8 +142,7 @@ namespace Inventory
             tooltipText.font = tooltipFont != null
                 ? tooltipFont
                 : Resources.GetBuiltinResource<Font>("Arial.ttf");
-            tooltipText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            tooltipText.alignment = TextAnchor.MiddleLeft;
+            tooltipText.alignment = TextAnchor.UpperLeft;
             tooltipText.color = Color.white;
 
             var tooltipRect = tooltip.GetComponent<RectTransform>();
@@ -233,7 +232,8 @@ namespace Inventory
             var item = items[slotIndex];
             if (item == null || tooltip == null || tooltipText == null) return;
 
-            tooltipText.text = item.description;
+            string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
+            tooltipText.text = $"{name}\n{item.description}";
             tooltip.SetActive(true);
             tooltip.transform.position = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
         }

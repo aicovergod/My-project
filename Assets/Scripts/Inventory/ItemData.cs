@@ -12,6 +12,7 @@ public class ItemData : ScriptableObject
     public string id;
 
     [Header("Display")]
+    public string itemName;
     public Sprite icon;
 
     [Header("Description")]
