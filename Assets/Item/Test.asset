@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Test
   icon: {fileID: -65191694924727605, guid: d74d7c2b131bc3e4fa02a0f3861e3295, type: 3}
+  description: This is a test
