@@ -55,6 +55,10 @@ namespace Inventory
         // UI
         private GameObject uiRoot; // Canvas root
 
+        // Drag & drop
+        private int draggingIndex = -1;
+        private GameObject draggingIcon;
+
         private void Awake()
         {
             items = new ItemData[size];
@@ -190,6 +194,29 @@ namespace Inventory
             tooltip.SetActive(false);
         }
 
+        private void UpdateSlotVisual(int index)
+        {
+            if (slotImages == null || index < 0 || index >= slotImages.Length || slotImages[index] == null)
+                return;
+
+            var item = items[index];
+            if (item != null)
+            {
+                slotImages[index].sprite = item.icon ? item.icon : slotFrameSprite;
+                slotImages[index].type = (slotImages[index].sprite == slotFrameSprite && slotFrameSprite != null)
+                    ? Image.Type.Sliced : Image.Type.Simple;
+                slotImages[index].color = Color.white;
+                slotImages[index].enabled = true;
+            }
+            else
+            {
+                slotImages[index].sprite = slotFrameSprite;
+                slotImages[index].type = (slotFrameSprite != null) ? Image.Type.Sliced : Image.Type.Simple;
+                slotImages[index].color = emptySlotColor;
+                slotImages[index].enabled = true;
+            }
+        }
+
         /// <summary>
         /// Adds an item to the first empty slot. Returns true if added.
         /// </summary>
@@ -200,16 +227,7 @@ namespace Inventory
                 if (items[i] == null)
                 {
                     items[i] = item;
-
-                    if (slotImages != null && i < slotImages.Length && slotImages[i] != null)
-                    {
-                        // Put the item icon on top of the slot look by replacing/tinting
-                        slotImages[i].sprite = item.icon ? item.icon : slotFrameSprite;
-                        slotImages[i].type = (slotImages[i].sprite == slotFrameSprite && slotFrameSprite != null)
-                            ? Image.Type.Sliced : Image.Type.Simple;
-                        slotImages[i].color = Color.white; // show item icon as-is
-                        slotImages[i].enabled = true;
-                    }
+                    UpdateSlotVisual(i);
 
                     return true;
                 }
@@ -242,14 +260,7 @@ namespace Inventory
                 if (items[i] != null && items[i].id == id)
                 {
                     items[i] = null;
-
-                    if (slotImages != null && i < slotImages.Length && slotImages[i] != null)
-                    {
-                        slotImages[i].sprite = slotFrameSprite;
-                        slotImages[i].type = (slotFrameSprite != null) ? Image.Type.Sliced : Image.Type.Simple;
-                        slotImages[i].color = emptySlotColor;
-                        slotImages[i].enabled = true;
-                    }
+                    UpdateSlotVisual(i);
 
                     return true;
                 }
@@ -279,6 +290,70 @@ namespace Inventory
         {
             if (tooltip != null)
                 tooltip.SetActive(false);
+        }
+
+        public void BeginDrag(int slotIndex)
+        {
+            if (slotIndex < 0 || slotIndex >= items.Length) return;
+            var item = items[slotIndex];
+            if (item == null) return;
+
+            HideTooltip();
+            draggingIndex = slotIndex;
+
+            draggingIcon = new GameObject("DraggingIcon", typeof(Image));
+            draggingIcon.transform.SetParent(uiRoot.transform, false);
+            var img = draggingIcon.GetComponent<Image>();
+            img.raycastTarget = false;
+            img.sprite = item.icon ? item.icon : slotFrameSprite;
+            img.color = Color.white;
+            var rect = draggingIcon.GetComponent<RectTransform>();
+            rect.sizeDelta = slotSize;
+
+            if (slotImages != null && slotIndex < slotImages.Length && slotImages[slotIndex] != null)
+                slotImages[slotIndex].enabled = false;
+        }
+
+        public void Drag(PointerEventData eventData)
+        {
+            if (draggingIcon != null)
+                draggingIcon.transform.position = eventData.position;
+        }
+
+        public void Drop(int slotIndex)
+        {
+            if (draggingIndex == -1)
+            {
+                EndDrag();
+                return;
+            }
+
+            if (slotIndex >= 0 && slotIndex < items.Length)
+            {
+                if (slotIndex != draggingIndex)
+                {
+                    var temp = items[slotIndex];
+                    items[slotIndex] = items[draggingIndex];
+                    items[draggingIndex] = temp;
+                    UpdateSlotVisual(slotIndex);
+                }
+
+                UpdateSlotVisual(draggingIndex);
+            }
+
+            EndDrag();
+        }
+
+        public void EndDrag()
+        {
+            if (draggingIndex != -1)
+                UpdateSlotVisual(draggingIndex);
+
+            if (draggingIcon != null)
+                Destroy(draggingIcon);
+
+            draggingIcon = null;
+            draggingIndex = -1;
         }
 
         private void Update()
