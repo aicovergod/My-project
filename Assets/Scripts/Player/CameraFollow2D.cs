@@ -27,7 +27,12 @@ namespace Player
 
         void LateUpdate()
         {
-            if (!target) return;
+            if (!target)
+            {
+                var playerObj = GameObject.FindGameObjectWithTag("Player");
+                if (playerObj) target = playerObj.transform;
+                else return;
+            }
 
             // desired position (keep current Z)
             Vector3 desired = new Vector3(
