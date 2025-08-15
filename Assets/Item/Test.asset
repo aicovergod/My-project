@@ -13,5 +13,15 @@ MonoBehaviour:
   m_Name: Test
   m_EditorClassIdentifier: 
   id: Test
+  itemName: testing
   icon: {fileID: -65191694924727605, guid: d74d7c2b131bc3e4fa02a0f3861e3295, type: 3}
-  description: This is a test
+  description: 'This is a test
+
+    This is a test
+
+    This is a test
+
+    This
+    is a test'
+  stackable: 1
+  maxStack: 9
