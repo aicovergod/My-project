@@ -35,6 +35,9 @@ namespace Inventory
         private Image[] slotImages;
         private ItemData[] items;
 
+        private GameObject tooltip;
+        private Text tooltipText;
+
         // UI
         private GameObject uiRoot; // Canvas root
 
@@ -115,8 +118,37 @@ namespace Inventory
                 // IMPORTANT: keep enabled so you can see the empty slot
                 img.enabled = true;
 
+                // Add hover handler
+                var slotComponent = slot.AddComponent<InventorySlot>();
+                slotComponent.inventory = this;
+                slotComponent.index = i;
+
                 slotImages[i] = img;
             }
+
+            // Tooltip setup
+            tooltip = new GameObject("Tooltip", typeof(Image));
+            tooltip.transform.SetParent(uiRoot.transform, false);
+            var bg = tooltip.GetComponent<Image>();
+            bg.color = new Color(0f, 0f, 0f, 0.75f);
+
+            var textGO = new GameObject("Text", typeof(Text));
+            textGO.transform.SetParent(tooltip.transform, false);
+            tooltipText = textGO.GetComponent<Text>();
+            tooltipText.alignment = TextAnchor.MiddleLeft;
+            tooltipText.color = Color.white;
+
+            var tooltipRect = tooltip.GetComponent<RectTransform>();
+            tooltipRect.pivot = new Vector2(0f, 1f);
+            tooltipRect.sizeDelta = new Vector2(160f, 40f);
+
+            var textRect = tooltipText.GetComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = new Vector2(4f, 4f);
+            textRect.offsetMax = new Vector2(-4f, -4f);
+
+            tooltip.SetActive(false);
         }
 
         /// <summary>
@@ -185,6 +217,23 @@ namespace Inventory
             }
 
             return false;
+        }
+
+        public void ShowTooltip(int slotIndex, RectTransform slotRect)
+        {
+            if (slotIndex < 0 || slotIndex >= items.Length) return;
+            var item = items[slotIndex];
+            if (item == null || tooltip == null || tooltipText == null) return;
+
+            tooltipText.text = item.description;
+            tooltip.SetActive(true);
+            tooltip.transform.position = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
+        }
+
+        public void HideTooltip()
+        {
+            if (tooltip != null)
+                tooltip.SetActive(false);
         }
 
         private void Update()
