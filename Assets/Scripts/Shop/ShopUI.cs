@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Inventory;
 using Player;
+using NPC;
 
 namespace ShopSystem
 {
@@ -37,6 +38,7 @@ namespace ShopSystem
         private Text[] slotPriceTexts;
         private Shop currentShop;
         private PlayerMover playerMover;
+        private NpcRandomMovement npcMover;
 
         private void Awake()
         {
@@ -46,9 +48,9 @@ namespace ShopSystem
         }
 
         /// <summary>
-        /// Opens the UI for the given shop.
+        /// Opens the UI for the given shop and optionally pauses an NPC's movement.
         /// </summary>
-        public void Open(Shop shop)
+        public void Open(Shop shop, NpcRandomMovement npcMovement = null)
         {
             if (shop == null) return;
             currentShop = shop;
@@ -58,6 +60,9 @@ namespace ShopSystem
                 playerMover = FindObjectOfType<PlayerMover>();
             if (playerMover != null)
                 playerMover.enabled = false;
+            npcMover = npcMovement;
+            if (npcMover != null)
+                npcMover.enabled = false;
         }
 
         /// <summary>
@@ -69,6 +74,11 @@ namespace ShopSystem
             currentShop = null;
             if (playerMover != null)
                 playerMover.enabled = true;
+            if (npcMover != null)
+            {
+                npcMover.enabled = true;
+                npcMover = null;
+            }
         }
 
         /// <summary>
