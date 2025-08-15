@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 namespace World
 {
@@ -22,6 +23,9 @@ namespace World
 
         private static string nextSpawnPoint;
         private static Transform playerToMove;
+        private static GameObject cameraToMove;
+        private static GameObject inventoryUIToMove;
+        private static GameObject eventSystemToMove;
 
         private void OnMouseDown()
         {
@@ -44,6 +48,17 @@ namespace World
                 playerToMove = player.transform;
                 DontDestroyOnLoad(player);
 
+                var cam = Camera.main;
+                cameraToMove = cam ? cam.gameObject : null;
+                if (cameraToMove) DontDestroyOnLoad(cameraToMove);
+
+                inventoryUIToMove = GameObject.Find("InventoryUI");
+                if (inventoryUIToMove) DontDestroyOnLoad(inventoryUIToMove);
+
+                var ev = EventSystem.current;
+                eventSystemToMove = ev ? ev.gameObject : null;
+                if (eventSystemToMove) DontDestroyOnLoad(eventSystemToMove);
+
                 SceneManager.sceneLoaded += OnSceneLoaded;
                 SceneManager.LoadScene(sceneToLoad);
             }
@@ -64,7 +79,6 @@ namespace World
                 }
 
                 SceneManager.MoveGameObjectToScene(playerToMove.gameObject, scene);
-
                 var players = GameObject.FindGameObjectsWithTag("Player");
                 foreach (var p in players)
                 {
@@ -75,9 +89,45 @@ namespace World
                 }
             }
 
+            if (cameraToMove != null)
+            {
+                SceneManager.MoveGameObjectToScene(cameraToMove, scene);
+                var cameras = GameObject.FindObjectsOfType<Camera>();
+                foreach (var c in cameras)
+                {
+                    if (c.gameObject != cameraToMove)
+                        Destroy(c.gameObject);
+                }
+            }
+
+            if (inventoryUIToMove != null)
+            {
+                SceneManager.MoveGameObjectToScene(inventoryUIToMove, scene);
+                var canvases = GameObject.FindObjectsOfType<Canvas>();
+                foreach (var cv in canvases)
+                {
+                    if (cv.gameObject != inventoryUIToMove && cv.gameObject.name == inventoryUIToMove.name)
+                        Destroy(cv.gameObject);
+                }
+            }
+
+            if (eventSystemToMove != null)
+            {
+                SceneManager.MoveGameObjectToScene(eventSystemToMove, scene);
+                var systems = GameObject.FindObjectsOfType<EventSystem>();
+                foreach (var es in systems)
+                {
+                    if (es.gameObject != eventSystemToMove)
+                        Destroy(es.gameObject);
+                }
+            }
+
             SceneManager.sceneLoaded -= OnSceneLoaded;
             playerToMove = null;
             nextSpawnPoint = null;
+            cameraToMove = null;
+            inventoryUIToMove = null;
+            eventSystemToMove = null;
         }
     }
 }
