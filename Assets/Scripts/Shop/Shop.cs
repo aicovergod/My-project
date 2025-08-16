@@ -103,18 +103,17 @@ namespace ShopSystem
             // Ensure player has enough currency and room for the item.
             if (playerInventory.GetItemCount(currency) < entry.price)
                 return false;
-            if (!playerInventory.CanAddItem(entry.item))
+            if (!playerInventory.CanAddItem(entry.item, 1))
                 return false;
 
             if (!playerInventory.RemoveItem(currency, entry.price))
                 return false;
 
-            if (!playerInventory.AddItem(entry.item))
+            if (!playerInventory.AddItem(entry.item, 1))
             {
                 // Should not happen because we checked CanAddItem, but just in case
                 // refund the currency.
-                for (int i = 0; i < entry.price; i++)
-                    playerInventory.AddItem(currency);
+                playerInventory.AddItem(currency, entry.price);
                 return false;
             }
 
@@ -176,17 +175,13 @@ namespace ShopSystem
             // Ensure player actually has the item and space for the currency payout.
             if (playerInventory.GetItemCount(item) <= 0)
                 return false;
-            for (int i = 0; i < config.playerSellPrice; i++)
-            {
-                if (!playerInventory.CanAddItem(currency))
-                    return false;
-            }
+            if (!playerInventory.CanAddItem(currency, config.playerSellPrice))
+                return false;
 
             if (!playerInventory.RemoveItem(item, 1))
                 return false;
 
-            for (int i = 0; i < config.playerSellPrice; i++)
-                playerInventory.AddItem(currency);
+            playerInventory.AddItem(currency, config.playerSellPrice);
 
             // Insert or update stock entry
             var entry = stock[slotIndex];
