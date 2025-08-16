@@ -102,6 +102,13 @@ namespace Skills.Mining
             if (!IsMining)
                 return;
 
+            // Stop immediately if the current rock has already been depleted
+            if (currentRock == null || currentRock.IsDepleted)
+            {
+                StopMining();
+                return;
+            }
+
             swingProgress++;
             Debug.Log($"Mining tick: {swingProgress}/{currentPickaxe.SwingSpeedTicks}");
             if (swingProgress >= currentPickaxe.SwingSpeedTicks)
