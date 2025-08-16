@@ -52,7 +52,12 @@ namespace Inventory
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (eventData.button == PointerEventData.InputButton.Right)
+            if (eventData.button == PointerEventData.InputButton.Left)
+            {
+                if (!eventData.dragging)
+                    inventory?.SellItem(index);
+            }
+            else if (eventData.button == PointerEventData.InputButton.Right)
             {
                 inventory?.DropItem(index);
             }

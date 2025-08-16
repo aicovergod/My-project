@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
+using ShopSystem;
 
 namespace Inventory
 {
@@ -58,6 +59,10 @@ namespace Inventory
         private GameObject tooltip;
         private Text tooltipNameText;
         private Text tooltipDescriptionText;
+
+        // Active shop context when interacting with a shop
+        private Shop currentShop;
+        private ShopUI currentShopUI;
 
         // UI
         private GameObject uiRoot; // Canvas root
@@ -456,6 +461,18 @@ namespace Inventory
             var item = items[slotIndex].item;
             if (item == null || tooltip == null || tooltipNameText == null || tooltipDescriptionText == null) return;
 
+            if (currentShop != null && currentShop.TryGetSellPrice(item, out int sellPrice))
+            {
+                string currencyName = currentShop.currency != null ? currentShop.currency.itemName : "Coins";
+                tooltipNameText.text = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
+                tooltipDescriptionText.text = $"Sell for {sellPrice} {currencyName}";
+                var tooltipRectSell = tooltip.GetComponent<RectTransform>();
+                LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRectSell);
+                tooltip.transform.position = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
+                tooltip.SetActive(true);
+                return;
+            }
+
             string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
             tooltipNameText.text = name;
             tooltipDescriptionText.text = item.description;
@@ -471,6 +488,34 @@ namespace Inventory
         {
             if (tooltip != null)
                 tooltip.SetActive(false);
+        }
+
+        /// <summary>
+        /// Attempts to sell the item at the given slot index to the current shop.
+        /// </summary>
+        public void SellItem(int slotIndex)
+        {
+            if (currentShop == null)
+                return;
+            if (slotIndex < 0 || slotIndex >= items.Length)
+                return;
+            var item = items[slotIndex].item;
+            if (item == null)
+                return;
+            if (currentShop.Sell(item, this))
+            {
+                HideTooltip();
+                currentShopUI?.Refresh();
+            }
+        }
+
+        /// <summary>
+        /// Sets the active shop context used for selling and tooltip information.
+        /// </summary>
+        public void SetShopContext(Shop shop, ShopUI ui)
+        {
+            currentShop = shop;
+            currentShopUI = ui;
         }
 
         public void BeginDrag(int slotIndex)
