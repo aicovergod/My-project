@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Util;
 
 namespace Skills.Mining
 {
@@ -13,6 +14,11 @@ namespace Skills.Mining
         private Image progressImage;
         private GameObject progressRoot;
         private readonly Vector3 offset = new Vector3(0f, 1.5f, 0f);
+
+        private float currentFill;
+        private float nextFill;
+        private float tickTimer;
+        private float step;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreateInstance()
@@ -50,6 +56,8 @@ namespace Skills.Mining
             bg.transform.SetParent(progressRoot.transform, false);
             var bgImage = bg.AddComponent<Image>();
             bgImage.color = new Color(0f, 0f, 0f, 0.5f);
+            var bgSprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
+            bgImage.sprite = bgSprite;
             var bgRect = bgImage.rectTransform;
             bgRect.sizeDelta = new Vector2(150f, 25f);
 
@@ -57,8 +65,10 @@ namespace Skills.Mining
             fill.transform.SetParent(bg.transform, false);
             progressImage = fill.AddComponent<Image>();
             progressImage.color = Color.green;
+            progressImage.sprite = bgSprite;
             progressImage.type = Image.Type.Filled;
             progressImage.fillMethod = Image.FillMethod.Horizontal;
+            progressImage.fillAmount = 0f;
             var fillRect = progressImage.rectTransform;
             fillRect.anchorMin = Vector2.zero;
             fillRect.anchorMax = Vector2.one;
@@ -72,13 +82,21 @@ namespace Skills.Mining
         {
             target = rock.transform;
             progressImage.fillAmount = 0f;
+            currentFill = 0f;
+            tickTimer = 0f;
+            step = skill.CurrentSwingSpeedTicks > 0 ? 1f / skill.CurrentSwingSpeedTicks : 0f;
+            nextFill = step;
             progressRoot.SetActive(true);
+            if (Ticker.Instance != null)
+                Ticker.Instance.OnTick += HandleTick;
         }
 
         private void HandleStop()
         {
             target = null;
             progressRoot.SetActive(false);
+            if (Ticker.Instance != null)
+                Ticker.Instance.OnTick -= HandleTick;
         }
 
         private void Update()
@@ -87,7 +105,29 @@ namespace Skills.Mining
                 return;
 
             progressRoot.transform.position = target.position + offset;
-            progressImage.fillAmount = skill.SwingProgressNormalized;
+
+            tickTimer += Time.deltaTime;
+            float t = Mathf.Clamp01(tickTimer / Ticker.TickDuration);
+            progressImage.fillAmount = Mathf.Lerp(currentFill, nextFill, t);
+        }
+
+        private void HandleTick()
+        {
+            if (target == null || skill == null || !skill.IsMining)
+                return;
+
+            tickTimer = 0f;
+            currentFill = nextFill;
+
+            if (currentFill >= 1f - step)
+            {
+                currentFill = 0f;
+                nextFill = step;
+            }
+            else
+            {
+                nextFill = Mathf.Min(1f, currentFill + step);
+            }
         }
 
         private void OnDestroy()
