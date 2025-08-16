@@ -8,52 +8,77 @@ namespace Skills.Mining
     /// </summary>
     public class MiningUI : MonoBehaviour
     {
-        [SerializeField] private MiningSkill skill;
-        [SerializeField] private Image progressPrefab;
-        [SerializeField] private Vector3 offset = new Vector3(0f, 1.5f, 0f);
-
+        private MiningSkill skill;
         private Transform target;
         private Image progressImage;
+        private GameObject progressRoot;
+        private readonly Vector3 offset = new Vector3(0f, 1.5f, 0f);
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void CreateInstance()
+        {
+            var go = new GameObject("MiningUI");
+            DontDestroyOnLoad(go);
+            go.AddComponent<MiningUI>();
+        }
 
         private void Awake()
         {
-            if (skill == null)
-                skill = FindObjectOfType<MiningSkill>();
+            skill = FindObjectOfType<MiningSkill>();
 
             if (skill != null)
             {
                 skill.OnStartMining += HandleStart;
                 skill.OnStopMining += HandleStop;
             }
+
+            CreateProgressBar();
+        }
+
+        private void CreateProgressBar()
+        {
+            progressRoot = new GameObject("MiningProgress");
+            progressRoot.transform.SetParent(transform);
+
+            var canvas = progressRoot.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.WorldSpace;
+            progressRoot.AddComponent<CanvasScaler>();
+            progressRoot.AddComponent<GraphicRaycaster>();
+            progressRoot.transform.localScale = Vector3.one * 0.01f;
+
+            var bg = new GameObject("Background");
+            bg.transform.SetParent(progressRoot.transform, false);
+            var bgImage = bg.AddComponent<Image>();
+            bgImage.color = new Color(0f, 0f, 0f, 0.5f);
+            var bgRect = bgImage.rectTransform;
+            bgRect.sizeDelta = new Vector2(150f, 25f);
+
+            var fill = new GameObject("Fill");
+            fill.transform.SetParent(bg.transform, false);
+            progressImage = fill.AddComponent<Image>();
+            progressImage.color = Color.green;
+            progressImage.type = Image.Type.Filled;
+            progressImage.fillMethod = Image.FillMethod.Horizontal;
+            var fillRect = progressImage.rectTransform;
+            fillRect.anchorMin = Vector2.zero;
+            fillRect.anchorMax = Vector2.one;
+            fillRect.offsetMin = Vector2.zero;
+            fillRect.offsetMax = Vector2.zero;
+
+            progressRoot.SetActive(false);
         }
 
         private void HandleStart(MineableRock rock)
         {
             target = rock.transform;
-
-            // Lazy instantiate the progress UI if needed.
-            if (progressImage == null && progressPrefab != null)
-            {
-                progressImage = Instantiate(progressPrefab, transform);
-                progressImage.transform.parent.gameObject.SetActive(false);
-            }
-
-            if (progressImage != null)
-            {
-                progressImage.fillAmount = 0f;
-                progressImage.transform.parent.gameObject.SetActive(true);
-            }
-            else
-            {
-                Debug.LogWarning("MiningUI progress prefab not assigned.");
-            }
+            progressImage.fillAmount = 0f;
+            progressRoot.SetActive(true);
         }
 
         private void HandleStop()
         {
             target = null;
-            if (progressImage != null)
-                progressImage.transform.parent.gameObject.SetActive(false);
+            progressRoot.SetActive(false);
         }
 
         private void Update()
@@ -61,7 +86,7 @@ namespace Skills.Mining
             if (target == null || progressImage == null || skill == null)
                 return;
 
-            progressImage.transform.position = target.position + offset;
+            progressRoot.transform.position = target.position + offset;
             progressImage.fillAmount = skill.SwingProgressNormalized;
         }
 
