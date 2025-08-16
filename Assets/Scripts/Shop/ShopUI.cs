@@ -269,7 +269,8 @@ namespace ShopSystem
                         img.sprite = entry.item.icon != null ? entry.item.icon : slotFrameSprite;
                         img.color = Color.white;
                         img.enabled = true;
-                        price.text = $"{entry.price} ({entry.quantity})";
+                        // Display only the quantity in the slot, not the price
+                        price.text = $"({entry.quantity})";
                         continue;
                     }
                 }
