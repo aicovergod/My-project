@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
+  m_Name: Steel Pickaxe
+  m_EditorClassIdentifier: 
+  id: Steel Pickaxe
+  itemName: Steel Pickaxe
+  icon: {fileID: 3498688785736947817, guid: 8b65b40182f0c5c44a1117a276b3beb6, type: 3}
+  description: 'A pickaxe, for mining ore
+
+    rocks'
+  stackable: 0
+  maxStack: 0
