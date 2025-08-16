@@ -34,6 +34,7 @@ namespace ShopSystem
         public Inventory.Inventory playerInventory;
 
         private GameObject uiRoot;
+        private static GameObject sharedUIRoot;
         private Image[] slotImages;
         private Text[] slotPriceTexts;
         private Text tooltipText;
@@ -54,9 +55,24 @@ namespace ShopSystem
             }
 
             instance = this;
-            CreateUI();
+
+            if (sharedUIRoot != null)
+            {
+                uiRoot = sharedUIRoot;
+            }
+            else
+            {
+                CreateUI();
+                sharedUIRoot = uiRoot;
+            }
             if (uiRoot != null)
                 uiRoot.SetActive(false);
+        }
+
+        private void OnDestroy()
+        {
+            if (instance == this)
+                instance = null;
         }
 
         /// <summary>
