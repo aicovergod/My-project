@@ -9,10 +9,11 @@ namespace Skills.Mining
     public class MiningUI : MonoBehaviour
     {
         [SerializeField] private MiningSkill skill;
-        [SerializeField] private Image progressImage;
+        [SerializeField] private Image progressPrefab;
         [SerializeField] private Vector3 offset = new Vector3(0f, 1.5f, 0f);
 
         private Transform target;
+        private Image progressImage;
 
         private void Awake()
         {
@@ -24,21 +25,28 @@ namespace Skills.Mining
                 skill.OnStartMining += HandleStart;
                 skill.OnStopMining += HandleStop;
             }
-            if (progressImage != null)
-            {
-                progressImage.transform.parent.gameObject.SetActive(false);
-            }
-            else
-            {
-                Debug.LogWarning("MiningUI progress image not assigned.");
-            }
         }
 
         private void HandleStart(MineableRock rock)
         {
             target = rock.transform;
+
+            // Lazy instantiate the progress UI if needed.
+            if (progressImage == null && progressPrefab != null)
+            {
+                progressImage = Instantiate(progressPrefab, transform);
+                progressImage.transform.parent.gameObject.SetActive(false);
+            }
+
             if (progressImage != null)
+            {
+                progressImage.fillAmount = 0f;
                 progressImage.transform.parent.gameObject.SetActive(true);
+            }
+            else
+            {
+                Debug.LogWarning("MiningUI progress prefab not assigned.");
+            }
         }
 
         private void HandleStop()
