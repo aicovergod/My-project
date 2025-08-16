@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Inventory;
 
@@ -26,6 +27,18 @@ namespace ShopSystem
     public class Shop : MonoBehaviour
     {
         public const int MaxSlots = 30;
+
+        /// <summary>
+        /// Fired after a player successfully buys an item from this shop.
+        /// Gameplay scripts can subscribe for quests, analytics, etc.
+        /// </summary>
+        public event Action<ShopItem> OnItemBought;
+
+        /// <summary>
+        /// Fired after a player successfully sells an item to this shop.
+        /// Gameplay scripts can subscribe for quests, analytics, etc.
+        /// </summary>
+        public event Action<ShopItem> OnItemSold;
 
         [Header("Info")]
         public string shopName;
@@ -73,7 +86,8 @@ namespace ShopSystem
 
         /// <summary>
         /// Attempts to buy the item at the given slot index using the provided
-        /// player inventory.  Returns true if the purchase succeeds.
+        /// player inventory.  Returns true if the purchase succeeds and raises
+        /// <see cref="OnItemBought"/>.
         /// </summary>
         public bool Buy(int slotIndex, Inventory.Inventory playerInventory)
         {
@@ -117,12 +131,23 @@ namespace ShopSystem
                 stock[slotIndex] = entry;
             }
 
+            // Notify listeners that an item was purchased.
+            OnItemBought?.Invoke(new ShopItem
+            {
+                item = entry.item,
+                price = entry.price,
+                quantity = 1,
+                playerSell = entry.playerSell,
+                playerSellPrice = entry.playerSellPrice
+            });
+
             return true;
         }
 
         /// <summary>
         /// Attempts to buy an item from the player and add it to the shop's stock.
-        /// The player receives currency equal to the configured sell price.
+        /// The player receives currency equal to the configured sell price. On
+        /// success <see cref="OnItemSold"/> is invoked.
         /// </summary>
         public bool Sell(ItemData item, Inventory.Inventory playerInventory)
         {
@@ -175,6 +200,16 @@ namespace ShopSystem
 
             if (restockTimers != null && slotIndex < restockTimers.Length)
                 restockTimers[slotIndex] = 0f;
+
+            // Notify listeners that an item was sold to the shop.
+            OnItemSold?.Invoke(new ShopItem
+            {
+                item = config.item,
+                price = config.playerSellPrice,
+                quantity = 1,
+                playerSell = config.playerSell,
+                playerSellPrice = config.playerSellPrice
+            });
 
             return true;
         }
