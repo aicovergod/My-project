@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using ShopSystem;
 
 namespace NPC
@@ -11,6 +12,7 @@ namespace NPC
     {
         [Tooltip("Optional shop component for this NPC.")]
         public Shop shop;
+
         [Tooltip("Context menu prefab that provides Talk / Open Shop / Examine.")]
         public RightClickMenu menuPrefab;
 
@@ -23,11 +25,18 @@ namespace NPC
                 if (menuInstance == null)
                 {
                     var canvas = FindObjectOfType<Canvas>();
-                    if (canvas != null)
-                        menuInstance = Instantiate(menuPrefab, canvas.transform);
-                    else
-                        menuInstance = Instantiate(menuPrefab);
+                    if (canvas == null)
+                    {
+                        var canvasGO = new GameObject("ContextMenuCanvas", typeof(Canvas), typeof(CanvasScaler),
+                            typeof(GraphicRaycaster));
+                        var c = canvasGO.GetComponent<Canvas>();
+                        c.renderMode = RenderMode.ScreenSpaceOverlay;
+                        canvas = c;
+                    }
+
+                    menuInstance = Instantiate(menuPrefab, canvas.transform);
                 }
+
                 menuInstance.Show(this, Input.mousePosition);
             }
         }
