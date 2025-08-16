@@ -22,3 +22,4 @@ MonoBehaviour:
     gods'
   stackable: 1
   maxStack: 2147483647
+  splittable: 0

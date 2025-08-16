@@ -25,4 +25,7 @@ public class ItemData : ScriptableObject
 
     [Tooltip("Maximum number of items per stack when stackable.")]
     public int maxStack = 1;
+
+    [Tooltip("If true, stacks of this item can be split in the inventory.")]
+    public bool splittable = true;
 }
