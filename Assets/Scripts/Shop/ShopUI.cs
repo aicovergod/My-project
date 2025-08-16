@@ -55,6 +55,7 @@ namespace ShopSystem
             }
 
             instance = this;
+            DontDestroyOnLoad(gameObject);
 
             if (sharedUIRoot != null)
             {
