@@ -25,6 +25,7 @@ namespace Util
             }
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            Debug.Log("Ticker initialized");
         }
 
         private void Update()
@@ -33,6 +34,7 @@ namespace Util
             if (timer >= TickDuration)
             {
                 timer -= TickDuration;
+                Debug.Log("Tick");
                 OnTick?.Invoke();
             }
         }
