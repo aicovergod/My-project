@@ -139,6 +139,9 @@ namespace Inventory
             // Start completely hidden (inactive object so it’s clear in Hierarchy)
             if (uiRoot != null)
                 uiRoot.SetActive(false);
+
+            // Restore any previously saved inventory state
+            Load();
         }
 
         /// <summary>
@@ -719,6 +722,82 @@ namespace Inventory
 
             draggingIcon = null;
             draggingIndex = -1;
+        }
+
+        [Serializable]
+        private class InventorySaveData
+        {
+            public SlotData[] slots;
+        }
+
+        [Serializable]
+        private class SlotData
+        {
+            public string id;
+            public int count;
+        }
+
+        private const string SaveKey = "InventoryData";
+
+        public void Save()
+        {
+            var data = new InventorySaveData
+            {
+                slots = new SlotData[size]
+            };
+
+            for (int i = 0; i < size; i++)
+            {
+                var entry = items[i];
+                data.slots[i] = new SlotData
+                {
+                    id = entry.item != null ? entry.item.id : string.Empty,
+                    count = entry.item != null ? entry.count : 0
+                };
+            }
+
+            string json = JsonUtility.ToJson(data);
+            PlayerPrefs.SetString(SaveKey, json);
+            PlayerPrefs.Save();
+        }
+
+        public void Load()
+        {
+            if (!PlayerPrefs.HasKey(SaveKey))
+                return;
+
+            string json = PlayerPrefs.GetString(SaveKey, string.Empty);
+            if (string.IsNullOrEmpty(json))
+                return;
+
+            var data = JsonUtility.FromJson<InventorySaveData>(json);
+            if (data?.slots == null)
+                return;
+
+            int len = Mathf.Min(size, data.slots.Length);
+            for (int i = 0; i < len; i++)
+            {
+                var slot = data.slots[i];
+                if (!string.IsNullOrEmpty(slot.id))
+                {
+                    var item = Resources.Load<ItemData>("Item/" + slot.id);
+                    items[i].item = item;
+                    items[i].count = slot.count;
+                }
+                else
+                {
+                    items[i].item = null;
+                    items[i].count = 0;
+                }
+                UpdateSlotVisual(i);
+            }
+
+            OnInventoryChanged?.Invoke();
+        }
+
+        private void OnApplicationQuit()
+        {
+            Save();
         }
 
         private void Update()
