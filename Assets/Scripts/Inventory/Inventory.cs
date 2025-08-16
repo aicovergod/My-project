@@ -16,6 +16,16 @@ namespace Inventory
     }
 
     /// <summary>
+    /// Indicates how a stack split action should be handled.
+    /// </summary>
+    public enum StackSplitType
+    {
+        Drop,
+        Sell,
+        Split
+    }
+
+    /// <summary>
     /// Runtime inventory UI generator (Screen Space Overlay) that toggles with the OLD
     /// Input Manager (Input.GetKeyDown). The UI is created at scene root, starts inactive,
     /// and shows always-visible slot squares. If a slotFrameSprite is provided, it is used
@@ -476,10 +486,44 @@ namespace Inventory
         }
 
         /// <summary>
-        /// Opens the stack split dialog for the specified slot. If <paramref name="sell"/>
-        /// is true the selected quantity will be sold, otherwise it will be dropped.
+        /// Splits a stack within the inventory, moving <paramref name="quantity"/>
+        /// items to a new slot if space is available.
         /// </summary>
-        public void PromptStackSplit(int slotIndex, bool sell)
+        public void SplitStack(int slotIndex, int quantity)
+        {
+            if (slotIndex < 0 || slotIndex >= items.Length) return;
+            var entry = items[slotIndex];
+            if (entry.item == null) return;
+
+            int amount = Mathf.Clamp(quantity, 1, entry.count - 1);
+            if (amount <= 0) return;
+
+            int target = -1;
+            for (int i = 0; i < items.Length; i++)
+            {
+                if (items[i].item == null)
+                {
+                    target = i;
+                    break;
+                }
+            }
+
+            if (target == -1) return; // no space
+
+            entry.count -= amount;
+            items[slotIndex] = entry;
+            items[target].item = entry.item;
+            items[target].count = amount;
+
+            UpdateSlotVisual(slotIndex);
+            UpdateSlotVisual(target);
+        }
+
+        /// <summary>
+        /// Opens the stack split dialog for the specified slot and performs the
+        /// desired action with the chosen amount.
+        /// </summary>
+        public void PromptStackSplit(int slotIndex, StackSplitType type)
         {
             if (slotIndex < 0 || slotIndex >= items.Length) return;
             var entry = items[slotIndex];
@@ -487,10 +531,21 @@ namespace Inventory
 
             StackSplitDialog.Show(uiRoot.transform, entry.count, amount =>
             {
-                if (sell)
-                    SellItem(slotIndex, amount);
-                else
-                    DropItem(slotIndex, amount);
+                switch (type)
+                {
+                    case StackSplitType.Sell:
+                        if (currentShop != null)
+                            SellItem(slotIndex, amount);
+                        else
+                            SplitStack(slotIndex, amount);
+                        break;
+                    case StackSplitType.Drop:
+                        DropItem(slotIndex, amount);
+                        break;
+                    case StackSplitType.Split:
+                        SplitStack(slotIndex, amount);
+                        break;
+                }
             });
         }
 
