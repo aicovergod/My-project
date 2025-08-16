@@ -45,10 +45,11 @@ namespace Skills.Mining
             level = xpTable != null ? xpTable.GetLevel(xp) : 1;
         }
 
+        private Coroutine tickerCoroutine;
+
         private void OnEnable()
         {
-            if (Ticker.Instance != null)
-                Ticker.Instance.OnTick += HandleTick;
+            TrySubscribeToTicker();
             StartCoroutine(SaveLoop());
         }
 
@@ -56,6 +57,29 @@ namespace Skills.Mining
         {
             if (Ticker.Instance != null)
                 Ticker.Instance.OnTick -= HandleTick;
+            if (tickerCoroutine != null)
+                StopCoroutine(tickerCoroutine);
+        }
+
+        private void TrySubscribeToTicker()
+        {
+            if (Ticker.Instance != null)
+            {
+                Ticker.Instance.OnTick += HandleTick;
+                Debug.Log("MiningSkill subscribed to ticker.");
+            }
+            else
+            {
+                tickerCoroutine = StartCoroutine(WaitForTicker());
+            }
+        }
+
+        private IEnumerator WaitForTicker()
+        {
+            while (Ticker.Instance == null)
+                yield return null;
+            Ticker.Instance.OnTick += HandleTick;
+            Debug.Log("MiningSkill subscribed to ticker after waiting.");
         }
 
         private IEnumerator SaveLoop()
@@ -78,6 +102,7 @@ namespace Skills.Mining
                 return;
 
             swingProgress++;
+            Debug.Log($"Mining tick: {swingProgress}/{currentPickaxe.SwingSpeedTicks}");
             if (swingProgress >= currentPickaxe.SwingSpeedTicks)
             {
                 swingProgress = 0;
@@ -124,6 +149,10 @@ namespace Skills.Mining
                 if (currentRock.IsDepleted)
                     StopMining();
             }
+            else
+            {
+                Debug.Log($"Failed to mine {currentRock.name}");
+            }
         }
 
         public void StartMining(MineableRock rock, PickaxeDefinition pickaxe)
@@ -134,6 +163,7 @@ namespace Skills.Mining
             currentRock = rock;
             currentPickaxe = pickaxe;
             swingProgress = 0;
+            Debug.Log($"Started mining {rock.name}");
             OnStartMining?.Invoke(rock);
         }
 
@@ -142,6 +172,7 @@ namespace Skills.Mining
             if (!IsMining)
                 return;
 
+            Debug.Log("Stopped mining");
             currentRock = null;
             currentPickaxe = null;
             swingProgress = 0;

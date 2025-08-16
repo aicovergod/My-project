@@ -24,9 +24,14 @@ namespace Skills.Mining
                 skill.OnStartMining += HandleStart;
                 skill.OnStopMining += HandleStop;
             }
-
             if (progressImage != null)
+            {
                 progressImage.transform.parent.gameObject.SetActive(false);
+            }
+            else
+            {
+                Debug.LogWarning("MiningUI progress image not assigned.");
+            }
         }
 
         private void HandleStart(MineableRock rock)
