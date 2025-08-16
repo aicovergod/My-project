@@ -11,6 +11,8 @@ namespace Inventory
     /// </summary>
     public class StackSplitDialog : MonoBehaviour
     {
+        private static StackSplitDialog instance;
+
         private InputField inputField;
         private Action<int> onConfirm;
         private int maxAmount;
@@ -20,12 +22,16 @@ namespace Inventory
         /// </summary>
         public static void Show(Transform parent, int max, Action<int> onConfirm)
         {
+            // Ensure only one dialog exists at a time
+            if (instance != null)
+                Destroy(instance.gameObject);
+
             var go = new GameObject("StackSplitDialog", typeof(Image), typeof(StackSplitDialog));
             go.transform.SetParent(parent, false);
-            var dialog = go.GetComponent<StackSplitDialog>();
-            dialog.onConfirm = onConfirm;
-            dialog.maxAmount = Mathf.Max(1, max);
-            dialog.BuildUI();
+            instance = go.GetComponent<StackSplitDialog>();
+            instance.onConfirm = onConfirm;
+            instance.maxAmount = Mathf.Max(1, max);
+            instance.BuildUI();
         }
 
         private void BuildUI()
@@ -50,7 +56,7 @@ namespace Inventory
             var textGO = new GameObject("Text", typeof(Text));
             textGO.transform.SetParent(fieldGO.transform, false);
             var text = textGO.GetComponent<Text>();
-            text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.alignment = TextAnchor.MiddleLeft;
             text.text = "1";
             text.color = Color.black;
@@ -68,8 +74,10 @@ namespace Inventory
             inputField.placeholder = placeholder;
             inputField.contentType = InputField.ContentType.IntegerNumber;
             inputField.text = "1";
+            inputField.Select();
+            inputField.ActivateInputField();
 
-            CreateButton("OK", new Vector2(0.1f, 0.1f), new Vector2(0.45f, 0.4f), Confirm);
+            CreateButton("Confirm", new Vector2(0.1f, 0.1f), new Vector2(0.45f, 0.4f), Confirm);
             CreateButton("Cancel", new Vector2(0.55f, 0.1f), new Vector2(0.9f, 0.4f), () => Destroy(gameObject));
         }
 
@@ -88,7 +96,7 @@ namespace Inventory
             var txtGO = new GameObject("Text", typeof(Text));
             txtGO.transform.SetParent(btnGO.transform, false);
             var txt = txtGO.GetComponent<Text>();
-            txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            txt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             txt.alignment = TextAnchor.MiddleCenter;
             txt.color = Color.black;
             txt.text = label;
@@ -105,6 +113,12 @@ namespace Inventory
             value = Mathf.Clamp(value, 1, maxAmount);
             onConfirm?.Invoke(value);
             Destroy(gameObject);
+        }
+
+        private void OnDestroy()
+        {
+            if (instance == this)
+                instance = null;
         }
     }
 }
