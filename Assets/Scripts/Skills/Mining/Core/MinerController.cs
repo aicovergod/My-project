@@ -1,5 +1,6 @@
 using UnityEngine;
 using Inventory;
+using Player;
 
 namespace Skills.Mining
 {
@@ -16,6 +17,7 @@ namespace Skills.Mining
         [Header("References")]
         [SerializeField] private MiningSkill miningSkill;
         [SerializeField] private PickaxeToUse pickaxeSelector;
+        [SerializeField] private PlayerMover playerMover;
 
         private MineableRock nearbyRock;
 
@@ -27,6 +29,8 @@ namespace Skills.Mining
                 miningSkill = GetComponent<MiningSkill>();
             if (pickaxeSelector == null)
                 pickaxeSelector = GetComponent<PickaxeToUse>();
+            if (playerMover == null)
+                playerMover = GetComponent<PlayerMover>();
             cam = Camera.main;
         }
 
@@ -53,7 +57,9 @@ namespace Skills.Mining
 
             if (miningSkill.IsMining)
             {
-                if (Vector3.Distance(transform.position, miningSkill.CurrentRock.transform.position) > cancelDistance)
+                if (playerMover != null && playerMover.IsMoving)
+                    miningSkill.StopMining();
+                else if (Vector3.Distance(transform.position, miningSkill.CurrentRock.transform.position) > cancelDistance)
                     miningSkill.StopMining();
             }
         }

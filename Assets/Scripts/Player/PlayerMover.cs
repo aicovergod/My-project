@@ -31,6 +31,8 @@ namespace Player
         private int facingDir = 0;
         private Vector2 moveDir;
 
+        public bool IsMoving => moveDir.sqrMagnitude > 0f;
+
 #if ENABLE_INPUT_SYSTEM
         private InputAction moveAction;
 #endif
