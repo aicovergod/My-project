@@ -79,6 +79,7 @@ namespace Inventory
 
         // UI
         private GameObject uiRoot; // Canvas root
+        private static GameObject sharedUIRoot;
 
         // Drag & drop
         private int draggingIndex = -1;
@@ -122,7 +123,16 @@ namespace Inventory
 
             items = new InventoryEntry[size];
             EnsureLegacyEventSystem();
-            CreateUI();
+
+            if (sharedUIRoot != null)
+            {
+                uiRoot = sharedUIRoot;
+            }
+            else
+            {
+                CreateUI();
+                sharedUIRoot = uiRoot;
+            }
 
             playerMover = GetComponent<PlayerMover>();
 
