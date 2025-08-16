@@ -101,6 +101,12 @@ namespace Skills.Mining
                 return;
             }
 
+            if (!miningSkill.CanAddOre(rock.RockDef.Ore))
+            {
+                FloatingText.Show("Your inventory is full", transform.position);
+                return;
+            }
+
             miningSkill.StartMining(rock, pickaxe);
         }
 
