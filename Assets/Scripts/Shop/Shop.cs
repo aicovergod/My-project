@@ -147,54 +147,76 @@ namespace ShopSystem
         /// Attempts to buy an item from the player and add it to the shop's stock.
         /// The player receives currency equal to the configured sell price. On
         /// success <see cref="OnItemSold"/> is invoked.
+        /// When the player's inventory is full, non-stackable items may be sold by
+        /// replacing the item's slot with the currency payout.
         /// </summary>
-        public bool Sell(ItemData item, Inventory.Inventory playerInventory)
+        public bool Sell(ItemData item, Inventory.Inventory playerInventory, int playerSlotIndex = -1)
         {
             if (item == null || playerInventory == null)
                 return false;
 
             // Find the slot matching this item from the initial stock so players
             // can sell even if the item is currently sold out.
-            int slotIndex = -1;
+            int stockIndex = -1;
             for (int i = 0; i < initialStock.Length; i++)
             {
                 if (initialStock[i].item == item)
                 {
-                    slotIndex = i;
+                    stockIndex = i;
                     break;
                 }
             }
 
-            if (slotIndex == -1)
+            if (stockIndex == -1)
                 return false; // shop doesn't buy this item
 
-            var config = initialStock[slotIndex];
+            var config = initialStock[stockIndex];
             if (!config.playerSell || config.playerSellPrice <= 0)
                 return false; // item not sellable to this shop
 
-            // Ensure player actually has the item and space for the currency payout.
             if (playerInventory.GetItemCount(item) <= 0)
                 return false;
+
+            bool usedReplacement = false;
+
+            // Check if the player can receive the currency normally. If not and the
+            // item is non-stackable, attempt to replace the sold item's slot with
+            // currency.
             if (!playerInventory.CanAddItem(currency, config.playerSellPrice))
-                return false;
+            {
+                if (playerSlotIndex >= 0 && !item.stackable && currency != null &&
+                    currency.stackable && config.playerSellPrice <= currency.maxStack)
+                {
+                    if (!playerInventory.ReplaceItem(playerSlotIndex, item, currency, config.playerSellPrice))
+                        return false;
+                    usedReplacement = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
 
-            if (!playerInventory.RemoveItem(item, 1))
-                return false;
+            if (!usedReplacement)
+            {
+                if (!playerInventory.RemoveItem(item, 1))
+                    return false;
 
-            playerInventory.AddItem(currency, config.playerSellPrice);
+                playerInventory.AddItem(currency, config.playerSellPrice);
+            }
 
             // Insert or update stock entry
-            var entry = stock[slotIndex];
+            var entry = stock[stockIndex];
             if (entry.item == null)
             {
                 entry = config;
                 entry.quantity = 0;
             }
             entry.quantity++;
-            stock[slotIndex] = entry;
+            stock[stockIndex] = entry;
 
-            if (restockTimers != null && slotIndex < restockTimers.Length)
-                restockTimers[slotIndex] = 0f;
+            if (restockTimers != null && stockIndex < restockTimers.Length)
+                restockTimers[stockIndex] = 0f;
 
             // Notify listeners that an item was sold to the shop.
             OnItemSold?.Invoke(new ShopItem
