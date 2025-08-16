@@ -727,7 +727,7 @@ namespace Inventory
         /// </summary>
         private static void EnsureLegacyEventSystem()
         {
-            var existing = Object.FindObjectOfType<EventSystem>();
+            var existing = UnityEngine.Object.FindObjectOfType<EventSystem>();
             if (existing != null)
             {
                 DontDestroyOnLoad(existing.gameObject);
