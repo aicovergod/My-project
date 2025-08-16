@@ -10,8 +10,9 @@ namespace Skills.Mining
         [SerializeField] private float lifetime = 1.5f;
         [SerializeField] private Vector3 floatSpeed = new Vector3(0f, 1f, 0f);
         private TextMesh textMesh;
+        [SerializeField] private float textSize = 0.2f;
 
-        public static void Show(string message, Vector3 position, Color? color = null)
+        public static void Show(string message, Vector3 position, Color? color = null, float? size = null)
         {
             GameObject go = new GameObject("FloatingText");
             go.transform.position = position;
@@ -19,6 +20,9 @@ namespace Skills.Mining
             ft.textMesh = go.AddComponent<TextMesh>();
             ft.textMesh.text = message;
             ft.textMesh.color = color ?? Color.white;
+            float finalSize = size ?? ft.textSize;
+            ft.textMesh.characterSize = finalSize;
+            ft.textMesh.fontSize = Mathf.RoundToInt(64 * finalSize);
         }
 
         private void Update()
