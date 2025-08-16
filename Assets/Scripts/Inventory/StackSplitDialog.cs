@@ -26,8 +26,19 @@ namespace Inventory
             if (instance != null)
                 Destroy(instance.gameObject);
 
-            var go = new GameObject("StackSplitDialog", typeof(Image), typeof(StackSplitDialog));
+            var go = new GameObject(
+                "StackSplitDialog",
+                typeof(Image),
+                typeof(Canvas),
+                typeof(GraphicRaycaster),
+                typeof(StackSplitDialog));
             go.transform.SetParent(parent, false);
+            go.transform.SetAsLastSibling();
+
+            var canvas = go.GetComponent<Canvas>();
+            canvas.overrideSorting = true;
+            canvas.sortingOrder = 1000;
+
             instance = go.GetComponent<StackSplitDialog>();
             instance.onConfirm = onConfirm;
             instance.maxAmount = Mathf.Max(1, max);
