@@ -528,6 +528,29 @@ namespace Inventory
         }
 
         /// <summary>
+        /// Replaces the item at <paramref name="slotIndex"/> with
+        /// <paramref name="newItem"/> and sets its count. The slot must
+        /// currently contain <paramref name="oldItem"/>. Returns true on
+        /// success.
+        /// </summary>
+        public bool ReplaceItem(int slotIndex, ItemData oldItem, ItemData newItem, int newCount)
+        {
+            if (slotIndex < 0 || slotIndex >= items.Length)
+                return false;
+
+            var entry = items[slotIndex];
+            if (entry.item != oldItem)
+                return false;
+
+            entry.item = newItem;
+            entry.count = newCount;
+            items[slotIndex] = entry;
+            UpdateSlotVisual(slotIndex);
+            OnInventoryChanged?.Invoke();
+            return true;
+        }
+
+        /// <summary>
         /// Drops a quantity of the item from the specified slot.
         /// </summary>
         public void DropItem(int slotIndex, int quantity = 1)
@@ -659,14 +682,14 @@ namespace Inventory
                 return;
             if (slotIndex < 0 || slotIndex >= items.Length)
                 return;
-            var item = items[slotIndex].item;
-            if (item == null)
-                return;
-
             int sold = 0;
             for (int i = 0; i < quantity; i++)
             {
-                if (currentShop.Sell(item, this))
+                var item = items[slotIndex].item;
+                if (item == null)
+                    break;
+
+                if (currentShop.Sell(item, this, slotIndex))
                     sold++;
                 else
                     break;
