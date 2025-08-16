@@ -11,9 +11,10 @@ namespace Inventory
     /// menu. When the menu is open, a button is shown for each item. Clicking a
     /// button adds that item to the inventory.
     ///
-    /// In the editor all items found under <c>Assets/Item</c> are listed using
-    /// <c>AssetDatabase</c>. In a player build it falls back to loading items from
-    /// a <c>Resources/Item</c> folder.
+    /// In the editor all items found under <c>Assets/Item</c> and
+    /// <c>Assets/Resources/Item</c> are listed using <c>AssetDatabase</c>. In a
+    /// player build it falls back to loading items from a <c>Resources/Item</c>
+    /// folder.
     /// </summary>
     [DisallowMultipleComponent]
     public class InventoryDebugMenu : MonoBehaviour
@@ -44,8 +45,11 @@ namespace Inventory
             }
 
 #if UNITY_EDITOR
-            // In the editor load all ItemData assets from Assets/Item
-            string[] guids = AssetDatabase.FindAssets("t:ItemData", new[] { "Assets/Item" });
+            // In the editor load all ItemData assets from Assets/Item and
+            // Assets/Resources/Item
+            string[] guids = AssetDatabase.FindAssets(
+                "t:ItemData",
+                new[] { "Assets/Item", "Assets/Resources/Item" });
             allItems = new ItemData[guids.Length];
             for (int i = 0; i < guids.Length; i++)
             {
