@@ -16,6 +16,9 @@ namespace Util
 
         private float timer;
 
+        [SerializeField]
+        private bool logTicks;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -31,10 +34,13 @@ namespace Util
         private void Update()
         {
             timer += Time.deltaTime;
-            if (timer >= TickDuration)
+            while (timer >= TickDuration)
             {
                 timer -= TickDuration;
-                Debug.Log("Tick");
+                if (logTicks)
+                {
+                    Debug.Log("Tick");
+                }
                 OnTick?.Invoke();
             }
         }
