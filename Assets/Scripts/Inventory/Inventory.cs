@@ -511,7 +511,7 @@ namespace Inventory
         {
             if (slotIndex < 0 || slotIndex >= items.Length) return;
             var entry = items[slotIndex];
-            if (entry.item == null) return;
+            if (entry.item == null || !entry.item.splittable) return;
 
             int amount = Mathf.Clamp(quantity, 1, entry.count - 1);
             if (amount <= 0) return;
@@ -547,6 +547,7 @@ namespace Inventory
             if (slotIndex < 0 || slotIndex >= items.Length) return;
             var entry = items[slotIndex];
             if (entry.item == null || entry.count <= 1) return;
+            if (!entry.item.splittable) return;
             if (type == StackSplitType.Drop && !CanDropItems) return;
 
             StackSplitDialog.Show(uiRoot.transform, entry.count, amount =>
