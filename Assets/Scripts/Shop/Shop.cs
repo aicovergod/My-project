@@ -12,6 +12,12 @@ namespace ShopSystem
         public ItemData item;
         public int price;
         public int quantity;
+
+        [Tooltip("If true, the shop will buy this item from the player.")]
+        public bool playerSell;
+
+        [Tooltip("Currency amount paid to the player when selling this item.")]
+        public int playerSellPrice;
     }
 
     /// <summary>
@@ -112,6 +118,85 @@ namespace ShopSystem
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Attempts to buy an item from the player and add it to the shop's stock.
+        /// The player receives currency equal to the configured sell price.
+        /// </summary>
+        public bool Sell(ItemData item, Inventory.Inventory playerInventory)
+        {
+            if (item == null || playerInventory == null)
+                return false;
+
+            // Find the slot matching this item from the initial stock so players
+            // can sell even if the item is currently sold out.
+            int slotIndex = -1;
+            for (int i = 0; i < initialStock.Length; i++)
+            {
+                if (initialStock[i].item == item)
+                {
+                    slotIndex = i;
+                    break;
+                }
+            }
+
+            if (slotIndex == -1)
+                return false; // shop doesn't buy this item
+
+            var config = initialStock[slotIndex];
+            if (!config.playerSell || config.playerSellPrice <= 0)
+                return false; // item not sellable to this shop
+
+            // Ensure player actually has the item and space for the currency payout.
+            if (playerInventory.GetItemCount(item) <= 0)
+                return false;
+            for (int i = 0; i < config.playerSellPrice; i++)
+            {
+                if (!playerInventory.CanAddItem(currency))
+                    return false;
+            }
+
+            if (!playerInventory.RemoveItem(item, 1))
+                return false;
+
+            for (int i = 0; i < config.playerSellPrice; i++)
+                playerInventory.AddItem(currency);
+
+            // Insert or update stock entry
+            var entry = stock[slotIndex];
+            if (entry.item == null)
+            {
+                entry = config;
+                entry.quantity = 0;
+            }
+            entry.quantity++;
+            stock[slotIndex] = entry;
+
+            if (restockTimers != null && slotIndex < restockTimers.Length)
+                restockTimers[slotIndex] = 0f;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true if the shop will buy the specified item and outputs the sell price.
+        /// </summary>
+        public bool TryGetSellPrice(ItemData item, out int sellPrice)
+        {
+            sellPrice = 0;
+            if (item == null)
+                return false;
+            for (int i = 0; i < initialStock.Length; i++)
+            {
+                var config = initialStock[i];
+                if (config.item == item && config.playerSell && config.playerSellPrice > 0)
+                {
+                    sellPrice = config.playerSellPrice;
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

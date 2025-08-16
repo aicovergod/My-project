@@ -58,6 +58,8 @@ namespace ShopSystem
             currentShop = shop;
             Refresh();
             uiRoot.SetActive(true);
+            if (playerInventory != null)
+                playerInventory.SetShopContext(shop, this);
             if (playerMover == null)
                 playerMover = FindObjectOfType<PlayerMover>();
             if (playerMover != null)
@@ -76,6 +78,8 @@ namespace ShopSystem
             currentShop = null;
             if (shopNameText != null)
                 shopNameText.text = string.Empty;
+            if (playerInventory != null)
+                playerInventory.SetShopContext(null, null);
             if (playerMover != null)
                 playerMover.enabled = true;
             if (npcMover != null)
@@ -248,7 +252,7 @@ namespace ShopSystem
             tooltipRect.offsetMax = new Vector2(-windowPadding.x, windowPadding.y + tooltipHeight);
         }
 
-        private void Refresh()
+        public void Refresh()
         {
             HideTooltip();
             if (shopNameText != null)
