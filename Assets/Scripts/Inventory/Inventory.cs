@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 #endif
 using ShopSystem;
+using Player;
 
 namespace Inventory
 {
@@ -74,6 +75,8 @@ namespace Inventory
         private Shop currentShop;
         private ShopUI currentShopUI;
 
+        private PlayerMover playerMover;
+
         // UI
         private GameObject uiRoot; // Canvas root
 
@@ -83,6 +86,8 @@ namespace Inventory
 
         // Cached default font to avoid repeated builtin lookups that may throw
         private Font defaultFont;
+
+        private bool CanDropItems => playerMover == null || playerMover.CanDrop;
 
         private void Awake()
         {
@@ -116,6 +121,8 @@ namespace Inventory
             items = new InventoryEntry[size];
             EnsureLegacyEventSystem();
             CreateUI();
+
+            playerMover = GetComponent<PlayerMover>();
 
             // Start completely hidden (inactive object so it’s clear in Hierarchy)
             if (uiRoot != null)
@@ -472,6 +479,7 @@ namespace Inventory
         /// </summary>
         public void DropItem(int slotIndex, int quantity = 1)
         {
+            if (!CanDropItems) return;
             if (slotIndex < 0 || slotIndex >= items.Length) return;
             var entry = items[slotIndex];
             if (entry.item == null) return;
@@ -528,6 +536,7 @@ namespace Inventory
             if (slotIndex < 0 || slotIndex >= items.Length) return;
             var entry = items[slotIndex];
             if (entry.item == null || entry.count <= 1) return;
+            if (type == StackSplitType.Drop && !CanDropItems) return;
 
             StackSplitDialog.Show(uiRoot.transform, entry.count, amount =>
             {

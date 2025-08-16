@@ -63,7 +63,10 @@ namespace ShopSystem
             if (playerMover == null)
                 playerMover = FindObjectOfType<PlayerMover>();
             if (playerMover != null)
+            {
                 playerMover.enabled = false;
+                playerMover.CanDrop = false;
+            }
             npcMover = npcMovement;
             if (npcMover != null)
                 npcMover.enabled = false;
@@ -81,7 +84,10 @@ namespace ShopSystem
             if (playerInventory != null)
                 playerInventory.SetShopContext(null, null);
             if (playerMover != null)
+            {
                 playerMover.enabled = true;
+                playerMover.CanDrop = true;
+            }
             if (npcMover != null)
             {
                 npcMover.enabled = true;
