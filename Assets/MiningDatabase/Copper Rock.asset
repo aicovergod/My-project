@@ -15,7 +15,7 @@ MonoBehaviour:
   id: Copper Rock
   ore: {fileID: 11400000, guid: 02ae12462e8dee5448c7d8b225c3b2dd, type: 2}
   depletionRoll: 0.33
-  depleteAfterNOres: 0
+  depleteAfterNOres: 1
   respawnTimeSecondsMin: 2
   respawnTimeSecondsMax: 4
   requiresToolTier: 1

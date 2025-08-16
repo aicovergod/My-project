@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Copper Ore
   displayName: Copper ore
-  levelRequirement: 0
+  levelRequirement: 1
   xpPerOre: 18
