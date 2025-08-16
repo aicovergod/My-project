@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Inventory;
 using Util;
@@ -26,6 +27,8 @@ namespace Skills.Mining
         private PickaxeDefinition currentPickaxe;
         private int swingProgress;
 
+        private Dictionary<string, ItemData> oreItems;
+
         public event System.Action<MineableRock> OnStartMining;
         public event System.Action OnStopMining;
         public event System.Action<string, int> OnOreGained;
@@ -47,6 +50,8 @@ namespace Skills.Mining
             save = saveProvider as IMiningSave ?? new PlayerPrefsMiningSave();
             xp = save.LoadXp();
             level = xpTable != null ? xpTable.GetLevel(xp) : 1;
+
+            PreloadOreItems();
         }
 
         private Coroutine tickerCoroutine;
@@ -133,7 +138,7 @@ namespace Skills.Mining
                 OreDefinition ore = currentRock.MineOre();
                 if (ore != null)
                 {
-                    var item = Resources.Load<ItemData>("Item/" + ore.Id);
+                    oreItems.TryGetValue(ore.Id, out var item);
                     bool added = false;
                     if (item != null && inventory != null)
                         added = inventory.AddItem(item);
@@ -188,6 +193,17 @@ namespace Skills.Mining
             currentPickaxe = null;
             swingProgress = 0;
             OnStopMining?.Invoke();
+        }
+
+        private void PreloadOreItems()
+        {
+            oreItems = new Dictionary<string, ItemData>();
+            var items = Resources.LoadAll<ItemData>("Item");
+            foreach (var item in items)
+            {
+                if (!string.IsNullOrEmpty(item.id))
+                    oreItems[item.id] = item;
+            }
         }
     }
 }
