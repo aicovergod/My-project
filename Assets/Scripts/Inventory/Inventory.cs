@@ -59,6 +59,8 @@ namespace Inventory
         public Color windowColor = new Color(0.15f, 0.15f, 0.15f, 0.95f);
         [Tooltip("Padding around the slot grid inside the window.")]
         public Vector2 windowPadding = new Vector2(8f, 8f);
+        [Tooltip("Fixed width and height for the inventory window background.")]
+        public Vector2 windowSize = new Vector2(83f, 375f);
 
         [Header("Tooltip")]
         [Tooltip("Optional: custom font for the tooltip item name. Uses Arial if null.")]
@@ -182,6 +184,7 @@ namespace Inventory
             windowRect.anchorMax = new Vector2(0f, 1f);
             windowRect.pivot = new Vector2(0f, 1f);
             windowRect.anchoredPosition = new Vector2(10f - windowPadding.x, -10f + windowPadding.y);
+            windowRect.sizeDelta = windowSize;
 
             var windowImg = window.GetComponent<Image>();
             windowImg.color = windowColor;
@@ -200,6 +203,8 @@ namespace Inventory
             grid.spacing = slotSpacing;
             grid.childAlignment = TextAnchor.UpperLeft;
             grid.startCorner = GridLayoutGroup.Corner.UpperLeft;
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = 2;
 
             // Generate visible slot images
             slotImages = new Image[size];
@@ -265,7 +270,7 @@ namespace Inventory
 
             // Force a layout rebuild so slots are positioned before the UI is hidden
             LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-            windowRect.sizeDelta = new Vector2(rect.rect.width + windowPadding.x * 2f, rect.rect.height + windowPadding.y * 2f);
+            windowRect.sizeDelta = windowSize;
 
             // Tooltip setup
             tooltip = new GameObject("Tooltip", typeof(Image), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
