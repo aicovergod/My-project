@@ -59,7 +59,10 @@ namespace ShopSystem
             Refresh();
             uiRoot.SetActive(true);
             if (playerInventory != null)
-                playerInventory.SetShopContext(shop, this);
+            {
+                playerInventory.SetShopContext(shop);
+                playerInventory.OnInventoryChanged += HandleInventoryChanged;
+            }
             if (playerMover == null)
                 playerMover = FindObjectOfType<PlayerMover>();
             if (playerMover != null)
@@ -82,7 +85,10 @@ namespace ShopSystem
             if (shopNameText != null)
                 shopNameText.text = string.Empty;
             if (playerInventory != null)
-                playerInventory.SetShopContext(null, null);
+            {
+                playerInventory.OnInventoryChanged -= HandleInventoryChanged;
+                playerInventory.SetShopContext(null);
+            }
             if (playerMover != null)
             {
                 playerMover.enabled = true;
@@ -101,10 +107,12 @@ namespace ShopSystem
         public void Buy(int index)
         {
             if (currentShop == null || playerInventory == null) return;
-            if (currentShop.Buy(index, playerInventory))
-            {
-                Refresh();
-            }
+            currentShop.Buy(index, playerInventory);
+        }
+
+        private void HandleInventoryChanged()
+        {
+            Refresh();
         }
 
         private void CreateUI()

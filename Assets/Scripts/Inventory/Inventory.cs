@@ -1,4 +1,5 @@
 // Assets/Scripts/Inventory/Inventory.cs
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -73,7 +74,6 @@ namespace Inventory
 
         // Active shop context when interacting with a shop
         private Shop currentShop;
-        private ShopUI currentShopUI;
 
         private PlayerMover playerMover;
 
@@ -86,6 +86,8 @@ namespace Inventory
 
         // Cached default font to avoid repeated builtin lookups that may throw
         private Font defaultFont;
+
+        public event Action OnInventoryChanged;
 
         private bool CanDropItems => playerMover == null || playerMover.CanDrop;
 
@@ -358,7 +360,10 @@ namespace Inventory
                 }
             }
 
-            return remaining <= 0;
+            bool success = remaining <= 0;
+            if (success)
+                OnInventoryChanged?.Invoke();
+            return success;
         }
 
         /// <summary>
@@ -436,7 +441,10 @@ namespace Inventory
                 }
             }
 
-            return count <= 0;
+            bool success = count <= 0;
+            if (success)
+                OnInventoryChanged?.Invoke();
+            return success;
         }
 
         /// <summary>
@@ -467,6 +475,7 @@ namespace Inventory
                         items[i].item = null;
                     UpdateSlotVisual(i);
 
+                    OnInventoryChanged?.Invoke();
                     return true;
                 }
             }
@@ -491,6 +500,7 @@ namespace Inventory
             items[slotIndex] = entry;
             UpdateSlotVisual(slotIndex);
             HideTooltip();
+            OnInventoryChanged?.Invoke();
         }
 
         /// <summary>
@@ -525,6 +535,7 @@ namespace Inventory
 
             UpdateSlotVisual(slotIndex);
             UpdateSlotVisual(target);
+            OnInventoryChanged?.Invoke();
         }
 
         /// <summary>
@@ -619,17 +630,16 @@ namespace Inventory
             if (sold > 0)
             {
                 HideTooltip();
-                currentShopUI?.Refresh();
+                OnInventoryChanged?.Invoke();
             }
         }
 
         /// <summary>
         /// Sets the active shop context used for selling and tooltip information.
         /// </summary>
-        public void SetShopContext(Shop shop, ShopUI ui)
+        public void SetShopContext(Shop shop)
         {
             currentShop = shop;
-            currentShopUI = ui;
         }
 
         public void BeginDrag(int slotIndex)
@@ -685,6 +695,7 @@ namespace Inventory
             }
 
             EndDrag();
+            OnInventoryChanged?.Invoke();
         }
 
         public void EndDrag()
