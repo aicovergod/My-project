@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Gold Coins
   itemName: Gold coins
-  icon: {fileID: -65191694924727605, guid: d74d7c2b131bc3e4fa02a0f3861e3295, type: 3}
+  icon: {fileID: -4839135724416879022, guid: 5426c9c3bd191414d88f14cf4f4c1dca, type: 3}
   description: 'These are used
 
     for purchasing

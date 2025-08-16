@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 478a3efbdba08cb42910fd0005addf6d, type: 3}
+  m_Name: Coal Rock
+  m_EditorClassIdentifier: 
+  id: Coal Rock
+  ore: {fileID: 11400000, guid: d6216817fc6a570448ad73e0e6a901e7, type: 2}
+  depletionRoll: 0.4
+  depleteAfterNOres: 0
+  respawnTimeSecondsMin: 15
+  respawnTimeSecondsMax: 30
+  requiresToolTier: 2
