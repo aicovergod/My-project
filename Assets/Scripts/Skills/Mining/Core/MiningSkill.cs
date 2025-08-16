@@ -34,6 +34,7 @@ namespace Skills.Mining
         public int Level => level;
         public bool IsMining => currentRock != null;
         public MineableRock CurrentRock => currentRock;
+        public int CurrentSwingSpeedTicks => currentPickaxe?.SwingSpeedTicks ?? 0;
         public float SwingProgressNormalized => currentPickaxe == null || currentPickaxe.SwingSpeedTicks <= 0 ? 0f : (float)swingProgress / currentPickaxe.SwingSpeedTicks;
 
         private void Awake()
