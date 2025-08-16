@@ -592,7 +592,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allPickaxes:
-  - {fileID: 0}
+  - {fileID: 11400000, guid: c32ce0b64104bf4409941cb078a3e792, type: 2}
+  - {fileID: 11400000, guid: a71a63176f90a4a4da64d3811c7c46f1, type: 2}
+  - {fileID: 11400000, guid: 0c113a3866f26b74992ca1f608810117, type: 2}
+  - {fileID: 11400000, guid: 562f262892e39da489174b0888b58fda, type: 2}
+  - {fileID: 11400000, guid: 43212d05622ddc24b9589ef081a176ef, type: 2}
+  - {fileID: 11400000, guid: c20e17523dc02e848a3f5b15d82aa376, type: 2}
+  - {fileID: 11400000, guid: b27f88278183049479c7e478c63df422, type: 2}
   inventory: {fileID: 193042515}
   skill: {fileID: 193042518}
 --- !u!114 &193042517
@@ -612,8 +618,8 @@ MonoBehaviour:
   rockMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  miningSkill: {fileID: 0}
-  pickaxeSelector: {fileID: 0}
+  miningSkill: {fileID: 193042518}
+  pickaxeSelector: {fileID: 193042516}
 --- !u!114 &193042518
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -628,7 +634,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xpTable: {fileID: 11400000, guid: 5fc68d467237c9d4388de2f1d141fbc4, type: 2}
   inventory: {fileID: 193042515}
-  floatingTextAnchor: {fileID: 0}
+  floatingTextAnchor: {fileID: 273806473}
   saveProvider: {fileID: 0}
 --- !u!1 &273806472
 GameObject:
@@ -661,6 +667,123 @@ Transform:
   m_Children: []
   m_Father: {fileID: 193042514}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &378837830
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 378837835}
+  - component: {fileID: 378837834}
+  - component: {fileID: 378837833}
+  - component: {fileID: 378837832}
+  - component: {fileID: 378837831}
+  m_Layer: 5
+  m_Name: MiningUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &378837831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378837830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb8775442cb99c142982c06c314c7ec6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skill: {fileID: 193042518}
+  progressImage: {fileID: 0}
+  offset: {x: 0, y: 1.5, z: 0}
+--- !u!114 &378837832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378837830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &378837833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378837830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UiScaleMode: 0
+  m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 800, y: 600}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 0
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 96
+  m_DefaultSpriteDPI: 96
+  m_DynamicPixelsPerUnit: 1
+  m_PresetInfoIsWorld: 0
+--- !u!223 &378837834
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378837830}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 0
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!224 &378837835
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378837830}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -6230,42 +6353,37 @@ MonoBehaviour:
   shopName: Isla's Pickaxes
   currency: {fileID: 11400000, guid: 4a6ad3a4783799f4bb7d2615a6a5fc51, type: 2}
   stock:
-  - item: {fileID: 11400000, guid: 24f1f7b2cf724ce4183c11ade2a12889, type: 2}
+  - item: {fileID: 11400000, guid: e1413bb1afc4f0c498277b78d76139ce, type: 2}
     price: 10
     quantity: 10
     playerSell: 1
     playerSellPrice: 5
-  - item: {fileID: 11400000, guid: 2ef1525614a133445aa73c13c646f605, type: 2}
+  - item: {fileID: 11400000, guid: 0b551e5e8e23d7d4c9ea3bc4547d4f4f, type: 2}
     price: 20
     quantity: 10
     playerSell: 1
     playerSellPrice: 10
-  - item: {fileID: 11400000, guid: 6bab078de4a0eec4bbcb6b1cc8df50da, type: 2}
+  - item: {fileID: 11400000, guid: e400c4d42cd2b4741a84bf0c0911c72d, type: 2}
     price: 85
     quantity: 10
     playerSell: 1
     playerSellPrice: 40
-  - item: {fileID: 11400000, guid: 8f192a8bc43d0694fab158e53460c51a, type: 2}
+  - item: {fileID: 11400000, guid: e1675e68ed5d2aa4a9cdc477bc716bde, type: 2}
     price: 160
     quantity: 10
     playerSell: 1
     playerSellPrice: 80
-  - item: {fileID: 11400000, guid: a8d722cb1968af64fbc14b52bb9cc641, type: 2}
+  - item: {fileID: 11400000, guid: 82d0e1b5acabb57448d4a15edb019145, type: 2}
     price: 640
     quantity: 10
     playerSell: 1
     playerSellPrice: 320
-  - item: {fileID: 11400000, guid: 31c96fda80df3f84c8a0e6f8d43484c9, type: 2}
+  - item: {fileID: 11400000, guid: 46f8e3fec71cb404babf09579b4ce078, type: 2}
     price: 2400
     quantity: 10
     playerSell: 1
     playerSellPrice: 1200
-  - item: {fileID: 11400000, guid: 31c96fda80df3f84c8a0e6f8d43484c9, type: 2}
-    price: 2400
-    quantity: 10
-    playerSell: 1
-    playerSellPrice: 1200
-  - item: {fileID: 11400000, guid: 65e179075811ced4498bfc12cdfb5025, type: 2}
+  - item: {fileID: 11400000, guid: 6763ee4a814c9fb41aae5a3088441753, type: 2}
     price: 8400
     quantity: 10
     playerSell: 1
@@ -6627,8 +6745,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2011776900}
   - component: {fileID: 2011776899}
-  m_Layer: 0
-  m_Name: Copper Ore
+  - component: {fileID: 2011776902}
+  - component: {fileID: 2011776901}
+  m_Layer: 7
+  m_Name: Copper Rock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6675,10 +6795,10 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_SortingLayerID: -2109142493
+  m_SortingLayer: -4
+  m_SortingOrder: 3
+  m_Sprite: {fileID: -8506256805805835225, guid: ae0c7cea6941cb04a80d3e377813109c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -6698,12 +6818,74 @@ Transform:
   m_GameObject: {fileID: 2011776898}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.08843, y: 4.33429, z: 0}
+  m_LocalPosition: {x: 1.68, y: 3.42, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2011776901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2011776898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaeca4ebf1961d646be160b9b0493572, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rockDef: {fileID: 11400000, guid: 4125f5233573edb4ca7b35e6d47a1533, type: 2}
+  spriteRenderer: {fileID: 2011776899}
+  fullSprite: {fileID: -8506256805805835225, guid: ae0c7cea6941cb04a80d3e377813109c, type: 3}
+  depletedSprite: {fileID: -4839135724416879022, guid: 5426c9c3bd191414d88f14cf4f4c1dca, type: 3}
+--- !u!61 &2011776902
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2011776898}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
 --- !u!1 &2017736615
 GameObject:
   m_ObjectHideFlags: 0
@@ -6775,3 +6957,4 @@ SceneRoots:
   - {fileID: 936348947}
   - {fileID: 2011776900}
   - {fileID: 1665489350}
+  - {fileID: 378837835}
