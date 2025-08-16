@@ -50,7 +50,7 @@ namespace Skills
             var textGo = new GameObject("MiningText");
             textGo.transform.SetParent(panel.transform, false);
             miningText = textGo.AddComponent<Text>();
-            miningText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            miningText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             miningText.alignment = TextAnchor.MiddleCenter;
             miningText.color = Color.white;
             var textRect = miningText.rectTransform;
