@@ -42,8 +42,18 @@ namespace ShopSystem
         private PlayerMover playerMover;
         private NpcRandomMovement npcMover;
 
+        private static ShopUI instance;
+        public static ShopUI Instance => instance;
+
         private void Awake()
         {
+            if (instance != null && instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            instance = this;
             CreateUI();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
