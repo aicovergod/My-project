@@ -12,25 +12,46 @@ namespace Skills.Mining
         private TextMesh textMesh;
         [SerializeField] private float textSize = 0.2f;
 
+        private float remainingLifetime;
+
+        private static FloatingText activeInstance;
+
         public static void Show(string message, Vector3 position, Color? color = null, float? size = null)
         {
-            GameObject go = new GameObject("FloatingText");
-            go.transform.position = position;
-            var ft = go.AddComponent<FloatingText>();
-            ft.textMesh = go.AddComponent<TextMesh>();
-            ft.textMesh.text = message;
-            ft.textMesh.color = color ?? Color.white;
-            float finalSize = size ?? ft.textSize;
-            ft.textMesh.characterSize = finalSize;
-            ft.textMesh.fontSize = Mathf.RoundToInt(64 * finalSize);
+            if (activeInstance == null)
+            {
+                GameObject go = new GameObject("FloatingText");
+                go.transform.position = position;
+                activeInstance = go.AddComponent<FloatingText>();
+                activeInstance.textMesh = go.AddComponent<TextMesh>();
+            }
+
+            activeInstance.transform.position = position;
+            activeInstance.textMesh.text = message;
+            activeInstance.textMesh.color = color ?? Color.white;
+            float finalSize = size ?? activeInstance.textSize;
+            activeInstance.textMesh.characterSize = finalSize;
+            activeInstance.textMesh.fontSize = Mathf.RoundToInt(64 * finalSize);
+            activeInstance.remainingLifetime = activeInstance.lifetime;
+        }
+
+        private void Awake()
+        {
+            remainingLifetime = lifetime;
         }
 
         private void Update()
         {
             transform.position += floatSpeed * Time.deltaTime;
-            lifetime -= Time.deltaTime;
-            if (lifetime <= 0f)
+            remainingLifetime -= Time.deltaTime;
+            if (remainingLifetime <= 0f)
                 Destroy(gameObject);
+        }
+
+        private void OnDestroy()
+        {
+            if (activeInstance == this)
+                activeInstance = null;
         }
     }
 }
