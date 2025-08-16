@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 
 namespace World
@@ -30,12 +29,6 @@ namespace World
 
         [Tooltip("How close the player must be in tiles to use the door.")]
         public float useRadius = 2f;
-
-        private static string nextSpawnPoint;
-        private static Transform playerToMove;
-        private static GameObject cameraToMove;
-        private static GameObject inventoryUIToMove;
-        private static GameObject eventSystemToMove;
 
         private void Update()
         {
@@ -74,105 +67,22 @@ namespace World
                     yield break;
                 }
 
-                if (removeItemOnUse && inv != null)
-                    inv.RemoveItem(requiredItemId);
             }
 
             if (!string.IsNullOrEmpty(sceneToLoad))
             {
-                if (ScreenFader.Instance == null)
-                    new GameObject("ScreenFader").AddComponent<ScreenFader>();
+                if (SceneTransitionManager.Instance == null)
+                    new GameObject("SceneTransitionManager").AddComponent<SceneTransitionManager>();
 
-                if (ScreenFader.Instance != null)
-                    yield return ScreenFader.Instance.FadeOut();
-
-                nextSpawnPoint = spawnPointName;
-                playerToMove = player.transform;
-                DontDestroyOnLoad(player);
-
-                var cam = Camera.main;
-                cameraToMove = cam ? cam.gameObject : null;
-                if (cameraToMove) DontDestroyOnLoad(cameraToMove);
-
-                inventoryUIToMove = GameObject.Find("InventoryUI");
-                if (inventoryUIToMove) DontDestroyOnLoad(inventoryUIToMove);
-
-                var ev = EventSystem.current;
-                eventSystemToMove = ev ? ev.gameObject : null;
-                if (eventSystemToMove) DontDestroyOnLoad(eventSystemToMove);
-
-                SceneManager.sceneLoaded += OnSceneLoaded;
-                SceneManager.LoadScene(sceneToLoad);
-            }
-        }
-
-        private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-        {
-            if (playerToMove != null && !string.IsNullOrEmpty(nextSpawnPoint))
-            {
-                var points = GameObject.FindObjectsOfType<SpawnPoint>();
-                foreach (var p in points)
+                if (SceneTransitionManager.Instance != null)
                 {
-                    if (p.id == nextSpawnPoint)
-                    {
-                        playerToMove.position = p.transform.position;
-                        break;
-                    }
-                }
-
-                SceneManager.MoveGameObjectToScene(playerToMove.gameObject, scene);
-                var players = GameObject.FindGameObjectsWithTag("Player");
-                foreach (var p in players)
-                {
-                    if (p != playerToMove.gameObject)
-                    {
-                        Destroy(p);
-                    }
+                    yield return SceneTransitionManager.Instance.Transition(
+                        sceneToLoad,
+                        spawnPointName,
+                        requiredItemId,
+                        removeItemOnUse);
                 }
             }
-
-            if (cameraToMove != null)
-            {
-                SceneManager.MoveGameObjectToScene(cameraToMove, scene);
-                var cameras = GameObject.FindObjectsOfType<Camera>();
-                foreach (var c in cameras)
-                {
-                    if (c.gameObject != cameraToMove)
-                        Destroy(c.gameObject);
-                }
-            }
-
-            if (inventoryUIToMove != null)
-            {
-                SceneManager.MoveGameObjectToScene(inventoryUIToMove, scene);
-                var canvases = GameObject.FindObjectsOfType<Canvas>();
-                foreach (var cv in canvases)
-                {
-                    if (cv.gameObject != inventoryUIToMove && cv.gameObject.name == inventoryUIToMove.name)
-                        Destroy(cv.gameObject);
-                }
-            }
-
-            if (eventSystemToMove != null)
-            {
-                SceneManager.MoveGameObjectToScene(eventSystemToMove, scene);
-                var systems = GameObject.FindObjectsOfType<EventSystem>();
-                foreach (var es in systems)
-                {
-                    if (es.gameObject != eventSystemToMove)
-                        Destroy(es.gameObject);
-                }
-            }
-
-            SceneManager.sceneLoaded -= OnSceneLoaded;
-            playerToMove = null;
-            nextSpawnPoint = null;
-            cameraToMove = null;
-            inventoryUIToMove = null;
-            eventSystemToMove = null;
-
-            if (ScreenFader.Instance != null)
-                ScreenFader.Instance.StartCoroutine(ScreenFader.Instance.FadeIn());
         }
     }
 }
