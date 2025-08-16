@@ -16,7 +16,9 @@ namespace NPC
         [Tooltip("Context menu prefab that provides Talk / Open Shop / Examine.")]
         public RightClickMenu menuPrefab;
 
-        private RightClickMenu menuInstance;
+        // Shared instance so the menu persists across scene loads
+        private static RightClickMenu menuInstance;
+        private static Canvas menuCanvas;
 
         private void OnMouseOver()
         {
@@ -24,17 +26,13 @@ namespace NPC
             {
                 if (menuInstance == null)
                 {
-                    var canvas = FindObjectOfType<Canvas>();
-                    if (canvas == null)
-                    {
-                        var canvasGO = new GameObject("ContextMenuCanvas", typeof(Canvas), typeof(CanvasScaler),
-                            typeof(GraphicRaycaster));
-                        var c = canvasGO.GetComponent<Canvas>();
-                        c.renderMode = RenderMode.ScreenSpaceOverlay;
-                        canvas = c;
-                    }
+                    var canvasGO = new GameObject("ContextMenuCanvas", typeof(Canvas), typeof(CanvasScaler),
+                        typeof(GraphicRaycaster));
+                    menuCanvas = canvasGO.GetComponent<Canvas>();
+                    menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                    DontDestroyOnLoad(canvasGO);
 
-                    menuInstance = Instantiate(menuPrefab, canvas.transform);
+                    menuInstance = Instantiate(menuPrefab, menuCanvas.transform);
                 }
 
                 menuInstance.Show(this, Input.mousePosition);
