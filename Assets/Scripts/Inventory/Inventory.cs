@@ -54,6 +54,12 @@ namespace Inventory
         [Tooltip("Color/tint for empty slots if no frame sprite, or tint over the frame.")]
         public Color emptySlotColor = new Color(1f, 1f, 1f, 0.25f); // light translucent
 
+        [Header("Window")]
+        [Tooltip("Background color for the inventory window.")]
+        public Color windowColor = new Color(0.15f, 0.15f, 0.15f, 0.95f);
+        [Tooltip("Padding around the slot grid inside the window.")]
+        public Vector2 windowPadding = new Vector2(8f, 8f);
+
         [Header("Tooltip")]
         [Tooltip("Optional: custom font for the tooltip item name. Uses Arial if null.")]
         public Font tooltipNameFont;
@@ -146,8 +152,7 @@ namespace Inventory
 
         /// <summary>
         /// Creates a Screen Space Overlay canvas and a simple grid of slots.
-        /// The grid background has no Image component (no giant rectangle).
-        /// Slots themselves have Image components so you can see the squares.
+        /// Slots sit inside a window with a colored background similar to the shop UI.
         /// </summary>
         private void CreateUI()
         {
@@ -169,15 +174,26 @@ namespace Inventory
             scaler.referenceResolution = referenceResolution;
             scaler.matchWidthOrHeight = 0f; // match width (nice for 64px tile games)
 
-            // Panel to hold slots (no Image component = no big background)
+            GameObject window = new GameObject("Window", typeof(RectTransform), typeof(Image));
+            window.transform.SetParent(uiRoot.transform, false);
+
+            var windowRect = window.GetComponent<RectTransform>();
+            windowRect.anchorMin = new Vector2(0f, 1f);
+            windowRect.anchorMax = new Vector2(0f, 1f);
+            windowRect.pivot = new Vector2(0f, 1f);
+            windowRect.anchoredPosition = new Vector2(10f - windowPadding.x, -10f + windowPadding.y);
+
+            var windowImg = window.GetComponent<Image>();
+            windowImg.color = windowColor;
+
             GameObject panel = new GameObject("Slots", typeof(RectTransform), typeof(GridLayoutGroup));
-            panel.transform.SetParent(uiRoot.transform, false);
+            panel.transform.SetParent(window.transform, false);
 
             var rect = panel.GetComponent<RectTransform>();
             rect.anchorMin = new Vector2(0f, 1f);
             rect.anchorMax = new Vector2(0f, 1f);
             rect.pivot = new Vector2(0f, 1f);
-            rect.anchoredPosition = new Vector2(10f, -10f);
+            rect.anchoredPosition = new Vector2(windowPadding.x, -windowPadding.y);
 
             var grid = panel.GetComponent<GridLayoutGroup>();
             grid.cellSize = slotSize;
@@ -249,6 +265,7 @@ namespace Inventory
 
             // Force a layout rebuild so slots are positioned before the UI is hidden
             LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+            windowRect.sizeDelta = new Vector2(rect.rect.width + windowPadding.x * 2f, rect.rect.height + windowPadding.y * 2f);
 
             // Tooltip setup
             tooltip = new GameObject("Tooltip", typeof(Image), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
@@ -654,6 +671,8 @@ namespace Inventory
         public void SetShopContext(Shop shop)
         {
             currentShop = shop;
+            if (shop != null && uiRoot != null)
+                uiRoot.SetActive(true);
         }
 
         public void BeginDrag(int slotIndex)
@@ -808,6 +827,12 @@ namespace Inventory
 #else
             bool toggle = Input.GetKeyDown(KeyCode.I);
 #endif
+            if (currentShop != null)
+            {
+                if (uiRoot != null && !uiRoot.activeSelf)
+                    uiRoot.SetActive(true);
+                return;
+            }
             if (toggle && uiRoot != null)
                 uiRoot.SetActive(!uiRoot.activeSelf);
         }
