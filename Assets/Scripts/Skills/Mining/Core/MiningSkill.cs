@@ -144,20 +144,24 @@ namespace Skills.Mining
                     if (item != null && inventory != null)
                         added = inventory.AddItem(item);
 
+                    Vector3 anchorPos = floatingTextAnchor != null
+                        ? floatingTextAnchor.position
+                        : transform.position;
+
                     if (!added)
                     {
-                        FloatingText.Show("Inventory is full", floatingTextAnchor.position);
+                        FloatingText.Show("Inventory is full", anchorPos);
                     }
                     else
                     {
-                        FloatingText.Show($"+1 {ore.DisplayName}", floatingTextAnchor.position);
                         xp += ore.XpPerOre;
+                        FloatingText.Show($"+1 {ore.DisplayName}", anchorPos);
                         OnOreGained?.Invoke(ore.Id, 1);
                         int newLevel = xpTable.GetLevel(xp);
                         if (newLevel > level)
                         {
                             level = newLevel;
-                            FloatingText.Show($"Mining level {level}", floatingTextAnchor.position);
+                            FloatingText.Show($"Mining level {level}", anchorPos);
                             OnLevelUp?.Invoke(level);
                         }
                     }
