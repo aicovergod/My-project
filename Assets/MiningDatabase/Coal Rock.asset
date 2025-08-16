@@ -15,7 +15,7 @@ MonoBehaviour:
   id: Coal Rock
   ore: {fileID: 11400000, guid: d6216817fc6a570448ad73e0e6a901e7, type: 2}
   depletionRoll: 0.4
-  depleteAfterNOres: 0
+  depleteAfterNOres: 5
   respawnTimeSecondsMin: 15
   respawnTimeSecondsMax: 30
   requiresToolTier: 2

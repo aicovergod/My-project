@@ -15,7 +15,7 @@ MonoBehaviour:
   id: Adamantite Ore
   ore: {fileID: 11400000, guid: 3027fbd7818b9a6448613444b53c9ca3, type: 2}
   depletionRoll: 0.5
-  depleteAfterNOres: 0
+  depleteAfterNOres: 1
   respawnTimeSecondsMin: 90
   respawnTimeSecondsMax: 180
   requiresToolTier: 4

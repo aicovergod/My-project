@@ -15,7 +15,7 @@ MonoBehaviour:
   id: Mithril Rock
   ore: {fileID: 11400000, guid: c0b1be63ffe600542a574d35fb81d71f, type: 2}
   depletionRoll: 0.5
-  depleteAfterNOres: 0
+  depleteAfterNOres: 1
   respawnTimeSecondsMin: 60
   respawnTimeSecondsMax: 120
   requiresToolTier: 3

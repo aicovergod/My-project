@@ -15,7 +15,7 @@ MonoBehaviour:
   id: Tin Rock
   ore: {fileID: 11400000, guid: 4f6b27442e147384cbf0fa012fe8e824, type: 2}
   depletionRoll: 0.33
-  depleteAfterNOres: 0
+  depleteAfterNOres: 1
   respawnTimeSecondsMin: 2
   respawnTimeSecondsMax: 4
   requiresToolTier: 1
