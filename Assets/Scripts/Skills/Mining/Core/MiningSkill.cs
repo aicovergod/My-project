@@ -148,22 +148,26 @@ namespace Skills.Mining
                         ? floatingTextAnchor.position
                         : transform.position;
 
+                    // Award XP regardless of inventory space so players always
+                    // progress their skill when successfully mining.
+                    xp += ore.XpPerOre;
+
                     if (!added)
                     {
                         FloatingText.Show("Inventory is full", anchorPos);
                     }
                     else
                     {
-                        xp += ore.XpPerOre;
                         FloatingText.Show($"+1 {ore.DisplayName}", anchorPos);
                         OnOreGained?.Invoke(ore.Id, 1);
-                        int newLevel = xpTable.GetLevel(xp);
-                        if (newLevel > level)
-                        {
-                            level = newLevel;
-                            FloatingText.Show($"Mining level {level}", anchorPos);
-                            OnLevelUp?.Invoke(level);
-                        }
+                    }
+
+                    int newLevel = xpTable.GetLevel(xp);
+                    if (newLevel > level)
+                    {
+                        level = newLevel;
+                        FloatingText.Show($"Mining level {level}", anchorPos);
+                        OnLevelUp?.Invoke(level);
                     }
                 }
 
