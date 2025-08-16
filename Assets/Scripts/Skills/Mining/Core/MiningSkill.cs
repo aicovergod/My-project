@@ -35,6 +35,7 @@ namespace Skills.Mining
         public event System.Action<int> OnLevelUp;
 
         public int Level => level;
+        public int Xp => xp;
         public bool IsMining => currentRock != null;
         public MineableRock CurrentRock => currentRock;
         public int CurrentSwingSpeedTicks => currentPickaxe?.SwingSpeedTicks ?? 0;
