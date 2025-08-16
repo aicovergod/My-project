@@ -48,7 +48,7 @@ namespace Skills.Mining
         {
             if (inventory == null)
                 inventory = GetComponent<Inventory.Inventory>();
-            save = saveProvider as IMiningSave ?? new PlayerPrefsMiningSave();
+            save = saveProvider as IMiningSave ?? new SaveManagerMiningSave();
             xp = save.LoadXp();
             level = xpTable != null ? xpTable.GetLevel(xp) : 1;
 

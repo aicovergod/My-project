@@ -1,6 +1,7 @@
 // Assets/Scripts/Inventory/Inventory.cs
 using System;
 using UnityEngine;
+using Core.Save;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 #if ENABLE_INPUT_SYSTEM
@@ -812,21 +813,12 @@ namespace Inventory
                 };
             }
 
-            string json = JsonUtility.ToJson(data);
-            PlayerPrefs.SetString(SaveKey, json);
-            PlayerPrefs.Save();
+            SaveManager.Save(SaveKey, data);
         }
 
         public void Load()
         {
-            if (!PlayerPrefs.HasKey(SaveKey))
-                return;
-
-            string json = PlayerPrefs.GetString(SaveKey, string.Empty);
-            if (string.IsNullOrEmpty(json))
-                return;
-
-            var data = JsonUtility.FromJson<InventorySaveData>(json);
+            var data = SaveManager.Load<InventorySaveData>(SaveKey);
             if (data?.slots == null)
                 return;
 
