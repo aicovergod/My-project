@@ -52,14 +52,23 @@ namespace Inventory
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
             if (eventData.button == PointerEventData.InputButton.Left)
             {
                 if (!eventData.dragging)
-                    inventory?.SellItem(index);
+                {
+                    if (shift)
+                        inventory?.PromptStackSplit(index, true);
+                    else
+                        inventory?.SellItem(index, 1);
+                }
             }
             else if (eventData.button == PointerEventData.InputButton.Right)
             {
-                inventory?.DropItem(index);
+                if (shift)
+                    inventory?.PromptStackSplit(index, false);
+                else
+                    inventory?.DropItem(index, 1);
             }
         }
     }

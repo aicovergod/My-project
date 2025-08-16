@@ -303,39 +303,45 @@ namespace Inventory
         }
 
         /// <summary>
-        /// Adds an item, stacking when possible. Returns true if added.
+        /// Adds an item, stacking when possible. Returns true if the entire
+        /// quantity could be added.
         /// </summary>
-        public bool AddItem(ItemData item)
+        public bool AddItem(ItemData item, int quantity = 1)
         {
-            if (item == null)
+            if (item == null || quantity <= 0)
                 return false;
+
+            if (!CanAddItem(item, quantity))
+                return false;
+
+            int remaining = quantity;
 
             if (item.stackable)
             {
-                for (int i = 0; i < items.Length; i++)
+                for (int i = 0; i < items.Length && remaining > 0; i++)
                 {
                     if (items[i].item == item && items[i].count < item.maxStack)
                     {
-                        items[i].count++;
+                        int add = Mathf.Min(item.maxStack - items[i].count, remaining);
+                        items[i].count += add;
+                        remaining -= add;
                         UpdateSlotVisual(i);
-                        return true;
                     }
                 }
             }
 
-            for (int i = 0; i < items.Length; i++)
+            for (int i = 0; i < items.Length && remaining > 0; i++)
             {
                 if (items[i].item == null)
                 {
                     items[i].item = item;
-                    items[i].count = 1;
+                    items[i].count = item.stackable ? Mathf.Min(item.maxStack, remaining) : 1;
+                    remaining -= items[i].count;
                     UpdateSlotVisual(i);
-
-                    return true;
                 }
             }
 
-            return false; // inventory full
+            return remaining <= 0;
         }
 
         /// <summary>
@@ -354,28 +360,41 @@ namespace Inventory
         }
 
         /// <summary>
-        /// Returns true if there is room to add at least one of the given item.
+        /// Returns true if there is room to add the specified quantity of the
+        /// given item.
         /// </summary>
-        public bool CanAddItem(ItemData item)
+        public bool CanAddItem(ItemData item, int quantity = 1)
         {
-            if (item == null)
+            if (item == null || quantity <= 0)
                 return false;
+
+            int space = 0;
 
             if (item.stackable)
             {
                 for (int i = 0; i < items.Length; i++)
                 {
-                    if (items[i].item == item && items[i].count < item.maxStack)
+                    if (items[i].item == item)
+                        space += item.maxStack - items[i].count;
+                    else if (items[i].item == null)
+                        space += item.maxStack;
+
+                    if (space >= quantity)
+                        return true;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < items.Length; i++)
+                {
+                    if (items[i].item == null)
+                        space++;
+                    if (space >= quantity)
                         return true;
                 }
             }
 
-            for (int i = 0; i < items.Length; i++)
-            {
-                if (items[i].item == null)
-                    return true;
-            }
-            return false;
+            return space >= quantity;
         }
 
         /// <summary>
@@ -439,20 +458,40 @@ namespace Inventory
         }
 
         /// <summary>
-        /// Drops the item from the specified slot.
+        /// Drops a quantity of the item from the specified slot.
         /// </summary>
-        public void DropItem(int slotIndex)
+        public void DropItem(int slotIndex, int quantity = 1)
         {
             if (slotIndex < 0 || slotIndex >= items.Length) return;
             var entry = items[slotIndex];
             if (entry.item == null) return;
 
-            entry.count--;
+            int remove = Mathf.Clamp(quantity, 1, entry.count);
+            entry.count -= remove;
             if (entry.count <= 0)
                 entry.item = null;
             items[slotIndex] = entry;
             UpdateSlotVisual(slotIndex);
             HideTooltip();
+        }
+
+        /// <summary>
+        /// Opens the stack split dialog for the specified slot. If <paramref name="sell"/>
+        /// is true the selected quantity will be sold, otherwise it will be dropped.
+        /// </summary>
+        public void PromptStackSplit(int slotIndex, bool sell)
+        {
+            if (slotIndex < 0 || slotIndex >= items.Length) return;
+            var entry = items[slotIndex];
+            if (entry.item == null || entry.count <= 1) return;
+
+            StackSplitDialog.Show(uiRoot.transform, entry.count, amount =>
+            {
+                if (sell)
+                    SellItem(slotIndex, amount);
+                else
+                    DropItem(slotIndex, amount);
+            });
         }
 
         public void ShowTooltip(int slotIndex, RectTransform slotRect)
@@ -491,9 +530,10 @@ namespace Inventory
         }
 
         /// <summary>
-        /// Attempts to sell the item at the given slot index to the current shop.
+        /// Attempts to sell a quantity of the item at the given slot index to
+        /// the current shop.
         /// </summary>
-        public void SellItem(int slotIndex)
+        public void SellItem(int slotIndex, int quantity = 1)
         {
             if (currentShop == null)
                 return;
@@ -502,7 +542,17 @@ namespace Inventory
             var item = items[slotIndex].item;
             if (item == null)
                 return;
-            if (currentShop.Sell(item, this))
+
+            int sold = 0;
+            for (int i = 0; i < quantity; i++)
+            {
+                if (currentShop.Sell(item, this))
+                    sold++;
+                else
+                    break;
+            }
+
+            if (sold > 0)
             {
                 HideTooltip();
                 currentShopUI?.Refresh();
