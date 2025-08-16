@@ -1,4 +1,5 @@
 using UnityEngine;
+using Core.Save;
 
 namespace Skills.Mining
 {
@@ -8,19 +9,18 @@ namespace Skills.Mining
         void SaveXp(int xp);
     }
 
-    public class PlayerPrefsMiningSave : IMiningSave
+    public class SaveManagerMiningSave : IMiningSave
     {
         private const string Key = "mining_xp";
 
         public int LoadXp()
         {
-            return PlayerPrefs.GetInt(Key, 0);
+            return SaveManager.Load<int>(Key);
         }
 
         public void SaveXp(int xp)
         {
-            PlayerPrefs.SetInt(Key, xp);
-            PlayerPrefs.Save();
+            SaveManager.Save(Key, xp);
         }
     }
 }

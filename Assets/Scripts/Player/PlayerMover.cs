@@ -2,6 +2,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using System;
+using Core.Save;
 
 namespace Player
 {
@@ -28,10 +30,16 @@ namespace Player
         private Animator anim;
         private SpriteRenderer sr;
 
-        private const string PosXKey = "PlayerPosX";
-        private const string PosYKey = "PlayerPosY";
-        private const string PosZKey = "PlayerPosZ";
-        private const string SceneKey = "PlayerScene";
+        [Serializable]
+        private class PositionData
+        {
+            public float x;
+            public float y;
+            public float z;
+            public string scene;
+        }
+
+        private const string PositionKey = "PlayerPosition";
 
         // 0=Down, 1=Left, 2=Right, 3=Up
         private int facingDir = 0;
@@ -166,23 +174,26 @@ namespace Player
         private void SavePosition()
         {
             Vector3 pos = transform.position;
-            PlayerPrefs.SetFloat(PosXKey, pos.x);
-            PlayerPrefs.SetFloat(PosYKey, pos.y);
-            PlayerPrefs.SetFloat(PosZKey, pos.z);
-            PlayerPrefs.SetString(SceneKey, SceneManager.GetActiveScene().name);
-            PlayerPrefs.Save();
+            var data = new PositionData
+            {
+                x = pos.x,
+                y = pos.y,
+                z = pos.z,
+                scene = SceneManager.GetActiveScene().name
+            };
+            SaveManager.Save(PositionKey, data);
         }
 
         private void LoadPosition()
         {
-            if (!PlayerPrefs.HasKey(PosXKey))
+            var data = SaveManager.Load<PositionData>(PositionKey);
+            if (data == null)
                 return;
 
-            string sceneName = PlayerPrefs.GetString(SceneKey, SceneManager.GetActiveScene().name);
-            if (SceneManager.GetActiveScene().name != sceneName)
+            if (SceneManager.GetActiveScene().name != data.scene)
             {
                 SceneManager.sceneLoaded += OnSceneLoaded;
-                SceneManager.LoadScene(sceneName);
+                SceneManager.LoadScene(data.scene);
             }
             else
             {
@@ -192,7 +203,8 @@ namespace Player
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            if (scene.name == PlayerPrefs.GetString(SceneKey))
+            var data = SaveManager.Load<PositionData>(PositionKey);
+            if (data != null && scene.name == data.scene)
             {
                 ApplySavedPosition();
                 SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -201,10 +213,9 @@ namespace Player
 
         private void ApplySavedPosition()
         {
-            float x = PlayerPrefs.GetFloat(PosXKey);
-            float y = PlayerPrefs.GetFloat(PosYKey);
-            float z = PlayerPrefs.GetFloat(PosZKey);
-            transform.position = new Vector3(x, y, z);
+            var data = SaveManager.Load<PositionData>(PositionKey);
+            if (data != null)
+                transform.position = new Vector3(data.x, data.y, data.z);
         }
     }
 }
