@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
+using ShopSystem;
+using Inventory;
 
 namespace Skills
 {
@@ -13,6 +15,10 @@ namespace Skills
         private Text miningText;
         private Mining.MiningSkill miningSkill;
 
+        public static SkillsUI Instance { get; private set; }
+
+        public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreateInstance()
         {
@@ -23,10 +29,24 @@ namespace Skills
 
         private void Awake()
         {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+
             miningSkill = FindObjectOfType<Mining.MiningSkill>();
             CreateUI();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+                Instance = null;
         }
 
         private void CreateUI()
@@ -64,14 +84,33 @@ namespace Skills
         {
             if (Input.GetKeyDown(KeyCode.O))
             {
+                var shop = ShopUI.Instance;
+                if (shop != null && shop.IsOpen)
+                    return;
+
                 if (uiRoot != null)
+                {
+                    bool opening = !uiRoot.activeSelf;
+                    if (opening)
+                    {
+                        var inv = Object.FindObjectOfType<Inventory.Inventory>();
+                        if (inv != null && inv.IsOpen)
+                            inv.CloseUI();
+                    }
                     uiRoot.SetActive(!uiRoot.activeSelf);
+                }
             }
 
             if (uiRoot != null && uiRoot.activeSelf && miningSkill != null)
             {
                 miningText.text = $"Mining Level: {miningSkill.Level}  XP: {miningSkill.Xp}";
             }
+        }
+
+        public void Close()
+        {
+            if (uiRoot != null)
+                uiRoot.SetActive(false);
         }
     }
 }

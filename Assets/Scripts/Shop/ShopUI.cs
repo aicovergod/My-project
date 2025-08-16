@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Inventory;
 using Player;
+using Skills;
 using NPC;
 
 namespace ShopSystem
@@ -46,6 +47,8 @@ namespace ShopSystem
         private static ShopUI instance;
         public static ShopUI Instance => instance;
 
+        public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
+
         private void Awake()
         {
             if (instance != null && instance != this)
@@ -84,6 +87,9 @@ namespace ShopSystem
             if (shop == null) return;
             currentShop = shop;
             Refresh();
+            var skills = SkillsUI.Instance;
+            if (skills != null && skills.IsOpen)
+                skills.Close();
             uiRoot.SetActive(true);
             if (playerInventory != null)
             {
@@ -115,6 +121,7 @@ namespace ShopSystem
             {
                 playerInventory.OnInventoryChanged -= HandleInventoryChanged;
                 playerInventory.SetShopContext(null);
+                playerInventory.CloseUI();
             }
             if (playerMover != null)
             {

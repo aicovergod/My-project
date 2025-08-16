@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 #endif
 using ShopSystem;
 using Player;
+using Skills;
 
 namespace Inventory
 {
@@ -98,7 +99,15 @@ namespace Inventory
 
         public event Action OnInventoryChanged;
 
+        public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
+
         private bool CanDropItems => playerMover == null || playerMover.CanDrop;
+
+        public void CloseUI()
+        {
+            if (uiRoot != null)
+                uiRoot.SetActive(false);
+        }
 
         private void Awake()
         {
@@ -839,7 +848,15 @@ namespace Inventory
                 return;
             }
             if (toggle && uiRoot != null)
+            {
+                if (!uiRoot.activeSelf)
+                {
+                    var skills = SkillsUI.Instance;
+                    if (skills != null && skills.IsOpen)
+                        skills.Close();
+                }
                 uiRoot.SetActive(!uiRoot.activeSelf);
+            }
         }
 
         /// <summary>
