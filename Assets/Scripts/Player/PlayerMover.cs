@@ -15,6 +15,9 @@ namespace Player
         [Tooltip("Deadzone used when reading analog sticks to snap to -1/0/1.")]
         public float gamepadDeadzone = 0.3f;
 
+        [HideInInspector]
+        public bool CanDrop = true;
+
         [Header("(Optional) Direct Sprite Override")]
         [Tooltip("If assigned, these sprites will be applied directly each frame based on Dir/IsMoving. Leave null to rely on Animator clips.")]
         public Sprite idleDown, idleLeft, idleRight, idleUp;
