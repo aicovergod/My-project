@@ -13,7 +13,9 @@ namespace Skills.Mining
         private Transform target;
         private Image progressImage;
         private GameObject progressRoot;
-        private readonly Vector3 offset = new Vector3(0f, 1.5f, 0f);
+        // Offset from the targeted rock's position where the progress bar will appear.
+        // Reduced the vertical component to half of its previous value so the bar sits closer to the object.
+        private readonly Vector3 offset = new Vector3(0f, 0.75f, 0f);
 
         private float currentFill;
         private float nextFill;
