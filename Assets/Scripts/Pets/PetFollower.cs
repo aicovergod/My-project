@@ -38,6 +38,7 @@ namespace Pets
         private Vector3 wanderTarget;
         private float wanderTimer;
         private bool wandering;
+        private int blockedLayers;
 
         private void Awake()
         {
@@ -54,6 +55,7 @@ namespace Pets
             IgnoreNPCs();
             ChooseOffset(Vector2.right);
             offset = targetOffset;
+            blockedLayers = LayerMask.GetMask("Obstacle", "Interactable");
         }
 
         public void SetPlayer(Transform newPlayer)
@@ -117,14 +119,20 @@ namespace Pets
                     wanderTimer -= Time.fixedDeltaTime;
                     if (wanderTimer <= 0f)
                     {
-                        wanderTarget = playerPos + (Vector3)Random.insideUnitCircle * wanderRadius;
+                        wanderTarget = GetWanderTarget(playerPos);
                         wanderTimer = Random.Range(wanderDelayRange.x, wanderDelayRange.y);
                     }
                 }
 
                 newPos = Vector3.SmoothDamp(transform.position, wanderTarget, ref currentVelocity, smoothTime, wanderMoveSpeed, Time.fixedDeltaTime);
                 velocity = currentVelocity;
+                newPos = MoveWithCollisions(newPos, out bool hit);
                 body.MovePosition(newPos);
+                if (hit)
+                {
+                    wanderTimer = 0f;
+                    wanderTarget = transform.position;
+                }
 
                 if (spriteAnimator != null)
                     spriteAnimator.UpdateVisuals(velocity);
@@ -145,6 +153,7 @@ namespace Pets
             newPos = Vector3.SmoothDamp(transform.position, target, ref currentVelocity, smoothTime, moveSpeed, Time.fixedDeltaTime);
 
             velocity = currentVelocity;
+            newPos = MoveWithCollisions(newPos, out _);
             body.MovePosition(newPos);
 
             if (Vector3.Distance(transform.position, playerPos) < followRadius * 0.5f)
@@ -191,6 +200,36 @@ namespace Pets
         {
             if (collision.collider.gameObject.name.Contains("NPC"))
                 Physics2D.IgnoreCollision(col, collision.collider);
+        }
+
+        private Vector3 GetWanderTarget(Vector3 center)
+        {
+            float radius = col != null ? col.bounds.extents.x : 0.1f;
+            for (int i = 0; i < 10; i++)
+            {
+                Vector3 candidate = center + (Vector3)Random.insideUnitCircle * wanderRadius;
+                if (!Physics2D.OverlapCircle(candidate, radius, blockedLayers))
+                    return candidate;
+            }
+            return center;
+        }
+
+        private Vector3 MoveWithCollisions(Vector3 targetPos, out bool hit)
+        {
+            Vector3 currentPos = transform.position;
+            Vector2 dir = targetPos - currentPos;
+            float dist = dir.magnitude;
+            hit = false;
+            if (dist <= 0f || col == null)
+                return targetPos;
+            float radius = col.bounds.extents.x;
+            RaycastHit2D cast = Physics2D.CircleCast(currentPos, radius, dir.normalized, dist, blockedLayers);
+            if (cast.collider != null)
+            {
+                hit = true;
+                return cast.point - dir.normalized * radius;
+            }
+            return targetPos;
         }
     }
 }
