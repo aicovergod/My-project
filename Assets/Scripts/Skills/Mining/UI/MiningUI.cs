@@ -7,7 +7,7 @@ namespace Skills.Mining
     /// <summary>
     /// Displays mining progress above the current rock.
     /// </summary>
-    public class MiningUI : MonoBehaviour
+    public class MiningUI : MonoBehaviour, ITickable
     {
         private MiningSkill skill;
         private Transform target;
@@ -90,7 +90,7 @@ namespace Skills.Mining
             nextFill = step;
             progressRoot.SetActive(true);
             if (Ticker.Instance != null)
-                Ticker.Instance.OnTick += HandleTick;
+                Ticker.Instance.Subscribe(this);
         }
 
         private void HandleStop()
@@ -98,7 +98,7 @@ namespace Skills.Mining
             target = null;
             progressRoot.SetActive(false);
             if (Ticker.Instance != null)
-                Ticker.Instance.OnTick -= HandleTick;
+                Ticker.Instance.Unsubscribe(this);
         }
 
         private void Update()
@@ -113,7 +113,7 @@ namespace Skills.Mining
             progressImage.fillAmount = Mathf.Lerp(currentFill, nextFill, t);
         }
 
-        private void HandleTick()
+        public void OnTick()
         {
             if (target == null || skill == null || !skill.IsMining)
                 return;
@@ -139,6 +139,9 @@ namespace Skills.Mining
                 skill.OnStartMining -= HandleStart;
                 skill.OnStopMining -= HandleStop;
             }
+
+            if (Ticker.Instance != null)
+                Ticker.Instance.Unsubscribe(this);
         }
     }
 }

@@ -1,9 +1,10 @@
 using UnityEngine;
+using Util;
 
 namespace NPC
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    public class NpcRandomMovement : MonoBehaviour
+    public class NpcRandomMovement : MonoBehaviour, ITickable
     {
         [Header("Movement Area")]
         [Tooltip("Width and height of the wandering area centered on the start position.")]
@@ -64,11 +65,24 @@ namespace NPC
             _waiting = false;
         }
 
-        private void FixedUpdate()
+        private void OnEnable()
         {
+            if (Ticker.Instance != null)
+                Ticker.Instance.Subscribe(this);
+        }
+
+        private void OnDisable()
+        {
+            if (Ticker.Instance != null)
+                Ticker.Instance.Unsubscribe(this);
+        }
+
+        public void OnTick()
+        {
+            float delta = Ticker.TickDuration;
             if (_waiting)
             {
-                _waitTimer -= Time.fixedDeltaTime;
+                _waitTimer -= delta;
                 if (_waitTimer <= 0f)
                     ChooseNewTarget();
                 if (spriteAnimator != null) spriteAnimator.UpdateVisuals(Vector2.zero);
@@ -76,8 +90,8 @@ namespace NPC
             }
 
             Vector2 current = _rb != null ? _rb.position : (Vector2)transform.position;
-            Vector2 next = Vector2.MoveTowards(current, _target, moveSpeed * Time.fixedDeltaTime);
-            Vector2 velocity = (next - _lastPos) / Time.fixedDeltaTime;
+            Vector2 next = Vector2.MoveTowards(current, _target, moveSpeed * delta);
+            Vector2 velocity = (next - _lastPos) / delta;
 
             if (_rb != null) _rb.MovePosition(next);
             else transform.position = next;

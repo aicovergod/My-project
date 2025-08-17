@@ -11,7 +11,7 @@ namespace Skills.Mining
     /// Handles XP, level, and mining tick logic.
     /// </summary>
     [DisallowMultipleComponent]
-    public class MiningSkill : MonoBehaviour
+    public class MiningSkill : MonoBehaviour, ITickable
     {
         [SerializeField] private XpTable xpTable;
         [SerializeField] private Inventory.Inventory inventory;
@@ -66,7 +66,7 @@ namespace Skills.Mining
         private void OnDisable()
         {
             if (Ticker.Instance != null)
-                Ticker.Instance.OnTick -= HandleTick;
+                Ticker.Instance.Unsubscribe(this);
             if (tickerCoroutine != null)
                 StopCoroutine(tickerCoroutine);
         }
@@ -75,7 +75,7 @@ namespace Skills.Mining
         {
             if (Ticker.Instance != null)
             {
-                Ticker.Instance.OnTick += HandleTick;
+                Ticker.Instance.Subscribe(this);
                 Debug.Log("MiningSkill subscribed to ticker.");
             }
             else
@@ -88,7 +88,7 @@ namespace Skills.Mining
         {
             while (Ticker.Instance == null)
                 yield return null;
-            Ticker.Instance.OnTick += HandleTick;
+            Ticker.Instance.Subscribe(this);
             Debug.Log("MiningSkill subscribed to ticker after waiting.");
         }
 
@@ -106,7 +106,7 @@ namespace Skills.Mining
             save.SaveXp(xp);
         }
 
-        private void HandleTick()
+        public void OnTick()
         {
             if (!IsMining)
                 return;
