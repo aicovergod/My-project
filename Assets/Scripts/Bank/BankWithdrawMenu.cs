@@ -52,7 +52,8 @@ namespace BankSystem
             var btnGO = new GameObject(label, typeof(Image), typeof(Button));
             btnGO.transform.SetParent(transform, false);
             var img = btnGO.GetComponent<Image>();
-            img.color = Color.white;
+            img.sprite = Resources.Load<Sprite>("Sprites/BankUI/Button_1");
+            img.color = new Color(0f, 0f, 0f, 0f);
             var btn = btnGO.GetComponent<Button>();
             btn.onClick.AddListener(onClick);
 
@@ -61,7 +62,7 @@ namespace BankSystem
             var txt = txtGO.GetComponent<Text>();
             txt.font = font;
             txt.alignment = TextAnchor.MiddleLeft;
-            txt.color = Color.black;
+            txt.color = Color.white;
             txt.text = label;
 
             var rect = btnGO.GetComponent<RectTransform>();
