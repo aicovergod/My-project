@@ -93,7 +93,7 @@ namespace Skills
                     bool opening = !uiRoot.activeSelf;
                     if (opening)
                     {
-                        var inv = Object.FindObjectOfType<Inventory.InventoryUI>();
+                        var inv = Object.FindObjectOfType<Inventory.Inventory>();
                         if (inv != null && inv.IsOpen)
                             inv.CloseUI();
                     }
