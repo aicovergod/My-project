@@ -12,7 +12,8 @@ namespace Pets
         public float followRadius = 0.6f;
         public float maxDistance = 2.0f;
         public float moveSpeed = 6f;
-        public float jitter = 0.05f;
+        public float noiseAmplitude = 0.05f;
+        public float noiseFrequency = 5f;
         public float smoothTime = 0.2f;
         public float offsetLerpSpeed = 5f;
         public float headingRefreshAngle = 30f;
@@ -80,7 +81,13 @@ namespace Pets
                 target = playerPos;
 
             Vector3 newPos = Vector3.SmoothDamp(transform.position, target, ref currentVelocity, smoothTime, moveSpeed, Time.fixedDeltaTime);
-            newPos.y += Mathf.Sin(Time.time * 5f) * jitter;
+
+            float t = Time.time * noiseFrequency;
+            float noiseX = (Mathf.PerlinNoise(t, 0f) - 0.5f) * 2f * noiseAmplitude;
+            float noiseY = (Mathf.PerlinNoise(0f, t) - 0.5f) * 2f * noiseAmplitude;
+            newPos.x += noiseX;
+            newPos.y += noiseY;
+
             Vector2 velocity = currentVelocity;
             body.MovePosition(newPos);
 
