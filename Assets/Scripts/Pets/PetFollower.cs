@@ -18,11 +18,13 @@ namespace Pets
         private Vector3 offset;
         private Rigidbody2D body;
         private SpriteRenderer sprite;
+        private PetSpriteAnimator spriteAnimator;
 
         private void Awake()
         {
             body = GetComponent<Rigidbody2D>();
             sprite = GetComponent<SpriteRenderer>();
+            spriteAnimator = GetComponent<PetSpriteAnimator>();
             FindPlayer();
             ChooseOffset();
         }
@@ -56,12 +58,15 @@ namespace Pets
 
             Vector3 newPos = Vector3.MoveTowards(transform.position, target, moveSpeed * Time.deltaTime);
             newPos.y += Mathf.Sin(Time.time * 5f) * jitter;
+            Vector2 velocity = (newPos - transform.position) / Time.deltaTime;
             body.MovePosition(newPos);
 
             if (Vector3.Distance(transform.position, player.position) < followRadius * 0.5f)
                 ChooseOffset();
 
-            if (sprite != null)
+            if (spriteAnimator != null)
+                spriteAnimator.UpdateVisuals(velocity);
+            else if (sprite != null)
                 sprite.flipX = newPos.x > player.position.x;
         }
     }

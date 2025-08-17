@@ -26,10 +26,45 @@ namespace Pets
             go.transform.position = position;
 
             var sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = def.sprite;
             sr.sortingLayerName = "Characters";
-            if (def.sprite != null && def.sprite.texture != null)
-                def.sprite.texture.filterMode = FilterMode.Point;
+            sr.sprite = def.sprite;
+            if (sr.sprite == null)
+            {
+                if (def.idleDown != null && def.idleDown.Length > 0) sr.sprite = def.idleDown[0];
+                else if (def.walkDown != null && def.walkDown.Length > 0) sr.sprite = def.walkDown[0];
+                else if (def.idleRight != null && def.idleRight.Length > 0) sr.sprite = def.idleRight[0];
+                else if (def.walkRight != null && def.walkRight.Length > 0) sr.sprite = def.walkRight[0];
+                else if (def.idleUp != null && def.idleUp.Length > 0) sr.sprite = def.idleUp[0];
+                else if (def.walkUp != null && def.walkUp.Length > 0) sr.sprite = def.walkUp[0];
+                else if (def.idleLeft != null && def.idleLeft.Length > 0) sr.sprite = def.idleLeft[0];
+                else if (def.walkLeft != null && def.walkLeft.Length > 0) sr.sprite = def.walkLeft[0];
+            }
+            if (sr.sprite != null && sr.sprite.texture != null)
+                sr.sprite.texture.filterMode = FilterMode.Point;
+
+            bool hasFrameSprites =
+                (def.idleUp != null && def.idleUp.Length > 0) ||
+                (def.walkUp != null && def.walkUp.Length > 0) ||
+                (def.idleDown != null && def.idleDown.Length > 0) ||
+                (def.walkDown != null && def.walkDown.Length > 0) ||
+                (def.idleLeft != null && def.idleLeft.Length > 0) ||
+                (def.walkLeft != null && def.walkLeft.Length > 0) ||
+                (def.idleRight != null && def.idleRight.Length > 0) ||
+                (def.walkRight != null && def.walkRight.Length > 0);
+
+            if (hasFrameSprites && (def.animationClips == null || def.animationClips.Length == 0))
+            {
+                var spriteAnim = go.AddComponent<PetSpriteAnimator>();
+                spriteAnim.spriteRenderer = sr;
+                spriteAnim.idleUp = def.idleUp;
+                spriteAnim.walkUp = def.walkUp;
+                spriteAnim.idleDown = def.idleDown;
+                spriteAnim.walkDown = def.walkDown;
+                spriteAnim.idleLeft = def.idleLeft;
+                spriteAnim.walkLeft = def.walkLeft;
+                spriteAnim.idleRight = def.idleRight;
+                spriteAnim.walkRight = def.walkRight;
+            }
 
             if (def.animationClips != null && def.animationClips.Length > 0)
             {
