@@ -11,7 +11,6 @@ namespace Pets
     public class PetClickable : MonoBehaviour
     {
         private PetDefinition definition;
-        private int layerMask;
 
         public void Init(PetDefinition def)
         {
@@ -20,7 +19,6 @@ namespace Pets
 
         private void Awake()
         {
-            layerMask = LayerMask.GetMask("Pets");
             var col = GetComponent<Collider2D>();
             col.isTrigger = true;
         }
@@ -31,7 +29,7 @@ namespace Pets
             {
                 Vector3 world = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 Vector2 p = new Vector2(world.x, world.y);
-                var hit = Physics2D.OverlapPoint(p, layerMask);
+                var hit = Physics2D.OverlapPoint(p);
                 if (hit != null && hit.gameObject == gameObject)
                     OnClicked();
             }
