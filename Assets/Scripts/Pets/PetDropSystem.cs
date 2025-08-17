@@ -142,7 +142,10 @@ namespace Pets
 
             DespawnActive();
             Vector3 spawnPos = position + (Vector3)(UnityEngine.Random.insideUnitCircle * 0.5f);
-            activePetGO = PetSpawner.Spawn(pet, spawnPos);
+
+            // Find the player once at spawn time so the follower knows whom to follow.
+            var playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+            activePetGO = PetSpawner.Spawn(pet, spawnPos, playerTransform);
             activePetDef = pet;
             PetSaveBridge.Save(pet.id);
             PetToastUI.Show("You have a funny feeling like you're being followed…", pet.messageColor);
