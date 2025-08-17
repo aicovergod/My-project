@@ -308,6 +308,13 @@ namespace Inventory
             // Tooltip setup
             tooltip = new GameObject("Tooltip", typeof(Image), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
             tooltip.transform.SetParent(uiRoot.transform, false);
+
+            // Ensure the tooltip is rendered above other interfaces like the bank
+            var tooltipCanvas = tooltip.AddComponent<Canvas>();
+            tooltipCanvas.overrideSorting = true;
+            tooltipCanvas.sortingOrder = 1000;
+            tooltip.AddComponent<GraphicRaycaster>();
+
             var bg = tooltip.GetComponent<Image>();
             bg.color = new Color(0f, 0f, 0f, 0.75f);
             bg.raycastTarget = false;
