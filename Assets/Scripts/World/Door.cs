@@ -57,7 +57,7 @@ namespace World
             if (Vector2.Distance(player.transform.position, transform.position) > useRadius)
                 yield break;
 
-            Inventory.Inventory inv = player.GetComponent<Inventory.Inventory>();
+            Inventory.InventoryModel inv = player.GetComponent<Inventory.InventoryModel>();
             if (!string.IsNullOrEmpty(requiredItemId))
             {
                 if (inv == null || !inv.HasItem(requiredItemId))

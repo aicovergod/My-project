@@ -22,7 +22,7 @@ namespace Inventory
         public static InventoryDebugMenu Instance;
 
         [Tooltip("Inventory to add items to. If not set the component tries to find one in the scene.")]
-        public Inventory inventory;
+        public InventoryModel inventory;
 
         private ItemData[] allItems = new ItemData[0];
         private Vector2 scroll;
@@ -41,7 +41,7 @@ namespace Inventory
 
             if (inventory == null)
             {
-                inventory = FindObjectOfType<Inventory>();
+                inventory = FindObjectOfType<InventoryModel>();
             }
 
 #if UNITY_EDITOR
