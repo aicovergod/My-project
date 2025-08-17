@@ -144,9 +144,10 @@ namespace Skills.Mining
                     if (item != null && inventory != null)
                         added = inventory.AddItem(item);
 
-                    Vector3 anchorPos = floatingTextAnchor != null
-                        ? floatingTextAnchor.position
-                        : transform.position;
+                    Transform anchorTransform = floatingTextAnchor != null
+                        ? floatingTextAnchor
+                        : transform;
+                    Vector3 anchorPos = anchorTransform.position;
 
                     if (!added)
                     {
@@ -157,6 +158,7 @@ namespace Skills.Mining
 
                     xp += ore.XpPerOre;
                     FloatingText.Show($"+1 {ore.DisplayName}", anchorPos);
+                    StartCoroutine(ShowXpGainDelayed(ore.XpPerOre, anchorTransform));
                     OnOreGained?.Invoke(ore.Id, 1);
 
                     int newLevel = xpTable.GetLevel(xp);
@@ -174,6 +176,15 @@ namespace Skills.Mining
             else
             {
                 Debug.Log($"Failed to mine {currentRock.name}");
+            }
+        }
+
+        private IEnumerator ShowXpGainDelayed(int xpGain, Transform anchor)
+        {
+            yield return new WaitForSeconds(Ticker.TickDuration * 5f);
+            if (anchor != null)
+            {
+                FloatingText.Show($"+{xpGain} XP", anchor.position);
             }
         }
 
