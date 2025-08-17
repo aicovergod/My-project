@@ -189,6 +189,35 @@ namespace Inventory
         }
 
         /// <summary>
+        /// Replaces the item in the specified slot with another item and quantity.
+        /// The slot must currently contain the expected item. Returns true on success.
+        /// </summary>
+        public bool ReplaceItem(int slotIndex, ItemData expectedItem, ItemData newItem, int quantity)
+        {
+            if (slotIndex < 0 || slotIndex >= items.Length)
+                return false;
+            if (items[slotIndex].item != expectedItem)
+                return false;
+            if (newItem == null || quantity <= 0)
+                return false;
+
+            if (newItem.stackable)
+            {
+                if (quantity > newItem.maxStack)
+                    return false;
+            }
+            else if (quantity != 1)
+            {
+                return false;
+            }
+
+            items[slotIndex].item = newItem;
+            items[slotIndex].count = newItem.stackable ? quantity : 1;
+            OnInventoryChanged?.Invoke();
+            return true;
+        }
+
+        /// <summary>
         /// Checks whether the inventory contains an item by ID.
         /// </summary>
         public bool HasItem(string id)
