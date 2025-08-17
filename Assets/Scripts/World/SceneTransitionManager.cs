@@ -47,7 +47,7 @@ namespace World
             if (player != null)
             {
                 _playerToMove = player.transform;
-                var inv = player.GetComponent<Inventory.InventoryModel>();
+                var inv = player.GetComponent<Inventory.Inventory>();
                 if (removeItemOnUse && inv != null && !string.IsNullOrEmpty(requiredItemId))
                     inv.RemoveItem(requiredItemId);
                 DontDestroyOnLoad(player);

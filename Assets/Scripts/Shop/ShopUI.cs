@@ -32,8 +32,7 @@ namespace ShopSystem
         public Color priceColor = Color.white;
 
         [Header("Inventory")]
-        public Inventory.InventoryModel playerInventory;
-        public Inventory.InventoryUI playerInventoryUI;
+        public Inventory.Inventory playerInventory;
 
         private GameObject uiRoot;
         private static GameObject sharedUIRoot;
@@ -122,8 +121,8 @@ namespace ShopSystem
             {
                 playerInventory.OnInventoryChanged -= HandleInventoryChanged;
                 playerInventory.SetShopContext(null);
+                playerInventory.CloseUI();
             }
-            playerInventoryUI?.CloseUI();
             if (playerMover != null)
             {
                 playerMover.enabled = true;

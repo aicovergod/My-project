@@ -24,7 +24,7 @@ namespace Inventory
             if (!other.CompareTag("Player"))
                 return;
 
-            InventoryModel inv = other.GetComponent<InventoryModel>();
+            Inventory inv = other.GetComponent<Inventory>();
             if (inv != null && inv.AddItem(item))
             {
                 Destroy(gameObject);
