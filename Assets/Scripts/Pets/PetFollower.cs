@@ -17,7 +17,7 @@ namespace Pets
         public float offsetLerpSpeed = 5f;
         public float headingRefreshAngle = 30f;
 
-        private Transform player;
+        [SerializeField] private Transform player;
         private Vector3 offset;
         private Vector3 targetOffset;
         private Vector2 lastHeading;
@@ -32,18 +32,17 @@ namespace Pets
             body = GetComponent<Rigidbody2D>();
             sprite = GetComponent<SpriteRenderer>();
             spriteAnimator = GetComponent<PetSpriteAnimator>();
-            FindPlayer();
             if (player != null)
                 lastPlayerPos = player.position;
             ChooseOffset(Vector2.right);
             offset = targetOffset;
         }
 
-        private void FindPlayer()
+        public void SetPlayer(Transform newPlayer)
         {
-            var go = GameObject.FindGameObjectWithTag("Player");
-            if (go != null)
-                player = go.transform;
+            player = newPlayer;
+            if (player != null)
+                lastPlayerPos = player.position;
         }
 
         private void ChooseOffset(Vector2 heading)
@@ -56,11 +55,7 @@ namespace Pets
         private void FixedUpdate()
         {
             if (player == null)
-            {
-                FindPlayer();
-                if (player == null)
-                    return;
-            }
+                return;
 
             Vector3 playerPos = player.position;
             Vector3 playerVel = (playerPos - lastPlayerPos) / Time.fixedDeltaTime;
