@@ -45,6 +45,7 @@ namespace BankSystem
             CreateButton("Withdraw 5", () => { bank?.Withdraw(slotIndex, 5); Hide(); });
             CreateButton("Withdraw 10", () => { bank?.Withdraw(slotIndex, 10); Hide(); });
             CreateButton("Withdraw X", () => { bank?.PromptWithdrawAmount(slotIndex); Hide(); });
+            CreateButton("Withdraw All", () => { bank?.WithdrawAll(slotIndex); Hide(); });
         }
 
         private void CreateButton(string label, UnityAction onClick)
