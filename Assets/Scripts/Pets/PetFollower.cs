@@ -18,6 +18,10 @@ namespace Pets
         public float offsetLerpSpeed = 5f;
         public float headingRefreshAngle = 30f;
 
+        public float idleThreshold = 5f;
+        public float wanderRadius = 3f;
+        public float wanderTargetRefreshTime = 2f;
+
         [SerializeField] private Transform player;
         private Vector3 offset;
         private Vector3 targetOffset;
@@ -29,6 +33,10 @@ namespace Pets
         private Collider2D col;
         private PlayerMover playerMover;
         private Vector3 currentVelocity;
+        private float idleTimer;
+        private Vector3 wanderTarget;
+        private float wanderTimer;
+        private bool wandering;
 
         private void Awake()
         {
@@ -78,12 +86,41 @@ namespace Pets
 
             if (playerMoving)
             {
+                idleTimer = 0f;
+                wandering = false;
                 Vector2 heading = ((Vector2)playerVel).normalized;
                 if (lastHeading == Vector2.zero || Vector2.Angle(lastHeading, heading) > headingRefreshAngle)
                 {
                     ChooseOffset(heading);
                     lastHeading = heading;
                 }
+            }
+            else
+            {
+                idleTimer += Time.fixedDeltaTime;
+                if (idleTimer >= idleThreshold)
+                    wandering = true;
+            }
+
+            if (wandering)
+            {
+                wanderTimer -= Time.fixedDeltaTime;
+                if (wanderTimer <= 0f || Vector3.Distance(transform.position, wanderTarget) < 0.1f)
+                {
+                    wanderTarget = playerPos + (Vector3)Random.insideUnitCircle * wanderRadius;
+                    wanderTimer = wanderTargetRefreshTime;
+                }
+
+                Vector3 newPos = Vector3.SmoothDamp(transform.position, wanderTarget, ref currentVelocity, smoothTime, moveSpeed, Time.fixedDeltaTime);
+                Vector2 velocity = currentVelocity;
+                body.MovePosition(newPos);
+
+                if (spriteAnimator != null)
+                    spriteAnimator.UpdateVisuals(velocity);
+                else if (sprite != null)
+                    sprite.flipX = velocity.x > 0f;
+
+                return;
             }
 
             offset = Vector3.Lerp(offset, targetOffset, Time.fixedDeltaTime * offsetLerpSpeed);
