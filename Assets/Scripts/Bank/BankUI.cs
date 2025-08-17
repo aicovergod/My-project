@@ -451,6 +451,17 @@ namespace BankSystem
             return DepositFromInventory(invIndex, entry.count);
         }
 
+        public bool DepositAllFromInventory(int invIndex)
+        {
+            if (playerInventory == null)
+                return false;
+            var entry = playerInventory.GetSlot(invIndex);
+            if (entry.item == null)
+                return false;
+            int available = playerInventory.GetItemCount(entry.item);
+            return DepositFromInventory(invIndex, available);
+        }
+
         public bool DepositFromInventory(int invIndex, int amount)
         {
             if (playerInventory == null)
@@ -520,6 +531,16 @@ namespace BankSystem
         public bool Withdraw(int bankIndex)
         {
             return Withdraw(bankIndex, 1);
+        }
+
+        public bool WithdrawAll(int bankIndex)
+        {
+            if (bankIndex < 0 || bankIndex >= items.Length)
+                return false;
+            var entry = items[bankIndex];
+            if (entry.item == null)
+                return false;
+            return Withdraw(bankIndex, entry.count);
         }
 
         public bool Withdraw(int bankIndex, int amount)

@@ -45,6 +45,7 @@ namespace BankSystem
             CreateButton("Add 5", () => { bank?.DepositFromInventory(slotIndex, 5); Hide(); });
             CreateButton("Add 10", () => { bank?.DepositFromInventory(slotIndex, 10); Hide(); });
             CreateButton("Add X", () => { bank?.PromptDepositAmount(slotIndex); Hide(); });
+            CreateButton("Add All", () => { bank?.DepositAllFromInventory(slotIndex); Hide(); });
         }
 
         private void CreateButton(string label, UnityAction onClick)
