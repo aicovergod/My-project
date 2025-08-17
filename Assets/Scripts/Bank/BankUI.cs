@@ -460,21 +460,38 @@ namespace BankSystem
             if (entry.item == null || amount <= 0)
                 return false;
 
-            int depositAmount = Mathf.Min(amount, entry.count);
+            int totalRequested = Mathf.Min(amount, entry.count);
+            int toDeposit = totalRequested;
+            int deposited = 0;
 
-            // Attempt to add as many items as possible to the bank and
-            // receive the actual number added.
-            int added = AddItem(entry.item, depositAmount);
-            if (added <= 0)
-                return false;
+            // Repeatedly attempt to add items to the bank until either the
+            // requested amount has been deposited or the bank can no longer
+            // accept more items. This ensures that multiple items can be
+            // deposited even if only one is accepted per call to AddItem.
+            while (toDeposit > 0)
+            {
+                int added = AddItem(entry.item, toDeposit);
+                if (added <= 0)
+                    break;
 
-            // Remove only the amount successfully deposited from the
-            // player's inventory.
-            playerInventory.RemoveFromSlot(invIndex, added);
-            playerInventory.Save();
-            Save();
+                playerInventory.RemoveFromSlot(invIndex, added);
+                toDeposit -= added;
+                deposited += added;
+
+                // Refresh the entry in case the slot became empty.
+                entry = playerInventory.GetSlot(invIndex);
+                if (entry.item == null)
+                    break;
+            }
+
+            if (deposited > 0)
+            {
+                playerInventory.Save();
+                Save();
+            }
+
             // Return true only if the full requested amount was deposited.
-            return added == depositAmount;
+            return deposited == totalRequested;
         }
 
         public bool Withdraw(int bankIndex)
