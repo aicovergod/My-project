@@ -19,6 +19,12 @@ namespace Pets
 
             var player = GameObject.FindGameObjectWithTag("Player");
             Vector3 pos = player != null ? player.transform.position : Vector3.zero;
+
+            var inventory = player != null ? player.GetComponent<Inventory.Inventory>() : null;
+            var currentPet = PetDropSystem.ActivePet;
+            if (inventory != null && currentPet != null && currentPet != pet && currentPet.pickupItem != null)
+                inventory.AddItem(currentPet.pickupItem);
+
             PetDropSystem.SpawnPet(pet, pos);
             return true;
         }

@@ -14,6 +14,7 @@ namespace Pets
         private static readonly Dictionary<ItemData, PetDefinition> itemToPet = new();
         private static GameObject activePetGO;
         private static PetDefinition activePetDef;
+        public static PetDefinition ActivePet => activePetDef;
         private static bool initialized;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
