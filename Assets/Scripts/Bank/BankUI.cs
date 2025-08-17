@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using Inventory;
 using Core.Save;
 using Skills;
@@ -33,6 +34,9 @@ namespace BankSystem
         private InventoryEntry[] items = new InventoryEntry[Size];
         private Inventory.Inventory playerInventory;
         private Font defaultFont;
+
+        private GameObject draggingIcon;
+        private int draggingIndex = -1;
 
         private static BankUI instance;
         public static BankUI Instance => instance;
@@ -280,6 +284,98 @@ namespace BankSystem
             }
         }
 
+        public void ShowTooltip(int bankIndex, RectTransform slotRect)
+        {
+            if (playerInventory == null)
+                playerInventory = FindObjectOfType<Inventory.Inventory>();
+            if (playerInventory == null)
+                return;
+            if (bankIndex < 0 || bankIndex >= items.Length)
+                return;
+
+            var entry = items[bankIndex];
+            if (entry.item == null)
+                return;
+
+            playerInventory.ShowTooltip(entry.item, slotRect);
+        }
+
+        public void HideTooltip()
+        {
+            if (playerInventory == null)
+                playerInventory = FindObjectOfType<Inventory.Inventory>();
+            playerInventory?.HideTooltip();
+        }
+
+        public void BeginDrag(int slotIndex)
+        {
+            if (slotIndex < 0 || slotIndex >= items.Length)
+                return;
+            var entry = items[slotIndex];
+            if (entry.item == null)
+                return;
+
+            HideTooltip();
+            draggingIndex = slotIndex;
+
+            draggingIcon = new GameObject("DraggingIcon", typeof(Image));
+            draggingIcon.transform.SetParent(uiRoot.transform, false);
+            var img = draggingIcon.GetComponent<Image>();
+            img.raycastTarget = false;
+            img.sprite = entry.item.icon;
+            img.color = Color.white;
+            var rect = draggingIcon.GetComponent<RectTransform>();
+            rect.sizeDelta = slotSize;
+
+            if (slotImages != null && slotIndex < slotImages.Length && slotImages[slotIndex] != null)
+                slotImages[slotIndex].enabled = false;
+            if (slotCountTexts != null && slotIndex < slotCountTexts.Length && slotCountTexts[slotIndex] != null)
+                slotCountTexts[slotIndex].enabled = false;
+        }
+
+        public void Drag(PointerEventData eventData)
+        {
+            if (draggingIcon != null)
+                draggingIcon.transform.position = eventData.position;
+        }
+
+        public void Drop(int slotIndex)
+        {
+            if (draggingIndex == -1)
+            {
+                EndDrag();
+                return;
+            }
+
+            if (slotIndex >= 0 && slotIndex < items.Length)
+            {
+                if (slotIndex != draggingIndex)
+                {
+                    var temp = items[slotIndex];
+                    items[slotIndex] = items[draggingIndex];
+                    items[draggingIndex] = temp;
+                    UpdateSlotVisual(slotIndex);
+                }
+
+                UpdateSlotVisual(draggingIndex);
+            }
+
+            EndDrag();
+            Save();
+        }
+
+        public void EndDrag()
+        {
+            if (draggingIndex != -1)
+                UpdateSlotVisual(draggingIndex);
+
+            if (draggingIcon != null)
+                Destroy(draggingIcon);
+
+            draggingIcon = null;
+            draggingIndex = -1;
+        }
+
         public void Open()
         {
             if (playerInventory == null)
@@ -302,7 +398,10 @@ namespace BankSystem
             CompactItems();
             uiRoot.SetActive(false);
             if (playerInventory != null)
+            {
                 playerInventory.BankOpen = false;
+                playerInventory.CloseUI();
+            }
             Save();
         }
 
