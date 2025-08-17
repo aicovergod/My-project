@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
   m_Name: Chick
   m_EditorClassIdentifier: 
-  id: Iron Ore
-  itemName: Iron Ore
-  icon: {fileID: 21300000, guid: 7f912c4bb31e7f441ac8bdfb161feaf4, type: 3}
-  description: 'A Piece of
+  id: Chick
+  itemName: Chick
+  icon: {fileID: 21300000, guid: 94b10514244e73845991e17885231ccc, type: 3}
+  description: 'A cute little
 
-    Iron ore'
+    chicken pet'
   stackable: 0
   maxStack: 0
   splittable: 0

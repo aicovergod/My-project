@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Coal Ore
   itemName: Coal
-  icon: {fileID: 21300000, guid: df8c69ffc8ce1934888b414acccc4468, type: 3}
+  icon: {fileID: 21300000, guid: f4faec0c6af1fab43afd79ea52a89d37, type: 3}
   description: 'A Piece of
 
     Coal'

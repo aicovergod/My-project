@@ -16,3 +16,6 @@ MonoBehaviour:
   - pet: {fileID: 11400000, guid: b0a7a94e0c7c3a74588b90fed96d8dd1, type: 2}
     oneInN: 1
     sourceId: Cosmetic
+  - pet: {fileID: 11400000, guid: b0a7a94e0c7c3a74588b90fed96d8dd1, type: 2}
+    oneInN: 5000
+    sourceId: mining
