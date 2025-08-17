@@ -10,7 +10,7 @@ namespace Pets
         /// <summary>
         /// Create a pet game object at the given position.
         /// </summary>
-        public static GameObject Spawn(PetDefinition def, Vector3 position)
+        public static GameObject Spawn(PetDefinition def, Vector3 position, Transform player = null)
         {
             if (def == null)
             {
@@ -103,7 +103,9 @@ namespace Pets
             col.isTrigger = true;
             col.radius = 0.3f;
 
-            go.AddComponent<PetFollower>();
+            var follower = go.AddComponent<PetFollower>();
+            if (player != null)
+                follower.SetPlayer(player);
             var clickable = go.AddComponent<PetClickable>();
             clickable.Init(def);
 
