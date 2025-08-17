@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+using UnityEngine;
+using Player;
 
 namespace Pets
 {
@@ -12,8 +13,6 @@ namespace Pets
         public float followRadius = 0.6f;
         public float maxDistance = 2.0f;
         public float moveSpeed = 6f;
-        public float noiseAmplitude = 0.05f;
-        public float noiseFrequency = 5f;
         public float smoothTime = 0.2f;
         public float offsetLerpSpeed = 5f;
         public float headingRefreshAngle = 30f;
@@ -26,6 +25,7 @@ namespace Pets
         private Rigidbody2D body;
         private SpriteRenderer sprite;
         private PetSpriteAnimator spriteAnimator;
+        private PlayerMover playerMover;
         private Vector3 currentVelocity;
 
         private void Awake()
@@ -34,7 +34,10 @@ namespace Pets
             sprite = GetComponent<SpriteRenderer>();
             spriteAnimator = GetComponent<PetSpriteAnimator>();
             if (player != null)
+            {
                 lastPlayerPos = player.position;
+                playerMover = player.GetComponent<PlayerMover>();
+            }
             ChooseOffset(Vector2.right);
             offset = targetOffset;
         }
@@ -43,7 +46,10 @@ namespace Pets
         {
             player = newPlayer;
             if (player != null)
+            {
                 lastPlayerPos = player.position;
+                playerMover = player.GetComponent<PlayerMover>();
+            }
         }
 
         private void ChooseOffset(Vector2 heading)
@@ -62,7 +68,9 @@ namespace Pets
             Vector3 playerVel = (playerPos - lastPlayerPos) / Time.fixedDeltaTime;
             lastPlayerPos = playerPos;
 
-            if (playerVel.sqrMagnitude > 0.01f)
+            bool playerMoving = playerVel.sqrMagnitude > 0.01f;
+
+            if (playerMoving)
             {
                 Vector2 heading = ((Vector2)playerVel).normalized;
                 if (lastHeading == Vector2.zero || Vector2.Angle(lastHeading, heading) > headingRefreshAngle)
@@ -82,12 +90,6 @@ namespace Pets
 
             Vector3 newPos = Vector3.SmoothDamp(transform.position, target, ref currentVelocity, smoothTime, moveSpeed, Time.fixedDeltaTime);
 
-            float t = Time.time * noiseFrequency;
-            float noiseX = (Mathf.PerlinNoise(t, 0f) - 0.5f) * 2f * noiseAmplitude;
-            float noiseY = (Mathf.PerlinNoise(0f, t) - 0.5f) * 2f * noiseAmplitude;
-            newPos.x += noiseX;
-            newPos.y += noiseY;
-
             Vector2 velocity = currentVelocity;
             body.MovePosition(newPos);
 
@@ -95,9 +97,18 @@ namespace Pets
                 ChooseOffset(lastHeading);
 
             if (spriteAnimator != null)
-                spriteAnimator.UpdateVisuals(velocity);
+            {
+                if (!playerMoving && playerMover != null)
+                    spriteAnimator.SetFacing(playerMover.FacingDir);
+                spriteAnimator.UpdateVisuals(playerMoving ? velocity : Vector2.zero);
+            }
             else if (sprite != null)
-                sprite.flipX = newPos.x > player.position.x;
+            {
+                if (!playerMoving && playerMover != null)
+                    sprite.flipX = playerMover.FacingDir == 1;
+                else
+                    sprite.flipX = newPos.x > player.position.x;
+            }
         }
     }
 }
