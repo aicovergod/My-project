@@ -36,6 +36,7 @@ namespace BankSystem
         private Font defaultFont;
 
         private BankWithdrawMenu withdrawMenu;
+        private BankDepositMenu depositMenu;
 
         private GameObject draggingIcon;
         private int draggingIndex = -1;
@@ -256,6 +257,7 @@ namespace BankSystem
             LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
 
             withdrawMenu = BankWithdrawMenu.Create(uiRoot.transform, defaultFont);
+            depositMenu = BankDepositMenu.Create(uiRoot.transform, defaultFont);
         }
 
         private void UpdateSlotVisual(int index)
@@ -316,6 +318,11 @@ namespace BankSystem
             withdrawMenu?.Show(this, bankIndex, position);
         }
 
+        public void ShowDepositMenu(int invIndex, Vector2 position)
+        {
+            depositMenu?.Show(this, invIndex, position);
+        }
+
         public void PromptWithdrawAmount(int bankIndex)
         {
             if (bankIndex < 0 || bankIndex >= items.Length)
@@ -324,6 +331,16 @@ namespace BankSystem
             if (entry.item == null)
                 return;
             StackSplitDialog.Show(uiRoot.transform, entry.count, amount => Withdraw(bankIndex, amount));
+        }
+
+        public void PromptDepositAmount(int invIndex)
+        {
+            if (playerInventory == null)
+                return;
+            var entry = playerInventory.GetSlot(invIndex);
+            if (entry.item == null)
+                return;
+            StackSplitDialog.Show(uiRoot.transform, entry.count, amount => DepositFromInventory(invIndex, amount));
         }
 
         public void BeginDrag(int slotIndex)
@@ -416,6 +433,7 @@ namespace BankSystem
         {
             CompactItems();
             withdrawMenu?.Hide();
+            depositMenu?.Hide();
             uiRoot.SetActive(false);
             if (playerInventory != null)
             {
@@ -430,11 +448,20 @@ namespace BankSystem
             if (playerInventory == null)
                 return false;
             var entry = playerInventory.GetSlot(invIndex);
-            if (entry.item == null)
+            return DepositFromInventory(invIndex, entry.count);
+        }
+
+        public bool DepositFromInventory(int invIndex, int amount)
+        {
+            if (playerInventory == null)
                 return false;
-            if (!AddItem(entry.item, entry.count))
+            var entry = playerInventory.GetSlot(invIndex);
+            if (entry.item == null || amount <= 0)
                 return false;
-            playerInventory.ClearSlot(invIndex);
+            int depositAmount = Mathf.Min(amount, entry.count);
+            if (!AddItem(entry.item, depositAmount))
+                return false;
+            playerInventory.RemoveFromSlot(invIndex, depositAmount);
             playerInventory.Save();
             Save();
             return true;
