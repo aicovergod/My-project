@@ -12,7 +12,7 @@ namespace Skills.Mining
     public class PickaxeToUse : MonoBehaviour
     {
         [SerializeField] private List<PickaxeDefinition> allPickaxes = new List<PickaxeDefinition>();
-        [SerializeField] private Inventory.Inventory inventory;
+        [SerializeField] private Inventory.InventoryModel inventory;
         [SerializeField] private MiningSkill skill;
 
         public PickaxeDefinition Current { get; private set; }
@@ -20,7 +20,7 @@ namespace Skills.Mining
         private void Awake()
         {
             if (inventory == null)
-                inventory = GetComponent<Inventory.Inventory>();
+                inventory = GetComponent<Inventory.InventoryModel>();
             if (skill == null)
                 skill = GetComponent<MiningSkill>();
         }

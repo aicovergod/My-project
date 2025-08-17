@@ -89,7 +89,7 @@ namespace ShopSystem
         /// player inventory.  Returns true if the purchase succeeds and raises
         /// <see cref="OnItemBought"/>.
         /// </summary>
-        public bool Buy(int slotIndex, Inventory.Inventory playerInventory)
+        public bool Buy(int slotIndex, Inventory.InventoryModel playerInventory)
         {
             if (playerInventory == null)
                 return false;
@@ -150,7 +150,7 @@ namespace ShopSystem
         /// When the player's inventory is full, non-stackable items may be sold by
         /// replacing the item's slot with the currency payout.
         /// </summary>
-        public bool Sell(ItemData item, Inventory.Inventory playerInventory, int playerSlotIndex = -1)
+        public bool Sell(ItemData item, Inventory.InventoryModel playerInventory, int playerSlotIndex = -1)
         {
             if (item == null || playerInventory == null)
                 return false;

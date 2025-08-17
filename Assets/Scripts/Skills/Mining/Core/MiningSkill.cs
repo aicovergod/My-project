@@ -14,7 +14,7 @@ namespace Skills.Mining
     public class MiningSkill : MonoBehaviour, ITickable
     {
         [SerializeField] private XpTable xpTable;
-        [SerializeField] private Inventory.Inventory inventory;
+        [SerializeField] private Inventory.InventoryModel inventory;
         [SerializeField] private Transform floatingTextAnchor;
         [SerializeField] private MonoBehaviour saveProvider; // Optional custom save provider
 
@@ -47,7 +47,7 @@ namespace Skills.Mining
         private void Awake()
         {
             if (inventory == null)
-                inventory = GetComponent<Inventory.Inventory>();
+                inventory = GetComponent<Inventory.InventoryModel>();
             save = saveProvider as IMiningSave ?? new SaveManagerMiningSave();
             xp = save.LoadXp();
             level = xpTable != null ? xpTable.GetLevel(xp) : 1;

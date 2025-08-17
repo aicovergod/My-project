@@ -16,38 +16,44 @@ namespace Inventory
         IPointerClickHandler
     {
         [HideInInspector]
-        public Inventory inventory;
+        public InventoryModel model;
+        [HideInInspector]
+        public InventoryDragHandler drag;
+        [HideInInspector]
+        public InventoryTooltip tooltip;
+        [HideInInspector]
+        public InventoryUI ui;
         [HideInInspector]
         public int index;
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            inventory?.ShowTooltip(index, transform as RectTransform);
+            tooltip?.ShowTooltip(index, transform as RectTransform);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            inventory?.HideTooltip();
+            tooltip?.HideTooltip();
         }
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            inventory?.BeginDrag(index);
+            drag?.BeginDrag(index);
         }
 
         public void OnDrag(PointerEventData eventData)
         {
-            inventory?.Drag(eventData);
+            drag?.Drag(eventData);
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            inventory?.EndDrag();
+            drag?.EndDrag();
         }
 
         public void OnDrop(PointerEventData eventData)
         {
-            inventory?.Drop(index);
+            drag?.Drop(index);
         }
 
         public void OnPointerClick(PointerEventData eventData)
@@ -58,17 +64,17 @@ namespace Inventory
                   if (!eventData.dragging)
                   {
                       if (shift)
-                          inventory?.PromptStackSplit(index, StackSplitType.Sell);
+                          ui?.PromptStackSplit(index, StackSplitType.Sell);
                       else
-                          inventory?.SellItem(index, 1);
+                          model?.SellItem(index, 1);
                   }
               }
               else if (eventData.button == PointerEventData.InputButton.Right)
               {
                   if (shift)
-                      inventory?.PromptStackSplit(index, StackSplitType.Drop);
+                      ui?.PromptStackSplit(index, StackSplitType.Drop);
                   else
-                      inventory?.DropItem(index, 1);
+                      model?.DropItem(index, 1);
               }
         }
     }
