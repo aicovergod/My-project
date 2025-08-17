@@ -18,11 +18,7 @@ namespace Pets
                 return null;
             }
 
-            PhysicsLayerUtility.Ensure();
-            int layer = LayerMask.NameToLayer("Pets");
-
             var go = new GameObject($"Pet_{def.id}");
-            go.layer = layer;
             go.transform.position = position;
 
             var sr = go.AddComponent<SpriteRenderer>();
@@ -96,12 +92,11 @@ namespace Pets
             }
 
             var rb = go.AddComponent<Rigidbody2D>();
-            rb.isKinematic = false;
+            rb.isKinematic = true;
             rb.gravityScale = 0f;
-            rb.freezeRotation = true;
 
             var col = go.AddComponent<CircleCollider2D>();
-            col.isTrigger = false;
+            col.isTrigger = true;
             col.radius = 0.3f;
 
             var follower = go.AddComponent<PetFollower>();
