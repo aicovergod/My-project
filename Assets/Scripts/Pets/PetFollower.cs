@@ -53,7 +53,7 @@ namespace Pets
             targetOffset = (Vector3)(-heading.normalized * followRadius);
         }
 
-        private void LateUpdate()
+        private void FixedUpdate()
         {
             if (player == null)
             {
@@ -63,7 +63,7 @@ namespace Pets
             }
 
             Vector3 playerPos = player.position;
-            Vector3 playerVel = (playerPos - lastPlayerPos) / Time.deltaTime;
+            Vector3 playerVel = (playerPos - lastPlayerPos) / Time.fixedDeltaTime;
             lastPlayerPos = playerPos;
 
             if (playerVel.sqrMagnitude > 0.01f)
@@ -76,7 +76,7 @@ namespace Pets
                 }
             }
 
-            offset = Vector3.Lerp(offset, targetOffset, Time.deltaTime * offsetLerpSpeed);
+            offset = Vector3.Lerp(offset, targetOffset, Time.fixedDeltaTime * offsetLerpSpeed);
 
             Vector3 target = playerPos + offset;
             float dist = Vector3.Distance(transform.position, target);
@@ -84,7 +84,7 @@ namespace Pets
             if (dist > maxDistance)
                 target = playerPos;
 
-            Vector3 newPos = Vector3.SmoothDamp(transform.position, target, ref currentVelocity, smoothTime, moveSpeed, Time.deltaTime);
+            Vector3 newPos = Vector3.SmoothDamp(transform.position, target, ref currentVelocity, smoothTime, moveSpeed, Time.fixedDeltaTime);
             newPos.y += Mathf.Sin(Time.time * 5f) * jitter;
             Vector2 velocity = currentVelocity;
             body.MovePosition(newPos);
