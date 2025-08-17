@@ -16,7 +16,7 @@ namespace Pets
         private static PetDefinition activePetDef;
         private static bool initialized;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AutoInit()
         {
             Initialize();
