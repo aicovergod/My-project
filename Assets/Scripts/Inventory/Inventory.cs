@@ -10,6 +10,7 @@ using UnityEngine.InputSystem;
 using ShopSystem;
 using Player;
 using Skills;
+using Pets;
 
 namespace Inventory
 {
@@ -591,6 +592,9 @@ namespace Inventory
             var entry = items[slotIndex];
             if (entry.item == null) return;
 
+            // Cache the item before modifying the slot so we can check for pets.
+            var droppedItem = entry.item;
+
             int remove = Mathf.Clamp(quantity, 1, entry.count);
             entry.count -= remove;
             if (entry.count <= 0)
@@ -599,6 +603,20 @@ namespace Inventory
             UpdateSlotVisual(slotIndex);
             HideTooltip();
             OnInventoryChanged?.Invoke();
+
+            // Attempt to spawn a pet for this item if one exists.
+            var pet = PetDropSystem.FindPetByItem(droppedItem);
+            if (pet != null)
+            {
+                var player = GameObject.FindGameObjectWithTag("Player");
+                Vector3 pos = player != null ? player.transform.position : Vector3.zero;
+                Debug.Log($"Dropping pet item '{droppedItem.name}', spawning pet '{pet.displayName}'.");
+                PetDropSystem.SpawnPet(pet, pos);
+            }
+            else
+            {
+                Debug.Log($"Dropped item '{droppedItem.name}' with no associated pet.");
+            }
         }
 
         /// <summary>

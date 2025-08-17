@@ -132,7 +132,10 @@ namespace Pets
         private static GameObject SpawnPetInternal(PetDefinition pet, Vector3 position)
         {
             if (pet == null)
+            {
+                Debug.LogError("SpawnPetInternal called with null pet.");
                 return null;
+            }
 
             DespawnActive();
             Vector3 spawnPos = position + (Vector3)(UnityEngine.Random.insideUnitCircle * 0.5f);
@@ -142,6 +145,7 @@ namespace Pets
             PetSaveBridge.Save(pet.id);
 #endif
             PetToastUI.Show("You have a funny feeling like you're being followed…", pet.messageColor);
+            Debug.Log($"Spawned pet '{pet.displayName}' at {spawnPos}.");
             return activePetGO;
         }
 
@@ -185,10 +189,17 @@ namespace Pets
         {
             Initialize();
             if (tables.Count == 0 || tables[0].entries.Count == 0)
+            {
+                Debug.LogWarning("DebugForceFirstDrop: no pet drop tables or entries found.");
                 return false;
+            }
             var entry = tables[0].entries[0];
             if (entry.pet == null)
+            {
+                Debug.LogWarning("DebugForceFirstDrop: first entry has no pet.");
                 return false;
+            }
+            Debug.Log("DebugForceFirstDrop spawning first pet drop.");
             SpawnPetInternal(entry.pet, position);
             return true;
         }
