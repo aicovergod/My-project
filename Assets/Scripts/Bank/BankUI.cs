@@ -455,16 +455,26 @@ namespace BankSystem
         {
             if (playerInventory == null)
                 return false;
+
             var entry = playerInventory.GetSlot(invIndex);
             if (entry.item == null || amount <= 0)
                 return false;
+
             int depositAmount = Mathf.Min(amount, entry.count);
-            if (!AddItem(entry.item, depositAmount))
+
+            // Attempt to add as many items as possible to the bank and
+            // receive the actual number added.
+            int added = AddItem(entry.item, depositAmount);
+            if (added <= 0)
                 return false;
-            playerInventory.RemoveFromSlot(invIndex, depositAmount);
+
+            // Remove only the amount successfully deposited from the
+            // player's inventory.
+            playerInventory.RemoveFromSlot(invIndex, added);
             playerInventory.Save();
             Save();
-            return true;
+            // Return true only if the full requested amount was deposited.
+            return added == depositAmount;
         }
 
         public bool Withdraw(int bankIndex)
@@ -526,10 +536,10 @@ namespace BankSystem
                 UpdateSlotVisual(i);
         }
 
-        private bool AddItem(ItemData item, int count)
+        private int AddItem(ItemData item, int count)
         {
             if (item == null || count <= 0)
-                return false;
+                return 0;
 
             int remaining = count;
             int maxStack = BankStackLimit;
@@ -556,7 +566,9 @@ namespace BankSystem
                     UpdateSlotVisual(i);
                 }
             }
-            return remaining <= 0;
+
+            // Return number of items successfully added.
+            return count - remaining;
         }
 
         [Serializable]
