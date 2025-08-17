@@ -23,6 +23,8 @@ namespace BankSystem
         {
             if (eventData.button == PointerEventData.InputButton.Left && !eventData.dragging)
                 bank?.Withdraw(index);
+            else if (eventData.button == PointerEventData.InputButton.Right && !eventData.dragging)
+                bank?.ShowWithdrawMenu(index, eventData.position);
         }
 
         public void OnPointerEnter(PointerEventData eventData)

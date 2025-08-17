@@ -35,6 +35,8 @@ namespace BankSystem
         private Inventory.Inventory playerInventory;
         private Font defaultFont;
 
+        private BankWithdrawMenu withdrawMenu;
+
         private GameObject draggingIcon;
         private int draggingIndex = -1;
 
@@ -252,6 +254,8 @@ namespace BankSystem
             }
 
             LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
+
+            withdrawMenu = BankWithdrawMenu.Create(uiRoot.transform, defaultFont);
         }
 
         private void UpdateSlotVisual(int index)
@@ -305,6 +309,21 @@ namespace BankSystem
             if (playerInventory == null)
                 playerInventory = FindObjectOfType<Inventory.Inventory>();
             playerInventory?.HideTooltip();
+        }
+
+        public void ShowWithdrawMenu(int bankIndex, Vector2 position)
+        {
+            withdrawMenu?.Show(this, bankIndex, position);
+        }
+
+        public void PromptWithdrawAmount(int bankIndex)
+        {
+            if (bankIndex < 0 || bankIndex >= items.Length)
+                return;
+            var entry = items[bankIndex];
+            if (entry.item == null)
+                return;
+            StackSplitDialog.Show(uiRoot.transform, entry.count, amount => Withdraw(bankIndex, amount));
         }
 
         public void BeginDrag(int slotIndex)
@@ -396,6 +415,7 @@ namespace BankSystem
         public void Close()
         {
             CompactItems();
+            withdrawMenu?.Hide();
             uiRoot.SetActive(false);
             if (playerInventory != null)
             {
@@ -422,17 +442,35 @@ namespace BankSystem
 
         public bool Withdraw(int bankIndex)
         {
+            return Withdraw(bankIndex, 1);
+        }
+
+        public bool Withdraw(int bankIndex, int amount)
+        {
             if (playerInventory == null)
                 playerInventory = FindObjectOfType<Inventory.Inventory>();
             if (playerInventory == null)
                 return false;
+            if (bankIndex < 0 || bankIndex >= items.Length)
+                return false;
             var entry = items[bankIndex];
-            if (entry.item == null)
+            if (entry.item == null || amount <= 0)
                 return false;
-            if (!playerInventory.AddItem(entry.item, entry.count))
+
+            int withdrawAmount = Mathf.Min(amount, entry.count);
+            if (!playerInventory.CanAddItem(entry.item, withdrawAmount))
                 return false;
-            items[bankIndex].item = null;
-            items[bankIndex].count = 0;
+
+            if (!playerInventory.AddItem(entry.item, withdrawAmount))
+                return false;
+
+            entry.count -= withdrawAmount;
+            if (entry.count <= 0)
+            {
+                entry.item = null;
+                entry.count = 0;
+            }
+            items[bankIndex] = entry;
             UpdateSlotVisual(bankIndex);
             playerInventory.Save();
             Save();
