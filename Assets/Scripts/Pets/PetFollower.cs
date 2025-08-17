@@ -102,6 +102,9 @@ namespace Pets
                     wandering = true;
             }
 
+            Vector3 newPos;
+            Vector2 velocity;
+
             if (wandering)
             {
                 wanderTimer -= Time.fixedDeltaTime;
@@ -111,8 +114,8 @@ namespace Pets
                     wanderTimer = wanderTargetRefreshTime;
                 }
 
-                Vector3 newPos = Vector3.SmoothDamp(transform.position, wanderTarget, ref currentVelocity, smoothTime, moveSpeed, Time.fixedDeltaTime);
-                Vector2 velocity = currentVelocity;
+                newPos = Vector3.SmoothDamp(transform.position, wanderTarget, ref currentVelocity, smoothTime, moveSpeed, Time.fixedDeltaTime);
+                velocity = currentVelocity;
                 body.MovePosition(newPos);
 
                 if (spriteAnimator != null)
@@ -131,9 +134,9 @@ namespace Pets
             if (dist > maxDistance)
                 target = playerPos;
 
-            Vector3 newPos = Vector3.SmoothDamp(transform.position, target, ref currentVelocity, smoothTime, moveSpeed, Time.fixedDeltaTime);
+            newPos = Vector3.SmoothDamp(transform.position, target, ref currentVelocity, smoothTime, moveSpeed, Time.fixedDeltaTime);
 
-            Vector2 velocity = currentVelocity;
+            velocity = currentVelocity;
             body.MovePosition(newPos);
 
             if (Vector3.Distance(transform.position, playerPos) < followRadius * 0.5f)
