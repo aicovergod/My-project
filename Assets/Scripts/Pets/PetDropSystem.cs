@@ -16,6 +16,13 @@ namespace Pets
         private static PetDefinition activePetDef;
         private static bool initialized;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void AutoInit()
+        {
+            Initialize();
+            Application.quitting += SaveOnQuit;
+        }
+
         private static void Initialize()
         {
             if (initialized)
@@ -32,7 +39,6 @@ namespace Pets
             go.AddComponent<PetDropSystemUpdater>();
             GameObject.DontDestroyOnLoad(go);
 
-#if PET_SAVE_SUPPORTED
             string saved = PetSaveBridge.Load();
             if (!string.IsNullOrEmpty(saved))
             {
@@ -44,7 +50,6 @@ namespace Pets
                     SpawnPetInternal(pet, pos);
                 }
             }
-#endif
         }
 
         /// <summary>
@@ -114,9 +119,7 @@ namespace Pets
                 UnityEngine.Object.Destroy(activePetGO);
                 activePetGO = null;
                 activePetDef = null;
-#if PET_SAVE_SUPPORTED
                 PetSaveBridge.Clear();
-#endif
             }
         }
 
@@ -141,9 +144,7 @@ namespace Pets
             Vector3 spawnPos = position + (Vector3)(UnityEngine.Random.insideUnitCircle * 0.5f);
             activePetGO = PetSpawner.Spawn(pet, spawnPos);
             activePetDef = pet;
-#if PET_SAVE_SUPPORTED
             PetSaveBridge.Save(pet.id);
-#endif
             PetToastUI.Show("You have a funny feeling like you're being followed…", pet.messageColor);
             Debug.Log($"Spawned pet '{pet.displayName}' at {spawnPos}.");
             return activePetGO;
@@ -157,6 +158,12 @@ namespace Pets
             Initialize();
             itemToPet.TryGetValue(item, out var pet);
             return pet;
+        }
+
+        private static void SaveOnQuit()
+        {
+            if (activePetDef != null)
+                PetSaveBridge.Save(activePetDef.id);
         }
 
         private static PetDefinition FindPetById(string id)
