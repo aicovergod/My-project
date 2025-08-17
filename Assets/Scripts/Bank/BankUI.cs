@@ -16,8 +16,7 @@ namespace BankSystem
         public Vector2 slotSize = new Vector2(32f, 32f);
         public Vector2 slotSpacing = new Vector2(4f, 4f);
         public Vector2 referenceResolution = new Vector2(640f, 360f);
-        public Sprite slotFrameSprite;
-        public Color emptySlotColor = new Color(1f, 1f, 1f, 1f);
+        public Color emptySlotColor = new Color(1f, 1f, 1f, 0f);
 
         public Color windowColor = new Color(0.15f, 0.15f, 0.15f, 0.95f);
         public Vector2 windowPadding = new Vector2(8f, 8f);
@@ -194,16 +193,9 @@ namespace BankSystem
                 GameObject slot = new GameObject($"Slot{i}", typeof(Image), typeof(BankSlot));
                 slot.transform.SetParent(content.transform, false);
                 var img = slot.GetComponent<Image>();
-                if (slotFrameSprite != null)
-                {
-                    img.sprite = slotFrameSprite;
-                    img.type = Image.Type.Sliced;
-                    img.color = new Color(emptySlotColor.r, emptySlotColor.g, emptySlotColor.b, 1f);
-                }
-                else
-                {
-                    img.color = new Color(emptySlotColor.r, emptySlotColor.g, emptySlotColor.b, 1f);
-                }
+                img.sprite = null;
+                img.type = Image.Type.Simple;
+                img.color = emptySlotColor;
                 img.enabled = true;
 
                 GameObject countGO = new GameObject("Count", typeof(Text));
@@ -235,15 +227,15 @@ namespace BankSystem
             var entry = items[index];
             if (entry.item != null)
             {
-                slotImages[index].sprite = entry.item.icon ? entry.item.icon : slotFrameSprite;
-                slotImages[index].type = (slotImages[index].sprite == slotFrameSprite && slotFrameSprite != null) ? Image.Type.Sliced : Image.Type.Simple;
+                slotImages[index].sprite = entry.item.icon;
+                slotImages[index].type = Image.Type.Simple;
                 slotImages[index].color = Color.white;
                 slotCountTexts[index].text = entry.count > 1 ? entry.count.ToString() : string.Empty;
             }
             else
             {
-                slotImages[index].sprite = slotFrameSprite;
-                slotImages[index].type = (slotFrameSprite != null) ? Image.Type.Sliced : Image.Type.Simple;
+                slotImages[index].sprite = null;
+                slotImages[index].type = Image.Type.Simple;
                 slotImages[index].color = emptySlotColor;
                 slotCountTexts[index].text = string.Empty;
             }
