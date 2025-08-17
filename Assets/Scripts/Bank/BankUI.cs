@@ -477,6 +477,7 @@ namespace BankSystem
                     goto FinishDeposit; // bank can no longer accept items
 
                 playerInventory.RemoveFromSlot(invIndex, added);
+                SaveState();
                 deposited += added;
                 toDeposit = Mathf.Min(playerInventory.GetSlot(invIndex).count,
                                       totalRequested - deposited);
@@ -500,6 +501,7 @@ namespace BankSystem
                         goto FinishDeposit;
 
                     playerInventory.RemoveFromSlot(i, added);
+                    SaveState();
                     deposited += added;
                     slot = playerInventory.GetSlot(i);
                     toDeposit = Mathf.Min(slot.item == entry.item ? slot.count : 0,
@@ -509,10 +511,7 @@ namespace BankSystem
 
         FinishDeposit:
             if (deposited > 0)
-            {
-                playerInventory.Save();
-                Save();
-            }
+                SaveState();
 
             // Return true only if the full requested amount was deposited.
             return deposited == totalRequested;
@@ -550,9 +549,15 @@ namespace BankSystem
             }
             items[bankIndex] = entry;
             UpdateSlotVisual(bankIndex);
-            playerInventory.Save();
-            Save();
+            SaveState();
             return true;
+        }
+
+        private void SaveState()
+        {
+            if (playerInventory != null)
+                playerInventory.Save();
+            Save();
         }
 
         private void CompactItems()
