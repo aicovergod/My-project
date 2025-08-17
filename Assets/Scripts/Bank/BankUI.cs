@@ -225,19 +225,30 @@ namespace BankSystem
         private void UpdateSlotVisual(int index)
         {
             var entry = items[index];
-            if (entry.item != null)
+            bool hasItem = entry.item != null;
+
+            // Ensure the slot image component is always enabled so changes to
+            // the sprite or colour are visible after loading/saving.
+            var image = slotImages[index];
+            image.enabled = true;
+
+            if (hasItem)
             {
-                slotImages[index].sprite = entry.item.icon;
-                slotImages[index].type = Image.Type.Simple;
-                slotImages[index].color = Color.white;
+                image.sprite = entry.item.icon;
+                image.type = Image.Type.Simple;
+                image.color = Color.white;
+
                 slotCountTexts[index].text = entry.count > 1 ? entry.count.ToString() : string.Empty;
+                slotCountTexts[index].enabled = entry.count > 1;
             }
             else
             {
-                slotImages[index].sprite = null;
-                slotImages[index].type = Image.Type.Simple;
-                slotImages[index].color = emptySlotColor;
+                image.sprite = null;
+                image.type = Image.Type.Simple;
+                image.color = emptySlotColor;
+
                 slotCountTexts[index].text = string.Empty;
+                slotCountTexts[index].enabled = false;
             }
         }
 
