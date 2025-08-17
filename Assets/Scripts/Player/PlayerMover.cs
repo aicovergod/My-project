@@ -45,6 +45,9 @@ namespace Player
         private int facingDir = 0;
         private Vector2 moveDir;
 
+        /// <summary>Current facing direction: 0=Down, 1=Left, 2=Right, 3=Up.</summary>
+        public int FacingDir => facingDir;
+
         public bool IsMoving => moveDir.sqrMagnitude > 0f;
 
 #if ENABLE_INPUT_SYSTEM

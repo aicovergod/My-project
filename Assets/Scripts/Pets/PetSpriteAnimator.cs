@@ -88,6 +88,12 @@ namespace Pets
             spriteRenderer.sprite = set[_animFrame];
         }
 
+        /// <summary>Force the animator to face the given direction (0=Down,1=Left,2=Right,3=Up).</summary>
+        public void SetFacing(int dir)
+        {
+            _currentDir = Mathf.Clamp(dir, 0, 3);
+        }
+
         private Sprite[] SelectSpriteSet(bool moving, int dir, out int frames)
         {
             Sprite[] set = null;
