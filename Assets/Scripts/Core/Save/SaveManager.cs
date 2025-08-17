@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Core.Save
@@ -36,7 +37,7 @@ namespace Core.Save
 
         private static SaveData cache;
 
-        private static SaveData LoadAll()
+        private static async Task<SaveData> LoadAll()
         {
             if (cache != null)
                 return cache;
@@ -45,7 +46,7 @@ namespace Core.Save
             {
                 try
                 {
-                    string json = File.ReadAllText(FilePath);
+                    string json = await File.ReadAllTextAsync(FilePath);
                     cache = JsonUtility.FromJson<SaveData>(json);
                 }
                 catch (Exception e)
@@ -62,12 +63,12 @@ namespace Core.Save
             return cache;
         }
 
-        private static void SaveAll()
+        private static async Task SaveAll()
         {
             try
             {
                 string json = JsonUtility.ToJson(cache);
-                File.WriteAllText(FilePath, json);
+                await File.WriteAllTextAsync(FilePath, json);
             }
             catch (Exception e)
             {
@@ -75,9 +76,9 @@ namespace Core.Save
             }
         }
 
-        public static void Save<T>(string key, T data)
+        public static async Task SaveAsync<T>(string key, T data)
         {
-            var all = LoadAll();
+            var all = await LoadAll();
             string json = JsonUtility.ToJson(new Wrapper<T> { value = data });
             var entry = all.entries.Find(e => e.key == key);
             if (entry != null)
@@ -85,12 +86,17 @@ namespace Core.Save
             else
                 all.entries.Add(new Entry { key = key, value = json });
 
-            SaveAll();
+            await SaveAll();
         }
 
-        public static T Load<T>(string key)
+        public static void Save<T>(string key, T data)
         {
-            var all = LoadAll();
+            SaveAsync<T>(key, data).GetAwaiter().GetResult();
+        }
+
+        public static async Task<T> LoadAsync<T>(string key)
+        {
+            var all = await LoadAll();
             var entry = all.entries.Find(e => e.key == key);
             if (entry == null || string.IsNullOrEmpty(entry.value))
                 return default;
@@ -104,6 +110,18 @@ namespace Core.Save
             {
                 return default;
             }
+        }
+
+        public static T Load<T>(string key)
+        {
+            return LoadAsync<T>(key).GetAwaiter().GetResult();
+        }
+
+        public static void Delete(string key)
+        {
+            var all = LoadAll().GetAwaiter().GetResult();
+            all.entries.RemoveAll(e => e.key == key);
+            SaveAll().GetAwaiter().GetResult();
         }
     }
 }
