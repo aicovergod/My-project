@@ -10,6 +10,7 @@ namespace Player
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(SpriteRenderer))]
+    [RequireComponent(typeof(Inventory.InventoryInput))]
     public class PlayerMover : MonoBehaviour
     {
         [Header("Movement")]
