@@ -690,6 +690,21 @@ namespace Inventory
             tooltip.SetActive(true);
         }
 
+        public void ShowTooltip(ItemData item, RectTransform slotRect)
+        {
+            if (item == null || tooltip == null || tooltipNameText == null || tooltipDescriptionText == null) return;
+
+            string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
+            tooltipNameText.text = name;
+            tooltipDescriptionText.text = item.description;
+
+            var tooltipRect = tooltip.GetComponent<RectTransform>();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
+
+            tooltip.transform.position = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
+            tooltip.SetActive(true);
+        }
+
         public void HideTooltip()
         {
             if (tooltip != null)
