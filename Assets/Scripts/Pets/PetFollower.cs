@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.AI;
+using System.Collections.Generic;
 using Player;
 
 namespace Pets
@@ -39,6 +41,9 @@ namespace Pets
         private float wanderTimer;
         private bool wandering;
         private int blockedLayers;
+        private NavMeshPath navPath;
+        private readonly List<Vector3> pathCorners = new List<Vector3>();
+        private int pathIndex;
 
         private void Awake()
         {
@@ -56,6 +61,7 @@ namespace Pets
             ChooseOffset(Vector2.right);
             offset = targetOffset;
             blockedLayers = LayerMask.GetMask("Obstacle", "Interactable");
+            navPath = new NavMeshPath();
         }
 
         public void SetPlayer(Transform newPlayer)
@@ -150,11 +156,31 @@ namespace Pets
             if (dist > maxDistance)
                 target = playerPos;
 
-            newPos = Vector3.SmoothDamp(transform.position, target, ref currentVelocity, smoothTime, moveSpeed, Time.fixedDeltaTime);
+            bool blocked = PathBlocked(target);
+            if (pathCorners.Count == 0 && blocked)
+                CalculatePath(playerPos);
+
+            Vector3 moveTarget = pathCorners.Count > 0 ? pathCorners[pathIndex] : target;
+
+            newPos = Vector3.SmoothDamp(transform.position, moveTarget, ref currentVelocity, smoothTime, moveSpeed, Time.fixedDeltaTime);
 
             velocity = currentVelocity;
             newPos = MoveWithCollisions(newPos, out _);
             body.MovePosition(newPos);
+
+            if (pathCorners.Count > 0)
+            {
+                if (!blocked)
+                {
+                    pathCorners.Clear();
+                }
+                else if (Vector3.Distance(transform.position, moveTarget) < 0.1f)
+                {
+                    pathIndex++;
+                    if (pathIndex >= pathCorners.Count)
+                        pathCorners.Clear();
+                }
+            }
 
             if (Vector3.Distance(transform.position, playerPos) < followRadius * 0.5f)
                 ChooseOffset(lastHeading);
@@ -213,6 +239,28 @@ namespace Pets
             }
             return center;
         }
+        private bool PathBlocked(Vector3 targetPos)
+        {
+            if (col == null)
+                return false;
+            Vector3 currentPos = transform.position;
+            Vector2 dir = targetPos - currentPos;
+            float dist = dir.magnitude;
+            float radius = col.bounds.extents.x;
+            return Physics2D.CircleCast(currentPos, radius, dir.normalized, dist, blockedLayers);
+        }
+
+        private void CalculatePath(Vector3 destination)
+        {
+            if (NavMesh.CalculatePath(transform.position, destination, NavMesh.AllAreas, navPath))
+            {
+                pathCorners.Clear();
+                pathCorners.AddRange(navPath.corners);
+                pathIndex = 0;
+                for (int i = 0; i < pathCorners.Count; i++)
+                    pathCorners[i].z = transform.position.z;
+            }
+        }
 
         private Vector3 MoveWithCollisions(Vector3 targetPos, out bool hit)
         {
@@ -227,20 +275,7 @@ namespace Pets
             if (cast.collider != null)
             {
                 hit = true;
-                // Move up to the hit point while staying outside the collider.
-                Vector3 hitPos = cast.point - dir.normalized * radius;
-
-                // Try to slide along the surface using the remaining distance.
-                float remaining = dist - cast.distance;
-                Vector2 slideDir = Vector2.Perpendicular(cast.normal);
-                if (Vector2.Dot(slideDir, dir) < 0f)
-                    slideDir = -slideDir;
-
-                RaycastHit2D slideCast = Physics2D.CircleCast(hitPos, radius, slideDir, remaining, blockedLayers);
-                if (slideCast.collider != null)
-                    return slideCast.point - slideDir.normalized * radius;
-
-                return hitPos + (Vector3)slideDir.normalized * remaining;
+                return cast.point - dir.normalized * radius;
             }
             return targetPos;
         }
