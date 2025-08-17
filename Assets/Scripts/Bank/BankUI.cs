@@ -17,7 +17,7 @@ namespace BankSystem
         public Vector2 slotSpacing = new Vector2(4f, 4f);
         public Vector2 referenceResolution = new Vector2(640f, 360f);
         public Sprite slotFrameSprite;
-        public Color emptySlotColor = new Color(1f, 1f, 1f, 0.25f);
+        public Color emptySlotColor = new Color(1f, 1f, 1f, 1f);
 
         public Color windowColor = new Color(0.15f, 0.15f, 0.15f, 0.95f);
         public Vector2 windowPadding = new Vector2(8f, 8f);
@@ -166,9 +166,12 @@ namespace BankSystem
             content.transform.SetParent(viewport.transform, false);
             var contentRect = content.GetComponent<RectTransform>();
             contentRect.anchorMin = new Vector2(0f, 1f);
-            contentRect.anchorMax = new Vector2(1f, 1f);
-            contentRect.pivot = new Vector2(0.5f, 1f);
+            contentRect.anchorMax = new Vector2(0f, 1f);
+            contentRect.pivot = new Vector2(0f, 1f);
             contentRect.anchoredPosition = Vector2.zero;
+            contentRect.sizeDelta = new Vector2(
+                Columns * slotSize.x + (Columns - 1) * slotSpacing.x,
+                Rows * slotSize.y + (Rows - 1) * slotSpacing.y);
 
             var grid = content.GetComponent<GridLayoutGroup>();
             grid.cellSize = slotSize;
@@ -195,11 +198,11 @@ namespace BankSystem
                 {
                     img.sprite = slotFrameSprite;
                     img.type = Image.Type.Sliced;
-                    img.color = emptySlotColor;
+                    img.color = new Color(emptySlotColor.r, emptySlotColor.g, emptySlotColor.b, 1f);
                 }
                 else
                 {
-                    img.color = emptySlotColor;
+                    img.color = new Color(emptySlotColor.r, emptySlotColor.g, emptySlotColor.b, 1f);
                 }
                 img.enabled = true;
 
