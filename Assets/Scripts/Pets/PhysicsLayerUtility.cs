@@ -3,7 +3,7 @@
 namespace Pets
 {
     /// <summary>
-    /// Ensures a dedicated physics layer for pets that collides with nothing.
+    /// Ensures a dedicated physics layer for pets.
     /// </summary>
     public static class PhysicsLayerUtility
     {
@@ -11,7 +11,7 @@ namespace Pets
         private static bool initialized;
 
         /// <summary>
-        /// Ensure the Pets layer exists and ignores all collisions.
+        /// Ensure the Pets layer exists.
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Ensure()
@@ -47,11 +47,7 @@ namespace Pets
             if (layer < 0)
             {
                 Debug.LogWarning("Pets layer missing. Please add a layer named 'Pets' in Project Settings > Tags and Layers.");
-                return;
             }
-
-            for (int i = 0; i < 32; i++)
-                Physics2D.IgnoreLayerCollision(layer, i, true);
         }
     }
 }
