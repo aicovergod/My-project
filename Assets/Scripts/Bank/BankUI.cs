@@ -299,6 +299,7 @@ namespace BankSystem
 
         public void Close()
         {
+            CompactItems();
             uiRoot.SetActive(false);
             if (playerInventory != null)
                 playerInventory.BankOpen = false;
@@ -337,6 +338,28 @@ namespace BankSystem
             playerInventory.Save();
             Save();
             return true;
+        }
+
+        private void CompactItems()
+        {
+            int nextIndex = 0;
+            for (int i = 0; i < items.Length; i++)
+            {
+                if (items[i].item != null)
+                {
+                    if (i != nextIndex)
+                    {
+                        items[nextIndex] = items[i];
+                        items[i].item = null;
+                        items[i].count = 0;
+                        UpdateSlotVisual(nextIndex);
+                        UpdateSlotVisual(i);
+                    }
+                    nextIndex++;
+                }
+            }
+            for (int i = nextIndex; i < items.Length; i++)
+                UpdateSlotVisual(i);
         }
 
         private bool AddItem(ItemData item, int count)
@@ -426,6 +449,7 @@ namespace BankSystem
 
         private void OnApplicationQuit()
         {
+            CompactItems();
             Save();
         }
     }
