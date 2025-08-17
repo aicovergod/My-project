@@ -158,7 +158,7 @@ namespace BankSystem
             viewportRect.offsetMin = Vector2.zero;
             viewportRect.offsetMax = Vector2.zero;
             var maskImg = viewport.GetComponent<Image>();
-            maskImg.color = Color.clear;
+            maskImg.color = new Color(0f, 0f, 0f, 1f);
             viewport.GetComponent<Mask>().showMaskGraphic = false;
 
             GameObject content = new GameObject("Content", typeof(RectTransform), typeof(GridLayoutGroup));
