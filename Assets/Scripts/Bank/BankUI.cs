@@ -460,30 +460,54 @@ namespace BankSystem
             if (entry.item == null || amount <= 0)
                 return false;
 
-            int totalRequested = Mathf.Min(amount, entry.count);
-            int toDeposit = totalRequested;
+            // Determine how many of this item exist across the entire
+            // inventory, not just the clicked slot. This allows depositing
+            // multiple non-stackable items of the same type.
+            int available = playerInventory.GetItemCount(entry.item);
+            int totalRequested = Mathf.Min(amount, available);
             int deposited = 0;
 
-            // Repeatedly attempt to add items to the bank until either the
-            // requested amount has been deposited or the bank can no longer
-            // accept more items. This ensures that multiple items can be
-            // deposited even if only one is accepted per call to AddItem.
+            // Deposit from the originally selected slot first so the item the
+            // player clicked is removed before searching other slots.
+            int toDeposit = Mathf.Min(entry.count, totalRequested);
             while (toDeposit > 0)
             {
                 int added = AddItem(entry.item, toDeposit);
                 if (added <= 0)
-                    break;
+                    goto FinishDeposit; // bank can no longer accept items
 
                 playerInventory.RemoveFromSlot(invIndex, added);
-                toDeposit -= added;
                 deposited += added;
-
-                // Refresh the entry in case the slot became empty.
-                entry = playerInventory.GetSlot(invIndex);
-                if (entry.item == null)
-                    break;
+                toDeposit = Mathf.Min(playerInventory.GetSlot(invIndex).count,
+                                      totalRequested - deposited);
             }
 
+            // Deposit remaining items of the same type from other slots.
+            for (int i = 0; i < playerInventory.size && deposited < totalRequested; i++)
+            {
+                if (i == invIndex)
+                    continue;
+
+                var slot = playerInventory.GetSlot(i);
+                if (slot.item != entry.item)
+                    continue;
+
+                toDeposit = Mathf.Min(slot.count, totalRequested - deposited);
+                while (toDeposit > 0)
+                {
+                    int added = AddItem(entry.item, toDeposit);
+                    if (added <= 0)
+                        goto FinishDeposit;
+
+                    playerInventory.RemoveFromSlot(i, added);
+                    deposited += added;
+                    slot = playerInventory.GetSlot(i);
+                    toDeposit = Mathf.Min(slot.item == entry.item ? slot.count : 0,
+                                           totalRequested - deposited);
+                }
+            }
+
+        FinishDeposit:
             if (deposited > 0)
             {
                 playerInventory.Save();
