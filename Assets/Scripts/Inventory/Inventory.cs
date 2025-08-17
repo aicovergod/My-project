@@ -828,7 +828,7 @@ namespace Inventory
                 var slot = data.slots[i];
                 if (!string.IsNullOrEmpty(slot.id))
                 {
-                    var item = Resources.Load<ItemData>("Item/" + slot.id);
+                    var item = ItemDatabase.GetItem(slot.id);
                     items[i].item = item;
                     items[i].count = slot.count;
                 }
