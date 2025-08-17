@@ -608,6 +608,12 @@ namespace Inventory
             var pet = PetDropSystem.FindPetByItem(droppedItem);
             if (pet != null)
             {
+                // If a different pet is already active, return its pickup item to the inventory
+                // before spawning the new one so players don't lose their previous pet item.
+                var currentPet = PetDropSystem.ActivePet;
+                if (currentPet != null && currentPet != pet && currentPet.pickupItem != null)
+                    AddItem(currentPet.pickupItem);
+
                 var player = GameObject.FindGameObjectWithTag("Player");
                 Vector3 pos = player != null ? player.transform.position : Vector3.zero;
                 Debug.Log($"Dropping pet item '{droppedItem.name}', spawning pet '{pet.displayName}'.");
