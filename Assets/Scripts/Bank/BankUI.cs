@@ -25,6 +25,7 @@ namespace BankSystem
         private const int Columns = 8;
         private const int Rows = 50;
         private const int Size = Columns * Rows;
+        private const int BankStackLimit = 9999;
 
         private GameObject uiRoot;
         private Image[] slotImages;
@@ -344,24 +345,24 @@ namespace BankSystem
                 return false;
 
             int remaining = count;
-            if (item.stackable)
+            int maxStack = BankStackLimit;
+
+            for (int i = 0; i < items.Length && remaining > 0; i++)
             {
-                for (int i = 0; i < items.Length && remaining > 0; i++)
+                if (items[i].item == item && items[i].count < maxStack)
                 {
-                    if (items[i].item == item && items[i].count < item.maxStack)
-                    {
-                        int add = Mathf.Min(item.maxStack - items[i].count, remaining);
-                        items[i].count += add;
-                        remaining -= add;
-                        UpdateSlotVisual(i);
-                    }
+                    int add = Mathf.Min(maxStack - items[i].count, remaining);
+                    items[i].count += add;
+                    remaining -= add;
+                    UpdateSlotVisual(i);
                 }
             }
+
             for (int i = 0; i < items.Length && remaining > 0; i++)
             {
                 if (items[i].item == null)
                 {
-                    int add = item.stackable ? Mathf.Min(item.maxStack, remaining) : 1;
+                    int add = Mathf.Min(maxStack, remaining);
                     items[i].item = item;
                     items[i].count = add;
                     remaining -= add;
