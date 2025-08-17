@@ -227,7 +227,20 @@ namespace Pets
             if (cast.collider != null)
             {
                 hit = true;
-                return cast.point - dir.normalized * radius;
+                // Move up to the hit point while staying outside the collider.
+                Vector3 hitPos = cast.point - dir.normalized * radius;
+
+                // Try to slide along the surface using the remaining distance.
+                float remaining = dist - cast.distance;
+                Vector2 slideDir = Vector2.Perpendicular(cast.normal);
+                if (Vector2.Dot(slideDir, dir) < 0f)
+                    slideDir = -slideDir;
+
+                RaycastHit2D slideCast = Physics2D.CircleCast(hitPos, radius, slideDir, remaining, blockedLayers);
+                if (slideCast.collider != null)
+                    return slideCast.point - slideDir.normalized * radius;
+
+                return hitPos + (Vector3)slideDir.normalized * remaining;
             }
             return targetPos;
         }
