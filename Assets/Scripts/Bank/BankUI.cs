@@ -151,33 +151,7 @@ namespace BankSystem
             closeTextRect.offsetMin = Vector2.zero;
             closeTextRect.offsetMax = Vector2.zero;
             float searchHeight = 20f;
-            float sortButtonWidth = 60f;
             float filterSpacing = 4f;
-
-            GameObject sortBtnGO = new GameObject("SortButton", typeof(RectTransform), typeof(Image), typeof(Button));
-            sortBtnGO.transform.SetParent(window.transform, false);
-            var sortRect = sortBtnGO.GetComponent<RectTransform>();
-            sortRect.anchorMin = new Vector2(1f, 1f);
-            sortRect.anchorMax = new Vector2(1f, 1f);
-            sortRect.pivot = new Vector2(1f, 1f);
-            sortRect.sizeDelta = new Vector2(sortButtonWidth, searchHeight);
-            sortRect.anchoredPosition = new Vector2(-windowPadding.x, -headerHeight);
-            var sortImg = sortBtnGO.GetComponent<Image>();
-            sortImg.color = new Color(0.2f, 0.2f, 0.2f, 1f);
-            var sortBtn = sortBtnGO.GetComponent<Button>();
-            sortBtn.onClick.AddListener(SortByName);
-            GameObject sortTextGO = new GameObject("Text", typeof(Text));
-            sortTextGO.transform.SetParent(sortBtnGO.transform, false);
-            var sortText = sortTextGO.GetComponent<Text>();
-            sortText.font = defaultFont;
-            sortText.alignment = TextAnchor.MiddleCenter;
-            sortText.color = Color.white;
-            sortText.text = "A-Z";
-            var sortTextRect = sortTextGO.GetComponent<RectTransform>();
-            sortTextRect.anchorMin = Vector2.zero;
-            sortTextRect.anchorMax = Vector2.one;
-            sortTextRect.offsetMin = Vector2.zero;
-            sortTextRect.offsetMax = Vector2.zero;
 
             GameObject searchGO = new GameObject("SearchField", typeof(RectTransform), typeof(Image), typeof(InputField));
             searchGO.transform.SetParent(window.transform, false);
@@ -186,16 +160,16 @@ namespace BankSystem
             searchRect.anchorMax = new Vector2(1f, 1f);
             searchRect.pivot = new Vector2(0f, 1f);
             searchRect.offsetMin = new Vector2(windowPadding.x, -headerHeight - searchHeight);
-            searchRect.offsetMax = new Vector2(-windowPadding.x - sortButtonWidth - filterSpacing, -headerHeight);
+            searchRect.offsetMax = new Vector2(-windowPadding.x, -headerHeight);
             var searchImg = searchGO.GetComponent<Image>();
-            searchImg.color = Color.white;
+            searchImg.color = new Color(0.3f, 0.3f, 0.3f, 1f);
             searchInput = searchGO.GetComponent<InputField>();
             GameObject textGO = new GameObject("Text", typeof(Text));
             textGO.transform.SetParent(searchGO.transform, false);
             var text = textGO.GetComponent<Text>();
             text.font = defaultFont;
             text.alignment = TextAnchor.MiddleLeft;
-            text.color = Color.black;
+            text.color = Color.white;
             var textRect = textGO.GetComponent<RectTransform>();
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
@@ -385,21 +359,6 @@ namespace BankSystem
                             entry.item.itemName != null &&
                             entry.item.itemName.IndexOf(currentFilter, StringComparison.OrdinalIgnoreCase) >= 0);
             slotImages[index].gameObject.SetActive(visible);
-        }
-
-        private void SortByName()
-        {
-            Array.Sort(items, (a, b) =>
-            {
-                string an = a.item != null ? a.item.itemName : string.Empty;
-                string bn = b.item != null ? b.item.itemName : string.Empty;
-                return string.Compare(an, bn, StringComparison.OrdinalIgnoreCase);
-            });
-
-            for (int i = 0; i < items.Length; i++)
-                UpdateSlotVisual(i);
-
-            UpdateFilteredSlots();
         }
 
         public void ShowTooltip(int bankIndex, RectTransform slotRect)
