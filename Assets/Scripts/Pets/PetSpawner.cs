@@ -96,11 +96,12 @@ namespace Pets
             }
 
             var rb = go.AddComponent<Rigidbody2D>();
-            rb.isKinematic = true;
+            rb.isKinematic = false;
             rb.gravityScale = 0f;
+            rb.freezeRotation = true;
 
             var col = go.AddComponent<CircleCollider2D>();
-            col.isTrigger = true;
+            col.isTrigger = false;
             col.radius = 0.3f;
 
             var follower = go.AddComponent<PetFollower>();

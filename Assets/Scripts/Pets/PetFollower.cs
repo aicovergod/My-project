@@ -8,6 +8,7 @@ namespace Pets
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(SpriteRenderer))]
+    [RequireComponent(typeof(Collider2D))]
     public class PetFollower : MonoBehaviour
     {
         public float followRadius = 0.6f;
@@ -25,6 +26,7 @@ namespace Pets
         private Rigidbody2D body;
         private SpriteRenderer sprite;
         private PetSpriteAnimator spriteAnimator;
+        private Collider2D col;
         private PlayerMover playerMover;
         private Vector3 currentVelocity;
 
@@ -33,11 +35,14 @@ namespace Pets
             body = GetComponent<Rigidbody2D>();
             sprite = GetComponent<SpriteRenderer>();
             spriteAnimator = GetComponent<PetSpriteAnimator>();
+            col = GetComponent<Collider2D>();
             if (player != null)
             {
                 lastPlayerPos = player.position;
                 playerMover = player.GetComponent<PlayerMover>();
+                IgnorePlayer();
             }
+            IgnoreNPCs();
             ChooseOffset(Vector2.right);
             offset = targetOffset;
         }
@@ -49,6 +54,7 @@ namespace Pets
             {
                 lastPlayerPos = player.position;
                 playerMover = player.GetComponent<PlayerMover>();
+                IgnorePlayer();
             }
         }
 
@@ -109,6 +115,34 @@ namespace Pets
                 else
                     sprite.flipX = newPos.x > player.position.x;
             }
+        }
+
+        private void IgnorePlayer()
+        {
+            if (player == null || col == null)
+                return;
+            foreach (var pCol in player.GetComponentsInChildren<Collider2D>())
+                Physics2D.IgnoreCollision(col, pCol);
+        }
+
+        private void IgnoreNPCs()
+        {
+            if (col == null)
+                return;
+            var cols = FindObjectsOfType<Collider2D>();
+            foreach (var c in cols)
+            {
+                if (c == col)
+                    continue;
+                if (c.gameObject.name.Contains("NPC"))
+                    Physics2D.IgnoreCollision(col, c);
+            }
+        }
+
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (collision.collider.gameObject.name.Contains("NPC"))
+                Physics2D.IgnoreCollision(col, collision.collider);
         }
     }
 }
