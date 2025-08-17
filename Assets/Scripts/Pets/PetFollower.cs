@@ -13,12 +13,14 @@ namespace Pets
         public float maxDistance = 2.0f;
         public float moveSpeed = 6f;
         public float jitter = 0.05f;
+        public float smoothTime = 0.2f;
 
         private Transform player;
         private Vector3 offset;
         private Rigidbody2D body;
         private SpriteRenderer sprite;
         private PetSpriteAnimator spriteAnimator;
+        private Vector3 currentVelocity;
 
         private void Awake()
         {
@@ -56,9 +58,9 @@ namespace Pets
             if (dist > maxDistance)
                 target = player.position;
 
-            Vector3 newPos = Vector3.MoveTowards(transform.position, target, moveSpeed * Time.deltaTime);
+            Vector3 newPos = Vector3.SmoothDamp(transform.position, target, ref currentVelocity, smoothTime, moveSpeed, Time.deltaTime);
             newPos.y += Mathf.Sin(Time.time * 5f) * jitter;
-            Vector2 velocity = (newPos - transform.position) / Time.deltaTime;
+            Vector2 velocity = currentVelocity;
             body.MovePosition(newPos);
 
             if (Vector3.Distance(transform.position, player.position) < followRadius * 0.5f)
