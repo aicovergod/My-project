@@ -102,12 +102,35 @@ namespace Inventory
 
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
 
+        public bool BankOpen { get; set; }
+
         private bool CanDropItems => playerMover == null || playerMover.CanDrop;
 
         public void CloseUI()
         {
             if (uiRoot != null)
                 uiRoot.SetActive(false);
+        }
+
+        public void OpenUI()
+        {
+            if (uiRoot != null)
+                uiRoot.SetActive(true);
+        }
+
+        public InventoryEntry GetSlot(int index)
+        {
+            return index >= 0 && index < items.Length ? items[index] : default;
+        }
+
+        public void ClearSlot(int index)
+        {
+            if (index < 0 || index >= items.Length)
+                return;
+            items[index].item = null;
+            items[index].count = 0;
+            UpdateSlotVisual(index);
+            OnInventoryChanged?.Invoke();
         }
 
         private void Awake()
@@ -556,7 +579,7 @@ namespace Inventory
         /// </summary>
         public void DropItem(int slotIndex, int quantity = 1)
         {
-            if (!CanDropItems) return;
+            if (BankOpen || !CanDropItems) return;
             if (slotIndex < 0 || slotIndex >= items.Length) return;
             var entry = items[slotIndex];
             if (entry.item == null) return;
@@ -612,7 +635,7 @@ namespace Inventory
         /// </summary>
         public void PromptStackSplit(int slotIndex, StackSplitType type)
         {
-            if (slotIndex < 0 || slotIndex >= items.Length) return;
+            if (BankOpen || slotIndex < 0 || slotIndex >= items.Length) return;
             var entry = items[slotIndex];
             if (entry.item == null || entry.count <= 1) return;
             if (!entry.item.splittable) return;
@@ -679,7 +702,7 @@ namespace Inventory
         /// </summary>
         public void SellItem(int slotIndex, int quantity = 1)
         {
-            if (currentShop == null)
+            if (BankOpen || currentShop == null)
                 return;
             if (slotIndex < 0 || slotIndex >= items.Length)
                 return;
@@ -715,7 +738,7 @@ namespace Inventory
 
         public void BeginDrag(int slotIndex)
         {
-            if (slotIndex < 0 || slotIndex >= items.Length) return;
+            if (BankOpen || slotIndex < 0 || slotIndex >= items.Length) return;
             var entry = items[slotIndex];
             var item = entry.item;
             if (item == null) return;
@@ -740,12 +763,18 @@ namespace Inventory
 
         public void Drag(PointerEventData eventData)
         {
+            if (BankOpen) return;
             if (draggingIcon != null)
                 draggingIcon.transform.position = eventData.position;
         }
 
         public void Drop(int slotIndex)
         {
+            if (BankOpen)
+            {
+                EndDrag();
+                return;
+            }
             if (draggingIndex == -1)
             {
                 EndDrag();
@@ -771,6 +800,14 @@ namespace Inventory
 
         public void EndDrag()
         {
+            if (BankOpen)
+            {
+                if (draggingIcon != null)
+                    Destroy(draggingIcon);
+                draggingIcon = null;
+                draggingIndex = -1;
+                return;
+            }
             if (draggingIndex != -1)
                 UpdateSlotVisual(draggingIndex);
 
@@ -857,6 +894,12 @@ namespace Inventory
             bool toggle = Input.GetKeyDown(KeyCode.I);
 #endif
             if (currentShop != null)
+            {
+                if (uiRoot != null && !uiRoot.activeSelf)
+                    uiRoot.SetActive(true);
+                return;
+            }
+            if (BankOpen)
             {
                 if (uiRoot != null && !uiRoot.activeSelf)
                     uiRoot.SetActive(true);

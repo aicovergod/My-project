@@ -32,44 +32,54 @@ namespace Inventory
 
         public void OnBeginDrag(PointerEventData eventData)
         {
+            if (inventory != null && inventory.BankOpen) return;
             inventory?.BeginDrag(index);
         }
 
         public void OnDrag(PointerEventData eventData)
         {
+            if (inventory != null && inventory.BankOpen) return;
             inventory?.Drag(eventData);
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
+            if (inventory != null && inventory.BankOpen) return;
             inventory?.EndDrag();
         }
 
         public void OnDrop(PointerEventData eventData)
         {
+            if (inventory != null && inventory.BankOpen) return;
             inventory?.Drop(index);
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            if (inventory != null && inventory.BankOpen)
+            {
+                if (eventData.button == PointerEventData.InputButton.Left)
+                    BankSystem.BankUI.Instance?.DepositFromInventory(index);
+                return;
+            }
             bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-              if (eventData.button == PointerEventData.InputButton.Left)
-              {
-                  if (!eventData.dragging)
-                  {
-                      if (shift)
-                          inventory?.PromptStackSplit(index, StackSplitType.Sell);
-                      else
-                          inventory?.SellItem(index, 1);
-                  }
-              }
-              else if (eventData.button == PointerEventData.InputButton.Right)
-              {
-                  if (shift)
-                      inventory?.PromptStackSplit(index, StackSplitType.Drop);
-                  else
-                      inventory?.DropItem(index, 1);
-              }
+            if (eventData.button == PointerEventData.InputButton.Left)
+            {
+                if (!eventData.dragging)
+                {
+                    if (shift)
+                        inventory?.PromptStackSplit(index, StackSplitType.Sell);
+                    else
+                        inventory?.SellItem(index, 1);
+                }
+            }
+            else if (eventData.button == PointerEventData.InputButton.Right)
+            {
+                if (shift)
+                    inventory?.PromptStackSplit(index, StackSplitType.Drop);
+                else
+                    inventory?.DropItem(index, 1);
+            }
         }
     }
 }
