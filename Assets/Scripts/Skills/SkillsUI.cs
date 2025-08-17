@@ -87,6 +87,9 @@ namespace Skills
                 var shop = ShopUI.Instance;
                 if (shop != null && shop.IsOpen)
                     return;
+                var bank = BankSystem.BankUI.Instance;
+                if (bank != null && bank.IsOpen)
+                    return;
 
                 if (uiRoot != null)
                 {
