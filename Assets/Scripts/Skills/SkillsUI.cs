@@ -6,14 +6,15 @@ using Inventory;
 namespace Skills
 {
     /// <summary>
-    /// Displays basic skill information. Currently shows the mining level and XP
+    /// Displays basic skill information such as mining and woodcutting levels and XP
     /// and can be toggled with the 'O' key.
     /// </summary>
     public class SkillsUI : MonoBehaviour
     {
         private GameObject uiRoot;
-        private Text miningText;
+        private Text skillText;
         private Mining.MiningSkill miningSkill;
+        private Woodcutting.WoodcuttingSkill woodcuttingSkill;
 
         public static SkillsUI Instance { get; private set; }
 
@@ -38,6 +39,7 @@ namespace Skills
             DontDestroyOnLoad(gameObject);
 
             miningSkill = FindObjectOfType<Mining.MiningSkill>();
+            woodcuttingSkill = FindObjectOfType<Woodcutting.WoodcuttingSkill>();
             CreateUI();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
@@ -64,16 +66,16 @@ namespace Skills
             var panelImage = panel.AddComponent<Image>();
             panelImage.color = new Color(0f, 0f, 0f, 0.5f);
             var panelRect = panel.GetComponent<RectTransform>();
-            panelRect.sizeDelta = new Vector2(200f, 60f);
+            panelRect.sizeDelta = new Vector2(200f, 100f);
             panelRect.anchoredPosition = Vector2.zero;
 
-            var textGo = new GameObject("MiningText");
+            var textGo = new GameObject("SkillText");
             textGo.transform.SetParent(panel.transform, false);
-            miningText = textGo.AddComponent<Text>();
-            miningText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            miningText.alignment = TextAnchor.MiddleCenter;
-            miningText.color = Color.white;
-            var textRect = miningText.rectTransform;
+            skillText = textGo.AddComponent<Text>();
+            skillText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            skillText.alignment = TextAnchor.MiddleCenter;
+            skillText.color = Color.white;
+            var textRect = skillText.rectTransform;
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
             textRect.offsetMin = Vector2.zero;
@@ -104,9 +106,18 @@ namespace Skills
                 }
             }
 
-            if (uiRoot != null && uiRoot.activeSelf && miningSkill != null)
+            if (uiRoot != null && uiRoot.activeSelf)
             {
-                miningText.text = $"Mining Level: {miningSkill.Level}  XP: {miningSkill.Xp}";
+                string text = "";
+                if (miningSkill != null)
+                    text += $"Mining Level: {miningSkill.Level}  XP: {miningSkill.Xp}";
+                if (woodcuttingSkill != null)
+                {
+                    if (text.Length > 0)
+                        text += "\n";
+                    text += $"Woodcutting Level: {woodcuttingSkill.Level}  XP: {woodcuttingSkill.Xp}";
+                }
+                skillText.text = text;
             }
         }
 
