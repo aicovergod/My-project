@@ -14,6 +14,7 @@ namespace Util
 
         private readonly List<ITickable> subscribers = new List<ITickable>();
         private float timer;
+        private bool paused;
 
         [SerializeField]
         private bool logTicks;
@@ -32,6 +33,11 @@ namespace Util
 
         private void Update()
         {
+            if (paused)
+            {
+                return;
+            }
+
             timer += Time.deltaTime;
             while (timer >= TickDuration)
             {
@@ -40,15 +46,17 @@ namespace Util
                 {
                     Debug.Log("Tick");
                 }
-                for (int i = 0; i < subscribers.Count; i++)
+                var snapshot = subscribers.ToArray();
+                for (int i = 0; i < snapshot.Length; i++)
                 {
-                    subscribers[i]?.OnTick();
+                    snapshot[i]?.OnTick();
                 }
             }
         }
 
         /// <summary>
         /// Registers a tickable object so it receives future <see cref="ITickable.OnTick"/> calls.
+        /// Safe to call from within <see cref="ITickable.OnTick"/>.
         /// </summary>
         /// <param name="tickable">The object to register.</param>
         public void Subscribe(ITickable tickable)
@@ -61,6 +69,7 @@ namespace Util
 
         /// <summary>
         /// Removes a previously registered tickable object.
+        /// Safe to call from within <see cref="ITickable.OnTick"/>.
         /// </summary>
         /// <param name="tickable">The object to unregister.</param>
         public void Unsubscribe(ITickable tickable)
@@ -69,6 +78,22 @@ namespace Util
             {
                 subscribers.Remove(tickable);
             }
+        }
+
+        /// <summary>
+        /// Stops ticking until <see cref="Resume"/> is called.
+        /// </summary>
+        public void Pause()
+        {
+            paused = true;
+        }
+
+        /// <summary>
+        /// Resumes ticking after a call to <see cref="Pause"/>.
+        /// </summary>
+        public void Resume()
+        {
+            paused = false;
         }
     }
 }
