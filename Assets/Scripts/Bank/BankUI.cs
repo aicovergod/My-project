@@ -261,6 +261,8 @@ namespace BankSystem
             var skills = SkillsUI.Instance;
             if (skills != null && skills.IsOpen)
                 skills.Close();
+            // Ensure latest saved state is loaded whenever the bank opens
+            Load();
             uiRoot.SetActive(true);
         }
 
@@ -367,7 +369,7 @@ namespace BankSystem
             SaveManager.Save(SaveKey, data);
         }
 
-        private void Load()
+        public void Load()
         {
             var data = SaveManager.Load<BankSaveData>(SaveKey);
             if (data?.slots == null)
