@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Util
@@ -12,8 +12,7 @@ namespace Util
 
         public static Ticker Instance { get; private set; }
 
-        public event Action OnTick;
-
+        private readonly List<ITickable> subscribers = new List<ITickable>();
         private float timer;
 
         [SerializeField]
@@ -41,7 +40,34 @@ namespace Util
                 {
                     Debug.Log("Tick");
                 }
-                OnTick?.Invoke();
+                for (int i = 0; i < subscribers.Count; i++)
+                {
+                    subscribers[i]?.OnTick();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Registers a tickable object so it receives future <see cref="ITickable.OnTick"/> calls.
+        /// </summary>
+        /// <param name="tickable">The object to register.</param>
+        public void Subscribe(ITickable tickable)
+        {
+            if (tickable != null && !subscribers.Contains(tickable))
+            {
+                subscribers.Add(tickable);
+            }
+        }
+
+        /// <summary>
+        /// Removes a previously registered tickable object.
+        /// </summary>
+        /// <param name="tickable">The object to unregister.</param>
+        public void Unsubscribe(ITickable tickable)
+        {
+            if (tickable != null)
+            {
+                subscribers.Remove(tickable);
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using Util;
 
 namespace NPC
 {
@@ -11,8 +12,8 @@ namespace NPC
     ///  - Animator mode: sets Dir(int:0=Down,1=Left,2=Right,3=Up) + IsMoving(bool)
     ///  - SpriteSwap mode: swaps SpriteRenderer sprites per direction with idle/walk arrays
     /// </summary>
-    [RequireComponent(typeof(Rigidbody2D))]
-    public class NpcPathFollower : MonoBehaviour
+[RequireComponent(typeof(Rigidbody2D))]
+    public class NpcPathFollower : MonoBehaviour, ITickable
     {
         public enum LoopType { Loop, PingPong, Once }
 
@@ -107,8 +108,21 @@ namespace NPC
             if (spriteAnimator != null) spriteAnimator.UpdateVisuals(Vector2.zero); // init as idle
         }
 
-        private void FixedUpdate()
+        private void OnEnable()
         {
+            if (Ticker.Instance != null)
+                Ticker.Instance.Subscribe(this);
+        }
+
+        private void OnDisable()
+        {
+            if (Ticker.Instance != null)
+                Ticker.Instance.Unsubscribe(this);
+        }
+
+        public void OnTick()
+        {
+            float delta = Ticker.TickDuration;
             if (_waiting || GetPointCount() == 0)
             {
                 if (spriteAnimator != null) spriteAnimator.UpdateVisuals(Vector2.zero);
@@ -135,15 +149,14 @@ namespace NPC
                 return;
             }
 
-            // Move
             Vector2 dir = (dist > 0.0001f) ? (toTarget / dist) : Vector2.zero;
             float speed = GetSpeedMultiplierFor(_index) * Mathf.Max(0f, moveSpeed);
-            Vector2 next = current + dir * speed * Time.fixedDeltaTime;
+            Vector2 next = current + dir * speed * delta;
 
             if (_rb != null) _rb.MovePosition(next);
             else transform.position = next;
 
-            Vector2 velocity = (next - _lastPos) / Time.fixedDeltaTime;
+            Vector2 velocity = (next - _lastPos) / delta;
             if (spriteAnimator != null) spriteAnimator.UpdateVisuals(velocity);
             _lastPos = next;
         }
