@@ -54,7 +54,7 @@ namespace Inventory
         [Tooltip("Optional: frame sprite (9-sliced) to draw for each slot.")]
         public Sprite slotFrameSprite;
         [Tooltip("Color/tint for empty slots if no frame sprite, or tint over the frame.")]
-        public Color emptySlotColor = new Color(1f, 1f, 1f, 0.25f); // light translucent
+        public Color emptySlotColor = new Color(0f, 0f, 0f, 1f); // solid black
 
         [Header("Window")]
         [Tooltip("Background color for the inventory window.")]

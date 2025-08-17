@@ -194,7 +194,7 @@ namespace BankSystem
             GameObject handleGO = new GameObject("Handle", typeof(Image));
             handleGO.transform.SetParent(scrollbarGO.transform, false);
             var handleImg = handleGO.GetComponent<Image>();
-            handleImg.color = new Color(0.8f, 0.8f, 0.8f, 1f);
+            handleImg.color = new Color(0.3f, 0.3f, 0.3f, 1f);
             var handleRect = handleGO.GetComponent<RectTransform>();
             handleRect.anchorMin = Vector2.zero;
             handleRect.anchorMax = Vector2.one;
