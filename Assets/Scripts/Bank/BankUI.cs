@@ -143,11 +143,12 @@ namespace BankSystem
             GameObject scrollGO = new GameObject("ScrollView", typeof(RectTransform), typeof(ScrollRect));
             scrollGO.transform.SetParent(window.transform, false);
             var scrollRect = scrollGO.GetComponent<RectTransform>();
+            float scrollbarWidth = 12f;
             scrollRect.anchorMin = new Vector2(0f, 0f);
             scrollRect.anchorMax = new Vector2(1f, 1f);
             scrollRect.pivot = new Vector2(0.5f, 0.5f);
             scrollRect.offsetMin = new Vector2(windowPadding.x, windowPadding.y);
-            scrollRect.offsetMax = new Vector2(-windowPadding.x, -windowPadding.y - headerHeight);
+            scrollRect.offsetMax = new Vector2(-windowPadding.x - scrollbarWidth, -windowPadding.y - headerHeight);
 
             GameObject viewport = new GameObject("Viewport", typeof(RectTransform), typeof(Image), typeof(Mask));
             viewport.transform.SetParent(scrollGO.transform, false);
@@ -180,11 +181,37 @@ namespace BankSystem
             grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             grid.constraintCount = Columns;
 
+            GameObject scrollbarGO = new GameObject("Scrollbar", typeof(RectTransform), typeof(Image), typeof(Scrollbar));
+            scrollbarGO.transform.SetParent(window.transform, false);
+            var scrollbarRect = scrollbarGO.GetComponent<RectTransform>();
+            scrollbarRect.anchorMin = new Vector2(1f, 0f);
+            scrollbarRect.anchorMax = new Vector2(1f, 1f);
+            scrollbarRect.pivot = new Vector2(1f, 1f);
+            scrollbarRect.offsetMin = new Vector2(-windowPadding.x - scrollbarWidth, windowPadding.y);
+            scrollbarRect.offsetMax = new Vector2(-windowPadding.x, -windowPadding.y - headerHeight);
+            var scrollbarImg = scrollbarGO.GetComponent<Image>();
+            scrollbarImg.color = new Color(0f, 0f, 0f, 0.5f);
+            GameObject handleGO = new GameObject("Handle", typeof(Image));
+            handleGO.transform.SetParent(scrollbarGO.transform, false);
+            var handleImg = handleGO.GetComponent<Image>();
+            handleImg.color = Color.white;
+            var handleRect = handleGO.GetComponent<RectTransform>();
+            handleRect.anchorMin = Vector2.zero;
+            handleRect.anchorMax = Vector2.one;
+            handleRect.offsetMin = Vector2.zero;
+            handleRect.offsetMax = Vector2.zero;
+            var scrollbar = scrollbarGO.GetComponent<Scrollbar>();
+            scrollbar.direction = Scrollbar.Direction.BottomToTop;
+            scrollbar.targetGraphic = handleImg;
+            scrollbar.handleRect = handleRect;
+
             var scroll = scrollGO.GetComponent<ScrollRect>();
             scroll.viewport = viewportRect;
             scroll.content = contentRect;
             scroll.horizontal = false;
             scroll.movementType = ScrollRect.MovementType.Clamped;
+            scroll.verticalScrollbar = scrollbar;
+            scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
 
             slotImages = new Image[Size];
             slotCountTexts = new Text[Size];
