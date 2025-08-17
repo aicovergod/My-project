@@ -20,7 +20,8 @@ namespace Pets
 
         public float idleThreshold = 5f;
         public float wanderRadius = 3f;
-        public float wanderTargetRefreshTime = 2f;
+        public Vector2 wanderDelayRange = new Vector2(1f, 3f);
+        public float wanderMoveSpeed = 2f;
 
         [SerializeField] private Transform player;
         private Vector3 offset;
@@ -98,8 +99,12 @@ namespace Pets
             else
             {
                 idleTimer += Time.fixedDeltaTime;
-                if (idleTimer >= idleThreshold)
+                if (!wandering && idleTimer >= idleThreshold)
+                {
                     wandering = true;
+                    wanderTarget = transform.position;
+                    wanderTimer = Random.Range(wanderDelayRange.x, wanderDelayRange.y);
+                }
             }
 
             Vector3 newPos;
@@ -107,14 +112,17 @@ namespace Pets
 
             if (wandering)
             {
-                wanderTimer -= Time.fixedDeltaTime;
-                if (wanderTimer <= 0f || Vector3.Distance(transform.position, wanderTarget) < 0.1f)
+                if (Vector3.Distance(transform.position, wanderTarget) < 0.1f)
                 {
-                    wanderTarget = playerPos + (Vector3)Random.insideUnitCircle * wanderRadius;
-                    wanderTimer = wanderTargetRefreshTime;
+                    wanderTimer -= Time.fixedDeltaTime;
+                    if (wanderTimer <= 0f)
+                    {
+                        wanderTarget = playerPos + (Vector3)Random.insideUnitCircle * wanderRadius;
+                        wanderTimer = Random.Range(wanderDelayRange.x, wanderDelayRange.y);
+                    }
                 }
 
-                newPos = Vector3.SmoothDamp(transform.position, wanderTarget, ref currentVelocity, smoothTime, moveSpeed, Time.fixedDeltaTime);
+                newPos = Vector3.SmoothDamp(transform.position, wanderTarget, ref currentVelocity, smoothTime, wanderMoveSpeed, Time.fixedDeltaTime);
                 velocity = currentVelocity;
                 body.MovePosition(newPos);
 
