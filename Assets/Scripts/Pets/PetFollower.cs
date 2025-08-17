@@ -14,9 +14,14 @@ namespace Pets
         public float moveSpeed = 6f;
         public float jitter = 0.05f;
         public float smoothTime = 0.2f;
+        public float offsetLerpSpeed = 5f;
+        public float headingRefreshAngle = 30f;
 
         private Transform player;
         private Vector3 offset;
+        private Vector3 targetOffset;
+        private Vector2 lastHeading;
+        private Vector3 lastPlayerPos;
         private Rigidbody2D body;
         private SpriteRenderer sprite;
         private PetSpriteAnimator spriteAnimator;
@@ -28,7 +33,10 @@ namespace Pets
             sprite = GetComponent<SpriteRenderer>();
             spriteAnimator = GetComponent<PetSpriteAnimator>();
             FindPlayer();
-            ChooseOffset();
+            if (player != null)
+                lastPlayerPos = player.position;
+            ChooseOffset(Vector2.right);
+            offset = targetOffset;
         }
 
         private void FindPlayer()
@@ -38,9 +46,11 @@ namespace Pets
                 player = go.transform;
         }
 
-        private void ChooseOffset()
+        private void ChooseOffset(Vector2 heading)
         {
-            offset = Random.insideUnitCircle.normalized * followRadius;
+            if (heading.sqrMagnitude < 0.01f)
+                heading = Vector2.right;
+            targetOffset = (Vector3)(-heading.normalized * followRadius);
         }
 
         private void LateUpdate()
@@ -52,19 +62,35 @@ namespace Pets
                     return;
             }
 
-            Vector3 target = player.position + offset;
+            Vector3 playerPos = player.position;
+            Vector3 playerVel = (playerPos - lastPlayerPos) / Time.deltaTime;
+            lastPlayerPos = playerPos;
+
+            if (playerVel.sqrMagnitude > 0.01f)
+            {
+                Vector2 heading = ((Vector2)playerVel).normalized;
+                if (lastHeading == Vector2.zero || Vector2.Angle(lastHeading, heading) > headingRefreshAngle)
+                {
+                    ChooseOffset(heading);
+                    lastHeading = heading;
+                }
+            }
+
+            offset = Vector3.Lerp(offset, targetOffset, Time.deltaTime * offsetLerpSpeed);
+
+            Vector3 target = playerPos + offset;
             float dist = Vector3.Distance(transform.position, target);
 
             if (dist > maxDistance)
-                target = player.position;
+                target = playerPos;
 
             Vector3 newPos = Vector3.SmoothDamp(transform.position, target, ref currentVelocity, smoothTime, moveSpeed, Time.deltaTime);
             newPos.y += Mathf.Sin(Time.time * 5f) * jitter;
             Vector2 velocity = currentVelocity;
             body.MovePosition(newPos);
 
-            if (Vector3.Distance(transform.position, player.position) < followRadius * 0.5f)
-                ChooseOffset();
+            if (Vector3.Distance(transform.position, playerPos) < followRadius * 0.5f)
+                ChooseOffset(lastHeading);
 
             if (spriteAnimator != null)
                 spriteAnimator.UpdateVisuals(velocity);
