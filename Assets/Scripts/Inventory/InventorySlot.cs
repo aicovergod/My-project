@@ -60,6 +60,8 @@ namespace Inventory
             {
                 if (eventData.button == PointerEventData.InputButton.Left)
                     BankSystem.BankUI.Instance?.DepositFromInventory(index);
+                else if (eventData.button == PointerEventData.InputButton.Right)
+                    BankSystem.BankUI.Instance?.ShowDepositMenu(index, eventData.position);
                 return;
             }
             bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);

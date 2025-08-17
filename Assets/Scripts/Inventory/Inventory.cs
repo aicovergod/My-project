@@ -602,6 +602,25 @@ namespace Inventory
         }
 
         /// <summary>
+        /// Removes a quantity from the specified slot without dropping it in the world.
+        /// </summary>
+        public void RemoveFromSlot(int slotIndex, int quantity)
+        {
+            if (slotIndex < 0 || slotIndex >= items.Length) return;
+            var entry = items[slotIndex];
+            if (entry.item == null) return;
+
+            int remove = Mathf.Clamp(quantity, 1, entry.count);
+            entry.count -= remove;
+            if (entry.count <= 0)
+                entry.item = null;
+            items[slotIndex] = entry;
+            UpdateSlotVisual(slotIndex);
+            HideTooltip();
+            OnInventoryChanged?.Invoke();
+        }
+
+        /// <summary>
         /// Splits a stack within the inventory, moving <paramref name="quantity"/>
         /// items to a new slot if space is available.
         /// </summary>
