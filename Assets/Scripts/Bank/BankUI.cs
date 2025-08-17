@@ -94,7 +94,7 @@ namespace BankSystem
             windowRect.anchorMax = new Vector2(0.5f, 0.5f);
             windowRect.pivot = new Vector2(0.5f, 0.5f);
             windowRect.anchoredPosition = Vector2.zero;
-            float width = Columns * slotSize.x + (Columns - 1) * slotSpacing.x + windowPadding.x * 2f;
+            float width = Columns * slotSize.x + (Columns - 1) * slotSpacing.x + windowPadding.x * 2f + 20f;
             float visibleRows = 8f;
             float height = visibleRows * slotSize.y + (visibleRows - 1f) * slotSpacing.y + windowPadding.y * 2f + headerHeight;
             windowRect.sizeDelta = new Vector2(width, height);
@@ -194,7 +194,7 @@ namespace BankSystem
             GameObject handleGO = new GameObject("Handle", typeof(Image));
             handleGO.transform.SetParent(scrollbarGO.transform, false);
             var handleImg = handleGO.GetComponent<Image>();
-            handleImg.color = Color.white;
+            handleImg.color = new Color(0.8f, 0.8f, 0.8f, 1f);
             var handleRect = handleGO.GetComponent<RectTransform>();
             handleRect.anchorMin = Vector2.zero;
             handleRect.anchorMax = Vector2.one;
