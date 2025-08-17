@@ -258,7 +258,11 @@ namespace Pets
                 pathCorners.AddRange(navPath.corners);
                 pathIndex = 0;
                 for (int i = 0; i < pathCorners.Count; i++)
-                    pathCorners[i].z = transform.position.z;
+                {
+                    Vector3 corner = pathCorners[i];
+                    corner.z = transform.position.z;
+                    pathCorners[i] = corner;
+                }
             }
         }
 
