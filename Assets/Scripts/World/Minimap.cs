@@ -39,6 +39,8 @@ namespace World
             {
                 name = "MinimapTexture"
             };
+            // Ensure the render texture is ready to receive camera output
+            mapTexture.Create();
 
             var camGO = new GameObject("MinimapCamera");
             camGO.transform.SetParent(transform, false);
@@ -47,7 +49,8 @@ namespace World
             mapCamera.orthographicSize = 25f;
             mapCamera.clearFlags = CameraClearFlags.SolidColor;
             mapCamera.backgroundColor = Color.black;
-            mapCamera.cullingMask &= ~LayerMask.GetMask("UI");
+            // Render everything except the UI layer
+            mapCamera.cullingMask = ~LayerMask.GetMask("UI");
             mapCamera.targetTexture = mapTexture;
         }
 
@@ -85,7 +88,8 @@ namespace World
             rawRect.offsetMax = new Vector2(-border, -border);
 
             const int buttonSize = 24;
-            float buttonY = -(size + border * 2 + 10f);
+            // Place buttons below the minimap with a small margin
+            float buttonY = -(size + border * 2 + buttonSize + 10f);
             CreateZoomButton(canvasGO.transform, "ZoomInButton", "+", new Vector2(-10f, buttonY), ZoomIn);
             CreateZoomButton(canvasGO.transform, "ZoomOutButton", "-", new Vector2(-10f - (buttonSize + 5), buttonY), ZoomOut);
         }
