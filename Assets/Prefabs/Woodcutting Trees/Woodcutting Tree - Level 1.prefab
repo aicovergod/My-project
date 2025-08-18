@@ -166,7 +166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   worldOffset: {x: 0, y: 0.6, z: 0}
   textColor: {r: 1, g: 1, b: 1, a: 1}
-  fontSize: 32
-  font: {fileID: 0}
+  fontSize: 4
+  font: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   outlineColor: {r: 0, g: 0, b: 0, a: 1}
   outlineWidth: 0
