@@ -87,6 +87,7 @@ namespace Inventory
         private Shop currentShop;
 
         private PlayerMover playerMover;
+        private Equipment equipment;
 
         // UI
         private GameObject uiRoot; // Canvas root
@@ -104,6 +105,7 @@ namespace Inventory
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
 
         public bool BankOpen { get; set; }
+        public bool InShop => currentShop != null;
 
         private bool CanDropItems => playerMover == null || playerMover.CanDrop;
 
@@ -132,6 +134,26 @@ namespace Inventory
             items[index].count = 0;
             UpdateSlotVisual(index);
             OnInventoryChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Equip the item in the given inventory slot if possible.
+        /// </summary>
+        public bool EquipItem(int index)
+        {
+            if (equipment == null)
+                return false;
+            if (index < 0 || index >= items.Length)
+                return false;
+            var entry = items[index];
+            if (entry.item == null || entry.item.equipmentSlot == EquipmentSlot.None)
+                return false;
+            if (equipment.Equip(entry))
+            {
+                ClearSlot(index);
+                return true;
+            }
+            return false;
         }
 
         private void Awake()
@@ -177,6 +199,7 @@ namespace Inventory
             }
 
             playerMover = GetComponent<PlayerMover>();
+            equipment = GetComponent<Equipment>();
 
             // Start completely hidden (inactive object so it’s clear in Hierarchy)
             if (uiRoot != null)

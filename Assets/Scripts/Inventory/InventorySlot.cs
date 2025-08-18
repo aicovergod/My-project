@@ -69,10 +69,17 @@ namespace Inventory
             {
                 if (!eventData.dragging)
                 {
-                    if (shift)
-                        inventory?.PromptStackSplit(index, StackSplitType.Sell);
+                    if (inventory != null && inventory.InShop)
+                    {
+                        if (shift)
+                            inventory?.PromptStackSplit(index, StackSplitType.Sell);
+                        else
+                            inventory?.SellItem(index, 1);
+                    }
                     else
-                        inventory?.SellItem(index, 1);
+                    {
+                        inventory?.EquipItem(index);
+                    }
                 }
             }
             else if (eventData.button == PointerEventData.InputButton.Right)
