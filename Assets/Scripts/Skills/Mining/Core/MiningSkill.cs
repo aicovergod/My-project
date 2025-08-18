@@ -38,6 +38,7 @@ namespace Skills.Mining
         public int Xp => xp;
         public bool IsMining => currentRock != null;
         public MineableRock CurrentRock => currentRock;
+        public PickaxeDefinition CurrentPickaxe => currentPickaxe;
         public int CurrentSwingSpeedTicks => currentPickaxe?.SwingSpeedTicks ?? 0;
         public float SwingProgressNormalized
             => currentPickaxe == null || currentPickaxe.SwingSpeedTicks <= 1

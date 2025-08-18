@@ -13,9 +13,12 @@ namespace Skills.Mining
         private Transform target;
         private Image progressImage;
         private GameObject progressRoot;
+        private GameObject pickaxeRoot;
+        private SpriteRenderer pickaxeRenderer;
         // Offset from the targeted rock's position where the progress bar will appear.
         // Reduced the vertical component to half of its previous value so the bar sits closer to the object.
         private readonly Vector3 offset = new Vector3(0f, 0.75f, 0f);
+        private readonly Vector3 pickaxeOffset = Vector3.zero;
 
         private float currentFill;
         private float nextFill;
@@ -41,6 +44,7 @@ namespace Skills.Mining
             }
 
             CreateProgressBar();
+            CreatePickaxeSprite();
         }
 
         private void CreateProgressBar()
@@ -80,6 +84,15 @@ namespace Skills.Mining
             progressRoot.SetActive(false);
         }
 
+        private void CreatePickaxeSprite()
+        {
+            pickaxeRoot = new GameObject("MiningPickaxe");
+            pickaxeRoot.transform.SetParent(transform);
+            pickaxeRenderer = pickaxeRoot.AddComponent<SpriteRenderer>();
+            pickaxeRenderer.sortingOrder = 100;
+            pickaxeRoot.SetActive(false);
+        }
+
         private void HandleStart(MineableRock rock)
         {
             target = rock.transform;
@@ -89,6 +102,16 @@ namespace Skills.Mining
             step = skill.CurrentSwingSpeedTicks > 0 ? 1f / skill.CurrentSwingSpeedTicks : 0f;
             nextFill = step;
             progressRoot.SetActive(true);
+            var pick = skill.CurrentPickaxe;
+            if (pick != null && pickaxeRenderer != null)
+            {
+                var item = Resources.Load<ItemData>("Item/" + pick.Id);
+                if (item != null && item.icon != null)
+                {
+                    pickaxeRenderer.sprite = item.icon;
+                    pickaxeRoot.SetActive(true);
+                }
+            }
             if (Ticker.Instance != null)
                 Ticker.Instance.Subscribe(this);
         }
@@ -97,6 +120,12 @@ namespace Skills.Mining
         {
             target = null;
             progressRoot.SetActive(false);
+            if (pickaxeRoot != null)
+            {
+                pickaxeRoot.SetActive(false);
+                if (pickaxeRenderer != null)
+                    pickaxeRenderer.sprite = null;
+            }
             if (Ticker.Instance != null)
                 Ticker.Instance.Unsubscribe(this);
         }
@@ -107,6 +136,8 @@ namespace Skills.Mining
                 return;
 
             progressRoot.transform.position = target.position + offset;
+            if (pickaxeRoot != null && pickaxeRoot.activeSelf)
+                pickaxeRoot.transform.position = target.position + pickaxeOffset;
 
             tickTimer += Time.deltaTime;
             float t = Mathf.Clamp01(tickTimer / Ticker.TickDuration);
