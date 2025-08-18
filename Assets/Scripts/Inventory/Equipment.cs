@@ -229,12 +229,12 @@ namespace Inventory
                 magicDef += entry.item.magicDefenceBonus;
             }
 
-            if (strengthBonusText != null) strengthBonusText.text = $"Strength Bonus = {strength}";
-            if (magicBonusText != null) magicBonusText.text = $"Magic Bonus = {magic}";
-            if (rangeBonusText != null) rangeBonusText.text = $"Range Bonus = {range}";
-            if (meleeDefenceBonusText != null) meleeDefenceBonusText.text = $"Melee Defence Bonus = {meleeDef}";
-            if (magicDefenceBonusText != null) magicDefenceBonusText.text = $"Magic Defence Bonus = {magicDef}";
-            if (rangedDefenceBonusText != null) rangedDefenceBonusText.text = $"Range Defence Bonus = {rangeDef}";
+            if (strengthBonusText != null) strengthBonusText.text = $"Melee = {strength}";
+            if (magicBonusText != null) magicBonusText.text = $"Magic = {magic}";
+            if (rangeBonusText != null) rangeBonusText.text = $"Range = {range}";
+            if (meleeDefenceBonusText != null) meleeDefenceBonusText.text = $"Melee = {meleeDef}";
+            if (magicDefenceBonusText != null) magicDefenceBonusText.text = $"Magic = {magicDef}";
+            if (rangedDefenceBonusText != null) rangedDefenceBonusText.text = $"Range= {rangeDef}";
         }
 
         private Sprite GetSlotSprite(EquipmentSlot slot)

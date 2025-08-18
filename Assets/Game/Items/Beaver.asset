@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72479de709848e3ab024450652154e5, type: 3}
   m_Name: Beaver
   m_EditorClassIdentifier: 
-  id: Rock Golem
-  displayName: Rock Golem
+  id: Beaver
+  displayName: Beaver
   pickupItem: {fileID: 11400000, guid: 77aacc22df6b8854c9be2ed0d470914b, type: 2}
   sprite: {fileID: 0}
   animationClips: []

@@ -20,3 +20,11 @@ MonoBehaviour:
     rocks'
   stackable: 0
   maxStack: 0
+  splittable: 1
+  equipmentSlot: 10
+  strengthBonus: 5
+  rangeBonus: 0
+  magicBonus: 0
+  meleeDefenceBonus: 0
+  rangedDefenceBonus: 0
+  magicDefenceBonus: 0
