@@ -92,7 +92,7 @@ namespace World
             var plusGO = new GameObject("ZoomIn", typeof(Image), typeof(Button));
             plusGO.transform.SetParent(canvasGO.transform, false);
             var plusImg = plusGO.GetComponent<Image>();
-            plusImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap.PlusButton");
+            plusImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap/PlusButton");
             plusImg.preserveAspect = true;
             var plusRect = plusImg.rectTransform;
             plusRect.anchorMin = new Vector2(1f, 1f);
@@ -106,7 +106,7 @@ namespace World
             var minusGO = new GameObject("ZoomOut", typeof(Image), typeof(Button));
             minusGO.transform.SetParent(canvasGO.transform, false);
             var minusImg = minusGO.GetComponent<Image>();
-            minusImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap.MinusButton");
+            minusImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap/MinusButton");
             minusImg.preserveAspect = true;
             var minusRect = minusImg.rectTransform;
             minusRect.anchorMin = new Vector2(1f, 1f);
