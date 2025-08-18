@@ -378,7 +378,15 @@ namespace World
 
             Vector3 viewport = mapCamera.WorldToViewportPoint(worldPos);
             Vector2 size = container.rect.size;
-            icon.anchoredPosition = new Vector2((viewport.x - 0.5f) * size.x, (viewport.y - 0.5f) * size.y);
+            Vector2 pos = new Vector2((viewport.x - 0.5f) * size.x, (viewport.y - 0.5f) * size.y);
+
+            // Clamp the icon to the bounds of the minimap so it never renders outside
+            Vector2 halfSize = size * 0.5f;
+            Vector2 iconHalf = Vector2.Scale(icon.rect.size, icon.localScale) * 0.5f;
+            pos.x = Mathf.Clamp(pos.x, -halfSize.x + iconHalf.x, halfSize.x - iconHalf.x);
+            pos.y = Mathf.Clamp(pos.y, -halfSize.y + iconHalf.y, halfSize.y - iconHalf.y);
+
+            icon.anchoredPosition = pos;
         }
     }
 }
