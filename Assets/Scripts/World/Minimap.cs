@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Skills;
+using BankSystem;
+using ShopSystem;
+using Player;
 
 namespace World
 {
@@ -14,6 +17,7 @@ namespace World
         private RenderTexture mapTexture;
         private Transform target;
         private GameObject expandedRoot;
+        private GameObject smallRoot;
 
         private const float ZoomStep = 5f;
         private const float MinZoom = 5f;
@@ -67,8 +71,16 @@ namespace World
             const int size = 128;
             const int border = 4;
 
+            smallRoot = new GameObject("Small", typeof(RectTransform));
+            smallRoot.transform.SetParent(canvasGO.transform, false);
+            var smallRect = smallRoot.GetComponent<RectTransform>();
+            smallRect.anchorMin = new Vector2(1f, 1f);
+            smallRect.anchorMax = new Vector2(1f, 1f);
+            smallRect.pivot = new Vector2(1f, 1f);
+            smallRect.anchoredPosition = Vector2.zero;
+
             var borderGO = new GameObject("Border", typeof(Image));
-            borderGO.transform.SetParent(canvasGO.transform, false);
+            borderGO.transform.SetParent(smallRoot.transform, false);
             var borderImg = borderGO.GetComponent<Image>();
             borderImg.color = new Color32(64, 64, 64, 255);
             var borderRect = borderImg.rectTransform;
@@ -92,7 +104,7 @@ namespace World
 
             // Load sprite from "Assets/Interfaces/Minimap.PlusButton.png"
             var plusGO = new GameObject("ZoomIn", typeof(Image), typeof(Button));
-            plusGO.transform.SetParent(canvasGO.transform, false);
+            plusGO.transform.SetParent(smallRoot.transform, false);
             var plusImg = plusGO.GetComponent<Image>();
             plusImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap/PlusButton");
             plusImg.preserveAspect = true;
@@ -106,7 +118,7 @@ namespace World
 
             // Load sprite from "Assets/Interfaces/Minimap.MinusButton.png"
             var minusGO = new GameObject("ZoomOut", typeof(Image), typeof(Button));
-            minusGO.transform.SetParent(canvasGO.transform, false);
+            minusGO.transform.SetParent(smallRoot.transform, false);
             var minusImg = minusGO.GetComponent<Image>();
             minusImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap/MinusButton");
             minusImg.preserveAspect = true;
@@ -141,6 +153,46 @@ namespace World
             expandedRawRect.anchorMax = Vector2.one;
             expandedRawRect.offsetMin = new Vector2(expandedBorder, expandedBorder);
             expandedRawRect.offsetMax = new Vector2(-expandedBorder, -expandedBorder);
+
+            // Buttons for expanded map
+            var closeGO = new GameObject("Close", typeof(Image), typeof(Button));
+            closeGO.transform.SetParent(expandedRoot.transform, false);
+            var closeImg = closeGO.GetComponent<Image>();
+            closeImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap/ExpandButton");
+            closeImg.preserveAspect = true;
+            var closeRect = closeImg.rectTransform;
+            closeRect.anchorMin = new Vector2(1f, 1f);
+            closeRect.anchorMax = new Vector2(1f, 1f);
+            closeRect.pivot = new Vector2(1f, 1f);
+            closeRect.sizeDelta = new Vector2(btnSize, btnSize);
+            closeRect.anchoredPosition = new Vector2(-btnSpacing, -btnSpacing);
+            closeGO.GetComponent<Button>().onClick.AddListener(ToggleExpanded);
+
+            var bigPlusGO = new GameObject("ZoomIn", typeof(Image), typeof(Button));
+            bigPlusGO.transform.SetParent(expandedRoot.transform, false);
+            var bigPlusImg = bigPlusGO.GetComponent<Image>();
+            bigPlusImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap/PlusButton");
+            bigPlusImg.preserveAspect = true;
+            var bigPlusRect = bigPlusImg.rectTransform;
+            bigPlusRect.anchorMin = new Vector2(1f, 1f);
+            bigPlusRect.anchorMax = new Vector2(1f, 1f);
+            bigPlusRect.pivot = new Vector2(1f, 1f);
+            bigPlusRect.sizeDelta = new Vector2(btnSize, btnSize);
+            bigPlusRect.anchoredPosition = closeRect.anchoredPosition + new Vector2(0f, -btnSize - btnSpacing);
+            bigPlusGO.GetComponent<Button>().onClick.AddListener(ZoomIn);
+
+            var bigMinusGO = new GameObject("ZoomOut", typeof(Image), typeof(Button));
+            bigMinusGO.transform.SetParent(expandedRoot.transform, false);
+            var bigMinusImg = bigMinusGO.GetComponent<Image>();
+            bigMinusImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap/MinusButton");
+            bigMinusImg.preserveAspect = true;
+            var bigMinusRect = bigMinusImg.rectTransform;
+            bigMinusRect.anchorMin = new Vector2(1f, 1f);
+            bigMinusRect.anchorMax = new Vector2(1f, 1f);
+            bigMinusRect.pivot = new Vector2(1f, 1f);
+            bigMinusRect.sizeDelta = new Vector2(btnSize, btnSize);
+            bigMinusRect.anchoredPosition = bigPlusRect.anchoredPosition + new Vector2(0f, -btnSize - btnSpacing);
+            bigMinusGO.GetComponent<Button>().onClick.AddListener(ZoomOut);
 
             expandedRoot.SetActive(false);
 
@@ -198,9 +250,17 @@ namespace World
         {
             if (expandedRoot == null)
                 return;
+
             bool opening = !expandedRoot.activeSelf;
             if (opening)
             {
+                var bank = BankUI.Instance;
+                if (bank != null && bank.IsOpen)
+                    return;
+                var shop = ShopUI.Instance;
+                if (shop != null && shop.IsOpen)
+                    return;
+
                 var skills = SkillsUI.Instance;
                 if (skills != null && skills.IsOpen)
                     skills.Close();
@@ -208,7 +268,15 @@ namespace World
                 if (inv != null && inv.IsOpen)
                     inv.CloseUI();
             }
-            expandedRoot.SetActive(!expandedRoot.activeSelf);
+
+            expandedRoot.SetActive(opening);
+            if (smallRoot != null)
+                smallRoot.SetActive(!opening);
+
+            var playerObj = target != null ? target.gameObject : GameObject.FindGameObjectWithTag("Player");
+            var mover = playerObj != null ? playerObj.GetComponent<PlayerMover>() : null;
+            if (mover != null)
+                mover.enabled = !opening;
         }
     }
 }
