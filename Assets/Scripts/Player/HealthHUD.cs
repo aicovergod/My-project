@@ -23,7 +23,9 @@ namespace Player
             hud.hitpoints = hp;
             go.transform.SetParent(parent, false);
 
-            var sprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
+            var sprite = Sprite.Create(Texture2D.whiteTexture,
+                new Rect(0f, 0f, 1f, 1f),
+                new Vector2(0.5f, 0.5f));
 
             const float height = 12f;
             const float margin = 4f;
