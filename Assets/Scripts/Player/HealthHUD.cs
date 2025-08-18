@@ -23,6 +23,8 @@ namespace Player
             hud.hitpoints = hp;
             go.transform.SetParent(parent, false);
 
+            var sprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
+
             const float height = 12f;
             const float margin = 4f;
 
@@ -37,6 +39,7 @@ namespace Player
             bgGO.transform.SetParent(go.transform, false);
             var bgImg = bgGO.GetComponent<Image>();
             bgImg.color = Color.red;
+            bgImg.sprite = sprite;
             var bgRect = bgImg.rectTransform;
             bgRect.anchorMin = Vector2.zero;
             bgRect.anchorMax = Vector2.one;
@@ -48,6 +51,7 @@ namespace Player
             hud.fillImage = fillGO.GetComponent<Image>();
             hud.fillImage.color = Color.green;
             hud.fillImage.type = Image.Type.Filled;
+            hud.fillImage.sprite = sprite;
             hud.fillImage.fillMethod = Image.FillMethod.Horizontal;
             hud.fillImage.fillOrigin = 0;
             hud.fillImage.fillAmount = 1f;
