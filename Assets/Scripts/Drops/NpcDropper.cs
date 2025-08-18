@@ -1,0 +1,82 @@
+using UnityEngine;
+using Inventory;
+
+namespace MyGame.Drops
+{
+    /// <summary>
+    /// Component that rolls a drop table and spawns items in the world.
+    /// </summary>
+    [RequireComponent(typeof(Transform))]
+    public class NpcDropper : MonoBehaviour
+    {
+        /// <summary>Drop table to roll.</summary>
+        public DropTable dropTable;
+
+        /// <summary>Luck multiplier applied to rolls.</summary>
+        public float luckMultiplier = 1f;
+
+        /// <summary>Radius for random spawn offset.</summary>
+        public float spawnSpreadRadius = 0.35f;
+
+        /// <summary>Whether to spawn at the NPC's feet.</summary>
+        public bool spawnAtFeet = true;
+
+        /// <summary>Spawner responsible for instantiating ground items.</summary>
+        public GroundItemSpawner spawner;
+
+        private void Awake()
+        {
+            if (spawner == null)
+            {
+                spawner = FindObjectOfType<GroundItemSpawner>();
+                if (spawner == null)
+                {
+                    Debug.LogError("NpcDropper: No GroundItemSpawner found in scene.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Resolves the drop table and spawns items around the NPC.
+        /// </summary>
+        /// <param name="overridePosition">Optional override for the spawn position.</param>
+        public void RollAndSpawn(Vector3? overridePosition = null)
+        {
+            if (dropTable == null || spawner == null)
+            {
+                Debug.LogWarning("NpcDropper.RollAndSpawn called without drop table or spawner.");
+                return;
+            }
+
+            Vector3 basePos = overridePosition ?? transform.position;
+            if (!spawnAtFeet)
+            {
+                basePos = transform.position; // placeholder for future expansion
+            }
+
+            var drops = DropResolver.Resolve(dropTable, luckMultiplier);
+            foreach (var drop in drops)
+            {
+                Vector2 offset = UnityEngine.Random.insideUnitCircle * spawnSpreadRadius;
+                Vector3 pos = basePos + (Vector3)offset;
+                spawner.Spawn(drop.item, drop.quantity, pos);
+            }
+        }
+
+        /// <summary>
+        /// Example method to hook into an NPC's death event.
+        /// </summary>
+        public void OnDeath()
+        {
+            RollAndSpawn();
+        }
+
+#if UNITY_EDITOR
+        [ContextMenu("Test Single Roll")]
+        private void TestSingleRoll()
+        {
+            RollAndSpawn();
+        }
+#endif
+    }
+}
