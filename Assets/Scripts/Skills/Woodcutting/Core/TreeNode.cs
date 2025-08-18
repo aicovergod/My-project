@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Util;
 
@@ -16,6 +17,9 @@ namespace Skills.Woodcutting
 
         public bool IsDepleted { get; private set; }
         public bool IsBusy { get; set; }
+
+        public event Action<TreeNode, float> OnTreeDepleted;
+        public event Action<TreeNode> OnTreeRespawned;
 
         private double respawnAt;
 
@@ -80,6 +84,7 @@ namespace Skills.Woodcutting
             if (col) col.enabled = false;
             if (sr && depletedSprite) sr.sprite = depletedSprite;
             IsBusy = false;
+            OnTreeDepleted?.Invoke(this, def != null ? def.RespawnSeconds : 0f);
         }
 
         private void Respawn()
@@ -88,6 +93,7 @@ namespace Skills.Woodcutting
             var col = GetComponent<Collider2D>();
             if (col) col.enabled = true;
             if (sr && aliveSprite) sr.sprite = aliveSprite;
+            OnTreeRespawned?.Invoke(this);
         }
     }
 }
