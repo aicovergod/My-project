@@ -79,6 +79,9 @@ namespace Inventory
         private Text rangedDefenceBonusText;
         private Text magicDefenceBonusText;
 
+        public int TotalAttackBonus { get; private set; }
+        public int TotalDefenceBonus { get; private set; }
+
         private static readonly System.Collections.Generic.Dictionary<int, EquipmentSlot> cellToSlot = new()
         {
             {1, EquipmentSlot.Head},
@@ -217,6 +220,7 @@ namespace Inventory
         private void UpdateBonuses()
         {
             int strength = 0, range = 0, magic = 0, meleeDef = 0, rangeDef = 0, magicDef = 0;
+            int attackTotal = 0, defenceTotal = 0;
             foreach (var entry in equipped)
             {
                 if (entry.item == null)
@@ -227,6 +231,8 @@ namespace Inventory
                 meleeDef += entry.item.meleeDefenceBonus;
                 rangeDef += entry.item.rangedDefenceBonus;
                 magicDef += entry.item.magicDefenceBonus;
+                attackTotal += entry.item.attackBonus;
+                defenceTotal += entry.item.defenceBonus;
             }
 
             if (strengthBonusText != null) strengthBonusText.text = $"Melee = {strength}";
@@ -235,6 +241,9 @@ namespace Inventory
             if (meleeDefenceBonusText != null) meleeDefenceBonusText.text = $"Melee = {meleeDef}";
             if (magicDefenceBonusText != null) magicDefenceBonusText.text = $"Magic = {magicDef}";
             if (rangedDefenceBonusText != null) rangedDefenceBonusText.text = $"Range = {rangeDef}";
+
+            TotalAttackBonus = attackTotal;
+            TotalDefenceBonus = defenceTotal;
         }
 
         private Sprite GetSlotSprite(EquipmentSlot slot)
