@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Inventory;
+using World;
 
 namespace ShopSystem
 {
@@ -24,6 +25,7 @@ namespace ShopSystem
     /// <summary>
     /// Basic shop component that can hold up to 30 items and a currency type.
     /// </summary>
+    [RequireComponent(typeof(MinimapMarker))]
     public class Shop : MonoBehaviour
     {
         public const int MaxSlots = 30;
@@ -65,6 +67,13 @@ namespace ShopSystem
             restockTimers = new float[stock.Length];
             for (int i = 0; i < stock.Length; i++)
                 initialStock[i] = stock[i];
+        }
+
+        private void Reset()
+        {
+            var marker = GetComponent<MinimapMarker>();
+            if (marker != null)
+                marker.type = MinimapMarker.MarkerType.Shop;
         }
 
         private void Update()

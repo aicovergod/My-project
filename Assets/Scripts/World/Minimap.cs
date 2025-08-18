@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 using Skills;
 using BankSystem;
 using ShopSystem;
@@ -18,6 +19,14 @@ namespace World
         private Transform target;
         private GameObject expandedRoot;
         private GameObject smallRoot;
+        private RectTransform smallMapRect;
+        private RectTransform expandedMapRect;
+
+        private readonly List<MinimapMarker> markers = new List<MinimapMarker>();
+        private readonly Dictionary<MinimapMarker.MarkerType, Sprite> iconCache = new Dictionary<MinimapMarker.MarkerType, Sprite>();
+
+        private static Minimap instance;
+        public static Minimap Instance => instance;
 
         private const float ZoomStep = 5f;
         private const float MinZoom = 5f;
@@ -34,6 +43,7 @@ namespace World
 
         private void Awake()
         {
+            instance = this;
             CreateCamera();
             CreateUI();
         }
@@ -100,6 +110,7 @@ namespace World
             rawRect.anchorMax = Vector2.one;
             rawRect.offsetMin = new Vector2(border, border);
             rawRect.offsetMax = new Vector2(-border, -border);
+            smallMapRect = rawRect;
             const int btnSize = 24;
             const int btnSpacing = 4;
 
@@ -155,6 +166,7 @@ namespace World
             expandedRawRect.anchorMax = Vector2.one;
             expandedRawRect.offsetMin = new Vector2(expandedBorder, expandedBorder);
             expandedRawRect.offsetMax = new Vector2(-expandedBorder, -expandedBorder);
+            expandedMapRect = expandedRawRect;
 
             // Buttons for expanded map
             var closeGO = new GameObject("Close", typeof(Image), typeof(Button));
@@ -234,6 +246,15 @@ namespace World
                 ToggleExpanded();
             }
 
+            if (mapCamera != null)
+            {
+                foreach (var marker in markers)
+                {
+                    if (marker == null) continue;
+                    UpdateIconPosition(marker.smallIcon, marker.transform.position, smallMapRect);
+                    UpdateIconPosition(marker.bigIcon, marker.transform.position, expandedMapRect);
+                }
+            }
         }
 
         private void ZoomIn()
@@ -279,6 +300,75 @@ namespace World
             var mover = playerObj != null ? playerObj.GetComponent<PlayerMover>() : null;
             if (mover != null)
                 mover.enabled = !opening;
+        }
+
+        public void Register(MinimapMarker marker)
+        {
+            if (marker == null || markers.Contains(marker))
+                return;
+
+            markers.Add(marker);
+
+            if (smallMapRect != null)
+            {
+                var smallGO = new GameObject("Marker", typeof(Image));
+                smallGO.transform.SetParent(smallMapRect, false);
+                var img = smallGO.GetComponent<Image>();
+                img.sprite = GetMarkerSprite(marker.type);
+                img.preserveAspect = true;
+                marker.smallIcon = img.rectTransform;
+            }
+
+            if (expandedMapRect != null)
+            {
+                var bigGO = new GameObject("Marker", typeof(Image));
+                bigGO.transform.SetParent(expandedMapRect, false);
+                var img = bigGO.GetComponent<Image>();
+                img.sprite = GetMarkerSprite(marker.type);
+                img.preserveAspect = true;
+                marker.bigIcon = img.rectTransform;
+            }
+        }
+
+        public void Unregister(MinimapMarker marker)
+        {
+            if (marker == null)
+                return;
+
+            markers.Remove(marker);
+            if (marker.smallIcon != null)
+                Destroy(marker.smallIcon.gameObject);
+            if (marker.bigIcon != null)
+                Destroy(marker.bigIcon.gameObject);
+        }
+
+        private Sprite GetMarkerSprite(MinimapMarker.MarkerType type)
+        {
+            if (!iconCache.TryGetValue(type, out var sprite) || sprite == null)
+            {
+                string path = type switch
+                {
+                    MinimapMarker.MarkerType.Bank => "Interfaces/Minimap/Bank",
+                    MinimapMarker.MarkerType.Shop => "Interfaces/Minimap/Shop",
+                    MinimapMarker.MarkerType.Ore => "Interfaces/Minimap/Ore",
+                    MinimapMarker.MarkerType.Tree => "Interfaces/Minimap/Tree",
+                    _ => null
+                };
+                if (!string.IsNullOrEmpty(path))
+                    sprite = Resources.Load<Sprite>(path);
+                iconCache[type] = sprite;
+            }
+            return sprite;
+        }
+
+        private void UpdateIconPosition(RectTransform icon, Vector3 worldPos, RectTransform container)
+        {
+            if (icon == null || container == null || mapCamera == null)
+                return;
+
+            Vector3 viewport = mapCamera.WorldToViewportPoint(worldPos);
+            Vector2 size = container.rect.size;
+            icon.anchoredPosition = new Vector2((viewport.x - 0.5f) * size.x, (viewport.y - 0.5f) * size.y);
         }
     }
 }
