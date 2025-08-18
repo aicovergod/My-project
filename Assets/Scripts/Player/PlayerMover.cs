@@ -29,6 +29,7 @@ namespace Player
         private Rigidbody2D rb;
         private Animator anim;
         private SpriteRenderer sr;
+        private Inventory.Inventory inventory;
 
         [Serializable]
         private class PositionData
@@ -59,6 +60,7 @@ namespace Player
             rb = GetComponent<Rigidbody2D>();
             anim = GetComponent<Animator>();
             sr  = GetComponent<SpriteRenderer>();
+            inventory = GetComponent<Inventory.Inventory>();
 
             rb.bodyType = RigidbodyType2D.Dynamic;
             rb.gravityScale = 0f;
@@ -103,6 +105,14 @@ namespace Player
 
         void Update()
         {
+            if (inventory != null && inventory.BankOpen)
+            {
+                moveDir = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
+                anim.SetBool("IsMoving", false);
+                return;
+            }
+
             float x = 0f, y = 0f;
 
 #if ENABLE_INPUT_SYSTEM
