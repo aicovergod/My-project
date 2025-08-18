@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Skills;
 
 namespace World
 {
@@ -12,6 +13,7 @@ namespace World
         private Camera mapCamera;
         private RenderTexture mapTexture;
         private Transform target;
+        private GameObject expandedRoot;
 
         private const float ZoomStep = 5f;
         private const float MinZoom = 5f;
@@ -116,6 +118,46 @@ namespace World
             minusRect.anchoredPosition = plusRect.anchoredPosition + new Vector2(0f, -btnSize - btnSpacing);
             minusGO.GetComponent<Button>().onClick.AddListener(ZoomOut);
 
+            // Expanded minimap window (center of screen)
+            const int expandedSize = 256;
+            const int expandedBorder = 8;
+            expandedRoot = new GameObject("Expanded", typeof(Image));
+            expandedRoot.transform.SetParent(canvasGO.transform, false);
+            var expandedImg = expandedRoot.GetComponent<Image>();
+            expandedImg.color = new Color32(64, 64, 64, 255);
+            var expandedRect = expandedImg.rectTransform;
+            expandedRect.anchorMin = new Vector2(0.5f, 0.5f);
+            expandedRect.anchorMax = new Vector2(0.5f, 0.5f);
+            expandedRect.pivot = new Vector2(0.5f, 0.5f);
+            expandedRect.sizeDelta = new Vector2(expandedSize + expandedBorder * 2, expandedSize + expandedBorder * 2);
+            expandedRect.anchoredPosition = Vector2.zero;
+
+            var expandedRawGO = new GameObject("Image", typeof(RawImage));
+            expandedRawGO.transform.SetParent(expandedRoot.transform, false);
+            var expandedRawImg = expandedRawGO.GetComponent<RawImage>();
+            expandedRawImg.texture = mapTexture;
+            var expandedRawRect = expandedRawImg.rectTransform;
+            expandedRawRect.anchorMin = Vector2.zero;
+            expandedRawRect.anchorMax = Vector2.one;
+            expandedRawRect.offsetMin = new Vector2(expandedBorder, expandedBorder);
+            expandedRawRect.offsetMax = new Vector2(-expandedBorder, -expandedBorder);
+
+            expandedRoot.SetActive(false);
+
+            // Load sprite from "Assets/Interfaces/Minimap/ExpandButton/ExpandButton.png"
+            var expandGO = new GameObject("Expand", typeof(Image), typeof(Button));
+            expandGO.transform.SetParent(borderGO.transform, false);
+            var expandImg = expandGO.GetComponent<Image>();
+            expandImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap/ExpandButton/ExpandButton");
+            expandImg.preserveAspect = true;
+            var expandRect = expandImg.rectTransform;
+            expandRect.anchorMin = new Vector2(1f, 1f);
+            expandRect.anchorMax = new Vector2(1f, 1f);
+            expandRect.pivot = new Vector2(1f, 1f);
+            expandRect.sizeDelta = new Vector2(btnSize, btnSize);
+            expandRect.anchoredPosition = new Vector2(-btnSpacing, -btnSpacing);
+            expandGO.GetComponent<Button>().onClick.AddListener(ToggleExpanded);
+
         }
 
         private void LateUpdate()
@@ -133,6 +175,11 @@ namespace World
                 mapCamera.transform.position = new Vector3(pos.x, pos.y, -10f);
             }
 
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                ToggleExpanded();
+            }
+
         }
 
         private void ZoomIn()
@@ -145,6 +192,23 @@ namespace World
         {
             if (mapCamera != null)
                 mapCamera.orthographicSize = Mathf.Min(MaxZoom, mapCamera.orthographicSize + ZoomStep);
+        }
+
+        private void ToggleExpanded()
+        {
+            if (expandedRoot == null)
+                return;
+            bool opening = !expandedRoot.activeSelf;
+            if (opening)
+            {
+                var skills = SkillsUI.Instance;
+                if (skills != null && skills.IsOpen)
+                    skills.Close();
+                var inv = Object.FindObjectOfType<Inventory.Inventory>();
+                if (inv != null && inv.IsOpen)
+                    inv.CloseUI();
+            }
+            expandedRoot.SetActive(!expandedRoot.activeSelf);
         }
     }
 }
