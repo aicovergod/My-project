@@ -17,7 +17,10 @@ namespace Skills.Woodcutting
         [SerializeField] private float outlineWidth = 0f;
 
         private TreeNode tree;
-        private TextMeshPro tmp;
+        // Using TMP_Text allows the label to work with either TextMeshPro or TextMeshProUGUI
+        // components. This avoids cases where GetComponent<TextMeshPro>() fails to find the
+        // existing text element, leaving the countdown blank.
+        private TMP_Text tmp;
         private Transform labelTransform;
         private SpriteRenderer treeRenderer;
         private double endTime;
@@ -71,7 +74,7 @@ namespace Skills.Woodcutting
             if (existing != null)
             {
                 labelTransform = existing;
-                tmp = existing.GetComponent<TextMeshPro>();
+                tmp = existing.GetComponent<TMP_Text>();
                 if (tmp == null)
                     tmp = existing.gameObject.AddComponent<TextMeshPro>();
             }
@@ -113,7 +116,7 @@ namespace Skills.Woodcutting
             int secs = Mathf.CeilToInt(respawnSeconds);
             lastSeconds = secs;
             if (tmp != null)
-                tmp.SetText("{0}", secs);
+                tmp.text = secs.ToString();
         }
 
         private void HandleRespawned(TreeNode node)
@@ -141,7 +144,8 @@ namespace Skills.Woodcutting
             if (secs != lastSeconds)
             {
                 lastSeconds = secs;
-                tmp.SetText("{0}", secs);
+                if (tmp != null)
+                    tmp.text = secs.ToString();
             }
 
             bool visible = treeRenderer == null || treeRenderer.isVisible;
