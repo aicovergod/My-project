@@ -101,6 +101,9 @@ namespace Skills
                         var inv = Object.FindObjectOfType<Inventory.Inventory>();
                         if (inv != null && inv.IsOpen)
                             inv.CloseUI();
+                        var eq = Object.FindObjectOfType<Inventory.Equipment>();
+                        if (eq != null && eq.IsOpen)
+                            eq.CloseUI();
                     }
                     uiRoot.SetActive(!uiRoot.activeSelf);
                 }

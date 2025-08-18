@@ -286,6 +286,9 @@ namespace World
                 var inv = Object.FindObjectOfType<Inventory.Inventory>();
                 if (inv != null && inv.IsOpen)
                     inv.CloseUI();
+                var eq = Object.FindObjectOfType<Inventory.Equipment>();
+                if (eq != null && eq.IsOpen)
+                    eq.CloseUI();
             }
 
             expandedRoot.SetActive(opening);
@@ -299,6 +302,14 @@ namespace World
             var mover = playerObj != null ? playerObj.GetComponent<PlayerMover>() : null;
             if (mover != null)
                 mover.enabled = !opening;
+        }
+
+        public bool IsExpanded => expandedRoot != null && expandedRoot.activeSelf;
+
+        public void CloseExpanded()
+        {
+            if (IsExpanded)
+                ToggleExpanded();
         }
 
         public void Register(MinimapMarker marker)
