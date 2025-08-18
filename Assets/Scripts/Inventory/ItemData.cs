@@ -29,19 +29,14 @@ namespace Inventory
     [CreateAssetMenu(menuName = "Inventory/ItemData")]
     public class ItemData : ScriptableObject
     {
-        [Header("Identification")]
-        public string id;
+        [Header("Identification")] public string id;
 
-        [Header("Display")]
-        public string itemName;
+        [Header("Display")] public string itemName;
         public Sprite icon;
 
-        [Header("Description")]
-        [TextArea]
-        public string description;
+        [Header("Description")] [TextArea] public string description;
 
-        [Header("Stacking")]
-        [Tooltip("If true, multiple items can occupy a single inventory slot.")]
+        [Header("Stacking")] [Tooltip("If true, multiple items can occupy a single inventory slot.")]
         public bool stackable;
 
         [Tooltip("Maximum number of items per stack when stackable.")]
@@ -50,7 +45,7 @@ namespace Inventory
         [Tooltip("If true, stacks of this item can be split in the inventory.")]
         public bool splittable = true;
 
-        [Header("Equipment")]
-        [Tooltip("Slot this item can be equipped to. Use None for non-equippable items.")]
+        [Header("Equipment")] [Tooltip("Slot this item can be equipped to. Use None for non-equippable items.")]
         public EquipmentSlot equipmentSlot = EquipmentSlot.None;
     }
+}
