@@ -54,6 +54,13 @@ namespace Inventory
         private InventoryEntry[] equipped;
         private Inventory inventory;
 
+        private Text strengthBonusText;
+        private Text rangeBonusText;
+        private Text magicBonusText;
+        private Text meleeDefenceBonusText;
+        private Text rangedDefenceBonusText;
+        private Text magicDefenceBonusText;
+
         private static readonly System.Collections.Generic.Dictionary<int, EquipmentSlot> cellToSlot = new()
         {
             {1, EquipmentSlot.Head},
@@ -74,6 +81,7 @@ namespace Inventory
             inventory = GetComponent<Inventory>();
             equipped = new InventoryEntry[Enum.GetValues(typeof(EquipmentSlot)).Length - 1];
             CreateUI();
+            UpdateBonuses();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
         }
@@ -138,6 +146,7 @@ namespace Inventory
 
             equipped[index] = entry;
             UpdateSlotVisual(slot);
+            UpdateBonuses();
             return true;
         }
 
@@ -159,6 +168,7 @@ namespace Inventory
                 equipped[index].item = null;
                 equipped[index].count = 0;
                 UpdateSlotVisual(slot);
+                UpdateBonuses();
             }
         }
 
@@ -184,6 +194,29 @@ namespace Inventory
                 img.color = emptySlotColor;
                 text.text = string.Empty;
             }
+        }
+
+        private void UpdateBonuses()
+        {
+            int strength = 0, range = 0, magic = 0, meleeDef = 0, rangeDef = 0, magicDef = 0;
+            foreach (var entry in equipped)
+            {
+                if (entry.item == null)
+                    continue;
+                strength += entry.item.strengthBonus;
+                range += entry.item.rangeBonus;
+                magic += entry.item.magicBonus;
+                meleeDef += entry.item.meleeDefenceBonus;
+                rangeDef += entry.item.rangedDefenceBonus;
+                magicDef += entry.item.magicDefenceBonus;
+            }
+
+            if (strengthBonusText != null) strengthBonusText.text = $"Strength Bonus = {strength}";
+            if (magicBonusText != null) magicBonusText.text = $"Magic Bonus = {magic}";
+            if (rangeBonusText != null) rangeBonusText.text = $"Range Bonus = {range}";
+            if (meleeDefenceBonusText != null) meleeDefenceBonusText.text = $"Melee Defence Bonus = {meleeDef}";
+            if (magicDefenceBonusText != null) magicDefenceBonusText.text = $"Magic Defence Bonus = {magicDef}";
+            if (rangedDefenceBonusText != null) rangedDefenceBonusText.text = $"Range Defence Bonus = {rangeDef}";
         }
 
         private Sprite GetSlotSprite(EquipmentSlot slot)
@@ -235,7 +268,8 @@ namespace Inventory
             // Size to fit 3 columns x 5 rows
             var contentSize = new Vector2(slotSize.x * 3 + slotSpacing.x * 2,
                 slotSize.y * 5 + slotSpacing.y * 4);
-            windowRect.sizeDelta = contentSize + new Vector2(16f, 16f);
+            float bonusWidth = 120f;
+            windowRect.sizeDelta = new Vector2(contentSize.x + bonusWidth, contentSize.y) + new Vector2(16f, 16f);
 
             var windowImg = window.GetComponent<Image>();
             windowImg.color = windowColor;
@@ -244,10 +278,10 @@ namespace Inventory
             panel.transform.SetParent(window.transform, false);
 
             var rect = panel.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.5f, 0.5f);
-            rect.anchorMax = new Vector2(0.5f, 0.5f);
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.anchoredPosition = Vector2.zero;
+            rect.anchorMin = new Vector2(0f, 0.5f);
+            rect.anchorMax = new Vector2(0f, 0.5f);
+            rect.pivot = new Vector2(0f, 0.5f);
+            rect.anchoredPosition = new Vector2(8f, 0f);
             rect.sizeDelta = contentSize;
 
             var grid = panel.GetComponent<GridLayoutGroup>();
@@ -312,6 +346,45 @@ namespace Inventory
                     placeholder.color = Color.clear;
                 }
             }
+
+            GameObject bonusPanel = new GameObject("Bonuses", typeof(RectTransform));
+            bonusPanel.transform.SetParent(window.transform, false);
+            var bonusRect = bonusPanel.GetComponent<RectTransform>();
+            bonusRect.anchorMin = new Vector2(1f, 0.5f);
+            bonusRect.anchorMax = new Vector2(1f, 0.5f);
+            bonusRect.pivot = new Vector2(1f, 0.5f);
+            bonusRect.anchoredPosition = new Vector2(-8f, 0f);
+            bonusRect.sizeDelta = new Vector2(bonusWidth, contentSize.y);
+
+            float lineHeight = 14f;
+            Text CreateText(string name, string txt, float y)
+            {
+                GameObject go = new GameObject(name, typeof(Text));
+                go.transform.SetParent(bonusPanel.transform, false);
+                var t = go.GetComponent<Text>();
+                if (defaultFont != null)
+                    t.font = defaultFont;
+                t.alignment = TextAnchor.UpperLeft;
+                t.raycastTarget = false;
+                t.color = Color.white;
+                t.text = txt;
+                var rt = t.GetComponent<RectTransform>();
+                rt.anchorMin = new Vector2(0f, 1f);
+                rt.anchorMax = new Vector2(0f, 1f);
+                rt.pivot = new Vector2(0f, 1f);
+                rt.anchoredPosition = new Vector2(0f, y);
+                rt.sizeDelta = new Vector2(bonusWidth, lineHeight);
+                return t;
+            }
+
+            CreateText("AttackHeader", "Attack:", 0f);
+            strengthBonusText = CreateText("Strength", "Strength Bonus = 0", -lineHeight);
+            magicBonusText = CreateText("Magic", "Magic Bonus = 0", -2f * lineHeight);
+            rangeBonusText = CreateText("Range", "Range Bonus = 0", -3f * lineHeight);
+            CreateText("DefenceHeader", "Defence:", -4f * lineHeight);
+            meleeDefenceBonusText = CreateText("MeleeDef", "Melee Defence Bonus = 0", -5f * lineHeight);
+            magicDefenceBonusText = CreateText("MagicDef", "Magic Defence Bonus = 0", -6f * lineHeight);
+            rangedDefenceBonusText = CreateText("RangeDef", "Range Defence Bonus = 0", -7f * lineHeight);
         }
     }
 }
