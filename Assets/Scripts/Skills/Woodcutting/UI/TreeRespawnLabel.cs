@@ -66,22 +66,35 @@ namespace Skills.Woodcutting
             if (tree == null || labelTransform != null)
                 return;
 
-            var go = new GameObject("TreeRespawnLabel");
-            labelTransform = go.transform;
-            labelTransform.SetParent(tree.transform, false);
-
-            tmp = go.AddComponent<TextMeshPro>();
-            tmp.alignment = TextAlignmentOptions.Center;
-            tmp.color = textColor;
-            tmp.fontSize = fontSize;
-            tmp.enableWordWrapping = false;
-            if (font != null) tmp.font = font;
-            if (outlineWidth > 0f)
+            // Reuse an existing label if one was already created for this tree.
+            var existing = tree.transform.Find("TreeRespawnLabel");
+            if (existing != null)
             {
-                tmp.outlineWidth = outlineWidth;
-                tmp.outlineColor = outlineColor;
+                labelTransform = existing;
+                tmp = existing.GetComponent<TextMeshPro>();
+                if (tmp == null)
+                    tmp = existing.gameObject.AddComponent<TextMeshPro>();
             }
-            go.SetActive(false);
+            else
+            {
+                var go = new GameObject("TreeRespawnLabel");
+                labelTransform = go.transform;
+                labelTransform.SetParent(tree.transform, false);
+
+                tmp = go.AddComponent<TextMeshPro>();
+                tmp.alignment = TextAlignmentOptions.Center;
+                tmp.color = textColor;
+                tmp.fontSize = fontSize;
+                tmp.enableWordWrapping = false;
+                if (font != null) tmp.font = font;
+                if (outlineWidth > 0f)
+                {
+                    tmp.outlineWidth = outlineWidth;
+                    tmp.outlineColor = outlineColor;
+                }
+            }
+
+            labelTransform.gameObject.SetActive(false);
         }
 
         private void HandleDepleted(TreeNode node, float respawnSeconds)
