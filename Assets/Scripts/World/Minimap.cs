@@ -148,7 +148,7 @@ namespace World
             var expandGO = new GameObject("Expand", typeof(Image), typeof(Button));
             expandGO.transform.SetParent(borderGO.transform, false);
             var expandImg = expandGO.GetComponent<Image>();
-            expandImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap/ExpandButton/ExpandButton");
+            expandImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap/ExpandButton");
             expandImg.preserveAspect = true;
             var expandRect = expandImg.rectTransform;
             expandRect.anchorMin = new Vector2(1f, 1f);
