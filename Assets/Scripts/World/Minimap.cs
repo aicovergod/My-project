@@ -32,6 +32,9 @@ namespace World
         private const float MinZoom = 5f;
         private const float MaxZoom = 100f;
         private const float MarkerScale = 0.25f;
+        private const int SmallMapZoomSteps = 3;
+        private const float DefaultZoom = 25f;
+        private float SmallMapZoom => DefaultZoom - ZoomStep * SmallMapZoomSteps;
 
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -48,6 +51,7 @@ namespace World
             CreateCamera();
             CreateUI();
             RegisterExistingMarkers();
+            ResetSmallMapZoom();
         }
 
         private void CreateCamera()
@@ -64,7 +68,7 @@ namespace World
             camGO.transform.SetParent(transform, false);
             mapCamera = camGO.AddComponent<Camera>();
             mapCamera.orthographic = true;
-            mapCamera.orthographicSize = 25f;
+            mapCamera.orthographicSize = DefaultZoom;
             mapCamera.clearFlags = CameraClearFlags.SolidColor;
             mapCamera.backgroundColor = Color.black;
             // Render everything except the UI layer
@@ -115,34 +119,6 @@ namespace World
             smallMapRect = rawRect;
             const int btnSize = 24;
             const int btnSpacing = 4;
-
-            // Load sprite from "Assets/Interfaces/Minimap.PlusButton.png"
-            var plusGO = new GameObject("ZoomIn", typeof(Image), typeof(Button));
-            plusGO.transform.SetParent(smallRoot.transform, false);
-            var plusImg = plusGO.GetComponent<Image>();
-            plusImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap/PlusButton");
-            plusImg.preserveAspect = true;
-            var plusRect = plusImg.rectTransform;
-            plusRect.anchorMin = new Vector2(1f, 1f);
-            plusRect.anchorMax = new Vector2(1f, 1f);
-            plusRect.pivot = new Vector2(1f, 1f);
-            plusRect.sizeDelta = new Vector2(btnSize, btnSize);
-            plusRect.anchoredPosition = new Vector2(-10f, -10f - (size + border * 2) - btnSpacing);
-            plusGO.GetComponent<Button>().onClick.AddListener(ZoomIn);
-
-            // Load sprite from "Assets/Interfaces/Minimap.MinusButton.png"
-            var minusGO = new GameObject("ZoomOut", typeof(Image), typeof(Button));
-            minusGO.transform.SetParent(smallRoot.transform, false);
-            var minusImg = minusGO.GetComponent<Image>();
-            minusImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap/MinusButton");
-            minusImg.preserveAspect = true;
-            var minusRect = minusImg.rectTransform;
-            minusRect.anchorMin = new Vector2(1f, 1f);
-            minusRect.anchorMax = new Vector2(1f, 1f);
-            minusRect.pivot = new Vector2(1f, 1f);
-            minusRect.sizeDelta = new Vector2(btnSize, btnSize);
-            minusRect.anchoredPosition = plusRect.anchoredPosition + new Vector2(0f, -btnSize - btnSpacing);
-            minusGO.GetComponent<Button>().onClick.AddListener(ZoomOut);
 
             // Expanded minimap window (center of screen)
             const int expandedWidth = 512;
@@ -282,6 +258,12 @@ namespace World
                 mapCamera.orthographicSize = Mathf.Min(MaxZoom, mapCamera.orthographicSize + ZoomStep);
         }
 
+        private void ResetSmallMapZoom()
+        {
+            if (mapCamera != null)
+                mapCamera.orthographicSize = SmallMapZoom;
+        }
+
         private void ToggleExpanded()
         {
             if (expandedRoot == null)
@@ -308,6 +290,9 @@ namespace World
             expandedRoot.SetActive(opening);
             if (smallRoot != null)
                 smallRoot.SetActive(!opening);
+
+            if (!opening)
+                ResetSmallMapZoom();
 
             var playerObj = target != null ? target.gameObject : GameObject.FindGameObjectWithTag("Player");
             var mover = playerObj != null ? playerObj.GetComponent<PlayerMover>() : null;
