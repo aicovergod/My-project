@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using ShopSystem;
 using Inventory;
+using Player;
 
 namespace Skills
 {
@@ -15,6 +16,7 @@ namespace Skills
         private Text skillText;
         private Mining.MiningSkill miningSkill;
         private Woodcutting.WoodcuttingSkill woodcuttingSkill;
+        private PlayerHitpoints hitpoints;
 
         public static SkillsUI Instance { get; private set; }
 
@@ -40,6 +42,7 @@ namespace Skills
 
             miningSkill = FindObjectOfType<Mining.MiningSkill>();
             woodcuttingSkill = FindObjectOfType<Woodcutting.WoodcuttingSkill>();
+            hitpoints = FindObjectOfType<PlayerHitpoints>();
             CreateUI();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
@@ -112,8 +115,14 @@ namespace Skills
             if (uiRoot != null && uiRoot.activeSelf)
             {
                 string text = "";
+                if (hitpoints != null)
+                    text += $"Hitpoints Level: {hitpoints.Level}  XP: {hitpoints.Xp:F2}";
                 if (miningSkill != null)
+                {
+                    if (text.Length > 0)
+                        text += "\n";
                     text += $"Mining Level: {miningSkill.Level}  XP: {miningSkill.Xp}";
+                }
                 if (woodcuttingSkill != null)
                 {
                     if (text.Length > 0)
