@@ -15,6 +15,13 @@ namespace Combat
         public const float TickLength = 0.6f; // seconds
         public static CombatManager Instance { get; private set; }
 
+        public event System.Action<PlayerCombat, Enemy> OnCombatStarted;
+        public event System.Action<PlayerCombat, Enemy> OnCombatEnded;
+
+        private Coroutine activeRoutine;
+        private PlayerCombat activePlayer;
+        private Enemy activeEnemy;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -30,8 +37,27 @@ namespace Combat
         {
             if (player == null || enemy == null)
                 return;
+
+            Disengage();
+
+            activePlayer = player;
+            activeEnemy = enemy;
             Debug.Log($"Combat started between {player.name} and {enemy.name}.");
-            StartCoroutine(CombatRoutine(player, enemy));
+            OnCombatStarted?.Invoke(player, enemy);
+            activeRoutine = StartCoroutine(CombatRoutine(player, enemy));
+        }
+
+        public void Disengage()
+        {
+            if (activeRoutine != null)
+            {
+                StopCoroutine(activeRoutine);
+                activeRoutine = null;
+                OnCombatEnded?.Invoke(activePlayer, activeEnemy);
+                activePlayer = null;
+                activeEnemy = null;
+                Debug.Log("Combat disengaged.");
+            }
         }
 
         private IEnumerator CombatRoutine(PlayerCombat player, Enemy enemy)
@@ -66,6 +92,11 @@ namespace Combat
                     enemyTimer = 0;
                 }
             }
+
+            OnCombatEnded?.Invoke(player, enemy);
+            activeRoutine = null;
+            activePlayer = null;
+            activeEnemy = null;
         }
     }
 }
