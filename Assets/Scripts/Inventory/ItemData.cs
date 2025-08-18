@@ -18,7 +18,8 @@ namespace Inventory
         Boots,
         Gloves,
         Ring,
-        Weapon
+        Weapon,
+        Shield
     }
 
     /// <summary>

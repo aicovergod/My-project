@@ -49,6 +49,7 @@ namespace Inventory
             {5, EquipmentSlot.Arrow},
             {6, EquipmentSlot.Weapon},
             {7, EquipmentSlot.Body},
+            {8, EquipmentSlot.Shield},
             {10, EquipmentSlot.Legs},
             {12, EquipmentSlot.Gloves},
             {13, EquipmentSlot.Boots},
