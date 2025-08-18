@@ -37,6 +37,12 @@ namespace Skills.Woodcutting
                 Ticker.Instance.Subscribe(this);
         }
 
+        private void Start()
+        {
+            if (Ticker.Instance != null)
+                Ticker.Instance.Subscribe(this);
+        }
+
         private void OnDisable()
         {
             if (Ticker.Instance != null)
