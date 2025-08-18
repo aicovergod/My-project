@@ -35,6 +35,19 @@ namespace Inventory
         [Tooltip("Background color of the window.")]
         public Color windowColor = new(0.15f, 0.15f, 0.15f, 0.95f);
 
+        [Header("Slot Sprites")]
+        public Sprite ammoSlotSprite;
+        public Sprite bodySlotSprite;
+        public Sprite capeSlotSprite;
+        public Sprite feetSlotSprite;
+        public Sprite glovesSlotSprite;
+        public Sprite headSlotSprite;
+        public Sprite amuletSlotSprite;
+        public Sprite legsSlotSprite;
+        public Sprite ringSlotSprite;
+        public Sprite shieldSlotSprite;
+        public Sprite weaponSlotSprite;
+
         private GameObject uiRoot;
         private Image[] slotImages;
         private Text[] slotCountTexts;
@@ -159,15 +172,36 @@ namespace Inventory
             var entry = equipped[index];
             if (entry.item != null)
             {
-                img.sprite = entry.item.icon ? entry.item.icon : slotFrameSprite;
+                img.sprite = entry.item.icon ? entry.item.icon : GetSlotSprite(slot);
                 img.color = Color.white;
+                img.type = Image.Type.Simple;
                 text.text = entry.item.stackable && entry.count > 1 ? entry.count.ToString() : string.Empty;
             }
             else
             {
-                img.sprite = slotFrameSprite;
+                img.sprite = GetSlotSprite(slot);
+                img.type = img.sprite == slotFrameSprite && slotFrameSprite != null ? Image.Type.Sliced : Image.Type.Simple;
                 img.color = emptySlotColor;
                 text.text = string.Empty;
+            }
+        }
+
+        private Sprite GetSlotSprite(EquipmentSlot slot)
+        {
+            switch (slot)
+            {
+                case EquipmentSlot.Arrow: return ammoSlotSprite;
+                case EquipmentSlot.Body: return bodySlotSprite;
+                case EquipmentSlot.Cape: return capeSlotSprite;
+                case EquipmentSlot.Boots: return feetSlotSprite;
+                case EquipmentSlot.Gloves: return glovesSlotSprite;
+                case EquipmentSlot.Head: return headSlotSprite;
+                case EquipmentSlot.Amulet: return amuletSlotSprite;
+                case EquipmentSlot.Legs: return legsSlotSprite;
+                case EquipmentSlot.Ring: return ringSlotSprite;
+                case EquipmentSlot.Shield: return shieldSlotSprite;
+                case EquipmentSlot.Weapon: return weaponSlotSprite;
+                default: return slotFrameSprite;
             }
         }
 
@@ -245,16 +279,10 @@ namespace Inventory
                 if (cellToSlot.TryGetValue(i, out var slot))
                 {
                     var img = cell.AddComponent<Image>();
-                    if (slotFrameSprite != null)
-                    {
-                        img.sprite = slotFrameSprite;
+                    img.sprite = GetSlotSprite(slot);
+                    if (img.sprite == slotFrameSprite && slotFrameSprite != null)
                         img.type = Image.Type.Sliced;
-                        img.color = emptySlotColor;
-                    }
-                    else
-                    {
-                        img.color = emptySlotColor;
-                    }
+                    img.color = emptySlotColor;
 
                     GameObject countGO = new GameObject("Count", typeof(Text));
                     countGO.transform.SetParent(cell.transform, false);
