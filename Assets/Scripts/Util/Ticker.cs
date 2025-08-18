@@ -10,6 +10,16 @@ namespace Util
     {
         public const float TickDuration = 0.6f;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void Initialize()
+        {
+            if (Instance == null)
+            {
+                var go = new GameObject(nameof(Ticker));
+                go.AddComponent<Ticker>();
+            }
+        }
+
         public static Ticker Instance { get; private set; }
 
         private readonly List<ITickable> subscribers = new List<ITickable>();
