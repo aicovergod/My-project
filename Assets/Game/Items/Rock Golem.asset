@@ -14,23 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Rock Golem
   displayName: Rock Golem
-  pickupItem: {fileID: 11400000, guid: c1b7457d0cd8c3e4aadfc3d905272dff, type: 2}
+  pickupItem: {fileID: 11400000, guid: 77aacc22df6b8854c9be2ed0d470914b, type: 2}
   sprite: {fileID: 0}
   animationClips: []
   idleUp:
-  - {fileID: 21300000, guid: 158fa5a64410c1e458ebbe8a3a4eddfe, type: 3}
+  - {fileID: 21300000, guid: e79e816f44d45fa48b3346ac22d105cc, type: 3}
   walkUp:
-  - {fileID: 21300000, guid: 158fa5a64410c1e458ebbe8a3a4eddfe, type: 3}
+  - {fileID: 21300000, guid: e79e816f44d45fa48b3346ac22d105cc, type: 3}
   idleDown:
-  - {fileID: 21300000, guid: 94b10514244e73845991e17885231ccc, type: 3}
+  - {fileID: 21300000, guid: 991c8b16c4d524d4487ac4467a00c531, type: 3}
   walkDown:
-  - {fileID: 21300000, guid: 94b10514244e73845991e17885231ccc, type: 3}
+  - {fileID: 21300000, guid: 991c8b16c4d524d4487ac4467a00c531, type: 3}
   idleLeft:
-  - {fileID: 21300000, guid: 28b917eaf4c20e2429a0ff1cd84718e3, type: 3}
+  - {fileID: 21300000, guid: 6b7fa031674abdf4d866041a1f4866ce, type: 3}
   walkLeft:
-  - {fileID: 21300000, guid: 28b917eaf4c20e2429a0ff1cd84718e3, type: 3}
+  - {fileID: 21300000, guid: 6b7fa031674abdf4d866041a1f4866ce, type: 3}
   idleRight:
-  - {fileID: 21300000, guid: e251eb248f84d8941b1c0e918ca6633a, type: 3}
+  - {fileID: 21300000, guid: b651b83922d02dd439bf2c420b5d5149, type: 3}
   walkRight:
-  - {fileID: 21300000, guid: e251eb248f84d8941b1c0e918ca6633a, type: 3}
+  - {fileID: 21300000, guid: b651b83922d02dd439bf2c420b5d5149, type: 3}
   messageColor: {r: 1, g: 1, b: 1, a: 1}

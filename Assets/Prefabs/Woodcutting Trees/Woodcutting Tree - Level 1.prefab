@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5754056975511585243}
   - component: {fileID: 6422946000288903746}
   - component: {fileID: 3909483753236746343}
+  - component: {fileID: 640502800502164102}
   m_Layer: 7
   m_Name: Woodcutting Tree - Level 1
   m_TagString: Untagged
@@ -134,3 +135,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1.5}
   m_EdgeRadius: 0
+--- !u!114 &640502800502164102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 670287344996780806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e4cec277a71f3c4c808e207a4d071d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  def: {fileID: 11400000, guid: 0b63891b85d11974696f51c99d9bb826, type: 2}
+  sr: {fileID: 6422946000288903746}
+  aliveSprite: {fileID: 0}
+  depletedSprite: {fileID: 0}

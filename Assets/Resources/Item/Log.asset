@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
-  m_Name: Rock Golem
+  m_Name: Log
   m_EditorClassIdentifier: 
-  id: Rock Golem
-  itemName: Rock Golem
-  icon: {fileID: 21300000, guid: 991c8b16c4d524d4487ac4467a00c531, type: 3}
-  description: 'a lucky reward
+  id: Log
+  itemName: Log
+  icon: {fileID: 21300000, guid: 2f2962dfc5f71b04897450a59949de55, type: 3}
+  description: 'A log for
 
-    from mining'
+    lighting fires'
   stackable: 0
   maxStack: 0
   splittable: 0

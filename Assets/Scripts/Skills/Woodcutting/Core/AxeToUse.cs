@@ -12,7 +12,7 @@ namespace Skills.Woodcutting
     public class AxeToUse : MonoBehaviour
     {
         [SerializeField] private List<AxeDefinition> allAxes = new List<AxeDefinition>();
-        [SerializeField] private Inventory inventory;
+        [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private WoodcuttingSkill skill;
 
         public AxeDefinition Current { get; private set; }
@@ -20,7 +20,7 @@ namespace Skills.Woodcutting
         private void Awake()
         {
             if (inventory == null)
-                inventory = GetComponent<Inventory>();
+                inventory = GetComponent<Inventory.Inventory>();
             if (skill == null)
                 skill = GetComponent<WoodcuttingSkill>();
         }
