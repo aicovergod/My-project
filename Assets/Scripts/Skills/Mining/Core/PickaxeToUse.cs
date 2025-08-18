@@ -13,6 +13,7 @@ namespace Skills.Mining
     {
         [SerializeField] private List<PickaxeDefinition> allPickaxes = new List<PickaxeDefinition>();
         [SerializeField] private Inventory.Inventory inventory;
+        [SerializeField] private Inventory.Equipment equipment;
         [SerializeField] private MiningSkill skill;
 
         public PickaxeDefinition Current { get; private set; }
@@ -21,6 +22,8 @@ namespace Skills.Mining
         {
             if (inventory == null)
                 inventory = GetComponent<Inventory.Inventory>();
+            if (equipment == null)
+                equipment = GetComponent<Inventory.Equipment>();
             if (skill == null)
                 skill = GetComponent<MiningSkill>();
         }
@@ -52,6 +55,15 @@ namespace Skills.Mining
                 {
                     Current = pick;
                     break;
+                }
+                else if (equipment != null)
+                {
+                    var entry = equipment.GetEquipped(EquipmentSlot.Weapon);
+                    if (entry.item == item && skill.Level >= pick.LevelRequirement)
+                    {
+                        Current = pick;
+                        break;
+                    }
                 }
             }
         }

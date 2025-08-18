@@ -13,6 +13,7 @@ namespace Skills.Woodcutting
     {
         [SerializeField] private List<AxeDefinition> allAxes = new List<AxeDefinition>();
         [SerializeField] private Inventory.Inventory inventory;
+        [SerializeField] private Inventory.Equipment equipment;
         [SerializeField] private WoodcuttingSkill skill;
 
         public AxeDefinition Current { get; private set; }
@@ -21,6 +22,8 @@ namespace Skills.Woodcutting
         {
             if (inventory == null)
                 inventory = GetComponent<Inventory.Inventory>();
+            if (equipment == null)
+                equipment = GetComponent<Inventory.Equipment>();
             if (skill == null)
                 skill = GetComponent<WoodcuttingSkill>();
         }
@@ -52,6 +55,15 @@ namespace Skills.Woodcutting
                 {
                     Current = axe;
                     break;
+                }
+                else if (equipment != null)
+                {
+                    var entry = equipment.GetEquipped(EquipmentSlot.Weapon);
+                    if (entry.item == item && skill.Level >= axe.RequiredWoodcuttingLevel)
+                    {
+                        Current = axe;
+                        break;
+                    }
                 }
             }
         }

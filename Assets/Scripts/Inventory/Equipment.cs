@@ -75,13 +75,33 @@ namespace Inventory
 #endif
             if (toggle && uiRoot != null)
             {
-                if (!uiRoot.activeSelf)
-                    inventory?.CloseUI();
+                bool opening = !uiRoot.activeSelf;
+                if (opening)
+                {
+                    var minimap = World.Minimap.Instance;
+                    minimap?.CloseExpanded();
+                }
                 uiRoot.SetActive(!uiRoot.activeSelf);
             }
         }
 
         private int SlotIndex(EquipmentSlot slot) => (int)slot - 1;
+
+        public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
+
+        public void CloseUI()
+        {
+            if (uiRoot != null)
+                uiRoot.SetActive(false);
+        }
+
+        public InventoryEntry GetEquipped(EquipmentSlot slot)
+        {
+            int index = SlotIndex(slot);
+            if (index < 0 || index >= equipped.Length)
+                return default;
+            return equipped[index];
+        }
 
         /// <summary>
         /// Equip an entry into its designated slot. Returns true on success.
