@@ -30,6 +30,7 @@ namespace Combat
         {
             if (player == null || enemy == null)
                 return;
+            Debug.Log($"Combat started between {player.name} and {enemy.name}.");
             StartCoroutine(CombatRoutine(player, enemy));
         }
 
@@ -50,6 +51,7 @@ namespace Combat
                     int dmg = Mathf.Max(0, player.AttackRoll() - enemy.Defence);
                     enemy.ApplyDamage(dmg);
                     playerHp.OnPlayerDealtDamage(dmg);
+                    Debug.Log($"Player attacked {enemy.name} for {dmg} damage.");
                     playerTimer = 0;
                 }
 
@@ -57,7 +59,10 @@ namespace Combat
                 {
                     int dmg = Mathf.Max(0, enemy.Attack - player.Defence);
                     if (dmg > 0)
+                    {
                         enemy.DealDamage(playerHp, dmg);
+                        Debug.Log($"{enemy.name} attacked player for {dmg} damage.");
+                    }
                     enemyTimer = 0;
                 }
             }
