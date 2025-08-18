@@ -90,12 +90,17 @@ namespace Skills.Woodcutting
             counting = true;
             lastSeconds = -1;
 
+            // Ensure the label exists before trying to show it.
+            if (labelTransform == null)
+                CreateLabel();
+
             if (labelTransform != null)
                 labelTransform.gameObject.SetActive(true);
 
             int secs = Mathf.CeilToInt(respawnSeconds);
             lastSeconds = secs;
-            tmp.SetText("{0}", secs);
+            if (tmp != null)
+                tmp.SetText("{0}", secs);
         }
 
         private void HandleRespawned(TreeNode node)
