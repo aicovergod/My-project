@@ -36,7 +36,7 @@ namespace Player
             var bgGO = new GameObject("Background", typeof(Image));
             bgGO.transform.SetParent(go.transform, false);
             var bgImg = bgGO.GetComponent<Image>();
-            bgImg.color = new Color32(20, 20, 20, 255);
+            bgImg.color = Color.red;
             var bgRect = bgImg.rectTransform;
             bgRect.anchorMin = Vector2.zero;
             bgRect.anchorMax = Vector2.one;
@@ -46,7 +46,7 @@ namespace Player
             var fillGO = new GameObject("Fill", typeof(Image));
             fillGO.transform.SetParent(bgGO.transform, false);
             hud.fillImage = fillGO.GetComponent<Image>();
-            hud.fillImage.color = Color.red;
+            hud.fillImage.color = Color.green;
             hud.fillImage.type = Image.Type.Filled;
             hud.fillImage.fillMethod = Image.FillMethod.Horizontal;
             hud.fillImage.fillOrigin = 0;
@@ -63,6 +63,7 @@ namespace Player
             hud.text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             hud.text.alignment = TextAnchor.MiddleCenter;
             hud.text.color = Color.white;
+            hud.text.fontSize = 11;
             var textRect = hud.text.rectTransform;
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
