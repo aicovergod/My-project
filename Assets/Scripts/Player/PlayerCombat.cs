@@ -37,6 +37,12 @@ namespace Player
             {
                 CombatManager.Instance?.Engage(this, currentTarget);
             }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                CombatManager.Instance?.Disengage();
+                currentTarget = null;
+            }
         }
 
         public void SetTarget(Enemy enemy)
