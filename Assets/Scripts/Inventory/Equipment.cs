@@ -48,6 +48,24 @@ namespace Inventory
         public Sprite shieldSlotSprite;
         public Sprite weaponSlotSprite;
 
+        [Header("Bonus Text Styles")]
+        public Font attackHeaderFont;
+        public Color attackHeaderColor = Color.white;
+        public Font strengthFont;
+        public Color strengthColor = Color.white;
+        public Font magicFont;
+        public Color magicColor = Color.white;
+        public Font rangeFont;
+        public Color rangeColor = Color.white;
+        public Font defenceHeaderFont;
+        public Color defenceHeaderColor = Color.white;
+        public Font meleeDefFont;
+        public Color meleeDefColor = Color.white;
+        public Font magicDefFont;
+        public Color magicDefColor = Color.white;
+        public Font rangeDefFont;
+        public Color rangeDefColor = Color.white;
+
         private GameObject uiRoot;
         private Image[] slotImages;
         private Text[] slotCountTexts;
@@ -357,16 +375,15 @@ namespace Inventory
             bonusRect.sizeDelta = new Vector2(bonusWidth, contentSize.y);
 
             float lineHeight = 14f;
-            Text CreateText(string name, string txt, float y)
+            Text CreateText(string name, string txt, float y, Font font, Color color)
             {
                 GameObject go = new GameObject(name, typeof(Text));
                 go.transform.SetParent(bonusPanel.transform, false);
                 var t = go.GetComponent<Text>();
-                if (defaultFont != null)
-                    t.font = defaultFont;
+                t.font = font != null ? font : defaultFont;
                 t.alignment = TextAnchor.UpperLeft;
                 t.raycastTarget = false;
-                t.color = Color.white;
+                t.color = color;
                 t.text = txt;
                 var rt = t.GetComponent<RectTransform>();
                 rt.anchorMin = new Vector2(0f, 1f);
@@ -377,14 +394,14 @@ namespace Inventory
                 return t;
             }
 
-            CreateText("AttackHeader", "Attack:", 0f);
-            strengthBonusText = CreateText("Strength", "Strength Bonus = 0", -lineHeight);
-            magicBonusText = CreateText("Magic", "Magic Bonus = 0", -2f * lineHeight);
-            rangeBonusText = CreateText("Range", "Range Bonus = 0", -3f * lineHeight);
-            CreateText("DefenceHeader", "Defence:", -4f * lineHeight);
-            meleeDefenceBonusText = CreateText("MeleeDef", "Melee Defence Bonus = 0", -5f * lineHeight);
-            magicDefenceBonusText = CreateText("MagicDef", "Magic Defence Bonus = 0", -6f * lineHeight);
-            rangedDefenceBonusText = CreateText("RangeDef", "Range Defence Bonus = 0", -7f * lineHeight);
+            CreateText("AttackHeader", "Attack:", 0f, attackHeaderFont, attackHeaderColor);
+            strengthBonusText = CreateText("Strength", "Strength Bonus = 0", -lineHeight, strengthFont, strengthColor);
+            magicBonusText = CreateText("Magic", "Magic Bonus = 0", -2f * lineHeight, magicFont, magicColor);
+            rangeBonusText = CreateText("Range", "Range Bonus = 0", -3f * lineHeight, rangeFont, rangeColor);
+            CreateText("DefenceHeader", "Defence:", -4f * lineHeight, defenceHeaderFont, defenceHeaderColor);
+            meleeDefenceBonusText = CreateText("MeleeDef", "Melee Defence Bonus = 0", -5f * lineHeight, meleeDefFont, meleeDefColor);
+            magicDefenceBonusText = CreateText("MagicDef", "Magic Defence Bonus = 0", -6f * lineHeight, magicDefFont, magicDefColor);
+            rangedDefenceBonusText = CreateText("RangeDef", "Range Defence Bonus = 0", -7f * lineHeight, rangeDefFont, rangeDefColor);
         }
     }
 }
