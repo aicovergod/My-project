@@ -32,6 +32,7 @@ namespace World
         private const float MinZoom = 5f;
         private const float MaxZoom = 100f;
         private const float MarkerScale = 0.25f;
+        private const float SmallIconScaleMultiplier = 0.5f;
         private const int SmallMapZoomSteps = 3;
         private const float DefaultZoom = 25f;
         private float SmallMapZoom => DefaultZoom - ZoomStep * SmallMapZoomSteps;
@@ -324,7 +325,7 @@ namespace World
                 img.sprite = GetMarkerSprite(marker.type);
                 img.preserveAspect = true;
                 marker.smallIcon = img.rectTransform;
-                marker.smallIcon.localScale = Vector3.one * MarkerScale;
+                marker.smallIcon.localScale = Vector3.one * MarkerScale * SmallIconScaleMultiplier;
             }
 
             if (expandedMapRect != null && marker.bigIcon == null)
