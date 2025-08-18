@@ -31,6 +31,7 @@ namespace World
         private const float ZoomStep = 5f;
         private const float MinZoom = 5f;
         private const float MaxZoom = 100f;
+        private const float MarkerScale = 0.25f;
 
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -317,6 +318,7 @@ namespace World
                 img.sprite = GetMarkerSprite(marker.type);
                 img.preserveAspect = true;
                 marker.smallIcon = img.rectTransform;
+                marker.smallIcon.localScale = Vector3.one * MarkerScale;
             }
 
             if (expandedMapRect != null)
@@ -327,6 +329,7 @@ namespace World
                 img.sprite = GetMarkerSprite(marker.type);
                 img.preserveAspect = true;
                 marker.bigIcon = img.rectTransform;
+                marker.bigIcon.localScale = Vector3.one * MarkerScale;
             }
         }
 
