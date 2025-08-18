@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Tin Ore
   m_EditorClassIdentifier: 
   id: Tin Ore
-  displayName: Tin ore
+  displayName: Tin Ore
   levelRequirement: 1
   xpPerOre: 18

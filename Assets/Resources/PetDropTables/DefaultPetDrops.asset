@@ -19,3 +19,6 @@ MonoBehaviour:
   - pet: {fileID: 11400000, guid: ddfa760e87b8f5d448d75d810f338961, type: 2}
     oneInN: 5000
     sourceId: mining
+  - pet: {fileID: 11400000, guid: ddfa760e87b8f5d448d75d810f338961, type: 2}
+    oneInN: 5000
+    sourceId: woodcutting

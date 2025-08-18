@@ -147,7 +147,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eaeca4ebf1961d646be160b9b0493572, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rockDef: {fileID: 0}
+  rockDef: {fileID: 11400000, guid: 87ed9bbf4d5f7df42bd123fc6b0fcf17, type: 2}
   spriteRenderer: {fileID: 1016246674056767260}
   fullSprite: {fileID: -3771428812961251709, guid: b87d980b0cd69894898daad8260b7e23, type: 3}
   depletedSprite: {fileID: -3867931755167647559, guid: 0b7e8363bc036f54683b8b5a2b4ffa18, type: 3}
