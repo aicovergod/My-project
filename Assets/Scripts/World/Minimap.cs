@@ -47,6 +47,7 @@ namespace World
             instance = this;
             CreateCamera();
             CreateUI();
+            RegisterExistingMarkers();
         }
 
         private void CreateCamera()
@@ -227,6 +228,17 @@ namespace World
 
         }
 
+        private void RegisterExistingMarkers()
+        {
+            var existing = FindObjectsOfType<MinimapMarker>();
+            foreach (var marker in existing)
+            {
+                if (!markers.Contains(marker))
+                    markers.Add(marker);
+                CreateIcons(marker);
+            }
+        }
+
         private void LateUpdate()
         {
             if (target == null)
@@ -305,12 +317,21 @@ namespace World
 
         public void Register(MinimapMarker marker)
         {
-            if (marker == null || markers.Contains(marker))
+            if (marker == null)
                 return;
 
-            markers.Add(marker);
+            if (!markers.Contains(marker))
+                markers.Add(marker);
 
-            if (smallMapRect != null)
+            CreateIcons(marker);
+        }
+
+        private void CreateIcons(MinimapMarker marker)
+        {
+            if (marker == null)
+                return;
+
+            if (smallMapRect != null && marker.smallIcon == null)
             {
                 var smallGO = new GameObject("Marker", typeof(Image));
                 smallGO.transform.SetParent(smallMapRect, false);
@@ -321,7 +342,7 @@ namespace World
                 marker.smallIcon.localScale = Vector3.one * MarkerScale;
             }
 
-            if (expandedMapRect != null)
+            if (expandedMapRect != null && marker.bigIcon == null)
             {
                 var bigGO = new GameObject("Marker", typeof(Image));
                 bigGO.transform.SetParent(expandedMapRect, false);
