@@ -203,6 +203,10 @@ namespace World
             expandRect.anchoredPosition = new Vector2(-btnSpacing, -btnSpacing);
             expandGO.GetComponent<Button>().onClick.AddListener(ToggleExpanded);
 
+            var hp = Object.FindObjectOfType<PlayerHitpoints>();
+            if (hp != null)
+                HealthHUD.CreateUnderMinimap(borderRect, hp);
+
         }
 
         private void RegisterExistingMarkers()
