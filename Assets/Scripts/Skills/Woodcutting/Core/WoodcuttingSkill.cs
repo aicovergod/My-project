@@ -40,6 +40,7 @@ namespace Skills.Woodcutting
         public bool IsChopping => currentTree != null;
         public TreeNode CurrentTree => currentTree;
         public int CurrentChopIntervalTicks => currentIntervalTicks;
+        public AxeDefinition CurrentAxe => currentAxe;
         public float ChopProgressNormalized
             => currentIntervalTicks <= 1 ? 0f : (float)chopProgress / (currentIntervalTicks - 1);
 
