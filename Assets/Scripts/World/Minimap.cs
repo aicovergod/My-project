@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 namespace World
 {
@@ -12,6 +13,11 @@ namespace World
         private Camera mapCamera;
         private RenderTexture mapTexture;
         private Transform target;
+
+        private const float MinZoom = 5f;
+        private const float MaxZoom = 50f;
+        private const float ZoomSpeed = 20f;
+        private const float ZoomStep = 5f;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreateInstance()
@@ -60,7 +66,7 @@ namespace World
             var borderGO = new GameObject("Border", typeof(Image));
             borderGO.transform.SetParent(canvasGO.transform, false);
             var borderImg = borderGO.GetComponent<Image>();
-            borderImg.color = Color.white;
+            borderImg.color = new Color32(64, 64, 64, 255);
             var borderRect = borderImg.rectTransform;
             borderRect.anchorMin = new Vector2(1f, 1f);
             borderRect.anchorMax = new Vector2(1f, 1f);
@@ -77,6 +83,41 @@ namespace World
             rawRect.anchorMax = Vector2.one;
             rawRect.offsetMin = new Vector2(border, border);
             rawRect.offsetMax = new Vector2(-border, -border);
+
+            const int buttonSize = 24;
+            float buttonY = -(size + border * 2 + 10f);
+            CreateZoomButton(canvasGO.transform, "ZoomInButton", "+", new Vector2(-10f, buttonY), ZoomIn);
+            CreateZoomButton(canvasGO.transform, "ZoomOutButton", "-", new Vector2(-10f - (buttonSize + 5), buttonY), ZoomOut);
+        }
+
+        private void CreateZoomButton(Transform parent, string name, string label, Vector2 anchoredPos, UnityAction onClick)
+        {
+            var buttonGO = new GameObject(name, typeof(Image), typeof(Button));
+            buttonGO.transform.SetParent(parent, false);
+            var image = buttonGO.GetComponent<Image>();
+            image.color = Color.white;
+            var rect = image.rectTransform;
+            rect.anchorMin = new Vector2(1f, 1f);
+            rect.anchorMax = new Vector2(1f, 1f);
+            rect.pivot = new Vector2(1f, 1f);
+            rect.sizeDelta = new Vector2(24f, 24f);
+            rect.anchoredPosition = anchoredPos;
+
+            var textGO = new GameObject("Text", typeof(Text));
+            textGO.transform.SetParent(buttonGO.transform, false);
+            var txt = textGO.GetComponent<Text>();
+            txt.text = label;
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.color = Color.black;
+            txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            var textRect = txt.rectTransform;
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
+
+            var button = buttonGO.GetComponent<Button>();
+            button.onClick.AddListener(onClick);
         }
 
         private void LateUpdate()
@@ -93,6 +134,23 @@ namespace World
                 var pos = target.position;
                 mapCamera.transform.position = new Vector3(pos.x, pos.y, -10f);
             }
+
+            if (mapCamera != null)
+            {
+                var scroll = Input.GetAxis("Mouse ScrollWheel");
+                if (Mathf.Abs(scroll) > 0.001f)
+                    AdjustZoom(-scroll * ZoomSpeed);
+            }
+        }
+
+        private void ZoomIn() => AdjustZoom(-ZoomStep);
+
+        private void ZoomOut() => AdjustZoom(ZoomStep);
+
+        private void AdjustZoom(float delta)
+        {
+            var size = mapCamera.orthographicSize + delta;
+            mapCamera.orthographicSize = Mathf.Clamp(size, MinZoom, MaxZoom);
         }
     }
 }
