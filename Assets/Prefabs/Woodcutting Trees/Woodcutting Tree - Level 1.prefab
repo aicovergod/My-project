@@ -149,5 +149,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   def: {fileID: 11400000, guid: 0b63891b85d11974696f51c99d9bb826, type: 2}
   sr: {fileID: 6422946000288903746}
-  aliveSprite: {fileID: 0}
-  depletedSprite: {fileID: 0}
+  aliveSprite: {fileID: 21300000, guid: 6fcc0156bb0e34640b91d4a2d234b296, type: 3}
+  depletedSprite: {fileID: 21300000, guid: fc6d96e646a87464baec31629e5e7c6f, type: 3}
