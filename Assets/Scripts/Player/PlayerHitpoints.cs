@@ -163,6 +163,11 @@ namespace Player
             GainHitpointsXP(damage * 1.33f);
         }
 
+        public void OnEnemyDealtDamage(int damage)
+        {
+            ApplyDamage(damage);
+        }
+
 #if UNITY_EDITOR
         public void DebugDealDamage(int dmg)
         {

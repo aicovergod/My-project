@@ -49,6 +49,12 @@ namespace Inventory
         [Header("Equipment")] [Tooltip("Slot this item can be equipped to. Use None for non-equippable items.")]
         public EquipmentSlot equipmentSlot = EquipmentSlot.None;
 
+        [Header("Combat")]
+        public int attackBonus;
+        public int defenceBonus;
+        [Tooltip("Number of 0.6s ticks between attacks when equipped as a weapon.")]
+        public int attackSpeed = 4;
+
         [Header("Bonuses")] public int strengthBonus;
         public int rangeBonus;
         public int magicBonus;
