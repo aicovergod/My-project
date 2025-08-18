@@ -40,7 +40,8 @@ namespace World
 
         private void CreateCamera()
         {
-            mapTexture = new RenderTexture(256, 256, 16)
+            // Increase resolution so the expanded map remains sharp
+            mapTexture = new RenderTexture(512, 512, 16)
             {
                 name = "MinimapTexture"
             };
@@ -131,7 +132,8 @@ namespace World
             minusGO.GetComponent<Button>().onClick.AddListener(ZoomOut);
 
             // Expanded minimap window (center of screen)
-            const int expandedSize = 256;
+            const int expandedWidth = 512;
+            const int expandedHeight = 384;
             const int expandedBorder = 8;
             expandedRoot = new GameObject("Expanded", typeof(Image));
             expandedRoot.transform.SetParent(canvasGO.transform, false);
@@ -141,7 +143,7 @@ namespace World
             expandedRect.anchorMin = new Vector2(0.5f, 0.5f);
             expandedRect.anchorMax = new Vector2(0.5f, 0.5f);
             expandedRect.pivot = new Vector2(0.5f, 0.5f);
-            expandedRect.sizeDelta = new Vector2(expandedSize + expandedBorder * 2, expandedSize + expandedBorder * 2);
+            expandedRect.sizeDelta = new Vector2(expandedWidth + expandedBorder * 2, expandedHeight + expandedBorder * 2);
             expandedRect.anchoredPosition = Vector2.zero;
 
             var expandedRawGO = new GameObject("Image", typeof(RawImage));
