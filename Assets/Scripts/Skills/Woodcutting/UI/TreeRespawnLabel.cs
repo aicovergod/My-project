@@ -1,15 +1,14 @@
 using TMPro;
 using UnityEngine;
-using Util;
 
 namespace Skills.Woodcutting
 {
     /// <summary>
-    /// Displays a world-space countdown above a depleted tree until it respawns.
+    /// (Deprecated) Previously displayed a world-space countdown above a depleted tree.
+    /// Countdown functionality has been removed, leaving the label hidden.
     /// </summary>
-    public class TreeRespawnLabel : MonoBehaviour, ITickable
+    public class TreeRespawnLabel : MonoBehaviour
     {
-        [SerializeField] private Vector3 worldOffset = new Vector3(0f, 0.6f, 0f);
         [SerializeField] private Color textColor = Color.white;
         [SerializeField] private int fontSize = 32;
         [SerializeField] private TMP_FontAsset font;
@@ -22,17 +21,12 @@ namespace Skills.Woodcutting
         // existing text element, leaving the countdown blank.
         private TMP_Text tmp;
         private Transform labelTransform;
-        private SpriteRenderer treeRenderer;
-        private double endTime;
-        private bool counting;
-        private int lastSeconds = -1;
 
         private void Awake()
         {
             tree = GetComponent<TreeNode>();
             if (tree == null)
                 tree = GetComponentInParent<TreeNode>();
-            treeRenderer = tree != null ? tree.GetComponent<SpriteRenderer>() : null;
             CreateLabel();
         }
 
@@ -43,20 +37,10 @@ namespace Skills.Woodcutting
                 tree.OnTreeDepleted += HandleDepleted;
                 tree.OnTreeRespawned += HandleRespawned;
             }
-            if (Ticker.Instance != null)
-                         Ticker.Instance.Subscribe(this);
-        }
-
-        private void Start()
-        {
-            if (Ticker.Instance != null)
-                Ticker.Instance.Subscribe(this);
         }
 
         private void OnDisable()
         {
-            if (Ticker.Instance != null)
-                Ticker.Instance.Unsubscribe(this);
             if (tree != null)
             {
                 tree.OnTreeDepleted -= HandleDepleted;
@@ -102,64 +86,14 @@ namespace Skills.Woodcutting
 
         private void HandleDepleted(TreeNode node, float respawnSeconds)
         {
-            endTime = Time.timeAsDouble + respawnSeconds;
-            counting = true;
-            lastSeconds = -1;
-
-            // Ensure the label exists before trying to show it.
-            if (labelTransform == null)
-                CreateLabel();
-
-            if (labelTransform != null)
-                labelTransform.gameObject.SetActive(true);
-
-            int secs = Mathf.CeilToInt(respawnSeconds);
-            lastSeconds = secs;
-            if (tmp != null)
-                tmp.text = secs.ToString();
-        }
-
-        private void HandleRespawned(TreeNode node)
-        {
-            counting = false;
             if (labelTransform != null)
                 labelTransform.gameObject.SetActive(false);
         }
 
-        public void OnTick()
+        private void HandleRespawned(TreeNode node)
         {
-            if (!counting)
-                return;
-
-            double remaining = endTime - Time.timeAsDouble;
-            int secs = remaining > 0 ? Mathf.CeilToInt((float)remaining) : 0;
-            if (secs <= 0)
-            {
-                counting = false;
-                if (labelTransform != null)
-                    labelTransform.gameObject.SetActive(false);
-                return;
-            }
-
-            if (secs != lastSeconds)
-            {
-                lastSeconds = secs;
-                if (tmp != null)
-                    tmp.text = secs.ToString();
-            }
-
-            bool visible = treeRenderer == null || treeRenderer.isVisible;
             if (labelTransform != null)
-            {
-                if (labelTransform.gameObject.activeSelf != visible)
-                    labelTransform.gameObject.SetActive(visible);
-                if (visible)
-                {
-                    labelTransform.position = tree.transform.position + worldOffset;
-                    if (Camera.main != null)
-                        labelTransform.rotation = Camera.main.transform.rotation;
-                }
-            }
+                labelTransform.gameObject.SetActive(false);
         }
     }
 }
