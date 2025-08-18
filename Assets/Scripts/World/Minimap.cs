@@ -13,6 +13,10 @@ namespace World
         private RenderTexture mapTexture;
         private Transform target;
 
+        private const float ZoomStep = 5f;
+        private const float MinZoom = 5f;
+        private const float MaxZoom = 100f;
+
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreateInstance()
@@ -81,6 +85,36 @@ namespace World
             rawRect.anchorMax = Vector2.one;
             rawRect.offsetMin = new Vector2(border, border);
             rawRect.offsetMax = new Vector2(-border, -border);
+            const int btnSize = 24;
+            const int btnSpacing = 4;
+
+            // Load sprite from "Assets/Interfaces/Minimap.PlusButton.png"
+            var plusGO = new GameObject("ZoomIn", typeof(Image), typeof(Button));
+            plusGO.transform.SetParent(canvasGO.transform, false);
+            var plusImg = plusGO.GetComponent<Image>();
+            plusImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap.PlusButton");
+            plusImg.preserveAspect = true;
+            var plusRect = plusImg.rectTransform;
+            plusRect.anchorMin = new Vector2(1f, 1f);
+            plusRect.anchorMax = new Vector2(1f, 1f);
+            plusRect.pivot = new Vector2(1f, 1f);
+            plusRect.sizeDelta = new Vector2(btnSize, btnSize);
+            plusRect.anchoredPosition = new Vector2(-10f, -10f - (size + border * 2) - btnSpacing);
+            plusGO.GetComponent<Button>().onClick.AddListener(ZoomIn);
+
+            // Load sprite from "Assets/Interfaces/Minimap.MinusButton.png"
+            var minusGO = new GameObject("ZoomOut", typeof(Image), typeof(Button));
+            minusGO.transform.SetParent(canvasGO.transform, false);
+            var minusImg = minusGO.GetComponent<Image>();
+            minusImg.sprite = Resources.Load<Sprite>("Interfaces/Minimap.MinusButton");
+            minusImg.preserveAspect = true;
+            var minusRect = minusImg.rectTransform;
+            minusRect.anchorMin = new Vector2(1f, 1f);
+            minusRect.anchorMax = new Vector2(1f, 1f);
+            minusRect.pivot = new Vector2(1f, 1f);
+            minusRect.sizeDelta = new Vector2(btnSize, btnSize);
+            minusRect.anchoredPosition = plusRect.anchoredPosition + new Vector2(0f, -btnSize - btnSpacing);
+            minusGO.GetComponent<Button>().onClick.AddListener(ZoomOut);
 
         }
 
@@ -99,6 +133,18 @@ namespace World
                 mapCamera.transform.position = new Vector3(pos.x, pos.y, -10f);
             }
 
+        }
+
+        private void ZoomIn()
+        {
+            if (mapCamera != null)
+                mapCamera.orthographicSize = Mathf.Max(MinZoom, mapCamera.orthographicSize - ZoomStep);
+        }
+
+        private void ZoomOut()
+        {
+            if (mapCamera != null)
+                mapCamera.orthographicSize = Mathf.Min(MaxZoom, mapCamera.orthographicSize + ZoomStep);
         }
     }
 }
