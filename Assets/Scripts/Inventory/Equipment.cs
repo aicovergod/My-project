@@ -234,7 +234,7 @@ namespace Inventory
             if (rangeBonusText != null) rangeBonusText.text = $"Range = {range}";
             if (meleeDefenceBonusText != null) meleeDefenceBonusText.text = $"Melee = {meleeDef}";
             if (magicDefenceBonusText != null) magicDefenceBonusText.text = $"Magic = {magicDef}";
-            if (rangedDefenceBonusText != null) rangedDefenceBonusText.text = $"Range= {rangeDef}";
+            if (rangedDefenceBonusText != null) rangedDefenceBonusText.text = $"Range = {rangeDef}";
         }
 
         private Sprite GetSlotSprite(EquipmentSlot slot)
@@ -381,7 +381,7 @@ namespace Inventory
                 go.transform.SetParent(bonusPanel.transform, false);
                 var t = go.GetComponent<Text>();
                 t.font = font != null ? font : defaultFont;
-                t.alignment = TextAnchor.UpperLeft;
+                t.alignment = TextAnchor.UpperCenter;
                 t.raycastTarget = false;
                 t.color = color;
                 t.text = txt;
@@ -395,13 +395,13 @@ namespace Inventory
             }
 
             CreateText("AttackHeader", "Attack:", 0f, attackHeaderFont, attackHeaderColor);
-            strengthBonusText = CreateText("Strength", "Strength Bonus = 0", -lineHeight, strengthFont, strengthColor);
-            magicBonusText = CreateText("Magic", "Magic Bonus = 0", -2f * lineHeight, magicFont, magicColor);
-            rangeBonusText = CreateText("Range", "Range Bonus = 0", -3f * lineHeight, rangeFont, rangeColor);
+            strengthBonusText = CreateText("Strength", "Melee = 0", -lineHeight, strengthFont, strengthColor);
+            magicBonusText = CreateText("Magic", "Magic = 0", -2f * lineHeight, magicFont, magicColor);
+            rangeBonusText = CreateText("Range", "Range = 0", -3f * lineHeight, rangeFont, rangeColor);
             CreateText("DefenceHeader", "Defence:", -4f * lineHeight, defenceHeaderFont, defenceHeaderColor);
-            meleeDefenceBonusText = CreateText("MeleeDef", "Melee Defence Bonus = 0", -5f * lineHeight, meleeDefFont, meleeDefColor);
-            magicDefenceBonusText = CreateText("MagicDef", "Magic Defence Bonus = 0", -6f * lineHeight, magicDefFont, magicDefColor);
-            rangedDefenceBonusText = CreateText("RangeDef", "Range Defence Bonus = 0", -7f * lineHeight, rangeDefFont, rangeDefColor);
+            meleeDefenceBonusText = CreateText("MeleeDef", "Melee = 0", -5f * lineHeight, meleeDefFont, meleeDefColor);
+            magicDefenceBonusText = CreateText("MagicDef", "Magic = 0", -6f * lineHeight, magicDefFont, magicDefColor);
+            rangedDefenceBonusText = CreateText("RangeDef", "Range = 0", -7f * lineHeight, rangeDefFont, rangeDefColor);
         }
     }
 }
