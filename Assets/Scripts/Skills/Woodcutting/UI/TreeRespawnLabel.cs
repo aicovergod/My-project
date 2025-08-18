@@ -41,7 +41,7 @@ namespace Skills.Woodcutting
                 tree.OnTreeRespawned += HandleRespawned;
             }
             if (Ticker.Instance != null)
-                Ticker.Instance.Subscribe(this);
+                         Ticker.Instance.Subscribe(this);
         }
 
         private void Start()
