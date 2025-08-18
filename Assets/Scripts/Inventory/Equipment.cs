@@ -3,6 +3,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using Core.Save;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -102,6 +103,7 @@ namespace Inventory
             inventory = GetComponent<Inventory>();
             equipped = new InventoryEntry[Enum.GetValues(typeof(EquipmentSlot)).Length - 1];
             CreateUI();
+            Load();
             UpdateBonuses();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
@@ -168,6 +170,7 @@ namespace Inventory
             equipped[index] = entry;
             UpdateSlotVisual(slot);
             UpdateBonuses();
+            Save();
             return true;
         }
 
@@ -190,6 +193,7 @@ namespace Inventory
                 equipped[index].count = 0;
                 UpdateSlotVisual(slot);
                 UpdateBonuses();
+                Save();
             }
         }
 
@@ -244,6 +248,72 @@ namespace Inventory
 
             TotalAttackBonus = attackTotal;
             TotalDefenceBonus = defenceTotal;
+        }
+
+        [Serializable]
+        private class EquipmentSaveData
+        {
+            public SlotData[] slots;
+        }
+
+        [Serializable]
+        private class SlotData
+        {
+            public string id;
+            public int count;
+        }
+
+        private const string SaveKey = "EquipmentData";
+
+        public void Save()
+        {
+            var data = new EquipmentSaveData
+            {
+                slots = new SlotData[equipped.Length]
+            };
+
+            for (int i = 0; i < equipped.Length; i++)
+            {
+                var entry = equipped[i];
+                data.slots[i] = new SlotData
+                {
+                    id = entry.item != null ? entry.item.id : string.Empty,
+                    count = entry.item != null ? entry.count : 0
+                };
+            }
+
+            SaveManager.Save(SaveKey, data);
+        }
+
+        public void Load()
+        {
+            var data = SaveManager.Load<EquipmentSaveData>(SaveKey);
+            if (data?.slots == null)
+                return;
+
+            int len = Mathf.Min(equipped.Length, data.slots.Length);
+            for (int i = 0; i < len; i++)
+            {
+                var slot = data.slots[i];
+                if (!string.IsNullOrEmpty(slot.id))
+                {
+                    equipped[i].item = ItemDatabase.GetItem(slot.id);
+                    equipped[i].count = slot.count;
+                }
+                else
+                {
+                    equipped[i].item = null;
+                    equipped[i].count = 0;
+                }
+                UpdateSlotVisual((EquipmentSlot)(i + 1));
+            }
+
+            UpdateBonuses();
+        }
+
+        private void OnApplicationQuit()
+        {
+            Save();
         }
 
         private Sprite GetSlotSprite(EquipmentSlot slot)
