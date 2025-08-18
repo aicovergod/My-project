@@ -25,6 +25,8 @@ namespace Combat
             if (player == null)
                 return;
 
+            Debug.Log($"Player clicked {enemy.name} to attack.");
+
             player.SetTarget(enemy);
             CombatManager.Instance?.Engage(player, enemy);
         }
