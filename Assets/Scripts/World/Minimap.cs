@@ -377,6 +377,21 @@ namespace World
                 return;
 
             Vector3 viewport = mapCamera.WorldToViewportPoint(worldPos);
+
+            bool inside = viewport.x >= 0f && viewport.x <= 1f &&
+                          viewport.y >= 0f && viewport.y <= 1f &&
+                          viewport.z > 0f;
+
+            if (!inside)
+            {
+                if (icon.gameObject.activeSelf)
+                    icon.gameObject.SetActive(false);
+                return;
+            }
+
+            if (!icon.gameObject.activeSelf)
+                icon.gameObject.SetActive(true);
+
             Vector2 size = container.rect.size;
             Vector2 pos = new Vector2((viewport.x - 0.5f) * size.x, (viewport.y - 0.5f) * size.y);
 
