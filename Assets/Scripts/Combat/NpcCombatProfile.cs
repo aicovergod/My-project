@@ -11,6 +11,7 @@ namespace Combat
         public int AttackLevel = 1;
         public int StrengthLevel = 1;
         public int DefenceLevel = 1;
+        public int HitpointsLevel = 10;
         public int MeleeDefence;
         public int RangeDefence;
         public int MagicDefence;
