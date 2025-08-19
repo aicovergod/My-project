@@ -4,6 +4,7 @@ using UnityEngine;
 using Inventory;
 using Util;
 using Skills.Mining; // reuse XP table
+using Pets;
 
 namespace Skills.Woodcutting
 {
@@ -136,9 +137,10 @@ namespace Skills.Woodcutting
             {
                 string logId = currentTree.def.LogItemId;
                 logItems.TryGetValue(logId, out var item);
+                int amount = PetDropSystem.ActivePet?.id == "Beaver" ? 2 : 1;
                 bool added = false;
                 if (item != null && inventory != null)
-                    added = inventory.AddItem(item);
+                    added = inventory.AddItem(item, amount);
 
                 Transform anchorTransform = floatingTextAnchor != null ? floatingTextAnchor : transform;
                 Vector3 anchorPos = anchorTransform.position;
@@ -150,11 +152,11 @@ namespace Skills.Woodcutting
                     return;
                 }
 
-                xp += currentTree.def.XpPerLog;
+                xp += currentTree.def.XpPerLog * amount;
                 string logName = item != null ? item.itemName : currentTree.def.DisplayName;
-                FloatingText.Show($"+1 {logName}", anchorPos);
-                StartCoroutine(ShowXpGainDelayed(currentTree.def.XpPerLog, anchorTransform));
-                OnLogGained?.Invoke(logId, 1);
+                FloatingText.Show($"+{amount} {logName}", anchorPos);
+                StartCoroutine(ShowXpGainDelayed(currentTree.def.XpPerLog * amount, anchorTransform));
+                OnLogGained?.Invoke(logId, amount);
 
                 int newLevel = xpTable.GetLevel(xp);
                 if (newLevel > level)

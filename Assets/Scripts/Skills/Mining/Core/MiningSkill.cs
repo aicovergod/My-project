@@ -4,6 +4,7 @@ using UnityEngine;
 using Inventory;
 using Util;
 using Skills.Mining;
+using Pets;
 
 namespace Skills.Mining
 {
@@ -141,9 +142,10 @@ namespace Skills.Mining
                 if (ore != null)
                 {
                     oreItems.TryGetValue(ore.Id, out var item);
+                    int amount = PetDropSystem.ActivePet?.id == "Rock Golem" ? 2 : 1;
                     bool added = false;
                     if (item != null && inventory != null)
-                        added = inventory.AddItem(item);
+                        added = inventory.AddItem(item, amount);
 
                     Transform anchorTransform = floatingTextAnchor != null
                         ? floatingTextAnchor
@@ -157,10 +159,10 @@ namespace Skills.Mining
                         return;
                     }
 
-                    xp += ore.XpPerOre;
-                    FloatingText.Show($"+1 {ore.DisplayName}", anchorPos);
-                    StartCoroutine(ShowXpGainDelayed(ore.XpPerOre, anchorTransform));
-                    OnOreGained?.Invoke(ore.Id, 1);
+                    xp += ore.XpPerOre * amount;
+                    FloatingText.Show($"+{amount} {ore.DisplayName}", anchorPos);
+                    StartCoroutine(ShowXpGainDelayed(ore.XpPerOre * amount, anchorTransform));
+                    OnOreGained?.Invoke(ore.Id, amount);
 
                     int newLevel = xpTable.GetLevel(xp);
                     if (newLevel > level)
