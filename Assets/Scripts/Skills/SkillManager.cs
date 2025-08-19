@@ -91,6 +91,22 @@ namespace Skills
             return skills.TryGetValue(skill, out var record) ? record.xp : 0f;
         }
 
+        /// <summary>
+        /// Debug helper to directly set a skill level. Updates both level and XP
+        /// without awarding XP. Values are clamped to the XP table range.
+        /// </summary>
+        public void DebugSetLevel(SkillType skill, int level)
+        {
+            if (xpTable == null)
+                return;
+
+            level = Mathf.Clamp(level, 1, 99);
+            var record = skills.ContainsKey(skill) ? skills[skill] : new SkillRecord();
+            record.level = level;
+            record.xp = xpTable.GetXpForLevel(level);
+            skills[skill] = record;
+        }
+
         private IEnumerator SaveLoop()
         {
             while (true)

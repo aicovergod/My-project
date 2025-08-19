@@ -223,6 +223,21 @@ namespace Skills.Woodcutting
             return inventory.CanAddItem(item);
         }
 
+        /// <summary>
+        /// Debug helper to directly set the woodcutting level. Adjusts XP and
+        /// triggers the level up event.
+        /// </summary>
+        public void DebugSetLevel(int newLevel)
+        {
+            if (xpTable == null)
+                return;
+
+            newLevel = Mathf.Clamp(newLevel, 1, 99);
+            xp = xpTable.GetXpForLevel(newLevel);
+            level = newLevel;
+            OnLevelUp?.Invoke(level);
+        }
+
         private void PreloadLogItems()
         {
             logItems = new Dictionary<string, ItemData>();
