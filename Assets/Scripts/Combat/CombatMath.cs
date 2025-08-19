@@ -10,6 +10,8 @@ namespace Combat
         /// <summary>Seconds per OSRS tick.</summary>
         public const float TICK_SECONDS = 0.6f;
 
+        public const float MIN_HIT_CHANCE = 0.25f;
+
         public static int GetEffectiveAttack(int level, CombatStyle style)
         {
             int bonus = style switch
@@ -56,7 +58,7 @@ namespace Combat
                 chance = 1f - (defenceRoll + 2f) / (2f * (attackRoll + 1f));
             else
                 chance = attackRoll / (2f * (defenceRoll + 1f));
-            return Mathf.Clamp01(chance);
+            return Mathf.Clamp(chance, MIN_HIT_CHANCE, 1f);
         }
 
         public static int GetMaxHit(int effectiveStrength, int strengthBonus)
