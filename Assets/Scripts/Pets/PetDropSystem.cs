@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Inventory;
+using Skills;
 
 namespace Pets
 {
@@ -77,17 +78,26 @@ namespace Pets
         }
 
         /// <summary>
-        /// Attempt to roll for a pet drop.
+        /// Attempt to roll for a pet drop using the player's Beastmaster level.
         /// </summary>
-        public static bool TryRollPet(string sourceId, Vector3 worldPosition, out PetDefinition pet)
+        public static bool TryRollPet(string sourceId, Vector3 worldPosition, int beastmasterLevel, out PetDefinition pet)
         {
-            return TryRollPet(sourceId, worldPosition, null, out pet);
+            return TryRollPet(sourceId, worldPosition, beastmasterLevel, null, out pet);
         }
 
         /// <summary>
-        /// Attempt to roll for a pet drop using a provided RNG.
+        /// Attempt to roll for a pet drop using the player's skills.
         /// </summary>
-        public static bool TryRollPet(string sourceId, Vector3 worldPosition, System.Random rng, out PetDefinition pet)
+        public static bool TryRollPet(string sourceId, Vector3 worldPosition, SkillManager skills, out PetDefinition pet)
+        {
+            int level = skills != null ? skills.GetLevel(SkillType.Beastmaster) : 1;
+            return TryRollPet(sourceId, worldPosition, level, null, out pet);
+        }
+
+        /// <summary>
+        /// Attempt to roll for a pet drop using a provided RNG and Beastmaster level.
+        /// </summary>
+        public static bool TryRollPet(string sourceId, Vector3 worldPosition, int beastmasterLevel, System.Random rng, out PetDefinition pet)
         {
             Initialize();
             pet = null;
@@ -99,8 +109,18 @@ namespace Pets
                         continue;
                     if (!string.Equals(entry.sourceId, sourceId, StringComparison.OrdinalIgnoreCase))
                         continue;
+                    if (beastmasterLevel < entry.requiredBeastmasterLevel)
+                        continue;
 
-                    int roll = rng != null ? rng.Next(entry.oneInN) : UnityEngine.Random.Range(0, entry.oneInN);
+                    int effectiveOneInN = entry.oneInN;
+                    int above = beastmasterLevel - entry.requiredBeastmasterLevel;
+                    if (above > 0 && entry.bonusDropMultiplier > 0f)
+                    {
+                        float mult = 1f + above * entry.bonusDropMultiplier;
+                        effectiveOneInN = Mathf.Max(1, Mathf.FloorToInt(entry.oneInN / mult));
+                    }
+
+                    int roll = rng != null ? rng.Next(effectiveOneInN) : UnityEngine.Random.Range(0, effectiveOneInN);
                     if (roll == 0)
                     {
                         SpawnPetInternal(entry.pet, worldPosition);
