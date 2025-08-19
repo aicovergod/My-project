@@ -1,10 +1,11 @@
 using UnityEngine;
 using Inventory;
+using Pets;
 
 namespace MyGame.Drops
 {
     /// <summary>
-    /// Component that rolls a drop table and spawns items in the world.
+    /// Component that resolves a drop table and gives items to the player or spawns them.
     /// </summary>
     [RequireComponent(typeof(Transform))]
     public class NpcDropper : MonoBehaviour
@@ -42,9 +43,9 @@ namespace MyGame.Drops
         /// <param name="overridePosition">Optional override for the spawn position.</param>
         public void RollAndSpawn(Vector3? overridePosition = null)
         {
-            if (dropTable == null || spawner == null)
+            if (dropTable == null)
             {
-                Debug.LogWarning("NpcDropper.RollAndSpawn called without drop table or spawner.");
+                Debug.LogWarning("NpcDropper.RollAndSpawn called without drop table.");
                 return;
             }
 
@@ -59,7 +60,19 @@ namespace MyGame.Drops
             {
                 Vector2 offset = UnityEngine.Random.insideUnitCircle * spawnSpreadRadius;
                 Vector3 pos = basePos + (Vector3)offset;
-                spawner.Spawn(drop.item, drop.quantity, pos);
+
+                bool added = InventoryBridge.AddItem(drop.item, drop.quantity);
+                if (!added)
+                {
+                    if (spawner != null)
+                    {
+                        spawner.Spawn(drop.item, drop.quantity, pos);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"NpcDropper: Failed to add {drop.item?.name} to inventory and no spawner available.");
+                    }
+                }
             }
         }
 
