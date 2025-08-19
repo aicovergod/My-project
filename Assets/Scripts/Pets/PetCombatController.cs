@@ -18,6 +18,7 @@ namespace Pets
         private PetFollower follower;
         private Animator animator;
         private SpriteRenderer spriteRenderer;
+        private PetSpriteAnimator spriteAnimator;
         private Sprite defaultSprite;
         private Coroutine spriteSwapRoutine;
         private CombatTarget currentTarget;
@@ -28,6 +29,7 @@ namespace Pets
             follower = GetComponent<PetFollower>();
             animator = GetComponent<Animator>();
             spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
+            spriteAnimator = GetComponent<PetSpriteAnimator>();
             if (spriteRenderer != null)
                 defaultSprite = spriteRenderer.sprite;
             if (TryGetComponent<Collider>(out var col))
@@ -58,7 +60,15 @@ namespace Pets
             {
                 Vector3 pos = transform.position;
                 Vector3 targetPos = currentTarget.transform.position;
-                transform.position = Vector3.MoveTowards(pos, targetPos, moveSpeed * Time.deltaTime);
+                Vector3 newPos = Vector3.MoveTowards(pos, targetPos, moveSpeed * Time.deltaTime);
+                Vector2 velocity = (newPos - pos) / Time.deltaTime;
+                transform.position = newPos;
+
+                if (spriteAnimator != null)
+                    spriteAnimator.UpdateVisuals(velocity);
+                else if (spriteRenderer != null)
+                    spriteRenderer.flipX = velocity.x > 0f;
+
                 float dist = Vector2.Distance(transform.position, currentTarget.transform.position);
                 if (dist <= CombatMath.MELEE_RANGE)
                 {
@@ -74,6 +84,8 @@ namespace Pets
                     yield return null;
                 }
             }
+            if (spriteAnimator != null)
+                spriteAnimator.UpdateVisuals(Vector2.zero);
             follower.enabled = true;
             attackRoutine = null;
             currentTarget = null;
