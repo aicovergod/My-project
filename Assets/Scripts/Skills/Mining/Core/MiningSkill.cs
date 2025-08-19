@@ -143,6 +143,8 @@ namespace Skills.Mining
                 {
                     oreItems.TryGetValue(ore.Id, out var item);
                     int amount = PetDropSystem.ActivePet?.id == "Rock Golem" ? 2 : 1;
+                    if (amount > 1)
+                        BeastmasterXp.TryGrantFromPetAssist(ore.XpPerOre * (amount - 1));
                     bool added = false;
                     if (item != null && inventory != null)
                         added = inventory.AddItem(item, amount);
