@@ -81,6 +81,15 @@ namespace Pets
         [Tooltip("Additional strength/damage bonus.")]
         public int damageBonus;
 
+        [Tooltip("Attack level multiplier applied per Beastmaster level (e.g. 0.05 for +5% per level).")]
+        public float attackLevelPerBeastmasterLevel;
+
+        [Tooltip("Strength level multiplier applied per Beastmaster level (e.g. 0.05 for +5% per level).")]
+        public float strengthLevelPerBeastmasterLevel;
+
+        [Tooltip("Max hit multiplier applied per Beastmaster level (e.g. 0.05 for +5% per level).")]
+        public float maxHitPerBeastmasterLevel;
+
         [Header("UI")]
         [Tooltip("Optional color for drop announcement messages.")]
         public Color messageColor = Color.white;

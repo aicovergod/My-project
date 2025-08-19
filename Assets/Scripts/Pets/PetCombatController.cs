@@ -109,6 +109,20 @@ namespace Pets
                 DamageType = DamageType.Melee
             };
 
+            // scale stats based on the owner's Beastmaster level
+            var owner = follower != null ? follower.Player : null;
+            int beastmasterLevel = 1;
+            if (owner != null && owner.TryGetComponent<SkillManager>(out var skills))
+                beastmasterLevel = skills.GetLevel(SkillType.Beastmaster);
+
+            if (definition != null)
+            {
+                if (definition.attackLevelPerBeastmasterLevel != 0f)
+                    attacker.AttackLevel = Mathf.RoundToInt(attacker.AttackLevel * (1f + definition.attackLevelPerBeastmasterLevel * beastmasterLevel));
+                if (definition.strengthLevelPerBeastmasterLevel != 0f)
+                    attacker.StrengthLevel = Mathf.RoundToInt(attacker.StrengthLevel * (1f + definition.strengthLevelPerBeastmasterLevel * beastmasterLevel));
+            }
+
             CombatantStats defender;
             if (target is NpcCombatant npc)
                 defender = npc.GetCombatantStats();
@@ -147,9 +161,10 @@ namespace Pets
             {
                 int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
                 int maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
+                if (definition != null && definition.maxHitPerBeastmasterLevel != 0f)
+                    maxHit = Mathf.RoundToInt(maxHit * (1f + definition.maxHitPerBeastmasterLevel * beastmasterLevel));
                 int dmg = CombatMath.RollDamage(maxHit);
                 target.ApplyDamage(dmg, attacker.DamageType, this);
-                var owner = follower != null ? follower.Player : null;
                 BeastmasterXp.TryGrantFromPetDamage(owner != null ? owner.gameObject : null, dmg);
             }
         }
