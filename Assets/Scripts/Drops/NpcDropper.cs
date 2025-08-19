@@ -56,16 +56,27 @@ namespace MyGame.Drops
             }
 
             var drops = DropResolver.Resolve(dropTable, luckMultiplier);
+            if (drops.Count == 0)
+            {
+                var name = !string.IsNullOrEmpty(dropTable.tableName) ? dropTable.tableName : dropTable.name;
+                Debug.Log($"NpcDropper: Drop table '{name}' produced no drops.");
+            }
             foreach (var drop in drops)
             {
                 Vector2 offset = UnityEngine.Random.insideUnitCircle * spawnSpreadRadius;
                 Vector3 pos = basePos + (Vector3)offset;
 
+                Debug.Log($"NpcDropper: Trying to add {drop.quantity}x {drop.item?.name} to inventory.");
                 bool added = InventoryBridge.AddItem(drop.item, drop.quantity);
-                if (!added)
+                if (added)
+                {
+                    Debug.Log($"NpcDropper: Added {drop.quantity}x {drop.item?.name} to inventory.");
+                }
+                else
                 {
                     if (spawner != null)
                     {
+                        Debug.Log($"NpcDropper: Inventory full, spawning {drop.quantity}x {drop.item?.name} at {pos}.");
                         spawner.Spawn(drop.item, drop.quantity, pos);
                     }
                     else
