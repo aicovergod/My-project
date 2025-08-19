@@ -24,6 +24,9 @@ namespace Skills
         private string miningLevel = "";
         private string woodcuttingLevel = "";
 
+        // Scroll position for the debug menu
+        private Vector2 scrollPos;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Create()
         {
@@ -85,6 +88,9 @@ namespace Skills
             Rect area = new Rect(10f, 10f, width, height);
             GUILayout.BeginArea(area, GUI.skin.box);
 
+            // Begin scroll view so all fields are accessible even if the window is small
+            scrollPos = GUILayout.BeginScrollView(scrollPos, false, true);
+
             GUILayout.Label("Hitpoints Level");
             hpLevel = GUILayout.TextField(hpLevel);
 
@@ -120,6 +126,8 @@ namespace Skills
 
                 RefreshFields();
             }
+
+            GUILayout.EndScrollView();
 
             GUILayout.EndArea();
         }
