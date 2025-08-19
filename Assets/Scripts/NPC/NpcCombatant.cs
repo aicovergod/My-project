@@ -19,11 +19,11 @@ namespace NPC
         public bool IsAlive => currentHp > 0;
         public DamageType PreferredDefenceType => profile != null ? profile.AttackType : DamageType.Melee;
         public int CurrentHP => currentHp;
-        public int MaxHP => profile != null ? profile.DefenceLevel : currentHp;
+        public int MaxHP => profile != null ? profile.HitpointsLevel : currentHp;
 
         private void Awake()
         {
-            currentHp = profile != null ? profile.DefenceLevel : 1;
+            currentHp = profile != null ? profile.HitpointsLevel : 1;
             OnHealthChanged?.Invoke(currentHp, MaxHP);
         }
 

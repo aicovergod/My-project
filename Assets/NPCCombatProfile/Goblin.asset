@@ -15,6 +15,7 @@ MonoBehaviour:
   AttackLevel: 1
   StrengthLevel: 1
   DefenceLevel: 1
+  HitpointsLevel: 10
   MeleeDefence: 0
   RangeDefence: 0
   MagicDefence: 0
