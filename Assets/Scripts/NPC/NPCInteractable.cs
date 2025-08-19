@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using ShopSystem;
+using Pets;
+using Combat;
 
 namespace NPC
 {
@@ -57,6 +59,14 @@ namespace NPC
         public void Examine()
         {
             Debug.Log($"You examine {name}.");
+        }
+
+        public void AttackWithPet()
+        {
+            var pet = PetDropSystem.ActivePetCombat;
+            var target = GetComponent<CombatTarget>();
+            if (pet != null && target != null)
+                pet.CommandAttack(target);
         }
     }
 }

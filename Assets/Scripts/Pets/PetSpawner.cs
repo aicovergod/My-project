@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
 
 namespace Pets
 {
@@ -106,6 +107,15 @@ namespace Pets
                 follower.SetPlayer(player);
             var clickable = go.AddComponent<PetClickable>();
             clickable.Init(def);
+
+            if (def.canFight)
+            {
+                var agent = go.AddComponent<NavMeshAgent>();
+                agent.updateRotation = false;
+                agent.updateUpAxis = false;
+                var combat = go.AddComponent<PetCombatController>();
+                combat.definition = def;
+            }
 
             return go;
         }
