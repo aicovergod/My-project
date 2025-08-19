@@ -23,7 +23,11 @@ namespace Combat
                 CombatStyle.Controlled => 1,
                 _ => 0
             };
-            return level + bonus;
+            // OSRS formulas include an additional constant 8 to the effective level
+            // calculation. Without this, low level characters end up with a maximum
+            // hit of 0 even when a swing successfully lands. Adding the constant
+            // ensures a minimum effective level so new players can deal damage.
+            return level + bonus + 8;
         }
 
         public static int GetEffectiveStrength(int level, CombatStyle style)
@@ -34,7 +38,9 @@ namespace Combat
                 CombatStyle.Controlled => 1,
                 _ => 0
             };
-            return level + bonus;
+            // Include the constant 8 used by OSRS to avoid zero effective strength
+            // which led to all damage rolls being zero for low level players.
+            return level + bonus + 8;
         }
 
         public static int GetEffectiveDefence(int level, CombatStyle style)
@@ -45,7 +51,8 @@ namespace Combat
                 CombatStyle.Controlled => 1,
                 _ => 0
             };
-            return level + bonus;
+            // Defence also needs the constant 8 for parity with OSRS calculations.
+            return level + bonus + 8;
         }
 
         public static int GetAttackRoll(int effectiveAttack, int attackBonus)
