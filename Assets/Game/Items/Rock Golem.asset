@@ -33,4 +33,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: b651b83922d02dd439bf2c420b5d5149, type: 3}
   walkRight:
   - {fileID: 21300000, guid: b651b83922d02dd439bf2c420b5d5149, type: 3}
+  useRightSpritesForLeft: 0
+  useLeftSpritesForRight: 0
   messageColor: {r: 1, g: 1, b: 1, a: 1}
