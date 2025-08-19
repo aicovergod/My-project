@@ -168,6 +168,24 @@ namespace Player
             ApplyDamage(damage);
         }
 
+        /// <summary>
+        /// Debug helper to directly set the hitpoints level. Adjusts XP and
+        /// clamps the current HP to the new maximum.
+        /// </summary>
+        public void DebugSetLevel(int newLevel)
+        {
+            if (xpTable == null)
+                return;
+
+            newLevel = Mathf.Clamp(newLevel, 1, 99);
+            xp = xpTable.GetXpForLevel(newLevel);
+            level = newLevel;
+            if (currentHp > MaxHp)
+                currentHp = MaxHp;
+            OnHitpointsLevelChanged?.Invoke(level);
+            OnHealthChanged?.Invoke(currentHp, MaxHp);
+        }
+
 #if UNITY_EDITOR
         public void DebugDealDamage(int dmg)
         {

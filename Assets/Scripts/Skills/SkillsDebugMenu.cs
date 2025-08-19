@@ -1,0 +1,127 @@
+using UnityEngine;
+using Player;
+using Skills.Mining;
+using Skills.Woodcutting;
+
+namespace Skills
+{
+    /// <summary>
+    /// Debug menu that allows setting player skill levels. Toggle with F2.
+    /// </summary>
+    [DisallowMultipleComponent]
+    public class SkillsDebugMenu : MonoBehaviour
+    {
+        private PlayerHitpoints hitpoints;
+        private SkillManager skillManager;
+        private MiningSkill miningSkill;
+        private WoodcuttingSkill woodcuttingSkill;
+
+        private bool visible;
+        private string hpLevel = "";
+        private string attackLevel = "";
+        private string strengthLevel = "";
+        private string defenceLevel = "";
+        private string miningLevel = "";
+        private string woodcuttingLevel = "";
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void Create()
+        {
+            var go = new GameObject("SkillsDebugMenu");
+            DontDestroyOnLoad(go);
+            go.AddComponent<SkillsDebugMenu>();
+        }
+
+        private void Awake()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.F2))
+            {
+                visible = !visible;
+                if (visible)
+                    RefreshFields();
+            }
+
+            if (!visible)
+                return;
+
+            // Ensure references are valid in case scenes change
+            if (hitpoints == null)
+                hitpoints = FindObjectOfType<PlayerHitpoints>();
+            if (skillManager == null)
+                skillManager = FindObjectOfType<SkillManager>();
+            if (miningSkill == null)
+                miningSkill = FindObjectOfType<MiningSkill>();
+            if (woodcuttingSkill == null)
+                woodcuttingSkill = FindObjectOfType<WoodcuttingSkill>();
+        }
+
+        private void RefreshFields()
+        {
+            hitpoints = FindObjectOfType<PlayerHitpoints>();
+            skillManager = FindObjectOfType<SkillManager>();
+            miningSkill = FindObjectOfType<MiningSkill>();
+            woodcuttingSkill = FindObjectOfType<WoodcuttingSkill>();
+
+            hpLevel = hitpoints != null ? hitpoints.Level.ToString() : "";
+            attackLevel = skillManager != null ? skillManager.GetLevel(SkillType.Attack).ToString() : "";
+            strengthLevel = skillManager != null ? skillManager.GetLevel(SkillType.Strength).ToString() : "";
+            defenceLevel = skillManager != null ? skillManager.GetLevel(SkillType.Defence).ToString() : "";
+            miningLevel = miningSkill != null ? miningSkill.Level.ToString() : "";
+            woodcuttingLevel = woodcuttingSkill != null ? woodcuttingSkill.Level.ToString() : "";
+        }
+
+        private void OnGUI()
+        {
+            if (!visible)
+                return;
+
+            const float width = 220f;
+            const float height = 220f;
+            Rect area = new Rect(10f, 10f, width, height);
+            GUILayout.BeginArea(area, GUI.skin.box);
+
+            GUILayout.Label("Hitpoints Level");
+            hpLevel = GUILayout.TextField(hpLevel);
+
+            GUILayout.Label("Attack Level");
+            attackLevel = GUILayout.TextField(attackLevel);
+
+            GUILayout.Label("Strength Level");
+            strengthLevel = GUILayout.TextField(strengthLevel);
+
+            GUILayout.Label("Defence Level");
+            defenceLevel = GUILayout.TextField(defenceLevel);
+
+            GUILayout.Label("Mining Level");
+            miningLevel = GUILayout.TextField(miningLevel);
+
+            GUILayout.Label("Woodcutting Level");
+            woodcuttingLevel = GUILayout.TextField(woodcuttingLevel);
+
+            if (GUILayout.Button("Apply"))
+            {
+                if (hitpoints != null && int.TryParse(hpLevel, out var hp))
+                    hitpoints.DebugSetLevel(hp);
+                if (skillManager != null && int.TryParse(attackLevel, out var atk))
+                    skillManager.DebugSetLevel(SkillType.Attack, atk);
+                if (skillManager != null && int.TryParse(strengthLevel, out var str))
+                    skillManager.DebugSetLevel(SkillType.Strength, str);
+                if (skillManager != null && int.TryParse(defenceLevel, out var def))
+                    skillManager.DebugSetLevel(SkillType.Defence, def);
+                if (miningSkill != null && int.TryParse(miningLevel, out var mine))
+                    miningSkill.DebugSetLevel(mine);
+                if (woodcuttingSkill != null && int.TryParse(woodcuttingLevel, out var wood))
+                    woodcuttingSkill.DebugSetLevel(wood);
+
+                RefreshFields();
+            }
+
+            GUILayout.EndArea();
+        }
+    }
+}
