@@ -16,6 +16,7 @@ namespace Combat
         public int RangeDefence;
         public int MagicDefence;
         public int AttackSpeedTicks = 4;
+        public float RespawnSeconds;
         public DamageType AttackType = DamageType.Melee;
         public CombatStyle Style = CombatStyle.Accurate;
     }
