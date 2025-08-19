@@ -23,6 +23,7 @@ namespace Pets
         public float wanderMoveSpeed = 2f;
 
         [SerializeField] private Transform player;
+        public Transform Player => player;
         private Vector3 offset;
         private Vector3 targetOffset;
         private Vector2 lastHeading;

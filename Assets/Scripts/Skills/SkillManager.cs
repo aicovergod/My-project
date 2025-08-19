@@ -32,6 +32,7 @@ namespace Skills
             InitialiseSkill(SkillType.Attack);
             InitialiseSkill(SkillType.Strength);
             InitialiseSkill(SkillType.Defence);
+            InitialiseSkill(SkillType.Beastmaster);
         }
 
         private void OnEnable()

@@ -10,6 +10,7 @@ namespace Skills
     {
         Mining,
         Woodcutting,
+        Beastmaster,
         Hitpoints,
         Attack,
         Strength,
