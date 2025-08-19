@@ -68,8 +68,12 @@ namespace NPC
                 int maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
                 damage = CombatMath.RollDamage(maxHit);
                 target.ApplyDamage(damage, attacker.DamageType, this);
+                Debug.Log($"{name} dealt {damage} damage to player.");
             }
-            Debug.Log($"{name} dealt {damage} damage to player.");
+            else
+            {
+                Debug.Log($"{name} missed player.");
+            }
         }
     }
 }
