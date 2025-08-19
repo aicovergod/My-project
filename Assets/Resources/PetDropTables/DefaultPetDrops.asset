@@ -30,6 +30,16 @@ MonoBehaviour:
     bonusDropMultiplier: 0.01
   - pet: {fileID: 11400000, guid: e5efc837ea5d96a46b41733308ac690a, type: 2}
     oneInN: 0
-    sourceId: cosmetic
-    requiredBeastmasterLevel: 1
+    sourceId: combat
+    requiredBeastmasterLevel: 60
+    bonusDropMultiplier: 0
+  - pet: {fileID: 11400000, guid: c111c9093f56e894a9cc10df8028f9d5, type: 2}
+    oneInN: 0
+    sourceId: combat
+    requiredBeastmasterLevel: 40
+    bonusDropMultiplier: 0
+  - pet: {fileID: 11400000, guid: c111c9093f56e894a9cc10df8028f9d5, type: 2}
+    oneInN: 0
+    sourceId: combat
+    requiredBeastmasterLevel: 40
     bonusDropMultiplier: 0

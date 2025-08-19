@@ -22,6 +22,11 @@ MonoBehaviour:
   maxStack: 0
   splittable: 0
   equipmentSlot: 10
+  skillRequirements:
+  - skill: 4
+    level: 20
+  - skill: 1
+    level: 20
   combat:
     Attack: 11
     Strength: 11

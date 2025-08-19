@@ -10,36 +10,34 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
-  m_Name: Black Pickaxe
+  m_Name: Lion
   m_EditorClassIdentifier: 
-  id: Black Pickaxe
-  itemName: Black Pickaxe
-  icon: {fileID: -4123752313632811023, guid: dd939abbffadced4ebdda40eb880fd6b, type: 3}
-  description: 'A pickaxe, for mining ore
+  id: Leopard
+  itemName: Leopard
+  icon: {fileID: 5903488652781262050, guid: 52e0d6b7e64ba4848bb272bbbaeaef38, type: 3}
+  description: 'A ferocious lion
 
-    rocks'
+    that helps you
+
+    in combat'
   stackable: 0
   maxStack: 0
-  splittable: 1
-  equipmentSlot: 10
-  skillRequirements:
-  - skill: 4
-    level: 10
-  - skill: 0
-    level: 10
+  splittable: 0
+  equipmentSlot: 0
+  skillRequirements: []
   combat:
-    Attack: 10
-    Strength: 10
+    Attack: 0
+    Strength: 0
     Range: 0
     Magic: 0
     MeleeDefence: 0
     RangeDefence: 0
     MagicDefence: 0
     AttackSpeedTicks: 4
-  attackBonus: 12
+  attackBonus: 0
   defenceBonus: 0
   attackSpeed: 4
-  strengthBonus: 12
+  strengthBonus: 0
   rangeBonus: 0
   magicBonus: 0
   meleeDefenceBonus: 0
