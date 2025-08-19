@@ -8,7 +8,7 @@ namespace MyGame.Drops
     public readonly struct ResolvedDrop
     {
         /// <summary>The item definition.</summary>
-        public readonly ItemDefinition item;
+        public readonly ItemData item;
 
         /// <summary>The quantity.</summary>
         public readonly int quantity;
@@ -16,7 +16,7 @@ namespace MyGame.Drops
         /// <summary>
         /// Creates a new resolved drop.
         /// </summary>
-        public ResolvedDrop(ItemDefinition item, int quantity)
+        public ResolvedDrop(ItemData item, int quantity)
         {
             this.item = item;
             this.quantity = quantity;

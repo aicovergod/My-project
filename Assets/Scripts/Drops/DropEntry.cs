@@ -49,7 +49,7 @@ namespace MyGame.Drops
     public class WeightedDropEntry
     {
         /// <summary>Item to drop.</summary>
-        public ItemDefinition item;
+        public ItemData item;
 
         /// <summary>Quantity definition.</summary>
         public DropQuantity qty = new DropQuantity();
@@ -70,7 +70,7 @@ namespace MyGame.Drops
     [Serializable]
     public class UniqueDropEntry
     {
-        public ItemDefinition item;
+        public ItemData item;
         public DropQuantity qty = new DropQuantity();
         public int denominator = 128;
         public bool affectedByLuck = true;
@@ -82,7 +82,7 @@ namespace MyGame.Drops
     [Serializable]
     public class TertiaryDropEntry
     {
-        public ItemDefinition item;
+        public ItemData item;
         public DropQuantity qty = new DropQuantity();
         public int denominator = 128;
         public bool affectedByLuck = true;

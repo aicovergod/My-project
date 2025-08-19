@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
-using UnityEngine;
 using Inventory;
+using UnityEngine;
 
 namespace MyGame.Drops
 {
@@ -135,7 +134,7 @@ namespace MyGame.Drops
             }
 
             // Merge stacks
-            var map = new Dictionary<ItemDefinition, int>();
+            var map = new Dictionary<ItemData, int>();
             foreach (var drop in working)
             {
                 if (drop.item == null)

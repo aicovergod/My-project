@@ -1,10 +1,11 @@
 #if UNITY_EDITOR
-using UnityEditor;
-using UnityEngine;
 using System.Collections.Generic;
 using Inventory;
+using MyGame.Drops;
+using UnityEditor;
+using UnityEngine;
 
-namespace MyGame.Drops.Editor
+namespace Drops.Editor
 {
     /// <summary>
     /// Custom inspector for <see cref="DropTable"/> providing testing utilities.
@@ -73,7 +74,7 @@ namespace MyGame.Drops.Editor
         private void TestRoll(DropTable table)
         {
             const int simulations = 10000;
-            var totals = new Dictionary<ItemDefinition, int>();
+            var totals = new Dictionary<ItemData, int>();
             for (int i = 0; i < simulations; i++)
             {
                 var drops = DropResolver.Resolve(table, 1f);

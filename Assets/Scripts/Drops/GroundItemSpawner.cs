@@ -21,7 +21,7 @@ namespace MyGame.Drops
         /// <param name="def">Item definition.</param>
         /// <param name="amount">Quantity.</param>
         /// <param name="pos">World position.</param>
-        public void Spawn(ItemDefinition def, int amount, Vector3 pos)
+        public void Spawn(ItemData def, int amount, Vector3 pos)
         {
             if (def == null || amount <= 0)
             {
