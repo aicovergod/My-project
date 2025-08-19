@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Combat;
 using MyGame.Drops;
@@ -12,6 +13,8 @@ namespace NPC
     {
         [SerializeField] private NpcCombatProfile profile;
         private int currentHp;
+        private Collider2D collider2D;
+        private SpriteRenderer spriteRenderer;
 
         public event System.Action<int, int> OnHealthChanged; // current, max
         public event System.Action OnDeath;
@@ -24,6 +27,8 @@ namespace NPC
         private void Awake()
         {
             currentHp = profile != null ? profile.HitpointsLevel : 1;
+            collider2D = GetComponent<Collider2D>();
+            spriteRenderer = GetComponent<SpriteRenderer>();
             OnHealthChanged?.Invoke(currentHp, MaxHP);
         }
 
@@ -38,6 +43,10 @@ namespace NPC
                 OnDeath?.Invoke();
                 var dropper = GetComponent<NpcDropper>();
                 dropper?.OnDeath();
+                if (collider2D) collider2D.enabled = false;
+                if (spriteRenderer) spriteRenderer.enabled = false;
+                if (profile != null && profile.RespawnSeconds > 0f)
+                    StartCoroutine(RespawnRoutine());
             }
         }
 
@@ -45,6 +54,15 @@ namespace NPC
         public CombatantStats GetCombatantStats()
         {
             return CombatantStats.ForNpc(profile);
+        }
+
+        private IEnumerator RespawnRoutine()
+        {
+            yield return new WaitForSeconds(profile.RespawnSeconds);
+            currentHp = profile != null ? profile.HitpointsLevel : 1;
+            if (collider2D) collider2D.enabled = true;
+            if (spriteRenderer) spriteRenderer.enabled = true;
+            OnHealthChanged?.Invoke(currentHp, MaxHP);
         }
     }
 }
