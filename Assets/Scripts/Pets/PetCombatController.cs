@@ -48,6 +48,10 @@ namespace Pets
             if (!CanFight || target == null || !target.IsAlive)
                 return;
 
+            // Prevent restarting the attack routine when already attacking the same target.
+            if (currentTarget == target && attackRoutine != null)
+                return;
+
             currentTarget = target;
             if (attackRoutine != null)
                 StopCoroutine(attackRoutine);
