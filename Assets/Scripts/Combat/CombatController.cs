@@ -27,10 +27,17 @@ namespace Combat
 
         private void Awake()
         {
-            skills = GetComponent<SkillManager>();
-            hitpoints = GetComponent<PlayerHitpoints>();
-            equipment = GetComponent<EquipmentAggregator>();
-            loadout = GetComponent<Player.PlayerCombatLoadout>();
+            // Grab required components from this object, falling back to parent/children so the
+            // controller still works if supporting components live elsewhere in the hierarchy.
+            skills = GetComponent<SkillManager>() ?? GetComponentInParent<SkillManager>() ?? GetComponentInChildren<SkillManager>();
+            hitpoints = GetComponent<PlayerHitpoints>() ?? GetComponentInParent<PlayerHitpoints>() ?? GetComponentInChildren<PlayerHitpoints>();
+            equipment = GetComponent<EquipmentAggregator>() ?? GetComponentInParent<EquipmentAggregator>() ?? GetComponentInChildren<EquipmentAggregator>();
+            loadout = GetComponent<Player.PlayerCombatLoadout>() ?? GetComponentInParent<Player.PlayerCombatLoadout>() ?? GetComponentInChildren<Player.PlayerCombatLoadout>();
+
+            if (skills == null)
+                Debug.LogWarning("CombatController could not find a SkillManager; damage will use level 1 stats.", this);
+            if (equipment == null)
+                Debug.LogWarning("CombatController could not find an EquipmentAggregator; equipment bonuses will be ignored.", this);
         }
 
         /// <summary>
