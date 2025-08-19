@@ -59,6 +59,25 @@ namespace Pets
         [Tooltip("If true, flip left-facing sprites to use for right-facing animations.")]
         public bool useLeftSpritesForRight = false;
 
+        [Header("Combat")]
+        [Tooltip("If true, this pet can participate in combat.")]
+        public bool canFight;
+
+        [Tooltip("Attack level used for combat calculations.")]
+        public int petAttackLevel = 1;
+
+        [Tooltip("Strength level used for combat calculations.")]
+        public int petStrengthLevel = 1;
+
+        [Tooltip("Attack speed in OSRS ticks.")]
+        public int attackSpeedTicks = 4;
+
+        [Tooltip("Additional attack accuracy bonus.")]
+        public int accuracyBonus;
+
+        [Tooltip("Additional strength/damage bonus.")]
+        public int damageBonus;
+
         [Header("UI")]
         [Tooltip("Optional color for drop announcement messages.")]
         public Color messageColor = Color.white;
