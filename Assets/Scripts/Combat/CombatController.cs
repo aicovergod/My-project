@@ -36,6 +36,8 @@ namespace Combat
         {
             if (target == null || !target.IsAlive)
                 return false;
+            if (Vector2.Distance(transform.position, target.transform.position) > CombatMath.MELEE_RANGE)
+                return false;
             StopAllCoroutines();
             StartCoroutine(AttackRoutine(target));
             return true;
@@ -45,6 +47,8 @@ namespace Combat
         {
             while (target != null && target.IsAlive)
             {
+                if (Vector2.Distance(transform.position, target.transform.position) > CombatMath.MELEE_RANGE)
+                    yield break;
                 OnAttackStart?.Invoke();
                 ResolveAttack(target);
                 float interval = equipment != null ? equipment.GetCombinedStats().attackSpeedTicks * CombatMath.TICK_SECONDS : 4 * CombatMath.TICK_SECONDS;
