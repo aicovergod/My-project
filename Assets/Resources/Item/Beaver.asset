@@ -12,12 +12,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
   m_Name: Beaver
   m_EditorClassIdentifier: 
-  id: Rock Golem
-  itemName: Rock Golem
-  icon: {fileID: 21300000, guid: 991c8b16c4d524d4487ac4467a00c531, type: 3}
+  id: Beaver
+  itemName: Beaver
+  icon: {fileID: 21300000, guid: 9f67e1cc5aedbc74eb9622630446cfd7, type: 3}
   description: 'a lucky reward
 
-    from mining'
+    from woodcutting'
   stackable: 0
   maxStack: 0
   splittable: 0
+  equipmentSlot: 0
+  combat:
+    Attack: 0
+    Strength: 0
+    Range: 0
+    Magic: 0
+    MeleeDefence: 0
+    RangeDefence: 0
+    MagicDefence: 0
+    AttackSpeedTicks: 4
+  attackBonus: 0
+  defenceBonus: 0
+  attackSpeed: 4
+  strengthBonus: 0
+  rangeBonus: 0
+  magicBonus: 0
+  meleeDefenceBonus: 0
+  rangedDefenceBonus: 0
+  magicDefenceBonus: 0

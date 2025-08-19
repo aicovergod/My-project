@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5a27520515d85841a1ab166966c8782, type: 3}
   m_Name: Goblin
   m_EditorClassIdentifier: 
-  AttackLevel: 0
+  AttackLevel: 1
   StrengthLevel: 1
   DefenceLevel: 1
   HitpointsLevel: 5
-  MeleeDefence: -15
-  RangeDefence: -15
-  MagicDefence: -15
+  MeleeDefence: 1
+  RangeDefence: 1
+  MagicDefence: 1
   AttackSpeedTicks: 4
   RespawnSeconds: 15
   AttackType: 0
-  Style: 1
+  Style: 0

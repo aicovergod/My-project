@@ -13,15 +13,14 @@ GameObject:
   - component: {fileID: 1285495058149382175}
   - component: {fileID: 1225287366087380678}
   - component: {fileID: 4462744165104283374}
-  - component: {fileID: 8477684174901110555}
   - component: {fileID: 7573619506058784387}
   - component: {fileID: 2394211271730700276}
   - component: {fileID: 5669147193365449333}
   - component: {fileID: 1276688815178828107}
   - component: {fileID: 4408143068028046321}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: NPC_GOBLIN
-  m_TagString: Untagged
+  m_TagString: NPC
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -182,18 +181,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   profile: {fileID: 11400000, guid: 99be5545587046b409a3d4e9f2a85c70, type: 2}
---- !u!114 &8477684174901110555
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8077571585701284791}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d02d43035d14f0f44b973eec23f7e118, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &7573619506058784387
 MonoBehaviour:
   m_ObjectHideFlags: 0
