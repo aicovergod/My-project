@@ -19,6 +19,9 @@ namespace Pets
         private NavMeshAgent agent;
         private PetFollower follower;
         private Animator animator;
+        private SpriteRenderer spriteRenderer;
+        private Sprite defaultSprite;
+        private Coroutine spriteSwapRoutine;
         private CombatTarget currentTarget;
         private Coroutine attackRoutine;
 
@@ -27,6 +30,9 @@ namespace Pets
             agent = GetComponent<NavMeshAgent>();
             follower = GetComponent<PetFollower>();
             animator = GetComponent<Animator>();
+            spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
+            if (spriteRenderer != null)
+                defaultSprite = spriteRenderer.sprite;
             if (agent != null)
             {
                 agent.updateRotation = false;
@@ -118,7 +124,14 @@ namespace Pets
             int defRoll = CombatMath.GetDefenceRoll(defEff, defBonus);
             float chance = CombatMath.ChanceToHit(atkRoll, defRoll);
             bool hit = Random.value < chance;
-            animator?.SetTrigger("Attack");
+            if (animator != null)
+                animator.SetTrigger("Attack");
+            else if (spriteRenderer != null && definition != null && definition.attackSprite != null)
+            {
+                if (spriteSwapRoutine != null)
+                    StopCoroutine(spriteSwapRoutine);
+                spriteSwapRoutine = StartCoroutine(AttackSpriteSwap());
+            }
             if (hit)
             {
                 int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
@@ -132,7 +145,17 @@ namespace Pets
         {
             if (attackRoutine != null)
                 StopCoroutine(attackRoutine);
+            if (spriteSwapRoutine != null)
+                StopCoroutine(spriteSwapRoutine);
             currentTarget = null;
+        }
+
+        private IEnumerator AttackSpriteSwap()
+        {
+            spriteRenderer.sprite = definition.attackSprite;
+            yield return new WaitForSeconds(0.2f);
+            spriteRenderer.sprite = defaultSprite;
+            spriteSwapRoutine = null;
         }
     }
 }

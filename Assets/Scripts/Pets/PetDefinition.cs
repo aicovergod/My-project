@@ -28,6 +28,9 @@ namespace Pets
         [Tooltip("Optional animation clips. If set, the pet will play these using an Animator.")]
         public AnimationClip[] animationClips;
 
+        [Tooltip("Sprite used when attacking if no Animator is present.")]
+        public Sprite attackSprite;
+
         [Header("Frame-based Sprites")]
         [Tooltip("Frames for idle animation when facing up.")]
         public Sprite[] idleUp;
