@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Core.Save;
+using Skills;
+using Skills.Mining;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -78,6 +80,8 @@ namespace Inventory
         private Text[] slotCountTexts;
         private InventoryEntry[] equipped;
         private Inventory inventory;
+        [SerializeField] private SkillManager skillManager;
+        [SerializeField] private Transform floatingTextAnchor;
 
         private Text attackBonusText;
         private Text strengthBonusText;
@@ -109,6 +113,9 @@ namespace Inventory
         private void Awake()
         {
             inventory = GetComponent<Inventory>();
+            skillManager = skillManager != null ? skillManager : GetComponent<SkillManager>();
+            if (floatingTextAnchor == null)
+                floatingTextAnchor = transform.Find("FloatingTextAnchor");
             equipped = new InventoryEntry[Enum.GetValues(typeof(EquipmentSlot)).Length - 1];
             CreateUI();
             Load();
@@ -163,6 +170,19 @@ namespace Inventory
             var slot = entry.item != null ? entry.item.equipmentSlot : EquipmentSlot.None;
             if (slot == EquipmentSlot.None)
                 return false;
+
+            if (entry.item != null && skillManager != null && entry.item.skillRequirements != null)
+            {
+                foreach (var req in entry.item.skillRequirements)
+                {
+                    if (skillManager.GetLevel(req.skill) < req.level)
+                    {
+                        Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
+                        FloatingText.Show($"You need {req.level} {req.skill} to wield this", anchor.position);
+                        return false;
+                    }
+                }
+            }
 
             int index = SlotIndex(slot);
             if (index < 0 || index >= equipped.Length)

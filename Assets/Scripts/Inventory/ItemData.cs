@@ -1,9 +1,17 @@
 using System;
 using UnityEngine;
 using Items;
+using Skills;
 
 namespace Inventory
 {
+    [Serializable]
+    public struct SkillRequirement
+    {
+        public SkillType skill;
+        public int level;
+    }
+
     /// <summary>
     /// Equipment slots available for equippable items. Items that are not
     /// equippable should use <see cref="EquipmentSlot.None"/>.
@@ -50,6 +58,9 @@ namespace Inventory
 
         [Header("Equipment")] [Tooltip("Slot this item can be equipped to. Use None for non-equippable items.")]
         public EquipmentSlot equipmentSlot = EquipmentSlot.None;
+
+        [Header("Requirements")]
+        public SkillRequirement[] skillRequirements;
 
         [Header("Combat")]
         public ItemCombatStats combat = ItemCombatStats.Default;
