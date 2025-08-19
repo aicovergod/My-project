@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Inventory;
+using Combat;
 
 namespace Pets
 {
@@ -93,5 +94,37 @@ namespace Pets
         [Header("UI")]
         [Tooltip("Optional color for drop announcement messages.")]
         public Color messageColor = Color.white;
+
+#if UNITY_EDITOR
+        [Header("Debugging")]
+        [Tooltip("Beastmaster level used when testing max hit via context menu.")]
+        public int debugBeastmasterLevel = 1;
+
+        [ContextMenu("Test Max Hit")]
+        private void TestMaxHit()
+        {
+            int max = GetMaxHit(debugBeastmasterLevel);
+            Debug.Log($"{displayName} max hit at level {debugBeastmasterLevel}: {max}");
+        }
+#endif
+
+        /// <summary>
+        /// Calculate the maximum hit this pet can deal for a given Beastmaster level.
+        /// </summary>
+        /// <param name="beastmasterLevel">Owner's Beastmaster skill level.</param>
+        public int GetMaxHit(int beastmasterLevel)
+        {
+            int strength = petStrengthLevel;
+            if (strengthLevelPerBeastmasterLevel != 0f)
+                strength = Mathf.RoundToInt(strength * (1f + strengthLevelPerBeastmasterLevel * beastmasterLevel));
+
+            int effectiveStrength = CombatMath.GetEffectiveStrength(strength, CombatStyle.Accurate);
+            int maxHit = CombatMath.GetMaxHit(effectiveStrength, damageBonus);
+
+            if (maxHitPerBeastmasterLevel != 0f)
+                maxHit = Mathf.RoundToInt(maxHit * (1f + maxHitPerBeastmasterLevel * beastmasterLevel));
+
+            return maxHit;
+        }
     }
 }
