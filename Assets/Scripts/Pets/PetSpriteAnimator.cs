@@ -33,6 +33,9 @@ namespace Pets
         [Tooltip("If true, ignore Left arrays and flip the Right sprites for left-facing.")]
         public bool useFlipXForLeft = true;
 
+        [Tooltip("If true, ignore Right arrays and flip the Left sprites for right-facing.")]
+        public bool useFlipXForRight = false;
+
         [Tooltip("Frames per second for the sprite swapping animation.")]
         public float animationFPS = 6f;
 
@@ -71,21 +74,8 @@ namespace Pets
             if (frames <= 0) return;
 
             _animFrame = Mathf.FloorToInt(_animClock) % frames;
-            spriteRenderer.flipX = false;
-
-            if (useFlipXForLeft && _currentDir == 1)
-            {
-                Sprite[] rightSet = SelectSpriteSet(_currentlyMoving, 2, out frames);
-                if (frames > 0)
-                {
-                    _animFrame = Mathf.FloorToInt(_animClock) % frames;
-                    spriteRenderer.sprite = rightSet[_animFrame];
-                    spriteRenderer.flipX = true;
-                    return;
-                }
-            }
-
             spriteRenderer.sprite = set[_animFrame];
+            spriteRenderer.flipX = (_currentDir == 1 && useFlipXForLeft) || (_currentDir == 2 && useFlipXForRight);
         }
 
         /// <summary>Force the animator to face the given direction (0=Down,1=Left,2=Right,3=Up).</summary>
@@ -104,7 +94,7 @@ namespace Pets
                 {
                     case 0: set = walkDown; break;
                     case 1: set = useFlipXForLeft ? walkRight : walkLeft; break;
-                    case 2: set = walkRight; break;
+                    case 2: set = useFlipXForRight ? walkLeft : walkRight; break;
                     case 3: set = walkUp; break;
                 }
             }
@@ -118,7 +108,11 @@ namespace Pets
                             ? (idleRight != null && idleRight.Length > 0 ? idleRight : walkRight)
                             : (idleLeft != null && idleLeft.Length > 0 ? idleLeft : walkLeft);
                         break;
-                    case 2: set = idleRight != null && idleRight.Length > 0 ? idleRight : walkRight; break;
+                    case 2:
+                        set = useFlipXForRight
+                            ? (idleLeft != null && idleLeft.Length > 0 ? idleLeft : walkLeft)
+                            : (idleRight != null && idleRight.Length > 0 ? idleRight : walkRight);
+                        break;
                     case 3: set = idleUp != null && idleUp.Length > 0 ? idleUp : walkUp; break;
                 }
             }

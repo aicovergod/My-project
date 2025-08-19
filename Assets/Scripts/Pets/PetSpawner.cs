@@ -60,6 +60,8 @@ namespace Pets
                 spriteAnim.walkLeft = def.walkLeft;
                 spriteAnim.idleRight = def.idleRight;
                 spriteAnim.walkRight = def.walkRight;
+                spriteAnim.useFlipXForLeft = def.useRightSpritesForLeft;
+                spriteAnim.useFlipXForRight = def.useLeftSpritesForRight;
             }
 
             if (def.animationClips != null && def.animationClips.Length > 0)
