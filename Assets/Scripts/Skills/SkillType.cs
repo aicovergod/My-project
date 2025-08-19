@@ -10,6 +10,9 @@ namespace Skills
     {
         Mining,
         Woodcutting,
-        Hitpoints
+        Hitpoints,
+        Attack,
+        Strength,
+        Defence
     }
 }

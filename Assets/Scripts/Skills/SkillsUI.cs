@@ -17,6 +17,7 @@ namespace Skills
         private Mining.MiningSkill miningSkill;
         private Woodcutting.WoodcuttingSkill woodcuttingSkill;
         private PlayerHitpoints hitpoints;
+        private SkillManager skillManager;
 
         public static SkillsUI Instance { get; private set; }
 
@@ -43,6 +44,7 @@ namespace Skills
             miningSkill = FindObjectOfType<Mining.MiningSkill>();
             woodcuttingSkill = FindObjectOfType<Woodcutting.WoodcuttingSkill>();
             hitpoints = FindObjectOfType<PlayerHitpoints>();
+            skillManager = FindObjectOfType<SkillManager>();
             CreateUI();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
@@ -117,6 +119,16 @@ namespace Skills
                 string text = "";
                 if (hitpoints != null)
                     text += $"Hitpoints Level: {hitpoints.Level}  XP: {hitpoints.Xp:F2}";
+                if (skillManager != null)
+                {
+                    if (text.Length > 0)
+                        text += "\n";
+                    text += $"Attack Level: {skillManager.GetLevel(SkillType.Attack)}  XP: {skillManager.GetXp(SkillType.Attack):F2}";
+                    text += "\n";
+                    text += $"Strength Level: {skillManager.GetLevel(SkillType.Strength)}  XP: {skillManager.GetXp(SkillType.Strength):F2}";
+                    text += "\n";
+                    text += $"Defence Level: {skillManager.GetLevel(SkillType.Defence)}  XP: {skillManager.GetXp(SkillType.Defence):F2}";
+                }
                 if (miningSkill != null)
                 {
                     if (text.Length > 0)
