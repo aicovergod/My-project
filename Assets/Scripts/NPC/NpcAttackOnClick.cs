@@ -22,6 +22,8 @@ namespace NPC
             var playerController = FindObjectOfType<CombatController>();
             if (playerController == null)
                 return;
+            if (Vector2.Distance(playerController.transform.position, transform.position) > CombatMath.MELEE_RANGE)
+                return;
             if (playerController.TryAttackTarget(combatant))
             {
                 var npcAttack = GetComponent<NpcAttackController>();

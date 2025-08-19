@@ -32,6 +32,8 @@ namespace NPC
             var wait = new WaitForSeconds(4 * CombatMath.TICK_SECONDS);
             while (target != null && target.IsAlive && combatant.IsAlive)
             {
+                if (Vector2.Distance(target.transform.position, transform.position) > CombatMath.MELEE_RANGE)
+                    yield break;
                 ResolveAttack(target);
                 yield return wait;
             }

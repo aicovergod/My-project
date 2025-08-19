@@ -12,6 +12,9 @@ namespace Combat
 
         public const float MIN_HIT_CHANCE = 0.25f;
 
+        /// <summary>Maximum distance allowed for melee combat.</summary>
+        public const float MELEE_RANGE = 1.5f;
+
         public static int GetEffectiveAttack(int level, CombatStyle style)
         {
             int bonus = style switch
