@@ -1,6 +1,7 @@
 using UnityEngine;
 using Player;
 using Util;
+using MyGame.Drops;
 
 namespace Combat
 {
@@ -32,12 +33,14 @@ namespace Combat
         private int respawnTimer;
         private Collider2D col;
         private SpriteRenderer sr;
+        private NpcDropper dropper;
 
         private void Awake()
         {
             CurrentHitpoints = maxHitpoints;
             col = GetComponent<Collider2D>();
             sr = GetComponent<SpriteRenderer>();
+            dropper = GetComponent<NpcDropper>();
         }
 
         private void OnEnable()
@@ -80,6 +83,7 @@ namespace Combat
         private void Die()
         {
             OnDied?.Invoke(this);
+            dropper?.OnDeath();
             if (respawnTicks > 0)
             {
                 respawnTimer = respawnTicks;
