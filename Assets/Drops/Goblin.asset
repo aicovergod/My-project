@@ -16,7 +16,15 @@ MonoBehaviour:
   stopOnUnique: 0
   rollsPerKill: 1
   uniques: []
-  mainTable: []
+  mainTable:
+  - item: {fileID: 11400000, guid: 4a6ad3a4783799f4bb7d2615a6a5fc51, type: 2}
+    qty:
+      useRange: 1
+      min: 1
+      max: 20
+    weight: 0
+    affectedByLuck: 0
+    alwaysDrop: 1
   tertiaries: []
   mainAffectedByLuck: 1
   rareDropTable: {fileID: 0}

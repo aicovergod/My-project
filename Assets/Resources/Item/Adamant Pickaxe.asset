@@ -22,6 +22,18 @@ MonoBehaviour:
   maxStack: 0
   splittable: 1
   equipmentSlot: 10
+  combat:
+    Attack: 17
+    Strength: 17
+    Range: 0
+    Magic: 0
+    MeleeDefence: 0
+    RangeDefence: 0
+    MagicDefence: 0
+    AttackSpeedTicks: 4
+  attackBonus: 19
+  defenceBonus: 0
+  attackSpeed: 4
   strengthBonus: 19
   rangeBonus: 0
   magicBonus: 0
