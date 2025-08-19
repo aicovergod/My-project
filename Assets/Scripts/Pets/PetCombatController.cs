@@ -3,6 +3,7 @@ using UnityEngine;
 using Combat;
 using EquipmentSystem;
 using NPC;
+using Skills;
 
 namespace Pets
 {
@@ -148,6 +149,8 @@ namespace Pets
                 int maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
                 int dmg = CombatMath.RollDamage(maxHit);
                 target.ApplyDamage(dmg, attacker.DamageType, this);
+                var owner = follower != null ? follower.Player : null;
+                BeastmasterXp.TryGrantFromPetDamage(owner != null ? owner.gameObject : null, dmg);
             }
         }
 

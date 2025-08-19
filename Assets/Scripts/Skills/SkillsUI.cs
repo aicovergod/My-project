@@ -128,6 +128,8 @@ namespace Skills
                     text += $"Strength Level: {skillManager.GetLevel(SkillType.Strength)}  XP: {skillManager.GetXp(SkillType.Strength):F2}";
                     text += "\n";
                     text += $"Defence Level: {skillManager.GetLevel(SkillType.Defence)}  XP: {skillManager.GetXp(SkillType.Defence):F2}";
+                    text += "\n";
+                    text += $"Beastmaster Level: {skillManager.GetLevel(SkillType.Beastmaster)}  XP: {skillManager.GetXp(SkillType.Beastmaster):F2}";
                 }
                 if (miningSkill != null)
                 {
