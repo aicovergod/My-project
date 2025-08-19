@@ -26,6 +26,12 @@ namespace NPC
         {
             if (Input.GetMouseButtonDown(1))
             {
+                if (PetDropSystem.ActivePetCombat != null && GetComponent<CombatTarget>() != null)
+                {
+                    AttackWithPet();
+                    return;
+                }
+
                 if (menuInstance == null)
                 {
                     var canvasGO = new GameObject("ContextMenuCanvas", typeof(Canvas), typeof(CanvasScaler),
