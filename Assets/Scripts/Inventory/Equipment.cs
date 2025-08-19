@@ -73,12 +73,14 @@ namespace Inventory
         private InventoryEntry[] equipped;
         private Inventory inventory;
 
+        private Text attackBonusText;
         private Text strengthBonusText;
         private Text rangeBonusText;
         private Text magicBonusText;
         private Text meleeDefenceBonusText;
         private Text rangedDefenceBonusText;
         private Text magicDefenceBonusText;
+        private Text attackSpeedText;
 
         public int TotalAttackBonus { get; private set; }
         public int TotalDefenceBonus { get; private set; }
@@ -223,31 +225,38 @@ namespace Inventory
 
         private void UpdateBonuses()
         {
-            int strength = 0, range = 0, magic = 0, meleeDef = 0, rangeDef = 0, magicDef = 0;
-            int attackTotal = 0, defenceTotal = 0;
+            int attack = 0, strength = 0, range = 0, magic = 0;
+            int meleeDef = 0, rangeDef = 0, magicDef = 0;
+            int attackSpeedTicks = 4;
+
             foreach (var entry in equipped)
             {
                 if (entry.item == null)
                     continue;
-                strength += entry.item.strengthBonus;
-                range += entry.item.rangeBonus;
-                magic += entry.item.magicBonus;
-                meleeDef += entry.item.meleeDefenceBonus;
-                rangeDef += entry.item.rangedDefenceBonus;
-                magicDef += entry.item.magicDefenceBonus;
-                attackTotal += entry.item.attackBonus;
-                defenceTotal += entry.item.defenceBonus;
+
+                var stats = entry.item.combat;
+                attack += stats.Attack;
+                strength += stats.Strength;
+                range += stats.Range;
+                magic += stats.Magic;
+                meleeDef += stats.MeleeDefence;
+                rangeDef += stats.RangeDefence;
+                magicDef += stats.MagicDefence;
+                if (entry.item.equipmentSlot == EquipmentSlot.Weapon && stats.AttackSpeedTicks > 0)
+                    attackSpeedTicks = stats.AttackSpeedTicks;
             }
 
-            if (strengthBonusText != null) strengthBonusText.text = $"Melee = {strength}";
-            if (magicBonusText != null) magicBonusText.text = $"Magic = {magic}";
+            if (attackBonusText != null) attackBonusText.text = $"Attack = {attack}";
+            if (strengthBonusText != null) strengthBonusText.text = $"Strength = {strength}";
             if (rangeBonusText != null) rangeBonusText.text = $"Range = {range}";
+            if (magicBonusText != null) magicBonusText.text = $"Magic = {magic}";
             if (meleeDefenceBonusText != null) meleeDefenceBonusText.text = $"Melee = {meleeDef}";
-            if (magicDefenceBonusText != null) magicDefenceBonusText.text = $"Magic = {magicDef}";
             if (rangedDefenceBonusText != null) rangedDefenceBonusText.text = $"Range = {rangeDef}";
+            if (magicDefenceBonusText != null) magicDefenceBonusText.text = $"Magic = {magicDef}";
+            if (attackSpeedText != null) attackSpeedText.text = $"Attack = {attackSpeedTicks}";
 
-            TotalAttackBonus = attackTotal;
-            TotalDefenceBonus = defenceTotal;
+            TotalAttackBonus = attack;
+            TotalDefenceBonus = meleeDef + rangeDef + magicDef;
         }
 
         [Serializable]
@@ -473,14 +482,17 @@ namespace Inventory
                 return t;
             }
 
-            CreateText("AttackHeader", "Attack:", 0f, attackHeaderFont, attackHeaderColor);
-            strengthBonusText = CreateText("Strength", "Melee = 0", -lineHeight, strengthFont, strengthColor);
-            magicBonusText = CreateText("Magic", "Magic = 0", -2f * lineHeight, magicFont, magicColor);
+            CreateText("CombatHeader", "Combat:", 0f, attackHeaderFont, attackHeaderColor);
+            attackBonusText = CreateText("Attack", "Attack = 0", -lineHeight, strengthFont, strengthColor);
+            strengthBonusText = CreateText("Strength", "Strength = 0", -2f * lineHeight, strengthFont, strengthColor);
             rangeBonusText = CreateText("Range", "Range = 0", -3f * lineHeight, rangeFont, rangeColor);
-            CreateText("DefenceHeader", "Defence:", -4f * lineHeight, defenceHeaderFont, defenceHeaderColor);
-            meleeDefenceBonusText = CreateText("MeleeDef", "Melee = 0", -5f * lineHeight, meleeDefFont, meleeDefColor);
-            magicDefenceBonusText = CreateText("MagicDef", "Magic = 0", -6f * lineHeight, magicDefFont, magicDefColor);
+            magicBonusText = CreateText("Magic", "Magic = 0", -4f * lineHeight, magicFont, magicColor);
+            CreateText("DefenceHeader", "Defence:", -5f * lineHeight, defenceHeaderFont, defenceHeaderColor);
+            meleeDefenceBonusText = CreateText("MeleeDef", "Melee = 0", -6f * lineHeight, meleeDefFont, meleeDefColor);
             rangedDefenceBonusText = CreateText("RangeDef", "Range = 0", -7f * lineHeight, rangeDefFont, rangeDefColor);
+            magicDefenceBonusText = CreateText("MagicDef", "Magic = 0", -8f * lineHeight, magicDefFont, magicDefColor);
+            CreateText("BonusHeader", "Bonuses:", -9f * lineHeight, attackHeaderFont, attackHeaderColor);
+            attackSpeedText = CreateText("AttackSpeed", "Attack = 0", -10f * lineHeight, strengthFont, strengthColor);
         }
     }
 }
