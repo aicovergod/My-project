@@ -15,6 +15,7 @@ namespace Combat
         public event System.Action OnAttackStart;
         public event System.Action<int, bool> OnAttackLanded;
         public event System.Action<CombatTarget> OnTargetKilled;
+        public event System.Action<CombatTarget> OnCombatTargetChanged;
 
         private SkillManager skills;
         private PlayerHitpoints hitpoints;
@@ -45,15 +46,17 @@ namespace Combat
 
         private IEnumerator AttackRoutine(CombatTarget target)
         {
+            OnCombatTargetChanged?.Invoke(target);
             while (target != null && target.IsAlive)
             {
                 if (Vector2.Distance(transform.position, target.transform.position) > CombatMath.MELEE_RANGE)
-                    yield break;
+                    break;
                 OnAttackStart?.Invoke();
                 ResolveAttack(target);
                 float interval = equipment != null ? equipment.GetCombinedStats().attackSpeedTicks * CombatMath.TICK_SECONDS : 4 * CombatMath.TICK_SECONDS;
                 yield return new WaitForSeconds(interval);
             }
+            OnCombatTargetChanged?.Invoke(null);
         }
 
         private void ResolveAttack(CombatTarget target)

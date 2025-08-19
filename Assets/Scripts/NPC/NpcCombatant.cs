@@ -7,7 +7,7 @@ namespace NPC
     /// <summary>
     /// Simple adaptor tying an NPC to the combat system using a combat profile.
     /// </summary>
-    [DisallowMultipleComponent]
+    [DisallowMultipleComponent, RequireComponent(typeof(NpcDropper))]
     public class NpcCombatant : MonoBehaviour, CombatTarget
     {
         [SerializeField] private NpcCombatProfile profile;
