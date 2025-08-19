@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.AI;
 using Combat;
 using EquipmentSystem;
 using NPC;
@@ -11,12 +10,11 @@ namespace Pets
     /// Handles combat behaviour for pets that can fight alongside the player.
     /// </summary>
     [RequireComponent(typeof(PetFollower))]
-    [RequireComponent(typeof(NavMeshAgent))]
     public class PetCombatController : MonoBehaviour
     {
         public PetDefinition definition;
+        public float moveSpeed = 5f;
 
-        private NavMeshAgent agent;
         private PetFollower follower;
         private Animator animator;
         private SpriteRenderer spriteRenderer;
@@ -27,17 +25,15 @@ namespace Pets
 
         private void Awake()
         {
-            agent = GetComponent<NavMeshAgent>();
             follower = GetComponent<PetFollower>();
             animator = GetComponent<Animator>();
             spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
             if (spriteRenderer != null)
                 defaultSprite = spriteRenderer.sprite;
-            if (agent != null)
-            {
-                agent.updateRotation = false;
-                agent.updateUpAxis = false;
-            }
+            if (TryGetComponent<Collider>(out var col))
+                col.isTrigger = true;
+            if (TryGetComponent<Collider2D>(out var col2d))
+                col2d.isTrigger = true;
         }
 
         /// <summary>Returns true if this pet has combat capabilities.</summary>
@@ -60,7 +56,9 @@ namespace Pets
             follower.enabled = false;
             while (currentTarget != null && currentTarget.IsAlive)
             {
-                agent.SetDestination(currentTarget.transform.position);
+                Vector3 pos = transform.position;
+                Vector3 targetPos = currentTarget.transform.position;
+                transform.position = Vector3.MoveTowards(pos, targetPos, moveSpeed * Time.deltaTime);
                 float dist = Vector2.Distance(transform.position, currentTarget.transform.position);
                 if (dist <= CombatMath.MELEE_RANGE)
                 {
