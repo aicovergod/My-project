@@ -16,12 +16,20 @@ MonoBehaviour:
   - pet: {fileID: 11400000, guid: b0a7a94e0c7c3a74588b90fed96d8dd1, type: 2}
     oneInN: 1
     sourceId: cosmetic
+    requiredBeastmasterLevel: 1
+    bonusDropMultiplier: 0
   - pet: {fileID: 11400000, guid: ddfa760e87b8f5d448d75d810f338961, type: 2}
     oneInN: 5000
     sourceId: mining
+    requiredBeastmasterLevel: 5
+    bonusDropMultiplier: 0.01
   - pet: {fileID: 11400000, guid: c3ddb98caa695254990b5dd3b87dd873, type: 2}
     oneInN: 5000
     sourceId: woodcutting
+    requiredBeastmasterLevel: 5
+    bonusDropMultiplier: 0.01
   - pet: {fileID: 11400000, guid: e5efc837ea5d96a46b41733308ac690a, type: 2}
     oneInN: 0
     sourceId: cosmetic
+    requiredBeastmasterLevel: 1
+    bonusDropMultiplier: 0
