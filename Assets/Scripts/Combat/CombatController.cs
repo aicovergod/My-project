@@ -3,6 +3,7 @@ using UnityEngine;
 using EquipmentSystem;
 using Skills;
 using Player;
+using NPC;
 
 namespace Combat
 {
@@ -46,6 +47,12 @@ namespace Combat
                 if (currentTarget == target)
                     return false;
                 StopCoroutine(attackRoutine);
+            }
+            var npcAttack = (target as MonoBehaviour)?.GetComponent<NpcAttackController>();
+            if (npcAttack != null)
+            {
+                var playerTarget = GetComponent<PlayerCombatTarget>();
+                npcAttack.BeginAttacking(playerTarget);
             }
             attackRoutine = StartCoroutine(AttackRoutine(target));
             return true;
