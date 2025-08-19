@@ -15,6 +15,13 @@ namespace Combat
         /// <summary>Maximum distance allowed for melee combat.</summary>
         public const float MELEE_RANGE = 1.5f;
 
+        /// <summary>
+        /// Base constant used in effective level calculations. OSRS adds this
+        /// value to a player's level to prevent very low level characters from
+        /// having a maximum hit of zero even when a swing lands.
+        /// </summary>
+        private const int EFFECTIVE_LEVEL_BASE = 8;
+
         public static int GetEffectiveAttack(int level, CombatStyle style)
         {
             int bonus = style switch
@@ -23,11 +30,10 @@ namespace Combat
                 CombatStyle.Controlled => 1,
                 _ => 0
             };
-            // OSRS formulas include an additional constant 8 to the effective level
-            // calculation. Without this, low level characters end up with a maximum
-            // hit of 0 even when a swing successfully lands. Adding the constant
-            // ensures a minimum effective level so new players can deal damage.
-            return level + bonus + 8;
+            // Include a base constant so that low level characters can still
+            // inflict damage. Without it, effective level would be zero and all
+            // successful swings would roll zero damage.
+            return level + bonus + EFFECTIVE_LEVEL_BASE;
         }
 
         public static int GetEffectiveStrength(int level, CombatStyle style)
@@ -38,9 +44,10 @@ namespace Combat
                 CombatStyle.Controlled => 1,
                 _ => 0
             };
-            // Include the constant 8 used by OSRS to avoid zero effective strength
-            // which led to all damage rolls being zero for low level players.
-            return level + bonus + 8;
+            // Include the base constant so low level players are able to deal
+            // damage. This mirrors the behaviour of OSRS and fixes cases where
+            // max hit was stuck at 0 or 1 regardless of strength level.
+            return level + bonus + EFFECTIVE_LEVEL_BASE;
         }
 
         public static int GetEffectiveDefence(int level, CombatStyle style)
@@ -51,15 +58,22 @@ namespace Combat
                 CombatStyle.Controlled => 1,
                 _ => 0
             };
-            // Defence also needs the constant 8 for parity with OSRS calculations.
-            return level + bonus + 8;
+            // Defence also incorporates the base constant for parity with OSRS
+            // calculations.
+            return level + bonus + EFFECTIVE_LEVEL_BASE;
         }
 
         public static int GetAttackRoll(int effectiveAttack, int attackBonus)
-            => Mathf.FloorToInt(effectiveAttack * (attackBonus + 64));
+        {
+            int bonus = Mathf.Max(0, attackBonus) + 64;
+            return Mathf.FloorToInt(effectiveAttack * bonus);
+        }
 
         public static int GetDefenceRoll(int effectiveDefence, int defenceBonus)
-            => Mathf.FloorToInt(effectiveDefence * (defenceBonus + 64));
+        {
+            int bonus = Mathf.Max(0, defenceBonus) + 64;
+            return Mathf.FloorToInt(effectiveDefence * bonus);
+        }
 
         public static float ChanceToHit(int attackRoll, int defenceRoll)
         {
@@ -73,7 +87,8 @@ namespace Combat
 
         public static int GetMaxHit(int effectiveStrength, int strengthBonus)
         {
-            int maxHit = Mathf.FloorToInt(0.5f + effectiveStrength * (strengthBonus + 64) / 640f);
+            int bonus = Mathf.Max(0, strengthBonus) + 64;
+            int maxHit = Mathf.FloorToInt(0.5f + effectiveStrength * bonus / 640f);
             return maxHit < 0 ? 0 : maxHit;
         }
 
