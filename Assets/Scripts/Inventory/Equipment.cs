@@ -70,8 +70,8 @@ namespace Inventory
         public Color magicDefColor = Color.white;
         public Font bonusHeaderFont;
         public Color bonusHeaderColor = Color.white;
-        public Font attackSpeedFont;
-        public Color attackSpeedColor = Color.white;
+        public Font itemAttackBonusFont;
+        public Color itemAttackBonusColor = Color.white;
 
         private GameObject uiRoot;
         private Image[] slotImages;
@@ -86,7 +86,7 @@ namespace Inventory
         private Text meleeDefenceBonusText;
         private Text rangedDefenceBonusText;
         private Text magicDefenceBonusText;
-        private Text attackSpeedText;
+        private Text itemAttackBonusText;
 
         public int TotalAttackBonus { get; private set; }
         public int TotalDefenceBonus { get; private set; }
@@ -233,7 +233,7 @@ namespace Inventory
         {
             int attack = 0, strength = 0, range = 0, magic = 0;
             int meleeDef = 0, rangeDef = 0, magicDef = 0;
-            int attackSpeedTicks = 4;
+            int itemAttackBonus = 0;
 
             foreach (var entry in equipped)
             {
@@ -248,8 +248,7 @@ namespace Inventory
                 meleeDef += stats.MeleeDefence;
                 rangeDef += stats.RangeDefence;
                 magicDef += stats.MagicDefence;
-                if (entry.item.equipmentSlot == EquipmentSlot.Weapon && stats.AttackSpeedTicks > 0)
-                    attackSpeedTicks = stats.AttackSpeedTicks;
+                itemAttackBonus += entry.item.attackBonus;
             }
 
             if (attackBonusText != null) attackBonusText.text = $"Attack = {attack}";
@@ -259,7 +258,7 @@ namespace Inventory
             if (meleeDefenceBonusText != null) meleeDefenceBonusText.text = $"Melee = {meleeDef}";
             if (rangedDefenceBonusText != null) rangedDefenceBonusText.text = $"Range = {rangeDef}";
             if (magicDefenceBonusText != null) magicDefenceBonusText.text = $"Magic = {magicDef}";
-            if (attackSpeedText != null) attackSpeedText.text = $"Attack = {attackSpeedTicks}";
+            if (itemAttackBonusText != null) itemAttackBonusText.text = $"Attack Bonus = {itemAttackBonus}";
 
             TotalAttackBonus = attack;
             TotalDefenceBonus = meleeDef + rangeDef + magicDef;
@@ -498,7 +497,7 @@ namespace Inventory
             rangedDefenceBonusText = CreateText("RangeDef", "Range = 0", -7f * lineHeight, rangeDefFont, rangeDefColor);
             magicDefenceBonusText = CreateText("MagicDef", "Magic = 0", -8f * lineHeight, magicDefFont, magicDefColor);
             CreateText("BonusHeader", "Bonuses:", -9f * lineHeight, bonusHeaderFont, bonusHeaderColor);
-            attackSpeedText = CreateText("AttackSpeed", "Attack = 0", -10f * lineHeight, attackSpeedFont, attackSpeedColor);
+            itemAttackBonusText = CreateText("ItemAttackBonus", "Attack Bonus = 0", -10f * lineHeight, itemAttackBonusFont, itemAttackBonusColor);
         }
     }
 }
