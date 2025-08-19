@@ -21,6 +21,8 @@ namespace Combat
         private PlayerHitpoints hitpoints;
         private EquipmentAggregator equipment;
         private Player.PlayerCombatLoadout loadout;
+        private Coroutine attackRoutine;
+        private CombatTarget currentTarget;
 
         private void Awake()
         {
@@ -39,13 +41,19 @@ namespace Combat
                 return false;
             if (Vector2.Distance(transform.position, target.transform.position) > CombatMath.MELEE_RANGE)
                 return false;
-            StopAllCoroutines();
-            StartCoroutine(AttackRoutine(target));
+            if (attackRoutine != null)
+            {
+                if (currentTarget == target)
+                    return false;
+                StopCoroutine(attackRoutine);
+            }
+            attackRoutine = StartCoroutine(AttackRoutine(target));
             return true;
         }
 
         private IEnumerator AttackRoutine(CombatTarget target)
         {
+            currentTarget = target;
             OnCombatTargetChanged?.Invoke(target);
             while (target != null && target.IsAlive)
             {
@@ -57,6 +65,8 @@ namespace Combat
                 yield return new WaitForSeconds(interval);
             }
             OnCombatTargetChanged?.Invoke(null);
+            currentTarget = null;
+            attackRoutine = null;
         }
 
         private void ResolveAttack(CombatTarget target)
