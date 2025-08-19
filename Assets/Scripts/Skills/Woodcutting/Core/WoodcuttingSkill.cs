@@ -138,6 +138,8 @@ namespace Skills.Woodcutting
                 string logId = currentTree.def.LogItemId;
                 logItems.TryGetValue(logId, out var item);
                 int amount = PetDropSystem.ActivePet?.id == "Beaver" ? 2 : 1;
+                if (amount > 1)
+                    BeastmasterXp.TryGrantFromPetAssist(currentTree.def.XpPerLog * (amount - 1));
                 bool added = false;
                 if (item != null && inventory != null)
                     added = inventory.AddItem(item, amount);
