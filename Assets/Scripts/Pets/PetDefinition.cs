@@ -53,6 +53,12 @@ namespace Pets
         [Tooltip("Frames for walking animation when facing right.")]
         public Sprite[] walkRight;
 
+        [Tooltip("If true, flip right-facing sprites to use for left-facing animations.")]
+        public bool useRightSpritesForLeft = true;
+
+        [Tooltip("If true, flip left-facing sprites to use for right-facing animations.")]
+        public bool useLeftSpritesForRight = false;
+
         [Header("UI")]
         [Tooltip("Optional color for drop announcement messages.")]
         public Color messageColor = Color.white;
