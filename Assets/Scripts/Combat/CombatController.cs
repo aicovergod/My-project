@@ -78,6 +78,8 @@ namespace Combat
             float chance = CombatMath.ChanceToHit(atkRoll, defRoll);
             bool hit = Random.value < chance;
             int damage = 0;
+            var targetMb = target as MonoBehaviour;
+            string targetName = targetMb != null ? targetMb.name : "target";
             if (hit)
             {
                 int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
@@ -87,6 +89,11 @@ namespace Combat
                 AwardXp(damage, attacker.Style);
                 if (!target.IsAlive)
                     OnTargetKilled?.Invoke(target);
+                Debug.Log($"Player dealt {damage} damage to {targetName}.");
+            }
+            else
+            {
+                Debug.Log($"Player missed {targetName}.");
             }
             OnAttackLanded?.Invoke(damage, hit);
         }

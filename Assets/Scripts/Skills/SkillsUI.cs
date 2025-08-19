@@ -71,7 +71,7 @@ namespace Skills
             var panelImage = panel.AddComponent<Image>();
             panelImage.color = new Color(0f, 0f, 0f, 0.5f);
             var panelRect = panel.GetComponent<RectTransform>();
-            panelRect.sizeDelta = new Vector2(200f, 100f);
+            panelRect.sizeDelta = new Vector2(200f, 200f);
             panelRect.anchoredPosition = Vector2.zero;
 
             var textGo = new GameObject("SkillText");
