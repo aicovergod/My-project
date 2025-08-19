@@ -30,10 +30,21 @@ namespace NPC
         private IEnumerator AttackRoutine(PlayerCombatTarget target)
         {
             var wait = new WaitForSeconds(4 * CombatMath.TICK_SECONDS);
+
+            // Wait until the player is within melee range before performing the first attack.
+            while (target != null && target.IsAlive && combatant.IsAlive &&
+                   Vector2.Distance(target.transform.position, transform.position) > CombatMath.MELEE_RANGE)
+            {
+                // Poll each frame until the target is close enough or combat ends.
+                yield return null;
+            }
+
             while (target != null && target.IsAlive && combatant.IsAlive)
             {
+                // If the player moves out of melee range, stop attacking.
                 if (Vector2.Distance(target.transform.position, transform.position) > CombatMath.MELEE_RANGE)
                     yield break;
+
                 ResolveAttack(target);
                 yield return wait;
             }
