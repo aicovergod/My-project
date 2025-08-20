@@ -14,17 +14,23 @@ namespace NPC
     public class NpcAttackController : MonoBehaviour
     {
         private NpcCombatant combatant;
+        private NpcWanderer wanderer;
 
         private void Awake()
         {
             combatant = GetComponent<NpcCombatant>();
+            wanderer = GetComponent<NpcWanderer>();
         }
 
         public void BeginAttacking(PlayerCombatTarget target)
         {
             StopAllCoroutines();
+            wanderer?.ExitCombat();
             if (target != null)
+            {
+                wanderer?.EnterCombat(target.transform);
                 StartCoroutine(AttackRoutine(target));
+            }
         }
 
         private IEnumerator AttackRoutine(PlayerCombatTarget target)
@@ -43,11 +49,13 @@ namespace NPC
             {
                 // If the player moves out of melee range, stop attacking.
                 if (Vector2.Distance(target.transform.position, transform.position) > CombatMath.MELEE_RANGE)
-                    yield break;
+                    break;
 
                 ResolveAttack(target);
                 yield return wait;
             }
+
+            wanderer?.ExitCombat();
         }
 
         private void ResolveAttack(PlayerCombatTarget target)
