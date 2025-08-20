@@ -26,7 +26,7 @@ namespace NPC
         {
             if (Input.GetMouseButtonDown(1))
             {
-                if (PetDropSystem.ActivePetCombat != null && GetComponent<CombatTarget>() != null)
+                if (!PetDropSystem.GuardModeEnabled && PetDropSystem.ActivePetCombat != null && GetComponent<CombatTarget>() != null)
                 {
                     AttackWithPet();
                     return;

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.Collections;
 using Player;
 
 namespace Pets
@@ -8,12 +9,13 @@ namespace Pets
     /// <summary>
     /// Displays the pet's level in a golden bar under the player's health bar.
     /// </summary>
-    public class PetLevelBarHUD : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    public class PetLevelBarHUD : MonoBehaviour, IPointerClickHandler
     {
         private static PetLevelBarHUD instance;
 
         private PetExperience experience;
         private Text text;
+        private Coroutine xpRoutine;
 
         /// <summary>
         /// Create the pet level bar under the existing health bar.
@@ -119,20 +121,33 @@ namespace Pets
                 text.text = $"{tier} Lv {experience.Level}";
         }
 
-        public void OnPointerEnter(PointerEventData eventData)
+        public void ShowXpToNextLevel()
         {
-            if (text == null || experience == null)
-                return;
-            int xp = experience.GetXpToNextLevel();
-            if (xp > 0)
-                text.text = $"{xp} XP till next lvl";
-            else
-                text.text = "Max level";
+            if (xpRoutine != null)
+                StopCoroutine(xpRoutine);
+            xpRoutine = StartCoroutine(ShowXpRoutine());
         }
 
-        public void OnPointerExit(PointerEventData eventData)
+        private IEnumerator ShowXpRoutine()
         {
+            if (text == null || experience == null)
+                yield break;
+            int xp = experience.GetXpToNextLevel();
+            text.text = xp > 0 ? $"{xp} XP till next lvl" : "Max level";
+            yield return new WaitForSeconds(2f);
             UpdateLevelText();
+            xpRoutine = null;
+        }
+
+        public void ToggleGuardMode()
+        {
+            PetDropSystem.GuardModeEnabled = !PetDropSystem.GuardModeEnabled;
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (eventData.button == PointerEventData.InputButton.Right)
+                PetLevelBarMenu.Show(this, eventData.position);
         }
 
         private void OnDestroy()
