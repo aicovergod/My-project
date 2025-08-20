@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a015a47ae66499896f77657aa2ffbc6, type: 3}
+  m_Name: Tools Of Survival Quest
+  m_EditorClassIdentifier: 
+  QuestID: ToolsOfSurvival
+  Title: Tools of Survival
+  Description: Elder Rowan has tasked you with gathering basic resources.
+  Steps:
+  - StepID: ChopLogs
+    StepDescription: Chop 3 logs
+    IsComplete: 0
+  - StepID: MineOres
+    StepDescription: Mine 3 ores
+    IsComplete: 0
+  - StepID: ReturnToRowan
+    StepDescription: Return to Elder Rowan
+    IsComplete: 0
+  Rewards: 'Small Woodcutting XP
+
+    Small Mining XP
+
+    100 Coins'

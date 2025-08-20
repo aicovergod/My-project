@@ -16,7 +16,14 @@ MonoBehaviour:
   displayName: Beaver
   pickupItem: {fileID: 11400000, guid: 3b674f19bfa4e544984c23e5298e4f86, type: 2}
   sprite: {fileID: 0}
+  pixelsPerUnit: 64
+  evolutionTiers: []
   animationClips: []
+  attackSprite: {fileID: 0}
+  hitUp: []
+  hitDown: []
+  hitLeft: []
+  hitRight: []
   idleUp:
   - {fileID: 21300000, guid: 9ac97a4d867e9b04b8ff48ec0bd0992d, type: 3}
   walkUp:
@@ -35,4 +42,14 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 3fd0b1d69ceeb0646a22491615b68e56, type: 3}
   useRightSpritesForLeft: 0
   useLeftSpritesForRight: 0
+  canFight: 0
+  petAttackLevel: 1
+  petStrengthLevel: 1
+  attackSpeedTicks: 4
+  accuracyBonus: 0
+  damageBonus: 0
+  attackLevelPerBeastmasterLevel: 0
+  strengthLevelPerBeastmasterLevel: 0
+  maxHitPerBeastmasterLevel: 0
   messageColor: {r: 1, g: 1, b: 1, a: 1}
+  debugBeastmasterLevel: 1

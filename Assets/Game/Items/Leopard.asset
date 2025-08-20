@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c72479de709848e3ab024450652154e5, type: 3}
+  m_Name: Leopard
+  m_EditorClassIdentifier: 
+  id: Leopard
+  displayName: Leopard
+  pickupItem: {fileID: 11400000, guid: 704c1dd9ea678324098dacfffb807c0a, type: 2}
+  sprite: {fileID: 0}
+  pixelsPerUnit: 128
+  evolutionTiers:
+  - level: 0
+    pixelsPerUnit: 128
+    tierName: Cub
+  - level: 25
+    pixelsPerUnit: 96
+    tierName: Juvenile
+  - level: 50
+    pixelsPerUnit: 64
+    tierName: Adult
+  - level: 75
+    pixelsPerUnit: 48
+    tierName: Elder
+  - level: 99
+    pixelsPerUnit: 32
+    tierName: Ancient
+  animationClips: []
+  attackSprite: {fileID: 0}
+  hitUp:
+  - {fileID: 21300000, guid: 14ecd84822e07ce4dba2f10aff03fee8, type: 3}
+  hitDown:
+  - {fileID: 21300000, guid: 54d6e84d3e3eef74d9e88293f7ee4cbb, type: 3}
+  hitLeft:
+  - {fileID: 21300000, guid: 636310564e722f84ea0d7776948fdb9b, type: 3}
+  hitRight: []
+  idleUp:
+  - {fileID: 21300000, guid: 8a65fad74eba7f04aad6eef72360ce3c, type: 3}
+  walkUp:
+  - {fileID: 21300000, guid: c723c17da29efdf4fb0ae9fef7f8a1b1, type: 3}
+  idleDown:
+  - {fileID: 21300000, guid: db3145868b0e4fe4fb71283c44be7a20, type: 3}
+  walkDown:
+  - {fileID: 21300000, guid: 102824ecfb92fc24f800c27f6d8c70c0, type: 3}
+  idleLeft:
+  - {fileID: 21300000, guid: 41e02169465442b4fa43acad61d143cf, type: 3}
+  walkLeft:
+  - {fileID: 21300000, guid: b2810f1636e3f3a409a98a3abdb7af43, type: 3}
+  idleRight: []
+  walkRight: []
+  useRightSpritesForLeft: 0
+  useLeftSpritesForRight: 1
+  canFight: 1
+  petAttackLevel: 40
+  petStrengthLevel: 50
+  attackSpeedTicks: 4
+  accuracyBonus: 30
+  damageBonus: 60
+  attackLevelPerBeastmasterLevel: 0.02
+  strengthLevelPerBeastmasterLevel: 0.02
+  maxHitPerBeastmasterLevel: 0
+  messageColor: {r: 1, g: 1, b: 1, a: 1}
+  debugBeastmasterLevel: 99

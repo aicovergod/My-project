@@ -12,4 +12,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79e6fcc5b9e14a38b0dba43befe7e4ab, type: 3}
   m_Name: DefaultPetDrops
   m_EditorClassIdentifier: 
-  entries: []
+  entries:
+  - pet: {fileID: 11400000, guid: c3ddb98caa695254990b5dd3b87dd873, type: 2}
+    oneInN: 5000
+    sourceId: woodcutting
+    requiredBeastmasterLevel: 0
+    bonusDropMultiplier: 0
+  - pet: {fileID: 11400000, guid: b0a7a94e0c7c3a74588b90fed96d8dd1, type: 2}
+    oneInN: 0
+    sourceId: cosmetic
+    requiredBeastmasterLevel: 0
+    bonusDropMultiplier: 0
+  - pet: {fileID: 11400000, guid: ddfa760e87b8f5d448d75d810f338961, type: 2}
+    oneInN: 5000
+    sourceId: mining
+    requiredBeastmasterLevel: 0
+    bonusDropMultiplier: 0
+  - pet: {fileID: 11400000, guid: b75bf64abeb427f4ca7810cf7b72b45e, type: 2}
+    oneInN: 1000
+    sourceId: combat
+    requiredBeastmasterLevel: 65
+    bonusDropMultiplier: 0
+  - pet: {fileID: 11400000, guid: 337daaf9600acf849833e3ee086cf362, type: 2}
+    oneInN: 0
+    sourceId: combat
+    requiredBeastmasterLevel: 0
+    bonusDropMultiplier: 0
+  - pet: {fileID: 11400000, guid: 57508ee9df2aabd4587b0b828e9329e2, type: 2}
+    oneInN: 1000
+    sourceId: combat
+    requiredBeastmasterLevel: 50
+    bonusDropMultiplier: 0
+  - pet: {fileID: 11400000, guid: 4bbfe2eef7f4c5f4690ebdbd55bfbf31, type: 2}
+    oneInN: 1000
+    sourceId: combat
+    requiredBeastmasterLevel: 65
+    bonusDropMultiplier: 0

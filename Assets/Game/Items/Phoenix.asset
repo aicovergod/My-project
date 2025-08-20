@@ -12,35 +12,61 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72479de709848e3ab024450652154e5, type: 3}
   m_Name: Phoenix
   m_EditorClassIdentifier: 
-  id: Lion
-  displayName: Lion
-  pickupItem: {fileID: 11400000, guid: b1f81412af211a045aca5a2a79b52fce, type: 2}
+  id: Phoenix
+  displayName: Phoenix
+  pickupItem: {fileID: 11400000, guid: c8471baa8fae5f24a9ea8e3ffe136eaa, type: 2}
   sprite: {fileID: 0}
+  pixelsPerUnit: 128
+  evolutionTiers:
+  - level: 0
+    pixelsPerUnit: 128
+    tierName: Baby
+  - level: 25
+    pixelsPerUnit: 96
+    tierName: Juvenile
+  - level: 50
+    pixelsPerUnit: 64
+    tierName: Adult
+  - level: 75
+    pixelsPerUnit: 48
+    tierName: Elder
+  - level: 99
+    pixelsPerUnit: 32
+    tierName: Ancient
   animationClips: []
   attackSprite: {fileID: 6666414941200281703, guid: 22d9a71bef5d9ec4283f7ca895561c02, type: 3}
+  hitUp:
+  - {fileID: 21300000, guid: c6d85a396d438034cb27e906ab88f84b, type: 3}
+  hitDown:
+  - {fileID: 21300000, guid: 6e5a6be6763a8644fa0efedb82a4cbe3, type: 3}
+  hitLeft:
+  - {fileID: 21300000, guid: 210f266a054e66549b13089c3cee62a8, type: 3}
+  hitRight:
+  - {fileID: 21300000, guid: 79fa7e91b7fb33a4a955d391410b67d0, type: 3}
   idleUp:
-  - {fileID: -7369307835892248498, guid: 054a76c72aa7ad44781a93f61f792bc4, type: 3}
+  - {fileID: 21300000, guid: c6d85a396d438034cb27e906ab88f84b, type: 3}
   walkUp:
-  - {fileID: -7369307835892248498, guid: 054a76c72aa7ad44781a93f61f792bc4, type: 3}
+  - {fileID: 21300000, guid: c6d85a396d438034cb27e906ab88f84b, type: 3}
   idleDown:
-  - {fileID: 6666414941200281703, guid: 22d9a71bef5d9ec4283f7ca895561c02, type: 3}
+  - {fileID: 21300000, guid: d67f5f8dc921e5f489e398af97faa2f9, type: 3}
   walkDown:
-  - {fileID: 6666414941200281703, guid: 22d9a71bef5d9ec4283f7ca895561c02, type: 3}
+  - {fileID: 21300000, guid: d67f5f8dc921e5f489e398af97faa2f9, type: 3}
   idleLeft: []
   walkLeft: []
   idleRight:
-  - {fileID: -328913899184053702, guid: 3dde5b18b1de42f4cae9babb9df5e1f7, type: 3}
+  - {fileID: 21300000, guid: 721f9d69e32794243957606cc7df8855, type: 3}
   walkRight:
-  - {fileID: -328913899184053702, guid: 3dde5b18b1de42f4cae9babb9df5e1f7, type: 3}
+  - {fileID: 21300000, guid: 721f9d69e32794243957606cc7df8855, type: 3}
   useRightSpritesForLeft: 1
   useLeftSpritesForRight: 0
   canFight: 1
-  petAttackLevel: 60
-  petStrengthLevel: 60
-  attackSpeedTicks: 4
+  petAttackLevel: 80
+  petStrengthLevel: 80
+  attackSpeedTicks: 3
   accuracyBonus: 40
   damageBonus: 40
-  attackLevelPerBeastmasterLevel: 0.02
-  strengthLevelPerBeastmasterLevel: 0.02
-  maxHitPerBeastmasterLevel: 0.02
+  attackLevelPerBeastmasterLevel: 0.01
+  strengthLevelPerBeastmasterLevel: 0.01
+  maxHitPerBeastmasterLevel: 0.015
   messageColor: {r: 1, g: 1, b: 1, a: 1}
+  debugBeastmasterLevel: 80

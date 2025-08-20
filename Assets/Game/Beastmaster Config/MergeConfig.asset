@@ -15,19 +15,19 @@ MonoBehaviour:
   entries:
   - minLevel: 50
     durationMinutes: 5
-    cooldownMinutes: 15
+    cooldownMinutes: 0
   - minLevel: 60
     durationMinutes: 10
-    cooldownMinutes: 14
+    cooldownMinutes: 0
   - minLevel: 70
     durationMinutes: 15
-    cooldownMinutes: 13
+    cooldownMinutes: 0
   - minLevel: 80
     durationMinutes: 20
-    cooldownMinutes: 12
+    cooldownMinutes: 0
   - minLevel: 90
     durationMinutes: 25
-    cooldownMinutes: 10
+    cooldownMinutes: 0
   - minLevel: 99
     durationMinutes: 30
     cooldownMinutes: 0

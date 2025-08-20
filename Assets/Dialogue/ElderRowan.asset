@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d8fe1987deb41aaaf3eec00a9c482a0, type: 3}
+  m_Name: ElderRowan
+  m_EditorClassIdentifier: 
+  NpcName: Elder Rowan
+  Nodes:
+  - Text: Greetings, traveler. If you want to survive here, you must learn the basics.
+      Chop some logs and mine some ore. Do you accept?
+    Options:
+    - Text: Accept
+      NextNode: -1
+      Action: 1
+      QuestID: ToolsOfSurvival
+      RequiredQuestID: ToolsOfSurvival
+      RequiredState: 1
+    - Text: Decline
+      NextNode: -1
+      Action: 0
+      QuestID: 
+      RequiredQuestID: ToolsOfSurvival
+      RequiredState: 1
+  - Text: Keep at it, traveler. Chop 3 logs and mine 3 ores, then return to me.
+    Options:
+    - Text: Continue
+      NextNode: -1
+      Action: 0
+      QuestID: 
+      RequiredQuestID: ToolsOfSurvival
+      RequiredState: 2
+  - Text: "Excellent work! You\u2019ve proven yourself capable."
+    Options:
+    - Text: Thanks
+      NextNode: -1
+      Action: 2
+      QuestID: ToolsOfSurvival
+      RequiredQuestID: ToolsOfSurvival
+      RequiredState: 2
+  - Text: "You\u2019ve mastered the basics. Violetstown is safer with you here."
+    Options:
+    - Text: Farewell
+      NextNode: -1
+      Action: 0
+      QuestID: 
+      RequiredQuestID: ToolsOfSurvival
+      RequiredState: 3

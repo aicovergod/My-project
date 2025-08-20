@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: White Tiger
   itemName: White Tiger
-  icon: {fileID: 21300000, guid: 262f8838f2603dc48b58055c5ac23c76, type: 3}
+  icon: {fileID: 21300000, guid: a6552839fa2d84a438740e7a7138f8e3, type: 3}
   description: 'A ferocious Tiger
 
     that helps you
@@ -24,6 +24,7 @@ MonoBehaviour:
   maxStack: 0
   splittable: 0
   equipmentSlot: 0
+  skillRequirements: []
   combat:
     Attack: 0
     Strength: 0
