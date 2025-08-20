@@ -23,6 +23,10 @@ namespace Pets
         public Sprite walkLeft;
         public Sprite walkRight;
         public Sprite walkUp;
+        public Sprite[] hitDown;
+        public Sprite[] hitLeft;
+        public Sprite[] hitRight;
+        public Sprite[] hitUp;
         public bool useFlipXForLeft;
         public bool useFlipXForRight;
         public Vector3 localScale = Vector3.one;
