@@ -10,7 +10,7 @@ namespace Pets
     [DisallowMultipleComponent]
     public class PetExperience : MonoBehaviour
     {
-        public const int MaxLevel = 50;
+        public const int MaxLevel = 99;
 
         public PetDefinition definition;
 
@@ -61,6 +61,14 @@ namespace Pets
 
         public int Level => level;
         public float Xp => xp;
+        public string TierName { get; private set; }
+
+        public int GetXpToNextLevel()
+        {
+            if (level >= MaxLevel)
+                return 0;
+            return LevelXp[level] - Mathf.FloorToInt(xp);
+        }
 
         public void AddXp(float amount)
         {
@@ -106,17 +114,26 @@ namespace Pets
 
         private void UpdateEvolution()
         {
-            if (definition == null || spriteRenderer == null)
+            if (definition == null)
                 return;
+
             float ppu = definition.pixelsPerUnit;
+            string name = string.Empty;
             if (definition.evolutionTiers != null)
             {
                 foreach (var tier in definition.evolutionTiers)
                 {
                     if (level >= tier.level)
+                    {
                         ppu = tier.pixelsPerUnit;
+                        if (!string.IsNullOrEmpty(tier.tierName))
+                            name = tier.tierName;
+                    }
                 }
             }
+            TierName = name;
+            if (spriteRenderer == null)
+                return;
             if (Mathf.Approximately(ppu, currentPpu))
                 return;
             currentPpu = ppu;
