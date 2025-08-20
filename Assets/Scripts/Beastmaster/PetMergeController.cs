@@ -131,6 +131,17 @@ namespace Beastmaster
             SaveState();
         }
 
+        /// <summary>Reset merge and cooldown timers to zero.</summary>
+        public void ResetMergeTimer()
+        {
+            if (merged)
+                EndMerge();
+            cooldownRemaining = 0f;
+            durationRemaining = 0f;
+            hudTimer?.Hide();
+            SaveState();
+        }
+
         private void OnDisable()
         {
             SaveState();
