@@ -74,6 +74,12 @@ namespace Dialogue
         /// </summary>
         public void Show(string npcName, DialogueNode node, System.Action<int> onOption)
         {
+            // Ensure UI elements are built before use in case initialization
+            // has not yet occurred (e.g., when DialogueManager adds this
+            // component at runtime and Show is called immediately).
+            if (nameText == null || bodyText == null || optionsParent == null)
+                Build();
+
             gameObject.SetActive(true);
             nameText.text = npcName;
             bodyText.text = node.Text;
