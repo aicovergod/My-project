@@ -87,10 +87,6 @@ namespace Inventory
         public Color petStrengthLevelColor = Color.white;
         public Font petAttackSpeedFont;
         public Color petAttackSpeedColor = Color.white;
-        public Font petAccuracyBonusFont;
-        public Color petAccuracyBonusColor = Color.white;
-        public Font petDamageBonusFont;
-        public Color petDamageBonusColor = Color.white;
         public Font petMaxHitFont;
         public Color petMaxHitColor = Color.white;
 
@@ -114,8 +110,6 @@ namespace Inventory
         private Text petAttackLevelText;
         private Text petStrengthLevelText;
         private Text petAttackSpeedText;
-        private Text petAccuracyBonusText;
-        private Text petDamageBonusText;
         private Text petMaxHitText;
 
         private GameObject playerBonusPanel;
@@ -343,6 +337,7 @@ namespace Inventory
                 strengthLevel = Mathf.RoundToInt(strengthLevel * (1f + def.strengthLevelPerBeastmasterLevel * bmLevel));
 
             int attackSpeed = def != null ? def.attackSpeedTicks : 0;
+            float speed = attackSpeed * 0.6f;
             int effStr = CombatMath.GetEffectiveStrength(strengthLevel, CombatStyle.Accurate);
             int maxHit = CombatMath.GetMaxHit(effStr, damageBonus);
             if (def != null && def.maxHitPerBeastmasterLevel != 0f)
@@ -351,15 +346,11 @@ namespace Inventory
             if (petHeaderText != null)
                 petHeaderText.text = def != null ? $"{def.displayName}:" : "Pet:";
             if (petAttackLevelText != null)
-                petAttackLevelText.text = $"Attack Level = {attackLevel}";
+                petAttackLevelText.text = $"Attack Level = {attackLevel} - Attack = {accuracyBonus}";
             if (petStrengthLevelText != null)
-                petStrengthLevelText.text = $"Strength Level = {strengthLevel}";
+                petStrengthLevelText.text = $"Strength Level = {strengthLevel} - Strength = {damageBonus}";
             if (petAttackSpeedText != null)
-                petAttackSpeedText.text = $"Attack Speed = {attackSpeed}";
-            if (petAccuracyBonusText != null)
-                petAccuracyBonusText.text = $"Accuracy Bonus = {accuracyBonus}";
-            if (petDamageBonusText != null)
-                petDamageBonusText.text = $"Damage Bonus = {damageBonus}";
+                petAttackSpeedText.text = $"Attack Speed = {attackSpeed} - Speed = {speed:F1}";
             if (petMaxHitText != null)
                 petMaxHitText.text = $"Max Hit = {maxHit}";
 
@@ -626,12 +617,10 @@ namespace Inventory
             itemAttackBonusText = CreateText(playerBonusPanel.transform, "ItemAttackBonus", "Attack Bonus = 0", -10f * lineHeight, itemAttackBonusFont, itemAttackBonusColor);
 
             petHeaderText = CreateText(petBonusPanel.transform, "PetHeader", "Pet:", 0f, petHeaderFont, petHeaderColor);
-            petAttackLevelText = CreateText(petBonusPanel.transform, "PetAttackLevel", "Attack Level = 0", -lineHeight, petAttackLevelFont, petAttackLevelColor);
-            petStrengthLevelText = CreateText(petBonusPanel.transform, "PetStrengthLevel", "Strength Level = 0", -2f * lineHeight, petStrengthLevelFont, petStrengthLevelColor);
-            petAttackSpeedText = CreateText(petBonusPanel.transform, "PetAttackSpeed", "Attack Speed = 0", -3f * lineHeight, petAttackSpeedFont, petAttackSpeedColor);
-            petAccuracyBonusText = CreateText(petBonusPanel.transform, "PetAccuracyBonus", "Accuracy Bonus = 0", -4f * lineHeight, petAccuracyBonusFont, petAccuracyBonusColor);
-            petDamageBonusText = CreateText(petBonusPanel.transform, "PetDamageBonus", "Damage Bonus = 0", -5f * lineHeight, petDamageBonusFont, petDamageBonusColor);
-            petMaxHitText = CreateText(petBonusPanel.transform, "PetMaxHit", "Max Hit = 0", -6f * lineHeight, petMaxHitFont, petMaxHitColor);
+            petAttackLevelText = CreateText(petBonusPanel.transform, "PetAttackLevel", "Attack Level = 0 - Attack = 0", -lineHeight, petAttackLevelFont, petAttackLevelColor);
+            petStrengthLevelText = CreateText(petBonusPanel.transform, "PetStrengthLevel", "Strength Level = 0 - Strength = 0", -2f * lineHeight, petStrengthLevelFont, petStrengthLevelColor);
+            petAttackSpeedText = CreateText(petBonusPanel.transform, "PetAttackSpeed", "Attack Speed = 0 - Speed = 0", -3f * lineHeight, petAttackSpeedFont, petAttackSpeedColor);
+            petMaxHitText = CreateText(petBonusPanel.transform, "PetMaxHit", "Max Hit = 0", -4f * lineHeight, petMaxHitFont, petMaxHitColor);
         }
     }
 }
