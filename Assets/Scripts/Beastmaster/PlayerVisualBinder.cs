@@ -1,5 +1,6 @@
 using UnityEngine;
 using Pets;
+using Player;
 
 namespace Beastmaster
 {
@@ -10,9 +11,12 @@ namespace Beastmaster
     {
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private Animator animator;
+        [SerializeField] private PlayerMover playerMover;
 
         private RuntimeAnimatorController originalController;
         private Sprite originalSprite;
+        private Sprite origIdleDown, origIdleLeft, origIdleRight, origIdleUp;
+        private Sprite origWalkDown, origWalkLeft, origWalkRight, origWalkUp;
 
         private void Awake()
         {
@@ -24,10 +28,25 @@ namespace Beastmaster
                 animator = GetComponent<Animator>();
             if (animator == null)
                 animator = GetComponentInChildren<Animator>();
+            if (playerMover == null)
+                playerMover = GetComponent<PlayerMover>();
+            if (playerMover == null)
+                playerMover = GetComponentInChildren<PlayerMover>();
             if (spriteRenderer != null)
                 originalSprite = spriteRenderer.sprite;
             if (animator != null)
                 originalController = animator.runtimeAnimatorController;
+            if (playerMover != null)
+            {
+                origIdleDown = playerMover.idleDown;
+                origIdleLeft = playerMover.idleLeft;
+                origIdleRight = playerMover.idleRight;
+                origIdleUp = playerMover.idleUp;
+                origWalkDown = playerMover.walkDown;
+                origWalkLeft = playerMover.walkLeft;
+                origWalkRight = playerMover.walkRight;
+                origWalkUp = playerMover.walkUp;
+            }
         }
 
         /// <summary>
@@ -41,6 +60,17 @@ namespace Beastmaster
                 animator.runtimeAnimatorController = profile.controller;
             if (spriteRenderer != null && profile.baseSprite != null)
                 spriteRenderer.sprite = profile.baseSprite;
+            if (playerMover != null)
+            {
+                if (profile.idleDown != null) playerMover.idleDown = profile.idleDown;
+                if (profile.idleLeft != null) playerMover.idleLeft = profile.idleLeft;
+                if (profile.idleRight != null) playerMover.idleRight = profile.idleRight;
+                if (profile.idleUp != null) playerMover.idleUp = profile.idleUp;
+                if (profile.walkDown != null) playerMover.walkDown = profile.walkDown;
+                if (profile.walkLeft != null) playerMover.walkLeft = profile.walkLeft;
+                if (profile.walkRight != null) playerMover.walkRight = profile.walkRight;
+                if (profile.walkUp != null) playerMover.walkUp = profile.walkUp;
+            }
         }
 
         /// <summary>
@@ -52,6 +82,17 @@ namespace Beastmaster
                 animator.runtimeAnimatorController = originalController;
             if (spriteRenderer != null)
                 spriteRenderer.sprite = originalSprite;
+            if (playerMover != null)
+            {
+                playerMover.idleDown = origIdleDown;
+                playerMover.idleLeft = origIdleLeft;
+                playerMover.idleRight = origIdleRight;
+                playerMover.idleUp = origIdleUp;
+                playerMover.walkDown = origWalkDown;
+                playerMover.walkLeft = origWalkLeft;
+                playerMover.walkRight = origWalkRight;
+                playerMover.walkUp = origWalkUp;
+            }
         }
     }
 }
