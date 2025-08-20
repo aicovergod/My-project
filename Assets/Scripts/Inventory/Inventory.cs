@@ -618,6 +618,12 @@ namespace Inventory
             // Cache the item before modifying the slot so we can check for pets.
             var droppedItem = entry.item;
 
+            // Prevent dropping or swapping pets while merged with a pet.
+            var pet = PetDropSystem.FindPetByItem(droppedItem);
+            if (pet != null && Beastmaster.PetMergeController.Instance != null &&
+                Beastmaster.PetMergeController.Instance.IsMerged)
+                return;
+
             int remove = Mathf.Clamp(quantity, 1, entry.count);
             entry.count -= remove;
             if (entry.count <= 0)
@@ -628,7 +634,6 @@ namespace Inventory
             OnInventoryChanged?.Invoke();
 
             // Attempt to spawn a pet for this item if one exists.
-            var pet = PetDropSystem.FindPetByItem(droppedItem);
             if (pet != null)
             {
                 // If a different pet is already active, return its pickup item to the inventory
