@@ -169,6 +169,11 @@ namespace Skills
                 RefreshFields();
             }
 
+            if (GUILayout.Button("Reset Merge Timer"))
+            {
+                PetMergeController.Instance?.ResetMergeTimer();
+            }
+
             GUILayout.EndScrollView();
 
             GUILayout.EndArea();
