@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using Player;
 
 namespace Pets
@@ -7,7 +8,7 @@ namespace Pets
     /// <summary>
     /// Displays the pet's level in a golden bar under the player's health bar.
     /// </summary>
-    public class PetLevelBarHUD : MonoBehaviour
+    public class PetLevelBarHUD : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         private static PetLevelBarHUD instance;
 
@@ -104,8 +105,34 @@ namespace Pets
 
         private void HandleLevelChanged(int lvl)
         {
-            if (text != null)
-                text.text = $"Lv {lvl}";
+            UpdateLevelText();
+        }
+
+        private void UpdateLevelText()
+        {
+            if (text == null || experience == null)
+                return;
+            string tier = experience.TierName;
+            if (string.IsNullOrEmpty(tier))
+                text.text = $"Lv {experience.Level}";
+            else
+                text.text = $"{tier} Lv {experience.Level}";
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (text == null || experience == null)
+                return;
+            int xp = experience.GetXpToNextLevel();
+            if (xp > 0)
+                text.text = $"{xp} XP till next lvl";
+            else
+                text.text = "Max level";
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            UpdateLevelText();
         }
 
         private void OnDestroy()
