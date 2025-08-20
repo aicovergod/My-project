@@ -102,6 +102,8 @@ namespace Pets
         {
             Initialize();
             pet = null;
+            if (Beastmaster.PetMergeController.Instance != null && Beastmaster.PetMergeController.Instance.IsMerged)
+                return false;
             foreach (var table in tables)
             {
                 foreach (var entry in table.entries)
@@ -154,6 +156,8 @@ namespace Pets
         public static GameObject SpawnPet(PetDefinition pet, Vector3 position)
         {
             Initialize();
+            if (Beastmaster.PetMergeController.Instance != null && Beastmaster.PetMergeController.Instance.IsMerged)
+                return null;
             return SpawnPetInternal(pet, position);
         }
 
@@ -225,6 +229,8 @@ namespace Pets
         internal static bool DebugForceFirstDrop(Vector3 position)
         {
             Initialize();
+            if (Beastmaster.PetMergeController.Instance != null && Beastmaster.PetMergeController.Instance.IsMerged)
+                return false;
             if (tables.Count == 0 || tables[0].entries.Count == 0)
             {
                 Debug.LogWarning("DebugForceFirstDrop: no pet drop tables or entries found.");

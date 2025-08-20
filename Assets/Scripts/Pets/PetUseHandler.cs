@@ -16,6 +16,8 @@ namespace Pets
             var pet = PetDropSystem.FindPetByItem(item);
             if (pet == null)
                 return false;
+            if (Beastmaster.PetMergeController.Instance != null && Beastmaster.PetMergeController.Instance.IsMerged)
+                return false;
 
             var player = GameObject.FindGameObjectWithTag("Player");
             Vector3 pos = player != null ? player.transform.position : Vector3.zero;

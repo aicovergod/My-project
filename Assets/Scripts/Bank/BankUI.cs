@@ -485,6 +485,8 @@ namespace BankSystem
 
         public void Open()
         {
+            if (Beastmaster.PetMergeController.Instance != null && Beastmaster.PetMergeController.Instance.IsMerged)
+                return;
             if (playerInventory == null)
                 playerInventory = FindObjectOfType<Inventory.Inventory>();
             if (playerInventory != null)
