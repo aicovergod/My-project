@@ -1,179 +1,111 @@
-﻿using TMPro;
 using UnityEngine;
+using TMPro;
+using Pets;
 
 namespace NPC
 {
+    /// <summary>
+    /// Displays a floating label above the NPC. If a <see cref="PetExperience"/>
+    /// component is present on the same GameObject, the label automatically
+    /// appends the current pet level.
+    /// </summary>
+    [DisallowMultipleComponent]
     public class NpcLabel : MonoBehaviour
     {
-        [Header("Text")]
-        public string labelText = "WEEEEEEE";
-        public Color textColor = Color.white;
-        public float fontSize = 2f;
-        public float yOffset = 1f;
-        [Range(0f,1f)] public float visibleAlpha = 1f;
-        public TMP_FontAsset font;
+        [Header("Appearance")]
+        [SerializeField] private string labelText = "Pet";
+        [SerializeField] private Color textColor = Color.white;
+        [SerializeField] private TMP_FontAsset font;
+        [SerializeField] private float fontSize = 2f;
+        [SerializeField] private float yOffset = 1.5f;
 
-        [Header("Float")]
-        public float floatAmplitude = 0.05f;
-        public float floatFrequency = 2f;
+        [Header("Animation")]
+        [SerializeField] private float bobAmplitude = 0.05f;
+        [SerializeField] private float bobFrequency = 2f;
 
-        [Header("Show Within Radius")]
-        public Transform player;              // drag Player here or tag "Player"
-        public float showRadiusTiles = 2f;
-        public float unitsPerTile = 1f;
-        public float fadeInDuration = 0.2f;
-        public float fadeOutDuration = 0.25f;
+        [Header("Visibility")]
+        [SerializeField] private Transform viewer;
+        [SerializeField] private float showRadius = 3f;
+        [SerializeField] private float fadeSpeed = 8f;
 
-        [Header("Debug")]
-        public bool alwaysShowRadiusGizmo = true;   // draw even when not selected
-        public bool logState = true;
-        public float logEverySeconds = 0.5f;
+        private TextMeshPro _tmp;
+        private Transform _labelTf;
+        private float _alpha;
+        private float _baseY;
+        private PetExperience _experience;
 
-        const string ChildName = "NPC_Label";
-        TextMeshPro _tmp;
-        Transform _labelTf;
-        Vector3 _baseLocalPos;
-        float _alpha = 0f;
-        float _nextLog;
-        bool _shouldShow;
-
-        void Awake()
+        private void Awake()
         {
-            Debug.Log($"[NPCLabel] Awake on '{name}' (enabled={enabled}, activeInHierarchy={gameObject.activeInHierarchy})");
-
-            if (player == null)
+            if (viewer == null)
             {
-                var p = GameObject.FindGameObjectWithTag("Player");
-                if (p) player = p.transform;
+                var go = GameObject.FindGameObjectWithTag("Player");
+                if (go) viewer = go.transform;
             }
 
-            EnsureLabel();
+            _experience = GetComponent<PetExperience>();
+            if (_experience) _experience.OnLevelChanged += OnLevelChanged;
 
-            if (_labelTf == null || _tmp == null)
-            {
-                Debug.LogError("[NPCLabel] Failed to create label transform", this);
-                return;
-            }
+            CreateLabel();
+            UpdateLabelText();
+        }
 
-            // Configure TMP once (so you can see Text change in Play)
-            _tmp.text = labelText;
-            _tmp.color = textColor;
-            _tmp.fontSize = fontSize;
-            if (font != null) _tmp.font = font;
+        private void OnDestroy()
+        {
+            if (_experience) _experience.OnLevelChanged -= OnLevelChanged;
+        }
+
+        private void CreateLabel()
+        {
+            var go = new GameObject("NpcLabel");
+            go.transform.SetParent(transform, false);
+            go.transform.localPosition = new Vector3(0f, yOffset, 0f);
+
+            _labelTf = go.transform;
+            _baseY = _labelTf.localPosition.y;
+
+            _tmp = go.AddComponent<TextMeshPro>();
             _tmp.alignment = TextAlignmentOptions.Center;
-            _tmp.enableWordWrapping = false;
-            _tmp.isOverlay = false;
-
-            // IMPORTANT for diagnosis: do NOT SetActive(false) at startup.
-            // Keep renderer enabled; we’ll only drive alpha so we can see state changes clearly.
-            ApplyAlpha(0f, toggleRenderer:false);
+            _tmp.fontSize = fontSize;
+            _tmp.color = textColor;
+            if (font) _tmp.font = font;
         }
 
-        void EnsureLabel()
+        private void Update()
         {
-            // If we already have a label transform and its GameObject still exists,
-            // there's nothing to do. Unity "missing" objects compare equal to null,
-            // but a stale reference might still have a GameObject that has been
-            // destroyed, so check that explicitly.
-            if (_labelTf != null && _labelTf.gameObject != null)
-                return;
+            if (_labelTf == null) return;
 
-            // Clear potentially stale references if the previous label was removed.
-            _labelTf = null;
-            _tmp = null;
+            // bob
+            float bob = Mathf.Sin(Time.time * bobFrequency) * bobAmplitude;
+            _labelTf.localPosition = new Vector3(0f, _baseY + bob, 0f);
 
-            // Try to find an existing child first.
-            var t = transform.Find(ChildName);
-            if (t == null || t.gameObject == null)
-            {
-                // No valid child found – create one now.
-                var go = new GameObject(ChildName);
-                t = go.transform;
-                t.SetParent(transform, false);
-            }
-
-            _labelTf = t;
-            if (_labelTf == null || _labelTf.gameObject == null)
-                return;
-
-            // Cache or create the TextMeshPro component used for rendering.
-            _tmp = _labelTf.GetComponent<TextMeshPro>();
-            if (_tmp == null)
-                _tmp = _labelTf.gameObject.AddComponent<TextMeshPro>();
-
-            // Guard against the label transform being destroyed during component
-            // creation. If it survived, update its position information.
-            if (_labelTf == null || _labelTf.gameObject == null)
-                return;
-
-            _labelTf.localPosition = new Vector3(0, yOffset, 0);
-            _baseLocalPos = _labelTf.localPosition;
-        }
-
-        void OnEnable()
-        {
-            Debug.Log($"[NPCLabel] OnEnable on '{name}'");
-            EnsureLabel();
-        }
-
-        void Start()
-        {
-            Debug.Log($"[NPCLabel] Start on '{name}' (player={(player?player.name:"<null>")})");
-        }
-
-        void Update()
-        {
-            if (_labelTf == null || _tmp == null) return;
-
-            // Bob + billboard
-            float bob = Mathf.Sin(Time.time * floatFrequency) * floatAmplitude;
-            _labelTf.localPosition = _baseLocalPos + new Vector3(0, bob, 0);
+            // face camera
             if (Camera.main) _labelTf.rotation = Camera.main.transform.rotation;
 
-            // Distance (tiles -> units)
-            float maxDist = Mathf.Max(0.0001f, showRadiusTiles * Mathf.Max(0.0001f, unitsPerTile));
-            if (player != null)
+            // fade based on distance
+            float target = 1f;
+            if (viewer)
             {
-                float dist = Vector2.Distance(player.position, transform.position);
-                _shouldShow = dist <= maxDist;
-                if (logState && Time.unscaledTime >= _nextLog)
-                {
-                    _nextLog = Time.unscaledTime + Mathf.Max(0.1f, logEverySeconds);
-                    Debug.Log($"[NPCLabel] '{name}' dist={dist:F2} max={maxDist:F2} shouldShow={_shouldShow} alpha={_alpha:F2} compEnabled={enabled} goActive={gameObject.activeInHierarchy}");
-                }
-            }
-            else
-            {
-                _shouldShow = false;
+                float dist = Vector3.Distance(viewer.position, transform.position);
+                target = dist <= showRadius ? 1f : 0f;
             }
 
-            // Fade (alpha only; do NOT set active in this diagnostic build)
-            float target = _shouldShow ? Mathf.Clamp01(visibleAlpha) : 0f;
-            float dur = _shouldShow ? Mathf.Max(0.001f, fadeInDuration) : Mathf.Max(0.001f, fadeOutDuration);
-            _alpha = Mathf.MoveTowards(_alpha, target, Time.deltaTime * (1f / dur));
-            ApplyAlpha(_alpha, toggleRenderer:false);
+            _alpha = Mathf.MoveTowards(_alpha, target, fadeSpeed * Time.deltaTime);
+            var c = _tmp.color; c.a = _alpha; _tmp.color = c;
         }
 
-        void ApplyAlpha(float a01, bool toggleRenderer)
+        private void OnLevelChanged(int lvl)
+        {
+            UpdateLabelText();
+        }
+
+        private void UpdateLabelText()
         {
             if (_tmp == null) return;
-            a01 = Mathf.Clamp01(a01);
-            var c = _tmp.color; c.a = a01; _tmp.color = c;
-            if (toggleRenderer)
-            {
-                var r = _tmp.renderer;
-                if (r) r.enabled = a01 > 0.01f;
-            }
+            if (_experience)
+                _tmp.text = $"{labelText} Lv {_experience.Level}";
+            else
+                _tmp.text = labelText;
         }
-
-#if UNITY_EDITOR
-        void OnDrawGizmos()
-        {
-            if (!alwaysShowRadiusGizmo) return;
-            Gizmos.color = new Color(0f, 1f, 1f, 0.6f);
-            float r = Mathf.Max(0.0001f, showRadiusTiles * Mathf.Max(0.0001f, unitsPerTile));
-            Gizmos.DrawWireSphere(transform.position, r);
-        }
-#endif
     }
 }
+
