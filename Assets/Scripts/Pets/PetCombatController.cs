@@ -78,7 +78,10 @@ namespace Pets
                 if (dist <= CombatMath.MELEE_RANGE)
                 {
                     ResolveAttack(currentTarget);
-                    yield return new WaitForSeconds(definition.attackSpeedTicks * CombatMath.TICK_SECONDS);
+                    int waitTicks = definition.attackSpeedTicks;
+                    if (currentTarget == null || !currentTarget.IsAlive)
+                        waitTicks = Mathf.Min(waitTicks, 2);
+                    yield return new WaitForSeconds(waitTicks * CombatMath.TICK_SECONDS);
                 }
                 else if (dist > CombatMath.MELEE_RANGE * 5f)
                 {
