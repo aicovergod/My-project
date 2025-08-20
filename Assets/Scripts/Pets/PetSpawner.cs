@@ -126,7 +126,6 @@ namespace Pets
 
             var exp = go.AddComponent<PetExperience>();
             exp.definition = def;
-            go.AddComponent<PetLevelHUD>();
 
             if (def.canFight)
             {
