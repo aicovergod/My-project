@@ -15,6 +15,14 @@ namespace Pets
     {
         public RuntimeAnimatorController controller;
         public Sprite baseSprite;
+        public Sprite idleDown;
+        public Sprite idleLeft;
+        public Sprite idleRight;
+        public Sprite idleUp;
+        public Sprite walkDown;
+        public Sprite walkLeft;
+        public Sprite walkRight;
+        public Sprite walkUp;
     }
 
     /// <summary>

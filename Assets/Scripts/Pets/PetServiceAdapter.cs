@@ -51,6 +51,18 @@ namespace Pets
                 var sr = pet.GetComponent<SpriteRenderer>();
                 if (sr != null)
                     profile.baseSprite = sr.sprite;
+                var psa = pet.GetComponent<PetSpriteAnimator>();
+                if (psa != null)
+                {
+                    if (psa.idleDown != null && psa.idleDown.Length > 0) profile.idleDown = psa.idleDown[0];
+                    if (psa.idleLeft != null && psa.idleLeft.Length > 0) profile.idleLeft = psa.idleLeft[0];
+                    if (psa.idleRight != null && psa.idleRight.Length > 0) profile.idleRight = psa.idleRight[0];
+                    if (psa.idleUp != null && psa.idleUp.Length > 0) profile.idleUp = psa.idleUp[0];
+                    if (psa.walkDown != null && psa.walkDown.Length > 0) profile.walkDown = psa.walkDown[0];
+                    if (psa.walkLeft != null && psa.walkLeft.Length > 0) profile.walkLeft = psa.walkLeft[0];
+                    if (psa.walkRight != null && psa.walkRight.Length > 0) profile.walkRight = psa.walkRight[0];
+                    if (psa.walkUp != null && psa.walkUp.Length > 0) profile.walkUp = psa.walkUp[0];
+                }
             }
             return profile;
         }
