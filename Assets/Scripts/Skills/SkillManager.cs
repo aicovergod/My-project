@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,10 +30,8 @@ namespace Skills
         private void Awake()
         {
             save = saveProvider as ICombatSkillSave ?? new SaveManagerCombatSkillSave();
-            InitialiseSkill(SkillType.Attack);
-            InitialiseSkill(SkillType.Strength);
-            InitialiseSkill(SkillType.Defence);
-            InitialiseSkill(SkillType.Beastmaster);
+            foreach (SkillType type in Enum.GetValues(typeof(SkillType)))
+                InitialiseSkill(type);
         }
 
         private void OnEnable()
@@ -81,7 +80,8 @@ namespace Skills
         /// </summary>
         public int GetLevel(SkillType skill)
         {
-            return skills.TryGetValue(skill, out var record) ? record.level : 1;
+            InitialiseSkill(skill);
+            return skills[skill].level;
         }
 
         /// <summary>
@@ -89,7 +89,8 @@ namespace Skills
         /// </summary>
         public float GetXp(SkillType skill)
         {
-            return skills.TryGetValue(skill, out var record) ? record.xp : 0f;
+            InitialiseSkill(skill);
+            return skills[skill].xp;
         }
 
         /// <summary>
