@@ -124,6 +124,10 @@ namespace Pets
             var clickable = go.AddComponent<PetClickable>();
             clickable.Init(def);
 
+            var exp = go.AddComponent<PetExperience>();
+            exp.definition = def;
+            go.AddComponent<PetLevelHUD>();
+
             if (def.canFight)
             {
                 var agent = go.AddComponent<NavMeshAgent>();

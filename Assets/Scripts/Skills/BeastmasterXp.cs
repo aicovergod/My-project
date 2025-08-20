@@ -11,6 +11,11 @@ public static class BeastmasterXp
 {
     public static void TryGrantFromPetDamage(GameObject ownerPlayer, float damage)
     {
+        int dmgInt = Mathf.Max(0, Mathf.FloorToInt(damage));
+        if (dmgInt <= 0) return;
+
+        PetExperience.AddPetXp(dmgInt * 12f);
+
         if (ownerPlayer == null) return;
 
         var skills = ownerPlayer.GetComponent<SkillManager>();
@@ -21,9 +26,6 @@ public static class BeastmasterXp
             // if (skillsAlt == null) return; else { /* adapt call below to skillsAlt */ }
             return;
         }
-
-        int dmgInt = Mathf.Max(0, Mathf.FloorToInt(damage));
-        if (dmgInt <= 0) return;
 
         float xp = dmgInt * 4f; // 4 XP per 1 damage
         skills.AddXP(SkillType.Beastmaster, xp);
@@ -49,5 +51,6 @@ public static class BeastmasterXp
         if (skills == null) return;
 
         skills.AddXP(SkillType.Beastmaster, xp);
+        PetExperience.AddPetXp(xp * 3f);
     }
 }

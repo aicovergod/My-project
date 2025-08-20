@@ -29,6 +29,16 @@ namespace Pets
         [Tooltip("Pixels per unit used to scale this pet's sprites.")]
         public float pixelsPerUnit = 64f;
 
+        [System.Serializable]
+        public struct EvolutionTier
+        {
+            public int level;
+            public float pixelsPerUnit;
+        }
+
+        [Tooltip("Evolution tiers that adjust pixels per unit as the pet levels up.")]
+        public EvolutionTier[] evolutionTiers;
+
         [Tooltip("Optional animation clips. If set, the pet will play these using an Animator.")]
         public AnimationClip[] animationClips;
 
