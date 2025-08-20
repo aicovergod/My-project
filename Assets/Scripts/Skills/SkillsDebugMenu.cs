@@ -2,6 +2,7 @@ using UnityEngine;
 using Player;
 using Skills.Mining;
 using Skills.Woodcutting;
+using Beastmaster;
 
 namespace Skills
 {
@@ -15,6 +16,8 @@ namespace Skills
         private SkillManager skillManager;
         private MiningSkill miningSkill;
         private WoodcuttingSkill woodcuttingSkill;
+        private IBeastmasterService beastmasterService;
+        private MergeConfig mergeConfig;
 
         private bool visible;
         private string hpLevel = "";
@@ -23,6 +26,7 @@ namespace Skills
         private string defenceLevel = "";
         private string miningLevel = "";
         private string woodcuttingLevel = "";
+        private string beastmasterLevel = "";
 
         // Scroll position for the debug menu
         private Vector2 scrollPos;
@@ -61,6 +65,17 @@ namespace Skills
                 miningSkill = FindObjectOfType<MiningSkill>();
             if (woodcuttingSkill == null)
                 woodcuttingSkill = FindObjectOfType<WoodcuttingSkill>();
+            if (beastmasterService == null)
+            {
+                foreach (var mb in FindObjectsOfType<MonoBehaviour>())
+                {
+                    if (mb is IBeastmasterService b)
+                    {
+                        beastmasterService = b;
+                        break;
+                    }
+                }
+            }
         }
 
         private void RefreshFields()
@@ -69,6 +84,17 @@ namespace Skills
             skillManager = FindObjectOfType<SkillManager>();
             miningSkill = FindObjectOfType<MiningSkill>();
             woodcuttingSkill = FindObjectOfType<WoodcuttingSkill>();
+            beastmasterService = null;
+            foreach (var mb in FindObjectsOfType<MonoBehaviour>())
+            {
+                if (mb is IBeastmasterService b)
+                {
+                    beastmasterService = b;
+                    break;
+                }
+            }
+            if (mergeConfig == null)
+                mergeConfig = Resources.Load<MergeConfig>("MergeConfig");
 
             hpLevel = hitpoints != null ? hitpoints.Level.ToString() : "";
             attackLevel = skillManager != null ? skillManager.GetLevel(SkillType.Attack).ToString() : "";
@@ -76,6 +102,7 @@ namespace Skills
             defenceLevel = skillManager != null ? skillManager.GetLevel(SkillType.Defence).ToString() : "";
             miningLevel = miningSkill != null ? miningSkill.Level.ToString() : "";
             woodcuttingLevel = woodcuttingSkill != null ? woodcuttingSkill.Level.ToString() : "";
+            beastmasterLevel = beastmasterService != null ? beastmasterService.CurrentLevel.ToString() : "";
         }
 
         private void OnGUI()
@@ -109,6 +136,19 @@ namespace Skills
             GUILayout.Label("Woodcutting Level");
             woodcuttingLevel = GUILayout.TextField(woodcuttingLevel);
 
+            GUILayout.Label("Beastmaster Level");
+            beastmasterLevel = GUILayout.TextField(beastmasterLevel);
+            if (mergeConfig != null && int.TryParse(beastmasterLevel, out var bmLevel))
+            {
+                if (mergeConfig.TryGetMergeParams(bmLevel, out var dur, out var cd, out var locked))
+                {
+                    GUILayout.Label($"Duration: {dur.TotalMinutes:0}m");
+                    GUILayout.Label($"Cooldown: {cd.TotalMinutes:0}m");
+                    if (locked)
+                        GUILayout.Label("Locked (<50)");
+                }
+            }
+
             if (GUILayout.Button("Apply"))
             {
                 if (hitpoints != null && int.TryParse(hpLevel, out var hp))
@@ -123,6 +163,8 @@ namespace Skills
                     miningSkill.DebugSetLevel(mine);
                 if (woodcuttingSkill != null && int.TryParse(woodcuttingLevel, out var wood))
                     woodcuttingSkill.DebugSetLevel(wood);
+                if (beastmasterService != null && int.TryParse(beastmasterLevel, out var bm))
+                    beastmasterService.SetLevel(Mathf.Clamp(bm, 1, 99));
 
                 RefreshFields();
             }
