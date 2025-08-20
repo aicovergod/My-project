@@ -14,7 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Lion
   itemName: Lion
+<<<<<<< Updated upstream
   icon: {fileID: 6666414941200281703, guid: 22d9a71bef5d9ec4283f7ca895561c02, type: 3}
+=======
+  icon: {fileID: 21300000, guid: 22d9a71bef5d9ec4283f7ca895561c02, type: 3}
+>>>>>>> Stashed changes
   description: 'A ferocious lion
 
     that helps you
@@ -24,7 +28,10 @@ MonoBehaviour:
   maxStack: 0
   splittable: 0
   equipmentSlot: 0
+<<<<<<< Updated upstream
   skillRequirements: []
+=======
+>>>>>>> Stashed changes
   combat:
     Attack: 0
     Strength: 0

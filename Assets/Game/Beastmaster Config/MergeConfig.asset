@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8e927798a4fabd489c454f18411d441, type: 3}
+  m_Name: MergeConfig
+  m_EditorClassIdentifier: 
+  entries:
+  - minLevel: 50
+    durationMinutes: 5
+    cooldownMinutes: 15
+  - minLevel: 60
+    durationMinutes: 10
+    cooldownMinutes: 14
+  - minLevel: 70
+    durationMinutes: 15
+    cooldownMinutes: 13
+  - minLevel: 80
+    durationMinutes: 20
+    cooldownMinutes: 12
+  - minLevel: 90
+    durationMinutes: 25
+    cooldownMinutes: 10
+  - minLevel: 99
+    durationMinutes: 30
+    cooldownMinutes: 0

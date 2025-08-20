@@ -2,15 +2,37 @@ add death spawn point
 add death fade out screen, with a interface popup on screen
 add graveyard, to spawn in after death
 
-add leopard pet
-add tiger pet
-add lion pet
-add beaver pet
+Add pet combat + add combat to lion, tiger, leopard
 
-On scene load, create a GameObject called "CombatManager" - attach the combat manager script
+Make woodcutting roll chance for woodcutting pet
+Make mining roll chance for mining pet
 
-- Add Attack skill
-- add defence skill
-- add strength skill
-- make attack, defence & strength skill work with the itemdata, items ingame, and also npc combat - Use osrs combat calculation
-- add debug f2 menu (set player hp, set player mining, set player woodcutting lvl)
+
+add oak tree
+add willow tree
+add maple tree
+add yew tree
+add magic tree
+
+Add bones
+
+Add Bronze - rune scimitar
+Add Bronze - rune sword
+Add Bronze - rune dagger
+Add Bronze - rune shield
+Add Bronze - rune sq shield
+Add Bronze - rune helmet
+Add bronze - rune platebody
+Add bronze - rune chainmail
+Add bronze - rune platelegs
+Add bronze - rune spears
+Add str amulet
+Add power amulet
+Add defence amulet
+
+-Add on screen buttons for attack style changing
+
+- Add skill requirements for items, if player lacks the skill requirement, using the logic that mining and woodcutting use
+to show text on the FloatingTextAnchor that is parented underneath player, make the text say "You need "lvl" "Skill" to wield this
+
+Create a wander radius script, that I can draw in the scene, and npcs with that script attacked, only wander within that area I have set.

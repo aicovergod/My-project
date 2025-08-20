@@ -35,6 +35,7 @@ MonoBehaviour:
   useRightSpritesForLeft: 1
   useLeftSpritesForRight: 0
   canFight: 1
+<<<<<<< Updated upstream
   petAttackLevel: 60
   petStrengthLevel: 60
   attackSpeedTicks: 4
@@ -43,4 +44,11 @@ MonoBehaviour:
   attackLevelPerBeastmasterLevel: 0.02
   strengthLevelPerBeastmasterLevel: 0.02
   maxHitPerBeastmasterLevel: 0.02
+=======
+  petAttackLevel: 65
+  petStrengthLevel: 65
+  attackSpeedTicks: 4
+  accuracyBonus: 0
+  damageBonus: 0
+>>>>>>> Stashed changes
   messageColor: {r: 1, g: 1, b: 1, a: 1}

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Lion
   displayName: Lion
+<<<<<<< Updated upstream
   pickupItem: {fileID: 11400000, guid: b1f81412af211a045aca5a2a79b52fce, type: 2}
   sprite: {fileID: 0}
   animationClips: []
@@ -32,15 +33,39 @@ MonoBehaviour:
   - {fileID: -328913899184053702, guid: 3dde5b18b1de42f4cae9babb9df5e1f7, type: 3}
   walkRight:
   - {fileID: -328913899184053702, guid: 3dde5b18b1de42f4cae9babb9df5e1f7, type: 3}
+=======
+  pickupItem: {fileID: 11400000, guid: 6cdffc9e9943a2e4bbf2b15ad6b600a9, type: 2}
+  sprite: {fileID: 0}
+  animationClips: []
+  idleUp:
+  - {fileID: 21300000, guid: 054a76c72aa7ad44781a93f61f792bc4, type: 3}
+  walkUp:
+  - {fileID: 21300000, guid: 054a76c72aa7ad44781a93f61f792bc4, type: 3}
+  idleDown:
+  - {fileID: 21300000, guid: 22d9a71bef5d9ec4283f7ca895561c02, type: 3}
+  walkDown:
+  - {fileID: 21300000, guid: 22d9a71bef5d9ec4283f7ca895561c02, type: 3}
+  idleLeft: []
+  walkLeft: []
+  idleRight:
+  - {fileID: 21300000, guid: 3dde5b18b1de42f4cae9babb9df5e1f7, type: 3}
+  walkRight:
+  - {fileID: 21300000, guid: 3dde5b18b1de42f4cae9babb9df5e1f7, type: 3}
+>>>>>>> Stashed changes
   useRightSpritesForLeft: 1
   useLeftSpritesForRight: 0
   canFight: 1
   petAttackLevel: 60
   petStrengthLevel: 60
   attackSpeedTicks: 4
+<<<<<<< Updated upstream
   accuracyBonus: 40
   damageBonus: 40
   attackLevelPerBeastmasterLevel: 0.02
   strengthLevelPerBeastmasterLevel: 0.02
   maxHitPerBeastmasterLevel: 0.02
+=======
+  accuracyBonus: 60
+  damageBonus: 60
+>>>>>>> Stashed changes
   messageColor: {r: 1, g: 1, b: 1, a: 1}

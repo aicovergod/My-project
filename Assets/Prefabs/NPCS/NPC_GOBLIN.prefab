@@ -18,8 +18,13 @@ GameObject:
   - component: {fileID: 5669147193365449333}
   - component: {fileID: 1276688815178828107}
   - component: {fileID: 4408143068028046321}
+<<<<<<< Updated upstream
   - component: {fileID: -3175024997635208073}
   - component: {fileID: -7034281214918345802}
+=======
+  - component: {fileID: 8900887291355311099}
+  - component: {fileID: 2507869183542092037}
+>>>>>>> Stashed changes
   m_Layer: 7
   m_Name: NPC_GOBLIN
   m_TagString: NPC
@@ -271,7 +276,26 @@ MonoBehaviour:
   - {fileID: 21300000, guid: e20b8672692009a4eb814a9fbfe59bf5, type: 3}
   useFlipXForLeft: 0
   animationFPS: 6
+<<<<<<< Updated upstream
 --- !u!114 &-3175024997635208073
+=======
+--- !u!114 &8900887291355311099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d5d511b1686466a9633c20c696c6564, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  xpTable: {fileID: 0}
+  passiveRegenEnabled: 0
+  saveProvider: {fileID: 0}
+--- !u!114 &2507869183542092037
+>>>>>>> Stashed changes
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -285,6 +309,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shop: {fileID: 0}
   menuPrefab: {fileID: 0}
+<<<<<<< Updated upstream
 --- !u!114 &-7034281214918345802
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -304,3 +329,5 @@ MonoBehaviour:
   minIdleTime: 0.5
   maxIdleTime: 2
   spriteAnimator: {fileID: 4408143068028046321}
+=======
+>>>>>>> Stashed changes
