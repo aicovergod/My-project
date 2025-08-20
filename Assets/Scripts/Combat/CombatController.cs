@@ -23,6 +23,7 @@ namespace Combat
         private PlayerHitpoints hitpoints;
         private EquipmentAggregator equipment;
         private Player.PlayerCombatLoadout loadout;
+        private PlayerCombatBinder combatBinder;
         private Coroutine attackRoutine;
         private CombatTarget currentTarget;
 
@@ -34,6 +35,7 @@ namespace Combat
             hitpoints = GetComponent<PlayerHitpoints>() ?? GetComponentInParent<PlayerHitpoints>() ?? GetComponentInChildren<PlayerHitpoints>();
             equipment = GetComponent<EquipmentAggregator>() ?? GetComponentInParent<EquipmentAggregator>() ?? GetComponentInChildren<EquipmentAggregator>();
             loadout = GetComponent<Player.PlayerCombatLoadout>() ?? GetComponentInParent<Player.PlayerCombatLoadout>() ?? GetComponentInChildren<Player.PlayerCombatLoadout>();
+            combatBinder = GetComponent<PlayerCombatBinder>() ?? GetComponentInParent<PlayerCombatBinder>() ?? GetComponentInChildren<PlayerCombatBinder>();
 
             if (skills == null)
                 Debug.LogWarning("CombatController could not find a SkillManager; damage will use level 1 stats.", this);
@@ -91,7 +93,13 @@ namespace Combat
 
         private void ResolveAttack(CombatTarget target)
         {
-            var attacker = CombatantStats.ForPlayer(skills, equipment, loadout != null ? loadout.Style : CombatStyle.Accurate, DamageType.Melee);
+            CombatantStats attacker;
+            if (combatBinder != null)
+                attacker = combatBinder.GetCombatantStats();
+            else if (loadout != null)
+                attacker = loadout.GetCombatantStats();
+            else
+                attacker = CombatantStats.ForPlayer(skills, equipment, CombatStyle.Accurate, DamageType.Melee);
             var defender = new CombatantStats
             {
                 AttackLevel = 1,
