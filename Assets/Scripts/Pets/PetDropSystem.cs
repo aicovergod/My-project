@@ -18,6 +18,7 @@ namespace Pets
         public static PetDefinition ActivePet => activePetDef;
         public static GameObject ActivePetObject => activePetGO;
         public static PetCombatController ActivePetCombat => activePetGO != null ? activePetGO.GetComponent<PetCombatController>() : null;
+        public static bool GuardModeEnabled { get; set; }
         private static bool initialized;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]

@@ -4,6 +4,7 @@ using EquipmentSystem;
 using Skills;
 using Player;
 using NPC;
+using Pets;
 
 namespace Combat
 {
@@ -62,6 +63,11 @@ namespace Combat
                 npcAttack.BeginAttacking(playerTarget);
             }
             attackRoutine = StartCoroutine(AttackRoutine(target));
+            if (PetDropSystem.GuardModeEnabled)
+            {
+                var pet = PetDropSystem.ActivePetCombat;
+                pet?.CommandAttack(target);
+            }
             return true;
         }
 
