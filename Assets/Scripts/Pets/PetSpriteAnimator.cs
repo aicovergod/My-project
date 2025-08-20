@@ -30,6 +30,15 @@ namespace Pets
         [Tooltip("Frames used when walking and facing right.")]
         public Sprite[] walkRight;
 
+        [Tooltip("Frames used when attacking and facing up.")]
+        public Sprite[] hitUp;
+        [Tooltip("Frames used when attacking and facing down.")]
+        public Sprite[] hitDown;
+        [Tooltip("Frames used when attacking and facing left.")]
+        public Sprite[] hitLeft;
+        [Tooltip("Frames used when attacking and facing right.")]
+        public Sprite[] hitRight;
+
         [Tooltip("If true, ignore Left arrays and flip the Right sprites for left-facing.")]
         public bool useFlipXForLeft = true;
 
@@ -43,6 +52,7 @@ namespace Pets
         private bool _currentlyMoving = false;
         private float _animClock = 0f;
         private int _animFrame = 0;
+        private bool _overridePlaying = false;
 
         private void Awake()
         {
@@ -55,6 +65,8 @@ namespace Pets
         /// </summary>
         public void UpdateVisuals(Vector2 velocity)
         {
+            if (_overridePlaying) return;
+
             _currentlyMoving = velocity.sqrMagnitude > 0.0001f;
 
             if (_currentlyMoving)
@@ -82,6 +94,46 @@ namespace Pets
         public void SetFacing(int dir)
         {
             _currentDir = Mathf.Clamp(dir, 0, 3);
+        }
+
+        public bool HasHitAnimation(int dir)
+        {
+            Sprite[] set = SelectHitSpriteSet(dir, out int frames);
+            return frames > 0;
+        }
+
+        public System.Collections.IEnumerator PlayHitAnimation(int dir)
+        {
+            Sprite[] set = SelectHitSpriteSet(dir, out int frames);
+            if (frames == 0 || spriteRenderer == null)
+                yield break;
+
+            _overridePlaying = true;
+            _currentDir = Mathf.Clamp(dir, 0, 3);
+            float fps = Mathf.Max(0.01f, animationFPS);
+            for (int i = 0; i < frames; i++)
+            {
+                spriteRenderer.sprite = set[i];
+                spriteRenderer.flipX = (_currentDir == 1 && useFlipXForLeft) || (_currentDir == 2 && useFlipXForRight);
+                yield return new WaitForSeconds(1f / fps);
+            }
+            _overridePlaying = false;
+            _animClock = 0f;
+        }
+
+        private Sprite[] SelectHitSpriteSet(int dir, out int frames)
+        {
+            Sprite[] set = null;
+            switch (dir)
+            {
+                case 0: set = hitDown; break;
+                case 1: set = useFlipXForLeft ? hitRight : hitLeft; break;
+                case 2: set = useFlipXForRight ? hitLeft : hitRight; break;
+                case 3: set = hitUp; break;
+            }
+
+            frames = set != null ? set.Length : 0;
+            return set ?? System.Array.Empty<Sprite>();
         }
 
         private Sprite[] SelectSpriteSet(bool moving, int dir, out int frames)

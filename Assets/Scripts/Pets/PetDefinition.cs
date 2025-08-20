@@ -32,6 +32,18 @@ namespace Pets
         [Tooltip("Sprite used when attacking if no Animator is present.")]
         public Sprite attackSprite;
 
+        [Tooltip("Frames for hit animation when facing up.")]
+        public Sprite[] hitUp;
+
+        [Tooltip("Frames for hit animation when facing down.")]
+        public Sprite[] hitDown;
+
+        [Tooltip("Frames for hit animation when facing left.")]
+        public Sprite[] hitLeft;
+
+        [Tooltip("Frames for hit animation when facing right.")]
+        public Sprite[] hitRight;
+
         [Header("Frame-based Sprites")]
         [Tooltip("Frames for idle animation when facing up.")]
         public Sprite[] idleUp;
@@ -57,10 +69,10 @@ namespace Pets
         [Tooltip("Frames for walking animation when facing right.")]
         public Sprite[] walkRight;
 
-        [Tooltip("If true, flip right-facing sprites to use for left-facing animations.")]
+        [Tooltip("If true, flip right-facing sprites to use for left-facing animations (idle/walk/hit).")] 
         public bool useRightSpritesForLeft = true;
 
-        [Tooltip("If true, flip left-facing sprites to use for right-facing animations.")]
+        [Tooltip("If true, flip left-facing sprites to use for right-facing animations (idle/walk/hit).")] 
         public bool useLeftSpritesForRight = false;
 
         [Header("Combat")]

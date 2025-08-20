@@ -47,7 +47,11 @@ namespace Pets
                 (def.idleLeft != null && def.idleLeft.Length > 0) ||
                 (def.walkLeft != null && def.walkLeft.Length > 0) ||
                 (def.idleRight != null && def.idleRight.Length > 0) ||
-                (def.walkRight != null && def.walkRight.Length > 0);
+                (def.walkRight != null && def.walkRight.Length > 0) ||
+                (def.hitUp != null && def.hitUp.Length > 0) ||
+                (def.hitDown != null && def.hitDown.Length > 0) ||
+                (def.hitLeft != null && def.hitLeft.Length > 0) ||
+                (def.hitRight != null && def.hitRight.Length > 0);
 
             if (hasFrameSprites && (def.animationClips == null || def.animationClips.Length == 0))
             {
@@ -61,6 +65,10 @@ namespace Pets
                 spriteAnim.walkLeft = def.walkLeft;
                 spriteAnim.idleRight = def.idleRight;
                 spriteAnim.walkRight = def.walkRight;
+                spriteAnim.hitUp = def.hitUp;
+                spriteAnim.hitDown = def.hitDown;
+                spriteAnim.hitLeft = def.hitLeft;
+                spriteAnim.hitRight = def.hitRight;
                 spriteAnim.useFlipXForLeft = def.useRightSpritesForLeft;
                 spriteAnim.useFlipXForRight = def.useLeftSpritesForRight;
             }
