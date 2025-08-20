@@ -32,6 +32,7 @@ GameObject:
   - component: {fileID: 9163069634417477957}
   - component: {fileID: 8550739373882839364}
   - component: {fileID: 1349151244878709659}
+  - component: {fileID: 5214978910855930964}
   - component: {fileID: 2299804284669429959}
   - component: {fileID: 4281066574966125299}
   m_Layer: 8
@@ -557,6 +558,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skills: {fileID: 5876308583413598339}
+--- !u!114 &5214978910855930964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6828106152084396001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7babd92de6e8604db4e1b0e8c2391a1, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!114 &2299804284669429959
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -570,8 +583,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   config: {fileID: 11400000, guid: cae0cc4b62605d7448e53986b9ed393e, type: 2}
-  beastmasterServiceComponent: {fileID: 8521201558377073484}
-  petServiceComponent: {fileID: 8521201558377073484}
+  beastmasterServiceComponent: {fileID: 1349151244878709659}
+  petServiceComponent: {fileID: 5214978910855930964}
   visualBinder: {fileID: 4281066574966125299}
   combatBinder: {fileID: 8550739373882839364}
   hudTimer: {fileID: 0}

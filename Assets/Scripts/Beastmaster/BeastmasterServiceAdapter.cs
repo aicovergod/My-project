@@ -14,6 +14,10 @@ namespace Beastmaster
         {
             if (skills == null)
                 skills = GetComponent<SkillManager>();
+            if (skills == null)
+                skills = FindObjectOfType<SkillManager>();
+            if (skills == null)
+                Debug.LogWarning("BeastmasterServiceAdapter could not find SkillManager.");
         }
 
         public int CurrentLevel => skills != null ? skills.GetLevel(SkillType.Beastmaster) : 1;

@@ -51,8 +51,20 @@ namespace Beastmaster
         private void Awake()
         {
             instance = this;
+
+            if (beastmasterServiceComponent == null)
+                beastmasterServiceComponent = FindObjectOfType<BeastmasterServiceAdapter>();
+            if (petServiceComponent == null)
+                petServiceComponent = FindObjectOfType<PetServiceAdapter>();
+
             beastmaster = beastmasterServiceComponent as IBeastmasterService;
             petService = petServiceComponent as IPetService;
+
+            if (beastmaster == null)
+                Debug.LogWarning("PetMergeController missing IBeastmasterService component.");
+            if (petService == null)
+                Debug.LogWarning("PetMergeController missing IPetService component.");
+
             LoadState();
         }
 
