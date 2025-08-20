@@ -45,6 +45,7 @@ namespace Pets
             var profile = new PetVisualProfile();
             if (pet != null)
             {
+                profile.localScale = pet.transform.localScale;
                 var anim = pet.GetComponent<Animator>();
                 if (anim != null)
                     profile.controller = anim.runtimeAnimatorController;
@@ -62,6 +63,8 @@ namespace Pets
                     if (psa.walkLeft != null && psa.walkLeft.Length > 0) profile.walkLeft = psa.walkLeft[0];
                     if (psa.walkRight != null && psa.walkRight.Length > 0) profile.walkRight = psa.walkRight[0];
                     if (psa.walkUp != null && psa.walkUp.Length > 0) profile.walkUp = psa.walkUp[0];
+                    profile.useFlipXForLeft = psa.useFlipXForLeft;
+                    profile.useFlipXForRight = psa.useFlipXForRight;
                 }
             }
             return profile;
