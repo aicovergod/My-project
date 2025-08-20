@@ -12,6 +12,8 @@ namespace Beastmaster
     [DisallowMultipleComponent]
     public class PetMergeController : MonoBehaviour
     {
+        private static PetMergeController instance;
+        public static PetMergeController Instance => instance;
         [SerializeField] private MergeConfig config;
         [SerializeField] private MonoBehaviour beastmasterServiceComponent;
         [SerializeField] private MonoBehaviour petServiceComponent;
@@ -48,9 +50,16 @@ namespace Beastmaster
 
         private void Awake()
         {
+            instance = this;
             beastmaster = beastmasterServiceComponent as IBeastmasterService;
             petService = petServiceComponent as IPetService;
             LoadState();
+        }
+
+        private void OnDestroy()
+        {
+            if (instance == this)
+                instance = null;
         }
 
         private void Update()
