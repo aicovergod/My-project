@@ -10,7 +10,7 @@ namespace NPC
     {
         public ElderRowanDialogueData dialogueData;
 
-        public new void Talk()
+        public override void Talk()
         {
             var qm = QuestManager.Instance;
             int node = 0;

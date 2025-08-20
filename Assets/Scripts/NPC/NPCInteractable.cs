@@ -56,7 +56,7 @@ namespace NPC
             }
         }
 
-        public void Talk()
+        public virtual void Talk()
         {
             Debug.Log($"{name} has nothing to say yet.");
         }
