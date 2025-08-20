@@ -5,6 +5,7 @@ using Inventory;
 using Util;
 using Skills.Mining;
 using Pets;
+using Quests;
 
 namespace Skills.Mining
 {
@@ -29,6 +30,7 @@ namespace Skills.Mining
         private int swingProgress;
 
         private Dictionary<string, ItemData> oreItems;
+        private int questOreCount;
 
         public event System.Action<MineableRock> OnStartMining;
         public event System.Action OnStopMining;
@@ -165,6 +167,18 @@ namespace Skills.Mining
                     FloatingText.Show($"+{amount} {ore.DisplayName}", anchorPos);
                     StartCoroutine(ShowXpGainDelayed(ore.XpPerOre * amount, anchorTransform));
                     OnOreGained?.Invoke(ore.Id, amount);
+
+                    if (QuestManager.Instance != null && QuestManager.Instance.IsQuestActive("ToolsOfSurvival"))
+                    {
+                        var quest = QuestManager.Instance.GetQuest("ToolsOfSurvival");
+                        var step = quest?.Steps.Find(s => s.StepID == "MineOres");
+                        if (step != null && !step.IsComplete)
+                        {
+                            questOreCount += amount;
+                            if (questOreCount >= 3)
+                                QuestManager.Instance.UpdateStep("ToolsOfSurvival", "MineOres");
+                        }
+                    }
 
                     int newLevel = xpTable.GetLevel(xp);
                     if (newLevel > level)
