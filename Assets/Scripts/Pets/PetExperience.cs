@@ -30,8 +30,13 @@ namespace Pets
             spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
             if (spriteRenderer != null && spriteRenderer.sprite != null)
                 spritePpu = spriteRenderer.sprite.pixelsPerUnit;
+        }
+
+        private void Start()
+        {
             Load();
             UpdateEvolution();
+            OnLevelChanged?.Invoke(level);
         }
 
         private void OnDisable()
@@ -79,8 +84,8 @@ namespace Pets
             if (newLevel != level)
             {
                 level = Mathf.Clamp(newLevel, 1, MaxLevel);
-                OnLevelChanged?.Invoke(level);
                 UpdateEvolution();
+                OnLevelChanged?.Invoke(level);
             }
         }
 
