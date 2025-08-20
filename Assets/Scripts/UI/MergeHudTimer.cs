@@ -39,6 +39,8 @@ namespace UI
                 text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             }
             text.alignment = TextAnchor.UpperCenter;
+            text.fontSize = 24;
+            text.color = Color.red;
             var rect = text.rectTransform;
             rect.anchorMin = new Vector2(0.5f, 1f);
             rect.anchorMax = new Vector2(0.5f, 1f);

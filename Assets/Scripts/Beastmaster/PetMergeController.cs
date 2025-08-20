@@ -60,10 +60,15 @@ namespace Beastmaster
             beastmaster = beastmasterServiceComponent as IBeastmasterService;
             petService = petServiceComponent as IPetService;
 
+            if (hudTimer == null)
+                hudTimer = GetComponentInChildren<MergeHudTimer>(true);
+
             if (beastmaster == null)
                 Debug.LogWarning("PetMergeController missing IBeastmasterService component.");
             if (petService == null)
                 Debug.LogWarning("PetMergeController missing IPetService component.");
+            if (hudTimer == null)
+                Debug.LogWarning("PetMergeController missing MergeHudTimer component.");
 
             LoadState();
         }
