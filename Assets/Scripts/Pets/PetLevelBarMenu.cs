@@ -6,7 +6,7 @@ namespace Pets
     /// <summary>
     /// Simple context menu for the pet level bar.
     /// </summary>
-    public class PetLevelBarMenu : MonoBehaviour
+    public partial class PetLevelBarMenu : MonoBehaviour
     {
         private Button xpButton;
         private Button guardButton;
@@ -24,6 +24,7 @@ namespace Pets
             instance.guardText.text = PetDropSystem.GuardModeEnabled ? "Guard Mode: On" : "Guard Mode: Off";
             instance.transform.position = position;
             instance.gameObject.SetActive(true);
+            instance.OnMenuShown();
         }
 
         private static void CreateInstance()
@@ -60,6 +61,8 @@ namespace Pets
                 instance.current?.ToggleGuardMode();
                 instance.Hide();
             });
+
+            instance.OnMenuCreated(menuGO.transform);
 
             menuGO.SetActive(false);
         }
@@ -104,5 +107,8 @@ namespace Pets
                     Hide();
             }
         }
+
+        partial void OnMenuCreated(Transform menuRoot);
+        partial void OnMenuShown();
     }
 }
