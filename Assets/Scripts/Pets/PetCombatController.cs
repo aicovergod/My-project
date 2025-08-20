@@ -115,6 +115,12 @@ namespace Pets
                 Style = CombatStyle.Accurate,
                 DamageType = DamageType.Melee
             };
+            var exp = GetComponent<PetExperience>();
+            float statMult = exp != null ? PetExperience.GetStatMultiplier(exp.Level) : 1f;
+            attacker.AttackLevel = Mathf.RoundToInt(attacker.AttackLevel * statMult);
+            attacker.StrengthLevel = Mathf.RoundToInt(attacker.StrengthLevel * statMult);
+            attacker.Equip.attack = Mathf.RoundToInt(attacker.Equip.attack * statMult);
+            attacker.Equip.strength = Mathf.RoundToInt(attacker.Equip.strength * statMult);
 
             // scale stats based on the owner's Beastmaster level
             var owner = follower != null ? follower.Player : null;
