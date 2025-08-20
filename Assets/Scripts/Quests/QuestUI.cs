@@ -53,6 +53,10 @@ namespace Quests
             bgRect.offsetMin = Vector2.zero;
             bgRect.offsetMax = Vector2.zero;
 
+            // Hide the full-screen background to avoid a white overlay
+            var bgImage = bg.GetComponent<Image>();
+            bgImage.color = Color.clear;
+
             // Left quest list
             var listGO = new GameObject("QuestList", typeof(Image), typeof(ScrollRect));
             var listRect = listGO.GetComponent<RectTransform>();
@@ -61,6 +65,7 @@ namespace Quests
             listRect.anchorMax = new Vector2(0.35f, 1f);
             listRect.offsetMin = new Vector2(10f, 10f);
             listRect.offsetMax = new Vector2(-10f, -10f);
+            listGO.GetComponent<Image>().color = Color.clear;
 
             var viewport = new GameObject("Viewport", typeof(RectTransform), typeof(Mask), typeof(Image));
             viewport.transform.SetParent(listGO.transform, false);
@@ -90,6 +95,7 @@ namespace Quests
             detRect.anchorMax = new Vector2(1f, 1f);
             detRect.offsetMin = new Vector2(10f, 10f);
             detRect.offsetMax = new Vector2(-40f, -10f);
+            details.GetComponent<Image>().color = Color.clear;
 
             titleText = CreateText("Title", detRect, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0, -10));
             titleText.fontStyle = FontStyle.Bold;
@@ -107,6 +113,7 @@ namespace Quests
             closeRect.anchoredPosition = new Vector2(-15f, -15f);
             var closeText = CreateText("X", closeRect, Vector2.zero, Vector2.one, Vector2.zero);
             closeText.alignment = TextAnchor.MiddleCenter;
+            closeBtnGO.GetComponent<Image>().color = Color.clear;
             closeBtnGO.GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
         }
 
