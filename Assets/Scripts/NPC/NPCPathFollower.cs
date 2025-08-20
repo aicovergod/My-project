@@ -50,6 +50,11 @@ namespace NPC
         private bool _waiting;
         private Vector2 _lastPos;
 
+        // Per-tick interpolation
+        private Vector2 _from;
+        private Vector2 _to;
+        private float _lerpTime;
+
         // Snapshot storage
         private Vector2[] _snapshotPoints;
         private bool _usingSnapshot;
@@ -105,6 +110,8 @@ namespace NPC
             }
 
             _lastPos = GetPosition2D();
+            _from = _to = _lastPos;
+            _lerpTime = Ticker.TickDuration;
             if (spriteAnimator != null) spriteAnimator.UpdateVisuals(Vector2.zero); // init as idle
         }
 
@@ -125,6 +132,7 @@ namespace NPC
             float delta = Ticker.TickDuration;
             if (_waiting || GetPointCount() == 0)
             {
+                _lerpTime = delta;
                 if (spriteAnimator != null) spriteAnimator.UpdateVisuals(Vector2.zero);
                 return;
             }
@@ -145,20 +153,35 @@ namespace NPC
                 {
                     AdvanceIndex();
                 }
+                _lerpTime = delta;
                 if (spriteAnimator != null) spriteAnimator.UpdateVisuals(Vector2.zero);
                 return;
             }
 
             Vector2 dir = (dist > 0.0001f) ? (toTarget / dist) : Vector2.zero;
             float speed = GetSpeedMultiplierFor(_index) * Mathf.Max(0f, moveSpeed);
-            Vector2 next = current + dir * speed * delta;
+            _from = current;
+            _to = current + dir * speed * delta;
+            _lerpTime = 0f;
+        }
 
-            if (_rb != null) _rb.MovePosition(next);
-            else transform.position = next;
+        private void Update()
+        {
+            if (_lerpTime >= Ticker.TickDuration)
+            {
+                if (spriteAnimator != null) spriteAnimator.UpdateVisuals(Vector2.zero);
+                return;
+            }
 
-            Vector2 velocity = (next - _lastPos) / delta;
+            _lerpTime += Time.deltaTime;
+            float t = Mathf.Clamp01(_lerpTime / Ticker.TickDuration);
+            Vector2 pos = Vector2.Lerp(_from, _to, t);
+            if (_rb != null) _rb.MovePosition(pos);
+            else transform.position = pos;
+
+            Vector2 velocity = (pos - _lastPos) / Mathf.Max(Time.deltaTime, 0.0001f);
             if (spriteAnimator != null) spriteAnimator.UpdateVisuals(velocity);
-            _lastPos = next;
+            _lastPos = pos;
         }
 
         private IEnumerator WaitThenAdvance(float seconds)

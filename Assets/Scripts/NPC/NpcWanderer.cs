@@ -33,6 +33,11 @@ namespace NPC
         private Vector2 _lastPos;
         private Transform _combatTarget;
 
+        // Per-tick interpolation
+        private Vector2 _from;
+        private Vector2 _to;
+        private float _lerpTime;
+
         private void Reset()
         {
             spriteAnimator = GetComponent<NpcSpriteAnimator>() ?? GetComponentInChildren<NpcSpriteAnimator>();
@@ -50,6 +55,8 @@ namespace NPC
         {
             _origin = _rb != null ? _rb.position : (Vector2)transform.position;
             _lastPos = _origin;
+            _from = _to = _origin;
+            _lerpTime = Ticker.TickDuration;
             BeginIdle();
         }
 
@@ -97,11 +104,9 @@ namespace NPC
             {
                 Vector2 current = _rb != null ? _rb.position : (Vector2)transform.position;
                 Vector2 dir = ((Vector2)_combatTarget.position) - current;
-                if (spriteAnimator != null)
-                {
-                    spriteAnimator.UpdateVisuals(dir);
-                    spriteAnimator.UpdateVisuals(Vector2.zero);
-                }
+                spriteAnimator?.UpdateVisuals(dir);
+                spriteAnimator?.UpdateVisuals(Vector2.zero);
+                _lerpTime = Ticker.TickDuration;
                 _lastPos = current;
                 return;
             }
@@ -112,19 +117,36 @@ namespace NPC
                 _waitTimer -= delta;
                 if (_waitTimer <= 0f)
                     ChooseNewTarget();
+                _lerpTime = delta; // idle
                 spriteAnimator?.UpdateVisuals(Vector2.zero);
                 return;
             }
 
-            Vector2 currentPos = _rb != null ? _rb.position : (Vector2)transform.position;
-            Vector2 next = Vector2.MoveTowards(currentPos, _target, moveSpeed * delta);
-            Vector2 velocity = (next - _lastPos) / delta;
-            if (_rb != null) _rb.MovePosition(next);
-            else transform.position = next;
-            if (Vector2.Distance(next, _target) <= arriveDistance)
+            _from = _rb != null ? _rb.position : (Vector2)transform.position;
+            _to = Vector2.MoveTowards(_from, _target, moveSpeed * delta);
+            _lerpTime = 0f;
+
+            if (Vector2.Distance(_to, _target) <= arriveDistance)
                 BeginIdle();
+        }
+
+        private void Update()
+        {
+            if (_lerpTime >= Ticker.TickDuration)
+            {
+                spriteAnimator?.UpdateVisuals(Vector2.zero);
+                return;
+            }
+
+            _lerpTime += Time.deltaTime;
+            float t = Mathf.Clamp01(_lerpTime / Ticker.TickDuration);
+            Vector2 pos = Vector2.Lerp(_from, _to, t);
+            if (_rb != null) _rb.MovePosition(pos);
+            else transform.position = pos;
+
+            Vector2 velocity = (pos - _lastPos) / Mathf.Max(Time.deltaTime, 0.0001f);
             spriteAnimator?.UpdateVisuals(velocity);
-            _lastPos = next;
+            _lastPos = pos;
         }
 
 #if UNITY_EDITOR
