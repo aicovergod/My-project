@@ -22,6 +22,14 @@ namespace UI
                 DontDestroyOnLoad(canvasGO);
                 transform.SetParent(canvasGO.transform, false);
             }
+            var rectTransform = GetComponent<RectTransform>();
+            if (rectTransform == null)
+                rectTransform = gameObject.AddComponent<RectTransform>();
+            rectTransform.anchorMin = new Vector2(0.5f, 1f);
+            rectTransform.anchorMax = new Vector2(0.5f, 1f);
+            rectTransform.pivot = new Vector2(0.5f, 1f);
+            rectTransform.anchoredPosition = Vector2.zero;
+
             text = GetComponentInChildren<Text>();
             if (text == null)
             {
@@ -29,13 +37,13 @@ namespace UI
                 textGO.transform.SetParent(transform, false);
                 text = textGO.GetComponent<Text>();
                 text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-                text.alignment = TextAnchor.UpperCenter;
-                var rect = text.rectTransform;
-                rect.anchorMin = new Vector2(0.5f, 1f);
-                rect.anchorMax = new Vector2(0.5f, 1f);
-                rect.pivot = new Vector2(0.5f, 1f);
-                rect.anchoredPosition = new Vector2(0f, -10f);
             }
+            text.alignment = TextAnchor.UpperCenter;
+            var rect = text.rectTransform;
+            rect.anchorMin = new Vector2(0.5f, 1f);
+            rect.anchorMax = new Vector2(0.5f, 1f);
+            rect.pivot = new Vector2(0.5f, 1f);
+            rect.anchoredPosition = new Vector2(0f, -10f);
             Hide();
         }
 
