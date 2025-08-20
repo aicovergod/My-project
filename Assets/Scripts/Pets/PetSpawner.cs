@@ -39,6 +39,14 @@ namespace Pets
             if (sr.sprite != null && sr.sprite.texture != null)
                 sr.sprite.texture.filterMode = FilterMode.Point;
 
+            // Scale based on desired pixels per unit
+            if (def.pixelsPerUnit > 0f)
+            {
+                float spritePPU = sr.sprite != null ? sr.sprite.pixelsPerUnit : 64f;
+                float scale = spritePPU / def.pixelsPerUnit;
+                go.transform.localScale = new Vector3(scale, scale, 1f);
+            }
+
             bool hasFrameSprites =
                 (def.idleUp != null && def.idleUp.Length > 0) ||
                 (def.walkUp != null && def.walkUp.Length > 0) ||
