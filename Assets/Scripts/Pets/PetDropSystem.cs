@@ -137,6 +137,7 @@ namespace Pets
         /// </summary>
         public static void DespawnActive()
         {
+            PetLevelBarHUD.DestroyInstance();
             if (activePetGO != null)
             {
                 UnityEngine.Object.Destroy(activePetGO);
@@ -171,6 +172,8 @@ namespace Pets
             activePetGO = PetSpawner.Spawn(pet, spawnPos, playerTransform);
             activePetDef = pet;
             PetSaveBridge.Save(pet.id);
+            var exp = activePetGO.GetComponent<PetExperience>();
+            PetLevelBarHUD.CreateForPet(exp);
             PetToastUI.Show("You have a funny feeling like you're being followed…", pet.messageColor);
             Debug.Log($"Spawned pet '{pet.displayName}' at {spawnPos}.");
             return activePetGO;
