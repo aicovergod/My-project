@@ -6,6 +6,9 @@ using UnityEngine.EventSystems;
 using Core.Save;
 using Skills;
 using Skills.Mining;
+using Beastmaster;
+using Pets;
+using Combat;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -75,6 +78,22 @@ namespace Inventory
         public Font itemAttackBonusFont;
         public Color itemAttackBonusColor = Color.white;
 
+        [Header("Pet Text Styles")]
+        public Font petHeaderFont;
+        public Color petHeaderColor = Color.white;
+        public Font petAttackLevelFont;
+        public Color petAttackLevelColor = Color.white;
+        public Font petStrengthLevelFont;
+        public Color petStrengthLevelColor = Color.white;
+        public Font petAttackSpeedFont;
+        public Color petAttackSpeedColor = Color.white;
+        public Font petAccuracyBonusFont;
+        public Color petAccuracyBonusColor = Color.white;
+        public Font petDamageBonusFont;
+        public Color petDamageBonusColor = Color.white;
+        public Font petMaxHitFont;
+        public Color petMaxHitColor = Color.white;
+
         private GameObject uiRoot;
         private Image[] slotImages;
         private Text[] slotCountTexts;
@@ -91,6 +110,18 @@ namespace Inventory
         private Text rangedDefenceBonusText;
         private Text magicDefenceBonusText;
         private Text itemAttackBonusText;
+        private Text petHeaderText;
+        private Text petAttackLevelText;
+        private Text petStrengthLevelText;
+        private Text petAttackSpeedText;
+        private Text petAccuracyBonusText;
+        private Text petDamageBonusText;
+        private Text petMaxHitText;
+
+        private GameObject playerBonusPanel;
+        private GameObject petBonusPanel;
+
+        private bool lastMergeState;
 
         public int TotalAttackBonus { get; private set; }
         public int TotalDefenceBonus { get; private set; }
@@ -119,6 +150,7 @@ namespace Inventory
             equipped = new InventoryEntry[Enum.GetValues(typeof(EquipmentSlot)).Length - 1];
             CreateUI();
             Load();
+            lastMergeState = PetMergeController.Instance != null && PetMergeController.Instance.IsMerged;
             UpdateBonuses();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
@@ -141,6 +173,13 @@ namespace Inventory
                     minimap?.CloseExpanded();
                 }
                 uiRoot.SetActive(!uiRoot.activeSelf);
+            }
+
+            bool merged = PetMergeController.Instance != null && PetMergeController.Instance.IsMerged;
+            if (merged != lastMergeState)
+            {
+                lastMergeState = merged;
+                UpdateBonuses();
             }
         }
 
@@ -249,7 +288,7 @@ namespace Inventory
             }
         }
 
-        private void UpdateBonuses()
+        private void UpdatePlayerBonuses()
         {
             int attack = 0, strength = 0, range = 0, magic = 0;
             int meleeDef = 0, rangeDef = 0, magicDef = 0;
@@ -282,6 +321,63 @@ namespace Inventory
 
             TotalAttackBonus = attack;
             TotalDefenceBonus = meleeDef + rangeDef + magicDef;
+        }
+
+        private void UpdatePetBonuses()
+        {
+            var def = PetDropSystem.ActivePet;
+            var combat = PetDropSystem.ActivePetCombat;
+            int bmLevel = skillManager != null ? skillManager.GetLevel(SkillType.Beastmaster) : 1;
+            float mult = 1f;
+            if (combat != null && combat.TryGetComponent<PetExperience>(out var exp))
+                mult = PetExperience.GetStatMultiplier(exp.Level);
+
+            int attackLevel = def != null ? Mathf.RoundToInt(def.petAttackLevel * mult) : 0;
+            int strengthLevel = def != null ? Mathf.RoundToInt(def.petStrengthLevel * mult) : 0;
+            int accuracyBonus = def != null ? Mathf.RoundToInt(def.accuracyBonus * mult) : 0;
+            int damageBonus = def != null ? Mathf.RoundToInt(def.damageBonus * mult) : 0;
+
+            if (def != null && def.attackLevelPerBeastmasterLevel != 0f)
+                attackLevel = Mathf.RoundToInt(attackLevel * (1f + def.attackLevelPerBeastmasterLevel * bmLevel));
+            if (def != null && def.strengthLevelPerBeastmasterLevel != 0f)
+                strengthLevel = Mathf.RoundToInt(strengthLevel * (1f + def.strengthLevelPerBeastmasterLevel * bmLevel));
+
+            int attackSpeed = def != null ? def.attackSpeedTicks : 0;
+            int effStr = CombatMath.GetEffectiveStrength(strengthLevel, CombatStyle.Accurate);
+            int maxHit = CombatMath.GetMaxHit(effStr, damageBonus);
+            if (def != null && def.maxHitPerBeastmasterLevel != 0f)
+                maxHit = Mathf.RoundToInt(maxHit * (1f + def.maxHitPerBeastmasterLevel * bmLevel));
+
+            if (petHeaderText != null)
+                petHeaderText.text = def != null ? $"{def.displayName}:" : "Pet:";
+            if (petAttackLevelText != null)
+                petAttackLevelText.text = $"Attack Level = {attackLevel}";
+            if (petStrengthLevelText != null)
+                petStrengthLevelText.text = $"Strength Level = {strengthLevel}";
+            if (petAttackSpeedText != null)
+                petAttackSpeedText.text = $"Attack Speed = {attackSpeed}";
+            if (petAccuracyBonusText != null)
+                petAccuracyBonusText.text = $"Accuracy Bonus = {accuracyBonus}";
+            if (petDamageBonusText != null)
+                petDamageBonusText.text = $"Damage Bonus = {damageBonus}";
+            if (petMaxHitText != null)
+                petMaxHitText.text = $"Max Hit = {maxHit}";
+
+            TotalAttackBonus = 0;
+            TotalDefenceBonus = 0;
+        }
+
+        private void UpdateBonuses()
+        {
+            bool merged = PetMergeController.Instance != null && PetMergeController.Instance.IsMerged;
+            if (playerBonusPanel != null)
+                playerBonusPanel.SetActive(!merged);
+            if (petBonusPanel != null)
+                petBonusPanel.SetActive(merged);
+            if (merged)
+                UpdatePetBonuses();
+            else
+                UpdatePlayerBonuses();
         }
 
         [Serializable]
@@ -478,20 +574,30 @@ namespace Inventory
                 }
             }
 
-            GameObject bonusPanel = new GameObject("Bonuses", typeof(RectTransform));
-            bonusPanel.transform.SetParent(window.transform, false);
-            var bonusRect = bonusPanel.GetComponent<RectTransform>();
+            playerBonusPanel = new GameObject("Bonuses", typeof(RectTransform));
+            playerBonusPanel.transform.SetParent(window.transform, false);
+            var bonusRect = playerBonusPanel.GetComponent<RectTransform>();
             bonusRect.anchorMin = new Vector2(1f, 0.5f);
             bonusRect.anchorMax = new Vector2(1f, 0.5f);
             bonusRect.pivot = new Vector2(1f, 0.5f);
             bonusRect.anchoredPosition = new Vector2(-8f, 0f);
             bonusRect.sizeDelta = new Vector2(bonusWidth, contentSize.y);
 
+            petBonusPanel = new GameObject("PetBonuses", typeof(RectTransform));
+            petBonusPanel.transform.SetParent(window.transform, false);
+            var petBonusRect = petBonusPanel.GetComponent<RectTransform>();
+            petBonusRect.anchorMin = new Vector2(1f, 0.5f);
+            petBonusRect.anchorMax = new Vector2(1f, 0.5f);
+            petBonusRect.pivot = new Vector2(1f, 0.5f);
+            petBonusRect.anchoredPosition = new Vector2(-8f, 0f);
+            petBonusRect.sizeDelta = new Vector2(bonusWidth, contentSize.y);
+            petBonusPanel.SetActive(false);
+
             float lineHeight = 14f;
-            Text CreateText(string name, string txt, float y, Font font, Color color)
+            Text CreateText(Transform parent, string name, string txt, float y, Font font, Color color)
             {
                 GameObject go = new GameObject(name, typeof(Text));
-                go.transform.SetParent(bonusPanel.transform, false);
+                go.transform.SetParent(parent, false);
                 var t = go.GetComponent<Text>();
                 t.font = font != null ? font : defaultFont;
                 t.alignment = TextAnchor.UpperCenter;
@@ -507,17 +613,25 @@ namespace Inventory
                 return t;
             }
 
-            CreateText("CombatHeader", "Combat:", 0f, combatHeaderFont, combatHeaderColor);
-            attackBonusText = CreateText("Attack", "Attack = 0", -lineHeight, attackFont, attackColor);
-            strengthBonusText = CreateText("Strength", "Strength = 0", -2f * lineHeight, strengthFont, strengthColor);
-            rangeBonusText = CreateText("Range", "Range = 0", -3f * lineHeight, rangeFont, rangeColor);
-            magicBonusText = CreateText("Magic", "Magic = 0", -4f * lineHeight, magicFont, magicColor);
-            CreateText("DefenceHeader", "Defence:", -5f * lineHeight, defenceHeaderFont, defenceHeaderColor);
-            meleeDefenceBonusText = CreateText("MeleeDef", "Melee = 0", -6f * lineHeight, meleeDefFont, meleeDefColor);
-            rangedDefenceBonusText = CreateText("RangeDef", "Range = 0", -7f * lineHeight, rangeDefFont, rangeDefColor);
-            magicDefenceBonusText = CreateText("MagicDef", "Magic = 0", -8f * lineHeight, magicDefFont, magicDefColor);
-            CreateText("BonusHeader", "Bonuses:", -9f * lineHeight, bonusHeaderFont, bonusHeaderColor);
-            itemAttackBonusText = CreateText("ItemAttackBonus", "Attack Bonus = 0", -10f * lineHeight, itemAttackBonusFont, itemAttackBonusColor);
+            CreateText(playerBonusPanel.transform, "CombatHeader", "Combat:", 0f, combatHeaderFont, combatHeaderColor);
+            attackBonusText = CreateText(playerBonusPanel.transform, "Attack", "Attack = 0", -lineHeight, attackFont, attackColor);
+            strengthBonusText = CreateText(playerBonusPanel.transform, "Strength", "Strength = 0", -2f * lineHeight, strengthFont, strengthColor);
+            rangeBonusText = CreateText(playerBonusPanel.transform, "Range", "Range = 0", -3f * lineHeight, rangeFont, rangeColor);
+            magicBonusText = CreateText(playerBonusPanel.transform, "Magic", "Magic = 0", -4f * lineHeight, magicFont, magicColor);
+            CreateText(playerBonusPanel.transform, "DefenceHeader", "Defence:", -5f * lineHeight, defenceHeaderFont, defenceHeaderColor);
+            meleeDefenceBonusText = CreateText(playerBonusPanel.transform, "MeleeDef", "Melee = 0", -6f * lineHeight, meleeDefFont, meleeDefColor);
+            rangedDefenceBonusText = CreateText(playerBonusPanel.transform, "RangeDef", "Range = 0", -7f * lineHeight, rangeDefFont, rangeDefColor);
+            magicDefenceBonusText = CreateText(playerBonusPanel.transform, "MagicDef", "Magic = 0", -8f * lineHeight, magicDefFont, magicDefColor);
+            CreateText(playerBonusPanel.transform, "BonusHeader", "Bonuses:", -9f * lineHeight, bonusHeaderFont, bonusHeaderColor);
+            itemAttackBonusText = CreateText(playerBonusPanel.transform, "ItemAttackBonus", "Attack Bonus = 0", -10f * lineHeight, itemAttackBonusFont, itemAttackBonusColor);
+
+            petHeaderText = CreateText(petBonusPanel.transform, "PetHeader", "Pet:", 0f, petHeaderFont, petHeaderColor);
+            petAttackLevelText = CreateText(petBonusPanel.transform, "PetAttackLevel", "Attack Level = 0", -lineHeight, petAttackLevelFont, petAttackLevelColor);
+            petStrengthLevelText = CreateText(petBonusPanel.transform, "PetStrengthLevel", "Strength Level = 0", -2f * lineHeight, petStrengthLevelFont, petStrengthLevelColor);
+            petAttackSpeedText = CreateText(petBonusPanel.transform, "PetAttackSpeed", "Attack Speed = 0", -3f * lineHeight, petAttackSpeedFont, petAttackSpeedColor);
+            petAccuracyBonusText = CreateText(petBonusPanel.transform, "PetAccuracyBonus", "Accuracy Bonus = 0", -4f * lineHeight, petAccuracyBonusFont, petAccuracyBonusColor);
+            petDamageBonusText = CreateText(petBonusPanel.transform, "PetDamageBonus", "Damage Bonus = 0", -5f * lineHeight, petDamageBonusFont, petDamageBonusColor);
+            petMaxHitText = CreateText(petBonusPanel.transform, "PetMaxHit", "Max Hit = 0", -6f * lineHeight, petMaxHitFont, petMaxHitColor);
         }
     }
 }
