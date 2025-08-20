@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 using Pets;
 
 namespace NPC
@@ -28,8 +29,9 @@ namespace NPC
         [SerializeField] private float showRadius = 3f;
         [SerializeField] private float fadeSpeed = 8f;
 
-        private TextMeshPro _tmp;
+        private TMP_Text _tmp;
         private Transform _labelTf;
+        private Canvas _canvas;
         private float _alpha;
         private float _baseY;
         private PetExperience _experience;
@@ -63,7 +65,14 @@ namespace NPC
             _labelTf = go.transform;
             _baseY = _labelTf.localPosition.y;
 
-            _tmp = go.AddComponent<TextMeshPro>();
+            _canvas = go.AddComponent<Canvas>();
+            _canvas.renderMode = RenderMode.WorldSpace;
+            if (Camera.main) _canvas.worldCamera = Camera.main;
+
+            var textGo = new GameObject("Text");
+            textGo.transform.SetParent(go.transform, false);
+
+            _tmp = textGo.AddComponent<TextMeshProUGUI>();
             _tmp.alignment = TextAlignmentOptions.Center;
             _tmp.fontSize = fontSize;
             _tmp.color = textColor;
@@ -73,6 +82,10 @@ namespace NPC
         private void Update()
         {
             if (_labelTf == null) return;
+
+            // ensure canvas has event camera
+            if (_canvas && _canvas.worldCamera == null && Camera.main)
+                _canvas.worldCamera = Camera.main;
 
             // bob
             float bob = Mathf.Sin(Time.time * bobFrequency) * bobAmplitude;
