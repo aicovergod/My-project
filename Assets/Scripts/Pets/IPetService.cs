@@ -23,6 +23,9 @@ namespace Pets
         public Sprite walkLeft;
         public Sprite walkRight;
         public Sprite walkUp;
+        public bool useFlipXForLeft;
+        public bool useFlipXForRight;
+        public Vector3 localScale = Vector3.one;
     }
 
     /// <summary>

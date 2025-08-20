@@ -17,6 +17,9 @@ namespace Beastmaster
         private Sprite originalSprite;
         private Sprite origIdleDown, origIdleLeft, origIdleRight, origIdleUp;
         private Sprite origWalkDown, origWalkLeft, origWalkRight, origWalkUp;
+        private Vector3 origScale;
+        private bool origFlipX;
+        private bool origUseFlipXForLeft, origUseFlipXForRight;
 
         private void Awake()
         {
@@ -46,7 +49,11 @@ namespace Beastmaster
                 origWalkLeft = playerMover.walkLeft;
                 origWalkRight = playerMover.walkRight;
                 origWalkUp = playerMover.walkUp;
+                origUseFlipXForLeft = playerMover.useFlipXForLeft;
+                origUseFlipXForRight = playerMover.useFlipXForRight;
             }
+            origScale = transform.localScale;
+            origFlipX = spriteRenderer != null && spriteRenderer.flipX;
         }
 
         /// <summary>
@@ -70,7 +77,12 @@ namespace Beastmaster
                 if (profile.walkLeft != null) playerMover.walkLeft = profile.walkLeft;
                 if (profile.walkRight != null) playerMover.walkRight = profile.walkRight;
                 if (profile.walkUp != null) playerMover.walkUp = profile.walkUp;
+                playerMover.useFlipXForLeft = profile.useFlipXForLeft;
+                playerMover.useFlipXForRight = profile.useFlipXForRight;
             }
+            transform.localScale = profile.localScale;
+            if (spriteRenderer != null)
+                spriteRenderer.flipX = false;
         }
 
         /// <summary>
@@ -81,7 +93,11 @@ namespace Beastmaster
             if (animator != null)
                 animator.runtimeAnimatorController = originalController;
             if (spriteRenderer != null)
+            {
                 spriteRenderer.sprite = originalSprite;
+                spriteRenderer.flipX = origFlipX;
+            }
+            transform.localScale = origScale;
             if (playerMover != null)
             {
                 playerMover.idleDown = origIdleDown;
@@ -92,6 +108,8 @@ namespace Beastmaster
                 playerMover.walkLeft = origWalkLeft;
                 playerMover.walkRight = origWalkRight;
                 playerMover.walkUp = origWalkUp;
+                playerMover.useFlipXForLeft = origUseFlipXForLeft;
+                playerMover.useFlipXForRight = origUseFlipXForRight;
             }
         }
     }

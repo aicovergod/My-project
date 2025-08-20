@@ -25,6 +25,10 @@ namespace Player
         [Tooltip("If assigned, these sprites will be applied directly each frame based on Dir/IsMoving. Leave null to rely on Animator clips.")]
         public Sprite idleDown, idleLeft, idleRight, idleUp;
         public Sprite walkDown, walkLeft, walkRight, walkUp;
+        [Tooltip("If true, flip right-facing sprites for left-facing movement/idle.")]
+        public bool useFlipXForLeft;
+        [Tooltip("If true, flip left-facing sprites for right-facing movement/idle.")]
+        public bool useFlipXForRight;
 
         private Rigidbody2D rb;
         private Animator anim;
@@ -149,28 +153,82 @@ namespace Player
 
             // --- OPTIONAL: Direct sprite override (solves your 'stuck on IdleDown_0' instantly) ---
             Sprite desired = null;
+            bool flip = false;
             if (isMoving)
             {
                 switch (facingDir)
                 {
-                    case 0: desired = walkDown  ? walkDown  : idleDown;  break;
-                    case 1: desired = walkLeft  ? walkLeft  : idleLeft;  break;
-                    case 2: desired = walkRight ? walkRight : idleRight; break;
-                    case 3: desired = walkUp    ? walkUp    : idleUp;    break;
+                    case 0:
+                        desired = walkDown ? walkDown : idleDown;
+                        break;
+                    case 1:
+                        if (useFlipXForLeft)
+                        {
+                            desired = walkRight ? walkRight : idleRight;
+                            flip = true;
+                        }
+                        else
+                        {
+                            desired = walkLeft ? walkLeft : idleLeft;
+                        }
+                        break;
+                    case 2:
+                        if (useFlipXForRight)
+                        {
+                            desired = walkLeft ? walkLeft : idleLeft;
+                            flip = true;
+                        }
+                        else
+                        {
+                            desired = walkRight ? walkRight : idleRight;
+                        }
+                        break;
+                    case 3:
+                        desired = walkUp ? walkUp : idleUp;
+                        break;
                 }
             }
             else
             {
                 switch (facingDir)
                 {
-                    case 0: desired = idleDown;  break;
-                    case 1: desired = idleLeft;  break;
-                    case 2: desired = idleRight; break;
-                    case 3: desired = idleUp;    break;
+                    case 0:
+                        desired = idleDown;
+                        break;
+                    case 1:
+                        if (useFlipXForLeft)
+                        {
+                            desired = idleRight ? idleRight : walkRight;
+                            flip = true;
+                        }
+                        else
+                        {
+                            desired = idleLeft;
+                        }
+                        break;
+                    case 2:
+                        if (useFlipXForRight)
+                        {
+                            desired = idleLeft ? idleLeft : walkLeft;
+                            flip = true;
+                        }
+                        else
+                        {
+                            desired = idleRight;
+                        }
+                        break;
+                    case 3:
+                        desired = idleUp;
+                        break;
                 }
             }
-            if (desired != null && sr.sprite != desired)
-                sr.sprite = desired;
+            if (desired != null)
+            {
+                if (sr.flipX != flip)
+                    sr.flipX = flip;
+                if (sr.sprite != desired)
+                    sr.sprite = desired;
+            }
             // --------------------------------------------------------------------------------------
         }
 
