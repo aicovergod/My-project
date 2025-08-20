@@ -158,6 +158,8 @@ namespace Pets
 
         public static float GetStatMultiplier(int level)
         {
+            if (level == 99) return 1.2f;
+            if (level >= 75) return 1.1f;
             if (level >= 50) return 1f;
             if (level >= 25) return 0.75f;
             return 0.5f;
