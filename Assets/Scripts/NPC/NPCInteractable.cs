@@ -34,6 +34,15 @@ namespace NPC
 
                 if (menuInstance == null)
                 {
+                    if (menuPrefab == null)
+                        menuPrefab = Resources.Load<RightClickMenu>("Interfaces/RightClickMenu");
+
+                    if (menuPrefab == null)
+                    {
+                        Debug.LogError("RightClickMenu prefab not assigned and could not be loaded.");
+                        return;
+                    }
+
                     var canvasGO = new GameObject("ContextMenuCanvas", typeof(Canvas), typeof(CanvasScaler),
                         typeof(GraphicRaycaster));
                     menuCanvas = canvasGO.GetComponent<Canvas>();
