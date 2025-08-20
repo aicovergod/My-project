@@ -32,6 +32,10 @@ namespace Dialogue
             panelRect.anchorMax = new Vector2(0.9f, 0.3f);
             panelRect.offsetMin = panelRect.offsetMax = Vector2.zero;
 
+            // Remove the default white background so the panel is invisible
+            var panelImage = panel.GetComponent<Image>();
+            panelImage.color = Color.clear;
+
             nameText = CreateText("Name", panelRect, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0, -10));
             nameText.fontStyle = FontStyle.Bold;
             bodyText = CreateText("Body", panelRect, new Vector2(0f, 0.4f), new Vector2(1f, 1f), new Vector2(0, -40));
