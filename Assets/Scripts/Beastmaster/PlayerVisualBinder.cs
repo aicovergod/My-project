@@ -18,8 +18,12 @@ namespace Beastmaster
         {
             if (spriteRenderer == null)
                 spriteRenderer = GetComponent<SpriteRenderer>();
+            if (spriteRenderer == null)
+                spriteRenderer = GetComponentInChildren<SpriteRenderer>();
             if (animator == null)
                 animator = GetComponent<Animator>();
+            if (animator == null)
+                animator = GetComponentInChildren<Animator>();
             if (spriteRenderer != null)
                 originalSprite = spriteRenderer.sprite;
             if (animator != null)
