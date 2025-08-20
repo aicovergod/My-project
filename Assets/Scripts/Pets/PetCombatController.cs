@@ -153,8 +153,27 @@ namespace Pets
             int defRoll = CombatMath.GetDefenceRoll(defEff, defBonus);
             float chance = CombatMath.ChanceToHit(atkRoll, defRoll);
             bool hit = Random.value < chance;
+
+            int facingDir = 0;
+            Vector2 diff = target.transform.position - transform.position;
+            if (Mathf.Abs(diff.x) > Mathf.Abs(diff.y))
+                facingDir = diff.x < 0f ? 1 : 2;
+            else
+                facingDir = diff.y < 0f ? 0 : 3;
+
+            if (spriteAnimator != null)
+                spriteAnimator.SetFacing(facingDir);
+            else if (spriteRenderer != null)
+                spriteRenderer.flipX = facingDir == 2;
+
             if (animator != null)
                 animator.SetTrigger("Attack");
+            else if (spriteAnimator != null && spriteAnimator.HasHitAnimation(facingDir))
+            {
+                if (spriteSwapRoutine != null)
+                    StopCoroutine(spriteSwapRoutine);
+                spriteSwapRoutine = StartCoroutine(spriteAnimator.PlayHitAnimation(facingDir));
+            }
             else if (spriteRenderer != null && definition != null && definition.attackSprite != null)
             {
                 if (spriteSwapRoutine != null)
