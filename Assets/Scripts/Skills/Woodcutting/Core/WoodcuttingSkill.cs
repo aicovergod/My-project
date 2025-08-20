@@ -5,6 +5,7 @@ using Inventory;
 using Util;
 using Skills.Mining; // reuse XP table
 using Pets;
+using Quests;
 
 namespace Skills.Woodcutting
 {
@@ -30,6 +31,7 @@ namespace Skills.Woodcutting
         private int currentIntervalTicks;
 
         private Dictionary<string, ItemData> logItems;
+        private int questLogCount;
 
         public event System.Action<TreeNode> OnStartChopping;
         public event System.Action OnStopChopping;
@@ -159,6 +161,18 @@ namespace Skills.Woodcutting
                 FloatingText.Show($"+{amount} {logName}", anchorPos);
                 StartCoroutine(ShowXpGainDelayed(currentTree.def.XpPerLog * amount, anchorTransform));
                 OnLogGained?.Invoke(logId, amount);
+
+                if (QuestManager.Instance != null && QuestManager.Instance.IsQuestActive("ToolsOfSurvival"))
+                {
+                    var quest = QuestManager.Instance.GetQuest("ToolsOfSurvival");
+                    var step = quest?.Steps.Find(s => s.StepID == "ChopLogs");
+                    if (step != null && !step.IsComplete)
+                    {
+                        questLogCount += amount;
+                        if (questLogCount >= 3)
+                            QuestManager.Instance.UpdateStep("ToolsOfSurvival", "ChopLogs");
+                    }
+                }
 
                 int newLevel = xpTable.GetLevel(xp);
                 if (newLevel > level)

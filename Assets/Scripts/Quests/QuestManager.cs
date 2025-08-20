@@ -60,7 +60,7 @@ namespace Quests
         }
 
         /// <summary>
-        /// Marks a quest step complete and checks for quest completion.
+        /// Marks a quest step complete.
         /// </summary>
         public void UpdateStep(string questID, string stepID)
         {
@@ -70,14 +70,7 @@ namespace Quests
             if (step == null || step.IsComplete)
                 return;
             step.IsComplete = true;
-            if (quest.Steps.TrueForAll(s => s.IsComplete))
-            {
-                CompleteQuest(questID);
-            }
-            else
-            {
-                QuestsUpdated.Invoke();
-            }
+            QuestsUpdated.Invoke();
         }
 
         /// <summary>
