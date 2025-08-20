@@ -34,6 +34,7 @@ namespace Pets
         {
             public int level;
             public float pixelsPerUnit;
+            public string tierName;
         }
 
         [Tooltip("Evolution tiers that adjust pixels per unit as the pet levels up.")]

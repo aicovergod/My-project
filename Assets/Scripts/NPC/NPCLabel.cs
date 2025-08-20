@@ -115,7 +115,13 @@ namespace NPC
         {
             if (_tmp == null) return;
             if (_experience)
-                _tmp.text = $"{labelText} Lv {_experience.Level}";
+            {
+                string tier = _experience.TierName;
+                if (string.IsNullOrEmpty(tier))
+                    _tmp.text = $"{labelText} Lv {_experience.Level}";
+                else
+                    _tmp.text = $"{tier} Lv {_experience.Level}";
+            }
             else
                 _tmp.text = labelText;
         }
