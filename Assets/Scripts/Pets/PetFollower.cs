@@ -32,6 +32,7 @@ namespace Pets
         private SpriteRenderer sprite;
         private PetSpriteAnimator spriteAnimator;
         private PlayerMover playerMover;
+        private SpriteRenderer playerSprite;
         private Vector3 currentVelocity;
         private float idleTimer;
         private Vector3 wanderTarget;
@@ -47,6 +48,7 @@ namespace Pets
             {
                 lastPlayerPos = player.position;
                 playerMover = player.GetComponent<PlayerMover>();
+                playerSprite = player.GetComponent<SpriteRenderer>();
             }
             ChooseOffset(Vector2.right);
             offset = targetOffset;
@@ -59,6 +61,7 @@ namespace Pets
             {
                 lastPlayerPos = player.position;
                 playerMover = player.GetComponent<PlayerMover>();
+                playerSprite = player.GetComponent<SpriteRenderer>();
             }
         }
 
@@ -157,6 +160,20 @@ namespace Pets
                     sprite.flipX = playerMover.FacingDir == 1;
                 else
                     sprite.flipX = newPos.x > player.position.x;
+            }
+
+            if (playerSprite != null && sprite != null)
+            {
+                int baseOrder = playerSprite.sortingOrder;
+                if (playerMover != null)
+                {
+                    if (playerMover.FacingDir == 3 && transform.position.y < player.position.y)
+                        sprite.sortingOrder = baseOrder + 1;
+                    else if (playerMover.FacingDir == 0 && transform.position.y > player.position.y)
+                        sprite.sortingOrder = baseOrder - 1;
+                    else
+                        sprite.sortingOrder = baseOrder;
+                }
             }
         }
 
