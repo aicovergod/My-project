@@ -12,6 +12,7 @@ namespace Beastmaster
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private Animator animator;
         [SerializeField] private PlayerMover playerMover;
+        [SerializeField] private MergedPetAttackAnimator attackAnimator;
 
         private RuntimeAnimatorController originalController;
         private Sprite originalSprite;
@@ -35,6 +36,10 @@ namespace Beastmaster
                 playerMover = GetComponent<PlayerMover>();
             if (playerMover == null)
                 playerMover = GetComponentInChildren<PlayerMover>();
+            if (attackAnimator == null)
+                attackAnimator = GetComponent<MergedPetAttackAnimator>();
+            if (attackAnimator == null)
+                attackAnimator = gameObject.AddComponent<MergedPetAttackAnimator>();
             if (spriteRenderer != null)
                 originalSprite = spriteRenderer.sprite;
             if (animator != null)
@@ -69,20 +74,35 @@ namespace Beastmaster
                 spriteRenderer.sprite = profile.baseSprite;
             if (playerMover != null)
             {
-                if (profile.idleDown != null) playerMover.idleDown = profile.idleDown;
-                if (profile.idleLeft != null) playerMover.idleLeft = profile.idleLeft;
-                if (profile.idleRight != null) playerMover.idleRight = profile.idleRight;
-                if (profile.idleUp != null) playerMover.idleUp = profile.idleUp;
-                if (profile.walkDown != null) playerMover.walkDown = profile.walkDown;
-                if (profile.walkLeft != null) playerMover.walkLeft = profile.walkLeft;
-                if (profile.walkRight != null) playerMover.walkRight = profile.walkRight;
-                if (profile.walkUp != null) playerMover.walkUp = profile.walkUp;
-                playerMover.useFlipXForLeft = profile.useFlipXForLeft;
-                playerMover.useFlipXForRight = profile.useFlipXForRight;
+                if (profile.controller == null)
+                {
+                    if (profile.idleDown != null) playerMover.idleDown = profile.idleDown;
+                    if (profile.idleLeft != null) playerMover.idleLeft = profile.idleLeft;
+                    if (profile.idleRight != null) playerMover.idleRight = profile.idleRight;
+                    if (profile.idleUp != null) playerMover.idleUp = profile.idleUp;
+                    if (profile.walkDown != null) playerMover.walkDown = profile.walkDown;
+                    if (profile.walkLeft != null) playerMover.walkLeft = profile.walkLeft;
+                    if (profile.walkRight != null) playerMover.walkRight = profile.walkRight;
+                    if (profile.walkUp != null) playerMover.walkUp = profile.walkUp;
+                    playerMover.useFlipXForLeft = profile.useFlipXForLeft;
+                    playerMover.useFlipXForRight = profile.useFlipXForRight;
+                }
+                else
+                {
+                    playerMover.idleDown = null;
+                    playerMover.idleLeft = null;
+                    playerMover.idleRight = null;
+                    playerMover.idleUp = null;
+                    playerMover.walkDown = null;
+                    playerMover.walkLeft = null;
+                    playerMover.walkRight = null;
+                    playerMover.walkUp = null;
+                }
             }
             transform.localScale = profile.localScale;
             if (spriteRenderer != null)
                 spriteRenderer.flipX = false;
+            attackAnimator?.ApplyPetLook(profile);
         }
 
         /// <summary>
@@ -111,6 +131,7 @@ namespace Beastmaster
                 playerMover.useFlipXForLeft = origUseFlipXForLeft;
                 playerMover.useFlipXForRight = origUseFlipXForRight;
             }
+            attackAnimator?.ClearPetLook();
         }
     }
 }

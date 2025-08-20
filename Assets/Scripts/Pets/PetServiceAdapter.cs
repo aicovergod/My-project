@@ -63,6 +63,10 @@ namespace Pets
                     if (psa.walkLeft != null && psa.walkLeft.Length > 0) profile.walkLeft = psa.walkLeft[0];
                     if (psa.walkRight != null && psa.walkRight.Length > 0) profile.walkRight = psa.walkRight[0];
                     if (psa.walkUp != null && psa.walkUp.Length > 0) profile.walkUp = psa.walkUp[0];
+                    if (psa.hitDown != null && psa.hitDown.Length > 0) profile.hitDown = psa.hitDown;
+                    if (psa.hitLeft != null && psa.hitLeft.Length > 0) profile.hitLeft = psa.hitLeft;
+                    if (psa.hitRight != null && psa.hitRight.Length > 0) profile.hitRight = psa.hitRight;
+                    if (psa.hitUp != null && psa.hitUp.Length > 0) profile.hitUp = psa.hitUp;
                     profile.useFlipXForLeft = psa.useFlipXForLeft;
                     profile.useFlipXForRight = psa.useFlipXForRight;
                 }

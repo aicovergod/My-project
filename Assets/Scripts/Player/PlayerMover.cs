@@ -21,6 +21,9 @@ namespace Player
         [HideInInspector]
         public bool CanDrop = true;
 
+        [HideInInspector]
+        public bool freezeSprite = false;
+
         [Header("(Optional) Direct Sprite Override")]
         [Tooltip("If assigned, these sprites will be applied directly each frame based on Dir/IsMoving. Leave null to rely on Animator clips.")]
         public Sprite idleDown, idleLeft, idleRight, idleUp;
@@ -222,7 +225,7 @@ namespace Player
                         break;
                 }
             }
-            if (desired != null)
+            if (desired != null && !freezeSprite)
             {
                 if (sr.flipX != flip)
                     sr.flipX = flip;
