@@ -9,6 +9,7 @@ namespace UI
     /// </summary>
     public class MergeHudTimer : MonoBehaviour
     {
+        [SerializeField] private Font font;
         private Text text;
         private Image background;
 
@@ -49,8 +50,7 @@ namespace UI
                 textGO.transform.SetParent(bgGO.transform, false);
                 text = textGO.GetComponent<Text>();
             }
-            var customFont = Resources.Load<Font>("ThaleahFAT_TTF") ?? Resources.Load<Font>("ThaleahFat_TTF");
-            text.font = customFont != null ? customFont : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            ApplyFont();
             text.alignment = TextAnchor.MiddleCenter;
             text.fontSize = 24;
             text.color = new Color32(0xFF, 0x8C, 0x00, 0xFF);
@@ -60,6 +60,19 @@ namespace UI
             rect.pivot = new Vector2(0.5f, 0.5f);
             rect.anchoredPosition = Vector2.zero;
             Hide();
+        }
+
+        public void SetFont(Font newFont)
+        {
+            font = newFont;
+            if (text != null)
+                ApplyFont();
+        }
+
+        private void ApplyFont()
+        {
+            var customFont = font ?? Resources.Load<Font>("ThaleahFAT_TTF") ?? Resources.Load<Font>("ThaleahFat_TTF");
+            text.font = customFont != null ? customFont : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         }
 
         public void Show(TimeSpan remaining)
