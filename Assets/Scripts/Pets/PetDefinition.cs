@@ -26,6 +26,9 @@ namespace Pets
         [Tooltip("Idle sprite if no animation clips are provided.")]
         public Sprite sprite;
 
+        [Tooltip("Pixels per unit used to scale this pet's sprites.")]
+        public float pixelsPerUnit = 64f;
+
         [Tooltip("Optional animation clips. If set, the pet will play these using an Animator.")]
         public AnimationClip[] animationClips;
 
