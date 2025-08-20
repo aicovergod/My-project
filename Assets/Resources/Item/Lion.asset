@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
   m_Name: Lion
   m_EditorClassIdentifier: 
-  id: Leopard
-  itemName: Leopard
-  icon: {fileID: 5903488652781262050, guid: 52e0d6b7e64ba4848bb272bbbaeaef38, type: 3}
+  id: Lion
+  itemName: Lion
+  icon: {fileID: 6666414941200281703, guid: 22d9a71bef5d9ec4283f7ca895561c02, type: 3}
   description: 'A ferocious lion
 
     that helps you

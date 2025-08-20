@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Leopard
   itemName: Leopard
-  icon: {fileID: 6666414941200281703, guid: 095118f6ccff8374fb7381b2e42e0e3d, type: 3}
+  icon: {fileID: 21300000, guid: 095118f6ccff8374fb7381b2e42e0e3d, type: 3}
   description: 'A ferocious leopard
 
     that helps you
@@ -24,6 +24,7 @@ MonoBehaviour:
   maxStack: 0
   splittable: 0
   equipmentSlot: 0
+  skillRequirements: []
   combat:
     Attack: 0
     Strength: 0

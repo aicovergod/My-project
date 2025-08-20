@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 36e49b06588c88a47a0fb5cd14741ef1
+guid: 41e02169465442b4fa43acad61d143cf
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -103,10 +103,10 @@ TextureImporter:
       name: Idle_Left_64x64_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 12
-        width: 59
-        height: 39
+        x: 8
+        y: 5
+        width: 54
+        height: 53
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

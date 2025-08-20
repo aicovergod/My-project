@@ -18,6 +18,8 @@ GameObject:
   - component: {fileID: 5669147193365449333}
   - component: {fileID: 1276688815178828107}
   - component: {fileID: 4408143068028046321}
+  - component: {fileID: -3175024997635208073}
+  - component: {fileID: -7034281214918345802}
   m_Layer: 7
   m_Name: NPC_GOBLIN
   m_TagString: NPC
@@ -103,7 +105,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8077571585701284791}
-  m_BodyType: 2
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -117,7 +119,7 @@ Rigidbody2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -269,3 +271,36 @@ MonoBehaviour:
   - {fileID: 21300000, guid: e20b8672692009a4eb814a9fbfe59bf5, type: 3}
   useFlipXForLeft: 0
   animationFPS: 6
+--- !u!114 &-3175024997635208073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 175847b768e444f5ad8badc3cf9eab03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shop: {fileID: 0}
+  menuPrefab: {fileID: 0}
+--- !u!114 &-7034281214918345802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3264207daa560b40bd49e240e104270, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minOffset: {x: -5, y: -5}
+  maxOffset: {x: 5, y: 5}
+  moveSpeed: 2
+  arriveDistance: 0.05
+  minIdleTime: 0.5
+  maxIdleTime: 2
+  spriteAnimator: {fileID: 4408143068028046321}

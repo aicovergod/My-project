@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c72479de709848e3ab024450652154e5, type: 3}
+  m_Name: Gorilla
+  m_EditorClassIdentifier: 
+  id: Gorilla
+  displayName: Gorilla
+  pickupItem: {fileID: 11400000, guid: 3f274c323d986bf47b6558c468c796d8, type: 2}
+  sprite: {fileID: 0}
+  animationClips: []
+  attackSprite: {fileID: 0}
+  hitUp:
+  - {fileID: 21300000, guid: e3e5caa5cf4697545b9b165baeef50d2, type: 3}
+  hitDown:
+  - {fileID: 21300000, guid: 19b54ad3bacac8c4780424de9c2091d8, type: 3}
+  hitLeft: []
+  hitRight:
+  - {fileID: 21300000, guid: 5a954638b7b42cb40a41263144629a8e, type: 3}
+  idleUp:
+  - {fileID: 21300000, guid: 9ed8acecd2c3cb5438b9d0871ad3f1cd, type: 3}
+  walkUp:
+  - {fileID: 21300000, guid: 9ed8acecd2c3cb5438b9d0871ad3f1cd, type: 3}
+  idleDown:
+  - {fileID: 21300000, guid: d38aa4eb7c3ce674881a17c875151c54, type: 3}
+  walkDown:
+  - {fileID: 21300000, guid: d38aa4eb7c3ce674881a17c875151c54, type: 3}
+  idleLeft: []
+  walkLeft: []
+  idleRight:
+  - {fileID: 21300000, guid: faa4ea1e4a13f3846a488f27ba192fa4, type: 3}
+  walkRight:
+  - {fileID: 21300000, guid: faa4ea1e4a13f3846a488f27ba192fa4, type: 3}
+  useRightSpritesForLeft: 1
+  useLeftSpritesForRight: 0
+  canFight: 1
+  petAttackLevel: 40
+  petStrengthLevel: 70
+  attackSpeedTicks: 6
+  accuracyBonus: 40
+  damageBonus: 70
+  attackLevelPerBeastmasterLevel: 0.02
+  strengthLevelPerBeastmasterLevel: 0.02
+  maxHitPerBeastmasterLevel: 0
+  messageColor: {r: 1, g: 1, b: 1, a: 1}
+  debugBeastmasterLevel: 1

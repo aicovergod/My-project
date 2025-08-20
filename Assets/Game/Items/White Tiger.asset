@@ -17,6 +17,7 @@ MonoBehaviour:
   pickupItem: {fileID: 11400000, guid: f3c0207c1d419764b8e4132ec3439acf, type: 2}
   sprite: {fileID: 0}
   animationClips: []
+  attackSprite: {fileID: 0}
   idleUp:
   - {fileID: 21300000, guid: ecc49880c7601b44b8d7536c7b3c8210, type: 3}
   walkUp:
@@ -33,4 +34,13 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 166306eb3305ea64d82984cf0a88fa72, type: 3}
   useRightSpritesForLeft: 1
   useLeftSpritesForRight: 0
+  canFight: 1
+  petAttackLevel: 60
+  petStrengthLevel: 60
+  attackSpeedTicks: 4
+  accuracyBonus: 50
+  damageBonus: 50
+  attackLevelPerBeastmasterLevel: 0.02
+  strengthLevelPerBeastmasterLevel: 0.02
+  maxHitPerBeastmasterLevel: 0.02
   messageColor: {r: 1, g: 1, b: 1, a: 1}

@@ -481,6 +481,8 @@ MonoBehaviour:
   bonusHeaderColor: {r: 0.72156864, g: 0.5254902, b: 0.043137256, a: 1}
   itemAttackBonusFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
   itemAttackBonusColor: {r: 1, g: 1, b: 1, a: 1}
+  skillManager: {fileID: 0}
+  floatingTextAnchor: {fileID: 0}
 --- !u!114 &5464874355821266726
 MonoBehaviour:
   m_ObjectHideFlags: 0
