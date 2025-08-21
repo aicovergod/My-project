@@ -120,8 +120,13 @@ namespace World
                 var cameras = GameObject.FindObjectsOfType<Camera>();
                 foreach (var c in cameras)
                 {
-                    if (c.gameObject != _cameraToMove)
+                    var isMinimapCam = c.GetComponentInParent<Minimap>() != null;
+                    Debug.Log($"[SceneTransition] Found camera {c.name}, isMinimap={isMinimapCam}");
+                    if (c.gameObject != _cameraToMove && !isMinimapCam)
+                    {
+                        Debug.Log($"[SceneTransition] Destroying camera {c.name}");
                         Destroy(c.gameObject);
+                    }
                 }
             }
 
