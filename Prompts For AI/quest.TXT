@@ -1,0 +1,44 @@
+/// You are generating a new quest for my existing Unity 2D RuneScape-inspired game.
+/// I already have a working Quest System, Dialogue System, Quest UI, and QuestManager.
+/// Use those systems and generate all the code + ScriptableObjects needed for this quest.
+///
+/// ----------------------
+/// QUEST DETAILS
+/// ----------------------
+/// Quest ID: [UNIQUE_ID]
+/// Title: [QUEST_NAME]
+/// NPC: [NPC_NAME] (NPC that starts/ends the quest)
+/// Location: [TOWN/AREA]
+///
+/// Objectives (steps):
+/// 1. [Describe step 1 clearly, e.g. "Chop 10 oak logs"]
+/// 2. [Step 2...]
+/// 3. [Final step...]
+///
+/// Rewards:
+/// - [XP rewards]
+/// - [Item rewards]
+/// - [Coins]
+///
+/// Dialogue Flow for [NPC_NAME]:
+/// - Before quest: "[Text shown before accepting]"
+///   - Options: Accept -> StartQuest([UNIQUE_ID]) / Decline -> End dialogue
+/// - In progress: "[Hint text while quest is ongoing]"
+/// - Ready to complete: "[Text when requirements are done]" -> CompleteQuest([UNIQUE_ID])
+/// - After completion: "[Generic post-quest text]"
+///
+/// ----------------------
+/// WHAT TO GENERATE
+/// ----------------------
+/// 1. A QuestDefinition ScriptableObject with QuestID, Title, Description, Steps, and Rewards.
+/// 2. A DialogueData ScriptableObject for [NPC_NAME] with dialogue lines that hook into the quest.
+/// 3. Any required sample code for triggers (e.g. item collection, monster kill counts).
+///
+/// ----------------------
+/// REQUIREMENTS
+/// ----------------------
+/// - Use my existing QuestManager & DialogueManager (assume they exist).
+/// - Quest progress must be text-based only (no clickable steps).
+/// - Dialogue system must use DialogueData ScriptableObjects.
+/// - Code should be clean, modular, and commented.
+/// - Generate everything needed so I can drop the quest into Unity and it works.
