@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72479de709848e3ab024450652154e5, type: 3}
   m_Name: Lion
   m_EditorClassIdentifier: 
-  id: White Tiger
-  displayName: White Tiger
-  pickupItem: {fileID: 11400000, guid: f3c0207c1d419764b8e4132ec3439acf, type: 2}
+  id: Lion
+  displayName: Lion
+  pickupItem: {fileID: 11400000, guid: 700aaff49f38dbf4cafb087953ad9bb6, type: 2}
   sprite: {fileID: 0}
   pixelsPerUnit: 128
   evolutionTiers:
@@ -36,26 +36,26 @@ MonoBehaviour:
   animationClips: []
   attackSprite: {fileID: 0}
   hitUp:
-  - {fileID: 21300000, guid: 2750f817f9bf3a746b5c459fe45c37a9, type: 3}
+  - {fileID: 21300000, guid: bc0e146510656ab43912c6d1a9017100, type: 3}
   hitDown:
-  - {fileID: 21300000, guid: 777440d574d83b046a42633b5441bcdf, type: 3}
+  - {fileID: 21300000, guid: f86de41d2bbb23d4aae01a71558fe943, type: 3}
   hitLeft: []
   hitRight:
-  - {fileID: 21300000, guid: b869f63a8d30cce42b61ce1c503660a7, type: 3}
+  - {fileID: 21300000, guid: 7625817598cf9c94ca4e21c7d776dee7, type: 3}
   idleUp:
-  - {fileID: 21300000, guid: f5343cdb34d4dfa43ae5aff502275d3b, type: 3}
+  - {fileID: 21300000, guid: 5ae4a7461ba8baa4e9c6294d91102395, type: 3}
   walkUp:
-  - {fileID: 21300000, guid: a58f14d44d2480e41a3c1c7417e14c6c, type: 3}
+  - {fileID: 21300000, guid: 5ae4a7461ba8baa4e9c6294d91102395, type: 3}
   idleDown:
-  - {fileID: 21300000, guid: a6552839fa2d84a438740e7a7138f8e3, type: 3}
+  - {fileID: 21300000, guid: 1b93fcdc8f4efa44883e7738aa3e7521, type: 3}
   walkDown:
-  - {fileID: 21300000, guid: 15d5580969b061b45ba9096c6011c009, type: 3}
+  - {fileID: 21300000, guid: 9463019866d84f444a2b509e1919c69e, type: 3}
   idleLeft: []
   walkLeft: []
   idleRight:
-  - {fileID: 21300000, guid: 1e8ce8932cca2444eb12bdc014869cdf, type: 3}
+  - {fileID: 21300000, guid: f30996a87b14ddc4da550fd5e2042a78, type: 3}
   walkRight:
-  - {fileID: 21300000, guid: 2f5630ee63105ec4c87be84667f2b089, type: 3}
+  - {fileID: 21300000, guid: b7973eb3bb3717949af5844e102852c5, type: 3}
   useRightSpritesForLeft: 1
   useLeftSpritesForRight: 0
   canFight: 1

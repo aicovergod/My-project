@@ -13,6 +13,7 @@ using Combat;
 using UnityEngine.InputSystem;
 #endif
 using Quests;
+using Object = UnityEngine.Object;
 
 namespace Inventory
 {

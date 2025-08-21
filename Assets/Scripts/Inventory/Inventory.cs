@@ -12,6 +12,7 @@ using Player;
 using Skills;
 using Pets;
 using Quests;
+using Object = UnityEngine.Object;
 
 namespace Inventory
 {
