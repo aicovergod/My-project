@@ -21,6 +21,7 @@ namespace World
         private GameObject smallRoot;
         private RectTransform smallMapRect;
         private RectTransform expandedMapRect;
+        private Vector3 dragOffset;
 
         private readonly List<MinimapMarker> markers = new List<MinimapMarker>();
         private readonly Dictionary<MinimapMarker.MarkerType, Sprite> iconCache = new Dictionary<MinimapMarker.MarkerType, Sprite>();
@@ -229,9 +230,22 @@ namespace World
                     target = player.transform;
             }
 
+            if (mapCamera != null)
+            {
+                if (IsExpanded && expandedMapRect != null && Input.GetMouseButton(1))
+                {
+                    float worldPerPixel = (mapCamera.orthographicSize * 2f) / expandedMapRect.rect.height;
+                    dragOffset += new Vector3(-Input.GetAxis("Mouse X"), -Input.GetAxis("Mouse Y"), 0f) * worldPerPixel;
+                }
+                else if (!IsExpanded)
+                {
+                    dragOffset = Vector3.zero;
+                }
+            }
+
             if (target != null && mapCamera != null)
             {
-                var pos = target.position;
+                var pos = target.position + dragOffset;
                 mapCamera.transform.position = new Vector3(pos.x, pos.y, -10f);
             }
 
@@ -300,7 +314,10 @@ namespace World
                 smallRoot.SetActive(!opening);
 
             if (!opening)
+            {
                 ResetSmallMapZoom();
+                dragOffset = Vector3.zero;
+            }
 
             var playerObj = target != null ? target.gameObject : GameObject.FindGameObjectWithTag("Player");
             var mover = playerObj != null ? playerObj.GetComponent<PlayerMover>() : null;
