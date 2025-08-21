@@ -150,7 +150,7 @@ namespace Quests
             var allQuests = QuestManager.Instance.GetActiveQuests().Concat(QuestManager.Instance.GetAvailableQuests());
             foreach (var quest in allQuests)
             {
-                var btnGO = new GameObject(quest.Title, typeof(Button));
+                var btnGO = new GameObject(quest.Title, typeof(RectTransform), typeof(Image), typeof(Button));
                 var btnRect = btnGO.GetComponent<RectTransform>();
                 btnRect.SetParent(listContent, false);
                 btnRect.sizeDelta = new Vector2(0, 30f);
