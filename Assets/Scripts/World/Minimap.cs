@@ -42,6 +42,8 @@ namespace World
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreateInstance()
         {
+            if (instance != null)
+                return;
             var go = new GameObject("Minimap");
             DontDestroyOnLoad(go);
             go.AddComponent<Minimap>();
@@ -54,6 +56,12 @@ namespace World
             CreateUI();
             RegisterExistingMarkers();
             ResetSmallMapZoom();
+        }
+
+        private void OnEnable()
+        {
+            if (mapTexture != null && !mapTexture.IsCreated())
+                mapTexture.Create();
         }
 
         private void CreateCamera()
