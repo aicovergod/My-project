@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace Dialogue
 {
@@ -19,6 +20,7 @@ namespace Dialogue
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             gameObject.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             gameObject.AddComponent<GraphicRaycaster>();
+            EnsureEventSystem();
             Build();
             gameObject.SetActive(false);
         }
@@ -28,13 +30,14 @@ namespace Dialogue
             var panel = new GameObject("Panel", typeof(Image));
             var panelRect = panel.GetComponent<RectTransform>();
             panelRect.SetParent(transform, false);
-            panelRect.anchorMin = new Vector2(0.1f, 0.1f);
-            panelRect.anchorMax = new Vector2(0.9f, 0.3f);
+            panelRect.anchorMin = new Vector2(0.1f, 0f);
+            panelRect.anchorMax = new Vector2(0.9f, 0.25f);
             panelRect.offsetMin = panelRect.offsetMax = Vector2.zero;
 
             // Remove the default white background so the panel is invisible
             var panelImage = panel.GetComponent<Image>();
             panelImage.color = Color.clear;
+            panelImage.raycastTarget = false;
 
             nameText = CreateText("Name", panelRect, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0, -10));
             nameText.fontStyle = FontStyle.Bold;
@@ -94,6 +97,7 @@ namespace Dialogue
                 var rect = btnGO.GetComponent<RectTransform>();
                 rect.SetParent(optionsParent, false);
                 rect.sizeDelta = new Vector2(0, 30f);
+                btnGO.GetComponent<Image>().color = Color.clear;
                 var txt = CreateText("Text", rect, Vector2.zero, Vector2.one, Vector2.zero);
                 txt.text = opt.Text;
                 txt.alignment = TextAnchor.MiddleLeft;
@@ -103,5 +107,13 @@ namespace Dialogue
         }
 
         public void Hide() => gameObject.SetActive(false);
+        
+        private static void EnsureEventSystem()
+        {
+            if (FindObjectOfType<EventSystem>() != null)
+                return;
+            var go = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+            DontDestroyOnLoad(go);
+        }
     }
 }
