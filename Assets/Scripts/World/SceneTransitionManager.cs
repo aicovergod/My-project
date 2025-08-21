@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using Pets;
 
 namespace World
 {
@@ -16,6 +17,7 @@ namespace World
         private GameObject _cameraToMove;
         private GameObject _inventoryUIToMove;
         private GameObject _eventSystemToMove;
+        private GameObject _petToMove;
         private string _nextSpawnPoint;
 
         private void Awake()
@@ -63,6 +65,13 @@ namespace World
             var ev = EventSystem.current;
             _eventSystemToMove = ev ? ev.gameObject : null;
             if (_eventSystemToMove) DontDestroyOnLoad(_eventSystemToMove);
+
+            var pet = PetDropSystem.ActivePetObject;
+            if (pet != null)
+            {
+                _petToMove = pet;
+                DontDestroyOnLoad(pet);
+            }
 
             SceneManager.sceneLoaded += OnSceneLoaded;
             SceneManager.LoadScene(sceneToLoad);
@@ -124,12 +133,25 @@ namespace World
                 }
             }
 
+            if (_petToMove != null)
+            {
+                if (_playerToMove != null)
+                {
+                    _petToMove.transform.position = _playerToMove.position;
+                    var follower = _petToMove.GetComponent<PetFollower>();
+                    if (follower != null)
+                        follower.SetPlayer(_playerToMove);
+                }
+                SceneManager.MoveGameObjectToScene(_petToMove, scene);
+            }
+
             SceneManager.sceneLoaded -= OnSceneLoaded;
             _playerToMove = null;
             _nextSpawnPoint = null;
             _cameraToMove = null;
             _inventoryUIToMove = null;
             _eventSystemToMove = null;
+            _petToMove = null;
 
             if (ScreenFader.Instance != null)
                 ScreenFader.Instance.StartCoroutine(ScreenFader.Instance.FadeIn());
