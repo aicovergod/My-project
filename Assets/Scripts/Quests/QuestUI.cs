@@ -137,6 +137,10 @@ namespace Quests
             var scroll = listGO.GetComponent<ScrollRect>();
             scroll.viewport = vpRect;
             scroll.content = listContent;
+            // Prevent horizontal dragging and excessive movement when
+            // the list contains few items so the layout remains stable.
+            scroll.horizontal = false;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
 
             // Right details panel
             var details = new GameObject("Details", typeof(Image));
@@ -246,13 +250,6 @@ namespace Quests
 
         private void SelectQuest(QuestDefinition quest)
         {
-            if (selected == quest)
-            {
-                selected = null;
-                titleText.text = descriptionText.text = stepsText.text = rewardsText.text = string.Empty;
-                return;
-            }
-
             selected = quest;
             if (quest == null)
             {
