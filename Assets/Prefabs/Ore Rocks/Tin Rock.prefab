@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1016246674056767260}
   - component: {fileID: 4616583675746275694}
   - component: {fileID: 7604887451663994226}
+  - component: {fileID: 5725583827003903326}
   m_Layer: 0
   m_Name: Tin Rock
   m_TagString: Untagged
@@ -75,9 +76,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -2109142493
-  m_SortingLayer: -4
-  m_SortingOrder: 3
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
   m_Sprite: {fileID: -3771428812961251709, guid: b87d980b0cd69894898daad8260b7e23, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -151,3 +152,16 @@ MonoBehaviour:
   spriteRenderer: {fileID: 1016246674056767260}
   fullSprite: {fileID: -3771428812961251709, guid: b87d980b0cd69894898daad8260b7e23, type: 3}
   depletedSprite: {fileID: -3867931755167647559, guid: 0b7e8363bc036f54683b8b5a2b4ffa18, type: 3}
+--- !u!114 &5725583827003903326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1786630247007552716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76cd1b72de0d4b218ac17b592277af94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: -1

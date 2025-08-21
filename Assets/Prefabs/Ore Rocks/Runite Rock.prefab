@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5103869218076937299}
   - component: {fileID: 1849133045492539361}
   - component: {fileID: 5585079869244152123}
+  - component: {fileID: 8070757357600581772}
   m_Layer: 0
   m_Name: Runite Rock
   m_TagString: Untagged
@@ -75,9 +76,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -2109142493
-  m_SortingLayer: -4
-  m_SortingOrder: 3
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 015f3f22b8d356945bb1376d1c2c3dbf, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -151,3 +152,16 @@ MonoBehaviour:
   spriteRenderer: {fileID: 5103869218076937299}
   fullSprite: {fileID: 21300000, guid: 015f3f22b8d356945bb1376d1c2c3dbf, type: 3}
   depletedSprite: {fileID: -3867931755167647559, guid: 0b7e8363bc036f54683b8b5a2b4ffa18, type: 3}
+--- !u!114 &8070757357600581772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8850926968184526311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76cd1b72de0d4b218ac17b592277af94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: -1

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1554418498335891255}
   - component: {fileID: 1056172804895332544}
   - component: {fileID: 9158371086379293641}
+  - component: {fileID: -3399186540181322053}
   m_Layer: 0
   m_Name: Mithril Rock
   m_TagString: Untagged
@@ -75,9 +76,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -2109142493
-  m_SortingLayer: -4
-  m_SortingOrder: 3
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: aa7a1b86b8019af479b00d1fb9848ea9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -151,3 +152,16 @@ MonoBehaviour:
   spriteRenderer: {fileID: 1554418498335891255}
   fullSprite: {fileID: 21300000, guid: aa7a1b86b8019af479b00d1fb9848ea9, type: 3}
   depletedSprite: {fileID: -3867931755167647559, guid: 0b7e8363bc036f54683b8b5a2b4ffa18, type: 3}
+--- !u!114 &-3399186540181322053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2853819158990723001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76cd1b72de0d4b218ac17b592277af94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: -1
