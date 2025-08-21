@@ -142,8 +142,9 @@ namespace Pets
                     attacker.StrengthLevel = Mathf.RoundToInt(attacker.StrengthLevel * (1f + definition.strengthLevelPerBeastmasterLevel * beastmasterLevel));
             }
 
+            var npc = target as NpcCombatant;
             CombatantStats defender;
-            if (target is NpcCombatant npc)
+            if (npc != null)
                 defender = npc.GetCombatantStats();
             else
                 defender = new CombatantStats
@@ -203,7 +204,7 @@ namespace Pets
                     maxHit = Mathf.RoundToInt(maxHit * (1f + definition.maxHitPerBeastmasterLevel * beastmasterLevel));
                 int dmg = CombatMath.RollDamage(maxHit);
                 target.ApplyDamage(dmg, attacker.DamageType, this);
-                if (target is NpcCombatant npc)
+                if (npc != null)
                 {
                     var npcAttack = npc.GetComponent<NpcAttackController>();
                     npcAttack?.BeginAttacking(this);
