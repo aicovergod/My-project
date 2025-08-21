@@ -15,17 +15,18 @@ namespace Quests
         private Text stepsText;
         private Text rewardsText;
         private QuestDefinition selected;
+        private Canvas canvas;
 
         private void Awake()
         {
             name = "QuestUI";
-            var canvas = gameObject.AddComponent<Canvas>();
+            canvas = gameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             gameObject.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             gameObject.AddComponent<GraphicRaycaster>();
 
             BuildLayout();
-            gameObject.SetActive(false);
+            canvas.enabled = false;
         }
 
         private void Start()
@@ -38,8 +39,8 @@ namespace Quests
         {
             if (Input.GetKeyDown(KeyCode.Q))
             {
-                gameObject.SetActive(!gameObject.activeSelf);
-                if (gameObject.activeSelf) Refresh();
+                canvas.enabled = !canvas.enabled;
+                if (canvas.enabled) Refresh();
             }
         }
 
@@ -114,7 +115,7 @@ namespace Quests
             var closeText = CreateText("X", closeRect, Vector2.zero, Vector2.one, Vector2.zero);
             closeText.alignment = TextAnchor.MiddleCenter;
             closeBtnGO.GetComponent<Image>().color = Color.clear;
-            closeBtnGO.GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
+            closeBtnGO.GetComponent<Button>().onClick.AddListener(() => canvas.enabled = false);
         }
 
         private Text CreateText(string name, RectTransform parent, Vector2 anchorMin, Vector2 anchorMax, Vector2 offset)
