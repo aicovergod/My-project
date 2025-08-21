@@ -129,6 +129,7 @@ namespace Quests
             listContent.offsetMin = listContent.offsetMax = Vector2.zero;
             var layout = content.GetComponent<VerticalLayoutGroup>();
             layout.childForceExpandHeight = false;
+            layout.childControlWidth = false;
             layout.childAlignment = TextAnchor.UpperLeft;
             // Add a bit of padding at the top so the first quest is fully visible
             layout.padding = new RectOffset(0, 0, 5, 0);
