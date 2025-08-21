@@ -30,6 +30,12 @@ namespace Quests
 
             if (QuestsUpdated == null)
                 QuestsUpdated = new UnityEvent();
+
+            // Load any quest definitions placed under Resources/Quests so they
+            // appear in the log before being accepted.
+            var initialQuests = Resources.LoadAll<QuestDefinition>("Quests");
+            foreach (var quest in initialQuests)
+                RegisterQuest(quest);
         }
 
         /// <summary>
