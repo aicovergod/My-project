@@ -16,6 +16,7 @@ namespace Skills.Mining
         private GameObject progressRoot;
         private GameObject pickaxeRoot;
         private SpriteRenderer pickaxeRenderer;
+        private Canvas progressCanvas;
         // Offset from the targeted rock's position where the progress bar will appear.
         // Reduced the vertical component to half of its previous value so the bar sits closer to the object.
         private readonly Vector3 offset = new Vector3(0f, 0.75f, 0f);
@@ -53,8 +54,9 @@ namespace Skills.Mining
             progressRoot = new GameObject("MiningProgress");
             progressRoot.transform.SetParent(transform);
 
-            var canvas = progressRoot.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.WorldSpace;
+            progressCanvas = progressRoot.AddComponent<Canvas>();
+            progressCanvas.renderMode = RenderMode.WorldSpace;
+            progressCanvas.overrideSorting = true;
             progressRoot.AddComponent<CanvasScaler>();
             progressRoot.AddComponent<GraphicRaycaster>();
             progressRoot.transform.localScale = Vector3.one * 0.01f;
@@ -111,6 +113,20 @@ namespace Skills.Mining
                 {
                     pickaxeRenderer.sprite = item.icon;
                     pickaxeRoot.SetActive(true);
+                }
+            }
+            var targetRenderer = rock.GetComponent<SpriteRenderer>();
+            if (targetRenderer != null)
+            {
+                if (progressCanvas != null)
+                {
+                    progressCanvas.sortingLayerID = targetRenderer.sortingLayerID;
+                    progressCanvas.sortingOrder = targetRenderer.sortingOrder + 1;
+                }
+                if (pickaxeRenderer != null)
+                {
+                    pickaxeRenderer.sortingLayerID = targetRenderer.sortingLayerID;
+                    pickaxeRenderer.sortingOrder = targetRenderer.sortingOrder + 2;
                 }
             }
             if (Ticker.Instance != null)

@@ -16,6 +16,7 @@ namespace Skills.Woodcutting
         private GameObject progressRoot;
         private GameObject axeRoot;
         private SpriteRenderer axeRenderer;
+        private Canvas progressCanvas;
         private readonly Vector3 offset = new Vector3(0f, 0.75f, 0f);
         private readonly Vector3 axeOffset = Vector3.zero;
 
@@ -51,8 +52,9 @@ namespace Skills.Woodcutting
             progressRoot = new GameObject("WoodcuttingProgress");
             progressRoot.transform.SetParent(transform);
 
-            var canvas = progressRoot.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.WorldSpace;
+            progressCanvas = progressRoot.AddComponent<Canvas>();
+            progressCanvas.renderMode = RenderMode.WorldSpace;
+            progressCanvas.overrideSorting = true;
             progressRoot.AddComponent<CanvasScaler>();
             progressRoot.AddComponent<GraphicRaycaster>();
             progressRoot.transform.localScale = Vector3.one * 0.01f;
@@ -110,6 +112,21 @@ namespace Skills.Woodcutting
                 {
                     axeRenderer.sprite = item.icon;
                     axeRoot.SetActive(true);
+                }
+            }
+
+            var targetRenderer = tree.GetComponent<SpriteRenderer>();
+            if (targetRenderer != null)
+            {
+                if (progressCanvas != null)
+                {
+                    progressCanvas.sortingLayerID = targetRenderer.sortingLayerID;
+                    progressCanvas.sortingOrder = targetRenderer.sortingOrder + 1;
+                }
+                if (axeRenderer != null)
+                {
+                    axeRenderer.sortingLayerID = targetRenderer.sortingLayerID;
+                    axeRenderer.sortingOrder = targetRenderer.sortingOrder + 2;
                 }
             }
 
