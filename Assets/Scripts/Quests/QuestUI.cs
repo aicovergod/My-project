@@ -15,6 +15,7 @@ namespace Quests
         private Text stepsText;
         private Text rewardsText;
         private QuestDefinition selected;
+        private Canvas canvas;
 
         private Canvas canvas;
 
