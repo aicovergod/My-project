@@ -5,6 +5,7 @@ using Inventory;
 using Player;
 using Skills;
 using NPC;
+using Quests;
 
 namespace ShopSystem
 {
@@ -85,6 +86,9 @@ namespace ShopSystem
         public void Open(Shop shop, NpcRandomMovement npcMovement = null)
         {
             if (shop == null) return;
+            var quest = FindObjectOfType<QuestUI>();
+            if (quest != null && quest.IsOpen)
+                return;
             currentShop = shop;
             Refresh();
             var skills = SkillsUI.Instance;

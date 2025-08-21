@@ -12,6 +12,7 @@ using Combat;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
+using Quests;
 
 namespace Inventory
 {
@@ -158,6 +159,13 @@ namespace Inventory
 #else
             bool toggle = Input.GetKeyDown(KeyCode.E);
 #endif
+            var quest = Object.FindObjectOfType<QuestUI>();
+            if (quest != null && quest.IsOpen)
+            {
+                if (uiRoot != null && uiRoot.activeSelf)
+                    uiRoot.SetActive(false);
+                return;
+            }
             if (toggle && uiRoot != null)
             {
                 bool opening = !uiRoot.activeSelf;

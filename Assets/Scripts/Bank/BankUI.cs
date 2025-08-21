@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 using Inventory;
 using Core.Save;
 using Skills;
+using Quests;
 
 namespace BankSystem
 {
@@ -486,6 +487,9 @@ namespace BankSystem
         public void Open()
         {
             if (Beastmaster.PetMergeController.Instance != null && Beastmaster.PetMergeController.Instance.IsMerged)
+                return;
+            var quest = FindObjectOfType<QuestUI>();
+            if (quest != null && quest.IsOpen)
                 return;
             if (playerInventory == null)
                 playerInventory = FindObjectOfType<Inventory.Inventory>();

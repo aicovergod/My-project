@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using ShopSystem;
 using Inventory;
 using Player;
+using Quests;
 
 namespace Skills
 {
@@ -89,6 +90,13 @@ namespace Skills
 
         private void Update()
         {
+            var quest = FindObjectOfType<QuestUI>();
+            if (quest != null && quest.IsOpen)
+            {
+                if (uiRoot != null && uiRoot.activeSelf)
+                    uiRoot.SetActive(false);
+                return;
+            }
             if (Input.GetKeyDown(KeyCode.O))
             {
                 var shop = ShopUI.Instance;

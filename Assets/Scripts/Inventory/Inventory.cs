@@ -11,6 +11,7 @@ using ShopSystem;
 using Player;
 using Skills;
 using Pets;
+using Quests;
 
 namespace Inventory
 {
@@ -986,6 +987,14 @@ namespace Inventory
 #else
             bool toggle = Input.GetKeyDown(KeyCode.I);
 #endif
+
+            var quest = Object.FindObjectOfType<QuestUI>();
+            if (quest != null && quest.IsOpen)
+            {
+                if (uiRoot != null && uiRoot.activeSelf)
+                    uiRoot.SetActive(false);
+                return;
+            }
             if (currentShop != null)
             {
                 if (uiRoot != null && !uiRoot.activeSelf)
