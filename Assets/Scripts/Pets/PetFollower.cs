@@ -168,22 +168,26 @@ namespace Pets
                     sprite.flipX = newPos.x > player.position.x;
             }
 
-            if (sprite != null)
+        }
+
+        private void LateUpdate()
+        {
+            if (spriteDepth != null || sprite == null)
+                return;
+
+            int baseOrder = Mathf.RoundToInt(-transform.position.y * 100f) + depthOffset;
+            if (player != null)
             {
-                int baseOrder = Mathf.RoundToInt(-transform.position.y * 100f) + (spriteDepth != null ? spriteDepth.offset : 0);
-                if (player != null)
+                int playerOrder = Mathf.RoundToInt(-player.position.y * 100f) + (playerDepth != null ? playerDepth.offset : 0);
+                if (playerMover != null)
                 {
-                    int playerOrder = Mathf.RoundToInt(-player.position.y * 100f) + (playerDepth != null ? playerDepth.offset : 0);
-                    if (playerMover != null)
-                    {
-                        if (playerMover.FacingDir == 3 && transform.position.y < player.position.y)
-                            baseOrder = playerOrder - 1;
-                        else if (playerMover.FacingDir == 0 && transform.position.y > player.position.y)
-                            baseOrder = playerOrder - 1;
-                    }
+                    if (playerMover.FacingDir == 3 && transform.position.y < player.position.y)
+                        baseOrder = playerOrder - 1;
+                    else if (playerMover.FacingDir == 0 && transform.position.y > player.position.y)
+                        baseOrder = playerOrder - 1;
                 }
-                sprite.sortingOrder = baseOrder;
             }
+            sprite.sortingOrder = baseOrder;
         }
 
     }
