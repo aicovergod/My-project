@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c72479de709848e3ab024450652154e5, type: 3}
+  m_Name: Solar Lion
+  m_EditorClassIdentifier: 
+  id: Lion
+  displayName: Lion
+  pickupItem: {fileID: 11400000, guid: 700aaff49f38dbf4cafb087953ad9bb6, type: 2}
+  sprite: {fileID: 0}
+  pixelsPerUnit: 128
+  evolutionTiers:
+  - level: 0
+    pixelsPerUnit: 128
+    tierName: Cub
+  - level: 25
+    pixelsPerUnit: 96
+    tierName: Juvenile
+  - level: 50
+    pixelsPerUnit: 64
+    tierName: Adult
+  - level: 75
+    pixelsPerUnit: 48
+    tierName: Elder
+  - level: 99
+    pixelsPerUnit: 32
+    tierName: Ancient
+  animationClips: []
+  attackSprite: {fileID: 0}
+  hitUp:
+  - {fileID: 21300000, guid: bc0e146510656ab43912c6d1a9017100, type: 3}
+  hitDown:
+  - {fileID: 21300000, guid: f86de41d2bbb23d4aae01a71558fe943, type: 3}
+  hitLeft: []
+  hitRight:
+  - {fileID: 21300000, guid: 7625817598cf9c94ca4e21c7d776dee7, type: 3}
+  idleUp:
+  - {fileID: 21300000, guid: 5ae4a7461ba8baa4e9c6294d91102395, type: 3}
+  walkUp:
+  - {fileID: 21300000, guid: 5ae4a7461ba8baa4e9c6294d91102395, type: 3}
+  idleDown:
+  - {fileID: 21300000, guid: 1b93fcdc8f4efa44883e7738aa3e7521, type: 3}
+  walkDown:
+  - {fileID: 21300000, guid: 9463019866d84f444a2b509e1919c69e, type: 3}
+  idleLeft: []
+  walkLeft: []
+  idleRight:
+  - {fileID: 21300000, guid: f30996a87b14ddc4da550fd5e2042a78, type: 3}
+  walkRight:
+  - {fileID: 21300000, guid: b7973eb3bb3717949af5844e102852c5, type: 3}
+  useRightSpritesForLeft: 1
+  useLeftSpritesForRight: 0
+  canFight: 1
+  petAttackLevel: 55
+  petStrengthLevel: 70
+  attackSpeedTicks: 4
+  accuracyBonus: 35
+  damageBonus: 70
+  attackLevelPerBeastmasterLevel: 0.02
+  strengthLevelPerBeastmasterLevel: 0.02
+  maxHitPerBeastmasterLevel: 0
+  messageColor: {r: 1, g: 1, b: 1, a: 1}
+  debugBeastmasterLevel: 99
