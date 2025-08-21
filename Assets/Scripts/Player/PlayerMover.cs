@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using System;
 using Core.Save;
+using World;
 
 namespace Player
 {
@@ -257,7 +258,7 @@ namespace Player
             SavePosition();
         }
 
-        private void SavePosition()
+        public void SavePosition()
         {
             Vector3 pos = transform.position;
             var data = new PositionData
@@ -276,15 +277,11 @@ namespace Player
             if (data == null)
                 return;
 
-            if (SceneManager.GetActiveScene().name != data.scene)
-            {
-                SceneManager.sceneLoaded += OnSceneLoaded;
-                SceneManager.LoadScene(data.scene);
-            }
-            else
-            {
-                ApplySavedPosition();
-            }
+            if (SceneTransitionManager.IsTransitioning || SceneManager.GetActiveScene().name == data.scene)
+                return;
+
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.LoadScene(data.scene);
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
