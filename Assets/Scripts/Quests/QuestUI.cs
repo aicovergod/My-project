@@ -210,7 +210,13 @@ namespace Quests
                     txt.color = Color.yellow;
                 else
                     txt.color = Color.red;
-                btnGO.GetComponent<Button>().onClick.AddListener(() => SelectQuest(quest));
+                // Capture the quest in a local variable to ensure the correct
+                // quest is referenced when the button is clicked. Without this,
+                // all buttons could end up referencing the final quest in the
+                // loop, preventing the correct details from appearing when
+                // selecting a quest.
+                var capturedQuest = quest;
+                btnGO.GetComponent<Button>().onClick.AddListener(() => SelectQuest(capturedQuest));
             }
 
             if (selected != null)
