@@ -21,6 +21,8 @@ namespace Quests
         private Text rewardsText;
         private QuestDefinition selected;
 
+        [SerializeField] private Button questEntryPrefab;
+
         private Canvas canvas;
         private PlayerMover playerMover;
 
@@ -196,22 +198,20 @@ namespace Quests
         {
             ClearList();
 
+            if (questEntryPrefab == null)
+            {
+                Debug.LogWarning("Quest entry prefab not assigned.");
+                return;
+            }
+
             var allQuests = QuestManager.Instance.GetActiveQuests()
                 .Concat(QuestManager.Instance.GetAvailableQuests())
                 .Concat(QuestManager.Instance.GetCompletedQuests());
             foreach (var quest in allQuests)
             {
-                var btnGO = new GameObject(quest.Title, typeof(RectTransform), typeof(Image), typeof(Button));
-                var btnRect = btnGO.GetComponent<RectTransform>();
-                btnRect.SetParent(listContent, false);
-                // Stretch the button to the full width of the list so the
-                // entire quest title is clickable instead of only a tiny
-                // portion at the left edge.
-                btnRect.anchorMin = new Vector2(0f, 1f);
-                btnRect.anchorMax = new Vector2(1f, 1f);
-                btnRect.pivot = new Vector2(0.5f, 1f);
-                btnRect.sizeDelta = new Vector2(0f, 30f);
-                var txt = CreateText("Text", btnRect, Vector2.zero, Vector2.one, Vector2.zero);
+                var btn = Instantiate(questEntryPrefab, listContent);
+                btn.name = quest.Title;
+                var txt = btn.GetComponentInChildren<Text>();
                 txt.text = quest.Title;
                 txt.alignment = TextAnchor.MiddleLeft;
                 txt.horizontalOverflow = HorizontalWrapMode.Overflow;
@@ -221,13 +221,8 @@ namespace Quests
                     txt.color = Color.yellow;
                 else
                     txt.color = Color.red;
-                // Capture the quest in a local variable to ensure the correct
-                // quest is referenced when the button is clicked. Without this,
-                // all buttons could end up referencing the final quest in the
-                // loop, preventing the correct details from appearing when
-                // selecting a quest.
                 var capturedQuest = quest;
-                btnGO.GetComponent<Button>().onClick.AddListener(() => SelectQuest(capturedQuest));
+                btn.onClick.AddListener(() => SelectQuest(capturedQuest));
             }
 
             if (selected != null)
