@@ -41,7 +41,14 @@ namespace Quests
             if (Input.GetKeyDown(KeyCode.Q))
             {
                 canvas.enabled = !canvas.enabled;
-                if (canvas.enabled) Refresh();
+                if (canvas.enabled)
+                {
+                    Refresh();
+                }
+                else
+                {
+                    Clear();
+                }
             }
         }
 
@@ -138,8 +145,7 @@ namespace Quests
 
         private void Refresh()
         {
-            foreach (Transform child in listContent)
-                Destroy(child.gameObject);
+            ClearList();
 
             var allQuests = QuestManager.Instance.GetActiveQuests().Concat(QuestManager.Instance.GetAvailableQuests());
             foreach (var quest in allQuests)
@@ -158,6 +164,20 @@ namespace Quests
                 SelectQuest(allQuests.First());
             else if (selected != null)
                 SelectQuest(selected);
+        }
+
+        private void Clear()
+        {
+            ClearList();
+            selected = null;
+            titleText.text = descriptionText.text = stepsText.text = rewardsText.text = string.Empty;
+        }
+
+        private void ClearList()
+        {
+            if (listContent == null) return;
+            foreach (Transform child in listContent)
+                Destroy(child.gameObject);
         }
 
         private void SelectQuest(QuestDefinition quest)
