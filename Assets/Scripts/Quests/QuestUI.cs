@@ -1,6 +1,11 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using Inventory;
+using Player;
+using Skills;
+using ShopSystem;
+using BankSystem;
 
 namespace Quests
 {
@@ -17,6 +22,9 @@ namespace Quests
         private QuestDefinition selected;
 
         private Canvas canvas;
+        private PlayerMover playerMover;
+
+        public bool IsOpen => canvas != null && canvas.enabled;
 
         private void Awake()
         {
@@ -28,6 +36,7 @@ namespace Quests
 
             BuildLayout();
             canvas.enabled = false;
+            playerMover = FindObjectOfType<PlayerMover>();
         }
 
         private void Start()
@@ -40,14 +49,40 @@ namespace Quests
         {
             if (Input.GetKeyDown(KeyCode.Q))
             {
-                canvas.enabled = !canvas.enabled;
+                bool opening = !canvas.enabled;
+                if (opening)
+                {
+                    var inv = FindObjectOfType<Inventory.Inventory>();
+                    if (inv != null && inv.IsOpen)
+                        inv.CloseUI();
+                    var eq = FindObjectOfType<Inventory.Equipment>();
+                    if (eq != null && eq.IsOpen)
+                        eq.CloseUI();
+                    var skills = SkillsUI.Instance;
+                    if (skills != null && skills.IsOpen)
+                        skills.Close();
+                    var shop = ShopUI.Instance;
+                    if (shop != null && shop.IsOpen)
+                        shop.Close();
+                    var bank = BankUI.Instance;
+                    if (bank != null && bank.IsOpen)
+                        bank.Close();
+                }
+
+                canvas.enabled = opening;
                 if (canvas.enabled)
                 {
                     Refresh();
+                    if (playerMover == null)
+                        playerMover = FindObjectOfType<PlayerMover>();
+                    if (playerMover != null)
+                        playerMover.enabled = false;
                 }
                 else
                 {
                     Clear();
+                    if (playerMover != null)
+                        playerMover.enabled = true;
                 }
             }
         }
