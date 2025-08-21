@@ -276,12 +276,18 @@ namespace Player
             var data = SaveManager.Load<PositionData>(PositionKey);
             if (data == null)
                 return;
-
-            if (SceneTransitionManager.IsTransitioning || SceneManager.GetActiveScene().name == data.scene)
+            if (SceneTransitionManager.IsTransitioning)
                 return;
 
-            SceneManager.sceneLoaded += OnSceneLoaded;
-            SceneManager.LoadScene(data.scene);
+            if (SceneManager.GetActiveScene().name == data.scene)
+            {
+                ApplySavedPosition();
+            }
+            else
+            {
+                SceneManager.sceneLoaded += OnSceneLoaded;
+                SceneManager.LoadScene(data.scene);
+            }
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
