@@ -37,7 +37,7 @@ namespace Skills.Mining
                 activeInstance.uiText.alignment = TextAnchor.MiddleCenter;
                 activeInstance.uiText.horizontalOverflow = HorizontalWrapMode.Overflow;
                 activeInstance.uiText.verticalOverflow = VerticalWrapMode.Overflow;
-                activeInstance.uiText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                activeInstance.uiText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
                 activeInstance.rectTransform = textGO.GetComponent<RectTransform>();
                 activeInstance.mainCamera = Camera.main;
             }

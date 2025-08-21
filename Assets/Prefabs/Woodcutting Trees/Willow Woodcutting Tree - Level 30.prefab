@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 5146756317505422246}
   - component: {fileID: 560002548667432091}
-  - component: {fileID: 8823242672750832941}
   - component: {fileID: 4014130824029682366}
   - component: {fileID: 1262169029336756179}
   - component: {fileID: 2288543091511179613}
+  - component: {fileID: -405956003792355250}
   m_Layer: 0
   m_Name: Willow Woodcutting Tree - Level 30
   m_TagString: Untagged
@@ -91,43 +91,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!70 &8823242672750832941
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8019037619377101243}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -1}
-  m_Size: {x: 3, y: 1.5}
-  m_Direction: 1
 --- !u!50 &4014130824029682366
 Rigidbody2D:
   serializedVersion: 5
@@ -184,4 +147,41 @@ MonoBehaviour:
   sr: {fileID: 560002548667432091}
   aliveSprite: {fileID: 21300000, guid: 0e1bd934d1e677c4bb4724459d2718ad, type: 3}
   depletedSprite: {fileID: -755174274035468053, guid: 12023af7e43fcee4da25bfb5a5547333, type: 3}
-  stumpCollider: {fileID: 8823242672750832941}
+  stumpCollider: {fileID: 0}
+--- !u!70 &-405956003792355250
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8019037619377101243}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: -1}
+  m_Size: {x: 2, y: 2}
+  m_Direction: 0
