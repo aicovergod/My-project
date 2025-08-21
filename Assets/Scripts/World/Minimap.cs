@@ -235,7 +235,7 @@ namespace World
                 if (IsExpanded && expandedMapRect != null && Input.GetMouseButton(1))
                 {
                     float worldPerPixel = (mapCamera.orthographicSize * 2f) / expandedMapRect.rect.height;
-                    dragOffset += new Vector3(-Input.GetAxis("Mouse X"), -Input.GetAxis("Mouse Y"), 0f) * worldPerPixel;
+                    dragOffset += new Vector3(-Input.GetAxis("Mouse X"), -Input.GetAxis("Mouse Y"), 0f) * worldPerPixel * 10f;
                 }
                 else if (!IsExpanded)
                 {
