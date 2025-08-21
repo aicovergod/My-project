@@ -1,5 +1,6 @@
 using UnityEngine;
 using Player;
+using Util;
 
 namespace Pets
 {
@@ -23,6 +24,7 @@ namespace Pets
         public float wanderMoveSpeed = 2f;
 
         [SerializeField] private Transform player;
+        [SerializeField] private int depthOffset = 1;
         public Transform Player => player;
         private Vector3 offset;
         private Vector3 targetOffset;
@@ -30,9 +32,10 @@ namespace Pets
         private Vector3 lastPlayerPos;
         private Rigidbody2D body;
         private SpriteRenderer sprite;
+        private SpriteDepth spriteDepth;
         private PetSpriteAnimator spriteAnimator;
         private PlayerMover playerMover;
-        private SpriteRenderer playerSprite;
+        private SpriteDepth playerDepth;
         private Vector3 currentVelocity;
         private float idleTimer;
         private Vector3 wanderTarget;
@@ -43,12 +46,15 @@ namespace Pets
         {
             body = GetComponent<Rigidbody2D>();
             sprite = GetComponent<SpriteRenderer>();
+            spriteDepth = GetComponent<SpriteDepth>();
+            if (spriteDepth != null)
+                spriteDepth.offset = depthOffset;
             spriteAnimator = GetComponent<PetSpriteAnimator>();
             if (player != null)
             {
                 lastPlayerPos = player.position;
                 playerMover = player.GetComponent<PlayerMover>();
-                playerSprite = player.GetComponent<SpriteRenderer>();
+                playerDepth = player.GetComponent<SpriteDepth>();
             }
             ChooseOffset(Vector2.right);
             offset = targetOffset;
@@ -61,7 +67,7 @@ namespace Pets
             {
                 lastPlayerPos = player.position;
                 playerMover = player.GetComponent<PlayerMover>();
-                playerSprite = player.GetComponent<SpriteRenderer>();
+                playerDepth = player.GetComponent<SpriteDepth>();
             }
         }
 
@@ -162,18 +168,21 @@ namespace Pets
                     sprite.flipX = newPos.x > player.position.x;
             }
 
-            if (playerSprite != null && sprite != null)
+            if (sprite != null)
             {
-                int baseOrder = playerSprite.sortingOrder;
-                if (playerMover != null)
+                int baseOrder = Mathf.RoundToInt(-transform.position.y * 100f) + (spriteDepth != null ? spriteDepth.offset : 0);
+                if (player != null)
                 {
-                    if (playerMover.FacingDir == 3 && transform.position.y < player.position.y)
-                        sprite.sortingOrder = baseOrder + 1;
-                    else if (playerMover.FacingDir == 0 && transform.position.y > player.position.y)
-                        sprite.sortingOrder = baseOrder - 1;
-                    else
-                        sprite.sortingOrder = baseOrder;
+                    int playerOrder = Mathf.RoundToInt(-player.position.y * 100f) + (playerDepth != null ? playerDepth.offset : 0);
+                    if (playerMover != null)
+                    {
+                        if (playerMover.FacingDir == 3 && transform.position.y < player.position.y)
+                            baseOrder = playerOrder - 1;
+                        else if (playerMover.FacingDir == 0 && transform.position.y > player.position.y)
+                            baseOrder = playerOrder - 1;
+                    }
                 }
+                sprite.sortingOrder = baseOrder;
             }
         }
 
