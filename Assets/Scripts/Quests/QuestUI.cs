@@ -199,7 +199,13 @@ namespace Quests
                 var btnGO = new GameObject(quest.Title, typeof(RectTransform), typeof(Image), typeof(Button));
                 var btnRect = btnGO.GetComponent<RectTransform>();
                 btnRect.SetParent(listContent, false);
-                btnRect.sizeDelta = new Vector2(0, 30f);
+                // Stretch the button to the full width of the list so the
+                // entire quest title is clickable instead of only a tiny
+                // portion at the left edge.
+                btnRect.anchorMin = new Vector2(0f, 1f);
+                btnRect.anchorMax = new Vector2(1f, 1f);
+                btnRect.pivot = new Vector2(0.5f, 1f);
+                btnRect.sizeDelta = new Vector2(0f, 30f);
                 var txt = CreateText("Text", btnRect, Vector2.zero, Vector2.one, Vector2.zero);
                 txt.text = quest.Title;
                 txt.alignment = TextAnchor.MiddleLeft;
