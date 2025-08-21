@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
+using Util;
 
 namespace Pets
 {
@@ -23,6 +24,7 @@ namespace Pets
             go.transform.position = position;
 
             var sr = go.AddComponent<SpriteRenderer>();
+            go.AddComponent<SpriteDepth>();
             sr.sortingLayerName = "Characters";
             sr.sprite = def.sprite;
             if (sr.sprite == null)
