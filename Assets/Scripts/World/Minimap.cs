@@ -305,7 +305,11 @@ namespace World
             var playerObj = target != null ? target.gameObject : GameObject.FindGameObjectWithTag("Player");
             var mover = playerObj != null ? playerObj.GetComponent<PlayerMover>() : null;
             if (mover != null)
+            {
+                if (opening)
+                    mover.StopMovement();
                 mover.enabled = !opening;
+            }
         }
 
         public bool IsExpanded => expandedRoot != null && expandedRoot.activeSelf;
