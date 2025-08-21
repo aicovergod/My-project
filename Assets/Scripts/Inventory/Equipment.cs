@@ -528,8 +528,7 @@ namespace Inventory
             }
             catch (ArgumentException)
             {
-                try { defaultFont = Resources.GetBuiltinResource<Font>("Arial.ttf"); }
-                catch (ArgumentException) { }
+                defaultFont = null;
             }
 
             for (int i = 0; i < 15; i++)

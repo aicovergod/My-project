@@ -68,11 +68,11 @@ namespace Inventory
         public Vector2 windowSize = new Vector2(83f, 375f);
 
         [Header("Tooltip")]
-        [Tooltip("Optional: custom font for the tooltip item name. Uses Arial if null.")]
+        [Tooltip("Optional: custom font for the tooltip item name. Uses LegacyRuntime if null.")]
         public Font tooltipNameFont;
         [Tooltip("Color for the tooltip item name text.")]
         public Color tooltipNameColor = Color.white;
-        [Tooltip("Optional: custom font for the tooltip description. Uses Arial if null.")]
+        [Tooltip("Optional: custom font for the tooltip description. Uses LegacyRuntime if null.")]
         public Font tooltipDescriptionFont;
         [Tooltip("Color for the tooltip description text.")]
         public Color tooltipDescriptionColor = Color.white;
@@ -163,28 +163,15 @@ namespace Inventory
             // Ensure at least one slot and cache the builtin font once
             size = Mathf.Max(1, size);
 
-            // Unity 2022+ renamed the builtin Arial font. Attempt to load the new
-            // name first and fall back for older Unity versions to avoid
-            // runtime exceptions that would prevent the UI from being created.
+            // Unity uses a builtin font named "LegacyRuntime" for runtime UI. Attempt
+            // to load it once so all UI elements have a consistent default.
             try
             {
                 defaultFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             }
             catch (System.ArgumentException)
             {
-                // ignored: will fall back below
-            }
-
-            if (defaultFont == null)
-            {
-                try
-                {
-                    defaultFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
-                }
-                catch (System.ArgumentException)
-                {
-                    defaultFont = null;
-                }
+                defaultFont = null;
             }
 
             items = new InventoryEntry[size];
