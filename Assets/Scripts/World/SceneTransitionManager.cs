@@ -74,6 +74,10 @@ namespace World
             }
 
             SceneManager.sceneLoaded += OnSceneLoaded;
+            if (_eventSystemToMove)
+                // Temporarily disable to avoid multiple active EventSystems during load
+                _eventSystemToMove.SetActive(false);
+
             SceneManager.LoadScene(sceneToLoad);
         }
 
@@ -131,6 +135,8 @@ namespace World
                     if (es.gameObject != _eventSystemToMove)
                         Destroy(es.gameObject);
                 }
+                // Reactivate after removing any duplicates
+                _eventSystemToMove.SetActive(true);
             }
 
             if (_petToMove != null)
