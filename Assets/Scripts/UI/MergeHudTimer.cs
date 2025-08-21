@@ -12,21 +12,38 @@ namespace UI
         [SerializeField] private Font font;
         private Text text;
         private Image background;
+        private static MergeHudTimer instance;
 
         private void Awake()
         {
-            var existing = GameObject.Find("MergeHudCanvas");
-            if (existing != null)
-                Destroy(existing);
+            if (instance != null && instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            instance = this;
 
             var canvas = GetComponentInChildren<Canvas>();
             if (canvas == null)
             {
-                var canvasGO = new GameObject("MergeHudCanvas", typeof(Canvas));
-                canvas = canvasGO.GetComponent<Canvas>();
-                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                DontDestroyOnLoad(canvasGO);
-                transform.SetParent(canvasGO.transform, false);
+                var existing = GameObject.Find("MergeHudCanvas");
+                if (existing != null)
+                {
+                    canvas = existing.GetComponent<Canvas>();
+                    transform.SetParent(existing.transform, false);
+                }
+                else
+                {
+                    var canvasGO = new GameObject("MergeHudCanvas", typeof(Canvas));
+                    canvas = canvasGO.GetComponent<Canvas>();
+                    canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                    DontDestroyOnLoad(canvasGO);
+                    transform.SetParent(canvasGO.transform, false);
+                }
+            }
+            else
+            {
+                DontDestroyOnLoad(canvas.gameObject);
             }
             var rectTransform = GetComponent<RectTransform>();
             if (rectTransform == null)

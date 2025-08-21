@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using Inventory;
 using Items;
+using Beastmaster;
 
 namespace EquipmentSystem
 {
@@ -39,27 +40,41 @@ namespace EquipmentSystem
         public CombinedStats GetCombinedStats()
         {
             CombinedStats result = new CombinedStats { attackSpeedTicks = 4 };
-            if (equipment == null)
-                return result;
-
-            foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+            if (equipment != null)
             {
-                if (slot == EquipmentSlot.None)
-                    continue;
-                var entry = equipment.GetEquipped(slot);
-                var item = entry.item;
-                if (item == null)
-                    continue;
-                var stats = item.combat;
-                result.attack += stats.Attack;
-                result.strength += stats.Strength;
-                result.range += stats.Range;
-                result.magic += stats.Magic;
-                result.meleeDef += stats.MeleeDefence;
-                result.rangeDef += stats.RangeDefence;
-                result.magicDef += stats.MagicDefence;
-                if (slot == EquipmentSlot.Weapon && stats.AttackSpeedTicks > 0)
-                    result.attackSpeedTicks = stats.AttackSpeedTicks;
+                foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+                {
+                    if (slot == EquipmentSlot.None)
+                        continue;
+                    var entry = equipment.GetEquipped(slot);
+                    var item = entry.item;
+                    if (item == null)
+                        continue;
+                    var stats = item.combat;
+                    result.attack += stats.Attack;
+                    result.strength += stats.Strength;
+                    result.range += stats.Range;
+                    result.magic += stats.Magic;
+                    result.meleeDef += stats.MeleeDefence;
+                    result.rangeDef += stats.RangeDefence;
+                    result.magicDef += stats.MagicDefence;
+                    if (slot == EquipmentSlot.Weapon && stats.AttackSpeedTicks > 0)
+                        result.attackSpeedTicks = stats.AttackSpeedTicks;
+                }
+            }
+
+            if (PetMergeController.Instance != null && PetMergeController.Instance.IsMerged)
+            {
+                var pet = PetMergeController.Instance.MergedEquipStats;
+                result.attack += pet.attack;
+                result.strength += pet.strength;
+                result.range += pet.range;
+                result.magic += pet.magic;
+                result.meleeDef += pet.meleeDef;
+                result.rangeDef += pet.rangeDef;
+                result.magicDef += pet.magicDef;
+                if (pet.attackSpeedTicks > 0)
+                    result.attackSpeedTicks = pet.attackSpeedTicks;
             }
 
             if (result.attackSpeedTicks <= 0)
