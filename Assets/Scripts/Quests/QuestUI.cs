@@ -88,6 +88,10 @@ namespace Quests
             var content = new GameObject("Content", typeof(RectTransform), typeof(VerticalLayoutGroup));
             listContent = content.GetComponent<RectTransform>();
             listContent.SetParent(viewport.transform, false);
+            listContent.anchorMin = new Vector2(0f, 1f);
+            listContent.anchorMax = new Vector2(1f, 1f);
+            listContent.pivot = new Vector2(0.5f, 1f);
+            listContent.offsetMin = listContent.offsetMax = Vector2.zero;
             var layout = content.GetComponent<VerticalLayoutGroup>();
             layout.childForceExpandHeight = false;
             layout.childAlignment = TextAnchor.UpperLeft;
@@ -147,7 +151,9 @@ namespace Quests
         {
             ClearList();
 
-            var allQuests = QuestManager.Instance.GetActiveQuests().Concat(QuestManager.Instance.GetAvailableQuests());
+            var allQuests = QuestManager.Instance.GetActiveQuests()
+                .Concat(QuestManager.Instance.GetAvailableQuests())
+                .Concat(QuestManager.Instance.GetCompletedQuests());
             foreach (var quest in allQuests)
             {
                 var btnGO = new GameObject(quest.Title, typeof(RectTransform), typeof(Image), typeof(Button));
@@ -157,12 +163,17 @@ namespace Quests
                 var txt = CreateText("Text", btnRect, Vector2.zero, Vector2.one, Vector2.zero);
                 txt.text = quest.Title;
                 txt.alignment = TextAnchor.MiddleLeft;
+                txt.horizontalOverflow = HorizontalWrapMode.Overflow;
+                if (QuestManager.Instance.IsQuestCompleted(quest.QuestID))
+                    txt.color = Color.green;
+                else if (QuestManager.Instance.IsQuestActive(quest.QuestID))
+                    txt.color = Color.yellow;
+                else
+                    txt.color = Color.red;
                 btnGO.GetComponent<Button>().onClick.AddListener(() => SelectQuest(quest));
             }
 
-            if (selected == null && allQuests.Any())
-                SelectQuest(allQuests.First());
-            else if (selected != null)
+            if (selected != null)
                 SelectQuest(selected);
         }
 
@@ -182,6 +193,13 @@ namespace Quests
 
         private void SelectQuest(QuestDefinition quest)
         {
+            if (selected == quest)
+            {
+                selected = null;
+                titleText.text = descriptionText.text = stepsText.text = rewardsText.text = string.Empty;
+                return;
+            }
+
             selected = quest;
             if (quest == null)
             {
