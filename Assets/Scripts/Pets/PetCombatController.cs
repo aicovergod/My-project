@@ -11,7 +11,7 @@ namespace Pets
     /// Handles combat behaviour for pets that can fight alongside the player.
     /// </summary>
     [RequireComponent(typeof(PetFollower))]
-    public class PetCombatController : MonoBehaviour
+    public class PetCombatController : MonoBehaviour, CombatTarget
     {
         public PetDefinition definition;
         public float moveSpeed = 5f;
@@ -24,6 +24,12 @@ namespace Pets
         private Coroutine spriteSwapRoutine;
         private CombatTarget currentTarget;
         private Coroutine attackRoutine;
+
+        public bool IsAlive => true;
+        public DamageType PreferredDefenceType => DamageType.Melee;
+        public int CurrentHP => 1;
+        public int MaxHP => 1;
+        public void ApplyDamage(int amount, DamageType type, object source) { }
 
         private void Awake()
         {
@@ -197,6 +203,11 @@ namespace Pets
                     maxHit = Mathf.RoundToInt(maxHit * (1f + definition.maxHitPerBeastmasterLevel * beastmasterLevel));
                 int dmg = CombatMath.RollDamage(maxHit);
                 target.ApplyDamage(dmg, attacker.DamageType, this);
+                if (target is NpcCombatant npc)
+                {
+                    var npcAttack = npc.GetComponent<NpcAttackController>();
+                    npcAttack?.BeginAttacking(this);
+                }
                 BeastmasterXp.TryGrantFromPetDamage(owner != null ? owner.gameObject : null, dmg);
             }
         }

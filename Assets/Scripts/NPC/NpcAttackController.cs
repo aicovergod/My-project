@@ -15,6 +15,7 @@ namespace NPC
     {
         private NpcCombatant combatant;
         private NpcWanderer wanderer;
+        private CombatTarget currentTarget;
 
         private void Awake()
         {
@@ -22,10 +23,13 @@ namespace NPC
             wanderer = GetComponent<NpcWanderer>();
         }
 
-        public void BeginAttacking(PlayerCombatTarget target)
+        public void BeginAttacking(CombatTarget target)
         {
+            if (target != null && currentTarget == target)
+                return;
             StopAllCoroutines();
             wanderer?.ExitCombat();
+            currentTarget = target;
             if (target != null)
             {
                 wanderer?.EnterCombat(target.transform);
@@ -33,7 +37,7 @@ namespace NPC
             }
         }
 
-        private IEnumerator AttackRoutine(PlayerCombatTarget target)
+        private IEnumerator AttackRoutine(CombatTarget target)
         {
             var wait = new WaitForSeconds(4 * CombatMath.TICK_SECONDS);
 
@@ -56,18 +60,35 @@ namespace NPC
             }
 
             wanderer?.ExitCombat();
+            currentTarget = null;
         }
 
-        private void ResolveAttack(PlayerCombatTarget target)
+        private void ResolveAttack(CombatTarget target)
         {
             var attacker = combatant.GetCombatantStats();
-            var skills = target.GetComponent<SkillManager>();
-            var equipment = target.GetComponent<EquipmentAggregator>();
-            var loadout = target.GetComponent<PlayerCombatLoadout>();
-
-            var defender = CombatantStats.ForPlayer(skills, equipment,
-                loadout != null ? loadout.Style : CombatStyle.Defensive,
-                DamageType.Melee);
+            CombatantStats defender;
+            var playerTarget = target as PlayerCombatTarget;
+            if (playerTarget != null)
+            {
+                var skills = playerTarget.GetComponent<SkillManager>();
+                var equipment = playerTarget.GetComponent<EquipmentAggregator>();
+                var loadout = playerTarget.GetComponent<PlayerCombatLoadout>();
+                defender = CombatantStats.ForPlayer(skills, equipment,
+                    loadout != null ? loadout.Style : CombatStyle.Defensive,
+                    DamageType.Melee);
+            }
+            else
+            {
+                defender = new CombatantStats
+                {
+                    AttackLevel = 1,
+                    StrengthLevel = 1,
+                    DefenceLevel = 1,
+                    Equip = new EquipmentAggregator.CombinedStats(),
+                    Style = CombatStyle.Defensive,
+                    DamageType = target.PreferredDefenceType
+                };
+            }
 
             int attEff = CombatMath.GetEffectiveAttack(attacker.AttackLevel, attacker.Style);
             int defEff = CombatMath.GetEffectiveDefence(defender.DefenceLevel, defender.Style);
@@ -87,11 +108,13 @@ namespace NPC
                 int maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
                 damage = CombatMath.RollDamage(maxHit);
                 target.ApplyDamage(damage, attacker.DamageType, this);
-                Debug.Log($"{name} dealt {damage} damage to player.");
+                var targetName = (target as MonoBehaviour)?.name ?? "target";
+                Debug.Log($"{name} dealt {damage} damage to {targetName}.");
             }
             else
             {
-                Debug.Log($"{name} missed player.");
+                var targetName = (target as MonoBehaviour)?.name ?? "target";
+                Debug.Log($"{name} missed {targetName}.");
             }
         }
     }
