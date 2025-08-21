@@ -83,7 +83,7 @@ namespace Quests
             vpRect.anchorMax = Vector2.one;
             vpRect.offsetMin = Vector2.zero;
             vpRect.offsetMax = Vector2.zero;
-            viewport.GetComponent<Image>().color = new Color(0, 0, 0, 0.2f);
+            viewport.GetComponent<Image>().color = new Color32(0x26, 0x26, 0x26, 0xF2);
 
             var content = new GameObject("Content", typeof(RectTransform), typeof(VerticalLayoutGroup));
             listContent = content.GetComponent<RectTransform>();
@@ -104,7 +104,7 @@ namespace Quests
             detRect.anchorMax = new Vector2(1f, 1f);
             detRect.offsetMin = new Vector2(10f, 10f);
             detRect.offsetMax = new Vector2(-40f, -10f);
-            details.GetComponent<Image>().color = Color.clear;
+            details.GetComponent<Image>().color = new Color32(0x26, 0x26, 0x26, 0xF2);
 
             titleText = CreateText("Title", detRect, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0, -10));
             titleText.fontStyle = FontStyle.Bold;
