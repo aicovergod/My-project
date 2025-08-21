@@ -93,10 +93,11 @@ namespace Dialogue
             for (int i = 0; i < node.Options.Count; i++)
             {
                 var opt = node.Options[i];
-                var btnGO = new GameObject($"Option{i}", typeof(Image), typeof(Button));
+                var btnGO = new GameObject($"Option{i}", typeof(Image), typeof(Button), typeof(LayoutElement));
                 var rect = btnGO.GetComponent<RectTransform>();
                 rect.SetParent(optionsParent, false);
-                rect.sizeDelta = new Vector2(0, 30f);
+                // Set a preferred height so the vertical layout group spaces options correctly
+                btnGO.GetComponent<LayoutElement>().preferredHeight = 30f;
                 btnGO.GetComponent<Image>().color = Color.clear;
                 var txt = CreateText("Text", rect, Vector2.zero, Vector2.one, Vector2.zero);
                 txt.text = opt.Text;
