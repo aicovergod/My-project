@@ -130,6 +130,8 @@ namespace Quests
             var layout = content.GetComponent<VerticalLayoutGroup>();
             layout.childForceExpandHeight = false;
             layout.childAlignment = TextAnchor.UpperLeft;
+            // Add a bit of padding at the top so the first quest is fully visible
+            layout.padding = new RectOffset(0, 0, 5, 0);
 
             var scroll = listGO.GetComponent<ScrollRect>();
             scroll.viewport = vpRect;
