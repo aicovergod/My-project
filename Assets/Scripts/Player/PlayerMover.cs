@@ -240,6 +240,18 @@ namespace Player
             rb.linearVelocity = moveDir * moveSpeed;
         }
 
+        /// <summary>
+        /// Immediately halts any current movement and updates animation state.
+        /// </summary>
+        public void StopMovement()
+        {
+            moveDir = Vector2.zero;
+            if (rb != null)
+                rb.linearVelocity = Vector2.zero;
+            if (anim != null)
+                anim.SetBool("IsMoving", false);
+        }
+
         void OnApplicationQuit()
         {
             SavePosition();
