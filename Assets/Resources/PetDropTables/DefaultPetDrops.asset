@@ -48,6 +48,11 @@ MonoBehaviour:
     sourceId: combat
     requiredBeastmasterLevel: 65
     bonusDropMultiplier: 0
+  - pet: {fileID: 11400000, guid: e3dc5e6a9fb7f9f4d8429f38daf03440, type: 2}
+    oneInN: 0
+    sourceId: combat
+    requiredBeastmasterLevel: 85
+    bonusDropMultiplier: 0
   - pet: {fileID: 11400000, guid: 05990d71e69e4264c8ba0dad8fdbbc59, type: 2}
     oneInN: 1000
     sourceId: combat

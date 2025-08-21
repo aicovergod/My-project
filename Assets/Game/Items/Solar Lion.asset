@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72479de709848e3ab024450652154e5, type: 3}
   m_Name: Solar Lion
   m_EditorClassIdentifier: 
-  id: Lion
-  displayName: Lion
-  pickupItem: {fileID: 11400000, guid: 700aaff49f38dbf4cafb087953ad9bb6, type: 2}
+  id: Solar Lion
+  displayName: Solar Lion
+  pickupItem: {fileID: 11400000, guid: 9641dff6b7458a843b27d1c90aa49929, type: 2}
   sprite: {fileID: 0}
   pixelsPerUnit: 128
   evolutionTiers:
@@ -36,34 +36,34 @@ MonoBehaviour:
   animationClips: []
   attackSprite: {fileID: 0}
   hitUp:
-  - {fileID: 21300000, guid: bc0e146510656ab43912c6d1a9017100, type: 3}
+  - {fileID: 21300000, guid: 136d0ab5936270541be70ad2650d4110, type: 3}
   hitDown:
-  - {fileID: 21300000, guid: f86de41d2bbb23d4aae01a71558fe943, type: 3}
+  - {fileID: 21300000, guid: 461d5f43cd19fe34abce7b56a06b0dbb, type: 3}
   hitLeft: []
   hitRight:
-  - {fileID: 21300000, guid: 7625817598cf9c94ca4e21c7d776dee7, type: 3}
+  - {fileID: 21300000, guid: 461d5f43cd19fe34abce7b56a06b0dbb, type: 3}
   idleUp:
-  - {fileID: 21300000, guid: 5ae4a7461ba8baa4e9c6294d91102395, type: 3}
+  - {fileID: 21300000, guid: 28d9d86c14b29444d8b088804da47b01, type: 3}
   walkUp:
-  - {fileID: 21300000, guid: 5ae4a7461ba8baa4e9c6294d91102395, type: 3}
+  - {fileID: 21300000, guid: 45c798c7e6559c44a8560f3c3d7cd88d, type: 3}
   idleDown:
-  - {fileID: 21300000, guid: 1b93fcdc8f4efa44883e7738aa3e7521, type: 3}
+  - {fileID: 21300000, guid: 2f7faedf081e76946a6b94bcaa3f2f3f, type: 3}
   walkDown:
-  - {fileID: 21300000, guid: 9463019866d84f444a2b509e1919c69e, type: 3}
+  - {fileID: 21300000, guid: f6e5fa961c14aab46b1aa3aeb34f51f9, type: 3}
   idleLeft: []
   walkLeft: []
   idleRight:
-  - {fileID: 21300000, guid: f30996a87b14ddc4da550fd5e2042a78, type: 3}
+  - {fileID: 21300000, guid: 5c118d1e6d8a61b41a2e1ac45ca14c4e, type: 3}
   walkRight:
-  - {fileID: 21300000, guid: b7973eb3bb3717949af5844e102852c5, type: 3}
+  - {fileID: 21300000, guid: 2d054d018278b054e942a2a956130d63, type: 3}
   useRightSpritesForLeft: 1
   useLeftSpritesForRight: 0
   canFight: 1
-  petAttackLevel: 55
-  petStrengthLevel: 70
+  petAttackLevel: 80
+  petStrengthLevel: 90
   attackSpeedTicks: 4
-  accuracyBonus: 35
-  damageBonus: 70
+  accuracyBonus: 50
+  damageBonus: 90
   attackLevelPerBeastmasterLevel: 0.02
   strengthLevelPerBeastmasterLevel: 0.02
   maxHitPerBeastmasterLevel: 0
