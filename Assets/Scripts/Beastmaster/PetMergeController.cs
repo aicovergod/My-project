@@ -3,6 +3,7 @@ using UnityEngine;
 using Combat;
 using Pets;
 using UI;
+using EquipmentSystem;
 
 namespace Beastmaster
 {
@@ -23,6 +24,7 @@ namespace Beastmaster
 
         private IBeastmasterService beastmaster;
         private IPetService petService;
+        private EquipmentAggregator.CombinedStats mergedEquipStats;
 
         private bool merged;
         private float durationRemaining;
@@ -34,6 +36,7 @@ namespace Beastmaster
         public bool IsMerged => merged;
         public bool IsOnCooldown => cooldownRemaining > 0f;
         public float CooldownRemaining => cooldownRemaining;
+        public EquipmentAggregator.CombinedStats MergedEquipStats => mergedEquipStats;
         public bool CanMerge
         {
             get
@@ -61,7 +64,7 @@ namespace Beastmaster
             petService = petServiceComponent as IPetService;
 
             if (hudTimer == null)
-                hudTimer = GetComponentInChildren<MergeHudTimer>(true);
+                hudTimer = GetComponentInChildren<MergeHudTimer>(true) ?? FindObjectOfType<MergeHudTimer>();
 
             if (beastmaster == null)
                 Debug.LogWarning("PetMergeController missing IBeastmasterService component.");
@@ -118,6 +121,7 @@ namespace Beastmaster
             visualBinder?.ApplyPetLook(visuals);
             var combat = petService.GetCombatProfile(pet);
             combatBinder?.UseProfile(combat);
+            mergedEquipStats = combat != null ? combat.GetCombatStats().Equip : default;
             hudTimer?.Show(TimeSpan.FromSeconds(durationRemaining));
             SaveState();
             return true;
@@ -132,6 +136,7 @@ namespace Beastmaster
             visualBinder?.RestorePlayerLook();
             combatBinder?.RestorePlayerProfile();
             petService?.ShowActivePet(transform.position);
+            mergedEquipStats = default;
             hudTimer?.Hide();
             SaveState();
         }
@@ -143,6 +148,7 @@ namespace Beastmaster
                 EndMerge();
             cooldownRemaining = 0f;
             durationRemaining = 0f;
+            mergedEquipStats = default;
             hudTimer?.Hide();
             SaveState();
         }
@@ -176,6 +182,7 @@ namespace Beastmaster
                 visualBinder?.ApplyPetLook(visuals);
                 var combat = petService.GetCombatProfile(pet);
                 combatBinder?.UseProfile(combat);
+                mergedEquipStats = combat != null ? combat.GetCombatStats().Equip : default;
                 hudTimer?.Show(TimeSpan.FromSeconds(durationRemaining));
             }
             else
