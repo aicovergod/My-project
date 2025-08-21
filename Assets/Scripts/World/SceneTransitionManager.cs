@@ -129,7 +129,8 @@ namespace World
             if (_eventSystemToMove != null)
             {
                 SceneManager.MoveGameObjectToScene(_eventSystemToMove, scene);
-                var systems = GameObject.FindObjectsOfType<EventSystem>();
+                // Remove any additional EventSystems, even if they are disabled
+                var systems = GameObject.FindObjectsOfType<EventSystem>(true);
                 foreach (var es in systems)
                 {
                     if (es.gameObject != _eventSystemToMove)
