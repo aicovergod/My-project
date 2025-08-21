@@ -12,6 +12,7 @@ namespace World
     public class SceneTransitionManager : MonoBehaviour
     {
         public static SceneTransitionManager Instance;
+        public static bool IsTransitioning;
 
         private Transform _playerToMove;
         private GameObject _cameraToMove;
@@ -82,6 +83,7 @@ namespace World
                 // Temporarily disable to avoid multiple active EventSystems during load
                 _eventSystemToMove.SetActive(false);
 
+            IsTransitioning = true;
             SceneManager.LoadScene(sceneToLoad);
         }
 
@@ -106,6 +108,10 @@ namespace World
                     if (p != _playerToMove.gameObject)
                         Destroy(p);
                 }
+
+                var playerMover = _playerToMove.GetComponent<Player.PlayerMover>();
+                if (playerMover != null)
+                    playerMover.SavePosition();
             }
 
             if (_cameraToMove != null)
@@ -178,6 +184,8 @@ namespace World
 
             if (ScreenFader.Instance != null)
                 ScreenFader.Instance.StartCoroutine(ScreenFader.Instance.FadeIn());
+
+            IsTransitioning = false;
         }
     }
 }
