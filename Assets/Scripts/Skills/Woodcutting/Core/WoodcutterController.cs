@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Inventory;
 using Player;
 using Skills.Mining;
@@ -38,9 +39,12 @@ namespace Skills.Woodcutting
         {
             if (Input.GetMouseButtonDown(0))
             {
-                var tree = GetTreeUnderCursor();
-                if (tree != null)
-                    TryStartChopping(tree);
+                if (EventSystem.current == null || !EventSystem.current.IsPointerOverGameObject())
+                {
+                    var tree = GetTreeUnderCursor();
+                    if (tree != null)
+                        TryStartChopping(tree);
+                }
             }
 
             if (Input.GetKeyDown(KeyCode.Escape))

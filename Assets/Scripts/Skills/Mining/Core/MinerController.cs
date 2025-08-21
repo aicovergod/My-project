@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Inventory;
 using Player;
 
@@ -36,13 +37,15 @@ namespace Skills.Mining
 
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            bool pointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+
+            if (Input.GetMouseButtonDown(0) && !pointerOverUI)
             {
                 var rock = GetRockUnderCursor();
                 if (rock != null)
                     TryStartMining(rock);
             }
-            else if (Input.GetMouseButtonDown(1))
+            else if (Input.GetMouseButtonDown(1) && !pointerOverUI)
             {
                 var rock = GetRockUnderCursor();
                 if (rock != null)
