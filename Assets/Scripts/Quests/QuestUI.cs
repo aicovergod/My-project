@@ -181,6 +181,9 @@ namespace Quests
             txt.horizontalOverflow = HorizontalWrapMode.Wrap;
             txt.verticalOverflow = VerticalWrapMode.Overflow;
             txt.color = Color.white;
+            // Allow buttons beneath the text to receive clicks by disabling
+            // raycast targeting on the label itself.
+            txt.raycastTarget = false;
             return txt;
         }
 
