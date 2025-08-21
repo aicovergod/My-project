@@ -467,6 +467,10 @@ namespace Inventory
 
         private void CreateUI()
         {
+            var existing = GameObject.Find("EquipmentUI");
+            if (existing != null)
+                Destroy(existing);
+
             uiRoot = new GameObject("EquipmentUI", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             uiRoot.transform.SetParent(null, false);
             DontDestroyOnLoad(uiRoot);

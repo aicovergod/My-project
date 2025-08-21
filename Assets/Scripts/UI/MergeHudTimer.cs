@@ -15,6 +15,10 @@ namespace UI
 
         private void Awake()
         {
+            var existing = GameObject.Find("MergeHudCanvas");
+            if (existing != null)
+                Destroy(existing);
+
             var canvas = GetComponentInChildren<Canvas>();
             if (canvas == null)
             {
