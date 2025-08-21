@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using Skills;
 using BankSystem;
@@ -62,6 +63,12 @@ namespace World
         {
             if (mapTexture != null && !mapTexture.IsCreated())
                 mapTexture.Create();
+            SceneManager.sceneLoaded += HandleSceneLoaded;
+        }
+
+        private void OnDisable()
+        {
+            SceneManager.sceneLoaded -= HandleSceneLoaded;
         }
 
         private void CreateCamera()
@@ -227,6 +234,33 @@ namespace World
                     markers.Add(marker);
                 CreateIcons(marker);
             }
+        }
+
+        private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (mapTexture != null && !mapTexture.IsCreated())
+                mapTexture.Create();
+
+            if (mapCamera != null)
+                mapCamera.targetTexture = mapTexture;
+
+            if (smallMapRect != null)
+            {
+                var raw = smallMapRect.GetComponent<RawImage>();
+                if (raw != null)
+                    raw.texture = mapTexture;
+            }
+
+            if (expandedMapRect != null)
+            {
+                var raw = expandedMapRect.GetComponent<RawImage>();
+                if (raw != null)
+                    raw.texture = mapTexture;
+            }
+
+            RegisterExistingMarkers();
+            ResetSmallMapZoom();
+            dragOffset = Vector3.zero;
         }
 
         private void LateUpdate()
