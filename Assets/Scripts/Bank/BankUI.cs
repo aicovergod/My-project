@@ -76,7 +76,7 @@ namespace BankSystem
             }
             catch (ArgumentException)
             {
-                defaultFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                defaultFont = null;
             }
 
             CreateUI();

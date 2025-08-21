@@ -45,7 +45,7 @@ namespace Skills.Mining
             activeInstance.worldPosition = position;
             if (activeInstance.mainCamera == null)
                 activeInstance.mainCamera = Camera.main;
-            activeInstance.rectTransform.anchoredPosition = activeInstance.mainCamera.WorldToScreenPoint(position);
+            activeInstance.rectTransform.position = activeInstance.mainCamera.WorldToScreenPoint(position);
             activeInstance.uiText.text = message;
             activeInstance.uiText.color = color ?? Color.white;
             float finalSize = size ?? activeInstance.textSize;
@@ -64,7 +64,7 @@ namespace Skills.Mining
             if (mainCamera == null)
                 mainCamera = Camera.main;
             if (rectTransform != null && mainCamera != null)
-                rectTransform.anchoredPosition = mainCamera.WorldToScreenPoint(worldPosition);
+                rectTransform.position = mainCamera.WorldToScreenPoint(worldPosition);
 
             remainingLifetime -= Time.deltaTime;
             if (remainingLifetime <= 0f)
