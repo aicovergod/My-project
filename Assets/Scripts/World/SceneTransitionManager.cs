@@ -16,6 +16,7 @@ namespace World
         private Transform _playerToMove;
         private GameObject _cameraToMove;
         private GameObject _inventoryUIToMove;
+        private GameObject _questUIToMove;
         private GameObject _eventSystemToMove;
         private GameObject _petToMove;
         private string _nextSpawnPoint;
@@ -61,6 +62,9 @@ namespace World
 
             _inventoryUIToMove = GameObject.Find("InventoryUI");
             if (_inventoryUIToMove) DontDestroyOnLoad(_inventoryUIToMove);
+
+            _questUIToMove = GameObject.Find("QuestUI");
+            if (_questUIToMove) DontDestroyOnLoad(_questUIToMove);
 
             var ev = EventSystem.current;
             _eventSystemToMove = ev ? ev.gameObject : null;
@@ -126,6 +130,17 @@ namespace World
                 }
             }
 
+            if (_questUIToMove != null)
+            {
+                SceneManager.MoveGameObjectToScene(_questUIToMove, scene);
+                var canvases = GameObject.FindObjectsOfType<Canvas>();
+                foreach (var cv in canvases)
+                {
+                    if (cv.gameObject != _questUIToMove && cv.gameObject.name == _questUIToMove.name)
+                        Destroy(cv.gameObject);
+                }
+            }
+
             if (_eventSystemToMove != null)
             {
                 SceneManager.MoveGameObjectToScene(_eventSystemToMove, scene);
@@ -157,6 +172,7 @@ namespace World
             _nextSpawnPoint = null;
             _cameraToMove = null;
             _inventoryUIToMove = null;
+            _questUIToMove = null;
             _eventSystemToMove = null;
             _petToMove = null;
 
