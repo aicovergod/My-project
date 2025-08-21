@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Skills.Mining
 {
@@ -9,9 +10,12 @@ namespace Skills.Mining
     {
         [SerializeField] private float lifetime = 1.5f;
         [SerializeField] private Vector3 floatSpeed = new Vector3(0f, 1f, 0f);
-        private TextMesh textMesh;
         [SerializeField] private float textSize = 0.2f;
 
+        private Text uiText;
+        private RectTransform rectTransform;
+        private Vector3 worldPosition;
+        private Camera mainCamera;
         private float remainingLifetime;
 
         private static FloatingText activeInstance;
@@ -20,18 +24,32 @@ namespace Skills.Mining
         {
             if (activeInstance == null)
             {
-                GameObject go = new GameObject("FloatingText");
-                go.transform.position = position;
+                GameObject go = new GameObject("FloatingText", typeof(Canvas));
                 activeInstance = go.AddComponent<FloatingText>();
-                activeInstance.textMesh = go.AddComponent<TextMesh>();
+                var canvas = go.GetComponent<Canvas>();
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                go.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+                go.AddComponent<GraphicRaycaster>();
+
+                var textGO = new GameObject("Text", typeof(Text));
+                textGO.transform.SetParent(go.transform, false);
+                activeInstance.uiText = textGO.GetComponent<Text>();
+                activeInstance.uiText.alignment = TextAnchor.MiddleCenter;
+                activeInstance.uiText.horizontalOverflow = HorizontalWrapMode.Overflow;
+                activeInstance.uiText.verticalOverflow = VerticalWrapMode.Overflow;
+                activeInstance.uiText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                activeInstance.rectTransform = textGO.GetComponent<RectTransform>();
+                activeInstance.mainCamera = Camera.main;
             }
 
-            activeInstance.transform.position = position;
-            activeInstance.textMesh.text = message;
-            activeInstance.textMesh.color = color ?? Color.white;
+            activeInstance.worldPosition = position;
+            if (activeInstance.mainCamera == null)
+                activeInstance.mainCamera = Camera.main;
+            activeInstance.rectTransform.anchoredPosition = activeInstance.mainCamera.WorldToScreenPoint(position);
+            activeInstance.uiText.text = message;
+            activeInstance.uiText.color = color ?? Color.white;
             float finalSize = size ?? activeInstance.textSize;
-            activeInstance.textMesh.characterSize = finalSize;
-            activeInstance.textMesh.fontSize = Mathf.RoundToInt(64 * finalSize);
+            activeInstance.uiText.fontSize = Mathf.RoundToInt(64 * finalSize);
             activeInstance.remainingLifetime = activeInstance.lifetime;
         }
 
@@ -42,7 +60,12 @@ namespace Skills.Mining
 
         private void Update()
         {
-            transform.position += floatSpeed * Time.deltaTime;
+            worldPosition += floatSpeed * Time.deltaTime;
+            if (mainCamera == null)
+                mainCamera = Camera.main;
+            if (rectTransform != null && mainCamera != null)
+                rectTransform.anchoredPosition = mainCamera.WorldToScreenPoint(worldPosition);
+
             remainingLifetime -= Time.deltaTime;
             if (remainingLifetime <= 0f)
                 Destroy(gameObject);
