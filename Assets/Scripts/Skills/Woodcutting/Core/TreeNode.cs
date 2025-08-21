@@ -16,6 +16,10 @@ namespace Skills.Woodcutting
         [SerializeField] private Sprite aliveSprite;
         [SerializeField] private Sprite depletedSprite;
 
+        [Header("Colliders")]
+        [SerializeField] private Collider2D stumpCollider;
+        private Collider2D col;
+
         public bool IsDepleted { get; private set; }
         public bool IsBusy { get; set; }
 
@@ -28,6 +32,9 @@ namespace Skills.Woodcutting
         {
             if (sr == null)
                 sr = GetComponent<SpriteRenderer>();
+            col = GetComponent<Collider2D>();
+            if (stumpCollider)
+                stumpCollider.enabled = false;
             if (def != null)
             {
                 if (aliveSprite == null) aliveSprite = def.AliveSprite;
@@ -81,8 +88,11 @@ namespace Skills.Woodcutting
         {
             IsDepleted = true;
             respawnAt = Time.timeAsDouble + def.RespawnSeconds;
-            var col = GetComponent<Collider2D>();
-            if (col) col.enabled = false;
+            if (stumpCollider)
+            {
+                if (col) col.enabled = false;
+                stumpCollider.enabled = true;
+            }
             if (sr && depletedSprite) sr.sprite = depletedSprite;
             IsBusy = false;
             OnTreeDepleted?.Invoke(this, def != null ? def.RespawnSeconds : 0f);
@@ -91,8 +101,15 @@ namespace Skills.Woodcutting
         private void Respawn()
         {
             IsDepleted = false;
-            var col = GetComponent<Collider2D>();
-            if (col) col.enabled = true;
+            if (stumpCollider)
+            {
+                stumpCollider.enabled = false;
+                if (col) col.enabled = true;
+            }
+            else if (col)
+            {
+                col.enabled = true;
+            }
             if (sr && aliveSprite) sr.sprite = aliveSprite;
             OnTreeRespawned?.Invoke(this);
         }
