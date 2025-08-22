@@ -11,12 +11,34 @@ namespace Inventory
     public class ItemPickup : MonoBehaviour
     {
         public ItemData item;
+        public int amount;
+        public SpriteRenderer iconRenderer;
 
         private void Reset()
         {
             // Ensure collider is configured as a trigger for easy pickup.
             var col = GetComponent<Collider2D>();
             col.isTrigger = true;
+            Initialize(item, amount);
+        }
+
+        private void Start()
+        {
+            Initialize(item, amount);
+        }
+
+        private void OnValidate()
+        {
+            Initialize(item, amount);
+        }
+
+        public void Initialize(ItemData item, int amount)
+        {
+            this.item = item;
+            this.amount = amount;
+            iconRenderer ??= GetComponentInChildren<SpriteRenderer>();
+            if (iconRenderer != null && item != null)
+                iconRenderer.sprite = item.icon;
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -25,7 +47,7 @@ namespace Inventory
                 return;
 
             Inventory inv = other.GetComponent<Inventory>();
-            if (inv != null && inv.AddItem(item))
+            if (inv != null && inv.AddItem(item, amount))
             {
                 Destroy(gameObject);
             }
