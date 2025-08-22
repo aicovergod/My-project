@@ -3,6 +3,7 @@ using UnityEngine;
 using Util;
 using World;
 using Inventory;
+using ShopSystem;
 
 namespace Core
 {
@@ -16,6 +17,7 @@ namespace Core
         private Ticker ticker;
         private ScreenFader screenFader;
         private ItemDatabase itemDatabase;
+        private ShopUI shopUI;
 
         /// <summary>
         /// Event fired once all services are initialized.
@@ -40,6 +42,7 @@ namespace Core
             ticker = FindOrCreate<Ticker>();
             screenFader = FindOrCreate<ScreenFader>();
             itemDatabase = FindOrCreate<ItemDatabase>();
+            shopUI = FindOrCreate<ShopUI>();
 
             ServicesReady?.Invoke();
         }
