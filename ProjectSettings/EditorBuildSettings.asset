@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/House1Interior.unity
     guid: f7bd8b55534759543a3018c0435a277d
+  - enabled: 1
+    path: Assets/Scenes/VioletsTownMinerBuilding.unity
+    guid: 728a564931c9c1747a12b54e8caabf35
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
