@@ -123,11 +123,19 @@ namespace Pets
             var follower = go.AddComponent<PetFollower>();
             if (player != null)
                 follower.SetPlayer(player);
-            var clickable = go.AddComponent<PetClickable>();
-            clickable.Init(def);
 
             var exp = go.AddComponent<PetExperience>();
             exp.definition = def;
+
+            PetStorage storage = null;
+            if (def.hasInventory)
+            {
+                storage = go.AddComponent<PetStorage>();
+                storage.definition = def;
+            }
+
+            var clickable = go.AddComponent<PetClickable>();
+            clickable.Init(def, storage);
 
             if (def.canFight)
             {
