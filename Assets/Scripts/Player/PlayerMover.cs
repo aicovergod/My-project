@@ -284,6 +284,15 @@ namespace Player
             if (SceneManager.GetActiveScene().name == data.scene)
             {
                 ApplySavedPosition();
+
+                var pet = PetDropSystem.ActivePetObject;
+                if (pet != null)
+                {
+                    pet.transform.position = transform.position;
+                    var follower = pet.GetComponent<PetFollower>();
+                    if (follower != null)
+                        follower.SetPlayer(transform);
+                }
             }
             else
             {
