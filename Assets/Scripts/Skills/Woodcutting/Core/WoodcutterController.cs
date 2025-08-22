@@ -14,7 +14,7 @@ namespace Skills.Woodcutting
     {
         [SerializeField] private float interactRange = 1.5f;
         [SerializeField] private float cancelDistance = 3f;
-        [SerializeField] private LayerMask treeMask = ~0;
+        [SerializeField] [Tooltip("Layers including tree interaction triggers")] private LayerMask treeMask = ~0;
 
         [Header("References")]
         [SerializeField] private WoodcuttingSkill woodcuttingSkill;
@@ -68,10 +68,10 @@ namespace Skills.Woodcutting
         {
             if (cam == null)
                 cam = Camera.main;
-            Vector3 world = cam.ScreenToWorldPoint(Input.mousePosition);
-            var hit = Physics2D.Raycast(world, Vector2.zero, 0f, treeMask);
-            if (hit.collider != null)
-                return hit.collider.GetComponent<TreeNode>();
+            Vector2 world = cam.ScreenToWorldPoint(Input.mousePosition);
+            var collider = Physics2D.OverlapPoint(world, treeMask);
+            if (collider != null)
+                return collider.GetComponentInParent<TreeNode>();
             return null;
         }
 
