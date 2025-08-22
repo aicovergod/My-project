@@ -21,5 +21,7 @@ MonoBehaviour:
   depleteRollInverse: 8
   respawnSeconds: 30
   chopIntervalTicks: 4
-  aliveSprite: {fileID: 0}
-  depletedSprite: {fileID: 0}
+  interactRange: 3
+  cancelDistance: 4.5
+  aliveSprite: {fileID: 21300000, guid: 0e1bd934d1e677c4bb4724459d2718ad, type: 3}
+  depletedSprite: {fileID: -755174274035468053, guid: 12023af7e43fcee4da25bfb5a5547333, type: 3}

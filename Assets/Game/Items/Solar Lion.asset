@@ -15,6 +15,7 @@ MonoBehaviour:
   id: Solar Lion
   displayName: Solar Lion
   pickupItem: {fileID: 11400000, guid: 9641dff6b7458a843b27d1c90aa49929, type: 2}
+  hasInventory: 1
   sprite: {fileID: 0}
   pixelsPerUnit: 128
   evolutionTiers:

@@ -23,3 +23,23 @@ MonoBehaviour:
   stackable: 1
   maxStack: 2147483647
   splittable: 0
+  equipmentSlot: 0
+  skillRequirements: []
+  combat:
+    Attack: 0
+    Strength: 0
+    Range: 0
+    Magic: 0
+    MeleeDefence: 0
+    RangeDefence: 0
+    MagicDefence: 0
+    AttackSpeedTicks: 4
+  attackBonus: 0
+  defenceBonus: 0
+  attackSpeed: 4
+  strengthBonus: 0
+  rangeBonus: 0
+  magicBonus: 0
+  meleeDefenceBonus: 0
+  rangedDefenceBonus: 0
+  magicDefenceBonus: 0
