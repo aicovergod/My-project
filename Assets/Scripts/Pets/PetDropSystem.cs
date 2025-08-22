@@ -170,6 +170,8 @@ namespace Pets
             PetLevelBarHUD.DestroyInstance();
             if (activePetGO != null)
             {
+                var storage = activePetGO.GetComponent<PetStorage>();
+                storage?.Close();
                 UnityEngine.Object.Destroy(activePetGO);
                 activePetGO = null;
                 activePetDef = null;
@@ -209,6 +211,14 @@ namespace Pets
             PetLevelBarHUD.CreateForPet(exp);
             PetToastUI.Show("You have a funny feeling like you're being followed…", pet.messageColor);
             Debug.Log($"Spawned pet '{pet.displayName}' at {spawnPos}.");
+
+            var playerInventory = playerTransform != null ? playerTransform.GetComponent<Inventory.Inventory>() : null;
+            if (playerInventory != null && playerInventory.IsOpen && !playerInventory.BankOpen)
+            {
+                var storage = activePetGO.GetComponent<PetStorage>();
+                storage?.Open();
+            }
+
             return activePetGO;
         }
 
