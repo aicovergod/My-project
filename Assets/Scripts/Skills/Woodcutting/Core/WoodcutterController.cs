@@ -57,10 +57,16 @@ namespace Skills.Woodcutting
             {
                 if (playerMover != null && playerMover.IsMoving)
                     woodcuttingSkill.StopChopping();
-                else if (Vector3.Distance(transform.position, woodcuttingSkill.CurrentTree.transform.position) > cancelDistance)
-                    woodcuttingSkill.StopChopping();
-                else if (woodcuttingSkill.CurrentTree.IsDepleted)
-                    woodcuttingSkill.StopChopping();
+                else
+                {
+                    float cancelDist = woodcuttingSkill.CurrentTree != null && woodcuttingSkill.CurrentTree.def != null
+                        ? woodcuttingSkill.CurrentTree.def.CancelDistance
+                        : cancelDistance;
+                    if (Vector3.Distance(transform.position, woodcuttingSkill.CurrentTree.transform.position) > cancelDist)
+                        woodcuttingSkill.StopChopping();
+                    else if (woodcuttingSkill.CurrentTree.IsDepleted)
+                        woodcuttingSkill.StopChopping();
+                }
             }
         }
 
@@ -81,7 +87,8 @@ namespace Skills.Woodcutting
                 return;
 
             float dist = Vector3.Distance(transform.position, tree.transform.position);
-            if (dist > interactRange)
+            float range = tree.def != null ? tree.def.InteractRange : interactRange;
+            if (dist > range)
                 return;
 
             var axe = axeSelector.GetBestAxe();

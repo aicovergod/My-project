@@ -26,6 +26,10 @@ namespace Skills.Woodcutting
         [Header("Chop Timing")]
         [SerializeField] private int chopIntervalTicks = 4;
 
+        [Header("Ranges")]
+        [SerializeField] private float interactRange = 1.5f;
+        [SerializeField] private float cancelDistance = 3f;
+
         [Header("Visuals")]
         [SerializeField] private Sprite aliveSprite;
         [SerializeField] private Sprite depletedSprite;
@@ -39,6 +43,8 @@ namespace Skills.Woodcutting
         public int DepleteRollInverse => depleteRollInverse;
         public int RespawnSeconds => respawnSeconds;
         public int ChopIntervalTicks => chopIntervalTicks;
+        public float InteractRange => interactRange;
+        public float CancelDistance => cancelDistance;
         public Sprite AliveSprite => aliveSprite;
         public Sprite DepletedSprite => depletedSprite;
     }
