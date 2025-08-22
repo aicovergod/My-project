@@ -65,7 +65,7 @@ namespace Pets
                 mergeController.EndMerge();
             else
                 mergeController.TryStartMerge();
-            OnMenuShown();
+            Hide();
         }
     }
 }
