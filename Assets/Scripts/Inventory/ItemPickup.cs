@@ -13,6 +13,8 @@ namespace Inventory
         public ItemData item;
         public int amount;
         public SpriteRenderer iconRenderer;
+        /// <summary>Time in seconds before the pickup is removed if untouched.</summary>
+        public float lifetime = 60f;
 
         private void Reset()
         {
@@ -25,6 +27,8 @@ namespace Inventory
         private void Start()
         {
             Initialize(item, amount);
+            // Automatically remove the item after its lifetime expires.
+            Destroy(gameObject, lifetime);
         }
 
         private void OnValidate()
