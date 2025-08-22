@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using System;
 using Core.Save;
 using World;
+using Pets;
 
 namespace Player
 {
@@ -38,6 +39,7 @@ namespace Player
         private Animator anim;
         private SpriteRenderer sr;
         private Inventory.Inventory inventory;
+        private GameObject petToMove;
 
         [Serializable]
         private class PositionData
@@ -286,6 +288,12 @@ namespace Player
             else
             {
                 SceneManager.sceneLoaded += OnSceneLoaded;
+                var pet = PetDropSystem.ActivePetObject;
+                if (pet != null)
+                {
+                    petToMove = pet;
+                    DontDestroyOnLoad(pet);
+                }
                 SceneManager.LoadScene(data.scene);
             }
         }
@@ -296,6 +304,15 @@ namespace Player
             if (data != null && scene.name == data.scene)
             {
                 ApplySavedPosition();
+                if (petToMove != null)
+                {
+                    petToMove.transform.position = transform.position;
+                    var follower = petToMove.GetComponent<PetFollower>();
+                    if (follower != null)
+                        follower.SetPlayer(transform);
+                    SceneManager.MoveGameObjectToScene(petToMove, scene);
+                    petToMove = null;
+                }
                 SceneManager.sceneLoaded -= OnSceneLoaded;
             }
         }
