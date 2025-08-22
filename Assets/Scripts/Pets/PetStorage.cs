@@ -68,9 +68,20 @@ namespace Pets
             int newSize = GetSlotsForLevel(lvl);
             if (newSize != inventory.size)
             {
+                // Remember if the inventory UI was open so we can restore it.
+                bool reopen = inventory.IsOpen;
+
                 inventory.Save();
+                // Close and deactivate the existing UI so it doesn't remain
+                // on screen or intercept clicks after the component is destroyed.
+                inventory.CloseUI();
                 Destroy(inventory);
                 CreateInventory();
+
+                // Reopen the UI if it was visible before the rebuild so players
+                // immediately see the updated slot count.
+                if (reopen)
+                    inventory.OpenUI();
             }
         }
 
