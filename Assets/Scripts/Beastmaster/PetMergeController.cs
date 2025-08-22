@@ -123,8 +123,13 @@ namespace Beastmaster
             if (pet != null)
             {
                 string id = pet.id;
-                if (id == "Lion" || id == "Leopard" || (id != null && id.Contains("Tiger")))
-                    return 2f;
+                if (!string.IsNullOrEmpty(id))
+                {
+                    if (id.IndexOf("lion", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        id.IndexOf("leopard", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        id.IndexOf("tiger", StringComparison.OrdinalIgnoreCase) >= 0)
+                        return 2f;
+                }
             }
             return 1f;
         }
