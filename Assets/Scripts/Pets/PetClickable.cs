@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Inventory;
 
 namespace Pets
@@ -27,6 +28,9 @@ namespace Pets
         private void Update()
         {
             if (!Input.GetMouseButtonDown(0))
+                return;
+
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
                 return;
 
             Vector3 world = Camera.main.ScreenToWorldPoint(Input.mousePosition);
