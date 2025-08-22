@@ -4,6 +4,7 @@ using Combat;
 using Pets;
 using UI;
 using EquipmentSystem;
+using Player;
 
 namespace Beastmaster
 {
@@ -21,6 +22,7 @@ namespace Beastmaster
         [SerializeField] private PlayerVisualBinder visualBinder;
         [SerializeField] private PlayerCombatBinder combatBinder;
         [SerializeField] private MergeHudTimer hudTimer;
+        [SerializeField] private PlayerMover playerMover;
 
         private IBeastmasterService beastmaster;
         private IPetService petService;
@@ -29,6 +31,7 @@ namespace Beastmaster
         private bool merged;
         private float durationRemaining;
         private float cooldownRemaining;
+        private float originalMoveSpeed;
 
         private const string MERGE_KEY = "BM_Merge_Remaining";
         private const string COOLDOWN_KEY = "BM_Merge_Cooldown";
@@ -65,6 +68,8 @@ namespace Beastmaster
 
             if (hudTimer == null)
                 hudTimer = GetComponentInChildren<MergeHudTimer>(true) ?? FindObjectOfType<MergeHudTimer>();
+            if (playerMover == null)
+                playerMover = GetComponent<PlayerMover>();
 
             if (beastmaster == null)
                 Debug.LogWarning("PetMergeController missing IBeastmasterService component.");
@@ -102,6 +107,34 @@ namespace Beastmaster
             }
         }
 
+        private void ApplySpeedModifier()
+        {
+            if (playerMover == null)
+                playerMover = GetComponent<PlayerMover>();
+            if (playerMover == null)
+                return;
+            originalMoveSpeed = playerMover.moveSpeed;
+            playerMover.moveSpeed = originalMoveSpeed * GetSpeedMultiplier();
+        }
+
+        private float GetSpeedMultiplier()
+        {
+            var pet = PetDropSystem.ActivePet;
+            if (pet != null)
+            {
+                string id = pet.id;
+                if (id == "Lion" || id == "Leopard" || (id != null && id.Contains("Tiger")))
+                    return 2f;
+            }
+            return 1f;
+        }
+
+        private void RestoreSpeed()
+        {
+            if (playerMover != null)
+                playerMover.moveSpeed = originalMoveSpeed;
+        }
+
         /// <summary>Attempt to start merging with the active pet.</summary>
         public bool TryStartMerge()
         {
@@ -122,6 +155,7 @@ namespace Beastmaster
             var combat = petService.GetCombatProfile(pet);
             combatBinder?.UseProfile(combat);
             mergedEquipStats = combat != null ? combat.GetCombatStats().Equip : default;
+            ApplySpeedModifier();
             hudTimer?.Show(TimeSpan.FromSeconds(durationRemaining));
             SaveState();
             return true;
@@ -133,6 +167,7 @@ namespace Beastmaster
             if (!merged)
                 return;
             merged = false;
+            RestoreSpeed();
             visualBinder?.RestorePlayerLook();
             combatBinder?.RestorePlayerProfile();
             petService?.ShowActivePet(transform.position);
@@ -183,6 +218,7 @@ namespace Beastmaster
                 var combat = petService.GetCombatProfile(pet);
                 combatBinder?.UseProfile(combat);
                 mergedEquipStats = combat != null ? combat.GetCombatStats().Equip : default;
+                ApplySpeedModifier();
                 hudTimer?.Show(TimeSpan.FromSeconds(durationRemaining));
             }
             else
