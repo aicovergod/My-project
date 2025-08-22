@@ -495,8 +495,8 @@ namespace BankSystem
                 playerInventory = FindObjectOfType<Inventory.Inventory>();
             if (playerInventory != null)
             {
-                playerInventory.OpenUI();
                 playerInventory.BankOpen = true;
+                playerInventory.OpenUI();
             }
             var skills = SkillsUI.Instance;
             if (skills != null && skills.IsOpen)

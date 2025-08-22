@@ -129,12 +129,27 @@ namespace Inventory
         {
             if (uiRoot != null)
                 uiRoot.SetActive(false);
+            if (playerMover != null)
+            {
+                var pet = PetDropSystem.ActivePetObject;
+                var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
+                storage?.Close();
+            }
         }
 
         public void OpenUI()
         {
             if (uiRoot != null)
                 uiRoot.SetActive(true);
+            if (playerMover != null)
+            {
+                var pet = PetDropSystem.ActivePetObject;
+                var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
+                if (!BankOpen)
+                    storage?.Open();
+                else
+                    storage?.Close();
+            }
         }
 
         public InventoryEntry GetSlot(int index)
@@ -1051,23 +1066,26 @@ namespace Inventory
             bool toggle = Input.GetKeyDown(KeyCode.I);
 #endif
 
+            if (playerMover == null)
+                return;
+
             var quest = Object.FindObjectOfType<QuestUI>();
             if (quest != null && quest.IsOpen)
             {
                 if (uiRoot != null && uiRoot.activeSelf)
-                    uiRoot.SetActive(false);
+                    CloseUI();
                 return;
             }
             if (currentShop != null)
             {
                 if (uiRoot != null && !uiRoot.activeSelf)
-                    uiRoot.SetActive(true);
+                    OpenUI();
                 return;
             }
             if (BankOpen)
             {
                 if (uiRoot != null && !uiRoot.activeSelf)
-                    uiRoot.SetActive(true);
+                    OpenUI();
                 return;
             }
             if (toggle && uiRoot != null)
@@ -1077,8 +1095,12 @@ namespace Inventory
                     var skills = SkillsUI.Instance;
                     if (skills != null && skills.IsOpen)
                         skills.Close();
+                    OpenUI();
                 }
-                uiRoot.SetActive(!uiRoot.activeSelf);
+                else
+                {
+                    CloseUI();
+                }
             }
         }
 

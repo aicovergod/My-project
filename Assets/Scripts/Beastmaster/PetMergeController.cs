@@ -150,6 +150,8 @@ namespace Beastmaster
             if (!petService.TryGetActiveCombatPet(out var pet))
                 return false;
 
+            pet?.GetComponent<PetStorage>()?.Close();
+
             durationRemaining = (float)dur.TotalSeconds;
             cooldownRemaining = (float)cd.TotalSeconds;
             merged = true;
