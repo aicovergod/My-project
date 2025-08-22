@@ -48,6 +48,7 @@ namespace Pets
             if (definition != null && definition.pickupItem != null)
                 InventoryBridge.AddItem(definition.pickupItem, 1);
 
+            storage?.Close();
             PetDropSystem.DespawnActive();
             PetToastUI.Show("You pick up the pet.");
             Destroy(gameObject);

@@ -39,7 +39,8 @@ namespace Pets
             inventory = gameObject.AddComponent<Inventory.Inventory>();
             inventory.useSharedUIRoot = false;
             inventory.columns = 4;
-            inventory.showCloseButton = true;
+            inventory.showCloseButton = false;
+            inventory.emptySlotColor = Color.clear;
             inventory.centerOnScreen = true;
             inventory.size = GetSlotsForLevel(experience != null ? experience.Level : 1);
             inventory.saveKey = $"PetInv_{definition?.id}";
@@ -80,6 +81,12 @@ namespace Pets
         {
             if (inventory != null)
                 inventory.OpenUI();
+        }
+
+        public void Close()
+        {
+            if (inventory != null)
+                inventory.CloseUI();
         }
     }
 }
