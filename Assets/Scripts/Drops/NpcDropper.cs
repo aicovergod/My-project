@@ -66,23 +66,15 @@ namespace MyGame.Drops
                 Vector2 offset = UnityEngine.Random.insideUnitCircle * spawnSpreadRadius;
                 Vector3 pos = basePos + (Vector3)offset;
 
-                Debug.Log($"NpcDropper: Trying to add {drop.quantity}x {drop.item?.name} to inventory.");
-                bool added = InventoryBridge.AddItem(drop.item, drop.quantity);
-                if (added)
+                if (spawner != null)
                 {
-                    Debug.Log($"NpcDropper: Added {drop.quantity}x {drop.item?.name} to inventory.");
+                    Debug.Log($"NpcDropper: Spawning {drop.quantity}x {drop.item?.name} at {pos}.");
+                    spawner.Spawn(drop.item, drop.quantity, pos);
                 }
                 else
                 {
-                    if (spawner != null)
-                    {
-                        Debug.Log($"NpcDropper: Inventory full, spawning {drop.quantity}x {drop.item?.name} at {pos}.");
-                        spawner.Spawn(drop.item, drop.quantity, pos);
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"NpcDropper: Failed to add {drop.item?.name} to inventory and no spawner available.");
-                    }
+                    Debug.LogWarning($"NpcDropper: No GroundItemSpawner available, adding {drop.item?.name} directly to inventory.");
+                    InventoryBridge.AddItem(drop.item, drop.quantity);
                 }
             }
         }
