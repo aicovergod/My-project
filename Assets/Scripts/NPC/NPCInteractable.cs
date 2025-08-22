@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using ShopSystem;
 using Pets;
 using Combat;
@@ -24,6 +25,10 @@ namespace NPC
 
         private void OnMouseOver()
         {
+            // Ignore clicks when the pointer is over any UI element (e.g. pet inventory)
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
+
             if (Input.GetMouseButtonDown(1))
             {
                 if (!PetDropSystem.GuardModeEnabled && PetDropSystem.ActivePetCombat != null && GetComponent<CombatTarget>() != null)
