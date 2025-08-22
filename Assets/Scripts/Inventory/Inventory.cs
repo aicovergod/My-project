@@ -127,6 +127,8 @@ namespace Inventory
 
         public void CloseUI()
         {
+            if (BankOpen)
+                return;
             if (uiRoot != null)
                 uiRoot.SetActive(false);
             if (playerMover != null)
