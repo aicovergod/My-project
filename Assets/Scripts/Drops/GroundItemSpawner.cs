@@ -65,6 +65,13 @@ namespace MyGame.Drops
                     amtField.SetValue(pickup, amount);
                 }
             }
+
+            // Shrink the pickup's sprite to one-third of its original size.
+            var renderer = pickup.GetComponentInChildren<SpriteRenderer>();
+            if (renderer != null)
+            {
+                renderer.transform.localScale *= 1f / 3f;
+            }
         }
     }
 }
