@@ -10,10 +10,12 @@ namespace Pets
     public class PetClickable : MonoBehaviour
     {
         private PetDefinition definition;
+        private PetStorage storage;
 
-        public void Init(PetDefinition def)
+        public void Init(PetDefinition def, PetStorage petStorage)
         {
             definition = def;
+            storage = petStorage;
         }
 
         private void Awake()
@@ -24,17 +26,24 @@ namespace Pets
 
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            bool left = Input.GetMouseButtonDown(0);
+            bool right = Input.GetMouseButtonDown(1);
+            if (!left && !right)
+                return;
+
+            Vector3 world = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 p = new Vector2(world.x, world.y);
+            var hit = Physics2D.OverlapPoint(p);
+            if (hit != null && hit.gameObject == gameObject)
             {
-                Vector3 world = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                Vector2 p = new Vector2(world.x, world.y);
-                var hit = Physics2D.OverlapPoint(p);
-                if (hit != null && hit.gameObject == gameObject)
-                    OnClicked();
+                if (left)
+                    OnLeftClick();
+                else if (right)
+                    OnRightClick();
             }
         }
 
-        private void OnClicked()
+        private void OnLeftClick()
         {
             if (definition != null && definition.pickupItem != null)
                 InventoryBridge.AddItem(definition.pickupItem, 1);
@@ -42,6 +51,12 @@ namespace Pets
             PetDropSystem.DespawnActive();
             PetToastUI.Show("You pick up the pet.");
             Destroy(gameObject);
+        }
+
+        private void OnRightClick()
+        {
+            if (storage != null)
+                storage.Open();
         }
     }
 }

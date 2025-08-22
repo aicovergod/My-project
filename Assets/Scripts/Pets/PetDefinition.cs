@@ -22,6 +22,10 @@ namespace Pets
         [Tooltip("Item awarded when picking up the pet.")]
         public ItemData pickupItem;
 
+        [Header("Storage")]
+        [Tooltip("If true, this pet has its own inventory.")]
+        public bool hasInventory;
+
         [Header("Visuals")]
         [Tooltip("Idle sprite if no animation clips are provided.")]
         public Sprite sprite;

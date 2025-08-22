@@ -52,6 +52,10 @@ namespace Inventory
         public Vector2 slotSpacing = new Vector2(4, 4);
         [Tooltip("Reference resolution for Canvas Scaler (use even numbers).")]
         public Vector2 referenceResolution = new Vector2(640, 360);
+        [Tooltip("Number of columns in the slot grid.")]
+        public int columns = 2;
+        [Tooltip("Reuse a shared UI root across multiple inventories.")]
+        public bool useSharedUIRoot = true;
 
         [Header("Empty Slot Look")]
         [Tooltip("Optional: frame sprite (9-sliced) to draw for each slot.")]
@@ -66,6 +70,8 @@ namespace Inventory
         public Vector2 windowPadding = new Vector2(8f, 8f);
         [Tooltip("Fixed width and height for the inventory window background.")]
         public Vector2 windowSize = new Vector2(83f, 375f);
+        [Tooltip("Show a close button in the top-right corner.")]
+        public bool showCloseButton;
 
         [Header("Tooltip")]
         [Tooltip("Optional: custom font for the tooltip item name. Uses LegacyRuntime if null.")]
@@ -76,6 +82,10 @@ namespace Inventory
         public Font tooltipDescriptionFont;
         [Tooltip("Color for the tooltip description text.")]
         public Color tooltipDescriptionColor = Color.white;
+
+        [Header("Save")]
+        [Tooltip("Save key used for persistence.")]
+        public string saveKey = "InventoryData";
         
         private Image[] slotImages;
         private Text[] slotCountTexts;
@@ -158,13 +168,11 @@ namespace Inventory
             return false;
         }
 
-        private void Awake()
+        private void Start()
         {
             // Ensure at least one slot and cache the builtin font once
             size = Mathf.Max(1, size);
 
-            // Unity uses a builtin font named "LegacyRuntime" for runtime UI. Attempt
-            // to load it once so all UI elements have a consistent default.
             try
             {
                 defaultFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -177,24 +185,23 @@ namespace Inventory
             items = new InventoryEntry[size];
             EnsureLegacyEventSystem();
 
-            if (sharedUIRoot != null)
+            if (useSharedUIRoot && sharedUIRoot != null)
             {
                 uiRoot = sharedUIRoot;
             }
             else
             {
                 CreateUI();
-                sharedUIRoot = uiRoot;
+                if (useSharedUIRoot)
+                    sharedUIRoot = uiRoot;
             }
 
             playerMover = GetComponent<PlayerMover>();
             equipment = GetComponent<Equipment>();
 
-            // Start completely hidden (inactive object so it’s clear in Hierarchy)
             if (uiRoot != null)
                 uiRoot.SetActive(false);
 
-            // Restore any previously saved inventory state
             Load();
         }
 
@@ -230,7 +237,6 @@ namespace Inventory
             windowRect.anchorMax = new Vector2(0f, 1f);
             windowRect.pivot = new Vector2(0f, 1f);
             windowRect.anchoredPosition = new Vector2(10f - windowPadding.x, -10f + windowPadding.y);
-            windowRect.sizeDelta = windowSize;
 
             var windowImg = window.GetComponent<Image>();
             windowImg.color = windowColor;
@@ -250,7 +256,7 @@ namespace Inventory
             grid.childAlignment = TextAnchor.UpperLeft;
             grid.startCorner = GridLayoutGroup.Corner.UpperLeft;
             grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            grid.constraintCount = 2;
+            grid.constraintCount = Mathf.Max(1, columns);
 
             // Generate visible slot images
             slotImages = new Image[size];
@@ -314,9 +320,39 @@ namespace Inventory
                 Debug.LogError($"Inventory UI generation failed: {ex}");
             }
 
+            int rows = Mathf.CeilToInt((float)size / Mathf.Max(1, columns));
+            windowSize = new Vector2(columns * slotSize.x + (columns - 1) * slotSpacing.x + windowPadding.x * 2f,
+                rows * slotSize.y + (rows - 1) * slotSpacing.y + windowPadding.y * 2f);
+            rect.sizeDelta = new Vector2(windowSize.x - windowPadding.x * 2f, windowSize.y - windowPadding.y * 2f);
+
             // Force a layout rebuild so slots are positioned before the UI is hidden
             LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
             windowRect.sizeDelta = windowSize;
+
+            if (showCloseButton)
+            {
+                GameObject closeBtn = new GameObject("CloseButton", typeof(RectTransform), typeof(Image), typeof(Button));
+                closeBtn.transform.SetParent(window.transform, false);
+                var cbRect = closeBtn.GetComponent<RectTransform>();
+                cbRect.anchorMin = cbRect.anchorMax = new Vector2(1f, 1f);
+                cbRect.pivot = new Vector2(1f, 1f);
+                cbRect.anchoredPosition = new Vector2(-4f, -4f);
+                cbRect.sizeDelta = new Vector2(16f, 16f);
+                var txtGO = new GameObject("X", typeof(Text));
+                txtGO.transform.SetParent(closeBtn.transform, false);
+                var txt = txtGO.GetComponent<Text>();
+                if (defaultFont != null) txt.font = defaultFont;
+                txt.text = "X";
+                txt.alignment = TextAnchor.MiddleCenter;
+                txt.color = Color.white;
+                txt.raycastTarget = false;
+                var txtRect = txtGO.GetComponent<RectTransform>();
+                txtRect.anchorMin = Vector2.zero;
+                txtRect.anchorMax = Vector2.one;
+                txtRect.offsetMin = Vector2.zero;
+                txtRect.offsetMax = Vector2.zero;
+                closeBtn.GetComponent<Button>().onClick.AddListener(CloseUI);
+            }
 
             // Tooltip setup
             tooltip = new GameObject("Tooltip", typeof(Image), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
@@ -913,8 +949,6 @@ namespace Inventory
             public int count;
         }
 
-        private const string SaveKey = "InventoryData";
-
         public void Save()
         {
             var data = new InventorySaveData
@@ -932,12 +966,12 @@ namespace Inventory
                 };
             }
 
-            SaveManager.Save(SaveKey, data);
+            SaveManager.Save(saveKey, data);
         }
 
         public void Load()
         {
-            var data = SaveManager.Load<InventorySaveData>(SaveKey);
+            var data = SaveManager.Load<InventorySaveData>(saveKey);
             if (data?.slots == null)
                 return;
 
