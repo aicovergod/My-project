@@ -40,6 +40,7 @@ namespace Pets
             inventory.useSharedUIRoot = false;
             inventory.columns = 4;
             inventory.showCloseButton = true;
+            inventory.centerOnScreen = true;
             inventory.size = GetSlotsForLevel(experience != null ? experience.Level : 1);
             inventory.saveKey = $"PetInv_{definition?.id}";
             var inventories = FindObjectsOfType<Inventory.Inventory>();

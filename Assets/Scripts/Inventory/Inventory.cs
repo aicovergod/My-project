@@ -73,6 +73,9 @@ namespace Inventory
         [Tooltip("Show a close button in the top-right corner.")]
         public bool showCloseButton;
 
+        [Tooltip("Center the inventory window on screen instead of anchoring to the top-left.")]
+        public bool centerOnScreen;
+
         [Header("Tooltip")]
         [Tooltip("Optional: custom font for the tooltip item name. Uses LegacyRuntime if null.")]
         public Font tooltipNameFont;
@@ -108,6 +111,7 @@ namespace Inventory
         // Drag & drop
         private int draggingIndex = -1;
         private GameObject draggingIcon;
+        private static Inventory draggingInventory;
 
         // Cached default font to avoid repeated builtin lookups that may throw
         private Font defaultFont;
@@ -233,10 +237,20 @@ namespace Inventory
             window.transform.SetParent(uiRoot.transform, false);
 
             var windowRect = window.GetComponent<RectTransform>();
-            windowRect.anchorMin = new Vector2(0f, 1f);
-            windowRect.anchorMax = new Vector2(0f, 1f);
-            windowRect.pivot = new Vector2(0f, 1f);
-            windowRect.anchoredPosition = new Vector2(10f - windowPadding.x, -10f + windowPadding.y);
+            if (centerOnScreen)
+            {
+                windowRect.anchorMin = new Vector2(0.5f, 0.5f);
+                windowRect.anchorMax = new Vector2(0.5f, 0.5f);
+                windowRect.pivot = new Vector2(0.5f, 0.5f);
+                windowRect.anchoredPosition = Vector2.zero;
+            }
+            else
+            {
+                windowRect.anchorMin = new Vector2(0f, 1f);
+                windowRect.anchorMax = new Vector2(0f, 1f);
+                windowRect.pivot = new Vector2(0f, 1f);
+                windowRect.anchoredPosition = new Vector2(10f - windowPadding.x, -10f + windowPadding.y);
+            }
 
             var windowImg = window.GetComponent<Image>();
             windowImg.color = windowColor;
@@ -863,6 +877,7 @@ namespace Inventory
 
             HideTooltip();
             draggingIndex = slotIndex;
+            draggingInventory = this;
 
             draggingIcon = new GameObject("DraggingIcon", typeof(Image));
             draggingIcon.transform.SetParent(uiRoot.transform, false);
@@ -893,6 +908,28 @@ namespace Inventory
                 EndDrag();
                 return;
             }
+            if (draggingInventory != null && draggingInventory != this && draggingInventory.draggingIndex != -1)
+            {
+                var source = draggingInventory;
+                int sourceIndex = source.draggingIndex;
+                if (slotIndex >= 0 && slotIndex < items.Length)
+                {
+                    var temp = items[slotIndex];
+                    items[slotIndex] = source.items[sourceIndex];
+                    source.items[sourceIndex] = temp;
+                    UpdateSlotVisual(slotIndex);
+                    source.UpdateSlotVisual(sourceIndex);
+                    source.EndDrag();
+                    OnInventoryChanged?.Invoke();
+                    source.OnInventoryChanged?.Invoke();
+                }
+                else
+                {
+                    source.EndDrag();
+                }
+                return;
+            }
+
             if (draggingIndex == -1)
             {
                 EndDrag();
@@ -924,6 +961,8 @@ namespace Inventory
                     Destroy(draggingIcon);
                 draggingIcon = null;
                 draggingIndex = -1;
+                if (draggingInventory == this)
+                    draggingInventory = null;
                 return;
             }
             if (draggingIndex != -1)
@@ -934,6 +973,8 @@ namespace Inventory
 
             draggingIcon = null;
             draggingIndex = -1;
+            if (draggingInventory == this)
+                draggingInventory = null;
         }
 
         [Serializable]
