@@ -26,21 +26,14 @@ namespace Pets
 
         private void Update()
         {
-            bool left = Input.GetMouseButtonDown(0);
-            bool right = Input.GetMouseButtonDown(1);
-            if (!left && !right)
+            if (!Input.GetMouseButtonDown(0))
                 return;
 
             Vector3 world = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector2 p = new Vector2(world.x, world.y);
             var hit = Physics2D.OverlapPoint(p);
             if (hit != null && hit.gameObject == gameObject)
-            {
-                if (left)
-                    OnLeftClick();
-                else if (right)
-                    OnRightClick();
-            }
+                OnLeftClick();
         }
 
         private void OnLeftClick()
@@ -54,10 +47,5 @@ namespace Pets
             Destroy(gameObject);
         }
 
-        private void OnRightClick()
-        {
-            if (storage != null)
-                storage.Open();
-        }
     }
 }

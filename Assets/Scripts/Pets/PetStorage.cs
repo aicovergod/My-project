@@ -32,6 +32,11 @@ namespace Pets
         {
             if (experience != null)
                 experience.OnLevelChanged -= HandleLevelChanged;
+            if (inventory != null)
+            {
+                inventory.OnInventoryChanged -= inventory.Save;
+                inventory.Save();
+            }
         }
 
         private void CreateInventory()
@@ -44,6 +49,7 @@ namespace Pets
             inventory.centerOnScreen = true;
             inventory.size = GetSlotsForLevel(experience != null ? experience.Level : 1);
             inventory.saveKey = $"PetInv_{definition?.id}";
+            inventory.OnInventoryChanged += inventory.Save;
             var inventories = FindObjectsOfType<Inventory.Inventory>();
             foreach (var inv in inventories)
             {
