@@ -20,12 +20,39 @@ namespace Pets
         public static PetCombatController ActivePetCombat => activePetGO != null ? activePetGO.GetComponent<PetCombatController>() : null;
         public static bool GuardModeEnabled { get; set; }
         private static bool initialized;
+        private static bool quittingRegistered;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AutoInit()
         {
             Initialize();
-            Application.quitting += SaveOnQuit;
+
+            var player = GameObject.FindGameObjectWithTag("Player");
+
+            if (activePetGO != null)
+            {
+                if (player != null)
+                {
+                    activePetGO.transform.position = player.transform.position;
+                    var follower = activePetGO.GetComponent<PetFollower>();
+                    if (follower != null)
+                        follower.SetPlayer(player.transform);
+                }
+
+                var expExisting = activePetGO.GetComponent<PetExperience>();
+                PetLevelBarHUD.CreateForPet(expExisting);
+            }
+            else if (activePetDef != null)
+            {
+                Vector3 pos = player != null ? player.transform.position : Vector3.zero;
+                SpawnPetInternal(activePetDef, pos);
+            }
+
+            if (!quittingRegistered)
+            {
+                Application.quitting += SaveOnQuit;
+                quittingRegistered = true;
+            }
         }
 
         private static void Initialize()
@@ -175,6 +202,7 @@ namespace Pets
             // Find the player once at spawn time so the follower knows whom to follow.
             var playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
             activePetGO = PetSpawner.Spawn(pet, spawnPos, playerTransform);
+            GameObject.DontDestroyOnLoad(activePetGO);
             activePetDef = pet;
             PetSaveBridge.Save(pet.id);
             var exp = activePetGO.GetComponent<PetExperience>();
