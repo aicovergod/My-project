@@ -894,7 +894,11 @@ namespace Inventory
             draggingIndex = slotIndex;
             draggingInventory = this;
 
-            draggingIcon = new GameObject("DraggingIcon", typeof(Image));
+            draggingIcon = new GameObject("DraggingIcon", typeof(Image), typeof(Canvas));
+            var dragCanvas = draggingIcon.GetComponent<Canvas>();
+            dragCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            dragCanvas.overrideSorting = true;
+            dragCanvas.sortingOrder = short.MaxValue;
             draggingIcon.transform.SetParent(uiRoot.transform, false);
             var img = draggingIcon.GetComponent<Image>();
             img.raycastTarget = false;

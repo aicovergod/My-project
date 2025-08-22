@@ -6,6 +6,7 @@ using Inventory;
 using Core.Save;
 using Skills;
 using Quests;
+using Pets;
 
 namespace BankSystem
 {
@@ -51,6 +52,7 @@ namespace BankSystem
         private const string SaveKey = "BankData";
 
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
+        private bool inventoryWasOpen;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Init()
@@ -495,8 +497,12 @@ namespace BankSystem
                 playerInventory = FindObjectOfType<Inventory.Inventory>();
             if (playerInventory != null)
             {
+                inventoryWasOpen = playerInventory.IsOpen;
                 playerInventory.BankOpen = true;
                 playerInventory.OpenUI();
+                var pet = PetDropSystem.ActivePetObject;
+                var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
+                storage?.Close();
             }
             var skills = SkillsUI.Instance;
             if (skills != null && skills.IsOpen)
@@ -520,7 +526,10 @@ namespace BankSystem
             if (playerInventory != null)
             {
                 playerInventory.BankOpen = false;
-                playerInventory.CloseUI();
+                if (inventoryWasOpen)
+                    playerInventory.OpenUI();
+                else
+                    playerInventory.CloseUI();
             }
             Save();
         }
