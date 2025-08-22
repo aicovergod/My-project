@@ -40,9 +40,12 @@ namespace NPC
             OnHealthChanged?.Invoke(currentHp, MaxHP);
             if (currentHp <= 0)
             {
-                OnDeath?.Invoke();
+                // Trigger drops before other death listeners in case they
+                // destroy this NPC immediately (e.g. when killed by pets).
                 var dropper = GetComponent<NpcDropper>();
                 dropper?.OnDeath();
+
+                OnDeath?.Invoke();
                 if (collider2D) collider2D.enabled = false;
                 if (spriteRenderer) spriteRenderer.enabled = false;
                 if (profile != null && profile.RespawnSeconds > 0f)
