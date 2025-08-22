@@ -19,6 +19,7 @@ namespace Skills.Woodcutting
         [Header("Colliders")]
         [SerializeField] private Collider2D stumpCollider;
         private Collider2D col;
+        private BoxCollider2D interactionCollider;
 
         public bool IsDepleted { get; private set; }
         public bool IsBusy { get; set; }
@@ -40,6 +41,25 @@ namespace Skills.Woodcutting
                 if (aliveSprite == null) aliveSprite = def.AliveSprite;
                 if (depletedSprite == null) depletedSprite = def.DepletedSprite;
                 if (sr != null && aliveSprite != null) sr.sprite = aliveSprite;
+            }
+
+            var boxColliders = GetComponents<BoxCollider2D>();
+            foreach (var bc in boxColliders)
+            {
+                if (bc != col)
+                {
+                    interactionCollider = bc;
+                    break;
+                }
+            }
+            if (interactionCollider == null)
+                interactionCollider = gameObject.AddComponent<BoxCollider2D>();
+            interactionCollider.isTrigger = true;
+            if (sr != null && sr.sprite != null)
+            {
+                var bounds = sr.sprite.bounds;
+                interactionCollider.size = bounds.size;
+                interactionCollider.offset = bounds.center;
             }
         }
 
