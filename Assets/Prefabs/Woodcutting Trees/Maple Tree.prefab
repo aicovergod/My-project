@@ -184,3 +184,4 @@ MonoBehaviour:
   aliveSprite: {fileID: 21300000, guid: 242abf46f197f1549bf445e233dee3c6, type: 3}
   depletedSprite: {fileID: -755174274035468053, guid: 12023af7e43fcee4da25bfb5a5547333, type: 3}
   stumpCollider: {fileID: 0}
+  stumpYOffset: -1
