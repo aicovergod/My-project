@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Iron Pickaxe
   itemName: Iron Pickaxe
-  icon: {fileID: -5128661850120462124, guid: 96b31c2ad927bcc4a9d3fea0bd9be10d, type: 3}
+  icon: {fileID: 21300000, guid: b1308ec09fc011045b49e95dd76ca30e, type: 3}
   description: 'A pickaxe, for mining ore
 
     rocks'
@@ -22,6 +22,7 @@ MonoBehaviour:
   maxStack: 0
   splittable: 1
   equipmentSlot: 10
+  skillRequirements: []
   combat:
     Attack: 5
     Strength: 5

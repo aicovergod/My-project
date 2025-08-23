@@ -15,6 +15,6 @@ MonoBehaviour:
   id: pickaxe_rune
   displayName: Rune pickaxe
   tier: 6
-  levelRequirement: 41
-  miningRollBonus: 0.05
+  levelRequirement: 40
+  miningRollBonus: 0.06
   swingSpeedTicks: 3

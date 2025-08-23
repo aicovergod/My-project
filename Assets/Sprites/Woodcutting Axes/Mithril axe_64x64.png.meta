@@ -3,8 +3,8 @@ guid: f6ff75d7b8b34b948a0c51f3db4f1754
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1799127359648974289
-    second: Mithril axe_64x64_0
+      213: -6098839027755937194
+    second: Mithril Axe_64x64_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Mithril axe_64x64_0
+      name: Mithril Axe_64x64_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 64
-        height: 64
+        x: 7
+        y: 8
+        width: 51
+        height: 50
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1d540992dc8c7f810800000000000000
-      internalID: 1799127359648974289
+      spriteID: 6529150a7329c5ba0800000000000000
+      internalID: -6098839027755937194
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Mithril axe_64x64_0: 1799127359648974289
+      Mithril Axe_64x64_0: -6098839027755937194
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

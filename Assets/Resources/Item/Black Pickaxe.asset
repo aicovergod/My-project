@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Black Pickaxe
   itemName: Black Pickaxe
-  icon: {fileID: -4123752313632811023, guid: dd939abbffadced4ebdda40eb880fd6b, type: 3}
+  icon: {fileID: 21300000, guid: 14630f0ee3ca95b4887bb2413260d387, type: 3}
   description: 'A pickaxe, for mining ore
 
     rocks'

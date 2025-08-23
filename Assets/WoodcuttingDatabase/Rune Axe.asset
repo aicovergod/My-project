@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Rune Axe
   displayName: Rune axe
-  requiredWoodcuttingLevel: 41
+  requiredWoodcuttingLevel: 40
   swingSpeedMultiplier: 1.4
   power: 7
   icon: {fileID: 0}

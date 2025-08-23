@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Black Axe
   displayName: Black axe
-  requiredWoodcuttingLevel: 11
+  requiredWoodcuttingLevel: 10
   swingSpeedMultiplier: 1.25
   power: 4
   icon: {fileID: 0}

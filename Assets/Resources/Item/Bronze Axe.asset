@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Bronze Axe
   itemName: Bronze Axe
-  icon: {fileID: 1750432345173048129, guid: 9ca2d00408aa04b43912c45fccb59490, type: 3}
+  icon: {fileID: 21300000, guid: 9ca2d00408aa04b43912c45fccb59490, type: 3}
   description: 'An axe for chopping
 
     trees'
@@ -22,6 +22,7 @@ MonoBehaviour:
   maxStack: 0
   splittable: 0
   equipmentSlot: 10
+  skillRequirements: []
   combat:
     Attack: 4
     Strength: 4

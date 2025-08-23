@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Steel Pickaxe
   itemName: Steel Pickaxe
-  icon: {fileID: 3498688785736947817, guid: 8b65b40182f0c5c44a1117a276b3beb6, type: 3}
+  icon: {fileID: 21300000, guid: 96d26d1f99c72834fab2702bf4f85b28, type: 3}
   description: 'A pickaxe, for mining ore
 
     rocks'

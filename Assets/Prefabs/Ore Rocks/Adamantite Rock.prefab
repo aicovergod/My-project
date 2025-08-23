@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7407885335484035834}
   - component: {fileID: 6572009165737799630}
-  - component: {fileID: 4535704395017745435}
   - component: {fileID: 5712038970875444439}
   - component: {fileID: -3349237954154817776}
+  - component: {fileID: 467840058231532874}
   m_Layer: 0
   m_Name: Adamantite Rock
   m_TagString: Untagged
@@ -90,8 +90,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &4535704395017745435
-BoxCollider2D:
+--- !u!114 &5712038970875444439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7538653971376797137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaeca4ebf1961d646be160b9b0493572, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rockDef: {fileID: 11400000, guid: 07314c14509b4274483977d8211754fa, type: 2}
+  spriteRenderer: {fileID: 6572009165737799630}
+  fullSprite: {fileID: 21300000, guid: 0ecf2436d9a0680409f286459820f13b, type: 3}
+  depletedSprite: {fileID: 21300000, guid: 760efa6975d83c24ba0ecd4d9d8e949a, type: 3}
+--- !u!114 &-3349237954154817776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7538653971376797137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76cd1b72de0d4b218ac17b592277af94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: -1
+--- !u!58 &467840058231532874
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -125,43 +154,4 @@ BoxCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
---- !u!114 &5712038970875444439
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7538653971376797137}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eaeca4ebf1961d646be160b9b0493572, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rockDef: {fileID: 11400000, guid: 07314c14509b4274483977d8211754fa, type: 2}
-  spriteRenderer: {fileID: 6572009165737799630}
-  fullSprite: {fileID: 21300000, guid: 0ecf2436d9a0680409f286459820f13b, type: 3}
-  depletedSprite: {fileID: -3867931755167647559, guid: 0b7e8363bc036f54683b8b5a2b4ffa18, type: 3}
---- !u!114 &-3349237954154817776
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7538653971376797137}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76cd1b72de0d4b218ac17b592277af94, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  offset: -1
+  m_Radius: 0.35

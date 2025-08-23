@@ -5,21 +5,6 @@ TextureImporter:
   - first:
       213: -8506256805805835225
     second: Copper Ore_64x64_0
-  - first:
-      213: 4194583456314538830
-    second: Copper Ore_64x64_1
-  - first:
-      213: 4160173583244557211
-    second: Copper Ore_64x64_2
-  - first:
-      213: -5114313980949704535
-    second: Copper Ore_64x64_3
-  - first:
-      213: -5287001245518364308
-    second: Copper Ore_64x64_4
-  - first:
-      213: -2229817515904007501
-    second: Copper Ore_64x64_5
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -87,7 +72,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 64
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -118,12 +103,12 @@ TextureImporter:
       name: Copper Ore_64x64_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 64
-        height: 64
+        x: 12
+        y: 13
+        width: 39
+        height: 39
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -136,121 +121,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: Copper Ore_64x64_1
-      rect:
-        serializedVersion: 2
-        x: 25
-        y: 17
-        width: 22
-        height: 45
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: e4bbb5efd67263a30800000000000000
-      internalID: 4194583456314538830
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Copper Ore_64x64_2
-      rect:
-        serializedVersion: 2
-        x: 47
-        y: 31
-        width: 17
-        height: 25
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: b9b714915d7ebb930800000000000000
-      internalID: 4160173583244557211
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Copper Ore_64x64_3
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 11
-        width: 22
-        height: 37
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 9a0dda7f78e4609b0800000000000000
-      internalID: -5114313980949704535
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Copper Ore_64x64_4
-      rect:
-        serializedVersion: 2
-        x: 17
-        y: 0
-        width: 18
-        height: 23
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: c6184d1016cc0a6b0800000000000000
-      internalID: -5287001245518364308
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Copper Ore_64x64_5
-      rect:
-        serializedVersion: 2
-        x: 42
-        y: 11
-        width: 13
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 3b2099a88c81e01e0800000000000000
-      internalID: -2229817515904007501
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 444cf2a4dae56274191fdf5fb8e6cdd5
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -261,11 +136,6 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       Copper Ore_64x64_0: -8506256805805835225
-      Copper Ore_64x64_1: 4194583456314538830
-      Copper Ore_64x64_2: 4160173583244557211
-      Copper Ore_64x64_3: -5114313980949704535
-      Copper Ore_64x64_4: -5287001245518364308
-      Copper Ore_64x64_5: -2229817515904007501
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

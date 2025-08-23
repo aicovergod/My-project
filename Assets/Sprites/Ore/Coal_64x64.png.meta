@@ -5,21 +5,6 @@ TextureImporter:
   - first:
       213: 1281655148261252740
     second: Coal_64x64_0
-  - first:
-      213: 1671667301284636621
-    second: Coal_64x64_1
-  - first:
-      213: 4754666686607029346
-    second: Coal_64x64_2
-  - first:
-      213: -7584098948490787340
-    second: Coal_64x64_3
-  - first:
-      213: -2561512714242778979
-    second: Coal_64x64_4
-  - first:
-      213: 2490110608740203717
-    second: Coal_64x64_5
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -118,10 +103,10 @@ TextureImporter:
       name: Coal_64x64_0
       rect:
         serializedVersion: 2
-        x: 20
-        y: 50
-        width: 10
-        height: 14
+        x: 10
+        y: 11
+        width: 43
+        height: 43
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -132,116 +117,6 @@ TextureImporter:
       bones: []
       spriteID: 48e99ac119a59c110800000000000000
       internalID: 1281655148261252740
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Coal_64x64_1
-      rect:
-        serializedVersion: 2
-        x: 25
-        y: 17
-        width: 22
-        height: 45
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: dc7e4bbbd84f23710800000000000000
-      internalID: 1671667301284636621
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Coal_64x64_2
-      rect:
-        serializedVersion: 2
-        x: 47
-        y: 31
-        width: 17
-        height: 25
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 26478900928fbf140800000000000000
-      internalID: 4754666686607029346
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Coal_64x64_3
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 11
-        width: 22
-        height: 37
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 4f50bc9403edfb690800000000000000
-      internalID: -7584098948490787340
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Coal_64x64_4
-      rect:
-        serializedVersion: 2
-        x: 17
-        y: 0
-        width: 18
-        height: 23
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d9899e302cda37cd0800000000000000
-      internalID: -2561512714242778979
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Coal_64x64_5
-      rect:
-        serializedVersion: 2
-        x: 42
-        y: 11
-        width: 13
-        height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 5cc346dc766ae8220800000000000000
-      internalID: 2490110608740203717
       vertices: []
       indices: 
       edges: []
@@ -261,11 +136,6 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       Coal_64x64_0: 1281655148261252740
-      Coal_64x64_1: 1671667301284636621
-      Coal_64x64_2: 4754666686607029346
-      Coal_64x64_3: -7584098948490787340
-      Coal_64x64_4: -2561512714242778979
-      Coal_64x64_5: 2490110608740203717
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

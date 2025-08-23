@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Adamant Pickaxe
   itemName: Adamant Pickaxe
-  icon: {fileID: 498697001015247770, guid: 579fcffa6f66da944af1d9759bb38f06, type: 3}
+  icon: {fileID: 21300000, guid: 6b5761f6889cda3429e3adc53e38493e, type: 3}
   description: 'A pickaxe, for mining ore
 
     rocks'

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Steel Axe
   displayName: Steel axe
-  requiredWoodcuttingLevel: 6
+  requiredWoodcuttingLevel: 5
   swingSpeedMultiplier: 1.2
   power: 3
   icon: {fileID: 0}

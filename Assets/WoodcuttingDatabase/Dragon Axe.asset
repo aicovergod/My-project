@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Dragon Axe
   displayName: Dragon axe
-  requiredWoodcuttingLevel: 61
+  requiredWoodcuttingLevel: 60
   swingSpeedMultiplier: 1.5
   power: 8
   icon: {fileID: 0}

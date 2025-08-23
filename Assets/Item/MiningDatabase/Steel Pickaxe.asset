@@ -15,6 +15,6 @@ MonoBehaviour:
   id: Steel Pickaxe
   displayName: Steel pickaxe
   tier: 3
-  levelRequirement: 6
+  levelRequirement: 5
   miningRollBonus: 0.02
   swingSpeedTicks: 4

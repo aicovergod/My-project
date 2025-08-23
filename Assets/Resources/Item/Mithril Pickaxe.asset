@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Mithril Pickaxe
   itemName: Mithril Pickaxe
-  icon: {fileID: 6964720876281782342, guid: bef43bc693f8bcd4cac05a6d0fb4b56e, type: 3}
+  icon: {fileID: 21300000, guid: a87e5651496ee8a479a2f56b02686a90, type: 3}
   description: 'A pickaxe, for mining ore
 
     rocks'

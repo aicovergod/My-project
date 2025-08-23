@@ -15,7 +15,7 @@ MonoBehaviour:
   id: Leopard
   displayName: Leopard
   pickupItem: {fileID: 11400000, guid: 704c1dd9ea678324098dacfffb807c0a, type: 2}
-  hasInventory: 1
+  hasInventory: 0
   sprite: {fileID: 0}
   pixelsPerUnit: 128
   evolutionTiers:

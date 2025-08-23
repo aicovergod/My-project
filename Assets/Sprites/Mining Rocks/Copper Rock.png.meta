@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: ae0c7cea6941cb04a80d3e377813109c
+guid: b317a1d1bf8f88c44bde24c367cbb5f6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8506256805805835225
-    second: Copper Ore_64x64_0
+      213: -7155784330665300522
+    second: ChatGPT Image Aug 22, 2025, 10_31_39 PM_64x64_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -72,7 +72,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 64
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Copper Ore_64x64_0
+      name: ChatGPT Image Aug 22, 2025, 10_31_39 PM_64x64_0
       rect:
         serializedVersion: 2
         x: 0
@@ -108,15 +108,15 @@ TextureImporter:
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 72cb1b1d084b3f980800000000000000
-      internalID: -8506256805805835225
+      spriteID: 6dd6361701c81bc90800000000000000
+      internalID: -7155784330665300522
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 4e90d256633b6cd4cb3ce22498fc6bc9
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Copper Ore_64x64_0: -8506256805805835225
+      ChatGPT Image Aug 22, 2025, 10_31_39 PM_64x64_0: -7155784330665300522
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

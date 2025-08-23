@@ -5,21 +5,6 @@ TextureImporter:
   - first:
       213: 6656839345578756395
     second: Mithril Ore_64x64_0
-  - first:
-      213: 1946512788694425226
-    second: Mithril Ore_64x64_1
-  - first:
-      213: 7646498758863134215
-    second: Mithril Ore_64x64_2
-  - first:
-      213: 8505624454008146992
-    second: Mithril Ore_64x64_3
-  - first:
-      213: -3574233436800123641
-    second: Mithril Ore_64x64_4
-  - first:
-      213: -4862563339250351652
-    second: Mithril Ore_64x64_5
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -118,10 +103,10 @@ TextureImporter:
       name: Mithril Ore_64x64_0
       rect:
         serializedVersion: 2
-        x: 20
-        y: 50
-        width: 10
-        height: 14
+        x: 11
+        y: 11
+        width: 40
+        height: 42
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -132,116 +117,6 @@ TextureImporter:
       bones: []
       spriteID: b29c0188d18d16c50800000000000000
       internalID: 6656839345578756395
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Mithril Ore_64x64_1
-      rect:
-        serializedVersion: 2
-        x: 25
-        y: 17
-        width: 22
-        height: 45
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: a8ed2e87117630b10800000000000000
-      internalID: 1946512788694425226
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Mithril Ore_64x64_2
-      rect:
-        serializedVersion: 2
-        x: 47
-        y: 31
-        width: 17
-        height: 25
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 70e9089bb12dd1a60800000000000000
-      internalID: 7646498758863134215
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Mithril Ore_64x64_3
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 11
-        width: 22
-        height: 37
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 03c080e406c0a0670800000000000000
-      internalID: 8505624454008146992
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Mithril Ore_64x64_4
-      rect:
-        serializedVersion: 2
-        x: 17
-        y: 0
-        width: 18
-        height: 23
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 70d743750a5c56ec0800000000000000
-      internalID: -3574233436800123641
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Mithril Ore_64x64_5
-      rect:
-        serializedVersion: 2
-        x: 42
-        y: 11
-        width: 13
-        height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: cd1452ae764b48cb0800000000000000
-      internalID: -4862563339250351652
       vertices: []
       indices: 
       edges: []
@@ -261,11 +136,6 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       Mithril Ore_64x64_0: 6656839345578756395
-      Mithril Ore_64x64_1: 1946512788694425226
-      Mithril Ore_64x64_2: 7646498758863134215
-      Mithril Ore_64x64_3: 8505624454008146992
-      Mithril Ore_64x64_4: -3574233436800123641
-      Mithril Ore_64x64_5: -4862563339250351652
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

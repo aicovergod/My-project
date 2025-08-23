@@ -15,6 +15,6 @@ MonoBehaviour:
   id: Black Pickaxe
   displayName: Black Pickaxe
   tier: 3
-  levelRequirement: 6
+  levelRequirement: 5
   miningRollBonus: 0.03
   swingSpeedTicks: 4

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
   m_Name: Solar Lion
   m_EditorClassIdentifier: 
-  id: Lion
-  itemName: Lion
+  id: Solar Lion
+  itemName: Solar Lion
   icon: {fileID: 21300000, guid: 2f7faedf081e76946a6b94bcaa3f2f3f, type: 3}
   description: 'A mythical beast
 

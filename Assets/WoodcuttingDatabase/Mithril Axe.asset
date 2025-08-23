@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Mithril Axe
   displayName: Mithril axe
-  requiredWoodcuttingLevel: 21
+  requiredWoodcuttingLevel: 20
   swingSpeedMultiplier: 1.3
   power: 5
   icon: {fileID: 0}

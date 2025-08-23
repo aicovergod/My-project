@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Rune Pickaxe
   itemName: Rune Pickaxe
-  icon: {fileID: -8895135298759124841, guid: 4be6f5410fb07d644b25f28ae8f6fcfa, type: 3}
+  icon: {fileID: 21300000, guid: ba1862482ac21d34c970f37ba7ef8d70, type: 3}
   description: 'A pickaxe, for mining ore
 
     rocks'

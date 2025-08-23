@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Adamant Axe
   displayName: Adamant axe
-  requiredWoodcuttingLevel: 31
+  requiredWoodcuttingLevel: 30
   swingSpeedMultiplier: 1.35
   power: 6
   icon: {fileID: 0}

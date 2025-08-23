@@ -15,6 +15,6 @@ MonoBehaviour:
   id: Mithril Pickaxe
   displayName: Mithril pickaxe
   tier: 4
-  levelRequirement: 21
+  levelRequirement: 20
   miningRollBonus: 0.03
   swingSpeedTicks: 4

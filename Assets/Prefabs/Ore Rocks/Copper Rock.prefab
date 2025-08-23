@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4068335057024675234}
   - component: {fileID: 5326940890304942251}
-  - component: {fileID: 2830691633462939197}
   - component: {fileID: 2320092293810124611}
   - component: {fileID: -7478075115232638984}
+  - component: {fileID: 3240694230821981480}
   m_Layer: 7
   m_Name: Copper Rock
   m_TagString: Untagged
@@ -79,7 +79,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -8506256805805835225, guid: ae0c7cea6941cb04a80d3e377813109c, type: 3}
+  m_Sprite: {fileID: -7155784330665300522, guid: b317a1d1bf8f88c44bde24c367cbb5f6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -90,8 +90,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &2830691633462939197
-BoxCollider2D:
+--- !u!114 &2320092293810124611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 213024439804270244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaeca4ebf1961d646be160b9b0493572, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rockDef: {fileID: 11400000, guid: 4125f5233573edb4ca7b35e6d47a1533, type: 2}
+  spriteRenderer: {fileID: 5326940890304942251}
+  fullSprite: {fileID: -7155784330665300522, guid: b317a1d1bf8f88c44bde24c367cbb5f6, type: 3}
+  depletedSprite: {fileID: 21300000, guid: 760efa6975d83c24ba0ecd4d9d8e949a, type: 3}
+--- !u!114 &-7478075115232638984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 213024439804270244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76cd1b72de0d4b218ac17b592277af94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offset: -1
+--- !u!58 &3240694230821981480
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -125,43 +154,4 @@ BoxCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
---- !u!114 &2320092293810124611
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 213024439804270244}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eaeca4ebf1961d646be160b9b0493572, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rockDef: {fileID: 11400000, guid: 4125f5233573edb4ca7b35e6d47a1533, type: 2}
-  spriteRenderer: {fileID: 5326940890304942251}
-  fullSprite: {fileID: -8506256805805835225, guid: ae0c7cea6941cb04a80d3e377813109c, type: 3}
-  depletedSprite: {fileID: -3867931755167647559, guid: 0b7e8363bc036f54683b8b5a2b4ffa18, type: 3}
---- !u!114 &-7478075115232638984
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 213024439804270244}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76cd1b72de0d4b218ac17b592277af94, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  offset: -1
+  m_Radius: 0.35
