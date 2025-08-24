@@ -1069,10 +1069,9 @@ namespace Inventory
         private void Update()
         {
 #if ENABLE_INPUT_SYSTEM
-            bool toggle = Keyboard.current != null && Keyboard.current.iKey.wasPressedThisFrame;
-            toggle |= Input.GetKeyDown(KeyCode.I);
+            bool toggle = false;
 #else
-            bool toggle = Input.GetKeyDown(KeyCode.I);
+            bool toggle = false;
 #endif
 
             if (playerMover == null)

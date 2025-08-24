@@ -176,10 +176,9 @@ namespace Inventory
         private void Update()
         {
 #if ENABLE_INPUT_SYSTEM
-            bool toggle = Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame;
-            toggle |= Input.GetKeyDown(KeyCode.E);
+            bool toggle = false;
 #else
-            bool toggle = Input.GetKeyDown(KeyCode.E);
+            bool toggle = false;
 #endif
             if (toggle)
                 ToggleUI();
