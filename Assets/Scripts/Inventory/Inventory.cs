@@ -76,6 +76,9 @@ namespace Inventory
         [Tooltip("Center the inventory window on screen instead of anchoring to the top-left.")]
         public bool centerOnScreen;
 
+        [Tooltip("Anchored position of the inventory window.")]
+        public Vector2 windowPosition = new Vector2(480f, -170f);
+
         [Header("Tooltip")]
         [Tooltip("Optional: custom font for the tooltip item name. Uses LegacyRuntime if null.")]
         public Font tooltipNameFont;
@@ -266,7 +269,7 @@ namespace Inventory
                 windowRect.anchorMin = new Vector2(0f, 1f);
                 windowRect.anchorMax = new Vector2(0f, 1f);
                 windowRect.pivot = new Vector2(0f, 1f);
-                windowRect.anchoredPosition = new Vector2(10f - windowPadding.x, -10f + windowPadding.y);
+                windowRect.anchoredPosition = windowPosition;
             }
 
             var windowImg = window.GetComponent<Image>();
