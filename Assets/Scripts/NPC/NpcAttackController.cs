@@ -4,6 +4,7 @@ using Combat;
 using EquipmentSystem;
 using Skills;
 using Player;
+using Pets;
 
 namespace NPC
 {
@@ -17,6 +18,7 @@ namespace NPC
         private NpcWanderer wanderer;
         private CombatTarget currentTarget;
         private PlayerCombatTarget playerTarget;
+        private bool hasHitPlayer;
 
         private void Awake()
         {
@@ -32,6 +34,7 @@ namespace NPC
             StopAllCoroutines();
             wanderer?.ExitCombat();
             currentTarget = target;
+            hasHitPlayer = false;
             if (target != null)
             {
                 wanderer?.EnterCombat(target.transform);
@@ -143,6 +146,13 @@ namespace NPC
             {
                 var targetName = (target as MonoBehaviour)?.name ?? "target";
                 Debug.Log($"{name} missed {targetName}.");
+            }
+
+            if (!hasHitPlayer && playerTarget != null && PetDropSystem.GuardModeEnabled)
+            {
+                var pet = PetDropSystem.ActivePetCombat;
+                pet?.CommandAttack(combatant);
+                hasHitPlayer = true;
             }
         }
     }
