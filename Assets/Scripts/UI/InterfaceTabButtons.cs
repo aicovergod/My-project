@@ -46,9 +46,10 @@ namespace UI
             rect.anchorMax = new Vector2(1f, 0f);
             rect.pivot = new Vector2(1f, 0f);
             rect.anchoredPosition = new Vector2(-10f, 10f);
+            rect.sizeDelta = new Vector2(400f, 100f);
 
             var layout = panel.GetComponent<HorizontalLayoutGroup>();
-            layout.spacing = 5f;
+            layout.spacing = 0f;
             layout.childForceExpandHeight = false;
             layout.childForceExpandWidth = false;
             layout.childAlignment = TextAnchor.LowerRight;
@@ -68,7 +69,7 @@ namespace UI
             img.sprite = sprite;
             img.preserveAspect = true;
             var rect = go.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(120f, 120f);
+            rect.sizeDelta = new Vector2(100f, 100f);
             go.GetComponent<Button>().onClick.AddListener(onClick);
         }
 
