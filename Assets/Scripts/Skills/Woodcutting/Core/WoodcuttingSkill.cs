@@ -72,6 +72,8 @@ namespace Skills.Woodcutting
                 Ticker.Instance.Unsubscribe(this);
             if (tickerCoroutine != null)
                 StopCoroutine(tickerCoroutine);
+            // Persist XP when the component is disabled to avoid losing progress
+            save.SaveXp(xp);
         }
 
         private void TrySubscribeToTicker()
