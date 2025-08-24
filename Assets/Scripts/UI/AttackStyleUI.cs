@@ -58,7 +58,7 @@ namespace UI
             panelRect.anchoredPosition = new Vector2(295f, -75f);
 
             var layout = panel.GetComponent<VerticalLayoutGroup>();
-            layout.spacing = 5f;
+            layout.spacing = 3f;
             layout.childAlignment = TextAnchor.MiddleCenter;
             layout.childForceExpandHeight = false;
             layout.childForceExpandWidth = false;
