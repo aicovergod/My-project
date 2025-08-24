@@ -65,12 +65,6 @@ namespace Pets
             var loaded = Resources.LoadAll<PetDropTable>("PetDropTables");
             RegisterTables(loaded);
 
-            // Create updater for debug hotkey
-            var go = new GameObject("~PetDropSystem");
-            go.hideFlags = HideFlags.HideAndDontSave;
-            go.AddComponent<PetDropSystemUpdater>();
-            GameObject.DontDestroyOnLoad(go);
-
             string saved = PetSaveBridge.Load();
             if (!string.IsNullOrEmpty(saved))
             {
@@ -251,39 +245,6 @@ namespace Pets
             return null;
         }
 
-        private class PetDropSystemUpdater : MonoBehaviour
-        {
-            private void Update()
-            {
-                if (Input.GetKeyDown(KeyCode.P))
-                {
-                    var player = GameObject.FindGameObjectWithTag("Player");
-                    Vector3 pos = player != null ? player.transform.position : Vector3.zero;
-                    DebugForceFirstDrop(pos);
-                }
-            }
-        }
-
-        internal static bool DebugForceFirstDrop(Vector3 position)
-        {
-            Initialize();
-            if (Beastmaster.PetMergeController.Instance != null && Beastmaster.PetMergeController.Instance.IsMerged)
-                return false;
-            if (tables.Count == 0 || tables[0].entries.Count == 0)
-            {
-                Debug.LogWarning("DebugForceFirstDrop: no pet drop tables or entries found.");
-                return false;
-            }
-            var entry = tables[0].entries[0];
-            if (entry.pet == null)
-            {
-                Debug.LogWarning("DebugForceFirstDrop: first entry has no pet.");
-                return false;
-            }
-            Debug.Log("DebugForceFirstDrop spawning first pet drop.");
-            SpawnPetInternal(entry.pet, position);
-            return true;
-        }
     }
 }
 
@@ -294,6 +255,5 @@ Hookup Checklist:
 - Put sample sprite at Assets/Game/Sprites/Pets/chick_idle.png (point filter, no compression).
 - Assign DefaultPetDrops.asset into a PetDropSystem bootstrapping MonoBehaviour in the first loaded scene,
   or place it under Resources/PetDropTables for auto-loading.
-- Press P in Play Mode to force a test drop.
 - Skill/action systems can call PetDropSystem.TryRollPet("mining", hitPos, out var pet) after a successful action tick.
-*/
+ */
