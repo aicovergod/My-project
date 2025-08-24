@@ -36,6 +36,9 @@ namespace NPC
         [Tooltip("If true, ignore Left arrays and flip the Right sprites for left-facing.")]
         public bool useFlipXForLeft = true;
 
+        [Tooltip("If true, ignore Right arrays and flip the Left sprites for right-facing.")]
+        public bool useFlipXForRight = false;
+
         [Tooltip("Frames per second for SpriteSwap animation.")]
         public float animationFPS = 6f;
 
@@ -104,6 +107,21 @@ namespace NPC
                 }
             }
 
+            if (useFlipXForRight && _currentDir == 2)
+            {
+                bool prevFlipLeft = useFlipXForLeft;
+                useFlipXForLeft = false;
+                Sprite[] leftSet = SelectSpriteSet(_currentlyMoving, 1, out frames);
+                useFlipXForLeft = prevFlipLeft;
+                if (frames > 0)
+                {
+                    _animFrame = Mathf.FloorToInt(_animClock) % frames;
+                    spriteRenderer.sprite = leftSet[_animFrame];
+                    spriteRenderer.flipX = true;
+                    return;
+                }
+            }
+
             spriteRenderer.sprite = set[_animFrame];
         }
 
@@ -117,7 +135,7 @@ namespace NPC
                 {
                     case 0: set = walkDown; break;
                     case 1: set = useFlipXForLeft ? walkRight : walkLeft; break;
-                    case 2: set = walkRight; break;
+                    case 2: set = useFlipXForRight ? walkLeft : walkRight; break;
                     case 3: set = walkUp; break;
                 }
             }
@@ -131,7 +149,11 @@ namespace NPC
                             ? (idleRight != null && idleRight.Length > 0 ? idleRight : walkRight)
                             : (idleLeft != null && idleLeft.Length > 0 ? idleLeft : walkLeft);
                         break;
-                    case 2: set = idleRight != null && idleRight.Length > 0 ? idleRight : (walkRight ?? idleRight); break;
+                    case 2:
+                        set = useFlipXForRight
+                            ? (idleLeft != null && idleLeft.Length > 0 ? idleLeft : walkLeft)
+                            : (idleRight != null && idleRight.Length > 0 ? idleRight : walkRight);
+                        break;
                     case 3: set = idleUp != null && idleUp.Length > 0 ? idleUp : (walkUp ?? idleUp); break;
                 }
             }
@@ -145,6 +167,7 @@ namespace NPC
                 }
                 else
                 {
+                    if (useFlipXForRight && walkLeft != null && walkLeft.Length > 0) { frames = walkLeft.Length; return walkLeft; }
                     if (walkRight != null && walkRight.Length > 0) { frames = walkRight.Length; return walkRight; }
                     if (walkDown != null && walkDown.Length > 0) { frames = walkDown.Length; return walkDown; }
                 }
