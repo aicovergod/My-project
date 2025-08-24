@@ -88,6 +88,39 @@ namespace Skills
             textRect.offsetMax = Vector2.zero;
         }
 
+        public void Toggle()
+        {
+            var quest = FindObjectOfType<QuestUI>();
+            if (quest != null && quest.IsOpen)
+            {
+                if (uiRoot != null && uiRoot.activeSelf)
+                    uiRoot.SetActive(false);
+                return;
+            }
+
+            var shop = ShopUI.Instance;
+            if (shop != null && shop.IsOpen)
+                return;
+            var bank = BankSystem.BankUI.Instance;
+            if (bank != null && bank.IsOpen)
+                return;
+
+            if (uiRoot != null)
+            {
+                bool opening = !uiRoot.activeSelf;
+                if (opening)
+                {
+                    var inv = Object.FindObjectOfType<Inventory.Inventory>();
+                    if (inv != null && inv.IsOpen)
+                        inv.CloseUI();
+                    var eq = Object.FindObjectOfType<Inventory.Equipment>();
+                    if (eq != null && eq.IsOpen)
+                        eq.CloseUI();
+                }
+                uiRoot.SetActive(!uiRoot.activeSelf);
+            }
+        }
+
         private void Update()
         {
             var quest = FindObjectOfType<QuestUI>();
@@ -98,29 +131,7 @@ namespace Skills
                 return;
             }
             if (Input.GetKeyDown(KeyCode.O))
-            {
-                var shop = ShopUI.Instance;
-                if (shop != null && shop.IsOpen)
-                    return;
-                var bank = BankSystem.BankUI.Instance;
-                if (bank != null && bank.IsOpen)
-                    return;
-
-                if (uiRoot != null)
-                {
-                    bool opening = !uiRoot.activeSelf;
-                    if (opening)
-                    {
-                        var inv = Object.FindObjectOfType<Inventory.Inventory>();
-                        if (inv != null && inv.IsOpen)
-                            inv.CloseUI();
-                        var eq = Object.FindObjectOfType<Inventory.Equipment>();
-                        if (eq != null && eq.IsOpen)
-                            eq.CloseUI();
-                    }
-                    uiRoot.SetActive(!uiRoot.activeSelf);
-                }
-            }
+                Toggle();
 
             if (uiRoot != null && uiRoot.activeSelf)
             {

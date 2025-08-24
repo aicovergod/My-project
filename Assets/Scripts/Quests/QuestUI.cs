@@ -48,46 +48,49 @@ namespace Quests
                 QuestManager.Instance.QuestsUpdated.AddListener(Refresh);
         }
 
+        public void Toggle()
+        {
+            bool opening = !canvas.enabled;
+            if (opening)
+            {
+                var inv = FindObjectOfType<Inventory.Inventory>();
+                if (inv != null && inv.IsOpen)
+                    inv.CloseUI();
+                var eq = FindObjectOfType<Inventory.Equipment>();
+                if (eq != null && eq.IsOpen)
+                    eq.CloseUI();
+                var skills = SkillsUI.Instance;
+                if (skills != null && skills.IsOpen)
+                    skills.Close();
+                var shop = ShopUI.Instance;
+                if (shop != null && shop.IsOpen)
+                    shop.Close();
+                var bank = BankUI.Instance;
+                if (bank != null && bank.IsOpen)
+                    bank.Close();
+            }
+
+            canvas.enabled = opening;
+            if (canvas.enabled)
+            {
+                Refresh();
+                if (playerMover == null)
+                    playerMover = FindObjectOfType<PlayerMover>();
+                if (playerMover != null)
+                    playerMover.enabled = false;
+            }
+            else
+            {
+                Clear();
+                if (playerMover != null)
+                    playerMover.enabled = true;
+            }
+        }
+
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Q))
-            {
-                bool opening = !canvas.enabled;
-                if (opening)
-                {
-                    var inv = FindObjectOfType<Inventory.Inventory>();
-                    if (inv != null && inv.IsOpen)
-                        inv.CloseUI();
-                    var eq = FindObjectOfType<Inventory.Equipment>();
-                    if (eq != null && eq.IsOpen)
-                        eq.CloseUI();
-                    var skills = SkillsUI.Instance;
-                    if (skills != null && skills.IsOpen)
-                        skills.Close();
-                    var shop = ShopUI.Instance;
-                    if (shop != null && shop.IsOpen)
-                        shop.Close();
-                    var bank = BankUI.Instance;
-                    if (bank != null && bank.IsOpen)
-                        bank.Close();
-                }
-
-                canvas.enabled = opening;
-                if (canvas.enabled)
-                {
-                    Refresh();
-                    if (playerMover == null)
-                        playerMover = FindObjectOfType<PlayerMover>();
-                    if (playerMover != null)
-                        playerMover.enabled = false;
-                }
-                else
-                {
-                    Clear();
-                    if (playerMover != null)
-                        playerMover.enabled = true;
-                }
-            }
+                Toggle();
         }
 
         private void BuildLayout()

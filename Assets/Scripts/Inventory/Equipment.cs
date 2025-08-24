@@ -152,14 +152,8 @@ namespace Inventory
                 uiRoot.SetActive(false);
         }
 
-        private void Update()
+        public void ToggleUI()
         {
-#if ENABLE_INPUT_SYSTEM
-            bool toggle = Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame;
-            toggle |= Input.GetKeyDown(KeyCode.E);
-#else
-            bool toggle = Input.GetKeyDown(KeyCode.E);
-#endif
             var quest = Object.FindObjectOfType<QuestUI>();
             if (quest != null && quest.IsOpen)
             {
@@ -167,7 +161,7 @@ namespace Inventory
                     uiRoot.SetActive(false);
                 return;
             }
-            if (toggle && uiRoot != null)
+            if (uiRoot != null)
             {
                 bool opening = !uiRoot.activeSelf;
                 if (opening)
@@ -177,6 +171,18 @@ namespace Inventory
                 }
                 uiRoot.SetActive(!uiRoot.activeSelf);
             }
+        }
+
+        private void Update()
+        {
+#if ENABLE_INPUT_SYSTEM
+            bool toggle = Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame;
+            toggle |= Input.GetKeyDown(KeyCode.E);
+#else
+            bool toggle = Input.GetKeyDown(KeyCode.E);
+#endif
+            if (toggle)
+                ToggleUI();
 
             bool merged = PetMergeController.Instance != null && PetMergeController.Instance.IsMerged;
             if (merged != lastMergeState)
