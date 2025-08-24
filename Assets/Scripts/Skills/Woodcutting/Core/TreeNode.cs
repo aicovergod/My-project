@@ -24,6 +24,8 @@ namespace Skills.Woodcutting
         [Header("Offsets")]
         [SerializeField] private float stumpYOffset;
         private Vector3 initialPosition;
+        private Vector2 initialColliderOffset;
+        private Vector2 initialStumpColliderOffset;
 
         public bool IsDepleted { get; private set; }
         public bool IsBusy { get; set; }
@@ -39,8 +41,13 @@ namespace Skills.Woodcutting
                 sr = GetComponent<SpriteRenderer>();
             col = GetComponent<Collider2D>();
             initialPosition = transform.position;
+            if (col)
+                initialColliderOffset = col.offset;
             if (stumpCollider)
+            {
+                initialStumpColliderOffset = stumpCollider.offset;
                 stumpCollider.enabled = false;
+            }
             if (def != null)
             {
                 if (aliveSprite == null) aliveSprite = def.AliveSprite;
@@ -120,7 +127,11 @@ namespace Skills.Woodcutting
             }
             if (sr && depletedSprite) sr.sprite = depletedSprite;
             if (stumpYOffset != 0f)
+            {
                 transform.position = initialPosition + Vector3.up * stumpYOffset;
+                if (col) col.offset = initialColliderOffset - Vector2.up * stumpYOffset;
+                if (stumpCollider) stumpCollider.offset = initialStumpColliderOffset - Vector2.up * stumpYOffset;
+            }
             IsBusy = false;
             OnTreeDepleted?.Invoke(this, def != null ? def.RespawnSeconds : 0f);
         }
@@ -129,7 +140,11 @@ namespace Skills.Woodcutting
         {
             IsDepleted = false;
             if (stumpYOffset != 0f)
+            {
                 transform.position = initialPosition;
+                if (col) col.offset = initialColliderOffset;
+                if (stumpCollider) stumpCollider.offset = initialStumpColliderOffset;
+            }
             if (stumpCollider)
             {
                 stumpCollider.enabled = false;
