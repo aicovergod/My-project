@@ -200,11 +200,52 @@ namespace NPC
                 for (int y = -1; y <= 1; y++)
                 {
                     if (slamDustPrefab != null)
-                        Instantiate(slamDustPrefab, (Vector2)transform.position + new Vector2(x, y), Quaternion.identity);
+                    {
+                        var dust = Instantiate(slamDustPrefab,
+                            (Vector2)transform.position + new Vector2(x, y), Quaternion.identity);
+                        StartCoroutine(FadeOutDust(dust));
+                    }
                 }
             }
 
             StartCoroutine(ScreenShake(shakeDuration, shakeMagnitude));
+        }
+
+        private IEnumerator FadeOutDust(GameObject dust)
+        {
+            var renderers = dust.GetComponentsInChildren<SpriteRenderer>();
+            if (renderers.Length == 0)
+            {
+                yield return new WaitForSeconds(3 * CombatMath.TICK_SECONDS);
+                Destroy(dust);
+                yield break;
+            }
+
+            float duration = 3 * CombatMath.TICK_SECONDS;
+            float elapsed = 0f;
+            var originalColors = new Color[renderers.Length];
+            for (int i = 0; i < renderers.Length; i++)
+                originalColors[i] = renderers[i].color;
+
+            while (elapsed < duration)
+            {
+                float alpha = 1f - (elapsed / duration);
+                for (int i = 0; i < renderers.Length; i++)
+                {
+                    var c = originalColors[i];
+                    renderers[i].color = new Color(c.r, c.g, c.b, alpha);
+                }
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                var c = originalColors[i];
+                renderers[i].color = new Color(c.r, c.g, c.b, 0f);
+            }
+
+            Destroy(dust);
         }
 
         private IEnumerator ScreenShake(float duration, float magnitude)
