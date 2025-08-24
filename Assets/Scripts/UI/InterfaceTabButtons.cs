@@ -58,6 +58,7 @@ namespace UI
             AddButton(panel.transform, "InventoryTab", ToggleInventory);
             AddButton(panel.transform, "SkillTab", ToggleSkills);
             AddButton(panel.transform, "EquipmentTab", ToggleEquipment);
+            AddButton(panel.transform, "AttackStyle", ToggleAttackStyle);
         }
 
         private void AddButton(Transform parent, string spriteName, UnityEngine.Events.UnityAction onClick)
@@ -101,6 +102,12 @@ namespace UI
         {
             var eq = Object.FindObjectOfType<Equipment>();
             eq?.ToggleUI();
+        }
+
+        private void ToggleAttackStyle()
+        {
+            var style = Object.FindObjectOfType<AttackStyleUI>();
+            style?.Toggle();
         }
     }
 }
