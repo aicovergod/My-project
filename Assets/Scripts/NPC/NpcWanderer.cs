@@ -1,5 +1,6 @@
 using UnityEngine;
 using Util;
+using Combat;
 
 namespace NPC
 {
@@ -105,7 +106,18 @@ namespace NPC
             if (_combatTarget != null)
             {
                 _from = _rb != null ? _rb.position : (Vector2)transform.position;
-                _to = Vector2.MoveTowards(_from, (Vector2)_combatTarget.position, moveSpeed * delta);
+                Vector2 targetPos = _combatTarget.position;
+                float distance = Vector2.Distance(_from, targetPos);
+                if (distance > CombatMath.MELEE_RANGE)
+                {
+                    Vector2 direction = (targetPos - _from).normalized;
+                    Vector2 desired = targetPos - direction * CombatMath.MELEE_RANGE;
+                    _to = Vector2.MoveTowards(_from, desired, moveSpeed * delta);
+                }
+                else
+                {
+                    _to = _from;
+                }
                 _lerpTime = 0f;
                 return;
             }
