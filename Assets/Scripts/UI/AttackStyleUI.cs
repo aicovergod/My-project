@@ -51,11 +51,11 @@ namespace UI
             var panelImage = panel.GetComponent<Image>();
             panelImage.color = new Color(0f, 0f, 0f, 0.5f);
             var panelRect = panel.GetComponent<RectTransform>();
-            panelRect.sizeDelta = new Vector2(60f, 220f);
+            panelRect.sizeDelta = new Vector2(170f, 220f);
             panelRect.anchorMin = new Vector2(0.5f, 0.5f);
             panelRect.anchorMax = new Vector2(0.5f, 0.5f);
             panelRect.pivot = new Vector2(0.5f, 0.5f);
-            panelRect.anchoredPosition = Vector2.zero;
+            panelRect.anchoredPosition = new Vector2(295f, -75f);
 
             var layout = panel.GetComponent<VerticalLayoutGroup>();
             layout.spacing = 5f;
@@ -80,7 +80,8 @@ namespace UI
             img.sprite = sprite;
             img.preserveAspect = true;
             var rect = go.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(50f, 50f);
+            rect.sizeDelta = new Vector2(30f, 30f);
+            rect.localScale = new Vector3(2.5f, 1.5f, 1f);
             var btn = go.GetComponent<Button>();
             btn.onClick.AddListener(() => SetStyle(style));
             return btn;
