@@ -58,7 +58,7 @@ namespace UI
             panelRect.anchoredPosition = new Vector2(295f, -75f);
 
             var layout = panel.GetComponent<VerticalLayoutGroup>();
-            layout.spacing = 3f;
+            layout.spacing = -25f;
             layout.childAlignment = TextAnchor.MiddleCenter;
             layout.childForceExpandHeight = false;
             layout.childForceExpandWidth = false;
@@ -81,7 +81,7 @@ namespace UI
             img.preserveAspect = true;
             var rect = go.GetComponent<RectTransform>();
             rect.sizeDelta = new Vector2(30f, 30f);
-            rect.localScale = new Vector3(2.5f, 1.5f, 1f);
+            rect.localScale = new Vector3(2f, 1f, 1f);
             var btn = go.GetComponent<Button>();
             btn.onClick.AddListener(() => SetStyle(style));
             return btn;

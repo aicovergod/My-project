@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 5dbaeabf6902e344aa4dfc99634e664b
+guid: 1fcdcb4c0f9285d498e23695b86ea23a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7942354163766034743
-    second: InventoryTab_0
+      213: 4526307777658090538
+    second: Aggressive_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: InventoryTab_0
+      name: Aggressive_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 0
-        width: 1019
-        height: 1019
+        x: 39
+        y: 88
+        width: 952
+        height: 931
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 9ce716ce7f617c190800000000000000
-      internalID: -7942354163766034743
+      spriteID: a24f56f31fca0de30800000000000000
+      internalID: 4526307777658090538
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      InventoryTab_0: -7942354163766034743
+      Aggressive_0: 4526307777658090538
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
