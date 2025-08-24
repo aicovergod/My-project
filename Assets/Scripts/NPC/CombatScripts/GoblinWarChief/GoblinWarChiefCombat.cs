@@ -203,6 +203,7 @@ namespace NPC
                     {
                         var dust = Instantiate(slamDustPrefab,
                             (Vector2)transform.position + new Vector2(x, y), Quaternion.identity);
+                        Destroy(dust, 3 * CombatMath.TICK_SECONDS);
                         StartCoroutine(FadeOutDust(dust));
                     }
                 }
