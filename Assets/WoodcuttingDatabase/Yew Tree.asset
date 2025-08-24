@@ -12,14 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96f096705264aa949bb9676dc004611c, type: 3}
   m_Name: Yew Tree
   m_EditorClassIdentifier: 
-  id: tree_yew
+  id: Yew Log
   displayName: Yew
   requiredWoodcuttingLevel: 60
   xpPerLog: 175
-  logItemId: log_yew
+  logItemId: Yew Log
   depletesAfterOneLog: 0
   depleteRollInverse: 8
   respawnSeconds: 114
   chopIntervalTicks: 4
+  interactRange: 3
+  cancelDistance: 4.5
   aliveSprite: {fileID: 0}
   depletedSprite: {fileID: 0}
