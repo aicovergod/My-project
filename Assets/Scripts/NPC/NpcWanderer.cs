@@ -100,18 +100,16 @@ namespace NPC
 
         public void OnTick()
         {
+            float delta = Ticker.TickDuration;
+
             if (_combatTarget != null)
             {
-                Vector2 current = _rb != null ? _rb.position : (Vector2)transform.position;
-                Vector2 dir = ((Vector2)_combatTarget.position) - current;
-                spriteAnimator?.UpdateVisuals(dir);
-                spriteAnimator?.UpdateVisuals(Vector2.zero);
-                _lerpTime = Ticker.TickDuration;
-                _lastPos = current;
+                _from = _rb != null ? _rb.position : (Vector2)transform.position;
+                _to = Vector2.MoveTowards(_from, (Vector2)_combatTarget.position, moveSpeed * delta);
+                _lerpTime = 0f;
                 return;
             }
 
-            float delta = Ticker.TickDuration;
             if (_waiting)
             {
                 _waitTimer -= delta;
