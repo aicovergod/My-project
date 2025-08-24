@@ -130,8 +130,7 @@ namespace Skills
                     uiRoot.SetActive(false);
                 return;
             }
-            if (Input.GetKeyDown(KeyCode.O))
-                Toggle();
+            // Removed O key toggle
 
             if (uiRoot != null && uiRoot.activeSelf)
             {

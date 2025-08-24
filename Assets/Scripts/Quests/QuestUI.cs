@@ -89,8 +89,7 @@ namespace Quests
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Q))
-                Toggle();
+            // Removed Q key toggle
         }
 
         private void BuildLayout()
