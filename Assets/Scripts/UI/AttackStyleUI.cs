@@ -46,18 +46,18 @@ namespace UI
             uiRoot.AddComponent<CanvasScaler>();
             uiRoot.AddComponent<GraphicRaycaster>();
 
-            var panel = new GameObject("Panel", typeof(Image), typeof(HorizontalLayoutGroup));
+            var panel = new GameObject("Panel", typeof(Image), typeof(VerticalLayoutGroup));
             panel.transform.SetParent(uiRoot.transform, false);
             var panelImage = panel.GetComponent<Image>();
             panelImage.color = new Color(0f, 0f, 0f, 0.5f);
             var panelRect = panel.GetComponent<RectTransform>();
-            panelRect.sizeDelta = new Vector2(220f, 60f);
+            panelRect.sizeDelta = new Vector2(60f, 220f);
             panelRect.anchorMin = new Vector2(0.5f, 0.5f);
             panelRect.anchorMax = new Vector2(0.5f, 0.5f);
             panelRect.pivot = new Vector2(0.5f, 0.5f);
             panelRect.anchoredPosition = Vector2.zero;
 
-            var layout = panel.GetComponent<HorizontalLayoutGroup>();
+            var layout = panel.GetComponent<VerticalLayoutGroup>();
             layout.spacing = 5f;
             layout.childAlignment = TextAnchor.MiddleCenter;
             layout.childForceExpandHeight = false;
