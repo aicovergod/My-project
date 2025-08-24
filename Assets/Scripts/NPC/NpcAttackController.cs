@@ -20,6 +20,9 @@ namespace NPC
         private PlayerCombatTarget playerTarget;
         private bool hasHitPlayer;
         private Vector2 spawnPosition;
+        private NpcSpriteAnimator spriteAnimator;
+        private SpriteRenderer spriteRenderer;
+        private Coroutine spriteSwapRoutine;
 
         private void Awake()
         {
@@ -27,6 +30,8 @@ namespace NPC
             wanderer = GetComponent<NpcWanderer>();
             playerTarget = FindObjectOfType<PlayerCombatTarget>();
             spawnPosition = transform.position;
+            spriteAnimator = GetComponent<NpcSpriteAnimator>() ?? GetComponentInChildren<NpcSpriteAnimator>();
+            spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
         }
 
         public void BeginAttacking(CombatTarget target)
@@ -137,6 +142,28 @@ namespace NPC
             int defRoll = CombatMath.GetDefenceRoll(defEff, defBonus);
             bool hit = Random.value < CombatMath.ChanceToHit(atkRoll, defRoll);
             int damage = 0;
+
+            int facingDir;
+            Vector2 diff = target.transform.position - transform.position;
+            if (Mathf.Abs(diff.x) > Mathf.Abs(diff.y))
+                facingDir = diff.x < 0f ? 1 : 2;
+            else
+                facingDir = diff.y < 0f ? 0 : 3;
+
+            if (spriteAnimator != null)
+            {
+                spriteAnimator.SetFacing(facingDir);
+                if (spriteAnimator.HasAttackAnimation(facingDir))
+                {
+                    if (spriteSwapRoutine != null)
+                        StopCoroutine(spriteSwapRoutine);
+                    spriteSwapRoutine = StartCoroutine(spriteAnimator.PlayAttackAnimation(facingDir));
+                }
+            }
+            else if (spriteRenderer != null)
+            {
+                spriteRenderer.flipX = facingDir == 2;
+            }
             if (hit)
             {
                 int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);

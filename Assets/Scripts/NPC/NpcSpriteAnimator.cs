@@ -16,6 +16,7 @@ namespace NPC
         public Animator animator;
         public string dirParam = "Dir";
         public string isMovingParam = "IsMoving";
+        public string attackTrigger = "Attack";
 
         [Tooltip("SpriteRenderer used in SpriteSwap mode (auto-found if null).")]
         public SpriteRenderer spriteRenderer;
@@ -33,11 +34,23 @@ namespace NPC
         public Sprite[] walkRight;
         public Sprite[] walkUp;
 
+        [Tooltip("Frames used when attacking (Down/Left/Right/Up).")]
+        public Sprite[] attackDown;
+        public Sprite[] attackLeft;
+        public Sprite[] attackRight;
+        public Sprite[] attackUp;
+
         [Tooltip("If true, ignore Left arrays and flip the Right sprites for left-facing.")]
         public bool useFlipXForLeft = true;
 
         [Tooltip("If true, ignore Right arrays and flip the Left sprites for right-facing.")]
         public bool useFlipXForRight = false;
+
+        [Tooltip("If true, ignore Left attack arrays and flip the Right sprites for left-facing attacks.")]
+        public bool useFlipXForLeftAttack = true;
+
+        [Tooltip("If true, ignore Right attack arrays and flip the Left sprites for right-facing attacks.")]
+        public bool useFlipXForRightAttack = false;
 
         [Tooltip("Frames per second for SpriteSwap animation.")]
         public float animationFPS = 6f;
@@ -46,6 +59,7 @@ namespace NPC
         private bool _currentlyMoving = false;
         private float _animClock = 0f;
         private int _animFrame = 0;
+        private bool _overridePlaying = false;
 
         private void Reset()
         {
@@ -64,6 +78,8 @@ namespace NPC
         /// </summary>
         public void UpdateVisuals(Vector2 velocity)
         {
+            if (_overridePlaying) return;
+
             _currentlyMoving = velocity.sqrMagnitude > 0.0001f;
 
             if (_currentlyMoving)
@@ -125,6 +141,47 @@ namespace NPC
             spriteRenderer.sprite = set[_animFrame];
         }
 
+        /// <summary>Force the animator to face the given direction (0=Down,1=Left,2=Right,3=Up).</summary>
+        public void SetFacing(int dir)
+        {
+            _currentDir = Mathf.Clamp(dir, 0, 3);
+        }
+
+        public bool HasAttackAnimation(int dir)
+        {
+            Sprite[] set = SelectAttackSpriteSet(dir, out int frames);
+            return frames > 0;
+        }
+
+        public System.Collections.IEnumerator PlayAttackAnimation(int dir)
+        {
+            if (visualMode == VisualMode.Animator)
+            {
+                if (animator != null)
+                {
+                    animator.SetInteger(dirParam, Mathf.Clamp(dir, 0, 3));
+                    animator.SetTrigger(attackTrigger);
+                }
+                yield break;
+            }
+
+            Sprite[] set = SelectAttackSpriteSet(dir, out int frames);
+            if (frames == 0 || spriteRenderer == null)
+                yield break;
+
+            _overridePlaying = true;
+            _currentDir = Mathf.Clamp(dir, 0, 3);
+            float fps = Mathf.Max(0.01f, animationFPS);
+            for (int i = 0; i < frames; i++)
+            {
+                spriteRenderer.sprite = set[i];
+                spriteRenderer.flipX = (_currentDir == 1 && useFlipXForLeftAttack) || (_currentDir == 2 && useFlipXForRightAttack);
+                yield return new WaitForSeconds(1f / fps);
+            }
+            _overridePlaying = false;
+            _animClock = 0f;
+        }
+
         private Sprite[] SelectSpriteSet(bool moving, int dir, out int frames)
         {
             Sprite[] set = null;
@@ -171,6 +228,21 @@ namespace NPC
                     if (walkRight != null && walkRight.Length > 0) { frames = walkRight.Length; return walkRight; }
                     if (walkDown != null && walkDown.Length > 0) { frames = walkDown.Length; return walkDown; }
                 }
+            }
+
+            frames = set != null ? set.Length : 0;
+            return set ?? System.Array.Empty<Sprite>();
+        }
+
+        private Sprite[] SelectAttackSpriteSet(int dir, out int frames)
+        {
+            Sprite[] set = null;
+            switch (dir)
+            {
+                case 0: set = attackDown; break;
+                case 1: set = useFlipXForLeftAttack ? attackRight : attackLeft; break;
+                case 2: set = useFlipXForRightAttack ? attackLeft : attackRight; break;
+                case 3: set = attackUp; break;
             }
 
             frames = set != null ? set.Length : 0;
