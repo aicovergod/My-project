@@ -23,6 +23,7 @@ namespace NPC
         public DamageType PreferredDefenceType => profile != null ? profile.AttackType : DamageType.Melee;
         public int CurrentHP => currentHp;
         public int MaxHP => profile != null ? profile.HitpointsLevel : currentHp;
+        public NpcCombatProfile Profile => profile;
 
         private void Awake()
         {

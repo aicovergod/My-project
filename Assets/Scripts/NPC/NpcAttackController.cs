@@ -16,11 +16,13 @@ namespace NPC
         private NpcCombatant combatant;
         private NpcWanderer wanderer;
         private CombatTarget currentTarget;
+        private PlayerCombatTarget playerTarget;
 
         private void Awake()
         {
             combatant = GetComponent<NpcCombatant>();
             wanderer = GetComponent<NpcWanderer>();
+            playerTarget = FindObjectOfType<PlayerCombatTarget>();
         }
 
         public void BeginAttacking(CombatTarget target)
@@ -34,6 +36,30 @@ namespace NPC
             {
                 wanderer?.EnterCombat(target.transform);
                 StartCoroutine(AttackRoutine(target));
+            }
+        }
+
+        private void Update()
+        {
+            var profile = combatant.Profile;
+            if (profile == null || !profile.IsAggressive)
+                return;
+
+            if (playerTarget == null)
+                playerTarget = FindObjectOfType<PlayerCombatTarget>();
+
+            if (playerTarget == null)
+                return;
+
+            float dist = Vector2.Distance(playerTarget.transform.position, transform.position);
+            if (currentTarget == null)
+            {
+                if (dist <= profile.AggroRange)
+                    BeginAttacking(playerTarget);
+            }
+            else if (dist > profile.AggroRange)
+            {
+                BeginAttacking(null);
             }
         }
 
@@ -51,8 +77,10 @@ namespace NPC
 
             while (target != null && target.IsAlive && combatant.IsAlive)
             {
-                // If the player moves out of melee range, stop attacking.
-                if (Vector2.Distance(target.transform.position, transform.position) > CombatMath.MELEE_RANGE)
+                float distance = Vector2.Distance(target.transform.position, transform.position);
+                // If the player moves out of aggro or melee range, stop attacking.
+                var profile = combatant.Profile;
+                if ((profile != null && distance > profile.AggroRange) || distance > CombatMath.MELEE_RANGE)
                     break;
 
                 ResolveAttack(target);

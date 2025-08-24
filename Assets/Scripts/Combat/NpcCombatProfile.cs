@@ -19,5 +19,9 @@ namespace Combat
         public float RespawnSeconds;
         public DamageType AttackType = DamageType.Melee;
         public CombatStyle Style = CombatStyle.Accurate;
+        [Tooltip("If true, this NPC will automatically attack nearby players.")]
+        public bool IsAggressive;
+        [Tooltip("Maximum distance in tiles before an aggressive NPC loses aggro.")]
+        public float AggroRange = 5f;
     }
 }
