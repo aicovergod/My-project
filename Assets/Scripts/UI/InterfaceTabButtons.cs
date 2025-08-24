@@ -30,7 +30,13 @@ namespace UI
         {
             var canvas = gameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            gameObject.AddComponent<CanvasScaler>();
+
+            var scaler = gameObject.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+            scaler.matchWidthOrHeight = 0.5f;
+
             gameObject.AddComponent<GraphicRaycaster>();
 
             var panel = new GameObject("Panel", typeof(RectTransform), typeof(HorizontalLayoutGroup));
@@ -39,12 +45,13 @@ namespace UI
             rect.anchorMin = new Vector2(1f, 0f);
             rect.anchorMax = new Vector2(1f, 0f);
             rect.pivot = new Vector2(1f, 0f);
-            rect.anchoredPosition = new Vector2(-10f, 0f);
+            rect.anchoredPosition = new Vector2(-10f, 10f);
 
             var layout = panel.GetComponent<HorizontalLayoutGroup>();
             layout.spacing = 5f;
             layout.childForceExpandHeight = false;
             layout.childForceExpandWidth = false;
+            layout.childAlignment = TextAnchor.LowerRight;
 
             AddButton(panel.transform, "QuestTab", ToggleQuest);
             AddButton(panel.transform, "InventoryTab", ToggleInventory);
