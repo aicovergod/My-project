@@ -19,12 +19,14 @@ namespace NPC
         private CombatTarget currentTarget;
         private PlayerCombatTarget playerTarget;
         private bool hasHitPlayer;
+        private Vector2 spawnPosition;
 
         private void Awake()
         {
             combatant = GetComponent<NpcCombatant>();
             wanderer = GetComponent<NpcWanderer>();
             playerTarget = FindObjectOfType<PlayerCombatTarget>();
+            spawnPosition = transform.position;
         }
 
         public void BeginAttacking(CombatTarget target)
@@ -54,13 +56,14 @@ namespace NPC
             if (playerTarget == null)
                 return;
 
-            float dist = Vector2.Distance(playerTarget.transform.position, transform.position);
+            float playerDistFromSpawn = Vector2.Distance(playerTarget.transform.position, spawnPosition);
+            float npcDistFromSpawn = Vector2.Distance(transform.position, spawnPosition);
             if (currentTarget == null)
             {
-                if (dist <= profile.AggroRange)
+                if (playerDistFromSpawn <= profile.AggroRange)
                     BeginAttacking(playerTarget);
             }
-            else if (dist > profile.AggroRange)
+            else if (playerDistFromSpawn > profile.AggroRange || npcDistFromSpawn > profile.AggroRange)
             {
                 BeginAttacking(null);
             }
@@ -81,9 +84,10 @@ namespace NPC
             while (target != null && target.IsAlive && combatant.IsAlive)
             {
                 float distance = Vector2.Distance(target.transform.position, transform.position);
-                // If the player moves out of aggro or melee range, stop attacking.
+                // If we move beyond aggro bounds or the target leaves melee range, stop attacking.
                 var profile = combatant.Profile;
-                if ((profile != null && distance > profile.AggroRange) || distance > CombatMath.MELEE_RANGE)
+                float npcDistFromSpawn = Vector2.Distance(transform.position, spawnPosition);
+                if ((profile != null && npcDistFromSpawn > profile.AggroRange) || distance > CombatMath.MELEE_RANGE)
                     break;
 
                 ResolveAttack(target);
