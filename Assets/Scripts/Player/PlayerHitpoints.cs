@@ -76,6 +76,7 @@ namespace Player
             if (saveRoutine != null)
                 StopCoroutine(saveRoutine);
             StopRegen();
+            Save();
         }
 
         private void OnApplicationQuit()
