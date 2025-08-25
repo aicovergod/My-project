@@ -4,6 +4,7 @@ using Util;
 using World;
 using Inventory;
 using ShopSystem;
+using Player;
 
 namespace Core
 {
@@ -18,6 +19,7 @@ namespace Core
         private ScreenFader screenFader;
         private ItemDatabase itemDatabase;
         private ShopUI shopUI;
+        private PlayerRespawnSystem respawnSystem;
 
         /// <summary>
         /// Event fired once all services are initialized.
@@ -43,6 +45,7 @@ namespace Core
             screenFader = FindOrCreate<ScreenFader>();
             itemDatabase = FindOrCreate<ItemDatabase>();
             shopUI = FindOrCreate<ShopUI>();
+            respawnSystem = FindOrCreate<PlayerRespawnSystem>();
 
             ServicesReady?.Invoke();
         }
