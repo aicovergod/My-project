@@ -2,17 +2,9 @@ add death spawn point
 add death fade out screen, with a interface popup on screen
 add graveyard, to spawn in after death
 
-Add pet combat + add combat to lion, tiger, leopard
-
 Make woodcutting roll chance for woodcutting pet
 Make mining roll chance for mining pet
 
-
-add oak tree
-add willow tree
-add maple tree
-add yew tree
-add magic tree
 
 Add bones
 
@@ -32,7 +24,19 @@ Add defence amulet
 
 -Add on screen buttons for attack style changing
 
-- Add skill requirements for items, if player lacks the skill requirement, using the logic that mining and woodcutting use
-to show text on the FloatingTextAnchor that is parented underneath player, make the text say "You need "lvl" "Skill" to wield this
+- Fix tree stumps, currently when a tree is chopped, it spawns a stump -1 (which is what i want)
+But it also moves the collision -1, so my player is forcefully moved because the collision is moving my player when the stump spawns at -1
+I dont want the collision to move, i want the collision to stay in its initial location, upon stump generation
 
-Create a wander radius script, that I can draw in the scene, and npcs with that script attacked, only wander within that area I have set.
+- if attackstyleui interface is open, and you click the inventory button, close the skillsui interface and open inventory
+
+- if attackstyleui interface is open, and you click the skilltab button, close the skillsui interface and open skilltab
+
+- if attackstyleui interface is open, and you click the equipmenttab button, close the skillsui interface and open skilltab
+
+- if attackstyleui interface is open, and you click the questtab button, close the skillsui interface and open questtab
+
+
+
+
+

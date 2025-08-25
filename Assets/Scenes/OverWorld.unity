@@ -79520,6 +79520,10 @@ PrefabInstance:
       propertyPath: interactRange
       value: 1.5
       objectReference: {fileID: 0}
+    - target: {fileID: 491447706204386932, guid: ac4dc3793be1bee4caf981f7340bf02d, type: 3}
+      propertyPath: columns
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 523138612117259209, guid: ac4dc3793be1bee4caf981f7340bf02d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 65.63561
