@@ -76,14 +76,12 @@ namespace UI
 
         private void ToggleQuest()
         {
-            CloseAttackStyle();
             var quest = Object.FindObjectOfType<QuestUI>();
             quest?.Toggle();
         }
 
         private void ToggleInventory()
         {
-            CloseAttackStyle();
             var inv = Object.FindObjectOfType<Inventory.Inventory>();
             if (inv != null)
             {
@@ -96,14 +94,12 @@ namespace UI
 
         private void ToggleSkills()
         {
-            CloseAttackStyle();
             var skills = SkillsUI.Instance;
             skills?.Toggle();
         }
 
         private void ToggleEquipment()
         {
-            CloseAttackStyle();
             var eq = Object.FindObjectOfType<Equipment>();
             if (eq != null)
             {
@@ -120,12 +116,7 @@ namespace UI
             style?.Toggle();
         }
 
-        private void CloseAttackStyle()
-        {
-            var style = Object.FindObjectOfType<AttackStyleUI>();
-            if (style != null && style.IsOpen)
-                style.Toggle();
-        }
+        // AttackStyleUI closes automatically through UIManager when other windows open.
     }
 }
 
