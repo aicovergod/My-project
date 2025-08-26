@@ -6,6 +6,7 @@ using Util;
 using Skills.Mining; // reuse XP table
 using Pets;
 using Quests;
+using Core.Save;
 
 namespace Skills.Woodcutting
 {
@@ -13,7 +14,7 @@ namespace Skills.Woodcutting
     /// Handles XP, level, and woodcutting tick logic.
     /// </summary>
     [DisallowMultipleComponent]
-    public class WoodcuttingSkill : MonoBehaviour, ITickable
+    public class WoodcuttingSkill : MonoBehaviour, ITickable, ISaveable
     {
         [SerializeField] private XpTable xpTable;
         [SerializeField] private Inventory.Inventory inventory;
@@ -52,9 +53,6 @@ namespace Skills.Woodcutting
             if (inventory == null)
                 inventory = GetComponent<Inventory.Inventory>();
             save = saveProvider as IWoodcuttingSave ?? new SaveManagerWoodcuttingSave();
-            xp = save.LoadXp();
-            level = xpTable != null ? xpTable.GetLevel(xp) : 1;
-
             PreloadLogItems();
         }
 
@@ -62,6 +60,7 @@ namespace Skills.Woodcutting
 
         private void OnEnable()
         {
+            SaveManager.Register(this);
             TrySubscribeToTicker();
             StartCoroutine(SaveLoop());
         }
@@ -72,8 +71,8 @@ namespace Skills.Woodcutting
                 Ticker.Instance.Unsubscribe(this);
             if (tickerCoroutine != null)
                 StopCoroutine(tickerCoroutine);
-            // Persist XP when the component is disabled to avoid losing progress
-            save.SaveXp(xp);
+            Save();
+            SaveManager.Unregister(this);
         }
 
         private void TrySubscribeToTicker()
@@ -102,13 +101,8 @@ namespace Skills.Woodcutting
             while (true)
             {
                 yield return new WaitForSeconds(10f);
-                save.SaveXp(xp);
+                Save();
             }
-        }
-
-        private void OnApplicationQuit()
-        {
-            save.SaveXp(xp);
         }
 
         public void OnTick()
@@ -256,6 +250,17 @@ namespace Skills.Woodcutting
             xp = xpTable.GetXpForLevel(newLevel);
             level = newLevel;
             OnLevelUp?.Invoke(level);
+        }
+
+        public void Save()
+        {
+            save.SaveXp(xp);
+        }
+
+        public void Load()
+        {
+            xp = save.LoadXp();
+            level = xpTable != null ? xpTable.GetLevel(xp) : 1;
         }
 
         private void PreloadLogItems()

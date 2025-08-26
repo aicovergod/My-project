@@ -13,7 +13,7 @@ namespace BankSystem
     /// Simple OSRS-style bank with 400 slots (8x50) generated at runtime.
     /// Allows depositing from the inventory and withdrawing back.
     /// </summary>
-    public class BankUI : MonoBehaviour, IUIWindow
+    public class BankUI : MonoBehaviour, IUIWindow, ISaveable
     {
         public Vector2 slotSize = new Vector2(32f, 32f);
         public Vector2 slotSpacing = new Vector2(4f, 4f);
@@ -82,7 +82,7 @@ namespace BankSystem
 
             CreateUI();
             uiRoot.SetActive(false);
-            Load();
+            SaveManager.Register(this);
             UIManager.Instance.RegisterWindow(this);
         }
 
@@ -739,6 +739,7 @@ namespace BankSystem
 
         public void Save()
         {
+            CompactItems();
             var data = new BankSaveData { slots = new SlotData[Size] };
             for (int i = 0; i < Size; i++)
             {
@@ -776,10 +777,10 @@ namespace BankSystem
             }
         }
 
-        private void OnApplicationQuit()
+
+        private void OnDestroy()
         {
-            CompactItems();
-            Save();
+            SaveManager.Unregister(this);
         }
     }
 }

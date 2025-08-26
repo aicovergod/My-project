@@ -6,6 +6,7 @@ using Util;
 using Skills.Mining;
 using Pets;
 using Quests;
+using Core.Save;
 
 namespace Skills.Mining
 {
@@ -13,7 +14,7 @@ namespace Skills.Mining
     /// Handles XP, level, and mining tick logic.
     /// </summary>
     [DisallowMultipleComponent]
-    public class MiningSkill : MonoBehaviour, ITickable
+    public class MiningSkill : MonoBehaviour, ITickable, ISaveable
     {
         [SerializeField] private XpTable xpTable;
         [SerializeField] private Inventory.Inventory inventory;
@@ -53,9 +54,6 @@ namespace Skills.Mining
             if (inventory == null)
                 inventory = GetComponent<Inventory.Inventory>();
             save = saveProvider as IMiningSave ?? new SaveManagerMiningSave();
-            xp = save.LoadXp();
-            level = xpTable != null ? xpTable.GetLevel(xp) : 1;
-
             PreloadOreItems();
         }
 
@@ -63,6 +61,7 @@ namespace Skills.Mining
 
         private void OnEnable()
         {
+            SaveManager.Register(this);
             TrySubscribeToTicker();
             StartCoroutine(SaveLoop());
         }
@@ -73,6 +72,8 @@ namespace Skills.Mining
                 Ticker.Instance.Unsubscribe(this);
             if (tickerCoroutine != null)
                 StopCoroutine(tickerCoroutine);
+            Save();
+            SaveManager.Unregister(this);
         }
 
         private void TrySubscribeToTicker()
@@ -101,13 +102,8 @@ namespace Skills.Mining
             while (true)
             {
                 yield return new WaitForSeconds(10f);
-                save.SaveXp(xp);
+                Save();
             }
-        }
-
-        private void OnApplicationQuit()
-        {
-            save.SaveXp(xp);
         }
 
         public void OnTick()
@@ -255,6 +251,17 @@ namespace Skills.Mining
             xp = xpTable.GetXpForLevel(newLevel);
             level = newLevel;
             OnLevelUp?.Invoke(level);
+        }
+
+        public void Save()
+        {
+            save.SaveXp(xp);
+        }
+
+        public void Load()
+        {
+            xp = save.LoadXp();
+            level = xpTable != null ? xpTable.GetLevel(xp) : 1;
         }
 
         private void PreloadOreItems()

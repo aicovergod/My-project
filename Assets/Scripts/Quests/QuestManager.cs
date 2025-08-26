@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Core.Save;
 
 namespace Quests
 {
     /// <summary>
     /// Manages the player's quests and notifies listeners when they change.
     /// </summary>
-    public class QuestManager : MonoBehaviour
+    public class QuestManager : MonoBehaviour, ISaveable
     {
         public static QuestManager Instance { get; private set; }
 
@@ -17,6 +18,8 @@ namespace Quests
         private readonly Dictionary<string, QuestDefinition> available = new Dictionary<string, QuestDefinition>();
         private readonly Dictionary<string, QuestDefinition> active = new Dictionary<string, QuestDefinition>();
         private readonly Dictionary<string, QuestDefinition> completed = new Dictionary<string, QuestDefinition>();
+
+        private const string SaveKey = "QuestData";
 
         private void Awake()
         {
@@ -36,6 +39,8 @@ namespace Quests
             var initialQuests = Resources.LoadAll<QuestDefinition>("Quests");
             foreach (var quest in initialQuests)
                 RegisterQuest(quest);
+
+            SaveManager.Register(this);
         }
 
         /// <summary>
@@ -120,6 +125,89 @@ namespace Quests
         {
             active.TryGetValue(questID, out var quest);
             return quest;
+        }
+
+        public void Save()
+        {
+            var data = new QuestSaveData();
+
+            data.active = new QuestState[active.Count];
+            int i = 0;
+            foreach (var kvp in active)
+            {
+                var quest = kvp.Value;
+                var state = new QuestState
+                {
+                    id = kvp.Key,
+                    steps = quest.Steps.ConvertAll(s => s.IsComplete).ToArray()
+                };
+                data.active[i++] = state;
+            }
+
+            data.completed = new string[completed.Count];
+            i = 0;
+            foreach (var kvp in completed)
+                data.completed[i++] = kvp.Key;
+
+            SaveManager.Save(SaveKey, data);
+        }
+
+        public void Load()
+        {
+            var data = SaveManager.Load<QuestSaveData>(SaveKey);
+            if (data == null)
+                return;
+
+            active.Clear();
+            completed.Clear();
+
+            if (data.completed != null)
+            {
+                foreach (var id in data.completed)
+                {
+                    if (available.TryGetValue(id, out var def))
+                    {
+                        completed[id] = def;
+                        available.Remove(id);
+                    }
+                }
+            }
+
+            if (data.active != null)
+            {
+                foreach (var state in data.active)
+                {
+                    if (available.TryGetValue(state.id, out var def))
+                    {
+                        var instance = Instantiate(def);
+                        for (int j = 0; j < instance.Steps.Count && j < state.steps.Length; j++)
+                            instance.Steps[j].IsComplete = state.steps[j];
+                        active[state.id] = instance;
+                        available.Remove(state.id);
+                    }
+                }
+            }
+
+            QuestsUpdated.Invoke();
+        }
+
+        [System.Serializable]
+        private class QuestSaveData
+        {
+            public QuestState[] active;
+            public string[] completed;
+        }
+
+        [System.Serializable]
+        private class QuestState
+        {
+            public string id;
+            public bool[] steps;
+        }
+
+        private void OnDestroy()
+        {
+            SaveManager.Unregister(this);
         }
     }
 }

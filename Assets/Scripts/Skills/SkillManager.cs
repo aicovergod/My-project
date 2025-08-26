@@ -12,7 +12,7 @@ namespace Skills
     /// Handles XP gain and level calculations using the shared <see cref="XpTable"/>.
     /// </summary>
     [DisallowMultipleComponent]
-    public class SkillManager : MonoBehaviour
+    public class SkillManager : MonoBehaviour, ISaveable
     {
         [SerializeField] private XpTable xpTable;
         [SerializeField] private MonoBehaviour saveProvider; // optional custom save provider
@@ -30,12 +30,11 @@ namespace Skills
         private void Awake()
         {
             save = saveProvider as ICombatSkillSave ?? new SaveManagerCombatSkillSave();
-            foreach (SkillType type in Enum.GetValues(typeof(SkillType)))
-                InitialiseSkill(type);
         }
 
         private void OnEnable()
         {
+            SaveManager.Register(this);
             saveRoutine = StartCoroutine(SaveLoop());
         }
 
@@ -43,11 +42,7 @@ namespace Skills
         {
             if (saveRoutine != null)
                 StopCoroutine(saveRoutine);
-        }
-
-        private void OnApplicationQuit()
-        {
-            Save();
+            SaveManager.Unregister(this);
         }
 
         private void InitialiseSkill(SkillType type)
@@ -118,10 +113,17 @@ namespace Skills
             }
         }
 
-        private void Save()
+        public void Save()
         {
             foreach (var kvp in skills)
                 save.SaveXp(kvp.Key, kvp.Value.xp);
+        }
+
+        public void Load()
+        {
+            skills.Clear();
+            foreach (SkillType type in Enum.GetValues(typeof(SkillType)))
+                InitialiseSkill(type);
         }
     }
 
