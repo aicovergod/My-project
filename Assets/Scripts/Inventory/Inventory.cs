@@ -12,6 +12,7 @@ using Player;
 using Skills;
 using Pets;
 using Quests;
+using UI;
 using Object = UnityEngine.Object;
 
 namespace Inventory
@@ -39,7 +40,7 @@ namespace Inventory
     /// as the slot frame (set to Sliced).
     /// </summary>
     [DisallowMultipleComponent]
-    public class Inventory : MonoBehaviour
+    public class Inventory : MonoBehaviour, IUIWindow
     {
         [Header("Inventory")]
         [Tooltip("Maximum number of items the inventory can hold.")]
@@ -142,8 +143,15 @@ namespace Inventory
             }
         }
 
+        public void Close()
+        {
+            CloseUI();
+        }
+
         public void OpenUI()
         {
+            if (!BankOpen && !InShop)
+                UIManager.Instance.OpenWindow(this);
             if (uiRoot != null)
                 uiRoot.SetActive(true);
             if (playerMover != null)
@@ -227,6 +235,7 @@ namespace Inventory
                 uiRoot.SetActive(false);
 
             Load();
+            UIManager.Instance.RegisterWindow(this);
         }
 
         /// <summary>

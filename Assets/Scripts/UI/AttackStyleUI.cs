@@ -8,7 +8,7 @@ namespace UI
     /// <summary>
     /// Simple interface for selecting the player's combat style.
     /// </summary>
-    public class AttackStyleUI : MonoBehaviour
+    public class AttackStyleUI : MonoBehaviour, IUIWindow
     {
         private GameObject uiRoot;
         private PlayerCombatLoadout loadout;
@@ -34,6 +34,7 @@ namespace UI
             CreateUI();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
+            UIManager.Instance.RegisterWindow(this);
         }
 
         private void CreateUI()
@@ -90,13 +91,28 @@ namespace UI
         /// <summary>Toggle the visibility of the UI.</summary>
         public void Toggle()
         {
+            if (IsOpen)
+                Close();
+            else
+                Open();
+        }
+
+        /// <summary>Open the attack style interface.</summary>
+        public void Open()
+        {
+            UIManager.Instance.OpenWindow(this);
             if (uiRoot != null)
             {
-                bool opening = !uiRoot.activeSelf;
-                uiRoot.SetActive(opening);
-                if (opening)
-                    UpdateSelection();
+                uiRoot.SetActive(true);
+                UpdateSelection();
             }
+        }
+
+        /// <summary>Close the attack style interface.</summary>
+        public void Close()
+        {
+            if (uiRoot != null)
+                uiRoot.SetActive(false);
         }
 
         private void SetStyle(CombatStyle style)
