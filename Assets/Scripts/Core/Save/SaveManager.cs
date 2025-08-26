@@ -14,6 +14,55 @@ namespace Core.Save
         private const int Version = 1;
         private static readonly string FilePath = Path.Combine(Application.persistentDataPath, "save_data.json");
 
+        // Registered saveable objects
+        private static readonly List<ISaveable> saveables = new List<ISaveable>();
+
+        static SaveManager()
+        {
+            // Ensure all data is persisted when the application quits
+            Application.quitting += SaveAll;
+        }
+
+        /// <summary>
+        /// Register a saveable object with the manager. The object will immediately
+        /// load its state and will be included in future SaveAll calls.
+        /// </summary>
+        public static void Register(ISaveable saveable)
+        {
+            if (saveable == null || saveables.Contains(saveable))
+                return;
+            saveables.Add(saveable);
+            saveable.Load();
+        }
+
+        /// <summary>
+        /// Remove a previously registered saveable object.
+        /// </summary>
+        public static void Unregister(ISaveable saveable)
+        {
+            if (saveable == null)
+                return;
+            saveables.Remove(saveable);
+        }
+
+        /// <summary>
+        /// Invoke Save on all registered saveable objects.
+        /// </summary>
+        public static void SaveAll()
+        {
+            foreach (var s in saveables)
+                s.Save();
+        }
+
+        /// <summary>
+        /// Invoke Load on all registered saveable objects.
+        /// </summary>
+        public static void LoadAll()
+        {
+            foreach (var s in saveables)
+                s.Load();
+        }
+
         [Serializable]
         private class Entry
         {
@@ -36,7 +85,7 @@ namespace Core.Save
 
         private static SaveData cache;
 
-        private static SaveData LoadAll()
+        private static SaveData LoadFile()
         {
             if (cache != null)
                 return cache;
@@ -62,7 +111,7 @@ namespace Core.Save
             return cache;
         }
 
-        private static void SaveAll()
+        private static void SaveFile()
         {
             try
             {
@@ -77,7 +126,7 @@ namespace Core.Save
 
         public static void Save<T>(string key, T data)
         {
-            var all = LoadAll();
+            var all = LoadFile();
             string json = JsonUtility.ToJson(new Wrapper<T> { value = data });
             var entry = all.entries.Find(e => e.key == key);
             if (entry != null)
@@ -85,12 +134,12 @@ namespace Core.Save
             else
                 all.entries.Add(new Entry { key = key, value = json });
 
-            SaveAll();
+            SaveFile();
         }
 
         public static T Load<T>(string key)
         {
-            var all = LoadAll();
+            var all = LoadFile();
             var entry = all.entries.Find(e => e.key == key);
             if (entry == null || string.IsNullOrEmpty(entry.value))
                 return default;
@@ -108,9 +157,9 @@ namespace Core.Save
 
         public static void Delete(string key)
         {
-            var all = LoadAll();
+            var all = LoadFile();
             all.entries.RemoveAll(e => e.key == key);
-            SaveAll();
+            SaveFile();
         }
     }
 }
