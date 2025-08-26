@@ -150,7 +150,7 @@ namespace Inventory
 
         public void OpenUI()
         {
-            if (!BankOpen && !InShop)
+            if (!BankOpen && !InShop && useSharedUIRoot)
                 UIManager.Instance.OpenWindow(this);
             if (uiRoot != null)
                 uiRoot.SetActive(true);
