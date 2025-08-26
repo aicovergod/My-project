@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using Inventory;
 using Quests;
 using Skills;
+using System.Collections.Generic;
 using Object = UnityEngine.Object;
 
 namespace UI
@@ -82,12 +83,44 @@ namespace UI
 
         private void ToggleInventory()
         {
-            var inv = Object.FindObjectOfType<Inventory.Inventory>();
-            if (inv != null)
+            var inventories = Object.FindObjectsOfType<Inventory.Inventory>();
+            Inventory.Inventory playerInv = null;
+            var petInvs = new List<Inventory.Inventory>();
+
+            foreach (var inv in inventories)
             {
-                if (inv.IsOpen)
+                if (inv.GetComponent<Player.PlayerMover>() != null)
+                    playerInv = inv;
+                else if (inv.GetComponent<Pets.PetStorage>() != null)
+                    petInvs.Add(inv);
+            }
+
+            if (playerInv == null)
+                return;
+
+            bool anyOpen = playerInv.IsOpen;
+            if (!anyOpen)
+            {
+                foreach (var inv in petInvs)
+                {
+                    if (inv.IsOpen)
+                    {
+                        anyOpen = true;
+                        break;
+                    }
+                }
+            }
+
+            if (anyOpen)
+            {
+                playerInv.CloseUI();
+                foreach (var inv in petInvs)
                     inv.CloseUI();
-                else
+            }
+            else
+            {
+                playerInv.OpenUI();
+                foreach (var inv in petInvs)
                     inv.OpenUI();
             }
         }
