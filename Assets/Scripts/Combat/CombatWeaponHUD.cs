@@ -8,8 +8,8 @@ namespace Combat
     /// </summary>
     public class CombatWeaponHUD : MonoBehaviour
     {
-        [SerializeField] private CombatController controller;
-        [SerializeField] private Equipment equipment;
+        private CombatController controller;
+        private Equipment equipment;
         private Transform target;
         private GameObject weaponRoot;
         private SpriteRenderer weaponRenderer;
@@ -25,14 +25,11 @@ namespace Combat
 
         private void Awake()
         {
-            if (controller == null)
-                controller = FindObjectOfType<CombatController>();
+            controller = FindObjectOfType<CombatController>();
             if (controller != null)
-            {
                 controller.OnCombatTargetChanged += HandleTargetChanged;
-                if (equipment == null)
-                    equipment = controller.GetComponent<Equipment>();
-            }
+            if (controller != null)
+                equipment = controller.GetComponent<Equipment>();
             CreateWeaponSprite();
         }
 

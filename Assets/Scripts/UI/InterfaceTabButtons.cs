@@ -21,6 +21,11 @@ namespace UI
             go.AddComponent<InterfaceTabButtons>();
         }
 
+        private void Awake()
+        {
+            CreateUI();
+        }
+
         private void CreateUI()
         {
             var canvas = gameObject.AddComponent<Canvas>();
@@ -69,40 +74,23 @@ namespace UI
             go.GetComponent<Button>().onClick.AddListener(onClick);
         }
 
-        [SerializeField] private QuestUI questUI;
-        [SerializeField] private Inventory.Inventory inventory;
-        [SerializeField] private Equipment equipmentUI;
-        [SerializeField] private AttackStyleUI attackStyleUI;
-
-        private void Awake()
-        {
-            CreateUI();
-
-            if (questUI == null)
-                questUI = FindObjectOfType<QuestUI>();
-            if (inventory == null)
-                inventory = FindObjectOfType<Inventory.Inventory>();
-            if (equipmentUI == null)
-                equipmentUI = FindObjectOfType<Equipment>();
-            if (attackStyleUI == null)
-                attackStyleUI = FindObjectOfType<AttackStyleUI>();
-        }
-
         private void ToggleQuest()
         {
             CloseAttackStyle();
-            questUI?.Toggle();
+            var quest = Object.FindObjectOfType<QuestUI>();
+            quest?.Toggle();
         }
 
         private void ToggleInventory()
         {
             CloseAttackStyle();
-            if (inventory != null)
+            var inv = Object.FindObjectOfType<Inventory.Inventory>();
+            if (inv != null)
             {
-                if (inventory.IsOpen)
-                    inventory.CloseUI();
+                if (inv.IsOpen)
+                    inv.CloseUI();
                 else
-                    inventory.OpenUI();
+                    inv.OpenUI();
             }
         }
 
@@ -116,18 +104,21 @@ namespace UI
         private void ToggleEquipment()
         {
             CloseAttackStyle();
-            equipmentUI?.ToggleUI();
+            var eq = Object.FindObjectOfType<Equipment>();
+            eq?.ToggleUI();
         }
 
         private void ToggleAttackStyle()
         {
-            attackStyleUI?.Toggle();
+            var style = Object.FindObjectOfType<AttackStyleUI>();
+            style?.Toggle();
         }
 
         private void CloseAttackStyle()
         {
-            if (attackStyleUI != null && attackStyleUI.IsOpen)
-                attackStyleUI.Toggle();
+            var style = Object.FindObjectOfType<AttackStyleUI>();
+            if (style != null && style.IsOpen)
+                style.Toggle();
         }
     }
 }

@@ -10,13 +10,12 @@ namespace UI
     /// </summary>
     public class AttackStrDefHUD : MonoBehaviour
     {
-        [SerializeField] private SkillManager skills;
+        private SkillManager skills;
         private Text text;
 
         private void Awake()
         {
-            if (skills == null)
-                skills = FindObjectOfType<SkillManager>();
+            skills = FindObjectOfType<SkillManager>();
             CreateUI();
         }
 

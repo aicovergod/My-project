@@ -37,8 +37,8 @@ namespace UI
                     var canvasGO = new GameObject("MergeHudCanvas", typeof(Canvas));
                     canvas = canvasGO.GetComponent<Canvas>();
                     canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                    transform.SetParent(canvasGO.transform, false);
                     DontDestroyOnLoad(canvasGO);
+                    transform.SetParent(canvasGO.transform, false);
                 }
             }
             else

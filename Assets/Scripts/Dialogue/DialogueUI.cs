@@ -111,7 +111,7 @@ namespace Dialogue
         
         private static void EnsureEventSystem()
         {
-            if (EventSystem.current != null)
+            if (FindObjectOfType<EventSystem>() != null)
                 return;
             var go = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
             DontDestroyOnLoad(go);
