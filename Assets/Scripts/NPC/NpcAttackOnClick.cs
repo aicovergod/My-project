@@ -11,15 +11,17 @@ namespace NPC
     public class NpcAttackOnClick : MonoBehaviour
     {
         private NpcCombatant combatant;
+        [SerializeField] private CombatController playerController;
 
         private void Awake()
         {
             combatant = GetComponent<NpcCombatant>();
+            if (playerController == null)
+                playerController = FindObjectOfType<CombatController>();
         }
 
         private void OnMouseDown()
         {
-            var playerController = FindObjectOfType<CombatController>();
             if (playerController == null)
                 return;
             if (Vector2.Distance(playerController.transform.position, transform.position) > CombatMath.MELEE_RANGE)

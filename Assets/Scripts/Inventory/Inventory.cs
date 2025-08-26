@@ -106,6 +106,7 @@ namespace Inventory
 
         private PlayerMover playerMover;
         private Equipment equipment;
+        [SerializeField] private QuestUI questUI;
 
         // UI
         private GameObject uiRoot; // Canvas root
@@ -209,6 +210,8 @@ namespace Inventory
             items = new InventoryEntry[size];
             EnsureLegacyEventSystem();
 
+            if (questUI == null)
+                questUI = FindObjectOfType<QuestUI>();
             if (useSharedUIRoot && sharedUIRoot != null)
             {
                 uiRoot = sharedUIRoot;
@@ -1077,8 +1080,7 @@ namespace Inventory
             if (playerMover == null)
                 return;
 
-            var quest = Object.FindObjectOfType<QuestUI>();
-            if (quest != null && quest.IsOpen)
+            if (questUI != null && questUI.IsOpen)
             {
                 if (uiRoot != null && uiRoot.activeSelf)
                     CloseUI();
@@ -1117,7 +1119,7 @@ namespace Inventory
         /// </summary>
         private static void EnsureLegacyEventSystem()
         {
-            var existing = UnityEngine.Object.FindObjectOfType<EventSystem>();
+            var existing = EventSystem.current;
             if (existing != null)
             {
                 DontDestroyOnLoad(existing.gameObject);

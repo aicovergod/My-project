@@ -99,6 +99,7 @@ namespace Inventory
         private Inventory inventory;
         [SerializeField] private SkillManager skillManager;
         [SerializeField] private Transform floatingTextAnchor;
+        [SerializeField] private QuestUI questUI;
 
         private Text attackBonusText;
         private Text strengthBonusText;
@@ -143,6 +144,8 @@ namespace Inventory
             skillManager = skillManager != null ? skillManager : GetComponent<SkillManager>();
             if (floatingTextAnchor == null)
                 floatingTextAnchor = transform.Find("FloatingTextAnchor");
+            if (questUI == null)
+                questUI = FindObjectOfType<QuestUI>();
             equipped = new InventoryEntry[Enum.GetValues(typeof(EquipmentSlot)).Length - 1];
             CreateUI();
             Load();
@@ -154,8 +157,7 @@ namespace Inventory
 
         public void ToggleUI()
         {
-            var quest = Object.FindObjectOfType<QuestUI>();
-            if (quest != null && quest.IsOpen)
+            if (questUI != null && questUI.IsOpen)
             {
                 if (uiRoot != null && uiRoot.activeSelf)
                     uiRoot.SetActive(false);

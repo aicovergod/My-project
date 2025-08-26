@@ -23,17 +23,13 @@ namespace MyGame.Drops
         public bool spawnAtFeet = true;
 
         /// <summary>Spawner responsible for instantiating ground items.</summary>
-        public GroundItemSpawner spawner;
+        [SerializeField] private GroundItemSpawner spawner;
 
         private void Awake()
         {
             if (spawner == null)
             {
-                spawner = FindObjectOfType<GroundItemSpawner>();
-                if (spawner == null)
-                {
-                    Debug.LogError("NpcDropper: No GroundItemSpawner found in scene.");
-                }
+                Debug.LogError("NpcDropper: No GroundItemSpawner assigned.");
             }
         }
 

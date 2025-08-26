@@ -17,7 +17,7 @@ namespace NPC
         private NpcCombatant combatant;
         private NpcWanderer wanderer;
         private CombatTarget currentTarget;
-        private PlayerCombatTarget playerTarget;
+        [SerializeField] private PlayerCombatTarget playerTarget;
         private bool hasHitPlayer;
         private Vector2 spawnPosition;
         private NpcSpriteAnimator spriteAnimator;
@@ -28,7 +28,8 @@ namespace NPC
         {
             combatant = GetComponent<NpcCombatant>();
             wanderer = GetComponent<NpcWanderer>();
-            playerTarget = FindObjectOfType<PlayerCombatTarget>();
+            if (playerTarget == null)
+                playerTarget = FindObjectOfType<PlayerCombatTarget>();
             spawnPosition = transform.position;
             spriteAnimator = GetComponent<NpcSpriteAnimator>() ?? GetComponentInChildren<NpcSpriteAnimator>();
             spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
@@ -54,9 +55,6 @@ namespace NPC
             var profile = combatant.Profile;
             if (profile == null || !profile.IsAggressive)
                 return;
-
-            if (playerTarget == null)
-                playerTarget = FindObjectOfType<PlayerCombatTarget>();
 
             if (playerTarget == null)
                 return;

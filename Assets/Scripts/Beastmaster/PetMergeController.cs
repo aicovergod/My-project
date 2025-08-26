@@ -58,16 +58,11 @@ namespace Beastmaster
         {
             instance = this;
 
-            if (beastmasterServiceComponent == null)
-                beastmasterServiceComponent = FindObjectOfType<BeastmasterServiceAdapter>();
-            if (petServiceComponent == null)
-                petServiceComponent = FindObjectOfType<PetServiceAdapter>();
-
             beastmaster = beastmasterServiceComponent as IBeastmasterService;
             petService = petServiceComponent as IPetService;
 
             if (hudTimer == null)
-                hudTimer = GetComponentInChildren<MergeHudTimer>(true) ?? FindObjectOfType<MergeHudTimer>();
+                hudTimer = GetComponentInChildren<MergeHudTimer>(true);
             if (playerMover == null)
                 playerMover = GetComponent<PlayerMover>();
 
