@@ -105,7 +105,13 @@ namespace UI
         {
             CloseAttackStyle();
             var eq = Object.FindObjectOfType<Equipment>();
-            eq?.ToggleUI();
+            if (eq != null)
+            {
+                if (eq.IsOpen)
+                    eq.Close();
+                else
+                    eq.Open();
+            }
         }
 
         private void ToggleAttackStyle()
