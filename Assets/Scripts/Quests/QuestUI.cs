@@ -3,16 +3,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using Inventory;
 using Player;
-using Skills;
-using ShopSystem;
-using BankSystem;
+using UI;
 
 namespace Quests
 {
     /// <summary>
     /// Simple quest log UI built entirely in code.
     /// </summary>
-    public class QuestUI : MonoBehaviour
+    public class QuestUI : MonoBehaviour, IUIWindow
     {
         private RectTransform listContent;
         private Text titleText;
@@ -40,6 +38,7 @@ namespace Quests
             DontDestroyOnLoad(gameObject);
             canvas.enabled = false;
             playerMover = FindObjectOfType<PlayerMover>();
+            UIManager.Instance.RegisterWindow(this);
         }
 
         private void Start()
@@ -50,41 +49,35 @@ namespace Quests
 
         public void Toggle()
         {
-            bool opening = !canvas.enabled;
-            if (opening)
-            {
-                var inv = FindObjectOfType<Inventory.Inventory>();
-                if (inv != null && inv.IsOpen)
-                    inv.CloseUI();
-                var eq = FindObjectOfType<Inventory.Equipment>();
-                if (eq != null && eq.IsOpen)
-                    eq.CloseUI();
-                var skills = SkillsUI.Instance;
-                if (skills != null && skills.IsOpen)
-                    skills.Close();
-                var shop = ShopUI.Instance;
-                if (shop != null && shop.IsOpen)
-                    shop.Close();
-                var bank = BankUI.Instance;
-                if (bank != null && bank.IsOpen)
-                    bank.Close();
-            }
-
-            canvas.enabled = opening;
-            if (canvas.enabled)
-            {
-                Refresh();
-                if (playerMover == null)
-                    playerMover = FindObjectOfType<PlayerMover>();
-                if (playerMover != null)
-                    playerMover.enabled = false;
-            }
+            if (IsOpen)
+                Close();
             else
-            {
-                Clear();
-                if (playerMover != null)
-                    playerMover.enabled = true;
-            }
+                Open();
+        }
+
+        public void Open()
+        {
+            UIManager.Instance.OpenWindow(this);
+            var inv = FindObjectOfType<Inventory.Inventory>();
+            if (inv != null && inv.IsOpen)
+                inv.CloseUI();
+            var eq = FindObjectOfType<Inventory.Equipment>();
+            if (eq != null && eq.IsOpen)
+                eq.CloseUI();
+            canvas.enabled = true;
+            Refresh();
+            if (playerMover == null)
+                playerMover = FindObjectOfType<PlayerMover>();
+            if (playerMover != null)
+                playerMover.enabled = false;
+        }
+
+        public void Close()
+        {
+            canvas.enabled = false;
+            Clear();
+            if (playerMover != null)
+                playerMover.enabled = true;
         }
 
         private void Update()

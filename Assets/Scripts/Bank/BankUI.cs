@@ -4,9 +4,8 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Inventory;
 using Core.Save;
-using Skills;
-using Quests;
 using Pets;
+using UI;
 
 namespace BankSystem
 {
@@ -14,7 +13,7 @@ namespace BankSystem
     /// Simple OSRS-style bank with 400 slots (8x50) generated at runtime.
     /// Allows depositing from the inventory and withdrawing back.
     /// </summary>
-    public class BankUI : MonoBehaviour
+    public class BankUI : MonoBehaviour, IUIWindow
     {
         public Vector2 slotSize = new Vector2(32f, 32f);
         public Vector2 slotSpacing = new Vector2(4f, 4f);
@@ -84,6 +83,7 @@ namespace BankSystem
             CreateUI();
             uiRoot.SetActive(false);
             Load();
+            UIManager.Instance.RegisterWindow(this);
         }
 
         private void CreateUI()
@@ -490,9 +490,7 @@ namespace BankSystem
         {
             if (Beastmaster.PetMergeController.Instance != null && Beastmaster.PetMergeController.Instance.IsMerged)
                 return;
-            var quest = FindObjectOfType<QuestUI>();
-            if (quest != null && quest.IsOpen)
-                return;
+            UIManager.Instance.OpenWindow(this);
             if (playerInventory == null)
                 playerInventory = FindObjectOfType<Inventory.Inventory>();
             if (playerInventory != null)
@@ -504,9 +502,6 @@ namespace BankSystem
                 var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
                 storage?.Close();
             }
-            var skills = SkillsUI.Instance;
-            if (skills != null && skills.IsOpen)
-                skills.Close();
             // Ensure latest saved state is loaded whenever the bank opens
             Load();
             uiRoot.SetActive(true);

@@ -1,9 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
-using ShopSystem;
 using Inventory;
 using Player;
-using Quests;
+using UI;
 
 namespace Skills
 {
@@ -11,7 +10,7 @@ namespace Skills
     /// Displays basic skill information such as mining and woodcutting levels and XP
     /// and can be toggled with the 'O' key.
     /// </summary>
-    public class SkillsUI : MonoBehaviour
+    public class SkillsUI : MonoBehaviour, IUIWindow
     {
         private GameObject uiRoot;
         private Text skillText;
@@ -49,6 +48,7 @@ namespace Skills
             CreateUI();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
+            UIManager.Instance.RegisterWindow(this);
         }
 
         private void OnDestroy()
@@ -90,46 +90,29 @@ namespace Skills
 
         public void Toggle()
         {
-            var quest = FindObjectOfType<QuestUI>();
-            if (quest != null && quest.IsOpen)
-            {
-                if (uiRoot != null && uiRoot.activeSelf)
-                    uiRoot.SetActive(false);
-                return;
-            }
+            if (IsOpen)
+                Close();
+            else
+                Open();
+        }
 
-            var shop = ShopUI.Instance;
-            if (shop != null && shop.IsOpen)
-                return;
-            var bank = BankSystem.BankUI.Instance;
-            if (bank != null && bank.IsOpen)
-                return;
-
+        public void Open()
+        {
+            UIManager.Instance.OpenWindow(this);
             if (uiRoot != null)
             {
-                bool opening = !uiRoot.activeSelf;
-                if (opening)
-                {
-                    var inv = Object.FindObjectOfType<Inventory.Inventory>();
-                    if (inv != null && inv.IsOpen)
-                        inv.CloseUI();
-                    var eq = Object.FindObjectOfType<Inventory.Equipment>();
-                    if (eq != null && eq.IsOpen)
-                        eq.CloseUI();
-                }
-                uiRoot.SetActive(!uiRoot.activeSelf);
+                var inv = Object.FindObjectOfType<Inventory.Inventory>();
+                if (inv != null && inv.IsOpen)
+                    inv.CloseUI();
+                var eq = Object.FindObjectOfType<Inventory.Equipment>();
+                if (eq != null && eq.IsOpen)
+                    eq.CloseUI();
+                uiRoot.SetActive(true);
             }
         }
 
         private void Update()
         {
-            var quest = FindObjectOfType<QuestUI>();
-            if (quest != null && quest.IsOpen)
-            {
-                if (uiRoot != null && uiRoot.activeSelf)
-                    uiRoot.SetActive(false);
-                return;
-            }
             // Removed O key toggle
 
             if (uiRoot != null && uiRoot.activeSelf)

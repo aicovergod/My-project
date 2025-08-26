@@ -3,9 +3,8 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Inventory;
 using Player;
-using Skills;
 using NPC;
-using Quests;
+using UI;
 
 namespace ShopSystem
 {
@@ -13,7 +12,7 @@ namespace ShopSystem
     /// Runtime generated shop UI used to display items for sale.
     /// </summary>
     [DisallowMultipleComponent]
-    public class ShopUI : MonoBehaviour
+    public class ShopUI : MonoBehaviour, IUIWindow
     {
         [Header("Layout")]
         public Vector2 slotSize = new Vector2(32, 32);
@@ -72,6 +71,7 @@ namespace ShopSystem
             }
             if (uiRoot != null)
                 uiRoot.SetActive(false);
+            UIManager.Instance.RegisterWindow(this);
         }
 
         private void OnDestroy()
@@ -86,14 +86,9 @@ namespace ShopSystem
         public void Open(Shop shop, NpcRandomMovement npcMovement = null)
         {
             if (shop == null) return;
-            var quest = FindObjectOfType<QuestUI>();
-            if (quest != null && quest.IsOpen)
-                return;
+            UIManager.Instance.OpenWindow(this);
             currentShop = shop;
             Refresh();
-            var skills = SkillsUI.Instance;
-            if (skills != null && skills.IsOpen)
-                skills.Close();
             uiRoot.SetActive(true);
             if (playerInventory != null)
             {
