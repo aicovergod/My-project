@@ -21,11 +21,6 @@ namespace UI
             go.AddComponent<InterfaceTabButtons>();
         }
 
-        private void Awake()
-        {
-            CreateUI();
-        }
-
         private void CreateUI()
         {
             var canvas = gameObject.AddComponent<Canvas>();
@@ -81,6 +76,8 @@ namespace UI
 
         private void Awake()
         {
+            CreateUI();
+
             if (questUI == null)
                 questUI = FindObjectOfType<QuestUI>();
             if (inventory == null)
