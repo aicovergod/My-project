@@ -13,6 +13,7 @@ using Combat;
 using UnityEngine.InputSystem;
 #endif
 using Quests;
+using UI;
 using Object = UnityEngine.Object;
 
 namespace Inventory
@@ -23,7 +24,7 @@ namespace Inventory
     /// generated at runtime and toggled with the "E" key.
     /// </summary>
     [DisallowMultipleComponent]
-    public class Equipment : MonoBehaviour
+    public class Equipment : MonoBehaviour, IUIWindow
     {
         [Tooltip("Size of each slot in pixels.")]
         public Vector2 slotSize = new(32f, 32f);
@@ -150,27 +151,16 @@ namespace Inventory
             UpdateBonuses();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
+
+            UIManager.Instance.RegisterWindow(this);
         }
 
         public void ToggleUI()
         {
-            var quest = Object.FindObjectOfType<QuestUI>();
-            if (quest != null && quest.IsOpen)
-            {
-                if (uiRoot != null && uiRoot.activeSelf)
-                    uiRoot.SetActive(false);
-                return;
-            }
-            if (uiRoot != null)
-            {
-                bool opening = !uiRoot.activeSelf;
-                if (opening)
-                {
-                    var minimap = World.Minimap.Instance;
-                    minimap?.CloseExpanded();
-                }
-                uiRoot.SetActive(!uiRoot.activeSelf);
-            }
+            if (IsOpen)
+                Close();
+            else
+                Open();
         }
 
         private void Update()
@@ -195,11 +185,28 @@ namespace Inventory
 
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
 
-        public void CloseUI()
+        public void Open()
+        {
+            var quest = Object.FindObjectOfType<QuestUI>();
+            if (quest != null && quest.IsOpen)
+                return;
+
+            if (uiRoot != null)
+            {
+                UIManager.Instance.OpenWindow(this);
+                var minimap = World.Minimap.Instance;
+                minimap?.CloseExpanded();
+                uiRoot.SetActive(true);
+            }
+        }
+
+        public void Close()
         {
             if (uiRoot != null)
                 uiRoot.SetActive(false);
         }
+
+        public void CloseUI() => Close();
 
         public InventoryEntry GetEquipped(EquipmentSlot slot)
         {
