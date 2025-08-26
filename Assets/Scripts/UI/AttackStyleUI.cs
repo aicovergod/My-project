@@ -11,7 +11,7 @@ namespace UI
     public class AttackStyleUI : MonoBehaviour
     {
         private GameObject uiRoot;
-        [SerializeField] private PlayerCombatLoadout loadout;
+        private PlayerCombatLoadout loadout;
         private Button accurateButton;
         private Button aggressiveButton;
         private Button defensiveButton;
@@ -30,8 +30,7 @@ namespace UI
 
         private void Awake()
         {
-            if (loadout == null)
-                loadout = FindObjectOfType<PlayerCombatLoadout>();
+            loadout = FindObjectOfType<PlayerCombatLoadout>();
             CreateUI();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
@@ -103,13 +102,16 @@ namespace UI
         private void SetStyle(CombatStyle style)
         {
             if (loadout == null)
-                return;
-            loadout.Style = style;
+                loadout = FindObjectOfType<PlayerCombatLoadout>();
+            if (loadout != null)
+                loadout.Style = style;
             UpdateSelection();
         }
 
         private void UpdateSelection()
         {
+            if (loadout == null)
+                loadout = FindObjectOfType<PlayerCombatLoadout>();
             if (loadout == null)
                 return;
             Highlight(accurateButton, loadout.Style == CombatStyle.Accurate);

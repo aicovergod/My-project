@@ -42,8 +42,7 @@ namespace ShopSystem
         private Text tooltipText;
         private Text shopNameText;
         private Shop currentShop;
-        [SerializeField] private PlayerMover playerMover;
-        [SerializeField] private QuestUI questUI;
+        private PlayerMover playerMover;
         private NpcRandomMovement npcMover;
 
         private static ShopUI instance;
@@ -73,10 +72,6 @@ namespace ShopSystem
             }
             if (uiRoot != null)
                 uiRoot.SetActive(false);
-            if (questUI == null)
-                questUI = FindObjectOfType<QuestUI>();
-            if (playerMover == null)
-                playerMover = FindObjectOfType<PlayerMover>();
         }
 
         private void OnDestroy()
@@ -91,7 +86,8 @@ namespace ShopSystem
         public void Open(Shop shop, NpcRandomMovement npcMovement = null)
         {
             if (shop == null) return;
-            if (questUI != null && questUI.IsOpen)
+            var quest = FindObjectOfType<QuestUI>();
+            if (quest != null && quest.IsOpen)
                 return;
             currentShop = shop;
             Refresh();
@@ -104,6 +100,8 @@ namespace ShopSystem
                 playerInventory.SetShopContext(shop);
                 playerInventory.OnInventoryChanged += HandleInventoryChanged;
             }
+            if (playerMover == null)
+                playerMover = FindObjectOfType<PlayerMover>();
             if (playerMover != null)
             {
                 playerMover.enabled = false;
