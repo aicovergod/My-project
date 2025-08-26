@@ -13,7 +13,7 @@ namespace Pets
     {
         private Button mergeButton;
         private Text mergeText;
-        private PetMergeController mergeController;
+        [SerializeField] private PetMergeController mergeController;
 
         partial void OnMenuCreated(Transform menuRoot)
         {
@@ -27,7 +27,7 @@ namespace Pets
             if (mergeButton == null)
                 return;
             if (mergeController == null)
-                mergeController = Object.FindObjectOfType<PetMergeController>();
+                mergeController = PetMergeController.Instance;
             if (mergeController == null)
             {
                 mergeButton.gameObject.SetActive(false);

@@ -24,6 +24,10 @@ namespace World
         private RectTransform expandedMapRect;
         private Vector3 dragOffset;
 
+        [SerializeField] private PlayerHitpoints playerHitpoints;
+        [SerializeField] private Inventory.Inventory playerInventory;
+        [SerializeField] private Inventory.Equipment playerEquipment;
+
         private readonly List<MinimapMarker> markers = new List<MinimapMarker>();
         private readonly Dictionary<MinimapMarker.MarkerType, Sprite> iconCache = new Dictionary<MinimapMarker.MarkerType, Sprite>();
 
@@ -53,6 +57,12 @@ namespace World
         private void Awake()
         {
             instance = this;
+            if (playerHitpoints == null)
+                playerHitpoints = FindObjectOfType<PlayerHitpoints>();
+            if (playerInventory == null)
+                playerInventory = FindObjectOfType<Inventory.Inventory>();
+            if (playerEquipment == null)
+                playerEquipment = FindObjectOfType<Inventory.Equipment>();
             CreateCamera();
             CreateUI();
             RegisterExistingMarkers();
@@ -219,9 +229,8 @@ namespace World
             expandRect.anchoredPosition = new Vector2(-btnSpacing, -btnSpacing);
             expandGO.GetComponent<Button>().onClick.AddListener(ToggleExpanded);
 
-            var hp = Object.FindObjectOfType<PlayerHitpoints>();
-            if (hp != null)
-                HealthHUD.CreateUnderMinimap(borderRect, hp);
+            if (playerHitpoints != null)
+                HealthHUD.CreateUnderMinimap(borderRect, playerHitpoints);
 
         }
 
@@ -343,12 +352,10 @@ namespace World
                 var skills = SkillsUI.Instance;
                 if (skills != null && skills.IsOpen)
                     skills.Close();
-                var inv = Object.FindObjectOfType<Inventory.Inventory>();
-                if (inv != null && inv.IsOpen)
-                    inv.CloseUI();
-                var eq = Object.FindObjectOfType<Inventory.Equipment>();
-                if (eq != null && eq.IsOpen)
-                    eq.CloseUI();
+                if (playerInventory != null && playerInventory.IsOpen)
+                    playerInventory.CloseUI();
+                if (playerEquipment != null && playerEquipment.IsOpen)
+                    playerEquipment.CloseUI();
             }
 
             expandedRoot.SetActive(opening);
