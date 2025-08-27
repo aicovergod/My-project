@@ -13,14 +13,29 @@ namespace Pets
         private Inventory.Inventory inventory;
         private PetExperience experience;
 
-        private void Awake()
+        public void Initialize(PetDefinition def)
         {
+            definition = def;
             experience = GetComponent<PetExperience>();
-            if (definition != null && definition.hasInventory)
+            if (inventory == null && definition != null && definition.hasInventory)
             {
                 CreateInventory();
                 if (experience != null)
                     experience.OnLevelChanged += HandleLevelChanged;
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (inventory == null && definition != null)
+            {
+                experience = GetComponent<PetExperience>();
+                if (definition.hasInventory)
+                {
+                    CreateInventory();
+                    if (experience != null)
+                        experience.OnLevelChanged += HandleLevelChanged;
+                }
             }
         }
 

@@ -131,7 +131,7 @@ namespace Pets
             if (def.hasInventory)
             {
                 storage = go.AddComponent<PetStorage>();
-                storage.definition = def;
+                storage.Initialize(def);
             }
 
             var clickable = go.AddComponent<PetClickable>();
