@@ -139,6 +139,8 @@ namespace Player
             if (instance == this)
                 instance = null;
 
+            SceneTransitionManager.TransitionStarted -= OnTransitionStarted;
+            SceneTransitionManager.TransitionCompleted -= OnTransitionCompleted;
             SceneTransitionManager.UnregisterPersistentObject(this);
         }
 
@@ -295,13 +297,6 @@ namespace Player
         void OnApplicationQuit()
         {
             SavePosition();
-        }
-
-        private void OnDestroy()
-        {
-            SceneTransitionManager.TransitionStarted -= OnTransitionStarted;
-            SceneTransitionManager.TransitionCompleted -= OnTransitionCompleted;
-            SceneTransitionManager.UnregisterPersistentObject(this);
         }
 
         public void SavePosition()
