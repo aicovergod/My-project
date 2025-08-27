@@ -298,6 +298,8 @@ namespace Player
                 return;
             if (isTransitioning)
                 return;
+            if (SceneTransitionManager.IsTransitioning)
+                return;
 
             if (SceneManager.GetActiveScene().name == data.scene)
             {
