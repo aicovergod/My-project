@@ -16,16 +16,19 @@ namespace Pets
         private void Awake()
         {
             experience = GetComponent<PetExperience>();
-        }
-
-        private void Start()
-        {
             if (definition != null && definition.hasInventory)
             {
                 CreateInventory();
                 if (experience != null)
                     experience.OnLevelChanged += HandleLevelChanged;
             }
+        }
+
+        private void Start()
+        {
+            var playerInv = GameObject.FindGameObjectWithTag("Player")?.GetComponent<Inventory.Inventory>();
+            if (playerInv != null && playerInv.IsOpen && !playerInv.BankOpen)
+                Open();
         }
 
         private void OnDestroy()
