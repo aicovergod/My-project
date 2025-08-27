@@ -210,7 +210,7 @@ namespace Pets
             if (playerInventory != null && playerInventory.IsOpen && !playerInventory.BankOpen)
             {
                 var storage = activePetGO.GetComponent<PetStorage>();
-                storage?.Open();
+                storage?.StartCoroutine(storage.OpenDelayed());
             }
 
             return activePetGO;

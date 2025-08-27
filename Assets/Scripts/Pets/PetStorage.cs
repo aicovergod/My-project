@@ -1,5 +1,6 @@
 using UnityEngine;
 using Inventory;
+using System.Collections;
 
 namespace Pets
 {
@@ -43,7 +44,7 @@ namespace Pets
         {
             var playerInv = GameObject.FindGameObjectWithTag("Player")?.GetComponent<Inventory.Inventory>();
             if (playerInv != null && playerInv.IsOpen && !playerInv.BankOpen)
-                Open();
+                StartCoroutine(OpenDelayed());
         }
 
         private void OnDestroy()
@@ -116,6 +117,12 @@ namespace Pets
         {
             if (inventory != null)
                 inventory.OpenUI();
+        }
+
+        public System.Collections.IEnumerator OpenDelayed()
+        {
+            yield return null;
+            Open();
         }
 
         public void Close()
