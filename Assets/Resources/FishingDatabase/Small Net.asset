@@ -11,11 +11,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dbe34942ecc14b96a2b60f7ce249549a, type: 3}
   m_Name: Small Net
-  m_EditorClassIdentifier:
-  id: SmallNet
+  m_EditorClassIdentifier: 
+  id: Small Net
   displayName: Small Net
   requiredLevel: 1
   swingSpeedMultiplier: 1
   catchBonus: 0
-  baitItemId:
+  baitItemId: 
   icon: {fileID: 0}
