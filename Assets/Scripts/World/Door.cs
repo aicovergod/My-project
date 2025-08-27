@@ -32,6 +32,9 @@ namespace World
 
         private void Update()
         {
+            if (SceneTransitionManager.IsTransitioning)
+                return;
+
             if (!Input.GetMouseButtonDown(0))
                 return;
 
