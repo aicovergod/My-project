@@ -2,6 +2,7 @@ using UnityEngine;
 using Player;
 using Skills.Mining;
 using Skills.Woodcutting;
+using Skills.Fishing;
 using Beastmaster;
 
 namespace Skills
@@ -16,6 +17,7 @@ namespace Skills
         private SkillManager skillManager;
         private MiningSkill miningSkill;
         private WoodcuttingSkill woodcuttingSkill;
+        private FishingSkill fishingSkill;
         private IBeastmasterService beastmasterService;
         private MergeConfig mergeConfig;
 
@@ -26,6 +28,7 @@ namespace Skills
         private string defenceLevel = "";
         private string miningLevel = "";
         private string woodcuttingLevel = "";
+        private string fishingLevel = "";
         private string beastmasterLevel = "";
 
         // Scroll position for the debug menu
@@ -68,6 +71,8 @@ namespace Skills
                 miningSkill = FindObjectOfType<MiningSkill>();
             if (woodcuttingSkill == null)
                 woodcuttingSkill = FindObjectOfType<WoodcuttingSkill>();
+            if (fishingSkill == null)
+                fishingSkill = FindObjectOfType<FishingSkill>();
             if (beastmasterService == null)
             {
                 foreach (var mb in FindObjectsOfType<MonoBehaviour>())
@@ -87,6 +92,7 @@ namespace Skills
             skillManager = FindObjectOfType<SkillManager>();
             miningSkill = FindObjectOfType<MiningSkill>();
             woodcuttingSkill = FindObjectOfType<WoodcuttingSkill>();
+            fishingSkill = FindObjectOfType<FishingSkill>();
             beastmasterService = null;
             foreach (var mb in FindObjectsOfType<MonoBehaviour>())
             {
@@ -105,6 +111,7 @@ namespace Skills
             defenceLevel = skillManager != null ? skillManager.GetLevel(SkillType.Defence).ToString() : "";
             miningLevel = miningSkill != null ? miningSkill.Level.ToString() : "";
             woodcuttingLevel = woodcuttingSkill != null ? woodcuttingSkill.Level.ToString() : "";
+            fishingLevel = fishingSkill != null ? fishingSkill.Level.ToString() : "";
             beastmasterLevel = beastmasterService != null ? beastmasterService.CurrentLevel.ToString() : "";
         }
 
@@ -139,6 +146,9 @@ namespace Skills
             GUILayout.Label("Woodcutting Level");
             woodcuttingLevel = GUILayout.TextField(woodcuttingLevel);
 
+            GUILayout.Label("Fishing Level");
+            fishingLevel = GUILayout.TextField(fishingLevel);
+
             GUILayout.Label("Beastmaster Level");
             beastmasterLevel = GUILayout.TextField(beastmasterLevel);
             if (mergeConfig != null && int.TryParse(beastmasterLevel, out var bmLevel))
@@ -166,6 +176,8 @@ namespace Skills
                     miningSkill.DebugSetLevel(mine);
                 if (woodcuttingSkill != null && int.TryParse(woodcuttingLevel, out var wood))
                     woodcuttingSkill.DebugSetLevel(wood);
+                if (fishingSkill != null && int.TryParse(fishingLevel, out var fish))
+                    fishingSkill.DebugSetLevel(fish);
                 if (beastmasterService != null && int.TryParse(beastmasterLevel, out var bm))
                     beastmasterService.SetLevel(Mathf.Clamp(bm, 1, 99));
 

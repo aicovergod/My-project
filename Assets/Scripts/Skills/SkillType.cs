@@ -14,6 +14,7 @@ namespace Skills
         Hitpoints,
         Attack,
         Strength,
-        Defence
+        Defence,
+        Fishing
     }
 }

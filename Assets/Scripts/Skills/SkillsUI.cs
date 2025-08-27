@@ -16,6 +16,7 @@ namespace Skills
         private Text skillText;
         private Mining.MiningSkill miningSkill;
         private Woodcutting.WoodcuttingSkill woodcuttingSkill;
+        private Fishing.FishingSkill fishingSkill;
         private PlayerHitpoints hitpoints;
         private SkillManager skillManager;
 
@@ -46,6 +47,7 @@ namespace Skills
 
             miningSkill = FindObjectOfType<Mining.MiningSkill>();
             woodcuttingSkill = FindObjectOfType<Woodcutting.WoodcuttingSkill>();
+            fishingSkill = FindObjectOfType<Fishing.FishingSkill>();
             hitpoints = FindObjectOfType<PlayerHitpoints>();
             skillManager = FindObjectOfType<SkillManager>();
             CreateUI();
@@ -146,6 +148,12 @@ namespace Skills
                     if (text.Length > 0)
                         text += "\n";
                     text += $"Woodcutting Level: {woodcuttingSkill.Level}  XP: {woodcuttingSkill.Xp}";
+                }
+                if (fishingSkill != null)
+                {
+                    if (text.Length > 0)
+                        text += "\n";
+                    text += $"Fishing Level: {fishingSkill.Level}  XP: {fishingSkill.Xp}";
                 }
                 skillText.text = text;
             }
