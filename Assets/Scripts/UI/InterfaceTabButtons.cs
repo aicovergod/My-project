@@ -16,6 +16,9 @@ namespace UI
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Init()
         {
+            if (Object.FindObjectOfType<InterfaceTabButtons>() != null)
+                return;
+
             var go = new GameObject("InterfaceTabButtons");
             DontDestroyOnLoad(go);
             go.AddComponent<InterfaceTabButtons>();

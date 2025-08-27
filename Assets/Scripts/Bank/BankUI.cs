@@ -56,6 +56,9 @@ namespace BankSystem
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Init()
         {
+            if (UnityEngine.Object.FindObjectOfType<BankUI>() != null)
+                return;
+
             var go = new GameObject("Bank");
             DontDestroyOnLoad(go);
             go.AddComponent<BankUI>();

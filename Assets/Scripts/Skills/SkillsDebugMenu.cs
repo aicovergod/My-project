@@ -34,6 +34,9 @@ namespace Skills
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Create()
         {
+            if (UnityEngine.Object.FindObjectOfType<SkillsDebugMenu>() != null)
+                return;
+
             var go = new GameObject("SkillsDebugMenu");
             DontDestroyOnLoad(go);
             go.AddComponent<SkillsDebugMenu>();

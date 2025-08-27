@@ -30,8 +30,11 @@ namespace Skills.Mining
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreateInstance()
         {
+            if (UnityEngine.Object.FindObjectOfType<MiningUI>() != null)
+                return;
+
             var go = new GameObject("MiningUI");
-            DontDestroyOnLoad(go);
+            UnityEngine.Object.DontDestroyOnLoad(go);
             go.AddComponent<MiningUI>();
         }
 

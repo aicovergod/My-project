@@ -28,8 +28,11 @@ namespace Skills.Woodcutting
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreateInstance()
         {
+            if (UnityEngine.Object.FindObjectOfType<WoodcuttingHUD>() != null)
+                return;
+
             var go = new GameObject("WoodcuttingHUD");
-            Object.DontDestroyOnLoad(go);
+            UnityEngine.Object.DontDestroyOnLoad(go);
             go.AddComponent<WoodcuttingHUD>();
         }
 

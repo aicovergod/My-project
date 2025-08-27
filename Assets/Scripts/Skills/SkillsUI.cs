@@ -26,6 +26,9 @@ namespace Skills
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreateInstance()
         {
+            if (Instance != null || UnityEngine.Object.FindObjectOfType<SkillsUI>() != null)
+                return;
+
             var go = new GameObject("SkillsUI");
             DontDestroyOnLoad(go);
             go.AddComponent<SkillsUI>();
