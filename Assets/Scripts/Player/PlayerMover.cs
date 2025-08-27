@@ -12,7 +12,7 @@ namespace Player
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(SpriteRenderer))]
-    public class PlayerMover : MonoBehaviour
+    public class PlayerMover : MonoBehaviour, IScenePersistent
     {
         [Header("Movement")]
         public float moveSpeed = 3.5f;
@@ -83,6 +83,7 @@ namespace Player
 
             SceneTransitionManager.TransitionStarted += OnTransitionStarted;
             SceneTransitionManager.TransitionCompleted += OnTransitionCompleted;
+            SceneTransitionManager.RegisterPersistentObject(this);
         }
 
 #if ENABLE_INPUT_SYSTEM
@@ -276,6 +277,7 @@ namespace Player
         {
             SceneTransitionManager.TransitionStarted -= OnTransitionStarted;
             SceneTransitionManager.TransitionCompleted -= OnTransitionCompleted;
+            SceneTransitionManager.UnregisterPersistentObject(this);
         }
 
         public void SavePosition()
@@ -361,6 +363,37 @@ namespace Player
             var data = SaveManager.Load<PositionData>(PositionKey);
             if (data != null)
                 transform.position = new Vector3(data.x, data.y, data.z);
+        }
+
+        public void OnBeforeSceneUnload()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
+
+        public void OnAfterSceneLoad(Scene scene)
+        {
+            var spawnId = SceneTransitionManager.NextSpawnPoint;
+            if (!string.IsNullOrEmpty(spawnId))
+            {
+                var points = GameObject.FindObjectsOfType<SpawnPoint>();
+                foreach (var p in points)
+                {
+                    if (p.id == spawnId)
+                    {
+                        transform.position = p.transform.position;
+                        break;
+                    }
+                }
+            }
+
+            SceneManager.MoveGameObjectToScene(gameObject, scene);
+            var players = GameObject.FindGameObjectsWithTag("Player");
+            foreach (var p in players)
+            {
+                if (p != gameObject)
+                    Destroy(p);
+            }
+            SavePosition();
         }
     }
 }
