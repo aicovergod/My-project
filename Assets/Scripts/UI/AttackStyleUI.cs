@@ -23,8 +23,11 @@ namespace UI
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Init()
         {
+            if (UnityEngine.Object.FindObjectOfType<AttackStyleUI>() != null)
+                return;
+
             var go = new GameObject("AttackStyleUI");
-            DontDestroyOnLoad(go);
+            UnityEngine.Object.DontDestroyOnLoad(go);
             go.AddComponent<AttackStyleUI>();
         }
 

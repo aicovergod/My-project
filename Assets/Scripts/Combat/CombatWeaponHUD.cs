@@ -18,8 +18,11 @@ namespace Combat
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreateInstance()
         {
+            if (UnityEngine.Object.FindObjectOfType<CombatWeaponHUD>() != null)
+                return;
+
             var go = new GameObject("CombatWeaponHUD");
-            DontDestroyOnLoad(go);
+            UnityEngine.Object.DontDestroyOnLoad(go);
             go.AddComponent<CombatWeaponHUD>();
         }
 
