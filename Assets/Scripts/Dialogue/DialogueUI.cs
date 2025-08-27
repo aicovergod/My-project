@@ -113,8 +113,7 @@ namespace Dialogue
         {
             if (FindObjectOfType<EventSystem>() != null)
                 return;
-            var go = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
-            DontDestroyOnLoad(go);
+            new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
         }
     }
 }
