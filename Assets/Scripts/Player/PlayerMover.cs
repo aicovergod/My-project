@@ -42,6 +42,9 @@ namespace Player
         private GameObject petToMove;
         private bool isTransitioning;
 
+        // Ensure only one player persists across scene loads.
+        private static PlayerMover instance;
+
         [Serializable]
         private class PositionData
         {
@@ -68,6 +71,19 @@ namespace Player
 
         void Awake()
         {
+            // Destroy any duplicate player instances that might exist in
+            // newly loaded scenes before they can register themselves as
+            // persistent objects.  This prevents two players from
+            // destroying each other during scene transitions and also
+            // avoids multiple AudioListeners.
+            if (instance != null && instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            instance = this;
+
             rb = GetComponent<Rigidbody2D>();
             anim = GetComponent<Animator>();
             sr  = GetComponent<SpriteRenderer>();
@@ -117,6 +133,14 @@ namespace Player
             moveAction?.Disable();
         }
 #endif
+
+        private void OnDestroy()
+        {
+            if (instance == this)
+                instance = null;
+
+            SceneTransitionManager.UnregisterPersistentObject(this);
+        }
 
         void Update()
         {
@@ -393,6 +417,21 @@ namespace Player
                 if (p != gameObject)
                     Destroy(p);
             }
+
+            // Remove any extra AudioListeners that may have been loaded with the
+            // new scene.  Unity requires exactly one listener and keeping only the
+            // player's avoids console warnings and audio glitches.
+            var myListener = GetComponentInChildren<AudioListener>();
+            if (myListener != null)
+            {
+                var listeners = GameObject.FindObjectsOfType<AudioListener>();
+                foreach (var l in listeners)
+                {
+                    if (l != myListener)
+                        Destroy(l);
+                }
+            }
+
             SavePosition();
         }
     }
