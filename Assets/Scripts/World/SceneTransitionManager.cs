@@ -36,6 +36,9 @@ namespace World
 
         public IEnumerator Transition(string sceneToLoad, string spawnPointName, string requiredItemId, bool removeItemOnUse)
         {
+            if (IsTransitioning)
+                yield break;
+
             if (string.IsNullOrEmpty(sceneToLoad))
                 yield break;
 
