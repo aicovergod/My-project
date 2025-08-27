@@ -40,6 +40,7 @@ namespace Player
         private SpriteRenderer sr;
         private Inventory.Inventory inventory;
         private GameObject petToMove;
+        private bool isTransitioning;
 
         [Serializable]
         private class PositionData
@@ -79,6 +80,9 @@ namespace Player
             rb.WakeUp();
 
             LoadPosition();
+
+            SceneTransitionManager.TransitionStarted += OnTransitionStarted;
+            SceneTransitionManager.TransitionCompleted += OnTransitionCompleted;
         }
 
 #if ENABLE_INPUT_SYSTEM
@@ -115,6 +119,14 @@ namespace Player
 
         void Update()
         {
+            if (isTransitioning)
+            {
+                moveDir = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
+                anim.SetBool("IsMoving", false);
+                return;
+            }
+
             if (inventory != null && inventory.BankOpen)
             {
                 moveDir = Vector2.zero;
@@ -260,6 +272,12 @@ namespace Player
             SavePosition();
         }
 
+        private void OnDestroy()
+        {
+            SceneTransitionManager.TransitionStarted -= OnTransitionStarted;
+            SceneTransitionManager.TransitionCompleted -= OnTransitionCompleted;
+        }
+
         public void SavePosition()
         {
             Vector3 pos = transform.position;
@@ -278,7 +296,7 @@ namespace Player
             var data = SaveManager.Load<PositionData>(PositionKey);
             if (data == null)
                 return;
-            if (SceneTransitionManager.IsTransitioning)
+            if (isTransitioning)
                 return;
 
             if (SceneManager.GetActiveScene().name == data.scene)
@@ -324,6 +342,16 @@ namespace Player
                 }
                 SceneManager.sceneLoaded -= OnSceneLoaded;
             }
+        }
+
+        private void OnTransitionStarted()
+        {
+            isTransitioning = true;
+        }
+
+        private void OnTransitionCompleted()
+        {
+            isTransitioning = false;
         }
 
         private void ApplySavedPosition()

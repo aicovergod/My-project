@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -13,6 +14,9 @@ namespace World
     {
         public static SceneTransitionManager Instance;
         public static bool IsTransitioning;
+
+        public static event Action TransitionStarted;
+        public static event Action TransitionCompleted;
 
         private Transform _playerToMove;
         private GameObject _cameraToMove;
@@ -41,6 +45,9 @@ namespace World
 
             if (string.IsNullOrEmpty(sceneToLoad))
                 yield break;
+
+            IsTransitioning = true;
+            TransitionStarted?.Invoke();
 
             if (ScreenFader.Instance == null)
                 new GameObject("ScreenFader").AddComponent<ScreenFader>();
@@ -86,7 +93,6 @@ namespace World
                 // Temporarily disable to avoid multiple active EventSystems during load
                 _eventSystemToMove.SetActive(false);
 
-            IsTransitioning = true;
             SceneManager.LoadScene(sceneToLoad);
         }
 
@@ -191,9 +197,21 @@ namespace World
             _petToMove = null;
 
             if (ScreenFader.Instance != null)
-                ScreenFader.Instance.StartCoroutine(ScreenFader.Instance.FadeIn());
+                StartCoroutine(FadeInRoutine());
+            else
+                OnFadeInComplete();
+        }
 
+        private IEnumerator FadeInRoutine()
+        {
+            yield return ScreenFader.Instance.FadeIn();
+            OnFadeInComplete();
+        }
+
+        private void OnFadeInComplete()
+        {
             IsTransitioning = false;
+            TransitionCompleted?.Invoke();
         }
     }
 }

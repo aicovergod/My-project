@@ -30,9 +30,23 @@ namespace World
         [Tooltip("How close the player must be in tiles to use the door.")]
         public float useRadius = 2f;
 
+        private bool _transitioning;
+
+        private void OnEnable()
+        {
+            SceneTransitionManager.TransitionStarted += OnTransitionStarted;
+            SceneTransitionManager.TransitionCompleted += OnTransitionCompleted;
+        }
+
+        private void OnDisable()
+        {
+            SceneTransitionManager.TransitionStarted -= OnTransitionStarted;
+            SceneTransitionManager.TransitionCompleted -= OnTransitionCompleted;
+        }
+
         private void Update()
         {
-            if (SceneTransitionManager.IsTransitioning)
+            if (_transitioning)
                 return;
 
             if (!Input.GetMouseButtonDown(0))
@@ -54,6 +68,9 @@ namespace World
 
         private IEnumerator UseDoor()
         {
+            if (_transitioning)
+                yield break;
+
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player == null) yield break;
 
@@ -87,5 +104,9 @@ namespace World
                 }
             }
         }
+
+        private void OnTransitionStarted() => _transitioning = true;
+
+        private void OnTransitionCompleted() => _transitioning = false;
     }
 }
