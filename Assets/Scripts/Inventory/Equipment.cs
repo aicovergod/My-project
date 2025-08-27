@@ -118,6 +118,8 @@ namespace Inventory
         private GameObject playerBonusPanel;
         private GameObject petBonusPanel;
 
+        private static Equipment instance;
+
         private bool lastMergeState;
 
         public int TotalAttackBonus { get; private set; }
@@ -140,6 +142,15 @@ namespace Inventory
 
         private void Awake()
         {
+            if (instance != null && instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+
             inventory = GetComponent<Inventory>();
             skillManager = skillManager != null ? skillManager : GetComponent<SkillManager>();
             if (floatingTextAnchor == null)
@@ -153,6 +164,12 @@ namespace Inventory
                 uiRoot.SetActive(false);
 
             UIManager.Instance.RegisterWindow(this);
+        }
+
+        private void OnDestroy()
+        {
+            if (instance == this)
+                instance = null;
         }
 
         public void ToggleUI()

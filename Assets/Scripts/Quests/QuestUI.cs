@@ -24,10 +24,19 @@ namespace Quests
         private Canvas canvas;
         private PlayerMover playerMover;
 
+        private static QuestUI instance;
+
         public bool IsOpen => canvas != null && canvas.enabled;
 
         private void Awake()
         {
+            if (instance != null && instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            instance = this;
             name = "QuestUI";
             canvas = gameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -39,6 +48,12 @@ namespace Quests
             canvas.enabled = false;
             playerMover = FindObjectOfType<PlayerMover>();
             UIManager.Instance.RegisterWindow(this);
+        }
+
+        private void OnDestroy()
+        {
+            if (instance == this)
+                instance = null;
         }
 
         private void Start()
