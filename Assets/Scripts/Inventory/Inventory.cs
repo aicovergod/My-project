@@ -1128,14 +1128,10 @@ namespace Inventory
         {
             var existing = UnityEngine.Object.FindObjectOfType<EventSystem>();
             if (existing != null)
-            {
-                DontDestroyOnLoad(existing.gameObject);
                 return;
-            }
 
             var go = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
             go.transform.SetParent(null, false);
-            DontDestroyOnLoad(go);
         }
     }
 }
