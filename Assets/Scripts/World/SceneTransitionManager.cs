@@ -93,7 +93,21 @@ namespace World
                 // Temporarily disable to avoid multiple active EventSystems during load
                 _eventSystemToMove.SetActive(false);
 
-            SceneManager.LoadScene(sceneToLoad);
+            // Load the new scene additively so we can explicitly set it active and
+            // unload the previous scene once loading completes.  This prevents the
+            // previous scene from lingering if the default single-mode load fails on
+            // some platforms and ensures the overworld becomes the active scene.
+            var currentScene = SceneManager.GetActiveScene();
+            var loadOp = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
+            while (!loadOp.isDone)
+                yield return null;
+
+            var loadedScene = SceneManager.GetSceneByName(sceneToLoad);
+            SceneManager.SetActiveScene(loadedScene);
+
+            var unloadOp = SceneManager.UnloadSceneAsync(currentScene);
+            while (unloadOp != null && !unloadOp.isDone)
+                yield return null;
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
