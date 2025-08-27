@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 
 namespace Dialogue
 {
@@ -20,7 +21,10 @@ namespace Dialogue
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             gameObject.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             gameObject.AddComponent<GraphicRaycaster>();
-            EnsureEventSystem();
+
+            if (EventSystem.current == null)
+                EnsureEventSystem();
+
             Build();
             gameObject.SetActive(false);
         }
@@ -113,7 +117,8 @@ namespace Dialogue
         {
             if (FindObjectOfType<EventSystem>() != null)
                 return;
-            new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+
+            new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
         }
     }
 }

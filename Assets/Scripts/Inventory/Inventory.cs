@@ -4,9 +4,8 @@ using UnityEngine;
 using Core.Save;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-#if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
-#endif
+using UnityEngine.InputSystem.UI;
 using ShopSystem;
 using Player;
 using Skills;
@@ -215,7 +214,9 @@ namespace Inventory
             }
 
             items = new InventoryEntry[size];
-            EnsureLegacyEventSystem();
+
+            if (EventSystem.current == null)
+                EnsureEventSystem();
 
             if (useSharedUIRoot && sharedUIRoot != null)
             {
@@ -1077,12 +1078,7 @@ namespace Inventory
 
         private void Update()
         {
-#if ENABLE_INPUT_SYSTEM
             bool toggle = false;
-#else
-            bool toggle = false;
-#endif
-
             if (playerMover == null)
                 return;
 
@@ -1122,15 +1118,15 @@ namespace Inventory
         }
 
         /// <summary>
-        /// Ensure a legacy EventSystem exists for uGUI with StandaloneInputModule.
+        /// Ensure an EventSystem exists for uGUI with the Input System module.
         /// </summary>
-        private static void EnsureLegacyEventSystem()
+        private static void EnsureEventSystem()
         {
-            var existing = UnityEngine.Object.FindObjectOfType<EventSystem>();
+            var existing = Object.FindObjectOfType<EventSystem>();
             if (existing != null)
                 return;
 
-            var go = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+            var go = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
             go.transform.SetParent(null, false);
         }
     }
