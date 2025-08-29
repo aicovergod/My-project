@@ -78,7 +78,8 @@ namespace Inventory
                     }
                     else
                     {
-                        inventory?.EquipItem(index);
+                        if (inventory == null || !inventory.EquipItem(index))
+                            inventory?.UseItem(index);
                     }
                 }
             }
