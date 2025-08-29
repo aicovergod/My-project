@@ -17,6 +17,7 @@ namespace UI
 
         private BookData currentBook;
         private int currentPage;
+        private const string BackgroundSpritePath = "Sprites/Books/UI/Parchment";
 
         public bool IsOpen => gameObject.activeSelf;
 
@@ -138,7 +139,16 @@ namespace UI
             var panel = new GameObject("Panel", typeof(Image));
             panel.transform.SetParent(transform, false);
             var panelImage = panel.GetComponent<Image>();
-            panelImage.color = new Color(0f, 0f, 0f, 0.5f);
+            var parchmentSprite = Resources.Load<Sprite>(BackgroundSpritePath);
+            if (parchmentSprite != null)
+            {
+                panelImage.sprite = parchmentSprite;
+                panelImage.color = Color.white;
+            }
+            else
+            {
+                panelImage.color = new Color(0f, 0f, 0f, 0.5f);
+            }
             var panelRect = panel.GetComponent<RectTransform>();
             panelRect.sizeDelta = new Vector2(300f, 200f);
             panelRect.anchorMin = new Vector2(0.5f, 0.5f);
