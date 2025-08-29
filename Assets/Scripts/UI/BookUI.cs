@@ -150,11 +150,11 @@ namespace UI
                 panelImage.color = new Color(0f, 0f, 0f, 0.5f);
             }
             var panelRect = panel.GetComponent<RectTransform>();
-            panelRect.sizeDelta = new Vector2(300f, 200f);
+            panelRect.sizeDelta = new Vector2(512f, 512f);
             panelRect.anchorMin = new Vector2(0.5f, 0.5f);
             panelRect.anchorMax = new Vector2(0.5f, 0.5f);
             panelRect.pivot = new Vector2(0.5f, 0.5f);
-            panelRect.anchoredPosition = Vector2.zero;
+            panelRect.anchoredPosition = new Vector2(-150f, 0f);
 
             var font = TMP_Settings.defaultFontAsset;
 
@@ -207,8 +207,9 @@ namespace UI
             var pageRect = pageText.rectTransform;
             pageRect.anchorMin = new Vector2(0f, 0f);
             pageRect.anchorMax = new Vector2(1f, 1f);
-            pageRect.offsetMin = new Vector2(10f, 40f);
-            pageRect.offsetMax = new Vector2(-10f, -40f);
+            pageRect.anchoredPosition3D = Vector3.zero;
+            pageRect.offsetMin = new Vector2(90f, 40f);
+            pageRect.offsetMax = new Vector2(-70f, -90f);
 
             var prevGO = new GameObject("PrevButton", typeof(Image), typeof(Button));
             prevGO.transform.SetParent(panel.transform, false);
