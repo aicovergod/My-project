@@ -212,8 +212,7 @@ namespace Inventory
             var entry = items[index];
             if (entry.item is BookItemData bookItem && bookItem.book != null)
             {
-                BookUI.Instance.Open(bookItem.book,
-                    BookProgressManager.Instance.GetPage(bookItem.book.id));
+                BookUI.Instance.Open(bookItem.book);
                 return true;
             }
 
