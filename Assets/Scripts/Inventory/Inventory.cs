@@ -12,6 +12,7 @@ using Skills;
 using Pets;
 using Quests;
 using UI;
+using Books;
 using Object = UnityEngine.Object;
 
 namespace Inventory
@@ -196,6 +197,26 @@ namespace Inventory
                 ClearSlot(index);
                 return true;
             }
+            return false;
+        }
+
+        /// <summary>
+        /// Use the item in the given slot if it supports usage.
+        /// Currently only opens books without consuming them.
+        /// </summary>
+        public bool UseItem(int index)
+        {
+            if (index < 0 || index >= items.Length)
+                return false;
+
+            var entry = items[index];
+            if (entry.item is BookItemData bookItem && bookItem.book != null)
+            {
+                BookUI.Instance.Open(bookItem.book,
+                    BookProgressManager.Instance.GetPage(bookItem.book.id));
+                return true;
+            }
+
             return false;
         }
 
