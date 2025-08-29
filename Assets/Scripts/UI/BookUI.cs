@@ -97,6 +97,28 @@ namespace UI
                     }
                 }
             }
+            if (titleText != null)
+                titleText.fontSize = 18;
+            if (pageText != null)
+                pageText.fontSize = 14;
+            if (nextButton != null)
+            {
+                var nextText = nextButton.GetComponentInChildren<TextMeshProUGUI>();
+                if (nextText != null)
+                    nextText.fontSize = 18;
+            }
+            if (prevButton != null)
+            {
+                var prevText = prevButton.GetComponentInChildren<TextMeshProUGUI>();
+                if (prevText != null)
+                    prevText.fontSize = 18;
+            }
+            if (closeButton != null)
+            {
+                var cText = closeButton.GetComponentInChildren<TextMeshProUGUI>();
+                if (cText != null)
+                    cText.fontSize = 14;
+            }
             if (pageText != null)
                 pageText.overflowMode = TextOverflowModes.Page;
             if (nextButton != null) nextButton.onClick.AddListener(NextPage);
@@ -132,6 +154,7 @@ namespace UI
             titleText.font = font;
             titleText.alignment = TextAlignmentOptions.Center;
             titleText.color = Color.white;
+            titleText.fontSize = 18f;
             var titleRect = titleText.rectTransform;
             titleRect.anchorMin = new Vector2(0f, 1f);
             titleRect.anchorMax = new Vector2(1f, 1f);
@@ -157,6 +180,7 @@ namespace UI
             closeText.alignment = TextAlignmentOptions.Center;
             closeText.color = Color.white;
             closeText.text = "X";
+            closeText.fontSize = 14f;
             var closeTextRect = closeText.rectTransform;
             closeTextRect.anchorMin = Vector2.zero;
             closeTextRect.anchorMax = Vector2.one;
@@ -169,6 +193,7 @@ namespace UI
             pageText.font = font;
             pageText.alignment = TextAlignmentOptions.TopLeft;
             pageText.color = Color.white;
+            pageText.fontSize = 14f;
             var pageRect = pageText.rectTransform;
             pageRect.anchorMin = new Vector2(0f, 0f);
             pageRect.anchorMax = new Vector2(1f, 1f);
@@ -193,6 +218,7 @@ namespace UI
             prevText.alignment = TextAlignmentOptions.Center;
             prevText.color = Color.white;
             prevText.text = "Prev";
+            prevText.fontSize = 18f;
             var prevTextRect = prevText.rectTransform;
             prevTextRect.anchorMin = Vector2.zero;
             prevTextRect.anchorMax = Vector2.one;
@@ -217,6 +243,7 @@ namespace UI
             nextText.alignment = TextAlignmentOptions.Center;
             nextText.color = Color.white;
             nextText.text = "Next";
+            nextText.fontSize = 18f;
             var nextTextRect = nextText.rectTransform;
             nextTextRect.anchorMin = Vector2.zero;
             nextTextRect.anchorMax = Vector2.one;
