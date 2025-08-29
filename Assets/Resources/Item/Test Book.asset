@@ -12,6 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 859b163eb5e1413a8d268c7d9a330dd7, type: 3}
   m_Name: Test Book
   m_EditorClassIdentifier: 
-  id: 
-  title: 
+  id: Test Book
+  title: Test Book
+  content: "Beneath the sky where violets bloom, A humble town defies the gloom.
+    Stone and timber, hearths that glow, Guard the secrets all folk know.  The river
+    hums its silver song, Guiding traders swift along. Fields of grain and orchards
+    sweet, Whisper welcome to all who meet.  By candle\u2019s light, the tales are
+    told, Of goblin caves and miners bold. Of oaken woods where spirits hide, And
+    magic roots that twist inside.  Though storms may howl and shadows creep, Violetstown
+    will never sleep. For hearts are strong, and bonds are true, Its blossoms bloom
+    in every hue."
   pages: []

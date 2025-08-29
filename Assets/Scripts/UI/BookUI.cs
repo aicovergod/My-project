@@ -17,7 +17,7 @@ namespace UI
 
         private BookData currentBook;
         private int currentPage;
-        private const string BackgroundSpritePath = "Sprites/Books/UI/Parchment";
+        private const string BackgroundSpritePath = "Interfaces/BookUI/Parchment";
 
         public bool IsOpen => gameObject.activeSelf;
 
