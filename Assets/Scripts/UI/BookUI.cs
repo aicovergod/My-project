@@ -1,4 +1,5 @@
 using Books;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,8 +9,8 @@ namespace UI
     {
         public static BookUI Instance { get; private set; }
 
-        public Text titleText;
-        public Text pageText;
+        public TextMeshProUGUI titleText;
+        public TextMeshProUGUI pageText;
         public Button nextButton;
         public Button prevButton;
         public Button closeButton;
@@ -43,7 +44,7 @@ namespace UI
             // Attempt to auto-bind UI components if they haven't been set in the Inspector
             if (titleText == null)
             {
-                foreach (var t in GetComponentsInChildren<Text>(true))
+                foreach (var t in GetComponentsInChildren<TextMeshProUGUI>(true))
                 {
                     if (t.name == "TitleText")
                     {
@@ -54,7 +55,7 @@ namespace UI
             }
             if (pageText == null)
             {
-                foreach (var t in GetComponentsInChildren<Text>(true))
+                foreach (var t in GetComponentsInChildren<TextMeshProUGUI>(true))
                 {
                     if (t.name == "PageText")
                     {
@@ -96,6 +97,8 @@ namespace UI
                     }
                 }
             }
+            if (pageText != null)
+                pageText.overflowMode = TextOverflowModes.Page;
             if (nextButton != null) nextButton.onClick.AddListener(NextPage);
             if (prevButton != null) prevButton.onClick.AddListener(PreviousPage);
             if (closeButton != null) closeButton.onClick.AddListener(Close);
@@ -121,13 +124,13 @@ namespace UI
             panelRect.pivot = new Vector2(0.5f, 0.5f);
             panelRect.anchoredPosition = Vector2.zero;
 
-            var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var font = TMP_Settings.defaultFontAsset;
 
-            var titleGO = new GameObject("TitleText", typeof(Text));
+            var titleGO = new GameObject("TitleText", typeof(TextMeshProUGUI));
             titleGO.transform.SetParent(panel.transform, false);
-            titleText = titleGO.GetComponent<Text>();
+            titleText = titleGO.GetComponent<TextMeshProUGUI>();
             titleText.font = font;
-            titleText.alignment = TextAnchor.MiddleCenter;
+            titleText.alignment = TextAlignmentOptions.Center;
             titleText.color = Color.white;
             var titleRect = titleText.rectTransform;
             titleRect.anchorMin = new Vector2(0f, 1f);
@@ -147,11 +150,11 @@ namespace UI
             closeRect.anchoredPosition = new Vector2(-5f, -5f);
             var closeImg = closeGO.GetComponent<Image>();
             closeImg.color = Color.red;
-            var closeTextGO = new GameObject("Text", typeof(Text));
+            var closeTextGO = new GameObject("Text", typeof(TextMeshProUGUI));
             closeTextGO.transform.SetParent(closeGO.transform, false);
-            var closeText = closeTextGO.GetComponent<Text>();
+            var closeText = closeTextGO.GetComponent<TextMeshProUGUI>();
             closeText.font = font;
-            closeText.alignment = TextAnchor.MiddleCenter;
+            closeText.alignment = TextAlignmentOptions.Center;
             closeText.color = Color.white;
             closeText.text = "X";
             var closeTextRect = closeText.rectTransform;
@@ -160,11 +163,11 @@ namespace UI
             closeTextRect.offsetMin = Vector2.zero;
             closeTextRect.offsetMax = Vector2.zero;
 
-            var pageGO = new GameObject("PageText", typeof(Text));
+            var pageGO = new GameObject("PageText", typeof(TextMeshProUGUI));
             pageGO.transform.SetParent(panel.transform, false);
-            pageText = pageGO.GetComponent<Text>();
+            pageText = pageGO.GetComponent<TextMeshProUGUI>();
             pageText.font = font;
-            pageText.alignment = TextAnchor.UpperLeft;
+            pageText.alignment = TextAlignmentOptions.TopLeft;
             pageText.color = Color.white;
             var pageRect = pageText.rectTransform;
             pageRect.anchorMin = new Vector2(0f, 0f);
@@ -183,11 +186,11 @@ namespace UI
             prevRect.anchoredPosition = new Vector2(10f, 10f);
             var prevImg = prevGO.GetComponent<Image>();
             prevImg.color = Color.gray;
-            var prevTextGO = new GameObject("Text", typeof(Text));
+            var prevTextGO = new GameObject("Text", typeof(TextMeshProUGUI));
             prevTextGO.transform.SetParent(prevGO.transform, false);
-            var prevText = prevTextGO.GetComponent<Text>();
+            var prevText = prevTextGO.GetComponent<TextMeshProUGUI>();
             prevText.font = font;
-            prevText.alignment = TextAnchor.MiddleCenter;
+            prevText.alignment = TextAlignmentOptions.Center;
             prevText.color = Color.white;
             prevText.text = "Prev";
             var prevTextRect = prevText.rectTransform;
@@ -207,11 +210,11 @@ namespace UI
             nextRect.anchoredPosition = new Vector2(-10f, 10f);
             var nextImg = nextGO.GetComponent<Image>();
             nextImg.color = Color.gray;
-            var nextTextGO = new GameObject("Text", typeof(Text));
+            var nextTextGO = new GameObject("Text", typeof(TextMeshProUGUI));
             nextTextGO.transform.SetParent(nextGO.transform, false);
-            var nextText = nextTextGO.GetComponent<Text>();
+            var nextText = nextTextGO.GetComponent<TextMeshProUGUI>();
             nextText.font = font;
-            nextText.alignment = TextAnchor.MiddleCenter;
+            nextText.alignment = TextAlignmentOptions.Center;
             nextText.color = Color.white;
             nextText.text = "Next";
             var nextTextRect = nextText.rectTransform;
@@ -221,12 +224,20 @@ namespace UI
             nextTextRect.offsetMax = Vector2.zero;
         }
 
-        public void Open(BookData data, int startPage)
+        public void Open(BookData data)
         {
             if (data == null)
                 return;
             currentBook = data;
-            currentPage = Mathf.Clamp(startPage, 0, data.pages.Count > 0 ? data.pages.Count - 1 : 0);
+            currentPage = 1;
+            if (titleText != null)
+                titleText.text = currentBook.title;
+            if (pageText != null)
+            {
+                pageText.text = currentBook.content;
+                pageText.pageToDisplay = currentPage;
+                pageText.ForceMeshUpdate();
+            }
             UpdatePage();
             UIManager.Instance.OpenWindow(this);
             gameObject.SetActive(true);
@@ -234,23 +245,25 @@ namespace UI
 
         private void UpdatePage()
         {
-            if (currentBook == null)
+            if (currentBook == null || pageText == null)
                 return;
-            if (titleText != null)
-                titleText.text = currentBook.title;
-            if (pageText != null)
-                pageText.text = currentBook.pages.Count > 0 ? currentBook.pages[currentPage] : string.Empty;
+
+            pageText.pageToDisplay = currentPage;
+            pageText.ForceMeshUpdate();
+            int pageCount = pageText.textInfo.pageCount;
+
             if (prevButton != null)
-                prevButton.interactable = currentPage > 0;
+                prevButton.interactable = currentPage > 1;
             if (nextButton != null)
-                nextButton.interactable = currentPage < currentBook.pages.Count - 1;
+                nextButton.interactable = currentPage < pageCount;
         }
 
         private void NextPage()
         {
-            if (currentBook == null)
+            if (pageText == null)
                 return;
-            if (currentPage < currentBook.pages.Count - 1)
+            pageText.ForceMeshUpdate();
+            if (currentPage < pageText.textInfo.pageCount)
             {
                 currentPage++;
                 UpdatePage();
@@ -259,9 +272,9 @@ namespace UI
 
         private void PreviousPage()
         {
-            if (currentBook == null)
+            if (pageText == null)
                 return;
-            if (currentPage > 0)
+            if (currentPage > 1)
             {
                 currentPage--;
                 UpdatePage();
