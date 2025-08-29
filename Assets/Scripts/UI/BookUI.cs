@@ -38,6 +38,62 @@ namespace UI
             }
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            // Attempt to auto-bind UI components if they haven't been set in the Inspector
+            if (titleText == null)
+            {
+                foreach (var t in GetComponentsInChildren<Text>(true))
+                {
+                    if (t.name == "TitleText")
+                    {
+                        titleText = t;
+                        break;
+                    }
+                }
+            }
+            if (pageText == null)
+            {
+                foreach (var t in GetComponentsInChildren<Text>(true))
+                {
+                    if (t.name == "PageText")
+                    {
+                        pageText = t;
+                        break;
+                    }
+                }
+            }
+            if (nextButton == null)
+            {
+                foreach (var b in GetComponentsInChildren<Button>(true))
+                {
+                    if (b.name == "NextButton")
+                    {
+                        nextButton = b;
+                        break;
+                    }
+                }
+            }
+            if (prevButton == null)
+            {
+                foreach (var b in GetComponentsInChildren<Button>(true))
+                {
+                    if (b.name == "PrevButton")
+                    {
+                        prevButton = b;
+                        break;
+                    }
+                }
+            }
+            if (closeButton == null)
+            {
+                foreach (var b in GetComponentsInChildren<Button>(true))
+                {
+                    if (b.name == "CloseButton")
+                    {
+                        closeButton = b;
+                        break;
+                    }
+                }
+            }
             if (nextButton != null) nextButton.onClick.AddListener(NextPage);
             if (prevButton != null) prevButton.onClick.AddListener(PreviousPage);
             if (closeButton != null) closeButton.onClick.AddListener(Close);
