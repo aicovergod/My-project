@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Inventory;
@@ -115,21 +116,30 @@ namespace Skills.Fishing
                 return;
             }
 
-            FishDefinition catchable = null;
+            var eligibleFish = new List<FishDefinition>();
             int minLevel = int.MaxValue;
             foreach (var fish in spot.def.AvailableFish)
             {
                 if (fish == null) continue;
                 minLevel = Mathf.Min(minLevel, fish.RequiredLevel);
                 if (fishingSkill.Level >= fish.RequiredLevel)
-                    catchable = fish;
+                    eligibleFish.Add(fish);
             }
-            if (catchable == null)
+            if (eligibleFish.Count == 0)
             {
                 FloatingText.Show($"You need Fishing level {minLevel}", transform.position);
                 return;
             }
-            if (!fishingSkill.CanAddFish(catchable))
+            bool canAdd = false;
+            foreach (var fish in eligibleFish)
+            {
+                if (fishingSkill.CanAddFish(fish))
+                {
+                    canAdd = true;
+                    break;
+                }
+            }
+            if (!canAdd)
             {
                 FloatingText.Show("Your inventory is full", transform.position);
                 return;
