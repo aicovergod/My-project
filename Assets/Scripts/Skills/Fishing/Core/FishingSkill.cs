@@ -121,6 +121,21 @@ namespace Skills.Fishing
                 StopFishing();
                 return;
             }
+            if (!string.IsNullOrEmpty(currentTool.BaitItemId))
+            {
+                Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
+                if (inventory == null || !inventory.RemoveItem(currentTool.BaitItemId))
+                {
+                    FloatingText.Show("You need bait", anchor.position);
+                    StopFishing();
+                    return;
+                }
+                var baitItem = ItemDatabase.GetItem(currentTool.BaitItemId);
+                if (baitItem != null)
+                    FloatingText.Show($"-1 {baitItem.itemName}", anchor.position);
+                else
+                    FloatingText.Show("-1 bait", anchor.position);
+            }
 
             float baseChance = 0.35f;
             float penalty = 0.0025f * Mathf.Max(fish.RequiredLevel - 1, 0);
@@ -186,6 +201,15 @@ namespace Skills.Fishing
         {
             if (spot == null || tool == null)
                 return;
+            if (!string.IsNullOrEmpty(tool.BaitItemId))
+            {
+                if (inventory == null || !inventory.HasItem(tool.BaitItemId))
+                {
+                    Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
+                    FloatingText.Show("You need bait", anchor.position);
+                    return;
+                }
+            }
             currentSpot = spot;
             currentTool = tool;
             catchProgress = 0;

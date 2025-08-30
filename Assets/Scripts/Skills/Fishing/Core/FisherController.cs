@@ -110,6 +110,23 @@ namespace Skills.Fishing
                 FloatingText.Show("You need a fishing tool", transform.position);
                 return;
             }
+            if (spot.def != null && spot.def.AllowedTools != null && spot.def.AllowedTools.Count > 0)
+            {
+                bool allowed = false;
+                foreach (var allowedTool in spot.def.AllowedTools)
+                {
+                    if (allowedTool != null && allowedTool.Id == tool.Id)
+                    {
+                        allowed = true;
+                        break;
+                    }
+                }
+                if (!allowed)
+                {
+                    FloatingText.Show("You can't use that tool here", transform.position);
+                    return;
+                }
+            }
             if (fishingSkill.Level < tool.RequiredLevel)
             {
                 FloatingText.Show($"You need Fishing level {tool.RequiredLevel}", transform.position);
