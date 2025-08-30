@@ -121,16 +121,16 @@ namespace Skills.Fishing
                 StopFishing();
                 return;
             }
-            if (!string.IsNullOrEmpty(currentTool.BaitItemId))
+            if (!string.IsNullOrEmpty(currentSpot.def.BaitItemId))
             {
                 Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
-                if (inventory == null || !inventory.RemoveItem(currentTool.BaitItemId))
+                if (inventory == null || !inventory.RemoveItem(currentSpot.def.BaitItemId))
                 {
                     FloatingText.Show("You need bait", anchor.position);
                     StopFishing();
                     return;
                 }
-                var baitItem = ItemDatabase.GetItem(currentTool.BaitItemId);
+                var baitItem = ItemDatabase.GetItem(currentSpot.def.BaitItemId);
                 if (baitItem != null)
                     FloatingText.Show($"-1 {baitItem.itemName}", anchor.position);
                 else
@@ -201,9 +201,9 @@ namespace Skills.Fishing
         {
             if (spot == null || tool == null)
                 return;
-            if (!string.IsNullOrEmpty(tool.BaitItemId))
+            if (!string.IsNullOrEmpty(spot.def.BaitItemId))
             {
-                if (inventory == null || !inventory.HasItem(tool.BaitItemId))
+                if (inventory == null || !inventory.HasItem(spot.def.BaitItemId))
                 {
                     Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
                     FloatingText.Show("You need bait", anchor.position);
