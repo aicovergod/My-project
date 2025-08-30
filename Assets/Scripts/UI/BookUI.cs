@@ -170,7 +170,7 @@ namespace UI
             titleRect.anchorMax = new Vector2(1f, 1f);
             titleRect.pivot = new Vector2(0.5f, 1f);
             titleRect.sizeDelta = new Vector2(0f, 30f);
-            titleRect.anchoredPosition = Vector2.zero;
+            titleRect.anchoredPosition = new Vector2(0f, -50f);
 
             var closeGO = new GameObject("CloseButton", typeof(Image), typeof(Button));
             closeGO.transform.SetParent(panel.transform, false);
@@ -219,7 +219,7 @@ namespace UI
             prevRect.anchorMax = new Vector2(0f, 0f);
             prevRect.pivot = new Vector2(0f, 0f);
             prevRect.sizeDelta = new Vector2(60f, 25f);
-            prevRect.anchoredPosition = new Vector2(10f, 10f);
+            prevRect.anchoredPosition = new Vector2(40f, 40f);
             var prevImg = prevGO.GetComponent<Image>();
             prevImg.color = Color.gray;
             var prevTextGO = new GameObject("Text", typeof(TextMeshProUGUI));
@@ -244,7 +244,7 @@ namespace UI
             nextRect.anchorMax = new Vector2(1f, 0f);
             nextRect.pivot = new Vector2(1f, 0f);
             nextRect.sizeDelta = new Vector2(60f, 25f);
-            nextRect.anchoredPosition = new Vector2(-10f, 10f);
+            nextRect.anchoredPosition = new Vector2(-40f, -40f);
             var nextImg = nextGO.GetComponent<Image>();
             nextImg.color = Color.gray;
             var nextTextGO = new GameObject("Text", typeof(TextMeshProUGUI));
