@@ -109,7 +109,12 @@ namespace Skills.Fishing
                 foreach (var fish in def.AvailableFish)
                 {
                     if (fish != null)
-                        fishNames.Add(fish.DisplayName);
+                    {
+                        var cleanName = fish.DisplayName;
+                        if (cleanName.StartsWith("Raw "))
+                            cleanName = cleanName.Substring(4);
+                        fishNames.Add(cleanName);
+                    }
                 }
             }
 
