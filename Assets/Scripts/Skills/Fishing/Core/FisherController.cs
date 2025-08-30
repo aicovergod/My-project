@@ -50,14 +50,19 @@ namespace Skills.Fishing
 
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            bool pointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+
+            if (Input.GetMouseButtonDown(0) && !pointerOverUI)
             {
-                if (EventSystem.current == null || !EventSystem.current.IsPointerOverGameObject())
-                {
-                    var spot = GetSpotUnderCursor();
-                    if (spot != null)
-                        TryStartFishing(spot);
-                }
+                var spot = GetSpotUnderCursor();
+                if (spot != null)
+                    TryStartFishing(spot);
+            }
+            else if (Input.GetMouseButtonDown(1) && !pointerOverUI)
+            {
+                var spot = GetSpotUnderCursor();
+                if (spot != null)
+                    spot.Prospect(transform);
             }
 
             if (Input.GetKeyDown(KeyCode.Escape))

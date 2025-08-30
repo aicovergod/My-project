@@ -1,6 +1,9 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Util;
+using Skills.Mining;
 using Random = UnityEngine.Random;
 
 namespace Skills.Fishing
@@ -85,6 +88,38 @@ namespace Skills.Fishing
             if (col) col.enabled = true;
             if (sr && activeSprite) sr.sprite = activeSprite;
             OnSpotRespawned?.Invoke(this);
+        }
+
+        public void Prospect(Transform requester)
+        {
+            StartCoroutine(ProspectRoutine(requester));
+        }
+
+        private IEnumerator ProspectRoutine(Transform requester)
+        {
+            if (requester == null)
+                yield break;
+
+            FloatingText.Show("Checking...", requester.position);
+            yield return new WaitForSeconds(Ticker.TickDuration * 2f);
+
+            var fishNames = new List<string>();
+            if (def != null && def.AvailableFish != null)
+            {
+                foreach (var fish in def.AvailableFish)
+                {
+                    if (fish != null)
+                        fishNames.Add(fish.DisplayName);
+                }
+            }
+
+            string message;
+            if (fishNames.Count == 1)
+                message = $"This spot contains {fishNames[0]} here";
+            else
+                message = $"This spot contains {string.Join(" & ", fishNames)} here";
+
+            FloatingText.Show(message, requester.position);
         }
     }
 }
