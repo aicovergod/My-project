@@ -18,6 +18,7 @@ namespace Skills.Fishing
         [SerializeField] private SpriteRenderer sr;
         [SerializeField] private Sprite activeSprite;
         [SerializeField] private Sprite depletedSprite;
+        [SerializeField] private FishingSpotAlphaOscillator oscillator;
 
         public bool IsDepleted { get; private set; }
         public bool IsBusy { get; set; }
@@ -31,6 +32,8 @@ namespace Skills.Fishing
         {
             if (sr == null)
                 sr = GetComponent<SpriteRenderer>();
+            if (oscillator == null)
+                oscillator = GetComponent<FishingSpotAlphaOscillator>();
             if (def != null)
             {
                 if (activeSprite == null && sr != null) activeSprite = sr.sprite;
@@ -77,6 +80,16 @@ namespace Skills.Fishing
             var col = GetComponent<Collider2D>();
             if (col) col.enabled = false;
             if (sr && depletedSprite) sr.sprite = depletedSprite;
+            if (oscillator)
+            {
+                oscillator.enabled = false;
+                if (sr)
+                {
+                    var color = sr.color;
+                    color.a = 1f;
+                    sr.color = color;
+                }
+            }
             IsBusy = false;
             OnSpotDepleted?.Invoke(this, def != null ? def.RespawnSeconds : 0f);
         }
@@ -87,6 +100,7 @@ namespace Skills.Fishing
             var col = GetComponent<Collider2D>();
             if (col) col.enabled = true;
             if (sr && activeSprite) sr.sprite = activeSprite;
+            if (oscillator) oscillator.enabled = true;
             OnSpotRespawned?.Invoke(this);
         }
 
