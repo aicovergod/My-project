@@ -244,7 +244,7 @@ namespace UI
             nextRect.anchorMax = new Vector2(1f, 0f);
             nextRect.pivot = new Vector2(1f, 0f);
             nextRect.sizeDelta = new Vector2(60f, 25f);
-            nextRect.anchoredPosition = new Vector2(-40f, -40f);
+            nextRect.anchoredPosition = new Vector2(-40f, 40f);
             var nextImg = nextGO.GetComponent<Image>();
             nextImg.color = Color.gray;
             var nextTextGO = new GameObject("Text", typeof(TextMeshProUGUI));
