@@ -115,7 +115,7 @@ namespace Skills.Fishing
 
         private void AttemptCatch()
         {
-            var fish = GetBestFish(currentSpot.def);
+            var fish = GetRandomFish(currentSpot.def);
             if (fish == null)
             {
                 StopFishing();
@@ -161,16 +161,18 @@ namespace Skills.Fishing
             }
         }
 
-        private FishDefinition GetBestFish(FishingSpotDefinition spot)
+        private FishDefinition GetRandomFish(FishingSpotDefinition spot)
         {
             if (spot == null) return null;
-            FishDefinition best = null;
+            var eligible = new List<FishDefinition>();
             foreach (var f in spot.AvailableFish)
             {
                 if (f != null && level >= f.RequiredLevel)
-                    best = f;
+                    eligible.Add(f);
             }
-            return best;
+            if (eligible.Count == 0)
+                return null;
+            return eligible[UnityEngine.Random.Range(0, eligible.Count)];
         }
 
         private IEnumerator ShowXpGainDelayed(int gain, Transform anchor)
