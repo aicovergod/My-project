@@ -15,7 +15,6 @@ namespace Skills.Fishing
         [Header("Stats")]
         [SerializeField] private float swingSpeedMultiplier = 1f;
         [SerializeField] private int catchBonus = 0;
-        [SerializeField] private string baitItemId;
 
         [Header("Visuals")]
         [SerializeField] private Sprite icon;
@@ -25,7 +24,6 @@ namespace Skills.Fishing
         public int RequiredLevel => requiredLevel;
         public float SwingSpeedMultiplier => swingSpeedMultiplier;
         public int CatchBonus => catchBonus;
-        public string BaitItemId => baitItemId;
         public Sprite Icon => icon;
     }
 }

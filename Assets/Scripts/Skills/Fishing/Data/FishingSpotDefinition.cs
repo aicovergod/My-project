@@ -15,6 +15,9 @@ namespace Skills.Fishing
         [Header("Tools")]
         [SerializeField] private List<FishingToolDefinition> allowedTools = new();
 
+        [Header("Bait")]
+        [SerializeField] private string baitItemId;
+
         [Header("Depletion")]
         [SerializeField] private bool depletesAfterCatch = false;
         [SerializeField] private int depleteRollInverse = 8;
@@ -32,6 +35,7 @@ namespace Skills.Fishing
         public string Id => id;
         public List<FishDefinition> AvailableFish => availableFish;
         public List<FishingToolDefinition> AllowedTools => allowedTools;
+        public string BaitItemId => baitItemId;
         public bool DepletesAfterCatch => depletesAfterCatch;
         public int DepleteRollInverse => depleteRollInverse;
         public int RespawnSeconds => respawnSeconds;
