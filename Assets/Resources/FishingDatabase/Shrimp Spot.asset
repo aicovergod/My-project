@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29e2ea8386a6462d9b08c4a8243f38a1, type: 3}
   m_Name: Shrimp Spot
   m_EditorClassIdentifier:
-  id: ShrimpSpot
-  availableFish:
-  - {fileID: 11400000, guid: e68477b5b0bf4d9fa51f24a3e3c4d079, type: 2}
-  depletesAfterCatch: 0
-  depleteRollInverse: 8
+    id: ShrimpSpot
+    availableFish:
+    - {fileID: 11400000, guid: e68477b5b0bf4d9fa51f24a3e3c4d079, type: 2}
+    allowedTools:
+    - {fileID: 11400000, guid: dbe34942ecc14b96a2b60f7ce249549a, type: 2}
+    depletesAfterCatch: 0
+    depleteRollInverse: 8
   respawnSeconds: 5
   catchIntervalTicks: 4
   interactRange: 1.5
