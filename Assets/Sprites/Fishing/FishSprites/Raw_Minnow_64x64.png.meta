@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 5cc5da84d48e816409ad0b3fb65d205c
+guid: 7de7b8cce11ed9e4695ddde91f682a91
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 164287060676598656
-    second: Raw_Minnow_0
+      213: 6985776581743326016
+    second: Raw_Minnow_64x64_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Raw_Minnow_0
+      name: Raw_Minnow_64x64_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 0
-        width: 1019
-        height: 1019
+        x: 1
+        y: 19
+        width: 60
+        height: 25
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 08b52d4163aa74200800000000000000
-      internalID: 164287060676598656
+      spriteID: 043bd03f9c672f060800000000000000
+      internalID: 6985776581743326016
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Raw_Minnow_0: 164287060676598656
+      Raw_Minnow_64x64_0: 6985776581743326016
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

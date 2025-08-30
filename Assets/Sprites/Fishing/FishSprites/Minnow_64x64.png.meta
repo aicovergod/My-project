@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 65baa3fca98c5d7469668fe6d8829c58
+guid: 53ab2cf211d61a54b9ef2f53f7e0f2bf
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1842172672916735438
-    second: Anchovy_0
+      213: -2888464011332401654
+    second: Minnow_64x64_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Anchovy_0
+      name: Minnow_64x64_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 0
-        width: 1019
-        height: 1019
+        x: 1
+        y: 20
+        width: 60
+        height: 26
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ec542282946b09910800000000000000
-      internalID: 1842172672916735438
+      spriteID: a064802194d1ae7d0800000000000000
+      internalID: -2888464011332401654
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Anchovy_0: 1842172672916735438
+      Minnow_64x64_0: -2888464011332401654
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

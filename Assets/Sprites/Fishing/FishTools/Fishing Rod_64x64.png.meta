@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: c1cb24d9a2f2266468425f62f9301954
+guid: 488d448390d6c12468a438c958948170
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6365431279602286763
-    second: Minnow_0
+      213: 2340220945910076658
+    second: Fishing Rod_64x64_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Minnow_0
+      name: Fishing Rod_64x64_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1024
-        height: 1024
+        x: 9
+        y: 12
+        width: 43
+        height: 43
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ba0cad6f50e865850800000000000000
-      internalID: 6365431279602286763
+      spriteID: 2f416e02d822a7020800000000000000
+      internalID: 2340220945910076658
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Minnow_0: 6365431279602286763
+      Fishing Rod_64x64_0: 2340220945910076658
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

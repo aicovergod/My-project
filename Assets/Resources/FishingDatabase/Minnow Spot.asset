@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29e2ea8386a6462d9b08c4a8243f38a1, type: 3}
+  m_Name: Minnow Spot
+  m_EditorClassIdentifier: 
+  id: MinnowSpot
+  availableFish:
+  - {fileID: 11400000, guid: b5e844c087e94fc4f9ee6d52f22459ae, type: 2}
+  depletesAfterCatch: 0
+  depleteRollInverse: 8
+  respawnSeconds: 6
+  catchIntervalTicks: 4
+  interactRange: 1.5
+  cancelDistance: 3
