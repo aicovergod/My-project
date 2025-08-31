@@ -157,6 +157,15 @@ namespace Skills.Mining
 
                     if (!added)
                     {
+                        var petStorage = PetDropSystem.ActivePetObject != null
+                            ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
+                            : null;
+                        if (petStorage != null)
+                            added = petStorage.StoreItem(item, amount);
+                    }
+
+                    if (!added)
+                    {
                         FloatingText.Show("Your inventory is full", anchorPos);
                         StopMining();
                         return;
