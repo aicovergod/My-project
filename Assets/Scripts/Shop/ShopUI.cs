@@ -63,18 +63,22 @@ namespace ShopSystem
             if (sharedUIRoot == null)
                 sharedUIRoot = GameObject.Find("ShopUI");
 
+            if (sharedUIRoot != null && sharedUIRoot.GetComponent<Canvas>() == null)
+                sharedUIRoot = null;
+
             if (sharedUIRoot != null)
             {
                 uiRoot = sharedUIRoot;
-                CacheSlotReferences();
             }
             else
             {
                 CreateUI();
                 sharedUIRoot = uiRoot;
             }
+
             if (uiRoot != null)
             {
+                CacheSlotReferences();
                 var canvas = uiRoot.GetComponent<Canvas>();
                 if (canvas != null && canvas.renderMode == RenderMode.ScreenSpaceCamera && canvas.worldCamera == null)
                 {
