@@ -146,22 +146,28 @@ namespace Skills.Mining
                     int amount = PetDropSystem.ActivePet?.id == "Rock Golem" ? 2 : 1;
                     if (amount > 1)
                         BeastmasterXp.TryGrantFromPetAssist(ore.XpPerOre * (amount - 1));
-                    bool added = false;
-                    if (item != null && inventory != null)
-                        added = inventory.AddItem(item, amount);
+                    bool added = true;
+                    var petStorage = PetDropSystem.ActivePet?.id == "Rock Golem" && PetDropSystem.ActivePetObject != null
+                        ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
+                        : null;
 
                     Transform anchorTransform = floatingTextAnchor != null
                         ? floatingTextAnchor
                         : transform;
                     Vector3 anchorPos = anchorTransform.position;
 
-                    if (!added && PetDropSystem.ActivePet?.id == "Rock Golem")
+                    for (int i = 0; i < amount; i++)
                     {
-                        var petStorage = PetDropSystem.ActivePetObject != null
-                            ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
-                            : null;
-                        if (petStorage != null)
-                            added = petStorage.StoreItem(item, amount);
+                        bool stepAdded = false;
+                        if (item != null && inventory != null)
+                            stepAdded = inventory.AddItem(item, 1);
+                        if (!stepAdded && petStorage != null)
+                            stepAdded = petStorage.StoreItem(item, 1);
+                        if (!stepAdded)
+                        {
+                            added = false;
+                            break;
+                        }
                     }
 
                     if (!added)
@@ -255,7 +261,7 @@ namespace Skills.Mining
             if (inventory.CanAddItem(item, amount))
                 return true;
 
-            if (PetDropSystem.ActivePet?.id == "Rock Golem")
+            if (amount > 1)
             {
                 var petStorage = PetDropSystem.ActivePetObject != null
                     ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
@@ -263,8 +269,12 @@ namespace Skills.Mining
                 var petInv = petStorage != null
                     ? petStorage.GetComponent<Inventory.Inventory>()
                     : null;
-                if (petInv != null)
-                    return petInv.CanAddItem(item, amount);
+
+                if (inventory.CanAddItem(item, 1) && petInv != null && petInv.CanAddItem(item, 1))
+                    return true;
+
+                if (petInv != null && petInv.CanAddItem(item, amount))
+                    return true;
             }
             return false;
         }
