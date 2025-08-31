@@ -14,6 +14,8 @@ namespace Skills.Fishing
         [SerializeField] private float cancelDistance = 3f;
         [SerializeField] [Tooltip("Layers including fishing spots")] private LayerMask spotMask = ~0;
 
+        [SerializeField] private float prospectCooldown = 3f;
+
         [Header("References")]
         [SerializeField] private FishingSkill fishingSkill;
         [SerializeField] private FishingToolToUse toolSelector;
@@ -22,6 +24,7 @@ namespace Skills.Fishing
 
         private FishableSpot nearbySpot;
         private Camera cam;
+        private float nextInteractionTime = 0f;
 
         private void Awake()
         {
@@ -52,17 +55,23 @@ namespace Skills.Fishing
         {
             bool pointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
 
-            if (Input.GetMouseButtonDown(0) && !pointerOverUI)
+            if (Time.time >= nextInteractionTime)
             {
-                var spot = GetSpotUnderCursor();
-                if (spot != null)
-                    TryStartFishing(spot);
-            }
-            else if (Input.GetMouseButtonDown(1) && !pointerOverUI)
-            {
-                var spot = GetSpotUnderCursor();
-                if (spot != null)
-                    spot.Prospect(transform);
+                if (Input.GetMouseButtonDown(0) && !pointerOverUI)
+                {
+                    var spot = GetSpotUnderCursor();
+                    if (spot != null)
+                        TryStartFishing(spot);
+                }
+                else if (Input.GetMouseButtonDown(1) && !pointerOverUI)
+                {
+                    var spot = GetSpotUnderCursor();
+                    if (spot != null)
+                    {
+                        spot.Prospect(transform);
+                        nextInteractionTime = Time.time + prospectCooldown;
+                    }
+                }
             }
 
             if (Input.GetKeyDown(KeyCode.Escape))
