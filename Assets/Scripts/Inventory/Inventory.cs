@@ -88,7 +88,7 @@ namespace Inventory
         [Tooltip("Optional: custom font for the tooltip description. Uses LegacyRuntime if null.")]
         public Font tooltipDescriptionFont;
         [Tooltip("Color for the tooltip description text.")]
-        public Color tooltipDescriptionColor = Color.white;
+        public Color tooltipDescriptionColor = new Color(184/255f, 134/255f, 11/255f, 1f);
 
         [Header("Save")]
         [Tooltip("Save key used for persistence.")]
