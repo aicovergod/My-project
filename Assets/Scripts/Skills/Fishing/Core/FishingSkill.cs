@@ -249,7 +249,19 @@ namespace Skills.Fishing
                 PreloadFishItems();
             if (!fishItems.TryGetValue(fish.ItemId, out var item) || item == null)
                 return true;
-            return inventory.CanAddItem(item);
+
+            if (inventory.CanAddItem(item))
+                return true;
+
+            var petStorage = PetDropSystem.ActivePetObject != null
+                ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
+                : null;
+            var petInv = petStorage != null
+                ? petStorage.GetComponent<Inventory.Inventory>()
+                : null;
+            if (petInv != null)
+                return petInv.CanAddItem(item);
+            return false;
         }
 
         public void DebugSetLevel(int newLevel)
