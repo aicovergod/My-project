@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Inventory;
 using Skills;
+using BankSystem;
 
 namespace Pets
 {
@@ -173,8 +174,26 @@ namespace Pets
                         Debug.Log($"{sourceId} pet roll: {roll} (chance 1 in {effectiveOneInN})");
                     if (roll == 0)
                     {
-                        SpawnPetInternal(entry.pet, worldPosition);
                         pet = entry.pet;
+                        if (activePetGO == null)
+                        {
+                            SpawnPetInternal(entry.pet, worldPosition);
+                        }
+                        else
+                        {
+                            var player = GameObject.FindGameObjectWithTag("Player");
+                            var inventory = player != null ? player.GetComponent<Inventory.Inventory>() : null;
+                            if (inventory != null && inventory.CanAddItem(entry.pet.pickupItem))
+                            {
+                                inventory.AddItem(entry.pet.pickupItem);
+                                PetToastUI.Show("You feel something crawl inside your backpack", entry.pet.messageColor);
+                            }
+                            else
+                            {
+                                BankUI.Instance?.AddItemToBank(entry.pet.pickupItem);
+                                PetToastUI.Show("You have a feeling something has snuck into your bank", entry.pet.messageColor);
+                            }
+                        }
                         return true;
                     }
                 }
