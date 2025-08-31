@@ -74,13 +74,28 @@ namespace Pets
             inventory.size = GetSlotsForLevel(experience != null ? experience.Level : 1);
             inventory.saveKey = $"PetInv_{definition?.id}";
             inventory.OnInventoryChanged += inventory.Save;
-            var inventories = FindObjectsOfType<Inventory.Inventory>();
-            foreach (var inv in inventories)
+
+            // Match the look and feel of the player's inventory so tooltips use the same fonts
+            var playerInv = GameObject.FindGameObjectWithTag("Player")?.GetComponent<Inventory.Inventory>();
+            if (playerInv != null && playerInv != inventory)
             {
-                if (inv.gameObject != gameObject)
+                inventory.windowColor = playerInv.windowColor;
+                inventory.tooltipNameFont = playerInv.tooltipNameFont;
+                inventory.tooltipDescriptionFont = playerInv.tooltipDescriptionFont;
+            }
+            else
+            {
+                // Fallback: copy styling from any other existing inventory
+                var inventories = FindObjectsOfType<Inventory.Inventory>();
+                foreach (var inv in inventories)
                 {
-                    inventory.windowColor = inv.windowColor;
-                    break;
+                    if (inv.gameObject != gameObject)
+                    {
+                        inventory.windowColor = inv.windowColor;
+                        inventory.tooltipNameFont = inv.tooltipNameFont;
+                        inventory.tooltipDescriptionFont = inv.tooltipDescriptionFont;
+                        break;
+                    }
                 }
             }
         }
