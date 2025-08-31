@@ -168,6 +168,8 @@ namespace Pets
                     }
 
                     int roll = rng != null ? rng.Next(effectiveOneInN) : UnityEngine.Random.Range(0, effectiveOneInN);
+                    if (string.Equals(sourceId, "woodcutting", StringComparison.OrdinalIgnoreCase))
+                        Debug.Log($"Woodcutting pet roll: {roll} (chance 1 in {effectiveOneInN})");
                     if (roll == 0)
                     {
                         SpawnPetInternal(entry.pet, worldPosition);
