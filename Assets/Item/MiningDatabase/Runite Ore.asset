@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Runite ore
   levelRequirement: 85
   xpPerOre: 125
+  petDropChance: 2500

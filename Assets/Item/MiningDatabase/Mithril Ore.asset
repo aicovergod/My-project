@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Mithril ore
   levelRequirement: 55
   xpPerOre: 80
+  petDropChance: 4500

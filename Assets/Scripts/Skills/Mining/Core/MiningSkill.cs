@@ -4,6 +4,7 @@ using UnityEngine;
 using Inventory;
 using Util;
 using Skills.Mining;
+using Skills;
 using Pets;
 using Quests;
 using Core.Save;
@@ -30,6 +31,7 @@ namespace Skills.Mining
         private PickaxeDefinition currentPickaxe;
         private int swingProgress;
 
+        private SkillManager skills;
         private Dictionary<string, ItemData> oreItems;
         private int questOreCount;
 
@@ -54,6 +56,7 @@ namespace Skills.Mining
             if (inventory == null)
                 inventory = GetComponent<Inventory.Inventory>();
             save = saveProvider as IMiningSave ?? new SaveManagerMiningSave();
+            skills = GetComponent<SkillManager>();
             PreloadOreItems();
         }
 
@@ -163,6 +166,9 @@ namespace Skills.Mining
                     FloatingText.Show($"+{amount} {ore.DisplayName}", anchorPos);
                     StartCoroutine(ShowXpGainDelayed(ore.XpPerOre * amount, anchorTransform));
                     OnOreGained?.Invoke(ore.Id, amount);
+
+                    if (ore.PetDropChance > 0)
+                        PetDropSystem.TryRollPet("mining", currentRock.transform.position, skills, ore.PetDropChance, out _);
 
                     if (QuestManager.Instance != null && QuestManager.Instance.IsQuestActive("ToolsOfSurvival"))
                     {
