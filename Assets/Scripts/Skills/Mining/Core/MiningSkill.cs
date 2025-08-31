@@ -155,7 +155,7 @@ namespace Skills.Mining
                         : transform;
                     Vector3 anchorPos = anchorTransform.position;
 
-                    if (!added)
+                    if (!added && PetDropSystem.ActivePet?.id == "Rock Golem")
                     {
                         var petStorage = PetDropSystem.ActivePetObject != null
                             ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
@@ -255,14 +255,17 @@ namespace Skills.Mining
             if (inventory.CanAddItem(item, amount))
                 return true;
 
-            var petStorage = PetDropSystem.ActivePetObject != null
-                ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
-                : null;
-            var petInv = petStorage != null
-                ? petStorage.GetComponent<Inventory.Inventory>()
-                : null;
-            if (petInv != null)
-                return petInv.CanAddItem(item, amount);
+            if (PetDropSystem.ActivePet?.id == "Rock Golem")
+            {
+                var petStorage = PetDropSystem.ActivePetObject != null
+                    ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
+                    : null;
+                var petInv = petStorage != null
+                    ? petStorage.GetComponent<Inventory.Inventory>()
+                    : null;
+                if (petInv != null)
+                    return petInv.CanAddItem(item, amount);
+            }
             return false;
         }
 
