@@ -380,7 +380,7 @@ namespace ShopSystem
             if (entry.item == null) return;
 
             string currencyName = currentShop.currency != null ? currentShop.currency.itemName : "Coins";
-            tooltipText.text = $"\"{entry.item.itemName}\" costs {entry.price} {currencyName}";
+            tooltipText.text = $"{entry.item.itemName} costs {entry.price} {currencyName}";
             var tooltipRect = tooltipText.GetComponent<RectTransform>();
             LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
         }
