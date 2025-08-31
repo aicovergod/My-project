@@ -18,6 +18,7 @@ namespace Pets
         public static PetDefinition ActivePet => activePetDef;
         public static GameObject ActivePetObject => activePetGO;
         public static PetCombatController ActivePetCombat => activePetGO != null ? activePetGO.GetComponent<PetCombatController>() : null;
+        public static bool DebugPetRolls { get; set; }
         public static bool GuardModeEnabled { get; set; }
         private static bool initialized;
         private static bool quittingRegistered;
@@ -168,8 +169,8 @@ namespace Pets
                     }
 
                     int roll = rng != null ? rng.Next(effectiveOneInN) : UnityEngine.Random.Range(0, effectiveOneInN);
-                    if (string.Equals(sourceId, "woodcutting", StringComparison.OrdinalIgnoreCase))
-                        Debug.Log($"Woodcutting pet roll: {roll} (chance 1 in {effectiveOneInN})");
+                    if (DebugPetRolls)
+                        Debug.Log($"{sourceId} pet roll: {roll} (chance 1 in {effectiveOneInN})");
                     if (roll == 0)
                     {
                         SpawnPetInternal(entry.pet, worldPosition);

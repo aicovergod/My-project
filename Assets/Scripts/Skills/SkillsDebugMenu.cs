@@ -4,6 +4,7 @@ using Skills.Mining;
 using Skills.Woodcutting;
 using Skills.Fishing;
 using Beastmaster;
+using Pets;
 
 namespace Skills
 {
@@ -187,6 +188,11 @@ namespace Skills
             if (GUILayout.Button("Reset Merge Timer"))
             {
                 PetMergeController.Instance?.ResetMergeTimer();
+            }
+
+            if (GUILayout.Button(PetDropSystem.DebugPetRolls ? "Disable Pet Roll Debug" : "Enable Pet Roll Debug"))
+            {
+                PetDropSystem.DebugPetRolls = !PetDropSystem.DebugPetRolls;
             }
 
             GUILayout.EndScrollView();
