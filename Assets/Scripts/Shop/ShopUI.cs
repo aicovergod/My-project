@@ -74,7 +74,14 @@ namespace ShopSystem
                 sharedUIRoot = uiRoot;
             }
             if (uiRoot != null)
+            {
+                var canvas = uiRoot.GetComponent<Canvas>();
+                if (canvas != null && canvas.renderMode == RenderMode.ScreenSpaceCamera && canvas.worldCamera == null)
+                {
+                    canvas.worldCamera = Camera.main;
+                }
                 uiRoot.SetActive(false);
+            }
             UIManager.Instance.RegisterWindow(this);
         }
 
