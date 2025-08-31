@@ -110,7 +110,7 @@ namespace BankSystem
             windowRect.anchorMin = new Vector2(0.5f, 0.5f);
             windowRect.anchorMax = new Vector2(0.5f, 0.5f);
             windowRect.pivot = new Vector2(0.5f, 0.5f);
-            windowRect.anchoredPosition = Vector2.zero;
+            windowRect.anchoredPosition = new Vector2(-50f, 0f);
             float width = Columns * slotSize.x + (Columns - 1) * slotSpacing.x + windowPadding.x * 2f + 20f;
             float visibleRows = 8f;
             float height = visibleRows * slotSize.y + (visibleRows - 1f) * slotSpacing.y + windowPadding.y * 2f + headerHeight;
