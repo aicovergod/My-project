@@ -15,9 +15,12 @@ MonoBehaviour:
   id: MinnowSpot
   availableFish:
   - {fileID: 11400000, guid: b5e844c087e94fc4f9ee6d52f22459ae, type: 2}
+  allowedTools:
+  - {fileID: 11400000, guid: c2180687f9967b347bdd2e6ac3153c2b, type: 2}
+  baitItemId: Worms
   depletesAfterCatch: 0
   depleteRollInverse: 8
   respawnSeconds: 6
-  catchIntervalTicks: 4
+  catchIntervalTicks: 7
   interactRange: 1.5
   cancelDistance: 3
