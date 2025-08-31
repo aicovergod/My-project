@@ -122,28 +122,14 @@ namespace Skills.Fishing
             if (dist > range)
                 return;
 
-            var tool = toolSelector.GetBestTool();
+            var tool = toolSelector.GetBestTool(spot.def != null ? spot.def.AllowedTools : null);
             if (tool == null)
             {
-                FloatingText.Show("You need a fishing tool", transform.position);
-                return;
-            }
-            if (spot.def != null && spot.def.AllowedTools != null && spot.def.AllowedTools.Count > 0)
-            {
-                bool allowed = false;
-                foreach (var allowedTool in spot.def.AllowedTools)
-                {
-                    if (allowedTool != null && allowedTool.Id == tool.Id)
-                    {
-                        allowed = true;
-                        break;
-                    }
-                }
-                if (!allowed)
-                {
+                if (spot.def != null && spot.def.AllowedTools != null && spot.def.AllowedTools.Count > 0)
                     FloatingText.Show("You can't use that tool here", transform.position);
-                    return;
-                }
+                else
+                    FloatingText.Show("You need a fishing tool", transform.position);
+                return;
             }
             if (fishingSkill.Level < tool.RequiredLevel)
             {

@@ -25,19 +25,26 @@ namespace Skills.Fishing
                 skill = GetComponent<FishingSkill>();
         }
 
-        public FishingToolDefinition GetBestTool()
+        public FishingToolDefinition GetBestTool(IEnumerable<FishingToolDefinition> allowed = null)
         {
-            Refresh();
+            Refresh(allowed);
             return Current;
         }
 
-        public void Refresh()
+        public void Refresh(IEnumerable<FishingToolDefinition> allowed = null)
         {
             Current = null;
             if (inventory == null || skill == null)
                 return;
 
-            foreach (var tool in allTools.OrderByDescending(t => t.CatchBonus))
+            IEnumerable<FishingToolDefinition> tools = allTools;
+            if (allowed != null)
+            {
+                var allowedSet = new HashSet<FishingToolDefinition>(allowed.Where(t => t != null));
+                tools = tools.Where(t => allowedSet.Contains(t));
+            }
+
+            foreach (var tool in tools.OrderByDescending(t => t.CatchBonus))
             {
                 var item = Resources.Load<ItemData>("Item/" + tool.Id);
                 if (item == null)
