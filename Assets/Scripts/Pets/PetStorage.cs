@@ -2,6 +2,10 @@ using UnityEngine;
 using Inventory;
 using System.Collections;
 using System;
+using System.Collections.Generic;
+using Skills.Fishing;
+using Skills.Woodcutting;
+using Skills.Mining;
 
 namespace Pets
 {
@@ -129,19 +133,82 @@ namespace Pets
             return inventory.AddItem(item, amount);
         }
 
+        private static HashSet<string> fishItemIds;
+        private static HashSet<string> logItemIds;
+        private static HashSet<string> oreItemIds;
+
+        private static void EnsureFishItemIds()
+        {
+            if (fishItemIds != null)
+                return;
+            fishItemIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var defs = Resources.LoadAll<FishDefinition>("FishingDatabase");
+            foreach (var def in defs)
+            {
+                if (def != null && !string.IsNullOrEmpty(def.ItemId))
+                    fishItemIds.Add(def.ItemId);
+            }
+        }
+
+        private static void EnsureLogItemIds()
+        {
+            if (logItemIds != null)
+                return;
+            logItemIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var defs = Resources.LoadAll<TreeDefinition>("WoodcuttingDatabase");
+            foreach (var def in defs)
+            {
+                if (def != null && !string.IsNullOrEmpty(def.LogItemId))
+                    logItemIds.Add(def.LogItemId);
+            }
+            if (logItemIds.Count == 0)
+            {
+                var items = Resources.LoadAll<ItemData>("Item");
+                foreach (var i in items)
+                {
+                    if (i != null && i.itemName.IndexOf("Log", StringComparison.OrdinalIgnoreCase) >= 0)
+                        logItemIds.Add(i.id);
+                }
+            }
+        }
+
+        private static void EnsureOreItemIds()
+        {
+            if (oreItemIds != null)
+                return;
+            oreItemIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var defs = Resources.LoadAll<OreDefinition>("MiningDatabase");
+            foreach (var def in defs)
+            {
+                if (def != null && !string.IsNullOrEmpty(def.Id))
+                    oreItemIds.Add(def.Id);
+            }
+            if (oreItemIds.Count == 0)
+            {
+                var items = Resources.LoadAll<ItemData>("Item");
+                foreach (var i in items)
+                {
+                    if (i != null && i.itemName.IndexOf("Ore", StringComparison.OrdinalIgnoreCase) >= 0)
+                        oreItemIds.Add(i.id);
+                }
+            }
+        }
+
         private bool CanStore(ItemData item)
         {
             if (definition == null || item == null)
                 return false;
-            string name = item.itemName ?? string.Empty;
             switch (definition.id)
             {
                 case "Beaver":
-                    return name.IndexOf("Log", StringComparison.OrdinalIgnoreCase) >= 0;
+                    EnsureLogItemIds();
+                    return logItemIds.Contains(item.id);
                 case "Rock Golem":
-                    return name.IndexOf("Ore", StringComparison.OrdinalIgnoreCase) >= 0;
+                    EnsureOreItemIds();
+                    return oreItemIds.Contains(item.id);
                 case "Heron":
-                    return name.StartsWith("Raw ", StringComparison.OrdinalIgnoreCase);
+                    EnsureFishItemIds();
+                    return fishItemIds.Contains(item.id);
                 default:
                     return false;
             }
