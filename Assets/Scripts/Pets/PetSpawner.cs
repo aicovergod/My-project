@@ -24,8 +24,13 @@ namespace Pets
             go.transform.position = position;
 
             var sr = go.AddComponent<SpriteRenderer>();
-            go.AddComponent<SpriteDepth>();
             sr.sortingLayerName = "Characters";
+            if (player != null)
+            {
+                var playerSr = player.GetComponent<SpriteRenderer>();
+                if (playerSr != null)
+                    sr.sortingLayerID = playerSr.sortingLayerID;
+            }
             sr.sprite = def.sprite;
             if (sr.sprite == null)
             {

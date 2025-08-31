@@ -35,7 +35,7 @@ namespace Pets
         private SpriteDepth spriteDepth;
         private PetSpriteAnimator spriteAnimator;
         private PlayerMover playerMover;
-        private SpriteDepth playerDepth;
+        private SpriteRenderer playerSprite;
         private Vector3 currentVelocity;
         private float idleTimer;
         private Vector3 wanderTarget;
@@ -51,11 +51,7 @@ namespace Pets
                 spriteDepth.offset = depthOffset;
             spriteAnimator = GetComponent<PetSpriteAnimator>();
             if (player != null)
-            {
-                lastPlayerPos = player.position;
-                playerMover = player.GetComponent<PlayerMover>();
-                playerDepth = player.GetComponent<SpriteDepth>();
-            }
+                SetPlayer(player);
             ChooseOffset(Vector2.right);
             offset = targetOffset;
         }
@@ -63,11 +59,15 @@ namespace Pets
         public void SetPlayer(Transform newPlayer)
         {
             player = newPlayer;
+            playerMover = null;
+            playerSprite = null;
             if (player != null)
             {
                 lastPlayerPos = player.position;
                 playerMover = player.GetComponent<PlayerMover>();
-                playerDepth = player.GetComponent<SpriteDepth>();
+                playerSprite = player.GetComponent<SpriteRenderer>();
+                if (playerSprite != null && sprite != null)
+                    sprite.sortingLayerID = playerSprite.sortingLayerID;
             }
         }
 
@@ -172,19 +172,19 @@ namespace Pets
 
         private void LateUpdate()
         {
-            if (spriteDepth != null || sprite == null)
+            if (sprite == null)
                 return;
 
             int baseOrder = Mathf.RoundToInt(-transform.position.y * 100f) + depthOffset;
             if (player != null)
             {
-                int playerOrder = Mathf.RoundToInt(-player.position.y * 100f) + (playerDepth != null ? playerDepth.offset : 0);
-                if (playerMover != null)
+                int playerOrder = Mathf.RoundToInt(-player.position.y * 100f);
+                if (playerMover != null && playerMover.FacingDir == 3)
                 {
-                    if (playerMover.FacingDir == 3 && transform.position.y < player.position.y)
+                    if (transform.position.y < player.position.y)
                         baseOrder = playerOrder - 1;
-                    else if (playerMover.FacingDir == 0 && transform.position.y > player.position.y)
-                        baseOrder = playerOrder - 1;
+                    else if (transform.position.y > player.position.y)
+                        baseOrder = playerOrder + 1;
                 }
             }
             sprite.sortingOrder = baseOrder;
