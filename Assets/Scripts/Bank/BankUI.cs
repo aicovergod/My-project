@@ -663,6 +663,17 @@ namespace BankSystem
             return true;
         }
 
+        public bool AddItemToBank(ItemData item, int count = 1)
+        {
+            int added = AddItem(item, count);
+            if (added > 0)
+            {
+                SaveState();
+                return true;
+            }
+            return false;
+        }
+
         private void SaveState()
         {
             if (playerInventory != null)
