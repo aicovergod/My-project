@@ -182,9 +182,9 @@ namespace Pets
                 if (playerMover != null && playerMover.FacingDir == 3)
                 {
                     if (transform.position.y < player.position.y)
-                        baseOrder = playerOrder - 1;
-                    else if (transform.position.y > player.position.y)
                         baseOrder = playerOrder + 1;
+                    else if (transform.position.y > player.position.y)
+                        baseOrder = playerOrder - 1;
                 }
             }
             sprite.sortingOrder = baseOrder;
