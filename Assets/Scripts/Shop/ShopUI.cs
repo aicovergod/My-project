@@ -66,6 +66,7 @@ namespace ShopSystem
             if (sharedUIRoot != null)
             {
                 uiRoot = sharedUIRoot;
+                CacheSlotReferences();
             }
             else
             {
@@ -302,9 +303,38 @@ namespace ShopSystem
             tooltipRect.offsetMax = new Vector2(-windowPadding.x, windowPadding.y + tooltipHeight);
         }
 
+        private void CacheSlotReferences()
+        {
+            if (uiRoot == null)
+                return;
+
+            var slots = uiRoot.GetComponentsInChildren<ShopSlot>(true);
+            slotImages = new Image[slots.Length];
+            slotPriceTexts = new Text[slots.Length];
+
+            for (int i = 0; i < slots.Length; i++)
+            {
+                slotImages[i] = slots[i].GetComponent<Image>();
+                slotPriceTexts[i] = slots[i].GetComponentInChildren<Text>();
+                slots[i].shopUI = this;
+                slots[i].index = i;
+            }
+
+            var texts = uiRoot.GetComponentsInChildren<Text>(true);
+            foreach (var t in texts)
+            {
+                if (t.gameObject.name == "Tooltip")
+                    tooltipText = t;
+                else if (t.gameObject.name == "Name")
+                    shopNameText = t;
+            }
+        }
+
         public void Refresh()
         {
             HideTooltip();
+            if (slotImages == null || slotPriceTexts == null)
+                CacheSlotReferences();
             if (shopNameText != null)
                 shopNameText.text = currentShop != null ? currentShop.shopName : string.Empty;
             for (int i = 0; i < slotImages.Length; i++)
