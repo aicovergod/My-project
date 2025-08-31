@@ -104,7 +104,7 @@ namespace Pets
         /// </summary>
         public static bool TryRollPet(string sourceId, Vector3 worldPosition, int beastmasterLevel, out PetDefinition pet)
         {
-            return TryRollPet(sourceId, worldPosition, beastmasterLevel, null, out pet);
+            return TryRollPet(sourceId, worldPosition, beastmasterLevel, null, null, out pet);
         }
 
         /// <summary>
@@ -113,13 +113,35 @@ namespace Pets
         public static bool TryRollPet(string sourceId, Vector3 worldPosition, SkillManager skills, out PetDefinition pet)
         {
             int level = skills != null ? skills.GetLevel(SkillType.Beastmaster) : 1;
-            return TryRollPet(sourceId, worldPosition, level, null, out pet);
+            return TryRollPet(sourceId, worldPosition, level, null, null, out pet);
+        }
+
+        /// <summary>
+        /// Attempt to roll for a pet drop using the player's Beastmaster level and an override drop rate.
+        /// </summary>
+        public static bool TryRollPet(string sourceId, Vector3 worldPosition, int beastmasterLevel, int oneInNOverride, out PetDefinition pet)
+        {
+            return TryRollPet(sourceId, worldPosition, beastmasterLevel, oneInNOverride, null, out pet);
+        }
+
+        /// <summary>
+        /// Attempt to roll for a pet drop using the player's skills and an override drop rate.
+        /// </summary>
+        public static bool TryRollPet(string sourceId, Vector3 worldPosition, SkillManager skills, int oneInNOverride, out PetDefinition pet)
+        {
+            int level = skills != null ? skills.GetLevel(SkillType.Beastmaster) : 1;
+            return TryRollPet(sourceId, worldPosition, level, oneInNOverride, null, out pet);
         }
 
         /// <summary>
         /// Attempt to roll for a pet drop using a provided RNG and Beastmaster level.
         /// </summary>
         public static bool TryRollPet(string sourceId, Vector3 worldPosition, int beastmasterLevel, System.Random rng, out PetDefinition pet)
+        {
+            return TryRollPet(sourceId, worldPosition, beastmasterLevel, null, rng, out pet);
+        }
+
+        private static bool TryRollPet(string sourceId, Vector3 worldPosition, int beastmasterLevel, int? oneInNOverride, System.Random rng, out PetDefinition pet)
         {
             Initialize();
             pet = null;
@@ -136,12 +158,13 @@ namespace Pets
                     if (beastmasterLevel < entry.requiredBeastmasterLevel)
                         continue;
 
-                    int effectiveOneInN = entry.oneInN;
+                    int baseOneInN = oneInNOverride.HasValue && oneInNOverride.Value > 0 ? oneInNOverride.Value : entry.oneInN;
+                    int effectiveOneInN = baseOneInN;
                     int above = beastmasterLevel - entry.requiredBeastmasterLevel;
                     if (above > 0 && entry.bonusDropMultiplier > 0f)
                     {
                         float mult = 1f + above * entry.bonusDropMultiplier;
-                        effectiveOneInN = Mathf.Max(1, Mathf.FloorToInt(entry.oneInN / mult));
+                        effectiveOneInN = Mathf.Max(1, Mathf.FloorToInt(baseOneInN / mult));
                     }
 
                     int roll = rng != null ? rng.Next(effectiveOneInN) : UnityEngine.Random.Range(0, effectiveOneInN);

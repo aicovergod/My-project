@@ -4,6 +4,7 @@ using UnityEngine;
 using Inventory;
 using Util;
 using Skills.Mining; // reuse XP table
+using Skills;
 using Pets;
 using Quests;
 using Core.Save;
@@ -31,6 +32,8 @@ namespace Skills.Woodcutting
         private int chopProgress;
         private int currentIntervalTicks;
 
+        private SkillManager skills;
+
         private Dictionary<string, ItemData> logItems;
         private int questLogCount;
 
@@ -52,6 +55,7 @@ namespace Skills.Woodcutting
         {
             if (inventory == null)
                 inventory = GetComponent<Inventory.Inventory>();
+            skills = GetComponent<SkillManager>();
             save = saveProvider as IWoodcuttingSave ?? new SaveManagerWoodcuttingSave();
             PreloadLogItems();
         }
@@ -157,6 +161,9 @@ namespace Skills.Woodcutting
                 FloatingText.Show($"+{amount} {logName}", anchorPos);
                 StartCoroutine(ShowXpGainDelayed(currentTree.def.XpPerLog * amount, anchorTransform));
                 OnLogGained?.Invoke(logId, amount);
+
+                if (currentTree.def.PetDropChance > 0)
+                    PetDropSystem.TryRollPet("woodcutting", currentTree.transform.position, skills, currentTree.def.PetDropChance, out _);
 
                 if (QuestManager.Instance != null && QuestManager.Instance.IsQuestActive("ToolsOfSurvival"))
                 {
