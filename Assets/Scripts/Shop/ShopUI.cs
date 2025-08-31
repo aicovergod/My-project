@@ -381,22 +381,8 @@ namespace ShopSystem
 
             string currencyName = currentShop.currency != null ? currentShop.currency.itemName : "Coins";
             tooltipText.text = $"\"{entry.item.itemName}\" costs {entry.price} {currencyName}";
-
             var tooltipRect = tooltipText.GetComponent<RectTransform>();
             LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
-
-            RectTransform slotRect = (slotImages != null && index < slotImages.Length) ? slotImages[index].rectTransform : null;
-            if (slotRect != null)
-            {
-                Vector3 pos = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
-                Vector3[] corners = new Vector3[4];
-                tooltipRect.GetWorldCorners(corners);
-                float width = corners[2].x - corners[0].x;
-                float height = corners[2].y - corners[0].y;
-                pos.x = Mathf.Min(pos.x, Screen.width - width);
-                pos.y = Mathf.Max(pos.y, height);
-                tooltipRect.position = pos;
-            }
         }
 
         public void HideTooltip()
@@ -404,7 +390,6 @@ namespace ShopSystem
             if (tooltipText != null)
             {
                 tooltipText.text = string.Empty;
-                tooltipText.rectTransform.position = Vector3.zero;
             }
         }
     }
