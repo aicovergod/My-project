@@ -145,10 +145,14 @@ namespace Skills.Fishing
 
             if (Random.value <= chance)
             {
+                int amount = PetDropSystem.ActivePet?.id == "Heron" ? 2 : 1;
+                if (amount > 1)
+                    BeastmasterXp.TryGrantFromPetAssist(fish.Xp * (amount - 1));
+
                 fishItems.TryGetValue(fish.ItemId, out var item);
                 bool added = false;
                 if (item != null && inventory != null)
-                    added = inventory.AddItem(item);
+                    added = inventory.AddItem(item, amount);
 
                 Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
                 if (!added)
@@ -157,7 +161,7 @@ namespace Skills.Fishing
                         ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
                         : null;
                     if (petStorage != null)
-                        added = petStorage.StoreItem(item, 1);
+                        added = petStorage.StoreItem(item, amount);
                 }
 
                 if (!added)
@@ -167,10 +171,10 @@ namespace Skills.Fishing
                     return;
                 }
 
-                xp += fish.Xp;
-                FloatingText.Show($"+1 {fish.DisplayName}", anchor.position);
-                StartCoroutine(ShowXpGainDelayed(fish.Xp, anchor));
-                OnFishCaught?.Invoke(fish.Id, 1);
+                xp += fish.Xp * amount;
+                FloatingText.Show($"+{amount} {fish.DisplayName}", anchor.position);
+                StartCoroutine(ShowXpGainDelayed(fish.Xp * amount, anchor));
+                OnFishCaught?.Invoke(fish.Id, amount);
 
                 int newLevel = xpTable.GetLevel(xp);
                 if (newLevel > level)
@@ -250,7 +254,8 @@ namespace Skills.Fishing
             if (!fishItems.TryGetValue(fish.ItemId, out var item) || item == null)
                 return true;
 
-            if (inventory.CanAddItem(item))
+            int amount = PetDropSystem.ActivePet?.id == "Heron" ? 2 : 1;
+            if (inventory.CanAddItem(item, amount))
                 return true;
 
             var petStorage = PetDropSystem.ActivePetObject != null
@@ -260,7 +265,7 @@ namespace Skills.Fishing
                 ? petStorage.GetComponent<Inventory.Inventory>()
                 : null;
             if (petInv != null)
-                return petInv.CanAddItem(item);
+                return petInv.CanAddItem(item, amount);
             return false;
         }
 
