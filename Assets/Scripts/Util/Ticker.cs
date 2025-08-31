@@ -105,5 +105,29 @@ namespace Util
         {
             paused = false;
         }
+
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (hasFocus)
+            {
+                Resume();
+            }
+            else
+            {
+                Pause();
+            }
+        }
+
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            if (pauseStatus)
+            {
+                Pause();
+            }
+            else
+            {
+                Resume();
+            }
+        }
     }
 }
