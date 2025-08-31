@@ -179,13 +179,10 @@ namespace Pets
             if (player != null)
             {
                 int playerOrder = Mathf.RoundToInt(-player.position.y * 100f);
-                if (playerMover != null && playerMover.FacingDir == 3)
-                {
-                    if (transform.position.y > player.position.y)
-                        baseOrder = playerOrder + 1;
-                    else if (transform.position.y < player.position.y)
-                        baseOrder = playerOrder - 1;
-                }
+                if (transform.position.y > player.position.y)
+                    baseOrder = playerOrder + 1;
+                else if (transform.position.y < player.position.y)
+                    baseOrder = playerOrder - 1;
             }
             sprite.sortingOrder = baseOrder;
         }
