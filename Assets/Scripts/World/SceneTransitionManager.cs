@@ -97,6 +97,8 @@ namespace World
             foreach (var obj in _persistentObjects)
                 obj.OnAfterSceneLoad(scene);
 
+            EnsureSingleAudioListener(scene);
+
             SceneManager.sceneLoaded -= OnSceneLoaded;
             NextSpawnPoint = null;
 
@@ -116,6 +118,46 @@ namespace World
         {
             IsTransitioning = false;
             TransitionCompleted?.Invoke();
+        }
+
+        /// <summary>
+        /// Ensures that only one <see cref="AudioListener"/> remains enabled after a
+        /// scene load.  If a persistent listener exists in the DontDestroyOnLoad
+        /// scene, it is preferred; otherwise the listener from the newly loaded
+        /// scene is used.
+        /// </summary>
+        private void EnsureSingleAudioListener(Scene loadedScene)
+        {
+            var listeners = FindObjectsOfType<AudioListener>();
+
+            // Prefer an AudioListener that lives in the DontDestroyOnLoad scene so
+            // that persistent objects like the player retain their listener.
+            AudioListener listenerToKeep = null;
+            foreach (var listener in listeners)
+            {
+                if (listener != null && listener.gameObject.scene.name == "DontDestroyOnLoad")
+                {
+                    listenerToKeep = listener;
+                    break;
+                }
+            }
+
+            // If none found, keep a listener from the newly loaded scene.
+            if (listenerToKeep == null)
+            {
+                foreach (var listener in listeners)
+                {
+                    if (listener != null && listener.gameObject.scene == loadedScene)
+                    {
+                        listenerToKeep = listener;
+                        break;
+                    }
+                }
+            }
+
+            // Disable any additional listeners to avoid duplicates.
+            foreach (var listener in listeners)
+                listener.enabled = listener == listenerToKeep;
         }
     }
 }
