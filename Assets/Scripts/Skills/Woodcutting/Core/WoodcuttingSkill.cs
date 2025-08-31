@@ -250,7 +250,20 @@ namespace Skills.Woodcutting
                 PreloadLogItems();
             if (!logItems.TryGetValue(tree.LogItemId, out var item) || item == null)
                 return true;
-            return inventory.CanAddItem(item);
+
+            int amount = PetDropSystem.ActivePet?.id == "Beaver" ? 2 : 1;
+            if (inventory.CanAddItem(item, amount))
+                return true;
+
+            var petStorage = PetDropSystem.ActivePetObject != null
+                ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
+                : null;
+            var petInv = petStorage != null
+                ? petStorage.GetComponent<Inventory.Inventory>()
+                : null;
+            if (petInv != null)
+                return petInv.CanAddItem(item, amount);
+            return false;
         }
 
         /// <summary>
