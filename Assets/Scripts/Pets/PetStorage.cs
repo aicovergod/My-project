@@ -113,6 +113,19 @@ namespace Pets
             return 4;
         }
 
+        /// <summary>
+        /// Attempts to add items to the pet's storage inventory.
+        /// </summary>
+        /// <param name="item">Item definition to store.</param>
+        /// <param name="amount">Quantity of the item.</param>
+        /// <returns>True if the items were stored successfully.</returns>
+        public bool StoreItem(ItemData item, int amount = 1)
+        {
+            if (inventory == null || item == null)
+                return false;
+            return inventory.AddItem(item, amount);
+        }
+
         public void Open()
         {
             if (inventory != null)

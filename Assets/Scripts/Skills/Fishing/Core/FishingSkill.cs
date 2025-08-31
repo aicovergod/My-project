@@ -5,6 +5,7 @@ using Inventory;
 using Util;
 using Skills.Mining; // reuse XP table
 using Core.Save;
+using Pets;
 
 namespace Skills.Fishing
 {
@@ -150,6 +151,15 @@ namespace Skills.Fishing
                     added = inventory.AddItem(item);
 
                 Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
+                if (!added)
+                {
+                    var petStorage = PetDropSystem.ActivePetObject != null
+                        ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
+                        : null;
+                    if (petStorage != null)
+                        added = petStorage.StoreItem(item, 1);
+                }
+
                 if (!added)
                 {
                     FloatingText.Show("Your inventory is full", anchor.position);
