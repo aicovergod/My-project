@@ -839,9 +839,19 @@ namespace Inventory
                 string currencyName = currentShop.currency != null ? currentShop.currency.itemName : "Coins";
                 tooltipNameText.text = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
                 tooltipDescriptionText.text = $"Sell for {sellPrice} {currencyName}";
+
                 var tooltipRectSell = tooltip.GetComponent<RectTransform>();
                 LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRectSell);
-                tooltip.transform.position = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
+
+                Vector3 pos = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
+                Vector3[] corners = new Vector3[4];
+                tooltipRectSell.GetWorldCorners(corners);
+                float width = corners[2].x - corners[0].x;
+                float height = corners[2].y - corners[0].y;
+                pos.x = Mathf.Min(pos.x, Screen.width - width);
+                pos.y = Mathf.Max(pos.y, height);
+                tooltipRectSell.position = pos;
+
                 tooltip.SetActive(true);
                 return;
             }
@@ -853,7 +863,15 @@ namespace Inventory
             var tooltipRect = tooltip.GetComponent<RectTransform>();
             LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
 
-            tooltip.transform.position = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
+            Vector3 pos = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
+            Vector3[] corners = new Vector3[4];
+            tooltipRect.GetWorldCorners(corners);
+            float width = corners[2].x - corners[0].x;
+            float height = corners[2].y - corners[0].y;
+            pos.x = Mathf.Min(pos.x, Screen.width - width);
+            pos.y = Mathf.Max(pos.y, height);
+            tooltipRect.position = pos;
+
             tooltip.SetActive(true);
         }
 
@@ -868,7 +886,15 @@ namespace Inventory
             var tooltipRect = tooltip.GetComponent<RectTransform>();
             LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
 
-            tooltip.transform.position = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
+            Vector3 pos = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
+            Vector3[] corners = new Vector3[4];
+            tooltipRect.GetWorldCorners(corners);
+            float width = corners[2].x - corners[0].x;
+            float height = corners[2].y - corners[0].y;
+            pos.x = Mathf.Min(pos.x, Screen.width - width);
+            pos.y = Mathf.Max(pos.y, height);
+            tooltipRect.position = pos;
+
             tooltip.SetActive(true);
         }
 
