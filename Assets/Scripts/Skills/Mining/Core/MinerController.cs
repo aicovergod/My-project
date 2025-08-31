@@ -15,6 +15,8 @@ namespace Skills.Mining
         [SerializeField] private float cancelDistance = 3f;
         [SerializeField] private LayerMask rockMask = ~0;
 
+        [SerializeField] private float prospectCooldown = 3f;
+
         [Header("References")]
         [SerializeField] private MiningSkill miningSkill;
         [SerializeField] private PickaxeToUse pickaxeSelector;
@@ -23,6 +25,7 @@ namespace Skills.Mining
         private MineableRock nearbyRock;
 
         private Camera cam;
+        private float nextInteractionTime = 0f;
 
         private void Awake()
         {
@@ -39,17 +42,23 @@ namespace Skills.Mining
         {
             bool pointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
 
-            if (Input.GetMouseButtonDown(0) && !pointerOverUI)
+            if (Time.time >= nextInteractionTime)
             {
-                var rock = GetRockUnderCursor();
-                if (rock != null)
-                    TryStartMining(rock);
-            }
-            else if (Input.GetMouseButtonDown(1) && !pointerOverUI)
-            {
-                var rock = GetRockUnderCursor();
-                if (rock != null)
-                    rock.Prospect(transform);
+                if (Input.GetMouseButtonDown(0) && !pointerOverUI)
+                {
+                    var rock = GetRockUnderCursor();
+                    if (rock != null)
+                        TryStartMining(rock);
+                }
+                else if (Input.GetMouseButtonDown(1) && !pointerOverUI)
+                {
+                    var rock = GetRockUnderCursor();
+                    if (rock != null)
+                    {
+                        rock.Prospect(transform);
+                        nextInteractionTime = Time.time + prospectCooldown;
+                    }
+                }
             }
 
             if (Input.GetKeyDown(KeyCode.Escape))
