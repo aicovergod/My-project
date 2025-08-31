@@ -93,9 +93,13 @@ namespace Skills.Fishing
             if (cam == null)
                 cam = Camera.main;
             Vector2 world = cam.ScreenToWorldPoint(Input.mousePosition);
-            var collider = Physics2D.OverlapPoint(world, spotMask);
-            if (collider != null)
-                return collider.GetComponentInParent<FishableSpot>();
+            var colliders = Physics2D.OverlapPointAll(world, spotMask);
+            foreach (var col in colliders)
+            {
+                var spot = col.GetComponentInParent<FishableSpot>();
+                if (spot != null)
+                    return spot;
+            }
             return null;
         }
 
