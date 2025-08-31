@@ -9,6 +9,7 @@ namespace Pets
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(SpriteRenderer))]
+    [RequireComponent(typeof(SpriteDepth))]
     public class PetFollower : MonoBehaviour
     {
         public float followRadius = 0.6f;
@@ -47,8 +48,9 @@ namespace Pets
             body = GetComponent<Rigidbody2D>();
             sprite = GetComponent<SpriteRenderer>();
             spriteDepth = GetComponent<SpriteDepth>();
-            if (spriteDepth != null)
-                spriteDepth.offset = depthOffset;
+            if (spriteDepth == null)
+                spriteDepth = gameObject.AddComponent<SpriteDepth>();
+            spriteDepth.offset = depthOffset;
             spriteAnimator = GetComponent<PetSpriteAnimator>();
             if (player != null)
                 SetPlayer(player);
@@ -168,23 +170,6 @@ namespace Pets
                     sprite.flipX = newPos.x > player.position.x;
             }
 
-        }
-
-        private void LateUpdate()
-        {
-            if (sprite == null)
-                return;
-
-            int baseOrder = Mathf.RoundToInt(-transform.position.y * 100f) + depthOffset;
-            if (player != null)
-            {
-                int playerOrder = Mathf.RoundToInt(-player.position.y * 100f);
-                if (transform.position.y > player.position.y)
-                    baseOrder = playerOrder + 1;
-                else if (transform.position.y < player.position.y)
-                    baseOrder = playerOrder - 1;
-            }
-            sprite.sortingOrder = baseOrder;
         }
 
     }

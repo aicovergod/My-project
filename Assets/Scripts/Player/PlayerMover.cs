@@ -6,6 +6,7 @@ using System;
 using Core.Save;
 using World;
 using Pets;
+using Util;
 
 namespace Player
 {
@@ -88,6 +89,9 @@ namespace Player
             anim = GetComponent<Animator>();
             sr  = GetComponent<SpriteRenderer>();
             inventory = GetComponent<Inventory.Inventory>();
+            var depth = GetComponent<SpriteDepth>();
+            if (depth != null)
+                depth.directionOffset = 1;
 
             rb.bodyType = RigidbodyType2D.Dynamic;
             rb.gravityScale = 0f;
