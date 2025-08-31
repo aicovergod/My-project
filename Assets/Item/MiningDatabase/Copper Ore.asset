@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Copper ore
   levelRequirement: 1
   xpPerOre: 18
+  petDropChance: 7500

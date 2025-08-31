@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Adamantite ore
   levelRequirement: 70
   xpPerOre: 95
+  petDropChance: 3500

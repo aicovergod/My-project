@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Orichalcum ore
   levelRequirement: 62
   xpPerOre: 87
+  petDropChance: 4000

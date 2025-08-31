@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Tin Ore
   levelRequirement: 1
   xpPerOre: 18
+  petDropChance: 7500

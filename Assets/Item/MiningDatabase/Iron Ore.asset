@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Iron ore
   levelRequirement: 15
   xpPerOre: 35
+  petDropChance: 6000

@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Coal
   levelRequirement: 30
   xpPerOre: 50
+  petDropChance: 5000

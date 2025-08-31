@@ -15,9 +15,13 @@ namespace Skills.Mining
         [Header("Rewards")]
         [SerializeField] private int xpPerOre = 1;
 
+        [Header("Pet Drop Chance")]
+        [SerializeField] private int petDropChance = 0;
+
         public string Id => id;
         public string DisplayName => displayName;
         public int LevelRequirement => levelRequirement;
         public int XpPerOre => xpPerOre;
+        public int PetDropChance => petDropChance;
     }
 }
