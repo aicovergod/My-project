@@ -15,6 +15,7 @@ MonoBehaviour:
   id: Beaver
   displayName: Beaver
   pickupItem: {fileID: 11400000, guid: 3b674f19bfa4e544984c23e5298e4f86, type: 2}
+  hasInventory: 1
   sprite: {fileID: 0}
   pixelsPerUnit: 64
   evolutionTiers: []
