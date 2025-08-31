@@ -21,6 +21,7 @@ MonoBehaviour:
   depleteRollInverse: 8
   respawnSeconds: 60
   chopIntervalTicks: 4
+  petDropChance: 4500
   interactRange: 3
   cancelDistance: 4.5
   aliveSprite: {fileID: 0}
