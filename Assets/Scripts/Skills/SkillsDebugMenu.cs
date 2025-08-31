@@ -5,6 +5,7 @@ using Skills.Woodcutting;
 using Skills.Fishing;
 using Beastmaster;
 using Pets;
+using BankSystem;
 
 namespace Skills
 {
@@ -193,6 +194,21 @@ namespace Skills
             if (GUILayout.Button(PetDropSystem.DebugPetRolls ? "Disable Pet Roll Debug" : "Enable Pet Roll Debug"))
             {
                 PetDropSystem.DebugPetRolls = !PetDropSystem.DebugPetRolls;
+            }
+
+            if (GUILayout.Button("Open Bank"))
+            {
+                BankUI.Instance?.Open();
+            }
+
+            if (GUILayout.Button("Clear Inventory"))
+            {
+                var inv = FindObjectOfType<Inventory.Inventory>();
+                if (inv != null)
+                {
+                    for (int i = 0; i < inv.size; i++)
+                        inv.ClearSlot(i);
+                }
             }
 
             GUILayout.EndScrollView();
