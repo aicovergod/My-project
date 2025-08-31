@@ -843,14 +843,14 @@ namespace Inventory
                 var tooltipRectSell = tooltip.GetComponent<RectTransform>();
                 LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRectSell);
 
-                Vector3 pos = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
-                Vector3[] corners = new Vector3[4];
-                tooltipRectSell.GetWorldCorners(corners);
-                float width = corners[2].x - corners[0].x;
-                float height = corners[2].y - corners[0].y;
-                pos.x = Mathf.Min(pos.x, Screen.width - width);
-                pos.y = Mathf.Max(pos.y, height);
-                tooltipRectSell.position = pos;
+                Vector3 sellPos = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
+                Vector3[] sellCorners = new Vector3[4];
+                tooltipRectSell.GetWorldCorners(sellCorners);
+                float sellWidth = sellCorners[2].x - sellCorners[0].x;
+                float sellHeight = sellCorners[2].y - sellCorners[0].y;
+                sellPos.x = Mathf.Min(sellPos.x, Screen.width - sellWidth);
+                sellPos.y = Mathf.Max(sellPos.y, sellHeight);
+                tooltipRectSell.position = sellPos;
 
                 tooltip.SetActive(true);
                 return;
