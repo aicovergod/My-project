@@ -994,6 +994,24 @@ namespace Inventory
                 int sourceIndex = source.draggingIndex;
                 if (slotIndex >= 0 && slotIndex < items.Length)
                 {
+                    var petStorage = GetComponent<PetStorage>();
+                    if (petStorage != null &&
+                        (petStorage.definition?.id == "Heron" ||
+                         petStorage.definition?.id == "Beaver" ||
+                         petStorage.definition?.id == "Rock Golem"))
+                    {
+                        // Skilling pets only accept auto-collected resources from their skill and cannot receive manual drops.
+                        var entry = source.items[sourceIndex];
+                        if (!petStorage.StoreItem(entry.item, entry.count))
+                        {
+                            source.EndDrag();
+                            return;
+                        }
+                        source.ClearSlot(sourceIndex);
+                        source.EndDrag();
+                        return;
+                    }
+
                     var temp = items[slotIndex];
                     items[slotIndex] = source.items[sourceIndex];
                     source.items[sourceIndex] = temp;
