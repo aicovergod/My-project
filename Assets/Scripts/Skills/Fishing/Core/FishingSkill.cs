@@ -155,7 +155,7 @@ namespace Skills.Fishing
                     added = inventory.AddItem(item, amount);
 
                 Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
-                if (!added)
+                if (!added && PetDropSystem.ActivePet?.id == "Heron")
                 {
                     var petStorage = PetDropSystem.ActivePetObject != null
                         ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
@@ -258,14 +258,17 @@ namespace Skills.Fishing
             if (inventory.CanAddItem(item, amount))
                 return true;
 
-            var petStorage = PetDropSystem.ActivePetObject != null
-                ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
-                : null;
-            var petInv = petStorage != null
-                ? petStorage.GetComponent<Inventory.Inventory>()
-                : null;
-            if (petInv != null)
-                return petInv.CanAddItem(item, amount);
+            if (PetDropSystem.ActivePet?.id == "Heron")
+            {
+                var petStorage = PetDropSystem.ActivePetObject != null
+                    ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
+                    : null;
+                var petInv = petStorage != null
+                    ? petStorage.GetComponent<Inventory.Inventory>()
+                    : null;
+                if (petInv != null)
+                    return petInv.CanAddItem(item, amount);
+            }
             return false;
         }
 

@@ -1,6 +1,7 @@
 using UnityEngine;
 using Inventory;
 using System.Collections;
+using System;
 
 namespace Pets
 {
@@ -123,7 +124,27 @@ namespace Pets
         {
             if (inventory == null || item == null)
                 return false;
+            if (!CanStore(item))
+                return false;
             return inventory.AddItem(item, amount);
+        }
+
+        private bool CanStore(ItemData item)
+        {
+            if (definition == null || item == null)
+                return false;
+            string name = item.itemName ?? string.Empty;
+            switch (definition.id)
+            {
+                case "Beaver":
+                    return name.IndexOf("Log", StringComparison.OrdinalIgnoreCase) >= 0;
+                case "Rock Golem":
+                    return name.IndexOf("Ore", StringComparison.OrdinalIgnoreCase) >= 0;
+                case "Heron":
+                    return name.StartsWith("Raw ", StringComparison.OrdinalIgnoreCase);
+                default:
+                    return false;
+            }
         }
 
         public void Open()
