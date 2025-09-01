@@ -20,6 +20,18 @@ namespace BankSystem
         public Vector2 referenceResolution = new Vector2(640f, 360f);
         public Color emptySlotColor = new Color(1f, 1f, 1f, 0f);
 
+        [Header("Stack Count Colors")]
+        [Tooltip("Color used for stack counts below 10,000.")]
+        public Color stackColorDefault = Color.yellow;
+        [Tooltip("Color used for stack counts of 10,000 or more.")]
+        public Color stackColor10k = Color.white;
+        [Tooltip("Color used for stack counts of 100,000 or more.")]
+        public Color stackColor100k = Color.green;
+        [Tooltip("Color used for stack counts of 10,000,000 or more.")]
+        public Color stackColor10m = Color.cyan;
+        [Tooltip("Color used for stack counts of 100,000,000 or more.")]
+        public Color stackColor100m = Color.magenta;
+
         public Color windowColor = new Color(0.15f, 0.15f, 0.15f, 0.95f);
         public Vector2 windowPadding = new Vector2(8f, 8f);
         public float headerHeight = 24f;
@@ -27,7 +39,7 @@ namespace BankSystem
         private const int Columns = 8;
         private const int Rows = 50;
         private const int Size = Columns * Rows;
-        private const int BankStackLimit = 9999;
+        private const int BankStackLimit = int.MaxValue; // 2_147_483_647
 
         private GameObject uiRoot;
         private Image[] slotImages;
@@ -310,6 +322,49 @@ namespace BankSystem
             depositMenu = BankDepositMenu.Create(uiRoot.transform, defaultFont);
         }
 
+        private string FormatStackCount(int count, out Color color)
+        {
+            if (count < 10000)
+            {
+                color = stackColorDefault;
+                return count.ToString();
+            }
+
+            if (count >= 1000000000)
+            {
+                color = stackColor100m;
+                return (count / 1000000000) + "b";
+            }
+
+            if (count >= 100000000)
+            {
+                color = stackColor100m;
+                return (count / 1000000) + "m";
+            }
+
+            if (count >= 10000000)
+            {
+                color = stackColor10m;
+                return (count / 1000000) + "m";
+            }
+
+            if (count >= 1000000)
+            {
+                color = stackColor100k;
+                return (count / 1000000) + "m";
+            }
+
+            if (count >= 100000)
+            {
+                color = stackColor100k;
+                return (count / 1000) + "k";
+            }
+
+            // count between 10,000 and 99,999
+            color = stackColor10k;
+            return (count / 1000) + "k";
+        }
+
         private void UpdateSlotVisual(int index)
         {
             var entry = items[index];
@@ -326,8 +381,18 @@ namespace BankSystem
                 image.type = Image.Type.Simple;
                 image.color = Color.white;
 
-                slotCountTexts[index].text = entry.count > 1 ? entry.count.ToString() : string.Empty;
-                slotCountTexts[index].enabled = entry.count > 1;
+                if (entry.count > 1)
+                {
+                    Color color;
+                    slotCountTexts[index].text = FormatStackCount(entry.count, out color);
+                    slotCountTexts[index].color = color;
+                    slotCountTexts[index].enabled = true;
+                }
+                else
+                {
+                    slotCountTexts[index].text = string.Empty;
+                    slotCountTexts[index].enabled = false;
+                }
             }
             else
             {
