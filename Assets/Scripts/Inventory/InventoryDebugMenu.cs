@@ -27,6 +27,8 @@ namespace Inventory
         private ItemData[] allItems = new ItemData[0];
         private Vector2 scroll;
         private bool visible;
+        private ItemData amountItem;
+        private string amountText = "1";
 
         private void Awake()
         {
@@ -83,14 +85,53 @@ namespace Inventory
 
             foreach (var item in allItems)
             {
-                if (item != null && GUILayout.Button(item.name))
+                if (item != null)
                 {
-                    inventory?.AddItem(item);
+                    if (GUILayout.Button(item.name))
+                    {
+                        inventory?.AddItem(item);
+                    }
+
+                    Rect r = GUILayoutUtility.GetLastRect();
+                    if (Event.current.type == EventType.MouseDown && Event.current.button == 1 && r.Contains(Event.current.mousePosition))
+                    {
+                        amountItem = item;
+                        amountText = "1";
+                        Event.current.Use();
+                    }
                 }
             }
 
             GUILayout.EndScrollView();
             GUILayout.EndArea();
+
+            if (amountItem != null)
+            {
+                Rect popup = new Rect(area.x + width + 10f, area.y, 180f, 100f);
+                GUILayout.BeginArea(popup, GUI.skin.box);
+                GUILayout.Label($"Spawn {amountItem.name}");
+                GUI.SetNextControlName("AmountField");
+                amountText = GUILayout.TextField(amountText);
+                GUI.FocusControl("AmountField");
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button("OK"))
+                {
+                    if (int.TryParse(amountText, out int n))
+                    {
+                        for (int i = 0; i < n; i++)
+                        {
+                            inventory?.AddItem(amountItem);
+                        }
+                    }
+                    amountItem = null;
+                }
+                if (GUILayout.Button("Cancel"))
+                {
+                    amountItem = null;
+                }
+                GUILayout.EndHorizontal();
+                GUILayout.EndArea();
+            }
         }
     }
 }
