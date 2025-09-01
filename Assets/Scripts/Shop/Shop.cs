@@ -194,7 +194,7 @@ namespace ShopSystem
             if (!playerInventory.CanAddItem(currency, config.playerSellPrice))
             {
                 if (playerSlotIndex >= 0 && !item.stackable && currency != null &&
-                    currency.stackable && config.playerSellPrice <= currency.maxStack)
+                    currency.stackable && config.playerSellPrice <= currency.MaxStack)
                 {
                     if (!playerInventory.ReplaceItem(playerSlotIndex, item, currency, config.playerSellPrice))
                         return false;
