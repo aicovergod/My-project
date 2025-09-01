@@ -87,17 +87,16 @@ namespace Inventory
             {
                 if (item != null)
                 {
-                    if (GUILayout.Button(item.name))
-                    {
-                        inventory?.AddItem(item);
-                    }
-
-                    Rect r = GUILayoutUtility.GetLastRect();
-                    if (Event.current.type == EventType.MouseDown && Event.current.button == 1 && r.Contains(Event.current.mousePosition))
+                    Rect rect = GUILayoutUtility.GetRect(GUIContent.Temp(item.name), GUI.skin.button);
+                    if (Event.current.type == EventType.MouseDown && Event.current.button == 1 && rect.Contains(Event.current.mousePosition))
                     {
                         amountItem = item;
                         amountText = "1";
                         Event.current.Use();
+                    }
+                    if (GUI.Button(rect, item.name) && Event.current.button == 0)
+                    {
+                        inventory?.AddItem(item);
                     }
                 }
             }
