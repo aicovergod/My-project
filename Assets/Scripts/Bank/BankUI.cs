@@ -739,6 +739,17 @@ namespace BankSystem
             return false;
         }
 
+        public void ClearBank()
+        {
+            for (int i = 0; i < items.Length; i++)
+            {
+                items[i].item = null;
+                items[i].count = 0;
+                UpdateSlotVisual(i);
+            }
+            SaveState();
+        }
+
         private void SaveState()
         {
             if (playerInventory != null)
