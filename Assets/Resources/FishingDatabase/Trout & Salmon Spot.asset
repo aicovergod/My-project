@@ -10,18 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 29e2ea8386a6462d9b08c4a8243f38a1, type: 3}
-  m_Name: Shrimp Spot
+  m_Name: Trout & Salmon Spot
   m_EditorClassIdentifier: 
-  id: ShrimpSpot
+  id: TroutSpot
   availableFish:
-  - {fileID: 11400000, guid: e68477b5b0bf4d9fa51f24a3e3c4d079, type: 2}
-  - {fileID: 11400000, guid: 08696f6959ccca14189255d3a84a17aa, type: 2}
+  - {fileID: 11400000, guid: c80ee8c07c68b504b8465007be14b50b, type: 2}
   allowedTools:
-  - {fileID: 11400000, guid: c08573f61adf4bc5a7a5e768f8b513c7, type: 2}
-  baitItemId: 
+  - {fileID: 11400000, guid: 30a8d8123aa0a7749b98426a2cc3aea4, type: 2}
+  baitItemId: Feathers
   depletesAfterCatch: 0
   depleteRollInverse: 8
   respawnSeconds: 5
-  catchIntervalTicks: 7
+  catchIntervalTicks: 8
   interactRange: 1.5
   cancelDistance: 3

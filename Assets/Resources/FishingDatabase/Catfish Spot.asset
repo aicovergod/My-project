@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29e2ea8386a6462d9b08c4a8243f38a1, type: 3}
+  m_Name: Catfish Spot
+  m_EditorClassIdentifier: 
+  id: CatfishSpot
+  availableFish:
+  - {fileID: 11400000, guid: f876d1d9634b4bf4ab963e14b6ea5904, type: 2}
+  allowedTools:
+  - {fileID: 11400000, guid: c2180687f9967b347bdd2e6ac3153c2b, type: 2}
+  baitItemId: Worms
+  depletesAfterCatch: 0
+  depleteRollInverse: 8
+  respawnSeconds: 8
+  catchIntervalTicks: 7
+  interactRange: 1.5
+  cancelDistance: 3

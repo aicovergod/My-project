@@ -10,16 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
-  m_Name: Fishing Cage
+  m_Name: Raw Salmon
   m_EditorClassIdentifier: 
-  id: Fishing Cage
-  itemName: Fishing Cage
-  icon: {fileID: 21300000, guid: 59c2bbf5ba71e4d4c9f467f9911c6a38, type: 3}
-  description: 'A cage for catching
-
-    certain types of
-
-    fish'
+  id: Raw Salmon
+  itemName: Raw Salmon
+  icon: {fileID: 21300000, guid: d8a9a93f85dc45c40ac88f5093dc4215, type: 3}
+  description: A raw salmon
   stackable: 0
   maxStack: 0
   splittable: 0
