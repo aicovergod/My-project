@@ -36,6 +36,12 @@ namespace BankSystem
         public Vector2 windowPadding = new Vector2(8f, 8f);
         public float headerHeight = 24f;
 
+        [Tooltip("Font used for displaying stack counts.")]
+        public Font stackCountFont;
+
+        [Tooltip("Font size for stack count text.")]
+        public int stackCountFontSize = 14;
+
         private const int Columns = 8;
         private const int Rows = 50;
         private const int Size = Columns * Rows;
@@ -94,6 +100,8 @@ namespace BankSystem
             {
                 defaultFont = null;
             }
+
+            stackCountFont = stackCountFont ?? defaultFont;
 
             CreateUI();
             uiRoot.SetActive(false);
@@ -298,7 +306,8 @@ namespace BankSystem
                 GameObject countGO = new GameObject("Count", typeof(Text));
                 countGO.transform.SetParent(slot.transform, false);
                 var countText = countGO.GetComponent<Text>();
-                countText.font = defaultFont;
+                countText.font = stackCountFont;
+                countText.fontSize = stackCountFontSize;
                 countText.alignment = TextAnchor.LowerRight;
                 countText.raycastTarget = false;
                 countText.color = Color.white;
@@ -318,8 +327,8 @@ namespace BankSystem
 
             LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
 
-            withdrawMenu = BankWithdrawMenu.Create(uiRoot.transform, defaultFont);
-            depositMenu = BankDepositMenu.Create(uiRoot.transform, defaultFont);
+            withdrawMenu = BankWithdrawMenu.Create(uiRoot.transform, stackCountFont);
+            depositMenu = BankDepositMenu.Create(uiRoot.transform, stackCountFont);
         }
 
         private string FormatStackCount(int count, out Color color)
