@@ -40,7 +40,7 @@ namespace BankSystem
         public Font stackCountFont;
 
         [Tooltip("Font size for stack count text.")]
-        public int stackCountFontSize = 14;
+        public int stackCountFontSize = 12;
 
         private const int Columns = 8;
         private const int Rows = 50;
