@@ -79,6 +79,9 @@ namespace Inventory
         [Tooltip("Optional: custom font for stack count text. Uses LegacyRuntime if null.")]
         public Font stackCountFont;
 
+        [Tooltip("Font size for stack count text.")]
+        public int stackCountFontSize = 12;
+
         [Header("Window")]
         [Tooltip("Background color for the inventory window.")]
         public Color windowColor = new Color(0.15f, 0.15f, 0.15f, 0.95f);
@@ -375,6 +378,7 @@ namespace Inventory
                     countGO.transform.SetParent(slot.transform, false);
                     var countText = countGO.GetComponent<Text>();
                     countText.font = stackCountFont ?? defaultFont;
+                    countText.fontSize = stackCountFontSize;
                     countText.alignment = TextAnchor.UpperLeft;
                     countText.raycastTarget = false;
                     countText.color = Color.white;
