@@ -374,6 +374,7 @@ namespace Inventory
                     countText.alignment = TextAnchor.UpperLeft;
                     countText.raycastTarget = false;
                     countText.color = Color.white;
+                    countText.horizontalOverflow = HorizontalWrapMode.Overflow;
                     countText.text = string.Empty;
                     var countRect = countGO.GetComponent<RectTransform>();
                     countRect.anchorMin = new Vector2(0f, 1f);
