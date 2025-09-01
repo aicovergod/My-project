@@ -212,6 +212,11 @@ namespace Skills
                 }
             }
 
+            if (GUILayout.Button("Clear Bank"))
+            {
+                BankUI.Instance?.ClearBank();
+            }
+
             GUILayout.EndScrollView();
 
             GUILayout.EndArea();
