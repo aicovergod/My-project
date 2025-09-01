@@ -22,15 +22,15 @@ namespace BankSystem
 
         [Header("Stack Count Colors")]
         [Tooltip("Color used for stack counts below 10,000.")]
-        public Color stackColorDefault = Color.yellow;
+        public Color stackColorDefault = new Color32(255, 255, 0, 255);
         [Tooltip("Color used for stack counts of 10,000 or more.")]
-        public Color stackColor10k = Color.white;
+        public Color stackColor10k = new Color32(170, 170, 170, 255);
         [Tooltip("Color used for stack counts of 100,000 or more.")]
-        public Color stackColor100k = Color.green;
+        public Color stackColor100k = new Color32(255, 255, 128, 255);
         [Tooltip("Color used for stack counts of 10,000,000 or more.")]
-        public Color stackColor10m = Color.cyan;
+        public Color stackColor10m = new Color32(102, 255, 0, 255);
         [Tooltip("Color used for stack counts of 100,000,000 or more.")]
-        public Color stackColor100m = Color.magenta;
+        public Color stackColor100m = new Color32(0, 255, 0, 255);
 
         public Color windowColor = new Color(0.15f, 0.15f, 0.15f, 0.95f);
         public Vector2 windowPadding = new Vector2(8f, 8f);
