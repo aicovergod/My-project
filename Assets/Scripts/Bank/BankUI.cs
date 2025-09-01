@@ -101,7 +101,9 @@ namespace BankSystem
                 defaultFont = null;
             }
 
-            stackCountFont = stackCountFont ?? defaultFont;
+            stackCountFont = Resources.Load<Font>("ThaleahFat_TTF") ??
+                             Resources.Load<Font>("ThaleahFAT_TTF") ??
+                             stackCountFont ?? defaultFont;
 
             CreateUI();
             uiRoot.SetActive(false);
@@ -308,7 +310,9 @@ namespace BankSystem
                 var countText = countGO.GetComponent<Text>();
                 countText.font = stackCountFont;
                 countText.fontSize = stackCountFontSize;
-                countText.alignment = TextAnchor.LowerRight;
+                countText.alignment = TextAnchor.UpperLeft;
+                countText.horizontalOverflow = HorizontalWrapMode.Overflow;
+                countText.verticalOverflow = VerticalWrapMode.Overflow;
                 countText.raycastTarget = false;
                 countText.color = Color.white;
                 var countRect = countGO.GetComponent<RectTransform>();
