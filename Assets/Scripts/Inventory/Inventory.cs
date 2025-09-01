@@ -377,6 +377,9 @@ namespace Inventory
                     GameObject countGO = new GameObject("Count", typeof(Text));
                     countGO.transform.SetParent(slot.transform, false);
                     var countText = countGO.GetComponent<Text>();
+                    var outline = countGO.AddComponent<Outline>();
+                    outline.effectColor = Color.black;
+                    outline.effectDistance = new Vector2(1f, -1f);
                     countText.font = stackCountFont ?? defaultFont;
                     countText.fontSize = stackCountFontSize;
                     countText.alignment = TextAnchor.UpperLeft;
