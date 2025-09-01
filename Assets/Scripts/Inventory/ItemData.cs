@@ -50,11 +50,33 @@ namespace Inventory
         [Header("Stacking")] [Tooltip("If true, multiple items can occupy a single inventory slot.")]
         public bool stackable;
 
-        [Tooltip("Maximum number of items per stack when stackable.")]
-        public int maxStack = 1;
+        /// <summary>
+        /// Maximum stack size for stackable items. Old School RuneScape uses a
+        /// 32-bit signed integer limit (2,147,483,647) for all stackable items,
+        /// so we mirror that behaviour here.
+        /// </summary>
+        public const int OSRS_MAX_STACK = int.MaxValue;
+
+        // Serialized only so existing assets don't lose data. At runtime the
+        // <see cref="MaxStack"/> property should be used instead which returns
+        // the OSRS limit for stackable items or 1 for non-stackables.
+        [HideInInspector] public int maxStack = OSRS_MAX_STACK;
+
+        /// <summary>
+        /// Gets the maximum number of items that can occupy a single inventory
+        /// slot. Stackable items use the OSRS limit; non-stackables always return
+        /// 1.
+        /// </summary>
+        public int MaxStack => stackable ? OSRS_MAX_STACK : 1;
 
         [Tooltip("If true, stacks of this item can be split in the inventory.")]
         public bool splittable = true;
+
+        private void OnValidate()
+        {
+            // Keep the serialized value in sync for inspector visibility.
+            maxStack = stackable ? OSRS_MAX_STACK : 1;
+        }
 
         [Header("Equipment")] [Tooltip("Slot this item can be equipped to. Use None for non-equippable items.")]
         public EquipmentSlot equipmentSlot = EquipmentSlot.None;

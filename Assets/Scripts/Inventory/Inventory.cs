@@ -596,9 +596,9 @@ namespace Inventory
             {
                 for (int i = 0; i < items.Length && remaining > 0; i++)
                 {
-                    if (items[i].item == item && items[i].count < item.maxStack)
+                    if (items[i].item == item && items[i].count < item.MaxStack)
                     {
-                        int add = Mathf.Min(item.maxStack - items[i].count, remaining);
+                        int add = Mathf.Min(item.MaxStack - items[i].count, remaining);
                         items[i].count += add;
                         remaining -= add;
                         UpdateSlotVisual(i);
@@ -611,7 +611,7 @@ namespace Inventory
                 if (items[i].item == null)
                 {
                     items[i].item = item;
-                    items[i].count = item.stackable ? Mathf.Min(item.maxStack, remaining) : 1;
+                    items[i].count = item.stackable ? Mathf.Min(item.MaxStack, remaining) : 1;
                     remaining -= items[i].count;
                     UpdateSlotVisual(i);
                 }
@@ -654,9 +654,9 @@ namespace Inventory
                 for (int i = 0; i < items.Length; i++)
                 {
                     if (items[i].item == item)
-                        space += item.maxStack - items[i].count;
+                        space += item.MaxStack - items[i].count;
                     else if (items[i].item == null)
-                        space += item.maxStack;
+                        space += item.MaxStack;
 
                     if (space >= quantity)
                         return true;
