@@ -102,6 +102,9 @@ namespace Inventory
         [Tooltip("Color for the tooltip description text.")]
         public Color tooltipDescriptionColor = new Color(184/255f, 134/255f, 11/255f, 1f);
 
+        [Tooltip("Optional: custom font for stack count text. Uses LegacyRuntime if null.")]
+        public Font stackCountFont;
+
         [Header("Save")]
         [Tooltip("Save key used for persistence.")]
         public string saveKey = "InventoryData";
@@ -367,8 +370,7 @@ namespace Inventory
                     GameObject countGO = new GameObject("Count", typeof(Text));
                     countGO.transform.SetParent(slot.transform, false);
                     var countText = countGO.GetComponent<Text>();
-                    if (defaultFont != null)
-                        countText.font = defaultFont;
+                    countText.font = stackCountFont ?? defaultFont;
                     countText.alignment = TextAnchor.UpperLeft;
                     countText.raycastTarget = false;
                     countText.color = Color.white;
