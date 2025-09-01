@@ -64,6 +64,18 @@ namespace Inventory
         [Tooltip("Color/tint for empty slots if no frame sprite, or tint over the frame.")]
         public Color emptySlotColor = new Color(0f, 0f, 0f, 1f); // solid black
 
+        [Header("Stack Count Colors")]
+        [Tooltip("Color used for stack counts below 10,000.")]
+        public Color stackColorDefault = Color.yellow;
+        [Tooltip("Color used for stack counts of 10,000 or more.")]
+        public Color stackColor10k = Color.white;
+        [Tooltip("Color used for stack counts of 100,000 or more.")]
+        public Color stackColor100k = Color.green;
+        [Tooltip("Color used for stack counts of 10,000,000 or more.")]
+        public Color stackColor10m = Color.cyan;
+        [Tooltip("Color used for stack counts of 100,000,000 or more.")]
+        public Color stackColor100m = Color.magenta;
+
         [Header("Window")]
         [Tooltip("Background color for the inventory window.")]
         public Color windowColor = new Color(0.15f, 0.15f, 0.15f, 0.95f);
@@ -357,15 +369,16 @@ namespace Inventory
                     var countText = countGO.GetComponent<Text>();
                     if (defaultFont != null)
                         countText.font = defaultFont;
-                    countText.alignment = TextAnchor.LowerRight;
+                    countText.alignment = TextAnchor.UpperLeft;
                     countText.raycastTarget = false;
                     countText.color = Color.white;
                     countText.text = string.Empty;
                     var countRect = countGO.GetComponent<RectTransform>();
-                    countRect.anchorMin = Vector2.zero;
-                    countRect.anchorMax = Vector2.one;
-                    countRect.offsetMin = Vector2.zero;
-                    countRect.offsetMax = Vector2.zero;
+                    countRect.anchorMin = new Vector2(0f, 1f);
+                    countRect.anchorMax = new Vector2(0f, 1f);
+                    countRect.pivot = new Vector2(0f, 1f);
+                    countRect.offsetMin = new Vector2(2f, -16f);
+                    countRect.offsetMax = new Vector2(16f, -2f);
 
                     // Add hover handler
                     var slotComponent = slot.AddComponent<InventorySlot>();
@@ -475,6 +488,49 @@ namespace Inventory
             tooltip.SetActive(false);
         }
 
+        private string FormatStackCount(int count, out Color color)
+        {
+            if (count < 10000)
+            {
+                color = stackColorDefault;
+                return count.ToString();
+            }
+
+            if (count >= 1000000000)
+            {
+                color = stackColor100m;
+                return (count / 1000000000) + "b";
+            }
+
+            if (count >= 100000000)
+            {
+                color = stackColor100m;
+                return (count / 1000000) + "m";
+            }
+
+            if (count >= 10000000)
+            {
+                color = stackColor10m;
+                return (count / 1000000) + "m";
+            }
+
+            if (count >= 1000000)
+            {
+                color = stackColor100k;
+                return (count / 1000000) + "m";
+            }
+
+            if (count >= 100000)
+            {
+                color = stackColor100k;
+                return (count / 1000) + "k";
+            }
+
+            // count between 10,000 and 99,999
+            color = stackColor10k;
+            return (count / 1000) + "k";
+        }
+
         private void UpdateSlotVisual(int index)
         {
             if (slotImages == null || index < 0 || index >= slotImages.Length || slotImages[index] == null)
@@ -491,8 +547,18 @@ namespace Inventory
                 slotImages[index].enabled = true;
                 if (slotCountTexts != null && slotCountTexts.Length > index && slotCountTexts[index] != null)
                 {
-                    slotCountTexts[index].text = entry.count > 1 ? entry.count.ToString() : string.Empty;
-                    slotCountTexts[index].enabled = true;
+                    if (entry.count > 1)
+                    {
+                        Color color;
+                        slotCountTexts[index].text = FormatStackCount(entry.count, out color);
+                        slotCountTexts[index].color = color;
+                        slotCountTexts[index].enabled = true;
+                    }
+                    else
+                    {
+                        slotCountTexts[index].text = string.Empty;
+                        slotCountTexts[index].enabled = false;
+                    }
                 }
             }
             else
