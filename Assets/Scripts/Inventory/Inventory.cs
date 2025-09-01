@@ -248,6 +248,10 @@ namespace Inventory
                 defaultFont = null;
             }
 
+            stackCountFont = Resources.Load<Font>("ThaleahFat_TTF") ??
+                             Resources.Load<Font>("ThaleahFAT_TTF") ??
+                             stackCountFont ?? defaultFont;
+
             items = new InventoryEntry[size];
 
             if (EventSystem.current == null)
