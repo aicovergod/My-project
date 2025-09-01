@@ -76,6 +76,9 @@ namespace Inventory
         [Tooltip("Color used for stack counts of 100,000,000 or more.")]
         public Color stackColor100m = Color.magenta;
 
+        [Tooltip("Optional: custom font for stack count text. Uses LegacyRuntime if null.")]
+        public Font stackCountFont;
+
         [Header("Window")]
         [Tooltip("Background color for the inventory window.")]
         public Color windowColor = new Color(0.15f, 0.15f, 0.15f, 0.95f);
@@ -101,9 +104,6 @@ namespace Inventory
         public Font tooltipDescriptionFont;
         [Tooltip("Color for the tooltip description text.")]
         public Color tooltipDescriptionColor = new Color(184/255f, 134/255f, 11/255f, 1f);
-
-        [Tooltip("Optional: custom font for stack count text. Uses LegacyRuntime if null.")]
-        public Font stackCountFont;
 
         [Header("Save")]
         [Tooltip("Save key used for persistence.")]
