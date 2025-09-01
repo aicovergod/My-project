@@ -87,7 +87,7 @@ namespace Inventory
             {
                 if (item != null)
                 {
-                    Rect rect = GUILayoutUtility.GetRect(GUIContent.Temp(item.name), GUI.skin.button);
+                    Rect rect = GUILayoutUtility.GetRect(new GUIContent(item.name), GUI.skin.button);
                     if (Event.current.type == EventType.MouseDown && Event.current.button == 1 && rect.Contains(Event.current.mousePosition))
                     {
                         amountItem = item;
