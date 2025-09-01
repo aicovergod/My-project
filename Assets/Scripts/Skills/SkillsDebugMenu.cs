@@ -203,11 +203,12 @@ namespace Skills
 
             if (GUILayout.Button("Clear Inventory"))
             {
-                var inv = FindObjectOfType<Inventory.Inventory>();
-                if (inv != null)
+                var playerInv = GameObject.FindGameObjectWithTag("Player")?.GetComponent<Inventory.Inventory>();
+                if (playerInv != null)
                 {
-                    for (int i = 0; i < inv.size; i++)
-                        inv.ClearSlot(i);
+                    for (int i = 0; i < playerInv.size; i++)
+                        playerInv.ClearSlot(i);
+                    playerInv.Save();
                 }
             }
 
