@@ -603,6 +603,10 @@ namespace Inventory
             if (item == null || quantity <= 0)
                 return false;
 
+            var petStorage = GetComponent<PetStorage>();
+            if (petStorage != null && !petStorage.CanStore(item))
+                return false;
+
             if (!CanAddItem(item, quantity))
                 return false;
 
@@ -661,6 +665,10 @@ namespace Inventory
         public bool CanAddItem(ItemData item, int quantity = 1)
         {
             if (item == null || quantity <= 0)
+                return false;
+
+            var petStorage = GetComponent<PetStorage>();
+            if (petStorage != null && !petStorage.CanStore(item))
                 return false;
 
             int space = 0;

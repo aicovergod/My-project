@@ -209,7 +209,7 @@ namespace Pets
             }
         }
 
-        private bool CanStore(ItemData item)
+        public bool CanStore(ItemData item)
         {
             if (definition == null || item == null)
                 return false;
