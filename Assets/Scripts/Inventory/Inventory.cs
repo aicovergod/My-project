@@ -1040,7 +1040,11 @@ namespace Inventory
             dragCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
             dragCanvas.overrideSorting = true;
             dragCanvas.sortingOrder = short.MaxValue;
-            draggingIcon.transform.SetParent(uiRoot.transform, false);
+            // Ensure the dragged icon renders above all inventory UIs by
+            // reparenting it to the shared root and placing it last.
+            Transform parent = sharedUIRoot != null ? sharedUIRoot.transform : uiRoot.transform;
+            draggingIcon.transform.SetParent(parent, false);
+            draggingIcon.transform.SetAsLastSibling();
             var img = draggingIcon.GetComponent<Image>();
             img.raycastTarget = false;
             img.sprite = item.icon ? item.icon : slotFrameSprite;
