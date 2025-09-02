@@ -144,6 +144,26 @@ namespace Pets
             PetDropSystem.GuardModeEnabled = !PetDropSystem.GuardModeEnabled;
         }
 
+        public void ToggleInventory()
+        {
+            var pet = PetDropSystem.ActivePetObject;
+            if (pet == null)
+                return;
+            var storage = pet.GetComponent<PetStorage>();
+            if (storage == null)
+                return;
+            if (PetDropSystem.PetInventoryVisible)
+            {
+                storage.Close();
+                PetDropSystem.PetInventoryVisible = false;
+            }
+            else
+            {
+                storage.Open();
+                PetDropSystem.PetInventoryVisible = true;
+            }
+        }
+
         public void OnPointerClick(PointerEventData eventData)
         {
             if (eventData.button == PointerEventData.InputButton.Right)

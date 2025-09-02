@@ -11,6 +11,8 @@ namespace Pets
         private Button xpButton;
         private Button guardButton;
         private Text guardText;
+        private Button inventoryButton;
+        private Text inventoryText;
         private PetLevelBarHUD current;
 
         private static PetLevelBarMenu instance;
@@ -22,6 +24,13 @@ namespace Pets
                 CreateInstance();
             instance.current = hud;
             instance.guardText.text = PetDropSystem.GuardModeEnabled ? "Guard Mode: On" : "Guard Mode: Off";
+            var pet = PetDropSystem.ActivePetObject;
+            var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
+            var inv = pet != null ? pet.GetComponent<Inventory.Inventory>() : null;
+            bool hasInventory = storage != null && inv != null;
+            instance.inventoryButton.gameObject.SetActive(hasInventory);
+            if (hasInventory)
+                instance.inventoryText.text = PetDropSystem.PetInventoryVisible ? "Inventory: On" : "Inventory: Off";
             instance.transform.position = position;
             instance.gameObject.SetActive(true);
             instance.OnMenuShown();
@@ -62,6 +71,14 @@ namespace Pets
             instance.guardButton.onClick.AddListener(() =>
             {
                 instance.current?.ToggleGuardMode();
+                instance.Hide();
+            });
+
+            instance.inventoryButton = CreateButton(menuGO.transform, "Inventory");
+            instance.inventoryText = instance.inventoryButton.GetComponentInChildren<Text>();
+            instance.inventoryButton.onClick.AddListener(() =>
+            {
+                instance.current?.ToggleInventory();
                 instance.Hide();
             });
 

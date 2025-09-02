@@ -21,6 +21,7 @@ namespace Pets
         public static PetCombatController ActivePetCombat => activePetGO != null ? activePetGO.GetComponent<PetCombatController>() : null;
         public static bool DebugPetRolls { get; set; }
         public static bool GuardModeEnabled { get; set; }
+        public static bool PetInventoryVisible { get; set; }
         private static bool initialized;
         private static bool quittingRegistered;
 
@@ -211,6 +212,7 @@ namespace Pets
             {
                 var storage = activePetGO.GetComponent<PetStorage>();
                 storage?.Close();
+                PetInventoryVisible = false;
                 UnityEngine.Object.Destroy(activePetGO);
                 activePetGO = null;
                 activePetDef = null;
@@ -252,7 +254,8 @@ namespace Pets
             Debug.Log($"Spawned pet '{pet.displayName}' at {spawnPos}.");
 
             var playerInventory = playerTransform != null ? playerTransform.GetComponent<Inventory.Inventory>() : null;
-            if (playerInventory != null && playerInventory.IsOpen && !playerInventory.BankOpen)
+            PetInventoryVisible = false;
+            if (playerInventory != null && playerInventory.IsOpen && !playerInventory.BankOpen && PetInventoryVisible)
             {
                 var storage = activePetGO.GetComponent<PetStorage>();
                 storage?.StartCoroutine(storage.OpenDelayed());

@@ -48,7 +48,7 @@ namespace Pets
         private void Start()
         {
             var playerInv = GameObject.FindGameObjectWithTag("Player")?.GetComponent<Inventory.Inventory>();
-            if (playerInv != null && playerInv.IsOpen && !playerInv.BankOpen)
+            if (playerInv != null && playerInv.IsOpen && !playerInv.BankOpen && PetDropSystem.PetInventoryVisible)
                 StartCoroutine(OpenDelayed());
         }
 
