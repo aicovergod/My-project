@@ -12,6 +12,10 @@ namespace Pets
     {
         private PetDefinition definition;
         private PetStorage storage;
+        private float nextPickupTime;
+
+        private const float PickupCooldown = 3f;
+        private const float PickupRadius = 1.5f;
 
         public void Init(PetDefinition def, PetStorage petStorage)
         {
@@ -42,10 +46,25 @@ namespace Pets
 
         private void OnLeftClick()
         {
+            if (Time.time < nextPickupTime)
+                return;
+
+            var player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                Vector2 playerPos = player.transform.position;
+                Vector2 petPos = transform.position;
+                if (Vector2.Distance(playerPos, petPos) > PickupRadius)
+                    return;
+            }
+
             if (definition != null && definition.pickupItem != null)
             {
                 if (!InventoryBridge.AddItem(definition.pickupItem, 1))
+                {
+                    nextPickupTime = Time.time + PickupCooldown;
                     return;
+                }
             }
 
             storage?.Close();
