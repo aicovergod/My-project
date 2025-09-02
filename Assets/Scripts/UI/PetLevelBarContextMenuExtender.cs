@@ -13,6 +13,7 @@ namespace Pets
     {
         private Button mergeButton;
         private Text mergeText;
+        private Button pickupButton;
         private PetMergeController mergeController;
 
         partial void OnMenuCreated(Transform menuRoot)
@@ -20,14 +21,18 @@ namespace Pets
             mergeButton = CreateButton(menuRoot, "Merge");
             mergeText = mergeButton.GetComponentInChildren<Text>();
             mergeButton.onClick.AddListener(OnMergeClicked);
+
+            pickupButton = CreateButton(menuRoot, "Pick up");
+            pickupButton.onClick.AddListener(OnPickupClicked);
         }
 
         partial void OnMenuShown()
         {
-            if (mergeButton == null)
+            if (mergeButton == null || pickupButton == null)
                 return;
             if (mergeController == null)
                 mergeController = Object.FindObjectOfType<PetMergeController>();
+            pickupButton.gameObject.SetActive(PetDropSystem.ActivePetObject != null);
             if (mergeController == null)
             {
                 mergeButton.gameObject.SetActive(false);
@@ -65,6 +70,17 @@ namespace Pets
                 mergeController.EndMerge();
             else
                 mergeController.TryStartMerge();
+            Hide();
+        }
+
+        private void OnPickupClicked()
+        {
+            var pet = PetDropSystem.ActivePetObject;
+            if (pet != null)
+            {
+                var clickable = pet.GetComponent<PetClickable>();
+                clickable?.Pickup();
+            }
             Hide();
         }
     }
