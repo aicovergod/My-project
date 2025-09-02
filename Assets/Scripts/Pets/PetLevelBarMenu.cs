@@ -32,6 +32,9 @@ namespace Pets
             var canvasGO = new GameObject("PetBarMenuCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             menuCanvas = canvasGO.GetComponent<Canvas>();
             menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            // Ensure the context menu canvas renders above other UI elements
+            menuCanvas.overrideSorting = true;
+            menuCanvas.sortingOrder = short.MaxValue;
             Object.DontDestroyOnLoad(canvasGO);
 
             var menuGO = new GameObject("PetLevelBarMenu", typeof(Image), typeof(PetLevelBarMenu), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
