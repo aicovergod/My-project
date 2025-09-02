@@ -1,11 +1,10 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using Inventory;
 
 namespace Pets
 {
     /// <summary>
-    /// Detects clicks on the pet and converts it to an inventory item.
+    /// Handles picking up the active pet and converting it into an inventory item.
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
     public class PetClickable : MonoBehaviour
@@ -29,22 +28,10 @@ namespace Pets
             col.isTrigger = true;
         }
 
-        private void Update()
-        {
-            if (!Input.GetMouseButtonDown(0))
-                return;
-
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
-                return;
-
-            Vector3 world = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector2 p = new Vector2(world.x, world.y);
-            var hit = Physics2D.OverlapPoint(p);
-            if (hit != null && hit.gameObject == gameObject)
-                OnLeftClick();
-        }
-
-        private void OnLeftClick()
+        /// <summary>
+        /// Attempts to convert the active pet to an inventory item.
+        /// </summary>
+        public void Pickup()
         {
             if (Time.time < nextPickupTime)
                 return;
@@ -72,6 +59,6 @@ namespace Pets
             PetToastUI.Show("You pick up the pet.");
             Destroy(gameObject);
         }
-
     }
 }
+
