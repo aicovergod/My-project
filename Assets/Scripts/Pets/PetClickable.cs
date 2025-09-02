@@ -43,7 +43,10 @@ namespace Pets
         private void OnLeftClick()
         {
             if (definition != null && definition.pickupItem != null)
-                InventoryBridge.AddItem(definition.pickupItem, 1);
+            {
+                if (!InventoryBridge.AddItem(definition.pickupItem, 1))
+                    return;
+            }
 
             storage?.Close();
             PetDropSystem.DespawnActive();

@@ -21,7 +21,12 @@ namespace Pets
             {
                 var inv = player.GetComponent<Inventory.Inventory>();
                 if (inv != null)
-                    return inv.AddItem(item, amount);
+                {
+                    bool added = inv.AddItem(item, amount);
+                    if (!added)
+                        PetToastUI.Show("Your inventory is currently full");
+                    return added;
+                }
             }
 
             Debug.Log($"InventoryBridge: Added {amount}x {item?.itemName} (stub).");
