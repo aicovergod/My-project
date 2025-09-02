@@ -177,7 +177,12 @@ namespace Inventory
                 var pet = PetDropSystem.ActivePetObject;
                 var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
                 if (!BankOpen)
-                    storage?.Open();
+                {
+                    if (PetDropSystem.PetInventoryVisible)
+                        storage?.Open();
+                    else
+                        storage?.Close();
+                }
                 else
                     storage?.Close();
             }
