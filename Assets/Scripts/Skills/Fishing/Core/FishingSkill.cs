@@ -151,7 +151,7 @@ namespace Skills.Fishing
             float chance = baseChance + (level * 0.005f) + currentTool.CatchBonus * 0.01f - penalty;
             chance = Mathf.Clamp(chance, 0.05f, 0.90f);
 
-            if (Random.value <= chance)
+            if (UnityEngine.Random.value <= chance)
             {
                 int amount = PetDropSystem.ActivePet?.id == "Heron" ? 2 : 1;
                 if (amount > 1)
@@ -264,17 +264,17 @@ namespace Skills.Fishing
             FloatingText.Show($"+{res.quantity} {res.item.DisplayName}", anchor.position);
         }
 
-        private Fishing.Bycatch.FishingTool MapTool(FishingToolDefinition tool)
+        private global::Fishing.Bycatch.FishingTool MapTool(FishingToolDefinition tool)
         {
             if (tool == null)
-                return Fishing.Bycatch.FishingTool.Any;
+                return global::Fishing.Bycatch.FishingTool.Any;
             string name = tool.DisplayName?.Replace(" ", "");
-            if (!string.IsNullOrEmpty(name) && Enum.TryParse(name, true, out Fishing.Bycatch.FishingTool res))
+            if (!string.IsNullOrEmpty(name) && Enum.TryParse<global::Fishing.Bycatch.FishingTool>(name, true, out var res))
                 return res;
             name = tool.Id?.Replace(" ", "");
-            if (!string.IsNullOrEmpty(name) && Enum.TryParse(name, true, out res))
+            if (!string.IsNullOrEmpty(name) && Enum.TryParse<global::Fishing.Bycatch.FishingTool>(name, true, out res))
                 return res;
-            return Fishing.Bycatch.FishingTool.Any;
+            return global::Fishing.Bycatch.FishingTool.Any;
         }
 
         public void StartFishing(FishableSpot spot, FishingToolDefinition tool)
