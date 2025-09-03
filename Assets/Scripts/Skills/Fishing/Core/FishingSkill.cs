@@ -30,6 +30,7 @@ namespace Skills.Fishing
         private int catchProgress;
         private int currentIntervalTicks;
         private int bycatchRollIndex;
+        private int consecutiveFails;
 
         private Dictionary<string, ItemData> fishItems;
 
@@ -233,6 +234,10 @@ namespace Skills.Fishing
 
             var waterType = currentSpot.def != null ? currentSpot.def.WaterType : WaterType.Any;
             int streak = bycatchManager.GetStreak(waterType);
+            int playerIdHash = gameObject.GetInstanceID();
+            int nodeHash = currentSpot.def != null ? currentSpot.def.Id.GetHashCode() : currentSpot.GetInstanceID();
+
+            int chanceRollIndex = bycatchRollIndex++;
             var ctx = new BycatchRollContext
             {
                 playerLevel = level,
@@ -242,25 +247,46 @@ namespace Skills.Fishing
                 luck = 0f,
                 spotRarityMultiplier = 1f,
                 noRareStreakForThisWater = streak,
-                playerIdHash = gameObject.GetInstanceID(),
-                nodeHash = currentSpot.def != null ? currentSpot.def.Id.GetHashCode() : currentSpot.GetInstanceID(),
-                rollIndex = bycatchRollIndex++
+                playerIdHash = playerIdHash,
+                nodeHash = nodeHash,
+                rollIndex = chanceRollIndex
             };
 
+            int L = Mathf.Clamp(level, 1, 99);
+            float t = (L - 1f) / 98f;
+            float baseChance = Mathf.Lerp(0.015f, 0.10f, t);
+            float pityBonus = consecutiveFails >= 50 ? (consecutiveFails - 49) * 0.01f : 0f;
+            float finalChance = Mathf.Clamp01(baseChance + pityBonus);
+
+            var rng = CreateRng(ctx);
+            bool success = rng.NextDouble() < finalChance;
+            if (!success)
+            {
+                consecutiveFails++;
+                bycatchManager.ApplyStreakResult(waterType, BycatchResult.None);
+                if (BycatchManager.DebugBycatchRolls)
+                    Debug.Log($"[Bycatch] roll {ctx.rollIndex} lvl={ctx.playerLevel} bait={ctx.hasBait} water={ctx.waterType} tool={ctx.tool} streak={streak} -> no bycatch");
+                return;
+            }
+
+            ctx.rollIndex = bycatchRollIndex++;
             var res = bycatchManager.Roll(ctx);
             if (BycatchManager.DebugBycatchRolls)
             {
                 string result = res.IsNone
                     ? "no bycatch"
                     : $"{res.item.DisplayName} x{res.quantity} ({res.Rarity})";
-                Debug.Log(
-                    $"[Bycatch] roll {ctx.rollIndex} lvl={ctx.playerLevel} bait={ctx.hasBait} water={ctx.waterType} tool={ctx.tool} streak={streak} -> {result}");
+                Debug.Log($"[Bycatch] roll {ctx.rollIndex} lvl={ctx.playerLevel} bait={ctx.hasBait} water={ctx.waterType} tool={ctx.tool} streak={streak} -> {result}");
             }
 
             bycatchManager.ApplyStreakResult(waterType, res);
             if (res.IsNone)
+            {
+                consecutiveFails++;
                 return;
+            }
 
+            consecutiveFails = 0;
             var itemData = ItemDatabase.GetItem(res.item.ItemId);
             if (itemData == null || inventory == null || !inventory.AddItem(itemData, res.quantity))
             {
@@ -282,6 +308,28 @@ namespace Skills.Fishing
             if (!string.IsNullOrEmpty(name) && Enum.TryParse<FishingTool>(name, true, out res))
                 return res;
             return FishingTool.Any;
+        }
+
+        private System.Random CreateRng(in BycatchRollContext ctx)
+        {
+            if (bycatchManager != null && bycatchManager.useDailySeed)
+            {
+                int seed = DateTime.UtcNow.Date.GetHashCode();
+                seed = HashCombine(seed, ctx.playerIdHash);
+                seed = HashCombine(seed, ctx.nodeHash);
+                seed = HashCombine(seed, ctx.rollIndex);
+                return new System.Random(seed);
+            }
+
+            return new System.Random();
+        }
+
+        private static int HashCombine(int a, int b)
+        {
+            unchecked
+            {
+                return (a * 397) ^ b;
+            }
         }
 
         public void StartFishing(FishableSpot spot, FishingToolDefinition tool)
