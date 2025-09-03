@@ -9,6 +9,12 @@ namespace Skills.Fishing
         public BycatchTable bycatchTable;
         public bool useDailySeed = true;
 
+        /// <summary>
+        /// When enabled, the bycatch system will emit debug logs for each roll.
+        /// Controlled via the F2 debug menu.
+        /// </summary>
+        public static bool DebugBycatchRolls { get; set; }
+
         private readonly Dictionary<WaterType, int> _noRareStreak = new();
         private readonly Dictionary<WaterType, int> _lastSeedDay = new();
 
