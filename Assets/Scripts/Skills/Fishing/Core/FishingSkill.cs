@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,8 @@ using Util;
 using Skills.Mining; // reuse XP table
 using Core.Save;
 using Pets;
+using Fishing;
+using Fishing.Bycatch;
 
 namespace Skills.Fishing
 {
@@ -16,6 +19,7 @@ namespace Skills.Fishing
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Transform floatingTextAnchor;
         [SerializeField] private MonoBehaviour saveProvider; // optional custom save provider
+        [SerializeField] private BycatchManager bycatchManager;
 
         private IFishingSave save;
 
@@ -26,6 +30,7 @@ namespace Skills.Fishing
         private FishingToolDefinition currentTool;
         private int catchProgress;
         private int currentIntervalTicks;
+        private int bycatchRollIndex;
 
         private Dictionary<string, ItemData> fishItems;
 
@@ -183,6 +188,8 @@ namespace Skills.Fishing
                 StartCoroutine(ShowXpGainDelayed(fish.Xp * amount, anchor));
                 OnFishCaught?.Invoke(fish.Id, amount);
 
+                TryRollBycatch(anchor);
+
                 int newLevel = xpTable.GetLevel(xp);
                 if (newLevel > level)
                 {
@@ -216,6 +223,55 @@ namespace Skills.Fishing
             yield return new WaitForSeconds(Ticker.TickDuration * 5f);
             if (anchor != null)
                 FloatingText.Show($"+{gain} XP", anchor.position);
+        }
+
+        private void TryRollBycatch(Transform anchor)
+        {
+            if (bycatchManager == null || currentSpot == null || currentTool == null)
+                return;
+
+            var waterType = currentSpot.def != null ? currentSpot.def.WaterType : WaterType.Any;
+            int streak = bycatchManager.GetStreak(waterType);
+            var ctx = new BycatchRollContext
+            {
+                playerLevel = level,
+                hasBait = !string.IsNullOrEmpty(currentSpot.def.BaitItemId),
+                waterType = waterType,
+                tool = MapTool(currentTool),
+                luck = 0f,
+                spotRarityMultiplier = 1f,
+                noRareStreakForThisWater = streak,
+                playerIdHash = gameObject.GetInstanceID(),
+                nodeHash = currentSpot.def != null ? currentSpot.def.Id.GetHashCode() : currentSpot.GetInstanceID(),
+                rollIndex = bycatchRollIndex++
+            };
+
+            var res = bycatchManager.Roll(ctx);
+            bycatchManager.ApplyStreakResult(waterType, res);
+            if (res.IsNone)
+                return;
+
+            var itemData = ItemDatabase.GetItem(res.item.ItemId);
+            if (itemData == null || inventory == null || !inventory.AddItem(itemData, res.quantity))
+            {
+                FloatingText.Show("Your inventory is full", anchor.position);
+                return;
+            }
+
+            FloatingText.Show($"+{res.quantity} {res.item.DisplayName}", anchor.position);
+        }
+
+        private Fishing.Bycatch.FishingTool MapTool(FishingToolDefinition tool)
+        {
+            if (tool == null)
+                return Fishing.Bycatch.FishingTool.Any;
+            string name = tool.DisplayName?.Replace(" ", "");
+            if (!string.IsNullOrEmpty(name) && Enum.TryParse(name, true, out Fishing.Bycatch.FishingTool res))
+                return res;
+            name = tool.Id?.Replace(" ", "");
+            if (!string.IsNullOrEmpty(name) && Enum.TryParse(name, true, out res))
+                return res;
+            return Fishing.Bycatch.FishingTool.Any;
         }
 
         public void StartFishing(FishableSpot spot, FishingToolDefinition tool)
