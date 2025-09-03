@@ -5,6 +5,7 @@ using World;
 using Inventory;
 using ShopSystem;
 using Player;
+using Fishing.Bycatch;
 
 namespace Core
 {
@@ -20,6 +21,7 @@ namespace Core
         private ItemDatabase itemDatabase;
         private ShopUI shopUI;
         private PlayerRespawnSystem respawnSystem;
+        private BycatchManager bycatchManager;
 
         /// <summary>
         /// Event fired once all services are initialized.
@@ -29,6 +31,7 @@ namespace Core
         public static Ticker Ticker => Instance.ticker;
         public static ScreenFader ScreenFader => Instance.screenFader;
         public static ItemDatabase ItemDatabase => Instance.itemDatabase;
+        public static BycatchManager BycatchManager => Instance.bycatchManager;
 
         private void Awake()
         {
@@ -46,6 +49,7 @@ namespace Core
             itemDatabase = FindOrCreate<ItemDatabase>();
             shopUI = FindOrCreate<ShopUI>();
             respawnSystem = FindOrCreate<PlayerRespawnSystem>();
+            bycatchManager = FindOrCreate<BycatchManager>();
 
             ServicesReady?.Invoke();
         }
@@ -60,6 +64,7 @@ namespace Core
             {
                 var go = new GameObject(typeof(T).Name);
                 service = go.AddComponent<T>();
+                DontDestroyOnLoad(go);
             }
             return service;
         }

@@ -12,6 +12,20 @@ namespace Fishing.Bycatch
         private readonly Dictionary<WaterType, int> _noRareStreak = new();
         private readonly Dictionary<WaterType, int> _lastSeedDay = new();
 
+        private static BycatchManager instance;
+
+        private void Awake()
+        {
+            if (instance != null && instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+
         public int GetStreak(WaterType wt)
         {
             int today = DateTime.UtcNow.Date.GetHashCode();

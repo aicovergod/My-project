@@ -9,6 +9,7 @@ using Core.Save;
 using Pets;
 using Fishing;
 using Fishing.Bycatch;
+using Core;
 
 namespace Skills.Fishing
 {
@@ -19,7 +20,7 @@ namespace Skills.Fishing
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Transform floatingTextAnchor;
         [SerializeField] private MonoBehaviour saveProvider; // optional custom save provider
-        [SerializeField] private BycatchManager bycatchManager;
+        private BycatchManager bycatchManager;
 
         private IFishingSave save;
 
@@ -55,6 +56,8 @@ namespace Skills.Fishing
                 inventory = GetComponent<Inventory.Inventory>();
             save = saveProvider as IFishingSave ?? new SaveManagerFishingSave();
             PreloadFishItems();
+            if (bycatchManager == null)
+                bycatchManager = GameManager.BycatchManager;
         }
 
         private void OnEnable()
