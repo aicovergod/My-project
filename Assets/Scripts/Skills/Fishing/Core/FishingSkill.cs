@@ -7,8 +7,6 @@ using Util;
 using Skills.Mining; // reuse XP table
 using Core.Save;
 using Pets;
-using Fishing;
-using Fishing.Bycatch;
 using Core;
 
 namespace Skills.Fishing
@@ -264,17 +262,17 @@ namespace Skills.Fishing
             FloatingText.Show($"+{res.quantity} {res.item.DisplayName}", anchor.position);
         }
 
-        private global::Fishing.Bycatch.FishingTool MapTool(FishingToolDefinition tool)
+        private FishingTool MapTool(FishingToolDefinition tool)
         {
             if (tool == null)
-                return global::Fishing.Bycatch.FishingTool.Any;
+                return FishingTool.Any;
             string name = tool.DisplayName?.Replace(" ", "");
-            if (!string.IsNullOrEmpty(name) && Enum.TryParse<global::Fishing.Bycatch.FishingTool>(name, true, out var res))
+            if (!string.IsNullOrEmpty(name) && Enum.TryParse<FishingTool>(name, true, out var res))
                 return res;
             name = tool.Id?.Replace(" ", "");
-            if (!string.IsNullOrEmpty(name) && Enum.TryParse<global::Fishing.Bycatch.FishingTool>(name, true, out res))
+            if (!string.IsNullOrEmpty(name) && Enum.TryParse<FishingTool>(name, true, out res))
                 return res;
-            return global::Fishing.Bycatch.FishingTool.Any;
+            return FishingTool.Any;
         }
 
         public void StartFishing(FishableSpot spot, FishingToolDefinition tool)

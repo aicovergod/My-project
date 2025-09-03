@@ -1,9 +1,9 @@
 using UnityEngine;
 using Util;
 
-namespace Fishing.Bycatch
+namespace Skills.Fishing
 {
-    [CreateAssetMenu(menuName = "Fishing/Bycatch Item", fileName = "BycatchItem")]
+    [CreateAssetMenu(menuName = "Skills/Fishing/Bycatch Item", fileName = "BycatchItem")]
     public class BycatchItemDefinition : ScriptableObject
     {
         [Header("Identification")]

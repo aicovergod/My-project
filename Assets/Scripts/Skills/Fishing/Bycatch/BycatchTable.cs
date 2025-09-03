@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace Fishing.Bycatch
+namespace Skills.Fishing
 {
-    [CreateAssetMenu(menuName = "Fishing/Bycatch Table", fileName = "BycatchTable")]
+    [CreateAssetMenu(menuName = "Skills/Fishing/Bycatch Table", fileName = "BycatchTable")]
     public class BycatchTable : ScriptableObject
     {
         public BycatchCategoryWeights categories = BycatchCategoryWeights.Default;
