@@ -196,6 +196,11 @@ namespace Skills
                 PetDropSystem.DebugPetRolls = !PetDropSystem.DebugPetRolls;
             }
 
+            if (GUILayout.Button(BycatchManager.DebugBycatchRolls ? "Disable Bycatch Debug" : "Enable Bycatch Debug"))
+            {
+                BycatchManager.DebugBycatchRolls = !BycatchManager.DebugBycatchRolls;
+            }
+
             if (GUILayout.Button("Open Bank"))
             {
                 BankUI.Instance?.Open();

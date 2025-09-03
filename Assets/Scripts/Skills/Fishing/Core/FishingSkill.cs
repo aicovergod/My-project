@@ -248,6 +248,15 @@ namespace Skills.Fishing
             };
 
             var res = bycatchManager.Roll(ctx);
+            if (BycatchManager.DebugBycatchRolls)
+            {
+                string result = res.IsNone
+                    ? "no bycatch"
+                    : $"{res.item.DisplayName} x{res.quantity} ({res.Rarity})";
+                Debug.Log(
+                    $"[Bycatch] roll {ctx.rollIndex} lvl={ctx.playerLevel} bait={ctx.hasBait} water={ctx.waterType} tool={ctx.tool} streak={streak} -> {result}");
+            }
+
             bycatchManager.ApplyStreakResult(waterType, res);
             if (res.IsNone)
                 return;
