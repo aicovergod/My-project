@@ -5,7 +5,7 @@ using World;
 using Inventory;
 using ShopSystem;
 using Player;
-using Fishing.Bycatch;
+using Skills.Fishing;
 
 namespace Core
 {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Fishing.Bycatch
+namespace Skills.Fishing
 {
     public class BycatchManager : MonoBehaviour
     {

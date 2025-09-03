@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Fishing.Bycatch
+namespace Skills.Fishing
 {
     [Serializable]
     public struct BycatchCategoryWeights

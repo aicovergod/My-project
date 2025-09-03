@@ -1,4 +1,4 @@
-namespace Fishing.Bycatch
+namespace Skills.Fishing
 {
     public readonly struct BycatchResult
     {

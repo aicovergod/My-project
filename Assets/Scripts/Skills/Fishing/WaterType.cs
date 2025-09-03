@@ -1,6 +1,6 @@
 using System;
 
-namespace Fishing
+namespace Skills.Fishing
 {
     [Flags]
     public enum WaterType
