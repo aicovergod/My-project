@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Fishing;
 
 namespace Skills.Fishing
 {
@@ -17,6 +18,9 @@ namespace Skills.Fishing
 
         [Header("Bait")]
         [SerializeField] private string baitItemId;
+
+        [Header("Water")]
+        [SerializeField] private WaterType waterType;
 
         [Header("Depletion")]
         [SerializeField] private bool depletesAfterCatch = false;
@@ -36,6 +40,7 @@ namespace Skills.Fishing
         public List<FishDefinition> AvailableFish => availableFish;
         public List<FishingToolDefinition> AllowedTools => allowedTools;
         public string BaitItemId => baitItemId;
+        public WaterType WaterType => waterType;
         public bool DepletesAfterCatch => depletesAfterCatch;
         public int DepleteRollInverse => depleteRollInverse;
         public int RespawnSeconds => respawnSeconds;
