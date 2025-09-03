@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e1f620b4fa8542bcb38d964538bf97d8, type: 3}
-  m_Name: Salmon
+  m_Name: Red Snapper
   m_EditorClassIdentifier: 
-  id: Raw Salmon
-  displayName: Raw Salmon
-  requiredLevel: 25
-  xp: 70
-  itemId: Raw Salmon
+  id: Raw Red Snapper
+  displayName: Raw Red Snapper
+  requiredLevel: 42
+  xp: 130
+  itemId: Raw Red Snapper

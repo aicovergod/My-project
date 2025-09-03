@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29e2ea8386a6462d9b08c4a8243f38a1, type: 3}
   m_Name: Trout & Salmon Spot
   m_EditorClassIdentifier: 
-  id: TroutSpot
+  id: TroutSalmonSpot
   availableFish:
   - {fileID: 11400000, guid: c80ee8c07c68b504b8465007be14b50b, type: 2}
+  - {fileID: 11400000, guid: 639e1af9d5c0ae548bba98432eea98f3, type: 2}
   allowedTools:
   - {fileID: 11400000, guid: 30a8d8123aa0a7749b98426a2cc3aea4, type: 2}
   baitItemId: Feathers
