@@ -94,7 +94,8 @@ namespace Inventory
         public Color petMaxHitColor = Color.white;
 
         private GameObject uiRoot;
-        private Image[] slotImages;
+        private Image[] slotBackgroundImages;
+        private Image[] slotItemImages;
         private Text[] slotCountTexts;
         private InventoryEntry[] equipped;
         private Inventory inventory;
@@ -121,6 +122,8 @@ namespace Inventory
         private static Equipment instance;
 
         private bool lastMergeState;
+
+        private Sprite emptySlotSprite;
 
         public int TotalAttackBonus { get; private set; }
         public int TotalDefenceBonus { get; private set; }
@@ -150,6 +153,8 @@ namespace Inventory
 
             instance = this;
             DontDestroyOnLoad(gameObject);
+
+            emptySlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Empty_Slot");
 
             inventory = GetComponent<Inventory>();
             skillManager = skillManager != null ? skillManager : GetComponent<SkillManager>();
@@ -299,23 +304,40 @@ namespace Inventory
         private void UpdateSlotVisual(EquipmentSlot slot)
         {
             int index = SlotIndex(slot);
-            if (index < 0 || index >= slotImages.Length)
+            if (index < 0 || index >= slotBackgroundImages.Length)
                 return;
-            var img = slotImages[index];
+            var bg = slotBackgroundImages[index];
+            var itemImg = slotItemImages[index];
             var text = slotCountTexts[index];
             var entry = equipped[index];
             if (entry.item != null)
             {
-                img.sprite = entry.item.icon ? entry.item.icon : GetSlotSprite(slot);
-                img.color = Color.white;
-                img.type = Image.Type.Simple;
+                if (bg != null)
+                {
+                    bg.sprite = emptySlotSprite != null ? emptySlotSprite : GetSlotSprite(slot);
+                    bg.type = Image.Type.Simple;
+                    bg.color = Color.white;
+                }
+                if (itemImg != null)
+                {
+                    itemImg.sprite = entry.item.icon;
+                    itemImg.color = entry.item.icon != null ? Color.white : Color.clear;
+                }
                 text.text = entry.item.stackable && entry.count > 1 ? entry.count.ToString() : string.Empty;
             }
             else
             {
-                img.sprite = GetSlotSprite(slot);
-                img.type = img.sprite == slotFrameSprite && slotFrameSprite != null ? Image.Type.Sliced : Image.Type.Simple;
-                img.color = emptySlotColor;
+                if (bg != null)
+                {
+                    bg.sprite = GetSlotSprite(slot);
+                    bg.type = bg.sprite == slotFrameSprite && slotFrameSprite != null ? Image.Type.Sliced : Image.Type.Simple;
+                    bg.color = emptySlotColor;
+                }
+                if (itemImg != null)
+                {
+                    itemImg.sprite = null;
+                    itemImg.color = Color.clear;
+                }
                 text.text = string.Empty;
             }
         }
@@ -551,7 +573,8 @@ namespace Inventory
             grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             grid.constraintCount = 3;
 
-            slotImages = new Image[equipped.Length];
+            slotBackgroundImages = new Image[equipped.Length];
+            slotItemImages = new Image[equipped.Length];
             slotCountTexts = new Text[equipped.Length];
 
             Font defaultFont = null;
@@ -577,6 +600,17 @@ namespace Inventory
                         img.type = Image.Type.Sliced;
                     img.color = emptySlotColor;
 
+                    GameObject itemGO = new GameObject("Item", typeof(Image));
+                    itemGO.transform.SetParent(cell.transform, false);
+                    var itemImg = itemGO.GetComponent<Image>();
+                    itemImg.raycastTarget = false;
+                    var itemRect = itemGO.GetComponent<RectTransform>();
+                    itemRect.anchorMin = Vector2.zero;
+                    itemRect.anchorMax = Vector2.one;
+                    itemRect.offsetMin = Vector2.zero;
+                    itemRect.offsetMax = Vector2.zero;
+                    itemImg.color = Color.clear;
+
                     GameObject countGO = new GameObject("Count", typeof(Text));
                     countGO.transform.SetParent(cell.transform, false);
                     var countText = countGO.GetComponent<Text>();
@@ -596,7 +630,8 @@ namespace Inventory
                     slotComponent.equipment = this;
                     slotComponent.slot = slot;
 
-                    slotImages[SlotIndex(slot)] = img;
+                    slotBackgroundImages[SlotIndex(slot)] = img;
+                    slotItemImages[SlotIndex(slot)] = itemImg;
                     slotCountTexts[SlotIndex(slot)] = countText;
                 }
                 else
