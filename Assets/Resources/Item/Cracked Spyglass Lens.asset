@@ -10,17 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
-  m_Name: Reed Woven Bracelet
+  m_Name: Cracked Spyglass Lens
   m_EditorClassIdentifier: 
-  id: Reed Woven Bracelet
-  itemName: Reed Woven Bracelet
-  icon: {fileID: 21300000, guid: 2fc154bc2a72dc54bbd059f0a7b46208, type: 3}
-  description: Gives a 0.5% fishing bycatch luck bonus when worn
+  id: Cracked Spyglass Lens
+  itemName: Cracked Spyglass Lens
+  icon: {fileID: 21300000, guid: 8f83fd3d2fbc4164bbbc11c7cde0007b, type: 3}
+  description: This probably belonged to a pirate one time
   stackable: 0
   maxStack: 1
   splittable: 0
-  equipmentSlot: 9
-  bycatchChanceBonus: 0.005
+  equipmentSlot: 0
+  bycatchChanceBonus: 0
+  fishingXpBonusMultiplier: 0
+  woodcuttingXpBonusMultiplier: 0
+  miningXpBonusMultiplier: 0
   skillRequirements: []
   combat:
     Attack: 0

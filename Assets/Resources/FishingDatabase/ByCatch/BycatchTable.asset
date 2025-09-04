@@ -169,3 +169,19 @@ MonoBehaviour:
     baseWeight: 1
     minLevelOverride: 1
     maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 257088fa5da5e544c816454f6fed4d11, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 349e397a22b3b74438145f56c4c27a26, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 5396cf7d2f05cc14089474846641010e, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 2919b1bed1c529145861141b447bfa0d, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
