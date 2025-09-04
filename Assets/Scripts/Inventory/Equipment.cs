@@ -56,6 +56,7 @@ namespace Inventory
         public Sprite ringSlotSprite;
         public Sprite shieldSlotSprite;
         public Sprite weaponSlotSprite;
+        public Sprite charmSlotSprite;
 
         [Header("Bonus Text Styles")]
         public Font combatHeaderFont;
@@ -130,6 +131,7 @@ namespace Inventory
 
         private static readonly System.Collections.Generic.Dictionary<int, EquipmentSlot> cellToSlot = new()
         {
+            {0, EquipmentSlot.Charm},
             {1, EquipmentSlot.Head},
             {3, EquipmentSlot.Cape},
             {4, EquipmentSlot.Amulet},
@@ -155,6 +157,7 @@ namespace Inventory
             DontDestroyOnLoad(gameObject);
 
             emptySlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Empty_Slot");
+            charmSlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Charm_Slot");
 
             inventory = GetComponent<Inventory>();
             skillManager = skillManager != null ? skillManager : GetComponent<SkillManager>();
@@ -512,6 +515,7 @@ namespace Inventory
                 case EquipmentSlot.Ring: return ringSlotSprite;
                 case EquipmentSlot.Shield: return shieldSlotSprite;
                 case EquipmentSlot.Weapon: return weaponSlotSprite;
+                case EquipmentSlot.Charm: return charmSlotSprite;
                 default: return slotFrameSprite;
             }
         }

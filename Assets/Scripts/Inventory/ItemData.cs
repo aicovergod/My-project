@@ -29,7 +29,8 @@ namespace Inventory
         Gloves,
         Ring,
         Weapon,
-        Shield
+        Shield,
+        Charm
     }
 
     /// <summary>
