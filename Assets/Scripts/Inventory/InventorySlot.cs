@@ -64,26 +64,32 @@ namespace Inventory
                     BankSystem.BankUI.Instance?.ShowDepositMenu(index, eventData.position);
                 return;
             }
-            bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+
             if (eventData.button == PointerEventData.InputButton.Left)
             {
-                if (!eventData.dragging)
+                if (inventory.selectedIndex < 0)
                 {
-                    if (inventory != null && inventory.InShop)
-                    {
-                        if (shift)
-                            inventory?.PromptStackSplit(index, StackSplitType.Sell);
-                        else
-                            inventory?.SellItem(index, 1);
-                    }
-                    else
-                    {
-                        if (inventory == null || !inventory.EquipItem(index))
-                            inventory?.UseItem(index);
-                    }
+                    inventory.selectedIndex = index;
+                    inventory.UpdateSlotVisual(index);
                 }
+                else if (inventory.selectedIndex == index)
+                {
+                    inventory.ClearSelection();
+                    inventory.UpdateSlotVisual(index);
+                }
+                else
+                {
+                    inventory.CombineItems(inventory.selectedIndex, index);
+                    int prev = inventory.selectedIndex;
+                    inventory.ClearSelection();
+                    inventory.UpdateSlotVisual(prev);
+                    inventory.UpdateSlotVisual(index);
+                }
+                return;
             }
-            else if (eventData.button == PointerEventData.InputButton.Right)
+
+            bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            if (eventData.button == PointerEventData.InputButton.Right)
             {
                 if (shift)
                     inventory?.PromptStackSplit(index, StackSplitType.Drop);

@@ -111,10 +111,16 @@ namespace Inventory
         [Header("Save")]
         [Tooltip("Save key used for persistence.")]
         public string saveKey = "InventoryData";
-        
+
+        [Header("Combination")]
+        [Tooltip("Database of valid item combinations.")]
+        public ItemCombinationDatabase combinationDatabase;
+
         private Image[] slotImages;
         private Text[] slotCountTexts;
         private InventoryEntry[] items;
+        public int selectedIndex = -1;
+        private Image[] slotHighlights;
 
         private GameObject tooltip;
         private Text tooltipNameText;
@@ -363,6 +369,7 @@ namespace Inventory
             // Generate visible slot images
             slotImages = new Image[size];
             slotCountTexts = new Text[size];
+            slotHighlights = new Image[size];
 
             try
             {
@@ -388,6 +395,25 @@ namespace Inventory
 
                     // IMPORTANT: keep enabled so you can see the empty slot
                     img.enabled = true;
+
+                    // Add highlight image
+                    GameObject highlightGO = new GameObject("Highlight", typeof(Image));
+                    highlightGO.transform.SetParent(slot.transform, false);
+                    var highlightImg = highlightGO.GetComponent<Image>();
+                    highlightImg.sprite = slotFrameSprite;
+                    highlightImg.type = (slotFrameSprite != null) ? Image.Type.Sliced : Image.Type.Simple;
+                    highlightImg.color = Color.clear;
+                    highlightImg.raycastTarget = false;
+                    var highlightOutline = highlightGO.AddComponent<Outline>();
+                    highlightOutline.effectColor = Color.yellow;
+                    highlightOutline.effectDistance = new Vector2(1f, -1f);
+                    var hlRect = highlightGO.GetComponent<RectTransform>();
+                    hlRect.anchorMin = Vector2.zero;
+                    hlRect.anchorMax = Vector2.one;
+                    hlRect.offsetMin = Vector2.zero;
+                    hlRect.offsetMax = Vector2.zero;
+                    highlightImg.enabled = false;
+                    slotHighlights[i] = highlightImg;
 
                     // Add quantity text
                     GameObject countGO = new GameObject("Count", typeof(Text));
@@ -561,7 +587,7 @@ namespace Inventory
             return (count / 1000) + "k";
         }
 
-        private void UpdateSlotVisual(int index)
+        public void UpdateSlotVisual(int index)
         {
             if (slotImages == null || index < 0 || index >= slotImages.Length || slotImages[index] == null)
                 return;
@@ -603,6 +629,9 @@ namespace Inventory
                     slotCountTexts[index].enabled = false;
                 }
             }
+
+            if (slotHighlights != null && slotHighlights.Length > index && slotHighlights[index] != null)
+                slotHighlights[index].enabled = (selectedIndex == index);
         }
 
         /// <summary>
@@ -773,6 +802,50 @@ namespace Inventory
             }
 
             return false;
+        }
+
+        public bool CombineItems(int srcIndex, int dstIndex)
+        {
+            if (combinationDatabase == null)
+                return false;
+            if (srcIndex < 0 || dstIndex < 0 || srcIndex >= items.Length || dstIndex >= items.Length)
+                return false;
+
+            var srcItem = items[srcIndex].item;
+            var dstItem = items[dstIndex].item;
+            if (srcItem == null || dstItem == null)
+                return false;
+
+            var result = combinationDatabase.GetResult(srcItem, dstItem);
+            if (result == null)
+                return false;
+
+            items[srcIndex].count--;
+            if (items[srcIndex].count <= 0)
+                items[srcIndex].item = null;
+            UpdateSlotVisual(srcIndex);
+
+            items[dstIndex].count--;
+            if (items[dstIndex].count <= 0)
+                items[dstIndex].item = null;
+            UpdateSlotVisual(dstIndex);
+
+            AddItem(result, 1);
+            OnInventoryChanged?.Invoke();
+            return true;
+        }
+
+        public void ClearSelection()
+        {
+            selectedIndex = -1;
+            if (slotHighlights != null)
+            {
+                for (int i = 0; i < slotHighlights.Length; i++)
+                {
+                    if (slotHighlights[i] != null)
+                        slotHighlights[i].enabled = false;
+                }
+            }
         }
 
         /// <summary>
