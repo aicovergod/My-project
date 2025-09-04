@@ -81,6 +81,10 @@ namespace Inventory
         [Header("Equipment")] [Tooltip("Slot this item can be equipped to. Use None for non-equippable items.")]
         public EquipmentSlot equipmentSlot = EquipmentSlot.None;
 
+        [Header("Fishing Bonuses")]
+        [Tooltip("Extra bycatch roll chance (0.01 = 1%).")]
+        public float bycatchChanceBonus = 0f;
+
         [Header("Requirements")]
         public SkillRequirement[] skillRequirements;
 
