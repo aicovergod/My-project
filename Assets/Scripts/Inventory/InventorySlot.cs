@@ -67,6 +67,12 @@ namespace Inventory
 
             if (eventData.button == PointerEventData.InputButton.Left)
             {
+                var entry = inventory.GetSlot(index);
+                if (entry.item != null && entry.item.equipmentSlot != EquipmentSlot.None)
+                {
+                    inventory.EquipItem(index);
+                    return;
+                }
                 if (inventory.selectedIndex < 0)
                 {
                     inventory.selectedIndex = index;
