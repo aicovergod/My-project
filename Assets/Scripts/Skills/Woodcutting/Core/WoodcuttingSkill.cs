@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,6 +20,7 @@ namespace Skills.Woodcutting
     {
         [SerializeField] private XpTable xpTable;
         [SerializeField] private Inventory.Inventory inventory;
+        [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
         [SerializeField] private MonoBehaviour saveProvider; // Optional custom save provider
 
@@ -55,6 +57,8 @@ namespace Skills.Woodcutting
         {
             if (inventory == null)
                 inventory = GetComponent<Inventory.Inventory>();
+            if (equipment == null)
+                equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
             save = saveProvider as IWoodcuttingSave ?? new SaveManagerWoodcuttingSave();
             PreloadLogItems();
@@ -171,10 +175,23 @@ namespace Skills.Woodcutting
                     return;
                 }
 
-                xp += currentTree.def.XpPerLog * amount;
+                float xpBonus = 0f;
+                if (equipment != null)
+                {
+                    foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+                    {
+                        if (slot == EquipmentSlot.None)
+                            continue;
+                        var entry = equipment.GetEquipped(slot);
+                        if (entry.item != null)
+                            xpBonus += entry.item.woodcuttingXpBonusMultiplier;
+                    }
+                }
+                int xpGain = Mathf.RoundToInt(currentTree.def.XpPerLog * amount * (1f + xpBonus));
+                xp += xpGain;
                 string logName = item != null ? item.itemName : currentTree.def.DisplayName;
                 FloatingText.Show($"+{amount} {logName}", anchorPos);
-                StartCoroutine(ShowXpGainDelayed(currentTree.def.XpPerLog * amount, anchorTransform));
+                StartCoroutine(ShowXpGainDelayed(xpGain, anchorTransform));
                 OnLogGained?.Invoke(logId, amount);
 
                 if (currentTree.def.PetDropChance > 0)
