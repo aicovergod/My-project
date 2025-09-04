@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,6 +20,7 @@ namespace Skills.Mining
     {
         [SerializeField] private XpTable xpTable;
         [SerializeField] private Inventory.Inventory inventory;
+        [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
         [SerializeField] private MonoBehaviour saveProvider; // Optional custom save provider
 
@@ -55,6 +57,8 @@ namespace Skills.Mining
         {
             if (inventory == null)
                 inventory = GetComponent<Inventory.Inventory>();
+            if (equipment == null)
+                equipment = GetComponent<Equipment>();
             save = saveProvider as IMiningSave ?? new SaveManagerMiningSave();
             skills = GetComponent<SkillManager>();
             PreloadOreItems();
@@ -177,9 +181,22 @@ namespace Skills.Mining
                         return;
                     }
 
-                    xp += ore.XpPerOre * amount;
+                    float xpBonus = 0f;
+                    if (equipment != null)
+                    {
+                        foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+                        {
+                            if (slot == EquipmentSlot.None)
+                                continue;
+                            var entry = equipment.GetEquipped(slot);
+                            if (entry.item != null)
+                                xpBonus += entry.item.miningXpBonusMultiplier;
+                        }
+                    }
+                    int xpGain = Mathf.RoundToInt(ore.XpPerOre * amount * (1f + xpBonus));
+                    xp += xpGain;
                     FloatingText.Show($"+{amount} {ore.DisplayName}", anchorPos);
-                    StartCoroutine(ShowXpGainDelayed(ore.XpPerOre * amount, anchorTransform));
+                    StartCoroutine(ShowXpGainDelayed(xpGain, anchorTransform));
                     OnOreGained?.Invoke(ore.Id, amount);
 
                     if (ore.PetDropChance > 0)

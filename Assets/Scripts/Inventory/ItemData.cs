@@ -88,6 +88,14 @@ namespace Inventory
         [Tooltip("Additional fishing XP multiplier (0.025 = +2.5% XP).")]
         public float fishingXpBonusMultiplier = 0f;
 
+        [Header("Woodcutting Bonuses")]
+        [Tooltip("Additional woodcutting XP multiplier (0.025 = +2.5% XP).")]
+        public float woodcuttingXpBonusMultiplier = 0f;
+
+        [Header("Mining Bonuses")]
+        [Tooltip("Additional mining XP multiplier (0.025 = +2.5% XP).")]
+        public float miningXpBonusMultiplier = 0f;
+
         [Header("Requirements")]
         public SkillRequirement[] skillRequirements;
 
