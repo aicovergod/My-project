@@ -85,6 +85,9 @@ namespace Inventory
         [Tooltip("Extra bycatch roll chance (0.01 = 1%).")]
         public float bycatchChanceBonus = 0f;
 
+        [Tooltip("Additional fishing XP multiplier (0.025 = +2.5% XP).")]
+        public float fishingXpBonusMultiplier = 0f;
+
         [Header("Requirements")]
         public SkillRequirement[] skillRequirements;
 
