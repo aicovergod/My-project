@@ -16,6 +16,7 @@ namespace Skills.Fishing
     {
         [SerializeField] private XpTable xpTable;
         [SerializeField] private Inventory.Inventory inventory;
+        [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
         [SerializeField] private MonoBehaviour saveProvider; // optional custom save provider
         private BycatchManager bycatchManager;
@@ -53,6 +54,8 @@ namespace Skills.Fishing
         {
             if (inventory == null)
                 inventory = GetComponent<Inventory.Inventory>();
+            if (equipment == null)
+                equipment = GetComponent<Equipment>();
             save = saveProvider as IFishingSave ?? new SaveManagerFishingSave();
             PreloadFishItems();
             if (bycatchManager == null)
@@ -256,7 +259,19 @@ namespace Skills.Fishing
             float t = (L - 1f) / 98f;
             float baseChance = Mathf.Lerp(0.015f, 0.10f, t);
             float pityBonus = consecutiveFails >= 50 ? (consecutiveFails - 49) * 0.01f : 0f;
-            float finalChance = Mathf.Clamp01(baseChance + pityBonus);
+            float gearBonus = 0f;
+            if (equipment != null)
+            {
+                foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+                {
+                    if (slot == EquipmentSlot.None)
+                        continue;
+                    var entry = equipment.GetEquipped(slot);
+                    if (entry.item != null)
+                        gearBonus += entry.item.bycatchChanceBonus;
+                }
+            }
+            float finalChance = Mathf.Clamp01(baseChance + pityBonus + gearBonus);
 
             var rng = CreateRng(ctx);
             bool success = rng.NextDouble() < finalChance;
