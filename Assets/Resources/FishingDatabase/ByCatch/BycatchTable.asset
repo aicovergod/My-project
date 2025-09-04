@@ -22,6 +22,150 @@ MonoBehaviour:
     pityRareStep: 0.005
     pityUltraStep: 0.001
   withBaitMul: 1
-  withoutBaitMul: 0.9
-  correctToolMul: 1.1
-  entries: []
+  withoutBaitMul: 1
+  correctToolMul: 1
+  entries:
+  - item: {fileID: 11400000, guid: 17db838874746284db6cbfe6ff9021b5, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 6463a445ea8da6d45b3ccb76a0e4a774, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: d09bcd6ff7cf48a4fa0218509342882e, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 4d3abb9d6bbb52c43b937b8c99667536, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 532545dcbcd3b5345a87575b7ae906ad, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 5a056e8d9d4499d46b38cf5a67fe389e, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 4f8681409f22f8e4b854e9d29e4654e1, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 8a1e9cd1e24049e46adcbeb89b193ce0, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 6c8ed9111bc05734f83860144758a19c, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: eeca995bd9926f34780a6a5ba5f311be, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: efd53f4e49a06be47bc66148f6f4624b, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: dc35c344b0b3beb409b62272d0b9a380, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: e21b54a18643cc24d96146dcac7beb81, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 37babaac91a574a4192d93686cc8cace, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 4e30f0e0c0b8d0040b7138f4bf314e89, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: a5e42e18af3ac0c4f9097255071f866e, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: e315fa148b8eca049829d52bbf296553, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 5b074fdfb49e72e4fb5548d34c3ec51d, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: cbb1575405c21e64ea6450320cbe6259, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 3dacefa986db7e547b3c43ac78196a11, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: c24318c3ad30f2e43b2d3e23a945e685, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: ffc8a79dff3343d43942f9833f2fe349, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 7b769e638a455944e9cf20fa2febc0a8, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: cd31792249ffdb4448c201cc690a8096, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 5334b43ba04b9f044a3ec00c82206d2b, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: f0bbb955cb1c53a409a17b78df496ef7, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: da87a61896fdec54db605011f59cb3bc, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: a3b2ef2fb32c7e44983caa626a0633ab, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: c4efa0f038741a643aeed4e2c17411be, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 4f8681409f22f8e4b854e9d29e4654e1, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: ed62d5883e6ebaf4a985bbc007e75d89, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 26a8031fe7048e54b9596bf27b34ed57, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: ab9b4cc39f6262a458a33ba80027dd31, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: f2dd4aee3b19b704c843604251397531, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 025de4a4c77c5fe45b511f4a8e4c5109, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: e3acb2c3bcfb3294bacb42cc36b52e9f, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99

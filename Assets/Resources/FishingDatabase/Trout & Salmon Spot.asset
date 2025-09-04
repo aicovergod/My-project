@@ -19,6 +19,7 @@ MonoBehaviour:
   allowedTools:
   - {fileID: 11400000, guid: 30a8d8123aa0a7749b98426a2cc3aea4, type: 2}
   baitItemId: Feathers
+  waterType: -1
   depletesAfterCatch: 0
   depleteRollInverse: 8
   respawnSeconds: 5

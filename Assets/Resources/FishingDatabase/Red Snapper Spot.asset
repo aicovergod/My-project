@@ -18,6 +18,7 @@ MonoBehaviour:
   allowedTools:
   - {fileID: 11400000, guid: c1e73f2ab42195a4d8e3abb3f611177b, type: 2}
   baitItemId: 
+  waterType: 2
   depletesAfterCatch: 0
   depleteRollInverse: 8
   respawnSeconds: 11

@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
+  m_Name: Frog Carcass
+  m_EditorClassIdentifier: 
+  id: Frog Carcass
+  itemName: Frog Carcass
+  icon: {fileID: 21300000, guid: 98ffa362be884654c9d3fd9cbaea0f14, type: 3}
+  description: A dead frog
+  stackable: 0
+  maxStack: 1
+  splittable: 0
+  equipmentSlot: 0
+  skillRequirements: []
+  combat:
+    Attack: 0
+    Strength: 0
+    Range: 0
+    Magic: 0
+    MeleeDefence: 0
+    RangeDefence: 0
+    MagicDefence: 0
+    AttackSpeedTicks: 0
+  attackBonus: 0
+  defenceBonus: 0
+  attackSpeed: 0
+  strengthBonus: 0
+  rangeBonus: 0
+  magicBonus: 0
+  meleeDefenceBonus: 0
+  rangedDefenceBonus: 0
+  magicDefenceBonus: 0

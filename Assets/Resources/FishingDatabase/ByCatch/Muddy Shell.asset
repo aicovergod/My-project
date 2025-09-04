@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5264921daa7e5584d882b6d1fbf3a725, type: 3}
-  m_Name: Dragon Axe
+  m_Name: Muddy Shell
   m_EditorClassIdentifier: 
-  itemId: Dragon Axe
-  displayName: Dragon Axe
+  itemId: Muddy Shell
+  displayName: Muddy Shell
   rarity: 0
   baseWeight: 1
-  allowedWaterTypes: -1
+  allowedWaterTypes: 4
   minFishingLevel: 1
   maxFishingLevel: 99
   requiresBait: 0
