@@ -65,6 +65,14 @@ namespace Inventory
                 return;
             }
 
+            bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            if (inventory != null && inventory.InShop && eventData.button == PointerEventData.InputButton.Left)
+            {
+                if (shift) inventory.PromptStackSplit(index, StackSplitType.Sell);
+                else       inventory.SellItem(index, 1);
+                return;
+            }
+
             if (eventData.button == PointerEventData.InputButton.Left)
             {
                 var entry = inventory.GetSlot(index);
@@ -94,7 +102,6 @@ namespace Inventory
                 return;
             }
 
-            bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
             if (eventData.button == PointerEventData.InputButton.Right)
             {
                 if (shift)
