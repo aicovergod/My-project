@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5264921daa7e5584d882b6d1fbf3a725, type: 3}
-  m_Name: Cracked Spyglass Lens
+  m_Name: Glowing Swamp Crystal
   m_EditorClassIdentifier: 
-  itemId: Cracked Spyglass Lens
-  displayName: Cracked Spyglass Lens
+  itemId: Glowing Swamp Crystal
+  displayName: Glowing Swamp Crystal
   rarity: 1
   baseWeight: 1
-  allowedWaterTypes: 2
+  allowedWaterTypes: 4
   minFishingLevel: 1
   maxFishingLevel: 99
   requiresBait: 0

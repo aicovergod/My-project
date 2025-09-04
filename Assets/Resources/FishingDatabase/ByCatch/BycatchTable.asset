@@ -185,3 +185,35 @@ MonoBehaviour:
     baseWeight: 1
     minLevelOverride: 1
     maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: f909f7bf84cc4b14c8566b4916ba4ff6, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 65677f553acca7e47afd378ccc94b925, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: df308b44f07208744a0e78c24328033e, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 0800c3d39748c91419c9dbe8c32df09f, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: be8f83713c8764748bbe252deacc00b1, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: c0c95df866e432f47a63ad16cec6f55e, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 85626f49e16682440a0dfc1e0fbf5794, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: 9d29510482bac15479a6bd8c696664b7, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99
