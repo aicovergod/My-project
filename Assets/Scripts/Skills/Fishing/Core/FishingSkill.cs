@@ -188,9 +188,22 @@ namespace Skills.Fishing
                     return;
                 }
 
-                xp += fish.Xp * amount;
+                float xpBonus = 0f;
+                if (equipment != null)
+                {
+                    foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+                    {
+                        if (slot == EquipmentSlot.None)
+                            continue;
+                        var entry = equipment.GetEquipped(slot);
+                        if (entry.item != null)
+                            xpBonus += entry.item.fishingXpBonusMultiplier;
+                    }
+                }
+                int xpGain = Mathf.RoundToInt(fish.Xp * amount * (1f + xpBonus));
+                xp += xpGain;
                 FloatingText.Show($"+{amount} {fish.DisplayName}", anchor.position);
-                StartCoroutine(ShowXpGainDelayed(fish.Xp * amount, anchor));
+                StartCoroutine(ShowXpGainDelayed(xpGain, anchor));
                 OnFishCaught?.Invoke(fish.Id, amount);
 
                 TryRollBycatch(anchor);
