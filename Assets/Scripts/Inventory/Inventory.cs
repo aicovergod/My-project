@@ -215,11 +215,22 @@ namespace Inventory
             var entry = items[index];
             if (entry.item == null || entry.item.equipmentSlot == EquipmentSlot.None)
                 return false;
+
+            // Temporarily free the slot before attempting to equip.
+            items[index] = default;
+            UpdateSlotVisual(index);
+
+            // Try to equip the item.
             if (equipment.Equip(entry))
             {
-                ClearSlot(index);
+                OnInventoryChanged?.Invoke();
                 return true;
             }
+
+            // Equipping failed. Restore the original item.
+            items[index] = entry;
+            UpdateSlotVisual(index);
+            OnInventoryChanged?.Invoke();
             return false;
         }
 
