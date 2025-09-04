@@ -280,7 +280,7 @@ namespace Skills.Fishing
                 consecutiveFails++;
                 bycatchManager.ApplyStreakResult(waterType, BycatchResult.None);
                 if (BycatchManager.DebugBycatchRolls)
-                    Debug.Log($"[Bycatch] roll {ctx.rollIndex} lvl={ctx.playerLevel} bait={ctx.hasBait} water={ctx.waterType} tool={ctx.tool} streak={streak} -> no bycatch");
+                    Debug.Log($"[Bycatch] roll {ctx.rollIndex} lvl={ctx.playerLevel} bait={ctx.hasBait} water={ctx.waterType} tool={ctx.tool} streak={streak} chance={finalChance * 100f:F2}% -> no bycatch");
                 return;
             }
 
@@ -291,7 +291,7 @@ namespace Skills.Fishing
                 string result = res.IsNone
                     ? "no bycatch"
                     : $"{res.item.DisplayName} x{res.quantity} ({res.Rarity})";
-                Debug.Log($"[Bycatch] roll {ctx.rollIndex} lvl={ctx.playerLevel} bait={ctx.hasBait} water={ctx.waterType} tool={ctx.tool} streak={streak} -> {result}");
+                Debug.Log($"[Bycatch] roll {ctx.rollIndex} lvl={ctx.playerLevel} bait={ctx.hasBait} water={ctx.waterType} tool={ctx.tool} streak={streak} chance={finalChance * 100f:F2}% -> {result}");
             }
 
             bycatchManager.ApplyStreakResult(waterType, res);
