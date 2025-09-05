@@ -21,6 +21,8 @@ namespace NPC
         private PlayerCombatTarget playerTarget;
         private bool hasHitPlayer;
         private Vector2 spawnPosition;
+        private NpcSpriteAnimator spriteAnimator;
+        private SpriteRenderer spriteRenderer;
 
         [SerializeField] private float slamInterval = 10f;
         [SerializeField] private int slamDamage = 10;
@@ -35,6 +37,8 @@ namespace NPC
             wanderer = GetComponent<NpcWanderer>();
             playerTarget = FindObjectOfType<PlayerCombatTarget>();
             spawnPosition = transform.position;
+            spriteAnimator = GetComponent<NpcSpriteAnimator>() ?? GetComponentInChildren<NpcSpriteAnimator>();
+            spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
         }
 
         private void Update()
@@ -59,6 +63,21 @@ namespace NPC
             else if (playerDistFromSpawn > profile.AggroRange || npcDistFromSpawn > profile.AggroRange)
             {
                 BeginAttacking(null);
+            }
+
+            if (currentTarget != null && currentTarget.IsAlive && combatant.IsAlive)
+            {
+                Vector2 diff = currentTarget.transform.position - transform.position;
+                int facingDir;
+                if (Mathf.Abs(diff.x) > Mathf.Abs(diff.y))
+                    facingDir = diff.x < 0f ? 1 : 2;
+                else
+                    facingDir = diff.y < 0f ? 0 : 3;
+
+                if (spriteAnimator != null)
+                    spriteAnimator.SetFacing(facingDir);
+                else if (spriteRenderer != null)
+                    spriteRenderer.flipX = facingDir == 2;
             }
         }
 

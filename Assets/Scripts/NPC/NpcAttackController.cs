@@ -72,6 +72,21 @@ namespace NPC
             {
                 BeginAttacking(null);
             }
+
+            if (currentTarget != null && combatant.IsAlive && currentTarget.IsAlive)
+            {
+                Vector2 diff = currentTarget.transform.position - transform.position;
+                int facingDir;
+                if (Mathf.Abs(diff.x) > Mathf.Abs(diff.y))
+                    facingDir = diff.x < 0f ? 1 : 2;
+                else
+                    facingDir = diff.y < 0f ? 0 : 3;
+
+                if (spriteAnimator != null)
+                    spriteAnimator.SetFacing(facingDir);
+                else if (spriteRenderer != null)
+                    spriteRenderer.flipX = facingDir == 2;
+            }
         }
 
         private IEnumerator AttackRoutine(CombatTarget target)
