@@ -121,6 +121,7 @@ namespace Inventory
         private InventoryEntry[] items;
         public int selectedIndex = -1;
         private Image[] slotHighlights;
+        private Material highlightMaterial;
 
         private GameObject tooltip;
         private Text tooltipNameText;
@@ -406,10 +407,16 @@ namespace Inventory
                     highlightImg.color = new Color(1f, 1f, 1f, 0f);
                     highlightImg.type = Image.Type.Simple;
                     highlightImg.raycastTarget = false;
-                    var highlightOutline = highlightGO.AddComponent<Outline>();
-                    highlightOutline.effectColor = Color.yellow;
-                    highlightOutline.effectDistance = new Vector2(1f, -1f);
-                    highlightOutline.useGraphicAlpha = false;
+                    if (highlightMaterial == null)
+                    {
+                        var shader = Shader.Find("Custom/SpriteOutline");
+                        if (shader != null)
+                        {
+                            highlightMaterial = new Material(shader);
+                            highlightMaterial.SetColor("_OutlineColor", Color.yellow);
+                        }
+                    }
+                    highlightImg.material = highlightMaterial;
                     var hlRect = highlightGO.GetComponent<RectTransform>();
                     hlRect.anchorMin = Vector2.zero;
                     hlRect.anchorMax = Vector2.one;
@@ -642,6 +649,11 @@ namespace Inventory
                 highlight.sprite = slotImages[index].sprite;
                 highlight.type = Image.Type.Simple;
                 highlight.color = new Color(1f, 1f, 1f, 0f); // transparent fill
+                if (highlightMaterial != null)
+                {
+                    highlight.material = highlightMaterial;
+                    highlightMaterial.SetColor("_OutlineColor", Color.yellow);
+                }
                 highlight.enabled = (selectedIndex == index);
             }
         }
