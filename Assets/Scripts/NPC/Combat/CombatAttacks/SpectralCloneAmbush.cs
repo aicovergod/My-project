@@ -20,12 +20,14 @@ namespace NPC
         /// <param name="clonePrefabs">Array of possible clone prefabs.</param>
         /// <param name="cloneCount">Number of clones to spawn.</param>
         /// <param name="cloneLifespan">Lifetime in seconds for each clone.</param>
+        /// <param name="spawnRadius">Radius around the target to spawn clones.</param>
         /// <param name="realCloneDamage">Damage dealt by the real clone.</param>
         /// <param name="onCloneDestroyed">Callback invoked whenever a clone is destroyed or expires.</param>
         /// <param name="onAllClonesGone">Callback invoked once all clones are gone.</param>
         public static void Perform(BaseNpcCombat owner, CombatTarget target,
             GameObject[] clonePrefabs, int cloneCount, float cloneLifespan,
-            int realCloneDamage, Action<GameObject> onCloneDestroyed = null,
+            float spawnRadius = 1f, int realCloneDamage = 0,
+            Action<GameObject> onCloneDestroyed = null,
             Action onAllClonesGone = null)
         {
             if (owner == null || target == null || clonePrefabs == null ||
@@ -33,14 +35,14 @@ namespace NPC
                 return;
 
             owner.StartCoroutine(SpawnClones(owner, target, clonePrefabs,
-                cloneCount, cloneLifespan, realCloneDamage,
+                cloneCount, cloneLifespan, spawnRadius, realCloneDamage,
                 onCloneDestroyed, onAllClonesGone));
         }
 
         private static IEnumerator SpawnClones(BaseNpcCombat owner, CombatTarget target,
             GameObject[] clonePrefabs, int cloneCount, float cloneLifespan,
-            int realCloneDamage, Action<GameObject> onCloneDestroyed,
-            Action onAllClonesGone)
+            float spawnRadius, int realCloneDamage,
+            Action<GameObject> onCloneDestroyed, Action onAllClonesGone)
         {
             var managerGO = new GameObject("SpectralCloneManager");
             var manager = managerGO.AddComponent<CloneManager>();
@@ -56,7 +58,10 @@ namespace NPC
                 if (prefab == null)
                     continue;
 
-                Vector2 spawnPos = (Vector2)target.transform.position + UnityEngine.Random.insideUnitCircle;
+                float angle = i * Mathf.PI * 2f / cloneCount;
+                angle += UnityEngine.Random.Range(-0.1f, 0.1f);
+                Vector2 spawnPos = (Vector2)target.transform.position +
+                    new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * spawnRadius;
                 var clone = UnityEngine.Object.Instantiate(prefab, spawnPos, Quaternion.identity);
                 var controller = clone.AddComponent<SpectralClone>();
                 controller.manager = manager;

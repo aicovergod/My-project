@@ -14,6 +14,7 @@ namespace NPC
         [SerializeField] private float ambushInterval = 15f;
         [SerializeField] private int cloneCount = 3;
         [SerializeField] private float cloneLifespan = 6f;
+        [SerializeField] private float spawnRadius = 1f;
         [SerializeField] private int realCloneDamage = 4;
         [SerializeField] private GameObject[] clonePrefabs;
 
@@ -33,7 +34,7 @@ namespace NPC
                 if (target == null || !target.IsAlive || !combatant.IsAlive)
                     break;
                 SpectralCloneAmbush.Perform(this, target, clonePrefabs, cloneCount,
-                    cloneLifespan, realCloneDamage);
+                    cloneLifespan, spawnRadius, realCloneDamage);
             }
         }
     }
