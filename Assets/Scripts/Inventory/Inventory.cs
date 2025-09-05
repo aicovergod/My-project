@@ -400,9 +400,9 @@ namespace Inventory
                     GameObject highlightGO = new GameObject("Highlight", typeof(Image));
                     highlightGO.transform.SetParent(slot.transform, false);
                     var highlightImg = highlightGO.GetComponent<Image>();
-                    highlightImg.sprite = slotFrameSprite;
-                    highlightImg.type = (slotFrameSprite != null) ? Image.Type.Sliced : Image.Type.Simple;
-                    highlightImg.color = Color.clear;
+                    highlightImg.sprite = null;
+                    highlightImg.color = new Color(1f, 1f, 1f, 0f);
+                    highlightImg.type = Image.Type.Simple;
                     highlightImg.raycastTarget = false;
                     var highlightOutline = highlightGO.AddComponent<Outline>();
                     highlightOutline.effectColor = Color.yellow;
@@ -631,7 +631,13 @@ namespace Inventory
             }
 
             if (slotHighlights != null && slotHighlights.Length > index && slotHighlights[index] != null)
-                slotHighlights[index].enabled = (selectedIndex == index);
+            {
+                var highlight = slotHighlights[index];
+                highlight.sprite = slotImages[index].sprite;
+                highlight.type = Image.Type.Simple;
+                highlight.color = new Color(1f, 1f, 1f, 0f); // transparent fill
+                highlight.enabled = (selectedIndex == index);
+            }
         }
 
         /// <summary>
