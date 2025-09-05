@@ -13,6 +13,7 @@ namespace Inventory
         private Inventory inventory;
         private int slotIndex;
         private Font font;
+        private RectTransform rect;
 
         public static InventoryDropMenu Create(Transform parent, Font font)
         {
@@ -20,16 +21,33 @@ namespace Inventory
             go.transform.SetParent(parent, false);
             var menu = go.GetComponent<InventoryDropMenu>();
             menu.font = font;
+            menu.rect = go.GetComponent<RectTransform>();
             menu.BuildUI();
             go.SetActive(false);
             return menu;
+        }
+
+        private void Awake()
+        {
+            rect ??= GetComponent<RectTransform>();
+        }
+
+        private void Update()
+        {
+            if (!gameObject.activeSelf)
+                return;
+
+            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
+            {
+                if (!RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition))
+                    Hide();
+            }
         }
 
         private void BuildUI()
         {
             var bg = GetComponent<Image>();
             bg.color = new Color(0f, 0f, 0f, 0.9f);
-            var rect = GetComponent<RectTransform>();
             rect.pivot = new Vector2(0f, 1f);
 
             var layout = gameObject.AddComponent<VerticalLayoutGroup>();
@@ -64,9 +82,9 @@ namespace Inventory
             txt.color = Color.white;
             txt.text = label;
 
-            var rect = btnGO.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(100f, 20f);
-            rect.pivot = new Vector2(0f, 1f);
+            var btnRect = btnGO.GetComponent<RectTransform>();
+            btnRect.sizeDelta = new Vector2(100f, 20f);
+            btnRect.pivot = new Vector2(0f, 1f);
 
             var txtRect = txtGO.GetComponent<RectTransform>();
             txtRect.anchorMin = Vector2.zero;
