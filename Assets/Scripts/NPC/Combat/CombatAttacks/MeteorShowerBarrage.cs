@@ -25,27 +25,26 @@ namespace NPC
         /// <param name="burnDuration">Duration of the burning ground.</param>
         /// <param name="meteorPrefab">Prefab used for meteor projectiles.</param>
         /// <param name="burnPrefab">Prefab used for the burning ground effect.</param>
-        /// <param name="impactRadius">Radius for impact damage and burning ground.</param>
         /// <param name="dropHeight">Height above the ground to spawn meteors.</param>
         /// <param name="meteorSpeed">Speed at which meteors fall.</param>
         public static void Perform(BaseNpcCombat owner, CombatTarget target,
             int meteorCount, float spreadRadius, int impactDamage,
             int burnDamagePerTick, float burnDuration,
             GameObject meteorPrefab, GameObject burnPrefab,
-            float impactRadius = 1.5f, float dropHeight = 8f, float meteorSpeed = 8f)
+            float dropHeight = 8f, float meteorSpeed = 8f)
         {
             if (owner == null || target == null || meteorCount <= 0)
                 return;
 
             owner.StartCoroutine(SpawnMeteors(owner, target, meteorCount, spreadRadius,
                 impactDamage, burnDamagePerTick, burnDuration, meteorPrefab, burnPrefab,
-                impactRadius, dropHeight, meteorSpeed));
+                dropHeight, meteorSpeed));
         }
 
         private static IEnumerator SpawnMeteors(BaseNpcCombat owner, CombatTarget target,
             int meteorCount, float spreadRadius, int impactDamage,
             int burnDamagePerTick, float burnDuration,
-            GameObject meteorPrefab, GameObject burnPrefab, float impactRadius,
+            GameObject meteorPrefab, GameObject burnPrefab,
             float dropHeight, float meteorSpeed)
         {
             for (int i = 0; i < meteorCount; i++)
@@ -62,7 +61,6 @@ namespace NPC
                     proj.burnDamagePerTick = burnDamagePerTick;
                     proj.burnDuration = burnDuration;
                     proj.burnPrefab = burnPrefab;
-                    proj.impactRadius = impactRadius;
                     proj.speed = meteorSpeed;
                     proj.owner = owner;
                 }

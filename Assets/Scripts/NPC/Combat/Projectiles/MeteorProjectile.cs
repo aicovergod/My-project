@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using Combat;
 
@@ -14,7 +13,6 @@ namespace NPC
         public int burnDamagePerTick;
         public float burnDuration;
         public GameObject burnPrefab;
-        public float impactRadius = 1.5f;
         public float speed = 8f;
         public BaseNpcCombat owner;
         [SerializeField] private float selfDestructTime = 10f;
@@ -42,20 +40,8 @@ namespace NPC
 
         private void Impact()
         {
-            ApplyAreaDamage();
             SpawnBurningGround();
             Destroy(gameObject);
-        }
-
-        private void ApplyAreaDamage()
-        {
-            var hits = Physics2D.OverlapCircleAll(target, impactRadius);
-            foreach (var h in hits)
-            {
-                var tgt = h.GetComponent<CombatTarget>();
-                if (tgt != null)
-                    tgt.ApplyDamage(impactDamage, DamageType.Magic, owner);
-            }
         }
 
         private void SpawnBurningGround()
@@ -63,42 +49,12 @@ namespace NPC
             if (burnPrefab != null && burnDuration > 0f && burnDamagePerTick > 0)
             {
                 var burnObj = Instantiate(burnPrefab, target, Quaternion.identity);
-                var burn = burnObj.AddComponent<BurningGround>();
-                burn.damagePerTick = burnDamagePerTick;
-                burn.duration = burnDuration;
-                burn.radius = impactRadius;
-            }
-        }
-
-        private class BurningGround : MonoBehaviour
-        {
-            public int damagePerTick;
-            public float duration;
-            public float radius;
-
-            private void Start()
-            {
-                StartCoroutine(BurnRoutine());
-            }
-
-            private IEnumerator BurnRoutine()
-            {
-                float elapsed = 0f;
-                var wait = new WaitForSeconds(CombatMath.TICK_SECONDS);
-                while (elapsed < duration)
+                var flame = burnObj.GetComponent<GroundFlame>();
+                if (flame != null)
                 {
-                    var hits = Physics2D.OverlapCircleAll(transform.position, radius);
-                    foreach (var h in hits)
-                    {
-                        var tgt = h.GetComponent<CombatTarget>();
-                        if (tgt != null)
-                            tgt.ApplyDamage(damagePerTick, DamageType.Burn, this);
-                    }
-                    elapsed += CombatMath.TICK_SECONDS;
-                    yield return wait;
+                    flame.damagePerTick = burnDamagePerTick;
+                    flame.duration = burnDuration;
                 }
-
-                Destroy(gameObject);
             }
         }
     }

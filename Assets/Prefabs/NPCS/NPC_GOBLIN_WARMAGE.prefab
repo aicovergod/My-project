@@ -364,6 +364,5 @@ MonoBehaviour:
   burnDuration: 5
   meteorPrefab: {fileID: 6111494187698877684, guid: ec39911e4d64dec46878ae62d069d0b7, type: 3}
   burnPrefab: {fileID: 6111494187698877684, guid: 9e9effd4291159241bc8f42d478e4569, type: 3}
-  impactRadius: 1.5
   dropHeight: 8
   meteorSpeed: 8
