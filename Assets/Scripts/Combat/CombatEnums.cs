@@ -9,7 +9,8 @@ namespace Combat
     {
         Melee,
         Ranged,
-        Magic
+        Magic,
+        Burn
     }
 
     /// <summary>

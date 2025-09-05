@@ -92,7 +92,7 @@ namespace NPC
                     {
                         var tgt = h.GetComponent<CombatTarget>();
                         if (tgt != null)
-                            tgt.ApplyDamage(damagePerTick, DamageType.Magic, this);
+                            tgt.ApplyDamage(damagePerTick, DamageType.Burn, this);
                     }
                     elapsed += CombatMath.TICK_SECONDS;
                     yield return wait;
