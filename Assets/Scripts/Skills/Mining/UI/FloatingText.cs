@@ -18,7 +18,7 @@ namespace Skills.Mining
         private Camera mainCamera;
         private float remainingLifetime;
 
-        public static void Show(string message, Vector3 position, Color? color = null, float? size = null)
+        public static void Show(string message, Vector3 position, Color? color = null, float? size = null, Sprite background = null)
         {
             GameObject go = new GameObject("FloatingText", typeof(Canvas));
             var instance = go.AddComponent<FloatingText>();
@@ -27,14 +27,26 @@ namespace Skills.Mining
             go.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             go.AddComponent<GraphicRaycaster>();
 
+            GameObject parentGO = go;
+
+            if (background != null)
+            {
+                var imageGO = new GameObject("Background", typeof(Image));
+                imageGO.transform.SetParent(go.transform, false);
+                var image = imageGO.GetComponent<Image>();
+                image.sprite = background;
+                image.SetNativeSize();
+                parentGO = imageGO;
+            }
+
             var textGO = new GameObject("Text", typeof(Text));
-            textGO.transform.SetParent(go.transform, false);
+            textGO.transform.SetParent(parentGO.transform, false);
             instance.uiText = textGO.GetComponent<Text>();
             instance.uiText.alignment = TextAnchor.MiddleCenter;
             instance.uiText.horizontalOverflow = HorizontalWrapMode.Overflow;
             instance.uiText.verticalOverflow = VerticalWrapMode.Overflow;
             instance.uiText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            instance.rectTransform = textGO.GetComponent<RectTransform>();
+            instance.rectTransform = background != null ? parentGO.GetComponent<RectTransform>() : textGO.GetComponent<RectTransform>();
             instance.mainCamera = Camera.main;
 
             instance.worldPosition = position;

@@ -28,6 +28,10 @@ namespace Combat
         private Coroutine attackRoutine;
         private CombatTarget currentTarget;
 
+        private Sprite damageHitsplat;
+        private Sprite zeroHitsplat;
+        private Sprite maxHitHitsplat;
+
         private void Awake()
         {
             // Grab required components from this object, falling back to parent/children so the
@@ -42,6 +46,10 @@ namespace Combat
                 Debug.LogWarning("CombatController could not find a SkillManager; damage will use level 1 stats.", this);
             if (equipment == null)
                 Debug.LogWarning("CombatController could not find an EquipmentAggregator; equipment bonuses will be ignored.", this);
+
+            damageHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat");
+            zeroHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Zero_damage_hitsplat");
+            maxHitHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat_maxhit");
         }
 
         /// <summary>
@@ -138,7 +146,8 @@ namespace Combat
                 int maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
                 damage = CombatMath.RollDamage(maxHit);
                 target.ApplyDamage(damage, attacker.DamageType, this);
-                FloatingText.Show(damage.ToString(), target.transform.position, Color.red);
+                var sprite = damage == maxHit ? maxHitHitsplat : damageHitsplat;
+                FloatingText.Show(damage.ToString(), target.transform.position, Color.white, null, sprite);
                 AwardXp(damage, attacker.Style);
                 if (!target.IsAlive)
                     OnTargetKilled?.Invoke(target);
@@ -146,7 +155,7 @@ namespace Combat
             }
             else
             {
-                FloatingText.Show("0", target.transform.position, Color.gray);
+                FloatingText.Show("0", target.transform.position, Color.white, null, zeroHitsplat);
                 Debug.Log($"Player missed {targetName}.");
             }
             OnAttackLanded?.Invoke(damage, hit);
