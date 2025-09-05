@@ -21,7 +21,8 @@ MonoBehaviour:
   splittable: 0
   equipmentSlot: 0
   bycatchChanceBonus: 0
-  fishingXpBonusMultiplier: 0
+  fishingXpBonusMultiplier: 0.02
+  fishingXpBonusWaterTypes: 1
   woodcuttingXpBonusMultiplier: 0
   miningXpBonusMultiplier: 0
   skillRequirements: []

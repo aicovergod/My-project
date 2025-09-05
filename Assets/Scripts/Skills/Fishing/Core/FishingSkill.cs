@@ -189,6 +189,7 @@ namespace Skills.Fishing
                 }
 
                 float xpBonus = 0f;
+                var waterType = currentSpot != null && currentSpot.def != null ? currentSpot.def.WaterType : WaterType.Any;
                 if (equipment != null)
                 {
                     foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
@@ -196,7 +197,7 @@ namespace Skills.Fishing
                         if (slot == EquipmentSlot.None)
                             continue;
                         var entry = equipment.GetEquipped(slot);
-                        if (entry.item != null)
+                        if (entry.item != null && (entry.item.fishingXpBonusWaterTypes & waterType) != 0)
                             xpBonus += entry.item.fishingXpBonusMultiplier;
                     }
                 }
