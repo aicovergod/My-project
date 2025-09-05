@@ -93,7 +93,7 @@ namespace Skills.Mining
 
             FloatingText.Show("Prospecting...", requester.position);
             yield return new WaitForSeconds(Ticker.TickDuration * 2f);
-            FloatingText.Show($"This rock contains {rockDef.Ore.DisplayName} ore.", requester.position);
+            FloatingText.Show($"This rock contains {rockDef.Ore.DisplayName} here", requester.position);
         }
     }
 }
