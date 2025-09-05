@@ -38,7 +38,7 @@ namespace NPC
 
             if (Vector2.Distance(playerController.transform.position, transform.position) > CombatMath.MELEE_RANGE)
             {
-                playerMover.MoveTo(transform.position, CombatMath.MELEE_RANGE, AttemptAttack);
+                playerMover.MoveTo(transform, CombatMath.MELEE_RANGE, AttemptAttack);
             }
             else
             {
