@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using ShopSystem;
 using Pets;
 using Combat;
+using UI;
 
 namespace NPC
 {
@@ -72,7 +73,7 @@ namespace NPC
             var ui = ShopUI.Instance;
             if (ui != null)
             {
-                ui.Open(shop, GetComponent<NpcRandomMovement>());
+                ui.Open(shop, GetComponent<NpcWanderer>());
             }
         }
 

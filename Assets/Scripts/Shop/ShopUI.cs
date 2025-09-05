@@ -42,7 +42,7 @@ namespace ShopSystem
         private Text shopNameText;
         private Shop currentShop;
         private PlayerMover playerMover;
-        private NpcRandomMovement npcMover;
+        private NpcWanderer npcMover;
 
         private static ShopUI instance;
         public static ShopUI Instance => instance;
@@ -98,7 +98,7 @@ namespace ShopSystem
         /// <summary>
         /// Opens the UI for the given shop and optionally pauses an NPC's movement.
         /// </summary>
-        public void Open(Shop shop, NpcRandomMovement npcMovement = null)
+        public void Open(Shop shop, NpcWanderer npcMovement = null)
         {
             if (shop == null) return;
             UIManager.Instance.OpenWindow(this);
