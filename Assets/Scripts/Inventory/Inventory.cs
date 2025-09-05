@@ -125,6 +125,7 @@ namespace Inventory
         private GameObject tooltip;
         private Text tooltipNameText;
         private Text tooltipDescriptionText;
+        private InventoryDropMenu dropMenu;
 
         // Active shop context when interacting with a shop
         private Shop currentShop;
@@ -159,6 +160,7 @@ namespace Inventory
                 return;
             if (uiRoot != null)
                 uiRoot.SetActive(false);
+            HideDropMenu();
             if (playerMover != null)
             {
                 var pet = PetDropSystem.ActivePetObject;
@@ -544,6 +546,8 @@ namespace Inventory
             tooltipRect.pivot = new Vector2(0f, 1f);
 
             tooltip.SetActive(false);
+
+            dropMenu = InventoryDropMenu.Create(uiRoot.transform, stackCountFont);
         }
 
         private string FormatStackCount(int count, out Color color)
@@ -1087,6 +1091,17 @@ namespace Inventory
         {
             if (tooltip != null)
                 tooltip.SetActive(false);
+        }
+
+        public void ShowDropMenu(int slotIndex, Vector2 position)
+        {
+            HideTooltip();
+            dropMenu?.Show(this, slotIndex, position);
+        }
+
+        public void HideDropMenu()
+        {
+            dropMenu?.Hide();
         }
 
         /// <summary>
