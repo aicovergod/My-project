@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Reflection;
 using UnityEngine;
 using Combat;
 
@@ -70,6 +71,22 @@ namespace NPC
                 controller.owner = owner;
                 controller.target = target;
                 controller.realDamage = realCloneDamage;
+
+                var npcCombatant = clone.GetComponent<NpcCombatant>();
+                if (npcCombatant != null)
+                {
+                    var profileField = typeof(NpcCombatant)
+                        .GetField("profile", BindingFlags.NonPublic | BindingFlags.Instance);
+                    var profile = npcCombatant.Profile;
+                    if (profile != null)
+                    {
+                        profile = UnityEngine.Object.Instantiate(profile);
+                        profileField?.SetValue(npcCombatant, profile);
+                        controller.profile = profile;
+                        controller.originalAggroRange = profile.AggroRange;
+                        profile.AggroRange = float.MaxValue;
+                    }
+                }
             }
 
             yield break;
@@ -102,6 +119,8 @@ namespace NPC
             public CombatTarget target;
             public int realDamage;
             public CloneManager manager;
+            public NpcCombatProfile profile;
+            public float originalAggroRange;
 
             private void Start()
             {
@@ -120,6 +139,10 @@ namespace NPC
 
             private void OnDestroy()
             {
+                if (profile != null)
+                {
+                    profile.AggroRange = originalAggroRange;
+                }
                 manager?.CloneGone(gameObject);
             }
         }
