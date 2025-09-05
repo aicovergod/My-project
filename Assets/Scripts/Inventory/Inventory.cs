@@ -404,7 +404,8 @@ namespace Inventory
                     highlightGO.transform.SetParent(slot.transform, false);
                     var highlightImg = highlightGO.GetComponent<Image>();
                     highlightImg.sprite = null;
-                    highlightImg.color = new Color(1f, 1f, 1f, 0f);
+                    // Use full alpha so the outline shader can render properly
+                    highlightImg.color = new Color(1f, 1f, 1f, 1f);
                     highlightImg.type = Image.Type.Simple;
                     highlightImg.raycastTarget = false;
                     if (highlightMaterial == null)
@@ -648,7 +649,9 @@ namespace Inventory
                 var highlight = slotHighlights[index];
                 highlight.sprite = slotImages[index].sprite;
                 highlight.type = Image.Type.Simple;
-                highlight.color = new Color(1f, 1f, 1f, 0f); // transparent fill
+                // Ensure the outline image has an opaque color; the outline shader
+                // will handle hiding the fill while keeping the border visible
+                highlight.color = new Color(1f, 1f, 1f, 1f);
                 if (highlightMaterial != null)
                 {
                     highlight.material = highlightMaterial;
