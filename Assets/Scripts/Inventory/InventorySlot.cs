@@ -78,14 +78,17 @@ namespace Inventory
                 var entry = inventory.GetSlot(index);
                 if (inventory.selectedIndex < 0)
                 {
-                    if (entry.item != null && entry.item.equipmentSlot != EquipmentSlot.None)
+                    if (entry.item != null)
                     {
-                        inventory.EquipItem(index);
-                        return;
-                    }
+                        if (entry.item.equipmentSlot != EquipmentSlot.None)
+                        {
+                            inventory.EquipItem(index);
+                            return;
+                        }
 
-                    inventory.selectedIndex = index;
-                    inventory.UpdateSlotVisual(index);
+                        inventory.selectedIndex = index;
+                        inventory.UpdateSlotVisual(index);
+                    }
                 }
                 else if (inventory.selectedIndex == index)
                 {
