@@ -18,39 +18,34 @@ namespace Skills.Mining
         private Camera mainCamera;
         private float remainingLifetime;
 
-        private static FloatingText activeInstance;
-
         public static void Show(string message, Vector3 position, Color? color = null, float? size = null)
         {
-            if (activeInstance == null)
-            {
-                GameObject go = new GameObject("FloatingText", typeof(Canvas));
-                activeInstance = go.AddComponent<FloatingText>();
-                var canvas = go.GetComponent<Canvas>();
-                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                go.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-                go.AddComponent<GraphicRaycaster>();
+            GameObject go = new GameObject("FloatingText", typeof(Canvas));
+            var instance = go.AddComponent<FloatingText>();
+            var canvas = go.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            go.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            go.AddComponent<GraphicRaycaster>();
 
-                var textGO = new GameObject("Text", typeof(Text));
-                textGO.transform.SetParent(go.transform, false);
-                activeInstance.uiText = textGO.GetComponent<Text>();
-                activeInstance.uiText.alignment = TextAnchor.MiddleCenter;
-                activeInstance.uiText.horizontalOverflow = HorizontalWrapMode.Overflow;
-                activeInstance.uiText.verticalOverflow = VerticalWrapMode.Overflow;
-                activeInstance.uiText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-                activeInstance.rectTransform = textGO.GetComponent<RectTransform>();
-                activeInstance.mainCamera = Camera.main;
-            }
+            var textGO = new GameObject("Text", typeof(Text));
+            textGO.transform.SetParent(go.transform, false);
+            instance.uiText = textGO.GetComponent<Text>();
+            instance.uiText.alignment = TextAnchor.MiddleCenter;
+            instance.uiText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            instance.uiText.verticalOverflow = VerticalWrapMode.Overflow;
+            instance.uiText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            instance.rectTransform = textGO.GetComponent<RectTransform>();
+            instance.mainCamera = Camera.main;
 
-            activeInstance.worldPosition = position;
-            if (activeInstance.mainCamera == null)
-                activeInstance.mainCamera = Camera.main;
-            activeInstance.rectTransform.position = activeInstance.mainCamera.WorldToScreenPoint(position);
-            activeInstance.uiText.text = message;
-            activeInstance.uiText.color = color ?? Color.white;
-            float finalSize = size ?? activeInstance.textSize;
-            activeInstance.uiText.fontSize = Mathf.RoundToInt(64 * finalSize);
-            activeInstance.remainingLifetime = activeInstance.lifetime;
+            instance.worldPosition = position;
+            if (instance.mainCamera == null)
+                instance.mainCamera = Camera.main;
+            instance.rectTransform.position = instance.mainCamera.WorldToScreenPoint(position);
+            instance.uiText.text = message;
+            instance.uiText.color = color ?? Color.white;
+            float finalSize = size ?? instance.textSize;
+            instance.uiText.fontSize = Mathf.RoundToInt(64 * finalSize);
+            instance.remainingLifetime = instance.lifetime;
         }
 
         private void Awake()
@@ -71,10 +66,5 @@ namespace Skills.Mining
                 Destroy(gameObject);
         }
 
-        private void OnDestroy()
-        {
-            if (activeInstance == this)
-                activeInstance = null;
-        }
     }
 }

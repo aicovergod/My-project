@@ -1,5 +1,6 @@
 using UnityEngine;
 using Combat;
+using Skills.Mining;
 
 namespace Player
 {
@@ -24,6 +25,7 @@ namespace Player
         public void ApplyDamage(int amount, DamageType type, object source)
         {
             hitpoints.OnEnemyDealtDamage(amount);
+            FloatingText.Show(amount.ToString(), transform.position, Color.red);
             Debug.Log($"Player took {amount} damage.");
         }
     }
