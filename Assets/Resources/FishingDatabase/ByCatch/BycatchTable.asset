@@ -225,3 +225,7 @@ MonoBehaviour:
     baseWeight: 1
     minLevelOverride: 1
     maxLevelOverride: 99
+  - item: {fileID: 11400000, guid: d32d0991f8254c74b8066d0c68814dea, type: 2}
+    baseWeight: 1
+    minLevelOverride: 1
+    maxLevelOverride: 99

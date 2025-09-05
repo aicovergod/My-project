@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5264921daa7e5584d882b6d1fbf3a725, type: 3}
   m_Name: Freshwater Fishing Charm
   m_EditorClassIdentifier: 
-  itemId: Reed Woven Bracelet
-  displayName: Reed Woven Bracelet
-  rarity: 1
+  itemId: Freshwater Fishing Charm
+  displayName: Freshwater Fishing Charm
+  rarity: 2
   baseWeight: 1
   allowedWaterTypes: 1
   minFishingLevel: 1

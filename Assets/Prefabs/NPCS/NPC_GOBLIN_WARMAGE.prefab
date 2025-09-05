@@ -22,9 +22,9 @@ GameObject:
   - component: {fileID: -7034281214918345802}
   - component: {fileID: 4856330758820000550}
   - component: {fileID: 3665449629679586575}
-  - component: {fileID: 1214185441905924890}
+  - component: {fileID: 8760582560412806108}
   m_Layer: 7
-  m_Name: NPC_GOBLIN_WARCHIEF
+  m_Name: NPC_GOBLIN_WARMAGE
   m_TagString: NPC
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -344,7 +344,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ade83d186a2426484d785699fb0c95b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1214185441905924890
+--- !u!114 &8760582560412806108
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -353,12 +353,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 8077571585701284791}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58d974d03c6542e0a33364a3dac3fa1f, type: 3}
+  m_Script: {fileID: 11500000, guid: f4d99e0cc6ca4d9c88cb2e594d89c3e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slamInterval: 10
-  slamDamage: 10
-  slamDustPrefab: {fileID: 0}
-  slamRange: 1.5
-  shakeDuration: 0.2
-  shakeMagnitude: 0.1
+  meteorInterval: 10
+  meteorCount: 5
+  spreadRadius: 3
+  impactDamage: 6
+  burnDamagePerTick: 1
+  burnDuration: 5
+  meteorPrefab: {fileID: 6111494187698877684, guid: ec39911e4d64dec46878ae62d069d0b7, type: 3}
+  burnPrefab: {fileID: 6111494187698877684, guid: 9e9effd4291159241bc8f42d478e4569, type: 3}
+  impactRadius: 1.5
+  dropHeight: 8
+  meteorSpeed: 8
