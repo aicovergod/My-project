@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using Items;
 using Skills;
+using Skills.Fishing;
 
 namespace Inventory
 {
@@ -88,6 +89,9 @@ namespace Inventory
 
         [Tooltip("Additional fishing XP multiplier (0.025 = +2.5% XP).")]
         public float fishingXpBonusMultiplier = 0f;
+
+        [Tooltip("Water types where the fishing XP bonus applies.")]
+        public WaterType fishingXpBonusWaterTypes = WaterType.Any;
 
         [Header("Woodcutting Bonuses")]
         [Tooltip("Additional woodcutting XP multiplier (0.025 = +2.5% XP).")]
