@@ -299,6 +299,13 @@ namespace Player
             moveRoutine = StartCoroutine(MoveToRoutine(target, stopDistance, onComplete));
         }
 
+        public void MoveTo(Transform target, float stopDistance, Action onComplete = null)
+        {
+            if (moveRoutine != null)
+                StopCoroutine(moveRoutine);
+            moveRoutine = StartCoroutine(MoveToRoutine(target, stopDistance, onComplete));
+        }
+
         private IEnumerator MoveToRoutine(Vector2 target, float stopDistance, Action onComplete)
         {
             isAutoMoving = true;
@@ -312,6 +319,22 @@ namespace Player
             isAutoMoving = false;
             moveRoutine = null;
             onComplete?.Invoke();
+        }
+
+        private IEnumerator MoveToRoutine(Transform target, float stopDistance, Action onComplete)
+        {
+            isAutoMoving = true;
+            while (target != null && Vector2.Distance(transform.position, target.position) > stopDistance)
+            {
+                Vector2 dir = ((Vector2)target.position - (Vector2)transform.position).normalized;
+                moveDir = dir;
+                yield return null;
+            }
+            StopMovement();
+            isAutoMoving = false;
+            moveRoutine = null;
+            if (target != null)
+                onComplete?.Invoke();
         }
 
         /// <summary>
