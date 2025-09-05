@@ -5,6 +5,7 @@ using Skills;
 using Player;
 using NPC;
 using Pets;
+using Skills.Mining;
 
 namespace Combat
 {
@@ -137,6 +138,7 @@ namespace Combat
                 int maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
                 damage = CombatMath.RollDamage(maxHit);
                 target.ApplyDamage(damage, attacker.DamageType, this);
+                FloatingText.Show(damage.ToString(), target.transform.position, Color.red);
                 AwardXp(damage, attacker.Style);
                 if (!target.IsAlive)
                     OnTargetKilled?.Invoke(target);
@@ -144,6 +146,7 @@ namespace Combat
             }
             else
             {
+                FloatingText.Show("0", target.transform.position, Color.gray);
                 Debug.Log($"Player missed {targetName}.");
             }
             OnAttackLanded?.Invoke(damage, hit);
