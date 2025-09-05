@@ -13,12 +13,14 @@ namespace Player
         private PlayerHitpoints hitpoints;
         private Sprite damageHitsplat;
         private Sprite zeroHitsplat;
+        private Sprite burnHitsplat;
 
         private void Awake()
         {
             hitpoints = GetComponent<PlayerHitpoints>();
             damageHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat");
             zeroHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Zero_damage_hitsplat");
+            burnHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Burn_hitsplat");
         }
 
         public bool IsAlive => hitpoints.CurrentHp > 0;
@@ -29,7 +31,13 @@ namespace Player
         public void ApplyDamage(int amount, DamageType type, object source)
         {
             hitpoints.OnEnemyDealtDamage(amount);
-            var sprite = amount == 0 ? zeroHitsplat : damageHitsplat;
+            Sprite sprite;
+            if (amount == 0)
+                sprite = zeroHitsplat;
+            else if (type == DamageType.Burn && burnHitsplat != null)
+                sprite = burnHitsplat;
+            else
+                sprite = damageHitsplat;
             FloatingText.Show(amount.ToString(), transform.position, Color.white, null, sprite);
             Debug.Log($"Player took {amount} damage.");
         }
