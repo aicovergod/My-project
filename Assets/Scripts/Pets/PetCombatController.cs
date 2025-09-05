@@ -4,6 +4,7 @@ using Combat;
 using EquipmentSystem;
 using NPC;
 using Skills;
+using Skills.Mining;
 
 namespace Pets
 {
@@ -25,6 +26,10 @@ namespace Pets
         private CombatTarget currentTarget;
         private Coroutine attackRoutine;
 
+        private Sprite damageHitsplat;
+        private Sprite zeroHitsplat;
+        private Sprite maxHitHitsplat;
+
         public bool IsAlive => true;
         public DamageType PreferredDefenceType => DamageType.Melee;
         public int CurrentHP => 1;
@@ -43,6 +48,10 @@ namespace Pets
                 col.isTrigger = true;
             if (TryGetComponent<Collider2D>(out var col2d))
                 col2d.isTrigger = true;
+
+            damageHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat");
+            zeroHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Zero_damage_hitsplat");
+            maxHitHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat_maxhit");
         }
 
         /// <summary>Returns true if this pet has combat capabilities.</summary>
@@ -204,12 +213,18 @@ namespace Pets
                     maxHit = Mathf.RoundToInt(maxHit * (1f + definition.maxHitPerBeastmasterLevel * beastmasterLevel));
                 int dmg = CombatMath.RollDamage(maxHit);
                 target.ApplyDamage(dmg, attacker.DamageType, this);
+                var sprite = dmg == maxHit ? maxHitHitsplat : damageHitsplat;
+                FloatingText.Show(dmg.ToString(), target.transform.position, Color.white, null, sprite);
                 if (npc != null)
                 {
                     var npcAttack = npc.GetComponent<NpcAttackController>();
                     npcAttack?.BeginAttacking(this);
                 }
                 BeastmasterXp.TryGrantFromPetDamage(owner != null ? owner.gameObject : null, dmg);
+            }
+            else
+            {
+                FloatingText.Show("0", target.transform.position, Color.white, null, zeroHitsplat);
             }
         }
 
