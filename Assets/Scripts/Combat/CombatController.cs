@@ -83,6 +83,12 @@ namespace Combat
                     break;
                 OnAttackStart?.Invoke();
                 ResolveAttack(target);
+                // If the target died from the attack, exit immediately so listeners are notified
+                // without waiting for the next attack interval. This prevents lingering HUD elements
+                // like the weapon sprite from staying visible after the enemy is dead.
+                if (!target.IsAlive)
+                    break;
+
                 float interval = equipment != null ? equipment.GetCombinedStats().attackSpeedTicks * CombatMath.TICK_SECONDS : 4 * CombatMath.TICK_SECONDS;
                 yield return new WaitForSeconds(interval);
             }
