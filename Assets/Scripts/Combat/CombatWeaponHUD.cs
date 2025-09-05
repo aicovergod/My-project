@@ -33,6 +33,8 @@ namespace Combat
                 controller.OnCombatTargetChanged += HandleTargetChanged;
             if (controller != null)
                 equipment = controller.GetComponent<Equipment>();
+            if (equipment != null)
+                equipment.OnEquipmentChanged += HandleEquipmentChanged;
             CreateWeaponSprite();
         }
 
@@ -77,6 +79,29 @@ namespace Combat
         {
             if (controller != null)
                 controller.OnCombatTargetChanged -= HandleTargetChanged;
+            if (equipment != null)
+                equipment.OnEquipmentChanged -= HandleEquipmentChanged;
+        }
+
+        private void HandleEquipmentChanged(EquipmentSlot slot)
+        {
+            if (slot != EquipmentSlot.Weapon || target == null)
+                return;
+
+            var entry = equipment != null ? equipment.GetEquipped(EquipmentSlot.Weapon) : default;
+            if (entry.item != null && entry.item.icon != null)
+            {
+                weaponRenderer.sprite = entry.item.icon;
+                if (weaponRoot != null)
+                    weaponRoot.SetActive(true);
+            }
+            else
+            {
+                if (weaponRenderer != null)
+                    weaponRenderer.sprite = null;
+                if (weaponRoot != null)
+                    weaponRoot.SetActive(false);
+            }
         }
     }
 }
