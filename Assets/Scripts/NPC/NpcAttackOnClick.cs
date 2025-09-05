@@ -26,14 +26,13 @@ namespace NPC
             if (playerMover == null)
                 return;
 
+            var npcAttack = GetComponent<NpcAttackController>();
+            var playerTarget = playerController.GetComponent<PlayerCombatTarget>();
+            npcAttack?.BeginAttacking(playerTarget);
+
             void AttemptAttack()
             {
-                if (playerController.TryAttackTarget(combatant))
-                {
-                    var npcAttack = GetComponent<NpcAttackController>();
-                    var playerTarget = playerController.GetComponent<PlayerCombatTarget>();
-                    npcAttack?.BeginAttacking(playerTarget);
-                }
+                playerController.TryAttackTarget(combatant);
             }
 
             if (Vector2.Distance(playerController.transform.position, transform.position) > CombatMath.MELEE_RANGE)

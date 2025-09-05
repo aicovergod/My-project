@@ -83,6 +83,18 @@ namespace NPC
                    Vector2.Distance(target.transform.position, transform.position) > CombatMath.MELEE_RANGE)
             {
                 // Poll each frame until the target is close enough or combat ends.
+                Vector2 diff = target.transform.position - transform.position;
+                int facingDir;
+                if (Mathf.Abs(diff.x) > Mathf.Abs(diff.y))
+                    facingDir = diff.x < 0f ? 1 : 2;
+                else
+                    facingDir = diff.y < 0f ? 0 : 3;
+
+                if (spriteAnimator != null)
+                    spriteAnimator.SetFacing(facingDir);
+                else if (spriteRenderer != null)
+                    spriteRenderer.flipX = facingDir == 2;
+
                 yield return null;
             }
 
