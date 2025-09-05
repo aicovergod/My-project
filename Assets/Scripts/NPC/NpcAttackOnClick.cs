@@ -22,13 +22,27 @@ namespace NPC
             var playerController = FindObjectOfType<CombatController>();
             if (playerController == null)
                 return;
-            if (Vector2.Distance(playerController.transform.position, transform.position) > CombatMath.MELEE_RANGE)
+            var playerMover = playerController.GetComponent<PlayerMover>();
+            if (playerMover == null)
                 return;
-            if (playerController.TryAttackTarget(combatant))
+
+            void AttemptAttack()
             {
-                var npcAttack = GetComponent<NpcAttackController>();
-                var playerTarget = playerController.GetComponent<PlayerCombatTarget>();
-                npcAttack?.BeginAttacking(playerTarget);
+                if (playerController.TryAttackTarget(combatant))
+                {
+                    var npcAttack = GetComponent<NpcAttackController>();
+                    var playerTarget = playerController.GetComponent<PlayerCombatTarget>();
+                    npcAttack?.BeginAttacking(playerTarget);
+                }
+            }
+
+            if (Vector2.Distance(playerController.transform.position, transform.position) > CombatMath.MELEE_RANGE)
+            {
+                playerMover.MoveTo(transform.position, CombatMath.MELEE_RANGE, AttemptAttack);
+            }
+            else
+            {
+                AttemptAttack();
             }
         }
     }

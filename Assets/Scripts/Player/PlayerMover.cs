@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using System;
+using System.Collections;
 using Core.Save;
 using World;
 using Pets;
@@ -42,6 +43,8 @@ namespace Player
         private Inventory.Inventory inventory;
         private GameObject petToMove;
         private bool isTransitioning;
+        private bool isAutoMoving;
+        private Coroutine moveRoutine;
 
         // Ensure only one player persists across scene loads.
         private static PlayerMover instance;
@@ -168,24 +171,27 @@ namespace Player
 
             float x = 0f, y = 0f;
 
+            if (!isAutoMoving)
+            {
 #if ENABLE_INPUT_SYSTEM
-            Vector2 raw = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
-            // Snap analog to -1/0/1 so animations are stable
-            x = Mathf.Abs(raw.x) < gamepadDeadzone ? 0f : Mathf.Sign(raw.x);
-            y = Mathf.Abs(raw.y) < gamepadDeadzone ? 0f : Mathf.Sign(raw.y);
+                Vector2 raw = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
+                // Snap analog to -1/0/1 so animations are stable
+                x = Mathf.Abs(raw.x) < gamepadDeadzone ? 0f : Mathf.Sign(raw.x);
+                y = Mathf.Abs(raw.y) < gamepadDeadzone ? 0f : Mathf.Sign(raw.y);
 #else
-            // Legacy input fallback if project uses Old/Both
-            x = Input.GetAxisRaw("Horizontal");
-            y = Input.GetAxisRaw("Vertical");
+                // Legacy input fallback if project uses Old/Both
+                x = Input.GetAxisRaw("Horizontal");
+                y = Input.GetAxisRaw("Vertical");
 #endif
 
-            if (fourWayOnly)
-            {
-                if (Mathf.Abs(y) > Mathf.Abs(x)) x = 0f;
-                else if (Mathf.Abs(x) > Mathf.Abs(y)) y = 0f;
-            }
+                if (fourWayOnly)
+                {
+                    if (Mathf.Abs(y) > Mathf.Abs(x)) x = 0f;
+                    else if (Mathf.Abs(x) > Mathf.Abs(y)) y = 0f;
+                }
 
-            moveDir = new Vector2(x, y).normalized;
+                moveDir = new Vector2(x, y).normalized;
+            }
 
             if (moveDir.sqrMagnitude > 0f)
             {
@@ -286,6 +292,28 @@ namespace Player
             rb.linearVelocity = moveDir * moveSpeed;
         }
 
+        public void MoveTo(Vector2 target, float stopDistance, Action onComplete = null)
+        {
+            if (moveRoutine != null)
+                StopCoroutine(moveRoutine);
+            moveRoutine = StartCoroutine(MoveToRoutine(target, stopDistance, onComplete));
+        }
+
+        private IEnumerator MoveToRoutine(Vector2 target, float stopDistance, Action onComplete)
+        {
+            isAutoMoving = true;
+            while (Vector2.Distance(transform.position, target) > stopDistance)
+            {
+                Vector2 dir = (target - (Vector2)transform.position).normalized;
+                moveDir = dir;
+                yield return null;
+            }
+            StopMovement();
+            isAutoMoving = false;
+            moveRoutine = null;
+            onComplete?.Invoke();
+        }
+
         /// <summary>
         /// Immediately halts any current movement and updates animation state.
         /// </summary>
@@ -296,6 +324,12 @@ namespace Player
                 rb.linearVelocity = Vector2.zero;
             if (anim != null)
                 anim.SetBool("IsMoving", false);
+            if (moveRoutine != null)
+            {
+                StopCoroutine(moveRoutine);
+                moveRoutine = null;
+            }
+            isAutoMoving = false;
         }
 
         void OnApplicationQuit()
