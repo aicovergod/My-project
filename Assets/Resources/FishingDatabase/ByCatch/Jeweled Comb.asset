@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5264921daa7e5584d882b6d1fbf3a725, type: 3}
-  m_Name: Freshwater Blessing
+  m_Name: Jeweled Comb
   m_EditorClassIdentifier: 
-  itemId: Freshwater Blessing
-  displayName: Freshwater Blessing
+  itemId: Jeweled Comb
+  displayName: Jeweled Comb
   rarity: 2
   baseWeight: 1
   allowedWaterTypes: 1
