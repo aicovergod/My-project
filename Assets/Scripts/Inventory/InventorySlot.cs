@@ -109,9 +109,17 @@ namespace Inventory
             if (eventData.button == PointerEventData.InputButton.Right)
             {
                 if (shift)
+                {
                     inventory?.PromptStackSplit(index, StackSplitType.Drop);
+                }
                 else
-                    inventory?.DropItem(index, 1);
+                {
+                    var entry = inventory != null ? inventory.GetSlot(index) : default;
+                    if (inventory != null && entry.count > 1)
+                        inventory.ShowDropMenu(index, eventData.position);
+                    else
+                        inventory?.DropItem(index, 1);
+                }
             }
         }
     }
