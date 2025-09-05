@@ -94,7 +94,13 @@ namespace Inventory
         public Font petMaxHitFont;
         public Color petMaxHitColor = Color.white;
 
+        [Header("Tooltip")]
+        public Font tooltipFont;
+        public Color tooltipColor = Color.white;
+
         private GameObject uiRoot;
+        private GameObject tooltip;
+        private Text tooltipText;
         private Image[] slotBackgroundImages;
         private Image[] slotItemImages;
         private Text[] slotCountTexts;
@@ -228,7 +234,10 @@ namespace Inventory
         public void Close()
         {
             if (uiRoot != null)
+            {
                 uiRoot.SetActive(false);
+                HideTooltip();
+            }
         }
 
         public void CloseUI() => Close();
@@ -239,6 +248,40 @@ namespace Inventory
             if (index < 0 || index >= equipped.Length)
                 return default;
             return equipped[index];
+        }
+
+        public void ShowTooltip(EquipmentSlot slot, RectTransform slotRect)
+        {
+            var entry = GetEquipped(slot);
+            var item = entry.item;
+            if (item == null || tooltip == null || tooltipText == null)
+            {
+                HideTooltip();
+                return;
+            }
+
+            string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
+            tooltipText.text = name;
+
+            var tooltipRect = tooltip.GetComponent<RectTransform>();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
+
+            Vector3 pos = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
+            Vector3[] corners = new Vector3[4];
+            tooltipRect.GetWorldCorners(corners);
+            float width = corners[2].x - corners[0].x;
+            float height = corners[2].y - corners[0].y;
+            pos.x = Mathf.Min(pos.x, Screen.width - width);
+            pos.y = Mathf.Max(pos.y, height);
+            tooltipRect.position = pos;
+
+            tooltip.SetActive(true);
+        }
+
+        public void HideTooltip()
+        {
+            if (tooltip != null)
+                tooltip.SetActive(false);
         }
 
         /// <summary>
@@ -701,6 +744,46 @@ namespace Inventory
             petStrengthLevelText = CreateText(petBonusPanel.transform, "PetStrengthLevel", "Strength Level = 0 - Strength = 0", -2f * lineHeight, petStrengthLevelFont, petStrengthLevelColor);
             petAttackSpeedText = CreateText(petBonusPanel.transform, "PetAttackSpeed", "Attack Speed = 0 - Speed = 0", -3f * lineHeight, petAttackSpeedFont, petAttackSpeedColor);
             petMaxHitText = CreateText(petBonusPanel.transform, "PetMaxHit", "Max Hit = 0", -4f * lineHeight, petMaxHitFont, petMaxHitColor);
+
+            tooltip = new GameObject("Tooltip", typeof(Image), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
+            tooltip.transform.SetParent(uiRoot.transform, false);
+
+            var tooltipCanvas = tooltip.AddComponent<Canvas>();
+            tooltipCanvas.overrideSorting = true;
+            tooltipCanvas.sortingOrder = 1000;
+            tooltip.AddComponent<GraphicRaycaster>();
+
+            var bg = tooltip.GetComponent<Image>();
+            bg.color = new Color(0f, 0f, 0f, 0.75f);
+            bg.raycastTarget = false;
+
+            var layout = tooltip.GetComponent<VerticalLayoutGroup>();
+            layout.childAlignment = TextAnchor.UpperLeft;
+            layout.childControlWidth = false;
+            layout.childControlHeight = true;
+            layout.childForceExpandWidth = false;
+            layout.childForceExpandHeight = false;
+            layout.padding = new RectOffset(4, 4, 4, 4);
+            layout.spacing = 2f;
+
+            var fitter = tooltip.GetComponent<ContentSizeFitter>();
+            fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            var textGO = new GameObject("Name", typeof(Text));
+            textGO.transform.SetParent(tooltip.transform, false);
+            tooltipText = textGO.GetComponent<Text>();
+            tooltipText.font = tooltipFont != null ? tooltipFont : defaultFont;
+            tooltipText.alignment = TextAnchor.UpperLeft;
+            tooltipText.color = tooltipColor;
+            tooltipText.raycastTarget = false;
+            tooltipText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            tooltipText.verticalOverflow = VerticalWrapMode.Overflow;
+
+            var tooltipRect = tooltip.GetComponent<RectTransform>();
+            tooltipRect.pivot = new Vector2(0f, 1f);
+
+            tooltip.SetActive(false);
         }
     }
 }
