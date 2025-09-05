@@ -186,6 +186,21 @@ namespace Skills
                 RefreshFields();
             }
 
+            if (GUILayout.Button("Restore Health"))
+            {
+                hitpoints?.DebugSetCurrentHp(hitpoints.MaxHp);
+            }
+
+            if (GUILayout.Button("Godmode"))
+            {
+                hitpoints?.DebugSetCurrentHp(99999, false);
+            }
+
+            if (GUILayout.Button("Godmode Off"))
+            {
+                hitpoints?.DebugSetCurrentHp(hitpoints.MaxHp);
+            }
+
             if (GUILayout.Button("Reset Merge Timer"))
             {
                 PetMergeController.Instance?.ResetMergeTimer();

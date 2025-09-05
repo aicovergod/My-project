@@ -187,6 +187,16 @@ namespace Player
             OnHealthChanged?.Invoke(currentHp, MaxHp);
         }
 
+        /// <summary>
+        /// Debug helper to directly set the current hitpoints. Optionally bypasses
+        /// the max hitpoint clamp, allowing values such as 99999 for godmode.
+        /// </summary>
+        public void DebugSetCurrentHp(int hp, bool clampToMax = true)
+        {
+            currentHp = clampToMax ? Mathf.Clamp(hp, 0, MaxHp) : Mathf.Max(0, hp);
+            OnHealthChanged?.Invoke(currentHp, MaxHp);
+        }
+
 #if UNITY_EDITOR
         public void DebugDealDamage(int dmg)
         {
