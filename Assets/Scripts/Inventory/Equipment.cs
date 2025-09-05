@@ -135,6 +135,8 @@ namespace Inventory
         public int TotalAttackBonus { get; private set; }
         public int TotalDefenceBonus { get; private set; }
 
+        public event Action<EquipmentSlot> OnEquipmentChanged;
+
         private static readonly System.Collections.Generic.Dictionary<int, EquipmentSlot> cellToSlot = new()
         {
             {0, EquipmentSlot.Charm},
@@ -321,6 +323,7 @@ namespace Inventory
             UpdateSlotVisual(slot);
             UpdateBonuses();
             Save();
+            OnEquipmentChanged?.Invoke(slot);
             return true;
         }
 
@@ -344,6 +347,7 @@ namespace Inventory
                 UpdateSlotVisual(slot);
                 UpdateBonuses();
                 Save();
+                OnEquipmentChanged?.Invoke(slot);
             }
         }
 
