@@ -407,6 +407,7 @@ namespace Inventory
                     var highlightOutline = highlightGO.AddComponent<Outline>();
                     highlightOutline.effectColor = Color.yellow;
                     highlightOutline.effectDistance = new Vector2(1f, -1f);
+                    highlightOutline.useGraphicAlpha = false;
                     var hlRect = highlightGO.GetComponent<RectTransform>();
                     hlRect.anchorMin = Vector2.zero;
                     hlRect.anchorMax = Vector2.one;
@@ -422,6 +423,7 @@ namespace Inventory
                     var outline = countGO.AddComponent<Outline>();
                     outline.effectColor = Color.black;
                     outline.effectDistance = new Vector2(1f, -1f);
+                    outline.useGraphicAlpha = false;
                     countText.font = stackCountFont ?? defaultFont;
                     countText.fontSize = stackCountFontSize;
                     countText.alignment = TextAnchor.UpperLeft;

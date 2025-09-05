@@ -311,6 +311,7 @@ namespace BankSystem
                 var outline = countGO.AddComponent<Outline>();
                 outline.effectColor = Color.black;
                 outline.effectDistance = new Vector2(1f, -1f);
+                outline.useGraphicAlpha = false;
                 countText.font = stackCountFont;
                 countText.fontSize = stackCountFontSize;
                 countText.alignment = TextAnchor.UpperLeft;
