@@ -358,7 +358,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   meteorInterval: 10
   meteorCount: 5
-  spreadRadius: 3
+  spreadRadius: 5
   impactDamage: 6
   burnDamagePerTick: 1
   burnDuration: 5
