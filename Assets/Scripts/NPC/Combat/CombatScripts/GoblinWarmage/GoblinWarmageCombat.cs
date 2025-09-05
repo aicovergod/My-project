@@ -19,7 +19,6 @@ namespace NPC
         [SerializeField] private float burnDuration = 5f;
         [SerializeField] private GameObject meteorPrefab;
         [SerializeField] private GameObject burnPrefab;
-        [SerializeField] private float impactRadius = 1.5f;
         [SerializeField] private float dropHeight = 8f;
         [SerializeField] private float meteorSpeed = 8f;
 
@@ -40,7 +39,7 @@ namespace NPC
                     break;
                 MeteorShowerBarrage.Perform(this, target, meteorCount, spreadRadius,
                     impactDamage, burnDamagePerTick, burnDuration,
-                    meteorPrefab, burnPrefab, impactRadius, dropHeight, meteorSpeed);
+                    meteorPrefab, burnPrefab, dropHeight, meteorSpeed);
             }
         }
     }
