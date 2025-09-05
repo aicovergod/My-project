@@ -11,10 +11,14 @@ namespace Player
     public class PlayerCombatTarget : MonoBehaviour, CombatTarget
     {
         private PlayerHitpoints hitpoints;
+        private Sprite damageHitsplat;
+        private Sprite zeroHitsplat;
 
         private void Awake()
         {
             hitpoints = GetComponent<PlayerHitpoints>();
+            damageHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat");
+            zeroHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Zero_damage_hitsplat");
         }
 
         public bool IsAlive => hitpoints.CurrentHp > 0;
@@ -25,7 +29,8 @@ namespace Player
         public void ApplyDamage(int amount, DamageType type, object source)
         {
             hitpoints.OnEnemyDealtDamage(amount);
-            FloatingText.Show(amount.ToString(), transform.position, Color.red);
+            var sprite = amount == 0 ? zeroHitsplat : damageHitsplat;
+            FloatingText.Show(amount.ToString(), transform.position, Color.white, null, sprite);
             Debug.Log($"Player took {amount} damage.");
         }
     }
