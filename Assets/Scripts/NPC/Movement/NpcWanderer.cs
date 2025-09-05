@@ -8,6 +8,10 @@ namespace NPC
     public class NpcWanderer : MonoBehaviour, ITickable
     {
         [Header("Movement Bounds")]
+        [Tooltip("If true, uses an area size centered on the start position instead of explicit offsets.")]
+        public bool useAreaSize;
+        [Tooltip("Width and height of the wandering area centered on the start position.")]
+        public Vector2 areaSize = new Vector2(10f, 10f);
         [Tooltip("Local-space minimum offset from the start position where the NPC may wander.")]
         public Vector2 minOffset = new Vector2(-5f, -5f);
         [Tooltip("Local-space maximum offset from the start position where the NPC may wander.")]
@@ -80,9 +84,19 @@ namespace NPC
 
         private void ChooseNewTarget()
         {
-            float x = Random.Range(minOffset.x, maxOffset.x);
-            float y = Random.Range(minOffset.y, maxOffset.y);
-            _target = _origin + new Vector2(x, y);
+            if (useAreaSize)
+            {
+                Vector2 half = areaSize * 0.5f;
+                float x = Random.Range(-half.x, half.x);
+                float y = Random.Range(-half.y, half.y);
+                _target = _origin + new Vector2(x, y);
+            }
+            else
+            {
+                float x = Random.Range(minOffset.x, maxOffset.x);
+                float y = Random.Range(minOffset.y, maxOffset.y);
+                _target = _origin + new Vector2(x, y);
+            }
             _waiting = false;
         }
 
@@ -164,9 +178,16 @@ namespace NPC
         {
             Gizmos.color = new Color(1f, 0.5f, 0f, 0.5f);
             Vector2 center = Application.isPlaying ? _origin : (Vector2)transform.position;
-            Vector2 size = maxOffset - minOffset;
-            Vector2 gizmoCenter = center + (minOffset + maxOffset) * 0.5f;
-            Gizmos.DrawWireCube(gizmoCenter, size);
+            if (useAreaSize)
+            {
+                Gizmos.DrawWireCube(center, new Vector3(areaSize.x, areaSize.y, 0f));
+            }
+            else
+            {
+                Vector2 size = maxOffset - minOffset;
+                Vector2 gizmoCenter = center + (minOffset + maxOffset) * 0.5f;
+                Gizmos.DrawWireCube(gizmoCenter, size);
+            }
         }
 #endif
     }

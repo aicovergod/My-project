@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
+using NPC;
 
-namespace NPC
+namespace UI
 {
     /// <summary>
     /// Simple right-click context menu used by NPCs.
