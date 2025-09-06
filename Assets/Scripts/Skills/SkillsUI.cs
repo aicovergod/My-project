@@ -1,5 +1,5 @@
 using System;
-using System.Text;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UI;
@@ -13,8 +13,23 @@ namespace Skills
     public class SkillsUI : MonoBehaviour, IUIWindow
     {
         private GameObject uiRoot;
-        private Text skillText;
         private SkillManager skillManager;
+
+        private readonly Dictionary<SkillType, Text> levelTexts = new();
+        private readonly Dictionary<SkillType, Text> xpTexts = new();
+        private readonly Dictionary<SkillType, bool> xpVisibility = new();
+
+        private readonly SkillType[] displayOrder =
+        {
+            SkillType.Hitpoints,
+            SkillType.Attack,
+            SkillType.Strength,
+            SkillType.Defence,
+            SkillType.Beastmaster,
+            SkillType.Fishing,
+            SkillType.Woodcutting,
+            SkillType.Mining
+        };
 
         public static SkillsUI Instance { get; private set; }
 
@@ -72,17 +87,53 @@ namespace Skills
             panelRect.sizeDelta = new Vector2(200f, 400f);
             panelRect.anchoredPosition = Vector2.zero;
 
-            var textGo = new GameObject("SkillText");
-            textGo.transform.SetParent(panel.transform, false);
-            skillText = textGo.AddComponent<Text>();
-            skillText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            skillText.alignment = TextAnchor.MiddleCenter;
-            skillText.color = Color.white;
-            var textRect = skillText.rectTransform;
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = Vector2.zero;
-            textRect.offsetMax = Vector2.zero;
+            var layout = panel.AddComponent<VerticalLayoutGroup>();
+            layout.childControlHeight = true;
+            layout.childControlWidth = true;
+
+            foreach (var type in displayOrder)
+                CreateSkillElement(type, panel.transform);
+        }
+
+        private void CreateSkillElement(SkillType type, Transform parent)
+        {
+            var skillGo = new GameObject($"{type}Skill");
+            skillGo.transform.SetParent(parent, false);
+
+            var image = skillGo.AddComponent<Image>();
+            image.color = new Color(0f, 0f, 0f, 0.25f);
+
+            var button = skillGo.AddComponent<Button>();
+            button.onClick.AddListener(() => OnSkillClicked(type));
+
+            var layout = skillGo.AddComponent<VerticalLayoutGroup>();
+            layout.childControlHeight = true;
+
+            var levelGo = new GameObject("LevelText");
+            levelGo.transform.SetParent(skillGo.transform, false);
+            var levelText = levelGo.AddComponent<Text>();
+            levelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            levelText.color = Color.white;
+
+            var xpGo = new GameObject("XpText");
+            xpGo.transform.SetParent(skillGo.transform, false);
+            var xpText = xpGo.AddComponent<Text>();
+            xpText.font = levelText.font;
+            xpText.color = Color.white;
+            xpText.gameObject.SetActive(false);
+
+            levelTexts[type] = levelText;
+            xpTexts[type] = xpText;
+            xpVisibility[type] = false;
+        }
+
+        private void OnSkillClicked(SkillType type)
+        {
+            if (!xpTexts.ContainsKey(type))
+                return;
+
+            xpVisibility[type] = !xpVisibility[type];
+            xpTexts[type].gameObject.SetActive(xpVisibility[type]);
         }
 
         public void Toggle()
@@ -110,29 +161,18 @@ namespace Skills
 
         private void Update()
         {
-            // Removed O key toggle
-
             if (uiRoot != null && uiRoot.activeSelf && skillManager != null)
             {
-                var sb = new StringBuilder();
-                var displayOrder = new[]
-                {
-                    SkillType.Hitpoints,
-                    SkillType.Attack,
-                    SkillType.Strength,
-                    SkillType.Defence,
-                    SkillType.Beastmaster,
-                    SkillType.Fishing,
-                    SkillType.Woodcutting,
-                    SkillType.Mining
-                };
                 foreach (var type in displayOrder)
                 {
-                    if (sb.Length > 0)
-                        sb.Append('\n');
-                    sb.Append($"{type} Level: {skillManager.GetLevel(type)}  XP: {skillManager.GetXp(type):F2}");
+                    if (!levelTexts.TryGetValue(type, out var levelText) ||
+                        !xpTexts.TryGetValue(type, out var xpText))
+                        continue;
+
+                    levelText.text = $"{type} Level: {skillManager.GetLevel(type)}";
+                    xpText.text = $"XP: {skillManager.GetXp(type):F2}";
+                    xpText.gameObject.SetActive(xpVisibility[type]);
                 }
-                skillText.text = sb.ToString();
             }
         }
 
