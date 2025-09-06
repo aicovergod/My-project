@@ -3,6 +3,7 @@ using Player;
 using Beastmaster;
 using Pets;
 using BankSystem;
+using Skills.Fishing;
 
 namespace Skills
 {

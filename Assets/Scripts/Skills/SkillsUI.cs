@@ -98,10 +98,10 @@ namespace Skills
             UIManager.Instance.OpenWindow(this);
             if (uiRoot != null)
             {
-                var inv = Object.FindObjectOfType<Inventory.Inventory>();
+                var inv = UnityEngine.Object.FindObjectOfType<Inventory.Inventory>();
                 if (inv != null && inv.IsOpen)
                     inv.CloseUI();
-                var eq = Object.FindObjectOfType<Inventory.Equipment>();
+                var eq = UnityEngine.Object.FindObjectOfType<Inventory.Equipment>();
                 if (eq != null && eq.IsOpen)
                     eq.CloseUI();
                 uiRoot.SetActive(true);
