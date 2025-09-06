@@ -18,6 +18,8 @@ namespace NPC
         [SerializeField] private int realCloneDamage = 4;
         [SerializeField] private GameObject[] clonePrefabs;
 
+        private bool clonesActive = false;
+
         public override void BeginAttacking(CombatTarget target)
         {
             base.BeginAttacking(target);
@@ -33,8 +35,12 @@ namespace NPC
                 yield return wait;
                 if (target == null || !target.IsAlive || !combatant.IsAlive)
                     break;
+                if (clonesActive)
+                    continue;
+                clonesActive = true;
                 SpectralCloneAmbush.Perform(this, target, clonePrefabs, cloneCount,
-                    cloneLifespan, spawnRadius, realCloneDamage);
+                    cloneLifespan, spawnRadius, realCloneDamage,
+                    onAllClonesGone: () => clonesActive = false);
             }
         }
     }
