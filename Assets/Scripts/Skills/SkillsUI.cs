@@ -115,7 +115,18 @@ namespace Skills
             if (uiRoot != null && uiRoot.activeSelf && skillManager != null)
             {
                 var sb = new StringBuilder();
-                foreach (SkillType type in Enum.GetValues(typeof(SkillType)))
+                var displayOrder = new[]
+                {
+                    SkillType.Hitpoints,
+                    SkillType.Attack,
+                    SkillType.Strength,
+                    SkillType.Defence,
+                    SkillType.Beastmaster,
+                    SkillType.Fishing,
+                    SkillType.Woodcutting,
+                    SkillType.Mining
+                };
+                foreach (var type in displayOrder)
                 {
                     if (sb.Length > 0)
                         sb.Append('\n');
