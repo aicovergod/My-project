@@ -31,6 +31,10 @@ namespace UI
 
         private void CreateUI()
         {
+            if (UnityEngine.EventSystems.EventSystem.current == null)
+                new GameObject("EventSystem", typeof(UnityEngine.EventSystems.EventSystem),
+                               typeof(UnityEngine.EventSystems.StandaloneInputModule));
+
             var canvas = gameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
