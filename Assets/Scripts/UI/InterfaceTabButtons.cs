@@ -31,10 +31,6 @@ namespace UI
 
         private void CreateUI()
         {
-            if (UnityEngine.EventSystems.EventSystem.current == null)
-                new GameObject("EventSystem", typeof(UnityEngine.EventSystems.EventSystem),
-                               typeof(UnityEngine.EventSystems.StandaloneInputModule));
-
             var canvas = gameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
@@ -83,14 +79,8 @@ namespace UI
 
         private void ToggleQuest()
         {
-            var quest = Object.FindObjectOfType<QuestListUI>();
-            if (quest != null)
-            {
-                if (quest.IsOpen)
-                    quest.Close();
-                else
-                    quest.Open();
-            }
+            var quest = Object.FindObjectOfType<QuestUI>();
+            quest?.Toggle();
         }
 
         private void ToggleInventory()

@@ -1365,7 +1365,7 @@ namespace Inventory
             if (playerMover == null)
                 return;
 
-            var quest = Object.FindObjectOfType<QuestListUI>();
+            var quest = Object.FindObjectOfType<QuestUI>();
             if (quest != null && quest.IsOpen)
             {
                 if (uiRoot != null && uiRoot.activeSelf)
