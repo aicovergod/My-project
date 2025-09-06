@@ -8,7 +8,6 @@ using Skills.Mining;
 using Skills;
 using Pets;
 using Quests;
-using Core.Save;
 using Random = UnityEngine.Random;
 using UI;
 
@@ -18,18 +17,11 @@ namespace Skills.Mining
     /// Handles XP, level, and mining tick logic.
     /// </summary>
     [DisallowMultipleComponent]
-    public class MiningSkill : MonoBehaviour, ITickable, ISaveable
+    public class MiningSkill : MonoBehaviour, ITickable
     {
-        [SerializeField] private XpTable xpTable;
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
-        [SerializeField] private MonoBehaviour saveProvider; // Optional custom save provider
-
-        private IMiningSave save;
-
-        private int xp;
-        private int level;
 
         private MineableRock currentRock;
         private PickaxeDefinition currentPickaxe;
@@ -44,8 +36,8 @@ namespace Skills.Mining
         public event System.Action<string, int> OnOreGained;
         public event System.Action<int> OnLevelUp;
 
-        public int Level => level;
-        public int Xp => xp;
+        public int Level => skills != null ? skills.GetLevel(SkillType.Mining) : 1;
+        public float Xp => skills != null ? skills.GetXp(SkillType.Mining) : 0f;
         public bool IsMining => currentRock != null;
         public MineableRock CurrentRock => currentRock;
         public PickaxeDefinition CurrentPickaxe => currentPickaxe;
@@ -61,7 +53,6 @@ namespace Skills.Mining
                 inventory = GetComponent<Inventory.Inventory>();
             if (equipment == null)
                 equipment = GetComponent<Equipment>();
-            save = saveProvider as IMiningSave ?? new SaveManagerMiningSave();
             skills = GetComponent<SkillManager>();
             PreloadOreItems();
         }
@@ -70,9 +61,7 @@ namespace Skills.Mining
 
         private void OnEnable()
         {
-            SaveManager.Register(this);
             TrySubscribeToTicker();
-            StartCoroutine(SaveLoop());
         }
 
         private void OnDisable()
@@ -81,8 +70,6 @@ namespace Skills.Mining
                 Ticker.Instance.Unsubscribe(this);
             if (tickerCoroutine != null)
                 StopCoroutine(tickerCoroutine);
-            Save();
-            SaveManager.Unregister(this);
         }
 
         private void TrySubscribeToTicker()
@@ -104,15 +91,6 @@ namespace Skills.Mining
                 yield return null;
             Ticker.Instance.Subscribe(this);
             Debug.Log("MiningSkill subscribed to ticker after waiting.");
-        }
-
-        private IEnumerator SaveLoop()
-        {
-            while (true)
-            {
-                yield return new WaitForSeconds(10f);
-                Save();
-            }
         }
 
         public void OnTick()
@@ -140,6 +118,7 @@ namespace Skills.Mining
         {
             float baseChance = 0.35f;
             float penalty = 0.0025f * Mathf.Max(currentRock.RockDef.Ore.LevelRequirement - 1, 0);
+            int level = skills.GetLevel(SkillType.Mining);
             float chance = baseChance + (level * 0.005f) + currentPickaxe.MiningRollBonus - penalty;
             chance = Mathf.Clamp(chance, 0.05f, 0.90f);
 
@@ -196,7 +175,8 @@ namespace Skills.Mining
                         }
                     }
                     int xpGain = Mathf.RoundToInt(ore.XpPerOre * amount * (1f + xpBonus));
-                    xp += xpGain;
+                    int oldLevel = skills.GetLevel(SkillType.Mining);
+                    int newLevel = skills.AddXP(SkillType.Mining, xpGain);
                     FloatingText.Show($"+{amount} {ore.DisplayName}", anchorPos);
                     StartCoroutine(ShowXpGainDelayed(xpGain, anchorTransform));
                     OnOreGained?.Invoke(ore.Id, amount);
@@ -216,12 +196,10 @@ namespace Skills.Mining
                         }
                     }
 
-                    int newLevel = xpTable.GetLevel(xp);
-                    if (newLevel > level)
+                    if (newLevel > oldLevel)
                     {
-                        level = newLevel;
-                        FloatingText.Show($"Mining level {level}", anchorPos);
-                        OnLevelUp?.Invoke(level);
+                        FloatingText.Show($"Mining level {newLevel}", anchorPos);
+                        OnLevelUp?.Invoke(newLevel);
                     }
                 }
 
@@ -299,29 +277,12 @@ namespace Skills.Mining
         }
 
         /// <summary>
-        /// Debug helper to directly set the mining level. Adjusts XP and
-        /// triggers the level up event.
+        /// Debug helper to directly set the mining level via the SkillManager.
         /// </summary>
         public void DebugSetLevel(int newLevel)
         {
-            if (xpTable == null)
-                return;
-
-            newLevel = Mathf.Clamp(newLevel, 1, 99);
-            xp = xpTable.GetXpForLevel(newLevel);
-            level = newLevel;
-            OnLevelUp?.Invoke(level);
-        }
-
-        public void Save()
-        {
-            save.SaveXp(xp);
-        }
-
-        public void Load()
-        {
-            xp = save.LoadXp();
-            level = xpTable != null ? xpTable.GetLevel(xp) : 1;
+            skills?.DebugSetLevel(SkillType.Mining, Mathf.Clamp(newLevel, 1, 99));
+            OnLevelUp?.Invoke(Level);
         }
 
         private void PreloadOreItems()

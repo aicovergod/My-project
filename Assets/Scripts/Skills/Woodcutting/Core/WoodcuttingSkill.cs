@@ -4,12 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Inventory;
 using Util;
-using Skills.Mining; // reuse XP table
 using UI;
 using Skills;
 using Pets;
 using Quests;
-using Core.Save;
 using Random = UnityEngine.Random;
 
 namespace Skills.Woodcutting
@@ -18,18 +16,11 @@ namespace Skills.Woodcutting
     /// Handles XP, level, and woodcutting tick logic.
     /// </summary>
     [DisallowMultipleComponent]
-    public class WoodcuttingSkill : MonoBehaviour, ITickable, ISaveable
+    public class WoodcuttingSkill : MonoBehaviour, ITickable
     {
-        [SerializeField] private XpTable xpTable;
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
-        [SerializeField] private MonoBehaviour saveProvider; // Optional custom save provider
-
-        private IWoodcuttingSave save;
-
-        private int xp;
-        private int level;
 
         private TreeNode currentTree;
         private AxeDefinition currentAxe;
@@ -46,8 +37,8 @@ namespace Skills.Woodcutting
         public event System.Action<string, int> OnLogGained;
         public event System.Action<int> OnLevelUp;
 
-        public int Level => level;
-        public int Xp => xp;
+        public int Level => skills != null ? skills.GetLevel(SkillType.Woodcutting) : 1;
+        public float Xp => skills != null ? skills.GetXp(SkillType.Woodcutting) : 0f;
         public bool IsChopping => currentTree != null;
         public TreeNode CurrentTree => currentTree;
         public int CurrentChopIntervalTicks => currentIntervalTicks;
@@ -62,7 +53,6 @@ namespace Skills.Woodcutting
             if (equipment == null)
                 equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
-            save = saveProvider as IWoodcuttingSave ?? new SaveManagerWoodcuttingSave();
             PreloadLogItems();
         }
 
@@ -70,9 +60,7 @@ namespace Skills.Woodcutting
 
         private void OnEnable()
         {
-            SaveManager.Register(this);
             TrySubscribeToTicker();
-            StartCoroutine(SaveLoop());
         }
 
         private void OnDisable()
@@ -81,8 +69,6 @@ namespace Skills.Woodcutting
                 Ticker.Instance.Unsubscribe(this);
             if (tickerCoroutine != null)
                 StopCoroutine(tickerCoroutine);
-            Save();
-            SaveManager.Unregister(this);
         }
 
         private void TrySubscribeToTicker()
@@ -104,15 +90,6 @@ namespace Skills.Woodcutting
                 yield return null;
             Ticker.Instance.Subscribe(this);
             Debug.Log("WoodcuttingSkill subscribed to ticker after waiting.");
-        }
-
-        private IEnumerator SaveLoop()
-        {
-            while (true)
-            {
-                yield return new WaitForSeconds(10f);
-                Save();
-            }
         }
 
         public void OnTick()
@@ -138,6 +115,7 @@ namespace Skills.Woodcutting
         {
             float baseChance = 0.35f;
             float penalty = 0.0025f * Mathf.Max(currentTree.def.RequiredWoodcuttingLevel - 1, 0);
+            int level = skills.GetLevel(SkillType.Woodcutting);
             float chance = baseChance + (level * 0.005f) + currentAxe.Power * 0.01f - penalty;
             chance = Mathf.Clamp(chance, 0.05f, 0.90f);
 
@@ -190,7 +168,8 @@ namespace Skills.Woodcutting
                     }
                 }
                 int xpGain = Mathf.RoundToInt(currentTree.def.XpPerLog * amount * (1f + xpBonus));
-                xp += xpGain;
+                int oldLevel = skills.GetLevel(SkillType.Woodcutting);
+                int newLevel = skills.AddXP(SkillType.Woodcutting, xpGain);
                 string logName = item != null ? item.itemName : currentTree.def.DisplayName;
                 FloatingText.Show($"+{amount} {logName}", anchorPos);
                 StartCoroutine(ShowXpGainDelayed(xpGain, anchorTransform));
@@ -211,12 +190,10 @@ namespace Skills.Woodcutting
                     }
                 }
 
-                int newLevel = xpTable.GetLevel(xp);
-                if (newLevel > level)
+                if (newLevel > oldLevel)
                 {
-                    level = newLevel;
-                    FloatingText.Show($"Woodcutting level {level}", anchorPos);
-                    OnLevelUp?.Invoke(level);
+                    FloatingText.Show($"Woodcutting level {newLevel}", anchorPos);
+                    OnLevelUp?.Invoke(newLevel);
                 }
 
                 currentTree.OnLogChopped();
@@ -299,29 +276,12 @@ namespace Skills.Woodcutting
         }
 
         /// <summary>
-        /// Debug helper to directly set the woodcutting level. Adjusts XP and
-        /// triggers the level up event.
+        /// Debug helper to directly set the woodcutting level via the SkillManager.
         /// </summary>
         public void DebugSetLevel(int newLevel)
         {
-            if (xpTable == null)
-                return;
-
-            newLevel = Mathf.Clamp(newLevel, 1, 99);
-            xp = xpTable.GetXpForLevel(newLevel);
-            level = newLevel;
-            OnLevelUp?.Invoke(level);
-        }
-
-        public void Save()
-        {
-            save.SaveXp(xp);
-        }
-
-        public void Load()
-        {
-            xp = save.LoadXp();
-            level = xpTable != null ? xpTable.GetLevel(xp) : 1;
+            skills?.DebugSetLevel(SkillType.Woodcutting, Mathf.Clamp(newLevel, 1, 99));
+            OnLevelUp?.Invoke(Level);
         }
 
         private void PreloadLogItems()

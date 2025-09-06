@@ -4,28 +4,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using Inventory;
 using Util;
-using Skills.Mining; // reuse XP table
 using UI;
-using Core.Save;
 using Pets;
 using Core;
 
 namespace Skills.Fishing
 {
     [DisallowMultipleComponent]
-    public class FishingSkill : MonoBehaviour, ITickable, ISaveable
+    public class FishingSkill : MonoBehaviour, ITickable
     {
-        [SerializeField] private XpTable xpTable;
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
-        [SerializeField] private MonoBehaviour saveProvider; // optional custom save provider
         private BycatchManager bycatchManager;
-
-        private IFishingSave save;
-
-        private int xp;
-        private int level;
 
         private FishableSpot currentSpot;
         private FishingToolDefinition currentTool;
@@ -41,14 +32,15 @@ namespace Skills.Fishing
         public event System.Action<string, int> OnFishCaught;
         public event System.Action<int> OnLevelUp;
 
-        public int Level => level;
-        public int Xp => xp;
+        public int Level => skills != null ? skills.GetLevel(SkillType.Fishing) : 1;
+        public float Xp => skills != null ? skills.GetXp(SkillType.Fishing) : 0f;
         public bool IsFishing => currentSpot != null;
         public FishableSpot CurrentSpot => currentSpot;
         public FishingToolDefinition CurrentTool => currentTool;
         public float CatchProgressNormalized => currentIntervalTicks <= 1 ? 0f : (float)catchProgress / (currentIntervalTicks - 1);
         public int CurrentCatchIntervalTicks => currentIntervalTicks;
 
+        private SkillManager skills;
         private Coroutine tickerCoroutine;
 
         private void Awake()
@@ -57,7 +49,7 @@ namespace Skills.Fishing
                 inventory = GetComponent<Inventory.Inventory>();
             if (equipment == null)
                 equipment = GetComponent<Equipment>();
-            save = saveProvider as IFishingSave ?? new SaveManagerFishingSave();
+            skills = GetComponent<SkillManager>();
             PreloadFishItems();
             if (bycatchManager == null)
                 bycatchManager = GameManager.BycatchManager;
@@ -65,9 +57,7 @@ namespace Skills.Fishing
 
         private void OnEnable()
         {
-            SaveManager.Register(this);
             TrySubscribeToTicker();
-            StartCoroutine(SaveLoop());
         }
 
         private void OnDisable()
@@ -76,8 +66,6 @@ namespace Skills.Fishing
                 Ticker.Instance.Unsubscribe(this);
             if (tickerCoroutine != null)
                 StopCoroutine(tickerCoroutine);
-            Save();
-            SaveManager.Unregister(this);
         }
 
         private void TrySubscribeToTicker()
@@ -97,15 +85,6 @@ namespace Skills.Fishing
             while (Ticker.Instance == null)
                 yield return null;
             Ticker.Instance.Subscribe(this);
-        }
-
-        private IEnumerator SaveLoop()
-        {
-            while (true)
-            {
-                yield return new WaitForSeconds(10f);
-                Save();
-            }
         }
 
         public void OnTick()
@@ -151,6 +130,7 @@ namespace Skills.Fishing
 
             float baseChance = 0.35f;
             float penalty = 0.0025f * Mathf.Max(fish.RequiredLevel - 1, 0);
+            int level = skills.GetLevel(SkillType.Fishing);
             float chance = baseChance + (level * 0.005f) + currentTool.CatchBonus * 0.01f - penalty;
             chance = Mathf.Clamp(chance, 0.05f, 0.90f);
 
@@ -203,19 +183,18 @@ namespace Skills.Fishing
                     }
                 }
                 int xpGain = Mathf.RoundToInt(fish.Xp * amount * (1f + xpBonus));
-                xp += xpGain;
+                int oldLevel = skills.GetLevel(SkillType.Fishing);
+                int newLevel = skills.AddXP(SkillType.Fishing, xpGain);
                 FloatingText.Show($"+{amount} {fish.DisplayName}", anchor.position);
                 StartCoroutine(ShowXpGainDelayed(xpGain, anchor));
                 OnFishCaught?.Invoke(fish.Id, amount);
 
                 TryRollBycatch(anchor);
 
-                int newLevel = xpTable.GetLevel(xp);
-                if (newLevel > level)
+                if (newLevel > oldLevel)
                 {
-                    level = newLevel;
-                    FloatingText.Show($"Fishing level {level}", anchor.position);
-                    OnLevelUp?.Invoke(level);
+                    FloatingText.Show($"Fishing level {newLevel}", anchor.position);
+                    OnLevelUp?.Invoke(newLevel);
                 }
 
                 currentSpot.OnFishCaught();
@@ -228,6 +207,7 @@ namespace Skills.Fishing
         {
             if (spot == null) return null;
             var eligible = new List<FishDefinition>();
+            int level = skills.GetLevel(SkillType.Fishing);
             foreach (var f in spot.AvailableFish)
             {
                 if (f != null && level >= f.RequiredLevel)
@@ -256,6 +236,7 @@ namespace Skills.Fishing
             int nodeHash = currentSpot.def != null ? currentSpot.def.Id.GetHashCode() : currentSpot.GetInstanceID();
 
             int chanceRollIndex = bycatchRollIndex++;
+            int level = skills.GetLevel(SkillType.Fishing);
             var ctx = new BycatchRollContext
             {
                 playerLevel = level,
@@ -429,23 +410,8 @@ namespace Skills.Fishing
 
         public void DebugSetLevel(int newLevel)
         {
-            if (xpTable == null)
-                return;
-            newLevel = Mathf.Clamp(newLevel, 1, 99);
-            xp = xpTable.GetXpForLevel(newLevel);
-            level = newLevel;
-            OnLevelUp?.Invoke(level);
-        }
-
-        public void Save()
-        {
-            save.SaveXp(xp);
-        }
-
-        public void Load()
-        {
-            xp = save.LoadXp();
-            level = xpTable != null ? xpTable.GetLevel(xp) : 1;
+            skills?.DebugSetLevel(SkillType.Fishing, Mathf.Clamp(newLevel, 1, 99));
+            OnLevelUp?.Invoke(Level);
         }
 
         private void PreloadFishItems()
@@ -457,27 +423,6 @@ namespace Skills.Fishing
                 if (!string.IsNullOrEmpty(item.id))
                     fishItems[item.id] = item;
             }
-        }
-    }
-
-    public interface IFishingSave
-    {
-        int LoadXp();
-        void SaveXp(int xp);
-    }
-
-    public class SaveManagerFishingSave : IFishingSave
-    {
-        private const string Key = "fishing_xp";
-
-        public int LoadXp()
-        {
-            return SaveManager.Load<int>(Key);
-        }
-
-        public void SaveXp(int xp)
-        {
-            SaveManager.Save(Key, xp);
         }
     }
 }

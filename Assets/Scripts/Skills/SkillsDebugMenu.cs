@@ -1,8 +1,5 @@
 using UnityEngine;
 using Player;
-using Skills.Mining;
-using Skills.Woodcutting;
-using Skills.Fishing;
 using Beastmaster;
 using Pets;
 using BankSystem;
@@ -17,9 +14,6 @@ namespace Skills
     {
         private PlayerHitpoints hitpoints;
         private SkillManager skillManager;
-        private MiningSkill miningSkill;
-        private WoodcuttingSkill woodcuttingSkill;
-        private FishingSkill fishingSkill;
         private IBeastmasterService beastmasterService;
         private MergeConfig mergeConfig;
 
@@ -69,12 +63,6 @@ namespace Skills
                 hitpoints = FindObjectOfType<PlayerHitpoints>();
             if (skillManager == null)
                 skillManager = FindObjectOfType<SkillManager>();
-            if (miningSkill == null)
-                miningSkill = FindObjectOfType<MiningSkill>();
-            if (woodcuttingSkill == null)
-                woodcuttingSkill = FindObjectOfType<WoodcuttingSkill>();
-            if (fishingSkill == null)
-                fishingSkill = FindObjectOfType<FishingSkill>();
             if (beastmasterService == null)
             {
                 foreach (var mb in FindObjectsOfType<MonoBehaviour>())
@@ -92,9 +80,6 @@ namespace Skills
         {
             hitpoints = FindObjectOfType<PlayerHitpoints>();
             skillManager = FindObjectOfType<SkillManager>();
-            miningSkill = FindObjectOfType<MiningSkill>();
-            woodcuttingSkill = FindObjectOfType<WoodcuttingSkill>();
-            fishingSkill = FindObjectOfType<FishingSkill>();
             beastmasterService = null;
             foreach (var mb in FindObjectsOfType<MonoBehaviour>())
             {
@@ -107,14 +92,14 @@ namespace Skills
             if (mergeConfig == null)
                 mergeConfig = Resources.Load<MergeConfig>("MergeConfig");
 
-            hpLevel = hitpoints != null ? hitpoints.Level.ToString() : "";
+            hpLevel = skillManager != null ? skillManager.GetLevel(SkillType.Hitpoints).ToString() : "";
             attackLevel = skillManager != null ? skillManager.GetLevel(SkillType.Attack).ToString() : "";
             strengthLevel = skillManager != null ? skillManager.GetLevel(SkillType.Strength).ToString() : "";
             defenceLevel = skillManager != null ? skillManager.GetLevel(SkillType.Defence).ToString() : "";
-            miningLevel = miningSkill != null ? miningSkill.Level.ToString() : "";
-            woodcuttingLevel = woodcuttingSkill != null ? woodcuttingSkill.Level.ToString() : "";
-            fishingLevel = fishingSkill != null ? fishingSkill.Level.ToString() : "";
-            beastmasterLevel = beastmasterService != null ? beastmasterService.CurrentLevel.ToString() : "";
+            miningLevel = skillManager != null ? skillManager.GetLevel(SkillType.Mining).ToString() : "";
+            woodcuttingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Woodcutting).ToString() : "";
+            fishingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Fishing).ToString() : "";
+            beastmasterLevel = skillManager != null ? skillManager.GetLevel(SkillType.Beastmaster).ToString() : "";
         }
 
         private void OnGUI()
@@ -166,22 +151,29 @@ namespace Skills
 
             if (GUILayout.Button("Apply"))
             {
-                if (hitpoints != null && int.TryParse(hpLevel, out var hp))
-                    hitpoints.DebugSetLevel(hp);
+                if (skillManager != null && int.TryParse(hpLevel, out var hp))
+                {
+                    skillManager.DebugSetLevel(SkillType.Hitpoints, hp);
+                    if (hitpoints != null)
+                        hitpoints.DebugSetCurrentHp(Mathf.Min(hitpoints.CurrentHp, hitpoints.MaxHp));
+                }
                 if (skillManager != null && int.TryParse(attackLevel, out var atk))
                     skillManager.DebugSetLevel(SkillType.Attack, atk);
                 if (skillManager != null && int.TryParse(strengthLevel, out var str))
                     skillManager.DebugSetLevel(SkillType.Strength, str);
                 if (skillManager != null && int.TryParse(defenceLevel, out var def))
                     skillManager.DebugSetLevel(SkillType.Defence, def);
-                if (miningSkill != null && int.TryParse(miningLevel, out var mine))
-                    miningSkill.DebugSetLevel(mine);
-                if (woodcuttingSkill != null && int.TryParse(woodcuttingLevel, out var wood))
-                    woodcuttingSkill.DebugSetLevel(wood);
-                if (fishingSkill != null && int.TryParse(fishingLevel, out var fish))
-                    fishingSkill.DebugSetLevel(fish);
-                if (beastmasterService != null && int.TryParse(beastmasterLevel, out var bm))
-                    beastmasterService.SetLevel(Mathf.Clamp(bm, 1, 99));
+                if (skillManager != null && int.TryParse(miningLevel, out var mine))
+                    skillManager.DebugSetLevel(SkillType.Mining, mine);
+                if (skillManager != null && int.TryParse(woodcuttingLevel, out var wood))
+                    skillManager.DebugSetLevel(SkillType.Woodcutting, wood);
+                if (skillManager != null && int.TryParse(fishingLevel, out var fish))
+                    skillManager.DebugSetLevel(SkillType.Fishing, fish);
+                if (skillManager != null && int.TryParse(beastmasterLevel, out var bm))
+                {
+                    skillManager.DebugSetLevel(SkillType.Beastmaster, bm);
+                    beastmasterService?.SetLevel(Mathf.Clamp(bm, 1, 99));
+                }
 
                 RefreshFields();
             }
