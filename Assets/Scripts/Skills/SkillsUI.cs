@@ -1,7 +1,7 @@
+using System;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
-using Inventory;
-using Player;
 using UI;
 
 namespace Skills
@@ -14,10 +14,6 @@ namespace Skills
     {
         private GameObject uiRoot;
         private Text skillText;
-        private Mining.MiningSkill miningSkill;
-        private Woodcutting.WoodcuttingSkill woodcuttingSkill;
-        private Fishing.FishingSkill fishingSkill;
-        private PlayerHitpoints hitpoints;
         private SkillManager skillManager;
 
         public static SkillsUI Instance { get; private set; }
@@ -45,10 +41,6 @@ namespace Skills
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            miningSkill = FindObjectOfType<Mining.MiningSkill>();
-            woodcuttingSkill = FindObjectOfType<Woodcutting.WoodcuttingSkill>();
-            fishingSkill = FindObjectOfType<Fishing.FishingSkill>();
-            hitpoints = FindObjectOfType<PlayerHitpoints>();
             skillManager = FindObjectOfType<SkillManager>();
             CreateUI();
             if (uiRoot != null)
@@ -120,42 +112,16 @@ namespace Skills
         {
             // Removed O key toggle
 
-            if (uiRoot != null && uiRoot.activeSelf)
+            if (uiRoot != null && uiRoot.activeSelf && skillManager != null)
             {
-                string text = "";
-                if (hitpoints != null)
-                    text += $"Hitpoints Level: {hitpoints.Level}  XP: {hitpoints.Xp:F2}";
-                if (skillManager != null)
+                var sb = new StringBuilder();
+                foreach (SkillType type in Enum.GetValues(typeof(SkillType)))
                 {
-                    if (text.Length > 0)
-                        text += "\n";
-                    text += $"Attack Level: {skillManager.GetLevel(SkillType.Attack)}  XP: {skillManager.GetXp(SkillType.Attack):F2}";
-                    text += "\n";
-                    text += $"Strength Level: {skillManager.GetLevel(SkillType.Strength)}  XP: {skillManager.GetXp(SkillType.Strength):F2}";
-                    text += "\n";
-                    text += $"Defence Level: {skillManager.GetLevel(SkillType.Defence)}  XP: {skillManager.GetXp(SkillType.Defence):F2}";
-                    text += "\n";
-                    text += $"Beastmaster Level: {skillManager.GetLevel(SkillType.Beastmaster)}  XP: {skillManager.GetXp(SkillType.Beastmaster):F2}";
+                    if (sb.Length > 0)
+                        sb.Append('\n');
+                    sb.Append($"{type} Level: {skillManager.GetLevel(type)}  XP: {skillManager.GetXp(type):F2}");
                 }
-                if (miningSkill != null)
-                {
-                    if (text.Length > 0)
-                        text += "\n";
-                    text += $"Mining Level: {miningSkill.Level}  XP: {miningSkill.Xp}";
-                }
-                if (woodcuttingSkill != null)
-                {
-                    if (text.Length > 0)
-                        text += "\n";
-                    text += $"Woodcutting Level: {woodcuttingSkill.Level}  XP: {woodcuttingSkill.Xp}";
-                }
-                if (fishingSkill != null)
-                {
-                    if (text.Length > 0)
-                        text += "\n";
-                    text += $"Fishing Level: {fishingSkill.Level}  XP: {fishingSkill.Xp}";
-                }
-                skillText.text = text;
+                skillText.text = sb.ToString();
             }
         }
 

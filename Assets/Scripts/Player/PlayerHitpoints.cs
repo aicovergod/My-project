@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using Skills;
-using Skills.Mining; // reuse XpTable
 using Core.Save;
 
 namespace Player
@@ -12,14 +11,11 @@ namespace Player
     [DisallowMultipleComponent]
     public class PlayerHitpoints : MonoBehaviour
     {
-        [SerializeField] private XpTable xpTable;
         [SerializeField] private bool passiveRegenEnabled;
         [SerializeField] private MonoBehaviour saveProvider; // optional custom save provider
 
         private IHitpointsSave save;
-
-        private float xp;
-        private int level;
+        private SkillManager skills;
         private int currentHp;
 
         private Coroutine regenRoutine;
@@ -28,10 +24,10 @@ namespace Player
         public event System.Action<int, int> OnHealthChanged; // current, max
         public event System.Action<int> OnHitpointsLevelChanged; // new level
 
-        public int Level => level;
-        public float Xp => xp;
+        public int Level => skills != null ? skills.GetLevel(SkillType.Hitpoints) : 1;
+        public float Xp => skills != null ? skills.GetXp(SkillType.Hitpoints) : 0f;
         public int CurrentHp => currentHp;
-        public int MaxHp => level;
+        public int MaxHp => Level;
         public bool PassiveRegenEnabled
         {
             get => passiveRegenEnabled;
@@ -53,11 +49,11 @@ namespace Player
         private void Awake()
         {
             save = saveProvider as IHitpointsSave ?? new SaveManagerHitpointsSave();
-            xp = save.LoadXp();
-            if (xp <= 0f && xpTable != null)
-                xp = xpTable.GetXpForLevel(10);
-            level = xpTable != null ? xpTable.GetLevel(Mathf.FloorToInt(xp)) : 10;
+            skills = GetComponent<SkillManager>();
+            if (skills != null && skills.GetXp(SkillType.Hitpoints) <= 0f)
+                skills.DebugSetLevel(SkillType.Hitpoints, 10);
             currentHp = save.LoadCurrentHp();
+            int level = Level;
             if (currentHp <= 0)
                 currentHp = level;
             currentHp = Mathf.Clamp(currentHp, 0, level);
@@ -95,7 +91,6 @@ namespace Player
 
         private void Save()
         {
-            save.SaveXp(xp);
             save.SaveCurrentHp(currentHp);
         }
 
@@ -142,19 +137,18 @@ namespace Player
 
         public void GainHitpointsXP(float amount)
         {
-            if (amount <= 0f || xpTable == null)
+            if (amount <= 0f || skills == null)
                 return;
-            xp += amount;
-            int newLevel = xpTable.GetLevel(Mathf.FloorToInt(xp));
-            if (newLevel > level)
+            int oldLevel = skills.GetLevel(SkillType.Hitpoints);
+            int newLevel = skills.AddXP(SkillType.Hitpoints, amount);
+            if (newLevel > oldLevel)
             {
-                level = newLevel;
                 if (currentHp > MaxHp)
                 {
                     currentHp = MaxHp;
                     OnHealthChanged?.Invoke(currentHp, MaxHp);
                 }
-                OnHitpointsLevelChanged?.Invoke(level);
+                OnHitpointsLevelChanged?.Invoke(newLevel);
                 OnHealthChanged?.Invoke(currentHp, MaxHp);
             }
         }
@@ -170,20 +164,15 @@ namespace Player
         }
 
         /// <summary>
-        /// Debug helper to directly set the hitpoints level. Adjusts XP and
-        /// clamps the current HP to the new maximum.
+        /// Debug helper to directly set the hitpoints level via the SkillManager
+        /// and clamp current HP to the new maximum.
         /// </summary>
         public void DebugSetLevel(int newLevel)
         {
-            if (xpTable == null)
-                return;
-
-            newLevel = Mathf.Clamp(newLevel, 1, 99);
-            xp = xpTable.GetXpForLevel(newLevel);
-            level = newLevel;
+            skills?.DebugSetLevel(SkillType.Hitpoints, Mathf.Clamp(newLevel, 1, 99));
             if (currentHp > MaxHp)
                 currentHp = MaxHp;
-            OnHitpointsLevelChanged?.Invoke(level);
+            OnHitpointsLevelChanged?.Invoke(Level);
             OnHealthChanged?.Invoke(currentHp, MaxHp);
         }
 
@@ -215,30 +204,17 @@ namespace Player
 
     public interface IHitpointsSave
     {
-        float LoadXp();
         int LoadCurrentHp();
-        void SaveXp(float xp);
         void SaveCurrentHp(int hp);
     }
 
     public class SaveManagerHitpointsSave : IHitpointsSave
     {
-        private const string XpKey = "hitpoints_xp";
         private const string HpKey = "hitpoints_hp";
-
-        public float LoadXp()
-        {
-            return SaveManager.Load<float>(XpKey);
-        }
 
         public int LoadCurrentHp()
         {
             return SaveManager.Load<int>(HpKey);
-        }
-
-        public void SaveXp(float xp)
-        {
-            SaveManager.Save(XpKey, xp);
         }
 
         public void SaveCurrentHp(int hp)
