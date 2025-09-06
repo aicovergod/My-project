@@ -219,7 +219,7 @@ namespace Inventory
 
         public void Open()
         {
-            var quest = Object.FindObjectOfType<QuestListUI>();
+            var quest = Object.FindObjectOfType<QuestUI>();
             if (quest != null && quest.IsOpen)
                 return;
 
