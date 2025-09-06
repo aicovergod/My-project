@@ -11,7 +11,7 @@ namespace Skills
     /// Debug menu that allows setting player skill levels. Toggle with F2.
     /// </summary>
     [DisallowMultipleComponent]
-    public class SkillsDebugMenu : MonoBehaviour
+    public class AdminF2Menu : MonoBehaviour
     {
         private PlayerHitpoints hitpoints;
         private SkillManager skillManager;
@@ -34,12 +34,12 @@ namespace Skills
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Create()
         {
-            if (UnityEngine.Object.FindObjectOfType<SkillsDebugMenu>() != null)
+            if (UnityEngine.Object.FindObjectOfType<AdminF2Menu>() != null)
                 return;
 
-            var go = new GameObject("SkillsDebugMenu");
+            var go = new GameObject("AdminF2Menu");
             DontDestroyOnLoad(go);
-            go.AddComponent<SkillsDebugMenu>();
+            go.AddComponent<AdminF2Menu>();
         }
 
         private void Awake()
