@@ -486,10 +486,6 @@ MonoBehaviour:
   rangeDefColor: {r: 1, g: 1, b: 1, a: 1}
   magicDefFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
   magicDefColor: {r: 1, g: 1, b: 1, a: 1}
-  bonusHeaderFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
-  bonusHeaderColor: {r: 0.72156864, g: 0.5254902, b: 0.043137256, a: 1}
-  itemAttackBonusFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
-  itemAttackBonusColor: {r: 1, g: 1, b: 1, a: 1}
   petHeaderFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
   petHeaderColor: {r: 0.72156864, g: 0.5254902, b: 0.043137256, a: 1}
   petAttackLevelFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}

@@ -30,13 +30,4 @@ MonoBehaviour:
     RangeDefence: 0
     MagicDefence: 0
     AttackSpeedTicks: 4
-  attackBonus: 0
-  defenceBonus: 0
-  attackSpeed: 0
-  strengthBonus: 0
-  rangeBonus: 0
-  magicBonus: 0
-  meleeDefenceBonus: 0
-  rangedDefenceBonus: 0
-  magicDefenceBonus: 0
   book: {fileID: 11400000, guid: 43867a8863d1522449c6062bf7b28002, type: 2}

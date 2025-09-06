@@ -106,17 +106,5 @@ namespace Inventory
 
         [Header("Combat")]
         public ItemCombatStats combat = ItemCombatStats.Default;
-
-        [Obsolete("Use combat.Attack instead", false)] public int attackBonus;
-        [Obsolete("Use per-type defence bonuses", false)] public int defenceBonus;
-        [Obsolete("Use combat.AttackSpeedTicks", false)] public int attackSpeed = 4;
-
-        [Header("Legacy Bonuses")]
-        [Obsolete("Use combat.Strength", false)] public int strengthBonus;
-        [Obsolete("Use combat.Range", false)] public int rangeBonus;
-        [Obsolete("Use combat.Magic", false)] public int magicBonus;
-        [Obsolete("Use combat.MeleeDefence", false)] public int meleeDefenceBonus;
-        [Obsolete("Use combat.RangeDefence", false)] public int rangedDefenceBonus;
-        [Obsolete("Use combat.MagicDefence", false)] public int magicDefenceBonus;
     }
 }
