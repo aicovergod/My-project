@@ -40,7 +40,8 @@ namespace NPC
                 clonesActive = true;
                 SpectralCloneAmbush.Perform(this, target, clonePrefabs, cloneCount,
                     cloneLifespan, spawnRadius, realCloneDamage,
-                    onAllClonesGone: () => clonesActive = false);
+                    onAllClonesGone: () => clonesActive = false,
+                    preventConcurrent: true);
             }
         }
     }
