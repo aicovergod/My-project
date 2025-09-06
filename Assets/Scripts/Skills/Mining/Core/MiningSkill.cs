@@ -10,6 +10,7 @@ using Pets;
 using Quests;
 using Core.Save;
 using Random = UnityEngine.Random;
+using UI;
 
 namespace Skills.Mining
 {

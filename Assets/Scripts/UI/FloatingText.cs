@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Skills.Mining
+namespace UI
 {
     /// <summary>
     /// Simple floating text utility for feedback messages.

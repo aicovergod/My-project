@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Inventory;
 using Player;
-using Skills.Mining;
+using UI;
 
 namespace Skills.Woodcutting
 {

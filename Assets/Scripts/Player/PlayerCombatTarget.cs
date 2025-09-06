@@ -1,6 +1,6 @@
 using UnityEngine;
 using Combat;
-using Skills.Mining;
+using UI;
 
 namespace Player
 {
