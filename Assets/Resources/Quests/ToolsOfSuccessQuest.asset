@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e1d326ee4e144ce864463e8ed25f28f, type: 3}
+  m_Name: Tools Of Success Quest
+  m_EditorClassIdentifier:
+  QuestID: ToolsOfSuccess
+  Title: Tools of Success
+  Description: Prove your skill by crafting and using improved tools.
+  Steps:
+  - StepID: CraftTool
+    StepDescription: Craft a tool
+    IsComplete: 0
+  - StepID: UseTool
+    StepDescription: Use the tool
+    IsComplete: 0
+  - StepID: ReturnToRowan
+    StepDescription: Return to Elder Rowan
+    IsComplete: 0
+  Rewards: 'Small Woodcutting XP
+
+    Small Fishing XP
+
+    100 Coins'
