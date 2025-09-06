@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Inventory;
 using Player;
+using UI;
 
 namespace Skills.Mining
 {

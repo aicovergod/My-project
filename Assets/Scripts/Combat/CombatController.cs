@@ -5,7 +5,7 @@ using Skills;
 using Player;
 using NPC;
 using Pets;
-using Skills.Mining;
+using UI;
 
 namespace Combat
 {

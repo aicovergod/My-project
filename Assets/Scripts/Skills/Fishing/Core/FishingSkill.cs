@@ -5,6 +5,7 @@ using UnityEngine;
 using Inventory;
 using Util;
 using Skills.Mining; // reuse XP table
+using UI;
 using Core.Save;
 using Pets;
 using Core;

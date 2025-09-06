@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using Util;
+using UI;
 
 namespace Skills.Mining
 {

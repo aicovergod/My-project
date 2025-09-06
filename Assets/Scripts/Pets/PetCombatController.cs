@@ -4,7 +4,7 @@ using Combat;
 using EquipmentSystem;
 using NPC;
 using Skills;
-using Skills.Mining;
+using UI;
 
 namespace Pets
 {

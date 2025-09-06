@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Util;
-using Skills.Mining;
+using UI;
 using Random = UnityEngine.Random;
 
 namespace Skills.Fishing

@@ -5,7 +5,6 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Core.Save;
 using Skills;
-using Skills.Mining;
 using Beastmaster;
 using Pets;
 using Combat;
