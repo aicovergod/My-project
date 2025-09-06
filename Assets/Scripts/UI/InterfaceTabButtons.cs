@@ -79,8 +79,14 @@ namespace UI
 
         private void ToggleQuest()
         {
-            var quest = Object.FindObjectOfType<QuestUI>();
-            quest?.Toggle();
+            var quest = Object.FindObjectOfType<QuestListUI>();
+            if (quest != null)
+            {
+                if (quest.IsOpen)
+                    quest.Close();
+                else
+                    quest.Open();
+            }
         }
 
         private void ToggleInventory()

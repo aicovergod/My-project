@@ -1,65 +1,43 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using Inventory;
 using Player;
 using UI;
 
 namespace Quests
 {
     /// <summary>
-    /// Simple quest log UI built entirely in code.
+    /// Displays available quests in a scrollable list and shows details when selected.
     /// </summary>
-    public class QuestUI : MonoBehaviour, IUIWindow
+    public class QuestListUI : MonoBehaviour, IUIWindow
     {
         private RectTransform listContent;
         private Text titleText;
         private Text descriptionText;
-        private Text stepsText;
         private Text rewardsText;
-        private QuestDefinition selected;
-
-        [SerializeField] private Button questEntryPrefab;
-
+        private GameObject detailsPanel;
+        private QuestDefinition[] quests;
         private Canvas canvas;
         private PlayerMover playerMover;
-
-        private static QuestUI instance;
 
         public bool IsOpen => canvas != null && canvas.enabled;
 
         private void Awake()
         {
-            if (instance != null && instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            instance = this;
-            name = "QuestUI";
+            name = "QuestListUI";
             canvas = gameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             gameObject.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             gameObject.AddComponent<GraphicRaycaster>();
-
             BuildLayout();
             DontDestroyOnLoad(gameObject);
             canvas.enabled = false;
-            playerMover = FindObjectOfType<PlayerMover>();
             UIManager.Instance.RegisterWindow(this);
-        }
-
-        private void OnDestroy()
-        {
-            if (instance == this)
-                instance = null;
         }
 
         private void Start()
         {
-            if (QuestManager.Instance != null)
-                QuestManager.Instance.QuestsUpdated.AddListener(Refresh);
+            Preload();
         }
 
         public void Toggle()
@@ -73,14 +51,7 @@ namespace Quests
         public void Open()
         {
             UIManager.Instance.OpenWindow(this);
-            var inv = FindObjectOfType<Inventory.Inventory>();
-            if (inv != null && inv.IsOpen)
-                inv.CloseUI();
-            var eq = FindObjectOfType<Inventory.Equipment>();
-            if (eq != null && eq.IsOpen)
-                eq.CloseUI();
             canvas.enabled = true;
-            Refresh();
             if (playerMover == null)
                 playerMover = FindObjectOfType<PlayerMover>();
             if (playerMover != null)
@@ -90,14 +61,10 @@ namespace Quests
         public void Close()
         {
             canvas.enabled = false;
-            Clear();
+            detailsPanel.SetActive(false);
+            titleText.text = descriptionText.text = rewardsText.text = string.Empty;
             if (playerMover != null)
                 playerMover.enabled = true;
-        }
-
-        private void Update()
-        {
-            // Removed Q key toggle
         }
 
         private void BuildLayout()
@@ -109,12 +76,8 @@ namespace Quests
             bgRect.anchorMax = Vector2.one;
             bgRect.offsetMin = Vector2.zero;
             bgRect.offsetMax = Vector2.zero;
+            bg.GetComponent<Image>().color = Color.clear;
 
-            // Hide the full-screen background to avoid a white overlay
-            var bgImage = bg.GetComponent<Image>();
-            bgImage.color = Color.clear;
-
-            // Left quest list
             var listGO = new GameObject("QuestList", typeof(Image), typeof(ScrollRect));
             var listRect = listGO.GetComponent<RectTransform>();
             listRect.SetParent(bgRect, false);
@@ -144,34 +107,30 @@ namespace Quests
             layout.childForceExpandHeight = false;
             layout.childControlWidth = true;
             layout.childAlignment = TextAnchor.UpperLeft;
-            // Add a bit of padding at the top so the first quest is fully visible
             layout.padding = new RectOffset(0, 0, 5, 0);
 
             var scroll = listGO.GetComponent<ScrollRect>();
             scroll.viewport = vpRect;
             scroll.content = listContent;
-            // Prevent horizontal dragging and excessive movement when
-            // the list contains few items so the layout remains stable.
             scroll.horizontal = false;
             scroll.movementType = ScrollRect.MovementType.Clamped;
 
-            // Right details panel
-            var details = new GameObject("Details", typeof(Image));
-            var detRect = details.GetComponent<RectTransform>();
+            detailsPanel = new GameObject("Details", typeof(Image));
+            var detRect = detailsPanel.GetComponent<RectTransform>();
             detRect.SetParent(bgRect, false);
             detRect.anchorMin = new Vector2(0.35f, 0f);
             detRect.anchorMax = new Vector2(1f, 1f);
             detRect.offsetMin = new Vector2(10f, 10f);
             detRect.offsetMax = new Vector2(-40f, -10f);
-            details.GetComponent<Image>().color = new Color32(0x26, 0x26, 0x26, 0xF2);
+            detailsPanel.GetComponent<Image>().color = new Color32(0x26, 0x26, 0x26, 0xF2);
 
             titleText = CreateText("Title", detRect, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0, -10));
             titleText.fontStyle = FontStyle.Bold;
-            descriptionText = CreateText("Description", detRect, new Vector2(0f, 0.7f), new Vector2(1f, 1f), new Vector2(0, -40));
-            stepsText = CreateText("Steps", detRect, new Vector2(0f, 0.3f), new Vector2(1f, 0.7f), Vector2.zero);
-            rewardsText = CreateText("Rewards", detRect, new Vector2(0f, 0f), new Vector2(1f, 0.3f), new Vector2(0, 10));
+            descriptionText = CreateText("Description", detRect, new Vector2(0f, 0.5f), new Vector2(1f, 0.9f), Vector2.zero);
+            rewardsText = CreateText("Rewards", detRect, new Vector2(0f, 0f), new Vector2(1f, 0.5f), new Vector2(0, 10));
 
-            // Close button
+            detailsPanel.SetActive(false);
+
             var closeBtnGO = new GameObject("Close", typeof(Image), typeof(Button));
             var closeRect = closeBtnGO.GetComponent<RectTransform>();
             closeRect.SetParent(bgRect, false);
@@ -182,7 +141,7 @@ namespace Quests
             var closeText = CreateText("X", closeRect, Vector2.zero, Vector2.one, Vector2.zero);
             closeText.alignment = TextAnchor.MiddleCenter;
             closeBtnGO.GetComponent<Image>().color = Color.clear;
-            closeBtnGO.GetComponent<Button>().onClick.AddListener(() => canvas.enabled = false);
+            closeBtnGO.GetComponent<Button>().onClick.AddListener(Close);
         }
 
         private Text CreateText(string name, RectTransform parent, Vector2 anchorMin, Vector2 anchorMax, Vector2 offset)
@@ -199,73 +158,41 @@ namespace Quests
             txt.horizontalOverflow = HorizontalWrapMode.Wrap;
             txt.verticalOverflow = VerticalWrapMode.Overflow;
             txt.color = Color.white;
-            // Allow buttons beneath the text to receive clicks by disabling
-            // raycast targeting on the label itself.
             txt.raycastTarget = false;
             return txt;
         }
 
-        private void Refresh()
+        private void Preload()
         {
-            ClearList();
-
-            if (questEntryPrefab == null)
-            {
-                Debug.LogWarning("Quest entry prefab not assigned.");
-                return;
-            }
-
-            var allQuests = QuestManager.Instance.GetActiveQuests()
-                .Concat(QuestManager.Instance.GetAvailableQuests())
-                .Concat(QuestManager.Instance.GetCompletedQuests());
-            foreach (var quest in allQuests)
-            {
-                var btn = Instantiate(questEntryPrefab, listContent);
-                btn.name = quest.Title;
-                var txt = btn.GetComponentInChildren<Text>();
-                txt.text = quest.Title;
-                txt.alignment = TextAnchor.MiddleLeft;
-                txt.horizontalOverflow = HorizontalWrapMode.Overflow;
-                if (QuestManager.Instance.IsQuestCompleted(quest.QuestID))
-                    txt.color = Color.green;
-                else if (QuestManager.Instance.IsQuestActive(quest.QuestID))
-                    txt.color = Color.yellow;
-                else
-                    txt.color = Color.red;
-                var capturedQuest = quest;
-                btn.onClick.AddListener(() => SelectQuest(capturedQuest));
-            }
-
-            if (selected != null)
-                SelectQuest(selected);
-        }
-
-        private void Clear()
-        {
-            ClearList();
-            selected = null;
-            titleText.text = descriptionText.text = stepsText.text = rewardsText.text = string.Empty;
-        }
-
-        private void ClearList()
-        {
-            if (listContent == null) return;
+            quests = QuestManager.Instance.GetAvailableQuests().ToArray();
             foreach (Transform child in listContent)
                 Destroy(child.gameObject);
+
+            var btnGO = new GameObject("ToolsOfSuccess", typeof(Image), typeof(Button));
+            var rect = btnGO.GetComponent<RectTransform>();
+            rect.SetParent(listContent, false);
+            rect.sizeDelta = new Vector2(0f, 30f);
+            var txt = CreateText("Label", rect, Vector2.zero, Vector2.one, Vector2.zero);
+            txt.text = "Tools Of Success";
+            txt.alignment = TextAnchor.MiddleLeft;
+            btnGO.GetComponent<Image>().color = Color.clear;
+            btnGO.GetComponent<Button>().onClick.AddListener(() => OpenQuest("ToolsOfSuccess"));
         }
 
-        private void SelectQuest(QuestDefinition quest)
+        /// <summary>
+        /// Opens the quest with the given identifier and populates the details panel.
+        /// </summary>
+        public void OpenQuest(string questId)
         {
-            selected = quest;
+            var quest = QuestManager.Instance.GetQuest(questId);
             if (quest == null)
-            {
-                titleText.text = descriptionText.text = stepsText.text = rewardsText.text = string.Empty;
+                quest = QuestManager.Instance.GetAvailableQuests().FirstOrDefault(q => q.QuestID == questId);
+            if (quest == null)
                 return;
-            }
             titleText.text = quest.Title;
             descriptionText.text = quest.Description;
-            stepsText.text = string.Join("\n", quest.Steps.Select(s => $"{(s.IsComplete ? "[\u2714]" : "[ ]")} {s.StepDescription}"));
             rewardsText.text = quest.Rewards;
+            detailsPanel.SetActive(true);
         }
     }
 }
