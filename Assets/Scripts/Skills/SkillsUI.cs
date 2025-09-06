@@ -18,6 +18,7 @@ namespace Skills
         private readonly Dictionary<SkillType, Text> levelTexts = new();
         private readonly Dictionary<SkillType, Text> xpTexts = new();
         private readonly Dictionary<SkillType, bool> xpVisibility = new();
+        private Text totalLevelText;
 
         private readonly SkillType[] displayOrder =
         {
@@ -93,6 +94,8 @@ namespace Skills
 
             foreach (var type in displayOrder)
                 CreateSkillElement(type, panel.transform);
+
+            CreateTotalLevelElement(panel.transform);
         }
 
         private void CreateSkillElement(SkillType type, Transform parent)
@@ -127,12 +130,30 @@ namespace Skills
             xpVisibility[type] = false;
         }
 
+        private void CreateTotalLevelElement(Transform parent)
+        {
+            var totalGo = new GameObject("TotalLevel");
+            totalGo.transform.SetParent(parent, false);
+
+            totalLevelText = totalGo.AddComponent<Text>();
+            totalLevelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            totalLevelText.color = Color.white;
+        }
+
         private void OnSkillClicked(SkillType type)
         {
             if (!xpTexts.ContainsKey(type))
                 return;
 
-            xpVisibility[type] = !xpVisibility[type];
+            bool wasVisible = xpVisibility[type];
+
+            foreach (var kvp in xpTexts)
+            {
+                xpVisibility[kvp.Key] = false;
+                kvp.Value.gameObject.SetActive(false);
+            }
+
+            xpVisibility[type] = !wasVisible;
             xpTexts[type].gameObject.SetActive(xpVisibility[type]);
         }
 
@@ -163,16 +184,22 @@ namespace Skills
         {
             if (uiRoot != null && uiRoot.activeSelf && skillManager != null)
             {
+                int totalLevel = 0;
                 foreach (var type in displayOrder)
                 {
                     if (!levelTexts.TryGetValue(type, out var levelText) ||
                         !xpTexts.TryGetValue(type, out var xpText))
                         continue;
 
-                    levelText.text = $"{type} Level: {skillManager.GetLevel(type)}";
+                    int level = skillManager.GetLevel(type);
+                    levelText.text = $"{type} Level: {level}";
                     xpText.text = $"XP: {skillManager.GetXp(type):F2}";
                     xpText.gameObject.SetActive(xpVisibility[type]);
+                    totalLevel += level;
                 }
+
+                if (totalLevelText != null)
+                    totalLevelText.text = $"Total Level: {totalLevel}";
             }
         }
 
