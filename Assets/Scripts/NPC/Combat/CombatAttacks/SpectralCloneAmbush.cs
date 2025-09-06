@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Combat;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace NPC
 {
@@ -104,7 +105,7 @@ namespace NPC
             for (int i = 0; i < cloneCount; i++)
             {
                 Vector2 pos = (Vector2)target.transform.position + Random.insideUnitCircle * spawnRadius;
-                GameObject prefab = clonePrefabs[UnityEngine.Random.Range(0, clonePrefabs.Length)];
+                GameObject prefab = clonePrefabs[Random.Range(0, clonePrefabs.Length)];
                 SpawnClone(prefab, pos, Quaternion.identity);
             }
 
