@@ -742,12 +742,12 @@ namespace Inventory
             strengthBonusText = CreateText(playerBonusPanel.transform, "Strength", "Strength = 0", -2f * lineHeight, strengthFont, strengthColor);
             rangeBonusText = CreateText(playerBonusPanel.transform, "Range", "Range = 0", -3f * lineHeight, rangeFont, rangeColor);
             magicBonusText = CreateText(playerBonusPanel.transform, "Magic", "Magic = 0", -4f * lineHeight, magicFont, magicColor);
-            CreateText(playerBonusPanel.transform, "MaxHitHeader", "Max Hit:", -5f * lineHeight, maxHitHeaderFont, maxHitHeaderColor);
-            maxHitText = CreateText(playerBonusPanel.transform, "MaxHit", "Total = 0", -6f * lineHeight, maxHitFont, maxHitColor);
-            CreateText(playerBonusPanel.transform, "DefenceHeader", "Defence:", -7f * lineHeight, defenceHeaderFont, defenceHeaderColor);
-            meleeDefenceBonusText = CreateText(playerBonusPanel.transform, "MeleeDef", "Melee = 0", -8f * lineHeight, meleeDefFont, meleeDefColor);
-            rangedDefenceBonusText = CreateText(playerBonusPanel.transform, "RangeDef", "Range = 0", -9f * lineHeight, rangeDefFont, rangeDefColor);
-            magicDefenceBonusText = CreateText(playerBonusPanel.transform, "MagicDef", "Magic = 0", -10f * lineHeight, magicDefFont, magicDefColor);
+            CreateText(playerBonusPanel.transform, "DefenceHeader", "Defence:", -5f * lineHeight, defenceHeaderFont, defenceHeaderColor);
+            meleeDefenceBonusText = CreateText(playerBonusPanel.transform, "MeleeDef", "Melee = 0", -6f * lineHeight, meleeDefFont, meleeDefColor);
+            rangedDefenceBonusText = CreateText(playerBonusPanel.transform, "RangeDef", "Range = 0", -7f * lineHeight, rangeDefFont, rangeDefColor);
+            magicDefenceBonusText = CreateText(playerBonusPanel.transform, "MagicDef", "Magic = 0", -8f * lineHeight, magicDefFont, magicDefColor);
+            CreateText(playerBonusPanel.transform, "MaxHitHeader", "Max Hit:", -9f * lineHeight, maxHitHeaderFont, maxHitHeaderColor);
+            maxHitText = CreateText(playerBonusPanel.transform, "MaxHit", "Total = 0", -10f * lineHeight, maxHitFont, maxHitColor);
 
             petHeaderText = CreateText(petBonusPanel.transform, "PetHeader", "Pet:", 0f, petHeaderFont, petHeaderColor);
             petAttackLevelText = CreateText(petBonusPanel.transform, "PetAttackLevel", "Attack Level = 0 - Attack = 0", -lineHeight, petAttackLevelFont, petAttackLevelColor);
