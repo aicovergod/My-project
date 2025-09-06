@@ -76,10 +76,6 @@ namespace Inventory
         public Color rangeDefColor = Color.white;
         public Font magicDefFont;
         public Color magicDefColor = Color.white;
-        public Font bonusHeaderFont;
-        public Color bonusHeaderColor = Color.white;
-        public Font itemAttackBonusFont;
-        public Color itemAttackBonusColor = Color.white;
 
         [Header("Pet Text Styles")]
         public Font petHeaderFont;
@@ -115,7 +111,6 @@ namespace Inventory
         private Text meleeDefenceBonusText;
         private Text rangedDefenceBonusText;
         private Text magicDefenceBonusText;
-        private Text itemAttackBonusText;
         private Text petHeaderText;
         private Text petAttackLevelText;
         private Text petStrengthLevelText;
@@ -395,7 +390,6 @@ namespace Inventory
         {
             int attack = 0, strength = 0, range = 0, magic = 0;
             int meleeDef = 0, rangeDef = 0, magicDef = 0;
-            int itemAttackBonus = 0;
 
             foreach (var entry in equipped)
             {
@@ -410,7 +404,6 @@ namespace Inventory
                 meleeDef += stats.MeleeDefence;
                 rangeDef += stats.RangeDefence;
                 magicDef += stats.MagicDefence;
-                itemAttackBonus += entry.item.attackBonus;
             }
 
             if (attackBonusText != null) attackBonusText.text = $"Attack = {attack}";
@@ -420,7 +413,6 @@ namespace Inventory
             if (meleeDefenceBonusText != null) meleeDefenceBonusText.text = $"Melee = {meleeDef}";
             if (rangedDefenceBonusText != null) rangedDefenceBonusText.text = $"Range = {rangeDef}";
             if (magicDefenceBonusText != null) magicDefenceBonusText.text = $"Magic = {magicDef}";
-            if (itemAttackBonusText != null) itemAttackBonusText.text = $"Attack Bonus = {itemAttackBonus}";
 
             TotalAttackBonus = attack;
             TotalDefenceBonus = meleeDef + rangeDef + magicDef;
@@ -739,8 +731,6 @@ namespace Inventory
             meleeDefenceBonusText = CreateText(playerBonusPanel.transform, "MeleeDef", "Melee = 0", -6f * lineHeight, meleeDefFont, meleeDefColor);
             rangedDefenceBonusText = CreateText(playerBonusPanel.transform, "RangeDef", "Range = 0", -7f * lineHeight, rangeDefFont, rangeDefColor);
             magicDefenceBonusText = CreateText(playerBonusPanel.transform, "MagicDef", "Magic = 0", -8f * lineHeight, magicDefFont, magicDefColor);
-            CreateText(playerBonusPanel.transform, "BonusHeader", "Bonuses:", -9f * lineHeight, bonusHeaderFont, bonusHeaderColor);
-            itemAttackBonusText = CreateText(playerBonusPanel.transform, "ItemAttackBonus", "Attack Bonus = 0", -10f * lineHeight, itemAttackBonusFont, itemAttackBonusColor);
 
             petHeaderText = CreateText(petBonusPanel.transform, "PetHeader", "Pet:", 0f, petHeaderFont, petHeaderColor);
             petAttackLevelText = CreateText(petBonusPanel.transform, "PetAttackLevel", "Attack Level = 0 - Attack = 0", -lineHeight, petAttackLevelFont, petAttackLevelColor);

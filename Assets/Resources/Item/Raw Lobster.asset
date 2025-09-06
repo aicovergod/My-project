@@ -32,12 +32,3 @@ MonoBehaviour:
     RangeDefence: 0
     MagicDefence: 0
     AttackSpeedTicks: 0
-  attackBonus: 0
-  defenceBonus: 0
-  attackSpeed: 0
-  strengthBonus: 0
-  rangeBonus: 0
-  magicBonus: 0
-  meleeDefenceBonus: 0
-  rangedDefenceBonus: 0
-  magicDefenceBonus: 0
