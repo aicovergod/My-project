@@ -8,6 +8,7 @@ using Skills;
 using Beastmaster;
 using Pets;
 using Combat;
+using Player;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -68,6 +69,10 @@ namespace Inventory
         public Color rangeColor = Color.white;
         public Font magicFont;
         public Color magicColor = Color.white;
+        public Font maxHitHeaderFont;
+        public Color maxHitHeaderColor = Color.white;
+        public Font maxHitFont;
+        public Color maxHitColor = Color.white;
         public Font defenceHeaderFont;
         public Color defenceHeaderColor = Color.white;
         public Font meleeDefFont;
@@ -103,11 +108,13 @@ namespace Inventory
         private Inventory inventory;
         [SerializeField] private SkillManager skillManager;
         [SerializeField] private Transform floatingTextAnchor;
+        private PlayerCombatLoadout combatLoadout;
 
         private Text attackBonusText;
         private Text strengthBonusText;
         private Text rangeBonusText;
         private Text magicBonusText;
+        private Text maxHitText;
         private Text meleeDefenceBonusText;
         private Text rangedDefenceBonusText;
         private Text magicDefenceBonusText;
@@ -163,6 +170,7 @@ namespace Inventory
 
             inventory = GetComponent<Inventory>();
             skillManager = skillManager != null ? skillManager : GetComponent<SkillManager>();
+            combatLoadout = GetComponent<PlayerCombatLoadout>();
             if (floatingTextAnchor == null)
                 floatingTextAnchor = transform.Find("FloatingTextAnchor");
             equipped = new InventoryEntry[Enum.GetValues(typeof(EquipmentSlot)).Length - 1];
@@ -410,6 +418,13 @@ namespace Inventory
             if (strengthBonusText != null) strengthBonusText.text = $"Strength = {strength}";
             if (rangeBonusText != null) rangeBonusText.text = $"Range = {range}";
             if (magicBonusText != null) magicBonusText.text = $"Magic = {magic}";
+
+            int strengthLevel = skillManager != null ? skillManager.GetLevel(SkillType.Strength) : 1;
+            CombatStyle style = combatLoadout != null ? combatLoadout.Style : CombatStyle.Accurate;
+            int effStr = CombatMath.GetEffectiveStrength(strengthLevel, style);
+            int maxHit = CombatMath.GetMaxHit(effStr, strength);
+            if (maxHitText != null) maxHitText.text = $"Total = {maxHit}";
+
             if (meleeDefenceBonusText != null) meleeDefenceBonusText.text = $"Melee = {meleeDef}";
             if (rangedDefenceBonusText != null) rangedDefenceBonusText.text = $"Range = {rangeDef}";
             if (magicDefenceBonusText != null) magicDefenceBonusText.text = $"Magic = {magicDef}";
@@ -727,10 +742,12 @@ namespace Inventory
             strengthBonusText = CreateText(playerBonusPanel.transform, "Strength", "Strength = 0", -2f * lineHeight, strengthFont, strengthColor);
             rangeBonusText = CreateText(playerBonusPanel.transform, "Range", "Range = 0", -3f * lineHeight, rangeFont, rangeColor);
             magicBonusText = CreateText(playerBonusPanel.transform, "Magic", "Magic = 0", -4f * lineHeight, magicFont, magicColor);
-            CreateText(playerBonusPanel.transform, "DefenceHeader", "Defence:", -5f * lineHeight, defenceHeaderFont, defenceHeaderColor);
-            meleeDefenceBonusText = CreateText(playerBonusPanel.transform, "MeleeDef", "Melee = 0", -6f * lineHeight, meleeDefFont, meleeDefColor);
-            rangedDefenceBonusText = CreateText(playerBonusPanel.transform, "RangeDef", "Range = 0", -7f * lineHeight, rangeDefFont, rangeDefColor);
-            magicDefenceBonusText = CreateText(playerBonusPanel.transform, "MagicDef", "Magic = 0", -8f * lineHeight, magicDefFont, magicDefColor);
+            CreateText(playerBonusPanel.transform, "MaxHitHeader", "Max Hit:", -5f * lineHeight, maxHitHeaderFont, maxHitHeaderColor);
+            maxHitText = CreateText(playerBonusPanel.transform, "MaxHit", "Total = 0", -6f * lineHeight, maxHitFont, maxHitColor);
+            CreateText(playerBonusPanel.transform, "DefenceHeader", "Defence:", -7f * lineHeight, defenceHeaderFont, defenceHeaderColor);
+            meleeDefenceBonusText = CreateText(playerBonusPanel.transform, "MeleeDef", "Melee = 0", -8f * lineHeight, meleeDefFont, meleeDefColor);
+            rangedDefenceBonusText = CreateText(playerBonusPanel.transform, "RangeDef", "Range = 0", -9f * lineHeight, rangeDefFont, rangeDefColor);
+            magicDefenceBonusText = CreateText(playerBonusPanel.transform, "MagicDef", "Magic = 0", -10f * lineHeight, magicDefFont, magicDefColor);
 
             petHeaderText = CreateText(petBonusPanel.transform, "PetHeader", "Pet:", 0f, petHeaderFont, petHeaderColor);
             petAttackLevelText = CreateText(petBonusPanel.transform, "PetAttackLevel", "Attack Level = 0 - Attack = 0", -lineHeight, petAttackLevelFont, petAttackLevelColor);
