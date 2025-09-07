@@ -21,7 +21,7 @@ MonoBehaviour:
   depleteRollInverse: 8
   respawnSeconds: 10
   chopIntervalTicks: 4
-  petDropChance: 5
+  petDropChance: 7500
   interactRange: 1.5
   cancelDistance: 3
   aliveSprite: {fileID: 21300000, guid: 6fcc0156bb0e34640b91d4a2d234b296, type: 3}

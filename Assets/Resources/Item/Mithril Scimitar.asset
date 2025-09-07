@@ -10,29 +10,31 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
-  m_Name: Mining Pants
+  m_Name: Mithril Scimitar
   m_EditorClassIdentifier: 
-  id: Mining Pants
-  itemName: Mining Pants
-  icon: {fileID: 21300000, guid: d9768624219bfdc45b441dd7cd1ba8f7, type: 3}
-  description: Gives a 2.5% mining XP bonus
+  id: Mithril Scimitar
+  itemName: Mithril Scimitar
+  icon: {fileID: 21300000, guid: d129bea14f27bc546866bd5507310d16, type: 3}
+  description: This looks sharp
   stackable: 0
   maxStack: 1
   splittable: 0
-  isUndroppable: 1
-  equipmentSlot: 6
+  isUndroppable: 0
+  equipmentSlot: 10
   bycatchChanceBonus: 0
   fishingXpBonusMultiplier: 0
   fishingXpBonusWaterTypes: -1
   woodcuttingXpBonusMultiplier: 0
-  miningXpBonusMultiplier: 0.025
-  skillRequirements: []
+  miningXpBonusMultiplier: 0
+  skillRequirements:
+  - skill: 4
+    level: 20
   combat:
-    Attack: 0
-    Strength: 0
+    Attack: 21
+    Strength: 20
     Range: 0
     Magic: 0
-    MeleeDefence: 0
+    MeleeDefence: 1
     RangeDefence: 0
     MagicDefence: 0
-    AttackSpeedTicks: 0
+    AttackSpeedTicks: 4
