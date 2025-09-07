@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
-  m_Name: Cooked Reef Shark
+  m_Name: Mr Frying Pan
   m_EditorClassIdentifier: 
-  id: Cooked Reef Shark
-  itemName: Cooked Reef Shark
-  icon: {fileID: 21300000, guid: edea4538add7372438d144aaa28d5962, type: 3}
-  description: 'A piece of
+  id: Mr Frying Pan
+  itemName: Mr Frying Pan
+  icon: {fileID: 21300000, guid: 143e540cf34394749aef16e3944654fe, type: 3}
+  description: 'a lucky reward
 
-    cooked reef shark'
+    from cooking'
   stackable: 0
   maxStack: 1
   splittable: 0
@@ -40,4 +40,4 @@ MonoBehaviour:
     MeleeDefence: 0
     RangeDefence: 0
     MagicDefence: 0
-    AttackSpeedTicks: 0
+    AttackSpeedTicks: 4
