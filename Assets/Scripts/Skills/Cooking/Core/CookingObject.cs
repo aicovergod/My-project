@@ -14,7 +14,7 @@ namespace Skills.Cooking
     /// player moves or steps too far away.
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
-    public class CookingObject : MonoBehaviour
+    public class CookingObject : MonoBehaviour, IPointerClickHandler
     {
         [SerializeField] private float cancelDistance = 3f;
 
@@ -36,6 +36,10 @@ namespace Skills.Cooking
                 playerTransform = playerObj.transform;
             }
             EnsureRecipeLookup();
+
+            var mainCam = Camera.main;
+            if (mainCam != null && mainCam.GetComponent<Physics2DRaycaster>() == null)
+                mainCam.gameObject.AddComponent<Physics2DRaycaster>();
         }
 
         private void EnsureRecipeLookup()
@@ -65,12 +69,10 @@ namespace Skills.Cooking
             }
         }
 
-        private void OnMouseOver()
+        public void OnPointerClick(PointerEventData eventData)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (eventData.button == PointerEventData.InputButton.Left)
             {
-                if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
-                    return;
                 TryStartCooking();
             }
         }
