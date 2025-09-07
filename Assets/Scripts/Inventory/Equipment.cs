@@ -96,12 +96,15 @@ namespace Inventory
         public Color petMaxHitColor = Color.white;
 
         [Header("Tooltip")]
-        public Font tooltipFont;
-        public Color tooltipColor = Color.white;
+        public Font tooltipNameFont;
+        public Color tooltipNameColor = Color.white;
+        public Font tooltipBonusFont;
+        public Color tooltipBonusColor = Color.white;
 
         private GameObject uiRoot;
         private GameObject tooltip;
-        private Text tooltipText;
+        private Text tooltipNameText;
+        private Text tooltipBonusText;
         private Image[] slotBackgroundImages;
         private Image[] slotItemImages;
         private Text[] slotCountTexts;
@@ -259,20 +262,22 @@ namespace Inventory
         {
             var entry = GetEquipped(slot);
             var item = entry.item;
-            if (item == null || tooltip == null || tooltipText == null)
+            if (item == null || tooltip == null || tooltipNameText == null || tooltipBonusText == null)
             {
                 HideTooltip();
                 return;
             }
 
             string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
-            var sb = new StringBuilder(name);
+            tooltipNameText.text = name;
+            var sb = new StringBuilder();
 
             void AppendBonus(float value, string label)
             {
                 if (Mathf.Abs(value) > Mathf.Epsilon)
                 {
-                    sb.AppendLine();
+                    if (sb.Length > 0)
+                        sb.AppendLine();
                     sb.Append($"+{value * 100f:0.##}% {label}");
                 }
             }
@@ -282,7 +287,7 @@ namespace Inventory
             AppendBonus(item.woodcuttingXpBonusMultiplier, "Woodcutting XP");
             AppendBonus(item.miningXpBonusMultiplier, "Mining XP");
 
-            tooltipText.text = sb.ToString();
+            tooltipBonusText.text = sb.ToString();
 
             var tooltipRect = tooltip.GetComponent<RectTransform>();
             LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
@@ -797,15 +802,25 @@ namespace Inventory
             fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
             fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            var textGO = new GameObject("Name", typeof(Text));
-            textGO.transform.SetParent(tooltip.transform, false);
-            tooltipText = textGO.GetComponent<Text>();
-            tooltipText.font = tooltipFont != null ? tooltipFont : defaultFont;
-            tooltipText.alignment = TextAnchor.UpperLeft;
-            tooltipText.color = tooltipColor;
-            tooltipText.raycastTarget = false;
-            tooltipText.horizontalOverflow = HorizontalWrapMode.Wrap;
-            tooltipText.verticalOverflow = VerticalWrapMode.Overflow;
+            var nameGO = new GameObject("Name", typeof(Text));
+            nameGO.transform.SetParent(tooltip.transform, false);
+            tooltipNameText = nameGO.GetComponent<Text>();
+            tooltipNameText.font = tooltipNameFont != null ? tooltipNameFont : defaultFont;
+            tooltipNameText.alignment = TextAnchor.UpperLeft;
+            tooltipNameText.color = tooltipNameColor;
+            tooltipNameText.raycastTarget = false;
+            tooltipNameText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            tooltipNameText.verticalOverflow = VerticalWrapMode.Overflow;
+
+            var bonusGO = new GameObject("Bonus", typeof(Text));
+            bonusGO.transform.SetParent(tooltip.transform, false);
+            tooltipBonusText = bonusGO.GetComponent<Text>();
+            tooltipBonusText.font = tooltipBonusFont != null ? tooltipBonusFont : defaultFont;
+            tooltipBonusText.alignment = TextAnchor.UpperLeft;
+            tooltipBonusText.color = tooltipBonusColor;
+            tooltipBonusText.raycastTarget = false;
+            tooltipBonusText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            tooltipBonusText.verticalOverflow = VerticalWrapMode.Overflow;
 
             var tooltipRect = tooltip.GetComponent<RectTransform>();
             tooltipRect.pivot = new Vector2(0f, 1f);
