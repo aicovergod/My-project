@@ -195,7 +195,10 @@ namespace Skills.Cooking
         {
             if (inventory == null || recipe == null)
                 return false;
-            return inventory.HasItem(recipe.rawItemId, quantity);
+            var item = ItemDatabase.GetItem(recipe.rawItemId);
+            if (item == null)
+                return false;
+            return inventory.GetItemCount(item) >= quantity;
         }
 
         private void TryAwardCookingOutfitPiece()
