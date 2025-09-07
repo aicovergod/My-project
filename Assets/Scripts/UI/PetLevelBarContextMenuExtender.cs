@@ -6,6 +6,7 @@ using Beastmaster;
 using Inventory;
 using Skills;
 using Skills.Cooking;
+using UI;
 using Object = UnityEngine.Object;
 
 namespace Pets
@@ -164,6 +165,8 @@ namespace Pets
             if (inventory == null)
                 return;
 
+            int totalXp = 0;
+
             for (int i = 0; i < inventory.size; i++)
             {
                 var entry = inventory.GetSlot(i);
@@ -180,8 +183,19 @@ namespace Pets
                 inventory.RemoveItem(entry.item, qty);
                 inventory.AddItem(cookedItem, qty);
 
-                if (skills != null && recipe.xp > 0)
-                    skills.AddXP(SkillType.Cooking, recipe.xp * qty);
+                if (recipe.xp > 0)
+                    totalXp += recipe.xp * qty;
+            }
+
+            if (skills != null && totalXp > 0)
+            {
+                skills.AddXP(SkillType.Cooking, totalXp);
+
+                Transform anchor = player.transform;
+                var anchorChild = player.transform.Find("FloatingTextAnchor");
+                if (anchorChild != null)
+                    anchor = anchorChild;
+                FloatingText.Show($"+{totalXp} XP", anchor.position);
             }
         }
 
