@@ -78,6 +78,12 @@ namespace Inventory
         [Tooltip("If true, this item cannot be dropped.")]
         public bool isUndroppable = false;
 
+        [Header("Consumable")]
+        [Tooltip("Hitpoints restored when this item is consumed.")]
+        public int healAmount = 0;
+        [Tooltip("Item id to replace this item with after consuming. Leave empty for single-use items.")]
+        public string replacementItemId;
+
         private void OnValidate()
         {
             // Keep the serialized value in sync for inspector visibility.

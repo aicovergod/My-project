@@ -245,7 +245,7 @@ namespace Inventory
 
         /// <summary>
         /// Use the item in the given slot if it supports usage.
-        /// Currently only opens books without consuming them.
+        /// Opens books or consumes food items.
         /// </summary>
         public bool UseItem(int index)
         {
@@ -253,10 +253,35 @@ namespace Inventory
                 return false;
 
             var entry = items[index];
-            if (entry.item is BookItemData bookItem && bookItem.book != null)
+            var item = entry.item;
+
+            if (item is BookItemData bookItem && bookItem.book != null)
             {
                 BookUI.Instance.Open(bookItem.book);
                 return true;
+            }
+
+            var eater = GetComponent<PlayerEat>();
+            if (eater != null && item != null && item.healAmount > 0)
+            {
+                if (eater.Eat(item))
+                {
+                    if (!string.IsNullOrEmpty(item.replacementItemId))
+                    {
+                        var next = ItemDatabase.GetItem(item.replacementItemId);
+                        items[index].item = next;
+                        items[index].count = next != null ? 1 : 0;
+                    }
+                    else
+                    {
+                        items[index].count--;
+                        if (items[index].count <= 0)
+                            items[index].item = null;
+                    }
+                    UpdateSlotVisual(index);
+                    OnInventoryChanged?.Invoke();
+                    return true;
+                }
             }
 
             return false;
