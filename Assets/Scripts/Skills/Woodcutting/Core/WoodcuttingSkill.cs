@@ -10,6 +10,7 @@ using Pets;
 using Quests;
 using BankSystem;
 using Core.Save;
+using Skills.Outfits;
 using Random = UnityEngine.Random;
 
 namespace Skills.Woodcutting
@@ -33,16 +34,7 @@ namespace Skills.Woodcutting
 
         private Dictionary<string, ItemData> logItems;
         private int questLogCount;
-        private static readonly string[] woodcuttingOutfitIds =
-        {
-            "Lumberjack Helmet",
-            "Lumberjack Shirt",
-            "Lumberjack Pants",
-            "Lumberjack Boots",
-            "Lumberjack Gloves"
-        };
-        private HashSet<string> woodcuttingOutfitOwned;
-        private const string WoodcuttingOutfitSaveKey = "WoodcuttingOutfitOwned";
+        private SkillingOutfitProgress woodcuttingOutfit;
 
         public event System.Action<TreeNode> OnStartChopping;
         public event System.Action OnStopChopping;
@@ -66,7 +58,14 @@ namespace Skills.Woodcutting
                 equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
             PreloadLogItems();
-            LoadWoodcuttingOutfitProgress();
+            woodcuttingOutfit = new SkillingOutfitProgress(new[]
+            {
+                "Lumberjack Helmet",
+                "Lumberjack Shirt",
+                "Lumberjack Pants",
+                "Lumberjack Boots",
+                "Lumberjack Gloves"
+            }, "WoodcuttingOutfitOwned");
         }
 
         private Coroutine tickerCoroutine;
@@ -82,6 +81,11 @@ namespace Skills.Woodcutting
                 Ticker.Instance.Unsubscribe(this);
             if (tickerCoroutine != null)
                 StopCoroutine(tickerCoroutine);
+        }
+
+        private void OnDestroy()
+        {
+            SaveManager.Unregister(woodcuttingOutfit);
         }
 
         private void TrySubscribeToTicker()
@@ -299,24 +303,15 @@ namespace Skills.Woodcutting
             OnLevelUp?.Invoke(Level);
         }
 
-        private void LoadWoodcuttingOutfitProgress()
-        {
-            var saved = SaveManager.Load<string[]>(WoodcuttingOutfitSaveKey);
-            woodcuttingOutfitOwned = saved != null ? new HashSet<string>(saved) : new HashSet<string>();
-        }
-
         private void TryAwardWoodcuttingOutfitPiece()
         {
             if (UnityEngine.Random.Range(0, 2500) != 0)
                 return;
 
-            if (woodcuttingOutfitOwned == null)
-                LoadWoodcuttingOutfitProgress();
-
             var missing = new List<string>();
-            foreach (var id in woodcuttingOutfitIds)
+            foreach (var id in woodcuttingOutfit.allPieceIds)
             {
-                if (!woodcuttingOutfitOwned.Contains(id))
+                if (!woodcuttingOutfit.owned.Contains(id))
                     missing.Add(id);
             }
             if (missing.Count == 0)
@@ -334,8 +329,7 @@ namespace Skills.Woodcutting
             {
                 PetToastUI.Show("You've received a piece of woodcutting outfit");
             }
-            woodcuttingOutfitOwned.Add(chosen);
-            SaveManager.Save(WoodcuttingOutfitSaveKey, new List<string>(woodcuttingOutfitOwned).ToArray());
+            woodcuttingOutfit.owned.Add(chosen);
         }
 
         private void PreloadLogItems()
