@@ -8,6 +8,9 @@ using Skills.Mining;
 using Skills;
 using Pets;
 using Quests;
+using BankSystem;
+using Core.Save;
+using Skills.Outfits;
 using Random = UnityEngine.Random;
 using UI;
 
@@ -30,6 +33,7 @@ namespace Skills.Mining
         private SkillManager skills;
         private Dictionary<string, ItemData> oreItems;
         private int questOreCount;
+        private SkillingOutfitProgress miningOutfit;
 
         public event System.Action<MineableRock> OnStartMining;
         public event System.Action OnStopMining;
@@ -55,6 +59,14 @@ namespace Skills.Mining
                 equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
             PreloadOreItems();
+            miningOutfit = new SkillingOutfitProgress(new[]
+            {
+                "Mining Helmet",
+                "Mining Jacket",
+                "Mining Pants",
+                "Mining Boots",
+                "Mining Gloves"
+            }, "MiningOutfitOwned");
         }
 
         private Coroutine tickerCoroutine;
@@ -70,6 +82,11 @@ namespace Skills.Mining
                 Ticker.Instance.Unsubscribe(this);
             if (tickerCoroutine != null)
                 StopCoroutine(tickerCoroutine);
+        }
+
+        private void OnDestroy()
+        {
+            SaveManager.Unregister(miningOutfit);
         }
 
         private void TrySubscribeToTicker()
@@ -196,6 +213,8 @@ namespace Skills.Mining
                         }
                     }
 
+                    TryAwardMiningOutfitPiece();
+
                     if (newLevel > oldLevel)
                     {
                         FloatingText.Show($"Mining level {newLevel}", anchorPos);
@@ -283,6 +302,35 @@ namespace Skills.Mining
         {
             skills?.DebugSetLevel(SkillType.Mining, Mathf.Clamp(newLevel, 1, 99));
             OnLevelUp?.Invoke(Level);
+        }
+
+        private void TryAwardMiningOutfitPiece()
+        {
+            if (UnityEngine.Random.Range(0, 2500) != 0)
+                return;
+
+            var missing = new List<string>();
+            foreach (var id in miningOutfit.allPieceIds)
+            {
+                if (!miningOutfit.owned.Contains(id))
+                    missing.Add(id);
+            }
+            if (missing.Count == 0)
+                return;
+
+            string chosen = missing[UnityEngine.Random.Range(0, missing.Count)];
+            var item = ItemDatabase.GetItem(chosen);
+            bool added = inventory != null && item != null && inventory.AddItem(item);
+            if (!added)
+            {
+                BankUI.Instance?.AddItemToBank(item);
+                PetToastUI.Show("A piece of mining outfit has been added to your bank");
+            }
+            else
+            {
+                PetToastUI.Show("You've received a piece of mining outfit");
+            }
+            miningOutfit.owned.Add(chosen);
         }
 
         private void PreloadOreItems()
