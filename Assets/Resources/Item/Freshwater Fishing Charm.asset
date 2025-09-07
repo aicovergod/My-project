@@ -16,10 +16,11 @@ MonoBehaviour:
   itemName: Freshwater Fishing Charm
   icon: {fileID: 21300000, guid: 7f7ea27d6fd4dfc48a5b14a01be6496f, type: 3}
   description: Gives 2% XP bonus when fishing freshwater fish
-  stackable: 0
-  maxStack: 1
+  stackable: 1
+  maxStack: 2147483647
   splittable: 0
-  equipmentSlot: 0
+  isUndroppable: 0
+  equipmentSlot: 12
   bycatchChanceBonus: 0
   fishingXpBonusMultiplier: 0.02
   fishingXpBonusWaterTypes: 1

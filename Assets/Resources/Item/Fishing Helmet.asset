@@ -19,6 +19,7 @@ MonoBehaviour:
   stackable: 0
   maxStack: 1
   splittable: 0
+  isUndroppable: 1
   equipmentSlot: 1
   bycatchChanceBonus: 0
   fishingXpBonusMultiplier: 0.025
