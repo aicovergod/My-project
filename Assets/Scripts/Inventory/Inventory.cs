@@ -907,6 +907,7 @@ namespace Inventory
             if (slotIndex < 0 || slotIndex >= items.Length) return;
             var entry = items[slotIndex];
             if (entry.item == null) return;
+            if (entry.item.isUndroppable) return;
 
             // Cache the item before modifying the slot so we can check for pets.
             var droppedItem = entry.item;
@@ -1111,6 +1112,9 @@ namespace Inventory
         public void ShowDropMenu(int slotIndex, Vector2 position)
         {
             HideTooltip();
+            var entry = GetSlot(slotIndex);
+            if (entry.item != null && entry.item.isUndroppable)
+                return;
             dropMenu?.Show(this, slotIndex, position);
         }
 

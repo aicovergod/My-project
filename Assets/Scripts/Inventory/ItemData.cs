@@ -74,6 +74,10 @@ namespace Inventory
         [Tooltip("If true, stacks of this item can be split in the inventory.")]
         public bool splittable = true;
 
+        [Header("Restrictions")]
+        [Tooltip("If true, this item cannot be dropped.")]
+        public bool isUndroppable = false;
+
         private void OnValidate()
         {
             // Keep the serialized value in sync for inspector visibility.
