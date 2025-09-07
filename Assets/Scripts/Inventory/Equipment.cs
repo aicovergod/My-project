@@ -1,5 +1,6 @@
 // Assets/Scripts/Inventory/Equipment.cs
 using System;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -265,7 +266,23 @@ namespace Inventory
             }
 
             string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
-            tooltipText.text = name;
+            var sb = new StringBuilder(name);
+
+            void AppendBonus(float value, string label)
+            {
+                if (Mathf.Abs(value) > Mathf.Epsilon)
+                {
+                    sb.AppendLine();
+                    sb.Append($"+{value * 100f:0.##}% {label}");
+                }
+            }
+
+            AppendBonus(item.bycatchChanceBonus, "Bycatch Chance");
+            AppendBonus(item.fishingXpBonusMultiplier, "Fishing XP");
+            AppendBonus(item.woodcuttingXpBonusMultiplier, "Woodcutting XP");
+            AppendBonus(item.miningXpBonusMultiplier, "Mining XP");
+
+            tooltipText.text = sb.ToString();
 
             var tooltipRect = tooltip.GetComponent<RectTransform>();
             LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
