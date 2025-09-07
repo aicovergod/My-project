@@ -126,6 +126,15 @@ namespace Skills.Cooking
             }
         }
 
+        public static float CalculateBurnChance(int level, CookableRecipe recipe)
+        {
+            if (level >= recipe.noBurnLevel)
+                return 0f;
+            float relative = (recipe.noBurnLevel - level) /
+                             (float)(recipe.noBurnLevel - recipe.requiredLevel);
+            return recipe.burnChance * Mathf.Clamp01(relative);
+        }
+
         private void AttemptCook()
         {
             if (currentRecipe == null || inventory == null)
@@ -144,12 +153,7 @@ namespace Skills.Cooking
             Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
 
             int level = skills != null ? skills.GetLevel(SkillType.Cooking) : 1;
-            float burnChance = currentRecipe.burnChance;
-            if (level > currentRecipe.requiredLevel)
-            {
-                float t = Mathf.InverseLerp(currentRecipe.requiredLevel, currentRecipe.noBurnLevel, level);
-                burnChance = Mathf.Lerp(currentRecipe.burnChance, 0f, t);
-            }
+            float burnChance = CalculateBurnChance(level, currentRecipe);
 
             bool burned = UnityEngine.Random.value < burnChance;
             if (burned)
