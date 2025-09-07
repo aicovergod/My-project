@@ -154,6 +154,16 @@ namespace Pets
 
             if (def.id == "Mr Frying Pan")
             {
+                // Add a collider that can receive mouse events for cooking interaction.
+                var interactCol = go.AddComponent<BoxCollider2D>();
+                interactCol.isTrigger = false;
+
+                // Optionally place on a layer that does not collide with the environment
+                // so pathfinding remains unaffected.
+                int interactionLayer = LayerMask.NameToLayer("PetInteraction");
+                if (interactionLayer >= 0)
+                    interactCol.gameObject.layer = interactionLayer;
+
                 go.AddComponent<CookingObject>();
             }
 
