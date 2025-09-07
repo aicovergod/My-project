@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4162593154502218739}
   - component: {fileID: 4733219904091962589}
   - component: {fileID: 6800088440297804542}
+  - component: {fileID: -7274771501436118603}
   m_Layer: 0
   m_Name: GroundFlameGFX
   m_TagString: Untagged
@@ -101,7 +102,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76cd1b72de0d4b218ac17b592277af94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offset: 2
+  offset: -1
   directionOffset: 0
 --- !u!70 &6800088440297804542
 CapsuleCollider2D:
@@ -140,3 +141,17 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 1, y: 1}
   m_Direction: 0
+--- !u!114 &-7274771501436118603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6111494187698877684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8876728a984446078d2af97dc69c5831, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damagePerTick: 1
+  duration: 5
