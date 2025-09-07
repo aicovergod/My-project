@@ -305,7 +305,10 @@ namespace Skills.Woodcutting
 
         private void TryAwardWoodcuttingOutfitPiece()
         {
-            if (UnityEngine.Random.Range(0, 2500) != 0)
+            int roll = UnityEngine.Random.Range(0, 2500);
+            if (SkillingOutfitProgress.DebugChance)
+                Debug.Log($"[Woodcutting] Skilling outfit roll: {roll} (chance 1 in 2500)");
+            if (roll != 0)
                 return;
 
             var missing = new List<string>();

@@ -9,6 +9,12 @@ namespace Skills.Outfits
     /// </summary>
     public class SkillingOutfitProgress : ISaveable
     {
+        /// <summary>
+        /// When enabled, skilling outfit roll attempts will be logged to the console.
+        /// Controlled via the F2 debug menu.
+        /// </summary>
+        public static bool DebugChance { get; set; }
+
         public readonly string[] allPieceIds;
         public HashSet<string> owned;
         public readonly string saveKey;
