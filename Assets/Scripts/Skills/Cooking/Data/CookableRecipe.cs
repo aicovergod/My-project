@@ -4,7 +4,8 @@ namespace Skills.Cooking
 {
     /// <summary>
     /// Defines a recipe for cooking. Maps a raw item to its cooked result and
-    /// contains information about level requirements and burn chance.
+    /// contains information about level requirements and burn chance at the
+    /// minimum required level.
     /// </summary>
     [CreateAssetMenu(menuName = "Skills/Cooking/Cookable Recipe")]
     public class CookableRecipe : ScriptableObject
@@ -22,7 +23,7 @@ namespace Skills.Cooking
         public int xp = 0;
 
         [Range(0f, 1f)]
-        [Tooltip("Chance to burn the food at the required level.")]
+        [Tooltip("Chance to burn the food at the minimum required level.")]
         public float burnChance = 0.0f;
 
         [Tooltip("Level at which the item can no longer be burned.")]
