@@ -105,6 +105,10 @@ namespace Inventory
         [Tooltip("Additional mining XP multiplier (0.025 = +2.5% XP).")]
         public float miningXpBonusMultiplier = 0f;
 
+        [Header("Cooking Bonuses")]
+        [Tooltip("Additional cooking XP multiplier (0.025 = +2.5% XP).")]
+        public float cookingXpBonusMultiplier = 0f;
+
         [Header("Requirements")]
         public SkillRequirement[] skillRequirements;
 

@@ -286,6 +286,7 @@ namespace Inventory
             AppendBonus(item.fishingXpBonusMultiplier, "Fishing XP");
             AppendBonus(item.woodcuttingXpBonusMultiplier, "Woodcutting XP");
             AppendBonus(item.miningXpBonusMultiplier, "Mining XP");
+            AppendBonus(item.cookingXpBonusMultiplier, "Cooking XP");
 
             tooltipBonusText.text = sb.ToString();
 
