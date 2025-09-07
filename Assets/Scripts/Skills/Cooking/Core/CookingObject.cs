@@ -1,9 +1,11 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Inventory;
 using Player;
 using UI;
+using Pets;
 
 namespace Skills.Cooking
 {
@@ -24,6 +26,7 @@ namespace Skills.Cooking
         private CookingSkill cookingSkill;
         private PlayerMover playerMover;
         private Transform playerTransform;
+        private bool isFryingPan;
 
         private void Awake()
         {
@@ -36,6 +39,10 @@ namespace Skills.Cooking
                 playerTransform = playerObj.transform;
             }
             EnsureRecipeLookup();
+
+            var petExp = GetComponent<PetExperience>();
+            var definition = petExp?.definition;
+            isFryingPan = definition != null && definition.id == "Mr Frying Pan";
 
             var mainCam = Camera.main;
             if (mainCam != null && mainCam.GetComponent<Physics2DRaycaster>() == null)
@@ -59,12 +66,12 @@ namespace Skills.Cooking
         {
             if (cookingSkill != null && cookingSkill.IsCooking)
             {
-                if (playerMover != null && playerMover.IsMoving)
+                if (!isFryingPan && playerMover != null && playerMover.IsMoving)
                 {
                     cookingSkill.StopCooking();
                     return;
                 }
-                if (playerTransform != null && Vector3.Distance(playerTransform.position, transform.position) > cancelDistance)
+                if (!isFryingPan && playerTransform != null && Vector3.Distance(playerTransform.position, transform.position) > cancelDistance)
                     cookingSkill.StopCooking();
             }
         }
@@ -73,7 +80,10 @@ namespace Skills.Cooking
         {
             if (eventData.button == PointerEventData.InputButton.Left)
             {
-                TryStartCooking();
+                if (isFryingPan)
+                    StartCoroutine(AutoCookAll());
+                else
+                    TryStartCooking();
             }
         }
 
@@ -107,6 +117,34 @@ namespace Skills.Cooking
                 return;
 
             cookingSkill.StartCooking(recipe, quantity);
+            inventory.ClearSelection();
+        }
+
+        private IEnumerator AutoCookAll()
+        {
+            if (inventory == null || cookingSkill == null)
+                yield break;
+
+            for (int i = 0; i < inventory.size; i++)
+            {
+                var entry = inventory.GetSlot(i);
+                var item = entry.item;
+                if (item == null)
+                    continue;
+                if (!recipeLookup.TryGetValue(item.id, out var recipe))
+                    continue;
+                if (cookingSkill.Level < recipe.requiredLevel)
+                    continue;
+
+                int quantity = inventory.GetItemCount(item);
+                if (quantity <= 0)
+                    continue;
+
+                cookingSkill.StartCooking(recipe, quantity);
+
+                while (cookingSkill.IsCooking)
+                    yield return null;
+            }
             inventory.ClearSelection();
         }
     }
