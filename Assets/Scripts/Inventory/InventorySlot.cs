@@ -76,6 +76,14 @@ namespace Inventory
             if (eventData.button == PointerEventData.InputButton.Left)
             {
                 var entry = inventory.GetSlot(index);
+
+                // Consumable items should be eaten immediately instead of being selected.
+                if (entry.item != null && entry.item.healAmount > 0)
+                {
+                    inventory.UseItem(index);
+                    return;
+                }
+
                 if (inventory.selectedIndex < 0)
                 {
                     if (entry.item != null)
