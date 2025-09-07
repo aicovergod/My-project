@@ -8,6 +8,8 @@ using UI;
 using Skills;
 using Pets;
 using Quests;
+using BankSystem;
+using Core.Save;
 using Random = UnityEngine.Random;
 
 namespace Skills.Woodcutting
@@ -31,6 +33,16 @@ namespace Skills.Woodcutting
 
         private Dictionary<string, ItemData> logItems;
         private int questLogCount;
+        private static readonly string[] woodcuttingOutfitIds =
+        {
+            "Lumberjack Helmet",
+            "Lumberjack Shirt",
+            "Lumberjack Pants",
+            "Lumberjack Boots",
+            "Lumberjack Gloves"
+        };
+        private HashSet<string> woodcuttingOutfitOwned;
+        private const string WoodcuttingOutfitSaveKey = "WoodcuttingOutfitOwned";
 
         public event System.Action<TreeNode> OnStartChopping;
         public event System.Action OnStopChopping;
@@ -54,6 +66,7 @@ namespace Skills.Woodcutting
                 equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
             PreloadLogItems();
+            LoadWoodcuttingOutfitProgress();
         }
 
         private Coroutine tickerCoroutine;
@@ -190,6 +203,8 @@ namespace Skills.Woodcutting
                     }
                 }
 
+                TryAwardWoodcuttingOutfitPiece();
+
                 if (newLevel > oldLevel)
                 {
                     FloatingText.Show($"Woodcutting level {newLevel}", anchorPos);
@@ -282,6 +297,45 @@ namespace Skills.Woodcutting
         {
             skills?.DebugSetLevel(SkillType.Woodcutting, Mathf.Clamp(newLevel, 1, 99));
             OnLevelUp?.Invoke(Level);
+        }
+
+        private void LoadWoodcuttingOutfitProgress()
+        {
+            var saved = SaveManager.Load<string[]>(WoodcuttingOutfitSaveKey);
+            woodcuttingOutfitOwned = saved != null ? new HashSet<string>(saved) : new HashSet<string>();
+        }
+
+        private void TryAwardWoodcuttingOutfitPiece()
+        {
+            if (UnityEngine.Random.Range(0, 2500) != 0)
+                return;
+
+            if (woodcuttingOutfitOwned == null)
+                LoadWoodcuttingOutfitProgress();
+
+            var missing = new List<string>();
+            foreach (var id in woodcuttingOutfitIds)
+            {
+                if (!woodcuttingOutfitOwned.Contains(id))
+                    missing.Add(id);
+            }
+            if (missing.Count == 0)
+                return;
+
+            string chosen = missing[UnityEngine.Random.Range(0, missing.Count)];
+            var item = ItemDatabase.GetItem(chosen);
+            bool added = inventory != null && item != null && inventory.AddItem(item);
+            if (!added)
+            {
+                BankUI.Instance?.AddItemToBank(item);
+                PetToastUI.Show("A piece of woodcutting outfit has been added to your bank");
+            }
+            else
+            {
+                PetToastUI.Show("You've received a piece of woodcutting outfit");
+            }
+            woodcuttingOutfitOwned.Add(chosen);
+            SaveManager.Save(WoodcuttingOutfitSaveKey, new List<string>(woodcuttingOutfitOwned).ToArray());
         }
 
         private void PreloadLogItems()

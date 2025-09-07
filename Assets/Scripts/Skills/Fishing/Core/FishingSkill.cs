@@ -7,6 +7,8 @@ using Util;
 using UI;
 using Pets;
 using Core;
+using BankSystem;
+using Core.Save;
 
 namespace Skills.Fishing
 {
@@ -26,6 +28,16 @@ namespace Skills.Fishing
         private int consecutiveFails;
 
         private Dictionary<string, ItemData> fishItems;
+        private static readonly string[] fishingOutfitIds =
+        {
+            "Fishing Helmet",
+            "Fishing Top",
+            "Fishing Pants",
+            "Fishing Boots",
+            "Fishing Gloves"
+        };
+        private HashSet<string> fishingOutfitOwned;
+        private const string FishingOutfitSaveKey = "FishingOutfitOwned";
 
         public event System.Action<FishableSpot> OnStartFishing;
         public event System.Action OnStopFishing;
@@ -51,6 +63,7 @@ namespace Skills.Fishing
                 equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
             PreloadFishItems();
+            LoadFishingOutfitProgress();
             if (bycatchManager == null)
                 bycatchManager = GameManager.BycatchManager;
         }
@@ -190,6 +203,7 @@ namespace Skills.Fishing
                 OnFishCaught?.Invoke(fish.Id, amount);
 
                 TryRollBycatch(anchor);
+                TryAwardFishingOutfitPiece();
 
                 if (newLevel > oldLevel)
                 {
@@ -412,6 +426,45 @@ namespace Skills.Fishing
         {
             skills?.DebugSetLevel(SkillType.Fishing, Mathf.Clamp(newLevel, 1, 99));
             OnLevelUp?.Invoke(Level);
+        }
+
+        private void LoadFishingOutfitProgress()
+        {
+            var saved = SaveManager.Load<string[]>(FishingOutfitSaveKey);
+            fishingOutfitOwned = saved != null ? new HashSet<string>(saved) : new HashSet<string>();
+        }
+
+        private void TryAwardFishingOutfitPiece()
+        {
+            if (UnityEngine.Random.Range(0, 2500) != 0)
+                return;
+
+            if (fishingOutfitOwned == null)
+                LoadFishingOutfitProgress();
+
+            var missing = new List<string>();
+            foreach (var id in fishingOutfitIds)
+            {
+                if (!fishingOutfitOwned.Contains(id))
+                    missing.Add(id);
+            }
+            if (missing.Count == 0)
+                return;
+
+            string chosen = missing[UnityEngine.Random.Range(0, missing.Count)];
+            var item = ItemDatabase.GetItem(chosen);
+            bool added = inventory != null && item != null && inventory.AddItem(item);
+            if (!added)
+            {
+                BankUI.Instance?.AddItemToBank(item);
+                PetToastUI.Show("A piece of fishing outfit has been added to your bank");
+            }
+            else
+            {
+                PetToastUI.Show("You've received a piece of fishing outfit");
+            }
+            fishingOutfitOwned.Add(chosen);
+            SaveManager.Save(FishingOutfitSaveKey, new List<string>(fishingOutfitOwned).ToArray());
         }
 
         private void PreloadFishItems()
