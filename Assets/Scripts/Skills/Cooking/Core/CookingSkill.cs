@@ -20,6 +20,7 @@ namespace Skills.Cooking
     public class CookingSkill : MonoBehaviour, ITickable
     {
         [SerializeField] private Inventory.Inventory inventory;
+        [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
 
         private SkillManager skills;
@@ -44,6 +45,8 @@ namespace Skills.Cooking
         {
             if (inventory == null)
                 inventory = GetComponent<Inventory.Inventory>();
+            if (equipment == null)
+                equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
             cookingOutfit = new SkillingOutfitProgress(new[]
             {
@@ -170,7 +173,19 @@ namespace Skills.Cooking
                     return;
                 }
 
-                int xpGain = currentRecipe.xp;
+                float xpBonus = 0f;
+                if (equipment != null)
+                {
+                    foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+                    {
+                        if (slot == EquipmentSlot.None)
+                            continue;
+                        var entry = equipment.GetEquipped(slot);
+                        if (entry.item != null)
+                            xpBonus += entry.item.cookingXpBonusMultiplier;
+                    }
+                }
+                int xpGain = Mathf.RoundToInt(currentRecipe.xp * (1f + xpBonus));
                 int oldLevel = skills.GetLevel(SkillType.Cooking);
                 int newLevel = skills.AddXP(SkillType.Cooking, xpGain);
                 FloatingText.Show($"+1 {cookedItem.itemName}", anchor.position);
