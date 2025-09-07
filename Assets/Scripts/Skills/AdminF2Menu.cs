@@ -4,6 +4,7 @@ using Beastmaster;
 using Pets;
 using BankSystem;
 using Skills.Fishing;
+using Skills.Outfits;
 
 namespace Skills
 {
@@ -207,6 +208,11 @@ namespace Skills
             if (GUILayout.Button(BycatchManager.DebugBycatchRolls ? "Disable Bycatch Debug" : "Enable Bycatch Debug"))
             {
                 BycatchManager.DebugBycatchRolls = !BycatchManager.DebugBycatchRolls;
+            }
+
+            if (GUILayout.Button(SkillingOutfitProgress.DebugChance ? "Disable Skilling Outfit Chance" : "Enable Skilling Outfit Chance"))
+            {
+                SkillingOutfitProgress.DebugChance = !SkillingOutfitProgress.DebugChance;
             }
 
             if (GUILayout.Button("Open Bank"))
