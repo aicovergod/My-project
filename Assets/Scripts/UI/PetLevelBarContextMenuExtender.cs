@@ -190,6 +190,8 @@ namespace Pets
             if (skills != null && totalXp > 0)
             {
                 skills.AddXP(SkillType.Cooking, totalXp);
+                if (PetDropSystem.ActivePet?.id == "Mr Frying Pan")
+                    PetExperience.AddPetXp(totalXp);
 
                 Transform anchor = player.transform;
                 var anchorChild = player.transform.Find("FloatingTextAnchor");

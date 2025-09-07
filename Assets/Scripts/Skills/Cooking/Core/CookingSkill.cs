@@ -188,6 +188,8 @@ namespace Skills.Cooking
                 int xpGain = Mathf.RoundToInt(currentRecipe.xp * (1f + xpBonus));
                 int oldLevel = skills.GetLevel(SkillType.Cooking);
                 int newLevel = skills.AddXP(SkillType.Cooking, xpGain);
+                if (PetDropSystem.ActivePet?.id == "Mr Frying Pan")
+                    PetExperience.AddPetXp(xpGain);
                 FloatingText.Show($"+1 {cookedItem.itemName}", anchor.position);
                 StartCoroutine(ShowXpGainDelayed(xpGain, anchor));
                 OnFoodCooked?.Invoke(currentRecipe.cookedItemId, 1);
