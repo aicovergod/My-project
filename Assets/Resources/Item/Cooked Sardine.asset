@@ -10,31 +10,31 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
-  m_Name: Solar Lion Wings
+  m_Name: Cooked Sardine
   m_EditorClassIdentifier: 
-  id: Solar Lion Wings
-  itemName: Solar Lion Wings
-  icon: {fileID: 21300000, guid: 4bf62a7fa9bda644daaadb1c78ca01fc, type: 3}
-  description: Wings from the mythical solar lion
+  id: Cooked Sardine
+  itemName: Cooked Sardine
+  icon: {fileID: 21300000, guid: 82fde6907a8ade245b3932412f391290, type: 3}
+  description: 'A piece of
+
+    cooked sardine'
   stackable: 0
   maxStack: 1
   splittable: 0
   isUndroppable: 0
-  equipmentSlot: 3
+  equipmentSlot: 0
   bycatchChanceBonus: 0
   fishingXpBonusMultiplier: 0
   fishingXpBonusWaterTypes: -1
   woodcuttingXpBonusMultiplier: 0
   miningXpBonusMultiplier: 0
-  skillRequirements:
-  - skill: 6
-    level: 80
+  skillRequirements: []
   combat:
-    Attack: 1
-    Strength: 2
+    Attack: 0
+    Strength: 0
     Range: 0
     Magic: 0
-    MeleeDefence: 10
-    RangeDefence: 10
-    MagicDefence: 10
+    MeleeDefence: 0
+    RangeDefence: 0
+    MagicDefence: 0
     AttackSpeedTicks: 0

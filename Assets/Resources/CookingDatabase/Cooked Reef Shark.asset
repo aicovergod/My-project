@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 42d004d8aff4099428895062bf31fbe1, type: 3}
-  m_Name: Cooked Snapper
-  m_EditorClassIdentifier:
-  rawItemId: Raw Red Snapper
-  cookedItemId: Cooked Snapper
-  requiredLevel: 42
-  xp: 195
+  m_Name: Cooked Reef Shark
+  m_EditorClassIdentifier: 
+  rawItemId: Raw Reef Shark
+  cookedItemId: Cooked Reef Shark
+  requiredLevel: 55
+  xp: 200
   burnChance: 0.4
-  noBurnLevel: 58
+  noBurnLevel: 65
