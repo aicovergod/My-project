@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -29,6 +30,7 @@ namespace Inventory
         private bool visible;
         private ItemData amountItem;
         private string amountText = "1";
+        private string searchText = string.Empty;
 
         private void Awake()
         {
@@ -81,11 +83,15 @@ namespace Inventory
             const float height = 300f;
             Rect area = new Rect(10f, 10f, width, height);
             GUILayout.BeginArea(area, GUI.skin.box);
+
+            GUILayout.Label("Search:");
+            searchText = GUILayout.TextField(searchText);
+
             scroll = GUILayout.BeginScrollView(scroll);
 
             foreach (var item in allItems)
             {
-                if (item != null)
+                if (item != null && (string.IsNullOrEmpty(searchText) || item.name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0))
                 {
                     Rect rect = GUILayoutUtility.GetRect(new GUIContent(item.name), GUI.skin.button);
                     if (Event.current.type == EventType.MouseDown && Event.current.button == 1 && rect.Contains(Event.current.mousePosition))

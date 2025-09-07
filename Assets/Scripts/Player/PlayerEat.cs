@@ -10,6 +10,8 @@ namespace Player
     public class PlayerEat : MonoBehaviour
     {
         private PlayerHitpoints hitpoints;
+        private float nextEatTime;
+        private const float EatDelay = 0.6f; // Delay between eating actions in seconds
 
         private void Awake()
         {
@@ -26,7 +28,11 @@ namespace Player
             if (item == null || hitpoints == null || item.healAmount <= 0)
                 return false;
 
+            if (Time.time < nextEatTime)
+                return false;
+
             hitpoints.Heal(item.healAmount);
+            nextEatTime = Time.time + EatDelay;
             return true;
         }
     }
