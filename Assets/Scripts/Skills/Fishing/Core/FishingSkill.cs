@@ -9,6 +9,7 @@ using Pets;
 using Core;
 using BankSystem;
 using Core.Save;
+using Skills.Outfits;
 
 namespace Skills.Fishing
 {
@@ -28,16 +29,7 @@ namespace Skills.Fishing
         private int consecutiveFails;
 
         private Dictionary<string, ItemData> fishItems;
-        private static readonly string[] fishingOutfitIds =
-        {
-            "Fishing Helmet",
-            "Fishing Top",
-            "Fishing Pants",
-            "Fishing Boots",
-            "Fishing Gloves"
-        };
-        private HashSet<string> fishingOutfitOwned;
-        private const string FishingOutfitSaveKey = "FishingOutfitOwned";
+        private SkillingOutfitProgress fishingOutfit;
 
         public event System.Action<FishableSpot> OnStartFishing;
         public event System.Action OnStopFishing;
@@ -63,7 +55,14 @@ namespace Skills.Fishing
                 equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
             PreloadFishItems();
-            LoadFishingOutfitProgress();
+            fishingOutfit = new SkillingOutfitProgress(new[]
+            {
+                "Fishing Helmet",
+                "Fishing Top",
+                "Fishing Pants",
+                "Fishing Boots",
+                "Fishing Gloves"
+            }, "FishingOutfitOwned");
             if (bycatchManager == null)
                 bycatchManager = GameManager.BycatchManager;
         }
@@ -79,6 +78,11 @@ namespace Skills.Fishing
                 Ticker.Instance.Unsubscribe(this);
             if (tickerCoroutine != null)
                 StopCoroutine(tickerCoroutine);
+        }
+
+        private void OnDestroy()
+        {
+            SaveManager.Unregister(fishingOutfit);
         }
 
         private void TrySubscribeToTicker()
@@ -428,24 +432,15 @@ namespace Skills.Fishing
             OnLevelUp?.Invoke(Level);
         }
 
-        private void LoadFishingOutfitProgress()
-        {
-            var saved = SaveManager.Load<string[]>(FishingOutfitSaveKey);
-            fishingOutfitOwned = saved != null ? new HashSet<string>(saved) : new HashSet<string>();
-        }
-
         private void TryAwardFishingOutfitPiece()
         {
             if (UnityEngine.Random.Range(0, 2500) != 0)
                 return;
 
-            if (fishingOutfitOwned == null)
-                LoadFishingOutfitProgress();
-
             var missing = new List<string>();
-            foreach (var id in fishingOutfitIds)
+            foreach (var id in fishingOutfit.allPieceIds)
             {
-                if (!fishingOutfitOwned.Contains(id))
+                if (!fishingOutfit.owned.Contains(id))
                     missing.Add(id);
             }
             if (missing.Count == 0)
@@ -463,8 +458,7 @@ namespace Skills.Fishing
             {
                 PetToastUI.Show("You've received a piece of fishing outfit");
             }
-            fishingOutfitOwned.Add(chosen);
-            SaveManager.Save(FishingOutfitSaveKey, new List<string>(fishingOutfitOwned).ToArray());
+            fishingOutfit.owned.Add(chosen);
         }
 
         private void PreloadFishItems()
