@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72479de709848e3ab024450652154e5, type: 3}
   m_Name: Mr Frying Pan
   m_EditorClassIdentifier: 
-  id: Beaver
-  displayName: Beaver
-  pickupItem: {fileID: 11400000, guid: 3b674f19bfa4e544984c23e5298e4f86, type: 2}
-  hasInventory: 1
+  id: Mr Frying Pan
+  displayName: Mr Frying Pan
+  pickupItem: {fileID: 11400000, guid: 9eef420767d12684680b8c0d496c17a7, type: 2}
+  hasInventory: 0
   sprite: {fileID: 0}
   pixelsPerUnit: 64
   evolutionTiers: []

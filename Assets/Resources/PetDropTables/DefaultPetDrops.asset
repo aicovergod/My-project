@@ -68,3 +68,8 @@ MonoBehaviour:
     sourceId: fishing
     requiredBeastmasterLevel: 0
     bonusDropMultiplier: 0
+  - pet: {fileID: 11400000, guid: ddaa914d2373ccf478f8aebb7ea2829d, type: 2}
+    oneInN: 10000
+    sourceId: cooking
+    requiredBeastmasterLevel: 0
+    bonusDropMultiplier: 0
