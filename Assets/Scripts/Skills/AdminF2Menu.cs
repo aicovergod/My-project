@@ -27,6 +27,7 @@ namespace Skills
         private string miningLevel = "";
         private string woodcuttingLevel = "";
         private string fishingLevel = "";
+        private string cookingLevel = "";
         private string beastmasterLevel = "";
 
         // Scroll position for the debug menu
@@ -101,6 +102,7 @@ namespace Skills
             miningLevel = skillManager != null ? skillManager.GetLevel(SkillType.Mining).ToString() : "";
             woodcuttingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Woodcutting).ToString() : "";
             fishingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Fishing).ToString() : "";
+            cookingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Cooking).ToString() : "";
             beastmasterLevel = skillManager != null ? skillManager.GetLevel(SkillType.Beastmaster).ToString() : "";
         }
 
@@ -138,6 +140,9 @@ namespace Skills
             GUILayout.Label("Fishing Level");
             fishingLevel = GUILayout.TextField(fishingLevel);
 
+            GUILayout.Label("Cooking Level");
+            cookingLevel = GUILayout.TextField(cookingLevel);
+
             GUILayout.Label("Beastmaster Level");
             beastmasterLevel = GUILayout.TextField(beastmasterLevel);
             if (mergeConfig != null && int.TryParse(beastmasterLevel, out var bmLevel))
@@ -171,6 +176,8 @@ namespace Skills
                     skillManager.DebugSetLevel(SkillType.Woodcutting, wood);
                 if (skillManager != null && int.TryParse(fishingLevel, out var fish))
                     skillManager.DebugSetLevel(SkillType.Fishing, fish);
+                if (skillManager != null && int.TryParse(cookingLevel, out var cook))
+                    skillManager.DebugSetLevel(SkillType.Cooking, cook);
                 if (skillManager != null && int.TryParse(beastmasterLevel, out var bm))
                 {
                     skillManager.DebugSetLevel(SkillType.Beastmaster, bm);

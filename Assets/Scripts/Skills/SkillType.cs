@@ -15,6 +15,7 @@ namespace Skills
         Attack,
         Strength,
         Defence,
-        Fishing
+        Fishing,
+        Cooking
     }
 }
