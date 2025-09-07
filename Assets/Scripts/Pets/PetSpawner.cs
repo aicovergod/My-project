@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 using Util;
+using Skills.Cooking;
 
 namespace Pets
 {
@@ -149,6 +150,11 @@ namespace Pets
                 agent.updateUpAxis = false;
                 var combat = go.AddComponent<PetCombatController>();
                 combat.definition = def;
+            }
+
+            if (def.id == "Mr Frying Pan")
+            {
+                go.AddComponent<CookingObject>();
             }
 
             return go;

@@ -191,6 +191,8 @@ namespace Skills.Cooking
                 FloatingText.Show($"+1 {cookedItem.itemName}", anchor.position);
                 StartCoroutine(ShowXpGainDelayed(xpGain, anchor));
                 OnFoodCooked?.Invoke(currentRecipe.cookedItemId, 1);
+                int petChance = Mathf.Max(5000, 10000 - (level - 1) * 100);
+                PetDropSystem.TryRollPet("cooking", anchor.position, skills, petChance, out _);
                 TryAwardCookingOutfitPiece();
                 if (newLevel > oldLevel)
                 {
