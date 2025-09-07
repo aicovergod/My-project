@@ -144,8 +144,11 @@ namespace UI
             if (btn == null)
                 return;
             var colors = btn.colors;
-            colors.normalColor = selected ? Color.green : Color.white;
-            colors.highlightedColor = selected ? Color.green : Color.white;
+            var color = selected ? Color.green : Color.white;
+            colors.normalColor = color;
+            colors.highlightedColor = color;
+            colors.selectedColor = color;
+            colors.pressedColor = color;
             btn.colors = colors;
         }
     }
