@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Combat;
 using EquipmentSystem;
@@ -16,12 +17,14 @@ namespace NPC
     {
         protected NpcCombatant combatant;
         protected NpcWanderer wanderer;
-        protected CombatTarget currentTarget;
         protected PlayerCombatTarget playerTarget;
         protected bool hasHitPlayer;
         protected Vector2 spawnPosition;
         protected NpcFacing npcFacing;
         protected Coroutine spriteSwapRoutine;
+
+        protected readonly Dictionary<CombatTarget, float> threatLevels = new();
+        protected readonly Dictionary<CombatTarget, Coroutine> activeAttacks = new();
 
         protected virtual void Awake()
         {
@@ -30,6 +33,21 @@ namespace NPC
             playerTarget = FindObjectOfType<PlayerCombatTarget>();
             spawnPosition = transform.position;
             npcFacing = GetComponent<NpcFacing>();
+        }
+
+        public void AddThreat(CombatTarget target, float amount)
+        {
+            if (target == null)
+                return;
+            if (target == playerTarget)
+            {
+                var profile = combatant.Profile;
+                amount *= profile != null ? profile.PlayerAggroWeight : 1f;
+            }
+            if (threatLevels.ContainsKey(target))
+                threatLevels[target] += amount;
+            else
+                threatLevels[target] = amount;
         }
 
         protected virtual void Update()
@@ -41,66 +59,103 @@ namespace NPC
             if (playerTarget == null)
                 playerTarget = FindObjectOfType<PlayerCombatTarget>();
 
-            float npcDistFromSpawn = Vector2.Distance(transform.position, spawnPosition);
-            float playerDistFromSpawn = playerTarget != null
-                ? Vector2.Distance(playerTarget.transform.position, spawnPosition)
-                : float.MaxValue;
-
-            if (currentTarget == null)
+            foreach (var t in new List<CombatTarget>(threatLevels.Keys))
             {
-                if (playerTarget != null && playerDistFromSpawn <= profile.AggroRange)
+                bool remove = t == null || !t.IsAlive;
+                if (!remove)
                 {
-                    BeginAttacking(playerTarget);
+                    float distFromSpawn = Vector2.Distance(t.transform.position, spawnPosition);
+                    remove = distFromSpawn > profile.AggroRange;
                 }
-                else
+                if (remove)
                 {
-                    var myFaction = combatant as IFactionProvider;
-                    if (myFaction != null)
+                    threatLevels.Remove(t);
+                    if (activeAttacks.TryGetValue(t, out var c))
                     {
-                        foreach (var npc in FindObjectsOfType<NpcCombatant>())
-                        {
-                            if (npc == combatant || !npc.IsAlive)
-                                continue;
-                            var otherFaction = npc as IFactionProvider;
-                            if (otherFaction == null)
-                                continue;
-                            if (!myFaction.IsEnemy(otherFaction.Faction))
-                                continue;
-                            float dist = Vector2.Distance(npc.transform.position, transform.position);
-                            if (dist <= profile.AggroRange)
-                            {
-                                BeginAttacking(npc);
-                                break;
-                            }
-                        }
+                        StopCoroutine(c);
+                        activeAttacks.Remove(t);
+                        wanderer?.ExitCombat(t.transform);
                     }
                 }
             }
-            else if (npcDistFromSpawn > profile.AggroRange ||
-                     Vector2.Distance(currentTarget.transform.position, spawnPosition) > profile.AggroRange)
+
+            var potentials = new List<CombatTarget>();
+
+            if (playerTarget != null && playerTarget.IsAlive)
             {
-                BeginAttacking(null);
+                float playerDist = Vector2.Distance(playerTarget.transform.position, spawnPosition);
+                if (playerDist <= profile.AggroRange)
+                    potentials.Add(playerTarget);
             }
 
-            if (currentTarget != null && combatant.IsAlive && currentTarget.IsAlive)
+            var myFaction = combatant as IFactionProvider;
+            if (myFaction != null)
             {
-                npcFacing?.FaceTarget(currentTarget.transform);
+                foreach (var npc in FindObjectsOfType<NpcCombatant>())
+                {
+                    if (npc == combatant || !npc.IsAlive)
+                        continue;
+                    var otherFaction = npc as IFactionProvider;
+                    if (otherFaction == null || !myFaction.IsEnemy(otherFaction.Faction))
+                        continue;
+                    float dist = Vector2.Distance(npc.transform.position, spawnPosition);
+                    if (dist <= profile.AggroRange)
+                        potentials.Add(npc);
+                }
+            }
+
+            foreach (var t in potentials)
+            {
+                float dist = Vector2.Distance(t.transform.position, transform.position);
+                AddThreat(t, 1f / Mathf.Max(dist, 0.1f));
+            }
+
+            while (activeAttacks.Count < profile.MaxConcurrentTargets)
+            {
+                CombatTarget next = null;
+                float best = float.MinValue;
+                foreach (var kv in threatLevels)
+                {
+                    if (activeAttacks.ContainsKey(kv.Key))
+                        continue;
+                    if (kv.Value > best)
+                    {
+                        best = kv.Value;
+                        next = kv.Key;
+                    }
+                }
+                if (next == null)
+                    break;
+                BeginAttacking(next);
+            }
+
+            if (activeAttacks.Count > 0)
+            {
+                CombatTarget closest = null;
+                float bestDist = float.MaxValue;
+                foreach (var t in activeAttacks.Keys)
+                {
+                    float dist = Vector2.Distance(t.transform.position, transform.position);
+                    if (dist < bestDist)
+                    {
+                        bestDist = dist;
+                        closest = t;
+                    }
+                }
+                if (closest != null)
+                    npcFacing?.FaceTarget(closest.transform);
             }
         }
 
         public virtual void BeginAttacking(CombatTarget target)
         {
-            if (target != null && currentTarget == target)
+            if (target == null || activeAttacks.ContainsKey(target))
                 return;
-            StopAllCoroutines();
-            wanderer?.ExitCombat();
-            currentTarget = target;
-            hasHitPlayer = false;
-            if (target != null)
-            {
-                wanderer?.EnterCombat(target.transform);
-                StartCoroutine(AttackRoutine(target));
-            }
+            if (activeAttacks.Count == 0)
+                hasHitPlayer = false;
+            wanderer?.EnterCombat(target.transform);
+            var routine = StartCoroutine(AttackRoutine(target));
+            activeAttacks[target] = routine;
         }
 
         protected virtual IEnumerator AttackRoutine(CombatTarget target)
@@ -108,28 +163,30 @@ namespace NPC
             var wait = new WaitForSeconds(4 * CombatMath.TICK_SECONDS);
 
             // Wait until the player is within melee range before performing the first attack.
-            while (target != null && target.IsAlive && combatant.IsAlive &&
-                   Vector2.Distance(target.transform.position, transform.position) > CombatMath.MELEE_RANGE)
-            {
-                npcFacing?.FaceTarget(target.transform);
-                yield return null;
-            }
-
-            while (target != null && target.IsAlive && combatant.IsAlive)
+            while (combatant.IsAlive && target != null && target.IsAlive)
             {
                 float distance = Vector2.Distance(target.transform.position, transform.position);
-                // If we move beyond aggro bounds or the target leaves melee range, stop attacking.
                 var profile = combatant.Profile;
-                float npcDistFromSpawn = Vector2.Distance(transform.position, spawnPosition);
-                if ((profile != null && npcDistFromSpawn > profile.AggroRange) || distance > CombatMath.MELEE_RANGE)
+                float npcDist = Vector2.Distance(transform.position, spawnPosition);
+                float targetDist = Vector2.Distance(target.transform.position, spawnPosition);
+                if (npcDist > profile.AggroRange || targetDist > profile.AggroRange || distance > CombatMath.MELEE_RANGE)
                     break;
 
-                ResolveAttack(target);
-                yield return wait;
+                if (distance <= CombatMath.MELEE_RANGE)
+                {
+                    ResolveAttack(target);
+                    yield return wait;
+                }
+                else
+                {
+                    npcFacing?.FaceTarget(target.transform);
+                    yield return null;
+                }
             }
 
-            wanderer?.ExitCombat();
-            currentTarget = null;
+            wanderer?.ExitCombat(target.transform);
+            activeAttacks.Remove(target);
+            threatLevels.Remove(target);
         }
 
         protected virtual void ResolveAttack(CombatTarget target)
