@@ -50,7 +50,7 @@ namespace Skills.Cooking
             skills = GetComponent<SkillManager>();
             cookingOutfit = new SkillingOutfitProgress(new[]
             {
-                "Cooking Hat",
+                "Chefs Hat",
                 "Cooking Top",
                 "Cooking Pants",
                 "Cooking Boots",
