@@ -35,6 +35,20 @@ namespace NPC
             npcFacing = GetComponent<NpcFacing>();
         }
 
+        public void ResetCombatState()
+        {
+            foreach (var routine in activeAttacks.Values)
+            {
+                if (routine != null)
+                    StopCoroutine(routine);
+            }
+            activeAttacks.Clear();
+            threatLevels.Clear();
+            hasHitPlayer = false;
+            spawnPosition = transform.position;
+            wanderer?.ExitCombat();
+        }
+
         public void AddThreat(CombatTarget target, float amount)
         {
             if (target == null)
