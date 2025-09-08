@@ -7,12 +7,14 @@ namespace Core.Save
 {
     /// <summary>
     /// Simple JSON based save manager with versioning and a file backend
-    /// stored under Application.persistentDataPath.
+    /// stored under a project-root folder for debugging.
+    /// Consider Application.persistentDataPath for builds.
     /// </summary>
     public static class SaveManager
     {
         private const int Version = 1;
-        private static readonly string FilePath = Path.Combine(Application.persistentDataPath, "save_data.json");
+        // Editor/debug path; consider Application.persistentDataPath for builds.
+        private static readonly string FilePath = Path.Combine(Application.dataPath, "../PlayerSave/save_data.json");
 
         // Registered saveable objects
         private static readonly List<ISaveable> saveables = new List<ISaveable>();
@@ -115,6 +117,7 @@ namespace Core.Save
         {
             try
             {
+                Directory.CreateDirectory(Path.GetDirectoryName(FilePath));
                 string json = JsonUtility.ToJson(cache);
                 File.WriteAllText(FilePath, json);
             }
