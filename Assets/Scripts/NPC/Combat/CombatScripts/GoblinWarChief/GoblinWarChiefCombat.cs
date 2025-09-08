@@ -17,22 +17,43 @@ namespace NPC
         [SerializeField] private float shakeDuration = 0.2f;
         [SerializeField] private float shakeMagnitude = 0.1f;
 
+        private bool slamReady;
+        private Coroutine slamCooldownRoutine;
+
         public override void BeginAttacking(CombatTarget target)
         {
             base.BeginAttacking(target);
             if (target != null)
-                StartCoroutine(SlamRoutine(target));
+            {
+                if (slamCooldownRoutine == null)
+                    slamCooldownRoutine = combatant.StartCoroutine(SlamCooldown());
+
+                StartCoroutine(SlamWatcher(target));
+                if (slamReady)
+                {
+                    // slam fires immediately on re-engagement
+                }
+            }
         }
 
-        private IEnumerator SlamRoutine(CombatTarget target)
+        private IEnumerator SlamCooldown()
         {
-            var wait = new WaitForSeconds(slamInterval);
+            yield return new WaitForSeconds(slamInterval);
+            slamReady = true;
+            slamCooldownRoutine = null;
+        }
+
+        private IEnumerator SlamWatcher(CombatTarget target)
+        {
             while (target != null && target.IsAlive && combatant.IsAlive)
             {
-                yield return wait;
-                if (target == null || !target.IsAlive || !combatant.IsAlive)
-                    break;
-                GoblinWarChiefSlam.Perform(this, target, slamDamage, slamDustPrefab, slamRange, shakeDuration, shakeMagnitude);
+                if (slamReady)
+                {
+                    GoblinWarChiefSlam.Perform(this, target, slamDamage, slamDustPrefab, slamRange, shakeDuration, shakeMagnitude);
+                    slamReady = false;
+                    slamCooldownRoutine = combatant.StartCoroutine(SlamCooldown());
+                }
+                yield return null;
             }
         }
     }
