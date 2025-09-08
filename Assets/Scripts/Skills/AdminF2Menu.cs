@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Player;
 using Beastmaster;
@@ -20,6 +21,7 @@ namespace Skills
         private MergeConfig mergeConfig;
 
         private bool visible;
+        private bool noclip;
         private string hpLevel = "";
         private string attackLevel = "";
         private string strengthLevel = "";
@@ -187,6 +189,18 @@ namespace Skills
                 RefreshFields();
             }
 
+            if (GUILayout.Button("Max Stats"))
+            {
+                if (skillManager != null)
+                {
+                    foreach (SkillType type in Enum.GetValues(typeof(SkillType)))
+                        skillManager.DebugSetLevel(type, 99);
+                    hitpoints?.DebugSetCurrentHp(hitpoints.MaxHp);
+                    beastmasterService?.SetLevel(99);
+                    RefreshFields();
+                }
+            }
+
             if (GUILayout.Button("Restore Health"))
             {
                 hitpoints?.DebugSetCurrentHp(hitpoints.MaxHp);
@@ -200,6 +214,19 @@ namespace Skills
             if (GUILayout.Button("Godmode Off"))
             {
                 hitpoints?.DebugSetCurrentHp(hitpoints.MaxHp);
+            }
+
+            if (GUILayout.Button(noclip ? "Disable Noclip" : "Enable Noclip"))
+            {
+                var playerObj = GameObject.FindGameObjectWithTag("Player");
+                if (playerObj != null)
+                {
+                    foreach (var col in playerObj.GetComponentsInChildren<Collider2D>())
+                        col.enabled = !noclip;
+                    foreach (var col in playerObj.GetComponentsInChildren<Collider>())
+                        col.enabled = !noclip;
+                }
+                noclip = !noclip;
             }
 
             if (GUILayout.Button("Reset Merge Timer"))
