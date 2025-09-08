@@ -24,4 +24,7 @@ MonoBehaviour:
   AttackType: 0
   Style: 0
   IsAggressive: 1
-  AggroRange: 3
+  AggroRange: 6
+  MaxConcurrentTargets: 1
+  PlayerAggroWeight: 1
+  Faction: 2
