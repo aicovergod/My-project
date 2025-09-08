@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using Combat;
 using MyGame.Drops;
+using Player;
 
 namespace NPC
 {
@@ -15,6 +16,8 @@ namespace NPC
         private int currentHp;
         private Collider2D collider2D;
         private SpriteRenderer spriteRenderer;
+        private int playerDamage;
+        private int npcDamage;
 
         public event System.Action<int, int> OnHealthChanged; // current, max
         public event System.Action OnDeath;
@@ -36,6 +39,7 @@ namespace NPC
             currentHp = profile != null ? profile.HitpointsLevel : 1;
             collider2D = GetComponent<Collider2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
+            ResetDamageCounters();
             OnHealthChanged?.Invoke(currentHp, MaxHP);
         }
 
@@ -48,16 +52,23 @@ namespace NPC
             var combatSource = source as CombatTarget;
             if (combatSource != null)
             {
+                if (combatSource is PlayerCombatTarget)
+                    playerDamage += amount;
+                else
+                    npcDamage += amount;
                 var combat = GetComponent<BaseNpcCombat>();
                 combat?.AddThreat(combatSource, amount);
             }
+            var killedByPlayer = source is PlayerCombatTarget;
             if (currentHp <= 0)
             {
                 // Trigger drops before other death listeners in case they
                 // destroy this NPC immediately (e.g. when killed by pets).
                 var dropper = GetComponent<NpcDropper>();
-                dropper?.OnDeath();
+                if (killedByPlayer || playerDamage > npcDamage)
+                    dropper?.OnDeath();
 
+                ResetDamageCounters();
                 OnDeath?.Invoke();
                 if (collider2D) collider2D.enabled = false;
                 if (spriteRenderer) spriteRenderer.enabled = false;
@@ -79,7 +90,14 @@ namespace NPC
             if (collider2D) collider2D.enabled = true;
             if (spriteRenderer) spriteRenderer.enabled = true;
             GetComponent<BaseNpcCombat>()?.ResetCombatState();
+            ResetDamageCounters();
             OnHealthChanged?.Invoke(currentHp, MaxHP);
+        }
+
+        private void ResetDamageCounters()
+        {
+            playerDamage = 0;
+            npcDamage = 0;
         }
     }
 }
