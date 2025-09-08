@@ -3,6 +3,7 @@ using UnityEngine;
 using Combat;
 using MyGame.Drops;
 using Player;
+using Pets;
 
 namespace NPC
 {
@@ -50,16 +51,35 @@ namespace NPC
             Debug.Log($"{name} took {amount} damage ({currentHp}/{MaxHP}).");
             OnHealthChanged?.Invoke(currentHp, MaxHP);
             var combatSource = source as CombatTarget;
+            bool creditedToPlayer = false;
             if (combatSource != null)
             {
                 if (combatSource is PlayerCombatTarget)
+                {
                     playerDamage += amount;
+                    creditedToPlayer = true;
+                }
+                else if (combatSource is PetCombatController pet)
+                {
+                    var owner = pet.GetComponent<PetFollower>()?.Player;
+                    if (owner != null && owner.TryGetComponent<PlayerCombatTarget>(out _))
+                    {
+                        playerDamage += amount;
+                        creditedToPlayer = true;
+                    }
+                    else
+                    {
+                        npcDamage += amount;
+                    }
+                }
                 else
+                {
                     npcDamage += amount;
+                }
                 var combat = GetComponent<BaseNpcCombat>();
                 combat?.AddThreat(combatSource, amount);
             }
-            var killedByPlayer = source is PlayerCombatTarget;
+            var killedByPlayer = creditedToPlayer;
             if (currentHp <= 0)
             {
                 // Trigger drops before other death listeners in case they
