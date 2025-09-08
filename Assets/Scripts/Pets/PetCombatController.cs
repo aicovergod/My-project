@@ -5,6 +5,7 @@ using EquipmentSystem;
 using NPC;
 using Skills;
 using UI;
+using Player;
 
 namespace Pets
 {
@@ -212,7 +213,10 @@ namespace Pets
                 if (definition != null && definition.maxHitPerBeastmasterLevel != 0f)
                     maxHit = Mathf.RoundToInt(maxHit * (1f + definition.maxHitPerBeastmasterLevel * beastmasterLevel));
                 int dmg = CombatMath.RollDamage(maxHit);
-                target.ApplyDamage(dmg, attacker.DamageType, this);
+                object source = this;
+                if (owner != null && owner.TryGetComponent<PlayerCombatTarget>(out var ownerTarget))
+                    source = ownerTarget;
+                target.ApplyDamage(dmg, attacker.DamageType, source);
                 var sprite = dmg == maxHit ? maxHitHitsplat : damageHitsplat;
                 FloatingText.Show(dmg.ToString(), target.transform.position, Color.white, null, sprite);
                 if (npc != null)
