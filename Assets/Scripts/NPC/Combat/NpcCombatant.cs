@@ -45,6 +45,12 @@ namespace NPC
             currentHp = Mathf.Max(0, currentHp - amount);
             Debug.Log($"{name} took {amount} damage ({currentHp}/{MaxHP}).");
             OnHealthChanged?.Invoke(currentHp, MaxHP);
+            var combatSource = source as CombatTarget;
+            if (combatSource != null)
+            {
+                var combat = GetComponent<BaseNpcCombat>();
+                combat?.AddThreat(combatSource, amount);
+            }
             if (currentHp <= 0)
             {
                 // Trigger drops before other death listeners in case they

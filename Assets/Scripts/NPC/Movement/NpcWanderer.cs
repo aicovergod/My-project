@@ -1,6 +1,7 @@
 using UnityEngine;
 using Util;
 using Combat;
+using System.Collections.Generic;
 
 namespace NPC
 {
@@ -36,7 +37,7 @@ namespace NPC
         private bool _waiting;
         private float _waitTimer;
         private Vector2 _lastPos;
-        private Transform _combatTarget;
+        private readonly System.Collections.Generic.List<Transform> _combatTargets = new();
 
         // Per-tick interpolation
         private Vector2 _from;
@@ -102,14 +103,22 @@ namespace NPC
 
         public void EnterCombat(Transform target)
         {
-            _combatTarget = target;
+            if (!_combatTargets.Contains(target))
+                _combatTargets.Add(target);
             _target = _rb != null ? _rb.position : (Vector2)transform.position;
             _waiting = false;
         }
 
+        public void ExitCombat(Transform target)
+        {
+            _combatTargets.Remove(target);
+            if (_combatTargets.Count == 0)
+                BeginIdle();
+        }
+
         public void ExitCombat()
         {
-            _combatTarget = null;
+            _combatTargets.Clear();
             BeginIdle();
         }
 
@@ -117,23 +126,36 @@ namespace NPC
         {
             float delta = Ticker.TickDuration;
 
-            if (_combatTarget != null)
+            if (_combatTargets.Count > 0)
             {
                 _from = _rb != null ? _rb.position : (Vector2)transform.position;
-                Vector2 targetPos = _combatTarget.position;
-                float distance = Vector2.Distance(_from, targetPos);
-                if (distance > CombatMath.MELEE_RANGE)
+                Transform closest = null;
+                float best = float.MaxValue;
+                foreach (var t in _combatTargets)
                 {
-                    Vector2 direction = (targetPos - _from).normalized;
-                    Vector2 desired = targetPos - direction * CombatMath.MELEE_RANGE;
-                    _to = Vector2.MoveTowards(_from, desired, moveSpeed * delta);
+                    float d = Vector2.Distance(_from, t.position);
+                    if (d < best)
+                    {
+                        best = d;
+                        closest = t;
+                    }
                 }
-                else
+                if (closest != null)
                 {
-                    _to = _from;
+                    Vector2 targetPos = closest.position;
+                    if (best > CombatMath.MELEE_RANGE)
+                    {
+                        Vector2 direction = (targetPos - _from).normalized;
+                        Vector2 desired = targetPos - direction * CombatMath.MELEE_RANGE;
+                        _to = Vector2.MoveTowards(_from, desired, moveSpeed * delta);
+                    }
+                    else
+                    {
+                        _to = _from;
+                    }
+                    _lerpTime = 0f;
+                    return;
                 }
-                _lerpTime = 0f;
-                return;
             }
 
             if (_waiting)
