@@ -59,13 +59,14 @@ namespace NPC
             if (playerTarget == null)
                 playerTarget = FindObjectOfType<PlayerCombatTarget>();
 
+            float npcChaseDist = Vector2.Distance(transform.position, spawnPosition);
             foreach (var t in new List<CombatTarget>(threatLevels.Keys))
             {
                 bool remove = t == null || !t.IsAlive;
                 if (!remove)
                 {
-                    float distFromSpawn = Vector2.Distance(t.transform.position, spawnPosition);
-                    remove = distFromSpawn > profile.AggroRange;
+                    float targetDist = Vector2.Distance(t.transform.position, transform.position);
+                    remove = targetDist > profile.AggroRange || npcChaseDist > profile.AggroRange;
                 }
                 if (remove)
                 {
@@ -83,7 +84,7 @@ namespace NPC
 
             if (playerTarget != null && playerTarget.IsAlive)
             {
-                float playerDist = Vector2.Distance(playerTarget.transform.position, spawnPosition);
+                float playerDist = Vector2.Distance(playerTarget.transform.position, transform.position);
                 if (playerDist <= profile.AggroRange)
                     potentials.Add(playerTarget);
             }
@@ -98,7 +99,7 @@ namespace NPC
                     var otherFaction = npc as IFactionProvider;
                     if (otherFaction == null || !myFaction.IsEnemy(otherFaction.Faction))
                         continue;
-                    float dist = Vector2.Distance(npc.transform.position, spawnPosition);
+                    float dist = Vector2.Distance(npc.transform.position, transform.position);
                     if (dist <= profile.AggroRange)
                         potentials.Add(npc);
                 }
@@ -167,9 +168,8 @@ namespace NPC
             {
                 float distance = Vector2.Distance(target.transform.position, transform.position);
                 var profile = combatant.Profile;
-                float npcDist = Vector2.Distance(transform.position, spawnPosition);
-                float targetDist = Vector2.Distance(target.transform.position, spawnPosition);
-                if (npcDist > profile.AggroRange || targetDist > profile.AggroRange || distance > CombatMath.MELEE_RANGE)
+                float chaseDist = Vector2.Distance(transform.position, spawnPosition);
+                if (chaseDist > profile.AggroRange || distance > profile.AggroRange)
                     break;
 
                 if (distance <= CombatMath.MELEE_RANGE)
