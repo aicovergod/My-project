@@ -9,7 +9,7 @@ namespace NPC
     /// Simple adaptor tying an NPC to the combat system using a combat profile.
     /// </summary>
     [DisallowMultipleComponent, RequireComponent(typeof(NpcDropper))]
-    public class NpcCombatant : MonoBehaviour, CombatTarget
+    public class NpcCombatant : MonoBehaviour, CombatTarget, IFactionProvider
     {
         [SerializeField] private NpcCombatProfile profile;
         private int currentHp;
@@ -24,6 +24,12 @@ namespace NPC
         public int CurrentHP => currentHp;
         public int MaxHP => profile != null ? profile.HitpointsLevel : currentHp;
         public NpcCombatProfile Profile => profile;
+
+        /// <summary>The faction of this NPC.</summary>
+        public FactionId Faction => profile != null ? profile.Faction : FactionId.Neutral;
+
+        /// <inheritdoc />
+        public bool IsEnemy(FactionId other) => FactionUtility.IsEnemy(Faction, other);
 
         private void Awake()
         {
