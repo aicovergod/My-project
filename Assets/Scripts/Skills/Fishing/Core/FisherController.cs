@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using Inventory;
 using Player;
 using UI;
@@ -53,17 +52,15 @@ namespace Skills.Fishing
 
         private void Update()
         {
-            bool pointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
-
             if (Time.time >= nextInteractionTime)
             {
-                if (Input.GetMouseButtonDown(0) && !pointerOverUI)
+                if (Input.GetMouseButtonDown(0))
                 {
                     var spot = GetSpotUnderCursor();
                     if (spot != null)
                         TryStartFishing(spot);
                 }
-                else if (Input.GetMouseButtonDown(1) && !pointerOverUI)
+                else if (Input.GetMouseButtonDown(1))
                 {
                     var spot = GetSpotUnderCursor();
                     if (spot != null)
