@@ -8,19 +8,24 @@ namespace NPC
     {
         public static void Perform(BaseNpcCombat owner, CombatTarget target, int slamDamage, GameObject slamDustPrefab, float slamRange, float shakeDuration, float shakeMagnitude)
         {
-            if (owner == null || target == null)
+            if (owner == null)
                 return;
 
-            var targetBehaviour = target as MonoBehaviour;
-            if (targetBehaviour != null)
+            var myFaction = owner.GetComponent<IFactionProvider>();
+            var ownerTarget = owner.GetComponent<CombatTarget>();
+            var hits = Physics2D.OverlapCircleAll(owner.transform.position, slamRange);
+            foreach (var hit in hits)
             {
-                Vector2 npcPos = owner.transform.position;
-                Vector2 targetPos = targetBehaviour.transform.position;
-                Vector2 delta = targetPos - npcPos;
-                if (Mathf.Abs(delta.x) <= slamRange && Mathf.Abs(delta.y) <= slamRange)
+                var otherTarget = hit.GetComponent<CombatTarget>();
+                if (otherTarget == null || otherTarget == ownerTarget || !otherTarget.IsAlive)
+                    continue;
+                if (myFaction != null)
                 {
-                    target.ApplyDamage(slamDamage, DamageType.Melee, owner);
+                    var otherFaction = hit.GetComponent<IFactionProvider>();
+                    if (otherFaction != null && !myFaction.IsEnemy(otherFaction.Faction))
+                        continue;
                 }
+                otherTarget.ApplyDamage(slamDamage, DamageType.Melee, owner);
             }
 
             for (int x = -1; x <= 1; x++)
@@ -30,7 +35,7 @@ namespace NPC
                     if (slamDustPrefab != null)
                     {
                         var dust = Object.Instantiate(slamDustPrefab,
-                            (Vector2)owner.transform.position + new Vector2(x, y), Quaternion.identity);
+                            (Vector2)owner.transform.position + new Vector2(x, y) * slamRange, Quaternion.identity);
                         Object.Destroy(dust, 3 * CombatMath.TICK_SECONDS);
                         owner.StartCoroutine(FadeOutDust(dust));
                     }
