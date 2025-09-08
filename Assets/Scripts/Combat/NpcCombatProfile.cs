@@ -1,4 +1,5 @@
 using UnityEngine;
+using NPC;
 
 namespace Combat
 {
@@ -23,5 +24,10 @@ namespace Combat
         public bool IsAggressive;
         [Tooltip("Maximum distance in tiles before an aggressive NPC loses aggro.")]
         public float AggroRange = 5f;
+
+        /// <summary>
+        /// Faction that this NPC belongs to. Defaults to <see cref="FactionId.Neutral"/>.
+        /// </summary>
+        public FactionId Faction = FactionId.Neutral;
     }
 }

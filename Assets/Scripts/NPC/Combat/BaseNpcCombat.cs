@@ -41,17 +41,43 @@ namespace NPC
             if (playerTarget == null)
                 playerTarget = FindObjectOfType<PlayerCombatTarget>();
 
-            if (playerTarget == null)
-                return;
-
-            float playerDistFromSpawn = Vector2.Distance(playerTarget.transform.position, spawnPosition);
             float npcDistFromSpawn = Vector2.Distance(transform.position, spawnPosition);
+            float playerDistFromSpawn = playerTarget != null
+                ? Vector2.Distance(playerTarget.transform.position, spawnPosition)
+                : float.MaxValue;
+
             if (currentTarget == null)
             {
-                if (playerDistFromSpawn <= profile.AggroRange)
+                if (playerTarget != null && playerDistFromSpawn <= profile.AggroRange)
+                {
                     BeginAttacking(playerTarget);
+                }
+                else
+                {
+                    var myFaction = combatant as IFactionProvider;
+                    if (myFaction != null)
+                    {
+                        foreach (var npc in FindObjectsOfType<NpcCombatant>())
+                        {
+                            if (npc == combatant || !npc.IsAlive)
+                                continue;
+                            var otherFaction = npc as IFactionProvider;
+                            if (otherFaction == null)
+                                continue;
+                            if (!myFaction.IsEnemy(otherFaction.Faction))
+                                continue;
+                            float dist = Vector2.Distance(npc.transform.position, transform.position);
+                            if (dist <= profile.AggroRange)
+                            {
+                                BeginAttacking(npc);
+                                break;
+                            }
+                        }
+                    }
+                }
             }
-            else if (playerDistFromSpawn > profile.AggroRange || npcDistFromSpawn > profile.AggroRange)
+            else if (npcDistFromSpawn > profile.AggroRange ||
+                     Vector2.Distance(currentTarget.transform.position, spawnPosition) > profile.AggroRange)
             {
                 BeginAttacking(null);
             }
