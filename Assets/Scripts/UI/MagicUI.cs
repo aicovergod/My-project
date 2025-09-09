@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using Combat;
 using Player;
+using System;
+using System.Collections.Generic;
 
 namespace UI
 {
@@ -12,7 +14,7 @@ namespace UI
     {
         private GameObject uiRoot;
         private PlayerCombatLoadout loadout;
-        private Button windStrikeButton;
+        private readonly Dictionary<Spell, Button> spellButtons = new();
 
         public enum Spell { WindStrike }
 
@@ -70,13 +72,18 @@ namespace UI
             layout.childForceExpandHeight = false;
             layout.childForceExpandWidth = false;
 
-            windStrikeButton = CreateSpellButton(panel.transform, "WindStrike", Spell.WindStrike);
+            foreach (Spell spell in Enum.GetValues(typeof(Spell)))
+            {
+                var btn = CreateSpellButton(panel.transform, spell.ToString(), spell);
+                spellButtons[spell] = btn;
+            }
+
             UpdateSelection();
         }
 
         private Button CreateSpellButton(Transform parent, string spriteName, Spell spell)
         {
-            var sprite = Resources.Load<Sprite>("Interfaces/Magic/" + spriteName);
+            var sprite = Resources.Load<Sprite>("Interfaces/StandardSpellBook/" + spriteName);
             var go = new GameObject(spriteName, typeof(Image), typeof(Button));
             go.transform.SetParent(parent, false);
             var img = go.GetComponent<Image>();
@@ -122,7 +129,8 @@ namespace UI
 
         private void UpdateSelection()
         {
-            Highlight(windStrikeButton, ActiveSpell == Spell.WindStrike);
+            foreach (var pair in spellButtons)
+                Highlight(pair.Value, ActiveSpell == pair.Key);
         }
 
         private void Highlight(Button btn, bool selected)
