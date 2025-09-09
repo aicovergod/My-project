@@ -26,6 +26,7 @@ namespace Skills
         private string attackLevel = "";
         private string strengthLevel = "";
         private string defenceLevel = "";
+        private string magicLevel = "";
         private string miningLevel = "";
         private string woodcuttingLevel = "";
         private string fishingLevel = "";
@@ -101,6 +102,7 @@ namespace Skills
             attackLevel = skillManager != null ? skillManager.GetLevel(SkillType.Attack).ToString() : "";
             strengthLevel = skillManager != null ? skillManager.GetLevel(SkillType.Strength).ToString() : "";
             defenceLevel = skillManager != null ? skillManager.GetLevel(SkillType.Defence).ToString() : "";
+            magicLevel = skillManager != null ? skillManager.GetLevel(SkillType.Magic).ToString() : "";
             miningLevel = skillManager != null ? skillManager.GetLevel(SkillType.Mining).ToString() : "";
             woodcuttingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Woodcutting).ToString() : "";
             fishingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Fishing).ToString() : "";
@@ -132,6 +134,9 @@ namespace Skills
 
             GUILayout.Label("Defence Level");
             defenceLevel = GUILayout.TextField(defenceLevel);
+
+            GUILayout.Label("Magic Level");
+            magicLevel = GUILayout.TextField(magicLevel);
 
             GUILayout.Label("Mining Level");
             miningLevel = GUILayout.TextField(miningLevel);
@@ -172,6 +177,8 @@ namespace Skills
                     skillManager.DebugSetLevel(SkillType.Strength, str);
                 if (skillManager != null && int.TryParse(defenceLevel, out var def))
                     skillManager.DebugSetLevel(SkillType.Defence, def);
+                if (skillManager != null && int.TryParse(magicLevel, out var mag))
+                    skillManager.DebugSetLevel(SkillType.Magic, mag);
                 if (skillManager != null && int.TryParse(miningLevel, out var mine))
                     skillManager.DebugSetLevel(SkillType.Mining, mine);
                 if (skillManager != null && int.TryParse(woodcuttingLevel, out var wood))

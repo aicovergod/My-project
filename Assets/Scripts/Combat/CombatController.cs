@@ -132,9 +132,13 @@ namespace Combat
                 DamageType = target.PreferredDefenceType
             };
 
-            int attEff = CombatMath.GetEffectiveAttack(attacker.AttackLevel, attacker.Style);
+            int attEff = attacker.DamageType == DamageType.Magic
+                ? CombatMath.GetEffectiveAttack(attacker.MagicLevel, CombatStyle.Accurate)
+                : CombatMath.GetEffectiveAttack(attacker.AttackLevel, attacker.Style);
             int defEff = CombatMath.GetEffectiveDefence(defender.DefenceLevel, defender.Style);
-            int atkRoll = CombatMath.GetAttackRoll(attEff, attacker.Equip.attack);
+            int atkRoll = attacker.DamageType == DamageType.Magic
+                ? CombatMath.GetAttackRoll(attEff, attacker.Equip.magic)
+                : CombatMath.GetAttackRoll(attEff, attacker.Equip.attack);
             int defBonus = defender.DamageType switch
             {
                 DamageType.Magic => defender.Equip.magicDef,
@@ -149,13 +153,21 @@ namespace Combat
             string targetName = targetMb != null ? targetMb.name : "target";
             if (hit)
             {
-                int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
-                int maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
+                int maxHit;
+                if (attacker.DamageType == DamageType.Magic)
+                {
+                    maxHit = MagicUI.ActiveSpellMaxHit + Mathf.FloorToInt(attacker.Equip.magic / 10f);
+                }
+                else
+                {
+                    int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
+                    maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
+                }
                 damage = CombatMath.RollDamage(maxHit);
                 target.ApplyDamage(damage, attacker.DamageType, this);
                 var sprite = damage == maxHit ? maxHitHitsplat : damageHitsplat;
                 FloatingText.Show(damage.ToString(), target.transform.position, Color.white, null, sprite);
-                AwardXp(damage, attacker.Style);
+                AwardXp(damage, attacker.Style, attacker.DamageType);
                 if (!target.IsAlive)
                     OnTargetKilled?.Invoke(target);
                 Debug.Log($"Player dealt {damage} damage to {targetName}.");
@@ -168,11 +180,16 @@ namespace Combat
             OnAttackLanded?.Invoke(damage, hit);
         }
 
-        private void AwardXp(int damage, CombatStyle style)
+        private void AwardXp(int damage, CombatStyle style, DamageType type)
         {
             if (damage <= 0)
                 return;
             hitpoints?.GainHitpointsXP(damage * 1.33f);
+            if (type == DamageType.Magic)
+            {
+                skills?.AddXP(SkillType.Magic, 4 * damage);
+                return;
+            }
             switch (style)
             {
                 case CombatStyle.Accurate:

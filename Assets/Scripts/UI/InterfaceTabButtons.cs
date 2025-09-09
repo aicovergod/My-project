@@ -62,6 +62,7 @@ namespace UI
             AddButton(panel.transform, "SkillTab", ToggleSkills);
             AddButton(panel.transform, "EquipmentTab", ToggleEquipment);
             AddButton(panel.transform, "AttackStyle", ToggleAttackStyle);
+            AddButton(panel.transform, "MagicTab", ToggleMagic);
         }
 
         private void AddButton(Transform parent, string spriteName, UnityEngine.Events.UnityAction onClick)
@@ -128,6 +129,12 @@ namespace UI
         {
             var style = Object.FindObjectOfType<AttackStyleUI>();
             style?.Toggle();
+        }
+
+        private void ToggleMagic()
+        {
+            var magic = Object.FindObjectOfType<MagicUI>();
+            magic?.Toggle();
         }
 
         // AttackStyleUI closes automatically through UIManager when other windows open.
