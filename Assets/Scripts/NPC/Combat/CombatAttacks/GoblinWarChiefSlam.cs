@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using Combat;
+using Player;
 
 namespace NPC
 {
@@ -42,7 +43,13 @@ namespace NPC
                 }
             }
 
-            owner.StartCoroutine(ScreenShake(shakeDuration, shakeMagnitude));
+            var playerMover = Object.FindObjectOfType<PlayerMover>();
+            if (playerMover != null)
+            {
+                float shakeRadius = slamRange + 2f;
+                if (Vector2.Distance(owner.transform.position, playerMover.transform.position) <= shakeRadius)
+                    owner.StartCoroutine(ScreenShake(shakeDuration, shakeMagnitude));
+            }
         }
 
         private static IEnumerator FadeOutDust(GameObject dust)
