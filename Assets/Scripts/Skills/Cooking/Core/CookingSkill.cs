@@ -54,7 +54,7 @@ namespace Skills.Cooking
                 "Cooking Top",
                 "Cooking Pants",
                 "Cooking Boots",
-                "Cooking Gloves"
+                "Cooking Mittens"
             }, "CookingOutfitOwned");
         }
 
