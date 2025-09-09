@@ -27,6 +27,7 @@ namespace Combat
         private PlayerCombatBinder combatBinder;
         private Coroutine attackRoutine;
         private CombatTarget currentTarget;
+        private float nextAttackTime;
 
         private Sprite damageHitsplat;
         private Sprite zeroHitsplat;
@@ -61,6 +62,8 @@ namespace Combat
                 return false;
             if (Vector2.Distance(transform.position, target.transform.position) > CombatMath.MELEE_RANGE)
                 return false;
+            if (Time.time < nextAttackTime && attackRoutine == null)
+                return false;
             if (attackRoutine != null)
             {
                 if (currentTarget == target)
@@ -86,6 +89,9 @@ namespace Combat
         {
             currentTarget = target;
             OnCombatTargetChanged?.Invoke(target);
+            float delay = Mathf.Max(0f, nextAttackTime - Time.time);
+            if (delay > 0f)
+                yield return new WaitForSeconds(delay);
             while (target != null && target.IsAlive)
             {
                 if (Vector2.Distance(transform.position, target.transform.position) > CombatMath.MELEE_RANGE)
@@ -99,6 +105,7 @@ namespace Combat
                     break;
 
                 float interval = equipment != null ? equipment.GetCombinedStats().attackSpeedTicks * CombatMath.TICK_SECONDS : 4 * CombatMath.TICK_SECONDS;
+                nextAttackTime = Time.time + interval;
                 yield return new WaitForSeconds(interval);
             }
             OnCombatTargetChanged?.Invoke(null);
