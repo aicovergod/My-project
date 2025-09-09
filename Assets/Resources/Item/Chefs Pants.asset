@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
-  m_Name: Chefs Hat 1
+  m_Name: Chefs Pants
   m_EditorClassIdentifier: 
-  id: Chefs Hat
-  itemName: Chefs Hat
-  icon: {fileID: 21300000, guid: b8502dcfe5321f54384624beca8ad520, type: 3}
+  id: Chefs Pants
+  itemName: Chefs Pants
+  icon: {fileID: 727978245582116167, guid: 8921c7f2613ac7f44b3a75ddc58b7a66, type: 3}
   description: Gives a 2.5% cooking XP bonus
   stackable: 0
   maxStack: 1
@@ -22,7 +22,7 @@ MonoBehaviour:
   isUndroppable: 1
   healAmount: 0
   replacementItemId: 
-  equipmentSlot: 1
+  equipmentSlot: 6
   bycatchChanceBonus: 0
   fishingXpBonusMultiplier: 0
   fishingXpBonusWaterTypes: -1
