@@ -51,9 +51,9 @@ namespace Skills.Cooking
             cookingOutfit = new SkillingOutfitProgress(new[]
             {
                 "Chefs Hat",
-                "Cooking Top",
-                "Cooking Pants",
-                "Cooking Boots",
+                "Chefs Top",
+                "Chefs Pants",
+                "Chefs Boots",
                 "Cooking Mittens"
             }, "CookingOutfitOwned");
         }

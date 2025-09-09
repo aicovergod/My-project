@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 59683e3aa8f4ecd41ab9cc8d83dbeae7
+guid: c4b71e9ec947fc8418148b321b031351
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2529701027961766361
-    second: Cooking Shirt_0
+      213: -343007737683173511
+    second: Chefs Top_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Cooking Shirt_0
+      name: Chefs Top_0
       rect:
         serializedVersion: 2
-        x: 143
-        y: 120
-        width: 791
-        height: 803
+        x: 8
+        y: 13
+        width: 48
+        height: 38
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 9d10a979ead4b1320800000000000000
-      internalID: 2529701027961766361
+      spriteID: 97f1f28a7446d3bf0800000000000000
+      internalID: -343007737683173511
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Cooking Shirt_0: 2529701027961766361
+      Chefs Top_0: -343007737683173511
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

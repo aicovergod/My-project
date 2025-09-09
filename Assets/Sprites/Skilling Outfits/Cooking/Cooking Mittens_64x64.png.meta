@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: 6c0dbab3258c90148890e48cbfa6a7af
+guid: d1c5121391c0f5f48b9b2be7b2dd7cd2
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6308850632888857339
-    second: ChatGPT Image Sep 8, 2025, 11_58_50 PM_0
+      213: 2376661790352894008
+    second: Cooking Mittens_64x64_0
+  - first:
+      213: 3516531870673025552
+    second: Cooking Mittens_64x64_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +49,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -100,13 +103,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ChatGPT Image Sep 8, 2025, 11_58_50 PM_0
+      name: Cooking Mittens_64x64_0
       rect:
         serializedVersion: 2
-        x: 211
-        y: 240
-        width: 627
-        height: 575
+        x: 5
+        y: 16
+        width: 26
+        height: 34
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +118,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: bf2b652993a8d8750800000000000000
-      internalID: 6308850632888857339
+      spriteID: 8386a356e499bf020800000000000000
+      internalID: 2376661790352894008
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cooking Mittens_64x64_1
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 16
+        width: 26
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01a3ec0ea1b3dc030800000000000000
+      internalID: 3516531870673025552
       vertices: []
       indices: 
       edges: []
@@ -125,7 +150,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +160,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ChatGPT Image Sep 8, 2025, 11_58_50 PM_0: 6308850632888857339
+      Cooking Mittens_64x64_0: 2376661790352894008
+      Cooking Mittens_64x64_1: 3516531870673025552
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

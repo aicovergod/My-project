@@ -1,13 +1,10 @@
 fileFormatVersion: 2
-guid: 9d2ffd1b2b5cb1540919c26d6b6a26f9
+guid: 8921c7f2613ac7f44b3a75ddc58b7a66
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6772764514106640933
-    second: Cooking Boots_0
-  - first:
-      213: 8316312901217441681
-    second: Cooking Boots_1
+      213: 727978245582116167
+    second: Chefs Pants_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -103,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Cooking Boots_0
+      name: Chefs Pants_0
       rect:
         serializedVersion: 2
-        x: 170
-        y: 287
-        width: 345
-        height: 433
+        x: 17
+        y: 14
+        width: 30
+        height: 42
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -118,30 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 52a82b22171bdfd50800000000000000
-      internalID: 6772764514106640933
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Cooking Boots_1
-      rect:
-        serializedVersion: 2
-        x: 527
-        y: 287
-        width: 335
-        height: 434
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 197501e958a796370800000000000000
-      internalID: 8316312901217441681
+      spriteID: 745522c7b5c4a1a00800000000000000
+      internalID: 727978245582116167
       vertices: []
       indices: 
       edges: []
@@ -160,8 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Cooking Boots_0: 6772764514106640933
-      Cooking Boots_1: 8316312901217441681
+      Chefs Pants_0: 727978245582116167
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
