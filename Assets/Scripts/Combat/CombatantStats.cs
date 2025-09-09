@@ -11,6 +11,7 @@ namespace Combat
         public int AttackLevel;
         public int StrengthLevel;
         public int DefenceLevel;
+        public int MagicLevel;
         public EquipmentAggregator.CombinedStats Equip;
         public CombatStyle Style;
         public DamageType DamageType;
@@ -25,6 +26,7 @@ namespace Combat
                 AttackLevel = skills != null ? skills.GetLevel(SkillType.Attack) : 1,
                 StrengthLevel = skills != null ? skills.GetLevel(SkillType.Strength) : 1,
                 DefenceLevel = skills != null ? skills.GetLevel(SkillType.Defence) : 1,
+                MagicLevel = skills != null ? skills.GetLevel(SkillType.Magic) : 1,
                 Equip = equip != null ? equip.GetCombinedStats() : default,
                 Style = style,
                 DamageType = type
@@ -41,6 +43,7 @@ namespace Combat
                 AttackLevel = profile != null ? profile.AttackLevel : 1,
                 StrengthLevel = profile != null ? profile.StrengthLevel : 1,
                 DefenceLevel = profile != null ? profile.DefenceLevel : 1,
+                MagicLevel = profile != null ? profile.MagicLevel : 1,
                 Equip = new EquipmentAggregator.CombinedStats
                 {
                     attack = 0,

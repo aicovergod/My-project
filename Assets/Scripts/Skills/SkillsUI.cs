@@ -26,6 +26,7 @@ namespace Skills
             SkillType.Attack,
             SkillType.Strength,
             SkillType.Defence,
+            SkillType.Magic,
             SkillType.Beastmaster,
             SkillType.Fishing,
             SkillType.Cooking,

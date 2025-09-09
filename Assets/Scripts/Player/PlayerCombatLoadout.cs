@@ -13,6 +13,7 @@ namespace Player
     public class PlayerCombatLoadout : MonoBehaviour, ISaveable
     {
         [SerializeField] private CombatStyle style = CombatStyle.Accurate;
+        [SerializeField] private DamageType damageType = DamageType.Melee;
         private const string SaveKey = "PlayerCombatStyle";
 
         private EquipmentAggregator equipment;
@@ -47,6 +48,15 @@ namespace Player
         {
             if (Input.GetKeyDown(KeyCode.F))
                 CycleStyle();
+
+            if (equipment != null)
+            {
+                var stats = equipment.GetCombinedStats();
+                if (stats.magic > 0)
+                    damageType = DamageType.Magic;
+                else if (damageType == DamageType.Magic)
+                    damageType = DamageType.Melee;
+            }
         }
 
         /// <summary>Cycle combat style in order Accurate → Aggressive → Defensive → Controlled.</summary>
@@ -58,7 +68,13 @@ namespace Player
         /// <summary>Get a snapshot of combat stats for the player.</summary>
         public CombatantStats GetCombatantStats()
         {
-            return CombatantStats.ForPlayer(skills, equipment, style, DamageType.Melee);
+            return CombatantStats.ForPlayer(skills, equipment, style, damageType);
+        }
+
+        /// <summary>Set the current damage type.</summary>
+        public void SetDamageType(DamageType type)
+        {
+            damageType = type;
         }
 
         public void Save()

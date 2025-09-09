@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
+  m_Name: Wand
+  m_EditorClassIdentifier:
+  id: Wand
+  itemName: Wand
+  icon: {fileID: 0}
+  description: Basic magic wand
+  stackable: 0
+  maxStack: 1
+  splittable: 0
+  isUndroppable: 0
+  equipmentSlot: 10
+  bycatchChanceBonus: 0
+  fishingXpBonusMultiplier: 0
+  fishingXpBonusWaterTypes: -1
+  woodcuttingXpBonusMultiplier: 0
+  miningXpBonusMultiplier: 0
+  skillRequirements: []
+  combat:
+    Attack: 0
+    Strength: 0
+    Range: 0
+    Magic: 15
+    MeleeDefence: 0
+    RangeDefence: 0
+    MagicDefence: 2
+    AttackSpeedTicks: 4
