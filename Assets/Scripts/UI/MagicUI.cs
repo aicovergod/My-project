@@ -62,9 +62,9 @@ namespace UI
             panelImage.color = new Color(0f, 0f, 0f, 0.5f);
             var panelRect = panel.GetComponent<RectTransform>();
             panelRect.sizeDelta = new Vector2(170f, 220f);
-            panelRect.anchorMin = panelRect.anchorMax = new Vector2(0.5f, 0.5f);
-            panelRect.pivot = new Vector2(0.5f, 0.5f);
-            panelRect.anchoredPosition = new Vector2(295f, -75f);
+            panelRect.anchorMin = panelRect.anchorMax = new Vector2(1f, 1f);
+            panelRect.pivot = new Vector2(1f, 1f);
+            panelRect.anchoredPosition = new Vector2(-10f, -10f);
 
             var layout = panel.GetComponent<VerticalLayoutGroup>();
             layout.spacing = -25f;
@@ -90,8 +90,8 @@ namespace UI
             img.sprite = sprite;
             img.preserveAspect = true;
             var rect = go.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(30f, 30f);
-            rect.localScale = new Vector3(2f, 1f, 1f);
+            rect.sizeDelta = new Vector2(64f, 64f);
+            rect.localScale = Vector3.one;
             var btn = go.GetComponent<Button>();
             btn.onClick.AddListener(() => SelectSpell(spell));
             return btn;
