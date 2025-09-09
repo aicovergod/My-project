@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Inventory;
 using Util;
@@ -232,7 +233,7 @@ namespace Skills.Cooking
             if (roll != 0)
                 return;
 
-            var missing = new System.Collections.Generic.List<string>();
+            var missing = new List<string>();
             foreach (var id in cookingOutfit.allPieceIds)
             {
                 if (!cookingOutfit.owned.Contains(id))
