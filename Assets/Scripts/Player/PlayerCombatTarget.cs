@@ -43,15 +43,20 @@ namespace Player
         {
             hitpoints.OnEnemyDealtDamage(amount);
             Sprite sprite;
+            Color textColor = Color.white;
             if (amount == 0)
                 sprite = zeroHitsplat;
             else if (type == DamageType.Burn)
                 sprite = burnHitsplat;
             else if (type == DamageType.Magic && elementHitsplats != null && elementHitsplats.TryGetValue(element, out var elemSprite) && elemSprite != null)
+            {
                 sprite = elemSprite;
+                if (element == SpellElement.Air)
+                    textColor = Color.black;
+            }
             else
                 sprite = damageHitsplat;
-            FloatingText.Show(amount.ToString(), transform.position, Color.white, null, sprite);
+            FloatingText.Show(amount.ToString(), transform.position, textColor, null, sprite);
             Debug.Log($"Player took {amount} damage.");
         }
     }
