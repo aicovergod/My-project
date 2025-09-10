@@ -35,7 +35,7 @@ namespace Pets
         public DamageType PreferredDefenceType => DamageType.Melee;
         public int CurrentHP => 1;
         public int MaxHP => 1;
-        public void ApplyDamage(int amount, DamageType type, SpellElement element, object source) { }
+        public int ApplyDamage(int amount, DamageType type, SpellElement element, object source) { return 0; }
 
         private void Awake()
         {
@@ -216,15 +216,15 @@ namespace Pets
                 object source = this;
                 if (owner != null && owner.TryGetComponent<PlayerCombatTarget>(out var ownerTarget))
                     source = ownerTarget;
-                target.ApplyDamage(dmg, attacker.DamageType, SpellElement.None, source);
-                var sprite = dmg == maxHit ? maxHitHitsplat : damageHitsplat;
-                FloatingText.Show(dmg.ToString(), target.transform.position, Color.white, null, sprite);
+                int finalDamage = target.ApplyDamage(dmg, attacker.DamageType, SpellElement.None, source);
+                var sprite = finalDamage == maxHit ? maxHitHitsplat : damageHitsplat;
+                FloatingText.Show(finalDamage.ToString(), target.transform.position, Color.white, null, sprite);
                 if (npc != null)
                 {
                     var npcAttack = npc.GetComponent<NpcAttackController>();
                     npcAttack?.BeginAttacking(this);
                 }
-                BeastmasterXp.TryGrantFromPetDamage(owner != null ? owner.gameObject : null, dmg);
+                BeastmasterXp.TryGrantFromPetDamage(owner != null ? owner.gameObject : null, finalDamage);
             }
             else
             {

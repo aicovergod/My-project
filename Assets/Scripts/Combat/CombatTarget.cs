@@ -12,6 +12,6 @@ namespace Combat
         DamageType PreferredDefenceType { get; }
         int CurrentHP { get; }
         int MaxHP { get; }
-        void ApplyDamage(int amount, DamageType type, SpellElement element, object source);
+        int ApplyDamage(int amount, DamageType type, SpellElement element, object source);
     }
 }

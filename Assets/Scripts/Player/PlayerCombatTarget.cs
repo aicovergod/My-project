@@ -39,7 +39,7 @@ namespace Player
         public int CurrentHP => hitpoints.CurrentHp;
         public int MaxHP => hitpoints.MaxHp;
 
-        public void ApplyDamage(int amount, DamageType type, SpellElement element, object source)
+        public int ApplyDamage(int amount, DamageType type, SpellElement element, object source)
         {
             hitpoints.OnEnemyDealtDamage(amount);
             Sprite sprite;
@@ -58,6 +58,7 @@ namespace Player
                 sprite = damageHitsplat;
             FloatingText.Show(amount.ToString(), transform.position, textColor, null, sprite);
             Debug.Log($"Player took {amount} damage.");
+            return amount;
         }
     }
 }
