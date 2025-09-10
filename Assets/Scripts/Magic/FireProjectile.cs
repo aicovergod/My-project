@@ -38,6 +38,9 @@ namespace Magic
                 return;
             }
 
+            Vector2 dir = (Vector2)(target.transform.position - transform.position);
+            transform.up = dir;
+
             transform.position = Vector2.MoveTowards(transform.position,
                 target.transform.position, speed * Time.deltaTime);
 
