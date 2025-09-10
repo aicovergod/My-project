@@ -3,6 +3,8 @@ using Combat;
 using EquipmentSystem;
 using Skills;
 using Core.Save;
+using UI;
+using Inventory;
 
 namespace Player
 {
@@ -16,7 +18,8 @@ namespace Player
         [SerializeField] private DamageType damageType = DamageType.Melee;
         private const string SaveKey = "PlayerCombatStyle";
 
-        private EquipmentAggregator equipment;
+        private EquipmentAggregator equipmentAggregator;
+        private Equipment equipment;
         private SkillManager skills;
 
         /// <summary>Current selected combat style.</summary>
@@ -34,13 +37,21 @@ namespace Player
 
         private void Awake()
         {
-            equipment = GetComponent<EquipmentAggregator>();
+            equipmentAggregator = GetComponent<EquipmentAggregator>();
+            equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
             SaveManager.Register(this);
+            if (equipment != null)
+            {
+                equipment.OnEquipmentChanged += HandleEquipmentChanged;
+                HandleEquipmentChanged(EquipmentSlot.Weapon);
+            }
         }
 
         private void OnDestroy()
         {
+            if (equipment != null)
+                equipment.OnEquipmentChanged -= HandleEquipmentChanged;
             SaveManager.Unregister(this);
         }
 
@@ -48,15 +59,6 @@ namespace Player
         {
             if (Input.GetKeyDown(KeyCode.F))
                 CycleStyle();
-
-            if (equipment != null)
-            {
-                var stats = equipment.GetCombinedStats();
-                if (stats.magic > 0)
-                    damageType = DamageType.Magic;
-                else if (damageType == DamageType.Magic)
-                    damageType = DamageType.Melee;
-            }
         }
 
         /// <summary>Cycle combat style in order Accurate → Aggressive → Defensive → Controlled.</summary>
@@ -68,7 +70,7 @@ namespace Player
         /// <summary>Get a snapshot of combat stats for the player.</summary>
         public CombatantStats GetCombatantStats()
         {
-            return CombatantStats.ForPlayer(skills, equipment, style, damageType);
+            return CombatantStats.ForPlayer(skills, equipmentAggregator, style, damageType);
         }
 
         /// <summary>Set the current damage type.</summary>
@@ -85,6 +87,32 @@ namespace Player
         public void Load()
         {
             style = SaveManager.Load<CombatStyle>(SaveKey);
+        }
+
+        private void HandleEquipmentChanged(EquipmentSlot slot)
+        {
+            if (slot != EquipmentSlot.Weapon)
+                return;
+
+            var entry = equipment != null ? equipment.GetEquipped(EquipmentSlot.Weapon) : default;
+            var weapon = entry.item;
+            if (weapon != null)
+            {
+                if (weapon.combat.Magic > 0)
+                    damageType = DamageType.Magic;
+                else if (weapon.combat.Range > 0)
+                    damageType = DamageType.Ranged;
+                else
+                {
+                    damageType = DamageType.Melee;
+                    MagicUI.ClearActiveSpell();
+                }
+            }
+            else
+            {
+                damageType = DamageType.Melee;
+                MagicUI.ClearActiveSpell();
+            }
         }
     }
 }
