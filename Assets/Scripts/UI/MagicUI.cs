@@ -22,10 +22,18 @@ namespace UI
         public static SpellDefinition ActiveSpell { get; private set; }
             = null;
 
+        /// <summary>Most recently selected spell.</summary>
+        public static SpellDefinition LastSelectedSpell { get; private set; } = null;
+
         /// <summary>Maximum hit for the active spell.</summary>
         public static int ActiveSpellMaxHit => ActiveSpell != null ? ActiveSpell.maxHit : 0;
 
-        public static void ClearActiveSpell() => ActiveSpell = null;
+        public static void ClearActiveSpell()
+        {
+            ActiveSpell = null;
+            var instance = FindObjectOfType<MagicUI>();
+            instance?.UpdateSelection();
+        }
 
         /// <summary>Range for the active spell or melee range if none.</summary>
         public static float GetActiveSpellRange() =>
@@ -61,7 +69,10 @@ namespace UI
             if (loaded != null)
                 spells.AddRange(loaded);
             if (spells.Count > 0)
+            {
                 ActiveSpell = spells[0];
+                LastSelectedSpell = ActiveSpell;
+            }
         }
 
         private void CreateUI()
@@ -141,6 +152,7 @@ namespace UI
         private void SelectSpell(SpellDefinition spell)
         {
             ActiveSpell = spell;
+            LastSelectedSpell = spell;
             if (loadout == null)
                 loadout = FindObjectOfType<PlayerCombatLoadout>();
             loadout?.SetDamageType(DamageType.Magic);
@@ -164,6 +176,16 @@ namespace UI
             colors.selectedColor = color;
             colors.pressedColor = color;
             btn.colors = colors;
+        }
+
+        /// <summary>Restore the last selected spell and update UI highlighting.</summary>
+        public static void RestoreLastSpell()
+        {
+            if (LastSelectedSpell == null)
+                return;
+            ActiveSpell = LastSelectedSpell;
+            var instance = FindObjectOfType<MagicUI>();
+            instance?.UpdateSelection();
         }
     }
 }
