@@ -6,6 +6,7 @@ using Player;
 using NPC;
 using Pets;
 using UI;
+using Magic;
 
 namespace Combat
 {
@@ -28,6 +29,10 @@ namespace Combat
         private Coroutine attackRoutine;
         private CombatTarget currentTarget;
         private float nextAttackTime;
+
+        private CombatStyle pendingStyle;
+        private DamageType pendingType;
+        private int pendingMaxHit;
 
         private Sprite damageHitsplat;
         private Sprite zeroHitsplat;
@@ -60,7 +65,7 @@ namespace Combat
         {
             if (target == null || !target.IsAlive)
                 return false;
-            if (Vector2.Distance(transform.position, target.transform.position) > CombatMath.MELEE_RANGE)
+            if (Vector2.Distance(transform.position, target.transform.position) > MagicUI.GetActiveSpellRange())
                 return false;
             if (Time.time < nextAttackTime && attackRoutine == null)
                 return false;
@@ -111,7 +116,7 @@ namespace Combat
                 yield return new WaitForSeconds(delay);
             while (target != null && target.IsAlive)
             {
-                if (Vector2.Distance(transform.position, target.transform.position) > CombatMath.MELEE_RANGE)
+                if (Vector2.Distance(transform.position, target.transform.position) > MagicUI.GetActiveSpellRange())
                     break;
                 OnAttackStart?.Invoke();
                 ResolveAttack(target);
@@ -130,15 +135,15 @@ namespace Combat
             attackRoutine = null;
         }
 
-        private void ResolveAttack(CombatTarget target)
+        private struct DamageResult
         {
-            CombatantStats attacker;
-            if (combatBinder != null)
-                attacker = combatBinder.GetCombatantStats();
-            else if (loadout != null)
-                attacker = loadout.GetCombatantStats();
-            else
-                attacker = CombatantStats.ForPlayer(skills, equipment, CombatStyle.Accurate, DamageType.Melee);
+            public int damage;
+            public bool hit;
+            public int maxHit;
+        }
+
+        private DamageResult CalculateDamage(CombatantStats attacker, CombatTarget target)
+        {
             var defender = new CombatantStats
             {
                 AttackLevel = 1,
@@ -165,26 +170,29 @@ namespace Combat
             int defRoll = CombatMath.GetDefenceRoll(defEff, defBonus);
             float chance = CombatMath.ChanceToHit(atkRoll, defRoll);
             bool hit = Random.value < chance;
-            int damage = 0;
+
+            int maxHit;
+            if (attacker.DamageType == DamageType.Magic)
+                maxHit = MagicUI.ActiveSpellMaxHit + Mathf.FloorToInt(attacker.Equip.magic / 10f);
+            else
+            {
+                int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
+                maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
+            }
+            int damage = hit ? CombatMath.RollDamage(maxHit) : 0;
+            return new DamageResult { damage = damage, hit = hit, maxHit = maxHit };
+        }
+
+        private void ApplyDamageResult(CombatTarget target, int damage, bool hit, int maxHit, CombatStyle style, DamageType type)
+        {
             var targetMb = target as MonoBehaviour;
             string targetName = targetMb != null ? targetMb.name : "target";
             if (hit)
             {
-                int maxHit;
-                if (attacker.DamageType == DamageType.Magic)
-                {
-                    maxHit = MagicUI.ActiveSpellMaxHit + Mathf.FloorToInt(attacker.Equip.magic / 10f);
-                }
-                else
-                {
-                    int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
-                    maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
-                }
-                damage = CombatMath.RollDamage(maxHit);
-                target.ApplyDamage(damage, attacker.DamageType, this);
+                target.ApplyDamage(damage, type, this);
                 var sprite = damage == maxHit ? maxHitHitsplat : damageHitsplat;
                 FloatingText.Show(damage.ToString(), target.transform.position, Color.white, null, sprite);
-                AwardXp(damage, attacker.Style, attacker.DamageType);
+                AwardXp(damage, style, type);
                 if (!target.IsAlive)
                     OnTargetKilled?.Invoke(target);
                 Debug.Log($"Player dealt {damage} damage to {targetName}.");
@@ -195,6 +203,49 @@ namespace Combat
                 Debug.Log($"Player missed {targetName}.");
             }
             OnAttackLanded?.Invoke(damage, hit);
+        }
+
+        private void ResolveAttack(CombatTarget target)
+        {
+            CombatantStats attacker;
+            if (combatBinder != null)
+                attacker = combatBinder.GetCombatantStats();
+            else if (loadout != null)
+                attacker = loadout.GetCombatantStats();
+            else
+                attacker = CombatantStats.ForPlayer(skills, equipment, CombatStyle.Accurate, DamageType.Melee);
+
+            var result = CalculateDamage(attacker, target);
+
+            if (attacker.DamageType == DamageType.Magic && MagicUI.ActiveSpell != null && MagicUI.ActiveSpell.projectilePrefab != null)
+            {
+                pendingStyle = attacker.Style;
+                pendingType = attacker.DamageType;
+                pendingMaxHit = result.maxHit;
+                var projObj = Instantiate(MagicUI.ActiveSpell.projectilePrefab, transform.position, Quaternion.identity);
+                var proj = projObj.GetComponent<Magic.FireProjectile>();
+                if (proj != null)
+                {
+                    proj.target = target;
+                    proj.damage = result.damage;
+                    proj.maxHit = result.maxHit;
+                    proj.owner = this;
+                    proj.style = attacker.Style;
+                    proj.damageType = attacker.DamageType;
+                    if (MagicUI.ActiveSpell.hitEffectPrefab != null)
+                        proj.hitEffectPrefab = MagicUI.ActiveSpell.hitEffectPrefab;
+                }
+            }
+            else
+            {
+                ApplyDamageResult(target, result.damage, result.hit, result.maxHit, attacker.Style, attacker.DamageType);
+            }
+        }
+
+        public void ApplySpellDamage(CombatTarget target, int damage)
+        {
+            bool hit = damage > 0;
+            ApplyDamageResult(target, damage, hit, pendingMaxHit, pendingStyle, pendingType);
         }
 
         private void AwardXp(int damage, CombatStyle style, DamageType type)

@@ -1,6 +1,7 @@
 using UnityEngine;
 using Combat;
 using Player;
+using UI;
 
 namespace NPC
 {
@@ -35,9 +36,10 @@ namespace NPC
                 playerController.TryAttackTarget(combatant);
             }
 
-            if (Vector2.Distance(playerController.transform.position, transform.position) > CombatMath.MELEE_RANGE)
+            float range = MagicUI.GetActiveSpellRange();
+            if (Vector2.Distance(playerController.transform.position, transform.position) > range)
             {
-                playerMover.MoveTo(transform, CombatMath.MELEE_RANGE, AttemptAttack);
+                playerMover.MoveTo(transform, range, AttemptAttack);
             }
             else
             {

@@ -4,6 +4,7 @@ using Combat;
 using Player;
 using System;
 using System.Collections.Generic;
+using Magic;
 
 namespace UI
 {
@@ -14,15 +15,19 @@ namespace UI
     {
         private GameObject uiRoot;
         private PlayerCombatLoadout loadout;
-        private readonly Dictionary<Spell, Button> spellButtons = new();
-
-        public enum Spell { WindStrike }
+        private readonly Dictionary<SpellDefinition, Button> spellButtons = new();
+        private readonly List<SpellDefinition> spells = new();
 
         /// <summary>Currently selected spell.</summary>
-        public static Spell ActiveSpell { get; private set; } = Spell.WindStrike;
+        public static SpellDefinition ActiveSpell { get; private set; }
+            = null;
 
         /// <summary>Maximum hit for the active spell.</summary>
-        public static int ActiveSpellMaxHit => ActiveSpell switch { Spell.WindStrike => 2, _ => 0 };
+        public static int ActiveSpellMaxHit => ActiveSpell != null ? ActiveSpell.maxHit : 0;
+
+        /// <summary>Range for the active spell or melee range if none.</summary>
+        public static float GetActiveSpellRange() =>
+            ActiveSpell != null ? ActiveSpell.range : CombatMath.MELEE_RANGE;
 
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
 
@@ -40,10 +45,21 @@ namespace UI
         private void Awake()
         {
             loadout = FindObjectOfType<PlayerCombatLoadout>();
+            LoadSpells();
             CreateUI();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
             UIManager.Instance.RegisterWindow(this);
+        }
+
+        private void LoadSpells()
+        {
+            spells.Clear();
+            var loaded = Resources.LoadAll<SpellDefinition>("Spells");
+            if (loaded != null)
+                spells.AddRange(loaded);
+            if (spells.Count > 0)
+                ActiveSpell = spells[0];
         }
 
         private void CreateUI()
@@ -72,19 +88,21 @@ namespace UI
             layout.childForceExpandHeight = false;
             layout.childForceExpandWidth = false;
 
-            foreach (Spell spell in Enum.GetValues(typeof(Spell)))
+            foreach (var spell in spells)
             {
-                var btn = CreateSpellButton(panel.transform, spell.ToString(), spell);
+                var btn = CreateSpellButton(panel.transform, spell);
                 spellButtons[spell] = btn;
             }
 
             UpdateSelection();
         }
 
-        private Button CreateSpellButton(Transform parent, string spriteName, Spell spell)
+        private Button CreateSpellButton(Transform parent, SpellDefinition spell)
         {
-            var sprite = Resources.Load<Sprite>("Interfaces/StandardSpellBook/" + spriteName);
-            var go = new GameObject(spriteName, typeof(Image), typeof(Button));
+            var sprite = spell.icon != null
+                ? spell.icon
+                : Resources.Load<Sprite>("Interfaces/StandardSpellBook/" + spell.name);
+            var go = new GameObject(spell.name, typeof(Image), typeof(Button));
             go.transform.SetParent(parent, false);
             var img = go.GetComponent<Image>();
             img.sprite = sprite;
@@ -118,7 +136,7 @@ namespace UI
                 uiRoot.SetActive(false);
         }
 
-        private void SelectSpell(Spell spell)
+        private void SelectSpell(SpellDefinition spell)
         {
             ActiveSpell = spell;
             if (loadout == null)
