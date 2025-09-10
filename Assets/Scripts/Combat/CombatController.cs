@@ -232,6 +232,7 @@ namespace Combat
                     proj.owner = this;
                     proj.style = attacker.Style;
                     proj.damageType = attacker.DamageType;
+                    proj.speed = MagicUI.ActiveSpell.speed;
                     if (MagicUI.ActiveSpell.hitEffectPrefab != null)
                         proj.hitEffectPrefab = MagicUI.ActiveSpell.hitEffectPrefab;
                 }
