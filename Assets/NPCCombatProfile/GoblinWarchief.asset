@@ -15,6 +15,7 @@ MonoBehaviour:
   AttackLevel: 20
   StrengthLevel: 20
   DefenceLevel: 20
+  MagicLevel: 1
   HitpointsLevel: 50
   MeleeDefence: 10
   RangeDefence: 10
@@ -23,7 +24,7 @@ MonoBehaviour:
   RespawnSeconds: 30
   AttackType: 0
   Style: 0
-  IsAggressive: 1
+  IsAggressive: 0
   AggroRange: 15
   MaxConcurrentTargets: 6
   PlayerAggroWeight: 1
