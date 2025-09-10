@@ -233,6 +233,7 @@ namespace Combat
                     proj.style = attacker.Style;
                     proj.damageType = attacker.DamageType;
                     proj.speed = MagicUI.ActiveSpell.speed;
+                    proj.hitFadeTime = MagicUI.ActiveSpell.hitFadeTime;
                     if (MagicUI.ActiveSpell.hitEffectPrefab != null)
                         proj.hitEffectPrefab = MagicUI.ActiveSpell.hitEffectPrefab;
                 }
