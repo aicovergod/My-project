@@ -99,7 +99,11 @@ namespace Player
             if (weapon != null)
             {
                 if (weapon.combat.Magic > 0)
+                {
                     damageType = DamageType.Magic;
+                    if (MagicUI.ActiveSpell == null)
+                        MagicUI.RestoreLastSpell();
+                }
                 else if (weapon.combat.Range > 0)
                     damageType = DamageType.Ranged;
                 else
