@@ -220,6 +220,11 @@ namespace Player
 
             // Drive Animator (kept for future use and for state visibility)
             bool isMoving = moveDir.sqrMagnitude > 0f;
+            RefreshAnimator(isMoving);
+        }
+
+        private void RefreshAnimator(bool isMoving)
+        {
             anim.SetBool("IsMoving", isMoving);
             anim.SetInteger("Dir", facingDir);
 
@@ -301,12 +306,25 @@ namespace Player
                 if (sr.sprite != desired)
                     sr.sprite = desired;
             }
-            // --------------------------------------------------------------------------------------
         }
 
         void FixedUpdate()
         {
             rb.linearVelocity = moveDir * moveSpeed;
+        }
+
+        public void FaceTarget(Transform target)
+        {
+            if (target == null)
+                return;
+
+            Vector2 dir = (Vector2)target.position - (Vector2)transform.position;
+            if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
+                facingDir = dir.x < 0 ? 1 : 2;
+            else
+                facingDir = dir.y < 0 ? 0 : 3;
+
+            RefreshAnimator(moveDir.sqrMagnitude > 0f);
         }
 
         public void MoveTo(Vector2 target, float stopDistance, Action onComplete = null)
