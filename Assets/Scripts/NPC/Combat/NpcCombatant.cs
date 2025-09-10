@@ -47,8 +47,23 @@ namespace NPC
         /// <summary>Apply damage to this NPC.</summary>
         public void ApplyDamage(int amount, DamageType type, SpellElement element, object source)
         {
-            currentHp = Mathf.Max(0, currentHp - amount);
-            Debug.Log($"{name} took {amount} damage ({currentHp}/{MaxHP}).");
+            int finalAmount = amount;
+            if (profile != null && profile.elementalModifiers != null)
+            {
+                foreach (var mod in profile.elementalModifiers)
+                {
+                    if (mod.element == element)
+                    {
+                        float adjusted = finalAmount;
+                        adjusted *= 1f - mod.protectionPercent / 100f;
+                        adjusted *= 1f + mod.bonusPercent / 100f;
+                        finalAmount = Mathf.Max(0, Mathf.RoundToInt(adjusted));
+                        break;
+                    }
+                }
+            }
+            currentHp = Mathf.Max(0, currentHp - finalAmount);
+            Debug.Log($"{name} took {finalAmount} damage ({currentHp}/{MaxHP}).");
             OnHealthChanged?.Invoke(currentHp, MaxHP);
             var combatSource = source as CombatTarget;
             bool creditedToPlayer = false;
@@ -56,7 +71,7 @@ namespace NPC
             {
                 if (combatSource is PlayerCombatTarget)
                 {
-                    playerDamage += amount;
+                    playerDamage += finalAmount;
                     creditedToPlayer = true;
                 }
                 else if (combatSource is PetCombatController pet)
@@ -64,20 +79,20 @@ namespace NPC
                     var owner = pet.GetComponent<PetFollower>()?.Player;
                     if (owner != null && owner.TryGetComponent<PlayerCombatTarget>(out _))
                     {
-                        playerDamage += amount;
+                        playerDamage += finalAmount;
                         creditedToPlayer = true;
                     }
                     else
                     {
-                        npcDamage += amount;
+                        npcDamage += finalAmount;
                     }
                 }
                 else
                 {
-                    npcDamage += amount;
+                    npcDamage += finalAmount;
                 }
                 var combat = GetComponent<BaseNpcCombat>();
-                combat?.AddThreat(combatSource, amount);
+                combat?.AddThreat(combatSource, finalAmount);
             }
             var killedByPlayer = creditedToPlayer;
             if (currentHp <= 0)

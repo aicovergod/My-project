@@ -1,8 +1,18 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using NPC;
 
 namespace Combat
 {
+    [Serializable]
+    public struct ElementalModifier
+    {
+        public SpellElement element;
+        [Range(0, 100)] public int protectionPercent;
+        public int bonusPercent;
+    }
+
     /// <summary>
     /// Defines combat statistics for an NPC.
     /// </summary>
@@ -36,5 +46,7 @@ namespace Combat
         /// Faction that this NPC belongs to. Defaults to <see cref="FactionId.Neutral"/>.
         /// </summary>
         public FactionId Faction = FactionId.Neutral;
+
+        public List<ElementalModifier> elementalModifiers = new();
     }
 }
