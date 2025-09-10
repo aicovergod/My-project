@@ -85,21 +85,24 @@ namespace UI
             uiRoot.AddComponent<CanvasScaler>();
             uiRoot.AddComponent<GraphicRaycaster>();
 
-            var panel = new GameObject("Panel", typeof(Image), typeof(VerticalLayoutGroup));
+            var panel = new GameObject("Panel", typeof(Image), typeof(GridLayoutGroup));
             panel.transform.SetParent(uiRoot.transform, false);
             var panelImage = panel.GetComponent<Image>();
             panelImage.color = new Color(0f, 0f, 0f, 0.5f);
             var panelRect = panel.GetComponent<RectTransform>();
-            panelRect.sizeDelta = new Vector2(170f, 220f);
+            var columns = Mathf.Max(1, Mathf.CeilToInt(Mathf.Sqrt(spells.Count)));
+            var rows = Mathf.Max(1, Mathf.CeilToInt(spells.Count / (float)columns));
+            panelRect.sizeDelta = new Vector2(columns * 64f, rows * 64f);
             panelRect.anchorMin = panelRect.anchorMax = new Vector2(1f, 1f);
             panelRect.pivot = new Vector2(1f, 1f);
             panelRect.anchoredPosition = new Vector2(-10f, -10f);
 
-            var layout = panel.GetComponent<VerticalLayoutGroup>();
-            layout.spacing = -25f;
-            layout.childAlignment = TextAnchor.MiddleCenter;
-            layout.childForceExpandHeight = false;
-            layout.childForceExpandWidth = false;
+            var layout = panel.GetComponent<GridLayoutGroup>();
+            layout.cellSize = new Vector2(64f, 64f);
+            layout.spacing = Vector2.zero;
+            layout.childAlignment = TextAnchor.UpperLeft;
+            layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            layout.constraintCount = columns;
 
             foreach (var spell in spells)
             {
