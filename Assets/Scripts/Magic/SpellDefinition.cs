@@ -24,6 +24,9 @@ namespace Magic
         [Tooltip("Prefab to spawn on impact")]
         public GameObject hitEffectPrefab;
 
+        [Tooltip("Time for the hit effect to fade out")]
+        public float hitFadeTime = 0.5f;
+
         [Tooltip("Maximum damage this spell can inflict before bonuses")]
         public int maxHit = 0;
 

@@ -14,6 +14,7 @@ namespace Magic
         public int damage;
         public int maxHit;
         public GameObject hitEffectPrefab;
+        public float hitFadeTime = 0.5f;
         public Sprite projectileSprite;
         public CombatController owner;
         public CombatStyle style;
@@ -54,7 +55,12 @@ namespace Magic
         private void Impact()
         {
             if (hitEffectPrefab != null)
-                Instantiate(hitEffectPrefab, transform.position, Quaternion.identity);
+            {
+                var hitObj = Instantiate(hitEffectPrefab, transform.position, Quaternion.identity);
+                var effect = hitObj.GetComponent<HitEffect>();
+                if (effect != null)
+                    effect.Initialize(hitFadeTime);
+            }
 
             owner?.ApplySpellDamage(target, damage);
             Destroy(gameObject);
