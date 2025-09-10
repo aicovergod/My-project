@@ -15,6 +15,9 @@ namespace Magic
         [Tooltip("Maximum range of the spell")]
         public float range = CombatMath.MELEE_RANGE;
 
+        [Tooltip("Projectile travel speed for this spell")]
+        public float speed = 8f;
+
         [Tooltip("Projectile prefab to spawn when casting")]
         public GameObject projectilePrefab;
 
