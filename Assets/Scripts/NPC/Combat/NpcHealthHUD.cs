@@ -20,6 +20,7 @@ namespace NPC
         [SerializeField] private float heightOffset = 1.5f;
         [SerializeField] private float fadeDuration = 0.25f;
         private Coroutine fadeRoutine;
+        private bool isVisible;
 
         private void Awake()
         {
@@ -31,6 +32,9 @@ namespace NPC
                 combat.OnCombatStateChanged += HandleCombatStateChanged;
             CreateHud();
             canvas.gameObject.SetActive(false);
+            bool inCombat = combat != null && combat.InCombat;
+            HandleCombatStateChanged(inCombat);
+            isVisible = inCombat;
         }
 
         private void CreateHud()
@@ -148,6 +152,16 @@ namespace NPC
             }
             if (combat != null)
                 combat.OnCombatStateChanged -= HandleCombatStateChanged;
+        }
+
+        private void Update()
+        {
+            bool inCombat = combat != null && combat.InCombat;
+            if (inCombat != isVisible)
+            {
+                HandleCombatStateChanged(inCombat);
+                isVisible = inCombat;
+            }
         }
     }
 }

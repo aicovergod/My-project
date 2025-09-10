@@ -27,6 +27,7 @@ namespace NPC
         protected readonly Dictionary<CombatTarget, Coroutine> activeAttacks = new();
 
         private bool inCombat;
+        public bool InCombat => inCombat;
         public event System.Action<bool> OnCombatStateChanged;
 
         private void SetCombatState(bool state)
