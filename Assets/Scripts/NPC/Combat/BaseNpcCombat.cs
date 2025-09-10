@@ -26,6 +26,17 @@ namespace NPC
         protected readonly Dictionary<CombatTarget, float> threatLevels = new();
         protected readonly Dictionary<CombatTarget, Coroutine> activeAttacks = new();
 
+        private bool inCombat;
+        public event System.Action<bool> OnCombatStateChanged;
+
+        private void SetCombatState(bool state)
+        {
+            if (inCombat == state)
+                return;
+            inCombat = state;
+            OnCombatStateChanged?.Invoke(inCombat);
+        }
+
         protected virtual void Awake()
         {
             combatant = GetComponent<NpcCombatant>();
@@ -47,6 +58,7 @@ namespace NPC
             hasHitPlayer = false;
             spawnPosition = transform.position;
             wanderer?.ExitCombat();
+            SetCombatState(false);
         }
 
         public void AddThreat(CombatTarget target, float amount)
@@ -93,6 +105,8 @@ namespace NPC
                     }
                 }
             }
+            if (activeAttacks.Count == 0)
+                SetCombatState(false);
 
             var potentials = new List<CombatTarget>();
 
@@ -171,6 +185,8 @@ namespace NPC
             wanderer?.EnterCombat(target.transform);
             var routine = StartCoroutine(AttackRoutine(target));
             activeAttacks[target] = routine;
+            if (activeAttacks.Count == 1)
+                SetCombatState(true);
         }
 
         protected virtual IEnumerator AttackRoutine(CombatTarget target)
@@ -201,6 +217,8 @@ namespace NPC
             wanderer?.ExitCombat(target.transform);
             activeAttacks.Remove(target);
             threatLevels.Remove(target);
+            if (activeAttacks.Count == 0)
+                SetCombatState(false);
         }
 
         protected virtual void ResolveAttack(CombatTarget target)
