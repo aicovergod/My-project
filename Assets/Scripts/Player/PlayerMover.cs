@@ -8,6 +8,7 @@ using Core.Save;
 using World;
 using Pets;
 using Util;
+using Combat;
 
 namespace Player
 {
@@ -41,6 +42,7 @@ namespace Player
         private Animator anim;
         private SpriteRenderer sr;
         private Inventory.Inventory inventory;
+        private CombatController combat;
         private GameObject petToMove;
         private bool isTransitioning;
         private bool isAutoMoving;
@@ -92,6 +94,7 @@ namespace Player
             anim = GetComponent<Animator>();
             sr  = GetComponent<SpriteRenderer>();
             inventory = GetComponent<Inventory.Inventory>();
+            combat = GetComponent<CombatController>();
             var depth = GetComponent<SpriteDepth>();
             if (depth != null)
                 depth.directionOffset = 1;
@@ -171,27 +174,41 @@ namespace Player
 
             float x = 0f, y = 0f;
 
-            if (!isAutoMoving)
-            {
 #if ENABLE_INPUT_SYSTEM
-                Vector2 raw = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
-                // Snap analog to -1/0/1 so animations are stable
-                x = Mathf.Abs(raw.x) < gamepadDeadzone ? 0f : Mathf.Sign(raw.x);
-                y = Mathf.Abs(raw.y) < gamepadDeadzone ? 0f : Mathf.Sign(raw.y);
+            Vector2 raw = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
+            // Snap analog to -1/0/1 so animations are stable
+            x = Mathf.Abs(raw.x) < gamepadDeadzone ? 0f : Mathf.Sign(raw.x);
+            y = Mathf.Abs(raw.y) < gamepadDeadzone ? 0f : Mathf.Sign(raw.y);
 #else
-                // Legacy input fallback if project uses Old/Both
-                x = Input.GetAxisRaw("Horizontal");
-                y = Input.GetAxisRaw("Vertical");
+            // Legacy input fallback if project uses Old/Both
+            x = Input.GetAxisRaw("Horizontal");
+            y = Input.GetAxisRaw("Vertical");
 #endif
 
-                if (fourWayOnly)
-                {
-                    if (Mathf.Abs(y) > Mathf.Abs(x)) x = 0f;
-                    else if (Mathf.Abs(x) > Mathf.Abs(y)) y = 0f;
-                }
-
-                moveDir = new Vector2(x, y).normalized;
+            if (fourWayOnly)
+            {
+                if (Mathf.Abs(y) > Mathf.Abs(x)) x = 0f;
+                else if (Mathf.Abs(x) > Mathf.Abs(y)) y = 0f;
             }
+
+            Vector2 inputDir = new Vector2(x, y).normalized;
+
+            if (inputDir.sqrMagnitude > 0f)
+            {
+                if (isAutoMoving)
+                {
+                    isAutoMoving = false;
+                    if (moveRoutine != null)
+                    {
+                        StopCoroutine(moveRoutine);
+                        moveRoutine = null;
+                    }
+                }
+                combat?.CancelCombat();
+            }
+
+            if (!isAutoMoving)
+                moveDir = inputDir;
 
             if (moveDir.sqrMagnitude > 0f)
             {
