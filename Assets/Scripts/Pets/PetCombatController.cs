@@ -35,7 +35,7 @@ namespace Pets
         public DamageType PreferredDefenceType => DamageType.Melee;
         public int CurrentHP => 1;
         public int MaxHP => 1;
-        public void ApplyDamage(int amount, DamageType type, object source) { }
+        public void ApplyDamage(int amount, DamageType type, SpellElement element, object source) { }
 
         private void Awake()
         {
@@ -216,7 +216,7 @@ namespace Pets
                 object source = this;
                 if (owner != null && owner.TryGetComponent<PlayerCombatTarget>(out var ownerTarget))
                     source = ownerTarget;
-                target.ApplyDamage(dmg, attacker.DamageType, source);
+                target.ApplyDamage(dmg, attacker.DamageType, SpellElement.None, source);
                 var sprite = dmg == maxHit ? maxHitHitsplat : damageHitsplat;
                 FloatingText.Show(dmg.ToString(), target.transform.position, Color.white, null, sprite);
                 if (npc != null)

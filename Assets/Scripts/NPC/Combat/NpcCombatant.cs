@@ -45,7 +45,7 @@ namespace NPC
         }
 
         /// <summary>Apply damage to this NPC.</summary>
-        public void ApplyDamage(int amount, DamageType type, object source)
+        public void ApplyDamage(int amount, DamageType type, SpellElement element, object source)
         {
             currentHp = Mathf.Max(0, currentHp - amount);
             Debug.Log($"{name} took {amount} damage ({currentHp}/{MaxHP}).");

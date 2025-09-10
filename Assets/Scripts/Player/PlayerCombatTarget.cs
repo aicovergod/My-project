@@ -1,6 +1,7 @@
 using UnityEngine;
 using Combat;
 using UI;
+using System.Collections.Generic;
 
 namespace Player
 {
@@ -14,6 +15,7 @@ namespace Player
         private Sprite damageHitsplat;
         private Sprite zeroHitsplat;
         private Sprite burnHitsplat;
+        private Dictionary<SpellElement, Sprite> elementHitsplats;
 
         private void Awake()
         {
@@ -21,6 +23,15 @@ namespace Player
             damageHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat");
             zeroHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Zero_damage_hitsplat");
             burnHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Burn_hitsplat");
+            elementHitsplats = new Dictionary<SpellElement, Sprite>
+            {
+                { SpellElement.Air, Resources.Load<Sprite>("Sprites/HitSplats/Air_hitsplat") },
+                { SpellElement.Water, Resources.Load<Sprite>("Sprites/HitSplats/Water_hitsplat") },
+                { SpellElement.Earth, Resources.Load<Sprite>("Sprites/HitSplats/Earth_hitsplat") },
+                { SpellElement.Electric, Resources.Load<Sprite>("Sprites/HitSplats/Electrocute_hitsplat") },
+                { SpellElement.Ice, Resources.Load<Sprite>("Sprites/HitSplats/Water_hitsplat") },
+                { SpellElement.Fire, burnHitsplat }
+            };
         }
 
         public bool IsAlive => hitpoints.CurrentHp > 0;
@@ -28,14 +39,16 @@ namespace Player
         public int CurrentHP => hitpoints.CurrentHp;
         public int MaxHP => hitpoints.MaxHp;
 
-        public void ApplyDamage(int amount, DamageType type, object source)
+        public void ApplyDamage(int amount, DamageType type, SpellElement element, object source)
         {
             hitpoints.OnEnemyDealtDamage(amount);
             Sprite sprite;
             if (amount == 0)
                 sprite = zeroHitsplat;
-            else if (type == DamageType.Burn && burnHitsplat != null)
+            else if (type == DamageType.Burn)
                 sprite = burnHitsplat;
+            else if (type == DamageType.Magic && elementHitsplats != null && elementHitsplats.TryGetValue(element, out var elemSprite) && elemSprite != null)
+                sprite = elemSprite;
             else
                 sprite = damageHitsplat;
             FloatingText.Show(amount.ToString(), transform.position, Color.white, null, sprite);

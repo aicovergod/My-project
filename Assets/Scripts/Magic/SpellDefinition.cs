@@ -35,5 +35,8 @@ namespace Magic
 
         [Tooltip("Magic level required to use this spell")]
         public int requiredMagicLevel = 1;
+
+        [Tooltip("Elemental type of this spell")]
+        public SpellElement element = SpellElement.None;
     }
 }

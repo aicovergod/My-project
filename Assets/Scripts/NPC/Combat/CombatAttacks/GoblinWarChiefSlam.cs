@@ -26,7 +26,7 @@ namespace NPC
                     if (otherFaction != null && !myFaction.IsEnemy(otherFaction.Faction))
                         continue;
                 }
-                otherTarget.ApplyDamage(slamDamage, DamageType.Melee, owner);
+                otherTarget.ApplyDamage(slamDamage, DamageType.Melee, SpellElement.None, owner);
             }
 
             for (int x = -1; x <= 1; x++)
