@@ -68,11 +68,10 @@ namespace UI
             var loaded = Resources.LoadAll<SpellDefinition>("Spells");
             if (loaded != null)
                 spells.AddRange(loaded);
-            if (spells.Count > 0)
-            {
-                ActiveSpell = spells[0];
-                LastSelectedSpell = ActiveSpell;
-            }
+            // Don't automatically select a spell on load. This allows melee
+            // range to be used at spawn when no magic weapon is equipped.
+            if (spells.Count > 0 && LastSelectedSpell == null)
+                LastSelectedSpell = spells[0];
         }
 
         private void CreateUI()
