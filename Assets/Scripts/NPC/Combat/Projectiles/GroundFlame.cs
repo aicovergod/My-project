@@ -43,7 +43,7 @@ namespace NPC
                 foreach (var tgt in targets)
                 {
                     if (tgt != null)
-                        tgt.ApplyDamage(damagePerTick, DamageType.Burn, this);
+                        tgt.ApplyDamage(damagePerTick, DamageType.Burn, SpellElement.Fire, this);
                 }
                 elapsed += CombatMath.TICK_SECONDS;
                 yield return wait;

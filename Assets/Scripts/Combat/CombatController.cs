@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using EquipmentSystem;
 using Skills;
@@ -34,10 +35,12 @@ namespace Combat
         private CombatStyle pendingStyle;
         private DamageType pendingType;
         private int pendingMaxHit;
+        private SpellElement pendingElement;
 
         private Sprite damageHitsplat;
         private Sprite zeroHitsplat;
         private Sprite maxHitHitsplat;
+        private Dictionary<SpellElement, Sprite> elementHitsplats;
 
         private void Awake()
         {
@@ -58,6 +61,16 @@ namespace Combat
             damageHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat");
             zeroHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Zero_damage_hitsplat");
             maxHitHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat_maxhit");
+
+            elementHitsplats = new Dictionary<SpellElement, Sprite>
+            {
+                { SpellElement.Air, Resources.Load<Sprite>("Sprites/HitSplats/Air_hitsplat") },
+                { SpellElement.Water, Resources.Load<Sprite>("Sprites/HitSplats/Water_hitsplat") },
+                { SpellElement.Earth, Resources.Load<Sprite>("Sprites/HitSplats/Earth_hitsplat") },
+                { SpellElement.Electric, Resources.Load<Sprite>("Sprites/HitSplats/Electrocute_hitsplat") },
+                { SpellElement.Ice, Resources.Load<Sprite>("Sprites/HitSplats/Water_hitsplat") },
+                { SpellElement.Fire, Resources.Load<Sprite>("Sprites/HitSplats/Burn_hitsplat") }
+            };
         }
 
         /// <summary>
@@ -186,14 +199,18 @@ namespace Combat
             return new DamageResult { damage = damage, hit = hit, maxHit = maxHit };
         }
 
-        private void ApplyDamageResult(CombatTarget target, int damage, bool hit, int maxHit, CombatStyle style, DamageType type)
+        private void ApplyDamageResult(CombatTarget target, int damage, bool hit, int maxHit, CombatStyle style, DamageType type, SpellElement element)
         {
             var targetMb = target as MonoBehaviour;
             string targetName = targetMb != null ? targetMb.name : "target";
             if (hit)
             {
-                target.ApplyDamage(damage, type, this);
-                var sprite = damage == maxHit ? maxHitHitsplat : damageHitsplat;
+                target.ApplyDamage(damage, type, element, this);
+                Sprite sprite;
+                if (type == DamageType.Magic && elementHitsplats != null && elementHitsplats.TryGetValue(element, out var elemSprite) && elemSprite != null)
+                    sprite = elemSprite;
+                else
+                    sprite = damage == maxHit ? maxHitHitsplat : damageHitsplat;
                 FloatingText.Show(damage.ToString(), target.transform.position, Color.white, null, sprite);
                 AwardXp(damage, style, type);
                 if (!target.IsAlive)
@@ -225,6 +242,7 @@ namespace Combat
                 pendingStyle = attacker.Style;
                 pendingType = attacker.DamageType;
                 pendingMaxHit = result.maxHit;
+                pendingElement = MagicUI.ActiveSpell.element;
                 var projObj = Instantiate(MagicUI.ActiveSpell.projectilePrefab, transform.position, Quaternion.identity);
                 var proj = projObj.GetComponent<Magic.FireProjectile>();
                 if (proj != null)
@@ -243,14 +261,14 @@ namespace Combat
             }
             else
             {
-                ApplyDamageResult(target, result.damage, result.hit, result.maxHit, attacker.Style, attacker.DamageType);
+                ApplyDamageResult(target, result.damage, result.hit, result.maxHit, attacker.Style, attacker.DamageType, SpellElement.None);
             }
         }
 
         public void ApplySpellDamage(CombatTarget target, int damage)
         {
             bool hit = damage > 0;
-            ApplyDamageResult(target, damage, hit, pendingMaxHit, pendingStyle, pendingType);
+            ApplyDamageResult(target, damage, hit, pendingMaxHit, pendingStyle, pendingType, pendingElement);
         }
 
         private void AwardXp(int damage, CombatStyle style, DamageType type)
@@ -329,7 +347,7 @@ namespace Combat
             public DamageType PreferredDefenceType => DamageType.Melee;
             public int CurrentHP => 10;
             public int MaxHP => 10;
-            public void ApplyDamage(int amount, DamageType type, object source)
+            public void ApplyDamage(int amount, DamageType type, SpellElement element, object source)
             {
                 Debug.Log($"Dummy took {amount} damage");
             }

@@ -14,6 +14,20 @@ namespace Combat
     }
 
     /// <summary>
+    /// Elemental affiliation of a magic spell.
+    /// </summary>
+    public enum SpellElement
+    {
+        Air,
+        Water,
+        Earth,
+        Electric,
+        Ice,
+        Fire,
+        None
+    }
+
+    /// <summary>
     /// Melee combat styles affecting effective levels and XP distribution.
     /// </summary>
     public enum CombatStyle
