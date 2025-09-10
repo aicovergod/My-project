@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 75a0bfa1a4e537c4d914009ef1161c3e, type: 3}
-  m_Name: WindStrike
+  m_Name: WaterStrike
   m_EditorClassIdentifier: Assembly-CSharp::Magic.SpellDefinition
   displayName: Wind Strike
   range: 5

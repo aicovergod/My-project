@@ -29,3 +29,7 @@ MonoBehaviour:
   MaxConcurrentTargets: 6
   PlayerAggroWeight: 1
   Faction: 2
+  elementalModifiers:
+  - element: 0
+    protectionPercent: 0
+    bonusPercent: 0
