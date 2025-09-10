@@ -25,6 +25,8 @@ namespace UI
         /// <summary>Maximum hit for the active spell.</summary>
         public static int ActiveSpellMaxHit => ActiveSpell != null ? ActiveSpell.maxHit : 0;
 
+        public static void ClearActiveSpell() => ActiveSpell = null;
+
         /// <summary>Range for the active spell or melee range if none.</summary>
         public static float GetActiveSpellRange() =>
             ActiveSpell != null ? ActiveSpell.range : CombatMath.MELEE_RANGE;
