@@ -85,6 +85,23 @@ namespace Combat
             return true;
         }
 
+        /// <summary>
+        /// Stops any ongoing attack routine and clears the current target.
+        /// </summary>
+        public void CancelCombat()
+        {
+            if (attackRoutine != null)
+            {
+                StopCoroutine(attackRoutine);
+                attackRoutine = null;
+            }
+            if (currentTarget != null)
+            {
+                OnCombatTargetChanged?.Invoke(null);
+                currentTarget = null;
+            }
+        }
+
         private IEnumerator AttackRoutine(CombatTarget target)
         {
             currentTarget = target;
