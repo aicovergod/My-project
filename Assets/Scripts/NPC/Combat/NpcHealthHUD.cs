@@ -117,7 +117,7 @@ namespace NPC
             float t = 0f;
             while (t < fadeDuration)
             {
-                t += Time.deltaTime;
+                t += Time.unscaledDeltaTime;
                 canvasGroup.alpha = Mathf.Lerp(start, target, t / fadeDuration);
                 yield return null;
             }
