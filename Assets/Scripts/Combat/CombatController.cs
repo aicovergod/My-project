@@ -207,11 +207,16 @@ namespace Combat
             {
                 target.ApplyDamage(damage, type, element, this);
                 Sprite sprite;
+                Color textColor = Color.white;
                 if (type == DamageType.Magic && elementHitsplats != null && elementHitsplats.TryGetValue(element, out var elemSprite) && elemSprite != null)
+                {
                     sprite = elemSprite;
+                    if (element == SpellElement.Air)
+                        textColor = Color.black;
+                }
                 else
                     sprite = damage == maxHit ? maxHitHitsplat : damageHitsplat;
-                FloatingText.Show(damage.ToString(), target.transform.position, Color.white, null, sprite);
+                FloatingText.Show(damage.ToString(), target.transform.position, textColor, null, sprite);
                 AwardXp(damage, style, type);
                 if (!target.IsAlive)
                     OnTargetKilled?.Invoke(target);
