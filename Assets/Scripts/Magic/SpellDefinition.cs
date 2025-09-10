@@ -32,5 +32,8 @@ namespace Magic
 
         [Tooltip("Icon used in the spell book")]
         public Sprite icon;
+
+        [Tooltip("Magic level required to use this spell")]
+        public int requiredMagicLevel = 1;
     }
 }

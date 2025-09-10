@@ -5,6 +5,7 @@ using Player;
 using System;
 using System.Collections.Generic;
 using Magic;
+using Skills;
 
 namespace UI
 {
@@ -152,6 +153,15 @@ namespace UI
         {
             if (loadout == null)
                 loadout = FindObjectOfType<PlayerCombatLoadout>();
+
+            // Check for magic level requirement before selecting the spell
+            var skills = loadout != null ? loadout.GetComponent<SkillManager>() : null;
+            if (skills != null && skills.GetLevel(SkillType.Magic) < spell.requiredMagicLevel)
+            {
+                var anchor = loadout.transform.Find("FloatingTextAnchor") ?? loadout.transform;
+                FloatingText.Show($"You need a Magic level of {spell.requiredMagicLevel} to use this spell", anchor.position);
+                return;
+            }
 
             if (ActiveSpell == spell)
             {
