@@ -88,6 +88,15 @@ namespace NPC
             textRect.anchorMax = Vector2.one;
             textRect.offsetMin = Vector2.zero;
             textRect.offsetMax = Vector2.zero;
+
+            SetLayerRecursively(go, LayerMask.NameToLayer("UI"));
+        }
+
+        private void SetLayerRecursively(GameObject obj, int layer)
+        {
+            obj.layer = layer;
+            foreach (Transform child in obj.transform)
+                SetLayerRecursively(child.gameObject, layer);
         }
 
         private void HandleHealthChanged(int current, int max)
