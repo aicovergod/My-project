@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Core;
 using World;
+using Combat;
 
 namespace Player
 {
@@ -14,6 +15,8 @@ namespace Player
         public static PlayerRespawnSystem Instance { get; private set; }
 
         private PlayerHitpoints hitpoints;
+        private PlayerMover playerMover;
+        private CombatController combatController;
         private bool isRespawning;
 
         private void Awake()
@@ -52,7 +55,18 @@ namespace Player
                 hitpoints.OnHealthChanged -= HandleHealthChanged;
 
             var playerObj = GameObject.FindGameObjectWithTag("Player");
-            hitpoints = playerObj != null ? playerObj.GetComponent<PlayerHitpoints>() : null;
+            if (playerObj != null)
+            {
+                hitpoints = playerObj.GetComponent<PlayerHitpoints>();
+                playerMover = playerObj.GetComponent<PlayerMover>();
+                combatController = playerObj.GetComponent<CombatController>();
+            }
+            else
+            {
+                hitpoints = null;
+                playerMover = null;
+                combatController = null;
+            }
             if (hitpoints != null)
                 hitpoints.OnHealthChanged += HandleHealthChanged;
         }
@@ -60,7 +74,11 @@ namespace Player
         private void HandleHealthChanged(int current, int max)
         {
             if (!isRespawning && current <= 0)
+            {
+                playerMover?.StopMovement();
+                combatController?.CancelCombat();
                 StartCoroutine(RespawnRoutine());
+            }
         }
 
         private IEnumerator RespawnRoutine()
