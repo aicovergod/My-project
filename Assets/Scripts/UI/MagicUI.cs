@@ -150,11 +150,21 @@ namespace UI
 
         private void SelectSpell(SpellDefinition spell)
         {
-            ActiveSpell = spell;
-            LastSelectedSpell = spell;
             if (loadout == null)
                 loadout = FindObjectOfType<PlayerCombatLoadout>();
-            loadout?.SetDamageType(DamageType.Magic);
+
+            if (ActiveSpell == spell)
+            {
+                ClearActiveSpell();
+                loadout?.SetDamageType(DamageType.Melee);
+            }
+            else
+            {
+                ActiveSpell = spell;
+                LastSelectedSpell = spell;
+                loadout?.SetDamageType(DamageType.Magic);
+            }
+
             UpdateSelection();
         }
 
