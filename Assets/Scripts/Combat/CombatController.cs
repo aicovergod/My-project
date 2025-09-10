@@ -26,6 +26,7 @@ namespace Combat
         private EquipmentAggregator equipment;
         private Player.PlayerCombatLoadout loadout;
         private PlayerCombatBinder combatBinder;
+        private PlayerMover mover;
         private Coroutine attackRoutine;
         private CombatTarget currentTarget;
         private float nextAttackTime;
@@ -47,6 +48,7 @@ namespace Combat
             equipment = GetComponent<EquipmentAggregator>() ?? GetComponentInParent<EquipmentAggregator>() ?? GetComponentInChildren<EquipmentAggregator>();
             loadout = GetComponent<Player.PlayerCombatLoadout>() ?? GetComponentInParent<Player.PlayerCombatLoadout>() ?? GetComponentInChildren<Player.PlayerCombatLoadout>();
             combatBinder = GetComponent<PlayerCombatBinder>() ?? GetComponentInParent<PlayerCombatBinder>() ?? GetComponentInChildren<PlayerCombatBinder>();
+            mover = GetComponent<PlayerMover>() ?? GetComponentInParent<PlayerMover>() ?? GetComponentInChildren<PlayerMover>();
 
             if (skills == null)
                 Debug.LogWarning("CombatController could not find a SkillManager; damage will use level 1 stats.", this);
@@ -118,6 +120,7 @@ namespace Combat
             {
                 if (Vector2.Distance(transform.position, target.transform.position) > MagicUI.GetActiveSpellRange())
                     break;
+                mover?.FaceTarget(target.transform);
                 OnAttackStart?.Invoke();
                 ResolveAttack(target);
                 // If the target died from the attack, exit immediately so listeners are notified
