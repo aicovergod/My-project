@@ -45,7 +45,7 @@ namespace NPC
         }
 
         /// <summary>Apply damage to this NPC.</summary>
-        public void ApplyDamage(int amount, DamageType type, SpellElement element, object source)
+        public int ApplyDamage(int amount, DamageType type, SpellElement element, object source)
         {
             int finalAmount = amount;
             if (profile != null && profile.elementalModifiers != null)
@@ -110,6 +110,8 @@ namespace NPC
                 if (profile != null && profile.RespawnSeconds > 0f)
                     StartCoroutine(RespawnRoutine());
             }
+
+            return finalAmount;
         }
 
         /// <summary>Get combat stats for this NPC.</summary>

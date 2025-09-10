@@ -280,9 +280,9 @@ namespace NPC
                 int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
                 int maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
                 damage = CombatMath.RollDamage(maxHit);
-                target.ApplyDamage(damage, attacker.DamageType, SpellElement.None, this);
+                int finalDamage = target.ApplyDamage(damage, attacker.DamageType, SpellElement.None, this);
                 var targetName = (target as MonoBehaviour)?.name ?? "target";
-                Debug.Log($"{name} dealt {damage} damage to {targetName}.");
+                Debug.Log($"{name} dealt {finalDamage} damage to {targetName}.");
             }
             else
             {

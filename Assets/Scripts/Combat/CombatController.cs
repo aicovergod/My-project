@@ -205,29 +205,38 @@ namespace Combat
             string targetName = targetMb != null ? targetMb.name : "target";
             if (hit)
             {
-                target.ApplyDamage(damage, type, element, this);
+                int finalDamage = target.ApplyDamage(damage, type, element, this);
                 Sprite sprite;
                 Color textColor = Color.white;
-                if (type == DamageType.Magic && elementHitsplats != null && elementHitsplats.TryGetValue(element, out var elemSprite) && elemSprite != null)
+                if (finalDamage == 0)
+                {
+                    sprite = zeroHitsplat;
+                    FloatingText.Show("0", target.transform.position, textColor, null, sprite);
+                }
+                else if (type == DamageType.Magic && elementHitsplats != null && elementHitsplats.TryGetValue(element, out var elemSprite) && elemSprite != null)
                 {
                     sprite = elemSprite;
                     if (element == SpellElement.Air)
                         textColor = Color.black;
+                    FloatingText.Show(finalDamage.ToString(), target.transform.position, textColor, null, sprite);
                 }
                 else
-                    sprite = damage == maxHit ? maxHitHitsplat : damageHitsplat;
-                FloatingText.Show(damage.ToString(), target.transform.position, textColor, null, sprite);
-                AwardXp(damage, style, type);
-                if (!target.IsAlive)
+                {
+                    sprite = finalDamage == maxHit ? maxHitHitsplat : damageHitsplat;
+                    FloatingText.Show(finalDamage.ToString(), target.transform.position, textColor, null, sprite);
+                }
+                AwardXp(finalDamage, style, type);
+                if (finalDamage > 0 && !target.IsAlive)
                     OnTargetKilled?.Invoke(target);
-                Debug.Log($"Player dealt {damage} damage to {targetName}.");
+                Debug.Log($"Player dealt {finalDamage} damage to {targetName}.");
+                OnAttackLanded?.Invoke(finalDamage, hit);
             }
             else
             {
                 FloatingText.Show("0", target.transform.position, Color.white, null, zeroHitsplat);
                 Debug.Log($"Player missed {targetName}.");
+                OnAttackLanded?.Invoke(0, false);
             }
-            OnAttackLanded?.Invoke(damage, hit);
         }
 
         private void ResolveAttack(CombatTarget target)
@@ -352,9 +361,10 @@ namespace Combat
             public DamageType PreferredDefenceType => DamageType.Melee;
             public int CurrentHP => 10;
             public int MaxHP => 10;
-            public void ApplyDamage(int amount, DamageType type, SpellElement element, object source)
+            public int ApplyDamage(int amount, DamageType type, SpellElement element, object source)
             {
                 Debug.Log($"Dummy took {amount} damage");
+                return amount;
             }
         }
     }
