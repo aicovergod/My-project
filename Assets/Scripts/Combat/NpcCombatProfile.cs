@@ -36,6 +36,9 @@ namespace Combat
         [Tooltip("Maximum distance in tiles before an aggressive NPC loses aggro.")]
         public float AggroRange = 5f;
 
+        [Tooltip("Seconds to keep aggro on a target after it moves beyond AggroRange.")]
+        public float AggroTimeoutSeconds = 5f;
+
         [Tooltip("Maximum number of targets this NPC can attack at once.")]
         public int MaxConcurrentTargets = 1;
 

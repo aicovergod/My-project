@@ -25,6 +25,8 @@ namespace NPC
 
         protected readonly Dictionary<CombatTarget, float> threatLevels = new();
         protected readonly Dictionary<CombatTarget, Coroutine> activeAttacks = new();
+        // Tracks the last time each target dealt damage to this NPC.
+        protected readonly Dictionary<CombatTarget, float> lastDamageTimes = new();
 
         private bool inCombat;
         public bool InCombat => inCombat;
@@ -56,6 +58,7 @@ namespace NPC
             }
             activeAttacks.Clear();
             threatLevels.Clear();
+            lastDamageTimes.Clear();
             hasHitPlayer = false;
             if (resetSpawnPosition)
                 spawnPosition = transform.position;
@@ -78,6 +81,16 @@ namespace NPC
                 threatLevels[target] = amount;
         }
 
+        /// <summary>
+        /// Record that <paramref name="attacker"/> dealt damage to this NPC.
+        /// </summary>
+        public void RecordDamageFrom(CombatTarget attacker)
+        {
+            if (attacker == null)
+                return;
+            lastDamageTimes[attacker] = Time.time;
+        }
+
         protected virtual void Update()
         {
             var profile = combatant.Profile;
@@ -94,11 +107,18 @@ namespace NPC
                 if (!remove)
                 {
                     float targetDist = Vector2.Distance(t.transform.position, spawnPosition);
-                    remove = targetDist > profile.AggroRange;
+                    if (targetDist > profile.AggroRange)
+                    {
+                        float last;
+                        if (!lastDamageTimes.TryGetValue(t, out last))
+                            last = float.NegativeInfinity;
+                        remove = Time.time - last > profile.AggroTimeoutSeconds;
+                    }
                 }
                 if (remove)
                 {
                     threatLevels.Remove(t);
+                    lastDamageTimes.Remove(t);
                     if (activeAttacks.TryGetValue(t, out var c))
                     {
                         if (c != null)
@@ -212,7 +232,13 @@ namespace NPC
                 var profile = combatant.Profile;
                 float spawnDist = Vector2.Distance(target.transform.position, spawnPosition);
                 if (spawnDist > profile.AggroRange)
-                    break;
+                {
+                    float last;
+                    if (!lastDamageTimes.TryGetValue(target, out last))
+                        last = float.NegativeInfinity;
+                    if (Time.time - last > profile.AggroTimeoutSeconds)
+                        break;
+                }
 
                 float distance = Vector2.Distance(target.transform.position, transform.position);
                 if (distance <= CombatMath.MELEE_RANGE)
@@ -230,6 +256,7 @@ namespace NPC
             wanderer?.ExitCombat(target.transform);
             activeAttacks.Remove(target);
             threatLevels.Remove(target);
+            lastDamageTimes.Remove(target);
             if (activeAttacks.Count == 0)
                 SetCombatState(false);
         }
