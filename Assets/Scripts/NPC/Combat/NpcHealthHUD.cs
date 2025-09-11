@@ -150,6 +150,7 @@ namespace NPC
                 if (canvasGroup != null)
                     canvasGroup.alpha = 0f;
             }
+            isVisible = false;
         }
 
         private void OnDestroy()

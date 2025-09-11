@@ -119,6 +119,8 @@ namespace NPC
                     dropper?.OnDeath();
 
                 ResetDamageCounters();
+                GetComponent<BaseNpcCombat>()?.ResetCombatState();
+                GetComponent<NpcWanderer>()?.enabled = false;
                 OnDeath?.Invoke();
                 if (collider2D) collider2D.enabled = false;
                 if (spriteRenderer) spriteRenderer.enabled = false;
@@ -141,7 +143,12 @@ namespace NPC
             currentHp = profile != null ? profile.HitpointsLevel : 1;
             if (collider2D) collider2D.enabled = true;
             if (spriteRenderer) spriteRenderer.enabled = true;
-            GetComponent<BaseNpcCombat>()?.ResetCombatState(true);
+            GetComponent<NpcWanderer>()?.enabled = true;
+            var combat = GetComponent<BaseNpcCombat>();
+            Vector2 spawn = combat != null ? combat.SpawnPosition : (Vector2)transform.position;
+            transform.position = spawn;
+            wanderer?.SetOrigin(spawn);
+            combat?.ResetCombatState(true);
             ResetDamageCounters();
             OnHealthChanged?.Invoke(currentHp, MaxHP);
         }
