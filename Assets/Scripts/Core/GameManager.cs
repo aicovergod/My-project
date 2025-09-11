@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using Util;
 using World;
@@ -6,6 +7,7 @@ using Inventory;
 using ShopSystem;
 using Player;
 using Skills.Fishing;
+using Core.Save;
 
 namespace Core
 {
@@ -22,6 +24,9 @@ namespace Core
         private ShopUI shopUI;
         private PlayerRespawnSystem respawnSystem;
         private BycatchManager bycatchManager;
+        private Coroutine autosaveRoutine;
+
+        private const float AutosaveInterval = 10f;
 
         /// <summary>
         /// Event fired once all services are initialized.
@@ -52,6 +57,24 @@ namespace Core
             bycatchManager = FindOrCreate<BycatchManager>();
 
             ServicesReady?.Invoke();
+
+            autosaveRoutine = StartCoroutine(AutoSaveLoop());
+        }
+
+        private IEnumerator AutoSaveLoop()
+        {
+            var wait = new WaitForSeconds(AutosaveInterval);
+            while (true)
+            {
+                yield return wait;
+                SaveManager.SaveAll();
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (autosaveRoutine != null)
+                StopCoroutine(autosaveRoutine);
         }
 
         /// <summary>
