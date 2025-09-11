@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2382285717988576523}
   - component: {fileID: 8421290492036978603}
   m_Layer: 0
-  m_Name: Fire Strike Projectile GFX
+  m_Name: Fire Strike Hit GFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
