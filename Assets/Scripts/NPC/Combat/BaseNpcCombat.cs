@@ -211,7 +211,8 @@ namespace NPC
                 float distance = Vector2.Distance(target.transform.position, transform.position);
                 var profile = combatant.Profile;
                 float chaseDist = Vector2.Distance(transform.position, spawnPosition);
-                if (chaseDist > profile.AggroRange || distance > profile.AggroRange)
+                if (distance > profile.AggroRange ||
+                    (chaseDist > profile.AggroRange && distance > CombatMath.MELEE_RANGE))
                     break;
 
                 if (distance <= CombatMath.MELEE_RANGE)
