@@ -94,7 +94,7 @@ namespace NPC
                 if (!remove)
                 {
                     float targetDist = Vector2.Distance(t.transform.position, transform.position);
-                    remove = targetDist > profile.AggroRange || npcChaseDist > profile.AggroRange;
+                    remove = targetDist > profile.AggroRange;
                 }
                 if (remove)
                 {
@@ -110,8 +110,9 @@ namespace NPC
 
             if (threatLevels.Count == 0 &&
                 activeAttacks.Count == 0 &&
-                Vector2.Distance(transform.position, spawnPosition) > profile.AggroRange)
+                npcChaseDist > profile.AggroRange)
             {
+                // Without targets, send the NPC back toward its spawn when it has wandered too far.
                 ResetCombatState();
             }
             else if (activeAttacks.Count == 0)
