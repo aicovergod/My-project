@@ -47,7 +47,7 @@ namespace NPC
             npcFacing = GetComponent<NpcFacing>();
         }
 
-        public virtual void ResetCombatState()
+        public virtual void ResetCombatState(bool resetSpawnPosition = false)
         {
             foreach (var routine in activeAttacks.Values)
             {
@@ -57,7 +57,8 @@ namespace NPC
             activeAttacks.Clear();
             threatLevels.Clear();
             hasHitPlayer = false;
-            spawnPosition = transform.position;
+            if (resetSpawnPosition)
+                spawnPosition = transform.position;
             wanderer?.ExitCombat();
             SetCombatState(false);
         }
@@ -111,7 +112,7 @@ namespace NPC
                 activeAttacks.Count == 0 &&
                 Vector2.Distance(transform.position, spawnPosition) > profile.AggroRange)
             {
-                ResetCombatState(); // updates spawnPosition to current location
+                ResetCombatState();
             }
             else if (activeAttacks.Count == 0)
             {
