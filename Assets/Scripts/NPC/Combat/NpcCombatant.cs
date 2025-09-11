@@ -94,6 +94,16 @@ namespace NPC
                 var combat = GetComponent<BaseNpcCombat>();
                 combat?.AddThreat(combatSource, finalAmount);
                 combat?.RecordDamageFrom(combatSource);
+                if (combat != null && !combat.InCombat)
+                {
+                    var profile = this.profile;
+                    if (profile != null)
+                    {
+                        float dist = Vector2.Distance(transform.position, combat.SpawnPosition);
+                        if (dist > profile.AggroRange)
+                            combat.ReengageFromRetreat(combatSource);
+                    }
+                }
                 combat?.BeginAttacking(combatSource);
             }
             else
