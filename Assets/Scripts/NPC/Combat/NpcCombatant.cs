@@ -94,6 +94,7 @@ namespace NPC
                 var combat = GetComponent<BaseNpcCombat>();
                 combat?.AddThreat(combatSource, finalAmount);
                 combat?.RecordDamageFrom(combatSource);
+                combat?.BeginAttacking(combatSource);
             }
             else
             {
