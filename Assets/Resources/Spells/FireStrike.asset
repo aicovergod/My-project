@@ -15,11 +15,11 @@ MonoBehaviour:
   displayName: Electric Strike
   range: 5
   speed: 8
-  projectilePrefab: {fileID: 8992547425151743537, guid: da296c280bba8ff4ab726123c3ec8ee7, type: 3}
-  hitEffectPrefab: {fileID: 8992547425151743537, guid: 00efa5df98b070248b8352df720f440b, type: 3}
+  projectilePrefab: {fileID: 8992547425151743537, guid: 4207e90c2f565fd4bb49b23f64061efb, type: 3}
+  hitEffectPrefab: {fileID: 8992547425151743537, guid: 24d88c1201e2b754b823bf54279d734d, type: 3}
   hitFadeTime: 1
   maxHit: 6
-  icon: {fileID: 21300000, guid: 72c6399e42241534681e9ce227d7744f, type: 3}
+  icon: {fileID: 21300000, guid: 3b8d01116d0907f458d43bfa1ea6da5a, type: 3}
   requiredMagicLevel: 1
   element: 5
-  loadOrder: 3
+  loadOrder: 4
