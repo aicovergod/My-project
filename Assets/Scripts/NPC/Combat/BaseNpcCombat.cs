@@ -93,7 +93,7 @@ namespace NPC
                 bool remove = t == null || !t.IsAlive;
                 if (!remove)
                 {
-                    float targetDist = Vector2.Distance(t.transform.position, transform.position);
+                    float targetDist = Vector2.Distance(t.transform.position, spawnPosition);
                     remove = targetDist > profile.AggroRange;
                 }
                 if (remove)
@@ -125,7 +125,7 @@ namespace NPC
 
             if (playerTarget != null && playerTarget.IsAlive)
             {
-                float playerDist = Vector2.Distance(playerTarget.transform.position, transform.position);
+                float playerDist = Vector2.Distance(playerTarget.transform.position, spawnPosition);
                 if (playerDist <= profile.AggroRange)
                     potentials.Add(playerTarget);
             }
@@ -140,7 +140,7 @@ namespace NPC
                     var otherFaction = npc as IFactionProvider;
                     if (otherFaction == null || !myFaction.IsEnemy(otherFaction.Faction))
                         continue;
-                    float dist = Vector2.Distance(npc.transform.position, transform.position);
+                    float dist = Vector2.Distance(npc.transform.position, spawnPosition);
                     if (dist <= profile.AggroRange)
                         potentials.Add(npc);
                 }
@@ -209,11 +209,12 @@ namespace NPC
             // Wait until the player is within melee range before performing the first attack.
             while (combatant.IsAlive && target != null && target.IsAlive)
             {
-                float distance = Vector2.Distance(target.transform.position, transform.position);
                 var profile = combatant.Profile;
-                if (distance > profile.AggroRange)
+                float spawnDist = Vector2.Distance(target.transform.position, spawnPosition);
+                if (spawnDist > profile.AggroRange)
                     break;
 
+                float distance = Vector2.Distance(target.transform.position, transform.position);
                 if (distance <= CombatMath.MELEE_RANGE)
                 {
                     ResolveAttack(target);

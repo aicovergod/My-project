@@ -27,6 +27,10 @@ namespace NPC
         [Tooltip("Maximum idle time before choosing a new target.")]
         public float maxIdleTime = 2f;
 
+        [Header("Chasing")]
+        [Tooltip("Maximum distance from the spawn position that the NPC may chase a target.")]
+        public float chaseRadius = 5f;
+
         [Header("Visuals")]
         [Tooltip("Component handling sprite animation/animator updates.")]
         public NpcSpriteAnimator spriteAnimator;
@@ -63,6 +67,11 @@ namespace NPC
             _lastPos = _origin;
             _from = _to = _origin;
             _lerpTime = Ticker.TickDuration;
+
+            var combatant = GetComponent<NpcCombatant>();
+            if (combatant != null && combatant.Profile != null)
+                chaseRadius = combatant.Profile.AggroRange;
+
             BeginIdle();
         }
 
@@ -147,7 +156,12 @@ namespace NPC
                     {
                         Vector2 direction = (targetPos - _from).normalized;
                         Vector2 desired = targetPos - direction * CombatMath.MELEE_RANGE;
-                        _to = Vector2.MoveTowards(_from, desired, moveSpeed * delta);
+                        Vector2 step = Vector2.MoveTowards(_from, desired, moveSpeed * delta);
+                        Vector2 offset = step - _origin;
+                        if (offset.sqrMagnitude > chaseRadius * chaseRadius)
+                            _to = _origin + offset.normalized * chaseRadius;
+                        else
+                            _to = step;
                     }
                     else
                     {
