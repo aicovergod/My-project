@@ -101,7 +101,8 @@ namespace NPC
                     threatLevels.Remove(t);
                     if (activeAttacks.TryGetValue(t, out var c))
                     {
-                        StopCoroutine(c);
+                        if (c != null)
+                            StopCoroutine(c);
                         activeAttacks.Remove(t);
                         wanderer?.ExitCombat(t.transform);
                     }
