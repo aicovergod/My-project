@@ -245,6 +245,9 @@ namespace Combat
                 if (finalDamage > 0 && !target.IsAlive)
                     OnTargetKilled?.Invoke(target);
                 Debug.Log($"Player dealt {finalDamage} damage to {targetName}.");
+                var applier = GetComponentInChildren<OnHitPoisonApplier>();
+                if (applier != null && targetMb != null)
+                    applier.TryApply(targetMb.gameObject, finalDamage > 0);
                 OnAttackLanded?.Invoke(finalDamage, hit);
             }
             else
