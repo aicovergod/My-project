@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 75a0bfa1a4e537c4d914009ef1161c3e, type: 3}
-  m_Name: WindStrike
+  m_Name: ElectricStrike
   m_EditorClassIdentifier: Assembly-CSharp::Magic.SpellDefinition
-  displayName: Wind Strike
+  displayName: Electric Strike
   range: 5
   speed: 8
-  projectilePrefab: {fileID: 8992547425151743537, guid: bd7dc5f10d2a37049a3c33112171e9c9, type: 3}
-  hitEffectPrefab: {fileID: 8992547425151743537, guid: 4fadbc66e865ef04a9fdd14ccf48f69b, type: 3}
+  projectilePrefab: {fileID: 8992547425151743537, guid: da296c280bba8ff4ab726123c3ec8ee7, type: 3}
+  hitEffectPrefab: {fileID: 8992547425151743537, guid: 00efa5df98b070248b8352df720f440b, type: 3}
   hitFadeTime: 1
-  maxHit: 4
-  icon: {fileID: 21300000, guid: 615f182a766d77c41b8c44f8e0732e3a, type: 3}
-  requiredMagicLevel: 1
-  element: 0
+  maxHit: 6
+  icon: {fileID: 21300000, guid: 72c6399e42241534681e9ce227d7744f, type: 3}
+  requiredMagicLevel: 10
+  element: 3

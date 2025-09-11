@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75a0bfa1a4e537c4d914009ef1161c3e, type: 3}
   m_Name: WaterStrike
   m_EditorClassIdentifier: Assembly-CSharp::Magic.SpellDefinition
-  displayName: Wind Strike
+  displayName: Water Strike
   range: 5
   speed: 8
-  projectilePrefab: {fileID: 8992547425151743537, guid: bd7dc5f10d2a37049a3c33112171e9c9, type: 3}
-  hitEffectPrefab: {fileID: 8992547425151743537, guid: 4fadbc66e865ef04a9fdd14ccf48f69b, type: 3}
-  hitFadeTime: 0.5
+  projectilePrefab: {fileID: 8992547425151743537, guid: 74e67e723dd561a4a88af791e1a2d37d, type: 3}
+  hitEffectPrefab: {fileID: 8992547425151743537, guid: c8b81dcc129cee743adee1cb9398ceaf, type: 3}
+  hitFadeTime: 1
   maxHit: 4
-  icon: {fileID: 21300000, guid: 615f182a766d77c41b8c44f8e0732e3a, type: 3}
-  requiredMagicLevel: 1
-  element: 0
+  icon: {fileID: 21300000, guid: 5f817161ba2b33042b53b924ed8db0f5, type: 3}
+  requiredMagicLevel: 5
+  element: 1
