@@ -99,7 +99,7 @@ namespace NPC
                     var profile = this.profile;
                     if (profile != null)
                     {
-                        float dist = Vector2.Distance(transform.position, combat.SpawnPosition);
+                        float dist = Vector2.Distance(combatSource.transform.position, combat.SpawnPosition);
                         if (dist > profile.AggroRange)
                             combat.ReengageFromRetreat(combatSource);
                     }
