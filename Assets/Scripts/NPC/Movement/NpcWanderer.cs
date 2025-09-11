@@ -159,6 +159,12 @@ namespace NPC
             BeginIdle();
         }
 
+        public void ForceReturnToOrigin()
+        {
+            _target = _origin;
+            _waiting = false;
+        }
+
         public void OnTick()
         {
             float delta = Ticker.TickDuration;
@@ -185,11 +191,27 @@ namespace NPC
                         Vector2 direction = (targetPos - _from).normalized;
                         Vector2 desired = targetPos - direction * CombatMath.MELEE_RANGE;
                         Vector2 step = Vector2.MoveTowards(_from, desired, moveSpeed * delta);
-                        Vector2 offset = step - _origin;
-                        if (offset.sqrMagnitude > chaseRadius * chaseRadius)
-                            _to = _origin + offset.normalized * chaseRadius;
+                        if (useAreaSize)
+                        {
+                            Vector2 half = areaSize * 0.5f;
+                            float minX = _origin.x - half.x;
+                            float maxX = _origin.x + half.x;
+                            float minY = _origin.y - half.y;
+                            float maxY = _origin.y + half.y;
+                            _to = new Vector2(
+                                Mathf.Clamp(step.x, minX, maxX),
+                                Mathf.Clamp(step.y, minY, maxY));
+                        }
                         else
-                            _to = step;
+                        {
+                            float minX = _origin.x + minOffset.x;
+                            float maxX = _origin.x + maxOffset.x;
+                            float minY = _origin.y + minOffset.y;
+                            float maxY = _origin.y + maxOffset.y;
+                            _to = new Vector2(
+                                Mathf.Clamp(step.x, minX, maxX),
+                                Mathf.Clamp(step.y, minY, maxY));
+                        }
                     }
                     else
                     {

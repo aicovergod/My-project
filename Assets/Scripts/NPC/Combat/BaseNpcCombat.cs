@@ -102,19 +102,16 @@ namespace NPC
                 playerTarget = FindObjectOfType<PlayerCombatTarget>();
 
             float aggroRadius = wanderer != null ? wanderer.AggroRadius : 5f;
-            float npcChaseDist = Vector2.Distance(transform.position, spawnPosition);
             foreach (var t in new List<CombatTarget>(threatLevels.Keys))
             {
                 bool remove = t == null || !t.IsAlive;
                 if (!remove)
                 {
-                    float targetDist = Vector2.Distance(t.transform.position, spawnPosition);
-                    if (targetDist > aggroRadius)
+                    float dist = Vector2.Distance(t.transform.position, transform.position);
+                    if (dist > 15f)
                     {
-                        float last;
-                        if (!lastDamageTimes.TryGetValue(t, out last))
-                            last = float.NegativeInfinity;
-                        remove = Time.time - last > profile.AggroTimeoutSeconds;
+                        wanderer?.ForceReturnToOrigin();
+                        remove = true;
                     }
                 }
                 if (remove)
@@ -131,12 +128,10 @@ namespace NPC
                 }
             }
 
-            if (threatLevels.Count == 0 &&
-                activeAttacks.Count == 0 &&
-                npcChaseDist > aggroRadius)
+            if (threatLevels.Count == 0 && activeAttacks.Count == 0)
             {
-                // Without targets, send the NPC back toward its spawn when it has wandered too far.
-                ResetCombatState();
+                wanderer?.ForceReturnToOrigin();
+                SetCombatState(false);
             }
             else if (activeAttacks.Count == 0)
             {
@@ -246,19 +241,13 @@ namespace NPC
             // Wait until the player is within melee range before performing the first attack.
             while (combatant.IsAlive && target != null && target.IsAlive)
             {
-                var profile = combatant.Profile;
-                float aggroRadius = wanderer != null ? wanderer.AggroRadius : 5f;
-                float spawnDist = Vector2.Distance(target.transform.position, spawnPosition);
-                if (spawnDist > aggroRadius)
+                float distance = Vector2.Distance(target.transform.position, transform.position);
+                if (distance > 15f)
                 {
-                    float last;
-                    if (!lastDamageTimes.TryGetValue(target, out last))
-                        last = float.NegativeInfinity;
-                    if (Time.time - last > profile.AggroTimeoutSeconds)
-                        break;
+                    wanderer?.ForceReturnToOrigin();
+                    break;
                 }
 
-                float distance = Vector2.Distance(target.transform.position, transform.position);
                 if (distance <= CombatMath.MELEE_RANGE)
                 {
                     ResolveAttack(target);
@@ -276,7 +265,10 @@ namespace NPC
             threatLevels.Remove(target);
             lastDamageTimes.Remove(target);
             if (activeAttacks.Count == 0)
+            {
+                wanderer?.ForceReturnToOrigin();
                 SetCombatState(false);
+            }
         }
 
         protected virtual void ResolveAttack(CombatTarget target)
