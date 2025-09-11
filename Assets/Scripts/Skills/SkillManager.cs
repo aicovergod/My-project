@@ -19,6 +19,8 @@ namespace Skills
         private readonly Dictionary<SkillType, SkillRecord> skills = new();
         private ICombatSkillSave save;
 
+        public event Action<SkillType, int> LevelChanged;
+
         private struct SkillRecord
         {
             public float xp;
@@ -59,10 +61,16 @@ namespace Skills
             if (xpTable == null || amount <= 0f)
                 return GetLevel(skill);
 
+            InitialiseSkill(skill);
             var record = skills[skill];
+            int oldLevel = record.level;
             record.xp += amount;
             record.level = xpTable.GetLevel(Mathf.FloorToInt(record.xp));
             skills[skill] = record;
+
+            if (record.level > oldLevel)
+                LevelChanged?.Invoke(skill, record.level);
+
             return record.level;
         }
 

@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75a0bfa1a4e537c4d914009ef1161c3e, type: 3}
   m_Name: FireStrike
   m_EditorClassIdentifier: Assembly-CSharp::Magic.SpellDefinition
-  displayName: Electric Strike
+  displayName: Fire Strike
   range: 5
   speed: 8
   projectilePrefab: {fileID: 8992547425151743537, guid: 4207e90c2f565fd4bb49b23f64061efb, type: 3}
   hitEffectPrefab: {fileID: 8992547425151743537, guid: 24d88c1201e2b754b823bf54279d734d, type: 3}
   hitFadeTime: 1
-  maxHit: 6
+  maxHit: 8
   icon: {fileID: 21300000, guid: 3b8d01116d0907f458d43bfa1ea6da5a, type: 3}
-  requiredMagicLevel: 1
+  requiredMagicLevel: 13
   element: 5
   loadOrder: 4
