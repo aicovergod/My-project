@@ -109,12 +109,6 @@ namespace NPC
             {
                 HandleDeath();
             }
-            else if (canvas != null && !canvas.gameObject.activeSelf)
-            {
-                canvas.gameObject.SetActive(true);
-                if (canvasGroup != null)
-                    canvasGroup.alpha = 1f;
-            }
         }
 
         private void HandleCombatStateChanged(bool inCombat)
