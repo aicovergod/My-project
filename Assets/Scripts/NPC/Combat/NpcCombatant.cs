@@ -94,6 +94,10 @@ namespace NPC
                 var combat = GetComponent<BaseNpcCombat>();
                 combat?.AddThreat(combatSource, finalAmount);
             }
+            else
+            {
+                npcDamage += finalAmount;
+            }
             var killedByPlayer = creditedToPlayer;
             if (currentHp <= 0)
             {
