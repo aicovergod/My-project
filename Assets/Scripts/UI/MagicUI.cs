@@ -19,6 +19,9 @@ namespace UI
         private readonly Dictionary<SpellDefinition, Button> spellButtons = new();
         private readonly List<SpellDefinition> spells = new();
 
+        // Strike spell references cached for max hit adjustments
+        private readonly List<SpellDefinition> strikeSpells = new();
+
         /// <summary>Currently selected spell.</summary>
         public static SpellDefinition ActiveSpell { get; private set; }
             = null;
@@ -42,6 +45,15 @@ namespace UI
 
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
 
+        /// <summary>
+        /// Updates strike spell max hits based on the given magic level.
+        /// </summary>
+        public static void UpdateStrikeMaxHits(int level)
+        {
+            var instance = FindObjectOfType<MagicUI>();
+            instance?.ApplyStrikeMaxHits(level);
+        }
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Init()
         {
@@ -57,6 +69,7 @@ namespace UI
         {
             loadout = FindObjectOfType<PlayerCombatLoadout>();
             LoadSpells();
+            CacheStrikeSpells();
             CreateUI();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
@@ -74,6 +87,18 @@ namespace UI
             // range to be used at spawn when no magic weapon is equipped.
             if (spells.Count > 0 && LastSelectedSpell == null)
                 LastSelectedSpell = spells[0];
+        }
+
+        private void CacheStrikeSpells()
+        {
+            strikeSpells.Clear();
+            string[] names = { "WindStrike", "WaterStrike", "EarthStrike", "ElectricStrike", "FireStrike" };
+            foreach (var name in names)
+            {
+                var spell = spells.Find(s => s.name == name);
+                if (spell != null)
+                    strikeSpells.Add(spell);
+            }
         }
 
         private void CreateUI()
@@ -130,6 +155,28 @@ namespace UI
             var btn = go.GetComponent<Button>();
             btn.onClick.AddListener(() => SelectSpell(spell));
             return btn;
+        }
+
+        private void ApplyStrikeMaxHits(int level)
+        {
+            if (strikeSpells.Count == 0)
+                return;
+
+            int highest = 0;
+            foreach (var spell in strikeSpells)
+            {
+                if (spell.requiredMagicLevel <= level && spell.maxHit > highest)
+                    highest = spell.maxHit;
+            }
+
+            if (highest == 0)
+                return;
+
+            foreach (var spell in strikeSpells)
+            {
+                if (spell.requiredMagicLevel <= level)
+                    spell.maxHit = highest;
+            }
         }
 
         public void Toggle()

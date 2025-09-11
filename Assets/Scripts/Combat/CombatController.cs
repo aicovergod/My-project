@@ -58,6 +58,9 @@ namespace Combat
             if (equipment == null)
                 Debug.LogWarning("CombatController could not find an EquipmentAggregator; equipment bonuses will be ignored.", this);
 
+            if (skills != null)
+                skills.LevelChanged += OnSkillLevelChanged;
+
             damageHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat");
             zeroHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Zero_damage_hitsplat");
             maxHitHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat_maxhit");
@@ -103,6 +106,18 @@ namespace Combat
                 pet?.CommandAttack(target);
             }
             return true;
+        }
+
+        private void OnDestroy()
+        {
+            if (skills != null)
+                skills.LevelChanged -= OnSkillLevelChanged;
+        }
+
+        private void OnSkillLevelChanged(SkillType type, int level)
+        {
+            if (type == SkillType.Magic)
+                MagicUI.UpdateStrikeMaxHits(level);
         }
 
         /// <summary>
