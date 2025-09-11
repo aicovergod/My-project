@@ -205,7 +205,8 @@ namespace Combat
             string targetName = targetMb != null ? targetMb.name : "target";
             if (hit)
             {
-                int finalDamage = target.ApplyDamage(damage, type, element, this);
+                var source = GetComponent<Player.PlayerCombatTarget>();
+                int finalDamage = target.ApplyDamage(damage, type, element, source);
                 Sprite sprite;
                 Color textColor = Color.white;
                 if (finalDamage == 0)
