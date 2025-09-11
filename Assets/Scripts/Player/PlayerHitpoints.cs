@@ -9,7 +9,7 @@ namespace Player
     /// Handles hitpoints skill, HP logic and XP integration.
     /// </summary>
     [DisallowMultipleComponent]
-    public class PlayerHitpoints : MonoBehaviour
+    public class PlayerHitpoints : MonoBehaviour, ISaveable
     {
         [SerializeField] private bool passiveRegenEnabled;
         [SerializeField] private MonoBehaviour saveProvider; // optional custom save provider
@@ -19,7 +19,6 @@ namespace Player
         private int currentHp;
 
         private Coroutine regenRoutine;
-        private Coroutine saveRoutine;
 
         public event System.Action<int, int> OnHealthChanged; // current, max
         public event System.Action<int> OnHitpointsLevelChanged; // new level
@@ -52,27 +51,20 @@ namespace Player
             skills = GetComponent<SkillManager>();
             if (skills != null && skills.GetXp(SkillType.Hitpoints) <= 0f)
                 skills.DebugSetLevel(SkillType.Hitpoints, 10);
-            currentHp = save.LoadCurrentHp();
-            int level = Level;
-            if (currentHp <= 0)
-                currentHp = level;
-            currentHp = Mathf.Clamp(currentHp, 0, level);
-            OnHealthChanged?.Invoke(currentHp, MaxHp);
         }
 
         private void OnEnable()
         {
-            saveRoutine = StartCoroutine(SaveLoop());
+            SaveManager.Register(this);
             if (passiveRegenEnabled)
                 StartRegen();
         }
 
         private void OnDisable()
         {
-            if (saveRoutine != null)
-                StopCoroutine(saveRoutine);
             StopRegen();
             Save();
+            SaveManager.Unregister(this);
         }
 
         private void OnApplicationQuit()
@@ -80,18 +72,19 @@ namespace Player
             Save();
         }
 
-        private IEnumerator SaveLoop()
-        {
-            while (true)
-            {
-                yield return new WaitForSeconds(10f);
-                Save();
-            }
-        }
-
-        private void Save()
+        public void Save()
         {
             save.SaveCurrentHp(currentHp);
+        }
+
+        public void Load()
+        {
+            currentHp = save.LoadCurrentHp();
+            int level = Level;
+            if (currentHp <= 0)
+                currentHp = level;
+            currentHp = Mathf.Clamp(currentHp, 0, level);
+            OnHealthChanged?.Invoke(currentHp, MaxHp);
         }
 
         private void StartRegen()

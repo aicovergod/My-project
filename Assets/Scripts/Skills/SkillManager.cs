@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Skills.Mining;
@@ -19,7 +18,6 @@ namespace Skills
 
         private readonly Dictionary<SkillType, SkillRecord> skills = new();
         private ICombatSkillSave save;
-        private Coroutine saveRoutine;
 
         private struct SkillRecord
         {
@@ -35,13 +33,11 @@ namespace Skills
         private void OnEnable()
         {
             SaveManager.Register(this);
-            saveRoutine = StartCoroutine(SaveLoop());
         }
 
         private void OnDisable()
         {
-            if (saveRoutine != null)
-                StopCoroutine(saveRoutine);
+            Save();
             SaveManager.Unregister(this);
         }
 
@@ -102,15 +98,6 @@ namespace Skills
             record.level = level;
             record.xp = xpTable.GetXpForLevel(level);
             skills[skill] = record;
-        }
-
-        private IEnumerator SaveLoop()
-        {
-            while (true)
-            {
-                yield return new WaitForSeconds(10f);
-                Save();
-            }
         }
 
         public void Save()
