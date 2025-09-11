@@ -75,6 +75,13 @@ namespace NPC
             BeginIdle();
         }
 
+        public void SetOrigin(Vector2 origin)
+        {
+            _origin = origin;
+            _lastPos = origin;
+            _from = _to = origin;
+        }
+
         private void OnEnable()
         {
             Ticker.Instance?.Subscribe(this);

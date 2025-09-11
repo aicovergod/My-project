@@ -20,6 +20,7 @@ namespace NPC
         protected PlayerCombatTarget playerTarget;
         protected bool hasHitPlayer;
         protected Vector2 spawnPosition;
+        public Vector2 SpawnPosition => spawnPosition;
         protected NpcFacing npcFacing;
         protected Coroutine spriteSwapRoutine;
 
@@ -207,6 +208,21 @@ namespace NPC
                 if (closest != null)
                     npcFacing?.FaceTarget(closest.transform);
             }
+        }
+
+        public virtual void ReengageFromRetreat(CombatTarget target)
+        {
+            if (target == null)
+                return;
+            spawnPosition = transform.position;
+            wanderer?.SetOrigin(spawnPosition);
+            wanderer?.EnterCombat(target.transform);
+            if (!activeAttacks.ContainsKey(target))
+            {
+                var routine = StartCoroutine(AttackRoutine(target));
+                activeAttacks[target] = routine;
+            }
+            SetCombatState(true);
         }
 
         public virtual void BeginAttacking(CombatTarget target)
