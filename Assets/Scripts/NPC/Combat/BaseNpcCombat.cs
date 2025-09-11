@@ -47,7 +47,7 @@ namespace NPC
             npcFacing = GetComponent<NpcFacing>();
         }
 
-        public void ResetCombatState()
+        public virtual void ResetCombatState()
         {
             foreach (var routine in activeAttacks.Values)
             {
@@ -106,8 +106,17 @@ namespace NPC
                     }
                 }
             }
-            if (activeAttacks.Count == 0)
+
+            if (threatLevels.Count == 0 &&
+                activeAttacks.Count == 0 &&
+                Vector2.Distance(transform.position, spawnPosition) > profile.AggroRange)
+            {
+                ResetCombatState(); // updates spawnPosition to current location
+            }
+            else if (activeAttacks.Count == 0)
+            {
                 SetCombatState(false);
+            }
 
             var potentials = new List<CombatTarget>();
 
