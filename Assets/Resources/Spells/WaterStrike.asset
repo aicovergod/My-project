@@ -22,3 +22,4 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 5f817161ba2b33042b53b924ed8db0f5, type: 3}
   requiredMagicLevel: 5
   element: 1
+  loadOrder: 1
