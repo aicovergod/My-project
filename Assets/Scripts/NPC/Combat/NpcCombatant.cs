@@ -17,6 +17,7 @@ namespace NPC
         private int currentHp;
         private Collider2D collider2D;
         private SpriteRenderer spriteRenderer;
+        private NpcWanderer wanderer;
         private int playerDamage;
         private int npcDamage;
 
@@ -40,6 +41,7 @@ namespace NPC
             currentHp = profile != null ? profile.HitpointsLevel : 1;
             collider2D = GetComponent<Collider2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
+            wanderer = GetComponent<NpcWanderer>();
             ResetDamageCounters();
             OnHealthChanged?.Invoke(currentHp, MaxHP);
         }
@@ -96,14 +98,11 @@ namespace NPC
                 combat?.RecordDamageFrom(combatSource);
                 if (combat != null && !combat.InCombat)
                 {
-                    var profile = this.profile;
-                    if (profile != null)
-                    {
-                        float dist = Vector2.Distance(combatSource.transform.position, combat.SpawnPosition);
-                        if (dist > profile.AggroRange)
-                            combat.ReengageFromRetreat(combatSource);
+                    float dist = Vector2.Distance(combatSource.transform.position, combat.SpawnPosition);
+                    float radius = wanderer != null ? wanderer.AggroRadius : 5f;
+                    if (dist > radius)
+                        combat.ReengageFromRetreat(combatSource);
                     }
-                }
                 combat?.BeginAttacking(combatSource);
             }
             else

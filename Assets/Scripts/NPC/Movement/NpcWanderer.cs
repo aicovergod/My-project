@@ -30,6 +30,7 @@ namespace NPC
         [Header("Chasing")]
         [Tooltip("Maximum distance from the spawn position that the NPC may chase a target.")]
         public float chaseRadius = 5f;
+        public float AggroRadius => chaseRadius;
 
         [Header("Visuals")]
         [Tooltip("Component handling sprite animation/animator updates.")]
@@ -47,6 +48,27 @@ namespace NPC
         private Vector2 _from;
         private Vector2 _to;
         private float _lerpTime;
+
+        private float ComputeChaseRadius()
+        {
+            if (useAreaSize)
+            {
+                Vector2 half = areaSize * 0.5f;
+                return half.magnitude;
+            }
+
+            Vector2[] corners = new Vector2[4]
+            {
+                minOffset,
+                maxOffset,
+                new Vector2(minOffset.x, maxOffset.y),
+                new Vector2(maxOffset.x, minOffset.y)
+            };
+            float max = 0f;
+            foreach (var c in corners)
+                max = Mathf.Max(max, c.magnitude);
+            return max;
+        }
 
         private void Reset()
         {
@@ -68,9 +90,7 @@ namespace NPC
             _from = _to = _origin;
             _lerpTime = Ticker.TickDuration;
 
-            var combatant = GetComponent<NpcCombatant>();
-            if (combatant != null && combatant.Profile != null)
-                chaseRadius = combatant.Profile.AggroRange;
+            chaseRadius = ComputeChaseRadius();
 
             BeginIdle();
         }
@@ -80,6 +100,7 @@ namespace NPC
             _origin = origin;
             _lastPos = origin;
             _from = _to = origin;
+            chaseRadius = ComputeChaseRadius();
         }
 
         private void OnEnable()
