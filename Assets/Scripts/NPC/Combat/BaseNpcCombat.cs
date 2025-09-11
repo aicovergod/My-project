@@ -101,6 +101,7 @@ namespace NPC
             if (playerTarget == null)
                 playerTarget = FindObjectOfType<PlayerCombatTarget>();
 
+            float aggroRadius = wanderer != null ? wanderer.AggroRadius : 5f;
             float npcChaseDist = Vector2.Distance(transform.position, spawnPosition);
             foreach (var t in new List<CombatTarget>(threatLevels.Keys))
             {
@@ -108,7 +109,7 @@ namespace NPC
                 if (!remove)
                 {
                     float targetDist = Vector2.Distance(t.transform.position, spawnPosition);
-                    if (targetDist > profile.AggroRange)
+                    if (targetDist > aggroRadius)
                     {
                         float last;
                         if (!lastDamageTimes.TryGetValue(t, out last))
@@ -132,7 +133,7 @@ namespace NPC
 
             if (threatLevels.Count == 0 &&
                 activeAttacks.Count == 0 &&
-                npcChaseDist > profile.AggroRange)
+                npcChaseDist > aggroRadius)
             {
                 // Without targets, send the NPC back toward its spawn when it has wandered too far.
                 ResetCombatState();
@@ -147,7 +148,7 @@ namespace NPC
             if (playerTarget != null && playerTarget.IsAlive)
             {
                 float playerDist = Vector2.Distance(playerTarget.transform.position, spawnPosition);
-                if (playerDist <= profile.AggroRange)
+                if (playerDist <= aggroRadius)
                     potentials.Add(playerTarget);
             }
 
@@ -162,7 +163,7 @@ namespace NPC
                     if (otherFaction == null || !myFaction.IsEnemy(otherFaction.Faction))
                         continue;
                     float dist = Vector2.Distance(npc.transform.position, spawnPosition);
-                    if (dist <= profile.AggroRange)
+                    if (dist <= aggroRadius)
                         potentials.Add(npc);
                 }
             }
@@ -246,8 +247,9 @@ namespace NPC
             while (combatant.IsAlive && target != null && target.IsAlive)
             {
                 var profile = combatant.Profile;
+                float aggroRadius = wanderer != null ? wanderer.AggroRadius : 5f;
                 float spawnDist = Vector2.Distance(target.transform.position, spawnPosition);
-                if (spawnDist > profile.AggroRange)
+                if (spawnDist > aggroRadius)
                 {
                     float last;
                     if (!lastDamageTimes.TryGetValue(target, out last))
