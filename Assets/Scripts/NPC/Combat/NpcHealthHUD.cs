@@ -105,6 +105,8 @@ namespace NPC
                 fill.fillAmount = max > 0 ? (float)current / max : 0f;
             if (text != null)
                 text.text = $"{current}/{max}";
+            if (current <= 0)
+                HandleDeath();
         }
 
         private void HandleCombatStateChanged(bool inCombat)
