@@ -38,5 +38,8 @@ namespace Magic
 
         [Tooltip("Elemental type of this spell")]
         public SpellElement element = SpellElement.None;
+
+        [Tooltip("Order that spells appear in the spell book")]
+        public int loadOrder = 0;
     }
 }

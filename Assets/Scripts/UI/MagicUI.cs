@@ -69,6 +69,7 @@ namespace UI
             var loaded = Resources.LoadAll<SpellDefinition>("Spells");
             if (loaded != null)
                 spells.AddRange(loaded);
+            spells.Sort((a, b) => a.loadOrder.CompareTo(b.loadOrder));
             // Don't automatically select a spell on load. This allows melee
             // range to be used at spawn when no magic weapon is equipped.
             if (spells.Count > 0 && LastSelectedSpell == null)
