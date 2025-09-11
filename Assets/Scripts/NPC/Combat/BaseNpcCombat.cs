@@ -336,6 +336,10 @@ namespace NPC
                 int finalDamage = target.ApplyDamage(damage, attacker.DamageType, SpellElement.None, this);
                 var targetName = (target as MonoBehaviour)?.name ?? "target";
                 Debug.Log($"{name} dealt {finalDamage} damage to {targetName}.");
+                var applier = GetComponentInChildren<OnHitPoisonApplier>();
+                var targetMb = target as MonoBehaviour;
+                if (applier != null && targetMb != null)
+                    applier.TryApply(targetMb.gameObject, finalDamage > 0);
             }
             else
             {
