@@ -126,7 +126,7 @@ namespace NPC
             currentHp = profile != null ? profile.HitpointsLevel : 1;
             if (collider2D) collider2D.enabled = true;
             if (spriteRenderer) spriteRenderer.enabled = true;
-            GetComponent<BaseNpcCombat>()?.ResetCombatState();
+            GetComponent<BaseNpcCombat>()?.ResetCombatState(true);
             ResetDamageCounters();
             OnHealthChanged?.Invoke(currentHp, MaxHP);
         }
