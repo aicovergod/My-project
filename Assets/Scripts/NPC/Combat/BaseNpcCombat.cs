@@ -94,7 +94,7 @@ namespace NPC
         protected virtual void Update()
         {
             var profile = combatant.Profile;
-            if (profile == null || !profile.IsAggressive)
+            if (profile == null || (!profile.IsAggressive && threatLevels.Count == 0))
                 return;
 
             if (playerTarget == null)
