@@ -94,6 +94,8 @@ namespace NPC
 
         protected virtual void Update()
         {
+            if (!combatant.IsAlive)
+                return;
             var profile = combatant.Profile;
             if (profile == null || (!profile.IsAggressive && threatLevels.Count == 0))
                 return;
@@ -223,6 +225,8 @@ namespace NPC
 
         public virtual void BeginAttacking(CombatTarget target)
         {
+            if (!combatant.IsAlive)
+                return;
             if (target == null || activeAttacks.ContainsKey(target))
                 return;
             if (activeAttacks.Count == 0)
