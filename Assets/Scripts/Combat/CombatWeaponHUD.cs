@@ -1,5 +1,6 @@
 using UnityEngine;
 using Inventory;
+using UI;
 
 namespace Combat
 {
@@ -14,6 +15,7 @@ namespace Combat
         private GameObject weaponRoot;
         private SpriteRenderer weaponRenderer;
         private readonly Vector3 offset = new Vector3(0f, 0.75f, 0f);
+        private bool spellActiveLastFrame;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreateInstance()
@@ -49,28 +51,19 @@ namespace Combat
 
         private void HandleTargetChanged(CombatTarget newTarget)
         {
-            if (newTarget != null)
-            {
-                target = newTarget.transform;
-                var entry = equipment != null ? equipment.GetEquipped(EquipmentSlot.Weapon) : default;
-                if (entry.item != null && entry.item.icon != null)
-                {
-                    weaponRenderer.sprite = entry.item.icon;
-                    weaponRoot.SetActive(true);
-                }
-            }
-            else
-            {
-                target = null;
-                if (weaponRenderer != null)
-                    weaponRenderer.sprite = null;
-                if (weaponRoot != null)
-                    weaponRoot.SetActive(false);
-            }
+            target = newTarget != null ? newTarget.transform : null;
+            RefreshWeaponSprite();
         }
 
         private void Update()
         {
+            bool spellActive = MagicUI.ActiveSpell != null;
+            if (spellActive != spellActiveLastFrame)
+            {
+                RefreshWeaponSprite();
+                spellActiveLastFrame = spellActive;
+            }
+
             if (target != null && weaponRoot != null && weaponRoot.activeSelf)
                 weaponRoot.transform.position = target.position + offset;
         }
@@ -85,22 +78,34 @@ namespace Combat
 
         private void HandleEquipmentChanged(EquipmentSlot slot)
         {
-            if (slot != EquipmentSlot.Weapon || target == null)
+            if (slot != EquipmentSlot.Weapon)
                 return;
+
+            RefreshWeaponSprite();
+        }
+
+        private void RefreshWeaponSprite()
+        {
+            if (weaponRenderer == null || weaponRoot == null)
+                return;
+
+            if (target == null || MagicUI.ActiveSpell != null)
+            {
+                weaponRenderer.sprite = null;
+                weaponRoot.SetActive(false);
+                return;
+            }
 
             var entry = equipment != null ? equipment.GetEquipped(EquipmentSlot.Weapon) : default;
             if (entry.item != null && entry.item.icon != null)
             {
                 weaponRenderer.sprite = entry.item.icon;
-                if (weaponRoot != null)
-                    weaponRoot.SetActive(true);
+                weaponRoot.SetActive(true);
             }
             else
             {
-                if (weaponRenderer != null)
-                    weaponRenderer.sprite = null;
-                if (weaponRoot != null)
-                    weaponRoot.SetActive(false);
+                weaponRenderer.sprite = null;
+                weaponRoot.SetActive(false);
             }
         }
     }
