@@ -81,7 +81,7 @@ namespace Status.Poison
         /// </summary>
         private bool DealTrueDamageBridge(int amount)
         {
-            stats?.ApplyDamage(amount, DamageType.Magic, SpellElement.None, this);
+            stats?.ApplyDamage(amount, DamageType.Poison, SpellElement.None, this);
             return true;
         }
     }

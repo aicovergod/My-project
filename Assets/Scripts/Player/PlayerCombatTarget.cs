@@ -15,6 +15,7 @@ namespace Player
         private Sprite damageHitsplat;
         private Sprite zeroHitsplat;
         private Sprite burnHitsplat;
+        private Sprite poisonHitsplat;
         private Dictionary<SpellElement, Sprite> elementHitsplats;
 
         private void Awake()
@@ -23,6 +24,7 @@ namespace Player
             damageHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat");
             zeroHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Zero_damage_hitsplat");
             burnHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Burn_hitsplat");
+            poisonHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Poison_hitsplat");
             elementHitsplats = new Dictionary<SpellElement, Sprite>
             {
                 { SpellElement.Air, Resources.Load<Sprite>("Sprites/HitSplats/Air_hitsplat") },
@@ -48,6 +50,8 @@ namespace Player
                 sprite = zeroHitsplat;
             else if (type == DamageType.Burn)
                 sprite = burnHitsplat;
+            else if (type == DamageType.Poison)
+                sprite = poisonHitsplat;
             else if (type == DamageType.Magic && elementHitsplats != null && elementHitsplats.TryGetValue(element, out var elemSprite) && elemSprite != null)
             {
                 sprite = elemSprite;
