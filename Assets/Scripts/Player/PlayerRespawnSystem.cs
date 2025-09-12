@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using Core;
 using World;
 using Combat;
+using Status.Poison;
 
 namespace Player
 {
@@ -17,6 +18,7 @@ namespace Player
         private PlayerHitpoints hitpoints;
         private PlayerMover playerMover;
         private CombatController combatController;
+        private PoisonController poisonController;
         private bool isRespawning;
 
         private void Awake()
@@ -60,12 +62,14 @@ namespace Player
                 hitpoints = playerObj.GetComponent<PlayerHitpoints>();
                 playerMover = playerObj.GetComponent<PlayerMover>();
                 combatController = playerObj.GetComponent<CombatController>();
+                poisonController = playerObj.GetComponent<PoisonController>();
             }
             else
             {
                 hitpoints = null;
                 playerMover = null;
                 combatController = null;
+                poisonController = null;
             }
             if (hitpoints != null)
                 hitpoints.OnHealthChanged += HandleHealthChanged;
@@ -77,6 +81,7 @@ namespace Player
             {
                 playerMover?.StopMovement();
                 combatController?.CancelCombat();
+                poisonController?.CurePoison(0f);
                 StartCoroutine(RespawnRoutine());
             }
         }
