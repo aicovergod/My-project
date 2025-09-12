@@ -4,6 +4,7 @@ using Combat;
 using MyGame.Drops;
 using Player;
 using Pets;
+using UI;
 
 namespace NPC
 {
@@ -20,6 +21,7 @@ namespace NPC
         private NpcWanderer wanderer;
         private int playerDamage;
         private int npcDamage;
+        private Sprite poisonHitsplat;
 
         public event System.Action<int, int> OnHealthChanged; // current, max
         public event System.Action OnDeath;
@@ -44,6 +46,7 @@ namespace NPC
             wanderer = GetComponent<NpcWanderer>();
             ResetDamageCounters();
             OnHealthChanged?.Invoke(currentHp, MaxHP);
+            poisonHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Poison_hitsplat");
         }
 
         /// <summary>Apply damage to this NPC.</summary>
@@ -67,6 +70,8 @@ namespace NPC
             currentHp = Mathf.Max(0, currentHp - finalAmount);
             Debug.Log($"{name} took {finalAmount} damage ({currentHp}/{MaxHP}).");
             OnHealthChanged?.Invoke(currentHp, MaxHP);
+            if (type == DamageType.Poison && poisonHitsplat != null)
+                FloatingText.Show(finalAmount.ToString(), transform.position, Color.white, null, poisonHitsplat);
             var combatSource = source as CombatTarget;
             bool creditedToPlayer = false;
             if (combatSource != null)

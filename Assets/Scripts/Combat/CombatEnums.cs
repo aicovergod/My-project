@@ -10,7 +10,8 @@ namespace Combat
         Melee,
         Ranged,
         Magic,
-        Burn
+        Burn,
+        Poison
     }
 
     /// <summary>
