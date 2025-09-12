@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using NPC;
+using Status.Poison;
 
 namespace Combat
 {
@@ -46,6 +47,12 @@ namespace Combat
         /// Faction that this NPC belongs to. Defaults to <see cref="FactionId.Neutral"/>.
         /// </summary>
         public FactionId Faction = FactionId.Neutral;
+
+        [Header("Poison")]
+        public bool IsPoisonous;
+        public PoisonConfig OnHitPoison;
+        [Range(0f, 1f)] public float PoisonChance = 0.25f;
+        public bool PoisonRequiresDamage = true;
 
         public List<ElementalModifier> elementalModifiers = new();
     }

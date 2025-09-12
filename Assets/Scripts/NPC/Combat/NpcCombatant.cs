@@ -47,6 +47,16 @@ namespace NPC
             ResetDamageCounters();
             OnHealthChanged?.Invoke(currentHp, MaxHP);
             poisonHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Poison_hitsplat");
+
+            if (profile != null && profile.IsPoisonous && profile.OnHitPoison != null)
+            {
+                var applier = GetComponent<OnHitPoisonApplier>();
+                if (applier == null)
+                    applier = gameObject.AddComponent<OnHitPoisonApplier>();
+                applier.poison = profile.OnHitPoison;
+                applier.applyChance = profile.PoisonChance;
+                applier.requiresDamage = profile.PoisonRequiresDamage;
+            }
         }
 
         /// <summary>Apply damage to this NPC.</summary>
