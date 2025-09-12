@@ -96,6 +96,21 @@ namespace Player
 
             var entry = equipment != null ? equipment.GetEquipped(EquipmentSlot.Weapon) : default;
             var weapon = entry.item;
+
+            var poisonApplier = GetComponent<OnHitPoisonApplier>();
+            if (weapon != null && weapon.onHitPoison != null)
+            {
+                if (poisonApplier == null)
+                    poisonApplier = gameObject.AddComponent<OnHitPoisonApplier>();
+                poisonApplier.poison = weapon.onHitPoison;
+                poisonApplier.applyChance = weapon.poisonApplyChance;
+                poisonApplier.requiresDamage = weapon.poisonRequiresDamage;
+            }
+            else if (poisonApplier != null)
+            {
+                Destroy(poisonApplier);
+            }
+
             if (weapon != null)
             {
                 if (weapon.combat.Magic > 0)
