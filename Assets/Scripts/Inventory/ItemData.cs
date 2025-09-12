@@ -3,6 +3,7 @@ using UnityEngine;
 using Items;
 using Skills;
 using Skills.Fishing;
+using Status.Poison;
 
 namespace Inventory
 {
@@ -120,5 +121,15 @@ namespace Inventory
 
         [Header("Combat")]
         public ItemCombatStats combat = ItemCombatStats.Default;
+
+        [Header("Poison")]
+        public PoisonConfig onHitPoison;
+
+        [Range(0f, 1f)]
+        [Tooltip("Chance that the poison is applied on a successful hit.")]
+        public float poisonApplyChance = 0.25f;
+
+        [Tooltip("Only apply poison if the hit dealt damage.")]
+        public bool poisonRequiresDamage = true;
     }
 }
