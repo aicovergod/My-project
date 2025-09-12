@@ -73,7 +73,26 @@ namespace Status.Poison
             if (immunityTimer > 0f)
                 immunityTimer = Mathf.Max(0f, immunityTimer - Time.deltaTime);
             if (active != null)
-                active.Tick(Time.deltaTime, DealTrueDamageBridge);
+            {
+                if (stats != null && stats.IsAlive)
+                {
+                    active.Tick(Time.deltaTime, DealTrueDamageBridge);
+                }
+                else
+                {
+                    active.ForceEnd();
+                    active = null;
+                }
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (active != null)
+            {
+                active.ForceEnd();
+                active = null;
+            }
         }
 
         /// <summary>
