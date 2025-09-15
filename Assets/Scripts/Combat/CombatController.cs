@@ -22,9 +22,12 @@ namespace Combat
         public event System.Action<CombatTarget> OnTargetKilled;
         public event System.Action<CombatTarget> OnCombatTargetChanged;
 
+        private const float TILE_SIZE = 1f;
+
         private SkillManager skills;
         private PlayerHitpoints hitpoints;
         private EquipmentAggregator equipment;
+        private Inventory.Equipment equipmentComponent;
         private Player.PlayerCombatLoadout loadout;
         private PlayerCombatBinder combatBinder;
         private PlayerMover mover;
@@ -49,6 +52,7 @@ namespace Combat
             skills = GetComponent<SkillManager>() ?? GetComponentInParent<SkillManager>() ?? GetComponentInChildren<SkillManager>();
             hitpoints = GetComponent<PlayerHitpoints>() ?? GetComponentInParent<PlayerHitpoints>() ?? GetComponentInChildren<PlayerHitpoints>();
             equipment = GetComponent<EquipmentAggregator>() ?? GetComponentInParent<EquipmentAggregator>() ?? GetComponentInChildren<EquipmentAggregator>();
+            equipmentComponent = GetComponent<Inventory.Equipment>() ?? GetComponentInParent<Inventory.Equipment>() ?? GetComponentInChildren<Inventory.Equipment>();
             loadout = GetComponent<Player.PlayerCombatLoadout>() ?? GetComponentInParent<Player.PlayerCombatLoadout>() ?? GetComponentInChildren<Player.PlayerCombatLoadout>();
             combatBinder = GetComponent<PlayerCombatBinder>() ?? GetComponentInParent<PlayerCombatBinder>() ?? GetComponentInChildren<PlayerCombatBinder>();
             mover = GetComponent<PlayerMover>() ?? GetComponentInParent<PlayerMover>() ?? GetComponentInChildren<PlayerMover>();
@@ -247,14 +251,15 @@ namespace Combat
             return stats;
         }
 
-        private void ApplyDamageResult(CombatTarget target, int damage, bool hit, int maxHit, CombatStyle style, DamageType type, SpellElement element)
+        private int ApplyDamageResult(CombatTarget target, int damage, bool hit, int maxHit, CombatStyle style, DamageType type, SpellElement element)
         {
             var targetMb = target as MonoBehaviour;
             string targetName = targetMb != null ? targetMb.name : "target";
+            int finalDamage = 0;
             if (hit)
             {
                 var source = GetComponent<Player.PlayerCombatTarget>();
-                int finalDamage = target.ApplyDamage(damage, type, element, source);
+                finalDamage = target.ApplyDamage(damage, type, element, source);
                 Sprite sprite;
                 Color textColor = Color.white;
                 if (finalDamage == 0)
@@ -289,6 +294,8 @@ namespace Combat
                 Debug.Log($"Player missed {targetName}.");
                 OnAttackLanded?.Invoke(0, false);
             }
+
+            return finalDamage;
         }
 
         private void ResolveAttack(CombatTarget target)
@@ -327,7 +334,8 @@ namespace Combat
             }
             else
             {
-                ApplyDamageResult(target, result.damage, result.hit, result.maxHit, attacker.Style, attacker.DamageType, SpellElement.None);
+                int primaryDamage = ApplyDamageResult(target, result.damage, result.hit, result.maxHit, attacker.Style, attacker.DamageType, SpellElement.None);
+                ApplyHalberdAoe(attacker, target, primaryDamage, result.maxHit);
             }
         }
 
@@ -335,6 +343,110 @@ namespace Combat
         {
             bool hit = damage > 0;
             ApplyDamageResult(target, damage, hit, pendingMaxHit, pendingStyle, pendingType, pendingElement);
+        }
+
+        private void ApplyHalberdAoe(CombatantStats attacker, CombatTarget primaryTarget, int primaryDamage, int maxHit)
+        {
+            if (equipmentComponent == null || primaryTarget == null || primaryDamage <= 0)
+                return;
+
+            Inventory.InventoryEntry weaponEntry = equipmentComponent.GetEquipped(Inventory.EquipmentSlot.Weapon);
+            var weaponData = weaponEntry.item;
+            if (weaponData == null || !weaponData.isHalberd)
+                return;
+
+            if (weaponData.aoeRadiusTiles <= 0f || weaponData.aoeMultiplier <= 0f || weaponData.aoeMaxTargets <= 0)
+                return;
+
+            float radiusTiles = weaponData.aoeRadiusTiles;
+            float radius = radiusTiles * TILE_SIZE;
+            if (radius <= 0f)
+                return;
+
+            Vector2 origin = transform.position;
+            Vector2 forward = FacingDirToVector(mover != null ? mover.FacingDir : 0);
+            if (forward.sqrMagnitude <= Mathf.Epsilon)
+                forward = Vector2.down;
+
+            float maxAngle = weaponData.coneAngleDeg > 0f ? weaponData.coneAngleDeg * 0.5f : 180f;
+            int layerMask = LayerMask.GetMask("NPC", "Enemy", "Hostile");
+            if (layerMask == 0)
+                layerMask = ~LayerMask.GetMask("Player", "UI", "Pets");
+
+            Collider2D[] hits = Physics2D.OverlapCircleAll(origin, radius, layerMask);
+            if (hits == null || hits.Length == 0)
+                return;
+
+            var processedTargets = new HashSet<CombatTarget> { primaryTarget };
+            var playerTarget = GetComponent<Player.PlayerCombatTarget>();
+            int applied = 0;
+
+            foreach (var hit in hits)
+            {
+                if (applied >= weaponData.aoeMaxTargets)
+                    break;
+                if (hit == null)
+                    continue;
+
+                CombatTarget otherTarget = hit.GetComponent<CombatTarget>() ?? hit.GetComponentInParent<CombatTarget>();
+                if (otherTarget == null || processedTargets.Contains(otherTarget) || !otherTarget.IsAlive)
+                    continue;
+
+                if (otherTarget == primaryTarget || otherTarget == playerTarget)
+                    continue;
+
+                if (otherTarget is PetCombatController)
+                    continue;
+
+                Vector2 toTarget = (Vector2)otherTarget.transform.position - origin;
+                float distanceWorld = toTarget.magnitude;
+                if (distanceWorld <= Mathf.Epsilon)
+                    continue;
+
+                float distanceTiles = distanceWorld / TILE_SIZE;
+                if (distanceTiles > radiusTiles)
+                    continue;
+
+                float angleDeg = Vector2.Angle(forward, toTarget);
+                if (angleDeg > maxAngle)
+                    continue;
+
+                float falloffAngle = Mathf.Max(0f, Mathf.Cos(angleDeg * Mathf.Deg2Rad));
+                if (falloffAngle <= 0f)
+                    continue;
+
+                float falloffDist = Mathf.Clamp01(1f - (distanceTiles / radiusTiles));
+                if (falloffDist <= 0f)
+                    continue;
+
+                float scaledDamage = primaryDamage * weaponData.aoeMultiplier * falloffAngle * falloffDist;
+                int secondaryDamage = Mathf.CeilToInt(scaledDamage);
+                if (secondaryDamage <= 0)
+                    continue;
+
+                int minDamage = Mathf.CeilToInt(primaryDamage * 0.15f);
+                int maxDamageClamp = Mathf.CeilToInt(primaryDamage * 0.80f);
+                secondaryDamage = Mathf.Clamp(secondaryDamage, minDamage, maxDamageClamp);
+
+                ApplyDamageResult(otherTarget, secondaryDamage, secondaryDamage > 0, maxHit, attacker.Style, attacker.DamageType, SpellElement.None);
+                processedTargets.Add(otherTarget);
+                applied++;
+            }
+        }
+
+        private static Vector2 FacingDirToVector(int facingDir)
+        {
+            switch (facingDir)
+            {
+                case 1:
+                    return Vector2.left;
+                case 2:
+                    return Vector2.right;
+                case 3:
+                    return Vector2.up;
+                default:
+                    return Vector2.down;
+            }
         }
 
         private void AwardXp(int damage, CombatStyle style, DamageType type)
