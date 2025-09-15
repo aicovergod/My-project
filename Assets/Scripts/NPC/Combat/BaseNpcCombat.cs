@@ -287,7 +287,7 @@ namespace NPC
                 var loadout = playerTarget.GetComponent<PlayerCombatLoadout>();
                 defender = CombatantStats.ForPlayer(skills, equipment,
                     loadout != null ? loadout.Style : CombatStyle.Defensive,
-                    DamageType.Melee);
+                    attacker.DamageType);
             }
             else
             {
@@ -302,10 +302,28 @@ namespace NPC
                 };
             }
 
-            int attEff = CombatMath.GetEffectiveAttack(attacker.AttackLevel, attacker.Style);
+            defender.DamageType = attacker.DamageType;
+
+            int attEff;
+            int attackBonus;
+            switch (attacker.DamageType)
+            {
+                case DamageType.Magic:
+                    attEff = CombatMath.GetEffectiveAttack(attacker.MagicLevel, CombatStyle.Accurate);
+                    attackBonus = attacker.Equip.magic;
+                    break;
+                case DamageType.Ranged:
+                    attEff = CombatMath.GetEffectiveAttack(attacker.AttackLevel, attacker.Style);
+                    attackBonus = attacker.Equip.range;
+                    break;
+                default:
+                    attEff = CombatMath.GetEffectiveAttack(attacker.AttackLevel, attacker.Style);
+                    attackBonus = attacker.Equip.attack;
+                    break;
+            }
             int defEff = CombatMath.GetEffectiveDefence(defender.DefenceLevel, defender.Style);
-            int atkRoll = CombatMath.GetAttackRoll(attEff, attacker.Equip.attack);
-            int defBonus = defender.DamageType switch
+            int atkRoll = CombatMath.GetAttackRoll(attEff, attackBonus);
+            int defBonus = attacker.DamageType switch
             {
                 DamageType.Magic => defender.Equip.magicDef,
                 DamageType.Ranged => defender.Equip.rangeDef,
@@ -313,7 +331,25 @@ namespace NPC
             };
             int defRoll = CombatMath.GetDefenceRoll(defEff, defBonus);
             bool hit = Random.value < CombatMath.ChanceToHit(atkRoll, defRoll);
-            int damage = 0;
+            int maxHit;
+            switch (attacker.DamageType)
+            {
+                case DamageType.Magic:
+                    maxHit = CombatMath.GetMaxHit(attEff, attacker.Equip.magic);
+                    break;
+                case DamageType.Ranged:
+                {
+                    int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
+                    maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.range);
+                    break;
+                }
+                default:
+                {
+                    int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
+                    maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
+                    break;
+                }
+            }
 
             npcFacing?.FaceTarget(target.transform);
             var animator = npcFacing?.Animator;
@@ -330,9 +366,7 @@ namespace NPC
 
             if (hit)
             {
-                int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
-                int maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
-                damage = CombatMath.RollDamage(maxHit);
+                int damage = CombatMath.RollDamage(maxHit);
                 int finalDamage = target.ApplyDamage(damage, attacker.DamageType, SpellElement.None, this);
                 var targetName = (target as MonoBehaviour)?.name ?? "target";
                 Debug.Log($"{name} dealt {finalDamage} damage to {targetName}.");
