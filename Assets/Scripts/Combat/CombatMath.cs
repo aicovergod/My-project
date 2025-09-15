@@ -10,8 +10,6 @@ namespace Combat
         /// <summary>Seconds per OSRS tick.</summary>
         public const float TICK_SECONDS = 0.6f;
 
-        public const float MIN_HIT_CHANCE = 0.25f;
-
         /// <summary>Maximum distance allowed for melee combat.</summary>
         public const float MELEE_RANGE = 1.5f;
 
@@ -68,7 +66,7 @@ namespace Combat
                 chance = 1f - (defenceRoll + 2f) / (2f * (attackRoll + 1f));
             else
                 chance = attackRoll / (2f * (defenceRoll + 1f));
-            return Mathf.Clamp(chance, MIN_HIT_CHANCE, 1f);
+            return chance;
         }
 
         public static int GetMaxHit(int effectiveStrength, int strengthBonus)

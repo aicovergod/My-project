@@ -175,15 +175,7 @@ namespace Combat
 
         private DamageResult CalculateDamage(CombatantStats attacker, CombatTarget target)
         {
-            var defender = new CombatantStats
-            {
-                AttackLevel = 1,
-                StrengthLevel = 1,
-                DefenceLevel = 1,
-                Equip = new EquipmentAggregator.CombinedStats(),
-                Style = CombatStyle.Defensive,
-                DamageType = target.PreferredDefenceType
-            };
+            var defender = GetDefenderStats(target, attacker);
 
             int attEff = attacker.DamageType == DamageType.Magic
                 ? CombatMath.GetEffectiveAttack(attacker.MagicLevel, CombatStyle.Accurate)
@@ -192,7 +184,7 @@ namespace Combat
             int atkRoll = attacker.DamageType == DamageType.Magic
                 ? CombatMath.GetAttackRoll(attEff, attacker.Equip.magic)
                 : CombatMath.GetAttackRoll(attEff, attacker.Equip.attack);
-            int defBonus = defender.DamageType switch
+            int defBonus = attacker.DamageType switch
             {
                 DamageType.Magic => defender.Equip.magicDef,
                 DamageType.Ranged => defender.Equip.rangeDef,
@@ -212,6 +204,47 @@ namespace Combat
             }
             int damage = hit ? CombatMath.RollDamage(maxHit) : 0;
             return new DamageResult { damage = damage, hit = hit, maxHit = maxHit };
+        }
+
+        private CombatantStats GetDefenderStats(CombatTarget target, CombatantStats attacker)
+        {
+            CombatantStats stats = null;
+            DamageType incomingType = attacker != null ? attacker.DamageType : DamageType.Melee;
+
+            if (target is NpcCombatant npc)
+            {
+                stats = npc.GetCombatantStats();
+            }
+            else if (target is PlayerCombatTarget playerTarget)
+            {
+                stats = playerTarget.GetCombatantStats();
+            }
+            else if (target is MonoBehaviour targetBehaviour)
+            {
+                var profile = targetBehaviour.GetComponent<ICombatProfile>();
+                if (profile != null)
+                    stats = profile.GetCombatStats();
+            }
+
+            if (stats == null)
+            {
+                stats = new CombatantStats
+                {
+                    AttackLevel = 1,
+                    StrengthLevel = 1,
+                    DefenceLevel = 1,
+                    MagicLevel = 1,
+                    Equip = new EquipmentAggregator.CombinedStats(),
+                    Style = CombatStyle.Defensive,
+                    DamageType = target != null ? target.PreferredDefenceType : incomingType
+                };
+            }
+            else
+            {
+                stats.DamageType = incomingType;
+            }
+
+            return stats;
         }
 
         private void ApplyDamageResult(CombatTarget target, int damage, bool hit, int maxHit, CombatStyle style, DamageType type, SpellElement element)

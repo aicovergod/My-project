@@ -2,6 +2,8 @@ using UnityEngine;
 using Combat;
 using UI;
 using System.Collections.Generic;
+using EquipmentSystem;
+using Skills;
 
 namespace Player
 {
@@ -40,6 +42,22 @@ namespace Player
         public DamageType PreferredDefenceType => DamageType.Melee;
         public int CurrentHP => hitpoints.CurrentHp;
         public int MaxHP => hitpoints.MaxHp;
+
+        /// <summary>Get combat stats representing the player's current defensive state.</summary>
+        public CombatantStats GetCombatantStats()
+        {
+            var binder = GetComponent<PlayerCombatBinder>();
+            if (binder != null)
+                return binder.GetCombatantStats();
+
+            var loadout = GetComponent<PlayerCombatLoadout>();
+            if (loadout != null)
+                return loadout.GetCombatantStats();
+
+            var skills = GetComponent<SkillManager>();
+            var equipment = GetComponent<EquipmentAggregator>();
+            return CombatantStats.ForPlayer(skills, equipment, CombatStyle.Defensive, PreferredDefenceType);
+        }
 
         public int ApplyDamage(int amount, DamageType type, SpellElement element, object source)
         {
