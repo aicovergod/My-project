@@ -131,5 +131,12 @@ namespace Inventory
 
         [Tooltip("Only apply poison if the hit dealt damage.")]
         public bool poisonRequiresDamage = true;
+
+        [Header("Halberd AOE")]
+        public bool isHalberd = false;
+        public float aoeRadiusTiles = 0f;
+        public float coneAngleDeg = 0f;
+        public int aoeMaxTargets = 0;
+        public float aoeMultiplier = 0f;
     }
 }
