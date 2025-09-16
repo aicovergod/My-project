@@ -90,12 +90,12 @@ namespace World
             SceneTransitionManager.UnregisterPersistentObject(this);
         }
 
-        public void OnBeforeSceneUnload()
+        public virtual void OnBeforeSceneUnload()
         {
             DontDestroyOnLoad(gameObject);
         }
 
-        public void OnAfterSceneLoad(Scene scene)
+        public virtual void OnAfterSceneLoad(Scene scene)
         {
             SceneManager.MoveGameObjectToScene(gameObject, scene);
         }
