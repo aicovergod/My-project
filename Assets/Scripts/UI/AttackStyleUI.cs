@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Combat;
 using Player;
+using World;
 
 namespace UI
 {
@@ -27,6 +28,9 @@ namespace UI
                 return;
 
             var go = new GameObject("AttackStyleUI");
+            // Ensure the UI survives scene loads and is tracked by the transition system so it
+            // can be re-parented into the active scene after a door transition.
+            go.AddComponent<ScenePersistentObject>();
             UnityEngine.Object.DontDestroyOnLoad(go);
             go.AddComponent<AttackStyleUI>();
         }

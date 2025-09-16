@@ -15,7 +15,7 @@ namespace Player
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(SpriteRenderer))]
-    public class PlayerMover : MonoBehaviour, IScenePersistent
+    public class PlayerMover : ScenePersistentObject
     {
         [Header("Movement")]
         public float moveSpeed = 3.5f;
@@ -75,8 +75,10 @@ namespace Player
         private InputAction moveAction;
 #endif
 
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             // Destroy any duplicate player instances that might exist in
             // newly loaded scenes before they can register themselves as
             // persistent objects.  This prevents two players from
@@ -109,7 +111,6 @@ namespace Player
 
             SceneTransitionManager.TransitionStarted += OnTransitionStarted;
             SceneTransitionManager.TransitionCompleted += OnTransitionCompleted;
-            SceneTransitionManager.RegisterPersistentObject(this);
         }
 
 #if ENABLE_INPUT_SYSTEM
@@ -151,7 +152,6 @@ namespace Player
 
             SceneTransitionManager.TransitionStarted -= OnTransitionStarted;
             SceneTransitionManager.TransitionCompleted -= OnTransitionCompleted;
-            SceneTransitionManager.UnregisterPersistentObject(this);
         }
 
         void Update()
@@ -480,13 +480,15 @@ namespace Player
                 transform.position = new Vector3(data.x, data.y, data.z);
         }
 
-        public void OnBeforeSceneUnload()
+        public override void OnBeforeSceneUnload()
         {
-            DontDestroyOnLoad(gameObject);
+            base.OnBeforeSceneUnload();
         }
 
-        public void OnAfterSceneLoad(Scene scene)
+        public override void OnAfterSceneLoad(Scene scene)
         {
+            base.OnAfterSceneLoad(scene);
+
             var spawnId = SceneTransitionManager.NextSpawnPoint;
             if (!string.IsNullOrEmpty(spawnId))
             {
@@ -501,7 +503,6 @@ namespace Player
                 }
             }
 
-            SceneManager.MoveGameObjectToScene(gameObject, scene);
             var players = GameObject.FindGameObjectsWithTag("Player");
             foreach (var p in players)
             {
