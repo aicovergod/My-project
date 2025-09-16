@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1275879031103303567}
+  - component: {fileID: 1313131313131313131}
   - component: {fileID: 312706842149785227}
   - component: {fileID: 7099375072489141131}
   m_Layer: 0
@@ -79,3 +80,15 @@ MonoBehaviour:
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
   m_ScrollDeltaPerTick: 6
+--- !u!114 &1313131313131313131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2419982046797033590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a23b760b7356ac141a5ff9fe31e13251, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:

@@ -5,6 +5,7 @@ using Inventory;
 using Player;
 using NPC;
 using UI;
+using World;
 
 namespace ShopSystem
 {
@@ -12,7 +13,7 @@ namespace ShopSystem
     /// Runtime generated shop UI used to display items for sale.
     /// </summary>
     [DisallowMultipleComponent]
-    public class ShopUI : MonoBehaviour, IUIWindow
+    public class ShopUI : ScenePersistentObject, IUIWindow
     {
         [Header("Layout")]
         public Vector2 slotSize = new Vector2(32, 32);
@@ -49,7 +50,7 @@ namespace ShopSystem
 
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
 
-        private void Awake()
+        protected override void Awake()
         {
             if (instance != null && instance != this)
             {
@@ -58,6 +59,7 @@ namespace ShopSystem
             }
 
             instance = this;
+            base.Awake();
             DontDestroyOnLoad(gameObject);
 
             if (sharedUIRoot == null)

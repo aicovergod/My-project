@@ -11,7 +11,7 @@ namespace Player
     /// <summary>
     /// Listens for player death and handles respawning with a screen fade.
     /// </summary>
-    public class PlayerRespawnSystem : MonoBehaviour
+    public class PlayerRespawnSystem : ScenePersistentObject
     {
         public static PlayerRespawnSystem Instance { get; private set; }
 
@@ -21,7 +21,7 @@ namespace Player
         private PoisonController poisonController;
         private bool isRespawning;
 
-        private void Awake()
+        protected override void Awake()
         {
             if (Instance != null && Instance != this)
             {
@@ -30,6 +30,7 @@ namespace Player
             }
 
             Instance = this;
+            base.Awake();
             DontDestroyOnLoad(gameObject);
         }
 

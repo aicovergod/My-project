@@ -1,11 +1,12 @@
 ﻿// Assets/Scripts/Camera/CameraFollow2D.cs
 
 using UnityEngine;
+using World;
 
 namespace Player
 {
     [RequireComponent(typeof(Camera))]
-    public class CameraFollow2D : MonoBehaviour
+    public class CameraFollow2D : ScenePersistentObject
     {
         public Transform target;
         public Vector2 offset = Vector2.zero;
@@ -23,8 +24,9 @@ namespace Player
         private Vector3 velocity;
         private Camera cam;
 
-        void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             cam = GetComponent<Camera>();
             DontDestroyOnLoad(gameObject);
         }

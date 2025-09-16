@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using World;
 
 namespace Inventory
 {
@@ -8,7 +9,7 @@ namespace Inventory
     /// fast lookup by item id. The database will initialize itself on first use
     /// so callers do not need to ensure the component exists ahead of time.
     /// </summary>
-    public class ItemDatabase : MonoBehaviour
+    public class ItemDatabase : ScenePersistentObject
     {
         private static ItemDatabase instance;
         private readonly Dictionary<string, ItemData> items = new();
@@ -38,7 +39,7 @@ namespace Inventory
             return item;
         }
 
-        private void Awake()
+        protected override void Awake()
         {
             // Singleton enforcement.
             if (instance != null && instance != this)
@@ -48,6 +49,7 @@ namespace Inventory
             }
 
             instance = this;
+            base.Awake();
             DontDestroyOnLoad(gameObject);
 
             var loadedItems = Resources.LoadAll<ItemData>("Item");

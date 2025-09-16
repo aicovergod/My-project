@@ -1,24 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
+using World;
 
 namespace Util
 {
     /// <summary>
     /// Fires an event every OSRS-style tick (0.6 seconds).
     /// </summary>
-    public class Ticker : MonoBehaviour
+    public class Ticker : ScenePersistentObject
     {
         public const float TickDuration = 0.6f;
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void Initialize()
-        {
-            if (Instance == null)
-            {
-                var go = new GameObject(nameof(Ticker));
-                go.AddComponent<Ticker>();
-            }
-        }
 
         public static Ticker Instance { get; private set; }
 
@@ -29,13 +20,15 @@ namespace Util
         [SerializeField]
         private bool logTicks;
 
-        private void Awake()
+        protected override void Awake()
         {
             if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
                 return;
             }
+            base.Awake();
+
             Instance = this;
             DontDestroyOnLoad(gameObject);
             Debug.Log("Ticker initialized");
