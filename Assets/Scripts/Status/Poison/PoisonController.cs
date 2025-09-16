@@ -1,5 +1,6 @@
 using UnityEngine;
 using Combat;
+using Status;
 
 namespace Status.Poison
 {
@@ -11,7 +12,10 @@ namespace Status.Poison
         [Tooltip("Stats component implementing CombatTarget for this entity.")]
         [SerializeField] private MonoBehaviour statsComponent;
 
+        private const float DefaultPoisonInterval = 15f;
+
         private CombatTarget stats;
+        private CombatController combat;
         private PoisonEffect active;
         private float immunityTimer;
 
@@ -37,6 +41,7 @@ namespace Status.Poison
         private void Awake()
         {
             stats = statsComponent as CombatTarget ?? GetComponent<CombatTarget>();
+            combat = GetComponent<CombatController>() ?? GetComponentInParent<CombatController>() ?? GetComponentInChildren<CombatController>();
         }
 
         /// <summary>
@@ -50,9 +55,10 @@ namespace Status.Poison
             {
                 active = new PoisonEffect(cfg);
                 active.OnPoisonTick += dmg => OnPoisonTick?.Invoke(dmg);
-                active.OnPoisonEnd += () => { OnPoisonEnd?.Invoke(); active = null; };
+                active.OnPoisonEnd += HandlePoisonEnded;
             }
             active.ApplyTo(stats);
+            NotifyBuffApplied(cfg);
         }
 
         /// <summary>
@@ -102,6 +108,55 @@ namespace Status.Poison
         {
             stats?.ApplyDamage(amount, DamageType.Poison, SpellElement.None, this);
             return true;
+        }
+
+        private void HandlePoisonEnded()
+        {
+            NotifyBuffRemoved(active != null ? active.Config : null);
+            OnPoisonEnd?.Invoke();
+            active = null;
+        }
+
+        private void NotifyBuffApplied(PoisonConfig cfg)
+        {
+            if (combat == null || cfg == null)
+                return;
+
+            float interval = cfg.tickIntervalSeconds > 0f ? cfg.tickIntervalSeconds : DefaultPoisonInterval;
+            string icon = !string.IsNullOrEmpty(cfg.Id) ? cfg.Id.ToLowerInvariant() : "poison";
+            var definition = new BuffTimerDefinition
+            {
+                type = BuffType.Poison,
+                displayName = "Poison",
+                iconId = icon,
+                durationSeconds = interval,
+                recurringIntervalSeconds = interval,
+                isRecurring = true,
+                showExpiryWarning = false,
+                expiryWarningTicks = 0
+            };
+            combat.ReportStatusEffectApplied(definition, cfg.Id, true);
+        }
+
+        private void NotifyBuffRemoved(PoisonConfig cfg)
+        {
+            if (combat == null)
+                return;
+
+            float interval = cfg != null && cfg.tickIntervalSeconds > 0f ? cfg.tickIntervalSeconds : DefaultPoisonInterval;
+            string icon = cfg != null && !string.IsNullOrEmpty(cfg.Id) ? cfg.Id.ToLowerInvariant() : "poison";
+            var definition = new BuffTimerDefinition
+            {
+                type = BuffType.Poison,
+                displayName = "Poison",
+                iconId = icon,
+                durationSeconds = interval,
+                recurringIntervalSeconds = interval,
+                isRecurring = true,
+                showExpiryWarning = false,
+                expiryWarningTicks = 0
+            };
+            combat.ReportStatusEffectRemoved(definition, cfg != null ? cfg.Id : null);
         }
     }
 }

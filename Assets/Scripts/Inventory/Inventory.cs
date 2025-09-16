@@ -280,6 +280,7 @@ namespace Inventory
                     }
                     UpdateSlotVisual(index);
                     OnInventoryChanged?.Invoke();
+                    ItemUseResolver.NotifyItemUsed(gameObject, item, ItemUseType.Consumed);
                     return true;
                 }
             }

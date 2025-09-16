@@ -23,12 +23,19 @@ namespace World
         private RectTransform smallMapRect;
         private RectTransform expandedMapRect;
         private Vector3 dragOffset;
+        private RectTransform borderRect;
+        private RectTransform smallRootRect;
+        private Canvas minimapCanvas;
 
         private readonly List<MinimapMarker> markers = new List<MinimapMarker>();
         private readonly Dictionary<MinimapMarker.MarkerType, Sprite> iconCache = new Dictionary<MinimapMarker.MarkerType, Sprite>();
 
         private static Minimap instance;
         public static Minimap Instance => instance;
+
+        public RectTransform BorderRect => borderRect;
+        public RectTransform SmallRootRect => smallRootRect;
+        public Canvas MinimapCanvas => minimapCanvas;
 
         private const float ZoomStep = 5f;
         private const float MinZoom = 5f;
@@ -99,6 +106,7 @@ namespace World
             canvasGO.transform.SetParent(transform, false);
             var canvas = canvasGO.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            minimapCanvas = canvas;
             var scaler = canvasGO.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
 
@@ -107,17 +115,18 @@ namespace World
 
             smallRoot = new GameObject("Small", typeof(RectTransform));
             smallRoot.transform.SetParent(canvasGO.transform, false);
-            var smallRect = smallRoot.GetComponent<RectTransform>();
-            smallRect.anchorMin = new Vector2(1f, 1f);
-            smallRect.anchorMax = new Vector2(1f, 1f);
-            smallRect.pivot = new Vector2(1f, 1f);
-            smallRect.anchoredPosition = Vector2.zero;
+            smallRootRect = smallRoot.GetComponent<RectTransform>();
+            smallRootRect.anchorMin = new Vector2(1f, 1f);
+            smallRootRect.anchorMax = new Vector2(1f, 1f);
+            smallRootRect.pivot = new Vector2(1f, 1f);
+            smallRootRect.anchoredPosition = Vector2.zero;
 
             var borderGO = new GameObject("Border", typeof(Image));
             borderGO.transform.SetParent(smallRoot.transform, false);
             var borderImg = borderGO.GetComponent<Image>();
             borderImg.color = new Color32(64, 64, 64, 255);
             var borderRect = borderImg.rectTransform;
+            this.borderRect = borderRect;
             borderRect.anchorMin = new Vector2(1f, 1f);
             borderRect.anchorMax = new Vector2(1f, 1f);
             borderRect.pivot = new Vector2(1f, 1f);
