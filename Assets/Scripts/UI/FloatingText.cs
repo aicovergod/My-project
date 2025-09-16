@@ -15,8 +15,11 @@ namespace UI
         [SerializeField, Tooltip("World-space velocity applied each frame while the text is visible.")]
         private Vector3 floatSpeed = new Vector3(0f, 1f, 0f);
 
-        [SerializeField, Tooltip("Baseline text size multiplier when no override is supplied.")]
-        private float textSize = 0.2f;
+        [SerializeField, Tooltip("Baseline text size multiplier when no override is supplied (1 = 64px font).")]
+        private float textSize = 1f;
+
+        [SerializeField, Tooltip("World-space offset applied when positioning the floating text (helps align with character height).")]
+        private Vector3 spawnOffset = new Vector3(0f, 0.75f, 0f);
 
         private Text uiText;
         private RectTransform rectTransform;
@@ -89,7 +92,8 @@ namespace UI
             if (!gameObject.activeSelf)
                 gameObject.SetActive(true);
 
-            worldPosition = position;
+            // Capture the desired world position with the configured spawn offset so text renders above the anchor point.
+            worldPosition = position + spawnOffset;
             mainCamera = Camera.main;
 
             float finalSize = Mathf.Max(0.01f, size ?? textSize);
