@@ -30,7 +30,6 @@ namespace Util
             base.Awake();
 
             Instance = this;
-            DontDestroyOnLoad(gameObject);
             Debug.Log("Ticker initialized");
         }
 

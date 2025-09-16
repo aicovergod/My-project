@@ -31,7 +31,6 @@ namespace Skills.Fishing
 
             instance = this;
             base.Awake();
-            DontDestroyOnLoad(gameObject);
         }
 
         public int GetStreak(WaterType wt)

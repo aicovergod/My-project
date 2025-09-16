@@ -42,7 +42,6 @@ namespace World
             base.Awake();
 
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
 
         public IEnumerator Transition(string sceneToLoad, string spawnPointName, string requiredItemId, bool removeItemOnUse)

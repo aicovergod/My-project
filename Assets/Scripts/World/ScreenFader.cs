@@ -27,7 +27,6 @@ namespace World
             base.Awake();
 
             Instance = this;
-            DontDestroyOnLoad(gameObject);
 
             var canvas = GetComponentInChildren<Canvas>();
             if (canvas == null)

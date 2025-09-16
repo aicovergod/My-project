@@ -60,7 +60,6 @@ namespace ShopSystem
 
             instance = this;
             base.Awake();
-            DontDestroyOnLoad(gameObject);
 
             if (sharedUIRoot == null)
                 sharedUIRoot = GameObject.Find("ShopUI");
