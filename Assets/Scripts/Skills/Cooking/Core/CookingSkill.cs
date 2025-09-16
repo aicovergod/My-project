@@ -9,6 +9,7 @@ using BankSystem;
 using Pets;
 using Skills.Outfits;
 using Core.Save;
+using Skills.Common;
 
 namespace Skills.Cooking
 {
@@ -18,7 +19,7 @@ namespace Skills.Cooking
     /// simply removes the raw item.
     /// </summary>
     [DisallowMultipleComponent]
-    public class CookingSkill : MonoBehaviour, ITickable
+    public class CookingSkill : TickedSkillBehaviour
     {
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
@@ -29,7 +30,6 @@ namespace Skills.Cooking
         private int itemsRemaining;
         private int cookProgress;
         private const int CookIntervalTicks = 5;
-        private Coroutine tickerCoroutine;
         private SkillingOutfitProgress cookingOutfit;
 
         public event Action<CookableRecipe> OnStartCooking;
@@ -59,41 +59,9 @@ namespace Skills.Cooking
             }, "CookingOutfitOwned");
         }
 
-        private void OnEnable()
-        {
-            TrySubscribeToTicker();
-        }
-
-        private void OnDisable()
-        {
-            if (Ticker.Instance != null)
-                Ticker.Instance.Unsubscribe(this);
-            if (tickerCoroutine != null)
-                StopCoroutine(tickerCoroutine);
-        }
-
         private void OnDestroy()
         {
             SaveManager.Unregister(cookingOutfit);
-        }
-
-        private void TrySubscribeToTicker()
-        {
-            if (Ticker.Instance != null)
-            {
-                Ticker.Instance.Subscribe(this);
-            }
-            else
-            {
-                tickerCoroutine = StartCoroutine(WaitForTicker());
-            }
-        }
-
-        private IEnumerator WaitForTicker()
-        {
-            while (Ticker.Instance == null)
-                yield return null;
-            Ticker.Instance.Subscribe(this);
         }
 
         public void StartCooking(CookableRecipe recipe, int quantity)
@@ -118,7 +86,7 @@ namespace Skills.Cooking
             OnStopCooking?.Invoke();
         }
 
-        public void OnTick()
+        protected override void HandleTick()
         {
             if (!IsCooking)
                 return;

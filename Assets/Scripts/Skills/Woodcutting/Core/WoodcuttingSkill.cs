@@ -6,6 +6,7 @@ using Inventory;
 using Util;
 using UI;
 using Skills;
+using Skills.Common;
 using Pets;
 using Quests;
 using BankSystem;
@@ -19,7 +20,7 @@ namespace Skills.Woodcutting
     /// Handles XP, level, and woodcutting tick logic.
     /// </summary>
     [DisallowMultipleComponent]
-    public class WoodcuttingSkill : MonoBehaviour, ITickable
+    public class WoodcuttingSkill : TickedSkillBehaviour
     {
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
@@ -68,48 +69,17 @@ namespace Skills.Woodcutting
             }, "WoodcuttingOutfitOwned");
         }
 
-        private Coroutine tickerCoroutine;
-
-        private void OnEnable()
-        {
-            TrySubscribeToTicker();
-        }
-
-        private void OnDisable()
-        {
-            if (Ticker.Instance != null)
-                Ticker.Instance.Unsubscribe(this);
-            if (tickerCoroutine != null)
-                StopCoroutine(tickerCoroutine);
-        }
-
         private void OnDestroy()
         {
             SaveManager.Unregister(woodcuttingOutfit);
         }
 
-        private void TrySubscribeToTicker()
-        {
-            if (Ticker.Instance != null)
-            {
-                Ticker.Instance.Subscribe(this);
-                Debug.Log("WoodcuttingSkill subscribed to ticker.");
-            }
-            else
-            {
-                tickerCoroutine = StartCoroutine(WaitForTicker());
-            }
-        }
+        /// <summary>
+        ///     Enables ticker logging so we can trace subscription timing during debugging sessions.
+        /// </summary>
+        protected override bool LogTickerSubscription => true;
 
-        private IEnumerator WaitForTicker()
-        {
-            while (Ticker.Instance == null)
-                yield return null;
-            Ticker.Instance.Subscribe(this);
-            Debug.Log("WoodcuttingSkill subscribed to ticker after waiting.");
-        }
-
-        public void OnTick()
+        protected override void HandleTick()
         {
             if (!IsChopping)
                 return;

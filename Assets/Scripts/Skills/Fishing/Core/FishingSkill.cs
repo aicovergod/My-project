@@ -10,11 +10,12 @@ using Core;
 using BankSystem;
 using Core.Save;
 using Skills.Outfits;
+using Skills.Common;
 
 namespace Skills.Fishing
 {
     [DisallowMultipleComponent]
-    public class FishingSkill : MonoBehaviour, ITickable
+    public class FishingSkill : TickedSkillBehaviour
     {
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
@@ -45,7 +46,6 @@ namespace Skills.Fishing
         public int CurrentCatchIntervalTicks => currentIntervalTicks;
 
         private SkillManager skills;
-        private Coroutine tickerCoroutine;
 
         private void Awake()
         {
@@ -67,44 +67,12 @@ namespace Skills.Fishing
                 bycatchManager = GameManager.BycatchManager;
         }
 
-        private void OnEnable()
-        {
-            TrySubscribeToTicker();
-        }
-
-        private void OnDisable()
-        {
-            if (Ticker.Instance != null)
-                Ticker.Instance.Unsubscribe(this);
-            if (tickerCoroutine != null)
-                StopCoroutine(tickerCoroutine);
-        }
-
         private void OnDestroy()
         {
             SaveManager.Unregister(fishingOutfit);
         }
 
-        private void TrySubscribeToTicker()
-        {
-            if (Ticker.Instance != null)
-            {
-                Ticker.Instance.Subscribe(this);
-            }
-            else
-            {
-                tickerCoroutine = StartCoroutine(WaitForTicker());
-            }
-        }
-
-        private IEnumerator WaitForTicker()
-        {
-            while (Ticker.Instance == null)
-                yield return null;
-            Ticker.Instance.Subscribe(this);
-        }
-
-        public void OnTick()
+        protected override void HandleTick()
         {
             if (!IsFishing)
                 return;
