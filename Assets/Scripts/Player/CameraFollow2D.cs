@@ -28,7 +28,6 @@ namespace Player
         {
             base.Awake();
             cam = GetComponent<Camera>();
-            DontDestroyOnLoad(gameObject);
         }
 
         void LateUpdate()

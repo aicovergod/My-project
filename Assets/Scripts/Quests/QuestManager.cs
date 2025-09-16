@@ -33,7 +33,6 @@ namespace Quests
             base.Awake();
 
             Instance = this;
-            DontDestroyOnLoad(gameObject);
 
             if (QuestsUpdated == null)
                 QuestsUpdated = new UnityEvent();

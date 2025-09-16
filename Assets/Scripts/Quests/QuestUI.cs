@@ -47,7 +47,6 @@ namespace Quests
             gameObject.AddComponent<GraphicRaycaster>();
 
             BuildLayout();
-            DontDestroyOnLoad(gameObject);
             canvas.enabled = false;
             playerMover = FindObjectOfType<PlayerMover>();
             UIManager.Instance.RegisterWindow(this);

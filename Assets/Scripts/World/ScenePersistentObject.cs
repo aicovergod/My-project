@@ -21,7 +21,7 @@ namespace World
         /// </summary>
         protected virtual void Awake()
         {
-            var others = FindObjectsOfType<ScenePersistentObject>();
+            var others = FindObjectsOfType<ScenePersistentObject>(true);
             foreach (var obj in others)
             {
                 if (obj != this && obj.gameObject.name == gameObject.name)

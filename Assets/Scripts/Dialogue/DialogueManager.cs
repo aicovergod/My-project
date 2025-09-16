@@ -26,7 +26,6 @@ namespace Dialogue
             base.Awake();
 
             Instance = this;
-            DontDestroyOnLoad(gameObject);
 
             ui = gameObject.AddComponent<DialogueUI>();
         }

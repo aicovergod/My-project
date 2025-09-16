@@ -31,7 +31,6 @@ namespace Player
 
             Instance = this;
             base.Awake();
-            DontDestroyOnLoad(gameObject);
         }
 
         private void OnEnable()

@@ -25,7 +25,6 @@ namespace UI
             instance = this;
 
             base.Awake();
-            DontDestroyOnLoad(gameObject);
 
             var canvas = GetComponentInChildren<Canvas>();
             if (canvas == null)

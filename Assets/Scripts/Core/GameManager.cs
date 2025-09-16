@@ -52,7 +52,6 @@ namespace Core
             base.Awake();
 
             Instance = this;
-            DontDestroyOnLoad(gameObject);
 
             CacheServices(false);
         }

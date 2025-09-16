@@ -50,7 +50,6 @@ namespace Inventory
 
             instance = this;
             base.Awake();
-            DontDestroyOnLoad(gameObject);
 
             var loadedItems = Resources.LoadAll<ItemData>("Item");
             foreach (var item in loadedItems)
