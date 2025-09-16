@@ -39,6 +39,10 @@ namespace World
             if (_group == null)
                 _group = canvas.gameObject.AddComponent<CanvasGroup>();
 
+            // Ensure the invisible fader never consumes input while inactive.
+            _group.blocksRaycasts = false;
+            _group.interactable = false;
+
             if (canvas.GetComponentInChildren<Image>() == null)
             {
                 var img = new GameObject("Image", typeof(Image)).GetComponent<Image>();
@@ -56,6 +60,9 @@ namespace World
 
         public IEnumerator FadeOut(float duration = -1f)
         {
+            // Block user input as the screen fades to black so interactions do not slip through.
+            _group.blocksRaycasts = true;
+
             if (duration <= 0f) duration = fadeDuration;
             float t = 0f;
             while (t < duration)
@@ -68,6 +75,9 @@ namespace World
 
         public IEnumerator FadeIn(float duration = -1f)
         {
+            // Keep input blocked while fading back from black.
+            _group.blocksRaycasts = true;
+
             if (duration <= 0f) duration = fadeDuration;
             float t = 0f;
             while (t < duration)
@@ -76,6 +86,10 @@ namespace World
                 _group.alpha = 1f - Mathf.Clamp01(t / duration);
                 yield return null;
             }
+
+            // Restore default input settings once the screen is fully visible again.
+            _group.blocksRaycasts = false;
+            _group.interactable = false;
         }
     }
 }
