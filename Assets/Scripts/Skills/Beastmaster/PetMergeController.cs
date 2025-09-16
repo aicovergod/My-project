@@ -67,7 +67,7 @@ namespace Beastmaster
             petService = petServiceComponent as IPetService;
 
             if (hudTimer == null)
-                hudTimer = GetComponentInChildren<MergeHudTimer>(true) ?? FindObjectOfType<MergeHudTimer>();
+                hudTimer = GetComponentInChildren<MergeHudTimer>(true) ?? FindObjectOfType<MergeHudTimer>(true);
             if (playerMover == null)
                 playerMover = GetComponent<PlayerMover>();
 
