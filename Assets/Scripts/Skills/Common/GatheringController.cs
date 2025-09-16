@@ -445,7 +445,24 @@ namespace Skills.Common
             if (pointer == null)
                 return false;
 
-            return module.IsPointerOverGameObject(pointer.pointerId);
+            if (pointer is Touchscreen touchscreen)
+            {
+                var touches = touchscreen.touches;
+                for (int i = 0; i < touches.Count; i++)
+                {
+                    var touchControl = touches[i];
+                    if (!touchControl.press.isPressed)
+                        continue;
+
+                    int touchId = touchControl.touchId.ReadValue();
+                    if (module.IsPointerOverGameObject(touchId))
+                        return true;
+                }
+
+                return module.IsPointerOverGameObject(touchscreen.deviceId);
+            }
+
+            return module.IsPointerOverGameObject(pointer.deviceId);
         }
 
         /// <summary>

@@ -141,7 +141,26 @@ namespace NPC
             if (pointer == null)
                 return false;
 
-            return module.IsPointerOverGameObject(pointer.pointerId);
+            // Input System 1.14 removed Pointer.pointerId. Device ids and explicit touch ids must
+            // now be supplied when querying the UI module, so we mirror Unity's recommendations.
+            if (pointer is Touchscreen touchscreen)
+            {
+                var touches = touchscreen.touches;
+                for (int i = 0; i < touches.Count; i++)
+                {
+                    var touchControl = touches[i];
+                    if (!touchControl.press.isPressed)
+                        continue;
+
+                    int touchId = touchControl.touchId.ReadValue();
+                    if (module.IsPointerOverGameObject(touchId))
+                        return true;
+                }
+
+                return module.IsPointerOverGameObject(touchscreen.deviceId);
+            }
+
+            return module.IsPointerOverGameObject(pointer.deviceId);
         }
     }
 }
