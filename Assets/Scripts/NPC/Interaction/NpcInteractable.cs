@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 using ShopSystem;
 using Pets;
 using Combat;
@@ -78,7 +79,7 @@ namespace NPC
             if (!pointerHovering)
                 return;
 
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            if (IsPointerOverUI())
                 return;
 
             var combatTarget = GetComponent<CombatTarget>();
@@ -146,6 +147,24 @@ namespace NPC
                 openMenuAction = null;
                 openMenuActionOwned = false;
             }
+        }
+
+        /// <summary>
+        ///     Determines whether the current pointer is hovering UI that should prevent NPC interactions.
+        /// </summary>
+        private static bool IsPointerOverUI()
+        {
+            if (EventSystem.current == null)
+                return false;
+
+            if (!(EventSystem.current.currentInputModule is InputSystemUIInputModule module))
+                return false;
+
+            Pointer pointer = Pointer.current;
+            if (pointer == null)
+                return false;
+
+            return module.IsPointerOverGameObject(pointer.pointerId);
         }
 
         public virtual void Talk()

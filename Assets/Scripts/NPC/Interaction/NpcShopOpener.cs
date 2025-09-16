@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 using ShopSystem;
 using Combat;
 using Pets;
@@ -104,7 +105,7 @@ namespace NPC
             if (!pointerHovering)
                 return;
 
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            if (IsPointerOverUI())
                 return;
 
             var combatTarget = GetComponent<CombatTarget>();
@@ -123,6 +124,24 @@ namespace NPC
             var ui = ShopUI.Instance;
             if (ui != null)
                 ui.Open(shop, GetComponent<NpcWanderer>());
+        }
+
+        /// <summary>
+        ///     Evaluates whether the active pointer is currently hovering UI that should block world interactions.
+        /// </summary>
+        private static bool IsPointerOverUI()
+        {
+            if (EventSystem.current == null)
+                return false;
+
+            if (!(EventSystem.current.currentInputModule is InputSystemUIInputModule module))
+                return false;
+
+            Pointer pointer = Pointer.current;
+            if (pointer == null)
+                return false;
+
+            return module.IsPointerOverGameObject(pointer.pointerId);
         }
     }
 }
