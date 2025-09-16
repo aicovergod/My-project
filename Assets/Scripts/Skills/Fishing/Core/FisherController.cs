@@ -1,191 +1,241 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Inventory;
-using Player;
-using UI;
+using Skills.Common;
 
 namespace Skills.Fishing
 {
+    /// <summary>
+    /// Handles player input for fishing by delegating shared logic to <see cref="GatheringController{TSkill,TNode}"/>.
+    /// Evaluates fishing specific requirements such as tool selection, available fish and inventory capacity.
+    /// </summary>
     [DisallowMultipleComponent]
-    public class FisherController : MonoBehaviour
+    public class FisherController : GatheringController<FishingSkill, FishableSpot>
     {
-        [SerializeField] private float interactRange = 1.5f;
-        [SerializeField] private float cancelDistance = 3f;
-        [SerializeField] [Tooltip("Layers including fishing spots")] private LayerMask spotMask = ~0;
+        [SerializeField]
+        [Tooltip("Layers including fishing spots")] private LayerMask spotMask = ~0;
 
-        [SerializeField] private float prospectCooldown = 3f;
-
-        [Header("References")]
-        [SerializeField] private FishingSkill fishingSkill;
         [SerializeField] private FishingToolToUse toolSelector;
-        [SerializeField] private PlayerMover playerMover;
         [SerializeField] private Animator animator;
 
-        private FishableSpot nearbySpot;
-        private Camera cam;
-        private float nextInteractionTime = 0f;
+        private readonly List<FishDefinition> eligibleFish = new List<FishDefinition>();
+        private FishingToolDefinition cachedTool;
 
-        private void Awake()
+        private FishingSkill FishingSkill => Skill;
+
+        /// <summary>
+        /// Cache optional references on Awake while still letting the base class wire shared dependencies.
+        /// </summary>
+        protected override void Awake()
         {
-            if (fishingSkill == null)
-                fishingSkill = GetComponent<FishingSkill>();
+            base.Awake();
             if (toolSelector == null)
                 toolSelector = GetComponent<FishingToolToUse>();
-            if (playerMover == null)
-                playerMover = GetComponent<PlayerMover>();
             if (animator == null)
                 animator = GetComponentInChildren<Animator>();
-            cam = Camera.main;
         }
 
+        /// <summary>
+        /// Subscribe to skill events so animations remain in sync even if fishing stops externally.
+        /// </summary>
         private void OnEnable()
         {
-            if (fishingSkill != null)
-                fishingSkill.OnStopFishing += HandleStop;
+            if (FishingSkill != null)
+            {
+                FishingSkill.OnStartFishing += HandleStartFishing;
+                FishingSkill.OnStopFishing += HandleStopFishing;
+            }
         }
 
+        /// <summary>
+        /// Unsubscribe from the skill events when the component is disabled.
+        /// </summary>
         private void OnDisable()
         {
-            if (fishingSkill != null)
-                fishingSkill.OnStopFishing -= HandleStop;
-        }
-
-        private void Update()
-        {
-            if (Time.time >= nextInteractionTime)
+            if (FishingSkill != null)
             {
-                if (Input.GetMouseButtonDown(0))
-                {
-                    var spot = GetSpotUnderCursor();
-                    if (spot != null)
-                        TryStartFishing(spot);
-                }
-                else if (Input.GetMouseButtonDown(1))
-                {
-                    var spot = GetSpotUnderCursor();
-                    if (spot != null)
-                    {
-                        spot.Prospect(transform);
-                        nextInteractionTime = Time.time + prospectCooldown;
-                    }
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.Escape))
-                fishingSkill.StopFishing();
-
-            if (nearbySpot != null && Input.GetKeyDown(KeyCode.E))
-                TryStartFishing(nearbySpot);
-
-            if (fishingSkill.IsFishing)
-            {
-                if (playerMover != null && playerMover.IsMoving)
-                    fishingSkill.StopFishing();
-                else
-                {
-                    float cancelDist = fishingSkill.CurrentSpot != null && fishingSkill.CurrentSpot.def != null
-                        ? fishingSkill.CurrentSpot.def.CancelDistance
-                        : cancelDistance;
-                    if (Vector3.Distance(transform.position, fishingSkill.CurrentSpot.transform.position) > cancelDist)
-                        fishingSkill.StopFishing();
-                    else if (fishingSkill.CurrentSpot.IsDepleted)
-                        fishingSkill.StopFishing();
-                }
+                FishingSkill.OnStartFishing -= HandleStartFishing;
+                FishingSkill.OnStopFishing -= HandleStopFishing;
             }
         }
 
-        private FishableSpot GetSpotUnderCursor()
+        /// <summary>
+        /// Fishing supports the right click prospect action.
+        /// </summary>
+        protected override bool SupportsProspecting => true;
+
+        /// <summary>
+        /// Fishing should still respond to clicks when the pointer is over UI elements.
+        /// </summary>
+        protected override bool BlockMouseWhilePointerOverUI => false;
+
+        /// <inheritdoc />
+        protected override bool IsPerformingAction => FishingSkill != null && FishingSkill.IsFishing;
+
+        /// <inheritdoc />
+        protected override FishableSpot CurrentNode => FishingSkill != null ? FishingSkill.CurrentSpot : null;
+
+        /// <inheritdoc />
+        protected override void StopAction()
         {
-            if (cam == null)
-                cam = Camera.main;
-            Vector2 world = cam.ScreenToWorldPoint(Input.mousePosition);
-            var colliders = Physics2D.OverlapPointAll(world, spotMask);
-            foreach (var col in colliders)
+            FishingSkill?.StopFishing();
+        }
+
+        /// <inheritdoc />
+        protected override bool IsNodeDepleted(FishableSpot node) => node != null && node.IsDepleted;
+
+        /// <inheritdoc />
+        protected override bool IsNodeBusy(FishableSpot node) => node != null && node.IsBusy;
+
+        /// <inheritdoc />
+        protected override float GetInteractionRange(FishableSpot node)
+        {
+            return node != null && node.def != null ? node.def.InteractRange : base.GetInteractionRange(node);
+        }
+
+        /// <inheritdoc />
+        protected override float GetCancelDistance(FishableSpot node)
+        {
+            return node != null && node.def != null ? node.def.CancelDistance : base.GetCancelDistance(node);
+        }
+
+        /// <inheritdoc />
+        protected override FishableSpot FindNodeAtWorldPosition(Vector2 worldPosition)
+        {
+            var colliders = Physics2D.OverlapPointAll(worldPosition, spotMask);
+            foreach (var collider in colliders)
             {
-                var spot = col.GetComponentInParent<FishableSpot>();
+                var spot = collider.GetComponentInParent<FishableSpot>();
                 if (spot != null)
                     return spot;
             }
             return null;
         }
 
-        private void TryStartFishing(FishableSpot spot)
+        /// <inheritdoc />
+        protected override bool ValidateNode(FishableSpot node, out string failureMessage)
         {
-            if (spot == null || spot.IsDepleted || spot.IsBusy)
-                return;
+            failureMessage = string.Empty;
+            eligibleFish.Clear();
+            cachedTool = null;
 
-            float dist = Vector3.Distance(transform.position, spot.transform.position);
-            float range = spot.def != null ? spot.def.InteractRange : interactRange;
-            if (dist > range)
-                return;
-
-            var tool = toolSelector.GetBestTool(spot.def != null ? spot.def.AllowedTools : null);
-            if (tool == null)
+            if (FishingSkill == null || node == null)
             {
-                if (spot.def != null && spot.def.AllowedTools != null && spot.def.AllowedTools.Count > 0)
-                    FloatingText.Show("You can't use that tool here", transform.position);
+                failureMessage = "You can't fish here";
+                return false;
+            }
+
+            var definition = node.def;
+            cachedTool = toolSelector != null
+                ? toolSelector.GetBestTool(definition != null ? definition.AllowedTools : null)
+                : null;
+
+            if (cachedTool == null)
+            {
+                if (definition != null && definition.AllowedTools != null && definition.AllowedTools.Count > 0)
+                    failureMessage = "You can't use that tool here";
                 else
-                    FloatingText.Show("You need a fishing tool", transform.position);
-                return;
-            }
-            if (fishingSkill.Level < tool.RequiredLevel)
-            {
-                FloatingText.Show($"You need Fishing level {tool.RequiredLevel}", transform.position);
-                return;
+                    failureMessage = "You need a fishing tool";
+                return false;
             }
 
-            var eligibleFish = new List<FishDefinition>();
-            int minLevel = int.MaxValue;
-            foreach (var fish in spot.def.AvailableFish)
+            if (FishingSkill.Level < cachedTool.RequiredLevel)
             {
-                if (fish == null) continue;
-                minLevel = Mathf.Min(minLevel, fish.RequiredLevel);
-                if (fishingSkill.Level >= fish.RequiredLevel)
-                    eligibleFish.Add(fish);
+                failureMessage = $"You need Fishing level {cachedTool.RequiredLevel}";
+                return false;
             }
-            if (eligibleFish.Count == 0)
+
+            int minimumLevel = int.MaxValue;
+            if (definition != null && definition.AvailableFish != null)
             {
-                FloatingText.Show($"You need Fishing level {minLevel}", transform.position);
-                return;
-            }
-            bool canAdd = false;
-            foreach (var fish in eligibleFish)
-            {
-                if (fishingSkill.CanAddFish(fish))
+                foreach (var fish in definition.AvailableFish)
                 {
-                    canAdd = true;
-                    break;
+                    if (fish == null)
+                        continue;
+                    minimumLevel = Mathf.Min(minimumLevel, fish.RequiredLevel);
+                    if (FishingSkill.Level >= fish.RequiredLevel)
+                        eligibleFish.Add(fish);
                 }
             }
-            if (!canAdd)
+
+            if (eligibleFish.Count == 0)
             {
-                FloatingText.Show("Your inventory is full", transform.position);
-                return;
+                failureMessage = minimumLevel == int.MaxValue
+                    ? "You can't fish here"
+                    : $"You need Fishing level {minimumLevel}";
+                return false;
             }
 
-            fishingSkill.StartFishing(spot, tool);
+            return true;
+        }
+
+        /// <inheritdoc />
+        protected override bool HasInventorySpace(FishableSpot node, out string failureMessage)
+        {
+            failureMessage = string.Empty;
+            if (FishingSkill == null)
+            {
+                failureMessage = "You can't fish here";
+                return false;
+            }
+
+            foreach (var fish in eligibleFish)
+            {
+                if (FishingSkill.CanAddFish(fish))
+                    return true;
+            }
+
+            failureMessage = "Your inventory is full";
+            return false;
+        }
+
+        /// <inheritdoc />
+        protected override bool TryStartAction(FishableSpot node, out string failureMessage)
+        {
+            failureMessage = string.Empty;
+            if (FishingSkill == null || node == null)
+            {
+                failureMessage = "You can't fish here";
+                return false;
+            }
+
+            if (cachedTool == null && toolSelector != null)
+            {
+                var definition = node.def;
+                cachedTool = toolSelector.GetBestTool(definition != null ? definition.AllowedTools : null);
+            }
+
+            if (cachedTool == null)
+            {
+                failureMessage = "You need a fishing tool";
+                return false;
+            }
+
+            FishingSkill.StartFishing(node, cachedTool);
+            return FishingSkill.IsFishing;
+        }
+
+        /// <inheritdoc />
+        protected override void Prospect(FishableSpot node)
+        {
+            node?.Prospect(transform);
+        }
+
+        /// <summary>
+        /// Triggered whenever fishing successfully starts so the animator can enter the fishing state.
+        /// </summary>
+        private void HandleStartFishing(FishableSpot spot)
+        {
             if (animator != null)
                 animator.SetBool("isFishing", true);
         }
 
-        private void HandleStop()
+        /// <summary>
+        /// Triggered whenever fishing stops for any reason, allowing the animation to reset.
+        /// </summary>
+        private void HandleStopFishing()
         {
             if (animator != null)
                 animator.SetBool("isFishing", false);
-        }
-
-        private void OnTriggerEnter2D(Collider2D other)
-        {
-            var spot = other.GetComponent<FishableSpot>();
-            if (spot != null)
-                nearbySpot = spot;
-        }
-
-        private void OnTriggerExit2D(Collider2D other)
-        {
-            var spot = other.GetComponent<FishableSpot>();
-            if (spot != null && spot == nearbySpot)
-                nearbySpot = null;
         }
     }
 }

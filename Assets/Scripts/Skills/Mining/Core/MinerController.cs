@@ -1,140 +1,137 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
-using Inventory;
-using Player;
-using UI;
+using Skills.Common;
 
 namespace Skills.Mining
 {
     /// <summary>
-    /// Handles player input and range checks for mining.
+    /// Handles mining specific validation on top of the shared <see cref="GatheringController{TSkill,TNode}"/> logic.
+    /// Selects the appropriate pickaxe, checks skill requirements and ensures inventory space before mining.
     /// </summary>
     [DisallowMultipleComponent]
-    public class MinerController : MonoBehaviour
+    public class MinerController : GatheringController<MiningSkill, MineableRock>
     {
-        [SerializeField] private float interactRange = 1.5f;
-        [SerializeField] private float cancelDistance = 3f;
         [SerializeField] private LayerMask rockMask = ~0;
-
-        [SerializeField] private float prospectCooldown = 3f;
-
-        [Header("References")]
-        [SerializeField] private MiningSkill miningSkill;
         [SerializeField] private PickaxeToUse pickaxeSelector;
-        [SerializeField] private PlayerMover playerMover;
 
-        private MineableRock nearbyRock;
+        private PickaxeDefinition cachedPickaxe;
 
-        private Camera cam;
-        private float nextInteractionTime = 0f;
+        private MiningSkill MiningSkill => Skill;
 
-        private void Awake()
+        /// <summary>
+        /// Let the base class wire common references before caching the pickaxe selector.
+        /// </summary>
+        protected override void Awake()
         {
-            if (miningSkill == null)
-                miningSkill = GetComponent<MiningSkill>();
+            base.Awake();
             if (pickaxeSelector == null)
                 pickaxeSelector = GetComponent<PickaxeToUse>();
-            if (playerMover == null)
-                playerMover = GetComponent<PlayerMover>();
-            cam = Camera.main;
         }
 
-        private void Update()
+        /// <summary>
+        /// Mining supports right click prospecting like OSRS rocks.
+        /// </summary>
+        protected override bool SupportsProspecting => true;
+
+        /// <inheritdoc />
+        protected override bool IsPerformingAction => MiningSkill != null && MiningSkill.IsMining;
+
+        /// <inheritdoc />
+        protected override MineableRock CurrentNode => MiningSkill != null ? MiningSkill.CurrentRock : null;
+
+        /// <inheritdoc />
+        protected override void StopAction()
         {
-            bool pointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
-
-            if (Time.time >= nextInteractionTime)
-            {
-                if (Input.GetMouseButtonDown(0) && !pointerOverUI)
-                {
-                    var rock = GetRockUnderCursor();
-                    if (rock != null)
-                        TryStartMining(rock);
-                }
-                else if (Input.GetMouseButtonDown(1) && !pointerOverUI)
-                {
-                    var rock = GetRockUnderCursor();
-                    if (rock != null)
-                    {
-                        rock.Prospect(transform);
-                        nextInteractionTime = Time.time + prospectCooldown;
-                    }
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.Escape))
-                miningSkill.StopMining();
-
-            if (nearbyRock != null && Input.GetKeyDown(KeyCode.E))
-                TryStartMining(nearbyRock);
-
-            if (miningSkill.IsMining)
-            {
-                if (playerMover != null && playerMover.IsMoving)
-                    miningSkill.StopMining();
-                else if (Vector3.Distance(transform.position, miningSkill.CurrentRock.transform.position) > cancelDistance)
-                    miningSkill.StopMining();
-            }
+            MiningSkill?.StopMining();
         }
 
-        private MineableRock GetRockUnderCursor()
+        /// <inheritdoc />
+        protected override bool IsNodeDepleted(MineableRock node) => node != null && node.IsDepleted;
+
+        /// <inheritdoc />
+        protected override MineableRock FindNodeAtWorldPosition(Vector2 worldPosition)
         {
-            if (cam == null)
-                cam = Camera.main;
-            Vector3 world = cam.ScreenToWorldPoint(Input.mousePosition);
-            var hit = Physics2D.Raycast(world, Vector2.zero, 0f, rockMask);
-            if (hit.collider != null)
-                return hit.collider.GetComponent<MineableRock>();
-            return null;
+            var hit = Physics2D.Raycast(worldPosition, Vector2.zero, 0f, rockMask);
+            return hit.collider != null ? hit.collider.GetComponent<MineableRock>() : null;
         }
 
-        private void TryStartMining(MineableRock rock)
+        /// <inheritdoc />
+        protected override bool ValidateNode(MineableRock node, out string failureMessage)
         {
-            if (rock == null || rock.IsDepleted)
-                return;
+            failureMessage = string.Empty;
+            cachedPickaxe = null;
 
-            float dist = Vector3.Distance(transform.position, rock.transform.position);
-            if (dist > interactRange)
-                return;
-
-            var pickaxe = pickaxeSelector.GetBestPickaxe();
-            if (pickaxe == null)
+            if (MiningSkill == null || node == null || node.RockDef == null)
             {
-                FloatingText.Show("You need a pickaxe", transform.position);
-                return;
-            }
-            if (miningSkill.Level < rock.RockDef.Ore.LevelRequirement)
-            {
-                FloatingText.Show($"You need Mining level {rock.RockDef.Ore.LevelRequirement}", transform.position);
-                return;
-            }
-            if (pickaxe.Tier < rock.RockDef.RequiresToolTier)
-            {
-                FloatingText.Show("You need a better pickaxe", transform.position);
-                return;
+                failureMessage = "You can't mine this rock";
+                return false;
             }
 
-            if (!miningSkill.CanAddOre(rock.RockDef.Ore))
+            cachedPickaxe = pickaxeSelector != null ? pickaxeSelector.GetBestPickaxe() : null;
+            if (cachedPickaxe == null)
             {
-                FloatingText.Show("Your inventory is full", transform.position);
-                return;
+                failureMessage = "You need a pickaxe";
+                return false;
             }
 
-            miningSkill.StartMining(rock, pickaxe);
+            if (MiningSkill.Level < node.RockDef.Ore.LevelRequirement)
+            {
+                failureMessage = $"You need Mining level {node.RockDef.Ore.LevelRequirement}";
+                return false;
+            }
+
+            if (cachedPickaxe.Tier < node.RockDef.RequiresToolTier)
+            {
+                failureMessage = "You need a better pickaxe";
+                return false;
+            }
+
+            return true;
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        /// <inheritdoc />
+        protected override bool HasInventorySpace(MineableRock node, out string failureMessage)
         {
-            var rock = other.GetComponent<MineableRock>();
-            if (rock != null)
-                nearbyRock = rock;
+            failureMessage = string.Empty;
+            if (MiningSkill == null || node == null || node.RockDef == null)
+            {
+                failureMessage = "You can't mine this rock";
+                return false;
+            }
+
+            if (MiningSkill.CanAddOre(node.RockDef.Ore))
+                return true;
+
+            failureMessage = "Your inventory is full";
+            return false;
         }
 
-        private void OnTriggerExit2D(Collider2D other)
+        /// <inheritdoc />
+        protected override bool TryStartAction(MineableRock node, out string failureMessage)
         {
-            var rock = other.GetComponent<MineableRock>();
-            if (rock != null && rock == nearbyRock)
-                nearbyRock = null;
+            failureMessage = string.Empty;
+            if (MiningSkill == null || node == null)
+            {
+                failureMessage = "You can't mine this rock";
+                return false;
+            }
+
+            if (cachedPickaxe == null && pickaxeSelector != null)
+                cachedPickaxe = pickaxeSelector.GetBestPickaxe();
+
+            if (cachedPickaxe == null)
+            {
+                failureMessage = "You need a pickaxe";
+                return false;
+            }
+
+            MiningSkill.StartMining(node, cachedPickaxe);
+            return MiningSkill.IsMining;
+        }
+
+        /// <inheritdoc />
+        protected override void Prospect(MineableRock node)
+        {
+            node?.Prospect(transform);
         }
     }
 }
