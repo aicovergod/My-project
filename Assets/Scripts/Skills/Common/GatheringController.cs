@@ -83,6 +83,11 @@ namespace Skills.Common
         private bool prospectActionOwned;
         private bool cancelActionOwned;
 
+        // Flags queued by input callbacks so pointer interactions are processed from Update.
+        private bool pendingInteract;
+        private int pendingPointerId;
+        private bool pendingProspect;
+
         /// <summary>
         ///     Cached reference to the skill component so derived classes can access it safely.
         /// </summary>
@@ -212,6 +217,35 @@ namespace Skills.Common
                 worldCamera = Camera.main;
 
             EvaluateActiveAction();
+
+            if (pendingInteract)
+            {
+                pendingInteract = false;
+                if (!(BlockMouseWhilePointerOverUI &&
+                      EventSystem.current != null &&
+                      EventSystem.current.IsPointerOverGameObject(pendingPointerId)))
+                {
+                    var node = FindNodeUnderCursor();
+                    if (node != null && IsInteractionReady())
+                        AttemptStart(node);
+                }
+            }
+
+            if (pendingProspect)
+            {
+                pendingProspect = false;
+                if (!(BlockMouseWhilePointerOverUI &&
+                      EventSystem.current != null &&
+                      EventSystem.current.IsPointerOverGameObject(pendingPointerId)))
+                {
+                    var node = FindNodeUnderCursor();
+                    if (node != null)
+                    {
+                        Prospect(node);
+                        nextProspectAllowedTime = Time.time + prospectCooldownSeconds;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -223,17 +257,13 @@ namespace Skills.Common
                 return;
 
             // Pointer devices (mouse, pen, touch) behave like the legacy left click handling.
-            if (context.control != null && context.control.device is Pointer)
+            if (context.control != null && context.control.device is Pointer pointer)
             {
                 if (!IsInteractionReady())
                     return;
 
-                if (IsPointerOverUI())
-                    return;
-
-                var node = FindNodeUnderCursor();
-                if (node != null)
-                    AttemptStart(node);
+                pendingInteract = true;
+                pendingPointerId = pointer.deviceId;
                 return;
             }
 
@@ -258,21 +288,14 @@ namespace Skills.Common
             if (!SupportsProspecting)
                 return;
 
-            if (context.control == null || !(context.control.device is Pointer))
+            if (context.control == null || !(context.control.device is Pointer pointer))
                 return;
 
             if (Time.time < nextProspectAllowedTime)
                 return;
 
-            if (IsPointerOverUI())
-                return;
-
-            var node = FindNodeUnderCursor();
-            if (node == null)
-                return;
-
-            Prospect(node);
-            nextProspectAllowedTime = Time.time + prospectCooldownSeconds;
+            pendingProspect = true;
+            pendingPointerId = pointer.deviceId;
         }
 
         /// <summary>
@@ -424,41 +447,6 @@ namespace Skills.Common
         private bool IsInteractionReady()
         {
             return Time.time >= nextInteractionAllowedTime;
-        }
-
-        /// <summary>
-        ///     Returns <c>true</c> when the pointer is currently hovering a UI element that should block input.
-        /// </summary>
-        private bool IsPointerOverUI()
-        {
-            if (!BlockMouseWhilePointerOverUI)
-                return false;
-
-            if (EventSystem.current == null)
-                return false;
-
-            // Evaluate active touches first so mobile presses correctly block gathering interactions.
-            Touchscreen touchscreen = Touchscreen.current;
-            if (touchscreen != null)
-            {
-                var touches = touchscreen.touches;
-                for (int i = 0; i < touches.Count; i++)
-                {
-                    var touchControl = touches[i];
-                    if (!touchControl.press.isPressed)
-                        continue;
-
-                    if (EventSystem.current.IsPointerOverGameObject(touchControl.touchId.ReadValue()))
-                        return true;
-                }
-            }
-
-            // If a mouse or pen pointer is available, rely on the default EventSystem behaviour.
-            Pointer pointer = Pointer.current;
-            if (pointer != null && !(pointer is Touchscreen))
-                return EventSystem.current.IsPointerOverGameObject();
-
-            return false;
         }
 
         /// <summary>
