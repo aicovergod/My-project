@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Inventory;
@@ -111,79 +110,65 @@ namespace Skills.Woodcutting
                 string logId = currentTree.def.LogItemId;
                 logItems.TryGetValue(logId, out var item);
                 int amount = PetDropSystem.ActivePet?.id == "Beaver" ? 2 : 1;
-                if (amount > 1)
-                    BeastmasterXp.TryGrantFromPetAssist(currentTree.def.XpPerLog * (amount - 1));
-                bool added = true;
                 var petStorage = PetDropSystem.ActivePet?.id == "Beaver" && PetDropSystem.ActivePetObject != null
                     ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
                     : null;
-
-                Transform anchorTransform = floatingTextAnchor != null ? floatingTextAnchor : transform;
-                Vector3 anchorPos = anchorTransform.position;
-
-                for (int i = 0; i < amount; i++)
-                {
-                    bool stepAdded = false;
-                    if (item != null && inventory != null)
-                        stepAdded = inventory.AddItem(item, 1);
-                    if (!stepAdded && petStorage != null)
-                        stepAdded = petStorage.StoreItem(item, 1);
-                    if (!stepAdded)
-                    {
-                        added = false;
-                        break;
-                    }
-                }
-
-                if (!added)
-                {
-                    FloatingText.Show("Your inventory is full", anchorPos);
-                    StopChopping();
-                    return;
-                }
-
-                float xpBonus = 0f;
-                if (equipment != null)
-                {
-                    foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
-                    {
-                        if (slot == EquipmentSlot.None)
-                            continue;
-                        var entry = equipment.GetEquipped(slot);
-                        if (entry.item != null)
-                            xpBonus += entry.item.woodcuttingXpBonusMultiplier;
-                    }
-                }
-                int xpGain = Mathf.RoundToInt(currentTree.def.XpPerLog * amount * (1f + xpBonus));
-                int oldLevel = skills.GetLevel(SkillType.Woodcutting);
-                int newLevel = skills.AddXP(SkillType.Woodcutting, xpGain);
                 string logName = item != null ? item.itemName : currentTree.def.DisplayName;
-                FloatingText.Show($"+{amount} {logName}", anchorPos);
-                StartCoroutine(ShowXpGainDelayed(xpGain, anchorTransform));
-                OnLogGained?.Invoke(logId, amount);
 
-                if (currentTree.def.PetDropChance > 0)
-                    PetDropSystem.TryRollPet("woodcutting", currentTree.transform.position, skills, currentTree.def.PetDropChance, out _);
-
-                if (QuestManager.Instance != null && QuestManager.Instance.IsQuestActive("ToolsOfSurvival"))
+                var context = new GatheringRewardContext
                 {
-                    var quest = QuestManager.Instance.GetQuest("ToolsOfSurvival");
-                    var step = quest?.Steps.Find(s => s.StepID == "ChopLogs");
-                    if (step != null && !step.IsComplete)
+                    runner = this,
+                    skills = skills,
+                    skillType = SkillType.Woodcutting,
+                    inventory = inventory,
+                    petStorage = petStorage,
+                    item = item,
+                    rewardDisplayName = logName,
+                    quantity = amount,
+                    xpPerItem = currentTree.def.XpPerLog,
+                    petAssistExtraQuantity = Mathf.Max(0, amount - 1),
+                    floatingTextAnchor = floatingTextAnchor,
+                    fallbackAnchor = transform,
+                    equipment = equipment,
+                    equipmentXpBonusEvaluator = data => data != null ? data.woodcuttingXpBonusMultiplier : 0f,
+                    showItemFloatingText = true,
+                    showXpPopup = true,
+                    xpPopupDelayTicks = 5f,
+                    rewardMessageFormatter = qty => $"+{qty} {logName}",
+                    onItemsGranted = result => OnLogGained?.Invoke(logId, result.QuantityAwarded),
+                    onXpApplied = result =>
                     {
-                        questLogCount += amount;
-                        if (questLogCount >= 3)
-                            QuestManager.Instance.UpdateStep("ToolsOfSurvival", "ChopLogs");
-                    }
-                }
+                        if (result.LeveledUp && result.Anchor != null)
+                        {
+                            FloatingText.Show($"Woodcutting level {result.NewLevel}", result.Anchor.position);
+                            OnLevelUp?.Invoke(result.NewLevel);
+                        }
+                    },
+                    onSuccess = result =>
+                    {
+                        if (currentTree.def.PetDropChance > 0)
+                            PetDropSystem.TryRollPet("woodcutting", currentTree.transform.position, skills, currentTree.def.PetDropChance, out _);
 
-                TryAwardWoodcuttingOutfitPiece();
+                        if (QuestManager.Instance != null && QuestManager.Instance.IsQuestActive("ToolsOfSurvival"))
+                        {
+                            var quest = QuestManager.Instance.GetQuest("ToolsOfSurvival");
+                            var step = quest?.Steps.Find(s => s.StepID == "ChopLogs");
+                            if (step != null && !step.IsComplete)
+                            {
+                                questLogCount += result.QuantityAwarded;
+                                if (questLogCount >= 3)
+                                    QuestManager.Instance.UpdateStep("ToolsOfSurvival", "ChopLogs");
+                            }
+                        }
 
-                if (newLevel > oldLevel)
-                {
-                    FloatingText.Show($"Woodcutting level {newLevel}", anchorPos);
-                    OnLevelUp?.Invoke(newLevel);
-                }
+                        TryAwardWoodcuttingOutfitPiece();
+                    },
+                    onFailure = _ => StopChopping()
+                };
+
+                var rewardResult = GatheringRewardProcessor.Process(context);
+                if (!rewardResult.Success)
+                    return;
 
                 currentTree.OnLogChopped();
                 if (currentTree.IsDepleted)
@@ -192,15 +177,6 @@ namespace Skills.Woodcutting
             else
             {
                 Debug.Log($"Failed to chop {currentTree.name}");
-            }
-        }
-
-        private IEnumerator ShowXpGainDelayed(int xpGain, Transform anchor)
-        {
-            yield return new WaitForSeconds(Ticker.TickDuration * 5f);
-            if (anchor != null)
-            {
-                FloatingText.Show($"+{xpGain} XP", anchor.position);
             }
         }
 

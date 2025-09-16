@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Inventory;
@@ -122,66 +121,55 @@ namespace Skills.Fishing
             if (UnityEngine.Random.value <= chance)
             {
                 int amount = PetDropSystem.ActivePet?.id == "Heron" ? 2 : 1;
-                if (amount > 1)
-                    BeastmasterXp.TryGrantFromPetAssist(fish.Xp * (amount - 1));
-
                 fishItems.TryGetValue(fish.ItemId, out var item);
-                bool added = true;
                 var petStorage = PetDropSystem.ActivePet?.id == "Heron" && PetDropSystem.ActivePetObject != null
                     ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
                     : null;
-
-                Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
-
-                for (int i = 0; i < amount; i++)
-                {
-                    bool stepAdded = false;
-                    if (item != null && inventory != null)
-                        stepAdded = inventory.AddItem(item, 1);
-                    if (!stepAdded && petStorage != null)
-                        stepAdded = petStorage.StoreItem(item, 1);
-                    if (!stepAdded)
-                    {
-                        added = false;
-                        break;
-                    }
-                }
-
-                if (!added)
-                {
-                    FloatingText.Show("Your inventory is full", anchor.position);
-                    StopFishing();
-                    return;
-                }
-
-                float xpBonus = 0f;
                 var waterType = currentSpot != null && currentSpot.def != null ? currentSpot.def.WaterType : WaterType.Any;
-                if (equipment != null)
+
+                var context = new GatheringRewardContext
                 {
-                    foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+                    runner = this,
+                    skills = skills,
+                    skillType = SkillType.Fishing,
+                    inventory = inventory,
+                    petStorage = petStorage,
+                    item = item,
+                    rewardDisplayName = fish.DisplayName,
+                    quantity = amount,
+                    xpPerItem = fish.Xp,
+                    petAssistExtraQuantity = Mathf.Max(0, amount - 1),
+                    floatingTextAnchor = floatingTextAnchor,
+                    fallbackAnchor = transform,
+                    equipment = equipment,
+                    equipmentXpBonusEvaluator = data =>
+                        data != null && (data.fishingXpBonusWaterTypes & waterType) != 0
+                            ? data.fishingXpBonusMultiplier
+                            : 0f,
+                    showItemFloatingText = true,
+                    showXpPopup = true,
+                    xpPopupDelayTicks = 5f,
+                    rewardMessageFormatter = qty => $"+{qty} {fish.DisplayName}",
+                    onItemsGranted = result => OnFishCaught?.Invoke(fish.Id, result.QuantityAwarded),
+                    onXpApplied = result =>
                     {
-                        if (slot == EquipmentSlot.None)
-                            continue;
-                        var entry = equipment.GetEquipped(slot);
-                        if (entry.item != null && (entry.item.fishingXpBonusWaterTypes & waterType) != 0)
-                            xpBonus += entry.item.fishingXpBonusMultiplier;
-                    }
-                }
-                int xpGain = Mathf.RoundToInt(fish.Xp * amount * (1f + xpBonus));
-                int oldLevel = skills.GetLevel(SkillType.Fishing);
-                int newLevel = skills.AddXP(SkillType.Fishing, xpGain);
-                FloatingText.Show($"+{amount} {fish.DisplayName}", anchor.position);
-                StartCoroutine(ShowXpGainDelayed(xpGain, anchor));
-                OnFishCaught?.Invoke(fish.Id, amount);
+                        if (result.LeveledUp && result.Anchor != null)
+                        {
+                            FloatingText.Show($"Fishing level {result.NewLevel}", result.Anchor.position);
+                            OnLevelUp?.Invoke(result.NewLevel);
+                        }
+                    },
+                    onSuccess = result =>
+                    {
+                        TryRollBycatch(result.Anchor);
+                        TryAwardFishingOutfitPiece();
+                    },
+                    onFailure = _ => StopFishing()
+                };
 
-                TryRollBycatch(anchor);
-                TryAwardFishingOutfitPiece();
-
-                if (newLevel > oldLevel)
-                {
-                    FloatingText.Show($"Fishing level {newLevel}", anchor.position);
-                    OnLevelUp?.Invoke(newLevel);
-                }
+                var rewardResult = GatheringRewardProcessor.Process(context);
+                if (!rewardResult.Success)
+                    return;
 
                 currentSpot.OnFishCaught();
                 if (currentSpot.IsDepleted)
@@ -202,13 +190,6 @@ namespace Skills.Fishing
             if (eligible.Count == 0)
                 return null;
             return eligible[UnityEngine.Random.Range(0, eligible.Count)];
-        }
-
-        private IEnumerator ShowXpGainDelayed(int gain, Transform anchor)
-        {
-            yield return new WaitForSeconds(Ticker.TickDuration * 5f);
-            if (anchor != null)
-                FloatingText.Show($"+{gain} XP", anchor.position);
         }
 
         private void TryRollBycatch(Transform anchor)

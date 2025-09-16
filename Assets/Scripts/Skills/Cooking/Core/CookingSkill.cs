@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Inventory;
@@ -135,54 +134,57 @@ namespace Skills.Cooking
             else
             {
                 var cookedItem = ItemDatabase.GetItem(currentRecipe.cookedItemId);
-                if (cookedItem == null || !inventory.AddItem(cookedItem, 1))
+                string cookedName = cookedItem != null ? cookedItem.itemName : currentRecipe.cookedItemId;
+                var context = new GatheringRewardContext
                 {
-                    FloatingText.Show("Your inventory is full", anchor.position);
-                    StopCooking();
-                    return;
-                }
-
-                float xpBonus = 0f;
-                if (equipment != null)
-                {
-                    foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+                    runner = this,
+                    skills = skills,
+                    skillType = SkillType.Cooking,
+                    inventory = inventory,
+                    petStorage = null,
+                    item = cookedItem,
+                    rewardDisplayName = cookedName,
+                    quantity = 1,
+                    xpPerItem = currentRecipe.xp,
+                    petAssistExtraQuantity = 0,
+                    floatingTextAnchor = floatingTextAnchor,
+                    fallbackAnchor = transform,
+                    equipment = equipment,
+                    equipmentXpBonusEvaluator = data => data != null ? data.cookingXpBonusMultiplier : 0f,
+                    showItemFloatingText = true,
+                    showXpPopup = true,
+                    xpPopupDelayTicks = 5f,
+                    rewardMessageFormatter = qty => $"+{qty} {cookedName}",
+                    onItemsGranted = result => OnFoodCooked?.Invoke(currentRecipe.cookedItemId, result.QuantityAwarded),
+                    onXpApplied = result =>
                     {
-                        if (slot == EquipmentSlot.None)
-                            continue;
-                        var entry = equipment.GetEquipped(slot);
-                        if (entry.item != null)
-                            xpBonus += entry.item.cookingXpBonusMultiplier;
-                    }
-                }
-                int xpGain = Mathf.RoundToInt(currentRecipe.xp * (1f + xpBonus));
-                int oldLevel = skills.GetLevel(SkillType.Cooking);
-                int newLevel = skills.AddXP(SkillType.Cooking, xpGain);
-                if (PetDropSystem.ActivePet?.id == "Mr Frying Pan")
-                    PetExperience.AddPetXp(xpGain);
-                FloatingText.Show($"+1 {cookedItem.itemName}", anchor.position);
-                StartCoroutine(ShowXpGainDelayed(xpGain, anchor));
-                OnFoodCooked?.Invoke(currentRecipe.cookedItemId, 1);
-                int petChance = Mathf.Max(5000, 10000 - (level - 1) * 100);
-                PetDropSystem.TryRollPet("cooking", anchor.position, skills, petChance, out _);
-                TryAwardCookingOutfitPiece();
-                if (newLevel > oldLevel)
-                {
-                    FloatingText.Show($"Cooking level {newLevel}", anchor.position);
-                    OnLevelUp?.Invoke(newLevel);
-                }
+                        if (PetDropSystem.ActivePet?.id == "Mr Frying Pan")
+                            PetExperience.AddPetXp(result.XpGained);
+
+                        if (result.LeveledUp && result.Anchor != null)
+                        {
+                            FloatingText.Show($"Cooking level {result.NewLevel}", result.Anchor.position);
+                            OnLevelUp?.Invoke(result.NewLevel);
+                        }
+                    },
+                    onSuccess = result =>
+                    {
+                        int petChance = Mathf.Max(5000, 10000 - (level - 1) * 100);
+                        var anchorTransform = result.Anchor != null ? result.Anchor : transform;
+                        PetDropSystem.TryRollPet("cooking", anchorTransform.position, skills, petChance, out _);
+                        TryAwardCookingOutfitPiece();
+                    },
+                    onFailure = _ => StopCooking()
+                };
+
+                var rewardResult = GatheringRewardProcessor.Process(context);
+                if (!rewardResult.Success)
+                    return;
             }
 
             if (itemsRemaining <= 0)
                 StopCooking();
         }
-
-        private IEnumerator ShowXpGainDelayed(int xp, Transform anchor)
-        {
-            yield return new WaitForSeconds(Ticker.TickDuration * 5f);
-            if (anchor != null)
-                FloatingText.Show($"+{xp} XP", anchor.position);
-        }
-
         public bool CanCook(CookableRecipe recipe, int quantity)
         {
             if (inventory == null || recipe == null)
