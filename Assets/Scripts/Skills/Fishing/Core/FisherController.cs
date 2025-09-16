@@ -37,8 +37,9 @@ namespace Skills.Fishing
         /// <summary>
         /// Subscribe to skill events so animations remain in sync even if fishing stops externally.
         /// </summary>
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             if (FishingSkill != null)
             {
                 FishingSkill.OnStartFishing += HandleStartFishing;
@@ -49,8 +50,9 @@ namespace Skills.Fishing
         /// <summary>
         /// Unsubscribe from the skill events when the component is disabled.
         /// </summary>
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
             if (FishingSkill != null)
             {
                 FishingSkill.OnStartFishing -= HandleStartFishing;

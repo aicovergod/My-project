@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using ShopSystem;
 using Pets;
 using Combat;
 using UI;
+using Core.Input;
 
 namespace NPC
 {
@@ -20,45 +22,129 @@ namespace NPC
         [Tooltip("Context menu prefab that provides Talk / Open Shop / Examine.")]
         public RightClickMenu menuPrefab;
 
+        [Header("Input")]
+        [SerializeField]
+        [Tooltip("Player input component providing the interaction action map. Auto-resolved when empty.")]
+        private PlayerInput playerInput;
+
+        [SerializeField]
+        [Tooltip("Optional override for the OpenMenu action used to display the context menu.")]
+        private InputActionReference openMenuActionReference;
+
         // Shared instance so the menu persists across scene loads
         private static RightClickMenu menuInstance;
         private static Canvas menuCanvas;
 
-        private void OnMouseOver()
+        private InputAction openMenuAction;
+        private bool openMenuActionOwned;
+        private bool pointerHovering;
+
+        private void Awake()
         {
-            // Ignore clicks when the pointer is over any UI element (e.g. pet inventory)
+            if (shop == null)
+                shop = GetComponent<Shop>();
+        }
+
+        private void OnEnable()
+        {
+            pointerHovering = false;
+            SubscribeToInput();
+        }
+
+        private void OnDisable()
+        {
+            pointerHovering = false;
+            UnsubscribeFromInput();
+        }
+
+        private void OnMouseEnter()
+        {
+            pointerHovering = true;
+        }
+
+        private void OnMouseExit()
+        {
+            pointerHovering = false;
+        }
+
+        /// <summary>
+        /// Display the NPC context menu (or command a pet attack) when the OpenMenu action is performed.
+        /// </summary>
+        private void HandleOpenMenu(InputAction.CallbackContext context)
+        {
+            if (!context.performed)
+                return;
+
+            if (!pointerHovering)
+                return;
+
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
                 return;
 
-            if (Input.GetMouseButtonDown(1))
+            var combatTarget = GetComponent<CombatTarget>();
+            if (!PetDropSystem.GuardModeEnabled && PetDropSystem.ActivePetCombat != null && combatTarget != null)
             {
-                if (!PetDropSystem.GuardModeEnabled && PetDropSystem.ActivePetCombat != null && GetComponent<CombatTarget>() != null)
-                {
-                    AttackWithPet();
-                    return;
-                }
+                PetDropSystem.ActivePetCombat.CommandAttack(combatTarget);
+                return;
+            }
 
-                if (menuInstance == null)
-                {
-                    if (menuPrefab == null)
-                        menuPrefab = Resources.Load<RightClickMenu>("Interfaces/RightClickMenu");
+            if (!EnsureMenuInstance())
+                return;
 
-                    if (menuPrefab == null)
-                    {
-                        Debug.LogError("RightClickMenu prefab not assigned and could not be loaded.");
-                        return;
-                    }
+            Vector2 pointer = InputActionResolver.GetPointerScreenPosition(
+                new Vector2(Screen.width * 0.5f, Screen.height * 0.5f));
+            menuInstance.Show(this, pointer);
+        }
 
-                    var canvasGO = new GameObject("ContextMenuCanvas", typeof(Canvas), typeof(CanvasScaler),
-                        typeof(GraphicRaycaster));
-                    menuCanvas = canvasGO.GetComponent<Canvas>();
-                    menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                    DontDestroyOnLoad(canvasGO);
+        /// <summary>
+        /// Ensures the static menu instance exists before attempting to display it.
+        /// </summary>
+        private bool EnsureMenuInstance()
+        {
+            if (menuInstance != null)
+                return true;
 
-                    menuInstance = Instantiate(menuPrefab, menuCanvas.transform);
-                }
+            if (menuPrefab == null)
+                menuPrefab = Resources.Load<RightClickMenu>("Interfaces/RightClickMenu");
 
-                menuInstance.Show(this, Input.mousePosition);
+            if (menuPrefab == null)
+            {
+                Debug.LogError("RightClickMenu prefab not assigned and could not be loaded.");
+                return false;
+            }
+
+            var canvasGO = new GameObject("ContextMenuCanvas", typeof(Canvas), typeof(CanvasScaler),
+                typeof(GraphicRaycaster));
+            menuCanvas = canvasGO.GetComponent<Canvas>();
+            menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            DontDestroyOnLoad(canvasGO);
+
+            menuInstance = Instantiate(menuPrefab, menuCanvas.transform);
+            return true;
+        }
+
+        private void SubscribeToInput()
+        {
+            UnsubscribeFromInput();
+
+            if (playerInput == null)
+                playerInput = FindObjectOfType<PlayerInput>();
+
+            openMenuAction = InputActionResolver.Resolve(playerInput, openMenuActionReference, "OpenMenu",
+                out openMenuActionOwned);
+            if (openMenuAction != null)
+                openMenuAction.performed += HandleOpenMenu;
+        }
+
+        private void UnsubscribeFromInput()
+        {
+            if (openMenuAction != null)
+            {
+                openMenuAction.performed -= HandleOpenMenu;
+                if (openMenuActionOwned)
+                    openMenuAction.Disable();
+                openMenuAction = null;
+                openMenuActionOwned = false;
             }
         }
 

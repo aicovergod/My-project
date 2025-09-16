@@ -11,6 +11,21 @@ This project currently targets **Unity 6000.2.3f1**.
 - **Skill System** – A modular framework for training skills such as woodcutting and mining through `SkillManager` and skill-specific modules.
 - **Shop System** – Supports buying and selling items via `Shop` and `ShopUI` components.
 
+## Input & Rebinding
+- The project relies on the Unity Input System with the `Assets/InputSystem_Actions.inputactions` asset. The **Player** map now
+  exposes `Move`, `Interact`, `Prospect`, `Cancel`, and `OpenMenu` so gameplay, NPCs, and UI can share the same bindings.
+- Player-facing scripts such as gathering controllers and `NpcInteractable` consume input through a `PlayerInput` component or
+  serialized `InputActionReference` fields. The shared `Core/Input/InputActionResolver` helper resolves the action instance and
+  ensures it is enabled when required.
+- To rebind controls:
+  1. Open **Input System Actions** in the Unity editor and edit the relevant binding under the **Player** action map. Left-click
+     interactions, right-click context actions, and menu cancellation already have default bindings.
+  2. Apply the changes to the `PlayerInput` component on the player prefab or scene object (it should reference the updated
+     action asset).
+  3. Any script that needs the new binding can request it via `InputActionResolver.Resolve`, optionally exposing an
+     `InputActionReference` field for prefab-level overrides. This keeps new systems aligned with the shared action map and
+     avoids duplicating bindings.
+
 ## Build and Run
 1. Install Unity 6000.2.3f1 or newer.
 2. Clone this repository.
