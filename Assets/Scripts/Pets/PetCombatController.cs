@@ -21,6 +21,12 @@ namespace Pets
         [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
         private HitSplatLibrary hitSplatLibrary;
 
+        /// <summary>
+        /// Shared cache so pets reuse a single hitsplat library loaded from the Resources
+        /// folder whenever no explicit reference has been assigned in the inspector.
+        /// </summary>
+        private static HitSplatLibrary sharedHitSplatLibrary;
+
         private PetFollower follower;
         private Animator animator;
         private SpriteRenderer spriteRenderer;
@@ -52,6 +58,8 @@ namespace Pets
                 col.isTrigger = true;
             if (TryGetComponent<Collider2D>(out var col2d))
                 col2d.isTrigger = true;
+
+            EnsureHitSplatLibrary();
 
             if (hitSplatLibrary == null)
             {
@@ -240,6 +248,22 @@ namespace Pets
             {
                 FloatingText.Show("0", target.transform.position, Color.white, null, zeroHitsplat);
             }
+        }
+
+        /// <summary>
+        /// Ensures a shared hitsplat library is available, falling back to the
+        /// Resources asset when no explicit assignment exists in the inspector.
+        /// </summary>
+        private void EnsureHitSplatLibrary()
+        {
+            if (hitSplatLibrary != null)
+                return;
+
+            if (sharedHitSplatLibrary == null)
+                sharedHitSplatLibrary = Resources.Load<HitSplatLibrary>("HitSplatLibrary");
+
+            if (sharedHitSplatLibrary != null)
+                hitSplatLibrary = sharedHitSplatLibrary;
         }
 
         private void OnDisable()
