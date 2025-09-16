@@ -28,6 +28,16 @@ namespace Skills.Fishing
 
         private double respawnAt;
 
+        /// <summary>
+        /// Consistent offset used so prospect feedback renders comfortably above the player's head.
+        /// </summary>
+        private static readonly Vector3 ProspectTextOffset = new Vector3(0f, 0.9f, 0f);
+
+        /// <summary>
+        /// Slightly reduced size so prospect text matches the scale of other OSRS-style popups.
+        /// </summary>
+        private const float ProspectTextSize = 0.65f;
+
         private void Awake()
         {
             if (sr == null)
@@ -114,8 +124,17 @@ namespace Skills.Fishing
             if (requester == null)
                 yield break;
 
-            FloatingText.Show("Checking...", requester.position);
+            Transform anchor = ResolveFloatingTextAnchor(requester);
+            Vector3 anchorPosition = anchor != null ? anchor.position : requester.position;
+
+            FloatingText.Show("Checking...", anchorPosition, null, ProspectTextSize, null, ProspectTextOffset);
             yield return new WaitForSeconds(Ticker.TickDuration * 2f);
+
+            if (requester == null)
+                yield break;
+
+            anchor = ResolveFloatingTextAnchor(requester);
+            anchorPosition = anchor != null ? anchor.position : requester.position;
 
             var fishNames = new List<string>();
             if (def != null && def.AvailableFish != null)
@@ -133,12 +152,28 @@ namespace Skills.Fishing
             }
 
             string message;
-            if (fishNames.Count == 1)
+            if (fishNames.Count == 0)
+                message = "There are no fish in this spot";
+            else if (fishNames.Count == 1)
                 message = $"This spot contains {fishNames[0]} here";
             else
                 message = $"This spot contains {string.Join(" & ", fishNames)} here";
 
-            FloatingText.Show(message, requester.position);
+            FloatingText.Show(message, anchorPosition, null, ProspectTextSize, null, ProspectTextOffset);
+        }
+
+        /// <summary>
+        /// Attempts to locate a dedicated floating text anchor on the requester so popups appear at head height.
+        /// </summary>
+        /// <param name="requester">Transform responsible for triggering the prospect action.</param>
+        /// <returns>The floating text anchor if one exists, otherwise the requester transform.</returns>
+        private static Transform ResolveFloatingTextAnchor(Transform requester)
+        {
+            if (requester == null)
+                return null;
+
+            var anchor = requester.Find("FloatingTextAnchor");
+            return anchor != null ? anchor : requester;
         }
     }
 }

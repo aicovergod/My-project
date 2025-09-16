@@ -23,6 +23,16 @@ namespace Skills.Mining
         private bool depleted;
         private float respawnTimer;
 
+        /// <summary>
+        /// Offset ensuring prospect feedback floats above the player's head for mining just like fishing.
+        /// </summary>
+        private static readonly Vector3 ProspectTextOffset = new Vector3(0f, 0.9f, 0f);
+
+        /// <summary>
+        /// Shared prospect text scale that keeps informational popups unobtrusive.
+        /// </summary>
+        private const float ProspectTextSize = 0.65f;
+
         public RockDefinition RockDef => rockDef;
         public bool IsDepleted => depleted;
 
@@ -92,9 +102,37 @@ namespace Skills.Mining
             if (requester == null)
                 yield break;
 
-            FloatingText.Show("Prospecting...", requester.position);
+            Transform anchor = ResolveFloatingTextAnchor(requester);
+            Vector3 anchorPosition = anchor != null ? anchor.position : requester.position;
+
+            FloatingText.Show("Prospecting...", anchorPosition, null, ProspectTextSize, null, ProspectTextOffset);
             yield return new WaitForSeconds(Ticker.TickDuration * 2f);
-            FloatingText.Show($"This rock contains {rockDef.Ore.DisplayName} here", requester.position);
+
+            if (requester == null)
+                yield break;
+
+            anchor = ResolveFloatingTextAnchor(requester);
+            anchorPosition = anchor != null ? anchor.position : requester.position;
+
+            string message = rockDef != null && rockDef.Ore != null
+                ? $"This rock contains {rockDef.Ore.DisplayName} here"
+                : "There is nothing of interest in this rock";
+
+            FloatingText.Show(message, anchorPosition, null, ProspectTextSize, null, ProspectTextOffset);
+        }
+
+        /// <summary>
+        /// Finds the floating text anchor on the requester so prospect feedback appears relative to the character head.
+        /// </summary>
+        /// <param name="requester">Transform that initiated the prospect action.</param>
+        /// <returns>The floating text anchor if present, otherwise the requester transform.</returns>
+        private static Transform ResolveFloatingTextAnchor(Transform requester)
+        {
+            if (requester == null)
+                return null;
+
+            var anchor = requester.Find("FloatingTextAnchor");
+            return anchor != null ? anchor : requester;
         }
     }
 }
