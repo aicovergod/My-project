@@ -3,6 +3,7 @@ using UnityEngine;
 using Items;
 using Skills;
 using Skills.Fishing;
+using Status;
 using Status.Poison;
 
 namespace Inventory
@@ -138,5 +139,9 @@ namespace Inventory
         public float coneAngleDeg = 0f;
         public int aoeMaxTargets = 0;
         public float aoeMultiplier = 0f;
+
+        [Header("Buff Effects")]
+        [Tooltip("Timers that should start when this item is consumed or equipped.")]
+        public ItemBuffEffect[] buffEffects;
     }
 }

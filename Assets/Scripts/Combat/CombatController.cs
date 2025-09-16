@@ -8,6 +8,7 @@ using NPC;
 using Pets;
 using UI;
 using Magic;
+using Status;
 
 namespace Combat
 {
@@ -21,6 +22,43 @@ namespace Combat
         public event System.Action<int, bool> OnAttackLanded;
         public event System.Action<CombatTarget> OnTargetKilled;
         public event System.Action<CombatTarget> OnCombatTargetChanged;
+
+        /// <summary>
+        /// Broadcasts a combat driven buff so shared systems like the HUD can react without tight
+        /// coupling. The timer definition mirrors the payload sent through <see cref="BuffEvents"/>.
+        /// </summary>
+        public void ReportStatusEffectApplied(BuffTimerDefinition definition, string sourceId = null, bool refreshTimer = true)
+        {
+            var context = new BuffEventContext
+            {
+                target = gameObject,
+                definition = definition,
+                sourceType = BuffSourceType.Combat,
+                sourceId = string.IsNullOrEmpty(sourceId) ? name : sourceId,
+                resetTimer = refreshTimer
+            };
+
+            if (refreshTimer)
+                BuffEvents.RaiseBuffApplied(context);
+            else
+                BuffEvents.RaiseBuffRefreshed(context);
+        }
+
+        /// <summary>
+        /// Broadcasts that a combat driven buff has ended on the owning player.
+        /// </summary>
+        public void ReportStatusEffectRemoved(BuffTimerDefinition definition, string sourceId = null)
+        {
+            var context = new BuffEventContext
+            {
+                target = gameObject,
+                definition = definition,
+                sourceType = BuffSourceType.Combat,
+                sourceId = string.IsNullOrEmpty(sourceId) ? name : sourceId
+            };
+
+            BuffEvents.RaiseBuffRemoved(context);
+        }
 
         private const float TILE_SIZE = 1f;
 

@@ -342,6 +342,7 @@ namespace Inventory
             {
                 if (inventory != null && !inventory.AddItem(current.item, current.count))
                     return false;
+                ItemUseResolver.NotifyItemUsed(gameObject, current.item, ItemUseType.Unequipped);
             }
 
             equipped[index] = entry;
@@ -349,6 +350,7 @@ namespace Inventory
             UpdateBonuses();
             Save();
             OnEquipmentChanged?.Invoke(slot);
+            ItemUseResolver.NotifyItemUsed(gameObject, entry.item, ItemUseType.Equipped);
             return true;
         }
 
@@ -373,6 +375,7 @@ namespace Inventory
                 UpdateBonuses();
                 Save();
                 OnEquipmentChanged?.Invoke(slot);
+                ItemUseResolver.NotifyItemUsed(gameObject, entry.item, ItemUseType.Unequipped);
             }
         }
 
