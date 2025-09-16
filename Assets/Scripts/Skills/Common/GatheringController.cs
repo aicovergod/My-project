@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 using Player;
 using UI;
 using Core.Input;
@@ -434,7 +435,17 @@ namespace Skills.Common
             if (!BlockMouseWhilePointerOverUI)
                 return false;
 
-            return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+            if (EventSystem.current == null)
+                return false;
+
+            if (!(EventSystem.current.currentInputModule is InputSystemUIInputModule module))
+                return false;
+
+            Pointer pointer = Pointer.current;
+            if (pointer == null)
+                return false;
+
+            return module.IsPointerOverGameObject(pointer.pointerId);
         }
 
         /// <summary>

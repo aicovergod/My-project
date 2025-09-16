@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 
 namespace World
 {
@@ -52,7 +54,7 @@ namespace World
             if (!Input.GetMouseButtonDown(0))
                 return;
 
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            if (IsPointerOverUI())
                 return;
 
             var worldPoint = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -108,5 +110,23 @@ namespace World
         private void OnTransitionStarted() => _transitioning = true;
 
         private void OnTransitionCompleted() => _transitioning = false;
+
+        /// <summary>
+        ///     Checks whether the pointer is hovering a UI element managed by the Input System UI module.
+        /// </summary>
+        private static bool IsPointerOverUI()
+        {
+            if (EventSystem.current == null)
+                return false;
+
+            if (!(EventSystem.current.currentInputModule is InputSystemUIInputModule module))
+                return false;
+
+            Pointer pointer = Pointer.current;
+            if (pointer == null)
+                return false;
+
+            return module.IsPointerOverGameObject(pointer.pointerId);
+        }
     }
 }
