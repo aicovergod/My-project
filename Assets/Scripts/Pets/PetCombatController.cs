@@ -18,6 +18,9 @@ namespace Pets
         public PetDefinition definition;
         public float moveSpeed = 5f;
 
+        [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
+        private HitSplatLibrary hitSplatLibrary;
+
         private PetFollower follower;
         private Animator animator;
         private SpriteRenderer spriteRenderer;
@@ -50,9 +53,16 @@ namespace Pets
             if (TryGetComponent<Collider2D>(out var col2d))
                 col2d.isTrigger = true;
 
-            damageHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat");
-            zeroHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Zero_damage_hitsplat");
-            maxHitHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat_maxhit");
+            if (hitSplatLibrary == null)
+            {
+                Debug.LogError("PetCombatController requires a HitSplatLibrary reference. Assign one in the inspector.", this);
+            }
+            else
+            {
+                damageHitsplat = hitSplatLibrary.DamageHitsplat;
+                zeroHitsplat = hitSplatLibrary.ZeroDamageHitsplat;
+                maxHitHitsplat = hitSplatLibrary.MaxHitHitsplat;
+            }
         }
 
         /// <summary>Returns true if this pet has combat capabilities.</summary>
