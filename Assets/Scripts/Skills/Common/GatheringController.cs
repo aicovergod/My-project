@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.UI;
 using Player;
 using UI;
 using Core.Input;
@@ -438,14 +437,9 @@ namespace Skills.Common
             if (EventSystem.current == null)
                 return false;
 
-            if (!(EventSystem.current.currentInputModule is InputSystemUIInputModule module))
-                return false;
-
-            Pointer pointer = Pointer.current;
-            if (pointer == null)
-                return false;
-
-            if (pointer is Touchscreen touchscreen)
+            // Evaluate active touches first so mobile presses correctly block gathering interactions.
+            Touchscreen touchscreen = Touchscreen.current;
+            if (touchscreen != null)
             {
                 var touches = touchscreen.touches;
                 for (int i = 0; i < touches.Count; i++)
@@ -454,15 +448,17 @@ namespace Skills.Common
                     if (!touchControl.press.isPressed)
                         continue;
 
-                    int touchId = touchControl.touchId.ReadValue();
-                    if (module.IsPointerOverGameObject(touchId))
+                    if (EventSystem.current.IsPointerOverGameObject(touchControl.touchId.ReadValue()))
                         return true;
                 }
-
-                return module.IsPointerOverGameObject(touchscreen.deviceId);
             }
 
-            return module.IsPointerOverGameObject(pointer.deviceId);
+            // If a mouse or pen pointer is available, rely on the default EventSystem behaviour.
+            Pointer pointer = Pointer.current;
+            if (pointer != null && !(pointer is Touchscreen))
+                return EventSystem.current.IsPointerOverGameObject();
+
+            return false;
         }
 
         /// <summary>
