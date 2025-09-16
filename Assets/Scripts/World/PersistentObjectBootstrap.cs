@@ -108,6 +108,8 @@ namespace World
 
                 var instance = Instantiate(prefab);
                 instance.name = rootName;
+                // Prevent required objects—such as the main camera—from being destroyed before the initial scene transition.
+                DontDestroyOnLoad(instance);
 
                 if (!TryEnsurePersistentComponent(instance))
                 {
