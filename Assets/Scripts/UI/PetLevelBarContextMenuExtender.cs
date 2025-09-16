@@ -197,7 +197,7 @@ namespace Pets
                 var anchorChild = player.transform.Find("FloatingTextAnchor");
                 if (anchorChild != null)
                     anchor = anchorChild;
-                FloatingText.Show($"+{totalXp} XP", anchor.position);
+                FloatingText.Show($"+{totalXp} XP", anchor);
             }
         }
 
