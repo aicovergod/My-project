@@ -1,13 +1,15 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using Player;
 using UI;
+using Core.Input;
 
 namespace Skills.Common
 {
     /// <summary>
     ///     Generic controller that provides shared gathering behaviour (fishing, mining, woodcutting, etc.).
-    ///     Handles click input, range validation, action cancellation, and capacity checks while exposing
+    ///     Handles interaction input, range validation, action cancellation, and capacity checks while exposing
     ///     abstract hooks so skill specific controllers can inject their own requirements.
     /// </summary>
     /// <typeparam name="TSkill">Specific skill component that drives the gathering logic.</typeparam>
@@ -36,9 +38,22 @@ namespace Skills.Common
         [Tooltip("Cooldown between prospect (right click) interactions.")]
         private float prospectCooldownSeconds = 3f;
 
+        [Header("Input")]
         [SerializeField]
-        [Tooltip("Key used to trigger the closest node while standing inside its trigger volume.")]
-        private KeyCode quickActionKey = KeyCode.E;
+        [Tooltip("Player input component supplying the default action map. Auto-assigned from the hierarchy when empty.")]
+        private PlayerInput playerInput;
+
+        [SerializeField]
+        [Tooltip("Optional override for the Interact action (left click / confirm button).")]
+        private InputActionReference interactActionReference;
+
+        [SerializeField]
+        [Tooltip("Optional override for the Prospect action (right click).")]
+        private InputActionReference prospectActionReference;
+
+        [SerializeField]
+        [Tooltip("Optional override for the Cancel action (escape / back).")]
+        private InputActionReference cancelActionReference;
 
         [Header("References")]
         [SerializeField]
@@ -53,12 +68,20 @@ namespace Skills.Common
         [Tooltip("Camera used for translating screen clicks into world positions.")]
         private Camera worldCamera;
 
-        // Node detected through trigger range so the player can press the interaction key instead of clicking.
+        // Node detected through trigger range so the player can press the interaction action instead of clicking.
         private TNode nearbyNode;
 
-        // Time trackers for throttling mouse input and prospect interactions.
+        // Time trackers for throttling interaction and prospect usage.
         private float nextInteractionAllowedTime;
         private float nextProspectAllowedTime;
+
+        // Cached input actions resolved from the PlayerInput/asset.
+        private InputAction interactAction;
+        private InputAction prospectAction;
+        private InputAction cancelAction;
+        private bool interactActionOwned;
+        private bool prospectActionOwned;
+        private bool cancelActionOwned;
 
         /// <summary>
         ///     Cached reference to the skill component so derived classes can access it safely.
@@ -101,27 +124,22 @@ namespace Skills.Common
         protected float ProspectCooldownSeconds => prospectCooldownSeconds;
 
         /// <summary>
-        ///     Proximity key used when inside a node trigger.
-        /// </summary>
-        protected KeyCode QuickInteractionKey => quickActionKey;
-
-        /// <summary>
         ///     Anchor used when spawning floating feedback text.
         /// </summary>
         protected virtual Transform FeedbackAnchor => transform;
 
         /// <summary>
-        ///     Whether mouse clicks should be blocked while the pointer is over UI.
+        ///     Whether pointer interactions should be blocked while the cursor hovers a UI element.
         /// </summary>
         protected virtual bool BlockMouseWhilePointerOverUI => true;
 
         /// <summary>
-        ///     Whether pressing escape should terminate the active gathering action.
+        ///     Whether invoking the Cancel action should terminate the active gathering action.
         /// </summary>
         protected virtual bool AllowEscapeCancel => true;
 
         /// <summary>
-        ///     Enables pressing <see cref="QuickInteractionKey"/> while a node trigger is active.
+        ///     Enables Interact action presses (keyboard / gamepad confirm) while a node trigger is active.
         /// </summary>
         protected virtual bool AllowQuickActionKey => true;
 
@@ -151,6 +169,10 @@ namespace Skills.Common
                 playerMover = GetComponent<PlayerMover>();
             if (worldCamera == null)
                 worldCamera = Camera.main;
+            if (playerInput == null)
+                playerInput = GetComponent<PlayerInput>();
+            if (playerInput == null)
+                playerInput = GetComponentInParent<PlayerInput>();
         }
 
         /// <summary>
@@ -165,7 +187,23 @@ namespace Skills.Common
         }
 
         /// <summary>
-        ///     Central update loop handling click input, proximity interactions and cancellation rules.
+        ///     Subscribe to the configured input actions when the controller becomes active.
+        /// </summary>
+        protected virtual void OnEnable()
+        {
+            SubscribeToInput();
+        }
+
+        /// <summary>
+        ///     Ensure input actions are released whenever the controller is disabled.
+        /// </summary>
+        protected virtual void OnDisable()
+        {
+            UnsubscribeFromInput();
+        }
+
+        /// <summary>
+        ///     Central update loop that refreshes the cached camera and evaluates cancellation rules.
         /// </summary>
         protected virtual void Update()
         {
@@ -173,53 +211,54 @@ namespace Skills.Common
             if (worldCamera == null)
                 worldCamera = Camera.main;
 
-            HandleEscapeCancel();
-            HandlePrimaryClick();
-            HandleProspectClick();
-            HandleQuickActionKey();
             EvaluateActiveAction();
         }
 
         /// <summary>
-        ///     Reacts to the escape key cancelling the current action when allowed.
+        ///     Hook to be invoked whenever the interact action fires.
         /// </summary>
-        private void HandleEscapeCancel()
+        private void HandleInteractAction(InputAction.CallbackContext context)
         {
-            if (!AllowEscapeCancel)
+            if (!context.performed)
                 return;
 
-            if (Input.GetKeyDown(KeyCode.Escape))
-                RequestStopAction();
-        }
+            // Pointer devices (mouse, pen, touch) behave like the legacy left click handling.
+            if (context.control != null && context.control.device is Pointer)
+            {
+                if (!IsInteractionReady())
+                    return;
 
-        /// <summary>
-        ///     Processes left click input and attempts to start interacting with a node.
-        /// </summary>
-        private void HandlePrimaryClick()
-        {
-            if (!Input.GetMouseButtonDown(0))
+                if (IsPointerOverUI())
+                    return;
+
+                var node = FindNodeUnderCursor();
+                if (node != null)
+                    AttemptStart(node);
+                return;
+            }
+
+            if (!AllowQuickActionKey)
                 return;
 
             if (!IsInteractionReady())
                 return;
 
-            if (IsPointerOverUI())
-                return;
-
-            var node = FindNodeUnderCursor();
-            if (node != null)
-                AttemptStart(node);
+            if (nearbyNode != null)
+                AttemptStart(nearbyNode);
         }
 
         /// <summary>
-        ///     Handles the optional prospect (right click) action shared by mining/fishing.
+        ///     Handles the optional prospect action triggered by right click bindings.
         /// </summary>
-        private void HandleProspectClick()
+        private void HandleProspectAction(InputAction.CallbackContext context)
         {
+            if (!context.performed)
+                return;
+
             if (!SupportsProspecting)
                 return;
 
-            if (!Input.GetMouseButtonDown(1))
+            if (context.control == null || !(context.control.device is Pointer))
                 return;
 
             if (Time.time < nextProspectAllowedTime)
@@ -237,21 +276,17 @@ namespace Skills.Common
         }
 
         /// <summary>
-        ///     Allows keyboard interaction with the closest node when standing inside its trigger.
+        ///     Cancels the current action when the cancel input is pressed.
         /// </summary>
-        private void HandleQuickActionKey()
+        private void HandleCancelAction(InputAction.CallbackContext context)
         {
-            if (!AllowQuickActionKey)
+            if (!context.performed)
                 return;
 
-            if (!Input.GetKeyDown(quickActionKey))
+            if (!AllowEscapeCancel)
                 return;
 
-            if (!IsInteractionReady())
-                return;
-
-            if (nearbyNode != null)
-                AttemptStart(nearbyNode);
+            RequestStopAction();
         }
 
         /// <summary>
@@ -291,14 +326,16 @@ namespace Skills.Common
         }
 
         /// <summary>
-        ///     Converts the current mouse position into a node reference using the derived implementation.
+        ///     Converts the current pointer position into a node reference using the derived implementation.
         /// </summary>
         private TNode FindNodeUnderCursor()
         {
             if (worldCamera == null)
                 return null;
 
-            Vector2 worldPoint = worldCamera.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 fallback = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+            Vector2 screenPoint = InputActionResolver.GetPointerScreenPosition(fallback);
+            Vector2 worldPoint = worldCamera.ScreenToWorldPoint(screenPoint);
             return FindNodeAtWorldPosition(worldPoint);
         }
 
@@ -520,5 +557,74 @@ namespace Skills.Common
         ///     Message displayed when attempting to interact with an already occupied node.
         /// </summary>
         protected virtual string GetBusyMessage(TNode node) => string.Empty;
+
+        /// <summary>
+        ///     Resolve and subscribe to the configured input actions.
+        /// </summary>
+        private void SubscribeToInput()
+        {
+            UnsubscribeFromInput();
+
+            if (playerInput == null)
+            {
+                playerInput = GetComponent<PlayerInput>();
+                if (playerInput == null)
+                    playerInput = GetComponentInParent<PlayerInput>();
+            }
+
+            interactAction = InputActionResolver.Resolve(playerInput, interactActionReference, "Interact",
+                out interactActionOwned);
+            if (interactAction != null)
+                interactAction.performed += HandleInteractAction;
+
+            if (SupportsProspecting)
+            {
+                prospectAction = InputActionResolver.Resolve(playerInput, prospectActionReference, "Prospect",
+                    out prospectActionOwned);
+                if (prospectAction != null)
+                    prospectAction.performed += HandleProspectAction;
+            }
+
+            if (AllowEscapeCancel)
+            {
+                cancelAction = InputActionResolver.Resolve(playerInput, cancelActionReference, "Cancel",
+                    out cancelActionOwned);
+                if (cancelAction != null)
+                    cancelAction.performed += HandleCancelAction;
+            }
+        }
+
+        /// <summary>
+        ///     Unsubscribe from cached input actions and disable them if the resolver enabled them.
+        /// </summary>
+        private void UnsubscribeFromInput()
+        {
+            if (interactAction != null)
+            {
+                interactAction.performed -= HandleInteractAction;
+                if (interactActionOwned)
+                    interactAction.Disable();
+                interactAction = null;
+                interactActionOwned = false;
+            }
+
+            if (prospectAction != null)
+            {
+                prospectAction.performed -= HandleProspectAction;
+                if (prospectActionOwned)
+                    prospectAction.Disable();
+                prospectAction = null;
+                prospectActionOwned = false;
+            }
+
+            if (cancelAction != null)
+            {
+                cancelAction.performed -= HandleCancelAction;
+                if (cancelActionOwned)
+                    cancelAction.Disable();
+                cancelAction = null;
+                cancelActionOwned = false;
+            }
+        }
     }
 }

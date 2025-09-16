@@ -1,8 +1,10 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using ShopSystem;
 using Combat;
 using Pets;
+using Core.Input;
 
 namespace NPC
 {
@@ -18,7 +20,19 @@ namespace NPC
         [Tooltip("If true, open the shop immediately when right-clicked.")]
         public bool openDirectly;
 
+        [Header("Input")]
+        [SerializeField]
+        [Tooltip("Player input component providing the interaction map. Auto-resolved when empty.")]
+        private PlayerInput playerInput;
+
+        [SerializeField]
+        [Tooltip("Optional override for the OpenMenu action used for direct shop opening.")]
+        private InputActionReference openMenuActionReference;
+
         private NpcInteractable interactable;
+        private InputAction openMenuAction;
+        private bool openMenuActionOwned;
+        private bool pointerHovering;
 
         private void Awake()
         {
@@ -29,22 +43,78 @@ namespace NPC
                 interactable.shop = shop;
         }
 
-        private void OnMouseOver()
+        private void OnEnable()
         {
+            pointerHovering = false;
+            SubscribeToInput();
+        }
+
+        private void OnDisable()
+        {
+            pointerHovering = false;
+            UnsubscribeFromInput();
+        }
+
+        private void OnMouseEnter()
+        {
+            pointerHovering = true;
+        }
+
+        private void OnMouseExit()
+        {
+            pointerHovering = false;
+        }
+
+        private void SubscribeToInput()
+        {
+            UnsubscribeFromInput();
+
             if (!openDirectly)
                 return;
+
+            if (playerInput == null)
+                playerInput = FindObjectOfType<PlayerInput>();
+
+            openMenuAction = InputActionResolver.Resolve(playerInput, openMenuActionReference, "OpenMenu",
+                out openMenuActionOwned);
+            if (openMenuAction != null)
+                openMenuAction.performed += HandleOpenMenu;
+        }
+
+        private void UnsubscribeFromInput()
+        {
+            if (openMenuAction != null)
+            {
+                openMenuAction.performed -= HandleOpenMenu;
+                if (openMenuActionOwned)
+                    openMenuAction.Disable();
+                openMenuAction = null;
+                openMenuActionOwned = false;
+            }
+        }
+
+        /// <summary>
+        /// Trigger shop opening (or pet commands) when the input action fires.
+        /// </summary>
+        private void HandleOpenMenu(InputAction.CallbackContext context)
+        {
+            if (!openDirectly || !context.performed)
+                return;
+
+            if (!pointerHovering)
+                return;
+
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
                 return;
-            if (Input.GetMouseButtonDown(1))
-            {
-                if (!PetDropSystem.GuardModeEnabled && PetDropSystem.ActivePetCombat != null && GetComponent<CombatTarget>() != null)
-                {
-                    PetDropSystem.ActivePetCombat.CommandAttack(GetComponent<CombatTarget>());
-                    return;
-                }
 
-                OpenShop();
+            var combatTarget = GetComponent<CombatTarget>();
+            if (!PetDropSystem.GuardModeEnabled && PetDropSystem.ActivePetCombat != null && combatTarget != null)
+            {
+                PetDropSystem.ActivePetCombat.CommandAttack(combatTarget);
+                return;
             }
+
+            OpenShop();
         }
 
         public void OpenShop()
