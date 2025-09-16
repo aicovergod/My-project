@@ -19,11 +19,16 @@ MonoBehaviour:
   stackable: 0
   maxStack: 1
   splittable: 0
+  isUndroppable: 0
+  healAmount: 0
+  replacementItemId: 
   equipmentSlot: 10
   bycatchChanceBonus: 0
   fishingXpBonusMultiplier: 0
+  fishingXpBonusWaterTypes: -1
   woodcuttingXpBonusMultiplier: 0
   miningXpBonusMultiplier: 0
+  cookingXpBonusMultiplier: 0
   skillRequirements:
   - skill: 4
     level: 40
@@ -36,6 +41,6 @@ MonoBehaviour:
     RangeDefence: 0
     MagicDefence: 0
     AttackSpeedTicks: 4
-  onHitPoison: {fileID: 11400000, guid: 5a501ca099d54f02a1139ef22ba213c8, type: 2}
+  onHitPoison: {fileID: 11400000, guid: f6f640a4e0374a80a749d8606f6010d8, type: 2}
   poisonApplyChance: 0.25
   poisonRequiresDamage: 1

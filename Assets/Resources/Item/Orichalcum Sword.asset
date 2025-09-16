@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
+  m_Name: Orichalcum Sword
+  m_EditorClassIdentifier: 
+  id: Orichalcum Sword
+  itemName: Orichalcum Sword
+  icon: {fileID: 21300000, guid: 102ba1a9372e34b4fbb4a7ffae3fc16f, type: 3}
+  description: This looks sharp
+  stackable: 0
+  maxStack: 1
+  splittable: 0
+  isUndroppable: 0
+  healAmount: 0
+  replacementItemId: 
+  equipmentSlot: 10
+  bycatchChanceBonus: 0
+  fishingXpBonusMultiplier: 0
+  fishingXpBonusWaterTypes: -1
+  woodcuttingXpBonusMultiplier: 0
+  miningXpBonusMultiplier: 0
+  cookingXpBonusMultiplier: 0
+  skillRequirements:
+  - skill: 4
+    level: 25
+  combat:
+    Attack: 24
+    Strength: 26
+    Range: 0
+    Magic: 0
+    MeleeDefence: 1
+    RangeDefence: 0
+    MagicDefence: 0
+    AttackSpeedTicks: 4
+  onHitPoison: {fileID: 0}
+  poisonApplyChance: 0.25
+  poisonRequiresDamage: 1

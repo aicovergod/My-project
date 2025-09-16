@@ -20,21 +20,32 @@ MonoBehaviour:
   maxStack: 1
   splittable: 0
   isUndroppable: 0
+  healAmount: 0
+  replacementItemId: 
   equipmentSlot: 1
   bycatchChanceBonus: 0
   fishingXpBonusMultiplier: 0
   fishingXpBonusWaterTypes: -1
   woodcuttingXpBonusMultiplier: 0
   miningXpBonusMultiplier: 0
+  cookingXpBonusMultiplier: 0
   skillRequirements:
   - skill: 6
     level: 80
   combat:
     Attack: 0
     Strength: 4
-    Range: 0
-    Magic: 0
+    Range: -6
+    Magic: -17
     MeleeDefence: 32
     RangeDefence: 18
-    MagicDefence: 10
+    MagicDefence: -2
     AttackSpeedTicks: 0
+  onHitPoison: {fileID: 0}
+  poisonApplyChance: 0.25
+  poisonRequiresDamage: 1
+  isHalberd: 0
+  aoeRadiusTiles: 0
+  coneAngleDeg: 0
+  aoeMaxTargets: 0
+  aoeMultiplier: 0

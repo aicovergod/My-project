@@ -67,6 +67,12 @@ GameObject:
   - component: {fileID: 7342380646047256195}
   - component: {fileID: 1099567880523368060}
   - component: {fileID: 1418513688407256015}
+  - component: {fileID: 1188243290273898710}
+  - component: {fileID: 8168772117157042845}
+  - component: {fileID: 2135814546816086449}
+  - component: {fileID: 3613127701134760555}
+  - component: {fileID: 4675609188221558876}
+  - component: {fileID: 6165058707388082531}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -110,6 +116,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -131,6 +139,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -233,7 +242,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d5d511b1686466a9633c20c696c6564, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xpTable: {fileID: 11400000, guid: 5fc68d467237c9d4388de2f1d141fbc4, type: 2}
   passiveRegenEnabled: 1
   saveProvider: {fileID: 0}
 --- !u!114 &491447706204386932
@@ -252,15 +260,30 @@ MonoBehaviour:
   slotSize: {x: 32, y: 32}
   slotSpacing: {x: 4, y: 4}
   referenceResolution: {x: 640, y: 360}
+  columns: 4
+  useSharedUIRoot: 1
   slotFrameSprite: {fileID: 0}
   emptySlotColor: {r: 0, g: 0, b: 0, a: 0.007843138}
+  stackColorDefault: {r: 1, g: 1, b: 1, a: 1}
+  stackColor10k: {r: 1, g: 1, b: 1, a: 1}
+  stackColor100k: {r: 0, g: 1, b: 0, a: 1}
+  stackColor10m: {r: 0, g: 1, b: 1, a: 1}
+  stackColor100m: {r: 1, g: 0, b: 1, a: 1}
+  stackCountFont: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+  stackCountFontSize: 12
   windowColor: {r: 0.15, g: 0.15, b: 0.15, a: 0.95}
   windowPadding: {x: 8, y: 8}
   windowSize: {x: 83, y: 375}
+  showCloseButton: 0
+  centerOnScreen: 0
+  windowPosition: {x: 480, y: -170}
   tooltipNameFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
   tooltipNameColor: {r: 1, g: 1, b: 1, a: 1}
   tooltipDescriptionFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
   tooltipDescriptionColor: {r: 0.72156864, g: 0.5254902, b: 0.043137256, a: 1}
+  saveKey: InventoryData
+  combinationDatabase: {fileID: 11400000, guid: df7cdbb7e82af404789dbfc409560920, type: 2}
+  selectedIndex: -1
 --- !u!114 &4546782594985685190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -291,6 +314,7 @@ MonoBehaviour:
   rockMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  prospectCooldown: 3
   miningSkill: {fileID: 6125646337061022332}
   pickaxeSelector: {fileID: 7144165460139909622}
   playerMover: {fileID: 5825080390935697164}
@@ -375,10 +399,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e0ea1b551ffcd343800cab44ccf807f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xpTable: {fileID: 11400000, guid: 5fc68d467237c9d4388de2f1d141fbc4, type: 2}
   inventory: {fileID: 491447706204386932}
+  equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
-  saveProvider: {fileID: 0}
 --- !u!114 &4484345410366226628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -391,10 +414,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e009ae6bbcf576459198b27069eeadf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xpTable: {fileID: 11400000, guid: 5fc68d467237c9d4388de2f1d141fbc4, type: 2}
   inventory: {fileID: 491447706204386932}
+  equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
-  saveProvider: {fileID: 0}
 --- !u!114 &224529023114725345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -433,6 +455,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5b90fcddeaa32d2458b1ce60d8e15e8e, type: 2}
   - {fileID: 11400000, guid: 743b14d5d3b216d408ba5a2e769d6392, type: 2}
   - {fileID: 11400000, guid: e0491618bd7ef674d8bfb9ba724bcf5d, type: 2}
+  - {fileID: 11400000, guid: 4c556e240c05ade42aea9ab0f38706c5, type: 2}
   - {fileID: 11400000, guid: 952e4cda1b52796418b8797ded538ddb, type: 2}
   - {fileID: 11400000, guid: 1994f92bad6bed14f9711039a52e743f, type: 2}
   - {fileID: 11400000, guid: b63e6c0d177f6824894c18bd71c63e53, type: 2}
@@ -468,6 +491,7 @@ MonoBehaviour:
   ringSlotSprite: {fileID: 9165299886886544917, guid: 912bfd76f3c414c49853887a1f34fc2f, type: 3}
   shieldSlotSprite: {fileID: 3593463979492878866, guid: dc9c001b4bab91c4d9aded8a3596b13c, type: 3}
   weaponSlotSprite: {fileID: 8601291869735606110, guid: f9d2aeead3a0edb4ca0cef557144230f, type: 3}
+  charmSlotSprite: {fileID: 6820692451709878354, guid: 9b06368411d75f044bf9c46e590d74be, type: 3}
   combatHeaderFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
   combatHeaderColor: {r: 0.72156864, g: 0.5254902, b: 0.043137256, a: 1}
   attackFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
@@ -478,6 +502,10 @@ MonoBehaviour:
   rangeColor: {r: 1, g: 1, b: 1, a: 1}
   magicFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
   magicColor: {r: 1, g: 1, b: 1, a: 1}
+  maxHitHeaderFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
+  maxHitHeaderColor: {r: 1, g: 0, b: 0, a: 1}
+  maxHitFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
+  maxHitColor: {r: 1, g: 1, b: 1, a: 1}
   defenceHeaderFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
   defenceHeaderColor: {r: 0.7215686, g: 0.5254902, b: 0.04313726, a: 1}
   meleeDefFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
@@ -496,6 +524,10 @@ MonoBehaviour:
   petAttackSpeedColor: {r: 1, g: 1, b: 1, a: 1}
   petMaxHitFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
   petMaxHitColor: {r: 1, g: 0, b: 0, a: 1}
+  tooltipNameFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
+  tooltipNameColor: {r: 0.72156864, g: 0.5254902, b: 0.043137256, a: 1}
+  tooltipBonusFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
+  tooltipBonusColor: {r: 1, g: 1, b: 1, a: 1}
   skillManager: {fileID: 5028650979715864874}
   floatingTextAnchor: {fileID: 487381587706843324}
 --- !u!114 &5028650979715864874
@@ -537,6 +569,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   style: 1
+  damageType: 0
 --- !u!114 &4934220548873172218
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -629,6 +662,7 @@ MonoBehaviour:
   visualBinder: {fileID: 1099567880523368060}
   combatBinder: {fileID: 8069331157420240731}
   hudTimer: {fileID: 0}
+  playerMover: {fileID: 0}
 --- !u!114 &1099567880523368060
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -658,3 +692,102 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   offset: 1
+  directionOffset: 0
+--- !u!114 &1188243290273898710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd3b78d5e1484c5981fe06cfaf08763d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventory: {fileID: 491447706204386932}
+  equipment: {fileID: 8439072058276114910}
+  floatingTextAnchor: {fileID: 487381587706843324}
+--- !u!114 &8168772117157042845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dd1e793621a4b0ea9f20b17e25bfb2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactRange: 1.5
+  cancelDistance: 3
+  spotMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  prospectCooldown: 3
+  fishingSkill: {fileID: 1188243290273898710}
+  toolSelector: {fileID: 2135814546816086449}
+  playerMover: {fileID: 5825080390935697164}
+  animator: {fileID: 0}
+--- !u!114 &2135814546816086449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0fb4a3603de46629f25f1dc0a93d5b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allTools:
+  - {fileID: 11400000, guid: c1e73f2ab42195a4d8e3abb3f611177b, type: 2}
+  - {fileID: 11400000, guid: b4db4356babbeac48a01baf6ddfede3f, type: 2}
+  - {fileID: 11400000, guid: c2180687f9967b347bdd2e6ac3153c2b, type: 2}
+  - {fileID: 11400000, guid: 7c6ecd6fb346712409ef8b9d1f67aecc, type: 2}
+  - {fileID: 11400000, guid: 30a8d8123aa0a7749b98426a2cc3aea4, type: 2}
+  - {fileID: 11400000, guid: 8f2ab9007beb33c4ba1b394e300e055a, type: 2}
+  - {fileID: 11400000, guid: c08573f61adf4bc5a7a5e768f8b513c7, type: 2}
+  inventory: {fileID: 491447706204386932}
+  equipment: {fileID: 8439072058276114910}
+  skill: {fileID: 1188243290273898710}
+--- !u!114 &3613127701134760555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6179177d197d4fa199e195fa4b769bcc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4675609188221558876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43cf1b12cd8843bfba005476a51223af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Status.Poison.PoisonController
+  statsComponent: {fileID: 4934220548873172218}
+--- !u!114 &6165058707388082531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 582e91441b154c16a96cb371bc38a2b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Status.Poison.PoisonSaveBridge
+  controller: {fileID: 4675609188221558876}

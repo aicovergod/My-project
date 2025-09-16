@@ -29,6 +29,10 @@ MonoBehaviour:
   MaxConcurrentTargets: 6
   PlayerAggroWeight: 1
   Faction: 2
+  IsPoisonous: 1
+  OnHitPoison: {fileID: 11400000, guid: f6f640a4e0374a80a749d8606f6010d8, type: 2}
+  PoisonChance: 1
+  PoisonRequiresDamage: 1
   elementalModifiers:
   - element: 0
     protectionPercent: 0
