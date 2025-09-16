@@ -71,6 +71,12 @@ namespace Skills.Common
     {
         private const float DefaultXpPopupDelayTicks = 5f;
 
+        /// <summary>
+        /// Consistent floating text scale applied to all gathering rewards so different skills
+        /// present feedback using the same visual size as prospecting popups.
+        /// </summary>
+        internal const float DefaultFloatingTextSize = 0.65f;
+
         public static GatheringRewardResult Process(in GatheringRewardContext context)
         {
             var anchor = context.floatingTextAnchor != null ? context.floatingTextAnchor : context.fallbackAnchor;
@@ -108,7 +114,7 @@ namespace Skills.Common
                     ? "Your inventory is full"
                     : context.inventoryFullMessage;
                 if (anchor != null)
-                    FloatingText.Show(fullMessage, anchor.position);
+                    FloatingText.Show(fullMessage, anchor.position, null, DefaultFloatingTextSize);
                 result.InventoryFull = true;
                 result.NewLevel = result.PreviousLevel;
                 context.onFailure?.Invoke(result);
@@ -127,7 +133,7 @@ namespace Skills.Common
                     ? context.rewardMessageFormatter(result.QuantityAwarded)
                     : $"+{result.QuantityAwarded} {displayName}";
                 if (!string.IsNullOrEmpty(rewardMessage))
-                    FloatingText.Show(rewardMessage, anchor.position);
+                    FloatingText.Show(rewardMessage, anchor.position, null, DefaultFloatingTextSize);
             }
 
             context.onItemsGranted?.Invoke(result);
@@ -215,7 +221,7 @@ namespace Skills.Common
             if (delaySeconds > 0f)
                 yield return new WaitForSeconds(delaySeconds);
             if (anchor != null)
-                FloatingText.Show($"+{xp} XP", anchor.position);
+                FloatingText.Show($"+{xp} XP", anchor.position, null, DefaultFloatingTextSize);
         }
     }
 }

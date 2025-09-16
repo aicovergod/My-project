@@ -52,6 +52,11 @@ namespace Skills.Fishing
                 inventory = GetComponent<Inventory.Inventory>();
             if (equipment == null)
                 equipment = GetComponent<Equipment>();
+            if (floatingTextAnchor == null)
+            {
+                // Ensure floating text uses the dedicated anchor if the field was left unassigned.
+                floatingTextAnchor = transform.Find("FloatingTextAnchor");
+            }
             skills = GetComponent<SkillManager>();
             PreloadFishItems();
             fishingOutfit = new SkillingOutfitProgress(new[]
@@ -101,15 +106,15 @@ namespace Skills.Fishing
                 Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
                 if (inventory == null || !inventory.RemoveItem(currentSpot.def.BaitItemId))
                 {
-                    FloatingText.Show("You need bait", anchor.position);
+                    FloatingText.Show("You need bait", anchor.position, null, GatheringRewardProcessor.DefaultFloatingTextSize);
                     StopFishing();
                     return;
                 }
                 var baitItem = ItemDatabase.GetItem(currentSpot.def.BaitItemId);
                 if (baitItem != null)
-                    FloatingText.Show($"-1 {baitItem.itemName}", anchor.position);
+                    FloatingText.Show($"-1 {baitItem.itemName}", anchor.position, null, GatheringRewardProcessor.DefaultFloatingTextSize);
                 else
-                    FloatingText.Show("-1 bait", anchor.position);
+                    FloatingText.Show("-1 bait", anchor.position, null, GatheringRewardProcessor.DefaultFloatingTextSize);
             }
 
             float baseChance = 0.35f;
@@ -155,7 +160,11 @@ namespace Skills.Fishing
                     {
                         if (result.LeveledUp && result.Anchor != null)
                         {
-                            FloatingText.Show($"Fishing level {result.NewLevel}", result.Anchor.position);
+                            FloatingText.Show(
+                                $"Fishing level {result.NewLevel}",
+                                result.Anchor.position,
+                                null,
+                                GatheringRewardProcessor.DefaultFloatingTextSize);
                             OnLevelUp?.Invoke(result.NewLevel);
                         }
                     },
@@ -268,11 +277,11 @@ namespace Skills.Fishing
             var itemData = ItemDatabase.GetItem(res.item.ItemId);
             if (itemData == null || inventory == null || !inventory.AddItem(itemData, res.quantity))
             {
-                FloatingText.Show("Your inventory is full", anchor.position);
+                FloatingText.Show("Your inventory is full", anchor.position, null, GatheringRewardProcessor.DefaultFloatingTextSize);
                 return;
             }
 
-            FloatingText.Show($"+{res.quantity} {res.item.DisplayName}", anchor.position);
+            FloatingText.Show($"+{res.quantity} {res.item.DisplayName}", anchor.position, null, GatheringRewardProcessor.DefaultFloatingTextSize);
         }
 
         private FishingTool MapTool(FishingToolDefinition tool)
@@ -319,7 +328,7 @@ namespace Skills.Fishing
                 if (inventory == null || !inventory.HasItem(spot.def.BaitItemId))
                 {
                     Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
-                    FloatingText.Show("You need bait", anchor.position);
+                    FloatingText.Show("You need bait", anchor.position, null, GatheringRewardProcessor.DefaultFloatingTextSize);
                     return;
                 }
             }
