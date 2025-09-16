@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1424843122579645638}
   - component: {fileID: 1660509826054094924}
-  - component: {fileID: -5458000856981965856}
   m_Layer: 0
   m_Name: PlayerRespawnSystem
   m_TagString: Untagged
@@ -45,15 +44,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4265ae917bbc463c839850c65a2a49b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerRespawnSystem
---- !u!114 &-5458000856981965856
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2417333853597210264}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a23b760b7356ac141a5ff9fe31e13251, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::World.ScenePersistentObject

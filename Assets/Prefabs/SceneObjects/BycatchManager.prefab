@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1730321474125209323}
   - component: {fileID: 1673605016979059047}
-  - component: {fileID: -536712880797316376}
   m_Layer: 0
   m_Name: BycatchManager
   m_TagString: Untagged
@@ -47,15 +46,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bycatchTable: {fileID: 11400000, guid: 9099503588d0e334b933e7363942b865, type: 2}
   useDailySeed: 1
---- !u!114 &-536712880797316376
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6374956931679646004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a23b760b7356ac141a5ff9fe31e13251, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::World.ScenePersistentObject
