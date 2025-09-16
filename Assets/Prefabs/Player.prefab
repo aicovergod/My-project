@@ -73,6 +73,7 @@ GameObject:
   - component: {fileID: 3613127701134760555}
   - component: {fileID: 4675609188221558876}
   - component: {fileID: 6165058707388082531}
+  - component: {fileID: 7000745351061079601}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -309,15 +310,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0914d7f8c5f70eb489de0a46a9c5bc48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactRange: 1.5
-  cancelDistance: 3
+  defaultInteractRange: 1.5
+  defaultCancelDistance: 3
+  interactionCooldownSeconds: 0.2
+  prospectCooldownSeconds: 3
+  playerInput: {fileID: 0}
+  interactActionReference: {fileID: 0}
+  prospectActionReference: {fileID: 0}
+  cancelActionReference: {fileID: 0}
+  skill: {fileID: 6125646337061022332}
+  playerMover: {fileID: 5825080390935697164}
+  worldCamera: {fileID: 0}
   rockMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  prospectCooldown: 3
-  miningSkill: {fileID: 6125646337061022332}
   pickaxeSelector: {fileID: 7144165460139909622}
-  playerMover: {fileID: 5825080390935697164}
 --- !u!61 &7555130849869520999
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -429,14 +436,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa50e5587460651438851c942f9ca685, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactRange: 1.5
-  cancelDistance: 3
+  defaultInteractRange: 1.5
+  defaultCancelDistance: 3
+  interactionCooldownSeconds: 0.2
+  prospectCooldownSeconds: 3
+  playerInput: {fileID: 0}
+  interactActionReference: {fileID: 0}
+  prospectActionReference: {fileID: 0}
+  cancelActionReference: {fileID: 0}
+  skill: {fileID: 4484345410366226628}
+  playerMover: {fileID: 5825080390935697164}
+  worldCamera: {fileID: 0}
   treeMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  woodcuttingSkill: {fileID: 4484345410366226628}
   axeSelector: {fileID: 1918137810809910746}
-  playerMover: {fileID: 5825080390935697164}
 --- !u!114 &1918137810809910746
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -720,15 +734,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dd1e793621a4b0ea9f20b17e25bfb2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactRange: 1.5
-  cancelDistance: 3
+  defaultInteractRange: 1.5
+  defaultCancelDistance: 3
+  interactionCooldownSeconds: 0.2
+  prospectCooldownSeconds: 3
+  playerInput: {fileID: 0}
+  interactActionReference: {fileID: 0}
+  prospectActionReference: {fileID: 0}
+  cancelActionReference: {fileID: 0}
+  skill: {fileID: 1188243290273898710}
+  playerMover: {fileID: 5825080390935697164}
+  worldCamera: {fileID: 0}
   spotMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  prospectCooldown: 3
-  fishingSkill: {fileID: 1188243290273898710}
   toolSelector: {fileID: 2135814546816086449}
-  playerMover: {fileID: 5825080390935697164}
   animator: {fileID: 0}
 --- !u!114 &2135814546816086449
 MonoBehaviour:
@@ -772,7 +792,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4297641342699346684}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43cf1b12cd8843bfba005476a51223af, type: 3}
   m_Name: 
@@ -791,3 +811,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Status.Poison.PoisonSaveBridge
   controller: {fileID: 4675609188221558876}
+--- !u!114 &7000745351061079601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
+  m_Actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Keyboard&Mouse
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
