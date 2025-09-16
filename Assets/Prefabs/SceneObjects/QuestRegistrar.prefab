@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &3919214416532287126
+--- !u!1 &5392178745851484221
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,8 +8,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4501624427851046971}
-  - component: {fileID: 3334605931551123117}
+  - component: {fileID: 1738358971530823370}
+  - component: {fileID: 5944113595315184592}
+  - component: {fileID: 3243749518771363254}
   m_Layer: 0
   m_Name: QuestRegistrar
   m_TagString: Untagged
@@ -17,13 +18,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4501624427851046971
+--- !u!4 &1738358971530823370
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3919214416532287126}
+  m_GameObject: {fileID: 5392178745851484221}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 65.63561, y: -19.76898, z: 0}
@@ -32,13 +33,13 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3334605931551123117
+--- !u!114 &5944113595315184592
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3919214416532287126}
+  m_GameObject: {fileID: 5392178745851484221}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e6b156ad28484fed9aa2435797d4cc85, type: 3}
@@ -46,3 +47,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   quests:
   - {fileID: 11400000, guid: 0611674d31283824a84cf53887d02bef, type: 2}
+--- !u!114 &3243749518771363254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5392178745851484221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a23b760b7356ac141a5ff9fe31e13251, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::World.ScenePersistentObject
