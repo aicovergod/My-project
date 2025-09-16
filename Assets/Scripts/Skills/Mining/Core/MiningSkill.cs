@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Inventory;
@@ -117,79 +116,65 @@ namespace Skills.Mining
                     oreItems.TryGetValue(ore.Id, out var item);
                     int amount = PetDropSystem.ActivePet?.id == "Rock Golem" ? 2 : 1;
                     if (amount > 1)
-                        BeastmasterXp.TryGrantFromPetAssist(ore.XpPerOre * (amount - 1));
-                    bool added = true;
-                    var petStorage = PetDropSystem.ActivePet?.id == "Rock Golem" && PetDropSystem.ActivePetObject != null
+                        var petStorage = PetDropSystem.ActivePet?.id == "Rock Golem" && PetDropSystem.ActivePetObject != null
                         ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
                         : null;
+                    string oreName = item != null ? item.itemName : ore.DisplayName;
 
-                    Transform anchorTransform = floatingTextAnchor != null
-                        ? floatingTextAnchor
-                        : transform;
-                    Vector3 anchorPos = anchorTransform.position;
-
-                    for (int i = 0; i < amount; i++)
+                    var context = new GatheringRewardContext
                     {
-                        bool stepAdded = false;
-                        if (item != null && inventory != null)
-                            stepAdded = inventory.AddItem(item, 1);
-                        if (!stepAdded && petStorage != null)
-                            stepAdded = petStorage.StoreItem(item, 1);
-                        if (!stepAdded)
+                        runner = this,
+                        skills = skills,
+                        skillType = SkillType.Mining,
+                        inventory = inventory,
+                        petStorage = petStorage,
+                        item = item,
+                        rewardDisplayName = oreName,
+                        quantity = amount,
+                        xpPerItem = ore.XpPerOre,
+                        petAssistExtraQuantity = Mathf.Max(0, amount - 1),
+                        floatingTextAnchor = floatingTextAnchor,
+                        fallbackAnchor = transform,
+                        equipment = equipment,
+                        equipmentXpBonusEvaluator = data => data != null ? data.miningXpBonusMultiplier : 0f,
+                        showItemFloatingText = true,
+                        showXpPopup = true,
+                        xpPopupDelayTicks = 5f,
+                        rewardMessageFormatter = qty => $"+{qty} {ore.DisplayName}",
+                        onItemsGranted = result => OnOreGained?.Invoke(ore.Id, result.QuantityAwarded),
+                        onXpApplied = result =>
                         {
-                            added = false;
-                            break;
-                        }
-                    }
+                            if (result.LeveledUp && result.Anchor != null)
+                            {
+                                FloatingText.Show($"Mining level {result.NewLevel}", result.Anchor.position);
+                                OnLevelUp?.Invoke(result.NewLevel);
+                            }
+                        },
+                        onSuccess = result =>
+                        {
+                            if (ore.PetDropChance > 0)
+                                PetDropSystem.TryRollPet("mining", currentRock.transform.position, skills, ore.PetDropChance, out _);
 
-                    if (!added)
-                    {
-                        FloatingText.Show("Your inventory is full", anchorPos);
-                        StopMining();
+                            if (QuestManager.Instance != null && QuestManager.Instance.IsQuestActive("ToolsOfSurvival"))
+                            {
+                                var quest = QuestManager.Instance.GetQuest("ToolsOfSurvival");
+                                var step = quest?.Steps.Find(s => s.StepID == "MineOres");
+                                if (step != null && !step.IsComplete)
+                                {
+                                    questOreCount += result.QuantityAwarded;
+                                    if (questOreCount >= 3)
+                                        QuestManager.Instance.UpdateStep("ToolsOfSurvival", "MineOres");
+                                }
+                            }
+
+                            TryAwardMiningOutfitPiece();
+                        },
+                        onFailure = _ => StopMining()
+                    };
+
+                    var rewardResult = GatheringRewardProcessor.Process(context);
+                    if (!rewardResult.Success)
                         return;
-                    }
-
-                    float xpBonus = 0f;
-                    if (equipment != null)
-                    {
-                        foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
-                        {
-                            if (slot == EquipmentSlot.None)
-                                continue;
-                            var entry = equipment.GetEquipped(slot);
-                            if (entry.item != null)
-                                xpBonus += entry.item.miningXpBonusMultiplier;
-                        }
-                    }
-                    int xpGain = Mathf.RoundToInt(ore.XpPerOre * amount * (1f + xpBonus));
-                    int oldLevel = skills.GetLevel(SkillType.Mining);
-                    int newLevel = skills.AddXP(SkillType.Mining, xpGain);
-                    FloatingText.Show($"+{amount} {ore.DisplayName}", anchorPos);
-                    StartCoroutine(ShowXpGainDelayed(xpGain, anchorTransform));
-                    OnOreGained?.Invoke(ore.Id, amount);
-
-                    if (ore.PetDropChance > 0)
-                        PetDropSystem.TryRollPet("mining", currentRock.transform.position, skills, ore.PetDropChance, out _);
-
-                    if (QuestManager.Instance != null && QuestManager.Instance.IsQuestActive("ToolsOfSurvival"))
-                    {
-                        var quest = QuestManager.Instance.GetQuest("ToolsOfSurvival");
-                        var step = quest?.Steps.Find(s => s.StepID == "MineOres");
-                        if (step != null && !step.IsComplete)
-                        {
-                            questOreCount += amount;
-                            if (questOreCount >= 3)
-                                QuestManager.Instance.UpdateStep("ToolsOfSurvival", "MineOres");
-                        }
-                    }
-
-                    TryAwardMiningOutfitPiece();
-
-                    if (newLevel > oldLevel)
-                    {
-                        FloatingText.Show($"Mining level {newLevel}", anchorPos);
-                        OnLevelUp?.Invoke(newLevel);
-                    }
                 }
 
                 if (currentRock.IsDepleted)
@@ -198,15 +183,6 @@ namespace Skills.Mining
             else
             {
                 Debug.Log($"Failed to mine {currentRock.name}");
-            }
-        }
-
-        private IEnumerator ShowXpGainDelayed(int xpGain, Transform anchor)
-        {
-            yield return new WaitForSeconds(Ticker.TickDuration * 5f);
-            if (anchor != null)
-            {
-                FloatingText.Show($"+{xpGain} XP", anchor.position);
             }
         }
 
