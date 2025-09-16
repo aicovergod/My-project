@@ -40,10 +40,13 @@ namespace Combat
         private int pendingMaxHit;
         private SpellElement pendingElement;
 
+        [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
+        private HitSplatLibrary hitSplatLibrary;
+
         private Sprite damageHitsplat;
         private Sprite zeroHitsplat;
         private Sprite maxHitHitsplat;
-        private Dictionary<SpellElement, Sprite> elementHitsplats;
+        private IReadOnlyDictionary<SpellElement, Sprite> elementHitsplats;
 
         private void Awake()
         {
@@ -65,19 +68,17 @@ namespace Combat
             if (skills != null)
                 skills.LevelChanged += OnSkillLevelChanged;
 
-            damageHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat");
-            zeroHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Zero_damage_hitsplat");
-            maxHitHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat_maxhit");
-
-            elementHitsplats = new Dictionary<SpellElement, Sprite>
+            if (hitSplatLibrary == null)
             {
-                { SpellElement.Air, Resources.Load<Sprite>("Sprites/HitSplats/Air_hitsplat") },
-                { SpellElement.Water, Resources.Load<Sprite>("Sprites/HitSplats/Water_hitsplat") },
-                { SpellElement.Earth, Resources.Load<Sprite>("Sprites/HitSplats/Earth_hitsplat") },
-                { SpellElement.Electric, Resources.Load<Sprite>("Sprites/HitSplats/Electrocute_hitsplat") },
-                { SpellElement.Ice, Resources.Load<Sprite>("Sprites/HitSplats/Water_hitsplat") },
-                { SpellElement.Fire, Resources.Load<Sprite>("Sprites/HitSplats/Burn_hitsplat") }
-            };
+                Debug.LogError("CombatController requires a HitSplatLibrary reference. Assign one in the inspector.", this);
+            }
+            else
+            {
+                damageHitsplat = hitSplatLibrary.DamageHitsplat;
+                zeroHitsplat = hitSplatLibrary.ZeroDamageHitsplat;
+                maxHitHitsplat = hitSplatLibrary.MaxHitHitsplat;
+                elementHitsplats = hitSplatLibrary.ElementHitsplats;
+            }
         }
 
         /// <summary>

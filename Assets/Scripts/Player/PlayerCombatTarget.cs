@@ -13,29 +13,31 @@ namespace Player
     [RequireComponent(typeof(PlayerHitpoints))]
     public class PlayerCombatTarget : MonoBehaviour, CombatTarget
     {
+        [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
+        private HitSplatLibrary hitSplatLibrary;
+
         private PlayerHitpoints hitpoints;
         private Sprite damageHitsplat;
         private Sprite zeroHitsplat;
         private Sprite burnHitsplat;
         private Sprite poisonHitsplat;
-        private Dictionary<SpellElement, Sprite> elementHitsplats;
+        private IReadOnlyDictionary<SpellElement, Sprite> elementHitsplats;
 
         private void Awake()
         {
             hitpoints = GetComponent<PlayerHitpoints>();
-            damageHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Damage_hitsplat");
-            zeroHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Zero_damage_hitsplat");
-            burnHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Burn_hitsplat");
-            poisonHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Poison_hitsplat");
-            elementHitsplats = new Dictionary<SpellElement, Sprite>
+            if (hitSplatLibrary == null)
             {
-                { SpellElement.Air, Resources.Load<Sprite>("Sprites/HitSplats/Air_hitsplat") },
-                { SpellElement.Water, Resources.Load<Sprite>("Sprites/HitSplats/Water_hitsplat") },
-                { SpellElement.Earth, Resources.Load<Sprite>("Sprites/HitSplats/Earth_hitsplat") },
-                { SpellElement.Electric, Resources.Load<Sprite>("Sprites/HitSplats/Electrocute_hitsplat") },
-                { SpellElement.Ice, Resources.Load<Sprite>("Sprites/HitSplats/Water_hitsplat") },
-                { SpellElement.Fire, burnHitsplat }
-            };
+                Debug.LogError("PlayerCombatTarget requires a HitSplatLibrary reference. Assign one in the inspector.", this);
+            }
+            else
+            {
+                damageHitsplat = hitSplatLibrary.DamageHitsplat;
+                zeroHitsplat = hitSplatLibrary.ZeroDamageHitsplat;
+                burnHitsplat = hitSplatLibrary.BurnHitsplat;
+                poisonHitsplat = hitSplatLibrary.PoisonHitsplat;
+                elementHitsplats = hitSplatLibrary.ElementHitsplats;
+            }
         }
 
         public bool IsAlive => hitpoints.CurrentHp > 0;

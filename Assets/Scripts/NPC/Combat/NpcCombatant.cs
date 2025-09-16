@@ -15,6 +15,8 @@ namespace NPC
     public class NpcCombatant : MonoBehaviour, CombatTarget, IFactionProvider
     {
         [SerializeField] private NpcCombatProfile profile;
+        [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
+        private HitSplatLibrary hitSplatLibrary;
         private int currentHp;
         private Collider2D collider2D;
         private SpriteRenderer spriteRenderer;
@@ -46,7 +48,14 @@ namespace NPC
             wanderer = GetComponent<NpcWanderer>();
             ResetDamageCounters();
             OnHealthChanged?.Invoke(currentHp, MaxHP);
-            poisonHitsplat = Resources.Load<Sprite>("Sprites/HitSplats/Poison_hitsplat");
+            if (hitSplatLibrary == null)
+            {
+                Debug.LogError("NpcCombatant requires a HitSplatLibrary reference. Assign one in the inspector.", this);
+            }
+            else
+            {
+                poisonHitsplat = hitSplatLibrary.PoisonHitsplat;
+            }
 
             if (profile != null && profile.IsPoisonous && profile.OnHitPoison != null)
             {
