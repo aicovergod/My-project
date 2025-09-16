@@ -7,7 +7,7 @@ namespace World
     /// <summary>
     /// Handles fading the screen in and out using a full screen canvas.
     /// </summary>
-    public class ScreenFader : MonoBehaviour
+    public class ScreenFader : ScenePersistentObject
     {
         public static ScreenFader Instance;
 
@@ -16,13 +16,15 @@ namespace World
 
         private CanvasGroup _group;
 
-        private void Awake()
+        protected override void Awake()
         {
             if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
                 return;
             }
+
+            base.Awake();
 
             Instance = this;
             DontDestroyOnLoad(gameObject);

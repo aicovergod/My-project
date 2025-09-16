@@ -14,7 +14,12 @@ namespace World
         // alongside the existing instance that was carried over via
         // DontDestroyOnLoad, leading to duplicated managers and HUD
         // elements.
-        void Awake()
+        /// <summary>
+        /// Performs duplicate detection so only a single copy of the object survives
+        /// scene loads.  Derived classes should call the base implementation when
+        /// overriding <see cref="Awake"/>.
+        /// </summary>
+        protected virtual void Awake()
         {
             var others = FindObjectsOfType<ScenePersistentObject>();
             foreach (var obj in others)

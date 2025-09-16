@@ -1,12 +1,13 @@
 using UnityEngine;
 using Quests;
+using World;
 
 namespace Dialogue
 {
     /// <summary>
     /// Controls dialogue flow and applies option actions.
     /// </summary>
-    public class DialogueManager : MonoBehaviour
+    public class DialogueManager : ScenePersistentObject
     {
         public static DialogueManager Instance { get; private set; }
 
@@ -14,13 +15,16 @@ namespace Dialogue
         private int currentIndex;
         private DialogueUI ui;
 
-        private void Awake()
+        protected override void Awake()
         {
             if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
                 return;
             }
+
+            base.Awake();
+
             Instance = this;
             DontDestroyOnLoad(gameObject);
 

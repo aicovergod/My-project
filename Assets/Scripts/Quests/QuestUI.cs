@@ -4,13 +4,14 @@ using UnityEngine.UI;
 using Inventory;
 using Player;
 using UI;
+using World;
 
 namespace Quests
 {
     /// <summary>
     /// Simple quest log UI built entirely in code.
     /// </summary>
-    public class QuestUI : MonoBehaviour, IUIWindow
+    public class QuestUI : ScenePersistentObject, IUIWindow
     {
         private RectTransform listContent;
         private Text titleText;
@@ -28,13 +29,15 @@ namespace Quests
 
         public bool IsOpen => canvas != null && canvas.enabled;
 
-        private void Awake()
+        protected override void Awake()
         {
             if (instance != null && instance != this)
             {
                 Destroy(gameObject);
                 return;
             }
+
+            base.Awake();
 
             instance = this;
             name = "QuestUI";

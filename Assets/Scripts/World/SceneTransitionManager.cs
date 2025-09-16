@@ -8,7 +8,7 @@ namespace World
     /// <summary>
     /// Manages moving key objects between scenes and handling fade transitions.
     /// </summary>
-    public class SceneTransitionManager : MonoBehaviour
+    public class SceneTransitionManager : ScenePersistentObject
     {
         public static SceneTransitionManager Instance;
         public static bool IsTransitioning;
@@ -31,13 +31,15 @@ namespace World
                 _persistentObjects.Remove(obj);
         }
 
-        private void Awake()
+        protected override void Awake()
         {
             if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
                 return;
             }
+
+            base.Awake();
 
             Instance = this;
             DontDestroyOnLoad(gameObject);

@@ -2,13 +2,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using Core.Save;
+using World;
 
 namespace Quests
 {
     /// <summary>
     /// Manages the player's quests and notifies listeners when they change.
     /// </summary>
-    public class QuestManager : MonoBehaviour, ISaveable
+    public class QuestManager : ScenePersistentObject, ISaveable
     {
         public static QuestManager Instance { get; private set; }
 
@@ -21,13 +22,16 @@ namespace Quests
 
         private const string SaveKey = "QuestData";
 
-        private void Awake()
+        protected override void Awake()
         {
             if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
                 return;
             }
+
+            base.Awake();
+
             Instance = this;
             DontDestroyOnLoad(gameObject);
 

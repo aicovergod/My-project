@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using World;
 
 namespace Skills.Fishing
 {
-    public class BycatchManager : MonoBehaviour
+    public class BycatchManager : ScenePersistentObject
     {
         public BycatchTable bycatchTable;
         public bool useDailySeed = true;
@@ -20,7 +21,7 @@ namespace Skills.Fishing
 
         private static BycatchManager instance;
 
-        private void Awake()
+        protected override void Awake()
         {
             if (instance != null && instance != this)
             {
@@ -29,6 +30,7 @@ namespace Skills.Fishing
             }
 
             instance = this;
+            base.Awake();
             DontDestroyOnLoad(gameObject);
         }
 

@@ -1,20 +1,21 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using World;
 
 namespace UI
 {
     /// <summary>
     /// Displays the remaining merge time at the top centre of the screen.
     /// </summary>
-    public class MergeHudTimer : MonoBehaviour
+    public class MergeHudTimer : ScenePersistentObject
     {
         [SerializeField] private Font font;
         private Text text;
         private Image background;
         private static MergeHudTimer instance;
 
-        private void Awake()
+        protected override void Awake()
         {
             if (instance != null && instance != this)
             {
@@ -22,6 +23,9 @@ namespace UI
                 return;
             }
             instance = this;
+
+            base.Awake();
+            DontDestroyOnLoad(gameObject);
 
             var canvas = GetComponentInChildren<Canvas>();
             if (canvas == null)
