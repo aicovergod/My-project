@@ -57,11 +57,6 @@ namespace Skills.Mining
                 inventory = GetComponent<Inventory.Inventory>();
             if (equipment == null)
                 equipment = GetComponent<Equipment>();
-            if (floatingTextAnchor == null)
-            {
-                // Cache the floating text anchor automatically so popups appear at head height.
-                floatingTextAnchor = transform.Find("FloatingTextAnchor");
-            }
             skills = GetComponent<SkillManager>();
             PreloadOreItems();
             miningOutfit = new SkillingOutfitProgress(new[]
@@ -153,11 +148,7 @@ namespace Skills.Mining
                         {
                             if (result.LeveledUp && result.Anchor != null)
                             {
-                                FloatingText.Show(
-                                    $"Mining level {result.NewLevel}",
-                                    result.Anchor,
-                                    null,
-                                    GatheringRewardProcessor.DefaultFloatingTextSize);
+                                FloatingText.Show($"Mining level {result.NewLevel}", result.Anchor.position);
                                 OnLevelUp?.Invoke(result.NewLevel);
                             }
                         },

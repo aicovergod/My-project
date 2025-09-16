@@ -438,7 +438,7 @@ namespace Skills.Common
                 return;
 
             Transform anchor = FeedbackAnchor != null ? FeedbackAnchor : transform;
-            FloatingText.Show(message, anchor);
+            FloatingText.Show(message, anchor.position);
         }
 
         /// <summary>

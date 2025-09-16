@@ -210,7 +210,7 @@ namespace UI
             if (skills != null && skills.GetLevel(SkillType.Magic) < spell.requiredMagicLevel)
             {
                 var anchor = loadout.transform.Find("FloatingTextAnchor") ?? loadout.transform;
-                FloatingText.Show($"You need a Magic level of {spell.requiredMagicLevel} to use this spell", anchor);
+                FloatingText.Show($"You need a Magic level of {spell.requiredMagicLevel} to use this spell", anchor.position);
                 return;
             }
 
