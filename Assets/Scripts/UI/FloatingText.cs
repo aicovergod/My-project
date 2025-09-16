@@ -38,7 +38,9 @@ namespace UI
         /// <param name="color">Optional colour override.</param>
         /// <param name="size">Optional size override in OSRS units (1 = 64px font).</param>
         /// <param name="background">Optional background sprite.</param>
-        public static void Show(string message, Vector3 position, Color? color = null, float? size = null, Sprite background = null)
+        /// <param name="worldOffset">Optional world-space offset that overrides the default spawn offset.</param>
+        public static void Show(string message, Vector3 position, Color? color = null, float? size = null, Sprite background = null,
+            Vector3? worldOffset = null)
         {
             var pool = FloatingTextPool.Instance;
             if (pool == null)
@@ -53,7 +55,7 @@ namespace UI
                 return;
             }
 
-            instance.Present(message, position, color, size, background);
+            instance.Present(message, position, color, size, background, worldOffset);
         }
 
         /// <summary>
@@ -81,7 +83,8 @@ namespace UI
         /// <param name="color">Optional colour override.</param>
         /// <param name="size">Optional size override in OSRS units.</param>
         /// <param name="background">Optional background sprite override.</param>
-        internal void Present(string message, Vector3 position, Color? color, float? size, Sprite background)
+        /// <param name="worldOffset">Optional override that controls where the text spawns relative to the provided position.</param>
+        internal void Present(string message, Vector3 position, Color? color, float? size, Sprite background, Vector3? worldOffset)
         {
             if (uiText == null)
             {
@@ -93,7 +96,8 @@ namespace UI
                 gameObject.SetActive(true);
 
             // Capture the desired world position with the configured spawn offset so text renders above the anchor point.
-            worldPosition = position + spawnOffset;
+            Vector3 offset = worldOffset ?? spawnOffset;
+            worldPosition = position + offset;
             mainCamera = Camera.main;
 
             float finalSize = Mathf.Max(0.01f, size ?? textSize);
