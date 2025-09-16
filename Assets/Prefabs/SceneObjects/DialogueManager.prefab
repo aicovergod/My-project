@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7500953353994040917}
   - component: {fileID: 8531773506327946706}
-  - component: {fileID: -1749587285411163875}
   m_Layer: 0
   m_Name: DialogueManager
   m_TagString: Untagged
@@ -45,15 +44,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 385067e1ae9b4e56888001d3cf5132b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &-1749587285411163875
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5924813278431017395}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a23b760b7356ac141a5ff9fe31e13251, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::World.ScenePersistentObject

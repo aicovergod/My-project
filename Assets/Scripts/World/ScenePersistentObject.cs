@@ -39,7 +39,21 @@ namespace World
             foreach (var obj in others)
             {
                 // Ignore unrelated persistent objects.
-                if (obj == this || obj.gameObject.name != gameObject.name)
+                if (obj == this)
+                {
+                    continue;
+                }
+
+                // Allow derived components that live on the same GameObject to
+                // coexist without being flagged as duplicates.  Prefabs often
+                // include a base ScenePersistentObject component alongside a
+                // specialised subclass and they should not cull each other.
+                if (obj.gameObject == gameObject)
+                {
+                    continue;
+                }
+
+                if (obj.gameObject.name != gameObject.name)
                 {
                     continue;
                 }
@@ -68,7 +82,17 @@ namespace World
             // lifecycle logic.
             foreach (var obj in others)
             {
-                if (obj == this || obj.gameObject.name != gameObject.name)
+                if (obj == this)
+                {
+                    continue;
+                }
+
+                if (obj.gameObject == gameObject)
+                {
+                    continue;
+                }
+
+                if (obj.gameObject.name != gameObject.name)
                 {
                     continue;
                 }
