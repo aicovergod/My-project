@@ -47,6 +47,11 @@ namespace Skills.Cooking
                 inventory = GetComponent<Inventory.Inventory>();
             if (equipment == null)
                 equipment = GetComponent<Equipment>();
+            if (floatingTextAnchor == null)
+            {
+                // Locate the floating text anchor automatically when the inspector reference is missing.
+                floatingTextAnchor = transform.Find("FloatingTextAnchor");
+            }
             skills = GetComponent<SkillManager>();
             cookingOutfit = new SkillingOutfitProgress(new[]
             {
@@ -129,7 +134,7 @@ namespace Skills.Cooking
             bool burned = UnityEngine.Random.value < burnChance;
             if (burned)
             {
-                FloatingText.Show("Burned", anchor.position);
+                FloatingText.Show("Burned", anchor.position, null, GatheringRewardProcessor.DefaultFloatingTextSize);
             }
             else
             {
@@ -163,7 +168,11 @@ namespace Skills.Cooking
 
                         if (result.LeveledUp && result.Anchor != null)
                         {
-                            FloatingText.Show($"Cooking level {result.NewLevel}", result.Anchor.position);
+                            FloatingText.Show(
+                                $"Cooking level {result.NewLevel}",
+                                result.Anchor.position,
+                                null,
+                                GatheringRewardProcessor.DefaultFloatingTextSize);
                             OnLevelUp?.Invoke(result.NewLevel);
                         }
                     },
