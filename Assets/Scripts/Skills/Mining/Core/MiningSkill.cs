@@ -6,6 +6,7 @@ using Inventory;
 using Util;
 using Skills.Mining;
 using Skills;
+using Skills.Common;
 using Pets;
 using Quests;
 using BankSystem;
@@ -20,7 +21,7 @@ namespace Skills.Mining
     /// Handles XP, level, and mining tick logic.
     /// </summary>
     [DisallowMultipleComponent]
-    public class MiningSkill : MonoBehaviour, ITickable
+    public class MiningSkill : TickedSkillBehaviour
     {
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
@@ -69,48 +70,17 @@ namespace Skills.Mining
             }, "MiningOutfitOwned");
         }
 
-        private Coroutine tickerCoroutine;
-
-        private void OnEnable()
-        {
-            TrySubscribeToTicker();
-        }
-
-        private void OnDisable()
-        {
-            if (Ticker.Instance != null)
-                Ticker.Instance.Unsubscribe(this);
-            if (tickerCoroutine != null)
-                StopCoroutine(tickerCoroutine);
-        }
-
         private void OnDestroy()
         {
             SaveManager.Unregister(miningOutfit);
         }
 
-        private void TrySubscribeToTicker()
-        {
-            if (Ticker.Instance != null)
-            {
-                Ticker.Instance.Subscribe(this);
-                Debug.Log("MiningSkill subscribed to ticker.");
-            }
-            else
-            {
-                tickerCoroutine = StartCoroutine(WaitForTicker());
-            }
-        }
+        /// <summary>
+        ///     Enables ticker logging so we can trace subscription timing during debugging sessions.
+        /// </summary>
+        protected override bool LogTickerSubscription => true;
 
-        private IEnumerator WaitForTicker()
-        {
-            while (Ticker.Instance == null)
-                yield return null;
-            Ticker.Instance.Subscribe(this);
-            Debug.Log("MiningSkill subscribed to ticker after waiting.");
-        }
-
-        public void OnTick()
+        protected override void HandleTick()
         {
             if (!IsMining)
                 return;
