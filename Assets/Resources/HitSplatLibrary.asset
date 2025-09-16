@@ -9,12 +9,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 694728a00baa4b40862326791255c111, type: 3}
+  m_Script: {fileID: 11500000, guid: fb3e953143762924ab01f74f2ad22e20, type: 3}
   m_Name: HitSplatLibrary
-  m_EditorClassIdentifier:
-  damageHitsplat: {fileID: 0}
-  zeroDamageHitsplat: {fileID: 0}
-  maxHitHitsplat: {fileID: 0}
-  burnHitsplat: {fileID: 0}
-  poisonHitsplat: {fileID: 0}
-  elementalHitsplats: []
+  m_EditorClassIdentifier: 
+  damageHitsplat: {fileID: 2643565242304681076, guid: 804df3f2290dcd14ab6513e35cefd06d, type: 3}
+  zeroDamageHitsplat: {fileID: 5674328677316794200, guid: 43034e62b0c73fc48ab4f35b0c2fd725, type: 3}
+  maxHitHitsplat: {fileID: -6248954236745575685, guid: 1b7210ee5d76d094ebc139b13a1bcf4c, type: 3}
+  burnHitsplat: {fileID: 7059404773132378763, guid: feb36fbdde13f434ea96af30dadf8f4c, type: 3}
+  poisonHitsplat: {fileID: 4406498984485628535, guid: cd65afd14ba67424c8494b3f1ab44b16, type: 3}
+  elementalHitsplats:
+  - element: 0
+    sprite: {fileID: -4135240501904523552, guid: a478b19992e0850449b1867582309abb, type: 3}
+  - element: 1
+    sprite: {fileID: -382790863921028431, guid: f23bff0e4193e2a428e8664139a53e68, type: 3}
+  - element: 2
+    sprite: {fileID: -3751032464632176838, guid: 98994045b857b0447a1e955dc17b80b2, type: 3}
+  - element: 3
+    sprite: {fileID: -7686577212322968770, guid: 4ca971e08a509dd4cbe74b140a6eb374, type: 3}
+  - element: 5
+    sprite: {fileID: 7059404773132378763, guid: feb36fbdde13f434ea96af30dadf8f4c, type: 3}

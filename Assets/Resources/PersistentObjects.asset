@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: PersistentObjects
   m_EditorClassIdentifier: Assembly-CSharp:World:PersistentObjectCatalog
   prefabs:
+  - {fileID: 555555000000000001, guid: 9b1961207fca43848edaec514a127f6b, type: 3}
   - {fileID: 6374956931679646004, guid: 4fbebeaadd02b7746bc147a808fd9b35, type: 3}
   - {fileID: 5924813278431017395, guid: aeacb8d3016fc954a9ae3e09e95f736c, type: 3}
   - {fileID: 1514773939915699660, guid: 2078d3a350deadb47ad4bb20d3df4805, type: 3}
@@ -31,4 +32,3 @@ MonoBehaviour:
   - {fileID: 1337000000000000000, guid: 24e6c0c2e5b54061bcf3d3e331bbb747, type: 3}
   - {fileID: 1450000000000000000, guid: b5491e846856443d99a8573cd56be3d9, type: 3}
   - {fileID: 3292544441928706444, guid: dbb802ba54777614f868b6f0b207cee2, type: 3}
-  - {fileID: 555555000000000001, guid: 9b1961207fca43848edaec514a127f6b, type: 3}
