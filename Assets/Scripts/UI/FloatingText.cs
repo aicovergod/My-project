@@ -26,6 +26,9 @@ namespace UI
         private RectTransform textRect;
         private Image backgroundImage;
         private Vector3 worldPosition;
+        private Vector3 anchorOffset;
+        private Vector3 driftOffset;
+        private Transform followTarget;
         private Camera mainCamera;
         private float remainingLifetime;
         private FloatingTextPool owningPool;
@@ -55,7 +58,41 @@ namespace UI
                 return;
             }
 
-            instance.Present(message, position, color, size, background, worldOffset);
+            instance.Present(message, position, color, size, background, worldOffset, null);
+        }
+
+        /// <summary>
+        /// Displays a floating text message that follows the supplied transform during its lifetime.
+        /// </summary>
+        /// <param name="message">Message to render.</param>
+        /// <param name="anchor">Transform the floating text should follow.</param>
+        /// <param name="color">Optional colour override.</param>
+        /// <param name="size">Optional size override in OSRS units (1 = 64px font).</param>
+        /// <param name="background">Optional background sprite.</param>
+        /// <param name="worldOffset">Optional world-space offset that overrides the default spawn offset.</param>
+        public static void Show(string message, Transform anchor, Color? color = null, float? size = null, Sprite background = null,
+            Vector3? worldOffset = null)
+        {
+            if (anchor == null)
+            {
+                Debug.LogWarning("FloatingText.Show(Transform) was invoked with a null anchor and will be ignored.");
+                return;
+            }
+
+            var pool = FloatingTextPool.Instance;
+            if (pool == null)
+            {
+                Debug.LogWarning("FloatingText.Show was called but no FloatingTextPool exists in the scene.");
+                return;
+            }
+
+            if (!pool.TryGet(out FloatingText instance) || instance == null)
+            {
+                Debug.LogWarning("FloatingTextPool is exhausted and cannot provide a floating text instance.");
+                return;
+            }
+
+            instance.Present(message, anchor.position, color, size, background, worldOffset, anchor);
         }
 
         /// <summary>
@@ -84,7 +121,8 @@ namespace UI
         /// <param name="size">Optional size override in OSRS units.</param>
         /// <param name="background">Optional background sprite override.</param>
         /// <param name="worldOffset">Optional override that controls where the text spawns relative to the provided position.</param>
-        internal void Present(string message, Vector3 position, Color? color, float? size, Sprite background, Vector3? worldOffset)
+        /// <param name="target">Optional transform to follow while the text remains active.</param>
+        internal void Present(string message, Vector3 position, Color? color, float? size, Sprite background, Vector3? worldOffset, Transform target)
         {
             if (uiText == null)
             {
@@ -96,8 +134,12 @@ namespace UI
                 gameObject.SetActive(true);
 
             // Capture the desired world position with the configured spawn offset so text renders above the anchor point.
-            Vector3 offset = worldOffset ?? spawnOffset;
-            worldPosition = position + offset;
+            anchorOffset = worldOffset ?? spawnOffset;
+            driftOffset = Vector3.zero;
+            followTarget = target;
+
+            Vector3 basePosition = followTarget != null ? followTarget.position : position;
+            worldPosition = basePosition + anchorOffset;
             mainCamera = Camera.main;
 
             float finalSize = Mathf.Max(0.01f, size ?? textSize);
@@ -145,7 +187,15 @@ namespace UI
             if (remainingLifetime <= 0f)
                 return;
 
-            worldPosition += floatSpeed * Time.deltaTime;
+            if (followTarget != null)
+            {
+                driftOffset += floatSpeed * Time.deltaTime;
+                worldPosition = followTarget.position + anchorOffset + driftOffset;
+            }
+            else
+            {
+                worldPosition += floatSpeed * Time.deltaTime;
+            }
             UpdateScreenPosition();
 
             remainingLifetime -= Time.deltaTime;
@@ -175,6 +225,9 @@ namespace UI
         {
             remainingLifetime = 0f;
             worldPosition = Vector3.zero;
+            anchorOffset = Vector3.zero;
+            driftOffset = Vector3.zero;
+            followTarget = null;
             mainCamera = null;
 
             if (uiText != null)

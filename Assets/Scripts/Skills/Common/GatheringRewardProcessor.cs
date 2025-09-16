@@ -114,7 +114,7 @@ namespace Skills.Common
                     ? "Your inventory is full"
                     : context.inventoryFullMessage;
                 if (anchor != null)
-                    FloatingText.Show(fullMessage, anchor.position, null, DefaultFloatingTextSize);
+                    FloatingText.Show(fullMessage, anchor, null, DefaultFloatingTextSize);
                 result.InventoryFull = true;
                 result.NewLevel = result.PreviousLevel;
                 context.onFailure?.Invoke(result);
@@ -133,7 +133,7 @@ namespace Skills.Common
                     ? context.rewardMessageFormatter(result.QuantityAwarded)
                     : $"+{result.QuantityAwarded} {displayName}";
                 if (!string.IsNullOrEmpty(rewardMessage))
-                    FloatingText.Show(rewardMessage, anchor.position, null, DefaultFloatingTextSize);
+                    FloatingText.Show(rewardMessage, anchor, null, DefaultFloatingTextSize);
             }
 
             context.onItemsGranted?.Invoke(result);
@@ -221,7 +221,7 @@ namespace Skills.Common
             if (delaySeconds > 0f)
                 yield return new WaitForSeconds(delaySeconds);
             if (anchor != null)
-                FloatingText.Show($"+{xp} XP", anchor.position, null, DefaultFloatingTextSize);
+                FloatingText.Show($"+{xp} XP", anchor, null, DefaultFloatingTextSize);
         }
     }
 }

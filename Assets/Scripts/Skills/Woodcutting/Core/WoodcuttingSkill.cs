@@ -147,7 +147,7 @@ namespace Skills.Woodcutting
                         {
                             FloatingText.Show(
                                 $"Woodcutting level {result.NewLevel}",
-                                result.Anchor.position,
+                                result.Anchor,
                                 null,
                                 GatheringRewardProcessor.DefaultFloatingTextSize);
                             OnLevelUp?.Invoke(result.NewLevel);

@@ -155,7 +155,7 @@ namespace Skills.Mining
                             {
                                 FloatingText.Show(
                                     $"Mining level {result.NewLevel}",
-                                    result.Anchor.position,
+                                    result.Anchor,
                                     null,
                                     GatheringRewardProcessor.DefaultFloatingTextSize);
                                 OnLevelUp?.Invoke(result.NewLevel);

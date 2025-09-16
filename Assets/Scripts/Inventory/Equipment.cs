@@ -327,7 +327,7 @@ namespace Inventory
                     if (skillManager.GetLevel(req.skill) < req.level)
                     {
                         Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
-                        FloatingText.Show($"You need {req.level} {req.skill} to wield this", anchor.position);
+                        FloatingText.Show($"You need {req.level} {req.skill} to wield this", anchor);
                         return false;
                     }
                 }

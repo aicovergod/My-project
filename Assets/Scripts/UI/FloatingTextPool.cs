@@ -12,7 +12,7 @@ namespace UI
     public class FloatingTextPool : MonoBehaviour
     {
         /// <summary>
-        /// Global accessor so <see cref="FloatingText.Show(string, Vector3, Color?, float?, Sprite)"/> can locate the pool.
+        /// Global accessor so <see cref="FloatingText"/> helpers can locate the active pool instance.
         /// </summary>
         public static FloatingTextPool Instance { get; private set; }
 

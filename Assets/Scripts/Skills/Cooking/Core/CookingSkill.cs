@@ -134,7 +134,7 @@ namespace Skills.Cooking
             bool burned = UnityEngine.Random.value < burnChance;
             if (burned)
             {
-                FloatingText.Show("Burned", anchor.position, null, GatheringRewardProcessor.DefaultFloatingTextSize);
+                FloatingText.Show("Burned", anchor, null, GatheringRewardProcessor.DefaultFloatingTextSize);
             }
             else
             {
@@ -170,7 +170,7 @@ namespace Skills.Cooking
                         {
                             FloatingText.Show(
                                 $"Cooking level {result.NewLevel}",
-                                result.Anchor.position,
+                                result.Anchor,
                                 null,
                                 GatheringRewardProcessor.DefaultFloatingTextSize);
                             OnLevelUp?.Invoke(result.NewLevel);
