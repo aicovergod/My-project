@@ -17,6 +17,12 @@ namespace NPC
         [SerializeField] private NpcCombatProfile profile;
         [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
         private HitSplatLibrary hitSplatLibrary;
+
+        /// <summary>
+        /// Shared cached reference so NPCs can automatically use the global hitsplat
+        /// library without paying the cost of repeated Resources lookups.
+        /// </summary>
+        private static HitSplatLibrary sharedHitSplatLibrary;
         private int currentHp;
         private Collider2D collider2D;
         private SpriteRenderer spriteRenderer;
@@ -48,6 +54,9 @@ namespace NPC
             wanderer = GetComponent<NpcWanderer>();
             ResetDamageCounters();
             OnHealthChanged?.Invoke(currentHp, MaxHP);
+
+            EnsureHitSplatLibrary();
+
             if (hitSplatLibrary == null)
             {
                 Debug.LogError("NpcCombatant requires a HitSplatLibrary reference. Assign one in the inspector.", this);
@@ -181,6 +190,22 @@ namespace NPC
         {
             playerDamage = 0;
             npcDamage = 0;
+        }
+
+        /// <summary>
+        /// Ensure the NPC has access to a hitsplat library, loading the shared asset from
+        /// the Resources folder when no explicit reference is configured in the inspector.
+        /// </summary>
+        private void EnsureHitSplatLibrary()
+        {
+            if (hitSplatLibrary != null)
+                return;
+
+            if (sharedHitSplatLibrary == null)
+                sharedHitSplatLibrary = Resources.Load<HitSplatLibrary>("HitSplatLibrary");
+
+            if (sharedHitSplatLibrary != null)
+                hitSplatLibrary = sharedHitSplatLibrary;
         }
     }
 }
