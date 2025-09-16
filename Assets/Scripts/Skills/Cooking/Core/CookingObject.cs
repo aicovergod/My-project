@@ -6,6 +6,7 @@ using Inventory;
 using Player;
 using UI;
 using Pets;
+using Skills.Common;
 
 namespace Skills.Cooking
 {
@@ -93,13 +94,13 @@ namespace Skills.Cooking
 
             if (!recipeLookup.TryGetValue(entry.item.id, out var recipe))
             {
-                FloatingText.Show("You can't cook that", transform.position);
+                FloatingText.Show("You can't cook that", transform.position, null, GatheringRewardProcessor.DefaultFloatingTextSize);
                 return;
             }
 
             if (cookingSkill.Level < recipe.requiredLevel)
             {
-                FloatingText.Show($"You need Cooking level {recipe.requiredLevel}", transform.position);
+                FloatingText.Show($"You need Cooking level {recipe.requiredLevel}", transform.position, null, GatheringRewardProcessor.DefaultFloatingTextSize);
                 return;
             }
 

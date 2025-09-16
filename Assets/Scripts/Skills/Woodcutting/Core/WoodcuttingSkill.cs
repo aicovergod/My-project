@@ -56,6 +56,11 @@ namespace Skills.Woodcutting
                 inventory = GetComponent<Inventory.Inventory>();
             if (equipment == null)
                 equipment = GetComponent<Equipment>();
+            if (floatingTextAnchor == null)
+            {
+                // Auto-cache the floating text anchor if it wasn't assigned in the inspector.
+                floatingTextAnchor = transform.Find("FloatingTextAnchor");
+            }
             skills = GetComponent<SkillManager>();
             PreloadLogItems();
             woodcuttingOutfit = new SkillingOutfitProgress(new[]
@@ -140,7 +145,11 @@ namespace Skills.Woodcutting
                     {
                         if (result.LeveledUp && result.Anchor != null)
                         {
-                            FloatingText.Show($"Woodcutting level {result.NewLevel}", result.Anchor.position);
+                            FloatingText.Show(
+                                $"Woodcutting level {result.NewLevel}",
+                                result.Anchor.position,
+                                null,
+                                GatheringRewardProcessor.DefaultFloatingTextSize);
                             OnLevelUp?.Invoke(result.NewLevel);
                         }
                     },
