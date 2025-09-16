@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using System;
 using System.Collections;
+using Core.Input;
 using Core.Save;
 using World;
 using Pets;
@@ -37,6 +38,17 @@ namespace Player
         public bool useFlipXForLeft;
         [Tooltip("If true, flip left-facing sprites for right-facing movement/idle.")]
         public bool useFlipXForRight;
+
+#if ENABLE_INPUT_SYSTEM
+        [Header("Input")]
+        [Tooltip("PlayerInput component that owns the Player action map.")]
+        [SerializeField]
+        private PlayerInput playerInput;
+
+        [Tooltip("Reference to the Player/Move action inside the shared input asset.")]
+        [SerializeField]
+        private InputActionReference moveActionReference;
+#endif
 
         private Rigidbody2D rb;
         private Animator anim;
@@ -73,6 +85,8 @@ namespace Player
 
 #if ENABLE_INPUT_SYSTEM
         private InputAction moveAction;
+        private bool moveActionEnabledByResolver;
+        private Vector2 moveActionValue;
 #endif
 
         protected override void Awake()
@@ -97,6 +111,11 @@ namespace Player
             sr  = GetComponent<SpriteRenderer>();
             inventory = GetComponent<Inventory.Inventory>();
             combat = GetComponent<CombatController>();
+#if ENABLE_INPUT_SYSTEM
+            // Fallback to the local PlayerInput if one exists and no explicit reference was supplied.
+            if (playerInput == null)
+                playerInput = GetComponent<PlayerInput>();
+#endif
             var depth = GetComponent<SpriteDepth>();
             if (depth != null)
                 depth.directionOffset = 1;
@@ -116,32 +135,41 @@ namespace Player
 #if ENABLE_INPUT_SYSTEM
         void OnEnable()
         {
-            // Self-contained Move action (no .inputactions asset required)
-            moveAction = new InputAction("Move", InputActionType.Value, expectedControlType: "Vector2");
+            moveAction = InputActionResolver.Resolve(playerInput, moveActionReference, "Move", out moveActionEnabledByResolver);
 
-            // WASD
-            var wasd = moveAction.AddCompositeBinding("2DVector");
-            wasd.With("Up", "<Keyboard>/w");
-            wasd.With("Down", "<Keyboard>/s");
-            wasd.With("Left", "<Keyboard>/a");
-            wasd.With("Right", "<Keyboard>/d");
-
-            // Arrow keys
-            var arrows = moveAction.AddCompositeBinding("2DVector");
-            arrows.With("Up", "<Keyboard>/upArrow");
-            arrows.With("Down", "<Keyboard>/downArrow");
-            arrows.With("Left", "<Keyboard>/leftArrow");
-            arrows.With("Right", "<Keyboard>/rightArrow");
-
-            // Gamepad
-            moveAction.AddBinding("<Gamepad>/leftStick");
-
-            moveAction.Enable();
+            if (moveAction != null)
+            {
+                moveAction.performed += OnMovePerformed;
+                moveAction.canceled += OnMoveCanceled;
+                moveActionValue = moveAction.ReadValue<Vector2>();
+            }
         }
 
         void OnDisable()
         {
-            moveAction?.Disable();
+            if (moveAction != null)
+            {
+                moveAction.performed -= OnMovePerformed;
+                moveAction.canceled -= OnMoveCanceled;
+
+                if (moveActionEnabledByResolver)
+                    moveAction.Disable();
+            }
+
+            moveAction = null;
+            moveActionEnabledByResolver = false;
+            moveActionValue = Vector2.zero;
+        }
+
+        private void OnMovePerformed(InputAction.CallbackContext context)
+        {
+            // Cache the most recent movement vector supplied by the Player action map.
+            moveActionValue = context.ReadValue<Vector2>();
+        }
+
+        private void OnMoveCanceled(InputAction.CallbackContext context)
+        {
+            moveActionValue = Vector2.zero;
         }
 #endif
 
@@ -175,7 +203,7 @@ namespace Player
             float x = 0f, y = 0f;
 
 #if ENABLE_INPUT_SYSTEM
-            Vector2 raw = moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
+            Vector2 raw = moveAction != null ? moveActionValue : Vector2.zero;
             // Snap analog to -1/0/1 so animations are stable
             x = Mathf.Abs(raw.x) < gamepadDeadzone ? 0f : Mathf.Sign(raw.x);
             y = Mathf.Abs(raw.y) < gamepadDeadzone ? 0f : Mathf.Sign(raw.y);
