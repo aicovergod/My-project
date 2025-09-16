@@ -114,11 +114,13 @@ namespace Skills.Mining
                 if (ore != null)
                 {
                     oreItems.TryGetValue(ore.Id, out var item);
-                    int amount = PetDropSystem.ActivePet?.id == "Rock Golem" ? 2 : 1;
-                    if (amount > 1)
-                        var petStorage = PetDropSystem.ActivePet?.id == "Rock Golem" && PetDropSystem.ActivePetObject != null
-                        ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
-                        : null;
+                    bool rockGolemActive = PetDropSystem.ActivePet?.id == "Rock Golem";
+                    int amount = rockGolemActive ? 2 : 1;
+                    // Cache the storage component from the active Rock Golem pet so the reward processor can
+                    // route overflow ore into the pet's inventory when it grants the bonus resource.
+                    PetStorage petStorage = null;
+                    if (rockGolemActive && PetDropSystem.ActivePetObject != null)
+                        petStorage = PetDropSystem.ActivePetObject.GetComponent<PetStorage>();
                     string oreName = item != null ? item.itemName : ore.DisplayName;
 
                     var context = new GatheringRewardContext
