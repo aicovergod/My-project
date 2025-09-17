@@ -1,6 +1,8 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Status;
+using Status.Antifire;
 using Util;
 
 namespace UI.HUD
@@ -8,7 +10,7 @@ namespace UI.HUD
     /// <summary>
     /// Displays a single buff infobox mirroring the Old School RuneScape UI style.
     /// </summary>
-    public class BuffInfoBox : MonoBehaviour
+    public class BuffInfoBox : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] private Image frameImage;
         [SerializeField] private Image iconImage;
@@ -19,6 +21,22 @@ namespace UI.HUD
         [SerializeField] private CanvasGroup canvasGroup;
 
         private Sprite loadedIcon;
+
+        // Cached references used for tooltip positioning and contextual data.
+        private RectTransform rectTransform;
+        private RectTransform cachedCanvasRect;
+        private BuffTooltipController tooltipController;
+
+        // Tracks whether the pointer is currently hovering this infobox.
+        private bool pointerHovering;
+
+        // Cached antifire controller so the tooltip can display live mitigation values.
+        private AntifireProtectionController antifireProtection;
+        private GameObject antifireTarget;
+
+        // Stores the last tooltip payload so we only refresh when something actually changes.
+        private string lastTooltipTitle;
+        private string lastTooltipBody;
 
         public BuffTimerInstance BoundBuff { get; private set; }
 
@@ -54,14 +72,16 @@ namespace UI.HUD
             var canvasGroup = rootGO.GetComponent<CanvasGroup>();
             canvasGroup.alpha = 0.92f;
             canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
+            // Enable raycasts so pointer hover events can be detected for tooltips.
+            canvasGroup.blocksRaycasts = true;
             component.canvasGroup = canvasGroup;
 
             var frameGO = new GameObject("Slot", typeof(Image));
             frameGO.layer = parentLayer;
             frameGO.transform.SetParent(rootGO.transform, false);
             var frameImage = frameGO.GetComponent<Image>();
-            frameImage.raycastTarget = false;
+            // Allow the frame to receive pointer events for tooltip display.
+            frameImage.raycastTarget = true;
             frameImage.sprite = Resources.Load<Sprite>("Interfaces/Equipment/Empty_Slot");
             frameImage.color = Color.white;
             var frameRect = frameImage.rectTransform;
@@ -148,6 +168,22 @@ namespace UI.HUD
                 timerText.font = legacyFont;
             if (canvasGroup == null)
                 canvasGroup = GetComponent<CanvasGroup>();
+
+            if (canvasGroup != null)
+                canvasGroup.blocksRaycasts = true;
+
+            if (frameImage != null)
+                frameImage.raycastTarget = true;
+
+            if (rectTransform == null)
+                rectTransform = GetComponent<RectTransform>();
+
+            if (cachedCanvasRect == null)
+            {
+                var canvas = GetComponentInParent<Canvas>();
+                if (canvas != null)
+                    cachedCanvasRect = canvas.transform as RectTransform;
+            }
         }
 
         /// <summary>
@@ -161,6 +197,10 @@ namespace UI.HUD
             ApplyIcon(instance.Definition.iconId);
             UpdateTimer(instance);
             SetWarning(false);
+            CacheTooltipSources(instance);
+            ClearTooltipTracking();
+            if (pointerHovering)
+                UpdateTooltip(true);
         }
 
         /// <summary>
@@ -179,6 +219,9 @@ namespace UI.HUD
 
             float seconds = Mathf.Max(0f, instance.RemainingTicks) * Ticker.TickDuration;
             timerText.text = FormatTime(seconds);
+
+            if (pointerHovering)
+                UpdateTooltip();
         }
 
         /// <summary>
@@ -198,6 +241,187 @@ namespace UI.HUD
         public void ResetVisuals()
         {
             SetWarning(false);
+        }
+
+        private void LateUpdate()
+        {
+            if (pointerHovering)
+                UpdateTooltip();
+        }
+
+        /// <summary>
+        /// Displays the tooltip when the pointer starts hovering the buff icon.
+        /// </summary>
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            pointerHovering = true;
+            ClearTooltipTracking();
+            UpdateTooltip(true);
+        }
+
+        /// <summary>
+        /// Hides the tooltip when the pointer leaves the buff icon.
+        /// </summary>
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            pointerHovering = false;
+            tooltipController ??= ResolveTooltipController();
+            tooltipController?.Hide();
+            ClearTooltipTracking();
+        }
+
+        private void OnDisable()
+        {
+            if (!pointerHovering)
+                return;
+
+            pointerHovering = false;
+            tooltipController ??= ResolveTooltipController();
+            tooltipController?.Hide();
+            ClearTooltipTracking();
+        }
+
+        /// <summary>
+        /// Refreshes the tooltip content if it has changed or if a reposition is requested.
+        /// </summary>
+        private void UpdateTooltip(bool forcePosition = false)
+        {
+            if (BoundBuff == null)
+                return;
+
+            tooltipController ??= ResolveTooltipController();
+            if (tooltipController == null || rectTransform == null)
+                return;
+
+            string title = BoundBuff.DisplayName;
+            string body = BuildTooltipBody(BoundBuff);
+            bool contentChanged = forcePosition
+                                  || !string.Equals(title, lastTooltipTitle)
+                                  || !string.Equals(body, lastTooltipBody);
+
+            if (!contentChanged)
+                return;
+
+            tooltipController.Show(rectTransform, title, body);
+            lastTooltipTitle = title;
+            lastTooltipBody = body;
+        }
+
+        /// <summary>
+        /// Clears cached tooltip state so the next refresh rebuilds the content.
+        /// </summary>
+        private void ClearTooltipTracking()
+        {
+            lastTooltipTitle = null;
+            lastTooltipBody = null;
+        }
+
+        /// <summary>
+        /// Caches contextual data used for tooltip messaging based on the bound buff.
+        /// </summary>
+        private void CacheTooltipSources(BuffTimerInstance instance)
+        {
+            if (instance == null)
+            {
+                ClearAntifireCache();
+                return;
+            }
+
+            switch (instance.Definition.type)
+            {
+                case BuffType.Antifire:
+                case BuffType.SuperAntifire:
+                    CacheAntifireController(instance.Target);
+                    break;
+                default:
+                    ClearAntifireCache();
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the antifire controller from the buff target so mitigation can be queried.
+        /// </summary>
+        private void CacheAntifireController(GameObject target)
+        {
+            if (antifireTarget == target && antifireProtection != null)
+                return;
+
+            antifireTarget = target;
+            antifireProtection = null;
+
+            if (target != null)
+            {
+                antifireProtection = target.GetComponent<AntifireProtectionController>()
+                    ?? target.GetComponentInChildren<AntifireProtectionController>()
+                    ?? target.GetComponentInParent<AntifireProtectionController>();
+            }
+
+            if (antifireProtection == null)
+            {
+#if UNITY_2022_2_OR_NEWER
+                antifireProtection = UnityEngine.Object.FindFirstObjectByType<AntifireProtectionController>();
+#else
+                antifireProtection = UnityEngine.Object.FindObjectOfType<AntifireProtectionController>();
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Resets cached antifire lookup data when no longer required.
+        /// </summary>
+        private void ClearAntifireCache()
+        {
+            antifireTarget = null;
+            antifireProtection = null;
+        }
+
+        /// <summary>
+        /// Builds the tooltip description text for the current buff.
+        /// </summary>
+        private string BuildTooltipBody(BuffTimerInstance instance)
+        {
+            if (instance == null)
+                return string.Empty;
+
+            switch (instance.Definition.type)
+            {
+                case BuffType.Antifire:
+                case BuffType.SuperAntifire:
+                    if (antifireProtection == null && instance.Target != null)
+                        CacheAntifireController(instance.Target);
+
+                    if (antifireProtection == null)
+                    {
+                        return instance.Definition.type == BuffType.SuperAntifire
+                            ? "100% protection"
+                            : "Protection data unavailable";
+                    }
+
+                    float mitigation = antifireProtection.GetProtectionPercentage();
+                    int percent = Mathf.Clamp(Mathf.RoundToInt(mitigation * 100f), 0, 100);
+                    return $"{percent}% protection";
+                default:
+                    return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Finds or creates the tooltip controller used to display buff hover details.
+        /// </summary>
+        private BuffTooltipController ResolveTooltipController()
+        {
+            if (BuffTooltipController.Instance != null)
+                return BuffTooltipController.Instance;
+
+            if (cachedCanvasRect == null)
+            {
+                var canvas = GetComponentInParent<Canvas>();
+                if (canvas != null)
+                    cachedCanvasRect = canvas.transform as RectTransform;
+            }
+
+            return BuffTooltipController.GetOrCreate(cachedCanvasRect);
         }
 
         /// <summary>

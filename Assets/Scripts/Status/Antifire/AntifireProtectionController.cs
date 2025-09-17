@@ -47,14 +47,32 @@ namespace Status.Antifire
             if (type != DamageType.Dragonfire)
                 return damage;
 
+            float mitigation = GetProtectionPercentage();
+            if (mitigation >= 1f)
+                return 0;
+
+            if (mitigation <= 0f)
+                return damage;
+
+            int mitigated = Mathf.FloorToInt(damage * (1f - mitigation));
+            return Mathf.Clamp(mitigated, 0, damage);
+        }
+
+        /// <summary>
+        /// Calculates the current dragonfire protection as a normalised percentage where 1.0
+        /// represents full immunity. This method centralises the mitigation logic so both the
+        /// combat calculations and UI tooltips remain perfectly in sync.
+        /// </summary>
+        public float GetProtectionPercentage()
+        {
             if (HasBuff(BuffType.SuperAntifire))
-                return 0;
+                return 1f;
 
-            bool hasAntifire = HasBuff(BuffType.Antifire);
             bool hasShield = HasDragonfireShieldEquipped();
+            bool hasAntifire = HasBuff(BuffType.Antifire);
 
-            if (hasAntifire && hasShield)
-                return 0;
+            if (hasShield && hasAntifire)
+                return 1f;
 
             float reduction = 0f;
             if (hasShield)
@@ -62,8 +80,7 @@ namespace Status.Antifire
             if (hasAntifire)
                 reduction = Mathf.Max(reduction, AntifireBuffDamageReduction);
 
-            int mitigated = Mathf.FloorToInt(damage * (1f - reduction));
-            return Mathf.Clamp(mitigated, 0, damage);
+            return Mathf.Clamp01(reduction);
         }
 
         /// <summary>
