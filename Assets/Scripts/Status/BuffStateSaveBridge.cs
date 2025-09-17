@@ -12,7 +12,7 @@ namespace Status
     /// and gameplay logic resume in a consistent state.
     /// </summary>
     [DisallowMultipleComponent]
-    [DefaultExecutionOrder(200)]
+    [DefaultExecutionOrder(-75)]
     public sealed class BuffStateSaveBridge : MonoBehaviour, ISaveable
     {
         [SerializeField, Tooltip("Optional explicit object that owns the buffs. Defaults to this GameObject when unset.")]
@@ -32,6 +32,12 @@ namespace Status
 
         /// <summary>Tracks whether a coroutine is already waiting for the timer service.</summary>
         private bool restoreCoroutineRunning;
+
+        /// <summary>Most recent buff snapshot captured when the timer service was available.</summary>
+        private BuffSaveData cachedSaveData;
+
+        /// <summary>Indicates whether <see cref="cachedSaveData"/> currently holds valid data.</summary>
+        private bool hasCachedSaveData;
 
         /// <summary>Structure describing the serialised state of a buff timer.</summary>
         [System.Serializable]
@@ -97,6 +103,8 @@ namespace Status
             var target = Target;
             if (target == null)
             {
+                cachedSaveData = null;
+                hasCachedSaveData = false;
                 SaveManager.Delete(SaveKey);
                 return;
             }
@@ -104,7 +112,8 @@ namespace Status
             var service = BuffTimerService.Instance;
             if (service == null)
             {
-                SaveManager.Delete(SaveKey);
+                if (hasCachedSaveData && cachedSaveData != null)
+                    SaveManager.Save(SaveKey, cachedSaveData);
                 return;
             }
 
@@ -114,6 +123,8 @@ namespace Status
             {
                 SaveManager.Delete(SaveKey);
                 runtimeBuffer.Clear();
+                cachedSaveData = null;
+                hasCachedSaveData = false;
                 return;
             }
 
@@ -139,10 +150,14 @@ namespace Status
             if (entries.Count == 0)
             {
                 SaveManager.Delete(SaveKey);
+                cachedSaveData = null;
+                hasCachedSaveData = false;
                 return;
             }
 
             var data = new BuffSaveData { entries = entries.ToArray() };
+            cachedSaveData = data;
+            hasCachedSaveData = true;
             SaveManager.Save(SaveKey, data);
         }
 
