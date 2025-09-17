@@ -75,6 +75,7 @@ GameObject:
   - component: {fileID: 6165058707388082531}
   - component: {fileID: 5512345678901234567}
   - component: {fileID: 7000745351061079601}
+  - component: {fileID: 5914355433513186549}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -232,6 +233,8 @@ MonoBehaviour:
   walkUp: {fileID: -7774987061422140978, guid: 1a6a48544ffc20640b61eb558ee1a1e8, type: 3}
   useFlipXForLeft: 0
   useFlipXForRight: 0
+  playerInput: {fileID: 7000745351061079601}
+  moveActionReference: {fileID: 0}
 --- !u!114 &6554036775103191577
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -597,6 +600,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d02d43035d14f0f44b973eec23f7e118, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hitSplatLibrary: {fileID: 11400000, guid: 3bdb17896f374e8bb098d628ca4ba2f4, type: 2}
 --- !u!114 &2480528448797343508
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -621,6 +625,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06dfd365318f55e4ab983b47d7337d41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hitSplatLibrary: {fileID: 11400000, guid: 3bdb17896f374e8bb098d628ca4ba2f4, type: 2}
 --- !u!114 &8069331157420240731
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -793,7 +798,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4297641342699346684}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43cf1b12cd8843bfba005476a51223af, type: 3}
   m_Name: 
@@ -809,7 +814,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 582e91441b154c16a96cb371bc38a2b7, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Status.Poison.PoisonSaveBridge
   controller: {fileID: 4675609188221558876}
 --- !u!114 &5512345678901234567
@@ -822,11 +827,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a40a52f6e8f4c4894e602bfbfbbd235, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   targetOverride: {fileID: 0}
-  ignoredBuffTypes:
-  - 0
+  ignoredBuffTypes: 00000000
 --- !u!114 &7000745351061079601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -857,3 +861,19 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &5914355433513186549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2864bff7b442be44bc2f0d2512349b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Status.Antifire.AntifireProtectionController
+  equipment: {fileID: 0}
+  dragonfireShieldIdentifiers:
+  - dragonfire_shield
+  - Dragonfire shield
