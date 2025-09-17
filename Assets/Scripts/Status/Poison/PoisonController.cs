@@ -54,15 +54,29 @@ namespace Status.Poison
         /// <summary>True when a combat controller reference has been discovered.</summary>
         public bool HasCombatController => combat != null;
 
+        /// <summary>
+        /// Indicates whether the linked <see cref="CombatTarget"/> exists and is currently alive.
+        /// Exposed so external systems (such as save bridges) can defer restoration until the entity is ready.
+        /// </summary>
+        public bool HasAliveTarget
+        {
+            get
+            {
+                ResolveStatsComponent();
+                return stats != null && stats.IsAlive;
+            }
+        }
+
         private void Awake()
         {
-            stats = statsComponent as CombatTarget ?? GetComponent<CombatTarget>();
+            ResolveStatsComponent();
             ResolveCombatController();
             TryFlushPendingBuffTimer();
         }
 
         private void OnEnable()
         {
+            ResolveStatsComponent();
             ResolveCombatController();
             TryFlushPendingBuffTimer();
         }
@@ -72,6 +86,7 @@ namespace Status.Poison
         /// </summary>
         public void ApplyPoison(PoisonConfig cfg)
         {
+            ResolveStatsComponent();
             if (IsImmune || cfg == null)
                 return;
             if (stats != null && !stats.IsAlive)
@@ -362,6 +377,17 @@ namespace Status.Poison
                 return;
 
             combat = GetComponent<CombatController>() ?? GetComponentInParent<CombatController>() ?? GetComponentInChildren<CombatController>();
+        }
+
+        /// <summary>
+        /// Attempts to cache a <see cref="CombatTarget"/> reference using the serialized hint or local components.
+        /// </summary>
+        private void ResolveStatsComponent()
+        {
+            if (stats != null)
+                return;
+
+            stats = statsComponent as CombatTarget ?? GetComponent<CombatTarget>();
         }
 
         /// <summary>

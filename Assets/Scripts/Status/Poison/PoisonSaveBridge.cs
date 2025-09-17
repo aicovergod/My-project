@@ -47,9 +47,19 @@ namespace Status.Poison
         private bool hasSnapshot;
 
         /// <summary>
-        /// Handle to a coroutine scheduled during load to delay HUD resync until the controller resolves dependencies.
+        /// Handle to a coroutine scheduled during load to defer poison restoration and HUD resync until dependencies resolve.
         /// </summary>
         private Coroutine pendingResyncRoutine;
+
+        /// <summary>
+        /// Saved poison payload awaiting restoration once the controller and combat target are ready.
+        /// </summary>
+        private PoisonSaveData pendingRestoreData;
+
+        /// <summary>
+        /// Configuration associated with <see cref="pendingRestoreData"/>.
+        /// </summary>
+        private PoisonConfig pendingRestoreConfig;
 
         private string SaveKey => $"poison_{gameObject.name}";
 
@@ -69,11 +79,7 @@ namespace Status.Poison
         {
             Save();
             UnsubscribeFromControllerEvents();
-            if (pendingResyncRoutine != null)
-            {
-                StopCoroutine(pendingResyncRoutine);
-                pendingResyncRoutine = null;
-            }
+            CancelPendingRestore();
             SaveManager.Unregister(this);
         }
 
@@ -114,28 +120,23 @@ namespace Status.Poison
         /// <inheritdoc />
         public void Load()
         {
+            CancelPendingRestore();
+
             var data = SaveManager.Load<PoisonSaveData>(SaveKey);
-            if (data == null || controller == null)
+            if (controller == null || data == null)
                 return;
 
             controller.ImmunityTimer = data.immunityTimer;
-            if (data.isPoisoned && !string.IsNullOrEmpty(data.configId))
-            {
-                var cfg = ResolveConfig(data.configId);
-                if (cfg != null)
-                {
-                    float savedImmune = controller.ImmunityTimer;
-                    controller.ImmunityTimer = 0f;
-                    controller.ApplyPoison(cfg);
-                    controller.ActiveEffect?.RestoreState(
-                        data.currentDamage,
-                        data.ticksSinceDecay,
-                        cfg.tickIntervalSeconds - data.timeToNextTick);
-                    controller.RefreshTickCountdown();
-                    ScheduleBuffTimerResync();
-                    controller.ImmunityTimer = savedImmune;
-                }
-            }
+            if (!data.isPoisoned || string.IsNullOrEmpty(data.configId))
+                return;
+
+            var cfg = ResolveConfig(data.configId);
+            if (cfg == null)
+                return;
+
+            pendingRestoreData = data;
+            pendingRestoreConfig = cfg;
+            SchedulePendingRestore();
         }
 
         /// <summary>
@@ -260,29 +261,95 @@ namespace Status.Poison
         }
 
         /// <summary>
-        /// Ensures the buff timer resync runs only after the controller has resolved its combat dependency.
+        /// Ensures poison restoration occurs only after the controller resolves its dependencies.
         /// </summary>
-        private void ScheduleBuffTimerResync()
+        private void SchedulePendingRestore()
         {
             if (pendingResyncRoutine != null)
                 StopCoroutine(pendingResyncRoutine);
 
-            pendingResyncRoutine = StartCoroutine(ResyncWhenControllerReady());
+            pendingResyncRoutine = StartCoroutine(RestoreWhenControllerReady());
         }
 
         /// <summary>
-        /// Waits for the next frame (and until the controller reports readiness) before issuing the HUD resync.
+        /// Waits for controller readiness before reapplying poison and synchronizing HUD countdowns.
         /// </summary>
-        private IEnumerator ResyncWhenControllerReady()
+        private IEnumerator RestoreWhenControllerReady()
         {
-            // Allow at least one frame so PoisonController.Awake can run before resync executes.
+            // Allow at least one frame so PoisonController.Awake can run before restoration executes.
             yield return null;
 
-            while (controller != null && controller.isActiveAndEnabled && !controller.HasCombatController)
-                yield return null;
+            while (controller != null)
+            {
+                if (!controller.isActiveAndEnabled)
+                {
+                    yield return null;
+                    continue;
+                }
 
-            controller?.ResyncBuffTimerWithState();
+                if (controller.HasCombatController && controller.HasAliveTarget)
+                    break;
+
+                yield return null;
+            }
+
+            if (controller == null || !controller.isActiveAndEnabled)
+            {
+                pendingRestoreData = null;
+                pendingRestoreConfig = null;
+                pendingResyncRoutine = null;
+                yield break;
+            }
+
+            var data = pendingRestoreData;
+            var config = pendingRestoreConfig;
+            pendingRestoreData = null;
+            pendingRestoreConfig = null;
+
+            if (data != null && config != null)
+            {
+                float savedImmune = controller.ImmunityTimer;
+                controller.ImmunityTimer = 0f;
+                controller.ApplyPoison(config);
+
+                var effect = controller.ActiveEffect;
+                if (effect != null && effect.IsActive)
+                {
+                    float restoredTimer = Mathf.Max(0f, config.tickIntervalSeconds - data.timeToNextTick);
+                    effect.RestoreState(data.currentDamage, data.ticksSinceDecay, restoredTimer);
+                }
+
+                if (controller != null && controller.isActiveAndEnabled)
+                {
+                    controller.RefreshTickCountdown();
+                    controller.ResyncBuffTimerWithState();
+                }
+
+                if (controller != null)
+                    controller.ImmunityTimer = savedImmune;
+            }
+            else if (controller != null && controller.isActiveAndEnabled)
+            {
+                controller.RefreshTickCountdown();
+                controller.ResyncBuffTimerWithState();
+            }
+
             pendingResyncRoutine = null;
+        }
+
+        /// <summary>
+        /// Cancels any pending restoration coroutine and clears cached payload data.
+        /// </summary>
+        private void CancelPendingRestore()
+        {
+            if (pendingResyncRoutine != null)
+            {
+                StopCoroutine(pendingResyncRoutine);
+                pendingResyncRoutine = null;
+            }
+
+            pendingRestoreData = null;
+            pendingRestoreConfig = null;
         }
 
         /// <summary>
