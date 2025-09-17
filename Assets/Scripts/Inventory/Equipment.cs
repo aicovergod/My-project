@@ -34,7 +34,7 @@ namespace Inventory
         public Vector2 slotSpacing = new(4f, 4f);
 
         [Tooltip("Reference resolution for the UI Canvas.")]
-        public Vector2 referenceResolution = new(640f, 360f);
+        public Vector2 referenceResolution = new(1024f, 768f);
 
         [Tooltip("Optional frame sprite for slots (9 sliced).")]
         public Sprite slotFrameSprite;

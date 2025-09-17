@@ -260,7 +260,7 @@ MonoBehaviour:
   size: 20
   slotSize: {x: 32, y: 32}
   slotSpacing: {x: 4, y: 4}
-  referenceResolution: {x: 640, y: 360}
+  referenceResolution: {x: 1024, y: 768}
   columns: 4
   useSharedUIRoot: 1
   slotFrameSprite: {fileID: 0}
@@ -490,7 +490,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slotSize: {x: 32, y: 32}
   slotSpacing: {x: 4, y: 4}
-  referenceResolution: {x: 640, y: 360}
+  referenceResolution: {x: 1024, y: 768}
   slotFrameSprite: {fileID: 0}
   emptySlotColor: {r: 1, g: 1, b: 1, a: 1}
   windowColor: {r: 0.15, g: 0.15, b: 0.15, a: 0.95}

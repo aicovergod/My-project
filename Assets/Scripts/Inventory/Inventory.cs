@@ -51,8 +51,8 @@ namespace Inventory
         public Vector2 slotSize = new Vector2(32, 32);
         [Tooltip("Spacing between slots in UI pixels.")]
         public Vector2 slotSpacing = new Vector2(4, 4);
-        [Tooltip("Reference resolution for Canvas Scaler (use even numbers).")]
-        public Vector2 referenceResolution = new Vector2(640, 360);
+        [Tooltip("Reference resolution for Canvas Scaler.")]
+        public Vector2 referenceResolution = new Vector2(1024f, 768f);
         [Tooltip("Number of columns in the slot grid.")]
         public int columns = 2;
         [Tooltip("Reuse a shared UI root across multiple inventories.")]

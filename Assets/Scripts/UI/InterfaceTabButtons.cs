@@ -13,6 +13,8 @@ namespace UI
     /// </summary>
     public class InterfaceTabButtons : MonoBehaviour
     {
+        private static readonly Vector2 FixedWindowResolution = new Vector2(1024f, 768f);
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Init()
         {
@@ -36,7 +38,7 @@ namespace UI
 
             var scaler = gameObject.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.referenceResolution = FixedWindowResolution;
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
             scaler.matchWidthOrHeight = 0.5f;
 
