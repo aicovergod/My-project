@@ -22,6 +22,123 @@ namespace UI.HUD
 
         public BuffTimerInstance BoundBuff { get; private set; }
 
+        /// <summary>
+        /// Creates a fully wired buff infobox at runtime using the expected OSRS styling.
+        /// </summary>
+        /// <param name="parent">Container that will hold the created infobox.</param>
+        public static BuffInfoBox Create(RectTransform parent)
+        {
+            if (parent == null)
+                throw new System.ArgumentNullException(nameof(parent));
+
+            const float width = 184f;
+            const float height = 48f;
+            const float iconSize = 32f;
+            const float padding = 6f;
+
+            // Root object that mimics the prefab layout.  The anchors/pivot align
+            // with the HUD expectation of stacking boxes downward from the
+            // minimap's top-right corner.
+            var rootGO = new GameObject("BuffInfoBox", typeof(RectTransform), typeof(CanvasGroup));
+            int parentLayer = parent.gameObject.layer;
+            rootGO.layer = parentLayer;
+
+            var rootRect = rootGO.GetComponent<RectTransform>();
+            rootRect.SetParent(parent, false);
+            rootRect.anchorMin = new Vector2(1f, 1f);
+            rootRect.anchorMax = new Vector2(1f, 1f);
+            rootRect.pivot = new Vector2(1f, 1f);
+            rootRect.sizeDelta = new Vector2(width, height);
+
+            var component = rootGO.AddComponent<BuffInfoBox>();
+
+            var canvasGroup = rootGO.GetComponent<CanvasGroup>();
+            canvasGroup.alpha = 0.92f;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+            component.canvasGroup = canvasGroup;
+
+            var frameGO = new GameObject("Frame", typeof(Image));
+            frameGO.layer = parentLayer;
+            frameGO.transform.SetParent(rootGO.transform, false);
+            var frameImage = frameGO.GetComponent<Image>();
+            frameImage.color = new Color32(46, 38, 30, 255);
+            frameImage.raycastTarget = false;
+            var frameRect = frameImage.rectTransform;
+            frameRect.anchorMin = Vector2.zero;
+            frameRect.anchorMax = Vector2.one;
+            frameRect.offsetMin = Vector2.zero;
+            frameRect.offsetMax = Vector2.zero;
+            component.frameImage = frameImage;
+
+            var iconGO = new GameObject("Icon", typeof(Image));
+            iconGO.layer = parentLayer;
+            iconGO.transform.SetParent(frameGO.transform, false);
+            var iconImage = iconGO.GetComponent<Image>();
+            iconImage.preserveAspect = true;
+            iconImage.raycastTarget = false;
+            var iconRect = iconImage.rectTransform;
+            iconRect.anchorMin = new Vector2(0f, 0.5f);
+            iconRect.anchorMax = new Vector2(0f, 0.5f);
+            iconRect.pivot = new Vector2(0f, 0.5f);
+            iconRect.sizeDelta = new Vector2(iconSize, iconSize);
+            iconRect.anchoredPosition = new Vector2(padding, 0f);
+            component.iconImage = iconImage;
+            iconImage.color = Color.clear;
+
+            var legacyFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+
+            var nameGO = new GameObject("Name", typeof(Text));
+            nameGO.layer = parentLayer;
+            nameGO.transform.SetParent(frameGO.transform, false);
+            var nameText = nameGO.GetComponent<Text>();
+            nameText.font = legacyFont;
+            nameText.fontSize = 16;
+            nameText.alignment = TextAnchor.UpperLeft;
+            nameText.color = new Color32(255, 240, 187, 255);
+            nameText.raycastTarget = false;
+            nameText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            nameText.verticalOverflow = VerticalWrapMode.Truncate;
+            nameText.supportRichText = false;
+            var nameRect = nameText.rectTransform;
+            nameRect.anchorMin = new Vector2(0f, 1f);
+            nameRect.anchorMax = new Vector2(0f, 1f);
+            nameRect.pivot = new Vector2(0f, 1f);
+            nameRect.anchoredPosition = new Vector2(iconSize + padding * 2f, -padding);
+            nameRect.sizeDelta = new Vector2(width - (iconSize + padding * 3f), 20f);
+            component.nameText = nameText;
+
+            nameText.text = string.Empty;
+
+            var timerGO = new GameObject("Timer", typeof(Text));
+            timerGO.layer = parentLayer;
+            timerGO.transform.SetParent(frameGO.transform, false);
+
+            var timerText = timerGO.GetComponent<Text>();
+            timerText.font = legacyFont;
+            timerText.fontSize = 14;
+            timerText.alignment = TextAnchor.LowerRight;
+            timerText.color = new Color32(212, 212, 212, 255);
+            timerText.raycastTarget = false;
+            timerText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            timerText.verticalOverflow = VerticalWrapMode.Truncate;
+            timerText.supportRichText = false;
+            timerText.text = string.Empty;
+            var timerRect = timerText.rectTransform;
+            timerRect.anchorMin = new Vector2(1f, 0f);
+            timerRect.anchorMax = new Vector2(1f, 0f);
+            timerRect.pivot = new Vector2(1f, 0f);
+            timerRect.anchoredPosition = new Vector2(-padding, padding);
+            timerRect.sizeDelta = new Vector2(width - (iconSize + padding * 3f), 18f);
+            component.timerText = timerText;
+
+            component.normalTimerColor = timerText.color;
+
+            component.ResetVisuals();
+
+            return component;
+        }
+
         private void Awake()
         {
             var legacyFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");

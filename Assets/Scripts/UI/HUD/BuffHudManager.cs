@@ -12,6 +12,13 @@ namespace UI.HUD
     [DisallowMultipleComponent]
     public class BuffHudManager : MonoBehaviour
     {
+        private static BuffHudManager instance;
+
+        /// <summary>
+        /// Global accessor used by systems that need to query the HUD manager at runtime.
+        /// </summary>
+        public static BuffHudManager Instance => instance;
+
         [SerializeField] private BuffInfoBox infoBoxPrefab;
         [SerializeField] private Vector2 anchoredOffset = new Vector2(-8f, -140f);
         [SerializeField] private float verticalSpacing = 4f;
@@ -26,8 +33,54 @@ namespace UI.HUD
         private GameObject player;
         private AudioSource audioSource;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void EnsureInstanceExists()
+        {
+            if (Instance != null)
+                return;
+
+            var existing = FindFirstManager();
+            if (existing != null)
+            {
+                instance = existing;
+                existing.EnsurePersistence();
+                DontDestroyOnLoad(existing.gameObject);
+                existing.TryInitialiseContainer();
+                existing.RefreshPlayerReference();
+                existing.RebuildExistingBuffs();
+                return;
+            }
+
+            var go = new GameObject("BuffHudManager");
+            go.AddComponent<ScenePersistentObject>();
+            var manager = go.AddComponent<BuffHudManager>();
+            DontDestroyOnLoad(go);
+            manager.TryInitialiseContainer();
+            manager.RefreshPlayerReference();
+            manager.RebuildExistingBuffs();
+        }
+
+        private static BuffHudManager FindFirstManager()
+        {
+#if UNITY_2023_1_OR_NEWER
+            return UnityEngine.Object.FindFirstObjectByType<BuffHudManager>();
+#else
+            return UnityEngine.Object.FindObjectOfType<BuffHudManager>();
+#endif
+        }
+
         private void Awake()
         {
+            if (instance != null && instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            instance = this;
+            EnsurePersistence();
+            DontDestroyOnLoad(gameObject);
+
             if (infoBoxPrefab == null)
             {
                 var loaded = Resources.Load<BuffInfoBox>("UI/Status/BuffInfoBox");
@@ -46,6 +99,12 @@ namespace UI.HUD
                 audioSource.playOnAwake = false;
             }
 
+        }
+
+        private void OnDestroy()
+        {
+            if (instance == this)
+                instance = null;
         }
 
         private void OnEnable()
@@ -152,17 +211,30 @@ namespace UI.HUD
 
         private void CreateOrUpdateBox(BuffTimerInstance instance)
         {
-            if (container == null || infoBoxPrefab == null)
+            if (container == null)
                 return;
 
             if (!activeBoxes.TryGetValue(instance.Key, out var box) || box == null)
             {
-                box = Instantiate(infoBoxPrefab, container);
+                box = CreateInfoBox();
+                if (box == null)
+                    return;
                 activeBoxes[instance.Key] = box;
             }
 
             box.Bind(instance);
             LayoutBoxes();
+        }
+
+        private BuffInfoBox CreateInfoBox()
+        {
+            if (container == null)
+                return null;
+
+            if (infoBoxPrefab != null)
+                return Instantiate(infoBoxPrefab, container);
+
+            return BuffInfoBox.Create(container);
         }
 
         private void LayoutBoxes()
@@ -257,6 +329,7 @@ namespace UI.HUD
             {
                 var go = new GameObject("BuffHud", typeof(RectTransform));
                 container = go.GetComponent<RectTransform>();
+                go.layer = anchor.gameObject.layer;
                 container.SetParent(anchor, false);
                 container.anchorMin = new Vector2(1f, 1f);
                 container.anchorMax = new Vector2(1f, 1f);
@@ -264,6 +337,12 @@ namespace UI.HUD
             }
 
             container.anchoredPosition = anchoredOffset;
+        }
+
+        private void EnsurePersistence()
+        {
+            if (GetComponent<ScenePersistentObject>() == null)
+                gameObject.AddComponent<ScenePersistentObject>();
         }
 
         private void RebuildExistingBuffs()
