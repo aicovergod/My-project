@@ -24,14 +24,14 @@ MonoBehaviour:
   RespawnSeconds: 30
   AttackType: 0
   Style: 0
-  IsAggressive: 0
+  IsAggressive: 1
   AggroTimeoutSeconds: 5
   MaxConcurrentTargets: 6
   PlayerAggroWeight: 1
   Faction: 2
   IsPoisonous: 1
-  OnHitPoison: {fileID: 11400000, guid: f6f640a4e0374a80a749d8606f6010d8, type: 2}
-  PoisonChance: 1
+  OnHitPoison: {fileID: 11400000, guid: 5a501ca099d54f02a1139ef22ba213c8, type: 2}
+  PoisonChance: 0.199
   PoisonRequiresDamage: 1
   elementalModifiers:
   - element: 0
