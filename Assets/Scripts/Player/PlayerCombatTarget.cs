@@ -4,6 +4,7 @@ using UI;
 using System.Collections.Generic;
 using EquipmentSystem;
 using Skills;
+using Status.Antifire;
 
 namespace Player
 {
@@ -11,6 +12,7 @@ namespace Player
     /// Adapts the player into a CombatTarget so NPCs can attack.
     /// </summary>
     [RequireComponent(typeof(PlayerHitpoints))]
+    [RequireComponent(typeof(AntifireProtectionController))]
     public class PlayerCombatTarget : MonoBehaviour, CombatTarget
     {
         [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
@@ -22,6 +24,7 @@ namespace Player
         private Sprite burnHitsplat;
         private Sprite poisonHitsplat;
         private IReadOnlyDictionary<SpellElement, Sprite> elementHitsplats;
+        private AntifireProtectionController antifireProtection;
 
         private void Awake()
         {
@@ -37,6 +40,11 @@ namespace Player
                 burnHitsplat = hitSplatLibrary.BurnHitsplat;
                 poisonHitsplat = hitSplatLibrary.PoisonHitsplat;
                 elementHitsplats = hitSplatLibrary.ElementHitsplats;
+            }
+
+            if (antifireProtection == null)
+            {
+                antifireProtection = GetComponent<AntifireProtectionController>() ?? GetComponentInParent<AntifireProtectionController>() ?? GetComponentInChildren<AntifireProtectionController>();
             }
         }
 
@@ -63,12 +71,16 @@ namespace Player
 
         public int ApplyDamage(int amount, DamageType type, SpellElement element, object source)
         {
-            hitpoints.OnEnemyDealtDamage(amount);
+            int mitigatedAmount = amount;
+            if (antifireProtection != null)
+                mitigatedAmount = antifireProtection.ModifyDamage(amount, type);
+
+            hitpoints.OnEnemyDealtDamage(mitigatedAmount);
             Sprite sprite;
             Color textColor = Color.white;
-            if (amount == 0)
+            if (mitigatedAmount == 0)
                 sprite = zeroHitsplat;
-            else if (type == DamageType.Burn)
+            else if (type == DamageType.Burn || type == DamageType.Dragonfire)
                 sprite = burnHitsplat;
             else if (type == DamageType.Poison)
                 sprite = poisonHitsplat;
@@ -80,9 +92,13 @@ namespace Player
             }
             else
                 sprite = damageHitsplat;
-            FloatingText.Show(amount.ToString(), transform.position, textColor, null, sprite);
-            Debug.Log($"Player took {amount} damage.");
-            return amount;
+            FloatingText.Show(mitigatedAmount.ToString(), transform.position, textColor, null, sprite);
+
+            if (mitigatedAmount != amount)
+                Debug.Log($"Player took {mitigatedAmount} damage ({amount} before antifire mitigation).");
+            else
+                Debug.Log($"Player took {mitigatedAmount} damage.");
+            return mitigatedAmount;
         }
     }
 }

@@ -6,6 +6,8 @@ using Pets;
 using BankSystem;
 using Skills.Fishing;
 using Skills.Outfits;
+using Status;
+using Status.Antifire;
 using Status.Poison;
 
 namespace Skills
@@ -236,6 +238,11 @@ namespace Skills
                 ApplyPoisonP();
             }
 
+            if (GUILayout.Button("Apply Antifire Buff"))
+            {
+                ApplyAntifireBuff();
+            }
+
             if (GUILayout.Button(noclip ? "Disable Noclip" : "Enable Noclip"))
             {
                 var playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -318,6 +325,33 @@ namespace Skills
             }
 
             controller.ApplyPoison(poisonPConfig);
+        }
+
+        /// <summary>
+        /// Applies the standard antifire buff to the player for debugging.
+        /// </summary>
+        private void ApplyAntifireBuff()
+        {
+            if (hitpoints == null)
+                hitpoints = FindObjectOfType<PlayerHitpoints>();
+
+            var target = hitpoints != null ? hitpoints.gameObject : GameObject.FindGameObjectWithTag("Player");
+            if (target == null)
+            {
+                Debug.LogWarning("AdminF2Menu could not locate the player to apply the antifire buff.");
+                return;
+            }
+
+            var definition = AntifireProtectionController.BuildStandardAntifireBuffDefinition();
+            var context = new BuffEventContext
+            {
+                target = target,
+                definition = definition,
+                sourceType = BuffSourceType.Scripted,
+                sourceId = nameof(AdminF2Menu)
+            };
+
+            BuffEvents.RaiseBuffApplied(context);
         }
 
         /// <summary>

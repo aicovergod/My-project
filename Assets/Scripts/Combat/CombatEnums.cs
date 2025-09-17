@@ -11,6 +11,7 @@ namespace Combat
         Ranged,
         Magic,
         Burn,
+        Dragonfire,
         Poison
     }
 
