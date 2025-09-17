@@ -29,6 +29,15 @@ namespace Core
         private BycatchManager bycatchManager;
         private Coroutine autosaveRoutine;
 
+        [Header("Window Configuration")]
+        [SerializeField]
+        [Tooltip("OSRS-style fixed window dimensions. Defaults to the 1024x768 client layout.")]
+        private Vector2 osrsWindowedResolution = new Vector2(1024f, 768f);
+
+        [SerializeField]
+        [Tooltip("When enabled the editor will also enforce the fixed window size during Play Mode.")]
+        private bool applyResolutionInEditorPlayMode = false;
+
         private const float AutosaveInterval = 10f;
 
         /// <summary>
@@ -43,6 +52,8 @@ namespace Core
 
         protected override void Awake()
         {
+            ConfigureWindowMode();
+
             if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
@@ -54,6 +65,24 @@ namespace Core
             Instance = this;
 
             CacheServices(false);
+        }
+
+        /// <summary>
+        /// Forces the game to start in a fixed-size window that mirrors OSRS' 4:3 aspect ratio.
+        /// Ensures the runtime resolution is deterministic so UI layouts align perfectly.
+        /// </summary>
+        private void ConfigureWindowMode()
+        {
+            // Clamp to sane minimums to avoid invalid resolution requests.
+            var width = Mathf.Max(1, Mathf.RoundToInt(osrsWindowedResolution.x));
+            var height = Mathf.Max(1, Mathf.RoundToInt(osrsWindowedResolution.y));
+
+            Screen.fullScreenMode = FullScreenMode.Windowed;
+
+            if (!Application.isEditor || applyResolutionInEditorPlayMode)
+            {
+                Screen.SetResolution(width, height, FullScreenMode.Windowed);
+            }
         }
 
         private void Start()

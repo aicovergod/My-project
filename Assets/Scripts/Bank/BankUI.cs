@@ -17,7 +17,7 @@ namespace BankSystem
     {
         public Vector2 slotSize = new Vector2(32f, 32f);
         public Vector2 slotSpacing = new Vector2(4f, 4f);
-        public Vector2 referenceResolution = new Vector2(640f, 360f);
+        public Vector2 referenceResolution = new Vector2(1024f, 768f);
         public Color emptySlotColor = new Color(1f, 1f, 1f, 0f);
 
         [Header("Stack Count Colors")]

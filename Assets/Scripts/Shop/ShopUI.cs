@@ -18,7 +18,7 @@ namespace ShopSystem
         [Header("Layout")]
         public Vector2 slotSize = new Vector2(32, 32);
         public Vector2 slotSpacing = new Vector2(4, 4);
-        public Vector2 referenceResolution = new Vector2(640, 360);
+        public Vector2 referenceResolution = new Vector2(1024f, 768f);
         public Sprite slotFrameSprite;
         public Color emptySlotColor = new Color(1f, 1f, 1f, 0.25f);
 
