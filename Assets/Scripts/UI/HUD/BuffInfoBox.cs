@@ -1,8 +1,10 @@
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Status;
 using Status.Antifire;
+using Status.Poison;
 using Util;
 
 namespace UI.HUD
@@ -30,9 +32,15 @@ namespace UI.HUD
         // Tracks whether the pointer is currently hovering this infobox.
         private bool pointerHovering;
 
+        private const float DefaultPoisonIntervalSeconds = 15f;
+
         // Cached antifire controller so the tooltip can display live mitigation values.
         private AntifireProtectionController antifireProtection;
         private GameObject antifireTarget;
+
+        // Cached poison controller used to expose live tick damage values.
+        private PoisonController poisonController;
+        private GameObject poisonTarget;
 
         // Stores the last tooltip payload so we only refresh when something actually changes.
         private string lastTooltipTitle;
@@ -324,6 +332,7 @@ namespace UI.HUD
             if (instance == null)
             {
                 ClearAntifireCache();
+                ClearPoisonCache();
                 return;
             }
 
@@ -332,9 +341,15 @@ namespace UI.HUD
                 case BuffType.Antifire:
                 case BuffType.SuperAntifire:
                     CacheAntifireController(instance.Target);
+                    ClearPoisonCache();
+                    break;
+                case BuffType.Poison:
+                    CachePoisonController(instance.Target);
+                    ClearAntifireCache();
                     break;
                 default:
                     ClearAntifireCache();
+                    ClearPoisonCache();
                     break;
             }
         }
@@ -377,6 +392,34 @@ namespace UI.HUD
         }
 
         /// <summary>
+        /// Retrieves the poison controller so the tooltip can display live tick damage values.
+        /// </summary>
+        private void CachePoisonController(GameObject target)
+        {
+            if (poisonTarget == target && poisonController != null)
+                return;
+
+            poisonTarget = target;
+            poisonController = null;
+
+            if (target != null)
+            {
+                poisonController = target.GetComponent<PoisonController>()
+                    ?? target.GetComponentInChildren<PoisonController>()
+                    ?? target.GetComponentInParent<PoisonController>();
+            }
+        }
+
+        /// <summary>
+        /// Clears cached poison lookups when the tooltip is no longer displaying poison.
+        /// </summary>
+        private void ClearPoisonCache()
+        {
+            poisonTarget = null;
+            poisonController = null;
+        }
+
+        /// <summary>
         /// Builds the tooltip description text for the current buff.
         /// </summary>
         private string BuildTooltipBody(BuffTimerInstance instance)
@@ -401,6 +444,25 @@ namespace UI.HUD
                     float mitigation = antifireProtection.GetProtectionPercentage();
                     int percent = Mathf.Clamp(Mathf.RoundToInt(mitigation * 100f), 0, 100);
                     return $"{percent}% protection";
+                case BuffType.Poison:
+                    if (poisonController == null && instance.Target != null)
+                        CachePoisonController(instance.Target);
+
+                    if (poisonController == null)
+                        return "Damage data unavailable";
+
+                    var effect = poisonController.ActiveEffect;
+                    if (effect == null || !effect.IsActive || effect.Config == null)
+                        return "Damage data unavailable";
+
+                    int damage = Mathf.Max(0, effect.CurrentDamage);
+                    float intervalSeconds = effect.Config.tickIntervalSeconds > 0f
+                        ? effect.Config.tickIntervalSeconds
+                        : DefaultPoisonIntervalSeconds;
+                    string intervalLabel = intervalSeconds % 1f == 0f
+                        ? intervalSeconds.ToString("0", CultureInfo.InvariantCulture)
+                        : intervalSeconds.ToString("0.##", CultureInfo.InvariantCulture);
+                    return $"{damage} Damage every {intervalLabel} seconds";
                 default:
                     return string.Empty;
             }
