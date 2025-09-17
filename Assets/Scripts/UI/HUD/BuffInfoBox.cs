@@ -31,10 +31,9 @@ namespace UI.HUD
             if (parent == null)
                 throw new System.ArgumentNullException(nameof(parent));
 
-            const float width = 184f;
-            const float height = 48f;
-            const float iconSize = 32f;
-            const float padding = 6f;
+            const float slotSize = 64f;
+            const float iconSize = 56f;
+            const float textPadding = 2f;
 
             // Root object that mimics the prefab layout.  The anchors/pivot align
             // with the HUD expectation of stacking boxes downward from the
@@ -48,7 +47,7 @@ namespace UI.HUD
             rootRect.anchorMin = new Vector2(1f, 1f);
             rootRect.anchorMax = new Vector2(1f, 1f);
             rootRect.pivot = new Vector2(1f, 1f);
-            rootRect.sizeDelta = new Vector2(width, height);
+            rootRect.sizeDelta = new Vector2(slotSize, slotSize);
 
             var component = rootGO.AddComponent<BuffInfoBox>();
 
@@ -58,12 +57,13 @@ namespace UI.HUD
             canvasGroup.blocksRaycasts = false;
             component.canvasGroup = canvasGroup;
 
-            var frameGO = new GameObject("Frame", typeof(Image));
+            var frameGO = new GameObject("Slot", typeof(Image));
             frameGO.layer = parentLayer;
             frameGO.transform.SetParent(rootGO.transform, false);
             var frameImage = frameGO.GetComponent<Image>();
-            frameImage.color = new Color32(46, 38, 30, 255);
             frameImage.raycastTarget = false;
+            frameImage.sprite = Resources.Load<Sprite>("Interfaces/Equipment/Empty_Slot");
+            frameImage.color = Color.white;
             var frameRect = frameImage.rectTransform;
             frameRect.anchorMin = Vector2.zero;
             frameRect.anchorMax = Vector2.one;
@@ -78,11 +78,11 @@ namespace UI.HUD
             iconImage.preserveAspect = true;
             iconImage.raycastTarget = false;
             var iconRect = iconImage.rectTransform;
-            iconRect.anchorMin = new Vector2(0f, 0.5f);
-            iconRect.anchorMax = new Vector2(0f, 0.5f);
-            iconRect.pivot = new Vector2(0f, 0.5f);
+            iconRect.anchorMin = new Vector2(0.5f, 0.5f);
+            iconRect.anchorMax = new Vector2(0.5f, 0.5f);
+            iconRect.pivot = new Vector2(0.5f, 0.5f);
             iconRect.sizeDelta = new Vector2(iconSize, iconSize);
-            iconRect.anchoredPosition = new Vector2(padding, 0f);
+            iconRect.anchoredPosition = Vector2.zero;
             component.iconImage = iconImage;
             iconImage.color = Color.clear;
 
@@ -93,19 +93,19 @@ namespace UI.HUD
             nameGO.transform.SetParent(frameGO.transform, false);
             var nameText = nameGO.GetComponent<Text>();
             nameText.font = legacyFont;
-            nameText.fontSize = 16;
-            nameText.alignment = TextAnchor.UpperLeft;
+            nameText.fontSize = 14;
+            nameText.alignment = TextAnchor.UpperCenter;
             nameText.color = new Color32(255, 240, 187, 255);
             nameText.raycastTarget = false;
             nameText.horizontalOverflow = HorizontalWrapMode.Overflow;
             nameText.verticalOverflow = VerticalWrapMode.Truncate;
             nameText.supportRichText = false;
             var nameRect = nameText.rectTransform;
-            nameRect.anchorMin = new Vector2(0f, 1f);
-            nameRect.anchorMax = new Vector2(0f, 1f);
-            nameRect.pivot = new Vector2(0f, 1f);
-            nameRect.anchoredPosition = new Vector2(iconSize + padding * 2f, -padding);
-            nameRect.sizeDelta = new Vector2(width - (iconSize + padding * 3f), 20f);
+            nameRect.anchorMin = new Vector2(0.5f, 1f);
+            nameRect.anchorMax = new Vector2(0.5f, 1f);
+            nameRect.pivot = new Vector2(0.5f, 1f);
+            nameRect.anchoredPosition = new Vector2(0f, -textPadding);
+            nameRect.sizeDelta = new Vector2(slotSize - (textPadding * 2f), 18f);
             component.nameText = nameText;
 
             nameText.text = string.Empty;
@@ -116,8 +116,8 @@ namespace UI.HUD
 
             var timerText = timerGO.GetComponent<Text>();
             timerText.font = legacyFont;
-            timerText.fontSize = 14;
-            timerText.alignment = TextAnchor.LowerRight;
+            timerText.fontSize = 12;
+            timerText.alignment = TextAnchor.LowerCenter;
             timerText.color = new Color32(212, 212, 212, 255);
             timerText.raycastTarget = false;
             timerText.horizontalOverflow = HorizontalWrapMode.Overflow;
@@ -125,11 +125,11 @@ namespace UI.HUD
             timerText.supportRichText = false;
             timerText.text = string.Empty;
             var timerRect = timerText.rectTransform;
-            timerRect.anchorMin = new Vector2(1f, 0f);
-            timerRect.anchorMax = new Vector2(1f, 0f);
-            timerRect.pivot = new Vector2(1f, 0f);
-            timerRect.anchoredPosition = new Vector2(-padding, padding);
-            timerRect.sizeDelta = new Vector2(width - (iconSize + padding * 3f), 18f);
+            timerRect.anchorMin = new Vector2(0.5f, 0f);
+            timerRect.anchorMax = new Vector2(0.5f, 0f);
+            timerRect.pivot = new Vector2(0.5f, 0f);
+            timerRect.anchoredPosition = new Vector2(0f, textPadding);
+            timerRect.sizeDelta = new Vector2(slotSize - (textPadding * 2f), 18f);
             component.timerText = timerText;
 
             component.normalTimerColor = timerText.color;
