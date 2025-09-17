@@ -31,9 +31,9 @@ namespace UI.HUD
             if (parent == null)
                 throw new System.ArgumentNullException(nameof(parent));
 
-            const float slotSize = 64f;
-            const float iconSize = 56f;
-            const float textPadding = 2f;
+            const float slotSize = 32f;
+            const float iconSize = 28f;
+            const float textPadding = 1f;
 
             // Root object that mimics the prefab layout.  The anchors/pivot align
             // with the HUD expectation of stacking boxes downward from the
@@ -93,7 +93,7 @@ namespace UI.HUD
             nameGO.transform.SetParent(frameGO.transform, false);
             var nameText = nameGO.GetComponent<Text>();
             nameText.font = legacyFont;
-            nameText.fontSize = 14;
+            nameText.fontSize = 7;
             nameText.alignment = TextAnchor.UpperCenter;
             nameText.color = new Color32(255, 240, 187, 255);
             nameText.raycastTarget = false;
@@ -105,7 +105,7 @@ namespace UI.HUD
             nameRect.anchorMax = new Vector2(0.5f, 1f);
             nameRect.pivot = new Vector2(0.5f, 1f);
             nameRect.anchoredPosition = new Vector2(0f, -textPadding);
-            nameRect.sizeDelta = new Vector2(slotSize - (textPadding * 2f), 18f);
+            nameRect.sizeDelta = new Vector2(slotSize - (textPadding * 2f), 9f);
             component.nameText = nameText;
 
             nameText.text = string.Empty;
@@ -116,7 +116,7 @@ namespace UI.HUD
 
             var timerText = timerGO.GetComponent<Text>();
             timerText.font = legacyFont;
-            timerText.fontSize = 12;
+            timerText.fontSize = 6;
             timerText.alignment = TextAnchor.LowerCenter;
             timerText.color = new Color32(212, 212, 212, 255);
             timerText.raycastTarget = false;
@@ -129,7 +129,7 @@ namespace UI.HUD
             timerRect.anchorMax = new Vector2(0.5f, 0f);
             timerRect.pivot = new Vector2(0.5f, 0f);
             timerRect.anchoredPosition = new Vector2(0f, textPadding);
-            timerRect.sizeDelta = new Vector2(slotSize - (textPadding * 2f), 18f);
+            timerRect.sizeDelta = new Vector2(slotSize - (textPadding * 2f), 9f);
             component.timerText = timerText;
 
             component.normalTimerColor = timerText.color;

@@ -20,10 +20,11 @@ namespace UI.HUD
         public static BuffHudManager Instance => instance;
 
         [SerializeField] private BuffInfoBox infoBoxPrefab;
-        [SerializeField] private Vector2 anchoredOffset = new Vector2(-8f, -140f);
-        [SerializeField] private float verticalSpacing = 4f;
+        [SerializeField] private float topPadding = 8f;
+        [SerializeField] private float leftPadding = 8f;
+        [SerializeField] private float verticalSpacing = 2f;
         [SerializeField] private int columns = 3;
-        [SerializeField] private float horizontalSpacing = 4f;
+        [SerializeField] private float horizontalSpacing = 2f;
         [SerializeField] private BuffType[] ordering;
         [SerializeField] private bool playExpiryNotification = true;
         [SerializeField] private AudioClip expiryClip;
@@ -399,7 +400,12 @@ namespace UI.HUD
                 container.pivot = new Vector2(1f, 1f);
             }
 
-            container.anchoredPosition = anchoredOffset;
+            float anchorWidth = anchor.rect.width;
+            if (anchorWidth <= 0f)
+                anchorWidth = anchor.sizeDelta.x;
+
+            container.anchoredPosition = new Vector2(-(anchorWidth + leftPadding), -topPadding);
+            LayoutBoxes();
         }
 
         private void EnsurePersistence()

@@ -59,8 +59,11 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier:
   infoBoxPrefab: {fileID: 377000000000000005, guid: 9ef42ef0a57f4016b22d560d02f33959, type: 3}
-  anchoredOffset: {x: -8, y: -140}
-  verticalSpacing: 4
+  topPadding: 8
+  leftPadding: 8
+  verticalSpacing: 2
+  columns: 3
+  horizontalSpacing: 2
   ordering: []
   playExpiryNotification: 1
   expiryClip: {fileID: 0}
