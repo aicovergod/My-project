@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Core.Save;
 
@@ -10,6 +12,16 @@ namespace Status.Poison
     public class PoisonSaveBridge : MonoBehaviour, ISaveable
     {
         [SerializeField] private PoisonController controller;
+
+        /// <summary>
+        /// Cached poison configurations loaded from <c>Resources/Status/Poison</c>.
+        /// </summary>
+        private static readonly Dictionary<string, PoisonConfig> CachedConfigs = new Dictionary<string, PoisonConfig>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Tracks whether the poison configuration cache has been populated for the current domain reload.
+        /// </summary>
+        private static bool cacheBuilt;
 
         [System.Serializable]
         private class PoisonSaveData
@@ -67,7 +79,7 @@ namespace Status.Poison
             controller.ImmunityTimer = data.immunityTimer;
             if (data.isPoisoned && !string.IsNullOrEmpty(data.configId))
             {
-                var cfg = Resources.Load<PoisonConfig>($"Status/Poison/{data.configId}");
+                var cfg = ResolveConfig(data.configId);
                 if (cfg != null)
                 {
                     float savedImmune = controller.ImmunityTimer;
@@ -82,6 +94,43 @@ namespace Status.Poison
                     controller.ImmunityTimer = savedImmune;
                 }
             }
+        }
+
+        /// <summary>
+        /// Ensures the local cache contains every <see cref="PoisonConfig"/> under <c>Resources/Status/Poison</c>.
+        /// </summary>
+        private static void BuildCacheIfNeeded()
+        {
+            if (cacheBuilt)
+                return;
+
+            cacheBuilt = true;
+            CachedConfigs.Clear();
+            var configs = Resources.LoadAll<PoisonConfig>("Status/Poison");
+            foreach (var config in configs)
+            {
+                if (config == null || string.IsNullOrWhiteSpace(config.Id))
+                    continue;
+
+                // Case-insensitive dictionary prevents casing differences from blocking lookups.
+                if (!CachedConfigs.ContainsKey(config.Id))
+                    CachedConfigs.Add(config.Id, config);
+            }
+        }
+
+        /// <summary>
+        /// Resolves the poison configuration matching the persisted <paramref name="configId"/>.
+        /// </summary>
+        /// <param name="configId">Identifier persisted in the save data.</param>
+        /// <returns>The matching configuration if found; otherwise <c>null</c>.</returns>
+        private static PoisonConfig ResolveConfig(string configId)
+        {
+            BuildCacheIfNeeded();
+            if (string.IsNullOrWhiteSpace(configId))
+                return null;
+
+            CachedConfigs.TryGetValue(configId, out var config);
+            return config;
         }
     }
 }
