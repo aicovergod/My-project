@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Core.Save;
 using UnityEngine;
+using Status.Poison;
 
 namespace Status
 {
@@ -19,7 +21,7 @@ namespace Status
         private GameObject targetOverride;
 
         [SerializeField, Tooltip("Buff categories that are persisted by bespoke systems and should be ignored here.")]
-        private BuffType[] ignoredBuffTypes = { BuffType.Poison };
+        private BuffType[] ignoredBuffTypes = Array.Empty<BuffType>();
 
         /// <summary>Reusable buffer for querying the service.</summary>
         private readonly List<BuffTimerInstance> runtimeBuffer = new();
@@ -47,6 +49,10 @@ namespace Status
             public BuffSourceType sourceType;
             public string sourceId;
             public int remainingTicks;
+            public int poisonCurrentDamage;
+            public int poisonTicksSinceDecay;
+            public float poisonTimeToNextTick;
+            public float poisonImmunityTimer;
         }
 
         /// <summary>Wrapper used when storing the buff entries in JSON format.</summary>
@@ -63,7 +69,17 @@ namespace Status
             public BuffSourceType sourceType;
             public string sourceId;
             public int remainingTicks;
+            public int poisonCurrentDamage;
+            public int poisonTicksSinceDecay;
+            public float poisonTimeToNextTick;
+            public float poisonImmunityTimer;
         }
+
+        /// <summary>Cached poison configurations loaded from the Resources folder.</summary>
+        private static readonly Dictionary<string, PoisonConfig> PoisonConfigCache = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Tracks whether the poison configuration cache has been populated.</summary>
+        private static bool poisonConfigCacheBuilt;
 
         /// <summary>Resolves the GameObject that owns the buffs we are persisting.</summary>
         private GameObject Target => targetOverride != null ? targetOverride : gameObject;
@@ -136,13 +152,18 @@ namespace Status
                 if (ignoredTypeSet.Contains(instance.Definition.type))
                     continue;
 
-                entries.Add(new BuffSaveEntry
+                var entry = new BuffSaveEntry
                 {
                     definition = instance.Definition,
                     sourceType = instance.SourceType,
                     sourceId = instance.SourceId,
                     remainingTicks = instance.RemainingTicks
-                });
+                };
+
+                if (entry.definition.type == BuffType.Poison)
+                    CapturePoisonState(instance, entry);
+
+                entries.Add(entry);
             }
 
             runtimeBuffer.Clear();
@@ -185,7 +206,11 @@ namespace Status
                     definition = entry.definition,
                     sourceType = entry.sourceType,
                     sourceId = entry.sourceId,
-                    remainingTicks = entry.remainingTicks
+                    remainingTicks = entry.remainingTicks,
+                    poisonCurrentDamage = entry.poisonCurrentDamage,
+                    poisonTicksSinceDecay = entry.poisonTicksSinceDecay,
+                    poisonTimeToNextTick = entry.poisonTimeToNextTick,
+                    poisonImmunityTimer = entry.poisonImmunityTimer
                 });
             }
 
@@ -209,6 +234,15 @@ namespace Status
                 return;
             }
 
+            if (HasPendingPoisonRestore() && !IsPoisonControllerReady(target))
+            {
+                if (!restoreCoroutineRunning && isActiveAndEnabled)
+                    StartCoroutine(WaitForServiceThenRestore());
+                return;
+            }
+
+            List<BuffRestoreRecord> deferred = null;
+
             for (int i = 0; i < pendingRestores.Count; i++)
             {
                 var record = pendingRestores[i];
@@ -221,9 +255,28 @@ namespace Status
                     resetTimer = false
                 };
                 service.RestoreBuff(context, record.remainingTicks);
+
+                if (record.definition.type == BuffType.Poison)
+                {
+                    bool restored = TryRestorePoisonState(target, record);
+                    if (!restored)
+                    {
+                        deferred ??= new List<BuffRestoreRecord>();
+                        deferred.Add(record);
+                    }
+                }
             }
 
             pendingRestores.Clear();
+
+            if (deferred != null && deferred.Count > 0)
+            {
+                pendingRestores.AddRange(deferred);
+                if (!restoreCoroutineRunning && isActiveAndEnabled)
+                    StartCoroutine(WaitForServiceThenRestore());
+                return;
+            }
+
             restoreCoroutineRunning = false;
         }
 
@@ -233,8 +286,22 @@ namespace Status
         private IEnumerator WaitForServiceThenRestore()
         {
             restoreCoroutineRunning = true;
-            while (isActiveAndEnabled && (BuffTimerService.Instance == null || Target == null))
-                yield return null;
+            while (isActiveAndEnabled)
+            {
+                if (BuffTimerService.Instance == null || Target == null)
+                {
+                    yield return null;
+                    continue;
+                }
+
+                if (HasPendingPoisonRestore() && !IsPoisonControllerReady(Target))
+                {
+                    yield return null;
+                    continue;
+                }
+
+                break;
+            }
 
             restoreCoroutineRunning = false;
             TryRestorePendingBuffs();
@@ -251,6 +318,182 @@ namespace Status
 
             for (int i = 0; i < ignoredBuffTypes.Length; i++)
                 ignoredTypeSet.Add(ignoredBuffTypes[i]);
+        }
+
+        /// <summary>
+        /// Copies the active poison effect state into the supplied save entry.
+        /// </summary>
+        /// <param name="instance">Buff timer instance currently tracked by the service.</param>
+        /// <param name="entry">Destination entry being serialised.</param>
+        private static void CapturePoisonState(BuffTimerInstance instance, BuffSaveEntry entry)
+        {
+            if (instance?.Target == null)
+                return;
+
+            var controller = instance.Target.GetComponent<PoisonController>();
+            if (controller == null)
+                return;
+
+            entry.poisonImmunityTimer = Mathf.Max(0f, controller.ImmunityTimer);
+
+            var effect = controller.ActiveEffect;
+            if (effect == null || !effect.IsActive)
+            {
+                entry.poisonCurrentDamage = 0;
+                entry.poisonTicksSinceDecay = 0;
+                entry.poisonTimeToNextTick = 0f;
+                return;
+            }
+
+            entry.poisonCurrentDamage = effect.CurrentDamage;
+            entry.poisonTicksSinceDecay = effect.TicksSinceDecay;
+
+            var cfg = effect.Config;
+            float interval = cfg != null ? Mathf.Max(0f, cfg.tickIntervalSeconds) : 0f;
+            float timeRemaining = interval > 0f ? Mathf.Clamp(interval - effect.TickTimer, 0f, interval) : 0f;
+            entry.poisonTimeToNextTick = timeRemaining;
+
+            if (!string.IsNullOrEmpty(entry.sourceId) || cfg == null || string.IsNullOrEmpty(cfg.Id))
+                return;
+
+            entry.sourceId = cfg.Id;
+        }
+
+        /// <summary>
+        /// Restores poison controller state using data persisted alongside the buff timer.
+        /// </summary>
+        /// <param name="target">GameObject that owns the poison controller.</param>
+        /// <param name="record">Serialized poison payload.</param>
+        /// <returns>True when the poison state was successfully restored.</returns>
+        private bool TryRestorePoisonState(GameObject target, BuffRestoreRecord record)
+        {
+            if (target == null)
+                return false;
+
+            var controller = target.GetComponent<PoisonController>();
+            if (controller == null)
+                return true;
+
+            if (!controller.isActiveAndEnabled)
+                return false;
+
+            if (!controller.HasAliveTarget)
+                return false;
+
+            var config = ResolvePoisonConfig(record.sourceId);
+            float savedImmunity = Mathf.Max(0f, record.poisonImmunityTimer);
+
+            if (config == null)
+            {
+                controller.ImmunityTimer = savedImmunity;
+                controller.RefreshTickCountdown();
+                if (controller.HasCombatController)
+                    controller.ResyncBuffTimerWithState();
+                return true;
+            }
+
+            controller.ImmunityTimer = 0f;
+            controller.ApplyPoison(config);
+
+            var effect = controller.ActiveEffect;
+            if (effect != null && effect.IsActive)
+            {
+                int restoredDamage = record.poisonCurrentDamage > 0
+                    ? record.poisonCurrentDamage
+                    : config.startDamagePerTick;
+                int restoredTicksSinceDecay = Mathf.Max(0, record.poisonTicksSinceDecay);
+                if (config.hitsPerDecayStep > 0)
+                    restoredTicksSinceDecay = Mathf.Clamp(restoredTicksSinceDecay, 0, config.hitsPerDecayStep - 1);
+
+                float interval = Mathf.Max(0f, config.tickIntervalSeconds);
+                float remaining = Mathf.Max(0f, record.poisonTimeToNextTick);
+                float restoredTimer = 0f;
+                if (interval > 0f)
+                {
+                    float clampedRemaining = Mathf.Clamp(remaining, 0f, interval);
+                    restoredTimer = Mathf.Clamp(interval - clampedRemaining, 0f, interval);
+                }
+
+                effect.RestoreState(restoredDamage, restoredTicksSinceDecay, restoredTimer);
+            }
+
+            controller.ImmunityTimer = savedImmunity;
+            controller.RefreshTickCountdown();
+            if (controller.HasCombatController)
+                controller.ResyncBuffTimerWithState();
+
+            return true;
+        }
+
+        /// <summary>
+        /// Ensures the poison configuration cache has been populated before lookups occur.
+        /// </summary>
+        private static void EnsurePoisonConfigCache()
+        {
+            if (poisonConfigCacheBuilt)
+                return;
+
+            poisonConfigCacheBuilt = true;
+            PoisonConfigCache.Clear();
+
+            var configs = Resources.LoadAll<PoisonConfig>("Status/Poison");
+            for (int i = 0; i < configs.Length; i++)
+            {
+                var cfg = configs[i];
+                if (cfg == null || string.IsNullOrWhiteSpace(cfg.Id))
+                    continue;
+
+                if (!PoisonConfigCache.ContainsKey(cfg.Id))
+                    PoisonConfigCache.Add(cfg.Id, cfg);
+            }
+        }
+
+        /// <summary>
+        /// Resolves the poison configuration associated with the provided identifier.
+        /// </summary>
+        /// <param name="configId">Unique config identifier persisted in the buff entry.</param>
+        /// <returns>Matching configuration instance when found; otherwise <c>null</c>.</returns>
+        private static PoisonConfig ResolvePoisonConfig(string configId)
+        {
+            EnsurePoisonConfigCache();
+            if (string.IsNullOrWhiteSpace(configId))
+                return null;
+
+            PoisonConfigCache.TryGetValue(configId, out var config);
+            return config;
+        }
+
+        /// <summary>
+        /// Returns true when any pending restore entries correspond to poison effects.
+        /// </summary>
+        private bool HasPendingPoisonRestore()
+        {
+            for (int i = 0; i < pendingRestores.Count; i++)
+            {
+                if (pendingRestores[i].definition.type == BuffType.Poison)
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether the poison controller is ready to accept restored state.
+        /// </summary>
+        /// <param name="target">GameObject that should host the controller.</param>
+        private static bool IsPoisonControllerReady(GameObject target)
+        {
+            if (target == null)
+                return false;
+
+            var controller = target.GetComponent<PoisonController>();
+            if (controller == null)
+                return true;
+
+            if (!controller.isActiveAndEnabled)
+                return false;
+
+            return controller.HasAliveTarget;
         }
     }
 }

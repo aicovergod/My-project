@@ -72,7 +72,6 @@ GameObject:
   - component: {fileID: 2135814546816086449}
   - component: {fileID: 3613127701134760555}
   - component: {fileID: 4675609188221558876}
-  - component: {fileID: 6165058707388082531}
   - component: {fileID: 5512345678901234567}
   - component: {fileID: 7000745351061079601}
   - component: {fileID: 5914355433513186549}
@@ -804,19 +803,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Status.Poison.PoisonController
   statsComponent: {fileID: 4934220548873172218}
---- !u!114 &6165058707388082531
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4297641342699346684}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 582e91441b154c16a96cb371bc38a2b7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Status.Poison.PoisonSaveBridge
-  controller: {fileID: 4675609188221558876}
 --- !u!114 &5512345678901234567
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -830,7 +816,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetOverride: {fileID: 0}
-  ignoredBuffTypes: 00000000
+  ignoredBuffTypes: []
 --- !u!114 &7000745351061079601
 MonoBehaviour:
   m_ObjectHideFlags: 0
