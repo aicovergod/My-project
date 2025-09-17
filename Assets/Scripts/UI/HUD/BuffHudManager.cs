@@ -33,6 +33,20 @@ namespace UI.HUD
         private GameObject player;
         private AudioSource audioSource;
 
+        /// <summary>
+        /// Cached reference to the timer service currently driving this HUD. Tracking the
+        /// reference allows the manager to detect when the underlying singleton is recreated
+        /// during scene transitions or domain reloads so handlers can be rewired safely.
+        /// </summary>
+        private BuffTimerService subscribedService;
+
+        /// <summary>
+        /// Indicates whether the HUD has successfully registered event handlers with the timer
+        /// service. The flag prevents duplicate subscriptions and gives <see cref="LateUpdate"/>
+        /// a reliable signal for when a retry is required because the service was not yet ready.
+        /// </summary>
+        private bool serviceHandlersAttached;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void EnsureInstanceExists()
         {
@@ -136,28 +150,61 @@ namespace UI.HUD
                 TryInitialiseContainer();
             if (player == null)
                 RefreshPlayerReference();
+
+            // Ensure we remain subscribed even if the timer service is spawned after this HUD
+            // (such as during a scene load) or if it gets replaced by a new instance.
+            var currentService = BuffTimerService.Instance;
+            if (serviceHandlersAttached && (subscribedService == null || currentService != subscribedService))
+                DetachFromTrackedService();
+
+            if (!serviceHandlersAttached)
+                SubscribeToService();
         }
 
         private void SubscribeToService()
         {
-            if (BuffTimerService.Instance == null)
+            if (serviceHandlersAttached && subscribedService == BuffTimerService.Instance)
                 return;
 
-            BuffTimerService.Instance.BuffStarted += HandleBuffStarted;
-            BuffTimerService.Instance.BuffUpdated += HandleBuffUpdated;
-            BuffTimerService.Instance.BuffWarning += HandleBuffWarning;
-            BuffTimerService.Instance.BuffEnded += HandleBuffEnded;
+            if (serviceHandlersAttached && subscribedService != BuffTimerService.Instance)
+                DetachFromTrackedService();
+
+            var service = BuffTimerService.Instance;
+            if (service == null)
+                return;
+
+            service.BuffStarted += HandleBuffStarted;
+            service.BuffUpdated += HandleBuffUpdated;
+            service.BuffWarning += HandleBuffWarning;
+            service.BuffEnded += HandleBuffEnded;
+
+            subscribedService = service;
+            serviceHandlersAttached = true;
+
+            RebuildExistingBuffs();
         }
 
         private void UnsubscribeFromService()
         {
-            if (BuffTimerService.Instance == null)
-                return;
+            DetachFromTrackedService();
+        }
 
-            BuffTimerService.Instance.BuffStarted -= HandleBuffStarted;
-            BuffTimerService.Instance.BuffUpdated -= HandleBuffUpdated;
-            BuffTimerService.Instance.BuffWarning -= HandleBuffWarning;
-            BuffTimerService.Instance.BuffEnded -= HandleBuffEnded;
+        /// <summary>
+        /// Removes the HUD's event handlers from whichever timer service instance they were
+        /// registered with and resets the tracking flags so a fresh subscription can occur later.
+        /// </summary>
+        private void DetachFromTrackedService()
+        {
+            if (subscribedService != null)
+            {
+                subscribedService.BuffStarted -= HandleBuffStarted;
+                subscribedService.BuffUpdated -= HandleBuffUpdated;
+                subscribedService.BuffWarning -= HandleBuffWarning;
+                subscribedService.BuffEnded -= HandleBuffEnded;
+            }
+
+            subscribedService = null;
+            serviceHandlersAttached = false;
         }
 
         private void HandleBuffStarted(BuffTimerInstance instance)
