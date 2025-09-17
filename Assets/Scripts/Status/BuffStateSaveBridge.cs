@@ -235,6 +235,13 @@ namespace Status
             var service = BuffTimerService.Instance;
             if (target == null || service == null)
             {
+                string ownerName = target != null ? target.name : name;
+                string reason = target == null
+                    ? "no target GameObject was resolved"
+                    : "the BuffTimerService singleton is unavailable";
+                Debug.LogWarning(
+                    $"BuffStateSaveBridge deferred restoring {pendingRestores.Count} buff timer(s) for '{ownerName}' because {reason}.",
+                    target != null ? (UnityEngine.Object)target : this);
                 if (!restoreCoroutineRunning && isActiveAndEnabled)
                     StartCoroutine(WaitForServiceThenRestore());
                 return;
@@ -242,12 +249,16 @@ namespace Status
 
             if (HasPendingPoisonRestore() && !IsPoisonControllerReady(target))
             {
+                Debug.Log(
+                    $"BuffStateSaveBridge deferred restoring {pendingRestores.Count} buff timer(s) for '{target.name}' because HasPendingPoisonRestore() returned true while the poison controller was not ready.",
+                    target);
                 if (!restoreCoroutineRunning && isActiveAndEnabled)
                     StartCoroutine(WaitForServiceThenRestore());
                 return;
             }
 
             List<BuffRestoreRecord> deferred = null;
+            int processedCount = pendingRestores.Count;
 
             for (int i = 0; i < pendingRestores.Count; i++)
             {
@@ -269,6 +280,9 @@ namespace Status
                     {
                         deferred ??= new List<BuffRestoreRecord>();
                         deferred.Add(record);
+                        Debug.LogWarning(
+                            $"BuffStateSaveBridge re-queued poison state restoration for '{target.name}' because the poison controller was not ready.",
+                            target);
                     }
                 }
             }
@@ -278,11 +292,17 @@ namespace Status
             if (deferred != null && deferred.Count > 0)
             {
                 pendingRestores.AddRange(deferred);
+                Debug.Log(
+                    $"BuffStateSaveBridge deferred {deferred.Count} poison restore entr{(deferred.Count == 1 ? "y" : "ies")} for '{target.name}' pending poison controller readiness.",
+                    target);
                 if (!restoreCoroutineRunning && isActiveAndEnabled)
                     StartCoroutine(WaitForServiceThenRestore());
                 return;
             }
 
+            Debug.Log(
+                $"BuffStateSaveBridge restored {processedCount} buff timer(s) immediately for '{target.name}'.",
+                target);
             restoreCoroutineRunning = false;
         }
 
@@ -292,16 +312,42 @@ namespace Status
         private IEnumerator WaitForServiceThenRestore()
         {
             restoreCoroutineRunning = true;
+            Debug.Log(
+                $"BuffStateSaveBridge wait routine started for '{(Target != null ? Target.name : name)}' with {pendingRestores.Count} pending buff timer(s).",
+                this);
+            bool loggedServiceWait = false;
+            bool loggedPoisonWait = false;
             while (isActiveAndEnabled)
             {
-                if (BuffTimerService.Instance == null || Target == null)
+                var service = BuffTimerService.Instance;
+                var target = Target;
+                if (service == null || target == null)
                 {
+                    if (!loggedServiceWait)
+                    {
+                        string reason = service == null
+                            ? "BuffTimerService.Instance is null"
+                            : "the target GameObject resolved to null";
+                        Debug.LogWarning(
+                            $"BuffStateSaveBridge wait routine yielding because {reason} while {pendingRestores.Count} buff timer(s) remain queued for '{(target != null ? target.name : name)}'.",
+                            this);
+                        loggedServiceWait = true;
+                        loggedPoisonWait = false;
+                    }
                     yield return null;
                     continue;
                 }
 
-                if (HasPendingPoisonRestore() && !IsPoisonControllerReady(Target))
+                if (HasPendingPoisonRestore() && !IsPoisonControllerReady(target))
                 {
+                    if (!loggedPoisonWait)
+                    {
+                        Debug.Log(
+                            $"BuffStateSaveBridge wait routine yielding because HasPendingPoisonRestore() returned true but the poison controller on '{target.name}' is not ready. Pending entries: {pendingRestores.Count}.",
+                            target);
+                        loggedPoisonWait = true;
+                        loggedServiceWait = false;
+                    }
                     yield return null;
                     continue;
                 }
@@ -310,6 +356,9 @@ namespace Status
             }
 
             restoreCoroutineRunning = false;
+            Debug.Log(
+                $"BuffStateSaveBridge wait routine resuming restoration for '{(Target != null ? Target.name : name)}'. Pending entries: {pendingRestores.Count}, HasPendingPoisonRestore(): {HasPendingPoisonRestore()}.",
+                this);
             TryRestorePendingBuffs();
         }
 
@@ -373,18 +422,39 @@ namespace Status
         /// <returns>True when the poison state was successfully restored.</returns>
         private bool TryRestorePoisonState(GameObject target, BuffRestoreRecord record)
         {
+            string targetName = target != null ? target.name : "<null>";
             if (target == null)
+            {
+                Debug.LogWarning(
+                    $"BuffStateSaveBridge could not restore poison state because the resolved target GameObject was null for source id '{(string.IsNullOrWhiteSpace(record.sourceId) ? "<missing>" : record.sourceId)}'.",
+                    this);
                 return false;
+            }
 
             var controller = target.GetComponent<PoisonController>();
             if (controller == null)
+            {
+                Debug.Log(
+                    $"BuffStateSaveBridge skipped poison state restoration for '{targetName}' because no PoisonController component was present. The buff timer has already been restored by the service.",
+                    target);
                 return true;
+            }
 
             if (!controller.isActiveAndEnabled)
+            {
+                Debug.LogWarning(
+                    $"BuffStateSaveBridge deferred poison state restoration for '{targetName}' because the PoisonController component is disabled.",
+                    controller);
                 return false;
+            }
 
             if (!controller.HasAliveTarget)
+            {
+                Debug.LogWarning(
+                    $"BuffStateSaveBridge deferred poison state restoration for '{targetName}' because the PoisonController reports no alive target.",
+                    controller);
                 return false;
+            }
 
             if (!string.Equals(record.sourceId, DefaultPoisonConfigId, StringComparison.OrdinalIgnoreCase))
             {
@@ -403,6 +473,9 @@ namespace Status
                 controller.RefreshTickCountdown();
                 if (controller.HasCombatController)
                     controller.ResyncBuffTimerWithState();
+                Debug.LogWarning(
+                    $"BuffStateSaveBridge restored only poison immunity timers for '{targetName}' because the default poison configuration could not be resolved.",
+                    controller);
                 return true;
             }
 
@@ -410,25 +483,30 @@ namespace Status
             controller.ApplyPoison(config);
 
             var effect = controller.ActiveEffect;
+            bool effectRestored = false;
+            int finalDamage = 0;
+            int finalTicksSinceDecay = 0;
+            float finalTimer = 0f;
             if (effect != null && effect.IsActive)
             {
-                int restoredDamage = record.poisonCurrentDamage > 0
+                finalDamage = record.poisonCurrentDamage > 0
                     ? record.poisonCurrentDamage
                     : config.startDamagePerTick;
-                int restoredTicksSinceDecay = Mathf.Max(0, record.poisonTicksSinceDecay);
+                finalTicksSinceDecay = Mathf.Max(0, record.poisonTicksSinceDecay);
                 if (config.hitsPerDecayStep > 0)
-                    restoredTicksSinceDecay = Mathf.Clamp(restoredTicksSinceDecay, 0, config.hitsPerDecayStep - 1);
+                    finalTicksSinceDecay = Mathf.Clamp(finalTicksSinceDecay, 0, config.hitsPerDecayStep - 1);
 
                 float interval = Mathf.Max(0f, config.tickIntervalSeconds);
                 float remaining = Mathf.Max(0f, record.poisonTimeToNextTick);
-                float restoredTimer = 0f;
+                finalTimer = 0f;
                 if (interval > 0f)
                 {
                     float clampedRemaining = Mathf.Clamp(remaining, 0f, interval);
-                    restoredTimer = Mathf.Clamp(interval - clampedRemaining, 0f, interval);
+                    finalTimer = Mathf.Clamp(interval - clampedRemaining, 0f, interval);
                 }
 
-                effect.RestoreState(restoredDamage, restoredTicksSinceDecay, restoredTimer);
+                effect.RestoreState(finalDamage, finalTicksSinceDecay, finalTimer);
+                effectRestored = true;
             }
 
             controller.ImmunityTimer = savedImmunity;
@@ -436,6 +514,9 @@ namespace Status
             if (controller.HasCombatController)
                 controller.ResyncBuffTimerWithState();
 
+            Debug.Log(
+                $"BuffStateSaveBridge successfully restored poison state for '{targetName}'. Effect restored: {effectRestored}, damage: {finalDamage}, ticksSinceDecay: {finalTicksSinceDecay}, timer: {finalTimer:0.###}, immunity: {savedImmunity:0.###}.",
+                controller);
             return true;
         }
 
@@ -455,6 +536,8 @@ namespace Status
 
                 if (cachedPoisonConfig == null)
                     Debug.LogError($"BuffStateSaveBridge could not load default poison configuration at '{DefaultPoisonConfigResourcePath}'.");
+                else
+                    Debug.Log($"BuffStateSaveBridge resolved default poison configuration '{cachedPoisonConfig.name}'.", cachedPoisonConfig);
             }
 
             return cachedPoisonConfig;
