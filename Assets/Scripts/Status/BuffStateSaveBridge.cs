@@ -353,7 +353,7 @@ namespace Status
             float timeRemaining = interval > 0f ? Mathf.Clamp(interval - effect.TickTimer, 0f, interval) : 0f;
             entry.poisonTimeToNextTick = timeRemaining;
 
-            if (!string.IsNullOrEmpty(entry.sourceId) || cfg == null || string.IsNullOrEmpty(cfg.Id))
+            if (cfg == null || string.IsNullOrEmpty(cfg.Id))
                 return;
 
             entry.sourceId = cfg.Id;
@@ -381,6 +381,8 @@ namespace Status
                 return false;
 
             var config = ResolvePoisonConfig(record.sourceId);
+            if (config == null && ShouldResolveLegacyPoisonConfig(record))
+                config = ResolveLegacyPoisonConfig(record);
             float savedImmunity = Mathf.Max(0f, record.poisonImmunityTimer);
 
             if (config == null)
@@ -423,6 +425,83 @@ namespace Status
                 controller.ResyncBuffTimerWithState();
 
             return true;
+        }
+
+        /// <summary>
+        /// Determines whether the restore record refers to a legacy poison identifier that
+        /// relied on the default buff type string instead of the configuration identifier.
+        /// </summary>
+        /// <param name="record">Serialized poison payload captured in an older save.</param>
+        private static bool ShouldResolveLegacyPoisonConfig(in BuffRestoreRecord record)
+        {
+            if (record.definition.type != BuffType.Poison)
+                return false;
+
+            if (string.IsNullOrWhiteSpace(record.sourceId))
+                return true;
+
+            return string.Equals(record.sourceId, BuffType.Poison.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Attempts to map legacy poison save payloads to the closest matching configuration so
+        /// historical save files created before configuration identifiers were persisted remain
+        /// compatible.
+        /// </summary>
+        /// <param name="record">Serialized poison payload captured from the legacy system.</param>
+        /// <returns>The resolved poison configuration when one could be inferred; otherwise <c>null</c>.</returns>
+        private static PoisonConfig ResolveLegacyPoisonConfig(in BuffRestoreRecord record)
+        {
+            // Earlier builds stored the icon identifier using the config id, so prefer matching
+            // against that metadata first when it is available.
+            if (!string.IsNullOrWhiteSpace(record.definition.iconId))
+            {
+                var iconMatch = ResolvePoisonConfig(record.definition.iconId);
+                if (iconMatch != null)
+                    return iconMatch;
+            }
+
+            EnsurePoisonConfigCache();
+            if (PoisonConfigCache.Count == 0)
+                return null;
+
+            PoisonConfig bestMatch = null;
+            int bestDifference = int.MaxValue;
+            int recordedDamage = record.poisonCurrentDamage;
+
+            foreach (var cfg in PoisonConfigCache.Values)
+            {
+                if (cfg == null)
+                    continue;
+
+                if (recordedDamage > 0)
+                {
+                    int difference = Mathf.Abs(cfg.startDamagePerTick - recordedDamage);
+                    if (difference < bestDifference)
+                    {
+                        bestDifference = difference;
+                        bestMatch = cfg;
+
+                        if (difference == 0)
+                            break;
+                    }
+                }
+                else if (bestMatch == null)
+                {
+                    bestMatch = cfg;
+                }
+            }
+
+            if (bestMatch != null)
+                return bestMatch;
+
+            foreach (var cfg in PoisonConfigCache.Values)
+            {
+                if (cfg != null)
+                    return cfg;
+            }
+
+            return null;
         }
 
         /// <summary>
