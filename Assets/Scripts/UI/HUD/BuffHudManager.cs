@@ -22,6 +22,8 @@ namespace UI.HUD
         [SerializeField] private BuffInfoBox infoBoxPrefab;
         [SerializeField] private Vector2 anchoredOffset = new Vector2(-8f, -140f);
         [SerializeField] private float verticalSpacing = 4f;
+        [SerializeField] private int columns = 3;
+        [SerializeField] private float horizontalSpacing = 4f;
         [SerializeField] private BuffType[] ordering;
         [SerializeField] private bool playExpiryNotification = true;
         [SerializeField] private AudioClip expiryClip;
@@ -292,18 +294,32 @@ namespace UI.HUD
             var ordered = new List<BuffInfoBox>(activeBoxes.Values);
             ordered.Sort(CompareBoxes);
 
-            float currentY = 0f;
+            int effectiveColumns = Mathf.Max(1, columns);
+
             for (int i = 0; i < ordered.Count; i++)
             {
                 var box = ordered[i];
                 if (box == null)
                     continue;
+
                 var rect = box.GetComponent<RectTransform>();
                 rect.anchorMin = new Vector2(1f, 1f);
                 rect.anchorMax = new Vector2(1f, 1f);
                 rect.pivot = new Vector2(1f, 1f);
-                rect.anchoredPosition = new Vector2(0f, -currentY);
-                currentY += rect.rect.height + verticalSpacing;
+
+                float rectWidth = rect.rect.width;
+                float rectHeight = rect.rect.height;
+                if (rectWidth <= 0f)
+                    rectWidth = rect.sizeDelta.x;
+                if (rectHeight <= 0f)
+                    rectHeight = rect.sizeDelta.y;
+
+                int column = i % effectiveColumns;
+                int row = i / effectiveColumns;
+
+                float x = -(rectWidth + horizontalSpacing) * column;
+                float y = -(rectHeight + verticalSpacing) * row;
+                rect.anchoredPosition = new Vector2(x, y);
             }
         }
 
