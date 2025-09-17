@@ -25,6 +25,12 @@ namespace Status.Poison
         // Cached timer definition so removal payloads mirror the most recent HUD entry.
         private BuffTimerDefinition lastPoisonDefinition;
         private bool hasLastPoisonDefinition;
+        // When the combat dependency has not been resolved yet, stash the pending timer payload so it can
+        // be replayed once Awake/OnEnable assign the combat controller reference.
+        private BuffTimerDefinition pendingBuffDefinition;
+        private string pendingBuffConfigId;
+        private bool pendingBuffRefresh;
+        private bool hasPendingBuffTimer;
 
         /// <summary>Invoked when poison deals damage.</summary>
         public event System.Action<int> OnPoisonTick;
@@ -45,10 +51,20 @@ namespace Status.Poison
             set => immunityTimer = value;
         }
 
+        /// <summary>True when a combat controller reference has been discovered.</summary>
+        public bool HasCombatController => combat != null;
+
         private void Awake()
         {
             stats = statsComponent as CombatTarget ?? GetComponent<CombatTarget>();
-            combat = GetComponent<CombatController>() ?? GetComponentInParent<CombatController>() ?? GetComponentInChildren<CombatController>();
+            ResolveCombatController();
+            TryFlushPendingBuffTimer();
+        }
+
+        private void OnEnable()
+        {
+            ResolveCombatController();
+            TryFlushPendingBuffTimer();
         }
 
         /// <summary>
@@ -86,6 +102,7 @@ namespace Status.Poison
             intervalTicks = 0;
             UnsubscribeFromTicker();
             immunityTimer = Mathf.Max(immunityTimer, immunitySeconds);
+            hasPendingBuffTimer = false;
         }
 
         /// <summary>
@@ -179,6 +196,7 @@ namespace Status.Poison
             ticksUntilNextDamage = 0;
             intervalTicks = 0;
             UnsubscribeFromTicker();
+            hasPendingBuffTimer = false;
         }
 
         /// <summary>
@@ -297,12 +315,17 @@ namespace Status.Poison
         /// </summary>
         private void ReportPoisonTimer(PoisonConfig cfg, float durationSeconds, bool refreshTimer)
         {
-            if (combat == null || cfg == null)
+            ResolveCombatController();
+            if (cfg == null)
                 return;
 
             lastPoisonDefinition = CreateBuffDefinition(cfg, durationSeconds);
             hasLastPoisonDefinition = true;
-            combat.ReportStatusEffectApplied(lastPoisonDefinition, cfg.Id, refreshTimer);
+            pendingBuffDefinition = lastPoisonDefinition;
+            pendingBuffConfigId = cfg.Id;
+            pendingBuffRefresh = refreshTimer;
+            hasPendingBuffTimer = true;
+            TryFlushPendingBuffTimer();
         }
 
         private void NotifyBuffApplied(PoisonConfig cfg)
@@ -316,6 +339,7 @@ namespace Status.Poison
 
         private void NotifyBuffRemoved(PoisonConfig cfg)
         {
+            hasPendingBuffTimer = false;
             if (combat == null)
             {
                 hasLastPoisonDefinition = false;
@@ -327,6 +351,31 @@ namespace Status.Poison
                 : CreateBuffDefinition(cfg, CalculatePoisonLifetimeSeconds(cfg));
             combat.ReportStatusEffectRemoved(definition, cfg != null ? cfg.Id : null);
             hasLastPoisonDefinition = false;
+        }
+
+        /// <summary>
+        /// Attempts to locate a combat controller dependency either on this object or in nearby hierarchy nodes.
+        /// </summary>
+        private void ResolveCombatController()
+        {
+            if (combat != null)
+                return;
+
+            combat = GetComponent<CombatController>() ?? GetComponentInParent<CombatController>() ?? GetComponentInChildren<CombatController>();
+        }
+
+        /// <summary>
+        /// Forwards any cached buff definition once the combat controller reference becomes available.
+        /// </summary>
+        private void TryFlushPendingBuffTimer()
+        {
+            if (!hasPendingBuffTimer)
+                return;
+            if (combat == null)
+                return;
+
+            combat.ReportStatusEffectApplied(pendingBuffDefinition, pendingBuffConfigId, pendingBuffRefresh);
+            hasPendingBuffTimer = false;
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Core.Save;
@@ -45,6 +46,11 @@ namespace Status.Poison
         /// </summary>
         private bool hasSnapshot;
 
+        /// <summary>
+        /// Handle to a coroutine scheduled during load to delay HUD resync until the controller resolves dependencies.
+        /// </summary>
+        private Coroutine pendingResyncRoutine;
+
         private string SaveKey => $"poison_{gameObject.name}";
 
         private void Awake()
@@ -63,6 +69,11 @@ namespace Status.Poison
         {
             Save();
             UnsubscribeFromControllerEvents();
+            if (pendingResyncRoutine != null)
+            {
+                StopCoroutine(pendingResyncRoutine);
+                pendingResyncRoutine = null;
+            }
             SaveManager.Unregister(this);
         }
 
@@ -121,7 +132,7 @@ namespace Status.Poison
                         data.ticksSinceDecay,
                         cfg.tickIntervalSeconds - data.timeToNextTick);
                     controller.RefreshTickCountdown();
-                    controller.ResyncBuffTimerWithState();
+                    ScheduleBuffTimerResync();
                     controller.ImmunityTimer = savedImmune;
                 }
             }
@@ -246,6 +257,32 @@ namespace Status.Poison
             {
                 ClearSnapshotEffectState();
             }
+        }
+
+        /// <summary>
+        /// Ensures the buff timer resync runs only after the controller has resolved its combat dependency.
+        /// </summary>
+        private void ScheduleBuffTimerResync()
+        {
+            if (pendingResyncRoutine != null)
+                StopCoroutine(pendingResyncRoutine);
+
+            pendingResyncRoutine = StartCoroutine(ResyncWhenControllerReady());
+        }
+
+        /// <summary>
+        /// Waits for the next frame (and until the controller reports readiness) before issuing the HUD resync.
+        /// </summary>
+        private IEnumerator ResyncWhenControllerReady()
+        {
+            // Allow at least one frame so PoisonController.Awake can run before resync executes.
+            yield return null;
+
+            while (controller != null && controller.isActiveAndEnabled && !controller.HasCombatController)
+                yield return null;
+
+            controller?.ResyncBuffTimerWithState();
+            pendingResyncRoutine = null;
         }
 
         /// <summary>
