@@ -6,6 +6,7 @@ using Pets;
 using BankSystem;
 using Skills.Fishing;
 using Skills.Outfits;
+using Status.Poison;
 
 namespace Skills
 {
@@ -19,6 +20,10 @@ namespace Skills
         private SkillManager skillManager;
         private IBeastmasterService beastmasterService;
         private MergeConfig mergeConfig;
+        private PoisonController poisonController;
+        private PoisonConfig poisonPConfig;
+
+        private const string PoisonPResourcePath = "Status/Poison/Poison_p";
 
         private bool visible;
         private bool noclip;
@@ -69,6 +74,8 @@ namespace Skills
                 hitpoints = FindObjectOfType<PlayerHitpoints>();
             if (skillManager == null)
                 skillManager = FindObjectOfType<SkillManager>();
+            if (poisonController == null && hitpoints != null)
+                poisonController = hitpoints.GetComponent<PoisonController>();
             if (beastmasterService == null)
             {
                 foreach (var mb in FindObjectsOfType<MonoBehaviour>())
@@ -86,6 +93,7 @@ namespace Skills
         {
             hitpoints = FindObjectOfType<PlayerHitpoints>();
             skillManager = FindObjectOfType<SkillManager>();
+            poisonController = hitpoints != null ? hitpoints.GetComponent<PoisonController>() : null;
             beastmasterService = null;
             foreach (var mb in FindObjectsOfType<MonoBehaviour>())
             {
@@ -223,6 +231,11 @@ namespace Skills
                 hitpoints?.DebugSetCurrentHp(hitpoints.MaxHp);
             }
 
+            if (GUILayout.Button("Apply Poison (p)"))
+            {
+                ApplyPoisonP();
+            }
+
             if (GUILayout.Button(noclip ? "Disable Noclip" : "Enable Noclip"))
             {
                 var playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -280,6 +293,51 @@ namespace Skills
             GUILayout.EndScrollView();
 
             GUILayout.EndArea();
+        }
+
+        /// <summary>
+        /// Applies the standard poison (p) status effect to the player for quick debugging.
+        /// </summary>
+        private void ApplyPoisonP()
+        {
+            var controller = ResolvePoisonController();
+            if (controller == null)
+            {
+                Debug.LogWarning("AdminF2Menu could not find a PoisonController on the player to apply poison.");
+                return;
+            }
+
+            if (poisonPConfig == null)
+            {
+                poisonPConfig = Resources.Load<PoisonConfig>(PoisonPResourcePath);
+                if (poisonPConfig == null)
+                {
+                    Debug.LogWarning($"AdminF2Menu could not load poison config at Resources/{PoisonPResourcePath}.");
+                    return;
+                }
+            }
+
+            controller.ApplyPoison(poisonPConfig);
+        }
+
+        /// <summary>
+        /// Ensures we are referencing the current player's <see cref="PoisonController"/>.
+        /// </summary>
+        private PoisonController ResolvePoisonController()
+        {
+            if (poisonController != null)
+                return poisonController;
+
+            if (hitpoints != null)
+                poisonController = hitpoints.GetComponent<PoisonController>();
+
+            if (poisonController == null)
+            {
+                var playerObj = GameObject.FindGameObjectWithTag("Player");
+                poisonController = playerObj != null ? playerObj.GetComponent<PoisonController>() : null;
+            }
+
+            return poisonController;
         }
     }
 }
