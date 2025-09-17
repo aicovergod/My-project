@@ -9,6 +9,7 @@ namespace Status.Poison
     /// Persists <see cref="PoisonController"/> state using the <see cref="SaveManager"/>.
     /// </summary>
     [DisallowMultipleComponent]
+    [DefaultExecutionOrder(-100)]
     public class PoisonSaveBridge : MonoBehaviour, ISaveable
     {
         [SerializeField] private PoisonController controller;
