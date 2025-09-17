@@ -129,6 +129,90 @@ namespace Status
             }
         }
 
+        /// <summary>
+        /// Restores a buff using previously serialised data. When no active instance is found
+        /// a new timer is created, otherwise the metadata is refreshed and the remaining ticks
+        /// are clamped to the saved countdown so HUD elements resume accurately.
+        /// </summary>
+        /// <param name="context">Buff metadata captured during saving.</param>
+        /// <param name="remainingTicks">Remaining tick count at the time of the save.</param>
+        public BuffTimerInstance RestoreBuff(BuffEventContext context, int remainingTicks)
+        {
+            if (context.target == null)
+                return null;
+
+            var key = new BuffKey(context.target, context.definition.type);
+            if (!activeBuffs.TryGetValue(key, out var instance))
+            {
+                if (activeBuffs.Count >= maxTrackedBuffs)
+                {
+                    Debug.LogWarning($"BuffTimerService cannot restore buff {context.definition.type}; maximum capacity {maxTrackedBuffs} reached.");
+                    return null;
+                }
+
+                sequenceCounter++;
+                instance = new BuffTimerInstance(context, sequenceCounter);
+                activeBuffs[key] = instance;
+                EnsureTickerSubscription();
+                Log($"Restored buff {instance.DisplayName} on {context.target.name} (ticks: {remainingTicks}).");
+                BuffStarted?.Invoke(instance);
+            }
+            else
+            {
+                instance.ApplyContext(context);
+                Log($"Updated buff {instance.DisplayName} on {context.target.name} during restore (ticks: {remainingTicks}).");
+            }
+
+            ApplyRestoredTickCount(instance, remainingTicks);
+            BuffUpdated?.Invoke(instance);
+
+            if (instance.CanWarn && instance.RemainingTicks == instance.WarningTicks)
+                BuffWarning?.Invoke(instance);
+
+            return instance;
+        }
+
+        /// <summary>
+        /// Removes every buff currently associated with the supplied target. Primarily used for
+        /// death/respawn flows so future buffs are automatically cleared without bespoke logic.
+        /// </summary>
+        /// <param name="target">GameObject whose buffs should be purged.</param>
+        /// <param name="reason">Reason communicated to listeners when invoking <see cref="BuffEnded"/>.</param>
+        public void RemoveAllBuffs(GameObject target, BuffEndReason reason = BuffEndReason.Manual)
+        {
+            if (target == null)
+                return;
+
+            removalBuffer.Clear();
+            List<BuffTimerInstance> removedInstances = null;
+
+            foreach (var pair in activeBuffs)
+            {
+                if (pair.Value.Target != target)
+                    continue;
+
+                removalBuffer.Add(pair.Key);
+                removedInstances ??= new List<BuffTimerInstance>();
+                removedInstances.Add(pair.Value);
+            }
+
+            if (removedInstances == null || removedInstances.Count == 0)
+                return;
+
+            for (int i = 0; i < removalBuffer.Count; i++)
+                activeBuffs.Remove(removalBuffer[i]);
+            removalBuffer.Clear();
+
+            for (int i = 0; i < removedInstances.Count; i++)
+            {
+                var instance = removedInstances[i];
+                BuffEnded?.Invoke(instance, reason);
+                Log($"Removed buff {instance.DisplayName} from {target.name} via bulk removal.");
+            }
+
+            ReleaseTickerSubscriptionIfIdle();
+        }
+
         private void HandleBuffApplied(BuffEventContext context)
         {
             if (context.target == null)
@@ -272,6 +356,48 @@ namespace Status
         {
             if (logDebugMessages)
                 Debug.Log($"[BuffTimerService] {message}");
+        }
+
+        /// <summary>
+        /// Clamps the restored tick count to sensible bounds before the service resumes ticking.
+        /// </summary>
+        private void ApplyRestoredTickCount(BuffTimerInstance instance, int remainingTicks)
+        {
+            if (instance == null)
+                return;
+
+            if (instance.Definition.isRecurring)
+            {
+                int clamped = remainingTicks;
+                if (instance.IntervalTicks > 0)
+                {
+                    clamped = remainingTicks <= 0
+                        ? Mathf.Max(1, instance.IntervalTicks)
+                        : Mathf.Clamp(remainingTicks, 1, instance.IntervalTicks);
+                }
+                else
+                {
+                    clamped = Mathf.Max(1, remainingTicks);
+                }
+                instance.RemainingTicks = clamped;
+                return;
+            }
+
+            if (instance.HasDuration)
+            {
+                if (instance.DurationTicks > 0)
+                {
+                    int clamped = remainingTicks < 0 ? instance.DurationTicks : remainingTicks;
+                    instance.RemainingTicks = Mathf.Clamp(clamped, 0, instance.DurationTicks);
+                }
+                else
+                {
+                    instance.RemainingTicks = remainingTicks;
+                }
+                return;
+            }
+
+            instance.RemainingTicks = remainingTicks;
         }
 
         private void EnsurePersistenceComponent()
