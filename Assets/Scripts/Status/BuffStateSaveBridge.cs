@@ -75,11 +75,17 @@ namespace Status
             public float poisonImmunityTimer;
         }
 
-        /// <summary>Cached poison configurations loaded from the Resources folder.</summary>
-        private static readonly Dictionary<string, PoisonConfig> PoisonConfigCache = new(StringComparer.OrdinalIgnoreCase);
+        /// <summary>Resource path for the default poison configuration.</summary>
+        private const string DefaultPoisonConfigResourcePath = "Status/Poison/Poison_p";
 
-        /// <summary>Tracks whether the poison configuration cache has been populated.</summary>
-        private static bool poisonConfigCacheBuilt;
+        /// <summary>Identifier persisted by the default poison configuration.</summary>
+        private const string DefaultPoisonConfigId = "poison_p";
+
+        /// <summary>Singleton poison configuration loaded from Resources.</summary>
+        private static PoisonConfig cachedPoisonConfig;
+
+        /// <summary>Tracks whether we already attempted to resolve the poison configuration.</summary>
+        private static bool attemptedPoisonConfigLoad;
 
         /// <summary>Resolves the GameObject that owns the buffs we are persisting.</summary>
         private GameObject Target => targetOverride != null ? targetOverride : gameObject;
@@ -380,9 +386,15 @@ namespace Status
             if (!controller.HasAliveTarget)
                 return false;
 
-            var config = ResolvePoisonConfig(record.sourceId);
-            if (config == null && ShouldResolveLegacyPoisonConfig(record))
-                config = ResolveLegacyPoisonConfig(record);
+            if (!string.Equals(record.sourceId, DefaultPoisonConfigId, StringComparison.OrdinalIgnoreCase))
+            {
+                string savedId = string.IsNullOrWhiteSpace(record.sourceId) ? "<missing>" : record.sourceId;
+                Debug.LogWarning(
+                    $"BuffStateSaveBridge encountered unexpected poison config id '{savedId}' while restoring '{target.name}'. Defaulting to '{DefaultPoisonConfigId}'.",
+                    target);
+            }
+
+            var config = ResolvePoisonConfig();
             float savedImmunity = Mathf.Max(0f, record.poisonImmunityTimer);
 
             if (config == null)
@@ -428,118 +440,24 @@ namespace Status
         }
 
         /// <summary>
-        /// Determines whether the restore record refers to a legacy poison identifier that
-        /// relied on the default buff type string instead of the configuration identifier.
+        /// Resolves the singleton poison configuration so restores always use the canonical asset.
         /// </summary>
-        /// <param name="record">Serialized poison payload captured in an older save.</param>
-        private static bool ShouldResolveLegacyPoisonConfig(in BuffRestoreRecord record)
-        {
-            if (record.definition.type != BuffType.Poison)
-                return false;
-
-            if (string.IsNullOrWhiteSpace(record.sourceId))
-                return true;
-
-            return string.Equals(record.sourceId, BuffType.Poison.ToString(), StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Attempts to map legacy poison save payloads to the closest matching configuration so
-        /// historical save files created before configuration identifiers were persisted remain
-        /// compatible.
-        /// </summary>
-        /// <param name="record">Serialized poison payload captured from the legacy system.</param>
-        /// <returns>The resolved poison configuration when one could be inferred; otherwise <c>null</c>.</returns>
-        private static PoisonConfig ResolveLegacyPoisonConfig(in BuffRestoreRecord record)
-        {
-            // Earlier builds stored the icon identifier using the config id, so prefer matching
-            // against that metadata first when it is available.
-            if (!string.IsNullOrWhiteSpace(record.definition.iconId))
-            {
-                var iconMatch = ResolvePoisonConfig(record.definition.iconId);
-                if (iconMatch != null)
-                    return iconMatch;
-            }
-
-            EnsurePoisonConfigCache();
-            if (PoisonConfigCache.Count == 0)
-                return null;
-
-            PoisonConfig bestMatch = null;
-            int bestDifference = int.MaxValue;
-            int recordedDamage = record.poisonCurrentDamage;
-
-            foreach (var cfg in PoisonConfigCache.Values)
-            {
-                if (cfg == null)
-                    continue;
-
-                if (recordedDamage > 0)
-                {
-                    int difference = Mathf.Abs(cfg.startDamagePerTick - recordedDamage);
-                    if (difference < bestDifference)
-                    {
-                        bestDifference = difference;
-                        bestMatch = cfg;
-
-                        if (difference == 0)
-                            break;
-                    }
-                }
-                else if (bestMatch == null)
-                {
-                    bestMatch = cfg;
-                }
-            }
-
-            if (bestMatch != null)
-                return bestMatch;
-
-            foreach (var cfg in PoisonConfigCache.Values)
-            {
-                if (cfg != null)
-                    return cfg;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Ensures the poison configuration cache has been populated before lookups occur.
-        /// </summary>
-        private static void EnsurePoisonConfigCache()
-        {
-            if (poisonConfigCacheBuilt)
-                return;
-
-            poisonConfigCacheBuilt = true;
-            PoisonConfigCache.Clear();
-
-            var configs = Resources.LoadAll<PoisonConfig>("Status/Poison");
-            for (int i = 0; i < configs.Length; i++)
-            {
-                var cfg = configs[i];
-                if (cfg == null || string.IsNullOrWhiteSpace(cfg.Id))
-                    continue;
-
-                if (!PoisonConfigCache.ContainsKey(cfg.Id))
-                    PoisonConfigCache.Add(cfg.Id, cfg);
-            }
-        }
-
-        /// <summary>
-        /// Resolves the poison configuration associated with the provided identifier.
-        /// </summary>
-        /// <param name="configId">Unique config identifier persisted in the buff entry.</param>
         /// <returns>Matching configuration instance when found; otherwise <c>null</c>.</returns>
-        private static PoisonConfig ResolvePoisonConfig(string configId)
+        private static PoisonConfig ResolvePoisonConfig()
         {
-            EnsurePoisonConfigCache();
-            if (string.IsNullOrWhiteSpace(configId))
-                return null;
+            if (cachedPoisonConfig != null)
+                return cachedPoisonConfig;
 
-            PoisonConfigCache.TryGetValue(configId, out var config);
-            return config;
+            if (!attemptedPoisonConfigLoad)
+            {
+                attemptedPoisonConfigLoad = true;
+                cachedPoisonConfig = Resources.Load<PoisonConfig>(DefaultPoisonConfigResourcePath);
+
+                if (cachedPoisonConfig == null)
+                    Debug.LogError($"BuffStateSaveBridge could not load default poison configuration at '{DefaultPoisonConfigResourcePath}'.");
+            }
+
+            return cachedPoisonConfig;
         }
 
         /// <summary>
