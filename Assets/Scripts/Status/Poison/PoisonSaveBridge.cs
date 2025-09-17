@@ -35,6 +35,16 @@ namespace Status.Poison
             public float immunityTimer;
         }
 
+        /// <summary>
+        /// Cached snapshot of the active poison effect so we can persist even if the controller clears it first.
+        /// </summary>
+        private PoisonSaveData snapshot;
+
+        /// <summary>
+        /// Tracks whether <see cref="snapshot"/> currently represents an active poison effect.
+        /// </summary>
+        private bool hasSnapshot;
+
         private string SaveKey => $"poison_{gameObject.name}";
 
         private void Awake()
@@ -46,26 +56,46 @@ namespace Status.Poison
         private void OnEnable()
         {
             SaveManager.Register(this);
+            SubscribeToControllerEvents();
         }
 
         private void OnDisable()
         {
             Save();
+            UnsubscribeFromControllerEvents();
             SaveManager.Unregister(this);
+        }
+
+        private void LateUpdate()
+        {
+            CaptureSnapshotFromController();
         }
 
         /// <inheritdoc />
         public void Save()
         {
-            var data = new PoisonSaveData { immunityTimer = controller != null ? controller.ImmunityTimer : 0f };
+            var data = new PoisonSaveData
+            {
+                immunityTimer = controller != null ? controller.ImmunityTimer : 0f
+            };
             var effect = controller != null ? controller.ActiveEffect : null;
             if (effect != null && effect.IsActive)
             {
                 data.isPoisoned = true;
-                data.configId = effect.Config != null ? effect.Config.Id : null;
+                var cfg = effect.Config;
+                data.configId = cfg != null ? cfg.Id : null;
                 data.currentDamage = effect.CurrentDamage;
                 data.ticksSinceDecay = effect.TicksSinceDecay;
-                data.timeToNextTick = effect.Config.tickIntervalSeconds - effect.TickTimer;
+                data.timeToNextTick = cfg != null ? cfg.tickIntervalSeconds - effect.TickTimer : 0f;
+            }
+            else if (hasSnapshot && snapshot != null)
+            {
+                data.isPoisoned = snapshot.isPoisoned;
+                data.configId = snapshot.configId;
+                data.currentDamage = snapshot.currentDamage;
+                data.ticksSinceDecay = snapshot.ticksSinceDecay;
+                data.timeToNextTick = snapshot.timeToNextTick;
+                data.immunityTimer = Mathf.Max(data.immunityTimer, snapshot.immunityTimer);
             }
             SaveManager.Save(SaveKey, data);
         }
@@ -132,6 +162,106 @@ namespace Status.Poison
 
             CachedConfigs.TryGetValue(configId, out var config);
             return config;
+        }
+
+        /// <summary>
+        /// Subscribes to poison controller events so we know when to refresh or clear the cached snapshot.
+        /// </summary>
+        private void SubscribeToControllerEvents()
+        {
+            if (controller == null)
+                return;
+
+            controller.OnPoisonTick += HandlePoisonTick;
+            controller.OnPoisonEnd += HandlePoisonEnded;
+        }
+
+        /// <summary>
+        /// Unsubscribes from any events the bridge previously attached to.
+        /// </summary>
+        private void UnsubscribeFromControllerEvents()
+        {
+            if (controller == null)
+                return;
+
+            controller.OnPoisonTick -= HandlePoisonTick;
+            controller.OnPoisonEnd -= HandlePoisonEnded;
+        }
+
+        /// <summary>
+        /// Polls the controller for live poison data so the snapshot mirrors the current runtime state.
+        /// </summary>
+        private void CaptureSnapshotFromController()
+        {
+            if (controller == null)
+                return;
+
+            var effect = controller.ActiveEffect;
+            EnsureSnapshot();
+            snapshot.immunityTimer = controller.ImmunityTimer;
+
+            if (effect != null && effect.IsActive)
+            {
+                snapshot.isPoisoned = true;
+                var cfg = effect.Config;
+                snapshot.configId = cfg != null ? cfg.Id : null;
+                snapshot.currentDamage = effect.CurrentDamage;
+                snapshot.ticksSinceDecay = effect.TicksSinceDecay;
+                float interval = cfg != null ? Mathf.Max(0f, cfg.tickIntervalSeconds) : 0f;
+                float timeRemaining = interval > 0f ? Mathf.Clamp(interval - effect.TickTimer, 0f, interval) : 0f;
+                snapshot.timeToNextTick = timeRemaining;
+                hasSnapshot = true;
+            }
+            else
+            {
+                if (controller == null || controller.enabled)
+                    ClearSnapshotEffectState();
+            }
+        }
+
+        /// <summary>
+        /// Ensures the snapshot container exists before attempting to write to it.
+        /// </summary>
+        private void EnsureSnapshot()
+        {
+            if (snapshot == null)
+                snapshot = new PoisonSaveData();
+        }
+
+        /// <summary>
+        /// Called whenever a poison tick occurs so we capture the newly progressed state immediately.
+        /// </summary>
+        /// <param name="damage">Damage dealt by the tick (unused).</param>
+        private void HandlePoisonTick(int damage)
+        {
+            CaptureSnapshotFromController();
+        }
+
+        /// <summary>
+        /// Handles poison ending. If the controller is still enabled this represents an actual cure, so clear the snapshot.
+        /// </summary>
+        private void HandlePoisonEnded()
+        {
+            if (controller != null && controller.enabled)
+            {
+                ClearSnapshotEffectState();
+            }
+        }
+
+        /// <summary>
+        /// Clears the poison-specific portion of the cached snapshot so cured poison is not resurrected on load.
+        /// </summary>
+        private void ClearSnapshotEffectState()
+        {
+            if (snapshot == null)
+                return;
+
+            snapshot.isPoisoned = false;
+            snapshot.configId = null;
+            snapshot.currentDamage = 0;
+            snapshot.ticksSinceDecay = 0;
+            snapshot.timeToNextTick = 0f;
+            hasSnapshot = false;
         }
     }
 }
