@@ -11,9 +11,13 @@ namespace Status.Poison
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(-100)]
+    [Obsolete("PoisonSaveBridge has been superseded by BuffStateSaveBridge. Enable legacy save only when required for debugging.")]
     public class PoisonSaveBridge : MonoBehaviour, ISaveable
     {
         [SerializeField] private PoisonController controller;
+
+        [SerializeField, Tooltip("Enable deprecated SaveManager integration. Leave disabled so BuffStateSaveBridge persists poison state.")]
+        private bool enableLegacySave;
 
         /// <summary>
         /// Cached poison configurations loaded from <c>Resources/Status/Poison</c>.
@@ -71,12 +75,18 @@ namespace Status.Poison
 
         private void OnEnable()
         {
+            if (!enableLegacySave)
+                return;
+
             SaveManager.Register(this);
             SubscribeToControllerEvents();
         }
 
         private void OnDisable()
         {
+            if (!enableLegacySave)
+                return;
+
             Save();
             UnsubscribeFromControllerEvents();
             CancelPendingRestore();
@@ -85,12 +95,18 @@ namespace Status.Poison
 
         private void LateUpdate()
         {
+            if (!enableLegacySave)
+                return;
+
             CaptureSnapshotFromController();
         }
 
         /// <inheritdoc />
         public void Save()
         {
+            if (!enableLegacySave)
+                return;
+
             var data = new PoisonSaveData
             {
                 immunityTimer = controller != null ? controller.ImmunityTimer : 0f
@@ -120,6 +136,9 @@ namespace Status.Poison
         /// <inheritdoc />
         public void Load()
         {
+            if (!enableLegacySave)
+                return;
+
             CancelPendingRestore();
 
             var data = SaveManager.Load<PoisonSaveData>(SaveKey);
