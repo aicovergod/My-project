@@ -22,6 +22,9 @@ namespace Status.Poison
         private int ticksUntilNextDamage;
         private int intervalTicks;
         private bool tickerSubscribed;
+        // Cached timer definition so removal payloads mirror the most recent HUD entry.
+        private BuffTimerDefinition lastPoisonDefinition;
+        private bool hasLastPoisonDefinition;
 
         /// <summary>Invoked when poison deals damage.</summary>
         public event System.Action<int> OnPoisonTick;
@@ -100,6 +103,41 @@ namespace Status.Poison
 
             ConfigureTickCadence(active.Config, active.TickTimer);
             SubscribeToTicker();
+        }
+
+        /// <summary>
+        /// Reissues the poison buff timer so HUD countdowns match the remaining lifetime after a save restore.
+        /// </summary>
+        public void ResyncBuffTimerWithState()
+        {
+            if (active == null)
+                return;
+
+            var cfg = active.Config;
+            if (cfg == null)
+                return;
+
+            float lifetimeSeconds = CalculatePoisonLifetimeSeconds(cfg);
+            float remainingSeconds = Mathf.Max(0f, lifetimeSeconds);
+
+            if (lifetimeSeconds > 0f && cfg.decayAmountPerStep > 0 && cfg.hitsPerDecayStep > 0)
+            {
+                float intervalSeconds = cfg.tickIntervalSeconds > 0f ? cfg.tickIntervalSeconds : DefaultPoisonInterval;
+                int decayAmount = Mathf.Max(1, cfg.decayAmountPerStep);
+                int hitsPerStep = Mathf.Max(1, cfg.hitsPerDecayStep);
+                // Determine how many full decay steps have completed so we can subtract their elapsed ticks.
+                int totalDecaySteps = Mathf.Max(1, Mathf.CeilToInt((cfg.startDamagePerTick - cfg.minDamagePerTick) / (float)decayAmount));
+                int damageDelta = Mathf.Max(0, cfg.startDamagePerTick - active.CurrentDamage);
+                int completedSteps = Mathf.Clamp(damageDelta / decayAmount, 0, totalDecaySteps);
+                // TicksSinceDecay tracks progress within the current step, so subtract that partial progress as well.
+                int ticksIntoCurrentStep = Mathf.Clamp(active.TicksSinceDecay, 0, Mathf.Max(0, hitsPerStep - 1));
+                long totalTicksConsumed = (long)completedSteps * hitsPerStep + ticksIntoCurrentStep;
+                float partialTimer = Mathf.Clamp(active.TickTimer, 0f, intervalSeconds);
+                float elapsedSeconds = (float)totalTicksConsumed * intervalSeconds + partialTimer;
+                remainingSeconds = Mathf.Max(0f, lifetimeSeconds - elapsedSeconds);
+            }
+
+            ReportPoisonTimer(cfg, remainingSeconds, true);
         }
 
         private void Update()
@@ -216,46 +254,79 @@ namespace Status.Poison
             ticksUntilNextDamage = Mathf.Clamp(remainingTicks, 0, intervalTicks);
         }
 
-        private void NotifyBuffApplied(PoisonConfig cfg)
+        /// <summary>
+        /// Calculates the total poison lifetime using the config values and default interval fallback.
+        /// </summary>
+        private float CalculatePoisonLifetimeSeconds(PoisonConfig cfg)
         {
-            if (combat == null || cfg == null)
-                return;
+            if (cfg == null)
+                return 0f;
 
-            float interval = cfg.tickIntervalSeconds > 0f ? cfg.tickIntervalSeconds : DefaultPoisonInterval;
-            string icon = !string.IsNullOrEmpty(cfg.Id) ? cfg.Id.ToLowerInvariant() : "poison";
-            var definition = new BuffTimerDefinition
+            float intervalSeconds = cfg.tickIntervalSeconds > 0f ? cfg.tickIntervalSeconds : DefaultPoisonInterval;
+            if (cfg.decayAmountPerStep <= 0 || cfg.hitsPerDecayStep <= 0)
+                return 0f;
+
+            int decayAmount = Mathf.Max(1, cfg.decayAmountPerStep);
+            int decaySteps = Mathf.Max(1, Mathf.CeilToInt((cfg.startDamagePerTick - cfg.minDamagePerTick) / (float)decayAmount));
+            int totalTicks = decaySteps * cfg.hitsPerDecayStep;
+            return Mathf.Max(0f, totalTicks * intervalSeconds);
+        }
+
+        /// <summary>
+        /// Builds a consistent buff definition so the HUD receives identical metadata on apply and removal.
+        /// </summary>
+        private BuffTimerDefinition CreateBuffDefinition(PoisonConfig cfg, float durationSeconds)
+        {
+            string icon = cfg != null && !string.IsNullOrEmpty(cfg.Id) ? cfg.Id.ToLowerInvariant() : "poison";
+            float clampedDuration = durationSeconds > 0f ? durationSeconds : 0f;
+            return new BuffTimerDefinition
             {
                 type = BuffType.Poison,
                 displayName = "Poison",
                 iconId = icon,
-                durationSeconds = interval,
-                recurringIntervalSeconds = interval,
-                isRecurring = true,
+                durationSeconds = clampedDuration,
+                recurringIntervalSeconds = 0f,
+                isRecurring = false,
                 showExpiryWarning = false,
                 expiryWarningTicks = 0
             };
-            combat.ReportStatusEffectApplied(definition, cfg.Id, true);
+        }
+
+        /// <summary>
+        /// Caches the active timer definition and forwards it to the combat controller so shared systems update.
+        /// </summary>
+        private void ReportPoisonTimer(PoisonConfig cfg, float durationSeconds, bool refreshTimer)
+        {
+            if (combat == null || cfg == null)
+                return;
+
+            lastPoisonDefinition = CreateBuffDefinition(cfg, durationSeconds);
+            hasLastPoisonDefinition = true;
+            combat.ReportStatusEffectApplied(lastPoisonDefinition, cfg.Id, refreshTimer);
+        }
+
+        private void NotifyBuffApplied(PoisonConfig cfg)
+        {
+            if (cfg == null)
+                return;
+
+            float lifetimeSeconds = CalculatePoisonLifetimeSeconds(cfg);
+            ReportPoisonTimer(cfg, lifetimeSeconds, true);
         }
 
         private void NotifyBuffRemoved(PoisonConfig cfg)
         {
             if (combat == null)
-                return;
-
-            float interval = cfg != null && cfg.tickIntervalSeconds > 0f ? cfg.tickIntervalSeconds : DefaultPoisonInterval;
-            string icon = cfg != null && !string.IsNullOrEmpty(cfg.Id) ? cfg.Id.ToLowerInvariant() : "poison";
-            var definition = new BuffTimerDefinition
             {
-                type = BuffType.Poison,
-                displayName = "Poison",
-                iconId = icon,
-                durationSeconds = interval,
-                recurringIntervalSeconds = interval,
-                isRecurring = true,
-                showExpiryWarning = false,
-                expiryWarningTicks = 0
-            };
+                hasLastPoisonDefinition = false;
+                return;
+            }
+
+            BuffTimerDefinition definition = hasLastPoisonDefinition
+                ? lastPoisonDefinition
+                : CreateBuffDefinition(cfg, CalculatePoisonLifetimeSeconds(cfg));
             combat.ReportStatusEffectRemoved(definition, cfg != null ? cfg.Id : null);
+            hasLastPoisonDefinition = false;
         }
     }
 }
