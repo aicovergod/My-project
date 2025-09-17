@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using Core;
 using World;
 using Combat;
+using Status;
 using Status.Poison;
 
 namespace Player
@@ -82,6 +83,8 @@ namespace Player
                 playerMover?.StopMovement();
                 combatController?.CancelCombat();
                 poisonController?.CurePoison(0f);
+                if (BuffTimerService.Instance != null && hitpoints != null)
+                    BuffTimerService.Instance.RemoveAllBuffs(hitpoints.gameObject, BuffEndReason.Manual);
                 StartCoroutine(RespawnRoutine());
             }
         }
