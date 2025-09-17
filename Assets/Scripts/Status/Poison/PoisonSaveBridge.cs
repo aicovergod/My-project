@@ -77,6 +77,7 @@ namespace Status.Poison
                         data.currentDamage,
                         data.ticksSinceDecay,
                         cfg.tickIntervalSeconds - data.timeToNextTick);
+                    controller.RefreshTickCountdown();
                     controller.ImmunityTimer = savedImmune;
                 }
             }
