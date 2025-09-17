@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Util;
+using World;
 
 namespace Status
 {
@@ -13,6 +14,37 @@ namespace Status
     public class BuffTimerService : MonoBehaviour, ITickable
     {
         public static BuffTimerService Instance { get; private set; }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void EnsureServiceExists()
+        {
+            if (Instance != null)
+                return;
+
+            var existing = FindExistingService();
+            if (existing != null)
+            {
+                Instance = existing;
+                existing.EnsurePersistenceComponent();
+                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
+                    DontDestroyOnLoad(existing.gameObject);
+                return;
+            }
+
+            var go = new GameObject("BuffTimerService");
+            go.AddComponent<ScenePersistentObject>();
+            go.AddComponent<BuffTimerService>();
+            DontDestroyOnLoad(go);
+        }
+
+        private static BuffTimerService FindExistingService()
+        {
+#if UNITY_2023_1_OR_NEWER
+            return Object.FindFirstObjectByType<BuffTimerService>();
+#else
+            return Object.FindObjectOfType<BuffTimerService>();
+#endif
+        }
 
         [Tooltip("Hard limit to avoid runaway buff spawning in error cases.")]
         [SerializeField] private int maxTrackedBuffs = 64;
@@ -51,6 +83,7 @@ namespace Status
             }
 
             Instance = this;
+            EnsurePersistenceComponent();
             DontDestroyOnLoad(gameObject);
         }
 
@@ -239,6 +272,12 @@ namespace Status
         {
             if (logDebugMessages)
                 Debug.Log($"[BuffTimerService] {message}");
+        }
+
+        private void EnsurePersistenceComponent()
+        {
+            if (GetComponent<ScenePersistentObject>() == null)
+                gameObject.AddComponent<ScenePersistentObject>();
         }
     }
 }
