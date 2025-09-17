@@ -99,7 +99,7 @@ namespace Status.Antifire
             {
                 type = BuffType.Antifire,
                 displayName = "Antifire",
-                iconId = string.Empty,
+                iconId = "antifire",
                 durationSeconds = StandardAntifireDurationSeconds,
                 recurringIntervalSeconds = 0f,
                 isRecurring = false,
