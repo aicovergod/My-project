@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Core.Save;
 
@@ -20,14 +19,24 @@ namespace Status.Poison
         private bool enableLegacySave;
 
         /// <summary>
-        /// Cached poison configurations loaded from <c>Resources/Status/Poison</c>.
+        /// Resource path used to load the canonical poison configuration.
         /// </summary>
-        private static readonly Dictionary<string, PoisonConfig> CachedConfigs = new Dictionary<string, PoisonConfig>(StringComparer.OrdinalIgnoreCase);
+        private const string DefaultPoisonConfigResourcePath = "Status/Poison/Poison_p";
 
         /// <summary>
-        /// Tracks whether the poison configuration cache has been populated for the current domain reload.
+        /// Identifier recorded by the canonical poison configuration.
         /// </summary>
-        private static bool cacheBuilt;
+        private const string DefaultPoisonConfigId = "poison_p";
+
+        /// <summary>
+        /// Cached reference to the singleton poison configuration.
+        /// </summary>
+        private static PoisonConfig cachedPoisonConfig;
+
+        /// <summary>
+        /// Tracks whether a load attempt has been made so we avoid redundant error logging.
+        /// </summary>
+        private static bool attemptedPoisonConfigLoad;
 
         [System.Serializable]
         private class PoisonSaveData
@@ -146,7 +155,7 @@ namespace Status.Poison
                 return;
 
             controller.ImmunityTimer = data.immunityTimer;
-            if (!data.isPoisoned || string.IsNullOrEmpty(data.configId))
+            if (!data.isPoisoned)
                 return;
 
             var cfg = ResolveConfig(data.configId);
@@ -159,40 +168,31 @@ namespace Status.Poison
         }
 
         /// <summary>
-        /// Ensures the local cache contains every <see cref="PoisonConfig"/> under <c>Resources/Status/Poison</c>.
-        /// </summary>
-        private static void BuildCacheIfNeeded()
-        {
-            if (cacheBuilt)
-                return;
-
-            cacheBuilt = true;
-            CachedConfigs.Clear();
-            var configs = Resources.LoadAll<PoisonConfig>("Status/Poison");
-            foreach (var config in configs)
-            {
-                if (config == null || string.IsNullOrWhiteSpace(config.Id))
-                    continue;
-
-                // Case-insensitive dictionary prevents casing differences from blocking lookups.
-                if (!CachedConfigs.ContainsKey(config.Id))
-                    CachedConfigs.Add(config.Id, config);
-            }
-        }
-
-        /// <summary>
-        /// Resolves the poison configuration matching the persisted <paramref name="configId"/>.
+        /// Resolves the canonical poison configuration regardless of the saved identifier.
         /// </summary>
         /// <param name="configId">Identifier persisted in the save data.</param>
         /// <returns>The matching configuration if found; otherwise <c>null</c>.</returns>
         private static PoisonConfig ResolveConfig(string configId)
         {
-            BuildCacheIfNeeded();
-            if (string.IsNullOrWhiteSpace(configId))
-                return null;
+            if (!string.Equals(configId, DefaultPoisonConfigId, StringComparison.OrdinalIgnoreCase))
+            {
+                string savedId = string.IsNullOrWhiteSpace(configId) ? "<missing>" : configId;
+                Debug.LogWarning($"PoisonSaveBridge encountered unexpected poison config id '{savedId}'. Defaulting to '{DefaultPoisonConfigId}'.");
+            }
 
-            CachedConfigs.TryGetValue(configId, out var config);
-            return config;
+            if (cachedPoisonConfig != null)
+                return cachedPoisonConfig;
+
+            if (!attemptedPoisonConfigLoad)
+            {
+                attemptedPoisonConfigLoad = true;
+                cachedPoisonConfig = Resources.Load<PoisonConfig>(DefaultPoisonConfigResourcePath);
+
+                if (cachedPoisonConfig == null)
+                    Debug.LogError($"PoisonSaveBridge could not load default poison configuration at '{DefaultPoisonConfigResourcePath}'.");
+            }
+
+            return cachedPoisonConfig;
         }
 
         /// <summary>
