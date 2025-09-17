@@ -287,7 +287,7 @@ namespace Status.Poison
                     continue;
                 }
 
-                if (controller.HasCombatController && controller.HasAliveTarget)
+                if (controller.HasAliveTarget)
                     break;
 
                 yield return null;
@@ -322,7 +322,9 @@ namespace Status.Poison
                 if (controller != null && controller.isActiveAndEnabled)
                 {
                     controller.RefreshTickCountdown();
-                    controller.ResyncBuffTimerWithState();
+
+                    if (controller.HasCombatController)
+                        controller.ResyncBuffTimerWithState();
                 }
 
                 if (controller != null)
@@ -331,7 +333,9 @@ namespace Status.Poison
             else if (controller != null && controller.isActiveAndEnabled)
             {
                 controller.RefreshTickCountdown();
-                controller.ResyncBuffTimerWithState();
+
+                if (controller.HasCombatController)
+                    controller.ResyncBuffTimerWithState();
             }
 
             pendingResyncRoutine = null;
