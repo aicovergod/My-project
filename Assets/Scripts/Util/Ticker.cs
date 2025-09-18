@@ -13,6 +13,11 @@ namespace Util
 
         public static Ticker Instance { get; private set; }
 
+        /// <summary>
+        /// Time remaining before the next tick event is dispatched.
+        /// </summary>
+        public float TimeUntilNextTick => Mathf.Max(0f, TickDuration - timer);
+
         private readonly List<ITickable> subscribers = new List<ITickable>();
         private float timer;
         private bool paused;
