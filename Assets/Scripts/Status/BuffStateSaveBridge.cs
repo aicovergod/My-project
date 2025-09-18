@@ -41,6 +41,9 @@ namespace Status
         /// <summary>Indicates whether <see cref="cachedSaveData"/> currently holds valid data.</summary>
         private bool hasCachedSaveData;
 
+        /// <summary>Service instance we are currently listening to for buff state changes.</summary>
+        private BuffTimerService subscribedService;
+
         /// <summary>Structure describing the serialised state of a buff timer.</summary>
         [System.Serializable]
         private sealed class BuffSaveEntry
@@ -106,15 +109,51 @@ namespace Status
         private void OnEnable()
         {
             SaveManager.Register(this);
+            SubscribeToServiceEvents();
         }
 
         private void OnDisable()
         {
             StopAllCoroutines();
             Save();
+            UnsubscribeFromServiceEvents();
             SaveManager.Unregister(this);
             pendingRestores.Clear();
             restoreCoroutineRunning = false;
+        }
+
+        /// <summary>
+        /// Hooks into the buff timer service so cached snapshots stay synchronised with runtime changes.
+        /// </summary>
+        /// <param name="service">Optional service override. Defaults to <see cref="BuffTimerService.Instance"/>.</param>
+        private void SubscribeToServiceEvents(BuffTimerService service = null)
+        {
+            service ??= BuffTimerService.Instance;
+            if (service == null || service == subscribedService)
+                return;
+
+            UnsubscribeFromServiceEvents();
+
+            service.BuffStarted += HandleBuffStateChanged;
+            service.BuffUpdated += HandleBuffStateChanged;
+            service.BuffEnded += HandleBuffEnded;
+            subscribedService = service;
+
+            CaptureSnapshot(subscribedService, Target);
+        }
+
+        /// <summary>
+        /// Removes event subscriptions when the component disables or the service changes.
+        /// </summary>
+        private void UnsubscribeFromServiceEvents()
+        {
+            if (subscribedService == null)
+                return;
+
+            subscribedService.BuffStarted -= HandleBuffStateChanged;
+            subscribedService.BuffUpdated -= HandleBuffStateChanged;
+            subscribedService.BuffEnded -= HandleBuffEnded;
+            subscribedService = null;
         }
 
         /// <summary>
@@ -125,8 +164,7 @@ namespace Status
             var target = Target;
             if (target == null)
             {
-                cachedSaveData = null;
-                hasCachedSaveData = false;
+                ClearCachedSnapshot();
                 SaveManager.Delete(SaveKey);
                 return;
             }
@@ -136,56 +174,19 @@ namespace Status
             {
                 if (hasCachedSaveData && cachedSaveData != null)
                     SaveManager.Save(SaveKey, cachedSaveData);
+                else
+                    SaveManager.Delete(SaveKey);
                 return;
             }
 
-            runtimeBuffer.Clear();
-            service.GetBuffsFor(target, runtimeBuffer);
-            if (runtimeBuffer.Count == 0)
+            bool hasSnapshot = CaptureSnapshot(service, target);
+            if (!hasSnapshot)
             {
                 SaveManager.Delete(SaveKey);
-                runtimeBuffer.Clear();
-                cachedSaveData = null;
-                hasCachedSaveData = false;
                 return;
             }
 
-            var entries = new List<BuffSaveEntry>(runtimeBuffer.Count);
-            foreach (var instance in runtimeBuffer)
-            {
-                if (instance == null)
-                    continue;
-                if (ignoredTypeSet.Contains(instance.Definition.type))
-                    continue;
-
-                var entry = new BuffSaveEntry
-                {
-                    definition = instance.Definition,
-                    sourceType = instance.SourceType,
-                    sourceId = instance.SourceId,
-                    remainingTicks = instance.RemainingTicks
-                };
-
-                if (entry.definition.type == BuffType.Poison)
-                    CapturePoisonState(instance, entry);
-
-                entries.Add(entry);
-            }
-
-            runtimeBuffer.Clear();
-
-            if (entries.Count == 0)
-            {
-                SaveManager.Delete(SaveKey);
-                cachedSaveData = null;
-                hasCachedSaveData = false;
-                return;
-            }
-
-            var data = new BuffSaveData { entries = entries.ToArray() };
-            cachedSaveData = data;
-            hasCachedSaveData = true;
-            SaveManager.Save(SaveKey, data);
+            SaveManager.Save(SaveKey, cachedSaveData);
         }
 
         /// <summary>
@@ -246,6 +247,8 @@ namespace Status
                     StartCoroutine(WaitForServiceThenRestore());
                 return;
             }
+
+            SubscribeToServiceEvents(service);
 
             if (HasPendingPoisonRestore() && !IsPoisonControllerReady(target))
             {
@@ -355,11 +358,47 @@ namespace Status
                 break;
             }
 
+            SubscribeToServiceEvents();
             restoreCoroutineRunning = false;
             Debug.Log(
                 $"BuffStateSaveBridge wait routine resuming restoration for '{(Target != null ? Target.name : name)}'. Pending entries: {pendingRestores.Count}, HasPendingPoisonRestore(): {HasPendingPoisonRestore()}.",
                 this);
             TryRestorePendingBuffs();
+        }
+
+        /// <summary>
+        /// Captures snapshots whenever buffs on the tracked target start or update.
+        /// </summary>
+        /// <param name="instance">Instance associated with the service event.</param>
+        private void HandleBuffStateChanged(BuffTimerInstance instance)
+        {
+            if (instance == null)
+                return;
+
+            var target = Target;
+            if (target == null || instance.Target != target)
+                return;
+
+            var service = subscribedService ?? BuffTimerService.Instance;
+            CaptureSnapshot(service, target);
+        }
+
+        /// <summary>
+        /// Captures snapshots when buffs on the tracked target end so cached data mirrors reality.
+        /// </summary>
+        /// <param name="instance">Instance that finished.</param>
+        /// <param name="reason">Reason reported by the timer service.</param>
+        private void HandleBuffEnded(BuffTimerInstance instance, BuffEndReason reason)
+        {
+            if (instance == null)
+                return;
+
+            var target = Target;
+            if (target == null || instance.Target != target)
+                return;
+
+            var service = subscribedService ?? BuffTimerService.Instance;
+            CaptureSnapshot(service, target);
         }
 
         /// <summary>
@@ -541,6 +580,76 @@ namespace Status
             }
 
             return cachedPoisonConfig;
+        }
+
+        /// <summary>
+        /// Captures the current buff state for the configured target and caches the result for future saves.
+        /// </summary>
+        /// <param name="service">Service that owns the runtime buff instances.</param>
+        /// <param name="target">Target whose buffs should be persisted.</param>
+        /// <returns>True when the snapshot contains at least one persisted entry.</returns>
+        private bool CaptureSnapshot(BuffTimerService service, GameObject target)
+        {
+            if (target == null)
+            {
+                ClearCachedSnapshot();
+                return false;
+            }
+
+            if (service == null)
+                return hasCachedSaveData && cachedSaveData != null;
+
+            runtimeBuffer.Clear();
+            service.GetBuffsFor(target, runtimeBuffer);
+            if (runtimeBuffer.Count == 0)
+            {
+                runtimeBuffer.Clear();
+                ClearCachedSnapshot();
+                return false;
+            }
+
+            var entries = new List<BuffSaveEntry>(runtimeBuffer.Count);
+            foreach (var instance in runtimeBuffer)
+            {
+                if (instance == null)
+                    continue;
+                if (ignoredTypeSet.Contains(instance.Definition.type))
+                    continue;
+
+                var entry = new BuffSaveEntry
+                {
+                    definition = instance.Definition,
+                    sourceType = instance.SourceType,
+                    sourceId = instance.SourceId,
+                    remainingTicks = instance.RemainingTicks
+                };
+
+                if (entry.definition.type == BuffType.Poison)
+                    CapturePoisonState(instance, entry);
+
+                entries.Add(entry);
+            }
+
+            runtimeBuffer.Clear();
+
+            if (entries.Count == 0)
+            {
+                ClearCachedSnapshot();
+                return false;
+            }
+
+            cachedSaveData = new BuffSaveData { entries = entries.ToArray() };
+            hasCachedSaveData = true;
+            return true;
+        }
+
+        /// <summary>
+        /// Clears the cached snapshot so the save system knows no buff state is pending persistence.
+        /// </summary>
+        private void ClearCachedSnapshot()
+        {
+            cachedSaveData = null;
+            hasCachedSaveData = false;
         }
 
         /// <summary>
