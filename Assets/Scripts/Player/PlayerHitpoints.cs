@@ -124,7 +124,22 @@ namespace Player
         {
             if (amount <= 0)
                 return;
+            if (currentHp + amount >= MaxHp)
+            {
+                RestoreToFullHealth();
+                return;
+            }
+
             currentHp = Mathf.Min(MaxHp, currentHp + amount);
+            OnHealthChanged?.Invoke(currentHp, MaxHp);
+        }
+
+        /// <summary>
+        /// Restores the player's hitpoints to their maximum value and notifies listeners.
+        /// </summary>
+        public void RestoreToFullHealth()
+        {
+            currentHp = MaxHp;
             OnHealthChanged?.Invoke(currentHp, MaxHp);
         }
 

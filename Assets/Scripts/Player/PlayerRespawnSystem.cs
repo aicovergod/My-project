@@ -101,7 +101,7 @@ namespace Player
                 hitpoints.transform.position = RespawnPoint.Current.transform.position;
 
             if (hitpoints != null)
-                hitpoints.Heal(hitpoints.MaxHp);
+                hitpoints.RestoreToFullHealth();
 
             if (fader != null)
                 yield return fader.FadeIn();
