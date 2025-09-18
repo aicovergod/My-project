@@ -37,6 +37,9 @@ namespace Combat
         [Tooltip("Seconds to keep aggro on a target after it moves beyond the chase radius.")]
         public float AggroTimeoutSeconds = 5f;
 
+        [Tooltip("When enabled the NPC ignores freeze effects while still taking damage.")]
+        public bool NotFreezable;
+
         [Tooltip("Maximum number of targets this NPC can attack at once.")]
         public int MaxConcurrentTargets = 1;
 

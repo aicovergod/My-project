@@ -5,13 +5,14 @@ using MyGame.Drops;
 using Player;
 using Pets;
 using UI;
+using Status.Freeze;
 
 namespace NPC
 {
     /// <summary>
     /// Simple adaptor tying an NPC to the combat system using a combat profile.
     /// </summary>
-    [DisallowMultipleComponent, RequireComponent(typeof(NpcDropper))]
+    [DisallowMultipleComponent, RequireComponent(typeof(NpcDropper)), RequireComponent(typeof(FrozenStatusController))]
     public class NpcCombatant : MonoBehaviour, CombatTarget, IFactionProvider
     {
         [SerializeField] private NpcCombatProfile profile;
@@ -39,6 +40,9 @@ namespace NPC
         public int CurrentHP => currentHp;
         public int MaxHP => profile != null ? profile.HitpointsLevel : currentHp;
         public NpcCombatProfile Profile => profile;
+
+        /// <summary>Returns true when this NPC can be affected by the frozen status effect.</summary>
+        public bool IsFreezable => profile == null || !profile.NotFreezable;
 
         /// <summary>The faction of this NPC.</summary>
         public FactionId Faction => profile != null ? profile.Faction : FactionId.Neutral;

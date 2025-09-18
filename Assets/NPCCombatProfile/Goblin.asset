@@ -26,6 +26,7 @@ MonoBehaviour:
   Style: 0
   IsAggressive: 0
   AggroTimeoutSeconds: 5
+  NotFreezable: 0
   MaxConcurrentTargets: 6
   PlayerAggroWeight: 1
   Faction: 1

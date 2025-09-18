@@ -48,6 +48,7 @@ namespace NPC
         private Vector2 _from;
         private Vector2 _to;
         private float _lerpTime;
+        private bool _frozen;
 
         private float ComputeChaseRadius()
         {
@@ -165,9 +166,49 @@ namespace NPC
             _waiting = false;
         }
 
+        /// <summary>True when a freeze effect is preventing the NPC from moving.</summary>
+        public bool IsFrozen => _frozen;
+
+        /// <summary>
+        /// Enables or disables the frozen state, halting movement immediately when active.
+        /// </summary>
+        public void SetFrozen(bool frozen)
+        {
+            if (_frozen == frozen)
+                return;
+
+            _frozen = frozen;
+            if (_frozen)
+            {
+                _from = _rb != null ? _rb.position : (Vector2)transform.position;
+                _to = _from;
+#if UNITY_2023_1_OR_NEWER
+                if (_rb != null)
+                    _rb.linearVelocity = Vector2.zero;
+#else
+                if (_rb != null)
+                    _rb.velocity = Vector2.zero;
+#endif
+                spriteAnimator?.UpdateVisuals(Vector2.zero);
+            }
+            else
+            {
+                _lerpTime = Ticker.TickDuration;
+            }
+        }
+
         public void OnTick()
         {
             float delta = Ticker.TickDuration;
+
+            if (_frozen)
+            {
+                _from = _rb != null ? _rb.position : (Vector2)transform.position;
+                _to = _from;
+                _lerpTime = Ticker.TickDuration;
+                spriteAnimator?.UpdateVisuals(Vector2.zero);
+                return;
+            }
 
             if (_combatTargets.Count > 0)
             {
@@ -242,6 +283,16 @@ namespace NPC
 
         private void Update()
         {
+            if (_frozen)
+            {
+                Vector2 pos = _rb != null ? _rb.position : (Vector2)transform.position;
+                if (_rb != null)
+                    _rb.MovePosition(pos);
+                spriteAnimator?.UpdateVisuals(Vector2.zero);
+                _lastPos = pos;
+                return;
+            }
+
             if (_lerpTime >= Ticker.TickDuration)
             {
                 spriteAnimator?.UpdateVisuals(Vector2.zero);
