@@ -54,6 +54,13 @@
 - **UI**: Add new OSRS-style panels under `Assets/Scripts/UI` or the appropriate feature folder. Use existing tab/button controllers to avoid duplicating input logic.
 - **Data**: Place ScriptableObject databases in the relevant `Assets/Resources/...` subfolder so runtime lookups via `Resources.Load` continue to work.
 
+## Shared Gathering Utilities
+- **Location**: `Assets/Scripts/Skills/Common` collects the cross-skill helpers used by Fishing, Mining, Woodcutting, and future gathering content.
+- `GatheringController<TSkill, TNode>` drives interaction range checks, cancel conditions, and tick-aware start logic. Always subclass it for new gathering controllers so pointer/UI throttling, quick-action hotkeys, and movement cancellation match the rest of the project.
+- `GatheringRewardProcessor` standardises how resource rewards, XP, outfit rolls, and floating text are resolved. Build a `GatheringRewardContext` and run it through the processor so outfit hooks, XP multipliers, and pet assistance are honoured automatically.
+- `GatheringInventoryHelper` (new) owns the shared `Resources.Load` cache for `ItemData` lookups and the pet overflow capacity rules. When adding or updating gathering skills call `GatheringInventoryHelper.CanAcceptGatheredItem` instead of duplicating inventory checks. Pass the per-skill dictionary field by reference so the helper can bind it to the shared cache, and supply the double-drop pet ID ("Beaver", "Heron", "Rock Golem", etc.) to keep bonus rolls consistent.
+- When a pet doubles resource output the helper will automatically probe the pet's `PetStorage` inventory. Ensure any new pets that offer a similar bonus have a matching `id` string and an attached `PetStorage` component so overflow routing continues to work.
+
 ## Testing & Validation
 - Play mode and edit mode tests live in `Assets/Tests` (currently NUnit-based unit tests like `CookingSkillTests`, `NpcFactionTests`, `NpcElementalModifierTests`). Run them through the Unity Test Runner or an equivalent CLI invocation (`Unity -runTests`) whenever you touch gameplay logic.
 - Validate scenes by loading `Assets/Scenes/OverWorld.unity` and ensuring persistent objects (`PersistentObjects.asset`) spawn correctly.

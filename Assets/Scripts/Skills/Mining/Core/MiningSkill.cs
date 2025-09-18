@@ -113,7 +113,7 @@ namespace Skills.Mining
                 OreDefinition ore = currentRock.MineOre();
                 if (ore != null)
                 {
-                    oreItems.TryGetValue(ore.Id, out var item);
+                    var item = GatheringInventoryHelper.GetItemData(ore.Id, ref oreItems);
                     bool rockGolemActive = PetDropSystem.ActivePet?.id == "Rock Golem";
                     int amount = rockGolemActive ? 2 : 1;
                     // Cache the storage component from the active Rock Golem pet so the reward processor can
@@ -214,33 +214,15 @@ namespace Skills.Mining
 
         public bool CanAddOre(OreDefinition ore)
         {
-            if (inventory == null || ore == null)
-                return true;
-            if (oreItems == null)
-                PreloadOreItems();
-            if (!oreItems.TryGetValue(ore.Id, out var item) || item == null)
+            if (ore == null)
                 return true;
 
-            int amount = PetDropSystem.ActivePet?.id == "Rock Golem" ? 2 : 1;
-            if (inventory.CanAddItem(item, amount))
-                return true;
-
-            if (amount > 1)
-            {
-                var petStorage = PetDropSystem.ActivePetObject != null
-                    ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
-                    : null;
-                var petInv = petStorage != null
-                    ? petStorage.GetComponent<Inventory.Inventory>()
-                    : null;
-
-                if (inventory.CanAddItem(item, 1) && petInv != null && petInv.CanAddItem(item, 1))
-                    return true;
-
-                if (petInv != null && petInv.CanAddItem(item, amount))
-                    return true;
-            }
-            return false;
+            return GatheringInventoryHelper.CanAcceptGatheredItem(
+                inventory,
+                ore.Id,
+                "Rock Golem",
+                ref oreItems,
+                out _);
         }
 
         /// <summary>
@@ -286,13 +268,7 @@ namespace Skills.Mining
 
         private void PreloadOreItems()
         {
-            oreItems = new Dictionary<string, ItemData>();
-            var items = Resources.LoadAll<ItemData>("Item");
-            foreach (var item in items)
-            {
-                if (!string.IsNullOrEmpty(item.id))
-                    oreItems[item.id] = item;
-            }
+            GatheringInventoryHelper.EnsureItemCache(ref oreItems);
         }
     }
 }

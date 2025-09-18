@@ -108,7 +108,7 @@ namespace Skills.Woodcutting
             if (Random.value <= chance)
             {
                 string logId = currentTree.def.LogItemId;
-                logItems.TryGetValue(logId, out var item);
+                var item = GatheringInventoryHelper.GetItemData(logId, ref logItems);
                 int amount = PetDropSystem.ActivePet?.id == "Beaver" ? 2 : 1;
                 var petStorage = PetDropSystem.ActivePet?.id == "Beaver" && PetDropSystem.ActivePetObject != null
                     ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
@@ -211,33 +211,15 @@ namespace Skills.Woodcutting
 
         public bool CanAddLog(TreeDefinition tree)
         {
-            if (inventory == null || tree == null)
-                return true;
-            if (logItems == null)
-                PreloadLogItems();
-            if (!logItems.TryGetValue(tree.LogItemId, out var item) || item == null)
+            if (tree == null)
                 return true;
 
-            int amount = PetDropSystem.ActivePet?.id == "Beaver" ? 2 : 1;
-            if (inventory.CanAddItem(item, amount))
-                return true;
-
-            if (amount > 1)
-            {
-                var petStorage = PetDropSystem.ActivePetObject != null
-                    ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
-                    : null;
-                var petInv = petStorage != null
-                    ? petStorage.GetComponent<Inventory.Inventory>()
-                    : null;
-
-                if (inventory.CanAddItem(item, 1) && petInv != null && petInv.CanAddItem(item, 1))
-                    return true;
-
-                if (petInv != null && petInv.CanAddItem(item, amount))
-                    return true;
-            }
-            return false;
+            return GatheringInventoryHelper.CanAcceptGatheredItem(
+                inventory,
+                tree.LogItemId,
+                "Beaver",
+                ref logItems,
+                out _);
         }
 
         /// <summary>
@@ -283,13 +265,7 @@ namespace Skills.Woodcutting
 
         private void PreloadLogItems()
         {
-            logItems = new Dictionary<string, ItemData>();
-            var items = Resources.LoadAll<ItemData>("Item");
-            foreach (var item in items)
-            {
-                if (!string.IsNullOrEmpty(item.id))
-                    logItems[item.id] = item;
-            }
+            GatheringInventoryHelper.EnsureItemCache(ref logItems);
         }
     }
 }
