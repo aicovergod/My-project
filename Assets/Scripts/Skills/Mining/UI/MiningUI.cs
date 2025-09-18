@@ -26,6 +26,8 @@ namespace Skills.Mining
         private float nextFill;
         private float tickTimer;
         private float step;
+        // Captures how long the current interpolation segment should last to align the UI with tick cadence.
+        private float segmentDuration = Ticker.TickDuration;
         // Tracks whether the bar should be reset after spending one full tick at 100%.
         private bool awaitingResetTick;
 
@@ -110,6 +112,7 @@ namespace Skills.Mining
             step = skill.CurrentSwingSpeedTicks > 0 ? 1f / skill.CurrentSwingSpeedTicks : 0f;
             nextFill = step;
             awaitingResetTick = false;
+            segmentDuration = ResolveInitialSegmentDuration();
             progressRoot.SetActive(true);
             var pick = skill.CurrentPickaxe;
             if (pick != null && pickaxeRenderer != null)
@@ -144,6 +147,7 @@ namespace Skills.Mining
             target = null;
             progressRoot.SetActive(false);
             awaitingResetTick = false;
+            segmentDuration = Ticker.TickDuration;
             if (pickaxeRoot != null)
             {
                 pickaxeRoot.SetActive(false);
@@ -164,12 +168,19 @@ namespace Skills.Mining
                 pickaxeRoot.transform.position = target.position + pickaxeOffset;
 
             tickTimer += Time.deltaTime;
-            float t = Mathf.Clamp01(tickTimer / Ticker.TickDuration);
+            if (segmentDuration <= 0f)
+            {
+                progressImage.fillAmount = nextFill;
+                return;
+            }
+
+            float t = Mathf.Clamp01(tickTimer / segmentDuration);
             progressImage.fillAmount = Mathf.Lerp(currentFill, nextFill, t);
         }
 
         public void OnTick()
         {
+            segmentDuration = Ticker.TickDuration;
             if (target == null || skill == null || !skill.IsMining)
                 return;
 
@@ -219,6 +230,20 @@ namespace Skills.Mining
 
             if (Ticker.Instance != null)
                 Ticker.Instance.Unsubscribe(this);
+        }
+
+        /// <summary>
+        /// Computes the first interpolation window using the ticker's remaining time so partial ticks animate correctly.
+        /// </summary>
+        private float ResolveInitialSegmentDuration()
+        {
+            if (Ticker.Instance == null)
+            {
+                return Ticker.TickDuration;
+            }
+
+            float remaining = Ticker.Instance.TimeUntilNextTick;
+            return remaining > 0f ? remaining : Ticker.TickDuration;
         }
     }
 }

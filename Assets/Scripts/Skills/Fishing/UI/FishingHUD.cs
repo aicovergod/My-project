@@ -21,6 +21,8 @@ namespace Skills.Fishing
         private float nextFill;
         private float tickTimer;
         private float step;
+        // Stores the duration of the current interpolation span so we can sync visual progress with the tick cadence.
+        private float segmentDuration = Ticker.TickDuration;
         // Keeps track of whether the bar should reset after being displayed at full progress for one tick.
         private bool awaitingResetTick;
 
@@ -105,6 +107,7 @@ namespace Skills.Fishing
             step = skill.CurrentCatchIntervalTicks > 0 ? 1f / skill.CurrentCatchIntervalTicks : 0f;
             nextFill = step;
             awaitingResetTick = false;
+            segmentDuration = ResolveInitialSegmentDuration();
             progressRoot.SetActive(true);
 
             var tool = skill.CurrentTool;
@@ -142,6 +145,7 @@ namespace Skills.Fishing
             target = null;
             progressRoot.SetActive(false);
             awaitingResetTick = false;
+            segmentDuration = Ticker.TickDuration;
             if (toolRoot != null)
             {
                 toolRoot.SetActive(false);
@@ -162,12 +166,19 @@ namespace Skills.Fishing
                 toolRoot.transform.position = target.position + toolOffset;
 
             tickTimer += Time.deltaTime;
-            float t = Mathf.Clamp01(tickTimer / Ticker.TickDuration);
+            if (segmentDuration <= 0f)
+            {
+                progressImage.fillAmount = nextFill;
+                return;
+            }
+
+            float t = Mathf.Clamp01(tickTimer / segmentDuration);
             progressImage.fillAmount = Mathf.Lerp(currentFill, nextFill, t);
         }
 
         public void OnTick()
         {
+            segmentDuration = Ticker.TickDuration;
             if (target == null || skill == null || !skill.IsFishing)
                 return;
 
@@ -217,6 +228,20 @@ namespace Skills.Fishing
 
             if (Ticker.Instance != null)
                 Ticker.Instance.Unsubscribe(this);
+        }
+
+        /// <summary>
+        /// Uses the ticker to determine how long the first lerp segment should last after starting a catch cycle.
+        /// </summary>
+        private float ResolveInitialSegmentDuration()
+        {
+            if (Ticker.Instance == null)
+            {
+                return Ticker.TickDuration;
+            }
+
+            float remaining = Ticker.Instance.TimeUntilNextTick;
+            return remaining > 0f ? remaining : Ticker.TickDuration;
         }
     }
 }

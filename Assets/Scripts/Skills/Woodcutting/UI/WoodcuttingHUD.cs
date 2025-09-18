@@ -24,6 +24,8 @@ namespace Skills.Woodcutting
         private float nextFill;
         private float tickTimer;
         private float step;
+        // Tracks how long the current interpolation segment should last so we sync perfectly with tick events.
+        private float segmentDuration = Ticker.TickDuration;
         // Flag used so we can hold the progress bar at 100% for a full tick before resetting back to 0.
         private bool awaitingResetTick;
 
@@ -108,6 +110,7 @@ namespace Skills.Woodcutting
             step = skill.CurrentChopIntervalTicks > 0 ? 1f / skill.CurrentChopIntervalTicks : 0f;
             nextFill = step;
             awaitingResetTick = false;
+            segmentDuration = ResolveInitialSegmentDuration();
             progressRoot.SetActive(true);
 
             var axe = skill.CurrentAxe;
@@ -145,6 +148,7 @@ namespace Skills.Woodcutting
             target = null;
             progressRoot.SetActive(false);
             awaitingResetTick = false;
+            segmentDuration = Ticker.TickDuration;
             if (axeRoot != null)
             {
                 axeRoot.SetActive(false);
@@ -165,12 +169,19 @@ namespace Skills.Woodcutting
                 axeRoot.transform.position = target.position + axeOffset;
 
             tickTimer += Time.deltaTime;
-            float t = Mathf.Clamp01(tickTimer / Ticker.TickDuration);
+            if (segmentDuration <= 0f)
+            {
+                progressImage.fillAmount = nextFill;
+                return;
+            }
+
+            float t = Mathf.Clamp01(tickTimer / segmentDuration);
             progressImage.fillAmount = Mathf.Lerp(currentFill, nextFill, t);
         }
 
         public void OnTick()
         {
+            segmentDuration = Ticker.TickDuration;
             if (target == null || skill == null || !skill.IsChopping)
                 return;
 
@@ -222,6 +233,20 @@ namespace Skills.Woodcutting
 
             if (Ticker.Instance != null)
                 Ticker.Instance.Unsubscribe(this);
+        }
+
+        /// <summary>
+        /// Determines how long the first interpolation segment should last based on the ticker's remaining time.
+        /// </summary>
+        private float ResolveInitialSegmentDuration()
+        {
+            if (Ticker.Instance == null)
+            {
+                return Ticker.TickDuration;
+            }
+
+            float remaining = Ticker.Instance.TimeUntilNextTick;
+            return remaining > 0f ? remaining : Ticker.TickDuration;
         }
     }
 }
