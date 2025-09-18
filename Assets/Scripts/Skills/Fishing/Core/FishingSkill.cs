@@ -112,11 +112,12 @@ namespace Skills.Fishing
                     FloatingText.Show("-1 bait", anchor.position);
             }
 
-            float baseChance = 0.35f;
-            float penalty = 0.0025f * Mathf.Max(fish.RequiredLevel - 1, 0);
-            int level = skills.GetLevel(SkillType.Fishing);
-            float chance = baseChance + (level * 0.005f) + currentTool.CatchBonus * 0.01f - penalty;
-            chance = Mathf.Clamp(chance, 0.05f, 0.90f);
+            float chance = GatheringRewardContextBuilder.CalculateSuccessChance(new GatheringRewardContextBuilder.SuccessChanceArgs
+            {
+                PlayerLevel = skills.GetLevel(SkillType.Fishing),
+                RequiredLevel = fish.RequiredLevel,
+                ToolBonus = currentTool != null ? currentTool.CatchBonus * 0.01f : 0f
+            });
 
             if (UnityEngine.Random.value <= chance)
             {
@@ -127,39 +128,28 @@ namespace Skills.Fishing
                     : null;
                 var waterType = currentSpot != null && currentSpot.def != null ? currentSpot.def.WaterType : WaterType.Any;
 
-                var context = new GatheringRewardContext
+                var context = GatheringRewardContextBuilder.BuildContext(new GatheringRewardContextBuilder.ContextArgs
                 {
-                    runner = this,
-                    skills = skills,
-                    skillType = SkillType.Fishing,
-                    inventory = inventory,
-                    petStorage = petStorage,
-                    item = item,
-                    rewardDisplayName = fish.DisplayName,
-                    quantity = amount,
-                    xpPerItem = fish.Xp,
-                    petAssistExtraQuantity = Mathf.Max(0, amount - 1),
-                    floatingTextAnchor = floatingTextAnchor,
-                    fallbackAnchor = transform,
-                    equipment = equipment,
-                    equipmentXpBonusEvaluator = data =>
+                    Runner = this,
+                    Skills = skills,
+                    SkillType = SkillType.Fishing,
+                    Inventory = inventory,
+                    PetStorage = petStorage,
+                    Item = item,
+                    RewardDisplayName = fish.DisplayName,
+                    Quantity = amount,
+                    XpPerItem = fish.Xp,
+                    PetAssistExtraQuantity = amount - 1,
+                    FloatingTextAnchor = floatingTextAnchor,
+                    FallbackAnchor = transform,
+                    Equipment = equipment,
+                    EquipmentXpBonusEvaluator = data =>
                         data != null && (data.fishingXpBonusWaterTypes & waterType) != 0
                             ? data.fishingXpBonusMultiplier
                             : 0f,
-                    showItemFloatingText = true,
-                    showXpPopup = true,
-                    xpPopupDelayTicks = 5f,
-                    rewardMessageFormatter = qty => $"+{qty} {fish.DisplayName}",
-                    onItemsGranted = result => OnFishCaught?.Invoke(fish.Id, result.QuantityAwarded),
-                    onXpApplied = result =>
-                    {
-                        if (result.LeveledUp && result.Anchor != null)
-                        {
-                            FloatingText.Show($"Fishing level {result.NewLevel}", result.Anchor.position);
-                            OnLevelUp?.Invoke(result.NewLevel);
-                        }
-                    },
-                    onSuccess = result =>
+                    RewardMessageFormatter = qty => $"+{qty} {fish.DisplayName}",
+                    OnItemsGranted = result => OnFishCaught?.Invoke(fish.Id, result.QuantityAwarded),
+                    OnSuccess = result =>
                     {
                         int? petChance = fish != null ? fish.PetDropChance : (int?)null;
                         Transform petAnchor = currentSpot != null
@@ -169,8 +159,10 @@ namespace Skills.Fishing
                         TryRollBycatch(result.Anchor);
                         TryAwardFishingOutfitPiece();
                     },
-                    onFailure = _ => StopFishing()
-                };
+                    OnFailure = _ => StopFishing(),
+                    LevelUpFloatingTextFormatter = result => $"Fishing level {result.NewLevel}",
+                    OnLevelUp = level => OnLevelUp?.Invoke(level)
+                });
 
                 var rewardResult = GatheringRewardProcessor.Process(context);
                 if (!rewardResult.Success)

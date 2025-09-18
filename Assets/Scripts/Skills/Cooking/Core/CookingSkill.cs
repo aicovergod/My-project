@@ -134,46 +134,39 @@ namespace Skills.Cooking
             {
                 var cookedItem = ItemDatabase.GetItem(currentRecipe.cookedItemId);
                 string cookedName = cookedItem != null ? cookedItem.itemName : currentRecipe.cookedItemId;
-                var context = new GatheringRewardContext
+                var context = GatheringRewardContextBuilder.BuildContext(new GatheringRewardContextBuilder.ContextArgs
                 {
-                    runner = this,
-                    skills = skills,
-                    skillType = SkillType.Cooking,
-                    inventory = inventory,
-                    petStorage = null,
-                    item = cookedItem,
-                    rewardDisplayName = cookedName,
-                    quantity = 1,
-                    xpPerItem = currentRecipe.xp,
-                    petAssistExtraQuantity = 0,
-                    floatingTextAnchor = floatingTextAnchor,
-                    fallbackAnchor = transform,
-                    equipment = equipment,
-                    equipmentXpBonusEvaluator = data => data != null ? data.cookingXpBonusMultiplier : 0f,
-                    showItemFloatingText = true,
-                    showXpPopup = true,
-                    xpPopupDelayTicks = 5f,
-                    rewardMessageFormatter = qty => $"+{qty} {cookedName}",
-                    onItemsGranted = result => OnFoodCooked?.Invoke(currentRecipe.cookedItemId, result.QuantityAwarded),
-                    onXpApplied = result =>
+                    Runner = this,
+                    Skills = skills,
+                    SkillType = SkillType.Cooking,
+                    Inventory = inventory,
+                    PetStorage = null,
+                    Item = cookedItem,
+                    RewardDisplayName = cookedName,
+                    Quantity = 1,
+                    XpPerItem = currentRecipe.xp,
+                    PetAssistExtraQuantity = 0,
+                    FloatingTextAnchor = floatingTextAnchor,
+                    FallbackAnchor = transform,
+                    Equipment = equipment,
+                    EquipmentXpBonusEvaluator = data => data != null ? data.cookingXpBonusMultiplier : 0f,
+                    RewardMessageFormatter = qty => $"+{qty} {cookedName}",
+                    OnItemsGranted = result => OnFoodCooked?.Invoke(currentRecipe.cookedItemId, result.QuantityAwarded),
+                    OnXpAppliedBeforeLevelCheck = result =>
                     {
                         if (PetDropSystem.ActivePet?.id == "Mr Frying Pan")
                             PetExperience.AddPetXp(result.XpGained);
-
-                        if (result.LeveledUp && result.Anchor != null)
-                        {
-                            FloatingText.Show($"Cooking level {result.NewLevel}", result.Anchor.position);
-                            OnLevelUp?.Invoke(result.NewLevel);
-                        }
                     },
-                    onSuccess = result =>
+                    OnSuccess = result =>
                     {
                         int petChance = Mathf.Max(5000, 10000 - (level - 1) * 100);
                         SkillingPetRewarder.TryRollPet("cooking", skills, result.Anchor ?? transform, petChance);
                         TryAwardCookingOutfitPiece();
                     },
-                    onFailure = _ => StopCooking()
-                };
+                    OnFailure = _ => StopCooking(),
+                    LevelUpFloatingTextFormatter = result => $"Cooking level {result.NewLevel}",
+                    OnLevelUp = newLevel => OnLevelUp?.Invoke(newLevel)
+                });
 
                 var rewardResult = GatheringRewardProcessor.Process(context);
                 if (!rewardResult.Success)
