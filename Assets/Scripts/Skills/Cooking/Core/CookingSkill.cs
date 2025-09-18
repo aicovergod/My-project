@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using Inventory;
 using Util;
@@ -195,36 +194,16 @@ namespace Skills.Cooking
             return inventory.GetItemCount(item) >= quantity;
         }
 
-        private void TryAwardCookingOutfitPiece()
+        private bool TryAwardCookingOutfitPiece()
         {
-            int roll = UnityEngine.Random.Range(0, 2500);
-            if (SkillingOutfitProgress.DebugChance)
-                Debug.Log($"[Cooking] Skilling outfit roll: {roll} (chance 1 in 2500)");
-            if (roll != 0)
-                return;
-
-            var missing = new List<string>();
-            foreach (var id in cookingOutfit.allPieceIds)
-            {
-                if (!cookingOutfit.owned.Contains(id))
-                    missing.Add(id);
-            }
-            if (missing.Count == 0)
-                return;
-
-            string chosen = missing[UnityEngine.Random.Range(0, missing.Count)];
-            var item = ItemDatabase.GetItem(chosen);
-            bool added = inventory != null && item != null && inventory.AddItem(item);
-            if (!added)
-            {
-                BankUI.Instance?.AddItemToBank(item);
-                PetToastUI.Show("A piece of cooking outfit has been added to your bank");
-            }
-            else
-            {
-                PetToastUI.Show("You've received a piece of cooking outfit");
-            }
-            cookingOutfit.owned.Add(chosen);
+            return SkillingOutfitRewarder.TryAwardPiece(
+                cookingOutfit,
+                inventory,
+                BankUI.Instance,
+                UnityEngine.Random.Range,
+                "Cooking",
+                "You've received a piece of cooking outfit",
+                "A piece of cooking outfit has been added to your bank");
         }
     }
 }

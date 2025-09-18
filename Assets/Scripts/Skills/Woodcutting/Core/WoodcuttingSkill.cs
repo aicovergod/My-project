@@ -231,36 +231,16 @@ namespace Skills.Woodcutting
             OnLevelUp?.Invoke(Level);
         }
 
-        private void TryAwardWoodcuttingOutfitPiece()
+        private bool TryAwardWoodcuttingOutfitPiece()
         {
-            int roll = UnityEngine.Random.Range(0, 2500);
-            if (SkillingOutfitProgress.DebugChance)
-                Debug.Log($"[Woodcutting] Skilling outfit roll: {roll} (chance 1 in 2500)");
-            if (roll != 0)
-                return;
-
-            var missing = new List<string>();
-            foreach (var id in woodcuttingOutfit.allPieceIds)
-            {
-                if (!woodcuttingOutfit.owned.Contains(id))
-                    missing.Add(id);
-            }
-            if (missing.Count == 0)
-                return;
-
-            string chosen = missing[UnityEngine.Random.Range(0, missing.Count)];
-            var item = ItemDatabase.GetItem(chosen);
-            bool added = inventory != null && item != null && inventory.AddItem(item);
-            if (!added)
-            {
-                BankUI.Instance?.AddItemToBank(item);
-                PetToastUI.Show("A piece of woodcutting outfit has been added to your bank");
-            }
-            else
-            {
-                PetToastUI.Show("You've received a piece of woodcutting outfit");
-            }
-            woodcuttingOutfit.owned.Add(chosen);
+            return SkillingOutfitRewarder.TryAwardPiece(
+                woodcuttingOutfit,
+                inventory,
+                BankUI.Instance,
+                Random.Range,
+                "Woodcutting",
+                "You've received a piece of woodcutting outfit",
+                "A piece of woodcutting outfit has been added to your bank");
         }
 
         private void PreloadLogItems()
