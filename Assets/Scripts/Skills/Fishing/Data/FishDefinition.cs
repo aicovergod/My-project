@@ -15,11 +15,13 @@ namespace Skills.Fishing
         [Header("Rewards")]
         [SerializeField] private int xp = 10;
         [SerializeField] private string itemId;
+        [SerializeField] private int petDropChance = 0;
 
         public string Id => id;
         public string DisplayName => displayName;
         public int RequiredLevel => requiredLevel;
         public int Xp => xp;
         public string ItemId => itemId;
+        public int PetDropChance => petDropChance;
     }
 }

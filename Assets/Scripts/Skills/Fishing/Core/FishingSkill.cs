@@ -161,6 +161,11 @@ namespace Skills.Fishing
                     },
                     onSuccess = result =>
                     {
+                        int? petChance = fish != null ? fish.PetDropChance : (int?)null;
+                        Transform petAnchor = currentSpot != null
+                            ? currentSpot.transform
+                            : result.Anchor != null ? result.Anchor : transform;
+                        SkillingPetRewarder.TryRollPet("fishing", skills, petAnchor, petChance);
                         TryRollBycatch(result.Anchor);
                         TryAwardFishingOutfitPiece();
                     },

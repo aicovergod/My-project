@@ -146,8 +146,14 @@ namespace Skills.Woodcutting
                     },
                     onSuccess = result =>
                     {
-                        if (currentTree.def.PetDropChance > 0)
-                            PetDropSystem.TryRollPet("woodcutting", currentTree.transform.position, skills, currentTree.def.PetDropChance, out _);
+                        int? petChance = currentTree != null && currentTree.def != null
+                            ? currentTree.def.PetDropChance
+                            : (int?)null;
+                        SkillingPetRewarder.TryRollPet(
+                            "woodcutting",
+                            skills,
+                            currentTree != null ? currentTree.transform : transform,
+                            petChance);
 
                         if (QuestManager.Instance != null && QuestManager.Instance.IsQuestActive("ToolsOfSurvival"))
                         {

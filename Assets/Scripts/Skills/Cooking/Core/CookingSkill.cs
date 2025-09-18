@@ -169,8 +169,7 @@ namespace Skills.Cooking
                     onSuccess = result =>
                     {
                         int petChance = Mathf.Max(5000, 10000 - (level - 1) * 100);
-                        var anchorTransform = result.Anchor != null ? result.Anchor : transform;
-                        PetDropSystem.TryRollPet("cooking", anchorTransform.position, skills, petChance, out _);
+                        SkillingPetRewarder.TryRollPet("cooking", skills, result.Anchor ?? transform, petChance);
                         TryAwardCookingOutfitPiece();
                     },
                     onFailure = _ => StopCooking()
