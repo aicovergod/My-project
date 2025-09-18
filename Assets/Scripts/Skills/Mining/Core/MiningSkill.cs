@@ -154,8 +154,12 @@ namespace Skills.Mining
                         },
                         onSuccess = result =>
                         {
-                            if (ore.PetDropChance > 0)
-                                PetDropSystem.TryRollPet("mining", currentRock.transform.position, skills, ore.PetDropChance, out _);
+                            int? petChance = ore != null ? ore.PetDropChance : (int?)null;
+                            SkillingPetRewarder.TryRollPet(
+                                "mining",
+                                skills,
+                                currentRock != null ? currentRock.transform : transform,
+                                petChance);
 
                             if (QuestManager.Instance != null && QuestManager.Instance.IsQuestActive("ToolsOfSurvival"))
                             {

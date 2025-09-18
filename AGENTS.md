@@ -61,6 +61,7 @@
 - `GatheringInventoryHelper` (new) owns the shared `Resources.Load` cache for `ItemData` lookups and the pet overflow capacity rules. When adding or updating gathering skills call `GatheringInventoryHelper.CanAcceptGatheredItem` instead of duplicating inventory checks. Pass the per-skill dictionary field by reference so the helper can bind it to the shared cache, and supply the double-drop pet ID ("Beaver", "Heron", "Rock Golem", etc.) to keep bonus rolls consistent.
 - When a pet doubles resource output the helper will automatically probe the pet's `PetStorage` inventory. Ensure any new pets that offer a similar bonus have a matching `id` string and an attached `PetStorage` component so overflow routing continues to work.
 - `Skills/Outfits/SkillingOutfitRewarder` centralises the 1-in-2500 skilling outfit rolls. Pass the per-skill `SkillingOutfitProgress`, inventory, bank hook, toast strings, and RNG delegate so debug logging and sanity checks remain consistent across every gathering skill.
+- `Skills/Common/SkillingPetRewarder` wraps `PetDropSystem.TryRollPet` for gathering skills. Supply the source ID, `SkillManager`, best available anchor, and optional 1-in-N override so pet rolls stay consistent.
 
 ## Testing & Validation
 - Play mode and edit mode tests live in `Assets/Tests` (currently NUnit-based unit tests like `CookingSkillTests`, `NpcFactionTests`, `NpcElementalModifierTests`). Run them through the Unity Test Runner or an equivalent CLI invocation (`Unity -runTests`) whenever you touch gameplay logic.
