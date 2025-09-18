@@ -93,15 +93,24 @@ namespace Player
         {
             isRespawning = true;
 
+            // Refresh player references in case a new player instance spawned during respawn.
+            FindPlayer();
+            var hasPlayer = hitpoints != null;
+
             var fader = GameManager.ScreenFader;
             if (fader != null)
                 yield return fader.FadeOut();
 
-            if (RespawnPoint.Current != null && hitpoints != null)
+            if (RespawnPoint.Current != null && hasPlayer)
                 hitpoints.transform.position = RespawnPoint.Current.transform.position;
 
-            if (hitpoints != null)
-                hitpoints.RestoreToFullHealth();
+            if (!hasPlayer)
+            {
+                isRespawning = false;
+                yield break;
+            }
+
+            hitpoints.RestoreToFullHealth();
 
             if (fader != null)
                 yield return fader.FadeIn();
