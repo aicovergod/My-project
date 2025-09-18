@@ -26,6 +26,8 @@ namespace Skills.Mining
         private float nextFill;
         private float tickTimer;
         private float step;
+        // Tracks whether the bar should be reset after spending one full tick at 100%.
+        private bool awaitingResetTick;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreateInstance()
@@ -107,6 +109,7 @@ namespace Skills.Mining
             tickTimer = 0f;
             step = skill.CurrentSwingSpeedTicks > 0 ? 1f / skill.CurrentSwingSpeedTicks : 0f;
             nextFill = step;
+            awaitingResetTick = false;
             progressRoot.SetActive(true);
             var pick = skill.CurrentPickaxe;
             if (pick != null && pickaxeRenderer != null)
@@ -140,6 +143,7 @@ namespace Skills.Mining
         {
             target = null;
             progressRoot.SetActive(false);
+            awaitingResetTick = false;
             if (pickaxeRoot != null)
             {
                 pickaxeRoot.SetActive(false);
@@ -170,12 +174,34 @@ namespace Skills.Mining
                 return;
 
             tickTimer = 0f;
-            currentFill = nextFill;
-
-            if (currentFill >= 1f - step)
+            // No valid swing speed means we cannot animate progress, so stay at zero.
+            if (step <= 0f)
             {
                 currentFill = 0f;
+                nextFill = 0f;
+                awaitingResetTick = false;
+                if (progressImage != null)
+                    progressImage.fillAmount = 0f;
+                return;
+            }
+
+            if (awaitingResetTick)
+            {
+                awaitingResetTick = false;
+                currentFill = 0f;
                 nextFill = step;
+                if (progressImage != null)
+                    progressImage.fillAmount = 0f;
+                return;
+            }
+
+            currentFill = nextFill;
+
+            if (currentFill >= 1f)
+            {
+                currentFill = 1f;
+                nextFill = 1f;
+                awaitingResetTick = true;
             }
             else
             {
