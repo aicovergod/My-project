@@ -24,6 +24,8 @@ namespace Skills.Woodcutting
         private float nextFill;
         private float tickTimer;
         private float step;
+        // Flag used so we can hold the progress bar at 100% for a full tick before resetting back to 0.
+        private bool awaitingResetTick;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreateInstance()
@@ -105,6 +107,7 @@ namespace Skills.Woodcutting
             tickTimer = 0f;
             step = skill.CurrentChopIntervalTicks > 0 ? 1f / skill.CurrentChopIntervalTicks : 0f;
             nextFill = step;
+            awaitingResetTick = false;
             progressRoot.SetActive(true);
 
             var axe = skill.CurrentAxe;
@@ -141,6 +144,7 @@ namespace Skills.Woodcutting
         {
             target = null;
             progressRoot.SetActive(false);
+            awaitingResetTick = false;
             if (axeRoot != null)
             {
                 axeRoot.SetActive(false);
@@ -171,12 +175,36 @@ namespace Skills.Woodcutting
                 return;
 
             tickTimer = 0f;
-            currentFill = nextFill;
-
-            if (currentFill >= 1f - step)
+            // When no valid interval exists we keep the bar hidden at 0.
+            if (step <= 0f)
             {
                 currentFill = 0f;
+                nextFill = 0f;
+                awaitingResetTick = false;
+                if (progressImage != null)
+                    progressImage.fillAmount = 0f;
+                return;
+            }
+
+            if (awaitingResetTick)
+            {
+                // The previous tick finished a cycle so we now snap back to the start.
+                awaitingResetTick = false;
+                currentFill = 0f;
                 nextFill = step;
+                if (progressImage != null)
+                    progressImage.fillAmount = 0f;
+                return;
+            }
+
+            currentFill = nextFill;
+
+            if (currentFill >= 1f)
+            {
+                // Hold the bar at 100% for a full tick so the player sees a complete animation.
+                currentFill = 1f;
+                nextFill = 1f;
+                awaitingResetTick = true;
             }
             else
             {

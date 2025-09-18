@@ -21,6 +21,8 @@ namespace Skills.Fishing
         private float nextFill;
         private float tickTimer;
         private float step;
+        // Keeps track of whether the bar should reset after being displayed at full progress for one tick.
+        private bool awaitingResetTick;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreateInstance()
@@ -102,6 +104,7 @@ namespace Skills.Fishing
             tickTimer = 0f;
             step = skill.CurrentCatchIntervalTicks > 0 ? 1f / skill.CurrentCatchIntervalTicks : 0f;
             nextFill = step;
+            awaitingResetTick = false;
             progressRoot.SetActive(true);
 
             var tool = skill.CurrentTool;
@@ -138,6 +141,7 @@ namespace Skills.Fishing
         {
             target = null;
             progressRoot.SetActive(false);
+            awaitingResetTick = false;
             if (toolRoot != null)
             {
                 toolRoot.SetActive(false);
@@ -168,12 +172,34 @@ namespace Skills.Fishing
                 return;
 
             tickTimer = 0f;
-            currentFill = nextFill;
-
-            if (currentFill >= 1f - step)
+            // If the tool cannot catch anything we keep the bar cleared.
+            if (step <= 0f)
             {
                 currentFill = 0f;
+                nextFill = 0f;
+                awaitingResetTick = false;
+                if (progressImage != null)
+                    progressImage.fillAmount = 0f;
+                return;
+            }
+
+            if (awaitingResetTick)
+            {
+                awaitingResetTick = false;
+                currentFill = 0f;
                 nextFill = step;
+                if (progressImage != null)
+                    progressImage.fillAmount = 0f;
+                return;
+            }
+
+            currentFill = nextFill;
+
+            if (currentFill >= 1f)
+            {
+                currentFill = 1f;
+                nextFill = 1f;
+                awaitingResetTick = true;
             }
             else
             {
