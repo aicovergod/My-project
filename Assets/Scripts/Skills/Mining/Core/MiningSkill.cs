@@ -234,36 +234,16 @@ namespace Skills.Mining
             OnLevelUp?.Invoke(Level);
         }
 
-        private void TryAwardMiningOutfitPiece()
+        private bool TryAwardMiningOutfitPiece()
         {
-            int roll = UnityEngine.Random.Range(0, 2500);
-            if (SkillingOutfitProgress.DebugChance)
-                Debug.Log($"[Mining] Skilling outfit roll: {roll} (chance 1 in 2500)");
-            if (roll != 0)
-                return;
-
-            var missing = new List<string>();
-            foreach (var id in miningOutfit.allPieceIds)
-            {
-                if (!miningOutfit.owned.Contains(id))
-                    missing.Add(id);
-            }
-            if (missing.Count == 0)
-                return;
-
-            string chosen = missing[UnityEngine.Random.Range(0, missing.Count)];
-            var item = ItemDatabase.GetItem(chosen);
-            bool added = inventory != null && item != null && inventory.AddItem(item);
-            if (!added)
-            {
-                BankUI.Instance?.AddItemToBank(item);
-                PetToastUI.Show("A piece of mining outfit has been added to your bank");
-            }
-            else
-            {
-                PetToastUI.Show("You've received a piece of mining outfit");
-            }
-            miningOutfit.owned.Add(chosen);
+            return SkillingOutfitRewarder.TryAwardPiece(
+                miningOutfit,
+                inventory,
+                BankUI.Instance,
+                Random.Range,
+                "Mining",
+                "You've received a piece of mining outfit",
+                "A piece of mining outfit has been added to your bank");
         }
 
         private void PreloadOreItems()
