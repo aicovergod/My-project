@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75a0bfa1a4e537c4d914009ef1161c3e, type: 3}
+  m_Name: Bind
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.SpellDefinition
+  displayName: Bind
+  range: 5
+  speed: 8
+  projectilePrefab: {fileID: 8992547425151743537, guid: f4413f9302aadf14e8846c18dfaf9adb, type: 3}
+  hitEffectPrefab: {fileID: 8992547425151743537, guid: f038bfba147804748892c2190ff0edec, type: 3}
+  hitFadeTime: 1
+  maxHit: 1
+  icon: {fileID: 21300000, guid: 60e902b6d7c6b0a4a916b01413b4ba2b, type: 3}
+  requiredMagicLevel: 20
+  element: 6
+  loadOrder: 5
+  appliesFreeze: 1
+  freezeDurationTicks: 8
