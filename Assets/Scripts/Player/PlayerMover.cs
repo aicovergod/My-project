@@ -90,6 +90,13 @@ namespace Player
         /// <summary>True while external systems have frozen player movement.</summary>
         public bool IsMovementFrozen => movementFrozen;
 
+        /// <summary>
+        ///     Indicates whether the mover is currently following an auto-move request issued through
+        ///     <see cref="MoveTo(Vector2,float,System.Action)"/> or <see cref="MoveTo(Transform,float,System.Action)"/>.
+        ///     Gathering controllers use this to determine if an automatically initiated walk is still in progress.
+        /// </summary>
+        public bool IsAutoMoving => isAutoMoving;
+
 #if ENABLE_INPUT_SYSTEM
         private InputAction moveAction;
         private bool moveActionEnabledByResolver;
