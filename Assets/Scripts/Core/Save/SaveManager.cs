@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEngine;
 
 namespace Core.Save
@@ -18,6 +19,12 @@ namespace Core.Save
 
         // Registered saveable objects
         private static readonly List<ISaveable> saveables = new List<ISaveable>();
+
+        /// <summary>
+        /// Identifier for the profile whose data should be loaded and saved. When empty the
+        /// manager behaves like the legacy single-profile implementation.
+        /// </summary>
+        public static string ActiveProfileId { get; private set; } = string.Empty;
 
         static SaveManager()
         {
@@ -63,6 +70,34 @@ namespace Core.Save
         {
             foreach (var s in saveables)
                 s.Load();
+        }
+
+        /// <summary>
+        /// Normalises and activates a profile for subsequent save and load operations. The
+        /// previous profile is saved before switching and the new profile can be reloaded so
+        /// gameplay systems pick up their persisted state immediately.
+        /// </summary>
+        /// <param name="profileId">Raw profile identifier supplied by the caller.</param>
+        /// <param name="reload">When true the manager invokes <see cref="LoadAll"/> after
+        /// switching so registered systems refresh their state.</param>
+        public static void SetActiveProfile(string profileId, bool reload = true)
+        {
+            string normalized = NormalizeProfileId(profileId);
+
+            if (string.Equals(normalized, ActiveProfileId, StringComparison.Ordinal))
+            {
+                if (reload)
+                    LoadAll();
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(ActiveProfileId))
+                SaveAll();
+
+            ActiveProfileId = normalized;
+
+            if (reload)
+                LoadAll();
         }
 
         [Serializable]
@@ -129,6 +164,20 @@ namespace Core.Save
 
         public static void Save<T>(string key, T data)
         {
+            SaveInternal(ComposeKey(key), data);
+        }
+
+        /// <summary>
+        /// Persists data without applying a profile prefix. Intended for account-wide metadata
+        /// such as credential hashes that must be available before a gameplay profile is active.
+        /// </summary>
+        public static void SaveGlobal<T>(string key, T data)
+        {
+            SaveInternal(key, data);
+        }
+
+        private static void SaveInternal<T>(string key, T data)
+        {
             var all = LoadFile();
             string json = JsonUtility.ToJson(new Wrapper<T> { value = data });
             var entry = all.entries.Find(e => e.key == key);
@@ -141,6 +190,20 @@ namespace Core.Save
         }
 
         public static T Load<T>(string key)
+        {
+            return LoadInternal<T>(ComposeKey(key));
+        }
+
+        /// <summary>
+        /// Loads a value stored without a profile prefix. Use this for global data such as the
+        /// account catalogue maintained by <see cref="AccountProfileService"/>.
+        /// </summary>
+        public static T LoadGlobal<T>(string key)
+        {
+            return LoadInternal<T>(key);
+        }
+
+        private static T LoadInternal<T>(string key)
         {
             var all = LoadFile();
             var entry = all.entries.Find(e => e.key == key);
@@ -160,9 +223,50 @@ namespace Core.Save
 
         public static void Delete(string key)
         {
+            DeleteInternal(ComposeKey(key));
+        }
+
+        /// <summary>
+        /// Removes a value stored without a profile prefix.
+        /// </summary>
+        public static void DeleteGlobal(string key)
+        {
+            DeleteInternal(key);
+        }
+
+        private static void DeleteInternal(string key)
+        {
             var all = LoadFile();
             all.entries.RemoveAll(e => e.key == key);
             SaveFile();
+        }
+
+        private static string ComposeKey(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                return key;
+
+            return string.IsNullOrEmpty(ActiveProfileId) ? key : string.Concat(ActiveProfileId, ":", key);
+        }
+
+        private static string NormalizeProfileId(string profileId)
+        {
+            if (string.IsNullOrWhiteSpace(profileId))
+                return string.Empty;
+
+            string trimmed = profileId.Trim();
+            var builder = new StringBuilder(trimmed.Length);
+            for (int i = 0; i < trimmed.Length; i++)
+            {
+                char c = char.ToLowerInvariant(trimmed[i]);
+                if (char.IsWhiteSpace(c))
+                    continue;
+                if (c == ':')
+                    c = '_';
+                builder.Append(c);
+            }
+
+            return builder.Length > 0 ? builder.ToString() : string.Empty;
         }
     }
 }
