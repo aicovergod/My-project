@@ -31,16 +31,6 @@ namespace UI.Login
         [SerializeField]
         private Image backgroundImage;
 
-        [SerializeField]
-        private Image loginPanelImage;
-
-        [Header("Sprite Resources")]
-        [SerializeField, Tooltip("Resources path for the fullscreen background sprite.")]
-        private string backgroundSpritePath = "Sprites/LoginScreen/Background";
-
-        [SerializeField, Tooltip("Resources path for the login panel sprite.")]
-        private string loginPanelSpritePath = "Sprites/LoginScreen/LoginBox";
-
         [Header("Status Colours")]
         [SerializeField]
         private Color successColour = new Color32(197, 183, 110, 255);
@@ -56,14 +46,10 @@ namespace UI.Login
 
         private Coroutine loadRoutine;
         private Font legacyFont;
-        private Sprite backgroundSprite;
-        private Sprite loginPanelSprite;
 
         private void Awake()
         {
             legacyFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            LoadLoginSprites();
-            ApplyLoadedSpritesToUi();
             EnsureUiHierarchy();
 
             ApplyLegacyFont(usernameField);
@@ -186,66 +172,66 @@ namespace UI.Login
 
         private void EnsureUiHierarchy()
         {
-            if (usernameField == null)
-                Debug.LogWarning("LoginScreenController is missing a reference to the username InputField.", this);
+            if (usernameField != null && passwordField != null && statusText != null && loginButton != null && backgroundImage != null)
+                return;
 
-            if (passwordField == null)
-                Debug.LogWarning("LoginScreenController is missing a reference to the password InputField.", this);
+            if (gameObject.layer != 5)
+                gameObject.layer = 5;
 
-            if (statusText == null)
-                Debug.LogWarning("LoginScreenController is missing a reference to the status Text component.", this);
+            var canvas = GetComponent<Canvas>();
+            if (canvas == null)
+                canvas = gameObject.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.pixelPerfect = false;
+            canvas.sortingOrder = 0;
 
-            if (loginButton == null)
-                Debug.LogWarning("LoginScreenController is missing a reference to the login Button.", this);
+            var scaler = GetComponent<CanvasScaler>();
+            if (scaler == null)
+                scaler = gameObject.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.matchWidthOrHeight = 0.5f;
 
-            if (backgroundImage == null)
-                Debug.LogWarning("LoginScreenController is missing a reference to the background Image.", this);
+            if (GetComponent<GraphicRaycaster>() == null)
+                gameObject.AddComponent<GraphicRaycaster>();
 
-            if (loginPanelImage == null)
-                Debug.LogWarning("LoginScreenController is missing a reference to the login panel Image.", this);
-        }
+            var rootRect = transform as RectTransform;
+            if (rootRect == null)
+                rootRect = gameObject.AddComponent<RectTransform>();
 
-        /// <summary>
-        /// Loads the login screen sprites from the Resources folder so the runtime UI
-        /// uses the art-authored assets instead of the default Unity skin.
-        /// </summary>
-        private void LoadLoginSprites()
-        {
-            backgroundSprite = LoadSpriteFromResources(backgroundSpritePath);
-            loginPanelSprite = LoadSpriteFromResources(loginPanelSpritePath);
-        }
+            Sprite panelSprite = Resources.GetBuiltinResource<Sprite>("UISprite.psd");
 
-        /// <summary>
-        /// Applies the loaded sprites to the serialized UI components when available so the
-        /// art-authored assets appear without modifying the existing hierarchy.
-        /// </summary>
-        private void ApplyLoadedSpritesToUi()
-        {
-            if (backgroundSprite != null && backgroundImage != null)
-                backgroundImage.sprite = backgroundSprite;
+            var panelRect = CreateRectTransform("LoginPanel", rootRect,
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                Vector2.zero, new Vector2(640f, 440f));
+            backgroundImage = panelRect.gameObject.AddComponent<Image>();
+            backgroundImage.sprite = panelSprite;
+            backgroundImage.type = Image.Type.Sliced;
+            backgroundImage.color = new Color32(28, 24, 20, 220);
 
-            if (loginPanelSprite != null && loginPanelImage != null)
-            {
-                loginPanelImage.sprite = loginPanelSprite;
+            var title = CreateText(panelRect, "Title", "RuneRealm Login", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(0f, -32f), new Vector2(520f, 48f), 34, TextAnchor.UpperCenter, FontStyle.Bold);
+            ApplyLegacyFont(title);
 
-                if (loginPanelSprite.border.sqrMagnitude > 0f)
-                    loginPanelImage.type = Image.Type.Sliced;
-            }
-        }
+            var usernameLabel = CreateText(panelRect, "UsernameLabel", "Username", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f),
+                new Vector2(40f, -110f), new Vector2(200f, 32f), 20, TextAnchor.MiddleLeft, FontStyle.Bold);
+            ApplyLegacyFont(usernameLabel);
 
-        /// <summary>
-        /// Attempts to load a sprite at the provided Resources path and logs a warning
-        /// if the sprite cannot be found so designers can correct missing references.
-        /// </summary>
-        private Sprite LoadSpriteFromResources(string resourcePath)
-        {
-            if (string.IsNullOrWhiteSpace(resourcePath))
-                return null;
+            usernameField = CreateInputField(panelRect, "UsernameInput", new Vector2(40f, -150f), false, "Enter username", panelSprite);
 
-            Sprite sprite = Resources.Load<Sprite>(resourcePath);
-            if (sprite == null)
-                Debug.LogWarning($"LoginScreenController could not locate a sprite at Resources/{resourcePath}.");
-            return sprite;
+            var passwordLabel = CreateText(panelRect, "PasswordLabel", "Password", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f),
+                new Vector2(40f, -210f), new Vector2(200f, 32f), 20, TextAnchor.MiddleLeft, FontStyle.Bold);
+            ApplyLegacyFont(passwordLabel);
+
+            passwordField = CreateInputField(panelRect, "PasswordInput", new Vector2(40f, -250f), true, "Enter password", panelSprite);
+
+            statusText = CreateText(panelRect, "StatusText", string.Empty, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
+                new Vector2(0f, 96f), new Vector2(560f, 80f), 18, TextAnchor.MiddleCenter, FontStyle.Normal);
+            ApplyLegacyFont(statusText);
+
+            loginButton = CreateButton(panelRect, "LoginButton", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
+                new Vector2(0f, 28f), new Vector2(220f, 56f), panelSprite, "Login");
+            ApplyLegacyFont(loginButton.GetComponentInChildren<Text>());
         }
 
         private void ApplyLegacyFont(InputField field)
@@ -277,5 +263,104 @@ namespace UI.Login
             statusText.color = colour;
         }
 
+        private RectTransform CreateRectTransform(string name, RectTransform parent, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 anchoredPosition, Vector2 sizeDelta)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            var rect = go.GetComponent<RectTransform>();
+            rect.SetParent(parent, false);
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
+            rect.pivot = pivot;
+            rect.anchoredPosition = anchoredPosition;
+            rect.sizeDelta = sizeDelta;
+            return rect;
+        }
+
+        private Text CreateText(RectTransform parent, string name, string content, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 anchoredPosition, Vector2 sizeDelta, int fontSize, TextAnchor alignment, FontStyle style)
+        {
+            var rect = CreateRectTransform(name, parent, anchorMin, anchorMax, pivot, anchoredPosition, sizeDelta);
+            rect.gameObject.AddComponent<CanvasRenderer>();
+            var text = rect.gameObject.AddComponent<Text>();
+            text.text = content;
+            text.fontSize = fontSize;
+            text.alignment = alignment;
+            text.fontStyle = style;
+            text.color = new Color32(212, 212, 212, 255);
+            text.supportRichText = false;
+            text.raycastTarget = false;
+            return text;
+        }
+
+        private InputField CreateInputField(RectTransform parent, string name, Vector2 anchoredPosition, bool isPassword, string placeholderText, Sprite backgroundSprite)
+        {
+            var rect = CreateRectTransform(name, parent, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), anchoredPosition, new Vector2(360f, 44f));
+            rect.gameObject.AddComponent<CanvasRenderer>();
+            var image = rect.gameObject.AddComponent<Image>();
+            image.sprite = backgroundSprite;
+            image.type = Image.Type.Sliced;
+            image.color = new Color32(46, 40, 32, 255);
+
+            var field = rect.gameObject.AddComponent<InputField>();
+            field.targetGraphic = image;
+            field.lineType = InputField.LineType.SingleLine;
+            field.contentType = isPassword ? InputField.ContentType.Password : InputField.ContentType.Standard;
+            field.characterValidation = InputField.CharacterValidation.None;
+
+            var textRect = CreateRectTransform("Text", rect, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0f), Vector2.zero, Vector2.zero);
+            textRect.offsetMin = new Vector2(12f, 8f);
+            textRect.offsetMax = new Vector2(-12f, -8f);
+            textRect.gameObject.AddComponent<CanvasRenderer>();
+            var text = textRect.gameObject.AddComponent<Text>();
+            text.text = string.Empty;
+            text.fontSize = 20;
+            text.alignment = TextAnchor.MiddleLeft;
+            text.supportRichText = false;
+            text.color = new Color32(238, 225, 171, 255);
+            text.raycastTarget = false;
+
+            var placeholderRect = CreateRectTransform("Placeholder", rect, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0f), Vector2.zero, Vector2.zero);
+            placeholderRect.offsetMin = new Vector2(12f, 8f);
+            placeholderRect.offsetMax = new Vector2(-12f, -8f);
+            placeholderRect.gameObject.AddComponent<CanvasRenderer>();
+            var placeholder = placeholderRect.gameObject.AddComponent<Text>();
+            placeholder.text = placeholderText;
+            placeholder.fontStyle = FontStyle.Italic;
+            placeholder.fontSize = 20;
+            placeholder.alignment = TextAnchor.MiddleLeft;
+            placeholder.color = new Color32(150, 150, 150, 255);
+            placeholder.supportRichText = false;
+            placeholder.raycastTarget = false;
+
+            field.textComponent = text;
+            field.placeholder = placeholder;
+
+            return field;
+        }
+
+        private Button CreateButton(RectTransform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 anchoredPosition, Vector2 sizeDelta, Sprite backgroundSprite, string label)
+        {
+            var rect = CreateRectTransform(name, parent, anchorMin, anchorMax, pivot, anchoredPosition, sizeDelta);
+            rect.gameObject.AddComponent<CanvasRenderer>();
+            var image = rect.gameObject.AddComponent<Image>();
+            image.sprite = backgroundSprite;
+            image.type = Image.Type.Sliced;
+            image.color = new Color32(92, 58, 30, 255);
+
+            var button = rect.gameObject.AddComponent<Button>();
+            button.transition = Selectable.Transition.ColorTint;
+            var colors = button.colors;
+            colors.normalColor = new Color32(92, 58, 30, 255);
+            colors.highlightedColor = new Color32(120, 78, 40, 255);
+            colors.pressedColor = new Color32(70, 46, 24, 255);
+            colors.selectedColor = new Color32(120, 78, 40, 255);
+            colors.disabledColor = new Color32(50, 32, 18, 180);
+            button.colors = colors;
+
+            var text = CreateText(rect, "Text", label, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 24, TextAnchor.MiddleCenter, FontStyle.Bold);
+            ApplyLegacyFont(text);
+            text.color = new Color32(238, 225, 171, 255);
+
+            return button;
+        }
     }
 }
