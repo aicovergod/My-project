@@ -285,11 +285,12 @@ namespace NPC
         {
             if (_frozen)
             {
-                Vector2 pos = _rb != null ? _rb.position : (Vector2)transform.position;
+                // Maintain the frozen position without reusing the interpolated movement variable name below.
+                Vector2 frozenPosition = _rb != null ? _rb.position : (Vector2)transform.position;
                 if (_rb != null)
-                    _rb.MovePosition(pos);
+                    _rb.MovePosition(frozenPosition);
                 spriteAnimator?.UpdateVisuals(Vector2.zero);
-                _lastPos = pos;
+                _lastPos = frozenPosition;
                 return;
             }
 
