@@ -51,10 +51,6 @@ namespace NPC
                 heldAttackRoutine = null;
             }
 
-            var npcAttack = GetComponent<NpcAttackController>();
-            var playerTarget = playerController.GetComponent<PlayerCombatTarget>();
-            npcAttack?.BeginAttacking(playerTarget);
-
             // Determine whether the player is currently frozen so we can decide how to handle
             // the attack click. Frozen players should not be able to move but should retain the
             // attack command so it can fire if the NPC walks into range.
