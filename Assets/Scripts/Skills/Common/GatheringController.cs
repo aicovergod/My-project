@@ -38,6 +38,16 @@ namespace Skills.Common
         [Tooltip("Cooldown between prospect (right click) interactions.")]
         private float prospectCooldownSeconds = 3f;
 
+        [Header("Movement")]
+        [SerializeField]
+        [Tooltip("Automatically walk into interaction range before starting the gathering action when out of range.")]
+        private bool autoMoveIntoRange = true;
+
+        [SerializeField]
+        [Min(0f)]
+        [Tooltip("Buffer removed from the interaction radius when auto moving so the player stops slightly inside the range.")]
+        private float autoMoveStopBuffer = 0.1f;
+
         [Header("Input")]
         [SerializeField]
         [Tooltip("Player input component supplying the default action map. Auto-assigned from the hierarchy when empty.")]
@@ -88,6 +98,13 @@ namespace Skills.Common
         private int pendingPointerId;
         private bool pendingProspect;
 
+        // Automatic movement state used when the player clicks a node from outside the interaction range.
+        private bool isApproachingNode;
+        private TNode approachingNode;
+        private Transform approachingTransform;
+        private Vector3 approachingPoint;
+        private float approachingRange;
+
         /// <summary>
         ///     Cached reference to the skill component so derived classes can access it safely.
         /// </summary>
@@ -127,6 +144,17 @@ namespace Skills.Common
         ///     Cooldown between prospect actions.
         /// </summary>
         protected float ProspectCooldownSeconds => prospectCooldownSeconds;
+
+        /// <summary>
+        ///     When <c>true</c> the controller will instruct the <see cref="PlayerMover"/> to walk into range before
+        ///     attempting to start the gathering action.
+        /// </summary>
+        protected virtual bool AllowAutoMoveToNodes => autoMoveIntoRange;
+
+        /// <summary>
+        ///     Buffer applied when auto moving so the player stops slightly inside the interaction range.
+        /// </summary>
+        protected virtual float AutoMoveStopBuffer => autoMoveStopBuffer;
 
         /// <summary>
         ///     Anchor used when spawning floating feedback text.
@@ -189,6 +217,7 @@ namespace Skills.Common
             defaultCancelDistance = Mathf.Max(0f, defaultCancelDistance);
             interactionCooldownSeconds = Mathf.Max(0f, interactionCooldownSeconds);
             prospectCooldownSeconds = Mathf.Max(0f, prospectCooldownSeconds);
+            autoMoveStopBuffer = Mathf.Max(0f, autoMoveStopBuffer);
         }
 
         /// <summary>
@@ -205,6 +234,7 @@ namespace Skills.Common
         protected virtual void OnDisable()
         {
             UnsubscribeFromInput();
+            CancelAutoApproach(true);
         }
 
         /// <summary>
@@ -217,6 +247,7 @@ namespace Skills.Common
                 worldCamera = Camera.main;
 
             EvaluateActiveAction();
+            UpdateAutoApproach();
 
             if (pendingInteract)
             {
@@ -309,6 +340,7 @@ namespace Skills.Common
             if (!AllowEscapeCancel)
                 return;
 
+            CancelAutoApproach(true);
             RequestStopAction();
         }
 
@@ -370,9 +402,15 @@ namespace Skills.Common
             if (node == null)
                 return;
 
-            if (!CanInteractWith(node, out string failure))
+            if (!ValidateInteractionPrerequisites(node, out string failure))
             {
                 ShowFeedback(failure);
+                return;
+            }
+
+            if (AllowAutoMoveToNodes && !IsWithinInteractionRange(node))
+            {
+                BeginAutoApproach(node);
                 return;
             }
 
@@ -391,33 +429,186 @@ namespace Skills.Common
         /// <summary>
         ///     Validates common interaction rules before delegating to the concrete skill controller.
         /// </summary>
-        private bool CanInteractWith(TNode node, out string failure)
+        private bool ValidateInteractionPrerequisites(TNode node, out string failureMessage)
         {
-            failure = string.Empty;
+            failureMessage = string.Empty;
 
             if (IsNodeDepleted(node))
             {
-                failure = GetDepletedMessage(node);
+                failureMessage = GetDepletedMessage(node);
                 return false;
             }
 
             if (IsNodeBusy(node))
             {
-                failure = GetBusyMessage(node);
+                failureMessage = GetBusyMessage(node);
                 return false;
             }
 
-            float distance = Vector3.Distance(transform.position, GetNodePosition(node));
-            if (distance > GetInteractionRange(node))
+            if (!ValidateNode(node, out failureMessage))
                 return false;
 
-            if (!ValidateNode(node, out failure))
-                return false;
-
-            if (!HasInventorySpace(node, out failure))
+            if (!HasInventorySpace(node, out failureMessage))
                 return false;
 
             return true;
+        }
+
+        /// <summary>
+        ///     Determines whether the player is currently standing within the configured interaction range of the node.
+        /// </summary>
+        private bool IsWithinInteractionRange(TNode node)
+        {
+            if (node == null)
+                return false;
+
+            float interactionRange = Mathf.Max(0f, GetInteractionRange(node));
+            float distance = Vector3.Distance(transform.position, GetNodePosition(node));
+            return distance <= interactionRange;
+        }
+
+        /// <summary>
+        ///     Starts automatically moving the player towards the node and triggers the interaction once within range.
+        /// </summary>
+        private void BeginAutoApproach(TNode node)
+        {
+            if (!AllowAutoMoveToNodes)
+                return;
+
+            if (playerMover == null)
+            {
+                ShowFeedback(GetOutOfRangeMessage(node));
+                return;
+            }
+
+            StopActiveActionForMovement();
+
+            approachingNode = node;
+            approachingTransform = GetApproachTransform(node);
+            approachingPoint = GetNodePosition(node);
+            approachingRange = Mathf.Max(0f, GetInteractionRange(node));
+            isApproachingNode = true;
+
+            float stopDistance = CalculateAutoApproachStopDistance(approachingRange);
+
+            if (approachingTransform != null)
+                playerMover.MoveTo(approachingTransform, stopDistance, HandleAutoApproachComplete);
+            else
+                playerMover.MoveTo((Vector2)approachingPoint, stopDistance, HandleAutoApproachComplete);
+        }
+
+        /// <summary>
+        ///     Evaluates the automatic movement state, cancelling it when aborted or retrying when required.
+        /// </summary>
+        private void UpdateAutoApproach()
+        {
+            if (!isApproachingNode)
+                return;
+
+            if (!AllowAutoMoveToNodes)
+            {
+                CancelAutoApproach(true);
+                return;
+            }
+
+            if (approachingNode == null)
+            {
+                CancelAutoApproach(true);
+                return;
+            }
+
+            if (playerMover == null)
+            {
+                CancelAutoApproach(true);
+                return;
+            }
+
+            if (playerMover.IsAutoMoving)
+                return;
+
+            if (IsWithinInteractionRange(approachingNode))
+            {
+                var node = approachingNode;
+                ClearAutoApproachState();
+                AttemptStart(node);
+            }
+            else
+            {
+                CancelAutoApproach(false);
+            }
+        }
+
+        /// <summary>
+        ///     Callback invoked by <see cref="PlayerMover.MoveTo(Vector2,float,System.Action)"/> once the player reaches the
+        ///     desired position. Revalidates the node before attempting to start the action.
+        /// </summary>
+        private void HandleAutoApproachComplete()
+        {
+            if (!isApproachingNode)
+                return;
+
+            var node = approachingNode;
+            ClearAutoApproachState();
+
+            if (node == null)
+                return;
+
+            if (!IsWithinInteractionRange(node))
+            {
+                BeginAutoApproach(node);
+                return;
+            }
+
+            AttemptStart(node);
+        }
+
+        /// <summary>
+        ///     Cancels any pending automatic approach to a node.
+        /// </summary>
+        private void CancelAutoApproach(bool stopMovement)
+        {
+            if (!isApproachingNode)
+                return;
+
+            if (stopMovement && playerMover != null)
+                playerMover.StopMovement();
+
+            ClearAutoApproachState();
+        }
+
+        /// <summary>
+        ///     Clears the cached auto approach state without modifying the player's movement.
+        /// </summary>
+        private void ClearAutoApproachState()
+        {
+            isApproachingNode = false;
+            approachingNode = null;
+            approachingTransform = null;
+            approachingPoint = Vector3.zero;
+            approachingRange = 0f;
+        }
+
+        /// <summary>
+        ///     Calculates the distance the <see cref="PlayerMover"/> should use when auto moving towards a node.
+        /// </summary>
+        private float CalculateAutoApproachStopDistance(float interactionRange)
+        {
+            if (interactionRange <= 0f)
+                return 0f;
+
+            float stopDistance = interactionRange - AutoMoveStopBuffer;
+            return Mathf.Clamp(stopDistance, 0f, interactionRange);
+        }
+
+        /// <summary>
+        ///     Ensures the current gathering action is halted before starting an automatic movement towards a new node.
+        /// </summary>
+        private void StopActiveActionForMovement()
+        {
+            if (!IsPerformingAction)
+                return;
+
+            RequestStopAction();
         }
 
         /// <summary>
@@ -425,6 +616,7 @@ namespace Skills.Common
         /// </summary>
         private void RequestStopAction()
         {
+            CancelAutoApproach(false);
             StopAction();
             OnActionStopped();
         }
@@ -551,6 +743,11 @@ namespace Skills.Common
         protected virtual Vector3 GetNodePosition(TNode node) => node.transform.position;
 
         /// <summary>
+        ///     Override when the auto movement target should follow a transform different from <see cref="Component.transform"/>.
+        /// </summary>
+        protected virtual Transform GetApproachTransform(TNode node) => node != null ? node.transform : null;
+
+        /// <summary>
         ///     Allows derived classes to provide custom interaction ranges per node.
         /// </summary>
         protected virtual float GetInteractionRange(TNode node) => defaultInteractRange;
@@ -569,6 +766,11 @@ namespace Skills.Common
         ///     Message displayed when attempting to interact with an already occupied node.
         /// </summary>
         protected virtual string GetBusyMessage(TNode node) => string.Empty;
+
+        /// <summary>
+        ///     Message displayed when the player cannot automatically walk into range of the node.
+        /// </summary>
+        protected virtual string GetOutOfRangeMessage(TNode node) => "You can't reach that.";
 
         /// <summary>
         ///     Resolve and subscribe to the configured input actions.
