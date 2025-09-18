@@ -31,6 +31,13 @@ namespace UI.Login
         [SerializeField]
         private Image backgroundImage;
 
+        [Header("Sprite Resources")]
+        [SerializeField, Tooltip("Resources path for the fullscreen background sprite.")]
+        private string backgroundSpritePath = "Sprites/LoginScreen/Background";
+
+        [SerializeField, Tooltip("Resources path for the login panel sprite.")]
+        private string loginPanelSpritePath = "Sprites/LoginScreen/LoginBox";
+
         [Header("Status Colours")]
         [SerializeField]
         private Color successColour = new Color32(197, 183, 110, 255);
@@ -46,10 +53,13 @@ namespace UI.Login
 
         private Coroutine loadRoutine;
         private Font legacyFont;
+        private Sprite backgroundSprite;
+        private Sprite loginPanelSprite;
 
         private void Awake()
         {
             legacyFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            LoadLoginSprites();
             EnsureUiHierarchy();
 
             ApplyLegacyFont(usernameField);
@@ -201,13 +211,29 @@ namespace UI.Login
 
             Sprite panelSprite = Resources.GetBuiltinResource<Sprite>("UISprite.psd");
 
+            var backgroundRect = CreateRectTransform("Background", rootRect,
+                new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0.5f, 0.5f),
+                Vector2.zero, Vector2.zero);
+            backgroundImage = backgroundRect.gameObject.AddComponent<Image>();
+            Sprite appliedBackgroundSprite = backgroundSprite != null ? backgroundSprite : panelSprite;
+            backgroundImage.sprite = appliedBackgroundSprite;
+            backgroundImage.type = Image.Type.Simple;
+            backgroundImage.color = backgroundSprite != null ? Color.white : new Color32(16, 12, 8, 255);
+            backgroundImage.preserveAspect = backgroundSprite != null;
+            backgroundImage.raycastTarget = false;
+            backgroundRect.SetAsFirstSibling();
+
+            Vector2 panelSize = GetSpriteSize(loginPanelSprite, new Vector2(640f, 440f));
             var panelRect = CreateRectTransform("LoginPanel", rootRect,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                Vector2.zero, new Vector2(640f, 440f));
-            backgroundImage = panelRect.gameObject.AddComponent<Image>();
-            backgroundImage.sprite = panelSprite;
-            backgroundImage.type = Image.Type.Sliced;
-            backgroundImage.color = new Color32(28, 24, 20, 220);
+                Vector2.zero, panelSize);
+            var panelImage = panelRect.gameObject.AddComponent<Image>();
+            Sprite appliedPanelSprite = loginPanelSprite != null ? loginPanelSprite : panelSprite;
+            panelImage.sprite = appliedPanelSprite;
+            bool panelHasBorder = loginPanelSprite != null && loginPanelSprite.border.sqrMagnitude > 0f;
+            panelImage.type = panelHasBorder ? Image.Type.Sliced : Image.Type.Simple;
+            panelImage.color = loginPanelSprite != null ? Color.white : new Color32(28, 24, 20, 220);
+            panelRect.SetAsLastSibling();
 
             var title = CreateText(panelRect, "Title", "RuneRealm Login", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
                 new Vector2(0f, -32f), new Vector2(520f, 48f), 34, TextAnchor.UpperCenter, FontStyle.Bold);
@@ -232,6 +258,31 @@ namespace UI.Login
             loginButton = CreateButton(panelRect, "LoginButton", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
                 new Vector2(0f, 28f), new Vector2(220f, 56f), panelSprite, "Login");
             ApplyLegacyFont(loginButton.GetComponentInChildren<Text>());
+        }
+
+        /// <summary>
+        /// Loads the login screen sprites from the Resources folder so the runtime UI
+        /// uses the art-authored assets instead of the default Unity skin.
+        /// </summary>
+        private void LoadLoginSprites()
+        {
+            backgroundSprite = LoadSpriteFromResources(backgroundSpritePath);
+            loginPanelSprite = LoadSpriteFromResources(loginPanelSpritePath);
+        }
+
+        /// <summary>
+        /// Attempts to load a sprite at the provided Resources path and logs a warning
+        /// if the sprite cannot be found so designers can correct missing references.
+        /// </summary>
+        private Sprite LoadSpriteFromResources(string resourcePath)
+        {
+            if (string.IsNullOrWhiteSpace(resourcePath))
+                return null;
+
+            Sprite sprite = Resources.Load<Sprite>(resourcePath);
+            if (sprite == null)
+                Debug.LogWarning($"LoginScreenController could not locate a sprite at Resources/{resourcePath}.");
+            return sprite;
         }
 
         private void ApplyLegacyFont(InputField field)
@@ -261,6 +312,20 @@ namespace UI.Login
 
             statusText.text = message;
             statusText.color = colour;
+        }
+
+        /// <summary>
+        /// Converts a sprite's pixel rect into UI units so the RectTransform matches the
+        /// art-authored dimensions when rendered inside the canvas. Returns the provided
+        /// fallback when a sprite is unavailable.
+        /// </summary>
+        private Vector2 GetSpriteSize(Sprite sprite, Vector2 fallback)
+        {
+            if (sprite == null)
+                return fallback;
+
+            float pixelsPerUnit = sprite.pixelsPerUnit <= 0f ? 100f : sprite.pixelsPerUnit;
+            return sprite.rect.size / pixelsPerUnit;
         }
 
         private RectTransform CreateRectTransform(string name, RectTransform parent, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 anchoredPosition, Vector2 sizeDelta)
