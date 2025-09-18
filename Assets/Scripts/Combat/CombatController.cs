@@ -9,6 +9,7 @@ using Pets;
 using UI;
 using Magic;
 using Status;
+using Status.Freeze;
 
 namespace Combat
 {
@@ -77,6 +78,8 @@ namespace Combat
         private DamageType pendingType;
         private int pendingMaxHit;
         private SpellElement pendingElement;
+        private SpellDefinition pendingSpell;
+        private bool pendingSpellHit;
 
         [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
         private HitSplatLibrary hitSplatLibrary;
@@ -347,28 +350,45 @@ namespace Combat
             else
                 attacker = CombatantStats.ForPlayer(skills, equipment, CombatStyle.Accurate, DamageType.Melee);
 
-            var result = CalculateDamage(attacker, target);
+            pendingSpell = null;
+            pendingSpellHit = false;
 
-            if (attacker.DamageType == DamageType.Magic && MagicUI.ActiveSpell != null && MagicUI.ActiveSpell.projectilePrefab != null)
+            var result = CalculateDamage(attacker, target);
+            var activeSpell = MagicUI.ActiveSpell;
+
+            if (attacker.DamageType == DamageType.Magic)
             {
-                pendingStyle = attacker.Style;
-                pendingType = attacker.DamageType;
-                pendingMaxHit = result.maxHit;
-                pendingElement = MagicUI.ActiveSpell.element;
-                var projObj = Instantiate(MagicUI.ActiveSpell.projectilePrefab, transform.position, Quaternion.identity);
-                var proj = projObj.GetComponent<Magic.FireProjectile>();
-                if (proj != null)
+                if (activeSpell != null && activeSpell.projectilePrefab != null)
                 {
-                    proj.target = target;
-                    proj.damage = result.damage;
-                    proj.maxHit = result.maxHit;
-                    proj.owner = this;
-                    proj.style = attacker.Style;
-                    proj.damageType = attacker.DamageType;
-                    proj.speed = MagicUI.ActiveSpell.speed;
-                    proj.hitFadeTime = MagicUI.ActiveSpell.hitFadeTime;
-                    if (MagicUI.ActiveSpell.hitEffectPrefab != null)
-                        proj.hitEffectPrefab = MagicUI.ActiveSpell.hitEffectPrefab;
+                    pendingStyle = attacker.Style;
+                    pendingType = attacker.DamageType;
+                    pendingMaxHit = result.maxHit;
+                    pendingElement = activeSpell.element;
+                    pendingSpell = activeSpell;
+                    pendingSpellHit = result.hit;
+
+                    var projObj = Instantiate(activeSpell.projectilePrefab, transform.position, Quaternion.identity);
+                    var proj = projObj.GetComponent<Magic.FireProjectile>();
+                    if (proj != null)
+                    {
+                        proj.target = target;
+                        proj.damage = result.damage;
+                        proj.maxHit = result.maxHit;
+                        proj.owner = this;
+                        proj.style = attacker.Style;
+                        proj.damageType = attacker.DamageType;
+                        proj.speed = activeSpell.speed;
+                        proj.hitFadeTime = activeSpell.hitFadeTime;
+                        if (activeSpell.hitEffectPrefab != null)
+                            proj.hitEffectPrefab = activeSpell.hitEffectPrefab;
+                    }
+                }
+                else
+                {
+                    SpellElement element = activeSpell != null ? activeSpell.element : SpellElement.None;
+                    int primaryDamage = ApplyDamageResult(target, result.damage, result.hit, result.maxHit, attacker.Style, attacker.DamageType, element);
+                    if (activeSpell != null)
+                        TryApplySpellStatusEffects(target, activeSpell, result.hit);
                 }
             }
             else
@@ -380,8 +400,52 @@ namespace Combat
 
         public void ApplySpellDamage(CombatTarget target, int damage)
         {
-            bool hit = damage > 0;
-            ApplyDamageResult(target, damage, hit, pendingMaxHit, pendingStyle, pendingType, pendingElement);
+            bool hit = pendingSpellHit;
+            int resolvedDamage = hit ? Mathf.Max(0, damage) : 0;
+            var spell = pendingSpell;
+
+            ApplyDamageResult(target, resolvedDamage, hit, pendingMaxHit, pendingStyle, pendingType, pendingElement);
+
+            if (hit && spell != null)
+                TryApplySpellStatusEffects(target, spell, hit);
+
+            pendingSpell = null;
+            pendingSpellHit = false;
+        }
+
+        private void TryApplySpellStatusEffects(CombatTarget target, SpellDefinition spell, bool hit)
+        {
+            if (!hit || target == null || spell == null)
+                return;
+
+            if (spell.appliesFreeze && spell.freezeDurationTicks > 0)
+                TryApplyFreeze(target, spell);
+        }
+
+        /// <summary>
+        /// Applies the frozen status effect to the supplied combat target when allowed.
+        /// </summary>
+        private void TryApplyFreeze(CombatTarget target, SpellDefinition spell)
+        {
+            var behaviour = target as MonoBehaviour;
+            if (behaviour == null)
+                return;
+
+            var npc = behaviour.GetComponent<NpcCombatant>() ?? behaviour.GetComponentInParent<NpcCombatant>();
+            if (npc != null && !npc.IsFreezable)
+                return;
+
+            var freezeController = behaviour.GetComponent<FrozenStatusController>() ??
+                behaviour.GetComponentInParent<FrozenStatusController>() ??
+                behaviour.GetComponentInChildren<FrozenStatusController>();
+
+            if (freezeController == null)
+            {
+                Debug.LogWarning($"CombatController attempted to freeze '{behaviour.name}' but it does not have a FrozenStatusController component.", behaviour);
+                return;
+            }
+
+            FreezeUtility.ApplyFreezeTicks(freezeController.gameObject, spell.freezeDurationTicks, BuffSourceType.Combat, spell.name);
         }
 
         private void ApplyHalberdAoe(CombatantStats attacker, CombatTarget primaryTarget, int primaryDamage, int maxHit)

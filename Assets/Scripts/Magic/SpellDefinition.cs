@@ -41,5 +41,12 @@ namespace Magic
 
         [Tooltip("Order that spells appear in the spell book")]
         public int loadOrder = 0;
+
+        [Header("Status Effects")]
+        [Tooltip("If true the spell applies a frozen debuff when it lands successfully.")]
+        public bool appliesFreeze;
+
+        [Tooltip("Duration of the frozen effect in ticks (1 tick = 0.6 seconds).")]
+        public int freezeDurationTicks = 0;
     }
 }

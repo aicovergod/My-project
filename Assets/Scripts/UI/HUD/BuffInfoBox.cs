@@ -494,10 +494,21 @@ namespace UI.HUD
             if (iconImage == null)
                 return;
 
+            loadedIcon = null;
             if (!string.IsNullOrEmpty(iconId))
             {
-                string path = $"UI/Buffs/{iconId}";
-                loadedIcon = Resources.Load<Sprite>(path);
+                string[] candidatePaths =
+                {
+                    $"UI/Buffs/{iconId}",
+                    $"ui/{iconId}"
+                };
+
+                for (int i = 0; i < candidatePaths.Length; i++)
+                {
+                    loadedIcon = Resources.Load<Sprite>(candidatePaths[i]);
+                    if (loadedIcon != null)
+                        break;
+                }
             }
 
             iconImage.sprite = loadedIcon;

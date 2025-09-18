@@ -9,6 +9,7 @@ using Skills.Outfits;
 using Status;
 using Status.Antifire;
 using Status.Poison;
+using Status.Freeze;
 
 namespace Skills
 {
@@ -29,6 +30,10 @@ namespace Skills
 
         private bool visible;
         private bool noclip;
+        private bool showFreezePopup;
+        private Rect freezePopupRect = new Rect(240f, 10f, 240f, 150f);
+        private string freezeTickInput = "8";
+        private string freezeError = string.Empty;
         private string hpLevel = "";
         private string attackLevel = "";
         private string strengthLevel = "";
@@ -243,6 +248,11 @@ namespace Skills
                 ApplyAntifireBuff();
             }
 
+            if (GUILayout.Button("Freeze for X time"))
+            {
+                ShowFreezePopup();
+            }
+
             if (GUILayout.Button(noclip ? "Disable Noclip" : "Enable Noclip"))
             {
                 var playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -300,6 +310,9 @@ namespace Skills
             GUILayout.EndScrollView();
 
             GUILayout.EndArea();
+
+            if (showFreezePopup)
+                freezePopupRect = GUI.ModalWindow(0xF20F2, freezePopupRect, DrawFreezePopup, "Freeze Player");
         }
 
         /// <summary>
@@ -372,6 +385,111 @@ namespace Skills
             }
 
             return poisonController;
+        }
+
+        /// <summary>
+        /// Opens the freeze popup and clears any previous error message.
+        /// </summary>
+        private void ShowFreezePopup()
+        {
+            showFreezePopup = true;
+            if (string.IsNullOrEmpty(freezeTickInput))
+                freezeTickInput = "8";
+            freezeError = string.Empty;
+        }
+
+        /// <summary>
+        /// Renders the freeze duration popup window used to debug the frozen status effect.
+        /// </summary>
+        private void DrawFreezePopup(int windowId)
+        {
+            Event e = Event.current;
+            if (e != null && e.type == EventType.KeyDown)
+            {
+                if (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter)
+                {
+                    ApplyFreezePopupSelection();
+                    e.Use();
+                }
+                else if (e.keyCode == KeyCode.Escape)
+                {
+                    CloseFreezePopup();
+                    e.Use();
+                }
+            }
+
+            GUILayout.Label("Duration (ticks, 0.6s each)");
+            GUI.SetNextControlName("FreezeTickField");
+            freezeTickInput = GUILayout.TextField(freezeTickInput);
+
+            if (!string.IsNullOrEmpty(freezeError))
+            {
+                Color previous = GUI.color;
+                GUI.color = Color.red;
+                GUILayout.Label(freezeError);
+                GUI.color = previous;
+            }
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Apply"))
+                ApplyFreezePopupSelection();
+            if (GUILayout.Button("Cancel"))
+                CloseFreezePopup();
+            GUILayout.EndHorizontal();
+
+            GUI.DragWindow(new Rect(0f, 0f, 10000f, 20f));
+        }
+
+        /// <summary>
+        /// Parses the freeze popup input and applies the frozen status if valid.
+        /// </summary>
+        private void ApplyFreezePopupSelection()
+        {
+            freezeError = string.Empty;
+
+            if (!int.TryParse(freezeTickInput, out int ticks) || ticks <= 0)
+            {
+                freezeError = "Enter a positive number of ticks.";
+                return;
+            }
+
+            if (!TryApplyFreezeToPlayer(ticks))
+                return;
+
+            CloseFreezePopup();
+        }
+
+        /// <summary>
+        /// Attempts to apply a freeze buff to the current player.
+        /// </summary>
+        private bool TryApplyFreezeToPlayer(int durationTicks)
+        {
+            var mover = FindObjectOfType<PlayerMover>();
+            if (mover == null)
+            {
+                freezeError = "Could not locate the player.";
+                return false;
+            }
+
+            var controller = mover.GetComponent<FrozenStatusController>();
+            if (controller == null)
+            {
+                freezeError = "Player is missing FrozenStatusController.";
+                return false;
+            }
+
+            FreezeUtility.ApplyFreezeTicks(controller.gameObject, durationTicks, BuffSourceType.Scripted, nameof(AdminF2Menu));
+            return true;
+        }
+
+        /// <summary>
+        /// Hides the freeze popup and clears focus so keyboard shortcuts resume working immediately.
+        /// </summary>
+        private void CloseFreezePopup()
+        {
+            showFreezePopup = false;
+            freezeError = string.Empty;
+            GUI.FocusControl(null);
         }
     }
 }

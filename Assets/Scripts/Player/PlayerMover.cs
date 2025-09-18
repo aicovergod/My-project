@@ -10,12 +10,14 @@ using World;
 using Pets;
 using Util;
 using Combat;
+using Status.Freeze;
 
 namespace Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(SpriteRenderer))]
+    [RequireComponent(typeof(FrozenStatusController))]
     public class PlayerMover : ScenePersistentObject
     {
         [Header("Movement")]
@@ -59,6 +61,8 @@ namespace Player
         private bool isTransitioning;
         private bool isAutoMoving;
         private Coroutine moveRoutine;
+        private bool movementFrozen;
+        private bool freezeSpriteStateBeforeFreeze;
 
         // Ensure only one player persists across scene loads.
         private static PlayerMover instance;
@@ -82,6 +86,9 @@ namespace Player
         public int FacingDir => facingDir;
 
         public bool IsMoving => moveDir.sqrMagnitude > 0f;
+
+        /// <summary>True while external systems have frozen player movement.</summary>
+        public bool IsMovementFrozen => movementFrozen;
 
 #if ENABLE_INPUT_SYSTEM
         private InputAction moveAction;
@@ -188,6 +195,15 @@ namespace Player
             {
                 moveDir = Vector2.zero;
                 rb.linearVelocity = Vector2.zero;
+                anim.SetBool("IsMoving", false);
+                return;
+            }
+
+            if (movementFrozen)
+            {
+                moveDir = Vector2.zero;
+                if (rb != null)
+                    rb.linearVelocity = Vector2.zero;
                 anim.SetBool("IsMoving", false);
                 return;
             }
@@ -339,6 +355,28 @@ namespace Player
         void FixedUpdate()
         {
             rb.linearVelocity = moveDir * moveSpeed;
+        }
+
+        /// <summary>
+        /// Enables or disables external freezing of the player's movement.
+        /// </summary>
+        /// <param name="frozen">When true input and auto movement are halted.</param>
+        public void SetMovementFrozen(bool frozen)
+        {
+            if (movementFrozen == frozen)
+                return;
+
+            movementFrozen = frozen;
+            if (movementFrozen)
+            {
+                freezeSpriteStateBeforeFreeze = freezeSprite;
+                StopMovement();
+                freezeSprite = true;
+            }
+            else
+            {
+                freezeSprite = freezeSpriteStateBeforeFreeze;
+            }
         }
 
         public void FaceTarget(Transform target)
