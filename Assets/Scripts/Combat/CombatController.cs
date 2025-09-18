@@ -139,12 +139,6 @@ namespace Combat
                     return false;
                 StopCoroutine(attackRoutine);
             }
-            var npcAttack = (target as MonoBehaviour)?.GetComponent<NpcAttackController>();
-            if (npcAttack != null)
-            {
-                var playerTarget = GetComponent<PlayerCombatTarget>();
-                npcAttack.BeginAttacking(playerTarget);
-            }
             attackRoutine = StartCoroutine(AttackRoutine(target));
             if (PetDropSystem.GuardModeEnabled)
             {
