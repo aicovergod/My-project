@@ -121,7 +121,7 @@ namespace Skills.Fishing
             if (UnityEngine.Random.value <= chance)
             {
                 int amount = PetDropSystem.ActivePet?.id == "Heron" ? 2 : 1;
-                fishItems.TryGetValue(fish.ItemId, out var item);
+                var item = GatheringInventoryHelper.GetItemData(fish.ItemId, ref fishItems);
                 var petStorage = PetDropSystem.ActivePet?.id == "Heron" && PetDropSystem.ActivePetObject != null
                     ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
                     : null;
@@ -346,33 +346,15 @@ namespace Skills.Fishing
 
         public bool CanAddFish(FishDefinition fish)
         {
-            if (inventory == null || fish == null)
-                return true;
-            if (fishItems == null)
-                PreloadFishItems();
-            if (!fishItems.TryGetValue(fish.ItemId, out var item) || item == null)
+            if (fish == null)
                 return true;
 
-            int amount = PetDropSystem.ActivePet?.id == "Heron" ? 2 : 1;
-            if (inventory.CanAddItem(item, amount))
-                return true;
-
-            if (amount > 1)
-            {
-                var petStorage = PetDropSystem.ActivePetObject != null
-                    ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
-                    : null;
-                var petInv = petStorage != null
-                    ? petStorage.GetComponent<Inventory.Inventory>()
-                    : null;
-
-                if (inventory.CanAddItem(item, 1) && petInv != null && petInv.CanAddItem(item, 1))
-                    return true;
-
-                if (petInv != null && petInv.CanAddItem(item, amount))
-                    return true;
-            }
-            return false;
+            return GatheringInventoryHelper.CanAcceptGatheredItem(
+                inventory,
+                fish.ItemId,
+                "Heron",
+                ref fishItems,
+                out _);
         }
 
         public void DebugSetLevel(int newLevel)
@@ -415,13 +397,7 @@ namespace Skills.Fishing
 
         private void PreloadFishItems()
         {
-            fishItems = new Dictionary<string, ItemData>();
-            var items = Resources.LoadAll<ItemData>("Item");
-            foreach (var item in items)
-            {
-                if (!string.IsNullOrEmpty(item.id))
-                    fishItems[item.id] = item;
-            }
+            GatheringInventoryHelper.EnsureItemCache(ref fishItems);
         }
     }
 }
