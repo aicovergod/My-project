@@ -142,29 +142,35 @@ namespace Skills.Common
 
         private static Action<GatheringRewardResult> ComposeXpAppliedDelegate(in ContextArgs args)
         {
-            bool hasCallbacks = args.OnXpAppliedBeforeLevelCheck != null ||
-                                args.OnXpApplied != null ||
-                                args.LevelUpFloatingTextFormatter != null ||
-                                args.OnLevelUp != null;
+            // Cache the delegates locally so the lambda does not close over the readonly ref parameter.
+            var beforeLevelCheckCallback = args.OnXpAppliedBeforeLevelCheck;
+            var xpAppliedCallback = args.OnXpApplied;
+            var levelUpFormatter = args.LevelUpFloatingTextFormatter;
+            var levelUpCallback = args.OnLevelUp;
+
+            bool hasCallbacks = beforeLevelCheckCallback != null ||
+                                xpAppliedCallback != null ||
+                                levelUpFormatter != null ||
+                                levelUpCallback != null;
 
             if (!hasCallbacks)
                 return null;
 
             return result =>
             {
-                args.OnXpAppliedBeforeLevelCheck?.Invoke(result);
-                args.OnXpApplied?.Invoke(result);
+                beforeLevelCheckCallback?.Invoke(result);
+                xpAppliedCallback?.Invoke(result);
 
                 if (result.LeveledUp)
                 {
-                    if (args.LevelUpFloatingTextFormatter != null && result.Anchor != null)
+                    if (levelUpFormatter != null && result.Anchor != null)
                     {
-                        string message = args.LevelUpFloatingTextFormatter.Invoke(result);
+                        string message = levelUpFormatter.Invoke(result);
                         if (!string.IsNullOrEmpty(message))
                             FloatingText.Show(message, result.Anchor.position);
                     }
 
-                    args.OnLevelUp?.Invoke(result.NewLevel);
+                    levelUpCallback?.Invoke(result.NewLevel);
                 }
             };
         }
