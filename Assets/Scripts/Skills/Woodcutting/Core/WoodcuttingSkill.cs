@@ -99,11 +99,15 @@ namespace Skills.Woodcutting
 
         private void AttemptChop()
         {
-            float baseChance = 0.35f;
-            float penalty = 0.0025f * Mathf.Max(currentTree.def.RequiredWoodcuttingLevel - 1, 0);
-            int level = skills.GetLevel(SkillType.Woodcutting);
-            float chance = baseChance + (level * 0.005f) + currentAxe.Power * 0.01f - penalty;
-            chance = Mathf.Clamp(chance, 0.05f, 0.90f);
+            int requiredLevel = currentTree != null && currentTree.def != null
+                ? currentTree.def.RequiredWoodcuttingLevel
+                : 1;
+            float chance = GatheringRewardContextBuilder.CalculateSuccessChance(new GatheringRewardContextBuilder.SuccessChanceArgs
+            {
+                PlayerLevel = skills.GetLevel(SkillType.Woodcutting),
+                RequiredLevel = requiredLevel,
+                ToolBonus = currentAxe != null ? currentAxe.Power * 0.01f : 0f
+            });
 
             if (Random.value <= chance)
             {
@@ -115,36 +119,25 @@ namespace Skills.Woodcutting
                     : null;
                 string logName = item != null ? item.itemName : currentTree.def.DisplayName;
 
-                var context = new GatheringRewardContext
+                var context = GatheringRewardContextBuilder.BuildContext(new GatheringRewardContextBuilder.ContextArgs
                 {
-                    runner = this,
-                    skills = skills,
-                    skillType = SkillType.Woodcutting,
-                    inventory = inventory,
-                    petStorage = petStorage,
-                    item = item,
-                    rewardDisplayName = logName,
-                    quantity = amount,
-                    xpPerItem = currentTree.def.XpPerLog,
-                    petAssistExtraQuantity = Mathf.Max(0, amount - 1),
-                    floatingTextAnchor = floatingTextAnchor,
-                    fallbackAnchor = transform,
-                    equipment = equipment,
-                    equipmentXpBonusEvaluator = data => data != null ? data.woodcuttingXpBonusMultiplier : 0f,
-                    showItemFloatingText = true,
-                    showXpPopup = true,
-                    xpPopupDelayTicks = 5f,
-                    rewardMessageFormatter = qty => $"+{qty} {logName}",
-                    onItemsGranted = result => OnLogGained?.Invoke(logId, result.QuantityAwarded),
-                    onXpApplied = result =>
-                    {
-                        if (result.LeveledUp && result.Anchor != null)
-                        {
-                            FloatingText.Show($"Woodcutting level {result.NewLevel}", result.Anchor.position);
-                            OnLevelUp?.Invoke(result.NewLevel);
-                        }
-                    },
-                    onSuccess = result =>
+                    Runner = this,
+                    Skills = skills,
+                    SkillType = SkillType.Woodcutting,
+                    Inventory = inventory,
+                    PetStorage = petStorage,
+                    Item = item,
+                    RewardDisplayName = logName,
+                    Quantity = amount,
+                    XpPerItem = currentTree.def.XpPerLog,
+                    PetAssistExtraQuantity = amount - 1,
+                    FloatingTextAnchor = floatingTextAnchor,
+                    FallbackAnchor = transform,
+                    Equipment = equipment,
+                    EquipmentXpBonusEvaluator = data => data != null ? data.woodcuttingXpBonusMultiplier : 0f,
+                    RewardMessageFormatter = qty => $"+{qty} {logName}",
+                    OnItemsGranted = result => OnLogGained?.Invoke(logId, result.QuantityAwarded),
+                    OnSuccess = result =>
                     {
                         int? petChance = currentTree != null && currentTree.def != null
                             ? currentTree.def.PetDropChance
@@ -169,8 +162,10 @@ namespace Skills.Woodcutting
 
                         TryAwardWoodcuttingOutfitPiece();
                     },
-                    onFailure = _ => StopChopping()
-                };
+                    OnFailure = _ => StopChopping(),
+                    LevelUpFloatingTextFormatter = result => $"Woodcutting level {result.NewLevel}",
+                    OnLevelUp = level => OnLevelUp?.Invoke(level)
+                });
 
                 var rewardResult = GatheringRewardProcessor.Process(context);
                 if (!rewardResult.Success)

@@ -102,11 +102,15 @@ namespace Skills.Mining
 
         private void AttemptMine()
         {
-            float baseChance = 0.35f;
-            float penalty = 0.0025f * Mathf.Max(currentRock.RockDef.Ore.LevelRequirement - 1, 0);
-            int level = skills.GetLevel(SkillType.Mining);
-            float chance = baseChance + (level * 0.005f) + currentPickaxe.MiningRollBonus - penalty;
-            chance = Mathf.Clamp(chance, 0.05f, 0.90f);
+            int requiredLevel = currentRock != null && currentRock.RockDef != null && currentRock.RockDef.Ore != null
+                ? currentRock.RockDef.Ore.LevelRequirement
+                : 1;
+            float chance = GatheringRewardContextBuilder.CalculateSuccessChance(new GatheringRewardContextBuilder.SuccessChanceArgs
+            {
+                PlayerLevel = skills.GetLevel(SkillType.Mining),
+                RequiredLevel = requiredLevel,
+                ToolBonus = currentPickaxe != null ? currentPickaxe.MiningRollBonus : 0f
+            });
 
             if (Random.value <= chance)
             {
@@ -123,36 +127,25 @@ namespace Skills.Mining
                         petStorage = PetDropSystem.ActivePetObject.GetComponent<PetStorage>();
                     string oreName = item != null ? item.itemName : ore.DisplayName;
 
-                    var context = new GatheringRewardContext
+                    var context = GatheringRewardContextBuilder.BuildContext(new GatheringRewardContextBuilder.ContextArgs
                     {
-                        runner = this,
-                        skills = skills,
-                        skillType = SkillType.Mining,
-                        inventory = inventory,
-                        petStorage = petStorage,
-                        item = item,
-                        rewardDisplayName = oreName,
-                        quantity = amount,
-                        xpPerItem = ore.XpPerOre,
-                        petAssistExtraQuantity = Mathf.Max(0, amount - 1),
-                        floatingTextAnchor = floatingTextAnchor,
-                        fallbackAnchor = transform,
-                        equipment = equipment,
-                        equipmentXpBonusEvaluator = data => data != null ? data.miningXpBonusMultiplier : 0f,
-                        showItemFloatingText = true,
-                        showXpPopup = true,
-                        xpPopupDelayTicks = 5f,
-                        rewardMessageFormatter = qty => $"+{qty} {ore.DisplayName}",
-                        onItemsGranted = result => OnOreGained?.Invoke(ore.Id, result.QuantityAwarded),
-                        onXpApplied = result =>
-                        {
-                            if (result.LeveledUp && result.Anchor != null)
-                            {
-                                FloatingText.Show($"Mining level {result.NewLevel}", result.Anchor.position);
-                                OnLevelUp?.Invoke(result.NewLevel);
-                            }
-                        },
-                        onSuccess = result =>
+                        Runner = this,
+                        Skills = skills,
+                        SkillType = SkillType.Mining,
+                        Inventory = inventory,
+                        PetStorage = petStorage,
+                        Item = item,
+                        RewardDisplayName = oreName,
+                        Quantity = amount,
+                        XpPerItem = ore.XpPerOre,
+                        PetAssistExtraQuantity = amount - 1,
+                        FloatingTextAnchor = floatingTextAnchor,
+                        FallbackAnchor = transform,
+                        Equipment = equipment,
+                        EquipmentXpBonusEvaluator = data => data != null ? data.miningXpBonusMultiplier : 0f,
+                        RewardMessageFormatter = qty => $"+{qty} {ore.DisplayName}",
+                        OnItemsGranted = result => OnOreGained?.Invoke(ore.Id, result.QuantityAwarded),
+                        OnSuccess = result =>
                         {
                             int? petChance = ore != null ? ore.PetDropChance : (int?)null;
                             SkillingPetRewarder.TryRollPet(
@@ -175,8 +168,10 @@ namespace Skills.Mining
 
                             TryAwardMiningOutfitPiece();
                         },
-                        onFailure = _ => StopMining()
-                    };
+                        OnFailure = _ => StopMining(),
+                        LevelUpFloatingTextFormatter = result => $"Mining level {result.NewLevel}",
+                        OnLevelUp = level => OnLevelUp?.Invoke(level)
+                    });
 
                     var rewardResult = GatheringRewardProcessor.Process(context);
                     if (!rewardResult.Success)
