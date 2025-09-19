@@ -27,6 +27,8 @@ namespace Skills.Fishing
         public event Action<FishableSpot> OnSpotRespawned;
 
         private double respawnAt;
+        private bool _tickerSubscribed;
+        private Coroutine _tickerSubscriptionRoutine;
 
         private void Awake()
         {
@@ -42,14 +44,71 @@ namespace Skills.Fishing
 
         private void OnEnable()
         {
-            if (Ticker.Instance != null)
-                Ticker.Instance.Subscribe(this);
+            EnsureTickerSubscription();
         }
 
         private void OnDisable()
         {
+            ReleaseTickerSubscription();
+        }
+
+        /// <summary>
+        /// Makes sure the spot is registered with the <see cref="Ticker"/>. When loading into a scene
+        /// the ticker singleton might not exist yet, so this method waits for it before subscribing to
+        /// avoid missed ticks or duplicate registrations.
+        /// </summary>
+        private void EnsureTickerSubscription()
+        {
+            if (_tickerSubscribed)
+                return;
+
             if (Ticker.Instance != null)
+            {
+                Ticker.Instance.Subscribe(this);
+                _tickerSubscribed = true;
+            }
+            else if (_tickerSubscriptionRoutine == null && isActiveAndEnabled)
+            {
+                _tickerSubscriptionRoutine = StartCoroutine(WaitForTickerAndSubscribe());
+            }
+        }
+
+        /// <summary>
+        /// Removes the ticker subscription and cancels any pending waiters so the component stops
+        /// receiving ticks while disabled and does not leak routines across scene transitions.
+        /// </summary>
+        private void ReleaseTickerSubscription()
+        {
+            if (_tickerSubscriptionRoutine != null)
+            {
+                StopCoroutine(_tickerSubscriptionRoutine);
+                _tickerSubscriptionRoutine = null;
+            }
+
+            if (_tickerSubscribed && Ticker.Instance != null)
+            {
                 Ticker.Instance.Unsubscribe(this);
+            }
+
+            _tickerSubscribed = false;
+        }
+
+        /// <summary>
+        /// Coroutine that blocks until the ticker singleton is available before performing the
+        /// subscription. This mirrors the wanderer handling so fishing spots work after scene loads.
+        /// </summary>
+        private IEnumerator WaitForTickerAndSubscribe()
+        {
+            while (Ticker.Instance == null)
+                yield return null;
+
+            _tickerSubscriptionRoutine = null;
+
+            if (!isActiveAndEnabled)
+                yield break;
+
+            Ticker.Instance.Subscribe(this);
+            _tickerSubscribed = true;
         }
 
         public void OnTick()
