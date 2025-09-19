@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using UI;
+using World;
 
 namespace Skills
 {
@@ -12,6 +14,9 @@ namespace Skills
     /// </summary>
     public class SkillsUI : MonoBehaviour, IUIWindow
     {
+        private static bool waitingForAllowedScene;
+        private static bool applicationIsQuitting;
+
         private GameObject uiRoot;
         private SkillManager skillManager;
 
@@ -19,6 +24,8 @@ namespace Skills
         private readonly Dictionary<SkillType, Text> xpTexts = new();
         private readonly Dictionary<SkillType, bool> xpVisibility = new();
         private Text totalLevelText;
+
+        private bool sceneGateSubscribed;
 
         private readonly SkillType[] displayOrder =
         {
@@ -38,15 +45,78 @@ namespace Skills
 
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void CreateInstance()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void Bootstrap()
         {
-            if (Instance != null || UnityEngine.Object.FindObjectOfType<SkillsUI>() != null)
+            var activeScene = SceneManager.GetActiveScene();
+            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
+            {
+                BeginWaitingForAllowedScene();
+                return;
+            }
+
+            CreateOrAdoptInstance();
+        }
+
+        private static void CreateOrAdoptInstance()
+        {
+            if (Instance != null)
                 return;
 
-            var go = new GameObject("SkillsUI");
+            StopWaitingForAllowedScene();
+
+            var existing = FindExistingInstance();
+            if (existing != null)
+            {
+                Instance = existing;
+                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
+                    DontDestroyOnLoad(existing.gameObject);
+                existing.EnsureSceneGateSubscription();
+                existing.RebindSkillManager();
+                return;
+            }
+
+            var go = new GameObject(nameof(SkillsUI));
             DontDestroyOnLoad(go);
             go.AddComponent<SkillsUI>();
+        }
+
+        private static SkillsUI FindExistingInstance()
+        {
+#if UNITY_2023_1_OR_NEWER
+            return UnityEngine.Object.FindFirstObjectByType<SkillsUI>();
+#else
+            return UnityEngine.Object.FindObjectOfType<SkillsUI>();
+#endif
+        }
+
+        private static void BeginWaitingForAllowedScene()
+        {
+            if (waitingForAllowedScene)
+                return;
+
+            waitingForAllowedScene = true;
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
+        }
+
+        private static void StopWaitingForAllowedScene()
+        {
+            if (!waitingForAllowedScene)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
+            waitingForAllowedScene = false;
+        }
+
+        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
+        {
+            if (!allowed)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            CreateOrAdoptInstance();
         }
 
         private void Awake()
@@ -59,17 +129,37 @@ namespace Skills
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
+            StopWaitingForAllowedScene();
+            EnsureSceneGateSubscription();
             skillManager = FindObjectOfType<SkillManager>();
             CreateUI();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
-            UIManager.Instance.RegisterWindow(this);
+            UIManager.Instance?.RegisterWindow(this);
         }
 
         private void OnDestroy()
         {
             if (Instance == this)
+            {
+                UIManager.Instance?.UnregisterWindow(this);
+
+                if (sceneGateSubscribed)
+                {
+                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+                    sceneGateSubscribed = false;
+                }
+
                 Instance = null;
+
+                if (!applicationIsQuitting)
+                    BeginWaitingForAllowedScene();
+            }
+        }
+
+        private void OnApplicationQuit()
+        {
+            applicationIsQuitting = true;
         }
 
         private void CreateUI()
@@ -209,6 +299,37 @@ namespace Skills
         {
             if (uiRoot != null)
                 uiRoot.SetActive(false);
+        }
+
+        private void EnsureSceneGateSubscription()
+        {
+            if (sceneGateSubscribed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
+            sceneGateSubscribed = true;
+        }
+
+        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
+        {
+            if (Instance != this)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            if (allowed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+            sceneGateSubscribed = false;
+            Destroy(gameObject);
+        }
+
+        private void RebindSkillManager()
+        {
+            if (skillManager == null)
+                skillManager = FindObjectOfType<SkillManager>();
         }
     }
 }

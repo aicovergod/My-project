@@ -2,10 +2,12 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using Inventory;
 using Core.Save;
 using Pets;
 using UI;
+using World;
 
 namespace BankSystem
 {
@@ -47,6 +49,9 @@ namespace BankSystem
         private const int Size = Columns * Rows;
         private const int BankStackLimit = int.MaxValue; // 2_147_483_647
 
+        private static bool waitingForAllowedScene;
+        private static bool applicationIsQuitting;
+
         private GameObject uiRoot;
         private Image[] slotImages;
         private Text[] slotCountTexts;
@@ -66,20 +71,85 @@ namespace BankSystem
         private static BankUI instance;
         public static BankUI Instance => instance;
 
+        private bool sceneGateSubscribed;
+
         private const string SaveKey = "BankData";
 
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
         private bool inventoryWasOpen;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void Init()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void Bootstrap()
         {
-            if (UnityEngine.Object.FindObjectOfType<BankUI>() != null)
+            var activeScene = SceneManager.GetActiveScene();
+            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
+            {
+                BeginWaitingForAllowedScene();
                 return;
+            }
+
+            CreateOrAdoptInstance();
+        }
+
+        private static void CreateOrAdoptInstance()
+        {
+            if (instance != null)
+                return;
+
+            StopWaitingForAllowedScene();
+
+            var existing = FindExistingInstance();
+            if (existing != null)
+            {
+                instance = existing;
+                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
+                    DontDestroyOnLoad(existing.gameObject);
+                existing.EnsureSceneGateSubscription();
+                existing.EnsureUiRootPersistence();
+                return;
+            }
 
             var go = new GameObject("Bank");
             DontDestroyOnLoad(go);
             go.AddComponent<BankUI>();
+        }
+
+        private static BankUI FindExistingInstance()
+        {
+#if UNITY_2023_1_OR_NEWER
+            return UnityEngine.Object.FindFirstObjectByType<BankUI>();
+#else
+            return UnityEngine.Object.FindObjectOfType<BankUI>();
+#endif
+        }
+
+        private static void BeginWaitingForAllowedScene()
+        {
+            if (waitingForAllowedScene)
+                return;
+
+            waitingForAllowedScene = true;
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
+        }
+
+        private static void StopWaitingForAllowedScene()
+        {
+            if (!waitingForAllowedScene)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
+            waitingForAllowedScene = false;
+        }
+
+        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
+        {
+            if (!allowed)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            CreateOrAdoptInstance();
         }
 
         private void Awake()
@@ -91,6 +161,9 @@ namespace BankSystem
             }
             instance = this;
             DontDestroyOnLoad(gameObject);
+
+            StopWaitingForAllowedScene();
+            EnsureSceneGateSubscription();
 
             try
             {
@@ -108,7 +181,12 @@ namespace BankSystem
             CreateUI();
             uiRoot.SetActive(false);
             SaveManager.Register(this);
-            UIManager.Instance.RegisterWindow(this);
+            UIManager.Instance?.RegisterWindow(this);
+        }
+
+        private void OnApplicationQuit()
+        {
+            applicationIsQuitting = true;
         }
 
         private void CreateUI()
@@ -881,7 +959,78 @@ namespace BankSystem
 
         private void OnDestroy()
         {
-            SaveManager.Unregister(this);
+            if (instance == this)
+            {
+                SaveManager.Unregister(this);
+                UIManager.Instance?.UnregisterWindow(this);
+
+                if (sceneGateSubscribed)
+                {
+                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+                    sceneGateSubscribed = false;
+                }
+
+                TearDownUiRoot();
+
+                instance = null;
+
+                if (!applicationIsQuitting)
+                    BeginWaitingForAllowedScene();
+            }
+        }
+
+        private void EnsureSceneGateSubscription()
+        {
+            if (sceneGateSubscribed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
+            sceneGateSubscribed = true;
+        }
+
+        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
+        {
+            if (instance != this)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            if (allowed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+            sceneGateSubscribed = false;
+
+            Close();
+            Destroy(gameObject);
+        }
+
+        private void EnsureUiRootPersistence()
+        {
+            if (uiRoot == null)
+                return;
+
+            if (uiRoot.scene.name != "DontDestroyOnLoad")
+                DontDestroyOnLoad(uiRoot);
+        }
+
+        private void TearDownUiRoot()
+        {
+            if (uiRoot != null)
+            {
+                uiRoot.SetActive(false);
+                Destroy(uiRoot);
+                uiRoot = null;
+            }
+
+            slotImages = null;
+            slotCountTexts = null;
+            withdrawMenu = null;
+            depositMenu = null;
+            draggingIcon = null;
+            playerInventory = null;
+            searchInput = null;
         }
     }
 }

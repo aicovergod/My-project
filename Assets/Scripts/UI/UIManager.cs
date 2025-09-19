@@ -82,14 +82,32 @@ namespace UI
 
         public void RegisterWindow(IUIWindow window)
         {
+            if (window == null)
+                return;
+
             if (!windows.Contains(window))
                 windows.Add(window);
         }
 
+        public void UnregisterWindow(IUIWindow window)
+        {
+            if (window == null)
+                return;
+
+            windows.Remove(window);
+        }
+
         public void OpenWindow(IUIWindow window)
         {
-            foreach (var w in windows)
+            for (int i = windows.Count - 1; i >= 0; i--)
             {
+                var w = windows[i];
+                if (w == null)
+                {
+                    windows.RemoveAt(i);
+                    continue;
+                }
+
                 if (w != window && w.IsOpen)
                     w.Close();
             }
