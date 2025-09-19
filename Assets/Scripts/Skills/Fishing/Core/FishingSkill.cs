@@ -20,6 +20,7 @@ namespace Skills.Fishing
         [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
         private BycatchManager bycatchManager;
+        private bool waitingForServices;
 
         private FishableSpot currentSpot;
         private FishingToolDefinition currentTool;
@@ -62,13 +63,64 @@ namespace Skills.Fishing
                 "Fishing Boots",
                 "Fishing Gloves"
             }, "FishingOutfitOwned");
+            TryResolveBycatchManager();
             if (bycatchManager == null)
-                bycatchManager = GameManager.BycatchManager;
+                SubscribeToServicesReady();
         }
 
         private void OnDestroy()
         {
+            if (waitingForServices)
+            {
+                GameManager.ServicesReady -= HandleGameManagerServicesReady;
+                waitingForServices = false;
+            }
             SaveManager.Unregister(fishingOutfit);
+        }
+
+        /// <summary>
+        /// Attempts to resolve the bycatch manager from the <see cref="GameManager"/> when available
+        /// and falls back to a direct scene search if necessary.
+        /// </summary>
+        private void TryResolveBycatchManager()
+        {
+            if (bycatchManager != null)
+                return;
+
+            if (GameManager.Instance != null)
+                bycatchManager = GameManager.BycatchManager;
+
+            if (bycatchManager == null)
+                bycatchManager = FindObjectOfType<BycatchManager>(true);
+        }
+
+        /// <summary>
+        /// Hooks into <see cref="GameManager.ServicesReady"/> so the bycatch manager can be cached
+        /// once the core services have finished bootstrapping.
+        /// </summary>
+        private void SubscribeToServicesReady()
+        {
+            if (waitingForServices)
+                return;
+
+            GameManager.ServicesReady -= HandleGameManagerServicesReady;
+            GameManager.ServicesReady += HandleGameManagerServicesReady;
+            waitingForServices = true;
+        }
+
+        /// <summary>
+        /// Handles the <see cref="GameManager.ServicesReady"/> event by caching the bycatch manager
+        /// and removing the subscription to avoid duplicate callbacks.
+        /// </summary>
+        private void HandleGameManagerServicesReady()
+        {
+            TryResolveBycatchManager();
+
+            if (!waitingForServices)
+                return;
+
+            GameManager.ServicesReady -= HandleGameManagerServicesReady;
+            waitingForServices = false;
         }
 
         protected override void HandleTick()
