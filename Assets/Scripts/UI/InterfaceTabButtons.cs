@@ -1,9 +1,11 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Inventory;
 using Quests;
 using Skills;
 using Object = UnityEngine.Object;
+using World;
 
 namespace UI
 {
@@ -15,20 +17,146 @@ namespace UI
     {
         private static readonly Vector2 FixedWindowResolution = new Vector2(1024f, 768f);
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void Init()
+        private static InterfaceTabButtons instance;
+        private static bool waitingForAllowedScene;
+        private static bool applicationIsQuitting;
+
+        private bool sceneGateSubscribed;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void Bootstrap()
         {
-            if (Object.FindObjectOfType<InterfaceTabButtons>() != null)
+            var activeScene = SceneManager.GetActiveScene();
+            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
+            {
+                BeginWaitingForAllowedScene();
+                return;
+            }
+
+            CreateOrAdoptInstance();
+        }
+
+        private static void CreateOrAdoptInstance()
+        {
+            if (instance != null)
                 return;
 
-            var go = new GameObject("InterfaceTabButtons");
+            StopWaitingForAllowedScene();
+
+            var existing = FindExistingInstance();
+            if (existing != null)
+            {
+                instance = existing;
+                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
+                    DontDestroyOnLoad(existing.gameObject);
+                existing.EnsureSceneGateSubscription();
+                return;
+            }
+
+            var go = new GameObject(nameof(InterfaceTabButtons));
             DontDestroyOnLoad(go);
             go.AddComponent<InterfaceTabButtons>();
         }
 
+        private static InterfaceTabButtons FindExistingInstance()
+        {
+#if UNITY_2023_1_OR_NEWER
+            return Object.FindFirstObjectByType<InterfaceTabButtons>();
+#else
+            return Object.FindObjectOfType<InterfaceTabButtons>();
+#endif
+        }
+
+        private static void BeginWaitingForAllowedScene()
+        {
+            if (waitingForAllowedScene)
+                return;
+
+            waitingForAllowedScene = true;
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
+        }
+
+        private static void StopWaitingForAllowedScene()
+        {
+            if (!waitingForAllowedScene)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
+            waitingForAllowedScene = false;
+        }
+
+        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
+        {
+            if (!allowed)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            CreateOrAdoptInstance();
+        }
+
         private void Awake()
         {
+            if (instance != null && instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            StopWaitingForAllowedScene();
+            EnsureSceneGateSubscription();
             CreateUI();
+        }
+
+        private void OnApplicationQuit()
+        {
+            applicationIsQuitting = true;
+        }
+
+        private void OnDestroy()
+        {
+            if (instance == this)
+            {
+                if (sceneGateSubscribed)
+                {
+                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+                    sceneGateSubscribed = false;
+                }
+
+                instance = null;
+
+                if (!applicationIsQuitting)
+                    BeginWaitingForAllowedScene();
+            }
+        }
+
+        private void EnsureSceneGateSubscription()
+        {
+            if (sceneGateSubscribed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
+            sceneGateSubscribed = true;
+        }
+
+        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
+        {
+            if (instance != this)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            if (allowed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+            sceneGateSubscribed = false;
+            Destroy(gameObject);
         }
 
         private void CreateUI()

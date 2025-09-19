@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using Combat;
 using Player;
 using System;
 using System.Collections.Generic;
 using Magic;
 using Skills;
+using World;
 
 namespace UI
 {
@@ -14,6 +16,14 @@ namespace UI
     /// </summary>
     public class MagicUI : MonoBehaviour, IUIWindow
     {
+        private static MagicUI instance;
+        private static bool waitingForAllowedScene;
+        private static bool applicationIsQuitting;
+
+        public static MagicUI Instance => instance;
+
+        private bool sceneGateSubscribed;
+
         private GameObject uiRoot;
         private PlayerCombatLoadout loadout;
         private readonly Dictionary<SpellDefinition, Button> spellButtons = new();
@@ -35,8 +45,8 @@ namespace UI
         public static void ClearActiveSpell()
         {
             ActiveSpell = null;
-            var instance = FindObjectOfType<MagicUI>();
-            instance?.UpdateSelection();
+            var ui = Instance ?? FindObjectOfType<MagicUI>();
+            ui?.UpdateSelection();
         }
 
         /// <summary>Range for the active spell or melee range if none.</summary>
@@ -50,30 +60,110 @@ namespace UI
         /// </summary>
         public static void UpdateStrikeMaxHits(int level)
         {
-            var instance = FindObjectOfType<MagicUI>();
-            instance?.ApplyStrikeMaxHits(level);
+            var ui = Instance ?? FindObjectOfType<MagicUI>();
+            ui?.ApplyStrikeMaxHits(level);
         }
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void Init()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void Bootstrap()
         {
-            if (FindObjectOfType<MagicUI>() != null)
+            var activeScene = SceneManager.GetActiveScene();
+            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
+            {
+                BeginWaitingForAllowedScene();
+                return;
+            }
+
+            CreateOrAdoptInstance();
+        }
+
+        private static void CreateOrAdoptInstance()
+        {
+            if (instance != null)
                 return;
 
-            var go = new GameObject("MagicUI");
+            StopWaitingForAllowedScene();
+
+            var existing = FindExistingInstance();
+            if (existing != null)
+            {
+                instance = existing;
+                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
+                    DontDestroyOnLoad(existing.gameObject);
+                existing.EnsureSceneGateSubscription();
+                existing.EnsureUiRootPersistence();
+                existing.RebindLoadout();
+                return;
+            }
+
+            var go = new GameObject(nameof(MagicUI));
             DontDestroyOnLoad(go);
             go.AddComponent<MagicUI>();
         }
 
+        private static MagicUI FindExistingInstance()
+        {
+#if UNITY_2023_1_OR_NEWER
+            return UnityEngine.Object.FindFirstObjectByType<MagicUI>();
+#else
+            return UnityEngine.Object.FindObjectOfType<MagicUI>();
+#endif
+        }
+
+        private static void BeginWaitingForAllowedScene()
+        {
+            if (waitingForAllowedScene)
+                return;
+
+            waitingForAllowedScene = true;
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
+        }
+
+        private static void StopWaitingForAllowedScene()
+        {
+            if (!waitingForAllowedScene)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
+            waitingForAllowedScene = false;
+        }
+
+        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
+        {
+            if (!allowed)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            CreateOrAdoptInstance();
+        }
+
         private void Awake()
         {
+            if (instance != null && instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            StopWaitingForAllowedScene();
+            EnsureSceneGateSubscription();
             loadout = FindObjectOfType<PlayerCombatLoadout>();
             LoadSpells();
             CacheStrikeSpells();
             CreateUI();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
-            UIManager.Instance.RegisterWindow(this);
+            UIManager.Instance?.RegisterWindow(this);
+        }
+
+        private void OnApplicationQuit()
+        {
+            applicationIsQuitting = true;
         }
 
         private void LoadSpells()
@@ -198,6 +288,78 @@ namespace UI
         {
             if (uiRoot != null)
                 uiRoot.SetActive(false);
+        }
+
+        private void OnDestroy()
+        {
+            if (instance == this)
+            {
+                UIManager.Instance?.UnregisterWindow(this);
+
+                if (sceneGateSubscribed)
+                {
+                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+                    sceneGateSubscribed = false;
+                }
+
+                TearDownUiRoot();
+
+                instance = null;
+
+                if (!applicationIsQuitting)
+                    BeginWaitingForAllowedScene();
+            }
+        }
+
+        private void EnsureSceneGateSubscription()
+        {
+            if (sceneGateSubscribed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
+            sceneGateSubscribed = true;
+        }
+
+        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
+        {
+            if (instance != this)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            if (allowed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+            sceneGateSubscribed = false;
+            Destroy(gameObject);
+        }
+
+        private void EnsureUiRootPersistence()
+        {
+            if (uiRoot == null)
+                return;
+
+            if (uiRoot.scene.name != "DontDestroyOnLoad")
+                DontDestroyOnLoad(uiRoot);
+        }
+
+        private void TearDownUiRoot()
+        {
+            if (uiRoot != null)
+            {
+                uiRoot.SetActive(false);
+                Destroy(uiRoot);
+                uiRoot = null;
+            }
+            spellButtons.Clear();
+        }
+
+        private void RebindLoadout()
+        {
+            if (loadout == null)
+                loadout = FindObjectOfType<PlayerCombatLoadout>();
         }
 
         private void SelectSpell(SpellDefinition spell)

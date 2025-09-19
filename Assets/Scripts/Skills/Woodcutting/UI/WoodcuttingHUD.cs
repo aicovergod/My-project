@@ -1,7 +1,9 @@
 using Inventory;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Util;
+using World;
 
 namespace Skills.Woodcutting
 {
@@ -10,6 +12,15 @@ namespace Skills.Woodcutting
     /// </summary>
     public class WoodcuttingHUD : MonoBehaviour, ITickable
     {
+        private static WoodcuttingHUD instance;
+        private static bool waitingForAllowedScene;
+        private static bool applicationIsQuitting;
+
+        public static WoodcuttingHUD Instance => instance;
+
+        private bool sceneGateSubscribed;
+        private bool sceneLoadedSubscribed;
+
         private WoodcuttingSkill skill;
         private Transform target;
         private Image progressImage;
@@ -29,33 +40,131 @@ namespace Skills.Woodcutting
         // Flag used so we can hold the progress bar at 100% for a full tick before resetting back to 0.
         private bool awaitingResetTick;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void CreateInstance()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void Bootstrap()
         {
-            if (UnityEngine.Object.FindObjectOfType<WoodcuttingHUD>() != null)
+            var activeScene = SceneManager.GetActiveScene();
+            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
+            {
+                BeginWaitingForAllowedScene();
+                return;
+            }
+
+            CreateOrAdoptInstance();
+        }
+
+        private static void CreateOrAdoptInstance()
+        {
+            if (instance != null)
                 return;
 
-            var go = new GameObject("WoodcuttingHUD");
-            UnityEngine.Object.DontDestroyOnLoad(go);
+            StopWaitingForAllowedScene();
+
+            var existing = FindExistingInstance();
+            if (existing != null)
+            {
+                instance = existing;
+                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
+                    DontDestroyOnLoad(existing.gameObject);
+                existing.EnsureSceneGateSubscription();
+                existing.EnsureSceneLoadedSubscription();
+                existing.EnsureProgressObjects();
+                existing.RefreshSkillSubscription();
+                return;
+            }
+
+            var go = new GameObject(nameof(WoodcuttingHUD));
+            DontDestroyOnLoad(go);
             go.AddComponent<WoodcuttingHUD>();
+        }
+
+        private static WoodcuttingHUD FindExistingInstance()
+        {
+#if UNITY_2023_1_OR_NEWER
+            return UnityEngine.Object.FindFirstObjectByType<WoodcuttingHUD>();
+#else
+            return UnityEngine.Object.FindObjectOfType<WoodcuttingHUD>();
+#endif
+        }
+
+        private static void BeginWaitingForAllowedScene()
+        {
+            if (waitingForAllowedScene)
+                return;
+
+            waitingForAllowedScene = true;
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
+        }
+
+        private static void StopWaitingForAllowedScene()
+        {
+            if (!waitingForAllowedScene)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
+            waitingForAllowedScene = false;
+        }
+
+        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
+        {
+            if (!allowed)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            CreateOrAdoptInstance();
         }
 
         private void Awake()
         {
-            skill = FindObjectOfType<WoodcuttingSkill>();
-
-            if (skill != null)
+            if (instance != null && instance != this)
             {
-                skill.OnStartChopping += HandleStart;
-                skill.OnStopChopping += HandleStop;
+                Destroy(gameObject);
+                return;
             }
 
-            CreateProgressBar();
-            CreateAxeSprite();
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            StopWaitingForAllowedScene();
+            EnsureSceneGateSubscription();
+            EnsureSceneLoadedSubscription();
+            EnsureProgressObjects();
+            RefreshSkillSubscription();
+        }
+
+        private void OnEnable()
+        {
+            EnsureSceneLoadedSubscription();
+            RefreshSkillSubscription();
+        }
+
+        private void OnDisable()
+        {
+            if (sceneLoadedSubscribed)
+            {
+                SceneManager.sceneLoaded -= HandleSceneLoaded;
+                sceneLoadedSubscribed = false;
+            }
+
+            HandleStop();
+            DetachFromSkill();
+        }
+
+        private void EnsureProgressObjects()
+        {
+            if (progressRoot == null)
+                CreateProgressBar();
+            if (axeRoot == null)
+                CreateAxeSprite();
         }
 
         private void CreateProgressBar()
         {
+            if (progressRoot != null)
+                return;
+
             progressRoot = new GameObject("WoodcuttingProgress");
             progressRoot.transform.SetParent(transform);
 
@@ -94,6 +203,9 @@ namespace Skills.Woodcutting
 
         private void CreateAxeSprite()
         {
+            if (axeRoot != null)
+                return;
+
             axeRoot = new GameObject("WoodcuttingAxe");
             axeRoot.transform.SetParent(transform);
             axeRenderer = axeRoot.AddComponent<SpriteRenderer>();
@@ -103,6 +215,7 @@ namespace Skills.Woodcutting
 
         private void HandleStart(TreeNode tree)
         {
+            EnsureProgressObjects();
             target = tree.transform;
             progressImage.fillAmount = 0f;
             currentFill = 0f;
@@ -146,7 +259,8 @@ namespace Skills.Woodcutting
         private void HandleStop()
         {
             target = null;
-            progressRoot.SetActive(false);
+            if (progressRoot != null)
+                progressRoot.SetActive(false);
             awaitingResetTick = false;
             segmentDuration = Ticker.TickDuration;
             if (axeRoot != null)
@@ -157,6 +271,37 @@ namespace Skills.Woodcutting
             }
             if (Ticker.Instance != null)
                 Ticker.Instance.Unsubscribe(this);
+        }
+
+        private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            EnsureProgressObjects();
+            RefreshSkillSubscription();
+        }
+
+        private void RefreshSkillSubscription()
+        {
+            var current = FindObjectOfType<WoodcuttingSkill>();
+            if (current == skill)
+                return;
+
+            DetachFromSkill();
+            skill = current;
+            if (skill != null)
+            {
+                skill.OnStartChopping += HandleStart;
+                skill.OnStopChopping += HandleStop;
+            }
+        }
+
+        private void DetachFromSkill()
+        {
+            if (skill != null)
+            {
+                skill.OnStartChopping -= HandleStart;
+                skill.OnStopChopping -= HandleStop;
+                skill = null;
+            }
         }
 
         private void Update()
@@ -223,16 +368,89 @@ namespace Skills.Woodcutting
             }
         }
 
+        private void EnsureSceneLoadedSubscription()
+        {
+            if (sceneLoadedSubscribed)
+                return;
+
+            SceneManager.sceneLoaded += HandleSceneLoaded;
+            sceneLoadedSubscribed = true;
+        }
+
+        private void EnsureSceneGateSubscription()
+        {
+            if (sceneGateSubscribed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
+            sceneGateSubscribed = true;
+        }
+
+        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
+        {
+            if (instance != this)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            if (allowed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+            sceneGateSubscribed = false;
+            Destroy(gameObject);
+        }
+
+        private void OnApplicationQuit()
+        {
+            applicationIsQuitting = true;
+        }
+
         private void OnDestroy()
         {
-            if (skill != null)
+            if (instance == this)
             {
-                skill.OnStartChopping -= HandleStart;
-                skill.OnStopChopping -= HandleStop;
-            }
+                if (sceneGateSubscribed)
+                {
+                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+                    sceneGateSubscribed = false;
+                }
 
-            if (Ticker.Instance != null)
-                Ticker.Instance.Unsubscribe(this);
+                if (sceneLoadedSubscribed)
+                {
+                    SceneManager.sceneLoaded -= HandleSceneLoaded;
+                    sceneLoadedSubscribed = false;
+                }
+
+                HandleStop();
+                DetachFromSkill();
+
+                if (Ticker.Instance != null)
+                    Ticker.Instance.Unsubscribe(this);
+
+                if (progressRoot != null)
+                {
+                    Destroy(progressRoot);
+                    progressRoot = null;
+                }
+
+                if (axeRoot != null)
+                {
+                    Destroy(axeRoot);
+                    axeRoot = null;
+                }
+
+                progressImage = null;
+                axeRenderer = null;
+                progressCanvas = null;
+                target = null;
+
+                instance = null;
+
+                if (!applicationIsQuitting)
+                    BeginWaitingForAllowedScene();
+            }
         }
 
         /// <summary>

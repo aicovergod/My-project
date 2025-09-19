@@ -33,6 +33,11 @@ namespace World
         private static Minimap instance;
         public static Minimap Instance => instance;
 
+        private static bool waitingForAllowedScene;
+        private static bool applicationIsQuitting;
+
+        private bool sceneGateSubscribed;
+
         public RectTransform BorderRect => borderRect;
         public RectTransform SmallRootRect => smallRootRect;
         public Canvas MinimapCanvas => minimapCanvas;
@@ -47,23 +52,105 @@ namespace World
         private float SmallMapZoom => DefaultZoom - ZoomStep * SmallMapZoomSteps;
 
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void CreateInstance()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void Bootstrap()
+        {
+            var activeScene = SceneManager.GetActiveScene();
+            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
+            {
+                BeginWaitingForAllowedScene();
+                return;
+            }
+
+            CreateOrAdoptInstance();
+        }
+
+        private static void CreateOrAdoptInstance()
         {
             if (instance != null)
                 return;
-            var go = new GameObject("Minimap");
+
+            StopWaitingForAllowedScene();
+
+            var existing = FindExistingInstance();
+            if (existing != null)
+            {
+                instance = existing;
+                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
+                    DontDestroyOnLoad(existing.gameObject);
+                existing.EnsureSceneGateSubscription();
+                existing.CreateCamera();
+                existing.CreateUI();
+                existing.RegisterExistingMarkers();
+                existing.ResetSmallMapZoom();
+                return;
+            }
+
+            var go = new GameObject(nameof(Minimap));
             DontDestroyOnLoad(go);
             go.AddComponent<Minimap>();
         }
 
+        private static Minimap FindExistingInstance()
+        {
+#if UNITY_2023_1_OR_NEWER
+            return UnityEngine.Object.FindFirstObjectByType<Minimap>();
+#else
+            return UnityEngine.Object.FindObjectOfType<Minimap>();
+#endif
+        }
+
+        private static void BeginWaitingForAllowedScene()
+        {
+            if (waitingForAllowedScene)
+                return;
+
+            waitingForAllowedScene = true;
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
+        }
+
+        private static void StopWaitingForAllowedScene()
+        {
+            if (!waitingForAllowedScene)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
+            waitingForAllowedScene = false;
+        }
+
+        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
+        {
+            if (!allowed)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            CreateOrAdoptInstance();
+        }
+
         private void Awake()
         {
+            if (instance != null && instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
             instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            StopWaitingForAllowedScene();
+            EnsureSceneGateSubscription();
             CreateCamera();
             CreateUI();
             RegisterExistingMarkers();
             ResetSmallMapZoom();
+        }
+
+        private void OnApplicationQuit()
+        {
+            applicationIsQuitting = true;
         }
 
         private void OnEnable()
@@ -78,8 +165,35 @@ namespace World
             SceneManager.sceneLoaded -= HandleSceneLoaded;
         }
 
+        private void OnDestroy()
+        {
+            if (instance == this)
+            {
+                if (sceneGateSubscribed)
+                {
+                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+                    sceneGateSubscribed = false;
+                }
+
+                SceneManager.sceneLoaded -= HandleSceneLoaded;
+
+                TearDownResources();
+
+                instance = null;
+
+                if (!applicationIsQuitting)
+                    BeginWaitingForAllowedScene();
+            }
+        }
+
         private void CreateCamera()
         {
+            if (mapCamera != null)
+                return;
+
+            if (mapTexture != null && mapTexture.IsCreated())
+                mapTexture.Release();
+
             // Increase resolution so the expanded map remains sharp
             mapTexture = new RenderTexture(512, 512, 16)
             {
@@ -102,6 +216,9 @@ namespace World
 
         private void CreateUI()
         {
+            if (minimapCanvas != null)
+                return;
+
             var canvasGO = new GameObject("MinimapCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             canvasGO.transform.SetParent(transform, false);
             var canvas = canvasGO.GetComponent<Canvas>();
@@ -397,6 +514,52 @@ namespace World
                 markers.Add(marker);
 
             CreateIcons(marker);
+        }
+
+        private void EnsureSceneGateSubscription()
+        {
+            if (sceneGateSubscribed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
+            sceneGateSubscribed = true;
+        }
+
+        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
+        {
+            if (instance != this)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            if (allowed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+            sceneGateSubscribed = false;
+            Destroy(gameObject);
+        }
+
+        private void TearDownResources()
+        {
+            if (mapTexture != null)
+            {
+                mapTexture.Release();
+                mapTexture = null;
+            }
+
+            mapCamera = null;
+            minimapCanvas = null;
+            expandedRoot = null;
+            smallRoot = null;
+            smallMapRect = null;
+            expandedMapRect = null;
+            borderRect = null;
+            smallRootRect = null;
+            target = null;
+            markers.Clear();
+            iconCache.Clear();
         }
 
         private void CreateIcons(MinimapMarker marker)
