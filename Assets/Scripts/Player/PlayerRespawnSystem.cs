@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using Core;
 using World;
 using Combat;
+using Audio;
 using Status;
 using Status.Poison;
 
@@ -85,6 +86,8 @@ namespace Player
                 poisonController?.CurePoison(0f);
                 if (BuffTimerService.Instance != null && hitpoints != null)
                     BuffTimerService.Instance.RemoveAllBuffs(hitpoints.gameObject, BuffEndReason.Manual);
+                // Play the classic OSRS-style death jingle before beginning the respawn sequence.
+                SoundManager.Instance.PlaySfx(SoundEffect.PlayerDeath);
                 StartCoroutine(RespawnRoutine());
             }
         }
