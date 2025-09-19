@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using World;
 
@@ -10,109 +9,39 @@ namespace Pets
     /// </summary>
     public class PetToastUI : MonoBehaviour
     {
-        private static PetToastUI instance;
-        private static bool waitingForAllowedScene;
-        private static bool applicationIsQuitting;
+        public static PetToastUI Instance => PersistentSceneSingleton<PetToastUI>.Instance;
 
         private Text text;
         private CanvasGroup group;
         private float timer;
-        private bool sceneGateSubscribed;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
-            if (instance != null)
-                return;
-
-            var activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
-            {
-                BeginWaitingForAllowedScene();
-                return;
-            }
-
-            CreateOrAdoptInstance();
+            PersistentSceneSingleton<PetToastUI>.Bootstrap(CreateSingleton);
         }
 
-        private static void CreateOrAdoptInstance()
+        private static PetToastUI CreateSingleton()
         {
-            if (instance != null)
-                return;
-
-            StopWaitingForAllowedScene();
-
-            var existing = FindExistingInstance();
-            if (existing != null)
-            {
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    DontDestroyOnLoad(existing.gameObject);
-                existing.FinaliseSetup();
-                return;
-            }
-
-            SpawnNewInstance();
+            var go = new GameObject(nameof(PetToastUI), typeof(Canvas), typeof(CanvasScaler), typeof(CanvasGroup));
+            return go.AddComponent<PetToastUI>();
         }
 
-        private static PetToastUI FindExistingInstance()
+        private void Awake()
         {
-#if UNITY_2023_1_OR_NEWER
-            return Object.FindFirstObjectByType<PetToastUI>();
-#else
-            return Object.FindObjectOfType<PetToastUI>();
-#endif
-        }
-
-        private static void SpawnNewInstance()
-        {
-            var go = new GameObject(nameof(PetToastUI), typeof(Canvas), typeof(CanvasScaler), typeof(PetToastUI), typeof(CanvasGroup));
-            DontDestroyOnLoad(go);
-
-            var toast = go.GetComponent<PetToastUI>();
-            toast.FinaliseSetup();
-        }
-
-        private static void BeginWaitingForAllowedScene()
-        {
-            if (waitingForAllowedScene)
+            if (!PersistentSceneSingleton<PetToastUI>.HandleAwake(this))
                 return;
 
-            waitingForAllowedScene = true;
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
-        }
-
-        private static void StopWaitingForAllowedScene()
-        {
-            if (!waitingForAllowedScene)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
-            waitingForAllowedScene = false;
-        }
-
-        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
-        {
-            if (!allowed)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            CreateOrAdoptInstance();
+            FinaliseSetup();
         }
 
         private void FinaliseSetup()
         {
-            instance = this;
-
             ConfigureCanvas();
             EnsureTextElement();
             group = GetComponent<CanvasGroup>() ?? gameObject.AddComponent<CanvasGroup>();
             group.alpha = 0f;
             timer = 0f;
-
-            StopWaitingForAllowedScene();
-            EnsureSceneGateSubscription();
 
             gameObject.SetActive(false);
         }
@@ -155,14 +84,15 @@ namespace Pets
         /// </summary>
         public static void Show(string message, Color? color = null)
         {
-            if (instance == null)
+            var toast = Instance;
+            if (toast == null)
                 return;
 
-            instance.text.text = message;
-            instance.text.color = color ?? Color.white;
-            instance.timer = 3f;
-            instance.group.alpha = 1f;
-            instance.gameObject.SetActive(true);
+            toast.text.text = message;
+            toast.text.color = color ?? Color.white;
+            toast.timer = 3f;
+            toast.group.alpha = 1f;
+            toast.gameObject.SetActive(true);
         }
 
         private void Update()
@@ -178,49 +108,7 @@ namespace Pets
 
         private void OnDestroy()
         {
-            if (instance == this)
-            {
-                if (sceneGateSubscribed)
-                {
-                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                    sceneGateSubscribed = false;
-                }
-
-                instance = null;
-
-                if (!applicationIsQuitting)
-                    BeginWaitingForAllowedScene();
-            }
-        }
-
-        private void OnApplicationQuit()
-        {
-            applicationIsQuitting = true;
-        }
-
-        private void EnsureSceneGateSubscription()
-        {
-            if (sceneGateSubscribed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
-            sceneGateSubscribed = true;
-        }
-
-        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
-        {
-            if (instance != this)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            if (allowed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-            sceneGateSubscribed = false;
-            Destroy(gameObject);
+            PersistentSceneSingleton<PetToastUI>.HandleOnDestroy(this);
         }
     }
 }

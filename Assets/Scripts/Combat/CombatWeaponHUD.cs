@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Inventory;
 using UI;
 using World;
@@ -11,9 +10,7 @@ namespace Combat
     /// </summary>
     public class CombatWeaponHUD : MonoBehaviour
     {
-        private static CombatWeaponHUD instance;
-        private static bool waitingForAllowedScene;
-        private static bool applicationIsQuitting;
+        public static CombatWeaponHUD Instance => PersistentSceneSingleton<CombatWeaponHUD>.Instance;
 
         private CombatController controller;
         private Equipment equipment;
@@ -22,107 +19,23 @@ namespace Combat
         private SpriteRenderer weaponRenderer;
         private readonly Vector3 offset = new Vector3(0f, 0.75f, 0f);
         private bool spellActiveLastFrame;
-        private bool sceneGateSubscribed;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreateInstance()
         {
-            if (instance != null)
-                return;
-
-#if UNITY_2023_1_OR_NEWER
-            if (Object.FindFirstObjectByType<CombatWeaponHUD>() != null)
-#else
-            if (Object.FindObjectOfType<CombatWeaponHUD>() != null)
-#endif
-            {
-                // An instance already exists in the scene. Adopt it so the gating logic can manage
-                // persistence consistently.
-                CreateOrAdoptInstance();
-                return;
-            }
-
-            var activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
-            {
-                BeginWaitingForAllowedScene();
-                return;
-            }
-
-            CreateOrAdoptInstance();
+            PersistentSceneSingleton<CombatWeaponHUD>.Bootstrap(CreateSingleton);
         }
 
-        private static void CreateOrAdoptInstance()
+        private static CombatWeaponHUD CreateSingleton()
         {
-            if (instance != null)
-                return;
-
-            StopWaitingForAllowedScene();
-
-            var existing = FindExistingInstance();
-            if (existing != null)
-            {
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    DontDestroyOnLoad(existing.gameObject);
-                instance = existing;
-                existing.EnsureSceneGateSubscription();
-                return;
-            }
-
             var go = new GameObject(nameof(CombatWeaponHUD));
-            DontDestroyOnLoad(go);
-            go.AddComponent<CombatWeaponHUD>();
-        }
-
-        private static CombatWeaponHUD FindExistingInstance()
-        {
-#if UNITY_2023_1_OR_NEWER
-            return Object.FindFirstObjectByType<CombatWeaponHUD>();
-#else
-            return Object.FindObjectOfType<CombatWeaponHUD>();
-#endif
-        }
-
-        private static void BeginWaitingForAllowedScene()
-        {
-            if (waitingForAllowedScene)
-                return;
-
-            waitingForAllowedScene = true;
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
-        }
-
-        private static void StopWaitingForAllowedScene()
-        {
-            if (!waitingForAllowedScene)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
-            waitingForAllowedScene = false;
-        }
-
-        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
-        {
-            if (!allowed)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            CreateOrAdoptInstance();
+            return go.AddComponent<CombatWeaponHUD>();
         }
 
         private void Awake()
         {
-            if (instance != null && instance != this)
-            {
-                Destroy(gameObject);
+            if (!PersistentSceneSingleton<CombatWeaponHUD>.HandleAwake(this))
                 return;
-            }
-
-            instance = this;
-            StopWaitingForAllowedScene();
-            EnsureSceneGateSubscription();
 
             controller = FindObjectOfType<CombatController>();
             if (controller != null)
@@ -169,49 +82,7 @@ namespace Combat
             if (equipment != null)
                 equipment.OnEquipmentChanged -= HandleEquipmentChanged;
 
-            if (instance == this)
-            {
-                if (sceneGateSubscribed)
-                {
-                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                    sceneGateSubscribed = false;
-                }
-
-                instance = null;
-
-                if (!applicationIsQuitting)
-                    BeginWaitingForAllowedScene();
-            }
-        }
-
-        private void OnApplicationQuit()
-        {
-            applicationIsQuitting = true;
-        }
-
-        private void EnsureSceneGateSubscription()
-        {
-            if (sceneGateSubscribed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
-            sceneGateSubscribed = true;
-        }
-
-        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
-        {
-            if (instance != this)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            if (allowed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-            sceneGateSubscribed = false;
-            Destroy(gameObject);
+            PersistentSceneSingleton<CombatWeaponHUD>.HandleOnDestroy(this);
         }
 
         private void HandleEquipmentChanged(EquipmentSlot slot)

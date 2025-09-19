@@ -74,3 +74,5 @@
 - When adding scripts, keep them under `Assets/Scripts/...` within the most specific subsystem folder (e.g., `Assets/Scripts/Skills/Fishing`).
 - Maintain compatibility with the existing autosave loop, pet systems, and tick timing. New features should clean up event subscriptions and coroutines to avoid lingering references across scene loads.
 - Prefer integration with existing managers (GameManager, SkillManager, SaveManager, ItemDatabase) before introducing new global singletons.
+
+- Added PersistentSceneSingleton helper under Assets/Scripts/World for shared scene-gated singleton lifecycle.
