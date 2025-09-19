@@ -95,6 +95,15 @@ namespace World
         /// </summary>
         private void EnsurePersistentObjects()
         {
+            // Resolve the currently active scene so the catalog can opt-out of spawning
+            // persistent prefabs for non-gameplay contexts such as login or menus.
+            Scene activeScene = SceneManager.GetActiveScene();
+            if (!activeScene.IsValid())
+                return;
+
+            if (!catalog.ShouldSpawnInScene(activeScene.name))
+                return;
+
             IReadOnlyList<GameObject> prefabs = catalog.Prefabs;
             for (int i = 0; i < prefabs.Count; i++)
             {
@@ -180,10 +189,42 @@ namespace World
         [Tooltip("Prefabs that should be spawned automatically if they are missing from the scene.")]
         private List<GameObject> prefabs = new();
 
+        [SerializeField]
+        [Tooltip("Scene names (case-insensitive) where the persistent prefabs should NOT spawn.")]
+        private List<string> excludedSceneNames = new();
+
         /// <summary>
         /// Read-only view of the prefabs used by the bootstrapper.
         /// </summary>
         public IReadOnlyList<GameObject> Prefabs => prefabs;
+
+        /// <summary>
+        /// Read-only view of the scene exclusion list for editor tooling or debugging.
+        /// </summary>
+        public IReadOnlyList<string> ExcludedSceneNames => excludedSceneNames;
+
+        /// <summary>
+        /// Checks whether the persistent catalog should spawn in the supplied scene name.
+        /// </summary>
+        /// <param name="sceneName">Scene currently being loaded or activated.</param>
+        /// <returns><c>true</c> when prefabs should spawn; otherwise, <c>false</c>.</returns>
+        public bool ShouldSpawnInScene(string sceneName)
+        {
+            if (string.IsNullOrWhiteSpace(sceneName))
+                return true;
+
+            for (int i = 0; i < excludedSceneNames.Count; i++)
+            {
+                string excluded = excludedSceneNames[i];
+                if (string.IsNullOrWhiteSpace(excluded))
+                    continue;
+
+                if (string.Equals(excluded, sceneName, StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+
+            return true;
+        }
 
 #if UNITY_EDITOR
         private void OnValidate()
@@ -201,6 +242,28 @@ namespace World
                     Debug.LogWarning($"Removed scene object '{entry.name}' from {name}. Drag prefab assets into the list instead.", this);
                     prefabs.RemoveAt(i);
                 }
+            }
+
+            // Normalise and deduplicate excluded scene entries so the runtime checks remain
+            // deterministic and case-insensitive.
+            var uniqueNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            for (int i = excludedSceneNames.Count - 1; i >= 0; i--)
+            {
+                string rawName = excludedSceneNames[i];
+                if (string.IsNullOrWhiteSpace(rawName))
+                {
+                    excludedSceneNames.RemoveAt(i);
+                    continue;
+                }
+
+                string trimmed = rawName.Trim();
+                if (!uniqueNames.Add(trimmed))
+                {
+                    excludedSceneNames.RemoveAt(i);
+                    continue;
+                }
+
+                excludedSceneNames[i] = trimmed;
             }
         }
 #endif
