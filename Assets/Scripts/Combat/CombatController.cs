@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Audio;
 using EquipmentSystem;
 using Skills;
 using Player;
@@ -156,8 +157,16 @@ namespace Combat
 
         private void OnSkillLevelChanged(SkillType type, int level)
         {
-            if (type == SkillType.Magic)
-                MagicUI.UpdateStrikeMaxHits(level);
+            switch (type)
+            {
+                case SkillType.Magic:
+                    MagicUI.UpdateStrikeMaxHits(level);
+                    break;
+                case SkillType.Attack:
+                    // Trigger the OSRS-style level-up chime whenever the player gains an Attack level.
+                    SoundManager.Instance.PlaySfx(SoundEffect.AttackLevelUp);
+                    break;
+            }
         }
 
         /// <summary>
