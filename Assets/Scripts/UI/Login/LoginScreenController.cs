@@ -39,6 +39,18 @@ namespace UI.Login
 
         private const string LoginPanelSpritePath = "Sprites/LoginScreen/LoginBox";
 
+        [SerializeField, Tooltip("Resources path for the login button sprite.")]
+        private string loginButtonSpritePath = "Sprites/LoginScreen/LoginButton";
+
+        private static readonly Vector2 UsernameFieldNormalizedCenter = new Vector2(0.5f, 0.43f);
+        private static readonly Vector2 PasswordFieldNormalizedCenter = new Vector2(0.5f, 0.74f);
+        private static readonly Vector2 StatusTextNormalizedCenter = new Vector2(0.5f, 0.6f);
+        private static readonly Vector2 LoginButtonNormalizedCenter = new Vector2(0.5f, 0.88f);
+        private static readonly Vector2 InputFieldNormalizedSize = new Vector2(0.8f, 0.11f);
+        private static readonly Vector2 StatusTextNormalizedSize = new Vector2(0.82f, 0.09f);
+        private static readonly Vector2 LoginButtonNormalizedSize = new Vector2(0.36f, 0.12f);
+        private const float LabelOffsetMultiplier = 0.65f;
+
         [Header("Status Colours")]
         [SerializeField]
         private Color successColour = new Color32(197, 183, 110, 255);
@@ -196,6 +208,7 @@ namespace UI.Login
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920f, 1080f);
             scaler.matchWidthOrHeight = 0.5f;
+            var referenceResolution = scaler.referenceResolution;
 
             if (GetComponent<GraphicRaycaster>() == null)
                 gameObject.AddComponent<GraphicRaycaster>();
@@ -250,40 +263,80 @@ namespace UI.Login
                 panelSprite = Resources.GetBuiltinResource<Sprite>("UISprite.psd");
             }
 
+            Vector2 panelSize = new Vector2(640f, 440f);
+            if (panelSprite != null)
+            {
+                float targetHeight = Mathf.Min(referenceResolution.y * 0.7f, panelSprite.rect.height);
+                float width = panelSprite.rect.width * targetHeight / panelSprite.rect.height;
+                float maxWidth = referenceResolution.x * 0.6f;
+                if (width > maxWidth)
+                {
+                    float widthScale = maxWidth / width;
+                    targetHeight *= widthScale;
+                    width *= widthScale;
+                }
+
+                panelSize = new Vector2(width, targetHeight);
+            }
+
             var panelRect = CreateRectTransform("LoginPanel", rootRect,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                Vector2.zero, new Vector2(640f, 440f));
+                Vector2.zero, panelSize);
             panelRect.SetAsLastSibling();
             loginPanelImage = panelRect.gameObject.AddComponent<Image>();
             if (panelSprite != null)
             {
                 loginPanelImage.sprite = panelSprite;
-                loginPanelImage.type = Image.Type.Sliced;
+                loginPanelImage.type = Image.Type.Simple;
+                loginPanelImage.preserveAspect = true;
             }
-            loginPanelImage.color = new Color32(28, 24, 20, 220);
+            loginPanelImage.color = Color.white;
 
             var title = CreateText(panelRect, "Title", "RuneRealm Login", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
                 new Vector2(0f, -32f), new Vector2(520f, 48f), 34, TextAnchor.UpperCenter, FontStyle.Bold);
             ApplyLegacyFont(title);
 
-            var usernameLabel = CreateText(panelRect, "UsernameLabel", "Username", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f),
-                new Vector2(40f, -110f), new Vector2(200f, 32f), 20, TextAnchor.MiddleLeft, FontStyle.Bold);
+            Sprite buttonSprite = null;
+            if (!string.IsNullOrEmpty(loginButtonSpritePath))
+                buttonSprite = Resources.Load<Sprite>(loginButtonSpritePath);
+            if (buttonSprite == null)
+            {
+                Debug.LogWarning($"LoginScreenController: Unable to load login button sprite at Resources/{loginButtonSpritePath}. Falling back to login panel sprite.");
+                buttonSprite = panelSprite;
+            }
+
+            Vector2 usernamePosition = CalculateAnchoredPosition(UsernameFieldNormalizedCenter, panelSize);
+            Vector2 inputFieldSize = CalculateSize(InputFieldNormalizedSize, panelSize);
+            Vector2 usernameLabelPosition = usernamePosition + new Vector2(0f, inputFieldSize.y * LabelOffsetMultiplier);
+            float labelHeight = Mathf.Max(32f, inputFieldSize.y * 0.45f);
+            int labelFontSize = Mathf.Clamp(Mathf.RoundToInt(inputFieldSize.y * 0.42f), 18, 26);
+
+            var usernameLabel = CreateText(panelRect, "UsernameLabel", "Username", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                usernameLabelPosition, new Vector2(inputFieldSize.x, labelHeight), labelFontSize, TextAnchor.LowerLeft, FontStyle.Bold);
             ApplyLegacyFont(usernameLabel);
 
-            usernameField = CreateInputField(panelRect, "UsernameInput", new Vector2(40f, -150f), false, "Enter username", panelSprite);
+            usernameField = CreateInputField(panelRect, "UsernameInput", usernamePosition, inputFieldSize, false, "Enter username", panelSprite, true);
 
-            var passwordLabel = CreateText(panelRect, "PasswordLabel", "Password", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f),
-                new Vector2(40f, -210f), new Vector2(200f, 32f), 20, TextAnchor.MiddleLeft, FontStyle.Bold);
+            Vector2 passwordPosition = CalculateAnchoredPosition(PasswordFieldNormalizedCenter, panelSize);
+            Vector2 passwordLabelPosition = passwordPosition + new Vector2(0f, inputFieldSize.y * LabelOffsetMultiplier);
+
+            var passwordLabel = CreateText(panelRect, "PasswordLabel", "Password", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                passwordLabelPosition, new Vector2(inputFieldSize.x, labelHeight), labelFontSize, TextAnchor.LowerLeft, FontStyle.Bold);
             ApplyLegacyFont(passwordLabel);
 
-            passwordField = CreateInputField(panelRect, "PasswordInput", new Vector2(40f, -250f), true, "Enter password", panelSprite);
+            passwordField = CreateInputField(panelRect, "PasswordInput", passwordPosition, inputFieldSize, true, "Enter password", panelSprite, true);
 
-            statusText = CreateText(panelRect, "StatusText", string.Empty, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
-                new Vector2(0f, 96f), new Vector2(560f, 80f), 18, TextAnchor.MiddleCenter, FontStyle.Normal);
+            Vector2 statusPosition = CalculateAnchoredPosition(StatusTextNormalizedCenter, panelSize);
+            Vector2 statusSize = CalculateSize(StatusTextNormalizedSize, panelSize);
+            int statusFontSize = Mathf.Clamp(Mathf.RoundToInt(statusSize.y * 0.28f), 18, 24);
+            statusText = CreateText(panelRect, "StatusText", string.Empty, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                statusPosition, statusSize, statusFontSize, TextAnchor.MiddleCenter, FontStyle.Normal);
             ApplyLegacyFont(statusText);
 
-            loginButton = CreateButton(panelRect, "LoginButton", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
-                new Vector2(0f, 28f), new Vector2(220f, 56f), panelSprite, "Login");
+            Vector2 buttonPosition = CalculateAnchoredPosition(LoginButtonNormalizedCenter, panelSize);
+            Vector2 buttonSize = CalculateSize(LoginButtonNormalizedSize, panelSize);
+            loginButton = CreateButton(panelRect, "LoginButton", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                buttonPosition, buttonSize, buttonSprite, "Login");
             ApplyLegacyFont(loginButton.GetComponentInChildren<Text>());
         }
 
@@ -344,41 +397,73 @@ namespace UI.Login
             return text;
         }
 
-        private InputField CreateInputField(RectTransform parent, string name, Vector2 anchoredPosition, bool isPassword, string placeholderText, Sprite backgroundSprite)
+        private static Vector2 CalculateAnchoredPosition(Vector2 normalizedCenter, Vector2 parentSize)
         {
-            var rect = CreateRectTransform(name, parent, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), anchoredPosition, new Vector2(360f, 44f));
+            return new Vector2(
+                (normalizedCenter.x - 0.5f) * parentSize.x,
+                (normalizedCenter.y - 0.5f) * parentSize.y);
+        }
+
+        private static Vector2 CalculateSize(Vector2 normalizedSize, Vector2 parentSize)
+        {
+            return new Vector2(
+                normalizedSize.x * parentSize.x,
+                normalizedSize.y * parentSize.y);
+        }
+
+        private InputField CreateInputField(RectTransform parent, string name, Vector2 anchoredPosition, Vector2 sizeDelta, bool isPassword, string placeholderText, Sprite backgroundSprite, bool useTransparentBackground)
+        {
+            var rect = CreateRectTransform(name, parent, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), anchoredPosition, sizeDelta);
             rect.gameObject.AddComponent<CanvasRenderer>();
             var image = rect.gameObject.AddComponent<Image>();
-            image.sprite = backgroundSprite;
-            image.type = Image.Type.Sliced;
-            image.color = new Color32(46, 40, 32, 255);
+            if (!useTransparentBackground && backgroundSprite != null)
+            {
+                image.sprite = backgroundSprite;
+                image.type = Image.Type.Sliced;
+                image.color = new Color32(46, 40, 32, 255);
+            }
+            else
+            {
+                image.sprite = null;
+                image.type = Image.Type.Simple;
+                image.color = useTransparentBackground ? new Color(1f, 1f, 1f, 0f) : new Color32(46, 40, 32, 255);
+            }
+            image.raycastTarget = true;
 
             var field = rect.gameObject.AddComponent<InputField>();
             field.targetGraphic = image;
             field.lineType = InputField.LineType.SingleLine;
             field.contentType = isPassword ? InputField.ContentType.Password : InputField.ContentType.Standard;
             field.characterValidation = InputField.CharacterValidation.None;
+            field.keyboardType = TouchScreenKeyboardType.Default;
+            field.customCaretColor = true;
+            field.caretBlinkRate = 0.5f;
+            field.caretWidth = 2;
+            field.caretColor = new Color32(238, 225, 171, 255);
+            field.selectionColor = new Color32(120, 98, 70, 160);
 
-            var textRect = CreateRectTransform("Text", rect, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0f), Vector2.zero, Vector2.zero);
-            textRect.offsetMin = new Vector2(12f, 8f);
-            textRect.offsetMax = new Vector2(-12f, -8f);
+            var textRect = CreateRectTransform("Text", rect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            textRect.offsetMin = new Vector2(24f, 14f);
+            textRect.offsetMax = new Vector2(-24f, -14f);
             textRect.gameObject.AddComponent<CanvasRenderer>();
             var text = textRect.gameObject.AddComponent<Text>();
             text.text = string.Empty;
-            text.fontSize = 20;
+            text.fontSize = 24;
             text.alignment = TextAnchor.MiddleLeft;
             text.supportRichText = false;
+            text.horizontalOverflow = HorizontalWrapMode.Overflow;
+            text.verticalOverflow = VerticalWrapMode.Truncate;
             text.color = new Color32(238, 225, 171, 255);
             text.raycastTarget = false;
 
-            var placeholderRect = CreateRectTransform("Placeholder", rect, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 0f), Vector2.zero, Vector2.zero);
-            placeholderRect.offsetMin = new Vector2(12f, 8f);
-            placeholderRect.offsetMax = new Vector2(-12f, -8f);
+            var placeholderRect = CreateRectTransform("Placeholder", rect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            placeholderRect.offsetMin = new Vector2(24f, 14f);
+            placeholderRect.offsetMax = new Vector2(-24f, -14f);
             placeholderRect.gameObject.AddComponent<CanvasRenderer>();
             var placeholder = placeholderRect.gameObject.AddComponent<Text>();
             placeholder.text = placeholderText;
             placeholder.fontStyle = FontStyle.Italic;
-            placeholder.fontSize = 20;
+            placeholder.fontSize = 24;
             placeholder.alignment = TextAnchor.MiddleLeft;
             placeholder.color = new Color32(150, 150, 150, 255);
             placeholder.supportRichText = false;
@@ -396,22 +481,25 @@ namespace UI.Login
             rect.gameObject.AddComponent<CanvasRenderer>();
             var image = rect.gameObject.AddComponent<Image>();
             image.sprite = backgroundSprite;
-            image.type = Image.Type.Sliced;
-            image.color = new Color32(92, 58, 30, 255);
+            image.type = backgroundSprite != null ? Image.Type.Simple : Image.Type.Sliced;
+            image.preserveAspect = backgroundSprite != null;
+            image.color = Color.white;
 
             var button = rect.gameObject.AddComponent<Button>();
             button.transition = Selectable.Transition.ColorTint;
+            button.targetGraphic = image;
             var colors = button.colors;
-            colors.normalColor = new Color32(92, 58, 30, 255);
-            colors.highlightedColor = new Color32(120, 78, 40, 255);
-            colors.pressedColor = new Color32(70, 46, 24, 255);
-            colors.selectedColor = new Color32(120, 78, 40, 255);
-            colors.disabledColor = new Color32(50, 32, 18, 180);
+            colors.normalColor = Color.white;
+            colors.highlightedColor = new Color32(255, 244, 203, 255);
+            colors.pressedColor = new Color32(214, 187, 126, 255);
+            colors.selectedColor = colors.highlightedColor;
+            colors.disabledColor = new Color32(140, 120, 90, 180);
             button.colors = colors;
 
-            var text = CreateText(rect, "Text", label, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, 24, TextAnchor.MiddleCenter, FontStyle.Bold);
+            int fontSize = Mathf.Clamp(Mathf.RoundToInt(sizeDelta.y * 0.45f), 20, 30);
+            var text = CreateText(rect, "Text", label, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, fontSize, TextAnchor.MiddleCenter, FontStyle.Bold);
             ApplyLegacyFont(text);
-            text.color = new Color32(238, 225, 171, 255);
+            text.color = new Color32(46, 32, 20, 255);
 
             return button;
         }
