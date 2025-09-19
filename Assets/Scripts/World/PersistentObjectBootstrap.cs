@@ -252,7 +252,8 @@ namespace World
                 string rawName = excludedSceneNames[i];
                 if (string.IsNullOrWhiteSpace(rawName))
                 {
-                    excludedSceneNames.RemoveAt(i);
+                    // Keep blank inspector slots so designers can immediately enter a scene name.
+                    excludedSceneNames[i] = string.Empty;
                     continue;
                 }
 
