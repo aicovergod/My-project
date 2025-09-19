@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Combat;
 using Player;
@@ -12,9 +11,7 @@ namespace UI
     /// </summary>
     public class AttackStyleUI : MonoBehaviour, IUIWindow
     {
-        private static AttackStyleUI instance;
-        private static bool waitingForAllowedScene;
-        private static bool applicationIsQuitting;
+        public static AttackStyleUI Instance => PersistentSceneSingleton<AttackStyleUI>.Instance;
 
         private GameObject uiRoot;
         private PlayerCombatLoadout loadout;
@@ -22,7 +19,6 @@ namespace UI
         private Button aggressiveButton;
         private Button defensiveButton;
         private Button controlledButton;
-        private bool sceneGateSubscribed;
 
         /// <summary>Whether the interface is currently visible.</summary>
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
@@ -30,101 +26,20 @@ namespace UI
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Init()
         {
-            if (instance != null)
-                return;
-
-#if UNITY_2023_1_OR_NEWER
-            if (Object.FindFirstObjectByType<AttackStyleUI>() != null)
-#else
-            if (Object.FindObjectOfType<AttackStyleUI>() != null)
-#endif
-            {
-                CreateOrAdoptInstance();
-                return;
-            }
-
-            var activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
-            {
-                BeginWaitingForAllowedScene();
-                return;
-            }
-
-            CreateOrAdoptInstance();
+            PersistentSceneSingleton<AttackStyleUI>.Bootstrap(CreateSingleton);
         }
 
-        private static void CreateOrAdoptInstance()
+        private static AttackStyleUI CreateSingleton()
         {
-            if (instance != null)
-                return;
-
-            StopWaitingForAllowedScene();
-
-            var existing = FindExistingInstance();
-            if (existing != null)
-            {
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    DontDestroyOnLoad(existing.gameObject);
-                instance = existing;
-                existing.EnsureSceneGateSubscription();
-                return;
-            }
-
             var go = new GameObject(nameof(AttackStyleUI));
             go.AddComponent<ScenePersistentObject>();
-            DontDestroyOnLoad(go);
-            go.AddComponent<AttackStyleUI>();
-        }
-
-        private static AttackStyleUI FindExistingInstance()
-        {
-#if UNITY_2023_1_OR_NEWER
-            return Object.FindFirstObjectByType<AttackStyleUI>();
-#else
-            return Object.FindObjectOfType<AttackStyleUI>();
-#endif
-        }
-
-        private static void BeginWaitingForAllowedScene()
-        {
-            if (waitingForAllowedScene)
-                return;
-
-            waitingForAllowedScene = true;
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
-        }
-
-        private static void StopWaitingForAllowedScene()
-        {
-            if (!waitingForAllowedScene)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
-            waitingForAllowedScene = false;
-        }
-
-        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
-        {
-            if (!allowed)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            CreateOrAdoptInstance();
+            return go.AddComponent<AttackStyleUI>();
         }
 
         private void Awake()
         {
-            if (instance != null && instance != this)
-            {
-                Destroy(gameObject);
+            if (!PersistentSceneSingleton<AttackStyleUI>.HandleAwake(this))
                 return;
-            }
-
-            instance = this;
-            StopWaitingForAllowedScene();
-            EnsureSceneGateSubscription();
 
             loadout = FindObjectOfType<PlayerCombatLoadout>();
             CreateUI();
@@ -136,49 +51,11 @@ namespace UI
 
         private void OnDestroy()
         {
-            if (instance == this)
-            {
-                if (sceneGateSubscribed)
-                {
-                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                    sceneGateSubscribed = false;
-                }
-
-                instance = null;
-
-                if (!applicationIsQuitting)
-                    BeginWaitingForAllowedScene();
-            }
-        }
-
-        private void OnApplicationQuit()
-        {
-            applicationIsQuitting = true;
-        }
-
-        private void EnsureSceneGateSubscription()
-        {
-            if (sceneGateSubscribed)
+            if (!PersistentSceneSingleton<AttackStyleUI>.HandleOnDestroy(this))
                 return;
 
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
-            sceneGateSubscribed = true;
-        }
-
-        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
-        {
-            if (instance != this)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            if (allowed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-            sceneGateSubscribed = false;
-            Destroy(gameObject);
+            if (UIManager.Instance != null)
+                UIManager.Instance.UnregisterWindow(this);
         }
 
         private void CreateUI()

@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using Combat;
 using Player;
 using System;
@@ -17,12 +16,7 @@ namespace UI
     public class MagicUI : MonoBehaviour, IUIWindow
     {
         private static MagicUI instance;
-        private static bool waitingForAllowedScene;
-        private static bool applicationIsQuitting;
-
         public static MagicUI Instance => instance;
-
-        private bool sceneGateSubscribed;
 
         private GameObject uiRoot;
         private PlayerCombatLoadout loadout;
@@ -67,103 +61,34 @@ namespace UI
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
         {
-            var activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
-            {
-                BeginWaitingForAllowedScene();
-                return;
-            }
-
-            CreateOrAdoptInstance();
+            PersistentSceneSingleton<MagicUI>.Bootstrap(CreateSingleton);
         }
 
-        private static void CreateOrAdoptInstance()
+        private static MagicUI CreateSingleton()
         {
-            if (instance != null)
-                return;
-
-            StopWaitingForAllowedScene();
-
-            var existing = FindExistingInstance();
-            if (existing != null)
-            {
-                instance = existing;
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    DontDestroyOnLoad(existing.gameObject);
-                existing.EnsureSceneGateSubscription();
-                existing.EnsureUiRootPersistence();
-                existing.RebindLoadout();
-                return;
-            }
-
             var go = new GameObject(nameof(MagicUI));
-            DontDestroyOnLoad(go);
-            go.AddComponent<MagicUI>();
-        }
-
-        private static MagicUI FindExistingInstance()
-        {
-#if UNITY_2023_1_OR_NEWER
-            return UnityEngine.Object.FindFirstObjectByType<MagicUI>();
-#else
-            return UnityEngine.Object.FindObjectOfType<MagicUI>();
-#endif
-        }
-
-        private static void BeginWaitingForAllowedScene()
-        {
-            if (waitingForAllowedScene)
-                return;
-
-            waitingForAllowedScene = true;
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
-        }
-
-        private static void StopWaitingForAllowedScene()
-        {
-            if (!waitingForAllowedScene)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
-            waitingForAllowedScene = false;
-        }
-
-        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
-        {
-            if (!allowed)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            CreateOrAdoptInstance();
+            return go.AddComponent<MagicUI>();
         }
 
         private void Awake()
         {
-            if (instance != null && instance != this)
-            {
-                Destroy(gameObject);
+            if (!PersistentSceneSingleton<MagicUI>.HandleAwake(this))
                 return;
-            }
 
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            StopWaitingForAllowedScene();
-            EnsureSceneGateSubscription();
             loadout = FindObjectOfType<PlayerCombatLoadout>();
             LoadSpells();
             CacheStrikeSpells();
             CreateUI();
+            EnsureUiRootPersistence();
             if (uiRoot != null)
                 uiRoot.SetActive(false);
             UIManager.Instance?.RegisterWindow(this);
         }
 
-        private void OnApplicationQuit()
+        private void OnEnable()
         {
-            applicationIsQuitting = true;
+            EnsureUiRootPersistence();
+            RebindLoadout();
         }
 
         private void LoadSpells()
@@ -292,48 +217,11 @@ namespace UI
 
         private void OnDestroy()
         {
-            if (instance == this)
-            {
-                UIManager.Instance?.UnregisterWindow(this);
-
-                if (sceneGateSubscribed)
-                {
-                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                    sceneGateSubscribed = false;
-                }
-
-                TearDownUiRoot();
-
-                instance = null;
-
-                if (!applicationIsQuitting)
-                    BeginWaitingForAllowedScene();
-            }
-        }
-
-        private void EnsureSceneGateSubscription()
-        {
-            if (sceneGateSubscribed)
+            if (!PersistentSceneSingleton<MagicUI>.HandleOnDestroy(this))
                 return;
 
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
-            sceneGateSubscribed = true;
-        }
-
-        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
-        {
-            if (instance != this)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            if (allowed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-            sceneGateSubscribed = false;
-            Destroy(gameObject);
+            UIManager.Instance?.UnregisterWindow(this);
+            TearDownUiRoot();
         }
 
         private void EnsureUiRootPersistence()

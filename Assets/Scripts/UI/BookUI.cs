@@ -1,7 +1,6 @@
 using Books;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using World;
 
@@ -9,12 +8,7 @@ namespace UI
 {
     public class BookUI : MonoBehaviour, IUIWindow
     {
-        public static BookUI Instance { get; private set; }
-
-        private static bool waitingForAllowedScene;
-        private static bool applicationIsQuitting;
-
-        private bool sceneGateSubscribed;
+        public static BookUI Instance => PersistentSceneSingleton<BookUI>.Instance;
 
         public TextMeshProUGUI titleText;
         public TextMeshProUGUI pageText;
@@ -31,87 +25,20 @@ namespace UI
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
         {
-            var activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
-            {
-                BeginWaitingForAllowedScene();
-                return;
-            }
-
-            CreateOrAdoptInstance();
+            PersistentSceneSingleton<BookUI>.Bootstrap(CreateSingleton);
         }
 
-        private static void CreateOrAdoptInstance()
+        private static BookUI CreateSingleton()
         {
-            if (Instance != null)
-                return;
-
-            StopWaitingForAllowedScene();
-
-            var existing = FindExistingInstance();
-            if (existing != null)
-            {
-                Instance = existing;
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    DontDestroyOnLoad(existing.gameObject);
-                existing.EnsureSceneGateSubscription();
-                return;
-            }
-
             var go = new GameObject(nameof(BookUI));
-            DontDestroyOnLoad(go);
-            go.AddComponent<BookUI>();
-        }
-
-        private static BookUI FindExistingInstance()
-        {
-#if UNITY_2023_1_OR_NEWER
-            return UnityEngine.Object.FindFirstObjectByType<BookUI>();
-#else
-            return UnityEngine.Object.FindObjectOfType<BookUI>();
-#endif
-        }
-
-        private static void BeginWaitingForAllowedScene()
-        {
-            if (waitingForAllowedScene)
-                return;
-
-            waitingForAllowedScene = true;
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
-        }
-
-        private static void StopWaitingForAllowedScene()
-        {
-            if (!waitingForAllowedScene)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
-            waitingForAllowedScene = false;
-        }
-
-        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
-        {
-            if (!allowed)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            CreateOrAdoptInstance();
+            return go.AddComponent<BookUI>();
         }
 
         private void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
+            if (!PersistentSceneSingleton<BookUI>.HandleAwake(this))
                 return;
-            }
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            StopWaitingForAllowedScene();
-            EnsureSceneGateSubscription();
+
             if (titleText == null || pageText == null || nextButton == null || prevButton == null || closeButton == null)
                 CreateUI();
             // Attempt to auto-bind UI components if they haven't been set in the Inspector
@@ -199,11 +126,6 @@ namespace UI
             if (closeButton != null) closeButton.onClick.AddListener(Close);
             gameObject.SetActive(false);
             UIManager.Instance?.RegisterWindow(this);
-        }
-
-        private void OnApplicationQuit()
-        {
-            applicationIsQuitting = true;
         }
 
         private void CreateUI()
@@ -405,46 +327,10 @@ namespace UI
 
         private void OnDestroy()
         {
-            if (Instance == this)
-            {
-                UIManager.Instance?.UnregisterWindow(this);
-
-                if (sceneGateSubscribed)
-                {
-                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                    sceneGateSubscribed = false;
-                }
-
-                Instance = null;
-
-                if (!applicationIsQuitting)
-                    BeginWaitingForAllowedScene();
-            }
-        }
-
-        private void EnsureSceneGateSubscription()
-        {
-            if (sceneGateSubscribed)
+            if (!PersistentSceneSingleton<BookUI>.HandleOnDestroy(this))
                 return;
 
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
-            sceneGateSubscribed = true;
-        }
-
-        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
-        {
-            if (Instance != this)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            if (allowed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-            sceneGateSubscribed = false;
-            Destroy(gameObject);
+            UIManager.Instance?.UnregisterWindow(this);
         }
     }
 }

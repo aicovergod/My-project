@@ -12,14 +12,10 @@ namespace UI.HUD
     [DisallowMultipleComponent]
     public class BuffHudManager : MonoBehaviour
     {
-        private static BuffHudManager instance;
-        private static bool waitingForAllowedScene;
-        private static bool applicationIsQuitting;
-
         /// <summary>
         /// Global accessor used by systems that need to query the HUD manager at runtime.
         /// </summary>
-        public static BuffHudManager Instance => instance;
+        public static BuffHudManager Instance => PersistentSceneSingleton<BuffHudManager>.Instance;
 
         [SerializeField] private BuffInfoBox infoBoxPrefab;
         [SerializeField] private float topPadding = 8f;
@@ -32,8 +28,6 @@ namespace UI.HUD
         [SerializeField] private AudioClip expiryClip;
 
         private readonly Dictionary<BuffKey, BuffInfoBox> activeBoxes = new();
-        private bool sceneGateSubscribed;
-
         private RectTransform container;
         private RectTransform anchor;
         private GameObject player;
@@ -56,98 +50,22 @@ namespace UI.HUD
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void EnsureInstanceExists()
         {
-            if (Instance != null)
-                return;
-
-            var activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
-            {
-                BeginWaitingForAllowedScene();
-                return;
-            }
-
-            CreateOrAdoptManager();
+            PersistentSceneSingleton<BuffHudManager>.Bootstrap(CreateSingleton);
         }
 
-        private static BuffHudManager FindFirstManager()
+        private static BuffHudManager CreateSingleton()
         {
-#if UNITY_2023_1_OR_NEWER
-            return UnityEngine.Object.FindFirstObjectByType<BuffHudManager>();
-#else
-            return UnityEngine.Object.FindObjectOfType<BuffHudManager>();
-#endif
-        }
-
-        private static void CreateOrAdoptManager()
-        {
-            if (Instance != null)
-                return;
-
-            StopWaitingForAllowedScene();
-
-            var existing = FindFirstManager();
-            if (existing != null)
-            {
-                instance = existing;
-                existing.EnsurePersistence();
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    DontDestroyOnLoad(existing.gameObject);
-                existing.TryInitialiseContainer();
-                existing.RefreshPlayerReference();
-                existing.RebuildExistingBuffs();
-                existing.EnsureSceneGateSubscription();
-                return;
-            }
-
             var go = new GameObject("BuffHudManager");
             go.AddComponent<ScenePersistentObject>();
-            var manager = go.AddComponent<BuffHudManager>();
-            DontDestroyOnLoad(go);
-            manager.TryInitialiseContainer();
-            manager.RefreshPlayerReference();
-            manager.RebuildExistingBuffs();
-        }
-
-        private static void BeginWaitingForAllowedScene()
-        {
-            if (waitingForAllowedScene)
-                return;
-
-            waitingForAllowedScene = true;
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
-        }
-
-        private static void StopWaitingForAllowedScene()
-        {
-            if (!waitingForAllowedScene)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
-            waitingForAllowedScene = false;
-        }
-
-        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
-        {
-            if (!allowed)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            CreateOrAdoptManager();
+            return go.AddComponent<BuffHudManager>();
         }
 
         private void Awake()
         {
-            if (instance != null && instance != this)
-            {
-                Destroy(gameObject);
+            if (!PersistentSceneSingleton<BuffHudManager>.HandleAwake(this))
                 return;
-            }
 
-            instance = this;
             EnsurePersistence();
-            DontDestroyOnLoad(gameObject);
 
             if (infoBoxPrefab == null)
             {
@@ -167,30 +85,14 @@ namespace UI.HUD
                 audioSource.playOnAwake = false;
             }
 
-            StopWaitingForAllowedScene();
-            EnsureSceneGateSubscription();
+            TryInitialiseContainer();
+            RefreshPlayerReference();
+            RebuildExistingBuffs();
         }
 
         private void OnDestroy()
         {
-            if (instance == this)
-            {
-                if (sceneGateSubscribed)
-                {
-                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                    sceneGateSubscribed = false;
-                }
-
-                instance = null;
-
-                if (!applicationIsQuitting)
-                    BeginWaitingForAllowedScene();
-            }
-        }
-
-        private void OnApplicationQuit()
-        {
-            applicationIsQuitting = true;
+            PersistentSceneSingleton<BuffHudManager>.HandleOnDestroy(this);
         }
 
         private void OnEnable()
@@ -207,31 +109,6 @@ namespace UI.HUD
             SceneManager.sceneLoaded -= HandleSceneLoaded;
             UnsubscribeFromService();
             ClearBoxes();
-        }
-
-        private void EnsureSceneGateSubscription()
-        {
-            if (sceneGateSubscribed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
-            sceneGateSubscribed = true;
-        }
-
-        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
-        {
-            if (Instance != this)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            if (allowed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-            sceneGateSubscribed = false;
-            Destroy(gameObject);
         }
 
         private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
