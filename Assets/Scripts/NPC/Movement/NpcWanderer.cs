@@ -1,6 +1,7 @@
 using UnityEngine;
 using Util;
 using Combat;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace NPC
@@ -49,6 +50,10 @@ namespace NPC
         private Vector2 _to;
         private float _lerpTime;
         private bool _frozen;
+
+        // Ticker subscription management
+        private Coroutine _tickerSubscriptionRoutine;
+        private bool _tickerSubscribed;
 
         private float ComputeChaseRadius()
         {
@@ -106,12 +111,12 @@ namespace NPC
 
         private void OnEnable()
         {
-            Ticker.Instance?.Subscribe(this);
+            EnsureTickerSubscription();
         }
 
         private void OnDisable()
         {
-            Ticker.Instance?.Unsubscribe(this);
+            ReleaseTickerSubscription();
         }
 
         private void BeginIdle()
@@ -195,6 +200,65 @@ namespace NPC
             {
                 _lerpTime = Ticker.TickDuration;
             }
+        }
+
+        /// <summary>
+        /// Ensures the component is registered with the global <see cref="Ticker"/>. When the ticker
+        /// has not spawned yet (for example, immediately after returning from the login scene) this will
+        /// wait until the singleton becomes available before subscribing so wandering resumes normally.
+        /// </summary>
+        private void EnsureTickerSubscription()
+        {
+            if (_tickerSubscribed)
+                return;
+
+            if (Ticker.Instance != null)
+            {
+                Ticker.Instance.Subscribe(this);
+                _tickerSubscribed = true;
+            }
+            else if (_tickerSubscriptionRoutine == null && isActiveAndEnabled)
+            {
+                _tickerSubscriptionRoutine = StartCoroutine(WaitForTickerAndSubscribe());
+            }
+        }
+
+        /// <summary>
+        /// Cancels any pending ticker waiters and unsubscribes from the <see cref="Ticker"/> when the
+        /// component is disabled so it does not continue receiving ticks unexpectedly.
+        /// </summary>
+        private void ReleaseTickerSubscription()
+        {
+            if (_tickerSubscriptionRoutine != null)
+            {
+                StopCoroutine(_tickerSubscriptionRoutine);
+                _tickerSubscriptionRoutine = null;
+            }
+
+            if (_tickerSubscribed && Ticker.Instance != null)
+            {
+                Ticker.Instance.Unsubscribe(this);
+            }
+
+            _tickerSubscribed = false;
+        }
+
+        /// <summary>
+        /// Coroutine that blocks until the ticker singleton becomes available and then registers this
+        /// wanderer so it continues to receive movement ticks once the overworld scene is active.
+        /// </summary>
+        private IEnumerator WaitForTickerAndSubscribe()
+        {
+            while (Ticker.Instance == null)
+                yield return null;
+
+            _tickerSubscriptionRoutine = null;
+
+            if (!isActiveAndEnabled)
+                yield break;
+
+            Ticker.Instance.Subscribe(this);
+            _tickerSubscribed = true;
         }
 
         public void OnTick()
