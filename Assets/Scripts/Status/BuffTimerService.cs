@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Util;
 using World;
 
@@ -15,26 +16,23 @@ namespace Status
     {
         public static BuffTimerService Instance { get; private set; }
 
+        private static bool waitingForAllowedScene;
+        private static bool applicationIsQuitting;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void EnsureServiceExists()
         {
             if (Instance != null)
                 return;
 
-            var existing = FindExistingService();
-            if (existing != null)
+            var activeScene = SceneManager.GetActiveScene();
+            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
             {
-                Instance = existing;
-                existing.EnsurePersistenceComponent();
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    DontDestroyOnLoad(existing.gameObject);
+                BeginWaitingForAllowedScene();
                 return;
             }
 
-            var go = new GameObject("BuffTimerService");
-            go.AddComponent<ScenePersistentObject>();
-            go.AddComponent<BuffTimerService>();
-            DontDestroyOnLoad(go);
+            CreateOrAdoptService();
         }
 
         private static BuffTimerService FindExistingService()
@@ -46,6 +44,59 @@ namespace Status
 #endif
         }
 
+        private static void CreateOrAdoptService()
+        {
+            if (Instance != null)
+                return;
+
+            StopWaitingForAllowedScene();
+
+            var existing = FindExistingService();
+            if (existing != null)
+            {
+                Instance = existing;
+                existing.EnsurePersistenceComponent();
+                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
+                    DontDestroyOnLoad(existing.gameObject);
+                existing.EnsureSceneGateSubscription();
+                return;
+            }
+
+            var go = new GameObject("BuffTimerService");
+            go.AddComponent<ScenePersistentObject>();
+            go.AddComponent<BuffTimerService>();
+            DontDestroyOnLoad(go);
+        }
+
+        private static void BeginWaitingForAllowedScene()
+        {
+            if (waitingForAllowedScene)
+                return;
+
+            waitingForAllowedScene = true;
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
+        }
+
+        private static void StopWaitingForAllowedScene()
+        {
+            if (!waitingForAllowedScene)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
+            waitingForAllowedScene = false;
+        }
+
+        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
+        {
+            if (!allowed)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            CreateOrAdoptService();
+        }
+
         [Tooltip("Hard limit to avoid runaway buff spawning in error cases.")]
         [SerializeField] private int maxTrackedBuffs = 64;
 
@@ -55,6 +106,7 @@ namespace Status
         private readonly Dictionary<BuffKey, BuffTimerInstance> activeBuffs = new();
         private readonly List<BuffKey> removalBuffer = new();
         private bool subscribedToTicker;
+        private bool sceneGateSubscribed;
         private int sequenceCounter;
 
         /// <summary>Raised when a buff becomes active for the first time.</summary>
@@ -85,6 +137,9 @@ namespace Status
             Instance = this;
             EnsurePersistenceComponent();
             DontDestroyOnLoad(gameObject);
+
+            StopWaitingForAllowedScene();
+            EnsureSceneGateSubscription();
         }
 
         private void OnEnable()
@@ -105,6 +160,53 @@ namespace Status
                 Ticker.Instance.Unsubscribe(this);
             }
             subscribedToTicker = false;
+        }
+
+        private void OnApplicationQuit()
+        {
+            applicationIsQuitting = true;
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                if (sceneGateSubscribed)
+                {
+                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+                    sceneGateSubscribed = false;
+                }
+
+                Instance = null;
+
+                if (!applicationIsQuitting)
+                    BeginWaitingForAllowedScene();
+            }
+        }
+
+        private void EnsureSceneGateSubscription()
+        {
+            if (sceneGateSubscribed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
+            sceneGateSubscribed = true;
+        }
+
+        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
+        {
+            if (Instance != this)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            if (allowed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+            sceneGateSubscribed = false;
+            Destroy(gameObject);
         }
 
         /// <summary>

@@ -13,6 +13,8 @@ namespace UI.HUD
     public class BuffHudManager : MonoBehaviour
     {
         private static BuffHudManager instance;
+        private static bool waitingForAllowedScene;
+        private static bool applicationIsQuitting;
 
         /// <summary>
         /// Global accessor used by systems that need to query the HUD manager at runtime.
@@ -30,6 +32,7 @@ namespace UI.HUD
         [SerializeField] private AudioClip expiryClip;
 
         private readonly Dictionary<BuffKey, BuffInfoBox> activeBoxes = new();
+        private bool sceneGateSubscribed;
 
         private RectTransform container;
         private RectTransform anchor;
@@ -56,15 +59,43 @@ namespace UI.HUD
             if (Instance != null)
                 return;
 
+            var activeScene = SceneManager.GetActiveScene();
+            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
+            {
+                BeginWaitingForAllowedScene();
+                return;
+            }
+
+            CreateOrAdoptManager();
+        }
+
+        private static BuffHudManager FindFirstManager()
+        {
+#if UNITY_2023_1_OR_NEWER
+            return UnityEngine.Object.FindFirstObjectByType<BuffHudManager>();
+#else
+            return UnityEngine.Object.FindObjectOfType<BuffHudManager>();
+#endif
+        }
+
+        private static void CreateOrAdoptManager()
+        {
+            if (Instance != null)
+                return;
+
+            StopWaitingForAllowedScene();
+
             var existing = FindFirstManager();
             if (existing != null)
             {
                 instance = existing;
                 existing.EnsurePersistence();
-                DontDestroyOnLoad(existing.gameObject);
+                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
+                    DontDestroyOnLoad(existing.gameObject);
                 existing.TryInitialiseContainer();
                 existing.RefreshPlayerReference();
                 existing.RebuildExistingBuffs();
+                existing.EnsureSceneGateSubscription();
                 return;
             }
 
@@ -77,13 +108,33 @@ namespace UI.HUD
             manager.RebuildExistingBuffs();
         }
 
-        private static BuffHudManager FindFirstManager()
+        private static void BeginWaitingForAllowedScene()
         {
-#if UNITY_2023_1_OR_NEWER
-            return UnityEngine.Object.FindFirstObjectByType<BuffHudManager>();
-#else
-            return UnityEngine.Object.FindObjectOfType<BuffHudManager>();
-#endif
+            if (waitingForAllowedScene)
+                return;
+
+            waitingForAllowedScene = true;
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
+        }
+
+        private static void StopWaitingForAllowedScene()
+        {
+            if (!waitingForAllowedScene)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
+            waitingForAllowedScene = false;
+        }
+
+        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
+        {
+            if (!allowed)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            CreateOrAdoptManager();
         }
 
         private void Awake()
@@ -116,12 +167,30 @@ namespace UI.HUD
                 audioSource.playOnAwake = false;
             }
 
+            StopWaitingForAllowedScene();
+            EnsureSceneGateSubscription();
         }
 
         private void OnDestroy()
         {
             if (instance == this)
+            {
+                if (sceneGateSubscribed)
+                {
+                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+                    sceneGateSubscribed = false;
+                }
+
                 instance = null;
+
+                if (!applicationIsQuitting)
+                    BeginWaitingForAllowedScene();
+            }
+        }
+
+        private void OnApplicationQuit()
+        {
+            applicationIsQuitting = true;
         }
 
         private void OnEnable()
@@ -138,6 +207,31 @@ namespace UI.HUD
             SceneManager.sceneLoaded -= HandleSceneLoaded;
             UnsubscribeFromService();
             ClearBoxes();
+        }
+
+        private void EnsureSceneGateSubscription()
+        {
+            if (sceneGateSubscribed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
+            sceneGateSubscribed = true;
+        }
+
+        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
+        {
+            if (Instance != this)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            if (allowed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+            sceneGateSubscribed = false;
+            Destroy(gameObject);
         }
 
         private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
