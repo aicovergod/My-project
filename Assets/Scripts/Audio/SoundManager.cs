@@ -53,6 +53,14 @@ namespace Audio
         private readonly Dictionary<SoundEffect, string> soundFileMap = new()
         {
             { SoundEffect.AttackLevelUp, "02_Attack_Level_Up" },
+            { SoundEffect.DefenceLevelUp, "03_Defence_Level_Up" },
+            { SoundEffect.MagicLevelUp, "09_Magic_Level_Up" },
+            { SoundEffect.MiningLevelUp, "08_Mining_Level_Up" },
+            { SoundEffect.WoodcuttingLevelUp, "09_Woodcutting_Level_Up" },
+            { SoundEffect.FishingLevelUp, "11_Fishing_Level_Up" },
+            { SoundEffect.CookingLevelUp, "10_Cooking_Level_Up" },
+            { SoundEffect.BeastmasterLevelUp, "03_Defence_Level_Up" },
+            { SoundEffect.PlayerDeath, "12_You_Are_Dead" },
             { SoundEffect.TreeChop, "01_Tree_Chop" }
         };
 

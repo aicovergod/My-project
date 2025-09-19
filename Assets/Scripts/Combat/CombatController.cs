@@ -160,11 +160,30 @@ namespace Combat
             switch (type)
             {
                 case SkillType.Magic:
+                    // Keep spell damage data in sync and play the corresponding level-up chime.
                     MagicUI.UpdateStrikeMaxHits(level);
+                    SoundManager.Instance.PlaySfx(SoundEffect.MagicLevelUp);
                     break;
                 case SkillType.Attack:
-                    // Trigger the OSRS-style level-up chime whenever the player gains an Attack level.
                     SoundManager.Instance.PlaySfx(SoundEffect.AttackLevelUp);
+                    break;
+                case SkillType.Defence:
+                    SoundManager.Instance.PlaySfx(SoundEffect.DefenceLevelUp);
+                    break;
+                case SkillType.Mining:
+                    SoundManager.Instance.PlaySfx(SoundEffect.MiningLevelUp);
+                    break;
+                case SkillType.Woodcutting:
+                    SoundManager.Instance.PlaySfx(SoundEffect.WoodcuttingLevelUp);
+                    break;
+                case SkillType.Fishing:
+                    SoundManager.Instance.PlaySfx(SoundEffect.FishingLevelUp);
+                    break;
+                case SkillType.Cooking:
+                    SoundManager.Instance.PlaySfx(SoundEffect.CookingLevelUp);
+                    break;
+                case SkillType.Beastmaster:
+                    SoundManager.Instance.PlaySfx(SoundEffect.BeastmasterLevelUp);
                     break;
             }
         }
