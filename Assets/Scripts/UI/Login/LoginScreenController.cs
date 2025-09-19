@@ -42,14 +42,16 @@ namespace UI.Login
         [SerializeField, Tooltip("Resources path for the login button sprite.")]
         private string loginButtonSpritePath = "Sprites/LoginScreen/LoginButton";
 
-        private static readonly Vector2 UsernameFieldNormalizedCenter = new Vector2(0.5f, 0.43f);
-        private static readonly Vector2 PasswordFieldNormalizedCenter = new Vector2(0.5f, 0.74f);
-        private static readonly Vector2 StatusTextNormalizedCenter = new Vector2(0.5f, 0.6f);
-        private static readonly Vector2 LoginButtonNormalizedCenter = new Vector2(0.5f, 0.88f);
         private static readonly Vector2 InputFieldNormalizedSize = new Vector2(0.8f, 0.11f);
         private static readonly Vector2 StatusTextNormalizedSize = new Vector2(0.82f, 0.09f);
         private static readonly Vector2 LoginButtonNormalizedSize = new Vector2(0.36f, 0.12f);
-        private const float LabelOffsetMultiplier = 0.65f;
+        private static readonly Vector2 LoginButtonNormalizedCenter = new Vector2(0.5f, 0.88f);
+
+        private static readonly Vector2 UsernameFieldAnchoredPosition = new Vector2(75f, -50f);
+        private static readonly Vector2 PasswordFieldAnchoredPosition = new Vector2(75f, -200f);
+        private static readonly Vector2 StatusTextAnchoredPosition = new Vector2(0f, -275f);
+        private static readonly Vector2 LoginPanelAnchoredPosition = new Vector2(0f, -380f);
+        private static readonly Vector3 LoginPanelScale = new Vector3(2.5f, 2f, 1f);
 
         [Header("Status Colours")]
         [SerializeField]
@@ -281,8 +283,10 @@ namespace UI.Login
 
             var panelRect = CreateRectTransform("LoginPanel", rootRect,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                Vector2.zero, panelSize);
+                LoginPanelAnchoredPosition, panelSize);
             panelRect.SetAsLastSibling();
+            // Apply the bespoke offset/scale so the login box matches the reference mock-up.
+            panelRect.localScale = LoginPanelScale;
             loginPanelImage = panelRect.gameObject.AddComponent<Image>();
             if (panelSprite != null)
             {
@@ -291,10 +295,6 @@ namespace UI.Login
                 loginPanelImage.preserveAspect = true;
             }
             loginPanelImage.color = Color.white;
-
-            var title = CreateText(panelRect, "Title", "RuneRealm Login", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
-                new Vector2(0f, -32f), new Vector2(520f, 48f), 34, TextAnchor.UpperCenter, FontStyle.Bold);
-            ApplyLegacyFont(title);
 
             Sprite buttonSprite = null;
             if (!string.IsNullOrEmpty(loginButtonSpritePath))
@@ -305,32 +305,15 @@ namespace UI.Login
                 buttonSprite = panelSprite;
             }
 
-            Vector2 usernamePosition = CalculateAnchoredPosition(UsernameFieldNormalizedCenter, panelSize);
             Vector2 inputFieldSize = CalculateSize(InputFieldNormalizedSize, panelSize);
-            Vector2 usernameLabelPosition = usernamePosition + new Vector2(0f, inputFieldSize.y * LabelOffsetMultiplier);
-            float labelHeight = Mathf.Max(32f, inputFieldSize.y * 0.45f);
-            int labelFontSize = Mathf.Clamp(Mathf.RoundToInt(inputFieldSize.y * 0.42f), 18, 26);
+            usernameField = CreateInputField(panelRect, "UsernameInput", UsernameFieldAnchoredPosition, inputFieldSize, false, "Enter username", panelSprite, true);
 
-            var usernameLabel = CreateText(panelRect, "UsernameLabel", "Username", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                usernameLabelPosition, new Vector2(inputFieldSize.x, labelHeight), labelFontSize, TextAnchor.LowerLeft, FontStyle.Bold);
-            ApplyLegacyFont(usernameLabel);
+            passwordField = CreateInputField(panelRect, "PasswordInput", PasswordFieldAnchoredPosition, inputFieldSize, true, "Enter password", panelSprite, true);
 
-            usernameField = CreateInputField(panelRect, "UsernameInput", usernamePosition, inputFieldSize, false, "Enter username", panelSprite, true);
-
-            Vector2 passwordPosition = CalculateAnchoredPosition(PasswordFieldNormalizedCenter, panelSize);
-            Vector2 passwordLabelPosition = passwordPosition + new Vector2(0f, inputFieldSize.y * LabelOffsetMultiplier);
-
-            var passwordLabel = CreateText(panelRect, "PasswordLabel", "Password", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                passwordLabelPosition, new Vector2(inputFieldSize.x, labelHeight), labelFontSize, TextAnchor.LowerLeft, FontStyle.Bold);
-            ApplyLegacyFont(passwordLabel);
-
-            passwordField = CreateInputField(panelRect, "PasswordInput", passwordPosition, inputFieldSize, true, "Enter password", panelSprite, true);
-
-            Vector2 statusPosition = CalculateAnchoredPosition(StatusTextNormalizedCenter, panelSize);
             Vector2 statusSize = CalculateSize(StatusTextNormalizedSize, panelSize);
             int statusFontSize = Mathf.Clamp(Mathf.RoundToInt(statusSize.y * 0.28f), 18, 24);
             statusText = CreateText(panelRect, "StatusText", string.Empty, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                statusPosition, statusSize, statusFontSize, TextAnchor.MiddleCenter, FontStyle.Normal);
+                StatusTextAnchoredPosition, statusSize, statusFontSize, TextAnchor.MiddleCenter, FontStyle.Normal);
             ApplyLegacyFont(statusText);
 
             Vector2 buttonPosition = CalculateAnchoredPosition(LoginButtonNormalizedCenter, panelSize);
