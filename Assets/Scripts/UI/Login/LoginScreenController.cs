@@ -42,6 +42,11 @@ namespace UI.Login
         [SerializeField, Tooltip("Resources path for the login button sprite.")]
         private string loginButtonSpritePath = "Sprites/LoginScreen/LoginButton";
 
+        [SerializeField, Tooltip("Fallback resolution that keeps the UI sized correctly when the background sprite cannot be loaded.")]
+        private Vector2 fallbackReferenceResolution = new Vector2(1024f, 768f);
+
+        private static readonly Vector2 DefaultReferenceResolution = new Vector2(1024f, 768f);
+
         private static readonly Vector2 InputFieldNormalizedSize = new Vector2(0.8f, 0.11f);
         private static readonly Vector2 StatusTextNormalizedSize = new Vector2(0.82f, 0.09f);
         private static readonly Vector2 LoginButtonNormalizedSize = new Vector2(0.36f, 0.12f);
@@ -50,7 +55,7 @@ namespace UI.Login
         private static readonly Vector2 UsernameFieldAnchoredPosition = new Vector2(75f, -50f);
         private static readonly Vector2 PasswordFieldAnchoredPosition = new Vector2(75f, -200f);
         private static readonly Vector2 StatusTextAnchoredPosition = new Vector2(0f, -275f);
-        private static readonly Vector2 LoginPanelAnchoredPosition = new Vector2(0f, -380f);
+        private const float LoginPanelVerticalOffsetFactor = 0.35f;
         private static readonly Vector3 LoginPanelScale = new Vector3(2.5f, 2f, 1f);
 
         [Header("Status Colours")]
@@ -208,9 +213,8 @@ namespace UI.Login
             if (scaler == null)
                 scaler = gameObject.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.referenceResolution = SanitizeResolution(fallbackReferenceResolution);
             scaler.matchWidthOrHeight = 0.5f;
-            var referenceResolution = scaler.referenceResolution;
 
             if (GetComponent<GraphicRaycaster>() == null)
                 gameObject.AddComponent<GraphicRaycaster>();
@@ -226,34 +230,11 @@ namespace UI.Login
             }
             else
             {
-                RectTransform backgroundRect;
-                if (backgroundImage == null)
-                {
-                    backgroundRect = CreateRectTransform("Background", rootRect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
-                    backgroundImage = backgroundRect.gameObject.AddComponent<Image>();
-                }
-                else
-                {
-                    backgroundRect = backgroundImage.rectTransform;
-                    backgroundRect.SetParent(rootRect, false);
-                    backgroundRect.name = "Background";
-                }
-
-                backgroundRect.anchorMin = Vector2.zero;
-                backgroundRect.anchorMax = Vector2.one;
-                backgroundRect.pivot = new Vector2(0.5f, 0.5f);
-                backgroundRect.anchoredPosition = Vector2.zero;
-                backgroundRect.sizeDelta = Vector2.zero;
-                backgroundRect.offsetMin = Vector2.zero;
-                backgroundRect.offsetMax = Vector2.zero;
-                backgroundRect.SetAsFirstSibling();
-
-                backgroundImage.sprite = backgroundSprite;
-                backgroundImage.type = Image.Type.Simple;
-                backgroundImage.preserveAspect = true;
-                backgroundImage.color = Color.white;
-                backgroundImage.raycastTarget = false;
+                ConfigureBackground(rootRect, backgroundSprite);
             }
+
+            Vector2 referenceResolution = DetermineReferenceResolution(backgroundSprite);
+            scaler.referenceResolution = referenceResolution;
 
             if (usernameField != null && passwordField != null && statusText != null && loginButton != null && loginPanelImage != null)
                 return;
@@ -265,25 +246,13 @@ namespace UI.Login
                 panelSprite = Resources.GetBuiltinResource<Sprite>("UISprite.psd");
             }
 
-            Vector2 panelSize = new Vector2(640f, 440f);
-            if (panelSprite != null)
-            {
-                float targetHeight = Mathf.Min(referenceResolution.y * 0.7f, panelSprite.rect.height);
-                float width = panelSprite.rect.width * targetHeight / panelSprite.rect.height;
-                float maxWidth = referenceResolution.x * 0.6f;
-                if (width > maxWidth)
-                {
-                    float widthScale = maxWidth / width;
-                    targetHeight *= widthScale;
-                    width *= widthScale;
-                }
+            Vector2 panelSize = DeterminePanelSize(panelSprite, referenceResolution);
 
-                panelSize = new Vector2(width, targetHeight);
-            }
+            Vector2 panelAnchoredPosition = CalculatePanelAnchoredPosition(referenceResolution);
 
             var panelRect = CreateRectTransform("LoginPanel", rootRect,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                LoginPanelAnchoredPosition, panelSize);
+                panelAnchoredPosition, panelSize);
             panelRect.SetAsLastSibling();
             // Apply the bespoke offset/scale so the login box matches the reference mock-up.
             panelRect.localScale = LoginPanelScale;
@@ -378,6 +347,105 @@ namespace UI.Login
             text.supportRichText = false;
             text.raycastTarget = false;
             return text;
+        }
+
+        /// <summary>
+        /// Creates or updates the background image so the login screen displays the provided sprite.
+        /// The RectTransform is configured to stretch across the full canvas while preserving the
+        /// sprite's aspect ratio.
+        /// </summary>
+        private void ConfigureBackground(RectTransform rootRect, Sprite backgroundSprite)
+        {
+            RectTransform backgroundRect;
+            if (backgroundImage == null)
+            {
+                backgroundRect = CreateRectTransform("Background", rootRect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+                backgroundImage = backgroundRect.gameObject.AddComponent<Image>();
+            }
+            else
+            {
+                backgroundRect = backgroundImage.rectTransform;
+                backgroundRect.SetParent(rootRect, false);
+                backgroundRect.name = "Background";
+            }
+
+            backgroundRect.anchorMin = Vector2.zero;
+            backgroundRect.anchorMax = Vector2.one;
+            backgroundRect.pivot = new Vector2(0.5f, 0.5f);
+            backgroundRect.anchoredPosition = Vector2.zero;
+            backgroundRect.sizeDelta = Vector2.zero;
+            backgroundRect.offsetMin = Vector2.zero;
+            backgroundRect.offsetMax = Vector2.zero;
+            backgroundRect.SetAsFirstSibling();
+
+            backgroundImage.sprite = backgroundSprite;
+            backgroundImage.type = Image.Type.Simple;
+            backgroundImage.preserveAspect = true;
+            backgroundImage.color = Color.white;
+            backgroundImage.raycastTarget = false;
+        }
+
+        /// <summary>
+        /// Returns the reference resolution that should drive the login layout. When a background
+        /// sprite is available we match its pixel dimensions; otherwise we fall back to the serialized
+        /// resolution so the UI retains predictable sizing.
+        /// </summary>
+        private Vector2 DetermineReferenceResolution(Sprite backgroundSprite)
+        {
+            if (backgroundSprite != null)
+            {
+                Vector2 spriteSize = backgroundSprite.rect.size;
+                if (spriteSize.x > 0f && spriteSize.y > 0f)
+                    return spriteSize;
+            }
+
+            return SanitizeResolution(fallbackReferenceResolution);
+        }
+
+        /// <summary>
+        /// Calculates the anchored position for the login panel based on the active reference
+        /// resolution. This keeps the panel's relative offset consistent across 16:9 and 4:3 art.
+        /// </summary>
+        private static Vector2 CalculatePanelAnchoredPosition(Vector2 referenceResolution)
+        {
+            return new Vector2(0f, -referenceResolution.y * LoginPanelVerticalOffsetFactor);
+        }
+
+        /// <summary>
+        /// Derives an appropriate panel size from the login box sprite and the current reference
+        /// resolution. The logic mirrors the original sizing rules but now adapts to the background's
+        /// pixel grid.
+        /// </summary>
+        private static Vector2 DeterminePanelSize(Sprite panelSprite, Vector2 referenceResolution)
+        {
+            Vector2 panelSize = new Vector2(640f, 440f);
+            if (panelSprite == null)
+                return panelSize;
+
+            float targetHeight = Mathf.Min(referenceResolution.y * 0.7f, panelSprite.rect.height);
+            float width = panelSprite.rect.width * targetHeight / panelSprite.rect.height;
+            float maxWidth = referenceResolution.x * 0.6f;
+            if (width > maxWidth)
+            {
+                float widthScale = maxWidth / width;
+                targetHeight *= widthScale;
+                width *= widthScale;
+            }
+
+            panelSize = new Vector2(width, targetHeight);
+            return panelSize;
+        }
+
+        /// <summary>
+        /// Ensures the provided resolution is valid. The layout defaults to a 1024x768 grid if the
+        /// serialized fallback is missing or zero to match the new login background art.
+        /// </summary>
+        private static Vector2 SanitizeResolution(Vector2 resolution)
+        {
+            if (resolution.x <= 0f || resolution.y <= 0f)
+                return DefaultReferenceResolution;
+
+            return resolution;
         }
 
         private static Vector2 CalculateAnchoredPosition(Vector2 normalizedCenter, Vector2 parentSize)
