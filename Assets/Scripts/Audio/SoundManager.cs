@@ -53,6 +53,11 @@ namespace Audio
         private readonly Dictionary<SoundEffect, string> soundFileMap = new()
         {
             { SoundEffect.AttackLevelUp, "02_Attack_Level_Up" },
+            { SoundEffect.DefenceLevelUp, "03_Defence_Level_Up" },
+            { SoundEffect.HitpointsLevelUpLow, "04_Hitpoints_Level_Up_2_49" },
+            { SoundEffect.HitpointsLevelUpHigh, "05_Hitpoints_Level_Up_50_99" },
+            { SoundEffect.StrengthLevelUpLow, "06_Strength_Level_Up_2_49" },
+            { SoundEffect.StrengthLevelUpHigh, "07_Strength_Level_Up_50_99" },
             { SoundEffect.TreeChop, "01_Tree_Chop" }
         };
 

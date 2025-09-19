@@ -166,6 +166,30 @@ namespace Combat
                     // Trigger the OSRS-style level-up chime whenever the player gains an Attack level.
                     SoundManager.Instance.PlaySfx(SoundEffect.AttackLevelUp);
                     break;
+                case SkillType.Defence:
+                    // Mirror the Attack behaviour so Defence level ups use their dedicated chime.
+                    SoundManager.Instance.PlaySfx(SoundEffect.DefenceLevelUp);
+                    break;
+                case SkillType.Hitpoints:
+                {
+                    // Use different sounds for early (2-49) and late (50-99) Hitpoints milestones.
+                    if (level < 2)
+                        break;
+
+                    var hitpointsEffect = level >= 50 ? SoundEffect.HitpointsLevelUpHigh : SoundEffect.HitpointsLevelUpLow;
+                    SoundManager.Instance.PlaySfx(hitpointsEffect);
+                    break;
+                }
+                case SkillType.Strength:
+                {
+                    // Strength shares the tiered level-up audio used by Hitpoints.
+                    if (level < 2)
+                        break;
+
+                    var strengthEffect = level >= 50 ? SoundEffect.StrengthLevelUpHigh : SoundEffect.StrengthLevelUpLow;
+                    SoundManager.Instance.PlaySfx(strengthEffect);
+                    break;
+                }
             }
         }
 
