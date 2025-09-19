@@ -3,6 +3,9 @@ using Core.Save;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace UI.Login
 {
@@ -52,11 +55,11 @@ namespace UI.Login
         private static readonly Vector2 LoginButtonNormalizedSize = new Vector2(0.36f, 0.12f);
         private static readonly Vector2 LoginButtonNormalizedCenter = new Vector2(0.5f, 0.88f);
 
-        private static readonly Vector2 UsernameFieldAnchoredPosition = new Vector2(75f, -50f);
-        private static readonly Vector2 PasswordFieldAnchoredPosition = new Vector2(75f, -200f);
-        private static readonly Vector2 StatusTextAnchoredPosition = new Vector2(0f, -275f);
-        private const float LoginPanelVerticalOffsetFactor = 0.35f;
-        private static readonly Vector3 LoginPanelScale = new Vector3(2.5f, 2f, 1f);
+        private static readonly Vector2 UsernameFieldAnchoredPosition = new Vector2(75f, 38f);
+        private static readonly Vector2 PasswordFieldAnchoredPosition = new Vector2(75f, -138f);
+        private static readonly Vector2 StatusTextAnchoredPosition = new Vector2(0f, -192f);
+        private static readonly Vector2 LoginPanelAnchoredPosition = new Vector2(0f, -50f);
+        private static readonly Vector3 LoginPanelScale = Vector3.one;
 
         [Header("Status Colours")]
         [SerializeField]
@@ -115,6 +118,11 @@ namespace UI.Login
 
             if (passwordField != null)
                 passwordField.onValueChanged.RemoveListener(HandleInputChanged);
+        }
+
+        private void Update()
+        {
+            HandleKeyboardSubmitNavigation();
         }
 
         private void HandleInputChanged(string _)
@@ -248,13 +256,13 @@ namespace UI.Login
 
             Vector2 panelSize = DeterminePanelSize(panelSprite, referenceResolution);
 
-            Vector2 panelAnchoredPosition = CalculatePanelAnchoredPosition(referenceResolution);
+            Vector2 panelAnchoredPosition = LoginPanelAnchoredPosition;
 
             var panelRect = CreateRectTransform("LoginPanel", rootRect,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 panelAnchoredPosition, panelSize);
             panelRect.SetAsLastSibling();
-            // Apply the bespoke offset/scale so the login box matches the reference mock-up.
+            // Apply the serialized scale so the login box respects the configured pixel dimensions.
             panelRect.localScale = LoginPanelScale;
             loginPanelImage = panelRect.gameObject.AddComponent<Image>();
             if (panelSprite != null)
@@ -290,6 +298,52 @@ namespace UI.Login
             loginButton = CreateButton(panelRect, "LoginButton", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 buttonPosition, buttonSize, buttonSprite, "Login");
             ApplyLegacyFont(loginButton.GetComponentInChildren<Text>());
+        }
+
+        /// <summary>
+        /// Allows the keyboard Enter/Return key to navigate between fields and submit the login
+        /// request so players can authenticate without touching the mouse.
+        /// </summary>
+        private void HandleKeyboardSubmitNavigation()
+        {
+            if (!WasSubmitPressedThisFrame())
+                return;
+
+            if (usernameField != null && usernameField.isFocused)
+            {
+                if (passwordField != null)
+                {
+                    passwordField.ActivateInputField();
+                    passwordField.MoveTextEnd(false);
+                }
+                return;
+            }
+
+            if (passwordField != null && passwordField.isFocused)
+            {
+                if (loginButton != null && loginButton.interactable)
+                    HandleLoginClicked();
+            }
+        }
+
+        /// <summary>
+        /// Detects whether the user pressed the Enter/Return key this frame using whichever input
+        /// backends are enabled in the project (new Input System and/or the legacy manager).
+        /// </summary>
+        private bool WasSubmitPressedThisFrame()
+        {
+#if ENABLE_INPUT_SYSTEM
+            if (Keyboard.current != null &&
+                (Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.numpadEnterKey.wasPressedThisFrame))
+            {
+                return true;
+            }
+#endif
+#if ENABLE_LEGACY_INPUT_MANAGER
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                return true;
+#endif
+            return false;
         }
 
         private void ApplyLegacyFont(InputField field)
@@ -400,15 +454,6 @@ namespace UI.Login
             }
 
             return SanitizeResolution(fallbackReferenceResolution);
-        }
-
-        /// <summary>
-        /// Calculates the anchored position for the login panel based on the active reference
-        /// resolution. This keeps the panel's relative offset consistent across 16:9 and 4:3 art.
-        /// </summary>
-        private static Vector2 CalculatePanelAnchoredPosition(Vector2 referenceResolution)
-        {
-            return new Vector2(0f, -referenceResolution.y * LoginPanelVerticalOffsetFactor);
         }
 
         /// <summary>
