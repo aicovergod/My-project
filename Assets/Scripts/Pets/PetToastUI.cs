@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using World;
 
 namespace Pets
 {
@@ -9,9 +11,13 @@ namespace Pets
     public class PetToastUI : MonoBehaviour
     {
         private static PetToastUI instance;
+        private static bool waitingForAllowedScene;
+        private static bool applicationIsQuitting;
+
         private Text text;
         private CanvasGroup group;
         private float timer;
+        private bool sceneGateSubscribed;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -19,29 +25,129 @@ namespace Pets
             if (instance != null)
                 return;
 
-            var go = new GameObject("PetToastUI", typeof(Canvas), typeof(CanvasScaler), typeof(PetToastUI), typeof(CanvasGroup));
+            var activeScene = SceneManager.GetActiveScene();
+            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
+            {
+                BeginWaitingForAllowedScene();
+                return;
+            }
+
+            CreateOrAdoptInstance();
+        }
+
+        private static void CreateOrAdoptInstance()
+        {
+            if (instance != null)
+                return;
+
+            StopWaitingForAllowedScene();
+
+            var existing = FindExistingInstance();
+            if (existing != null)
+            {
+                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
+                    DontDestroyOnLoad(existing.gameObject);
+                existing.FinaliseSetup();
+                return;
+            }
+
+            SpawnNewInstance();
+        }
+
+        private static PetToastUI FindExistingInstance()
+        {
+#if UNITY_2023_1_OR_NEWER
+            return Object.FindFirstObjectByType<PetToastUI>();
+#else
+            return Object.FindObjectOfType<PetToastUI>();
+#endif
+        }
+
+        private static void SpawnNewInstance()
+        {
+            var go = new GameObject(nameof(PetToastUI), typeof(Canvas), typeof(CanvasScaler), typeof(PetToastUI), typeof(CanvasGroup));
             DontDestroyOnLoad(go);
 
-            var canvas = go.GetComponent<Canvas>();
+            var toast = go.GetComponent<PetToastUI>();
+            toast.FinaliseSetup();
+        }
+
+        private static void BeginWaitingForAllowedScene()
+        {
+            if (waitingForAllowedScene)
+                return;
+
+            waitingForAllowedScene = true;
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
+        }
+
+        private static void StopWaitingForAllowedScene()
+        {
+            if (!waitingForAllowedScene)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
+            waitingForAllowedScene = false;
+        }
+
+        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
+        {
+            if (!allowed)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            CreateOrAdoptInstance();
+        }
+
+        private void FinaliseSetup()
+        {
+            instance = this;
+
+            ConfigureCanvas();
+            EnsureTextElement();
+            group = GetComponent<CanvasGroup>() ?? gameObject.AddComponent<CanvasGroup>();
+            group.alpha = 0f;
+            timer = 0f;
+
+            StopWaitingForAllowedScene();
+            EnsureSceneGateSubscription();
+
+            gameObject.SetActive(false);
+        }
+
+        private void ConfigureCanvas()
+        {
+            var canvas = GetComponent<Canvas>() ?? gameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            var scaler = go.GetComponent<CanvasScaler>();
+
+            var scaler = GetComponent<CanvasScaler>() ?? gameObject.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        }
 
-            instance = go.GetComponent<PetToastUI>();
-            instance.group = go.GetComponent<CanvasGroup>();
+        private void EnsureTextElement()
+        {
+            if (text != null)
+                return;
 
-            var textGO = new GameObject("Text", typeof(Text));
-            textGO.transform.SetParent(go.transform, false);
-            instance.text = textGO.GetComponent<Text>();
-            instance.text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            instance.text.alignment = TextAnchor.UpperCenter;
-            var rect = instance.text.rectTransform;
-            rect.anchorMin = new Vector2(0.5f, 1f);
-            rect.anchorMax = new Vector2(0.5f, 1f);
-            rect.pivot = new Vector2(0.5f, 1f);
-            rect.anchoredPosition = new Vector2(0f, -20f);
+            var existing = GetComponentInChildren<Text>();
+            if (existing == null)
+            {
+                var textGO = new GameObject("Text", typeof(Text));
+                textGO.transform.SetParent(transform, false);
+                existing = textGO.GetComponent<Text>();
+                existing.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                existing.alignment = TextAnchor.UpperCenter;
 
-            go.SetActive(false);
+                var rect = existing.rectTransform;
+                rect.anchorMin = new Vector2(0.5f, 1f);
+                rect.anchorMax = new Vector2(0.5f, 1f);
+                rect.pivot = new Vector2(0.5f, 1f);
+                rect.anchoredPosition = new Vector2(0f, -20f);
+            }
+
+            text = existing;
         }
 
         /// <summary>
@@ -51,6 +157,7 @@ namespace Pets
         {
             if (instance == null)
                 return;
+
             instance.text.text = message;
             instance.text.color = color ?? Color.white;
             instance.timer = 3f;
@@ -67,6 +174,53 @@ namespace Pets
                 if (timer <= 0f)
                     gameObject.SetActive(false);
             }
+        }
+
+        private void OnDestroy()
+        {
+            if (instance == this)
+            {
+                if (sceneGateSubscribed)
+                {
+                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+                    sceneGateSubscribed = false;
+                }
+
+                instance = null;
+
+                if (!applicationIsQuitting)
+                    BeginWaitingForAllowedScene();
+            }
+        }
+
+        private void OnApplicationQuit()
+        {
+            applicationIsQuitting = true;
+        }
+
+        private void EnsureSceneGateSubscription()
+        {
+            if (sceneGateSubscribed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
+            sceneGateSubscribed = true;
+        }
+
+        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
+        {
+            if (instance != this)
+                return;
+
+            if (scene != SceneManager.GetActiveScene())
+                return;
+
+            if (allowed)
+                return;
+
+            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+            sceneGateSubscribed = false;
+            Destroy(gameObject);
         }
     }
 }
