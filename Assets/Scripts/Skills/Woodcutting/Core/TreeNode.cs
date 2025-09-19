@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Util;
+using System.Collections;
 using Random = UnityEngine.Random;
 
 namespace Skills.Woodcutting
@@ -34,6 +35,8 @@ namespace Skills.Woodcutting
         public event Action<TreeNode> OnTreeRespawned;
 
         private double respawnAt;
+        private Coroutine tickerSubscriptionRoutine;
+        private bool tickerSubscribed;
 
         private void Awake()
         {
@@ -77,20 +80,75 @@ namespace Skills.Woodcutting
 
         private void OnEnable()
         {
-            if (Ticker.Instance != null)
-                Ticker.Instance.Subscribe(this);
+            EnsureTickerSubscription();
         }
 
         private void Start()
         {
-            if (Ticker.Instance != null)
-                Ticker.Instance.Subscribe(this);
+            EnsureTickerSubscription();
         }
 
         private void OnDisable()
         {
+            ReleaseTickerSubscription();
+        }
+
+        /// <summary>
+        /// Ensures the tree is registered with the shared <see cref="Ticker"/> so respawn timing continues
+        /// to progress after returning from login scenes or other loads where the singleton is spawned late.
+        /// </summary>
+        private void EnsureTickerSubscription()
+        {
+            if (tickerSubscribed)
+                return;
+
             if (Ticker.Instance != null)
+            {
+                Ticker.Instance.Subscribe(this);
+                tickerSubscribed = true;
+            }
+            else if (tickerSubscriptionRoutine == null && isActiveAndEnabled)
+            {
+                tickerSubscriptionRoutine = StartCoroutine(WaitForTickerAndSubscribe());
+            }
+        }
+
+        /// <summary>
+        /// Cancels pending ticker waits and unsubscribes when the object is disabled so no orphaned
+        /// subscriptions remain after scene transitions.
+        /// </summary>
+        private void ReleaseTickerSubscription()
+        {
+            if (tickerSubscriptionRoutine != null)
+            {
+                StopCoroutine(tickerSubscriptionRoutine);
+                tickerSubscriptionRoutine = null;
+            }
+
+            if (tickerSubscribed && Ticker.Instance != null)
+            {
                 Ticker.Instance.Unsubscribe(this);
+            }
+
+            tickerSubscribed = false;
+        }
+
+        /// <summary>
+        /// Waits for the global ticker singleton to appear before subscribing so respawn timers pick back up
+        /// correctly even when the ticker spawns a frame later (common after scene changes).
+        /// </summary>
+        private IEnumerator WaitForTickerAndSubscribe()
+        {
+            while (Ticker.Instance == null)
+                yield return null;
+
+            tickerSubscriptionRoutine = null;
+
+            if (!isActiveAndEnabled)
+                yield break;
+
+            Ticker.Instance.Subscribe(this);
+            tickerSubscribed = true;
         }
 
         public void OnTick()
