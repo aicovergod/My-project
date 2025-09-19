@@ -31,6 +31,14 @@ namespace UI.Login
         [SerializeField]
         private Image backgroundImage;
 
+        [SerializeField]
+        private Image loginPanelImage;
+
+        [SerializeField, Tooltip("Resources path for the login screen background sprite.")]
+        private string backgroundSpritePath = "Sprites/LoginScreen/Background";
+
+        private const string LoginPanelSpritePath = "Sprites/LoginScreen/LoginBox";
+
         [Header("Status Colours")]
         [SerializeField]
         private Color successColour = new Color32(197, 183, 110, 255);
@@ -172,9 +180,6 @@ namespace UI.Login
 
         private void EnsureUiHierarchy()
         {
-            if (usernameField != null && passwordField != null && statusText != null && loginButton != null && backgroundImage != null)
-                return;
-
             if (gameObject.layer != 5)
                 gameObject.layer = 5;
 
@@ -199,15 +204,63 @@ namespace UI.Login
             if (rootRect == null)
                 rootRect = gameObject.AddComponent<RectTransform>();
 
-            Sprite panelSprite = Resources.GetBuiltinResource<Sprite>("UISprite.psd");
+            var backgroundSprite = Resources.Load<Sprite>(backgroundSpritePath);
+            if (backgroundSprite == null)
+            {
+                Debug.LogWarning($"LoginScreenController: Unable to load background sprite at Resources/{backgroundSpritePath}. The login screen will use the existing solid-colour fallback.");
+            }
+            else
+            {
+                RectTransform backgroundRect;
+                if (backgroundImage == null)
+                {
+                    backgroundRect = CreateRectTransform("Background", rootRect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+                    backgroundImage = backgroundRect.gameObject.AddComponent<Image>();
+                }
+                else
+                {
+                    backgroundRect = backgroundImage.rectTransform;
+                    backgroundRect.SetParent(rootRect, false);
+                    backgroundRect.name = "Background";
+                }
+
+                backgroundRect.anchorMin = Vector2.zero;
+                backgroundRect.anchorMax = Vector2.one;
+                backgroundRect.pivot = new Vector2(0.5f, 0.5f);
+                backgroundRect.anchoredPosition = Vector2.zero;
+                backgroundRect.sizeDelta = Vector2.zero;
+                backgroundRect.offsetMin = Vector2.zero;
+                backgroundRect.offsetMax = Vector2.zero;
+                backgroundRect.SetAsFirstSibling();
+
+                backgroundImage.sprite = backgroundSprite;
+                backgroundImage.type = Image.Type.Simple;
+                backgroundImage.preserveAspect = true;
+                backgroundImage.color = Color.white;
+                backgroundImage.raycastTarget = false;
+            }
+
+            if (usernameField != null && passwordField != null && statusText != null && loginButton != null && loginPanelImage != null)
+                return;
+
+            var panelSprite = Resources.Load<Sprite>(LoginPanelSpritePath);
+            if (panelSprite == null)
+            {
+                Debug.LogWarning($"LoginScreenController: Unable to load login panel sprite at Resources/{LoginPanelSpritePath}. Falling back to built-in UI sprite.");
+                panelSprite = Resources.GetBuiltinResource<Sprite>("UISprite.psd");
+            }
 
             var panelRect = CreateRectTransform("LoginPanel", rootRect,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 Vector2.zero, new Vector2(640f, 440f));
-            backgroundImage = panelRect.gameObject.AddComponent<Image>();
-            backgroundImage.sprite = panelSprite;
-            backgroundImage.type = Image.Type.Sliced;
-            backgroundImage.color = new Color32(28, 24, 20, 220);
+            panelRect.SetAsLastSibling();
+            loginPanelImage = panelRect.gameObject.AddComponent<Image>();
+            if (panelSprite != null)
+            {
+                loginPanelImage.sprite = panelSprite;
+                loginPanelImage.type = Image.Type.Sliced;
+            }
+            loginPanelImage.color = new Color32(28, 24, 20, 220);
 
             var title = CreateText(panelRect, "Title", "RuneRealm Login", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
                 new Vector2(0f, -32f), new Vector2(520f, 48f), 34, TextAnchor.UpperCenter, FontStyle.Bold);
