@@ -1,6 +1,7 @@
 using System.Collections;
 using Core.Save;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 #if ENABLE_INPUT_SYSTEM
@@ -76,6 +77,7 @@ namespace UI.Login
 
         private Coroutine loadRoutine;
         private Font legacyFont;
+        private GameObject lastSelectedInputField;
 
         private void Awake()
         {
@@ -98,7 +100,10 @@ namespace UI.Login
                 loginButton.onClick.AddListener(HandleLoginClicked);
 
             if (usernameField != null)
+            {
                 usernameField.onValueChanged.AddListener(HandleInputChanged);
+                lastSelectedInputField = usernameField.gameObject;
+            }
 
             if (passwordField != null)
                 passwordField.onValueChanged.AddListener(HandleInputChanged);
@@ -118,10 +123,13 @@ namespace UI.Login
 
             if (passwordField != null)
                 passwordField.onValueChanged.RemoveListener(HandleInputChanged);
+
+            lastSelectedInputField = null;
         }
 
         private void Update()
         {
+            CacheActiveInputFieldSelection();
             HandleKeyboardSubmitNavigation();
         }
 
@@ -309,20 +317,19 @@ namespace UI.Login
             if (!WasSubmitPressedThisFrame())
                 return;
 
-            if (usernameField != null && usernameField.isFocused)
+            GameObject selection = ResolveCurrentInputSelection();
+            if (selection == null)
+                return;
+
+            if (usernameField != null && selection == usernameField.gameObject)
             {
-                if (passwordField != null)
-                {
-                    passwordField.ActivateInputField();
-                    passwordField.MoveTextEnd(false);
-                }
+                FocusPasswordField();
                 return;
             }
 
-            if (passwordField != null && passwordField.isFocused)
+            if (passwordField != null && selection == passwordField.gameObject)
             {
-                if (loginButton != null && loginButton.interactable)
-                    HandleLoginClicked();
+                TrySubmitFromPasswordField();
             }
         }
 
@@ -344,6 +351,80 @@ namespace UI.Login
                 return true;
 #endif
             return false;
+        }
+
+        /// <summary>
+        /// Records which of the login input fields the event system considers selected so the
+        /// Enter key logic can still resolve the previous focus after Unity blurs the field.
+        /// </summary>
+        private void CacheActiveInputFieldSelection()
+        {
+            if (EventSystem.current == null)
+                return;
+
+            var current = EventSystem.current.currentSelectedGameObject;
+            if (current == null)
+                return;
+
+            if ((usernameField != null && current == usernameField.gameObject) ||
+                (passwordField != null && current == passwordField.gameObject))
+            {
+                lastSelectedInputField = current;
+            }
+        }
+
+        /// <summary>
+        /// Resolves the object that should respond to the current Enter key press by checking the
+        /// event system and falling back to the last cached input field reference.
+        /// </summary>
+        private GameObject ResolveCurrentInputSelection()
+        {
+            if (EventSystem.current != null)
+            {
+                var selected = EventSystem.current.currentSelectedGameObject;
+                if (selected != null)
+                    return selected;
+            }
+
+            return lastSelectedInputField;
+        }
+
+        /// <summary>
+        /// Moves keyboard focus to the password field so players can type their password after
+        /// entering a username and pressing Enter.
+        /// </summary>
+        private void FocusPasswordField()
+        {
+            if (passwordField == null)
+                return;
+
+            if (EventSystem.current != null)
+                EventSystem.current.SetSelectedGameObject(passwordField.gameObject);
+
+            passwordField.ActivateInputField();
+            passwordField.MoveTextEnd(false);
+            passwordField.caretPosition = passwordField.text.Length;
+            passwordField.selectionAnchorPosition = passwordField.caretPosition;
+            passwordField.selectionFocusPosition = passwordField.caretPosition;
+            lastSelectedInputField = passwordField.gameObject;
+        }
+
+        /// <summary>
+        /// Attempts to submit the login form when the password field is active and the player presses
+        /// Enter.
+        /// </summary>
+        private void TrySubmitFromPasswordField()
+        {
+            if (loginButton == null || !loginButton.interactable)
+                return;
+
+            if (EventSystem.current != null)
+                EventSystem.current.SetSelectedGameObject(null);
+
+            if (passwordField != null)
+                passwordField.DeactivateInputField();
+
+            HandleLoginClicked();
         }
 
         private void ApplyLegacyFont(InputField field)
