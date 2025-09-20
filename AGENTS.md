@@ -11,12 +11,17 @@
   - `World/ScenePersistentObject` and `World/PersistentObjectBootstrap` keep singleton prefabs alive across scenes while preventing duplicates.
   - `Util/Ticker` emits 0.6 s OSRS ticks and accepts `ITickable` subscribers. Skills and time-based systems should subscribe here rather than relying on `Update` for logic ticks.
   - `World/PersistentSceneGate` centralises which scenes are allowed to spawn persistent services. Subscribe to `SceneEvaluationChanged` or call `ShouldSpawnInScene` so long-lived systems stay dormant on menu/login scenes.
+- **Time & Daily State** (`Assets/Scripts/Core/Time`)
+  - `DailyGameTimeService` caches the current UTC calendar day, survives scene loads, and raises `DayChanged` whenever the day rolls over so dailies, rotating shops, or quests can refresh in sync.
+  - Use `DailyGameTimeService.ComposeDailySeed(ReadOnlySpan<int> contextHashes)` to build deterministic per-day RNG seeds. Pass in hashes for player IDs, node positions, etc., to keep rolls unique while still resetting each day.
+  - Systems that need the service early should either wait for `GameManager.ServicesReady` or inherit from `ScenePersistentObject` so lifecycle matches the rest of the persistent catalog.
 - **Saving** (`Assets/Scripts/Core/Save`)
   - `SaveManager` exposes `Register/Unregister/Save/Load` helpers plus JSON-backed persistence (sample data in `PlayerSave/save_data.json`). Components implement `ISaveable` or use helper save bridges (`SkillManager`, quests, pets, outfits, etc.).
 - **Skills & Progression** (`Assets/Scripts/Skills`)
   - `SkillManager` maintains XP/levels per `SkillType`. Individual skills (Woodcutting, Mining, Fishing, Cooking, Combat styles, Beastmaster, Outfits) live under dedicated folders and rely on the shared `XpTable`/tick math.
   - Woodcutting demonstrates tick integration (`Woodcutting/Core/WoodcuttingSkill`), outfit tracking, pet bonuses, and inventory interactions.
   - Fishing/Cooking use ScriptableObject databases in `Assets/Resources` (`FishingDatabase`, `CookingDatabase`).
+  - Woodcutting, Mining, Fishing, and Cooking now expose `EnableDebugLogging` toggles that gate verbose log output and ticker subscription traces. Toggle them via the in-game `AdminF2Menu` (F2) or in the inspector when diagnosing tick cadence, loot rolls, or state transitions. The fishing `BycatchManager` also defaults `useDailySeed` to true so bycatch rolls key off the shared daily seed—leave that enabled unless a feature needs session-based randomness.
 - **Combat** (`Assets/Scripts/Combat`, `Assets/Scripts/NPC/Combat`, `Assets/NPCCombatProfile`)
   - `CombatController`, `CombatMath`, and `CombatEnums` coordinate player combat ticks, max hit calculations, spell elements, and hitsplat visuals via `Resources/HitSplatLibrary`.
   - NPC combat uses `NpcAttackController`, projectile logic, and drop resolution (`Drops` folder). Pet-assisted combat hooks exist in `Pets`.
@@ -51,6 +56,7 @@
 - Unity C# only. Scripts live under `Assets/Scripts/...` with folder-aligned namespaces (e.g., `namespace Skills.Woodcutting`).
 - Use `[SerializeField]` to expose private inspector references, add `[DisallowMultipleComponent]` where duplicates would break behaviour, and wire events for decoupled communication.
 - Tick-sensitive systems prefer `ITickable` + `Ticker` over raw `Update`. Use coroutines sparingly and clean up subscriptions in `OnDisable`/`OnDestroy`.
+- Follow the `enableDebugLogging` pattern from the gathering skills when adding verbose logging so toggles can be driven from `AdminF2Menu` and hook into `TickedSkillBehaviour.LogTickerSubscription`.
 - UI text defaults to `LegacyRuntime.ttf` via `Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf")` unless a serialized font override is provided.
 - Follow the existing commenting style (XML summaries and inline comments explaining intent) and keep logic modular for future skills/items.
 - For assets, maintain 64×64 resolution, transparent backgrounds, and URP-compatible import settings.
@@ -58,6 +64,7 @@
 ## Working With Systems
 - **Input**: Prefer serialized `InputActionReference` fields. Resolve actions through `InputActionResolver.Resolve` so they auto-enable/disable. New interactables should plug into the shared Player action map (`Move`, `Interact`, `Prospect`, `Cancel`, `OpenMenu`).
 - **Skills**: Register new skills in `SkillType`, supply XP tables, hook into `SkillManager`, and consider pets/outfits/tick cadence. Leverage shared drop/pet helpers where relevant.
+- **Daily Rolls & Calendar**: Query `DailyGameTimeService.CurrentUtcDay` for the cached day and subscribe to `DailyGameTimeService.DayChanged` when a system needs to refresh on rollover. Compose deterministic RNG with `DailyGameTimeService.ComposeDailySeed`, optionally passing context hashes (player ID, node hash, roll index, etc.) so per-entity rolls stay unique but reset each UTC day.
 - **Saving**: Register/deregister save participants with `SaveManager`. Store unique keys (usually lowercase skill IDs) and ensure loads occur during `Awake/OnEnable` to populate runtime state.
 - **Combat**: Route timing through `CombatController`/`Ticker`, reuse `HitSplatLibrary` for visuals, and respect `MagicUI` spell range queries. Pet and NPC hooks already exist—prefer extending those before introducing new combat entry points.
 - **UI**: Add new OSRS-style panels under `Assets/Scripts/UI` or the appropriate feature folder. Use existing tab/button controllers to avoid duplicating input logic.
@@ -86,5 +93,6 @@
 - When adding scripts, keep them under `Assets/Scripts/...` within the most specific subsystem folder (e.g., `Assets/Scripts/Skills/Fishing`).
 - Maintain compatibility with the existing autosave loop, pet systems, and tick timing. New features should clean up event subscriptions and coroutines to avoid lingering references across scene loads.
 - Prefer integration with existing managers (GameManager, SkillManager, SaveManager, ItemDatabase) before introducing new global singletons.
+- Use the in-game `AdminF2Menu` debug panel (F2) to toggle skill logging, pet roll debugging, bycatch debug spam, and skilling outfit odds while testing. Wire any new debug switches into this menu to keep QA tooling consistent.
 
 - Added `PersistentSceneSingleton` helper under `Assets/Scripts/World` plus `PersistentSceneGate` for scene-gated lifecycle management of long-lived services.
