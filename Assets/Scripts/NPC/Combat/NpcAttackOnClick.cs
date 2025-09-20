@@ -3,7 +3,6 @@ using UnityEngine;
 using Combat;
 using Player;
 using Status.Freeze;
-using UI;
 
 namespace NPC
 {
@@ -58,7 +57,7 @@ namespace NPC
                 ?? playerMover.GetComponent<FrozenStatusController>();
             bool playerFrozen = freezeController != null && freezeController.IsFrozen;
 
-            float range = MagicUI.GetActiveSpellRange();
+            float range = playerController.CurrentAttackRange;
             float distance = Vector2.Distance(playerController.transform.position, transform.position);
 
             // Always try to attack immediately when already in range; this covers both frozen and
@@ -105,7 +104,7 @@ namespace NPC
 
             while (playerController != null && freezeController != null && freezeController.IsFrozen && target != null && target.IsAlive)
             {
-                float range = MagicUI.GetActiveSpellRange();
+                float range = playerController.CurrentAttackRange;
                 float distance = Vector2.Distance(playerController.transform.position, target.transform.position);
 
                 // Attack immediately if the NPC wanders into range while the player is frozen.
@@ -120,7 +119,7 @@ namespace NPC
 
             if (playerController != null && freezeController != null && target != null && target.IsAlive)
             {
-                float range = MagicUI.GetActiveSpellRange();
+                float range = playerController.CurrentAttackRange;
                 float distance = Vector2.Distance(playerController.transform.position, target.transform.position);
 
                 if (distance <= range)
