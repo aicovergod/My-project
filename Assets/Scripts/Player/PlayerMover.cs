@@ -18,7 +18,7 @@ namespace Player
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(SpriteRenderer))]
     [RequireComponent(typeof(FrozenStatusController))]
-    public class PlayerMover : ScenePersistentObject
+    public class PlayerMover : ScenePersistentObject, ISaveable
     {
         [Header("Movement")]
         public float moveSpeed = 3.5f;
@@ -63,6 +63,23 @@ namespace Player
         private Coroutine moveRoutine;
         private bool movementFrozen;
         private bool freezeSpriteStateBeforeFreeze;
+        /// <summary>Tracks whether the previous frame considered the player to be moving.</summary>
+        private bool wasMoving;
+        /// <summary>
+        /// Timer used while the player is moving to trigger periodic position saves so autosaves are
+        /// always close to the most recent location.
+        /// </summary>
+        private float movementSaveTimer;
+        /// <summary>
+        /// When true this mover has been registered with the <see cref="SaveManager"/> and should
+        /// be unregistered during teardown.
+        /// </summary>
+        private bool registeredWithSaveManager;
+        /// <summary>
+        /// Interval in seconds used to persist the position while movement is in progress. This
+        /// keeps the stored location reasonably fresh without hammering the save file every frame.
+        /// </summary>
+        private const float MovementSaveInterval = 2f;
 
         // Ensure only one player persists across scene loads.
         private static PlayerMover instance;
@@ -140,7 +157,8 @@ namespace Player
             rb.interpolation = RigidbodyInterpolation2D.Interpolate;
             rb.WakeUp();
 
-            LoadPosition();
+            SaveManager.Register(this);
+            registeredWithSaveManager = true;
 
             SceneTransitionManager.TransitionStarted += OnTransitionStarted;
             SceneTransitionManager.TransitionCompleted += OnTransitionCompleted;
@@ -165,6 +183,7 @@ namespace Player
 
         private void OnDisable()
         {
+            HandleForcedIdle();
 #if ENABLE_INPUT_SYSTEM
             if (moveAction != null)
             {
@@ -199,11 +218,18 @@ namespace Player
 
         private void OnDestroy()
         {
+            HandleForcedIdle();
             if (instance == this)
                 instance = null;
 
             SceneTransitionManager.TransitionStarted -= OnTransitionStarted;
             SceneTransitionManager.TransitionCompleted -= OnTransitionCompleted;
+
+            if (registeredWithSaveManager)
+            {
+                SaveManager.Unregister(this);
+                registeredWithSaveManager = false;
+            }
         }
 
         void Update()
@@ -213,6 +239,7 @@ namespace Player
                 moveDir = Vector2.zero;
                 rb.linearVelocity = Vector2.zero;
                 anim.SetBool("IsMoving", false);
+                HandleForcedIdle();
                 return;
             }
 
@@ -222,6 +249,7 @@ namespace Player
                 if (rb != null)
                     rb.linearVelocity = Vector2.zero;
                 anim.SetBool("IsMoving", false);
+                HandleForcedIdle();
                 return;
             }
 
@@ -230,6 +258,7 @@ namespace Player
                 moveDir = Vector2.zero;
                 rb.linearVelocity = Vector2.zero;
                 anim.SetBool("IsMoving", false);
+                HandleForcedIdle();
                 return;
             }
 
@@ -282,6 +311,7 @@ namespace Player
             // Drive Animator (kept for future use and for state visibility)
             bool isMoving = moveDir.sqrMagnitude > 0f;
             RefreshAnimator(isMoving);
+            HandleMovementPersistenceAfterUpdate(isMoving);
         }
 
         private void RefreshAnimator(bool isMoving)
@@ -471,6 +501,7 @@ namespace Player
                 moveRoutine = null;
             }
             isAutoMoving = false;
+            HandleForcedIdle();
         }
 
         void OnApplicationQuit()
@@ -478,6 +509,9 @@ namespace Player
             SavePosition();
         }
 
+        /// <summary>
+        /// Persist the player's current position to the active save profile.
+        /// </summary>
         public void SavePosition()
         {
             Vector3 pos = transform.position;
@@ -489,6 +523,23 @@ namespace Player
                 scene = SceneManager.GetActiveScene().name
             };
             SaveManager.Save(PositionKey, data);
+        }
+
+        /// <summary>
+        /// Invoked by <see cref="SaveManager"/> during autosaves to capture the latest player position.
+        /// </summary>
+        public void Save()
+        {
+            SavePosition();
+        }
+
+        /// <summary>
+        /// Invoked by <see cref="SaveManager"/> when the profile changes or during initialisation to
+        /// restore the player to the saved location.
+        /// </summary>
+        public void Load()
+        {
+            LoadPosition();
         }
 
         private void LoadPosition()
@@ -549,6 +600,7 @@ namespace Player
         private void OnTransitionStarted()
         {
             isTransitioning = true;
+            HandleForcedIdle();
         }
 
         private void OnTransitionCompleted()
@@ -608,6 +660,44 @@ namespace Player
             }
 
             SavePosition();
+        }
+
+        /// <summary>
+        /// Handles persistence updates while movement input is processed so the saved location stays
+        /// current without incurring unnecessary writes.
+        /// </summary>
+        /// <param name="isMoving">Whether the player is considered to be moving this frame.</param>
+        private void HandleMovementPersistenceAfterUpdate(bool isMoving)
+        {
+            if (isMoving)
+            {
+                movementSaveTimer += Time.unscaledDeltaTime;
+                if (movementSaveTimer >= MovementSaveInterval)
+                {
+                    SavePosition();
+                    movementSaveTimer = 0f;
+                }
+            }
+            else if (wasMoving)
+            {
+                SavePosition();
+                movementSaveTimer = 0f;
+            }
+
+            wasMoving = isMoving;
+        }
+
+        /// <summary>
+        /// Ensures that any forced stop caused by transitions, menus, or scripted calls immediately
+        /// persists the current position so reloads resume from the correct spot.
+        /// </summary>
+        private void HandleForcedIdle()
+        {
+            if (wasMoving)
+                SavePosition();
+
+            wasMoving = false;
+            movementSaveTimer = 0f;
         }
     }
 }
