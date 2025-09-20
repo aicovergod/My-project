@@ -63,6 +63,8 @@ namespace Combat
         }
 
         private const float TILE_SIZE = 1f;
+        private const float DEFAULT_RANGED_RANGE_TILES = 5f;
+        private const float HALBERD_EXTRA_RANGE_TILES = 1f;
 
         private SkillManager skills;
         private PlayerHitpoints hitpoints;
@@ -130,7 +132,7 @@ namespace Combat
         {
             if (target == null || !target.IsAlive)
                 return false;
-            if (Vector2.Distance(transform.position, target.transform.position) > MagicUI.GetActiveSpellRange())
+            if (Vector2.Distance(transform.position, target.transform.position) > GetCurrentAttackRange())
                 return false;
             if (Time.time < nextAttackTime && attackRoutine == null)
                 return false;
@@ -205,6 +207,117 @@ namespace Combat
             }
         }
 
+        /// <summary>Exposes the currently expected attack range in world units.</summary>
+        public float CurrentAttackRange => GetCurrentAttackRange();
+
+        /// <summary>
+        /// Determine the effective range for the next attack based on the pending combat data and
+        /// the currently equipped weapon. Melee styles respect the melee reach, ranged defaults to
+        /// a configured projectile span, and magic defers to the active spell definition.
+        /// </summary>
+        private float GetCurrentAttackRange()
+        {
+            DamageType damageType = DetermineActiveDamageType();
+            switch (damageType)
+            {
+                case DamageType.Magic:
+                    return GetMagicRange();
+                case DamageType.Ranged:
+                    return GetRangedWeaponRange();
+                default:
+                    return GetMeleeWeaponRange();
+            }
+        }
+
+        /// <summary>
+        /// Resolve the most accurate damage type for the upcoming attack. When a combat routine is
+        /// active the pending type captured during resolution is preferred; otherwise fall back to
+        /// the loadout and equipped weapon to infer whether the player is wielding ranged or magic
+        /// gear.
+        /// </summary>
+        private DamageType DetermineActiveDamageType()
+        {
+            // Pending attack data provides the most up-to-date style while an attack coroutine is
+            // running. This ensures projectiles or queued swings keep their intended damage type
+            // even if the player swaps gear mid-action.
+            if (attackRoutine != null)
+            {
+                if (pendingType == DamageType.Magic || pendingType == DamageType.Ranged)
+                    return pendingType;
+                if (pendingSpell != null)
+                    return DamageType.Magic;
+            }
+
+            CombatantStats stats = null;
+            if (combatBinder != null)
+                stats = combatBinder.GetCombatantStats();
+            else if (loadout != null)
+                stats = loadout.GetCombatantStats();
+
+            if (stats != null)
+                return stats.DamageType;
+
+            var weapon = GetEquippedWeapon();
+            if (weapon != null)
+            {
+                if (weapon.combat.Magic > 0)
+                    return DamageType.Magic;
+                if (weapon.combat.Range > 0)
+                    return DamageType.Ranged;
+            }
+
+            return pendingType != DamageType.Melee ? pendingType : DamageType.Melee;
+        }
+
+        /// <summary>
+        /// Fetch the currently equipped weapon, returning null when unarmed.
+        /// </summary>
+        private Inventory.ItemData GetEquippedWeapon()
+        {
+            if (equipmentComponent == null)
+                return null;
+            Inventory.InventoryEntry entry = equipmentComponent.GetEquipped(Inventory.EquipmentSlot.Weapon);
+            return entry.item;
+        }
+
+        /// <summary>
+        /// Calculate melee reach, applying any halberd-style extension the weapon might provide.
+        /// </summary>
+        private float GetMeleeWeaponRange()
+        {
+            float range = CombatMath.MELEE_RANGE;
+            var weapon = GetEquippedWeapon();
+            if (weapon != null && weapon.isHalberd)
+                range = Mathf.Max(range, CombatMath.MELEE_RANGE + HALBERD_EXTRA_RANGE_TILES * TILE_SIZE);
+            return range;
+        }
+
+        /// <summary>
+        /// Determine the distance allowed for ranged weapons. Defaults to an OSRS-style projectile
+        /// span while still allowing future weapon overrides via scriptable data.
+        /// </summary>
+        private float GetRangedWeaponRange()
+        {
+            float range = DEFAULT_RANGED_RANGE_TILES * TILE_SIZE;
+            var weapon = GetEquippedWeapon();
+            if (weapon == null)
+                return range;
+
+            // Designers can introduce explicit ranged reach values later; until then the default is
+            // used for every projectile weapon.
+            return range;
+        }
+
+        /// <summary>
+        /// Retrieve the effective spell range while providing a melee fallback when no spell is
+        /// selected.
+        /// </summary>
+        private static float GetMagicRange()
+        {
+            float range = MagicUI.GetActiveSpellRange();
+            return range > 0f ? range : CombatMath.MELEE_RANGE;
+        }
+
         private IEnumerator AttackRoutine(CombatTarget target)
         {
             currentTarget = target;
@@ -214,7 +327,7 @@ namespace Combat
                 yield return new WaitForSeconds(delay);
             while (target != null && target.IsAlive)
             {
-                if (Vector2.Distance(transform.position, target.transform.position) > MagicUI.GetActiveSpellRange())
+                if (Vector2.Distance(transform.position, target.transform.position) > GetCurrentAttackRange())
                     break;
                 mover?.FaceTarget(target.transform);
                 OnAttackStart?.Invoke();
