@@ -640,6 +640,22 @@ namespace Player
                 }
             }
 
+            // Realign an active pet so it appears beside the player rather than
+            // lingering at the origin during scene swaps.  Without this pass the
+            // pet spawns at (0,0) because the player may not exist yet when the
+            // pet system restores its position during the load sequence.
+            var activePet = PetDropSystem.ActivePetObject;
+            if (activePet != null)
+            {
+                activePet.transform.position = transform.position;
+                var follower = activePet.GetComponent<PetFollower>();
+                if (follower != null)
+                    follower.SetPlayer(transform);
+
+                if (activePet.scene != scene)
+                    SceneManager.MoveGameObjectToScene(activePet, scene);
+            }
+
             var players = GameObject.FindGameObjectsWithTag("Player");
             foreach (var p in players)
             {
