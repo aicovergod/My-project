@@ -40,7 +40,7 @@ namespace Inventory
     /// as the slot frame (set to Sliced).
     /// </summary>
     [DisallowMultipleComponent]
-    public class Inventory : MonoBehaviour, IUIWindow
+    public class Inventory : MonoBehaviour, IUIWindow, ISaveable
     {
         [Header("Inventory")]
         [Tooltip("Maximum number of items the inventory can hold.")]
@@ -155,6 +155,18 @@ namespace Inventory
 
         private bool CanDropItems => playerMover == null || playerMover.CanDrop;
 
+        /// <summary>
+        /// Saves the inventory when requested and informs listeners that the
+        /// inventory contents changed.
+        /// </summary>
+        /// <param name="persist">True to write the inventory state to disk before notifying listeners.</param>
+        private void NotifyInventoryChanged(bool persist = true)
+        {
+            if (persist)
+                Save();
+            OnInventoryChanged?.Invoke();
+        }
+
         public void CloseUI()
         {
             if (BankOpen)
@@ -209,7 +221,7 @@ namespace Inventory
             items[index].item = null;
             items[index].count = 0;
             UpdateSlotVisual(index);
-            OnInventoryChanged?.Invoke();
+            NotifyInventoryChanged();
         }
 
         /// <summary>
@@ -232,14 +244,14 @@ namespace Inventory
             // Try to equip the item.
             if (equipment.Equip(entry))
             {
-                OnInventoryChanged?.Invoke();
+                NotifyInventoryChanged();
                 return true;
             }
 
             // Equipping failed. Restore the original item.
             items[index] = entry;
             UpdateSlotVisual(index);
-            OnInventoryChanged?.Invoke();
+            NotifyInventoryChanged(false);
             return false;
         }
 
@@ -279,7 +291,7 @@ namespace Inventory
                             items[index].item = null;
                     }
                     UpdateSlotVisual(index);
-                    OnInventoryChanged?.Invoke();
+                    NotifyInventoryChanged();
                     ItemUseResolver.NotifyItemUsed(gameObject, item, ItemUseType.Consumed);
                     return true;
                 }
@@ -288,47 +300,88 @@ namespace Inventory
             return false;
         }
 
-        private void Start()
+        private void OnEnable()
         {
-            // Ensure at least one slot and cache the builtin font once
+            EnsureInitialized();
+            SaveManager.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            SaveManager.Unregister(this);
+        }
+
+        /// <summary>
+        /// Ensures runtime data structures exist before the inventory participates in save/load.
+        /// </summary>
+        private void EnsureInitialized()
+        {
             size = Mathf.Max(1, size);
 
-            try
+            if (defaultFont == null)
             {
-                defaultFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            }
-            catch (System.ArgumentException)
-            {
-                defaultFont = null;
+                try
+                {
+                    defaultFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                }
+                catch (ArgumentException)
+                {
+                    defaultFont = null;
+                }
             }
 
-            stackCountFont = Resources.Load<Font>("ThaleahFat_TTF") ??
-                             Resources.Load<Font>("ThaleahFAT_TTF") ??
-                             stackCountFont ?? defaultFont;
+            if (stackCountFont == null)
+            {
+                stackCountFont = Resources.Load<Font>("ThaleahFat_TTF") ??
+                                 Resources.Load<Font>("ThaleahFAT_TTF") ??
+                                 defaultFont;
+            }
 
-            items = new InventoryEntry[size];
+            if (items == null || items.Length != size)
+            {
+                var previous = items;
+                items = new InventoryEntry[size];
+                if (previous != null)
+                {
+                    int copyLength = Mathf.Min(previous.Length, items.Length);
+                    for (int i = 0; i < copyLength; i++)
+                        items[i] = previous[i];
+                }
+            }
 
             if (EventSystem.current == null)
                 EnsureEventSystem();
 
-            if (useSharedUIRoot && sharedUIRoot != null)
+            if (uiRoot == null)
             {
-                uiRoot = sharedUIRoot;
+                if (useSharedUIRoot && sharedUIRoot != null)
+                {
+                    uiRoot = sharedUIRoot;
+                }
+                else
+                {
+                    CreateUI();
+                    if (useSharedUIRoot)
+                        sharedUIRoot = uiRoot;
+                }
             }
-            else
-            {
-                CreateUI();
-                if (useSharedUIRoot)
-                    sharedUIRoot = uiRoot;
-            }
-
-            playerMover = GetComponent<PlayerMover>();
-            equipment = GetComponent<Equipment>();
 
             if (uiRoot != null)
+            {
                 uiRoot.SetActive(false);
+                if (dropMenu == null)
+                    dropMenu = uiRoot.GetComponentInChildren<InventoryDropMenu>(true);
+            }
 
-            Load();
+            if (playerMover == null)
+                playerMover = GetComponent<PlayerMover>();
+            if (equipment == null)
+                equipment = GetComponent<Equipment>();
+        }
+
+        private void Start()
+        {
+            EnsureInitialized();
             UIManager.Instance.RegisterWindow(this);
         }
 
@@ -732,7 +785,7 @@ namespace Inventory
 
             bool success = remaining <= 0;
             if (success)
-                OnInventoryChanged?.Invoke();
+                NotifyInventoryChanged();
             return success;
         }
 
@@ -817,7 +870,7 @@ namespace Inventory
 
             bool success = count <= 0;
             if (success)
-                OnInventoryChanged?.Invoke();
+                NotifyInventoryChanged();
             return success;
         }
 
@@ -849,7 +902,7 @@ namespace Inventory
                         items[i].item = null;
                     UpdateSlotVisual(i);
 
-                    OnInventoryChanged?.Invoke();
+                    NotifyInventoryChanged();
                     return true;
                 }
             }
@@ -883,8 +936,11 @@ namespace Inventory
                 items[dstIndex].item = null;
             UpdateSlotVisual(dstIndex);
 
-            AddItem(result, 1);
-            OnInventoryChanged?.Invoke();
+            bool added = AddItem(result, 1);
+            if (added)
+                NotifyInventoryChanged(false);
+            else
+                NotifyInventoryChanged();
             return true;
         }
 
@@ -920,7 +976,7 @@ namespace Inventory
             entry.count = newCount;
             items[slotIndex] = entry;
             UpdateSlotVisual(slotIndex);
-            OnInventoryChanged?.Invoke();
+            NotifyInventoryChanged();
             return true;
         }
 
@@ -951,7 +1007,7 @@ namespace Inventory
             items[slotIndex] = entry;
             UpdateSlotVisual(slotIndex);
             HideTooltip();
-            OnInventoryChanged?.Invoke();
+            NotifyInventoryChanged();
 
             // Attempt to spawn a pet for this item if one exists.
             if (pet != null)
@@ -989,7 +1045,7 @@ namespace Inventory
             items[slotIndex] = entry;
             UpdateSlotVisual(slotIndex);
             HideTooltip();
-            OnInventoryChanged?.Invoke();
+            NotifyInventoryChanged();
         }
 
         /// <summary>
@@ -1024,7 +1080,7 @@ namespace Inventory
 
             UpdateSlotVisual(slotIndex);
             UpdateSlotVisual(target);
-            OnInventoryChanged?.Invoke();
+            NotifyInventoryChanged();
         }
 
         /// <summary>
@@ -1175,7 +1231,7 @@ namespace Inventory
             if (sold > 0)
             {
                 HideTooltip();
-                OnInventoryChanged?.Invoke();
+                NotifyInventoryChanged();
             }
         }
 
@@ -1267,8 +1323,8 @@ namespace Inventory
                     UpdateSlotVisual(slotIndex);
                     source.UpdateSlotVisual(sourceIndex);
                     source.EndDrag();
-                    OnInventoryChanged?.Invoke();
-                    source.OnInventoryChanged?.Invoke();
+                    NotifyInventoryChanged();
+                    source.NotifyInventoryChanged();
                 }
                 else
                 {
@@ -1297,7 +1353,7 @@ namespace Inventory
             }
 
             EndDrag();
-            OnInventoryChanged?.Invoke();
+            NotifyInventoryChanged();
         }
 
         public void EndDrag()
@@ -1381,7 +1437,7 @@ namespace Inventory
                 UpdateSlotVisual(i);
             }
 
-            OnInventoryChanged?.Invoke();
+            NotifyInventoryChanged(false);
         }
 
         private void OnApplicationQuit()
