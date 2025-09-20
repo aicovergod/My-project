@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using Core.Save;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -14,16 +16,24 @@ namespace Audio
     /// about logical <see cref="SoundEffect"/> identifiers rather than file paths.
     /// </summary>
     [DisallowMultipleComponent]
-    public class SoundManager : MonoBehaviour
+    public class SoundManager : MonoBehaviour, ISaveable
     {
         private const string SoundFolderName = "Sound";
         private const string AssetRoot = "Assets";
+        private const string SfxVolumeSaveKey = "audio_sfx_volume";
+        private const float MinAudibleVolume = 0.001f;
 
 #if UNITY_EDITOR
         private static readonly string[] SupportedExtensions = { ".ogg", ".wav", ".mp3" };
 #endif
 
         private static SoundManager instance;
+
+        /// <summary>
+        /// Event fired whenever the sound effect volume multiplier is modified. UI layers hook
+        /// into this to keep sliders/toggles synchronised with the persisted preference.
+        /// </summary>
+        public event Action<float> SfxVolumeChanged;
 
         /// <summary>
         /// Singleton style accessor that either returns an existing manager in the scene or
@@ -74,6 +84,16 @@ namespace Audio
         [Tooltip("Global volume applied to sound effects triggered through the manager.")]
         private float sfxVolume = 1f;
 
+        /// <summary>
+        /// Global sound effect volume multiplier. Values are clamped to the [0,1] range and
+        /// automatically persisted via <see cref="SaveManager"/> whenever they change.
+        /// </summary>
+        public float SfxVolume
+        {
+            get => sfxVolume;
+            set => ApplySfxVolume(value, true, true);
+        }
+
         private AudioSource oneShotSource;
 
         private void Awake()
@@ -89,10 +109,22 @@ namespace Audio
             EnsureAudioSource();
         }
 
+        private void OnEnable()
+        {
+            SaveManager.Register(this);
+        }
+
         private void OnDestroy()
         {
             if (instance == this)
                 instance = null;
+            SaveManager.Unregister(this);
+        }
+
+        private void OnDisable()
+        {
+            Save();
+            SaveManager.Unregister(this);
         }
 
         /// <summary>
@@ -122,6 +154,15 @@ namespace Audio
 
             EnsureAudioSource();
             oneShotSource.PlayOneShot(clip, sfxVolume);
+        }
+
+        /// <summary>
+        /// UnityEvent-friendly wrapper around <see cref="SfxVolume"/> so UI widgets can bind to
+        /// the setter without using reflection.
+        /// </summary>
+        public void SetSfxVolumeFromUI(float volume)
+        {
+            SfxVolume = volume;
         }
 
         /// <summary>
@@ -172,6 +213,28 @@ namespace Audio
             clipCache.Clear();
         }
 
+        /// <inheritdoc />
+        public void Save()
+        {
+            var data = new SfxVolumeSaveData
+            {
+                hasValue = true,
+                volume = sfxVolume
+            };
+            SaveManager.Save(SfxVolumeSaveKey, data);
+        }
+
+        /// <inheritdoc />
+        public void Load()
+        {
+            EnsureAudioSource();
+            var data = SaveManager.Load<SfxVolumeSaveData>(SfxVolumeSaveKey);
+            if (data.hasValue)
+                ApplySfxVolume(data.volume, false, true, true);
+            else
+                ApplySfxVolume(sfxVolume, false, true, true);
+        }
+
         private static SoundManager FindExistingManager()
         {
 #if UNITY_2023_1_OR_NEWER
@@ -193,6 +256,7 @@ namespace Audio
             oneShotSource.playOnAwake = false;
             oneShotSource.loop = false;
             oneShotSource.spatialBlend = 0f; // Treat as 2D UI-style audio.
+            oneShotSource.volume = 1f;
         }
 
         private AudioClip LoadClip(string clipName)
@@ -235,6 +299,35 @@ namespace Audio
 
             clipCache[key] = clip;
             return clip;
+        }
+
+        private void ApplySfxVolume(float value, bool persist, bool notify)
+        {
+            ApplySfxVolume(value, persist, notify, false);
+        }
+
+        private void ApplySfxVolume(float value, bool persist, bool notify, bool forceNotify)
+        {
+            float clamped = Mathf.Clamp01(value);
+            if (clamped < MinAudibleVolume)
+                clamped = 0f;
+            float previous = sfxVolume;
+            sfxVolume = clamped;
+
+            bool changed = !Mathf.Approximately(previous, clamped);
+
+            if (notify && (changed || forceNotify))
+                SfxVolumeChanged?.Invoke(sfxVolume);
+
+            if (persist && changed)
+                Save();
+        }
+
+        [Serializable]
+        private struct SfxVolumeSaveData
+        {
+            public bool hasValue;
+            public float volume;
         }
     }
 }
