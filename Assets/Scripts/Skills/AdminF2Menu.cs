@@ -368,6 +368,11 @@ namespace Skills
                 hitpoints?.DebugSetCurrentHp(hitpoints.MaxHp);
             }
 
+            if (GUILayout.Button("Kill Player"))
+            {
+                KillPlayer();
+            }
+
             if (GUILayout.Button("Apply Poison (p)"))
             {
                 ApplyPoisonP();
@@ -515,6 +520,22 @@ namespace Skills
             }
 
             return poisonController;
+        }
+
+        /// <summary>
+        /// Instantly reduces the player's hitpoints to zero, triggering the standard death flow.
+        /// </summary>
+        private void KillPlayer()
+        {
+            var target = hitpoints ?? FindObjectOfType<PlayerHitpoints>();
+            if (target == null)
+            {
+                Debug.LogWarning("AdminF2Menu could not locate PlayerHitpoints to kill the player.");
+                return;
+            }
+
+            // Clamp to zero so the respawn system receives an OnHealthChanged notification.
+            target.DebugSetCurrentHp(0);
         }
 
         /// <summary>
