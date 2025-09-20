@@ -75,6 +75,29 @@ namespace Audio
         };
 
         /// <summary>
+        /// Set of sound effects that represent level up chimes. Used so that only a single
+        /// level up clip is played per frame when multiple skills level simultaneously.
+        /// </summary>
+        private static readonly HashSet<SoundEffect> LevelUpEffects = new()
+        {
+            SoundEffect.AttackLevelUp,
+            SoundEffect.DefenceLevelUp,
+            SoundEffect.MagicLevelUp,
+            SoundEffect.MiningLevelUp,
+            SoundEffect.WoodcuttingLevelUp,
+            SoundEffect.FishingLevelUp,
+            SoundEffect.CookingLevelUp,
+            SoundEffect.BeastmasterLevelUp
+        };
+
+        /// <summary>
+        /// Tracks which frame most recently triggered a level up sound so the manager can
+        /// suppress additional requests in the same frame. This prevents multiple level up
+        /// chimes firing simultaneously when the player earns several levels at once.
+        /// </summary>
+        private int lastLevelUpFrame = -1;
+
+        /// <summary>
         /// Cache of loaded audio clips keyed by file name (without extension) so we only
         /// perform the IO/asset lookup once per clip.
         /// </summary>
@@ -139,6 +162,9 @@ namespace Audio
                 return;
             }
 
+            if (ShouldThrottleLevelUp(effect))
+                return;
+
             PlaySfxByFileName(fileName);
         }
 
@@ -154,6 +180,19 @@ namespace Audio
 
             EnsureAudioSource();
             oneShotSource.PlayOneShot(clip, sfxVolume);
+        }
+
+        private bool ShouldThrottleLevelUp(SoundEffect effect)
+        {
+            if (!LevelUpEffects.Contains(effect))
+                return false;
+
+            int currentFrame = Time.frameCount;
+            if (currentFrame == lastLevelUpFrame)
+                return true;
+
+            lastLevelUpFrame = currentFrame;
+            return false;
         }
 
         /// <summary>
