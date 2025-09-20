@@ -97,7 +97,8 @@ namespace Core
 
         private IEnumerator AutoSaveLoop()
         {
-            var wait = new WaitForSeconds(AutosaveInterval);
+            // Use the realtime variant so autosaves still fire when the game is paused via Time.timeScale.
+            var wait = new WaitForSecondsRealtime(AutosaveInterval);
             while (true)
             {
                 yield return wait;
