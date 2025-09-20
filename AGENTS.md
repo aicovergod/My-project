@@ -10,6 +10,7 @@
   - `Core/GameManager` is the scene-agnostic bootstrapper. It caches singletons spawned by `Resources/PersistentObjects.asset` and starts autosaves via `SaveManager`.
   - `World/ScenePersistentObject` and `World/PersistentObjectBootstrap` keep singleton prefabs alive across scenes while preventing duplicates.
   - `Util/Ticker` emits 0.6 s OSRS ticks and accepts `ITickable` subscribers. Skills and time-based systems should subscribe here rather than relying on `Update` for logic ticks.
+  - `World/PersistentSceneGate` centralises which scenes are allowed to spawn persistent services. Subscribe to `SceneEvaluationChanged` or call `ShouldSpawnInScene` so long-lived systems stay dormant on menu/login scenes.
 - **Saving** (`Assets/Scripts/Core/Save`)
   - `SaveManager` exposes `Register/Unregister/Save/Load` helpers plus JSON-backed persistence (sample data in `PlayerSave/save_data.json`). Components implement `ISaveable` or use helper save bridges (`SkillManager`, quests, pets, outfits, etc.).
 - **Skills & Progression** (`Assets/Scripts/Skills`)
@@ -30,13 +31,21 @@
   - NPC interaction, navigation, and movement wrappers live here. Minimap, doors, scene transitions, and respawns sit under `World`.
 - **UI Layer** (`Assets/Scripts/UI`, `Assets/Scripts/Player`, `Assets/Scripts/Status`)
   - HUDs such as `HealthHUD`, merge timers, tab buttons, and combat/skill overlays expect LegacyRuntime fonts and OSRS layout cues. `UI/PersistentEventSystem` maintains input modules across scenes.
+- **Status Effects** (`Assets/Scripts/Status`)
+  - `BuffTimerService` owns timed buffs (poison, freeze, antifire, stamina, etc.) and relays updates via `BuffTimerInstance`. Always raise effects through the static `BuffEvents` hub so combat, inventory, pets, and scripted encounters stay decoupled.
+  - `BuffStateSaveBridge` snapshots active timers for persistence. Attach it to entities that must keep buffs between loads; legacy `PoisonSaveBridge` is deprecated and should remain disabled unless debugging old data.
+  - Effect-specific controllers live under subfolders (`Status/Poison`, `Status/Freeze`, `Status/Antifire`) and handle combat mitigation, HUD sync, and ticker subscriptions.
 - **Pets & Drops** (`Assets/Scripts/Pets`, `Assets/Scripts/Drops`)
   - Pets include drop systems, storage, level bars, and context menus. Drop tables combine scriptable entries with RNG helpers and tie into `NpcDropper` and `GroundItemSpawner`.
+- **Books & Lore** (`Assets/Scripts/Books`, `Assets/Resources/Books`)
+  - `BookData` ScriptableObjects (use `\f` delimiters within `content`) drive lore pages while `BookProgressManager` tracks per-book page progress via `PersistentSceneSingleton`. `BookItemData` links inventory entries to the underlying book asset.
 
 ## Data & Assets
 - **Resources**: Centralized assets (persistent prefab list, item databases, hit splats, cooking/fishing databases, pet drop tables, quest data, sprite atlases).
 - **Prefabs & Scenes**: Gameplay scenes under `Assets/Scenes` with associated navmeshes. Shared UI/combat/pet prefabs live in `Assets/Prefabs` and subfolders.
 - **Sprites & Tiles**: Sprites under `Assets/Sprites`, `TileAssets`, and `WorldPalette`. Maintain 64×64 resolution with transparent backgrounds.
+- **Buff Icons & Status Configs**: HUD sprites reside in `Assets/Resources/UI/Buffs` while status configs (poison defaults, etc.) live in `Assets/Resources/Status`. Align icon IDs with `BuffTimerDefinition.iconId` and keep `PoisonConfig.Id` stable for saves.
+- **Book Content**: Lore assets live in `Assets/Resources/Books`. Use `\f` within `BookData.content` to break pages and avoid relying on the obsolete `pages` list.
 
 ## Code Conventions
 - Unity C# only. Scripts live under `Assets/Scripts/...` with folder-aligned namespaces (e.g., `namespace Skills.Woodcutting`).
@@ -53,6 +62,9 @@
 - **Combat**: Route timing through `CombatController`/`Ticker`, reuse `HitSplatLibrary` for visuals, and respect `MagicUI` spell range queries. Pet and NPC hooks already exist—prefer extending those before introducing new combat entry points.
 - **UI**: Add new OSRS-style panels under `Assets/Scripts/UI` or the appropriate feature folder. Use existing tab/button controllers to avoid duplicating input logic.
 - **Data**: Place ScriptableObject databases in the relevant `Assets/Resources/...` subfolder so runtime lookups via `Resources.Load` continue to work.
+- **Status Effects & Buff Timers**: Build a `BuffTimerDefinition` and `BuffEventContext` when applying effects from combat, inventory, or scripted hooks. Broadcast through `BuffEvents.RaiseBuffApplied`/`RaiseBuffRefreshed` (and `RaiseBuffRemoved` when clearing) so `BuffTimerService` can manage durations, HUD warnings, and recurrence. Query active buffs via `TryGetBuff`/`GetBuffsFor`, and persist long-lived timers with `BuffStateSaveBridge`.
+- **Consumable & Equipment Buffs**: Configure `ItemData.buffEffects` to mirror OSRS potions/prayers. `Inventory/ItemUseResolver` automatically translates consume/equip/unequip events into the appropriate buff broadcasts and removes equipment buffs when items are unequipped.
+- **Books**: Use `BookProgressManager.Instance` to track the current page per `BookData` ID. Load content with `Resources.Load<BookData>` and wire `BookItemData` references on inventory items so book UI panels resolve the correct lore entry and restore saved progress.
 
 ## Shared Gathering Utilities
 - **Location**: `Assets/Scripts/Skills/Common` collects the cross-skill helpers used by Fishing, Mining, Woodcutting, and future gathering content.
@@ -75,4 +87,4 @@
 - Maintain compatibility with the existing autosave loop, pet systems, and tick timing. New features should clean up event subscriptions and coroutines to avoid lingering references across scene loads.
 - Prefer integration with existing managers (GameManager, SkillManager, SaveManager, ItemDatabase) before introducing new global singletons.
 
-- Added PersistentSceneSingleton helper under Assets/Scripts/World for shared scene-gated singleton lifecycle.
+- Added `PersistentSceneSingleton` helper under `Assets/Scripts/World` plus `PersistentSceneGate` for scene-gated lifecycle management of long-lived services.

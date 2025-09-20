@@ -10,6 +10,8 @@ This project currently targets **Unity 6000.2.3f1**.
 - **Saving System** – Provides persistent player data using components like `SaveManager` and player-specific save bridges.
 - **Skill System** – A modular framework for training skills such as woodcutting and mining through `SkillManager` and skill-specific modules.
 - **Shop System** – Supports buying and selling items via `Shop` and `ShopUI` components.
+- **Status & Buff System** – Centralises timed effects with `Status/BuffTimerService`, `BuffEvents`, and `BuffStateSaveBridge` so combat, consumables, and scripted encounters can apply poison, antifire, freeze, and other buffs while persisting through saves.
+- **Lore & Books** – Scriptable `BookData` assets back in-world books while `BookProgressManager` tracks which page each player has reached when reading from items or world interactions.
 
 ## Input & Rebinding
 - The project relies on the Unity Input System with the `Assets/InputSystem_Actions.inputactions` asset. The **Player** map now
