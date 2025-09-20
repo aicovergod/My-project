@@ -146,9 +146,12 @@ namespace Player
             SceneTransitionManager.TransitionCompleted += OnTransitionCompleted;
         }
 
-#if ENABLE_INPUT_SYSTEM
-        void OnEnable()
+        private void OnEnable()
         {
+            // Register this mover with the SceneTransitionManager so the player persists across scene swaps.
+            SceneTransitionManager.RegisterPersistentObject(this);
+
+#if ENABLE_INPUT_SYSTEM
             moveAction = InputActionResolver.Resolve(playerInput, moveActionReference, "Move", out moveActionEnabledByResolver);
 
             if (moveAction != null)
@@ -157,10 +160,12 @@ namespace Player
                 moveAction.canceled += OnMoveCanceled;
                 moveActionValue = moveAction.ReadValue<Vector2>();
             }
+#endif
         }
 
-        void OnDisable()
+        private void OnDisable()
         {
+#if ENABLE_INPUT_SYSTEM
             if (moveAction != null)
             {
                 moveAction.performed -= OnMovePerformed;
@@ -173,6 +178,10 @@ namespace Player
             moveAction = null;
             moveActionEnabledByResolver = false;
             moveActionValue = Vector2.zero;
+#endif
+
+            // Remove this mover from the persistence registry when disabled so duplicates do not accumulate.
+            SceneTransitionManager.UnregisterPersistentObject(this);
         }
 
         private void OnMovePerformed(InputAction.CallbackContext context)
