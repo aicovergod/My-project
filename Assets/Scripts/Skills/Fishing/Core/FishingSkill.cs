@@ -341,22 +341,16 @@ namespace Skills.Fishing
         {
             if (bycatchManager != null && bycatchManager.useDailySeed)
             {
-                int seed = DateTime.UtcNow.Date.GetHashCode();
-                seed = HashCombine(seed, ctx.playerIdHash);
-                seed = HashCombine(seed, ctx.nodeHash);
-                seed = HashCombine(seed, ctx.rollIndex);
+                int seed = BycatchManager.ComposeDailySeed(stackalloc int[]
+                {
+                    ctx.playerIdHash,
+                    ctx.nodeHash,
+                    ctx.rollIndex
+                });
                 return new System.Random(seed);
             }
 
             return new System.Random();
-        }
-
-        private static int HashCombine(int a, int b)
-        {
-            unchecked
-            {
-                return (a * 397) ^ b;
-            }
         }
 
         public void StartFishing(FishableSpot spot, FishingToolDefinition tool)
