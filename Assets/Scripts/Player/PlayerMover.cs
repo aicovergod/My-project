@@ -184,6 +184,7 @@ namespace Player
             SceneTransitionManager.UnregisterPersistentObject(this);
         }
 
+#if ENABLE_INPUT_SYSTEM
         private void OnMovePerformed(InputAction.CallbackContext context)
         {
             // Cache the most recent movement vector supplied by the Player action map.
