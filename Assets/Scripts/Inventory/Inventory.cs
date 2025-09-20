@@ -1426,8 +1426,18 @@ namespace Inventory
                 if (!string.IsNullOrEmpty(slot.id))
                 {
                     var item = ItemDatabase.GetItem(slot.id);
-                    items[i].item = item;
-                    items[i].count = slot.count;
+                    if (item == null)
+                    {
+                        // Log the corruption so we can investigate missing or invalid item ids in save data.
+                        Debug.LogWarning($"Inventory.Load: Failed to resolve item id '{slot.id}' for slot {i}. Resetting slot to empty.");
+                        items[i].item = null;
+                        items[i].count = 0;
+                    }
+                    else
+                    {
+                        items[i].item = item;
+                        items[i].count = slot.count;
+                    }
                 }
                 else
                 {
