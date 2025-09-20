@@ -7,17 +7,17 @@ using Skills;
 namespace World
 {
     /// <summary>
-    /// Simple door interaction.  When the player clicks on the door the specified
-    /// scene is loaded.  If a required item ID is provided the player must possess
-    /// that item in their inventory to use the door.
+    ///     Generic scene transition interactable that can represent doors, ladders, cave entrances or any
+    ///     similar prop. When clicked (or tapped) it optionally validates inventory/skill requirements before
+    ///     triggering a scene change through the <see cref="SceneTransitionManager"/>.
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
-    public class Door : MonoBehaviour
+    public class SceneTransitionInteractable : MonoBehaviour
     {
-        [Tooltip("Name of the scene to load when this door is used.")]
+        [Tooltip("Name of the scene to load when this interactable is used.")]
         public string sceneToLoad;
 
-        [Tooltip("Optional item ID required to use this door.  Leave empty for no requirement.")]
+        [Tooltip("Optional item ID required to use this interactable. Leave empty for no requirement.")]
         public string requiredItemId;
 
         [Tooltip("If true, the required item will be removed from the player's inventory when used.")]
@@ -27,19 +27,19 @@ namespace World
         public string missingItemMessage;
 
         [Header("Skill Requirement")]
-        [Tooltip("If enabled, the player must reach the specified skill level to use this door.")]
+        [Tooltip("If enabled, the player must reach the specified skill level to use this interactable.")]
         public bool requireSkillLevel;
 
         [Tooltip("Skill that must meet the required level. Only used when Require Skill Level is enabled.")]
         public SkillType requiredSkill;
 
-        [Tooltip("Minimum level in the required skill needed to use this door.")]
+        [Tooltip("Minimum level in the required skill needed to use this interactable.")]
         public int requiredSkillLevel = 1;
 
         [Tooltip("Name of the spawn point in the target scene where the player should appear.")]
         public string spawnPointName;
 
-        [Tooltip("How close the player must be in tiles to use the door.")]
+        [Tooltip("How close the player must be in tiles to activate this interactable.")]
         public float useRadius = 2f;
 
         private bool _transitioning;
@@ -72,13 +72,13 @@ namespace World
             {
                 if (col.gameObject == gameObject)
                 {
-                    StartCoroutine(UseDoor());
+                    StartCoroutine(UseInteractable());
                     break;
                 }
             }
         }
 
-        private IEnumerator UseDoor()
+        private IEnumerator UseInteractable()
         {
             if (_transitioning)
                 yield break;
@@ -108,7 +108,7 @@ namespace World
                 if (skillManager == null)
                 {
                     // Failing silently would be confusing, so log a warning for designers.
-                    Debug.LogWarning($"Door {name} requires a skill check but the player is missing a SkillManager component.");
+                    Debug.LogWarning($"Interactable {name} requires a skill check but the player is missing a SkillManager component.");
                     yield break;
                 }
 
@@ -149,7 +149,7 @@ namespace World
             if (EventSystem.current == null)
                 return false;
 
-            // Evaluate active touches first so mobile presses correctly block door usage.
+            // Evaluate active touches first so mobile presses correctly block interactable usage.
             Touchscreen touchscreen = Touchscreen.current;
             if (touchscreen != null)
             {
