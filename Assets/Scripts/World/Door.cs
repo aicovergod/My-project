@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using Skills;
 
 namespace World
 {
@@ -24,6 +25,16 @@ namespace World
 
         [Tooltip("Text to display if the player lacks the required item.")]
         public string missingItemMessage;
+
+        [Header("Skill Requirement")]
+        [Tooltip("If enabled, the player must reach the specified skill level to use this door.")]
+        public bool requireSkillLevel;
+
+        [Tooltip("Skill that must meet the required level. Only used when Require Skill Level is enabled.")]
+        public SkillType requiredSkill;
+
+        [Tooltip("Minimum level in the required skill needed to use this door.")]
+        public int requiredSkillLevel = 1;
 
         [Tooltip("Name of the spawn point in the target scene where the player should appear.")]
         public string spawnPointName;
@@ -88,6 +99,26 @@ namespace World
                     yield break;
                 }
 
+            }
+
+            if (requireSkillLevel)
+            {
+                // Validate the player's skill level before allowing the transition.
+                SkillManager skillManager = player.GetComponent<SkillManager>();
+                if (skillManager == null)
+                {
+                    // Failing silently would be confusing, so log a warning for designers.
+                    Debug.LogWarning($"Door {name} requires a skill check but the player is missing a SkillManager component.");
+                    yield break;
+                }
+
+                int requiredLevel = Mathf.Max(1, requiredSkillLevel);
+                int currentLevel = skillManager.GetLevel(requiredSkill);
+                if (currentLevel < requiredLevel)
+                {
+                    PopupText.Show($"You need {requiredLevel} {requiredSkill} to enter", player.transform);
+                    yield break;
+                }
             }
 
             if (!string.IsNullOrEmpty(sceneToLoad))
