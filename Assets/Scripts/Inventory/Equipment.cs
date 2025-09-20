@@ -560,8 +560,19 @@ namespace Inventory
                 var slot = data.slots[i];
                 if (!string.IsNullOrEmpty(slot.id))
                 {
-                    equipped[i].item = ItemDatabase.GetItem(slot.id);
-                    equipped[i].count = slot.count;
+                    // Attempt to resolve the saved item id; if it no longer exists we clear
+                    // the slot so stale counts are not preserved between loads.
+                    var resolvedItem = ItemDatabase.GetItem(slot.id);
+                    equipped[i].item = resolvedItem;
+                    if (resolvedItem != null)
+                    {
+                        equipped[i].count = slot.count;
+                    }
+                    else
+                    {
+                        equipped[i].count = 0;
+                        Debug.LogWarning($"Equipment.Load: Missing item '{slot.id}' for slot {(EquipmentSlot)(i + 1)}. Slot has been cleared to prevent invalid state.");
+                    }
                 }
                 else
                 {
