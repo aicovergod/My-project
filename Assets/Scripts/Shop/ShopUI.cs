@@ -170,6 +170,8 @@ namespace ShopSystem
             uiRoot.transform.SetParent(null, false);
             DontDestroyOnLoad(uiRoot);
 
+            Font runtimeFont = priceFont != null ? priceFont : LegacyFontProvider.GetLegacyFont();
+
             var canvas = uiRoot.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.pixelPerfect = true;
@@ -207,7 +209,7 @@ namespace ShopSystem
             GameObject closeTextGO = new GameObject("Text", typeof(Text));
             closeTextGO.transform.SetParent(closeButtonGO.transform, false);
             var closeText = closeTextGO.GetComponent<Text>();
-            closeText.font = priceFont != null ? priceFont : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            closeText.font = runtimeFont;
             closeText.text = "X";
             closeText.alignment = TextAnchor.MiddleCenter;
             closeText.color = Color.white;
@@ -260,7 +262,7 @@ namespace ShopSystem
                 GameObject priceGO = new GameObject("Price", typeof(Text));
                 priceGO.transform.SetParent(slot.transform, false);
                 var priceText = priceGO.GetComponent<Text>();
-                priceText.font = priceFont != null ? priceFont : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                priceText.font = runtimeFont;
                 priceText.alignment = TextAnchor.LowerLeft;
                 priceText.color = priceColor;
                 priceText.raycastTarget = false;
@@ -287,7 +289,7 @@ namespace ShopSystem
             GameObject nameGO = new GameObject("Name", typeof(Text));
             nameGO.transform.SetParent(window.transform, false);
             shopNameText = nameGO.GetComponent<Text>();
-            shopNameText.font = priceFont != null ? priceFont : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            shopNameText.font = runtimeFont;
             shopNameText.color = priceColor;
             shopNameText.alignment = TextAnchor.MiddleLeft;
             shopNameText.text = string.Empty;
@@ -302,7 +304,7 @@ namespace ShopSystem
             GameObject tooltipGO = new GameObject("Tooltip", typeof(Text));
             tooltipGO.transform.SetParent(window.transform, false);
             tooltipText = tooltipGO.GetComponent<Text>();
-            tooltipText.font = priceFont != null ? priceFont : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            tooltipText.font = runtimeFont;
             tooltipText.color = priceColor;
             tooltipText.alignment = TextAnchor.MiddleLeft;
             tooltipText.text = string.Empty;

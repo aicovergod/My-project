@@ -45,7 +45,7 @@ namespace UI
             instance.uiText.alignment = TextAnchor.MiddleCenter;
             instance.uiText.horizontalOverflow = HorizontalWrapMode.Overflow;
             instance.uiText.verticalOverflow = VerticalWrapMode.Overflow;
-            instance.uiText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            LegacyFontProvider.ApplyTo(instance.uiText);
             instance.rectTransform = background != null ? parentGO.GetComponent<RectTransform>() : textGO.GetComponent<RectTransform>();
             instance.mainCamera = Camera.main;
 

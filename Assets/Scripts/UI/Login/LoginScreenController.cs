@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UI;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -76,21 +77,31 @@ namespace UI.Login
         private string gameplaySceneName = "OverWorld";
 
         private Coroutine loadRoutine;
-        private Font legacyFont;
         private GameObject lastSelectedInputField;
 
         private void Awake()
         {
-            legacyFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             EnsureUiHierarchy();
 
-            ApplyLegacyFont(usernameField);
-            ApplyLegacyFont(passwordField);
-            ApplyLegacyFont(statusText);
+            if (usernameField != null)
+            {
+                LegacyFontProvider.ApplyTo(usernameField.textComponent);
+                if (usernameField.placeholder is Text usernamePlaceholder)
+                    LegacyFontProvider.ApplyTo(usernamePlaceholder);
+            }
+
+            if (passwordField != null)
+            {
+                LegacyFontProvider.ApplyTo(passwordField.textComponent);
+                if (passwordField.placeholder is Text passwordPlaceholder)
+                    LegacyFontProvider.ApplyTo(passwordPlaceholder);
+            }
+
+            LegacyFontProvider.ApplyTo(statusText);
             if (loginButton != null)
             {
                 var buttonLabel = loginButton.GetComponentInChildren<Text>();
-                ApplyLegacyFont(buttonLabel);
+                LegacyFontProvider.ApplyTo(buttonLabel);
             }
         }
 
@@ -299,13 +310,13 @@ namespace UI.Login
             int statusFontSize = Mathf.Clamp(Mathf.RoundToInt(statusSize.y * 0.28f), 18, 24);
             statusText = CreateText(panelRect, "StatusText", string.Empty, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 StatusTextAnchoredPosition, statusSize, statusFontSize, TextAnchor.MiddleCenter, FontStyle.Normal);
-            ApplyLegacyFont(statusText);
+            LegacyFontProvider.ApplyTo(statusText);
 
             Vector2 buttonPosition = CalculateAnchoredPosition(LoginButtonNormalizedCenter, panelSize);
             Vector2 buttonSize = CalculateSize(LoginButtonNormalizedSize, panelSize);
             loginButton = CreateButton(panelRect, "LoginButton", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 buttonPosition, buttonSize, buttonSprite, "Login");
-            ApplyLegacyFont(loginButton.GetComponentInChildren<Text>());
+            LegacyFontProvider.ApplyTo(loginButton.GetComponentInChildren<Text>());
         }
 
         /// <summary>
@@ -427,26 +438,6 @@ namespace UI.Login
             HandleLoginClicked();
         }
 
-        private void ApplyLegacyFont(InputField field)
-        {
-            if (field == null || legacyFont == null)
-                return;
-
-            if (field.textComponent != null)
-                field.textComponent.font = legacyFont;
-
-            if (field.placeholder is Text placeholderText)
-                placeholderText.font = legacyFont;
-        }
-
-        private void ApplyLegacyFont(Text text)
-        {
-            if (text == null || legacyFont == null)
-                return;
-
-            text.font = legacyFont;
-        }
-
         private void SetStatus(string message, Color colour)
         {
             if (statusText == null)
@@ -481,6 +472,7 @@ namespace UI.Login
             text.color = new Color32(212, 212, 212, 255);
             text.supportRichText = false;
             text.raycastTarget = false;
+            LegacyFontProvider.ApplyTo(text);
             return text;
         }
 
@@ -632,6 +624,7 @@ namespace UI.Login
             text.verticalOverflow = VerticalWrapMode.Truncate;
             text.color = new Color32(238, 225, 171, 255);
             text.raycastTarget = false;
+            LegacyFontProvider.ApplyTo(text);
 
             var placeholderRect = CreateRectTransform("Placeholder", rect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
             placeholderRect.offsetMin = new Vector2(24f, 14f);
@@ -645,6 +638,7 @@ namespace UI.Login
             placeholder.color = new Color32(150, 150, 150, 255);
             placeholder.supportRichText = false;
             placeholder.raycastTarget = false;
+            LegacyFontProvider.ApplyTo(placeholder);
 
             field.textComponent = text;
             field.placeholder = placeholder;
@@ -675,7 +669,6 @@ namespace UI.Login
 
             int fontSize = Mathf.Clamp(Mathf.RoundToInt(sizeDelta.y * 0.45f), 20, 30);
             var text = CreateText(rect, "Text", label, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, fontSize, TextAnchor.MiddleCenter, FontStyle.Bold);
-            ApplyLegacyFont(text);
             text.color = new Color32(46, 32, 20, 255);
 
             return button;

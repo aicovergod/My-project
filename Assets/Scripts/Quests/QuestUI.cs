@@ -196,7 +196,7 @@ namespace Quests
             rect.anchorMax = anchorMax;
             rect.offsetMin = rect.offsetMax = offset;
             var txt = go.GetComponent<Text>();
-            txt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            LegacyFontProvider.ApplyTo(txt);
             txt.alignment = TextAnchor.UpperLeft;
             txt.horizontalOverflow = HorizontalWrapMode.Wrap;
             txt.verticalOverflow = VerticalWrapMode.Overflow;

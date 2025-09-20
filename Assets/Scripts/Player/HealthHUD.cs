@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UI;
 
 namespace Player
 {
@@ -66,7 +67,7 @@ namespace Player
             var textGO = new GameObject("Text", typeof(Text));
             textGO.transform.SetParent(bgGO.transform, false);
             hud.text = textGO.GetComponent<Text>();
-            hud.text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            LegacyFontProvider.ApplyTo(hud.text);
             hud.text.alignment = TextAnchor.MiddleCenter;
             hud.text.color = Color.white;
             hud.text.fontSize = 11;

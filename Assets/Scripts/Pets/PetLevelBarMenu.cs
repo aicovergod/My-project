@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UI;
 
 namespace Pets
 {
@@ -102,7 +103,7 @@ namespace Pets
             textGO.transform.SetParent(go.transform, false);
             var txt = textGO.GetComponent<Text>();
             txt.text = label;
-            txt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            LegacyFontProvider.ApplyTo(txt);
             txt.alignment = TextAnchor.MiddleCenter;
             txt.color = Color.white;
             var rect = txt.rectTransform;

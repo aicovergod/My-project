@@ -114,7 +114,7 @@ namespace UI.HUD
             component.iconImage = iconImage;
             iconImage.color = Color.clear;
 
-            var legacyFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var legacyFont = LegacyFontProvider.GetLegacyFont();
 
             var nameGO = new GameObject("Name", typeof(Text));
             nameGO.layer = parentLayer;
@@ -169,7 +169,7 @@ namespace UI.HUD
 
         private void Awake()
         {
-            var legacyFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var legacyFont = LegacyFontProvider.GetLegacyFont();
             if (nameText != null && nameText.font == null)
                 nameText.font = legacyFont;
             if (timerText != null && timerText.font == null)

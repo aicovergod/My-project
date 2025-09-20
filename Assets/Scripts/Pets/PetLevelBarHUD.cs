@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
 using Player;
+using UI;
 
 namespace Pets
 {
@@ -82,7 +83,7 @@ namespace Pets
             var textGO = new GameObject("Text", typeof(Text));
             textGO.transform.SetParent(bgGO.transform, false);
             instance.text = textGO.GetComponent<Text>();
-            instance.text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            LegacyFontProvider.ApplyTo(instance.text);
             instance.text.alignment = TextAnchor.MiddleCenter;
             instance.text.color = Color.white;
             instance.text.fontSize = 11;
