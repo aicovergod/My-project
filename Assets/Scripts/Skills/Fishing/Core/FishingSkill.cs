@@ -23,6 +23,9 @@ namespace Skills.Fishing
         private BycatchManager bycatchManager;
         private bool waitingForServices;
 
+        [SerializeField, Tooltip("Enables verbose debug logging for fishing actions.")]
+        private bool enableDebugLogging;
+
         private FishableSpot currentSpot;
         private FishingToolDefinition currentTool;
         private int catchProgress;
@@ -45,6 +48,15 @@ namespace Skills.Fishing
         public FishingToolDefinition CurrentTool => currentTool;
         public float CatchProgressNormalized => currentIntervalTicks <= 1 ? 0f : (float)catchProgress / (currentIntervalTicks - 1);
         public int CurrentCatchIntervalTicks => currentIntervalTicks;
+
+        /// <summary>
+        ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
+        /// </summary>
+        public bool EnableDebugLogging
+        {
+            get => enableDebugLogging;
+            set => enableDebugLogging = value;
+        }
 
         private SkillManager skills;
 
@@ -78,6 +90,8 @@ namespace Skills.Fishing
             }
             SaveManager.Unregister(fishingOutfit);
         }
+
+        protected override bool LogTickerSubscription => enableDebugLogging;
 
         /// <summary>
         /// Attempts to resolve the bycatch manager from the <see cref="GameManager"/> when available
@@ -134,6 +148,7 @@ namespace Skills.Fishing
                 return;
             }
             catchProgress++;
+            LogDebug($"Fishing tick: {catchProgress}/{currentIntervalTicks}");
             if (catchProgress >= currentIntervalTicks)
             {
                 catchProgress = 0;
@@ -146,6 +161,7 @@ namespace Skills.Fishing
             var fish = GetRandomFish(currentSpot.def);
             if (fish == null)
             {
+                LogDebug("No eligible fish could be selected; stopping.");
                 StopFishing();
                 return;
             }
@@ -155,6 +171,7 @@ namespace Skills.Fishing
                 if (inventory == null || !inventory.RemoveItem(currentSpot.def.BaitItemId))
                 {
                     FloatingText.Show("You need bait", anchor.position);
+                    LogDebug("Bait requirement not met; cancelling fishing session.");
                     StopFishing();
                     return;
                 }
@@ -222,8 +239,13 @@ namespace Skills.Fishing
                     return;
 
                 currentSpot.OnFishCaught();
+                LogDebug($"Caught {fish.DisplayName} x{amount} (chance {chance:P2})");
                 if (currentSpot.IsDepleted)
                     StopFishing();
+            }
+            else
+            {
+                LogDebug($"Failed to catch fish at {currentSpot?.name ?? "unknown spot"} (chance {chance:P2})");
             }
         }
 
@@ -364,6 +386,7 @@ namespace Skills.Fishing
                 {
                     Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
                     FloatingText.Show("You need bait", anchor.position);
+                    LogDebug("Unable to start fishing: missing bait.");
                     return;
                 }
             }
@@ -372,6 +395,7 @@ namespace Skills.Fishing
             catchProgress = 0;
             currentIntervalTicks = Mathf.Max(1, Mathf.RoundToInt(spot.def.CatchIntervalTicks / Mathf.Max(0.01f, tool.SwingSpeedMultiplier)));
             currentSpot.IsBusy = true;
+            LogDebug($"Started fishing {spot.name} with {tool.DisplayName}");
             OnStartFishing?.Invoke(spot);
         }
 
@@ -385,6 +409,7 @@ namespace Skills.Fishing
             currentTool = null;
             catchProgress = 0;
             currentIntervalTicks = 0;
+            LogDebug("Stopped fishing");
             OnStopFishing?.Invoke();
         }
 
@@ -422,6 +447,18 @@ namespace Skills.Fishing
         private void PreloadFishItems()
         {
             GatheringInventoryHelper.EnsureItemCache(ref fishItems);
+        }
+
+        /// <summary>
+        ///     Emits a formatted debug message when <see cref="enableDebugLogging"/> is enabled.
+        /// </summary>
+        /// <param name="message">Message to output to the Unity console.</param>
+        private void LogDebug(string message)
+        {
+            if (!enableDebugLogging)
+                return;
+
+            Debug.Log($"[FishingSkill] {message}");
         }
     }
 }

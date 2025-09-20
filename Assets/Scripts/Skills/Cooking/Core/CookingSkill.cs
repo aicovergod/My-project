@@ -22,6 +22,8 @@ namespace Skills.Cooking
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
+        [SerializeField, Tooltip("Enables verbose debug logging for cooking actions.")]
+        private bool enableDebugLogging;
 
         private SkillManager skills;
         private CookableRecipe currentRecipe;
@@ -39,6 +41,15 @@ namespace Skills.Cooking
         public float Xp => skills != null ? skills.GetXp(SkillType.Cooking) : 0f;
         public bool IsCooking => currentRecipe != null && itemsRemaining > 0;
         public float CookProgressNormalized => CookIntervalTicks <= 1 ? 0f : (float)cookProgress / (CookIntervalTicks - 1);
+
+        /// <summary>
+        ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
+        /// </summary>
+        public bool EnableDebugLogging
+        {
+            get => enableDebugLogging;
+            set => enableDebugLogging = value;
+        }
 
         private void Awake()
         {
@@ -71,6 +82,7 @@ namespace Skills.Cooking
             currentRecipe = recipe;
             itemsRemaining = quantity;
             cookProgress = 0;
+            LogDebug($"Started cooking {recipe.cookedItemId} x{quantity}");
             OnStartCooking?.Invoke(recipe);
         }
 
@@ -81,14 +93,18 @@ namespace Skills.Cooking
             currentRecipe = null;
             itemsRemaining = 0;
             cookProgress = 0;
+            LogDebug("Stopped cooking");
             OnStopCooking?.Invoke();
         }
+
+        protected override bool LogTickerSubscription => enableDebugLogging;
 
         protected override void HandleTick()
         {
             if (!IsCooking)
                 return;
             cookProgress++;
+            LogDebug($"Cooking tick: {cookProgress}/{CookIntervalTicks}");
             if (cookProgress >= CookIntervalTicks)
             {
                 cookProgress = 0;
@@ -109,12 +125,14 @@ namespace Skills.Cooking
         {
             if (currentRecipe == null || inventory == null)
             {
+                LogDebug("Cooking aborted because recipe or inventory reference was lost.");
                 StopCooking();
                 return;
             }
 
             if (!inventory.RemoveItem(currentRecipe.rawItemId))
             {
+                LogDebug("Failed to remove raw ingredient; stopping cooking session.");
                 StopCooking();
                 return;
             }
@@ -129,6 +147,7 @@ namespace Skills.Cooking
             if (burned)
             {
                 FloatingText.Show("Burned", anchor.position);
+                LogDebug($"Burned {currentRecipe.cookedItemId} (burn chance {burnChance:P2})");
             }
             else
             {
@@ -171,6 +190,8 @@ namespace Skills.Cooking
                 var rewardResult = GatheringRewardProcessor.Process(context);
                 if (!rewardResult.Success)
                     return;
+
+                LogDebug($"Successfully cooked {cookedName} (burn chance {burnChance:P2})");
             }
 
             if (itemsRemaining <= 0)
@@ -196,6 +217,18 @@ namespace Skills.Cooking
                 "Cooking",
                 "You've received a piece of cooking outfit",
                 "A piece of cooking outfit has been added to your bank");
+        }
+
+        /// <summary>
+        ///     Emits a formatted debug message when <see cref="enableDebugLogging"/> is enabled.
+        /// </summary>
+        /// <param name="message">Message to output to the Unity console.</param>
+        private void LogDebug(string message)
+        {
+            if (!enableDebugLogging)
+                return;
+
+            Debug.Log($"[CookingSkill] {message}");
         }
     }
 }

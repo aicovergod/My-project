@@ -24,6 +24,8 @@ namespace Skills.Woodcutting
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
+        [SerializeField, Tooltip("Enables verbose debug logging for woodcutting actions.")]
+        private bool enableDebugLogging;
 
         private TreeNode currentTree;
         private AxeDefinition currentAxe;
@@ -49,6 +51,15 @@ namespace Skills.Woodcutting
         public AxeDefinition CurrentAxe => currentAxe;
         public float ChopProgressNormalized
             => currentIntervalTicks <= 1 ? 0f : (float)chopProgress / (currentIntervalTicks - 1);
+
+        /// <summary>
+        ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
+        /// </summary>
+        public bool EnableDebugLogging
+        {
+            get => enableDebugLogging;
+            set => enableDebugLogging = value;
+        }
 
         private void Awake()
         {
@@ -76,7 +87,7 @@ namespace Skills.Woodcutting
         /// <summary>
         ///     Enables ticker logging so we can trace subscription timing during debugging sessions.
         /// </summary>
-        protected override bool LogTickerSubscription => true;
+        protected override bool LogTickerSubscription => enableDebugLogging;
 
         protected override void HandleTick()
         {
@@ -90,6 +101,7 @@ namespace Skills.Woodcutting
             }
 
             chopProgress++;
+            LogDebug($"Woodcutting tick: {chopProgress}/{currentIntervalTicks}");
             if (chopProgress >= currentIntervalTicks)
             {
                 chopProgress = 0;
@@ -172,12 +184,13 @@ namespace Skills.Woodcutting
                     return;
 
                 currentTree.OnLogChopped();
+                LogDebug($"Chopped {logName} x{amount} (chance {chance:P2})");
                 if (currentTree.IsDepleted)
                     StopChopping();
             }
             else
             {
-                Debug.Log($"Failed to chop {currentTree.name}");
+                LogDebug($"Failed to chop {currentTree?.name ?? "unknown tree"} (chance {chance:P2})");
             }
         }
 
@@ -190,7 +203,7 @@ namespace Skills.Woodcutting
             currentAxe = axe;
             chopProgress = 0;
             currentIntervalTicks = Mathf.Max(1, Mathf.RoundToInt(tree.def.ChopIntervalTicks / Mathf.Max(0.01f, axe.SwingSpeedMultiplier)));
-            Debug.Log($"Started chopping {tree.name}");
+            LogDebug($"Started chopping {tree.name} with {axe.DisplayName}");
             currentTree.IsBusy = true;
             OnStartChopping?.Invoke(tree);
         }
@@ -200,7 +213,7 @@ namespace Skills.Woodcutting
             if (!IsChopping)
                 return;
 
-            Debug.Log("Stopped chopping");
+            LogDebug("Stopped chopping");
             if (currentTree != null)
                 currentTree.IsBusy = false;
             currentTree = null;
@@ -247,6 +260,18 @@ namespace Skills.Woodcutting
         private void PreloadLogItems()
         {
             GatheringInventoryHelper.EnsureItemCache(ref logItems);
+        }
+
+        /// <summary>
+        ///     Emits a formatted debug message when <see cref="enableDebugLogging"/> is enabled.
+        /// </summary>
+        /// <param name="message">Message to output to the Unity console.</param>
+        private void LogDebug(string message)
+        {
+            if (!enableDebugLogging)
+                return;
+
+            Debug.Log($"[WoodcuttingSkill] {message}");
         }
     }
 }
