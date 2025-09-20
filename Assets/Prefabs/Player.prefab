@@ -75,6 +75,8 @@ GameObject:
   - component: {fileID: 5512345678901234567}
   - component: {fileID: 7000745351061079601}
   - component: {fileID: 5914355433513186549}
+  - component: {fileID: 8582261054864833439}
+  - component: {fileID: -8837884572014598511}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -317,6 +319,8 @@ MonoBehaviour:
   defaultCancelDistance: 3
   interactionCooldownSeconds: 0.2
   prospectCooldownSeconds: 3
+  autoMoveIntoRange: 1
+  autoMoveStopBuffer: 0.1
   playerInput: {fileID: 0}
   interactActionReference: {fileID: 0}
   prospectActionReference: {fileID: 0}
@@ -443,6 +447,8 @@ MonoBehaviour:
   defaultCancelDistance: 3
   interactionCooldownSeconds: 0.2
   prospectCooldownSeconds: 3
+  autoMoveIntoRange: 1
+  autoMoveStopBuffer: 0.1
   playerInput: {fileID: 0}
   interactActionReference: {fileID: 0}
   prospectActionReference: {fileID: 0}
@@ -743,6 +749,8 @@ MonoBehaviour:
   defaultCancelDistance: 3
   interactionCooldownSeconds: 0.2
   prospectCooldownSeconds: 3
+  autoMoveIntoRange: 1
+  autoMoveStopBuffer: 0.1
   playerInput: {fileID: 0}
   interactActionReference: {fileID: 0}
   prospectActionReference: {fileID: 0}
@@ -816,7 +824,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetOverride: {fileID: 0}
-  ignoredBuffTypes: []
+  ignoredBuffTypes: 
 --- !u!114 &7000745351061079601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -859,7 +867,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2864bff7b442be44bc2f0d2512349b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Status.Antifire.AntifireProtectionController
-  equipment: {fileID: 0}
+  equipment: {fileID: 8439072058276114910}
   dragonfireShieldIdentifiers:
   - dragonfire_shield
   - Dragonfire shield
+--- !u!114 &8582261054864833439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1e0d2e22e364d8fa4319372994f9847, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Status.Freeze.FrozenStatusController
+  playerMover: {fileID: 5825080390935697164}
+  npcWanderer: {fileID: 0}
+  rigidBody: {fileID: 5384127360561436123}
+--- !u!114 &-8837884572014598511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7586ce298185a624097b24079ec4793e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Audio.SoundManager
+  sfxVolume: 1
