@@ -96,7 +96,7 @@ namespace UI
         private void ApplyFont()
         {
             var customFont = font ?? Resources.Load<Font>("ThaleahFAT_TTF") ?? Resources.Load<Font>("ThaleahFat_TTF");
-            text.font = customFont != null ? customFont : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            text.font = customFont != null ? customFont : LegacyFontProvider.GetLegacyFont();
         }
 
         public void Show(TimeSpan remaining)

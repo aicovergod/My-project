@@ -319,16 +319,7 @@ namespace Inventory
             size = Mathf.Max(1, size);
 
             if (defaultFont == null)
-            {
-                try
-                {
-                    defaultFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-                }
-                catch (ArgumentException)
-                {
-                    defaultFont = null;
-                }
-            }
+                defaultFont = LegacyFontProvider.GetLegacyFont();
 
             if (stackCountFont == null)
             {

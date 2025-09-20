@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UI;
 
 namespace NPC
 {
@@ -79,7 +80,7 @@ namespace NPC
             var textGO = new GameObject("Text", typeof(Text));
             textGO.transform.SetParent(bg.transform, false);
             text = textGO.GetComponent<Text>();
-            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            LegacyFontProvider.ApplyTo(text);
             text.alignment = TextAnchor.MiddleCenter;
             text.color = Color.white;
             text.fontSize = 11;

@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using UI;
 
 namespace Inventory
 {
@@ -67,7 +68,7 @@ namespace Inventory
             var textGO = new GameObject("Text", typeof(Text));
             textGO.transform.SetParent(fieldGO.transform, false);
             var text = textGO.GetComponent<Text>();
-            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            LegacyFontProvider.ApplyTo(text);
             text.alignment = TextAnchor.MiddleLeft;
             text.text = "1";
             text.color = Color.black;
@@ -107,7 +108,7 @@ namespace Inventory
             var txtGO = new GameObject("Text", typeof(Text));
             txtGO.transform.SetParent(btnGO.transform, false);
             var txt = txtGO.GetComponent<Text>();
-            txt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            LegacyFontProvider.ApplyTo(txt);
             txt.alignment = TextAnchor.MiddleCenter;
             txt.color = Color.black;
             txt.text = label;

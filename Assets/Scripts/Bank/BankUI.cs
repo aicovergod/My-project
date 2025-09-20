@@ -88,14 +88,7 @@ namespace BankSystem
             if (!PersistentSceneSingleton<BankUI>.HandleAwake(this))
                 return;
 
-            try
-            {
-                defaultFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            }
-            catch (ArgumentException)
-            {
-                defaultFont = null;
-            }
+            defaultFont = LegacyFontProvider.GetLegacyFont();
 
             stackCountFont = Resources.Load<Font>("ThaleahFat_TTF") ??
                              Resources.Load<Font>("ThaleahFAT_TTF") ??

@@ -1,4 +1,3 @@
-using System;
 using Audio;
 using UnityEngine;
 using UnityEngine.UI;
@@ -97,7 +96,7 @@ namespace UI.Settings
             if (!PersistentSceneSingleton<AudioSettingsUI>.HandleAwake(this))
                 return;
 
-            legacyFont = LoadLegacyFont();
+            legacyFont = LegacyFontProvider.GetLegacyFont();
             if (canvas == null || windowRoot == null || volumeSlider == null || muteToggle == null)
                 BuildUi();
 
@@ -558,19 +557,5 @@ namespace UI.Settings
             muteToggle = toggle;
         }
 
-        /// <summary>
-        /// Retrieve the default LegacyRuntime font while falling back gracefully if Unity cannot find it.
-        /// </summary>
-        private Font LoadLegacyFont()
-        {
-            try
-            {
-                return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            }
-            catch (ArgumentException)
-            {
-                return Resources.GetBuiltinResource<Font>("Arial.ttf");
-            }
-        }
     }
 }

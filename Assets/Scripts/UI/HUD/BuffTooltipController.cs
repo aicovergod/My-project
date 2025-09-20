@@ -185,7 +185,7 @@ namespace UI.HUD
             fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
             fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            var legacyFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var legacyFont = LegacyFontProvider.GetLegacyFont();
 
             var titleGO = new GameObject("Title", typeof(Text));
             titleGO.transform.SetParent(transform, false);

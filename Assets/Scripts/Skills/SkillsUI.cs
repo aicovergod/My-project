@@ -207,7 +207,7 @@ namespace Skills
             var levelGo = new GameObject("LevelText");
             levelGo.transform.SetParent(skillGo.transform, false);
             var levelText = levelGo.AddComponent<Text>();
-            levelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            LegacyFontProvider.ApplyTo(levelText);
             levelText.color = Color.white;
 
             var xpGo = new GameObject("XpText");
@@ -228,7 +228,7 @@ namespace Skills
             totalGo.transform.SetParent(parent, false);
 
             totalLevelText = totalGo.AddComponent<Text>();
-            totalLevelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            LegacyFontProvider.ApplyTo(totalLevelText);
             totalLevelText.color = Color.white;
         }
 

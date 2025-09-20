@@ -671,15 +671,7 @@ namespace Inventory
             slotItemImages = new Image[equipped.Length];
             slotCountTexts = new Text[equipped.Length];
 
-            Font defaultFont = null;
-            try
-            {
-                defaultFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            }
-            catch (ArgumentException)
-            {
-                defaultFont = null;
-            }
+            Font defaultFont = LegacyFontProvider.GetLegacyFont();
 
             for (int i = 0; i < 15; i++)
             {
