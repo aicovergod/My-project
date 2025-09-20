@@ -60,25 +60,37 @@ namespace Pets
 
         private static void Initialize()
         {
-            if (initialized)
-                return;
-            initialized = true;
+            if (!initialized)
+            {
+                initialized = true;
 
-            // Load any drop tables placed under Resources/PetDropTables
-            var loaded = Resources.LoadAll<PetDropTable>("PetDropTables");
-            RegisterTables(loaded);
+                // Load any drop tables placed under Resources/PetDropTables
+                var loaded = Resources.LoadAll<PetDropTable>("PetDropTables");
+                RegisterTables(loaded);
+            }
+
+            TryRestoreSavedPet();
+        }
+
+        /// <summary>
+        /// Attempts to respawn the saved pet when none is currently active.
+        /// </summary>
+        private static void TryRestoreSavedPet()
+        {
+            if (activePetGO != null || activePetDef != null)
+                return;
 
             string saved = PetSaveBridge.Load();
-            if (!string.IsNullOrEmpty(saved))
-            {
-                var pet = FindPetById(saved);
-                if (pet != null)
-                {
-                    var player = GameObject.FindGameObjectWithTag("Player");
-                    Vector3 pos = player != null ? player.transform.position : Vector3.zero;
-                    SpawnPetInternal(pet, pos);
-                }
-            }
+            if (string.IsNullOrEmpty(saved))
+                return;
+
+            var pet = FindPetById(saved);
+            if (pet == null)
+                return;
+
+            var player = GameObject.FindGameObjectWithTag("Player");
+            Vector3 pos = player != null ? player.transform.position : Vector3.zero;
+            SpawnPetInternal(pet, pos);
         }
 
         /// <summary>
