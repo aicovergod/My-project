@@ -25,6 +25,10 @@
 - **Combat** (`Assets/Scripts/Combat`, `Assets/Scripts/NPC/Combat`, `Assets/NPCCombatProfile`)
   - `CombatController`, `CombatMath`, and `CombatEnums` coordinate player combat ticks, max hit calculations, spell elements, and hitsplat visuals via `Resources/HitSplatLibrary`.
   - NPC combat uses `NpcAttackController`, projectile logic, and drop resolution (`Drops` folder). Pet-assisted combat hooks exist in `Pets`.
+- **Magic System** (`Assets/Scripts/Magic`, `Assets/Resources/Spells`, `Assets/Prefabs/Spells`)
+  - `SpellDefinition` ScriptableObjects set spell range, projectile speed, hit FX, max hit, elemental type, and optional freeze settings. Respect `loadOrder` for UI sorting, keep `requiredMagicLevel` aligned with `SkillManager`, and pair freeze toggles with `Status/FrozenStatusController` listeners.
+  - Projectile prefabs (`FireProjectile`) and hit effect prefabs (`HitEffect`) live under `Assets/Prefabs/Spells`. Sprite VFX are in `Assets/Sprites/GFX/Spells` and should stay 64×64 transparent assets matching the ScriptableObject name.
+  - Spells load from `Resources/Spells`, so keep asset names unique and consistent with prefabs/icons. New strike-tier spells should call `MagicUI.UpdateStrikeMaxHits` logic by following the naming convention (`*Strike`).
 - **Inventory, Equipment & Items** (`Assets/Scripts/Inventory`, `Assets/Scripts/Items`)
   - Inventory UI defaults to LegacyRuntime, supports stack splitting, drag/drop, ground loot via `Drops/GroundItemSpawner`, and equipment synergy through `EquipmentAggregator`.
   - Scriptable item data resides in `Assets/Item` and `Assets/Resources/Items`. Combination recipes live in `Resources/ItemCombinationDatabase`.
@@ -36,10 +40,12 @@
   - NPC interaction, navigation, and movement wrappers live here. Minimap, doors, scene transitions, and respawns sit under `World`.
 - **UI Layer** (`Assets/Scripts/UI`, `Assets/Scripts/Player`, `Assets/Scripts/Status`)
   - HUDs such as `HealthHUD`, merge timers, tab buttons, and combat/skill overlays expect LegacyRuntime fonts and OSRS layout cues. `UI/PersistentEventSystem` maintains input modules across scenes.
+  - `UI/MagicUI` is a `PersistentSceneSingleton` that builds the spellbook grid from `Resources/Spells`, caches strike spells for max-hit syncing, and drives the active spell/last selected spell state consumed by `CombatController` and `PlayerCombatLoadout`.
 - **Status Effects** (`Assets/Scripts/Status`)
   - `BuffTimerService` owns timed buffs (poison, freeze, antifire, stamina, etc.) and relays updates via `BuffTimerInstance`. Always raise effects through the static `BuffEvents` hub so combat, inventory, pets, and scripted encounters stay decoupled.
   - `BuffStateSaveBridge` snapshots active timers for persistence. Attach it to entities that must keep buffs between loads; legacy `PoisonSaveBridge` is deprecated and should remain disabled unless debugging old data.
   - Effect-specific controllers live under subfolders (`Status/Poison`, `Status/Freeze`, `Status/Antifire`) and handle combat mitigation, HUD sync, and ticker subscriptions.
+  - `Status/Freeze/FrozenStatusController` pauses locomotion for targets with freeze buffs and expects spells that set `SpellDefinition.appliesFreeze` to raise buffs via `BuffEvents`.
 - **Pets & Drops** (`Assets/Scripts/Pets`, `Assets/Scripts/Drops`)
   - Pets include drop systems, storage, level bars, and context menus. Drop tables combine scriptable entries with RNG helpers and tie into `NpcDropper` and `GroundItemSpawner`.
 - **Books & Lore** (`Assets/Scripts/Books`, `Assets/Resources/Books`)
@@ -49,6 +55,7 @@
 - **Resources**: Centralized assets (persistent prefab list, item databases, hit splats, cooking/fishing databases, pet drop tables, quest data, sprite atlases).
 - **Prefabs & Scenes**: Gameplay scenes under `Assets/Scenes` with associated navmeshes. Shared UI/combat/pet prefabs live in `Assets/Prefabs` and subfolders.
 - **Sprites & Tiles**: Sprites under `Assets/Sprites`, `TileAssets`, and `WorldPalette`. Maintain 64×64 resolution with transparent backgrounds.
+- **Spells**: Spell ScriptableObjects reside in `Assets/Resources/Spells`, with corresponding projectile and hit-effect prefabs under `Assets/Prefabs/Spells` and sprite sheets in `Assets/Sprites/GFX/Spells`. Keep naming aligned so `MagicUI` can auto-load visuals.
 - **Buff Icons & Status Configs**: HUD sprites reside in `Assets/Resources/UI/Buffs` while status configs (poison defaults, etc.) live in `Assets/Resources/Status`. Align icon IDs with `BuffTimerDefinition.iconId` and keep `PoisonConfig.Id` stable for saves.
 - **Book Content**: Lore assets live in `Assets/Resources/Books`. Use `\f` within `BookData.content` to break pages and avoid relying on the obsolete `pages` list.
 
