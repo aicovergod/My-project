@@ -8,6 +8,7 @@ using Pets;
 using Core;
 using BankSystem;
 using Core.Save;
+using Core.Time;
 using Skills.Outfits;
 using Skills.Common;
 
@@ -341,7 +342,7 @@ namespace Skills.Fishing
         {
             if (bycatchManager != null && bycatchManager.useDailySeed)
             {
-                int seed = BycatchManager.ComposeDailySeed(stackalloc int[]
+                int seed = DailyGameTimeService.ComposeDailySeed(stackalloc int[]
                 {
                     ctx.playerIdHash,
                     ctx.nodeHash,

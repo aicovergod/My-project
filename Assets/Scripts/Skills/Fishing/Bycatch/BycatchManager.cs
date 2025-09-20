@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Core.Time;
 using World;
 
 namespace Skills.Fishing
@@ -35,7 +35,7 @@ namespace Skills.Fishing
 
         public int GetStreak(WaterType wt)
         {
-            int today = ComposeDailySeed();
+            int today = DailyGameTimeService.ComposeDailySeed();
             if (!_lastSeedDay.TryGetValue(wt, out int last) || last != today)
             {
                 _lastSeedDay[wt] = today;
@@ -46,7 +46,7 @@ namespace Skills.Fishing
 
         public void ApplyStreakResult(WaterType wt, BycatchResult res)
         {
-            int today = ComposeDailySeed();
+            int today = DailyGameTimeService.ComposeDailySeed();
             _lastSeedDay[wt] = today;
             bool isRare = !res.IsNone && (res.Rarity == Rarity.Rare || res.Rarity == Rarity.UltraRare);
             if (isRare)
@@ -229,7 +229,7 @@ namespace Skills.Fishing
             if (!useDailySeed)
                 return new System.Random();
 
-            int seed = ComposeDailySeed(stackalloc int[]
+            int seed = DailyGameTimeService.ComposeDailySeed(stackalloc int[]
             {
                 ctx.playerIdHash,
                 ctx.nodeHash,
@@ -238,36 +238,5 @@ namespace Skills.Fishing
             return new System.Random(seed);
         }
 
-        /// <summary>
-        /// Builds a deterministic daily seed using the current UTC day ticks combined with contextual hashes.
-        /// </summary>
-        /// <param name="contextHashes">Optional hashes to fold into the final seed for per-entity determinism.</param>
-        internal static int ComposeDailySeed(ReadOnlySpan<int> contextHashes)
-        {
-            long ticks = DateTime.UtcNow.Date.Ticks;
-            unchecked
-            {
-                int seed = (int)(ticks ^ (ticks >> 32));
-                foreach (int hash in contextHashes)
-                    seed = HashCombine(seed, hash);
-                return seed;
-            }
-        }
-
-        /// <summary>
-        /// Convenience wrapper when no contextual hashes are required.
-        /// </summary>
-        internal static int ComposeDailySeed()
-        {
-            return ComposeDailySeed(ReadOnlySpan<int>.Empty);
-        }
-
-        private static int HashCombine(int a, int b)
-        {
-            unchecked
-            {
-                return (a * 397) ^ b;
-            }
-        }
     }
 }
