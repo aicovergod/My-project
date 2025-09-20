@@ -593,8 +593,10 @@ namespace Player
                     SceneManager.MoveGameObjectToScene(petToMove, scene);
                     petToMove = null;
                 }
-                SceneManager.sceneLoaded -= OnSceneLoaded;
             }
+
+            // Always unsubscribe after handling the scene load so duplicate registrations cannot accumulate.
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
 
         private void OnTransitionStarted()
