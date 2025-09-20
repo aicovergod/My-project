@@ -5,8 +5,11 @@ using Player;
 using Beastmaster;
 using Pets;
 using BankSystem;
+using Skills.Cooking;
 using Skills.Fishing;
+using Skills.Mining;
 using Skills.Outfits;
+using Skills.Woodcutting;
 using Status;
 using Status.Antifire;
 using Status.Poison;
@@ -58,6 +61,11 @@ namespace Skills
 
         // Scroll position for the debug menu
         private Vector2 scrollPos;
+
+        private MiningSkill miningSkillBehaviour;
+        private WoodcuttingSkill woodcuttingSkillBehaviour;
+        private FishingSkill fishingSkillBehaviour;
+        private CookingSkill cookingSkillBehaviour;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -224,6 +232,14 @@ namespace Skills
                     }
                 }
             }
+            if (miningSkillBehaviour == null)
+                miningSkillBehaviour = FindObjectOfType<MiningSkill>();
+            if (woodcuttingSkillBehaviour == null)
+                woodcuttingSkillBehaviour = FindObjectOfType<WoodcuttingSkill>();
+            if (fishingSkillBehaviour == null)
+                fishingSkillBehaviour = FindObjectOfType<FishingSkill>();
+            if (cookingSkillBehaviour == null)
+                cookingSkillBehaviour = FindObjectOfType<CookingSkill>();
         }
 
         private void RefreshFields()
@@ -242,6 +258,11 @@ namespace Skills
             }
             if (mergeConfig == null)
                 mergeConfig = Resources.Load<MergeConfig>("MergeConfig");
+
+            miningSkillBehaviour = FindObjectOfType<MiningSkill>();
+            woodcuttingSkillBehaviour = FindObjectOfType<WoodcuttingSkill>();
+            fishingSkillBehaviour = FindObjectOfType<FishingSkill>();
+            cookingSkillBehaviour = FindObjectOfType<CookingSkill>();
 
             hpLevel = skillManager != null ? skillManager.GetLevel(SkillType.Hitpoints).ToString() : "";
             attackLevel = skillManager != null ? skillManager.GetLevel(SkillType.Attack).ToString() : "";
@@ -307,6 +328,29 @@ namespace Skills
                         GUILayout.Label("Locked (<50)");
                 }
             }
+
+            GUILayout.Space(10f);
+            GUILayout.Label("Skill Debug Logging");
+            DrawSkillDebugToggle(
+                "Mining Debug Logging",
+                () => miningSkillBehaviour != null,
+                () => miningSkillBehaviour.EnableDebugLogging,
+                value => miningSkillBehaviour.EnableDebugLogging = value);
+            DrawSkillDebugToggle(
+                "Woodcutting Debug Logging",
+                () => woodcuttingSkillBehaviour != null,
+                () => woodcuttingSkillBehaviour.EnableDebugLogging,
+                value => woodcuttingSkillBehaviour.EnableDebugLogging = value);
+            DrawSkillDebugToggle(
+                "Fishing Debug Logging",
+                () => fishingSkillBehaviour != null,
+                () => fishingSkillBehaviour.EnableDebugLogging,
+                value => fishingSkillBehaviour.EnableDebugLogging = value);
+            DrawSkillDebugToggle(
+                "Cooking Debug Logging",
+                () => cookingSkillBehaviour != null,
+                () => cookingSkillBehaviour.EnableDebugLogging,
+                value => cookingSkillBehaviour.EnableDebugLogging = value);
 
             if (GUILayout.Button("Apply"))
             {
@@ -448,6 +492,28 @@ namespace Skills
 
             if (showFreezePopup)
                 freezePopupRect = GUI.ModalWindow(0xF20F2, freezePopupRect, DrawFreezePopup, "Freeze Player");
+        }
+
+        /// <summary>
+        ///     Renders a toggle used to control runtime debug logging for a specific skill.
+        /// </summary>
+        /// <param name="label">Label describing the toggle.</param>
+        /// <param name="skillAvailable">Predicate that returns true when the skill component exists.</param>
+        /// <param name="getValue">Delegate that retrieves the current toggle state.</param>
+        /// <param name="setValue">Delegate that applies a new toggle state.</param>
+        private void DrawSkillDebugToggle(string label, Func<bool> skillAvailable, Func<bool> getValue, Action<bool> setValue)
+        {
+            bool available = skillAvailable();
+            bool previousEnabled = GUI.enabled;
+            GUI.enabled = available && previousEnabled;
+
+            bool current = available ? getValue() : false;
+            bool updated = GUILayout.Toggle(current, label);
+
+            if (available && updated != current)
+                setValue(updated);
+
+            GUI.enabled = previousEnabled;
         }
 
         /// <summary>

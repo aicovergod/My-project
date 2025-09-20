@@ -25,6 +25,8 @@ namespace Skills.Mining
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
+        [SerializeField, Tooltip("Enables verbose debug logging for mining tick processing.")]
+        private bool enableDebugLogging;
 
         private MineableRock currentRock;
         private PickaxeDefinition currentPickaxe;
@@ -50,6 +52,15 @@ namespace Skills.Mining
             => currentPickaxe == null || currentPickaxe.SwingSpeedTicks <= 1
                 ? 0f
                 : (float)swingProgress / (currentPickaxe.SwingSpeedTicks - 1);
+
+        /// <summary>
+        ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
+        /// </summary>
+        public bool EnableDebugLogging
+        {
+            get => enableDebugLogging;
+            set => enableDebugLogging = value;
+        }
 
         private void Awake()
         {
@@ -77,7 +88,7 @@ namespace Skills.Mining
         /// <summary>
         ///     Enables ticker logging so we can trace subscription timing during debugging sessions.
         /// </summary>
-        protected override bool LogTickerSubscription => true;
+        protected override bool LogTickerSubscription => enableDebugLogging;
 
         protected override void HandleTick()
         {
@@ -92,7 +103,7 @@ namespace Skills.Mining
             }
 
             swingProgress++;
-            Debug.Log($"Mining tick: {swingProgress}/{currentPickaxe.SwingSpeedTicks}");
+            LogDebug($"Mining tick: {swingProgress}/{currentPickaxe?.SwingSpeedTicks ?? 0}");
             if (swingProgress >= currentPickaxe.SwingSpeedTicks)
             {
                 swingProgress = 0;
@@ -176,6 +187,8 @@ namespace Skills.Mining
                     var rewardResult = GatheringRewardProcessor.Process(context);
                     if (!rewardResult.Success)
                         return;
+
+                    LogDebug($"Mined {oreName} x{amount} (chance {chance:P2})");
                 }
 
                 if (currentRock.IsDepleted)
@@ -183,7 +196,7 @@ namespace Skills.Mining
             }
             else
             {
-                Debug.Log($"Failed to mine {currentRock.name}");
+                LogDebug($"Failed to mine {currentRock?.name ?? "unknown rock"} (chance {chance:P2})");
             }
         }
 
@@ -195,7 +208,7 @@ namespace Skills.Mining
             currentRock = rock;
             currentPickaxe = pickaxe;
             swingProgress = 0;
-            Debug.Log($"Started mining {rock.name}");
+            LogDebug($"Started mining {rock.name} with {pickaxe.DisplayName}");
             OnStartMining?.Invoke(rock);
         }
 
@@ -204,7 +217,7 @@ namespace Skills.Mining
             if (!IsMining)
                 return;
 
-            Debug.Log("Stopped mining");
+            LogDebug("Stopped mining");
             currentRock = null;
             currentPickaxe = null;
             swingProgress = 0;
@@ -248,6 +261,18 @@ namespace Skills.Mining
         private void PreloadOreItems()
         {
             GatheringInventoryHelper.EnsureItemCache(ref oreItems);
+        }
+
+        /// <summary>
+        ///     Emits a formatted debug message when <see cref="enableDebugLogging"/> is enabled.
+        /// </summary>
+        /// <param name="message">Message to output to the Unity console.</param>
+        private void LogDebug(string message)
+        {
+            if (!enableDebugLogging)
+                return;
+
+            Debug.Log($"[MiningSkill] {message}");
         }
     }
 }
