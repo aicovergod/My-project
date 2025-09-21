@@ -254,14 +254,50 @@ namespace UI.Login
                 yield return null;
 
 #if ENABLE_INPUT_SYSTEM
-            // Ensure the PlayerInputManager instantiates the configured player prefab if no
-            // PlayerInput objects were spawned automatically. This prevents the login flow
-            // from timing out while waiting for the PlayerMover to appear in the newly loaded
-            // gameplay scene.
-            PlayerInputManager inputManager = Object.FindObjectOfType<PlayerInputManager>();
-            if (inputManager != null)
+            // Poll for a PlayerInputManager so the player prefab can be spawned even when the
+            // scene takes a frame to bootstrap its persistent objects. While waiting we also
+            // watch for any active PlayerInput so we avoid creating duplicates when the user
+            // returns to the overworld mid-session.
+            float managerWaitElapsed = 0f;
+            bool playerInputAlreadyPresent = false;
+            PlayerInputManager inputManager = null;
+            while (managerWaitElapsed < PlayerSpawnTimeout)
             {
-                bool playerInputAlreadyPresent = false;
+                // Check each frame if a PlayerInput already exists. If one is active we can
+                // stop polling immediately because the gameplay scene has already restored
+                // the local player object.
+                playerInputAlreadyPresent = false;
+                foreach (var playerInput in PlayerInput.all)
+                {
+                    if (playerInput != null && playerInput.isActiveAndEnabled)
+                    {
+                        playerInputAlreadyPresent = true;
+                        break;
+                    }
+                }
+
+                if (playerInputAlreadyPresent)
+                    break;
+
+                // Attempt to locate the PlayerInputManager that is responsible for spawning
+                // the controllable player prefab. The direct instance property is preferred,
+                // but we fall back to a scene search to handle the first frame of instantiation.
+                inputManager = PlayerInputManager.instance;
+                if (inputManager == null)
+                    inputManager = Object.FindObjectOfType<PlayerInputManager>();
+
+                if (inputManager != null)
+                    break;
+
+                managerWaitElapsed += Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            // If no PlayerInput existed when the manager became available, perform a final
+            // duplicate check before requesting a new player join. This protects against race
+            // conditions where the PlayerInput spawns naturally while we were yielding.
+            if (!playerInputAlreadyPresent && inputManager != null)
+            {
                 foreach (var playerInput in PlayerInput.all)
                 {
                     if (playerInput != null && playerInput.isActiveAndEnabled)
