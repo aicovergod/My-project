@@ -6,9 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UI;
-#if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
-#endif
 
 namespace UI.Login
 {
@@ -254,6 +252,29 @@ namespace UI.Login
             operation.allowSceneActivation = true;
             while (!operation.isDone)
                 yield return null;
+
+#if ENABLE_INPUT_SYSTEM
+            // Ensure the PlayerInputManager instantiates the configured player prefab if no
+            // PlayerInput objects were spawned automatically. This prevents the login flow
+            // from timing out while waiting for the PlayerMover to appear in the newly loaded
+            // gameplay scene.
+            PlayerInputManager inputManager = Object.FindObjectOfType<PlayerInputManager>();
+            if (inputManager != null)
+            {
+                bool playerInputAlreadyPresent = false;
+                foreach (var playerInput in PlayerInput.all)
+                {
+                    if (playerInput != null && playerInput.isActiveAndEnabled)
+                    {
+                        playerInputAlreadyPresent = true;
+                        break;
+                    }
+                }
+
+                if (!playerInputAlreadyPresent)
+                    inputManager.JoinPlayer();
+            }
+#endif
 
             float elapsed = 0f;
             PlayerMover mover = PlayerMover.Instance;
