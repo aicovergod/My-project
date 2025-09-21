@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Inventory;
 using Skills;
 using BankSystem;
+using Core.Save;
 
 namespace Pets
 {
@@ -28,6 +30,22 @@ namespace Pets
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AutoInit()
         {
+            SceneManager.sceneLoaded -= HandleSceneLoaded;
+            SceneManager.sceneLoaded += HandleSceneLoaded;
+            HandleSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
+
+            if (!quittingRegistered)
+            {
+                Application.quitting += SaveOnQuit;
+                quittingRegistered = true;
+            }
+        }
+
+        /// <summary>
+        /// Invoked after each scene load so saved pets refresh once a profile is active and the scene is fully authenticated.
+        /// </summary>
+        private static void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
             Initialize();
 
             var player = GameObject.FindGameObjectWithTag("Player");
@@ -50,12 +68,6 @@ namespace Pets
                 Vector3 pos = player != null ? player.transform.position : Vector3.zero;
                 SpawnPetInternal(activePetDef, pos);
             }
-
-            if (!quittingRegistered)
-            {
-                Application.quitting += SaveOnQuit;
-                quittingRegistered = true;
-            }
         }
 
         private static void Initialize()
@@ -77,6 +89,9 @@ namespace Pets
         /// </summary>
         private static void TryRestoreSavedPet()
         {
+            if (string.IsNullOrEmpty(SaveManager.ActiveProfileId))
+                return;
+
             if (activePetGO != null || activePetDef != null)
                 return;
 
