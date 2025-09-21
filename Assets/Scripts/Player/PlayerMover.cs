@@ -512,7 +512,11 @@ namespace Player
         /// <summary>
         /// Persist the player's current position to the active save profile.
         /// </summary>
-        public void SavePosition()
+        /// <param name="sceneNameOverride">
+        /// Optional scene identifier to store alongside the position. When null the
+        /// active scene reported by <see cref="SceneManager"/> is used instead.
+        /// </param>
+        public void SavePosition(string sceneNameOverride = null)
         {
             Vector3 pos = transform.position;
             var data = new PositionData
@@ -520,7 +524,9 @@ namespace Player
                 x = pos.x,
                 y = pos.y,
                 z = pos.z,
-                scene = SceneManager.GetActiveScene().name
+                scene = string.IsNullOrEmpty(sceneNameOverride)
+                    ? SceneManager.GetActiveScene().name
+                    : sceneNameOverride
             };
             SaveManager.Save(PositionKey, data);
         }
@@ -726,7 +732,7 @@ namespace Player
             }
 
             if (shouldPersistPosition)
-                SavePosition();
+                SavePosition(scene.name);
         }
 
         /// <summary>
