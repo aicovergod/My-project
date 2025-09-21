@@ -82,6 +82,19 @@ namespace Player
         /// </summary>
         private bool registeredWithSaveManager;
         /// <summary>
+        ///     Indicates whether the mover has initiated a scene swap in order to honour the saved
+        ///     position payload. While true, any intermediate scene loads must avoid persisting their
+        ///     default coordinates, otherwise the saved profile would be overwritten with staging
+        ///     scene metadata.
+        /// </summary>
+        private bool awaitingSavedSceneLoad;
+        /// <summary>
+        ///     Name of the scene that should become active before persistence resumes. This allows
+        ///     the mover to detect when a saved-scene load is still in progress and defer
+        ///     SavePosition calls until the correct location is ready.
+        /// </summary>
+        private string pendingSavedSceneName;
+        /// <summary>
         /// Interval in seconds used to persist the position while movement is in progress. This
         /// keeps the stored location reasonably fresh without hammering the save file every frame.
         /// </summary>
@@ -564,6 +577,9 @@ namespace Player
         {
             resolvedActiveScenePosition = false;
 
+            awaitingSavedSceneLoad = false;
+            pendingSavedSceneName = null;
+
             var data = SaveManager.Load<PositionData>(PositionKey);
             if (data == null)
             {
@@ -582,6 +598,9 @@ namespace Player
                 if (ApplySavedPosition())
                     resolvedActiveScenePosition = true;
 
+                awaitingSavedSceneLoad = false;
+                pendingSavedSceneName = null;
+
                 var pet = PetDropSystem.ActivePetObject;
                 if (pet != null)
                 {
@@ -593,6 +612,8 @@ namespace Player
             }
             else
             {
+                awaitingSavedSceneLoad = true;
+                pendingSavedSceneName = data.scene;
                 SceneManager.sceneLoaded += OnSceneLoaded;
                 var pet = PetDropSystem.ActivePetObject;
                 if (pet != null)
@@ -675,78 +696,101 @@ namespace Player
             // location has been resolved for this scene.  The additional flag ensures we do not
             // clobber saved metadata with coordinates from a different scene when the player is
             // about to transition.
-            bool positionedFromSpawn = false;
-            bool positionedFromSave = false;
+            bool skipPositionResolution = awaitingSavedSceneLoad
+                && !string.IsNullOrEmpty(pendingSavedSceneName)
+                && !string.Equals(scene.name, pendingSavedSceneName, StringComparison.Ordinal);
+
             bool resolvedActiveSceneLocation = false;
 
-            var savedData = SaveManager.Load<PositionData>(PositionKey);
-            bool hasSavedPosition = savedData != null;
-            bool savedSceneMatches = hasSavedPosition && savedData.scene == scene.name;
-
-            var spawnId = SceneTransitionManager.NextSpawnPoint;
-            bool spawnRequested = !string.IsNullOrEmpty(spawnId);
-
-            // When we're resuming the exact scene captured in the save and no explicit spawn override
-            // is active, prefer the persisted coordinates so logout/login flows feel seamless.
-            if (savedSceneMatches && !spawnRequested)
+            if (!skipPositionResolution)
             {
-                positionedFromSave = ApplyPositionData(savedData);
-                resolvedActiveSceneLocation = positionedFromSave;
-                if (positionedFromSave)
-                    resolvedActiveScenePosition = true;
-            }
-            else
-            {
-                if (!spawnRequested && !hasSavedPosition)
+                bool positionedFromSpawn = false;
+                bool positionedFromSave = false;
+
+                var savedData = SaveManager.Load<PositionData>(PositionKey);
+                bool hasSavedPosition = savedData != null;
+                bool savedSceneMatches = hasSavedPosition && savedData.scene == scene.name;
+
+                var spawnId = SceneTransitionManager.NextSpawnPoint;
+                bool spawnRequested = !string.IsNullOrEmpty(spawnId);
+
+                // When we're resuming the exact scene captured in the save and no explicit spawn override
+                // is active, prefer the persisted coordinates so logout/login flows feel seamless.
+                if (savedSceneMatches && !spawnRequested)
                 {
-                    // No saved data or spawn override exists, so the authored scene placement already
-                    // represents a valid location for this scene. Treat it as resolved so persistence can begin.
-                    resolvedActiveSceneLocation = true;
-                    resolvedActiveScenePosition = true;
+                    positionedFromSave = ApplyPositionData(savedData);
+                    resolvedActiveSceneLocation = positionedFromSave;
+                    if (positionedFromSave)
+                        resolvedActiveScenePosition = true;
                 }
                 else
                 {
-                    if (spawnRequested)
+                    if (!spawnRequested && !hasSavedPosition)
                     {
-                        var points = GameObject.FindObjectsOfType<SpawnPoint>();
-                        foreach (var p in points)
-                        {
-                            if (p.id == spawnId)
-                            {
-                                transform.position = p.transform.position;
-                                positionedFromSpawn = true;
-                                resolvedActiveSceneLocation = true;
-                                resolvedActiveScenePosition = true;
-                                break;
-                            }
-                        }
-
-                        if (!positionedFromSpawn)
-                        {
-                            Debug.LogWarning($"SceneTransitionManager requested spawn point '{spawnId}' but no matching SpawnPoint was found in scene '{scene.name}'. Falling back to saved position if available.", this);
-                        }
+                        // No saved data or spawn override exists, so the authored scene placement already
+                        // represents a valid location for this scene. Treat it as resolved so persistence can begin.
+                        resolvedActiveSceneLocation = true;
+                        resolvedActiveScenePosition = true;
                     }
-
-                    if (!positionedFromSpawn && hasSavedPosition)
+                    else
                     {
-                        if (savedSceneMatches)
+                        if (spawnRequested)
                         {
-                            positionedFromSave = ApplyPositionData(savedData);
-
-                            // Only treat the fallback as a resolved active-scene location when the saved
-                            // data already targets the scene we just loaded.  Otherwise we would be
-                            // overwriting the saved scene identifier before the deferred LoadPosition call
-                            // has a chance to move the player into the correct interior.
-                            if (positionedFromSave)
+                            var points = GameObject.FindObjectsOfType<SpawnPoint>();
+                            foreach (var p in points)
                             {
-                                resolvedActiveSceneLocation = true;
-                                resolvedActiveScenePosition = true;
+                                if (p.id == spawnId)
+                                {
+                                    transform.position = p.transform.position;
+                                    positionedFromSpawn = true;
+                                    resolvedActiveSceneLocation = true;
+                                    resolvedActiveScenePosition = true;
+                                    break;
+                                }
+                            }
+
+                            if (!positionedFromSpawn)
+                            {
+                                Debug.LogWarning($"SceneTransitionManager requested spawn point '{spawnId}' but no matching SpawnPoint was found in scene '{scene.name}'. Falling back to saved position if available.", this);
                             }
                         }
-                        // When the saved scene differs keep the authored/default transform so the
-                        // deferred LoadPosition flow can relocate the mover after the correct scene loads.
+
+                        if (!positionedFromSpawn && hasSavedPosition)
+                        {
+                            if (savedSceneMatches)
+                            {
+                                positionedFromSave = ApplyPositionData(savedData);
+
+                                // Only treat the fallback as a resolved active-scene location when the saved
+                                // data already targets the scene we just loaded.  Otherwise we would be
+                                // overwriting the saved scene identifier before the deferred LoadPosition call
+                                // has a chance to move the player into the correct interior.
+                                if (positionedFromSave)
+                                {
+                                    resolvedActiveSceneLocation = true;
+                                    resolvedActiveScenePosition = true;
+                                }
+                            }
+                            // When the saved scene differs keep the authored/default transform so the
+                            // deferred LoadPosition flow can relocate the mover after the correct scene loads.
+                        }
                     }
                 }
+
+                if (awaitingSavedSceneLoad && string.Equals(scene.name, pendingSavedSceneName, StringComparison.Ordinal))
+                {
+                    awaitingSavedSceneLoad = false;
+                    pendingSavedSceneName = null;
+                }
+            }
+            else
+            {
+                // The saved profile is directing us to another scene, so avoid persisting the staging
+                // coordinates. Reset movement tracking so SavePosition remains suppressed until the
+                // correct scene becomes active.
+                resolvedActiveScenePosition = false;
+                wasMoving = false;
+                movementSaveTimer = 0f;
             }
 
             // Realign an active pet so it appears beside the player rather than
@@ -789,7 +833,7 @@ namespace Player
             // Persist the updated position only when we resolved a location that belongs to the
             // active scene.  When the saved data targets another scene the deferred LoadPosition
             // call will handle the swap without us touching the stored metadata here.
-            if (resolvedActiveSceneLocation)
+            if (!skipPositionResolution && resolvedActiveSceneLocation)
                 SavePosition(scene.name);
         }
 
