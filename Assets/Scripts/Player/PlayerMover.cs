@@ -103,6 +103,24 @@ namespace Player
         // Ensure only one player persists across scene loads.
         private static PlayerMover instance;
 
+        /// <summary>
+        /// Provides global access to the active <see cref="PlayerMover"/> instance so external
+        /// systems can reposition the player without hunting through the scene hierarchy.
+        /// </summary>
+        public static PlayerMover Instance => instance;
+
+        /// <summary>
+        /// Tracks whether the login flow is orchestrating a resume so automatic saves are deferred
+        /// until the player has been placed at the desired coordinates.
+        /// </summary>
+        private static bool loginResumeActive;
+
+        /// <summary>
+        /// Snapshot captured during the login-driven resume sequence. This allows the mover to
+        /// expose the planned spawn data to other systems while saves are deferred.
+        /// </summary>
+        private static PlayerPositionSnapshot loginResumeSnapshot = PlayerPositionSnapshot.Empty;
+
         [Serializable]
         private class PositionData
         {
@@ -110,6 +128,49 @@ namespace Player
             public float y;
             public float z;
             public string scene;
+        }
+
+        /// <summary>
+        /// Data carrier that exposes the last persisted player scene and coordinates so callers can
+        /// query the save system without instantiating a mover.
+        /// </summary>
+        public readonly struct PlayerPositionSnapshot
+        {
+            /// <summary>
+            /// Name of the scene that owns the stored coordinates.
+            /// </summary>
+            public string SceneName { get; }
+
+            /// <summary>
+            /// World position the player occupied when the snapshot was taken.
+            /// </summary>
+            public Vector3 Position { get; }
+
+            /// <summary>
+            /// Indicates whether the snapshot originated from a valid save entry.
+            /// </summary>
+            public bool HasValidData { get; }
+
+            private PlayerPositionSnapshot(string sceneName, Vector3 position, bool hasValidData)
+            {
+                SceneName = string.IsNullOrEmpty(sceneName) ? string.Empty : sceneName;
+                Position = position;
+                HasValidData = hasValidData && !string.IsNullOrEmpty(SceneName);
+            }
+
+            /// <summary>
+            /// Returns an empty snapshot used when no persisted data exists for the active profile.
+            /// </summary>
+            public static PlayerPositionSnapshot Empty => new PlayerPositionSnapshot(string.Empty, Vector3.zero, false);
+
+            /// <summary>
+            /// Creates a snapshot pointing at the supplied scene and position. The caller controls
+            /// whether the payload should be considered a fully valid save entry.
+            /// </summary>
+            public static PlayerPositionSnapshot Create(string sceneName, Vector3 position, bool hasValidData)
+            {
+                return new PlayerPositionSnapshot(sceneName, position, hasValidData);
+            }
         }
 
         private const string PositionKey = "PlayerPosition";
@@ -132,6 +193,58 @@ namespace Player
         ///     Gathering controllers use this to determine if an automatically initiated walk is still in progress.
         /// </summary>
         public bool IsAutoMoving => isAutoMoving;
+
+        /// <summary>
+        /// Attempts to resolve the last persisted position payload without instantiating a mover.
+        /// </summary>
+        /// <param name="snapshot">Outputs the stored scene and coordinates when available.</param>
+        /// <returns>True when a saved snapshot exists for the active profile.</returns>
+        public static bool TryGetLastSavedSnapshot(out PlayerPositionSnapshot snapshot)
+        {
+            var data = SaveManager.Load<PositionData>(PositionKey);
+            if (data == null || string.IsNullOrEmpty(data.scene))
+            {
+                snapshot = PlayerPositionSnapshot.Empty;
+                return false;
+            }
+
+            snapshot = PlayerPositionSnapshot.Create(
+                data.scene,
+                new Vector3(data.x, data.y, data.z),
+                hasValidData: true);
+            return true;
+        }
+
+        /// <summary>
+        /// Flags that the login flow is about to resume a gameplay scene so automatic saves are
+        /// paused until the external placement logic completes.
+        /// </summary>
+        /// <param name="snapshot">Snapshot describing the desired resume location.</param>
+        public static void BeginLoginResume(PlayerPositionSnapshot snapshot)
+        {
+            loginResumeSnapshot = snapshot;
+            loginResumeActive = true;
+        }
+
+        /// <summary>
+        /// Clears the login resume guard so autosaves and movement persistence resume as normal.
+        /// </summary>
+        public static void CompleteLoginResume()
+        {
+            loginResumeSnapshot = PlayerPositionSnapshot.Empty;
+            loginResumeActive = false;
+        }
+
+        /// <summary>
+        /// Returns the snapshot currently being honoured by the login resume process.
+        /// </summary>
+        public static PlayerPositionSnapshot CurrentLoginResumeSnapshot => loginResumeSnapshot;
+
+        /// <summary>
+        /// Indicates whether the mover should defer automatic save writes while an external login
+        /// workflow positions the player.
+        /// </summary>
+        public static bool IsLoginResumeActive => loginResumeActive;
 
 #if ENABLE_INPUT_SYSTEM
         private InputAction moveAction;
@@ -535,9 +648,12 @@ namespace Player
         /// Optional scene identifier to store alongside the position. When null the
         /// active scene reported by <see cref="SceneManager"/> is used instead.
         /// </param>
-        public void SavePosition(string sceneNameOverride = null)
+        public void SavePosition(string sceneNameOverride = null, bool allowDuringLoginResume = false)
         {
             if (!resolvedActiveScenePosition)
+                return;
+
+            if (loginResumeActive && !allowDuringLoginResume)
                 return;
 
             Vector3 pos = transform.position;
