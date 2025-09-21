@@ -66,14 +66,12 @@ namespace Pets
         private void CreateInventory()
         {
             inventory = gameObject.AddComponent<Inventory.Inventory>();
-            inventory.useSharedUIRoot = false;
             inventory.columns = 4;
             inventory.showCloseButton = false;
             inventory.emptySlotColor = Color.clear;
             inventory.centerOnScreen = true;
             inventory.size = GetSlotsForLevel(experience != null ? experience.Level : 1);
             inventory.saveKey = $"PetInv_{definition?.id}";
-            inventory.OnInventoryChanged += inventory.Save;
 
             // Match the look and feel of the player's inventory so tooltips use the same fonts
             var playerInv = GameObject.FindGameObjectWithTag("Player")?.GetComponent<Inventory.Inventory>();
@@ -98,6 +96,10 @@ namespace Pets
                     }
                 }
             }
+
+            inventory.useSharedUIRoot = false;
+            inventory.ForceDedicatedUiRoot();
+            inventory.OnInventoryChanged += inventory.Save;
         }
 
         private void HandleLevelChanged(int lvl)
