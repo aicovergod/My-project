@@ -611,17 +611,27 @@ namespace Player
         }
 
         /// <summary>
+        /// Applies the provided position payload to the player if valid.
+        /// </summary>
+        /// <param name="data">Persisted position data captured from <see cref="SavePosition"/>.</param>
+        /// <returns>True when a non-null payload was applied to the transform.</returns>
+        private bool ApplyPositionData(PositionData data)
+        {
+            if (data == null)
+                return false;
+
+            transform.position = new Vector3(data.x, data.y, data.z);
+            return true;
+        }
+
+        /// <summary>
         /// Attempts to move the player to the coordinates stored in the active save profile.
         /// </summary>
         /// <returns>True when a saved location existed and was applied.</returns>
         private bool ApplySavedPosition()
         {
             var data = SaveManager.Load<PositionData>(PositionKey);
-            if (data == null)
-                return false;
-
-            transform.position = new Vector3(data.x, data.y, data.z);
-            return true;
+            return ApplyPositionData(data);
         }
 
         public override void OnBeforeSceneUnload()
@@ -638,29 +648,43 @@ namespace Player
             bool positionedFromSpawn = false;
             bool positionedFromSave = false;
 
+            var savedData = SaveManager.Load<PositionData>(PositionKey);
+            bool hasSavedPosition = savedData != null;
+            bool savedSceneMatches = hasSavedPosition && savedData.scene == scene.name;
+
             var spawnId = SceneTransitionManager.NextSpawnPoint;
             bool spawnRequested = !string.IsNullOrEmpty(spawnId);
-            if (spawnRequested)
+
+            // When we're resuming the exact scene captured in the save and no explicit spawn override
+            // is active, prefer the persisted coordinates so logout/login flows feel seamless.
+            if (savedSceneMatches && !spawnRequested)
             {
-                var points = GameObject.FindObjectsOfType<SpawnPoint>();
-                foreach (var p in points)
+                positionedFromSave = ApplyPositionData(savedData);
+            }
+            else
+            {
+                if (spawnRequested)
                 {
-                    if (p.id == spawnId)
+                    var points = GameObject.FindObjectsOfType<SpawnPoint>();
+                    foreach (var p in points)
                     {
-                        transform.position = p.transform.position;
-                        positionedFromSpawn = true;
-                        break;
+                        if (p.id == spawnId)
+                        {
+                            transform.position = p.transform.position;
+                            positionedFromSpawn = true;
+                            break;
+                        }
+                    }
+
+                    if (!positionedFromSpawn)
+                    {
+                        Debug.LogWarning($"SceneTransitionManager requested spawn point '{spawnId}' but no matching SpawnPoint was found in scene '{scene.name}'. Falling back to saved position if available.", this);
                     }
                 }
 
-                if (!positionedFromSpawn)
-                {
-                    Debug.LogWarning($"SceneTransitionManager requested spawn point '{spawnId}' but no matching SpawnPoint was found in scene '{scene.name}'. Falling back to saved position if available.", this);
-                }
+                if (!positionedFromSpawn && hasSavedPosition)
+                    positionedFromSave = ApplyPositionData(savedData);
             }
-
-            if (!positionedFromSpawn)
-                positionedFromSave = ApplySavedPosition();
 
             bool shouldPersistPosition = positionedFromSpawn || positionedFromSave;
 
