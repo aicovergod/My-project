@@ -370,6 +370,65 @@ namespace Inventory
                 equipment = GetComponent<Equipment>();
         }
 
+        /// <summary>
+        /// Rebuilds the inventory UI on a dedicated canvas when shared canvas usage is disabled.
+        /// </summary>
+        public void ForceDedicatedUiRoot()
+        {
+            // Bail out immediately if this inventory still expects to use the shared canvas.
+            if (useSharedUIRoot)
+                return;
+
+            // Ensure backing arrays/fonts are prepared before we touch the UI.
+            EnsureInitialized();
+
+            bool shouldRebuild = uiRoot == null || (sharedUIRoot != null && ReferenceEquals(uiRoot, sharedUIRoot));
+            if (!shouldRebuild)
+            {
+                // We already own a dedicated canvas—just make sure slot visuals stay in sync.
+                if (items != null)
+                {
+                    for (int i = 0; i < items.Length; i++)
+                        UpdateSlotVisual(i);
+                }
+                return;
+            }
+
+            // Remember whether the UI was visible so we can restore the state after rebuilding.
+            bool wasOpen = uiRoot != null && uiRoot.activeSelf;
+
+            // Clean up any lingering UI state that pointed at the shared root.
+            HideDropMenu();
+            HideTooltip();
+
+            uiRoot = null;
+            dropMenu = null;
+            tooltip = null;
+            tooltipNameText = null;
+            tooltipDescriptionText = null;
+            slotImages = null;
+            slotCountTexts = null;
+            slotHighlights = null;
+
+            // Build a fresh dedicated canvas hierarchy for this inventory instance.
+            CreateUI();
+
+            if (uiRoot != null)
+            {
+                // Restore the previous visibility state and make sure runtime helpers are rebound.
+                uiRoot.SetActive(wasOpen);
+                if (dropMenu == null)
+                    dropMenu = uiRoot.GetComponentInChildren<InventoryDropMenu>(true);
+            }
+
+            // Update every slot so the newly created UI matches the saved inventory contents.
+            if (items != null)
+            {
+                for (int i = 0; i < items.Length; i++)
+                    UpdateSlotVisual(i);
+            }
+        }
+
         private void Start()
         {
             EnsureInitialized();
