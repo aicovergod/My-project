@@ -1,3 +1,4 @@
+using System.Collections;
 using Inventory;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -36,6 +37,10 @@ namespace Skills.Fishing
         private float segmentDuration = Ticker.TickDuration;
         // Keeps track of whether the bar should reset after being displayed at full progress for one tick.
         private bool awaitingResetTick;
+        // Coroutine used to poll for the fishing skill when the player spawns after the HUD has already initialised.
+        private Coroutine skillRefreshRoutine;
+        // Delay between retry attempts so we do not run FindObjectOfType every frame while waiting for the skill to exist.
+        private static readonly WaitForSecondsRealtime skillRetryDelay = new WaitForSecondsRealtime(0.5f);
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -147,6 +152,7 @@ namespace Skills.Fishing
 
             HandleStop();
             DetachFromSkill();
+            CancelSkillRefreshRoutine();
         }
 
         private void EnsureProgressObjects()
@@ -280,15 +286,24 @@ namespace Skills.Fishing
         {
             var current = FindObjectOfType<FishingSkill>();
             if (current == skill)
+            {
+                if (current == null)
+                    EnsureSkillRefreshRoutine();
                 return;
+            }
 
             DetachFromSkill();
-            skill = current;
-            if (skill != null)
+
+            if (current == null)
             {
-                skill.OnStartFishing += HandleStart;
-                skill.OnStopFishing += HandleStop;
+                EnsureSkillRefreshRoutine();
+                return;
             }
+
+            CancelSkillRefreshRoutine();
+            skill = current;
+            skill.OnStartFishing += HandleStart;
+            skill.OnStopFishing += HandleStop;
         }
 
         private void DetachFromSkill()
@@ -297,13 +312,20 @@ namespace Skills.Fishing
             {
                 skill.OnStartFishing -= HandleStart;
                 skill.OnStopFishing -= HandleStop;
-                skill = null;
             }
+
+            skill = null;
         }
 
         private void Update()
         {
-            if (target == null || progressImage == null || skill == null)
+            if (skill == null)
+            {
+                EnsureSkillRefreshRoutine();
+                return;
+            }
+
+            if (target == null || progressImage == null)
                 return;
 
             progressRoot.transform.position = target.position + offset;
@@ -420,6 +442,7 @@ namespace Skills.Fishing
 
                 HandleStop();
                 DetachFromSkill();
+                CancelSkillRefreshRoutine();
 
                 if (Ticker.Instance != null)
                     Ticker.Instance.Unsubscribe(this);
@@ -460,6 +483,54 @@ namespace Skills.Fishing
 
             float remaining = Ticker.Instance.TimeUntilNextTick;
             return remaining > 0f ? remaining : Ticker.TickDuration;
+        }
+
+        /// <summary>
+        /// Starts a coroutine that periodically attempts to locate the fishing skill while the player object is still spawning.
+        /// </summary>
+        private void EnsureSkillRefreshRoutine()
+        {
+            if (!isActiveAndEnabled)
+                return;
+
+            if (skillRefreshRoutine != null)
+                return;
+
+            skillRefreshRoutine = StartCoroutine(AwaitSkillRoutine());
+        }
+
+        /// <summary>
+        /// Stops the retry coroutine if it is still running so the HUD does not leak when disabled or destroyed.
+        /// </summary>
+        private void CancelSkillRefreshRoutine()
+        {
+            if (skillRefreshRoutine == null)
+                return;
+
+            StopCoroutine(skillRefreshRoutine);
+            skillRefreshRoutine = null;
+        }
+
+        /// <summary>
+        /// Polls periodically for a <see cref="FishingSkill"/> instance and binds once it becomes available.
+        /// </summary>
+        private IEnumerator AwaitSkillRoutine()
+        {
+            while (isActiveAndEnabled)
+            {
+                var current = FindObjectOfType<FishingSkill>();
+                if (current != null)
+                {
+                    skill = current;
+                    skill.OnStartFishing += HandleStart;
+                    skill.OnStopFishing += HandleStop;
+                    break;
+                }
+
+                yield return skillRetryDelay;
+            }
+
+            skillRefreshRoutine = null;
         }
     }
 }

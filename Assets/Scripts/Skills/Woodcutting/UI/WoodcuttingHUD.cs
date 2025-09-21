@@ -1,3 +1,4 @@
+using System.Collections;
 using Inventory;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -39,6 +40,10 @@ namespace Skills.Woodcutting
         private float segmentDuration = Ticker.TickDuration;
         // Flag used so we can hold the progress bar at 100% for a full tick before resetting back to 0.
         private bool awaitingResetTick;
+        // Coroutine reference used to poll for a late-spawned woodcutting skill so we can rebind automatically.
+        private Coroutine skillRefreshRoutine;
+        // Delay between successive retries when no skill is present in the scene yet.
+        private static readonly WaitForSecondsRealtime skillRetryDelay = new WaitForSecondsRealtime(0.5f);
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -150,6 +155,7 @@ namespace Skills.Woodcutting
 
             HandleStop();
             DetachFromSkill();
+            CancelSkillRefreshRoutine();
         }
 
         private void EnsureProgressObjects()
@@ -283,15 +289,24 @@ namespace Skills.Woodcutting
         {
             var current = FindObjectOfType<WoodcuttingSkill>();
             if (current == skill)
+            {
+                if (current == null)
+                    EnsureSkillRefreshRoutine();
                 return;
+            }
 
             DetachFromSkill();
-            skill = current;
-            if (skill != null)
+
+            if (current == null)
             {
-                skill.OnStartChopping += HandleStart;
-                skill.OnStopChopping += HandleStop;
+                EnsureSkillRefreshRoutine();
+                return;
             }
+
+            CancelSkillRefreshRoutine();
+            skill = current;
+            skill.OnStartChopping += HandleStart;
+            skill.OnStopChopping += HandleStop;
         }
 
         private void DetachFromSkill()
@@ -300,13 +315,20 @@ namespace Skills.Woodcutting
             {
                 skill.OnStartChopping -= HandleStart;
                 skill.OnStopChopping -= HandleStop;
-                skill = null;
             }
+
+            skill = null;
         }
 
         private void Update()
         {
-            if (target == null || progressImage == null || skill == null)
+            if (skill == null)
+            {
+                EnsureSkillRefreshRoutine();
+                return;
+            }
+
+            if (target == null || progressImage == null)
                 return;
 
             progressRoot.transform.position = target.position + offset;
@@ -425,6 +447,7 @@ namespace Skills.Woodcutting
 
                 HandleStop();
                 DetachFromSkill();
+                CancelSkillRefreshRoutine();
 
                 if (Ticker.Instance != null)
                     Ticker.Instance.Unsubscribe(this);
@@ -465,6 +488,54 @@ namespace Skills.Woodcutting
 
             float remaining = Ticker.Instance.TimeUntilNextTick;
             return remaining > 0f ? remaining : Ticker.TickDuration;
+        }
+
+        /// <summary>
+        /// Ensures a coroutine is running to continually search for the woodcutting skill when it is not yet spawned.
+        /// </summary>
+        private void EnsureSkillRefreshRoutine()
+        {
+            if (!isActiveAndEnabled)
+                return;
+
+            if (skillRefreshRoutine != null)
+                return;
+
+            skillRefreshRoutine = StartCoroutine(AwaitSkillRoutine());
+        }
+
+        /// <summary>
+        /// Stops the retry coroutine to avoid leaking references when the HUD is disabled or destroyed.
+        /// </summary>
+        private void CancelSkillRefreshRoutine()
+        {
+            if (skillRefreshRoutine == null)
+                return;
+
+            StopCoroutine(skillRefreshRoutine);
+            skillRefreshRoutine = null;
+        }
+
+        /// <summary>
+        /// Polls the scene at intervals until a <see cref="WoodcuttingSkill"/> is available, then hooks into its events.
+        /// </summary>
+        private IEnumerator AwaitSkillRoutine()
+        {
+            while (isActiveAndEnabled)
+            {
+                var current = FindObjectOfType<WoodcuttingSkill>();
+                if (current != null)
+                {
+                    skill = current;
+                    skill.OnStartChopping += HandleStart;
+                    skill.OnStopChopping += HandleStop;
+                    break;
+                }
+
+                yield return skillRetryDelay;
+            }
+
+            skillRefreshRoutine = null;
         }
     }
 }
