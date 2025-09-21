@@ -66,7 +66,7 @@ namespace World
                 return;
             }
 
-            EnsurePersistentObjects(SceneManager.GetActiveScene());
+            EnsurePersistentObjects();
         }
 
         private void OnEnable()
@@ -85,7 +85,7 @@ namespace World
         /// </summary>
         private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            EnsurePersistentObjects(scene);
+            EnsurePersistentObjects();
         }
 
         /// <summary>
@@ -93,21 +93,15 @@ namespace World
         /// <see cref="ScenePersistentObject"/> so they register with
         /// <see cref="SceneTransitionManager"/> automatically.
         /// </summary>
-        /// <param name="scene">
-        /// Scene that triggered the spawn request. When invalid the active scene will be used instead.
-        /// </param>
-        private void EnsurePersistentObjects(Scene scene)
+        private void EnsurePersistentObjects()
         {
-            // Use the provided scene when available so the catalog can evaluate the correct
-            // context. When the scene is invalid (such as during the initial bootstrap) fall
-            // back to the currently active scene so menu/login gates still apply.
-            if (!scene.IsValid())
-                scene = SceneManager.GetActiveScene();
-
-            if (!scene.IsValid())
+            // Resolve the currently active scene so the catalog can opt-out of spawning
+            // persistent prefabs for non-gameplay contexts such as login or menus.
+            Scene activeScene = SceneManager.GetActiveScene();
+            if (!activeScene.IsValid())
                 return;
 
-            if (!catalog.ShouldSpawnInScene(scene.name))
+            if (!catalog.ShouldSpawnInScene(activeScene.name))
                 return;
 
             IReadOnlyList<GameObject> prefabs = catalog.Prefabs;

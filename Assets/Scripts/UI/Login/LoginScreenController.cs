@@ -1,12 +1,13 @@
 using System.Collections;
 using Core.Save;
-using Player;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UI;
+#if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
+#endif
 
 namespace UI.Login
 {
@@ -76,30 +77,7 @@ namespace UI.Login
         private string gameplaySceneName = "OverWorld";
 
         private Coroutine loadRoutine;
-        private Coroutine postLoadRoutine; // Coroutine that waits for persistent gameplay services before finishing the login flow.
         private GameObject lastSelectedInputField;
-        private bool loginResumeRequested;
-        private bool loadHandlerActive; // Indicates whether the login resume handler should survive scene transitions.
-        private bool sceneLoadedHandlerRegistered; // Tracks the SceneManager.sceneLoaded subscription so we can unsubscribe safely.
-        private bool persistentDuringLoad; // True while this controller has been marked DontDestroyOnLoad for the active transition.
-        private string pendingSceneName; // Target scene that should be loaded following authentication.
-        private Vector3 pendingSpawnPosition; // Position that the PlayerMover should use after the gameplay scene is ready.
-
-        private const float PendingSpawnLogInterval = 2f;
-#if ENABLE_INPUT_SYSTEM
-        /// <summary>
-        /// Duration in seconds to wait after requesting a player join before concluding the spawn
-        /// request failed. This only covers the immediate validation window so genuine cold boots
-        /// can continue relying on the longer wait below.
-        /// </summary>
-        private const float PlayerJoinVerificationTimeout = 0.2f;
-#endif
-
-        /// <summary>
-        /// Message displayed when the player prefab fails to appear so the user is not left staring
-        /// at an indefinite loading prompt.
-        /// </summary>
-        private const string PlayerSpawnFailureStatus = "Player instantiation failed. Please try again.";
 
         private void Awake()
         {
@@ -158,12 +136,6 @@ namespace UI.Login
                 passwordField.onValueChanged.RemoveListener(HandleInputChanged);
 
             lastSelectedInputField = null;
-
-            if (loginResumeRequested && !loadHandlerActive)
-            {
-                PlayerMover.CompleteLoginResume();
-                loginResumeRequested = false;
-            }
         }
 
         private void Update()
@@ -229,460 +201,27 @@ namespace UI.Login
             SetStatus(activationMessage, successColour);
             SaveManager.LoadAll();
 
-            bool hasSnapshot = PlayerMover.TryGetLastSavedSnapshot(out var savedSnapshot);
-            string sceneToLoad = hasSnapshot && !string.IsNullOrEmpty(savedSnapshot.SceneName)
-                ? savedSnapshot.SceneName
-                : gameplaySceneName;
-
-            if (string.IsNullOrEmpty(sceneToLoad))
-                sceneToLoad = gameplaySceneName;
-
-            Vector3 spawnPosition = hasSnapshot ? savedSnapshot.Position : Vector3.zero;
-            var loginSnapshot = hasSnapshot
-                ? savedSnapshot
-                : PlayerMover.PlayerPositionSnapshot.Create(sceneToLoad, spawnPosition, hasValidData: false);
-
-            PlayerMover.BeginLoginResume(loginSnapshot);
-            loginResumeRequested = true;
-
-            if (postLoadRoutine != null)
-            {
-                StopCoroutine(postLoadRoutine);
-                postLoadRoutine = null;
-            }
-
-            if (sceneLoadedHandlerRegistered)
-            {
-                SceneManager.sceneLoaded -= HandleSceneLoaded;
-                sceneLoadedHandlerRegistered = false;
-            }
-
             if (loadRoutine != null)
                 StopCoroutine(loadRoutine);
-            loadRoutine = StartCoroutine(LoadGameplayScene(sceneToLoad, spawnPosition, hasSnapshot));
+            loadRoutine = StartCoroutine(LoadGameplayScene());
         }
 
-        private IEnumerator LoadGameplayScene(string sceneToLoad, Vector3 spawnPosition, bool resumingFromSnapshot)
+        private IEnumerator LoadGameplayScene()
         {
-            PrepareForSceneLoad(sceneToLoad, spawnPosition);
+            SetStatus("Loading world...", infoColour);
 
-            SetStatus(resumingFromSnapshot ? "Restoring last location..." : "Preparing the overworld...", infoColour);
-
-            var operation = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Single);
+            var operation = SceneManager.LoadSceneAsync(gameplaySceneName, LoadSceneMode.Single);
             if (operation == null)
             {
-                HandleSceneTransitionFailure($"Failed to load scene '{sceneToLoad}'.");
-                loadRoutine = null;
+                SetStatus("Failed to load the overworld scene.", errorColour);
+                if (loginButton != null)
+                    loginButton.interactable = true;
                 yield break;
             }
 
             operation.allowSceneActivation = true;
             while (!operation.isDone)
                 yield return null;
-
-            loadRoutine = null;
-        }
-
-        /// <summary>
-        /// Marks the controller as persistent, caches the requested spawn data, and subscribes to the
-        /// sceneLoaded callback so the post-load handler executes from a context that survives the
-        /// upcoming scene swap.
-        /// </summary>
-        private void PrepareForSceneLoad(string sceneToLoad, Vector3 spawnPosition)
-        {
-            pendingSceneName = sceneToLoad;
-            pendingSpawnPosition = spawnPosition;
-            loadHandlerActive = true;
-
-            if (!persistentDuringLoad)
-            {
-                DontDestroyOnLoad(gameObject);
-                persistentDuringLoad = true;
-            }
-
-            if (!sceneLoadedHandlerRegistered)
-            {
-                SceneManager.sceneLoaded += HandleSceneLoaded;
-                sceneLoadedHandlerRegistered = true;
-            }
-        }
-
-        /// <summary>
-        /// Starts the post-load coroutine once the requested gameplay scene finishes loading.
-        /// </summary>
-        private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
-        {
-            if (!loadHandlerActive)
-                return;
-
-            if (!string.Equals(scene.name, pendingSceneName))
-                return;
-
-            if (sceneLoadedHandlerRegistered)
-            {
-                SceneManager.sceneLoaded -= HandleSceneLoaded;
-                sceneLoadedHandlerRegistered = false;
-            }
-
-            if (postLoadRoutine != null)
-            {
-                StopCoroutine(postLoadRoutine);
-                postLoadRoutine = null;
-            }
-
-            postLoadRoutine = StartCoroutine(HandlePostSceneLoad());
-        }
-
-        /// <summary>
-        /// Waits for persistent gameplay services to finish bootstrapping before finalising the login
-        /// resume flow.
-        /// </summary>
-        private IEnumerator HandlePostSceneLoad()
-        {
-            // Track the resolved PlayerMover so both the short verification window and the existing
-            // long-running wait loop can share a common reference.
-            PlayerMover mover = null;
-#if ENABLE_INPUT_SYSTEM
-            // Poll for a PlayerInputManager so the player prefab can be spawned even when the
-            // scene takes a frame to bootstrap its persistent objects. While waiting we also
-            // watch for any active PlayerInput so duplicates are avoided when returning to the
-            // overworld mid-session. The coroutine now remains patient until the manager
-            // actually appears instead of aborting after an arbitrary timeout so cold boots on
-            // slower devices do not bounce players back to the login screen.
-            float managerLogTimer = 0f;
-            bool playerInputAlreadyPresent = false;
-            PlayerInputManager inputManager = null;
-            PlayerInput joinedPlayerInput = null;
-            while (loadHandlerActive)
-            {
-                playerInputAlreadyPresent = false;
-                foreach (var playerInput in PlayerInput.all)
-                {
-                    if (playerInput != null && playerInput.isActiveAndEnabled)
-                    {
-                        playerInputAlreadyPresent = true;
-                        break;
-                    }
-                }
-
-                if (playerInputAlreadyPresent)
-                    break;
-
-                inputManager = PlayerInputManager.instance;
-                if (inputManager == null)
-                    inputManager = Object.FindObjectOfType<PlayerInputManager>();
-
-                if (inputManager != null)
-                    break;
-
-                if (!IsPendingSceneStillLoaded())
-                {
-                    Debug.LogError("LoginScreenController: Pending gameplay scene unloaded before the PlayerInputManager became available.", this);
-                    HandleSceneTransitionFailure("The gameplay scene unloaded before input could initialise. Please try again.");
-                    postLoadRoutine = null;
-                    yield break;
-                }
-
-                yield return null;
-
-                managerLogTimer += Time.unscaledDeltaTime;
-                if (managerLogTimer >= PendingSpawnLogInterval)
-                {
-                    Debug.Log($"LoginScreenController: Waiting for PlayerInputManager in scene '{pendingSceneName}'.", this);
-                    managerLogTimer = 0f;
-                }
-            }
-
-            if (!loadHandlerActive)
-            {
-                postLoadRoutine = null;
-                yield break;
-            }
-
-            // If no PlayerInput existed when the manager became available, perform a final duplicate
-            // check before requesting a new player join. This protects against race conditions where
-            // the PlayerInput spawns naturally while we were yielding.
-            if (!playerInputAlreadyPresent && inputManager != null)
-            {
-                foreach (var playerInput in PlayerInput.all)
-                {
-                    if (playerInput != null && playerInput.isActiveAndEnabled)
-                    {
-                        playerInputAlreadyPresent = true;
-                        break;
-                    }
-                }
-
-                if (!playerInputAlreadyPresent)
-                {
-                    Debug.Log("LoginScreenController: Requesting PlayerInputManager to spawn the local player.", this);
-                    joinedPlayerInput = inputManager.JoinPlayer();
-
-                    if (joinedPlayerInput == null)
-                    {
-                        Debug.LogError("LoginScreenController: PlayerInputManager.JoinPlayer returned null. Unable to continue the login flow.", this);
-                        CleanupJoinedPlayerInput(joinedPlayerInput);
-                        HandleSceneTransitionFailure(PlayerSpawnFailureStatus);
-                        postLoadRoutine = null;
-                        yield break;
-                    }
-
-                    // Immediately verify that the spawned prefab carries the PlayerMover component.
-                    mover = ResolveMoverFromPlayerInput(joinedPlayerInput);
-                    if (mover == null)
-                    {
-                        float joinVerificationTimer = 0f;
-                        while (loadHandlerActive && joinVerificationTimer < PlayerJoinVerificationTimeout && mover == null)
-                        {
-                            if (!IsPendingSceneStillLoaded())
-                            {
-                                Debug.LogError("LoginScreenController: Gameplay scene unloaded while validating the newly spawned player.", this);
-                                CleanupJoinedPlayerInput(joinedPlayerInput);
-                                HandleSceneTransitionFailure(PlayerSpawnFailureStatus);
-                                postLoadRoutine = null;
-                                yield break;
-                            }
-
-                            // Allow a few frames for the prefab hierarchy to finish initialising
-                            // before concluding the spawn truly failed.
-                            yield return null;
-                            joinVerificationTimer += Time.unscaledDeltaTime;
-                            mover = ResolveMoverFromPlayerInput(joinedPlayerInput);
-
-                            if (mover == null)
-                                mover = PlayerMover.Instance;
-
-                            if (mover == null)
-                                mover = FindObjectOfType<PlayerMover>();
-                        }
-
-                        if (mover == null)
-                        {
-                            Debug.LogError("LoginScreenController: Spawned PlayerInput is missing a PlayerMover component.", this);
-                            CleanupJoinedPlayerInput(joinedPlayerInput);
-                            HandleSceneTransitionFailure(PlayerSpawnFailureStatus);
-                            postLoadRoutine = null;
-                            yield break;
-                        }
-                    }
-                }
-            }
-#endif
-
-            float moverLogTimer = 0f;
-            if (mover == null)
-                mover = PlayerMover.Instance;
-            if (mover == null)
-                mover = FindObjectOfType<PlayerMover>();
-
-            while (loadHandlerActive && mover == null)
-            {
-                if (!IsPendingSceneStillLoaded())
-                {
-                    Debug.LogError("LoginScreenController: Gameplay scene unloaded before the PlayerMover spawned.", this);
-                    HandleSceneTransitionFailure("The gameplay scene unloaded before the player prefab could spawn. Please try again.");
-                    postLoadRoutine = null;
-                    yield break;
-                }
-
-                yield return null;
-
-                moverLogTimer += Time.unscaledDeltaTime;
-                if (moverLogTimer >= PendingSpawnLogInterval)
-                {
-                    Debug.Log($"LoginScreenController: Waiting for PlayerMover in scene '{pendingSceneName}'.", this);
-                    moverLogTimer = 0f;
-                }
-
-                mover = PlayerMover.Instance;
-                if (mover == null)
-                    mover = FindObjectOfType<PlayerMover>();
-            }
-
-            if (!loadHandlerActive)
-            {
-                postLoadRoutine = null;
-                yield break;
-            }
-
-            if (mover == null)
-            {
-                Debug.LogError("LoginScreenController: PlayerMover never became available despite the gameplay scene staying loaded.", this);
-                HandleSceneTransitionFailure(PlayerSpawnFailureStatus);
-                postLoadRoutine = null;
-                yield break;
-            }
-
-            mover.transform.position = pendingSpawnPosition;
-            mover.SavePosition(pendingSceneName, allowDuringLoginResume: true);
-
-            if (loginResumeRequested)
-            {
-                PlayerMover.CompleteLoginResume();
-                loginResumeRequested = false;
-            }
-
-            CompleteSuccessfulSceneTransition();
-            postLoadRoutine = null;
-        }
-
-#if ENABLE_INPUT_SYSTEM
-        /// <summary>
-        /// Attempts to locate the <see cref="PlayerMover"/> associated with the provided
-        /// <see cref="PlayerInput"/>. The search covers the root, children, and parents so prefabs with
-        /// nested hierarchies are still supported.
-        /// </summary>
-        /// <param name="playerInput">Player input component spawned by the input manager.</param>
-        /// <returns>The resolved mover instance when available; otherwise null.</returns>
-        private static PlayerMover ResolveMoverFromPlayerInput(PlayerInput playerInput)
-        {
-            if (playerInput == null)
-                return null;
-
-            var mover = playerInput.GetComponent<PlayerMover>();
-            if (mover != null)
-                return mover;
-
-            mover = playerInput.GetComponentInChildren<PlayerMover>(true);
-            if (mover != null)
-                return mover;
-
-            return playerInput.GetComponentInParent<PlayerMover>();
-        }
-
-        /// <summary>
-        /// Releases the temporary <see cref="PlayerInput"/> that was spawned during a failed login
-        /// resume attempt. The cleanup prefers the <see cref="PlayerInputManager"/> so internal
-        /// bookkeeping remains consistent before falling back to a direct destroy when the manager
-        /// is no longer available.
-        /// </summary>
-        /// <param name="joinedPlayerInput">Player input instance that should be removed.</param>
-        private void CleanupJoinedPlayerInput(PlayerInput joinedPlayerInput)
-        {
-            if (joinedPlayerInput == null)
-                return;
-
-            var manager = PlayerInputManager.instance;
-            if (manager != null)
-            {
-                manager.RemovePlayer(joinedPlayerInput);
-                return;
-            }
-
-            Destroy(joinedPlayerInput.gameObject);
-        }
-#endif
-
-        /// <summary>
-        /// Determines whether the pending gameplay scene is still present and loaded. The login
-        /// resume flow only treats the transition as failed when the scene actually unloads or is
-        /// replaced, preventing false negatives when the bootstrap work simply takes longer than
-        /// expected on a cold start.
-        /// </summary>
-        private bool IsPendingSceneStillLoaded()
-        {
-            if (string.IsNullOrEmpty(pendingSceneName))
-                return false;
-
-            var activeScene = SceneManager.GetActiveScene();
-            if (activeScene.IsValid() && activeScene.name == pendingSceneName)
-                return true;
-
-            var pendingScene = SceneManager.GetSceneByName(pendingSceneName);
-            return pendingScene.IsValid() && pendingScene.isLoaded;
-        }
-
-        /// <summary>
-        /// Finalises the login flow once the player has been spawned and positioned in the gameplay
-        /// scene.
-        /// </summary>
-        private void CompleteSuccessfulSceneTransition()
-        {
-            loadHandlerActive = false;
-            pendingSceneName = null;
-            pendingSpawnPosition = Vector3.zero;
-
-            if (loginButton != null)
-                loginButton.interactable = true;
-
-            if (persistentDuringLoad)
-                persistentDuringLoad = false;
-
-            HideAndDestroyLoginUi();
-        }
-
-        /// <summary>
-        /// Restores the login UI so the player can retry when the gameplay scene fails to initialise
-        /// correctly.
-        /// </summary>
-        private void HandleSceneTransitionFailure(string message)
-        {
-            loadHandlerActive = false;
-
-            if (postLoadRoutine != null)
-                postLoadRoutine = null;
-
-            if (sceneLoadedHandlerRegistered)
-            {
-                SceneManager.sceneLoaded -= HandleSceneLoaded;
-                sceneLoadedHandlerRegistered = false;
-            }
-
-            SetStatus(message, errorColour);
-
-            if (loginButton != null)
-                loginButton.interactable = true;
-
-            if (loginResumeRequested)
-            {
-                PlayerMover.CompleteLoginResume();
-                loginResumeRequested = false;
-            }
-
-            pendingSceneName = null;
-            pendingSpawnPosition = Vector3.zero;
-
-            if (persistentDuringLoad)
-            {
-                SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetActiveScene());
-                persistentDuringLoad = false;
-            }
-        }
-
-        /// <summary>
-        /// Hides every login element before destroying the controller so the gameplay scene is free
-        /// from lingering menu visuals.
-        /// </summary>
-        private void HideAndDestroyLoginUi()
-        {
-            if (backgroundImage != null)
-                backgroundImage.enabled = false;
-
-            if (loginPanelImage != null)
-                loginPanelImage.enabled = false;
-
-            if (usernameField != null)
-                usernameField.gameObject.SetActive(false);
-
-            if (passwordField != null)
-                passwordField.gameObject.SetActive(false);
-
-            if (statusText != null)
-                statusText.gameObject.SetActive(false);
-
-            if (loginButton != null)
-                loginButton.gameObject.SetActive(false);
-
-            var canvas = GetComponent<Canvas>();
-            if (canvas != null)
-                canvas.enabled = false;
-
-            var raycaster = GetComponent<GraphicRaycaster>();
-            if (raycaster != null)
-                raycaster.enabled = false;
-
-            gameObject.SetActive(false);
-            Destroy(gameObject);
         }
 
         private void EnsureUiHierarchy()
