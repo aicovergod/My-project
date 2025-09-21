@@ -650,9 +650,12 @@ namespace Player
             base.OnAfterSceneLoad(scene);
 
             // Track which positioning strategy ended up being used so we only persist when a valid
-            // location has been resolved for this scene.
+            // location has been resolved for this scene.  The additional flag ensures we do not
+            // clobber saved metadata with coordinates from a different scene when the player is
+            // about to transition.
             bool positionedFromSpawn = false;
             bool positionedFromSave = false;
+            bool resolvedActiveSceneLocation = false;
 
             var savedData = SaveManager.Load<PositionData>(PositionKey);
             bool hasSavedPosition = savedData != null;
@@ -666,6 +669,7 @@ namespace Player
             if (savedSceneMatches && !spawnRequested)
             {
                 positionedFromSave = ApplyPositionData(savedData);
+                resolvedActiveSceneLocation = positionedFromSave;
             }
             else
             {
@@ -678,6 +682,7 @@ namespace Player
                         {
                             transform.position = p.transform.position;
                             positionedFromSpawn = true;
+                            resolvedActiveSceneLocation = true;
                             break;
                         }
                     }
@@ -689,10 +694,17 @@ namespace Player
                 }
 
                 if (!positionedFromSpawn && hasSavedPosition)
+                {
                     positionedFromSave = ApplyPositionData(savedData);
-            }
 
-            bool shouldPersistPosition = positionedFromSpawn || positionedFromSave;
+                    // Only treat the fallback as a resolved active-scene location when the saved
+                    // data already targets the scene we just loaded.  Otherwise we would be
+                    // overwriting the saved scene identifier before the deferred LoadPosition call
+                    // has a chance to move the player into the correct interior.
+                    if (savedSceneMatches && positionedFromSave)
+                        resolvedActiveSceneLocation = true;
+                }
+            }
 
             // Realign an active pet so it appears beside the player rather than
             // lingering at the origin during scene swaps.  Without this pass the
@@ -731,7 +743,10 @@ namespace Player
                 }
             }
 
-            if (shouldPersistPosition)
+            // Persist the updated position only when we resolved a location that belongs to the
+            // active scene.  When the saved data targets another scene the deferred LoadPosition
+            // call will handle the swap without us touching the stored metadata here.
+            if (resolvedActiveSceneLocation)
                 SavePosition(scene.name);
         }
 
