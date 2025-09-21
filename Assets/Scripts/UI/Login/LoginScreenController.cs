@@ -86,6 +86,20 @@ namespace UI.Login
         private Vector3 pendingSpawnPosition; // Position that the PlayerMover should use after the gameplay scene is ready.
 
         private const float PendingSpawnLogInterval = 2f;
+#if ENABLE_INPUT_SYSTEM
+        /// <summary>
+        /// Duration in seconds to wait after requesting a player join before concluding the spawn
+        /// request failed. This only covers the immediate validation window so genuine cold boots
+        /// can continue relying on the longer wait below.
+        /// </summary>
+        private const float PlayerJoinVerificationTimeout = 0.2f;
+#endif
+
+        /// <summary>
+        /// Message displayed when the player prefab fails to appear so the user is not left staring
+        /// at an indefinite loading prompt.
+        /// </summary>
+        private const string PlayerSpawnFailureStatus = "Player instantiation failed. Please try again.";
 
         private void Awake()
         {
@@ -325,6 +339,9 @@ namespace UI.Login
         /// </summary>
         private IEnumerator HandlePostSceneLoad()
         {
+            // Track the resolved PlayerMover so both the short verification window and the existing
+            // long-running wait loop can share a common reference.
+            PlayerMover mover = null;
 #if ENABLE_INPUT_SYSTEM
             // Poll for a PlayerInputManager so the player prefab can be spawned even when the
             // scene takes a frame to bootstrap its persistent objects. While waiting we also
@@ -335,6 +352,7 @@ namespace UI.Login
             float managerLogTimer = 0f;
             bool playerInputAlreadyPresent = false;
             PlayerInputManager inputManager = null;
+            PlayerInput joinedPlayerInput = null;
             while (loadHandlerActive)
             {
                 playerInputAlreadyPresent = false;
@@ -398,13 +416,59 @@ namespace UI.Login
                 if (!playerInputAlreadyPresent)
                 {
                     Debug.Log("LoginScreenController: Requesting PlayerInputManager to spawn the local player.", this);
-                    inputManager.JoinPlayer();
+                    joinedPlayerInput = inputManager.JoinPlayer();
+
+                    if (joinedPlayerInput == null)
+                    {
+                        Debug.LogError("LoginScreenController: PlayerInputManager.JoinPlayer returned null. Unable to continue the login flow.", this);
+                        HandleSceneTransitionFailure(PlayerSpawnFailureStatus);
+                        postLoadRoutine = null;
+                        yield break;
+                    }
+
+                    // Immediately verify that the spawned prefab carries the PlayerMover component.
+                    mover = ResolveMoverFromPlayerInput(joinedPlayerInput);
+                    if (mover == null)
+                    {
+                        float joinVerificationTimer = 0f;
+                        while (loadHandlerActive && joinVerificationTimer < PlayerJoinVerificationTimeout && mover == null)
+                        {
+                            if (!IsPendingSceneStillLoaded())
+                            {
+                                Debug.LogError("LoginScreenController: Gameplay scene unloaded while validating the newly spawned player.", this);
+                                HandleSceneTransitionFailure(PlayerSpawnFailureStatus);
+                                postLoadRoutine = null;
+                                yield break;
+                            }
+
+                            // Allow a few frames for the prefab hierarchy to finish initialising
+                            // before concluding the spawn truly failed.
+                            yield return null;
+                            joinVerificationTimer += Time.unscaledDeltaTime;
+                            mover = ResolveMoverFromPlayerInput(joinedPlayerInput);
+
+                            if (mover == null)
+                                mover = PlayerMover.Instance;
+
+                            if (mover == null)
+                                mover = FindObjectOfType<PlayerMover>();
+                        }
+
+                        if (mover == null)
+                        {
+                            Debug.LogError("LoginScreenController: Spawned PlayerInput is missing a PlayerMover component.", this);
+                            HandleSceneTransitionFailure(PlayerSpawnFailureStatus);
+                            postLoadRoutine = null;
+                            yield break;
+                        }
+                    }
                 }
             }
 #endif
 
             float moverLogTimer = 0f;
-            PlayerMover mover = PlayerMover.Instance;
+            if (mover == null)
+                mover = PlayerMover.Instance;
             if (mover == null)
                 mover = FindObjectOfType<PlayerMover>();
 
@@ -441,7 +505,7 @@ namespace UI.Login
             if (mover == null)
             {
                 Debug.LogError("LoginScreenController: PlayerMover never became available despite the gameplay scene staying loaded.", this);
-                HandleSceneTransitionFailure("The gameplay scene failed to provide a player prefab. Please try again.");
+                HandleSceneTransitionFailure(PlayerSpawnFailureStatus);
                 postLoadRoutine = null;
                 yield break;
             }
@@ -458,6 +522,31 @@ namespace UI.Login
             CompleteSuccessfulSceneTransition();
             postLoadRoutine = null;
         }
+
+#if ENABLE_INPUT_SYSTEM
+        /// <summary>
+        /// Attempts to locate the <see cref="PlayerMover"/> associated with the provided
+        /// <see cref="PlayerInput"/>. The search covers the root, children, and parents so prefabs with
+        /// nested hierarchies are still supported.
+        /// </summary>
+        /// <param name="playerInput">Player input component spawned by the input manager.</param>
+        /// <returns>The resolved mover instance when available; otherwise null.</returns>
+        private static PlayerMover ResolveMoverFromPlayerInput(PlayerInput playerInput)
+        {
+            if (playerInput == null)
+                return null;
+
+            var mover = playerInput.GetComponent<PlayerMover>();
+            if (mover != null)
+                return mover;
+
+            mover = playerInput.GetComponentInChildren<PlayerMover>(true);
+            if (mover != null)
+                return mover;
+
+            return playerInput.GetComponentInParent<PlayerMover>();
+        }
+#endif
 
         /// <summary>
         /// Determines whether the pending gameplay scene is still present and loaded. The login
