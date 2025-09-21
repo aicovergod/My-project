@@ -729,17 +729,22 @@ namespace Player
 
                     if (!positionedFromSpawn && hasSavedPosition)
                     {
-                        positionedFromSave = ApplyPositionData(savedData);
-
-                        // Only treat the fallback as a resolved active-scene location when the saved
-                        // data already targets the scene we just loaded.  Otherwise we would be
-                        // overwriting the saved scene identifier before the deferred LoadPosition call
-                        // has a chance to move the player into the correct interior.
-                        if (savedSceneMatches && positionedFromSave)
+                        if (savedSceneMatches)
                         {
-                            resolvedActiveSceneLocation = true;
-                            resolvedActiveScenePosition = true;
+                            positionedFromSave = ApplyPositionData(savedData);
+
+                            // Only treat the fallback as a resolved active-scene location when the saved
+                            // data already targets the scene we just loaded.  Otherwise we would be
+                            // overwriting the saved scene identifier before the deferred LoadPosition call
+                            // has a chance to move the player into the correct interior.
+                            if (positionedFromSave)
+                            {
+                                resolvedActiveSceneLocation = true;
+                                resolvedActiveScenePosition = true;
+                            }
                         }
+                        // When the saved scene differs keep the authored/default transform so the
+                        // deferred LoadPosition flow can relocate the mover after the correct scene loads.
                     }
                 }
             }
