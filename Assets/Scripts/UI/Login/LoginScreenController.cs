@@ -421,6 +421,7 @@ namespace UI.Login
                     if (joinedPlayerInput == null)
                     {
                         Debug.LogError("LoginScreenController: PlayerInputManager.JoinPlayer returned null. Unable to continue the login flow.", this);
+                        CleanupJoinedPlayerInput(joinedPlayerInput);
                         HandleSceneTransitionFailure(PlayerSpawnFailureStatus);
                         postLoadRoutine = null;
                         yield break;
@@ -436,6 +437,7 @@ namespace UI.Login
                             if (!IsPendingSceneStillLoaded())
                             {
                                 Debug.LogError("LoginScreenController: Gameplay scene unloaded while validating the newly spawned player.", this);
+                                CleanupJoinedPlayerInput(joinedPlayerInput);
                                 HandleSceneTransitionFailure(PlayerSpawnFailureStatus);
                                 postLoadRoutine = null;
                                 yield break;
@@ -457,6 +459,7 @@ namespace UI.Login
                         if (mover == null)
                         {
                             Debug.LogError("LoginScreenController: Spawned PlayerInput is missing a PlayerMover component.", this);
+                            CleanupJoinedPlayerInput(joinedPlayerInput);
                             HandleSceneTransitionFailure(PlayerSpawnFailureStatus);
                             postLoadRoutine = null;
                             yield break;
@@ -545,6 +548,28 @@ namespace UI.Login
                 return mover;
 
             return playerInput.GetComponentInParent<PlayerMover>();
+        }
+
+        /// <summary>
+        /// Releases the temporary <see cref="PlayerInput"/> that was spawned during a failed login
+        /// resume attempt. The cleanup prefers the <see cref="PlayerInputManager"/> so internal
+        /// bookkeeping remains consistent before falling back to a direct destroy when the manager
+        /// is no longer available.
+        /// </summary>
+        /// <param name="joinedPlayerInput">Player input instance that should be removed.</param>
+        private void CleanupJoinedPlayerInput(PlayerInput joinedPlayerInput)
+        {
+            if (joinedPlayerInput == null)
+                return;
+
+            var manager = PlayerInputManager.instance;
+            if (manager != null)
+            {
+                manager.RemovePlayer(joinedPlayerInput);
+                return;
+            }
+
+            Destroy(joinedPlayerInput.gameObject);
         }
 #endif
 
