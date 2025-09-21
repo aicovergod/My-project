@@ -77,6 +77,7 @@ GameObject:
   - component: {fileID: 5914355433513186549}
   - component: {fileID: 8582261054864833439}
   - component: {fileID: -8837884572014598511}
+  - component: {fileID: -2219103460593389809}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -262,7 +263,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b7b922c76076f0f31794d0c1e14a791, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  size: 20
+  size: 28
   slotSize: {x: 32, y: 32}
   slotSpacing: {x: 4, y: 4}
   referenceResolution: {x: 1024, y: 768}
@@ -416,6 +417,7 @@ MonoBehaviour:
   inventory: {fileID: 491447706204386932}
   equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
+  enableDebugLogging: 0
 --- !u!114 &4484345410366226628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -431,6 +433,7 @@ MonoBehaviour:
   inventory: {fileID: 491447706204386932}
   equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
+  enableDebugLogging: 0
 --- !u!114 &224529023114725345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -733,6 +736,7 @@ MonoBehaviour:
   inventory: {fileID: 491447706204386932}
   equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
+  enableDebugLogging: 0
 --- !u!114 &8168772117157042845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -899,3 +903,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Audio.SoundManager
   sfxVolume: 1
+--- !u!114 &-2219103460593389809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 918b72a14a97c1744832a8918202ced8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Skills.Cooking.CookingSkill
+  inventory: {fileID: 491447706204386932}
+  equipment: {fileID: 8439072058276114910}
+  floatingTextAnchor: {fileID: 487381587706843324}
+  enableDebugLogging: 0
