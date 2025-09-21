@@ -1,5 +1,6 @@
 using System.Collections;
 using Core.Save;
+using Player;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -78,6 +79,9 @@ namespace UI.Login
 
         private Coroutine loadRoutine;
         private GameObject lastSelectedInputField;
+        private bool loginResumeRequested;
+
+        private const float PlayerSpawnTimeout = 5f;
 
         private void Awake()
         {
@@ -136,6 +140,12 @@ namespace UI.Login
                 passwordField.onValueChanged.RemoveListener(HandleInputChanged);
 
             lastSelectedInputField = null;
+
+            if (loginResumeRequested)
+            {
+                PlayerMover.CompleteLoginResume();
+                loginResumeRequested = false;
+            }
         }
 
         private void Update()
@@ -201,27 +211,91 @@ namespace UI.Login
             SetStatus(activationMessage, successColour);
             SaveManager.LoadAll();
 
+            bool hasSnapshot = PlayerMover.TryGetLastSavedSnapshot(out var savedSnapshot);
+            string sceneToLoad = hasSnapshot && !string.IsNullOrEmpty(savedSnapshot.SceneName)
+                ? savedSnapshot.SceneName
+                : gameplaySceneName;
+
+            if (string.IsNullOrEmpty(sceneToLoad))
+                sceneToLoad = gameplaySceneName;
+
+            Vector3 spawnPosition = hasSnapshot ? savedSnapshot.Position : Vector3.zero;
+            var loginSnapshot = hasSnapshot
+                ? savedSnapshot
+                : PlayerMover.PlayerPositionSnapshot.Create(sceneToLoad, spawnPosition, hasValidData: false);
+
+            PlayerMover.BeginLoginResume(loginSnapshot);
+            loginResumeRequested = true;
+
             if (loadRoutine != null)
                 StopCoroutine(loadRoutine);
-            loadRoutine = StartCoroutine(LoadGameplayScene());
+            loadRoutine = StartCoroutine(LoadGameplayScene(sceneToLoad, spawnPosition, hasSnapshot));
         }
 
-        private IEnumerator LoadGameplayScene()
+        private IEnumerator LoadGameplayScene(string sceneToLoad, Vector3 spawnPosition, bool resumingFromSnapshot)
         {
-            SetStatus("Loading world...", infoColour);
+            SetStatus(resumingFromSnapshot ? "Restoring last location..." : "Preparing the overworld...", infoColour);
 
-            var operation = SceneManager.LoadSceneAsync(gameplaySceneName, LoadSceneMode.Single);
+            var operation = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Single);
             if (operation == null)
             {
-                SetStatus("Failed to load the overworld scene.", errorColour);
+                SetStatus($"Failed to load scene '{sceneToLoad}'.", errorColour);
                 if (loginButton != null)
                     loginButton.interactable = true;
+                if (loginResumeRequested)
+                {
+                    PlayerMover.CompleteLoginResume();
+                    loginResumeRequested = false;
+                }
+                loadRoutine = null;
                 yield break;
             }
 
             operation.allowSceneActivation = true;
             while (!operation.isDone)
                 yield return null;
+
+            float elapsed = 0f;
+            PlayerMover mover = PlayerMover.Instance;
+            while (mover == null && elapsed < PlayerSpawnTimeout)
+            {
+                mover = PlayerMover.Instance;
+                if (mover != null)
+                    break;
+
+                mover = FindObjectOfType<PlayerMover>();
+                if (mover != null)
+                    break;
+
+                elapsed += Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            if (mover == null)
+            {
+                Debug.LogError("LoginScreenController: PlayerMover was not found after loading the gameplay scene.", this);
+                SetStatus("Failed to spawn the player character.", errorColour);
+                if (loginButton != null)
+                    loginButton.interactable = true;
+                if (loginResumeRequested)
+                {
+                    PlayerMover.CompleteLoginResume();
+                    loginResumeRequested = false;
+                }
+                loadRoutine = null;
+                yield break;
+            }
+
+            mover.transform.position = spawnPosition;
+            mover.SavePosition(sceneToLoad, allowDuringLoginResume: true);
+
+            if (loginResumeRequested)
+            {
+                PlayerMover.CompleteLoginResume();
+                loginResumeRequested = false;
+            }
+
+            loadRoutine = null;
         }
 
         private void EnsureUiHierarchy()
