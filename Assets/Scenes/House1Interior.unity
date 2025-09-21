@@ -1037,7 +1037,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8db31cc903ff6b046bcf972ee77570f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: House1EntranceSpawn
+  id: House1InteriorSpawn
 --- !u!114 &413998899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1054,6 +1054,9 @@ MonoBehaviour:
   requiredItemId: 
   removeItemOnUse: 0
   missingItemMessage: 
+  requireSkillLevel: 0
+  requiredSkill: 0
+  requiredSkillLevel: 1
   spawnPointName: House1ExitSpawn
   useRadius: 2
 --- !u!61 &413998900
