@@ -630,8 +630,17 @@ namespace Player
             var data = SaveManager.Load<PositionData>(PositionKey);
             if (data != null && scene.name == data.scene)
             {
-                if (ApplySavedPosition())
+                bool appliedSavedPosition = ApplySavedPosition();
+                if (appliedSavedPosition)
+                {
                     resolvedActiveScenePosition = true;
+
+                    // Clear the deferred load flags once the saved position has been restored so the
+                    // follow-up OnAfterSceneLoad pass can resume normal persistence handling.
+                    awaitingSavedSceneLoad = false;
+                    pendingSavedSceneName = null;
+                }
+
                 if (petToMove != null)
                 {
                     petToMove.transform.position = transform.position;
@@ -640,6 +649,13 @@ namespace Player
                         follower.SetPlayer(transform);
                     SceneManager.MoveGameObjectToScene(petToMove, scene);
                     petToMove = null;
+                }
+
+                if (appliedSavedPosition)
+                {
+                    // The saved-scene handoff has finished so this handler can be removed immediately.
+                    SceneManager.sceneLoaded -= OnSceneLoaded;
+                    return;
                 }
             }
 
