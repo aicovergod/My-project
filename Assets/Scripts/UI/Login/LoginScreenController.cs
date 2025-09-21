@@ -85,7 +85,7 @@ namespace UI.Login
         private string pendingSceneName; // Target scene that should be loaded following authentication.
         private Vector3 pendingSpawnPosition; // Position that the PlayerMover should use after the gameplay scene is ready.
 
-        private const float PlayerSpawnTimeout = 5f;
+        private const float PendingSpawnLogInterval = 2f;
 
         private void Awake()
         {
@@ -329,11 +329,13 @@ namespace UI.Login
             // Poll for a PlayerInputManager so the player prefab can be spawned even when the
             // scene takes a frame to bootstrap its persistent objects. While waiting we also
             // watch for any active PlayerInput so duplicates are avoided when returning to the
-            // overworld mid-session.
-            float managerWaitElapsed = 0f;
+            // overworld mid-session. The coroutine now remains patient until the manager
+            // actually appears instead of aborting after an arbitrary timeout so cold boots on
+            // slower devices do not bounce players back to the login screen.
+            float managerLogTimer = 0f;
             bool playerInputAlreadyPresent = false;
             PlayerInputManager inputManager = null;
-            while (managerWaitElapsed < PlayerSpawnTimeout)
+            while (loadHandlerActive)
             {
                 playerInputAlreadyPresent = false;
                 foreach (var playerInput in PlayerInput.all)
@@ -355,8 +357,28 @@ namespace UI.Login
                 if (inputManager != null)
                     break;
 
-                managerWaitElapsed += Time.unscaledDeltaTime;
+                if (!IsPendingSceneStillLoaded())
+                {
+                    Debug.LogError("LoginScreenController: Pending gameplay scene unloaded before the PlayerInputManager became available.", this);
+                    HandleSceneTransitionFailure("The gameplay scene unloaded before input could initialise. Please try again.");
+                    postLoadRoutine = null;
+                    yield break;
+                }
+
                 yield return null;
+
+                managerLogTimer += Time.unscaledDeltaTime;
+                if (managerLogTimer >= PendingSpawnLogInterval)
+                {
+                    Debug.Log($"LoginScreenController: Waiting for PlayerInputManager in scene '{pendingSceneName}'.", this);
+                    managerLogTimer = 0f;
+                }
+            }
+
+            if (!loadHandlerActive)
+            {
+                postLoadRoutine = null;
+                yield break;
             }
 
             // If no PlayerInput existed when the manager became available, perform a final duplicate
@@ -374,30 +396,52 @@ namespace UI.Login
                 }
 
                 if (!playerInputAlreadyPresent)
+                {
+                    Debug.Log("LoginScreenController: Requesting PlayerInputManager to spawn the local player.", this);
                     inputManager.JoinPlayer();
+                }
             }
 #endif
 
-            float elapsed = 0f;
+            float moverLogTimer = 0f;
             PlayerMover mover = PlayerMover.Instance;
-            while (mover == null && elapsed < PlayerSpawnTimeout)
-            {
-                mover = PlayerMover.Instance;
-                if (mover != null)
-                    break;
-
+            if (mover == null)
                 mover = FindObjectOfType<PlayerMover>();
-                if (mover != null)
-                    break;
 
-                elapsed += Time.unscaledDeltaTime;
+            while (loadHandlerActive && mover == null)
+            {
+                if (!IsPendingSceneStillLoaded())
+                {
+                    Debug.LogError("LoginScreenController: Gameplay scene unloaded before the PlayerMover spawned.", this);
+                    HandleSceneTransitionFailure("The gameplay scene unloaded before the player prefab could spawn. Please try again.");
+                    postLoadRoutine = null;
+                    yield break;
+                }
+
                 yield return null;
+
+                moverLogTimer += Time.unscaledDeltaTime;
+                if (moverLogTimer >= PendingSpawnLogInterval)
+                {
+                    Debug.Log($"LoginScreenController: Waiting for PlayerMover in scene '{pendingSceneName}'.", this);
+                    moverLogTimer = 0f;
+                }
+
+                mover = PlayerMover.Instance;
+                if (mover == null)
+                    mover = FindObjectOfType<PlayerMover>();
+            }
+
+            if (!loadHandlerActive)
+            {
+                postLoadRoutine = null;
+                yield break;
             }
 
             if (mover == null)
             {
-                Debug.LogError("LoginScreenController: PlayerMover was not found after loading the gameplay scene.", this);
-                HandleSceneTransitionFailure("Failed to spawn the player character.");
+                Debug.LogError("LoginScreenController: PlayerMover never became available despite the gameplay scene staying loaded.", this);
+                HandleSceneTransitionFailure("The gameplay scene failed to provide a player prefab. Please try again.");
                 postLoadRoutine = null;
                 yield break;
             }
@@ -413,6 +457,25 @@ namespace UI.Login
 
             CompleteSuccessfulSceneTransition();
             postLoadRoutine = null;
+        }
+
+        /// <summary>
+        /// Determines whether the pending gameplay scene is still present and loaded. The login
+        /// resume flow only treats the transition as failed when the scene actually unloads or is
+        /// replaced, preventing false negatives when the bootstrap work simply takes longer than
+        /// expected on a cold start.
+        /// </summary>
+        private bool IsPendingSceneStillLoaded()
+        {
+            if (string.IsNullOrEmpty(pendingSceneName))
+                return false;
+
+            var activeScene = SceneManager.GetActiveScene();
+            if (activeScene.IsValid() && activeScene.name == pendingSceneName)
+                return true;
+
+            var pendingScene = SceneManager.GetSceneByName(pendingSceneName);
+            return pendingScene.IsValid() && pendingScene.isLoaded;
         }
 
         /// <summary>
