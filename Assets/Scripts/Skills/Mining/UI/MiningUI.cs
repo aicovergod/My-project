@@ -1,5 +1,5 @@
-using System.Collections;
 using Inventory;
+using Skills.Common.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -11,7 +11,7 @@ namespace Skills.Mining
     /// <summary>
     /// Displays mining progress above the current rock.
     /// </summary>
-    public class MiningUI : MonoBehaviour, ITickable
+    public class MiningUI : GatheringSkillHudBase<MiningSkill>, ITickable
     {
         private static MiningUI instance;
         private static bool waitingForAllowedScene;
@@ -22,7 +22,6 @@ namespace Skills.Mining
         private bool sceneGateSubscribed;
         private bool sceneLoadedSubscribed;
 
-        private MiningSkill skill;
         private Transform target;
         private Image progressImage;
         private GameObject progressRoot;
@@ -42,10 +41,6 @@ namespace Skills.Mining
         private float segmentDuration = Ticker.TickDuration;
         // Tracks whether the bar should be reset after spending one full tick at 100%.
         private bool awaitingResetTick;
-        // Coroutine reference that polls for a mining skill when the player object spawns after the HUD has initialised.
-        private Coroutine skillRefreshRoutine;
-        // Delay used between retries so we only probe for the skill a few times per second instead of every frame.
-        private static readonly WaitForSecondsRealtime skillRetryDelay = new WaitForSecondsRealtime(0.5f);
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -284,41 +279,6 @@ namespace Skills.Mining
             RefreshSkillSubscription();
         }
 
-        private void RefreshSkillSubscription()
-        {
-            var current = FindObjectOfType<MiningSkill>();
-            if (current == skill)
-            {
-                if (current == null)
-                    EnsureSkillRefreshRoutine();
-                return;
-            }
-
-            DetachFromSkill();
-
-            if (current == null)
-            {
-                EnsureSkillRefreshRoutine();
-                return;
-            }
-
-            CancelSkillRefreshRoutine();
-            skill = current;
-            skill.OnStartMining += HandleStart;
-            skill.OnStopMining += HandleStop;
-        }
-
-        private void DetachFromSkill()
-        {
-            if (skill != null)
-            {
-                skill.OnStartMining -= HandleStart;
-                skill.OnStopMining -= HandleStop;
-            }
-
-            skill = null;
-        }
-
         private void Update()
         {
             if (skill == null)
@@ -488,51 +448,23 @@ namespace Skills.Mining
         }
 
         /// <summary>
-        /// Starts a coroutine that repeatedly attempts to locate the mining skill for late-spawned players.
+        /// Hooks mining events so the HUD can mirror the player's gathering progress.
         /// </summary>
-        private void EnsureSkillRefreshRoutine()
+        /// <param name="located">The mining skill belonging to the active player.</param>
+        protected override void OnSkillLocated(MiningSkill located)
         {
-            if (!isActiveAndEnabled)
-                return;
-
-            if (skillRefreshRoutine != null)
-                return;
-
-            skillRefreshRoutine = StartCoroutine(AwaitSkillRoutine());
+            located.OnStartMining += HandleStart;
+            located.OnStopMining += HandleStop;
         }
 
         /// <summary>
-        /// Stops the retry coroutine so the HUD cleans up correctly when disabled or destroyed.
+        /// Removes event hooks from the mining skill when the HUD is shutting down.
         /// </summary>
-        private void CancelSkillRefreshRoutine()
+        /// <param name="previous">The mining skill that is no longer being tracked.</param>
+        protected override void OnSkillDetached(MiningSkill previous)
         {
-            if (skillRefreshRoutine == null)
-                return;
-
-            StopCoroutine(skillRefreshRoutine);
-            skillRefreshRoutine = null;
-        }
-
-        /// <summary>
-        /// Polls at intervals until a <see cref="MiningSkill"/> exists and then binds to its events.
-        /// </summary>
-        private IEnumerator AwaitSkillRoutine()
-        {
-            while (isActiveAndEnabled)
-            {
-                var current = FindObjectOfType<MiningSkill>();
-                if (current != null)
-                {
-                    skill = current;
-                    skill.OnStartMining += HandleStart;
-                    skill.OnStopMining += HandleStop;
-                    break;
-                }
-
-                yield return skillRetryDelay;
-            }
-
-            skillRefreshRoutine = null;
+            previous.OnStartMining -= HandleStart;
+            previous.OnStopMining -= HandleStop;
         }
     }
 }

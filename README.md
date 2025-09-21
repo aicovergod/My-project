@@ -9,6 +9,7 @@ This project currently targets **Unity 6000.2.3f1**.
 ## Major Systems
 - **Saving System** – Provides persistent player data using components like `SaveManager` and player-specific save bridges.
 - **Skill System** – A modular framework for training skills such as woodcutting and mining through `SkillManager` and skill-specific modules.
+- **Gathering HUD Infrastructure** – Shared base logic in `Skills/Common/UI/GatheringSkillHudBase` keeps fishing, mining, and woodcutting progress bars in sync with players even when the skill component spawns late.
 - **Shop System** – Supports buying and selling items via `Shop` and `ShopUI` components.
 - **Status & Buff System** – Centralises timed effects with `Status/BuffTimerService`, `BuffEvents`, and `BuffStateSaveBridge` so combat, consumables, and scripted encounters can apply poison, antifire, freeze, and other buffs while persisting through saves.
 - **Magic Combat & Spellbook** – `MagicUI` surfaces strike spells and other definitions stored in `Assets/Resources/Spells`. Spells configure projectile prefabs (`Magic/FireProjectile`), hit effects, elemental types, and optional freeze durations that hook into `Status/FrozenStatusController`.

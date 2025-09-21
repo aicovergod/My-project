@@ -1,5 +1,5 @@
-using System.Collections;
 using Inventory;
+using Skills.Common.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -11,7 +11,7 @@ namespace Skills.Woodcutting
     /// <summary>
     /// Displays woodcutting progress above the current tree.
     /// </summary>
-    public class WoodcuttingHUD : MonoBehaviour, ITickable
+    public class WoodcuttingHUD : GatheringSkillHudBase<WoodcuttingSkill>, ITickable
     {
         private static WoodcuttingHUD instance;
         private static bool waitingForAllowedScene;
@@ -22,7 +22,6 @@ namespace Skills.Woodcutting
         private bool sceneGateSubscribed;
         private bool sceneLoadedSubscribed;
 
-        private WoodcuttingSkill skill;
         private Transform target;
         private Image progressImage;
         private GameObject progressRoot;
@@ -40,10 +39,6 @@ namespace Skills.Woodcutting
         private float segmentDuration = Ticker.TickDuration;
         // Flag used so we can hold the progress bar at 100% for a full tick before resetting back to 0.
         private bool awaitingResetTick;
-        // Coroutine reference used to poll for a late-spawned woodcutting skill so we can rebind automatically.
-        private Coroutine skillRefreshRoutine;
-        // Delay between successive retries when no skill is present in the scene yet.
-        private static readonly WaitForSecondsRealtime skillRetryDelay = new WaitForSecondsRealtime(0.5f);
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -285,41 +280,6 @@ namespace Skills.Woodcutting
             RefreshSkillSubscription();
         }
 
-        private void RefreshSkillSubscription()
-        {
-            var current = FindObjectOfType<WoodcuttingSkill>();
-            if (current == skill)
-            {
-                if (current == null)
-                    EnsureSkillRefreshRoutine();
-                return;
-            }
-
-            DetachFromSkill();
-
-            if (current == null)
-            {
-                EnsureSkillRefreshRoutine();
-                return;
-            }
-
-            CancelSkillRefreshRoutine();
-            skill = current;
-            skill.OnStartChopping += HandleStart;
-            skill.OnStopChopping += HandleStop;
-        }
-
-        private void DetachFromSkill()
-        {
-            if (skill != null)
-            {
-                skill.OnStartChopping -= HandleStart;
-                skill.OnStopChopping -= HandleStop;
-            }
-
-            skill = null;
-        }
-
         private void Update()
         {
             if (skill == null)
@@ -491,51 +451,23 @@ namespace Skills.Woodcutting
         }
 
         /// <summary>
-        /// Ensures a coroutine is running to continually search for the woodcutting skill when it is not yet spawned.
+        /// Subscribes to woodcutting events when the player skill component becomes available.
         /// </summary>
-        private void EnsureSkillRefreshRoutine()
+        /// <param name="located">The woodcutting skill that will drive the HUD.</param>
+        protected override void OnSkillLocated(WoodcuttingSkill located)
         {
-            if (!isActiveAndEnabled)
-                return;
-
-            if (skillRefreshRoutine != null)
-                return;
-
-            skillRefreshRoutine = StartCoroutine(AwaitSkillRoutine());
+            located.OnStartChopping += HandleStart;
+            located.OnStopChopping += HandleStop;
         }
 
         /// <summary>
-        /// Stops the retry coroutine to avoid leaking references when the HUD is disabled or destroyed.
+        /// Cleans up event subscriptions when the HUD detaches from the woodcutting skill.
         /// </summary>
-        private void CancelSkillRefreshRoutine()
+        /// <param name="previous">The woodcutting skill instance that is no longer tracked.</param>
+        protected override void OnSkillDetached(WoodcuttingSkill previous)
         {
-            if (skillRefreshRoutine == null)
-                return;
-
-            StopCoroutine(skillRefreshRoutine);
-            skillRefreshRoutine = null;
-        }
-
-        /// <summary>
-        /// Polls the scene at intervals until a <see cref="WoodcuttingSkill"/> is available, then hooks into its events.
-        /// </summary>
-        private IEnumerator AwaitSkillRoutine()
-        {
-            while (isActiveAndEnabled)
-            {
-                var current = FindObjectOfType<WoodcuttingSkill>();
-                if (current != null)
-                {
-                    skill = current;
-                    skill.OnStartChopping += HandleStart;
-                    skill.OnStopChopping += HandleStop;
-                    break;
-                }
-
-                yield return skillRetryDelay;
-            }
-
-            skillRefreshRoutine = null;
+            previous.OnStartChopping -= HandleStart;
+            previous.OnStopChopping -= HandleStop;
         }
     }
 }
