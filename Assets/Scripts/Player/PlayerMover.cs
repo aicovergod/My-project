@@ -610,11 +610,18 @@ namespace Player
             isTransitioning = false;
         }
 
-        private void ApplySavedPosition()
+        /// <summary>
+        /// Attempts to move the player to the coordinates stored in the active save profile.
+        /// </summary>
+        /// <returns>True when a saved location existed and was applied.</returns>
+        private bool ApplySavedPosition()
         {
             var data = SaveManager.Load<PositionData>(PositionKey);
-            if (data != null)
-                transform.position = new Vector3(data.x, data.y, data.z);
+            if (data == null)
+                return false;
+
+            transform.position = new Vector3(data.x, data.y, data.z);
+            return true;
         }
 
         public override void OnBeforeSceneUnload()
@@ -626,8 +633,14 @@ namespace Player
         {
             base.OnAfterSceneLoad(scene);
 
+            // Track which positioning strategy ended up being used so we only persist when a valid
+            // location has been resolved for this scene.
+            bool positionedFromSpawn = false;
+            bool positionedFromSave = false;
+
             var spawnId = SceneTransitionManager.NextSpawnPoint;
-            if (!string.IsNullOrEmpty(spawnId))
+            bool spawnRequested = !string.IsNullOrEmpty(spawnId);
+            if (spawnRequested)
             {
                 var points = GameObject.FindObjectsOfType<SpawnPoint>();
                 foreach (var p in points)
@@ -635,10 +648,21 @@ namespace Player
                     if (p.id == spawnId)
                     {
                         transform.position = p.transform.position;
+                        positionedFromSpawn = true;
                         break;
                     }
                 }
+
+                if (!positionedFromSpawn)
+                {
+                    Debug.LogWarning($"SceneTransitionManager requested spawn point '{spawnId}' but no matching SpawnPoint was found in scene '{scene.name}'. Falling back to saved position if available.", this);
+                }
             }
+
+            if (!positionedFromSpawn)
+                positionedFromSave = ApplySavedPosition();
+
+            bool shouldPersistPosition = positionedFromSpawn || positionedFromSave;
 
             // Realign an active pet so it appears beside the player rather than
             // lingering at the origin during scene swaps.  Without this pass the
@@ -677,7 +701,8 @@ namespace Player
                 }
             }
 
-            SavePosition();
+            if (shouldPersistPosition)
+                SavePosition();
         }
 
         /// <summary>
