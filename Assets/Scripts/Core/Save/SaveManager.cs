@@ -1,3 +1,4 @@
+// Refactor: OSRS-style login with per-account saves; removed Overworld hop; atomic file IO; PBKDF2.
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,34 +8,37 @@ using UnityEngine;
 namespace Core.Save
 {
     /// <summary>
-    /// Simple JSON based save manager with versioning and a file backend
-    /// stored under a project-root folder for debugging.
-    /// Consider Application.persistentDataPath for builds.
+    /// Simple JSON based save manager that now persists per-account data managed by <see cref="AccountManager"/>.
+    /// The manager still coordinates registered saveables but writes through to the active account file.
     /// </summary>
     public static class SaveManager
     {
-        private const int Version = 1;
-        // Editor/debug path; consider Application.persistentDataPath for builds.
-        private static readonly string FilePath = Path.Combine(Application.dataPath, "../PlayerSave/save_data.json");
+        public const int SaveDataVersion = 1;
 
-        // Registered saveable objects
         private static readonly List<ISaveable> saveables = new List<ISaveable>();
+        private static readonly string GlobalFilePath = Path.Combine(AccountManager.BaseDirectory, "global_state.json");
 
-        /// <summary>
-        /// Identifier for the profile whose data should be loaded and saved. When empty the
-        /// manager behaves like the legacy single-profile implementation.
-        /// </summary>
         public static string ActiveProfileId { get; private set; } = string.Empty;
+
+        private static AccountSave boundAccount;
+        private static AccountSave.AccountData cache;
+        private static bool cacheDirty;
+
+        private static GlobalData globalCache;
 
         static SaveManager()
         {
-            // Ensure all data is persisted when the application quits
-            Application.quitting += SaveAll;
+            Application.quitting += HandleApplicationQuitting;
+        }
+
+        private static void HandleApplicationQuitting()
+        {
+            SaveAll();
         }
 
         /// <summary>
-        /// Register a saveable object with the manager. The object will immediately
-        /// load its state and will be included in future SaveAll calls.
+        /// Register a saveable object with the manager. The object will immediately load its state
+        /// and will be included in future SaveAll calls.
         /// </summary>
         public static void Register(ISaveable saveable)
         {
@@ -55,12 +59,14 @@ namespace Core.Save
         }
 
         /// <summary>
-        /// Invoke Save on all registered saveable objects.
+        /// Invoke Save on all registered saveable objects and flush the active account to disk.
         /// </summary>
         public static void SaveAll()
         {
             foreach (var s in saveables)
                 s.Save();
+
+            FlushActiveAccount();
         }
 
         /// <summary>
@@ -73,98 +79,35 @@ namespace Core.Save
         }
 
         /// <summary>
-        /// Normalises and activates a profile for subsequent save and load operations. The
-        /// previous profile is saved before switching and the new profile can be reloaded so
-        /// gameplay systems pick up their persisted state immediately.
+        /// Binds the manager to a specific account so Save/Load operations map into that account's data store.
         /// </summary>
-        /// <param name="profileId">Raw profile identifier supplied by the caller.</param>
-        /// <param name="reload">When true the manager invokes <see cref="LoadAll"/> after
-        /// switching so registered systems refresh their state.</param>
-        public static void SetActiveProfile(string profileId, bool reload = true)
+        /// <param name="account">Account save that should become active.</param>
+        /// <param name="reload">When true, triggers <see cref="LoadAll"/> after switching accounts.</param>
+        internal static void BindAccount(AccountSave account, bool reload = true)
         {
-            string normalized = NormalizeProfileId(profileId);
+            boundAccount = account;
+            cache = null;
+            cacheDirty = false;
+            ActiveProfileId = account != null ? account.usernameSlug : string.Empty;
 
-            if (string.Equals(normalized, ActiveProfileId, StringComparison.Ordinal))
+            if (boundAccount != null)
             {
-                if (reload)
-                    LoadAll();
-                return;
+                if (string.IsNullOrEmpty(boundAccount.usernameSlug))
+                    boundAccount.usernameSlug = AccountManager.SanitizeUsername(boundAccount.username);
+
+                if (boundAccount.data == null)
+                    boundAccount.data = new AccountSave.AccountData { version = SaveDataVersion, entries = new List<AccountSave.AccountDataEntry>() };
+                else
+                {
+                    if (boundAccount.data.entries == null)
+                        boundAccount.data.entries = new List<AccountSave.AccountDataEntry>();
+                    if (boundAccount.data.version != SaveDataVersion)
+                        boundAccount.data.version = SaveDataVersion;
+                }
             }
-
-            if (!string.IsNullOrEmpty(ActiveProfileId))
-                SaveAll();
-
-            ActiveProfileId = normalized;
 
             if (reload)
                 LoadAll();
-        }
-
-        [Serializable]
-        private class Entry
-        {
-            public string key;
-            public string value;
-        }
-
-        [Serializable]
-        private class SaveData
-        {
-            public int version;
-            public List<Entry> entries = new List<Entry>();
-        }
-
-        [Serializable]
-        private class Wrapper<T>
-        {
-            public T value;
-        }
-
-        private static SaveData cache;
-
-        private static SaveData LoadFile()
-        {
-            if (cache != null)
-                return cache;
-
-            if (File.Exists(FilePath))
-            {
-                try
-                {
-                    string json = File.ReadAllText(FilePath);
-                    cache = JsonUtility.FromJson<SaveData>(json);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError($"Failed to read save file: {e}");
-                }
-            }
-
-            if (cache == null || cache.version != Version || cache.entries == null)
-            {
-                cache = new SaveData { version = Version, entries = new List<Entry>() };
-            }
-
-            return cache;
-        }
-
-        private static void SaveFile()
-        {
-            try
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(FilePath));
-                string json = JsonUtility.ToJson(cache);
-                File.WriteAllText(FilePath, json);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Failed to write save file: {e}");
-            }
-        }
-
-        public static void Save<T>(string key, T data)
-        {
-            SaveInternal(ComposeKey(key), data);
         }
 
         /// <summary>
@@ -173,40 +116,24 @@ namespace Core.Save
         /// </summary>
         public static void SaveGlobal<T>(string key, T data)
         {
-            SaveInternal(key, data);
-        }
-
-        private static void SaveInternal<T>(string key, T data)
-        {
-            var all = LoadFile();
+            var store = LoadGlobalStore();
             string json = JsonUtility.ToJson(new Wrapper<T> { value = data });
-            var entry = all.entries.Find(e => e.key == key);
+            var entry = store.entries.Find(e => e.key == key);
             if (entry != null)
                 entry.value = json;
             else
-                all.entries.Add(new Entry { key = key, value = json });
+                store.entries.Add(new GlobalEntry { key = key, value = json });
 
-            SaveFile();
-        }
-
-        public static T Load<T>(string key)
-        {
-            return LoadInternal<T>(ComposeKey(key));
+            SaveGlobalStore();
         }
 
         /// <summary>
-        /// Loads a value stored without a profile prefix. Use this for global data such as the
-        /// account catalogue maintained by <see cref="AccountProfileService"/>.
+        /// Loads a value stored without a profile prefix.
         /// </summary>
         public static T LoadGlobal<T>(string key)
         {
-            return LoadInternal<T>(key);
-        }
-
-        private static T LoadInternal<T>(string key)
-        {
-            var all = LoadFile();
-            var entry = all.entries.Find(e => e.key == key);
+            var store = LoadGlobalStore();
+            var entry = store.entries.Find(e => e.key == key);
             if (entry == null || string.IsNullOrEmpty(entry.value))
                 return default;
 
@@ -221,24 +148,127 @@ namespace Core.Save
             }
         }
 
+        /// <summary>
+        /// Removes a value stored without a profile prefix.
+        /// </summary>
+        public static void DeleteGlobal(string key)
+        {
+            var store = LoadGlobalStore();
+            if (store.entries.RemoveAll(e => e.key == key) > 0)
+                SaveGlobalStore();
+        }
+
+        public static void Save<T>(string key, T data)
+        {
+            SaveInternal(ComposeKey(key), data);
+        }
+
+        public static T Load<T>(string key)
+        {
+            return LoadInternal<T>(ComposeKey(key));
+        }
+
         public static void Delete(string key)
         {
             DeleteInternal(ComposeKey(key));
         }
 
         /// <summary>
-        /// Removes a value stored without a profile prefix.
+        /// Normalises and activates a profile for subsequent save and load operations. Provided for
+        /// backwards compatibility; prefer <see cref="BindAccount"/> when authenticating users.
         /// </summary>
-        public static void DeleteGlobal(string key)
+        public static void SetActiveProfile(string profileId, bool reload = true)
         {
-            DeleteInternal(key);
+            ActiveProfileId = NormalizeProfileId(profileId);
+            cache = null;
+            cacheDirty = false;
+
+            if (reload)
+                LoadAll();
+        }
+
+        private static void SaveInternal<T>(string key, T data)
+        {
+            var store = EnsureDataStore();
+            string json = JsonUtility.ToJson(new Wrapper<T> { value = data });
+            var entry = store.entries.Find(e => e.key == key);
+            if (entry != null)
+                entry.value = json;
+            else
+                store.entries.Add(new AccountSave.AccountDataEntry { key = key, value = json });
+
+            cacheDirty = true;
+            FlushActiveAccount();
+        }
+
+        private static T LoadInternal<T>(string key)
+        {
+            var store = EnsureDataStore();
+            var entry = store.entries.Find(e => e.key == key);
+            if (entry == null || string.IsNullOrEmpty(entry.value))
+                return default;
+
+            try
+            {
+                var wrapper = JsonUtility.FromJson<Wrapper<T>>(entry.value);
+                return wrapper != null ? wrapper.value : default;
+            }
+            catch
+            {
+                return default;
+            }
         }
 
         private static void DeleteInternal(string key)
         {
-            var all = LoadFile();
-            all.entries.RemoveAll(e => e.key == key);
-            SaveFile();
+            var store = EnsureDataStore();
+            if (store.entries.RemoveAll(e => e.key == key) > 0)
+            {
+                cacheDirty = true;
+                FlushActiveAccount();
+            }
+        }
+
+        private static AccountSave.AccountData EnsureDataStore()
+        {
+            if (cache != null)
+                return cache;
+
+            if (boundAccount != null)
+            {
+                cache = boundAccount.data ?? new AccountSave.AccountData();
+                if (cache.entries == null)
+                    cache.entries = new List<AccountSave.AccountDataEntry>();
+                if (cache.version != SaveDataVersion)
+                    cache.version = SaveDataVersion;
+                boundAccount.data = cache;
+            }
+            else
+            {
+                cache = new AccountSave.AccountData
+                {
+                    version = SaveDataVersion,
+                    entries = new List<AccountSave.AccountDataEntry>(),
+                };
+            }
+
+            return cache;
+        }
+
+        private static void FlushActiveAccount()
+        {
+            if (!cacheDirty || boundAccount == null)
+                return;
+
+            try
+            {
+                AccountManager.SaveAsync(boundAccount).GetAwaiter().GetResult();
+                cacheDirty = false;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"SaveManager: Failed to persist account '{boundAccount.usernameSlug}': {ex}");
+            }
         }
 
         private static string ComposeKey(string key)
@@ -251,22 +281,96 @@ namespace Core.Save
 
         private static string NormalizeProfileId(string profileId)
         {
-            if (string.IsNullOrWhiteSpace(profileId))
-                return string.Empty;
+            return AccountManager.SanitizeUsername(profileId);
+        }
 
-            string trimmed = profileId.Trim();
-            var builder = new StringBuilder(trimmed.Length);
-            for (int i = 0; i < trimmed.Length; i++)
+        [Serializable]
+        private sealed class Wrapper<T>
+        {
+            public T value;
+        }
+
+        [Serializable]
+        private sealed class GlobalEntry
+        {
+            public string key;
+            public string value;
+        }
+
+        [Serializable]
+        private sealed class GlobalData
+        {
+            public List<GlobalEntry> entries = new List<GlobalEntry>();
+        }
+
+        private static GlobalData LoadGlobalStore()
+        {
+            if (globalCache != null)
+                return globalCache;
+
+            try
             {
-                char c = char.ToLowerInvariant(trimmed[i]);
-                if (char.IsWhiteSpace(c))
-                    continue;
-                if (c == ':')
-                    c = '_';
-                builder.Append(c);
+                Directory.CreateDirectory(AccountManager.BaseDirectory);
+                if (File.Exists(GlobalFilePath))
+                {
+                    string json = File.ReadAllText(GlobalFilePath, Encoding.UTF8);
+                    globalCache = JsonUtility.FromJson<GlobalData>(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"SaveManager: Failed to read global save file: {ex}");
             }
 
-            return builder.Length > 0 ? builder.ToString() : string.Empty;
+            if (globalCache == null || globalCache.entries == null)
+                globalCache = new GlobalData { entries = new List<GlobalEntry>() };
+
+            return globalCache;
+        }
+
+        private static void SaveGlobalStore()
+        {
+            if (globalCache == null)
+                return;
+
+            string tempPath = GlobalFilePath + ".tmp";
+
+            try
+            {
+                Directory.CreateDirectory(AccountManager.BaseDirectory);
+                string json = JsonUtility.ToJson(globalCache);
+                File.WriteAllText(tempPath, json, Encoding.UTF8);
+                if (File.Exists(GlobalFilePath))
+                {
+                    File.Replace(tempPath, GlobalFilePath, null);
+                }
+                else
+                {
+#if NETSTANDARD2_1 || NETCOREAPP
+                    File.Move(tempPath, GlobalFilePath, overwrite: true);
+#else
+                    if (File.Exists(GlobalFilePath))
+                        File.Delete(GlobalFilePath);
+                    File.Move(tempPath, GlobalFilePath);
+#endif
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"SaveManager: Failed to write global save file: {ex}");
+            }
+            finally
+            {
+                try
+                {
+                    if (File.Exists(tempPath))
+                        File.Delete(tempPath);
+                }
+                catch
+                {
+                    // Ignore temp cleanup failure.
+                }
+            }
         }
     }
 }
