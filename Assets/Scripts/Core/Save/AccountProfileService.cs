@@ -18,7 +18,11 @@ namespace Core.Save
     /// </summary>
     public static class AccountManager
     {
-        private const string BaseSavePath = "C:\Users\lewis\Documents\My-project\PlayerSave";
+        /// <summary>
+        /// Base directory used for storing per-account save files. This resolves to Unity's
+        /// persistent data path so the saves land in a writable location on every platform.
+        /// </summary>
+        private static readonly string BaseSavePath = Path.Combine(Application.persistentDataPath, "PlayerSave");
         private const int SaltSizeBytes = 16;
         private const int Pbkdf2Iterations = 100_000;
         private const int Pbkdf2KeySizeBytes = 32;
