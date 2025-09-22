@@ -105,11 +105,19 @@ namespace Inventory
                 }
                 else
                 {
-                    inventory.CombineItems(inventory.selectedIndex, index);
-                    int prev = inventory.selectedIndex;
-                    inventory.ClearSelection();
-                    inventory.UpdateSlotVisual(prev);
+                    int previouslySelected = inventory.selectedIndex;
+                    bool keepSelection;
+                    inventory.CombineItems(previouslySelected, index, out keepSelection);
+                    int newSelection = inventory.selectedIndex;
+
+                    if (!keepSelection)
+                        inventory.ClearSelection();
+
+                    inventory.UpdateSlotVisual(previouslySelected);
                     inventory.UpdateSlotVisual(index);
+
+                    if (keepSelection && newSelection != previouslySelected && newSelection != index)
+                        inventory.UpdateSlotVisual(newSelection);
                 }
                 return;
             }
