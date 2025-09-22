@@ -1,8 +1,11 @@
-using System.Collections;
+// ------------------------------------------------------------------------------
+// CHANGES: Implemented direct scene resume on login by delegating world loading
+// to LoginFlowController. Exposed status helpers/colours for the new flow and
+// removed the legacy Overworld-first coroutine.
+// ------------------------------------------------------------------------------
 using Core.Save;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UI;
 #if ENABLE_INPUT_SYSTEM
@@ -12,10 +15,10 @@ using UnityEngine.InputSystem;
 namespace UI.Login
 {
     /// <summary>
-    /// Coordinates the login panel so users can authenticate before the overworld loads. The
+    /// Coordinates the login panel so users can authenticate before gameplay loads. The
     /// controller validates input, forwards credential checks to
-    /// <see cref="AccountProfileService"/>, and transitions to the gameplay scene after a
-    /// successful login.
+    /// <see cref="AccountProfileService"/>, and hands off to <see cref="LoginFlowController"/>
+    /// to resume the saved scene after a successful login.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class LoginScreenController : MonoBehaviour
@@ -73,15 +76,19 @@ namespace UI.Login
         [SerializeField]
         private Color infoColour = new Color32(212, 212, 212, 255);
 
-        [SerializeField, Tooltip("Name of the gameplay scene to load after authentication.")]
-        private string gameplaySceneName = "OverWorld";
-
-        private Coroutine loadRoutine;
+        [SerializeField, Tooltip("Coordinates the scene loading and player placement once authentication succeeds.")]
+        private LoginFlowController loginFlowController;
         private GameObject lastSelectedInputField;
 
         private void Awake()
         {
             EnsureUiHierarchy();
+
+            if (loginFlowController == null)
+                loginFlowController = GetComponent<LoginFlowController>();
+
+            if (loginFlowController != null)
+                loginFlowController.SetScreen(this);
 
             if (usernameField != null)
             {
@@ -201,27 +208,17 @@ namespace UI.Login
             SetStatus(activationMessage, successColour);
             SaveManager.LoadAll();
 
-            if (loadRoutine != null)
-                StopCoroutine(loadRoutine);
-            loadRoutine = StartCoroutine(LoadGameplayScene());
-        }
-
-        private IEnumerator LoadGameplayScene()
-        {
-            SetStatus("Loading world...", infoColour);
-
-            var operation = SceneManager.LoadSceneAsync(gameplaySceneName, LoadSceneMode.Single);
-            if (operation == null)
+            if (loginFlowController != null)
             {
-                SetStatus("Failed to load the overworld scene.", errorColour);
+                loginFlowController.BeginLoginFlow(created);
+            }
+            else
+            {
+                Debug.LogError("LoginScreenController: LoginFlowController reference is missing. Cannot continue into gameplay.");
+                SetStatus("Login succeeded but the gameplay flow is misconfigured.", errorColour);
                 if (loginButton != null)
                     loginButton.interactable = true;
-                yield break;
             }
-
-            operation.allowSceneActivation = true;
-            while (!operation.isDone)
-                yield return null;
         }
 
         private void EnsureUiHierarchy()
@@ -438,13 +435,25 @@ namespace UI.Login
             HandleLoginClicked();
         }
 
-        private void SetStatus(string message, Color colour)
+        internal void SetStatus(string message, Color colour)
         {
             if (statusText == null)
                 return;
 
             statusText.text = message;
             statusText.color = colour;
+        }
+
+        internal Color InfoColour => infoColour;
+
+        internal Color ErrorColour => errorColour;
+
+        internal Color SuccessColour => successColour;
+
+        internal void SetLoginButtonInteractable(bool interactable)
+        {
+            if (loginButton != null)
+                loginButton.interactable = interactable;
         }
 
         private RectTransform CreateRectTransform(string name, RectTransform parent, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 anchoredPosition, Vector2 sizeDelta)
