@@ -1,373 +1,366 @@
+// Refactor: OSRS-style login with per-account saves; removed Overworld hop; atomic file IO; PBKDF2.
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Core.Save
 {
     /// <summary>
-    /// Maintains a collection of player accounts and coordinates authentication so each
-    /// gameplay profile can be isolated inside <see cref="SaveManager"/>. Account data lives
-    /// alongside save files via <see cref="SaveManager.SaveGlobal"/> calls so credential
-    /// checks function before a profile is activated.
+    /// Handles account creation, authentication, and persistence using OSRS-style username and
+    /// password credentials. Each account is stored as an individual JSON file so save data can
+    /// be isolated per profile without a selection UI.
     /// </summary>
-    public static class AccountProfileService
+    public static class AccountManager
     {
-        private const string AccountsKey = "accounts";
-        private const int SaltSize = 32;
+        private const string BaseSavePath = "C:\Users\lewis\Documents\My-project\PlayerSave";
+        private const int SaltSizeBytes = 16;
+        private const int Pbkdf2Iterations = 100_000;
+        private const int Pbkdf2KeySizeBytes = 32;
+        private const string DefaultSceneName = "OverWorld";
 
-        private static AccountCollection cache;
-        private static AccountEntry activeAccount;
-
-        /// <summary>
-        /// Display name for the authenticated account. Returns an empty string when no
-        /// account has been activated yet.
-        /// </summary>
-        public static string ActiveDisplayName => activeAccount != null ? activeAccount.DisplayName : string.Empty;
-
-        /// <summary>
-        /// Normalised profile identifier for the active account. Falls back to the
-        /// <see cref="SaveManager.ActiveProfileId"/> value so legacy callers can check the
-        /// current profile even before <see cref="ActivateAccount"/> completes.
-        /// </summary>
-        public static string ActiveProfileId => activeAccount != null ? activeAccount.ProfileId : SaveManager.ActiveProfileId;
-
-        /// <summary>
-        /// Returns a read-only list of known accounts so login UIs can present existing
-        /// characters.
-        /// </summary>
-        public static IReadOnlyList<AccountEntry> Accounts
+        private static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions
         {
-            get
-            {
-                var collection = EnsureCollection();
-                return collection.Accounts;
-            }
+            AllowTrailingCommas = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            IgnoreUnknownProperties = true,
+            IncludeFields = true,
+            PropertyNameCaseInsensitive = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            WriteIndented = true,
+        };
+
+        static AccountManager()
+        {
+            EnsureBaseDirectory();
         }
 
         /// <summary>
-        /// Attempts to authenticate or create an account with the provided credentials. Use
-        /// this overload when the caller is not interested in the detailed status message.
+        /// Sanitises the supplied username into a slug suitable for filenames and profile IDs.
+        /// Characters outside the [a-z0-9_-] range are discarded and whitespace becomes underscores.
         /// </summary>
-        public static bool TryAuthenticate(string username, string password, out bool created)
+        /// <param name="input">Raw username supplied by the player.</param>
+        /// <returns>Lowercase slug that can be used safely for filenames.</returns>
+        public static string SanitizeUsername(string input)
         {
-            return TryAuthenticate(username, password, out created, out _, out _);
-        }
-
-        /// <summary>
-        /// Attempts to authenticate the supplied credentials. A new account is created when
-        /// the username has not been seen before; otherwise the password must match the stored
-        /// hash. The method always normalises the username before storing it so profile IDs can
-        /// be used safely with <see cref="SaveManager"/>.
-        /// </summary>
-        /// <param name="username">Raw username entered by the player.</param>
-        /// <param name="password">Plain text password supplied by the player.</param>
-        /// <param name="created">Outputs true when an account was created during this call.</param>
-        /// <param name="entry">Outputs the account entry that matches the credentials.</param>
-        /// <param name="statusMessage">Describes the result in a player-friendly manner.</param>
-        /// <returns>True when the authentication succeeded.</returns>
-        public static bool TryAuthenticate(string username, string password, out bool created, out AccountEntry entry, out string statusMessage)
-        {
-            created = false;
-            entry = null;
-            statusMessage = string.Empty;
-
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                statusMessage = "Enter a username to begin.";
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(password))
-            {
-                statusMessage = "Enter your password.";
-                return false;
-            }
-
-            string displayName = username.Trim();
-            string normalized = NormalizeUsername(displayName);
-
-            if (string.IsNullOrEmpty(normalized))
-            {
-                statusMessage = "Usernames must include at least one letter or number.";
-                return false;
-            }
-
-            var collection = EnsureCollection();
-            entry = collection.FindByProfileId(normalized);
-
-            if (entry == null)
-            {
-                entry = CreateAccount(displayName, normalized, password);
-                collection.Add(entry);
-                created = true;
-                statusMessage = $"Created new account for {displayName}.";
-                SaveCollection();
-                return true;
-            }
-
-            byte[] saltBytes;
-            byte[] storedHash;
-            try
-            {
-                saltBytes = Convert.FromBase64String(entry.Salt);
-                storedHash = Convert.FromBase64String(entry.PasswordHash);
-            }
-            catch (Exception)
-            {
-                statusMessage = "Account data is corrupted. Please recreate the profile.";
-                return false;
-            }
-
-            var computedHash = HashPassword(saltBytes, password);
-
-            if (!ConstantTimeEquals(storedHash, computedHash))
-            {
-                statusMessage = "Incorrect password.";
-                return false;
-            }
-
-            entry.RefreshDisplayName(displayName);
-            statusMessage = $"Welcome back, {entry.DisplayName}.";
-            SaveCollection();
-            return true;
-        }
-
-        /// <summary>
-        /// Activates the supplied account by selecting its profile in the save manager and
-        /// recording the last-used identifier for future sessions.
-        /// </summary>
-        /// <param name="entry">Account that should become active.</param>
-        /// <returns>A user-facing status message describing the result.</returns>
-        public static string ActivateAccount(AccountEntry entry)
-        {
-            if (entry == null)
-                return "No account selected.";
-
-            SaveManager.SetActiveProfile(entry.ProfileId);
-            activeAccount = entry;
-
-            var collection = EnsureCollection();
-            collection.LastUsedProfileId = entry.ProfileId;
-            SaveCollection();
-
-            return $"Logged in as {entry.DisplayName}.";
-        }
-
-        /// <summary>
-        /// Returns the display name for the most recently used account, allowing UI layers to
-        /// pre-fill login forms.
-        /// </summary>
-        public static string GetLastUsedDisplayName()
-        {
-            var collection = EnsureCollection();
-            var entry = collection.FindByProfileId(collection.LastUsedProfileId);
-            return entry != null ? entry.DisplayName : string.Empty;
-        }
-
-        /// <summary>
-        /// Normalises a username so it is suitable for use as a profile identifier. Whitespace
-        /// is removed, characters are lowercased, and colon characters are replaced with
-        /// underscores so the save key prefix remains valid.
-        /// </summary>
-        public static string NormalizeUsername(string username)
-        {
-            if (string.IsNullOrWhiteSpace(username))
+            if (string.IsNullOrWhiteSpace(input))
                 return string.Empty;
 
-            string trimmed = username.Trim();
-            var builder = new StringBuilder(trimmed.Length);
-            for (int i = 0; i < trimmed.Length; i++)
+            var builder = new StringBuilder(input.Length);
+            bool previousUnderscore = false;
+
+            for (int i = 0; i < input.Length; i++)
             {
-                char c = char.ToLowerInvariant(trimmed[i]);
+                char c = char.ToLowerInvariant(input[i]);
+
                 if (char.IsWhiteSpace(c))
+                {
+                    if (!previousUnderscore && builder.Length > 0)
+                    {
+                        builder.Append('_');
+                        previousUnderscore = true;
+                    }
                     continue;
-                if (c == ':')
-                    c = '_';
-                builder.Append(c);
+                }
+
+                if (c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '-' || c == '_')
+                {
+                    builder.Append(c);
+                    previousUnderscore = c == '_';
+                }
             }
 
-            return builder.Length > 0 ? builder.ToString() : string.Empty;
+            return builder.ToString();
         }
 
-        private static AccountEntry CreateAccount(string displayName, string normalizedProfileId, string password)
+        /// <summary>
+        /// Resolves the JSON path for an account file using either the raw username or an existing slug.
+        /// </summary>
+        /// <param name="usernameOrSlug">Raw username entered by the player or a pre-sanitised slug.</param>
+        /// <returns>Absolute path to the JSON save file.</returns>
+        public static string GetAccountPath(string usernameOrSlug)
         {
-            var salt = new byte[SaltSize];
+            string slug = SanitizeUsername(usernameOrSlug);
+            return string.IsNullOrEmpty(slug)
+                ? Path.Combine(BaseSavePath, "account.json")
+                : Path.Combine(BaseSavePath, $"{slug}.json");
+        }
+
+        /// <summary>
+        /// Attempts to load an account save file using the provided username or slug.
+        /// </summary>
+        /// <param name="username">Raw username supplied by the player.</param>
+        /// <param name="save">Outputs the loaded account when successful.</param>
+        /// <returns>True when a matching account file was found and deserialised.</returns>
+        public static bool TryLoadAccount(string username, out AccountSave save)
+        {
+            save = null;
+
+            string slug = SanitizeUsername(username);
+            if (string.IsNullOrEmpty(slug))
+                return false;
+
+            string path = GetAccountPath(slug);
+            if (!File.Exists(path))
+                return false;
+
+            try
+            {
+                string json = File.ReadAllText(path, Encoding.UTF8);
+                var loaded = JsonSerializer.Deserialize<AccountSave>(json, SerializerOptions);
+                if (loaded == null)
+                    return false;
+
+                EnsureDefaults(loaded, slug, username);
+                save = loaded;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"AccountManager: Failed to load account '{slug}': {ex}");
+                save = null;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Constructs a new account save with default data and hashed credentials.
+        /// </summary>
+        /// <param name="username">Username entered by the player.</param>
+        /// <param name="rawPassword">Plain text password to hash.</param>
+        /// <returns>Initialised account save ready for persistence.</returns>
+        public static AccountSave CreateNewAccount(string username, string rawPassword)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                throw new ArgumentException("Username is required.", nameof(username));
+            if (string.IsNullOrEmpty(rawPassword))
+                throw new ArgumentException("Password is required.", nameof(rawPassword));
+
+            string slug = SanitizeUsername(username);
+            if (string.IsNullOrEmpty(slug))
+                throw new ArgumentException("Username must include at least one valid character.", nameof(username));
+
+            var salt = new byte[SaltSizeBytes];
             RandomNumberGenerator.Fill(salt);
-            var hash = HashPassword(salt, password);
+            byte[] hash = HashPassword(rawPassword, salt);
 
-            return new AccountEntry(displayName, normalizedProfileId, Convert.ToBase64String(salt), Convert.ToBase64String(hash));
+            string now = DateTime.UtcNow.ToString("O");
+
+            var save = new AccountSave
+            {
+                schemaVersion = 1,
+                username = username.Trim(),
+                usernameSlug = slug,
+                passwordHash = Convert.ToBase64String(hash),
+                passwordSalt = Convert.ToBase64String(salt),
+                savedSceneName = DefaultSceneName,
+                savedX = 0f,
+                savedY = 0f,
+                createdAtUtc = now,
+                lastLoginUtc = now,
+                data = new AccountSave.AccountData
+                {
+                    version = SaveManager.SaveDataVersion,
+                    entries = new List<AccountSave.AccountDataEntry>(),
+                },
+            };
+
+            return save;
         }
 
-        private static byte[] HashPassword(byte[] salt, string password)
+        /// <summary>
+        /// Validates a password against the stored PBKDF2 hash using constant-time comparison.
+        /// </summary>
+        /// <param name="save">Account data loaded from disk.</param>
+        /// <param name="rawPassword">Password entered by the player.</param>
+        /// <returns>True when the password matches the stored hash.</returns>
+        public static bool VerifyPassword(AccountSave save, string rawPassword)
         {
-            if (salt == null)
-                throw new ArgumentNullException(nameof(salt));
-            if (password == null)
-                throw new ArgumentNullException(nameof(password));
+            if (save == null)
+                throw new ArgumentNullException(nameof(save));
+            if (rawPassword == null)
+                throw new ArgumentNullException(nameof(rawPassword));
 
-            var passwordBytes = Encoding.UTF8.GetBytes(password);
-            var buffer = new byte[salt.Length + passwordBytes.Length];
-            Buffer.BlockCopy(salt, 0, buffer, 0, salt.Length);
-            Buffer.BlockCopy(passwordBytes, 0, buffer, salt.Length, passwordBytes.Length);
+            if (string.IsNullOrEmpty(save.passwordSalt) || string.IsNullOrEmpty(save.passwordHash))
+                return false;
 
-            using var sha = SHA256.Create();
-            return sha.ComputeHash(buffer);
+            try
+            {
+                byte[] salt = Convert.FromBase64String(save.passwordSalt);
+                byte[] storedHash = Convert.FromBase64String(save.passwordHash);
+                byte[] computed = HashPassword(rawPassword, salt);
+                return ConstantTimeEquals(storedHash, computed);
+            }
+            catch (FormatException)
+            {
+                Debug.LogError($"AccountManager: Stored credentials for '{save.usernameSlug}' are corrupted.");
+                return false;
+            }
         }
 
-        private static bool ConstantTimeEquals(byte[] a, byte[] b)
+        /// <summary>
+        /// Saves the supplied account to disk using atomic file replacement.
+        /// </summary>
+        /// <param name="save">Account that should be persisted.</param>
+        public static async Task SaveAsync(AccountSave save)
         {
-            if (a == null || b == null || a.Length != b.Length)
+            if (save == null)
+                throw new ArgumentNullException(nameof(save));
+
+            EnsureBaseDirectory();
+            EnsureDefaults(save, save.usernameSlug, save.username);
+
+            save.lastLoginUtc = DateTime.UtcNow.ToString("O");
+
+            string path = GetAccountPath(save.usernameSlug);
+            string tempPath = path + ".tmp";
+            string json = JsonSerializer.Serialize(save, SerializerOptions);
+
+            try
+            {
+                await Task.Run(() =>
+                {
+                    File.WriteAllText(tempPath, json, Encoding.UTF8);
+                    if (File.Exists(path))
+                    {
+                        File.Replace(tempPath, path, null);
+                    }
+                    else
+                    {
+#if NETSTANDARD2_1 || NETCOREAPP
+                        File.Move(tempPath, path, overwrite: true);
+#else
+                        if (File.Exists(path))
+                            File.Delete(path);
+                        File.Move(tempPath, path);
+#endif
+                    }
+                }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"AccountManager: Failed to persist account '{save.usernameSlug}': {ex}");
+                throw;
+            }
+            finally
+            {
+                try
+                {
+                    if (File.Exists(tempPath))
+                        File.Delete(tempPath);
+                }
+                catch
+                {
+                    // Ignored; temp cleanup best-effort.
+                }
+            }
+        }
+
+        /// <summary>
+        /// Provides the filesystem directory used for per-account saves so other systems can
+        /// reference it when needed (e.g., global data migration helpers).
+        /// </summary>
+        internal static string BaseDirectory => BaseSavePath;
+
+        private static void EnsureDefaults(AccountSave save, string slug, string username)
+        {
+            if (save == null)
+                return;
+
+            if (save.schemaVersion <= 0)
+                save.schemaVersion = 1;
+
+            if (string.IsNullOrEmpty(save.usernameSlug))
+                save.usernameSlug = SanitizeUsername(slug);
+
+            if (string.IsNullOrEmpty(save.username) && !string.IsNullOrWhiteSpace(username))
+                save.username = username.Trim();
+
+            if (save.data == null)
+            {
+                save.data = new AccountSave.AccountData
+                {
+                    version = SaveManager.SaveDataVersion,
+                    entries = new List<AccountSave.AccountDataEntry>(),
+                };
+            }
+            else
+            {
+                if (save.data.entries == null)
+                    save.data.entries = new List<AccountSave.AccountDataEntry>();
+                if (save.data.version != SaveManager.SaveDataVersion)
+                    save.data.version = SaveManager.SaveDataVersion;
+            }
+
+            if (string.IsNullOrEmpty(save.savedSceneName))
+                save.savedSceneName = DefaultSceneName;
+        }
+
+        private static byte[] HashPassword(string password, byte[] salt)
+        {
+            using var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Pbkdf2Iterations, HashAlgorithmName.SHA256);
+            return pbkdf2.GetBytes(Pbkdf2KeySizeBytes);
+        }
+
+        private static bool ConstantTimeEquals(IReadOnlyList<byte> left, IReadOnlyList<byte> right)
+        {
+            if (left == null || right == null || left.Count != right.Count)
                 return false;
 
             int diff = 0;
-            for (int i = 0; i < a.Length; i++)
-                diff |= a[i] ^ b[i];
-
+            for (int i = 0; i < left.Count; i++)
+                diff |= left[i] ^ right[i];
             return diff == 0;
         }
 
-        private static AccountCollection EnsureCollection()
+        private static void EnsureBaseDirectory()
         {
-            if (cache != null)
-                return cache;
-
-            cache = SaveManager.LoadGlobal<AccountCollection>(AccountsKey);
-            if (cache == null)
-                cache = new AccountCollection();
-
-            return cache;
-        }
-
-        private static void SaveCollection()
-        {
-            if (cache == null)
-                return;
-
-            SaveManager.SaveGlobal(AccountsKey, cache);
-        }
-    }
-
-    /// <summary>
-    /// Serializable container stored in the global save file that tracks every known account
-    /// as well as the last-used identifier.
-    /// </summary>
-    [Serializable]
-    public sealed class AccountCollection
-    {
-        [SerializeField]
-        private List<AccountEntry> accounts = new List<AccountEntry>();
-
-        [SerializeField]
-        private string lastUsedProfileId = string.Empty;
-
-        /// <summary>
-        /// Read-only view of the stored accounts.
-        /// </summary>
-        public IReadOnlyList<AccountEntry> Accounts => accounts;
-
-        /// <summary>
-        /// Identifier of the most recently authenticated account.
-        /// </summary>
-        public string LastUsedProfileId
-        {
-            get => lastUsedProfileId;
-            set => lastUsedProfileId = value;
-        }
-
-        /// <summary>
-        /// Adds a new account entry to the collection.
-        /// </summary>
-        public void Add(AccountEntry entry)
-        {
-            if (entry == null)
-                throw new ArgumentNullException(nameof(entry));
-            accounts.Add(entry);
-        }
-
-        /// <summary>
-        /// Finds the stored account that matches the provided profile identifier.
-        /// </summary>
-        public AccountEntry FindByProfileId(string profileId)
-        {
-            if (string.IsNullOrEmpty(profileId))
-                return null;
-
-            for (int i = 0; i < accounts.Count; i++)
+            try
             {
-                var candidate = accounts[i];
-                if (candidate == null)
-                    continue;
-                if (string.Equals(candidate.ProfileId, profileId, StringComparison.Ordinal))
-                    return candidate;
+                Directory.CreateDirectory(BaseSavePath);
             }
-
-            return null;
+            catch (Exception ex)
+            {
+                Debug.LogError($"AccountManager: Failed to create save directory at '{BaseSavePath}': {ex}");
+            }
         }
     }
 
     /// <summary>
-    /// Serialized representation of an account, including the display name shown to the player
-    /// and the salted password hash used to validate credentials.
+    /// Serializable DTO that represents a single account, including credentials and gameplay state.
     /// </summary>
     [Serializable]
-    public sealed class AccountEntry
+    public sealed class AccountSave
     {
-        [SerializeField]
-        private string displayName;
+        public int schemaVersion;
+        public string username;
+        public string usernameSlug;
+        public string passwordHash;
+        public string passwordSalt;
+        public string savedSceneName;
+        public float savedX;
+        public float savedY;
+        public string createdAtUtc;
+        public string lastLoginUtc;
+        public AccountData data = new AccountData();
 
-        [SerializeField]
-        private string profileId;
-
-        [SerializeField]
-        private string salt;
-
-        [SerializeField]
-        private string passwordHash;
-
-        /// <summary>
-        /// Parameterless constructor required for serialization.
-        /// </summary>
-        public AccountEntry()
+        [Serializable]
+        public sealed class AccountData
         {
+            public int version = SaveManager.SaveDataVersion;
+            public List<AccountDataEntry> entries = new List<AccountDataEntry>();
         }
 
-        public AccountEntry(string displayName, string profileId, string salt, string passwordHash)
+        [Serializable]
+        public sealed class AccountDataEntry
         {
-            this.displayName = displayName;
-            this.profileId = profileId;
-            this.salt = salt;
-            this.passwordHash = passwordHash;
-        }
-
-        /// <summary>
-        /// Name presented to the player inside menus.
-        /// </summary>
-        public string DisplayName => displayName;
-
-        /// <summary>
-        /// Normalised identifier used to select save data.
-        /// </summary>
-        public string ProfileId => profileId;
-
-        /// <summary>
-        /// Base64 encoded salt used when hashing the password.
-        /// </summary>
-        public string Salt => salt;
-
-        /// <summary>
-        /// Base64 encoded salted password hash.
-        /// </summary>
-        public string PasswordHash => passwordHash;
-
-        /// <summary>
-        /// Updates the display name without altering the stored credentials.
-        /// </summary>
-        public void RefreshDisplayName(string value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-                displayName = value.Trim();
+            public string key;
+            public string value;
         }
     }
 }

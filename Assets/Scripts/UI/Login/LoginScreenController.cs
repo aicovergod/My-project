@@ -1,8 +1,6 @@
-// ------------------------------------------------------------------------------
-// CHANGES: Implemented direct scene resume on login by delegating world loading
-// to LoginFlowController. Exposed status helpers/colours for the new flow and
-// removed the legacy Overworld-first coroutine.
-// ------------------------------------------------------------------------------
+// Refactor: OSRS-style login with per-account saves; removed Overworld hop; atomic file IO; PBKDF2.
+using System;
+using System.Threading.Tasks;
 using Core.Save;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -17,7 +15,7 @@ namespace UI.Login
     /// <summary>
     /// Coordinates the login panel so users can authenticate before gameplay loads. The
     /// controller validates input, forwards credential checks to
-    /// <see cref="AccountProfileService"/>, and hands off to <see cref="LoginFlowController"/>
+    /// <see cref="AccountManager"/>, and hands off to <see cref="LoginFlowController"/>
     /// to resume the saved scene after a successful login.
     /// </summary>
     [DisallowMultipleComponent]
@@ -46,6 +44,7 @@ namespace UI.Login
         private string backgroundSpritePath = "Sprites/LoginScreen/Background";
 
         private const string LoginPanelSpritePath = "Sprites/LoginScreen/LoginBox";
+        private const string LastUsedUsernameKey = "AccountManager.LastUsername";
 
         [SerializeField, Tooltip("Resources path for the login button sprite.")]
         private string loginButtonSpritePath = "Sprites/LoginScreen/LoginButton";
@@ -161,7 +160,7 @@ namespace UI.Login
             if (usernameField == null)
                 return;
 
-            string lastUsed = AccountProfileService.GetLastUsedDisplayName();
+            string lastUsed = PlayerPrefs.GetString(LastUsedUsernameKey, string.Empty);
             if (!string.IsNullOrEmpty(lastUsed))
             {
                 usernameField.text = lastUsed;
@@ -180,7 +179,7 @@ namespace UI.Login
             loginButton.interactable = valid;
         }
 
-        private void HandleLoginClicked()
+        private async void HandleLoginClicked()
         {
             if (loginButton != null)
                 loginButton.interactable = false;
@@ -191,33 +190,53 @@ namespace UI.Login
             string username = usernameField != null ? usernameField.text : string.Empty;
             string password = passwordField != null ? passwordField.text : string.Empty;
 
-            bool created;
-            bool success = AccountProfileService.TryAuthenticate(username, password, out created, out AccountEntry entry, out string message);
-
-            if (!success)
+            try
             {
-                SetStatus(message, errorColour);
-                if (loginButton != null)
-                    loginButton.interactable = true;
-                return;
+                bool accountExists = AccountManager.TryLoadAccount(username, out AccountSave save);
+
+                if (accountExists)
+                {
+                    if (!AccountManager.VerifyPassword(save, password))
+                    {
+                        SetStatus("Invalid credentials.", errorColour);
+                        SetLoginButtonInteractable(true);
+                        return;
+                    }
+
+                    SetStatus($"Welcome back, {save.username}.", successColour);
+                }
+                else
+                {
+                    save = AccountManager.CreateNewAccount(username, password);
+                    SetStatus($"Created new account for {save.username}.", successColour);
+                }
+
+                SaveManager.BindAccount(save, reload: true);
+                await AccountManager.SaveAsync(save);
+                CacheLastUsedAccount(save.username);
+
+                if (loginFlowController != null)
+                {
+                    await loginFlowController.BeginLoginFlowAsync(save);
+                }
+                else
+                {
+                    Debug.LogError("LoginScreenController: LoginFlowController reference is missing. Cannot continue into gameplay.", this);
+                    SetStatus("Login succeeded but the gameplay flow is misconfigured.", errorColour);
+                    SetLoginButtonInteractable(true);
+                }
             }
-
-            SetStatus(message, successColour);
-
-            string activationMessage = AccountProfileService.ActivateAccount(entry);
-            SetStatus(activationMessage, successColour);
-            SaveManager.LoadAll();
-
-            if (loginFlowController != null)
+            catch (ArgumentException ex)
             {
-                loginFlowController.BeginLoginFlow(created);
+                Debug.LogWarning($"LoginScreenController: {ex.Message}", this);
+                SetStatus(ex.Message, errorColour);
+                SetLoginButtonInteractable(true);
             }
-            else
+            catch (Exception ex)
             {
-                Debug.LogError("LoginScreenController: LoginFlowController reference is missing. Cannot continue into gameplay.");
-                SetStatus("Login succeeded but the gameplay flow is misconfigured.", errorColour);
-                if (loginButton != null)
-                    loginButton.interactable = true;
+                Debug.LogError($"LoginScreenController: Failed to process login: {ex}", this);
+                SetStatus("Unexpected error while logging in.", errorColour);
+                SetLoginButtonInteractable(true);
             }
         }
 
@@ -454,6 +473,15 @@ namespace UI.Login
         {
             if (loginButton != null)
                 loginButton.interactable = interactable;
+        }
+
+        private static void CacheLastUsedAccount(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                return;
+
+            PlayerPrefs.SetString(LastUsedUsernameKey, username);
+            PlayerPrefs.Save();
         }
 
         private RectTransform CreateRectTransform(string name, RectTransform parent, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 anchoredPosition, Vector2 sizeDelta)
