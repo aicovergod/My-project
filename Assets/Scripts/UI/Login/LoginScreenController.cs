@@ -330,9 +330,14 @@ namespace UI.Login
 
             Vector2 buttonPosition = CalculateAnchoredPosition(LoginButtonNormalizedCenter, panelSize);
             Vector2 buttonSize = CalculateSize(LoginButtonNormalizedSize, panelSize);
+            // The login button art already contains the required lettering, so we pass an empty
+            // label to avoid drawing a duplicate Text component on top of the sprite graphics.
             loginButton = CreateButton(panelRect, "LoginButton", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                buttonPosition, buttonSize, buttonSprite, "Login");
-            LegacyFontProvider.ApplyTo(loginButton.GetComponentInChildren<Text>());
+                buttonPosition, buttonSize, buttonSprite, string.Empty);
+
+            var loginButtonLabel = loginButton.GetComponentInChildren<Text>();
+            if (loginButtonLabel != null)
+                LegacyFontProvider.ApplyTo(loginButtonLabel);
         }
 
         /// <summary>
@@ -704,9 +709,12 @@ namespace UI.Login
             colors.disabledColor = new Color32(140, 120, 90, 180);
             button.colors = colors;
 
-            int fontSize = Mathf.Clamp(Mathf.RoundToInt(sizeDelta.y * 0.45f), 20, 30);
-            var text = CreateText(rect, "Text", label, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, fontSize, TextAnchor.MiddleCenter, FontStyle.Bold);
-            text.color = new Color32(46, 32, 20, 255);
+            if (!string.IsNullOrWhiteSpace(label))
+            {
+                int fontSize = Mathf.Clamp(Mathf.RoundToInt(sizeDelta.y * 0.45f), 20, 30);
+                var text = CreateText(rect, "Text", label, new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, fontSize, TextAnchor.MiddleCenter, FontStyle.Bold);
+                text.color = new Color32(46, 32, 20, 255);
+            }
 
             return button;
         }
