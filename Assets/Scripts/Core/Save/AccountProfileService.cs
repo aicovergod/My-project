@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -27,17 +25,6 @@ namespace Core.Save
         private const int Pbkdf2Iterations = 100_000;
         private const int Pbkdf2KeySizeBytes = 32;
         private const string DefaultSceneName = "OverWorld";
-
-        private static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions
-        {
-            AllowTrailingCommas = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            IgnoreUnknownProperties = true,
-            IncludeFields = true,
-            PropertyNameCaseInsensitive = true,
-            ReadCommentHandling = JsonCommentHandling.Skip,
-            WriteIndented = true,
-        };
 
         static AccountManager()
         {
@@ -116,7 +103,7 @@ namespace Core.Save
             try
             {
                 string json = File.ReadAllText(path, Encoding.UTF8);
-                var loaded = JsonSerializer.Deserialize<AccountSave>(json, SerializerOptions);
+                var loaded = JsonUtility.FromJson<AccountSave>(json);
                 if (loaded == null)
                     return false;
 
@@ -223,7 +210,7 @@ namespace Core.Save
 
             string path = GetAccountPath(save.usernameSlug);
             string tempPath = path + ".tmp";
-            string json = JsonSerializer.Serialize(save, SerializerOptions);
+            string json = JsonUtility.ToJson(save, true);
 
             try
             {
