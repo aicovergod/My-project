@@ -57,7 +57,9 @@ namespace Skills.Common
         public static float CalculateSuccessChance(in SuccessChanceArgs args)
         {
             var settings = args.SettingsOverride ?? SuccessChanceSettings.Default;
-            int penaltyLevels = Mathf.Max(args.RequiredLevel - 1, 0);
+            // Calculate how many levels the player is below the requirement so high level characters
+            // are no longer penalised once they meet the threshold.
+            int penaltyLevels = Mathf.Max(args.RequiredLevel - args.PlayerLevel, 0);
             float baseChance = settings.BaseChance;
             float bonusFromLevel = args.PlayerLevel * settings.PerLevelBonus;
             float penalty = settings.PerLevelPenalty * penaltyLevels + args.AdditionalPenalty;
