@@ -149,8 +149,7 @@ namespace Skills.Firemaking
                 equipment = GetComponent<Equipment>();
             if (playerMover == null)
                 playerMover = GetComponent<PlayerMover>();
-            if (groundItemSpawner == null)
-                groundItemSpawner = FindObjectOfType<GroundItemSpawner>();
+            ResolveGroundItemSpawner();
             if (floatingTextAnchor == null)
                 floatingTextAnchor = transform;
 
@@ -451,6 +450,7 @@ namespace Skills.Firemaking
 
             if (createdNewFire)
             {
+                GroundItemSpawner spawner = ResolveGroundItemSpawner();
                 GameObject prefab = definition.firePrefab != null ? definition.firePrefab : defaultFirePrefab;
                 GameObject instance;
                 if (prefab != null)
@@ -468,7 +468,27 @@ namespace Skills.Firemaking
                     fire = instance.AddComponent<FiremakingFire>();
 
                 fire.SetOwner(this);
-                fire.Initialise(definition, lifetime, definition.maxLifetimeTicks, ashesItem, groundItemSpawner, definition.igniteSound, definition.extinguishSound);
+                if (spawner != null)
+                {
+                    fire.Initialise(
+                        definition,
+                        lifetime,
+                        definition.maxLifetimeTicks,
+                        ashesItem,
+                        spawner,
+                        definition.igniteSound,
+                        definition.extinguishSound);
+                }
+                else
+                {
+                    fire.Initialise(
+                        definition,
+                        lifetime,
+                        definition.maxLifetimeTicks,
+                        ashesItem,
+                        igniteSound: definition.igniteSound,
+                        extinguishSound: definition.extinguishSound);
+                }
                 EnsureFireTracked(fire);
             }
             else
@@ -662,6 +682,29 @@ namespace Skills.Firemaking
             }
 
             activeFires.Clear();
+        }
+
+        /// <summary>
+        ///     Locates the shared <see cref="GroundItemSpawner"/> responsible for ground loot and caches it for future fires.
+        /// </summary>
+        /// <returns>Cached spawner reference when available; otherwise <c>null</c>.</returns>
+        private GroundItemSpawner ResolveGroundItemSpawner()
+        {
+            if (groundItemSpawner != null)
+                return groundItemSpawner;
+
+            var spawner = FindObjectOfType<GroundItemSpawner>(true);
+            if (spawner != null)
+            {
+                groundItemSpawner = spawner;
+                LogDebug($"Resolved GroundItemSpawner instance '{spawner.name}'.");
+            }
+            else
+            {
+                Debug.LogWarning("[FiremakingSkill] Unable to locate a GroundItemSpawner in the active scene. Ashes drops will be skipped until one is available.");
+            }
+
+            return groundItemSpawner;
         }
 
         /// <summary>
