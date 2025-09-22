@@ -37,6 +37,7 @@ namespace Skills
             SkillType.Beastmaster,
             SkillType.Fishing,
             SkillType.Cooking,
+            SkillType.Firemaking,
             SkillType.Woodcutting,
             SkillType.Mining
         };

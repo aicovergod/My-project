@@ -9,6 +9,8 @@ namespace Skills
     public enum SkillType
     {
         Mining,
+        Cooking,
+        Firemaking,
         Woodcutting,
         Beastmaster,
         Hitpoints,
@@ -16,7 +18,6 @@ namespace Skills
         Strength,
         Defence,
         Magic,
-        Fishing,
-        Cooking
+        Fishing
     }
 }
