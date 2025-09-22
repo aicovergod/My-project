@@ -61,14 +61,21 @@ namespace Skills.Firemaking
             int initialTicks,
             int maxTicks,
             ItemData ashesItem,
-            GroundItemSpawner spawner,
-            AudioClip igniteSound,
-            AudioClip extinguishSound)
+            GroundItemSpawner spawner = null,
+            AudioClip igniteSound = null,
+            AudioClip extinguishSound = null)
         {
             // Cache everything so subsequent fuel additions share the same configuration.
             SourceLog = definition;
             this.ashesItem = ashesItem;
-            groundItemSpawner = spawner;
+            if (spawner != null)
+            {
+                groundItemSpawner = spawner;
+            }
+            else if (groundItemSpawner == null)
+            {
+                groundItemSpawner = ResolveGroundItemSpawner();
+            }
             igniteClip = igniteSound;
             extinguishClip = extinguishSound;
 
@@ -194,15 +201,37 @@ namespace Skills.Firemaking
                     AudioSource.PlayClipAtPoint(extinguishClip, transform.position);
             }
 
-            // Spawn ashes when an item definition was supplied.
-            if (groundItemSpawner != null && ashesItem != null)
-                groundItemSpawner.Spawn(ashesItem, 1, transform.position);
+            if (ashesItem != null)
+            {
+                var spawner = ResolveGroundItemSpawner();
+                if (spawner != null)
+                {
+                    spawner.Spawn(ashesItem, 1, transform.position);
+                }
+                else
+                {
+                    Debug.LogWarning($"[FiremakingFire] Unable to spawn ashes at {transform.position} because no GroundItemSpawner was found.");
+                }
+            }
 
             // Notify listeners before the GameObject is destroyed.
             Extinguished?.Invoke(this);
 
             // Destroy the visual so the world is cleared once the fire expires.
             Destroy(gameObject);
+        }
+
+        /// <summary>
+        ///     Attempts to resolve the shared <see cref="GroundItemSpawner"/> so extinguished fires can drop ashes via the loot pipeline.
+        /// </summary>
+        /// <returns>Spawner instance when located; otherwise <c>null</c>.</returns>
+        private GroundItemSpawner ResolveGroundItemSpawner()
+        {
+            if (groundItemSpawner != null)
+                return groundItemSpawner;
+
+            groundItemSpawner = FindObjectOfType<GroundItemSpawner>(true);
+            return groundItemSpawner;
         }
     }
 }
