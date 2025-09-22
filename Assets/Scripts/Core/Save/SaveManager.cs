@@ -346,13 +346,10 @@ namespace Core.Save
                 }
                 else
                 {
-#if NETSTANDARD2_1 || NETCOREAPP
-                    File.Move(tempPath, GlobalFilePath, overwrite: true);
-#else
                     if (File.Exists(GlobalFilePath))
                         File.Delete(GlobalFilePath);
+
                     File.Move(tempPath, GlobalFilePath);
-#endif
                 }
             }
             catch (Exception ex)

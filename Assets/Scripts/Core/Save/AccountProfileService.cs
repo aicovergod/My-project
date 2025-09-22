@@ -223,13 +223,10 @@ namespace Core.Save
                     }
                     else
                     {
-#if NETSTANDARD2_1 || NETCOREAPP
-                        File.Move(tempPath, path, overwrite: true);
-#else
                         if (File.Exists(path))
                             File.Delete(path);
+
                         File.Move(tempPath, path);
-#endif
                     }
                 }).ConfigureAwait(false);
             }
