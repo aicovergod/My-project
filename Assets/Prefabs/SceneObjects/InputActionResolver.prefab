@@ -71,7 +71,7 @@ MonoBehaviour:
   m_JoinAction:
     m_UseReference: 0
     m_Action:
-      m_Name: 
+      m_Name: Join
       m_Type: 0
       m_ExpectedControlType: 
       m_Id: 7e14ca24-2704-4a1a-b6d8-a7e352bd378e
