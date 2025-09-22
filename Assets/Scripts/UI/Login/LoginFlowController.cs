@@ -65,7 +65,11 @@ namespace UI.Login
             }
 
             if (loginScreen != null)
-                loginScreen.SetStatus($"Loading {targetScene}…", loginScreen.InfoColour);
+            {
+                // Always present a consistent login message that matches the requested
+                // branding instead of echoing the scene name.
+                loginScreen.SetStatus("Loading into VIosla 2D", loginScreen.InfoColour);
+            }
 
             bool loaded = await TryLoadSceneAsync(targetScene);
             if (!loaded)
