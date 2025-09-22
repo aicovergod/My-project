@@ -10,6 +10,7 @@ using Skills.Fishing;
 using Skills.Mining;
 using Skills.Outfits;
 using Skills.Woodcutting;
+using Skills.Firemaking;
 using Status;
 using Status.Antifire;
 using Status.Poison;
@@ -55,6 +56,7 @@ namespace Skills
         private string magicLevel = "";
         private string miningLevel = "";
         private string woodcuttingLevel = "";
+        private string firemakingLevel = "";
         private string fishingLevel = "";
         private string cookingLevel = "";
         private string beastmasterLevel = "";
@@ -64,6 +66,7 @@ namespace Skills
 
         private MiningSkill miningSkillBehaviour;
         private WoodcuttingSkill woodcuttingSkillBehaviour;
+        private FiremakingSkill firemakingSkillBehaviour;
         private FishingSkill fishingSkillBehaviour;
         private CookingSkill cookingSkillBehaviour;
 
@@ -236,6 +239,8 @@ namespace Skills
                 miningSkillBehaviour = FindObjectOfType<MiningSkill>();
             if (woodcuttingSkillBehaviour == null)
                 woodcuttingSkillBehaviour = FindObjectOfType<WoodcuttingSkill>();
+            if (firemakingSkillBehaviour == null)
+                firemakingSkillBehaviour = FindObjectOfType<FiremakingSkill>();
             if (fishingSkillBehaviour == null)
                 fishingSkillBehaviour = FindObjectOfType<FishingSkill>();
             if (cookingSkillBehaviour == null)
@@ -261,6 +266,7 @@ namespace Skills
 
             miningSkillBehaviour = FindObjectOfType<MiningSkill>();
             woodcuttingSkillBehaviour = FindObjectOfType<WoodcuttingSkill>();
+            firemakingSkillBehaviour = FindObjectOfType<FiremakingSkill>();
             fishingSkillBehaviour = FindObjectOfType<FishingSkill>();
             cookingSkillBehaviour = FindObjectOfType<CookingSkill>();
 
@@ -271,6 +277,7 @@ namespace Skills
             magicLevel = skillManager != null ? skillManager.GetLevel(SkillType.Magic).ToString() : "";
             miningLevel = skillManager != null ? skillManager.GetLevel(SkillType.Mining).ToString() : "";
             woodcuttingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Woodcutting).ToString() : "";
+            firemakingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Firemaking).ToString() : "";
             fishingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Fishing).ToString() : "";
             cookingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Cooking).ToString() : "";
             beastmasterLevel = skillManager != null ? skillManager.GetLevel(SkillType.Beastmaster).ToString() : "";
@@ -282,7 +289,7 @@ namespace Skills
                 return;
 
             const float width = 220f;
-            const float height = 220f;
+            const float height = 240f;
             Rect area = new Rect(10f, 10f, width, height);
             GUILayout.BeginArea(area, GUI.skin.box);
 
@@ -307,14 +314,17 @@ namespace Skills
             GUILayout.Label("Mining Level");
             miningLevel = GUILayout.TextField(miningLevel);
 
-            GUILayout.Label("Woodcutting Level");
-            woodcuttingLevel = GUILayout.TextField(woodcuttingLevel);
-
             GUILayout.Label("Fishing Level");
             fishingLevel = GUILayout.TextField(fishingLevel);
 
             GUILayout.Label("Cooking Level");
             cookingLevel = GUILayout.TextField(cookingLevel);
+
+            GUILayout.Label("Firemaking Level");
+            firemakingLevel = GUILayout.TextField(firemakingLevel);
+
+            GUILayout.Label("Woodcutting Level");
+            woodcuttingLevel = GUILayout.TextField(woodcuttingLevel);
 
             GUILayout.Label("Beastmaster Level");
             beastmasterLevel = GUILayout.TextField(beastmasterLevel);
@@ -351,6 +361,11 @@ namespace Skills
                 () => cookingSkillBehaviour != null,
                 () => cookingSkillBehaviour.EnableDebugLogging,
                 value => cookingSkillBehaviour.EnableDebugLogging = value);
+            DrawSkillDebugToggle(
+                "Firemaking Debug Logging",
+                () => firemakingSkillBehaviour != null,
+                () => firemakingSkillBehaviour.EnableDebugLogging,
+                value => firemakingSkillBehaviour.EnableDebugLogging = value);
 
             if (GUILayout.Button("Apply"))
             {
@@ -370,12 +385,14 @@ namespace Skills
                     skillManager.DebugSetLevel(SkillType.Magic, mag);
                 if (skillManager != null && int.TryParse(miningLevel, out var mine))
                     skillManager.DebugSetLevel(SkillType.Mining, mine);
-                if (skillManager != null && int.TryParse(woodcuttingLevel, out var wood))
-                    skillManager.DebugSetLevel(SkillType.Woodcutting, wood);
                 if (skillManager != null && int.TryParse(fishingLevel, out var fish))
                     skillManager.DebugSetLevel(SkillType.Fishing, fish);
                 if (skillManager != null && int.TryParse(cookingLevel, out var cook))
                     skillManager.DebugSetLevel(SkillType.Cooking, cook);
+                if (skillManager != null && int.TryParse(firemakingLevel, out var fire))
+                    skillManager.DebugSetLevel(SkillType.Firemaking, fire);
+                if (skillManager != null && int.TryParse(woodcuttingLevel, out var wood))
+                    skillManager.DebugSetLevel(SkillType.Woodcutting, wood);
                 if (skillManager != null && int.TryParse(beastmasterLevel, out var bm))
                 {
                     skillManager.DebugSetLevel(SkillType.Beastmaster, bm);

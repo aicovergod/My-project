@@ -117,6 +117,10 @@ namespace Inventory
         [Tooltip("Additional cooking XP multiplier (0.025 = +2.5% XP).")]
         public float cookingXpBonusMultiplier = 0f;
 
+        [Header("Firemaking Bonuses")]
+        [Tooltip("Additional firemaking XP multiplier (0.025 = +2.5% XP).")]
+        public float firemakingXpBonusMultiplier = 0f;
+
         [Header("Requirements")]
         public SkillRequirement[] skillRequirements;
 
