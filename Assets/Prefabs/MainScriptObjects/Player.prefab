@@ -78,6 +78,7 @@ GameObject:
   - component: {fileID: 8582261054864833439}
   - component: {fileID: -8837884572014598511}
   - component: {fileID: -2219103460593389809}
+  - component: {fileID: 4293722103470127009}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -919,3 +920,32 @@ MonoBehaviour:
   equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
   enableDebugLogging: 0
+--- !u!114 &4293722103470127009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9861f2bb42041945aaa1d6f2fc692b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Skills.Firemaking.FiremakingSkill
+  inventory: {fileID: 491447706204386932}
+  equipment: {fileID: 8439072058276114910}
+  floatingTextAnchor: {fileID: 487381587706843324}
+  playerMover: {fileID: 5825080390935697164}
+  fireBlockingLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  existingFireLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  defaultFirePrefab: {fileID: 8625610357521118339, guid: bc1b65eaaac7cf144921368a8947259c, type: 3}
+  groundItemSpawner: {fileID: 0}
+  tinderboxItemId: Tinderbox
+  maxIgniteDistance: 1.6
+  enableDebugLogging: 0
+  allowTileSnapping: 1
+  tileSnapSize: {x: 1, y: 1}

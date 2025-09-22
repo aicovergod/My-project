@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c364b37e5fd03c24d8b6a577f68c7310, type: 3}
+  m_Name: Yew Log
+  m_EditorClassIdentifier: Assembly-CSharp::Skills.Firemaking.FiremakingLogDefinition
+  logItemId: Yew Log
+  displayName: Yew Log
+  requiredLevel: 60
+  xp: 200
+  phoenixPetRoll: 6500
+  baseIgnitionTicks: 4
+  ignitionTickReductionPerLevel: 0.1
+  baseIgnitionChance: 0.35
+  ignitionChancePerLevel: 0.01
+  bonfireIgnitionBonus: 0.15
+  baseFireLifetimeTicks: 50
+  bonusLifetimeWhenAdding: 25
+  maxLifetimeTicks: 150
+  ashesItemId: Ashes
+  firePrefab: {fileID: 8625610357521118339, guid: bc1b65eaaac7cf144921368a8947259c, type: 3}
+  igniteSound: {fileID: 0}
+  extinguishSound: {fileID: 0}

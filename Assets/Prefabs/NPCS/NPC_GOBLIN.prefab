@@ -21,6 +21,8 @@ GameObject:
   - component: {fileID: -3175024997635208073}
   - component: {fileID: -7034281214918345802}
   - component: {fileID: 4856330758820000550}
+  - component: {fileID: 6410839004971985729}
+  - component: {fileID: 3665449629679586575}
   m_Layer: 7
   m_Name: NPC_GOBLIN
   m_TagString: NPC
@@ -63,6 +65,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -84,6 +88,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -184,6 +189,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   profile: {fileID: 11400000, guid: 99be5545587046b409a3d4e9f2a85c70, type: 2}
+  hitSplatLibrary: {fileID: 0}
 --- !u!114 &7573619506058784387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,7 +206,7 @@ MonoBehaviour:
   luckMultiplier: 1
   spawnSpreadRadius: 0.35
   spawnAtFeet: 1
-  spawner: {fileID: 0}
+  spawner: {fileID: 2834110941215306221, guid: f461b75dda0f24e41b585a40ec57efb4, type: 3}
 --- !u!114 &2394211271730700276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -237,6 +243,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29d046d9f0ec20d488834948f15ef84a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  heightOffset: 1.5
+  fadeDuration: 0.25
 --- !u!114 &4408143068028046321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -253,6 +261,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   dirParam: Dir
   isMovingParam: IsMoving
+  attackTrigger: Attack
   spriteRenderer: {fileID: 7487083981726320206}
   idleDown:
   - {fileID: 21300000, guid: 91dfdb742bde12b4794aeaa4930b9f2e, type: 3}
@@ -270,7 +279,14 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 290ee90a121184c48864215991a92851, type: 3}
   walkUp:
   - {fileID: 21300000, guid: e20b8672692009a4eb814a9fbfe59bf5, type: 3}
+  attackDown: []
+  attackLeft: []
+  attackRight: []
+  attackUp: []
   useFlipXForLeft: 0
+  useFlipXForRight: 0
+  useFlipXForLeftAttack: 1
+  useFlipXForRightAttack: 0
   animationFPS: 6
 --- !u!114 &-3175024997635208073
 MonoBehaviour:
@@ -286,6 +302,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shop: {fileID: 0}
   menuPrefab: {fileID: 0}
+  playerInput: {fileID: 0}
+  openMenuActionReference: {fileID: 0}
 --- !u!114 &-7034281214918345802
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -298,12 +316,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3264207daa560b40bd49e240e104270, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useAreaSize: 0
+  areaSize: {x: 10, y: 10}
   minOffset: {x: -5, y: -5}
   maxOffset: {x: 5, y: 5}
   moveSpeed: 2
   arriveDistance: 0.05
   minIdleTime: 0.5
   maxIdleTime: 2
+  chaseRadius: 5
   spriteAnimator: {fileID: 4408143068028046321}
 --- !u!114 &4856330758820000550
 MonoBehaviour:
@@ -318,3 +339,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   offset: -1
+  directionOffset: 0
+--- !u!114 &6410839004971985729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1e0d2e22e364d8fa4319372994f9847, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Status.Freeze.FrozenStatusController
+  playerMover: {fileID: 0}
+  npcWanderer: {fileID: -7034281214918345802}
+  rigidBody: {fileID: 1285495058149382175}
+--- !u!114 &3665449629679586575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ade83d186a2426484d785699fb0c95b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcFacing
