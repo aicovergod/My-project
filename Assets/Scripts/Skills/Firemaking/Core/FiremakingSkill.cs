@@ -83,6 +83,11 @@ namespace Skills.Firemaking
         public FiremakingLogDefinition CurrentDefinition => currentAttempt.definition;
 
         /// <summary>
+        ///     Identifier of the tinderbox item required to ignite logs.
+        /// </summary>
+        public string TinderboxItemId => tinderboxItemId;
+
+        /// <summary>
         ///     Runtime flag used by the admin menu to toggle verbose debug logging.
         /// </summary>
         public bool EnableDebugLogging
@@ -316,6 +321,31 @@ namespace Skills.Firemaking
             IgnitionStarted?.Invoke(definition, snappedPosition);
             LogDebug($"Started lighting {definition.displayName} at {snappedPosition} (feeding existing: {feedingExisting}).");
             return true;
+        }
+
+        /// <summary>
+        ///     Attempts to light the selected logs at the player's current tile without requiring a ground target component.
+        /// </summary>
+        /// <param name="logSlot">Inventory slot that contains the logs to ignite.</param>
+        /// <param name="failureReason">Outputs a player-facing message when the attempt cannot start.</param>
+        /// <returns><c>true</c> when the ignition attempt was started, otherwise <c>false</c>.</returns>
+        public bool BeginLightingFromInventory(int logSlot, out string failureReason)
+        {
+            failureReason = string.Empty;
+            Vector3 anchorPosition = transform != null ? transform.position : Vector3.zero;
+            anchorPosition.z = 0f;
+            Vector3 snapped = SnapToIgnitionPoint(anchorPosition);
+
+            FiremakingFire targetFire = null;
+            if (existingFireLayers.value != 0)
+            {
+                Vector2 checkSize = ResolveCollisionCheckSize();
+                Collider2D fireCollider = Physics2D.OverlapBox(snapped, checkSize * 0.9f, 0f, existingFireLayers);
+                if (fireCollider != null)
+                    targetFire = fireCollider.GetComponentInParent<FiremakingFire>() ?? fireCollider.GetComponent<FiremakingFire>();
+            }
+
+            return TryBeginLighting(logSlot, snapped, targetFire, out failureReason);
         }
 
         /// <summary>

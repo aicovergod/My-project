@@ -15,6 +15,9 @@ namespace Skills.Firemaking
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Camera worldCamera;
         [SerializeField] private LayerMask fireSearchLayers;
+        [SerializeField] private bool allowManualIgnitionPlacement;
+        [SerializeField, Tooltip("Feedback shown when manual placement is disabled and the helper is invoked instead.")]
+        private string manualPlacementDisabledMessage = "Use a tinderbox on the logs to light a fire.";
 
         /// <summary>
         ///     Locates the Firemaking skill, player inventory, and ensures the camera has a Physics2D raycaster for UI clicks.
@@ -73,6 +76,24 @@ namespace Skills.Firemaking
                 Collider2D hit = Physics2D.OverlapPoint(snapped, fireSearchLayers);
                 if (hit != null)
                     targetFire = hit.GetComponentInParent<FiremakingFire>() ?? hit.GetComponent<FiremakingFire>();
+            }
+
+            if (targetFire == null && !allowManualIgnitionPlacement)
+            {
+                if (skill != null && inventory != null && inventory.selectedIndex >= 0)
+                {
+                    if (!skill.BeginLightingFromInventory(inventory.selectedIndex, out var helperFailure) &&
+                        !string.IsNullOrEmpty(helperFailure))
+                    {
+                        FloatingText.Show(helperFailure, snapped);
+                    }
+                }
+                else if (!string.IsNullOrEmpty(manualPlacementDisabledMessage))
+                {
+                    FloatingText.Show(manualPlacementDisabledMessage, snapped);
+                }
+
+                return;
             }
 
             if (!skill.TryBeginLighting(inventory.selectedIndex, snapped, targetFire, out var failureReason))

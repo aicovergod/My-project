@@ -9,6 +9,7 @@ using UnityEngine.InputSystem.UI;
 using ShopSystem;
 using Player;
 using Skills;
+using Skills.Firemaking;
 using Pets;
 using Quests;
 using UI;
@@ -133,6 +134,7 @@ namespace Inventory
 
         private PlayerMover playerMover;
         private Equipment equipment;
+        private FiremakingSkill firemakingSkill;
 
         // UI
         private GameObject uiRoot; // Canvas root
@@ -960,16 +962,21 @@ namespace Inventory
             return false;
         }
 
-        public bool CombineItems(int srcIndex, int dstIndex)
+        public bool CombineItems(int srcIndex, int dstIndex, out bool keepSelection)
         {
-            if (combinationDatabase == null)
-                return false;
+            keepSelection = false;
             if (srcIndex < 0 || dstIndex < 0 || srcIndex >= items.Length || dstIndex >= items.Length)
                 return false;
 
             var srcItem = items[srcIndex].item;
             var dstItem = items[dstIndex].item;
             if (srcItem == null || dstItem == null)
+                return false;
+
+            if (TryHandleFiremakingCombination(srcIndex, dstIndex, srcItem, dstItem, out keepSelection))
+                return true;
+
+            if (combinationDatabase == null)
                 return false;
 
             var result = combinationDatabase.GetResult(srcItem, dstItem);
@@ -991,6 +998,51 @@ namespace Inventory
                 NotifyInventoryChanged(false);
             else
                 NotifyInventoryChanged();
+            return true;
+        }
+
+        private FiremakingSkill GetFiremakingSkill()
+        {
+            if (firemakingSkill == null)
+                firemakingSkill = GetComponent<FiremakingSkill>();
+            return firemakingSkill;
+        }
+
+        private bool TryHandleFiremakingCombination(int srcIndex, int dstIndex, ItemData srcItem, ItemData dstItem, out bool keepSelection)
+        {
+            keepSelection = false;
+
+            var firemaking = GetFiremakingSkill();
+            if (firemaking == null)
+                return false;
+
+            string tinderboxId = firemaking.TinderboxItemId;
+            if (string.IsNullOrEmpty(tinderboxId))
+                return false;
+
+            bool srcIsTinderbox = string.Equals(srcItem.id, tinderboxId, StringComparison.Ordinal);
+            bool dstIsTinderbox = string.Equals(dstItem.id, tinderboxId, StringComparison.Ordinal);
+            if (!srcIsTinderbox && !dstIsTinderbox)
+                return false;
+
+            int logSlot = srcIsTinderbox ? dstIndex : srcIndex;
+            ItemData logItem = srcIsTinderbox ? dstItem : srcItem;
+            if (logItem == null)
+                return false;
+
+            if (firemaking.GetDefinitionForItem(logItem.id) == null)
+                return false;
+
+            keepSelection = true;
+            selectedIndex = logSlot;
+
+            if (!firemaking.BeginLightingFromInventory(logSlot, out var failureReason) && !string.IsNullOrEmpty(failureReason))
+            {
+                Vector3 feedbackPosition = transform != null ? transform.position : Vector3.zero;
+                feedbackPosition = firemaking.SnapToIgnitionPoint(feedbackPosition);
+                FloatingText.Show(failureReason, feedbackPosition);
+            }
+
             return true;
         }
 
