@@ -19,6 +19,7 @@ namespace NPC
         private Text text;
 
         [SerializeField] private float heightOffset = 1.5f;
+        [SerializeField] private int sortingOrder = 5000;
         [SerializeField] private float fadeDuration = 0.25f;
         private Coroutine fadeRoutine;
         private bool isVisible;
@@ -43,6 +44,9 @@ namespace NPC
             var go = new GameObject("NpcHealthHUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             canvas = go.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
+            canvas.overrideSorting = true; // Force the HUD to obey the explicit sorting order so it can render above world geometry.
+            canvas.sortingLayerID = SortingLayer.NameToID("Default");
+            canvas.sortingOrder = sortingOrder;
             canvas.transform.SetParent(transform, false);
             canvas.transform.localPosition = new Vector3(0f, heightOffset, 0f);
             canvas.transform.localRotation = Quaternion.identity;
@@ -57,6 +61,7 @@ namespace NPC
             var bgImg = bg.GetComponent<Image>();
             bgImg.color = Color.red;
             bgImg.sprite = sprite;
+            bgImg.raycastTarget = false; // Prevent the HUD background from intercepting UI raycasts.
             var bgRect = bgImg.rectTransform;
             bgRect.anchorMin = Vector2.zero;
             bgRect.anchorMax = Vector2.one;
@@ -71,6 +76,7 @@ namespace NPC
             fill.fillMethod = Image.FillMethod.Horizontal;
             fill.fillOrigin = 0;
             fill.sprite = sprite;
+            fill.raycastTarget = false; // Allow player UI input to pass through the fill graphic.
             var fillRect = fill.rectTransform;
             fillRect.anchorMin = Vector2.zero;
             fillRect.anchorMax = Vector2.one;
@@ -84,6 +90,7 @@ namespace NPC
             text.alignment = TextAnchor.MiddleCenter;
             text.color = Color.white;
             text.fontSize = 11;
+            text.raycastTarget = false; // Ensure the text does not block other UI.
             var textRect = text.rectTransform;
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
