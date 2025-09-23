@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Inventory;
 using Skills.Common;
 using UnityEngine;
@@ -17,9 +16,6 @@ namespace Skills.Cooking
         [Tooltip("Layer mask used when searching for cooking stations.")]
         private LayerMask cookingStationMask = LayerMask.GetMask("Interactable");
 
-        private static readonly Dictionary<string, CookableRecipe> RecipeLookup = new();
-        private static bool recipesLoaded;
-
         private Inventory.Inventory inventory;
         private CookableRecipe cachedRecipe;
         private ItemData cachedRawItem;
@@ -30,7 +26,7 @@ namespace Skills.Cooking
         private CookingSkill CookingSkill => Skill;
 
         /// <summary>
-        ///     Resolve optional references and ensure the recipe dictionary is ready.
+        ///     Resolve optional references and ensure default configuration values are populated.
         /// </summary>
         protected override void Awake()
         {
@@ -39,7 +35,6 @@ namespace Skills.Cooking
                 inventory = GetComponent<Inventory.Inventory>();
             if (inventory == null && CookingSkill != null)
                 inventory = CookingSkill.GetComponent<Inventory.Inventory>();
-            EnsureRecipeLookup();
             if (cookingStationMask == 0)
                 cookingStationMask = ~0;
         }
@@ -131,71 +126,39 @@ namespace Skills.Cooking
                 return false;
             }
 
-            EnsureRecipeLookup();
+            var searchResult = CookingInventoryHelper.FindCookableRecipe(inventory, CookingSkill, inventory.selectedIndex);
 
-            if (RecipeLookup.Count == 0)
+            if (!searchResult.HasRecipe)
             {
-                failureMessage = "No recipes available";
+                failureMessage = !string.IsNullOrEmpty(searchResult.FailureMessage)
+                    ? searchResult.FailureMessage
+                    : "You need something raw to cook";
                 cachedFailureMessage = failureMessage;
                 return false;
             }
 
-            // Resolve the currently highlighted item.
-            ItemData candidateItem = null;
-            CookableRecipe candidateRecipe = null;
-            int selectedIndex = inventory.selectedIndex;
-            if (selectedIndex >= 0)
+            if (!searchResult.HasRequiredQuantity)
             {
-                var selectedEntry = inventory.GetSlot(selectedIndex);
-                candidateItem = selectedEntry.item;
-                if (candidateItem != null && !string.IsNullOrEmpty(candidateItem.id))
-                    RecipeLookup.TryGetValue(candidateItem.id, out candidateRecipe);
-            }
-
-            // Fallback to the first cookable item in the inventory if the highlighted slot is invalid.
-            if (candidateRecipe == null || candidateItem == null)
-            {
-                for (int i = 0; i < inventory.size; i++)
-                {
-                    var slot = inventory.GetSlot(i);
-                    var item = slot.item;
-                    if (item == null || string.IsNullOrEmpty(item.id))
-                        continue;
-
-                    if (!RecipeLookup.TryGetValue(item.id, out candidateRecipe))
-                        continue;
-
-                    candidateItem = item;
-                    break;
-                }
-            }
-
-            if (candidateRecipe == null || candidateItem == null)
-            {
-                failureMessage = "You need something raw to cook";
+                failureMessage = !string.IsNullOrEmpty(searchResult.FailureMessage)
+                    ? searchResult.FailureMessage
+                    : "You need something raw to cook";
                 cachedFailureMessage = failureMessage;
                 return false;
             }
 
-            if (CookingSkill.Level < candidateRecipe.requiredLevel)
+            if (!searchResult.MeetsLevelRequirement)
             {
-                failureMessage = $"You need Cooking level {candidateRecipe.requiredLevel}";
-                cachedFailureMessage = failureMessage;
-                return false;
-            }
-
-            int quantity = inventory.GetItemCount(candidateItem);
-            if (quantity <= 0)
-            {
-                failureMessage = "You need something raw to cook";
+                failureMessage = !string.IsNullOrEmpty(searchResult.FailureMessage)
+                    ? searchResult.FailureMessage
+                    : $"You need Cooking level {searchResult.Recipe.requiredLevel}";
                 cachedFailureMessage = failureMessage;
                 return false;
             }
 
             cachedStation = node;
-            cachedRecipe = candidateRecipe;
-            cachedRawItem = candidateItem;
-            cachedQuantity = quantity;
+            cachedRecipe = searchResult.Recipe;
+            cachedRawItem = searchResult.RawItem;
+            cachedQuantity = searchResult.Quantity;
             return true;
         }
 
@@ -248,23 +211,6 @@ namespace Skills.Cooking
 
             ClearCachedInteraction();
             return false;
-        }
-
-        private static void EnsureRecipeLookup()
-        {
-            if (recipesLoaded)
-                return;
-
-            RecipeLookup.Clear();
-            var recipes = Resources.LoadAll<CookableRecipe>("CookingDatabase");
-            foreach (var recipe in recipes)
-            {
-                if (recipe == null || string.IsNullOrEmpty(recipe.rawItemId))
-                    continue;
-                RecipeLookup[recipe.rawItemId] = recipe;
-            }
-
-            recipesLoaded = true;
         }
 
         private void ClearCachedInteraction()
