@@ -1,115 +1,65 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using Inventory;
-using Player;
-using UI;
-using Pets;
 
 namespace Skills.Cooking
 {
     /// <summary>
-    /// World object that allows the player to cook items when used.
-    /// The player selects a cookable item in the inventory and then
-    /// clicks this object to begin cooking. Cooking stops if the
-    /// player moves or steps too far away.
+    ///     Passive world component representing a cooking station.
+    ///     The station only exposes distance settings so <see cref="CookingController"/>
+    ///     can handle all player interaction logic.
     /// </summary>
+    [DisallowMultipleComponent]
     [RequireComponent(typeof(Collider2D))]
-    public class CookingObject : MonoBehaviour, IPointerClickHandler
+    public class CookingObject : MonoBehaviour
     {
-        [SerializeField] private float cancelDistance = 3f;
+        [Header("Interaction")]
+        [SerializeField]
+        [Tooltip("Maximum distance the player can stand from this station to start cooking.")]
+        private float interactionRange = 1.5f;
 
-        private static Dictionary<string, CookableRecipe> recipeLookup;
+        [SerializeField]
+        [Tooltip("Distance at which active cooking automatically cancels.")]
+        private float cancelDistance = 3f;
 
-        private Inventory.Inventory inventory;
+        [SerializeField]
+        [Tooltip("Optional anchor transform used when auto-moving the player into position.")]
+        private Transform approachAnchor;
+
         private CookingSkill cookingSkill;
-        private PlayerMover playerMover;
-        private Transform playerTransform;
+
+        /// <summary>
+        ///     Range used when checking whether the player can interact with this station.
+        /// </summary>
+        public float InteractionRange => interactionRange;
+
+        /// <summary>
+        ///     Maximum distance allowed before an active cooking action is cancelled.
+        /// </summary>
+        public float CancelDistance => cancelDistance;
+
+        /// <summary>
+        ///     Optional transform for auto-move targeting. Falls back to <see cref="Component.transform"/> when null.
+        /// </summary>
+        public Transform ApproachAnchor => approachAnchor != null ? approachAnchor : transform;
 
         private void Awake()
         {
-            var playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null)
-            {
-                inventory = playerObj.GetComponent<Inventory.Inventory>();
-                cookingSkill = playerObj.GetComponent<CookingSkill>();
-                playerMover = playerObj.GetComponent<PlayerMover>();
-                playerTransform = playerObj.transform;
-            }
-            EnsureRecipeLookup();
-            var mainCam = Camera.main;
-            if (mainCam != null && mainCam.GetComponent<Physics2DRaycaster>() == null)
-                mainCam.gameObject.AddComponent<Physics2DRaycaster>();
+            // Cache the player's cooking skill so we can cancel if the station disappears.
+            var player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+                cookingSkill = player.GetComponent<CookingSkill>();
         }
 
-        private void EnsureRecipeLookup()
+        private void OnDisable()
         {
-            if (recipeLookup != null)
-                return;
-            recipeLookup = new Dictionary<string, CookableRecipe>();
-            var recipes = Resources.LoadAll<CookableRecipe>("CookingDatabase");
-            foreach (var r in recipes)
-            {
-                if (r != null && !string.IsNullOrEmpty(r.rawItemId))
-                    recipeLookup[r.rawItemId] = r;
-            }
+            // If this station goes away while in use ensure the active session stops cleanly.
+            if (cookingSkill != null && cookingSkill.ActiveCookingObject == this)
+                cookingSkill.StopCooking();
         }
 
-        private void Update()
+        private void OnValidate()
         {
-            if (cookingSkill != null && cookingSkill.IsCooking)
-            {
-                if (playerMover != null && playerMover.IsMoving)
-                {
-                    cookingSkill.StopCooking();
-                    return;
-                }
-                if (playerTransform != null && Vector3.Distance(playerTransform.position, transform.position) > cancelDistance)
-                    cookingSkill.StopCooking();
-            }
-        }
-
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            if (eventData.button == PointerEventData.InputButton.Left)
-            {
-                TryStartCooking();
-            }
-        }
-
-        private void TryStartCooking()
-        {
-            if (inventory == null || cookingSkill == null)
-                return;
-
-            int selected = inventory.selectedIndex;
-            if (selected < 0)
-                return;
-
-            var entry = inventory.GetSlot(selected);
-            if (entry.item == null)
-                return;
-
-            if (!recipeLookup.TryGetValue(entry.item.id, out var recipe))
-            {
-                FloatingText.Show("You can't cook that", transform.position);
-                return;
-            }
-
-            if (cookingSkill.Level < recipe.requiredLevel)
-            {
-                FloatingText.Show($"You need Cooking level {recipe.requiredLevel}", transform.position);
-                return;
-            }
-
-            int quantity = inventory.GetItemCount(entry.item);
-            if (quantity <= 0)
-                return;
-
-            cookingSkill.StartCooking(recipe, quantity);
-            inventory.ClearSelection();
+            interactionRange = Mathf.Max(0f, interactionRange);
+            cancelDistance = Mathf.Max(0f, cancelDistance);
         }
     }
 }
-

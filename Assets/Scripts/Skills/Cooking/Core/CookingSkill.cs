@@ -39,7 +39,8 @@ namespace Skills.Cooking
 
         public int Level => skills != null ? skills.GetLevel(SkillType.Cooking) : 1;
         public float Xp => skills != null ? skills.GetXp(SkillType.Cooking) : 0f;
-        public bool IsCooking => currentRecipe != null && itemsRemaining > 0;
+        public CookingObject ActiveCookingObject { get; private set; }
+        public bool IsCooking => currentRecipe != null && itemsRemaining > 0 && ActiveCookingObject != null;
         public float CookProgressNormalized => CookIntervalTicks <= 1 ? 0f : (float)cookProgress / (CookIntervalTicks - 1);
 
         /// <summary>
@@ -73,26 +74,87 @@ namespace Skills.Cooking
             SaveManager.Unregister(cookingOutfit);
         }
 
-        public void StartCooking(CookableRecipe recipe, int quantity)
+        /// <summary>
+        ///     Attempts to begin a cooking session at the supplied station.
+        ///     Validates the player's level and ingredient availability before starting.
+        /// </summary>
+        /// <param name="station">World object representing the cooking station.</param>
+        /// <param name="recipe">Recipe to cook.</param>
+        /// <param name="quantity">Number of raw items to process.</param>
+        /// <param name="failureMessage">Feedback explaining why the action failed.</param>
+        /// <returns><c>true</c> if the session began successfully; otherwise <c>false</c>.</returns>
+        public bool TryStartCooking(CookingObject station, CookableRecipe recipe, int quantity, out string failureMessage)
         {
-            if (recipe == null || quantity <= 0)
-                return;
+            failureMessage = string.Empty;
+
+            if (station == null || recipe == null)
+            {
+                failureMessage = "You can't cook here";
+                return false;
+            }
+
+            if (quantity <= 0)
+            {
+                failureMessage = "You need something raw to cook";
+                return false;
+            }
+
             if (skills != null && skills.GetLevel(SkillType.Cooking) < recipe.requiredLevel)
-                return;
+            {
+                failureMessage = $"You need Cooking level {recipe.requiredLevel}";
+                return false;
+            }
+
+            if (inventory == null)
+            {
+                failureMessage = "You can't cook here";
+                return false;
+            }
+
+            var rawItem = ItemDatabase.GetItem(recipe.rawItemId);
+            if (rawItem == null)
+            {
+                failureMessage = "You can't cook that";
+                return false;
+            }
+
+            int available = inventory.GetItemCount(rawItem);
+            if (available <= 0)
+            {
+                failureMessage = "You need something raw to cook";
+                return false;
+            }
+
+            if (quantity > available)
+                quantity = available;
+
+            if (IsCooking)
+                StopCooking();
+
+            ActiveCookingObject = station;
             currentRecipe = recipe;
             itemsRemaining = quantity;
             cookProgress = 0;
             LogDebug($"Started cooking {recipe.cookedItemId} x{quantity}");
             OnStartCooking?.Invoke(recipe);
+            return true;
         }
 
+        /// <summary>
+        ///     Stops the current cooking session, clearing the active station and notifying listeners.
+        /// </summary>
         public void StopCooking()
         {
-            if (!IsCooking)
-                return;
+            bool hadActiveSession = IsCooking || ActiveCookingObject != null;
+
             currentRecipe = null;
             itemsRemaining = 0;
             cookProgress = 0;
+            ActiveCookingObject = null;
+
+            if (!hadActiveSession)
+                return;
+
             LogDebug("Stopped cooking");
             OnStopCooking?.Invoke();
         }
