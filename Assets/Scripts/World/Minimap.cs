@@ -434,6 +434,8 @@ namespace World
                 {
                     dragOffset = Vector3.zero;
                 }
+
+                HandleExpandedScrollZoom();
             }
 
             if (target != null && mapCamera != null)
@@ -459,6 +461,30 @@ namespace World
                     UpdateIconPosition(marker.bigIcon, marker.transform.position, expandedMapRect);
                 }
             }
+        }
+
+        /// <summary>
+        ///     Handles scroll-wheel zooming while the expanded minimap is visible and the pointer is over the map.
+        /// </summary>
+        private void HandleExpandedScrollZoom()
+        {
+            if (mapCamera == null || expandedMapRect == null || !IsExpanded)
+                return;
+
+            float scroll = Input.mouseScrollDelta.y;
+            if (Mathf.Approximately(scroll, 0f))
+                return;
+
+            Vector3 screenPosition = Input.mousePosition;
+            var referenceCamera = minimapCanvas != null ? minimapCanvas.worldCamera : null;
+            if (!RectTransformUtility.RectangleContainsScreenPoint(expandedMapRect, screenPosition, referenceCamera))
+                return;
+
+            if (PointerHitsBlockingControl(screenPosition))
+                return;
+
+            float newSize = Mathf.Clamp(mapCamera.orthographicSize - scroll * ZoomStep, MinZoom, MaxZoom);
+            mapCamera.orthographicSize = newSize;
         }
 
         /// <summary>
