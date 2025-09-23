@@ -34,8 +34,8 @@ MonoBehaviour:
     requiredBeastmasterLevel: 65
     bonusDropMultiplier: 0
   - pet: {fileID: 11400000, guid: 337daaf9600acf849833e3ee086cf362, type: 2}
-    oneInN: 0
-    sourceId: combat
+    oneInN: 5500
+    sourceId: firemaking
     requiredBeastmasterLevel: 0
     bonusDropMultiplier: 0
   - pet: {fileID: 11400000, guid: 57508ee9df2aabd4587b0b828e9329e2, type: 2}
@@ -57,11 +57,6 @@ MonoBehaviour:
     oneInN: 1000
     sourceId: combat
     requiredBeastmasterLevel: 65
-    bonusDropMultiplier: 0
-  - pet: {fileID: 11400000, guid: bdc70ad631a74c74e9151913132a4c18, type: 2}
-    oneInN: 0
-    sourceId: fishing
-    requiredBeastmasterLevel: 0
     bonusDropMultiplier: 0
   - pet: {fileID: 11400000, guid: bdc70ad631a74c74e9151913132a4c18, type: 2}
     oneInN: 0

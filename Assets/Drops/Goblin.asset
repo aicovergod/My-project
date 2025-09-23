@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 854d2f7ca78a79e4e8627c2179aae186, type: 3}
   m_Name: Goblin
   m_EditorClassIdentifier: 
-  tableName: 
+  tableName: Goblin
   stopOnUnique: 0
   rollsPerKill: 1
   uniques: []

@@ -15,35 +15,16 @@ MonoBehaviour:
   id: Phoenix
   displayName: Phoenix
   pickupItem: {fileID: 11400000, guid: c8471baa8fae5f24a9ea8e3ffe136eaa, type: 2}
-  hasInventory: 1
+  hasInventory: 0
   sprite: {fileID: 0}
-  pixelsPerUnit: 128
-  evolutionTiers:
-  - level: 0
-    pixelsPerUnit: 128
-    tierName: Baby
-  - level: 25
-    pixelsPerUnit: 96
-    tierName: Juvenile
-  - level: 50
-    pixelsPerUnit: 64
-    tierName: Adult
-  - level: 75
-    pixelsPerUnit: 48
-    tierName: Elder
-  - level: 99
-    pixelsPerUnit: 32
-    tierName: Ancient
+  pixelsPerUnit: 64
+  evolutionTiers: []
   animationClips: []
   attackSprite: {fileID: 6666414941200281703, guid: 22d9a71bef5d9ec4283f7ca895561c02, type: 3}
-  hitUp:
-  - {fileID: 21300000, guid: c6d85a396d438034cb27e906ab88f84b, type: 3}
-  hitDown:
-  - {fileID: 21300000, guid: 6e5a6be6763a8644fa0efedb82a4cbe3, type: 3}
-  hitLeft:
-  - {fileID: 21300000, guid: 210f266a054e66549b13089c3cee62a8, type: 3}
-  hitRight:
-  - {fileID: 21300000, guid: 79fa7e91b7fb33a4a955d391410b67d0, type: 3}
+  hitUp: []
+  hitDown: []
+  hitLeft: []
+  hitRight: []
   idleUp:
   - {fileID: 21300000, guid: c6d85a396d438034cb27e906ab88f84b, type: 3}
   walkUp:
@@ -61,13 +42,13 @@ MonoBehaviour:
   useRightSpritesForLeft: 1
   useLeftSpritesForRight: 0
   canFight: 1
-  petAttackLevel: 80
-  petStrengthLevel: 80
+  petAttackLevel: 0
+  petStrengthLevel: 0
   attackSpeedTicks: 3
-  accuracyBonus: 40
-  damageBonus: 40
-  attackLevelPerBeastmasterLevel: 0.01
-  strengthLevelPerBeastmasterLevel: 0.01
-  maxHitPerBeastmasterLevel: 0.015
+  accuracyBonus: 0
+  damageBonus: 0
+  attackLevelPerBeastmasterLevel: 0
+  strengthLevelPerBeastmasterLevel: 0
+  maxHitPerBeastmasterLevel: 0
   messageColor: {r: 1, g: 1, b: 1, a: 1}
   debugBeastmasterLevel: 80

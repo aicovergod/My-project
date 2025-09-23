@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1001}
   - component: {fileID: 1002}
+  - component: {fileID: 1003}
   m_Layer: 5
   m_Name: LoginCanvas
   m_TagString: Untagged
@@ -179,7 +180,22 @@ MonoBehaviour:
   successColour: {r: 0.77254903, g: 0.7176471, b: 0.43137255, a: 1}
   errorColour: {r: 0.7764706, g: 0.23529412, b: 0.19215687, a: 1}
   infoColour: {r: 0.83137256, g: 0.83137256, b: 0.83137256, a: 1}
-  gameplaySceneName: OverWorld
+  loginFlowController: {fileID: 0}
+--- !u!114 &1003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 169cd6aa6a329214bad64024f635c247, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.Login.LoginFlowController
+  fallbackSceneName: OverWorld
+  fallbackSpawnPosition: {x: 0, y: 0}
+  playerSearchTimeout: 5
 --- !u!1001 &73266654
 PrefabInstance:
   m_ObjectHideFlags: 0
