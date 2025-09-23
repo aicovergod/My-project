@@ -6,6 +6,8 @@ using Skills;
 using BankSystem;
 using ShopSystem;
 using Player;
+using UnityEngine.EventSystems;
+using Pets;
 
 namespace World
 {
@@ -18,6 +20,7 @@ namespace World
         private Camera mapCamera;
         private RenderTexture mapTexture;
         private Transform target;
+        private PlayerMover cachedPlayerMover;
         private GameObject expandedRoot;
         private GameObject smallRoot;
         private RectTransform smallMapRect;
@@ -35,12 +38,27 @@ namespace World
 
         private static bool waitingForAllowedScene;
         private static bool applicationIsQuitting;
+        private static bool debugTeleportOnClickEnabled;
+
+        /// <summary>
+        ///     Reused buffer for UI raycasts when diagnosing debug teleports so we avoid per-click allocations.
+        /// </summary>
+        private static readonly List<RaycastResult> teleportRaycastBuffer = new List<RaycastResult>();
 
         private bool sceneGateSubscribed;
 
         public RectTransform BorderRect => borderRect;
         public RectTransform SmallRootRect => smallRootRect;
         public Canvas MinimapCanvas => minimapCanvas;
+
+        /// <summary>
+        ///     Enables debug-only teleportation whenever the minimap is clicked. When false, the minimap behaves normally.
+        /// </summary>
+        public static bool DebugTeleportOnClickEnabled
+        {
+            get => debugTeleportOnClickEnabled;
+            set => debugTeleportOnClickEnabled = value;
+        }
 
         private const float ZoomStep = 5f;
         private const float MinZoom = 5f;
@@ -395,7 +413,14 @@ namespace World
             {
                 var player = GameObject.FindGameObjectWithTag("Player");
                 if (player != null)
+                {
                     target = player.transform;
+                    cachedPlayerMover = player.GetComponent<PlayerMover>();
+                }
+            }
+            else if (cachedPlayerMover == null)
+            {
+                cachedPlayerMover = target.GetComponent<PlayerMover>();
             }
 
             if (mapCamera != null)
@@ -422,6 +447,9 @@ namespace World
                 ToggleExpanded();
             }
 
+            if (DebugTeleportOnClickEnabled)
+                HandleDebugTeleportClick();
+
             if (mapCamera != null)
             {
                 foreach (var marker in markers)
@@ -431,6 +459,157 @@ namespace World
                     UpdateIconPosition(marker.bigIcon, marker.transform.position, expandedMapRect);
                 }
             }
+        }
+
+        /// <summary>
+        ///     Processes left-clicks on the minimap while the debug toggle is enabled and teleports the player when appropriate.
+        /// </summary>
+        private void HandleDebugTeleportClick()
+        {
+            if (mapCamera == null)
+                return;
+
+            if (!Input.GetMouseButtonDown(0))
+                return;
+
+            Vector3 screenPosition = Input.mousePosition;
+            // Operate entirely in screen space so UI checks and rect conversions agree on coordinates.
+
+            if (PointerHitsBlockingControl(screenPosition))
+                return;
+
+            // Resolve the minimap click into world space. Bail if the pointer is outside the active rect.
+            if (!TryGetTeleportWorldPosition(screenPosition, out Vector3 worldPosition))
+                return;
+
+            TeleportPlayerTo(worldPosition);
+        }
+
+        /// <summary>
+        ///     Checks if the pointer is currently over a UI control (such as zoom or expand buttons) that should block teleporting.
+        /// </summary>
+        private bool PointerHitsBlockingControl(Vector3 screenPosition)
+        {
+            var eventSystem = EventSystem.current;
+            if (eventSystem == null)
+                return false;
+
+            var pointerData = new PointerEventData(eventSystem)
+            {
+                position = screenPosition
+            };
+
+            // Reuse the cached buffer to avoid allocations every time QA clicks the minimap while testing.
+            teleportRaycastBuffer.Clear();
+            eventSystem.RaycastAll(pointerData, teleportRaycastBuffer);
+
+            for (int i = 0; i < teleportRaycastBuffer.Count; i++)
+            {
+                var result = teleportRaycastBuffer[i];
+                // Skip teleportation when the click hits interactive buttons like zoom or expand controls.
+                if (result.gameObject != null && result.gameObject.TryGetComponent<Button>(out _))
+                {
+                    teleportRaycastBuffer.Clear();
+                    return true;
+                }
+            }
+
+            teleportRaycastBuffer.Clear();
+            return false;
+        }
+
+        /// <summary>
+        ///     Converts a minimap click into a world position so the player can be warped to the target tile.
+        /// </summary>
+        private bool TryGetTeleportWorldPosition(Vector3 screenPosition, out Vector3 worldPosition)
+        {
+            worldPosition = Vector3.zero;
+
+            if (mapCamera == null)
+                return false;
+
+            RectTransform activeRect = null;
+            Camera eventCamera = minimapCanvas != null ? minimapCanvas.worldCamera : null;
+
+            if (expandedRoot != null && expandedRoot.activeSelf && expandedMapRect != null &&
+                RectTransformUtility.RectangleContainsScreenPoint(expandedMapRect, screenPosition, eventCamera))
+            {
+                // Prioritize the expanded rect whenever it is visible.
+                activeRect = expandedMapRect;
+            }
+            else if (smallRoot != null && smallRoot.activeSelf && smallMapRect != null &&
+                     RectTransformUtility.RectangleContainsScreenPoint(smallMapRect, screenPosition, eventCamera))
+            {
+                activeRect = smallMapRect;
+            }
+
+            if (activeRect == null)
+                return false;
+
+            // Convert the pointer into local minimap coordinates (centered around zero).
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(activeRect, screenPosition, eventCamera, out Vector2 localPoint))
+                return false;
+
+            Rect rect = activeRect.rect;
+            if (rect.height <= 0f)
+                return false;
+
+            // Translate the local offset into world units, respecting the current zoom/orthographic size.
+            float worldUnitsPerPixel = (mapCamera.orthographicSize * 2f) / rect.height;
+            Vector3 cameraCenter = mapCamera.transform.position;
+            Vector3 offset = new Vector3(localPoint.x * worldUnitsPerPixel, localPoint.y * worldUnitsPerPixel, 0f);
+            worldPosition = new Vector3(cameraCenter.x + offset.x, cameraCenter.y + offset.y, 0f);
+            return true;
+        }
+
+        /// <summary>
+        ///     Moves the player and their active pet to the requested minimap location, ensuring saves remain accurate.
+        /// </summary>
+        private void TeleportPlayerTo(Vector3 worldPosition)
+        {
+            var mover = cachedPlayerMover;
+            if (mover == null)
+            {
+                GameObject playerObj = target != null ? target.gameObject : GameObject.FindGameObjectWithTag("Player");
+                if (playerObj != null)
+                {
+                    // Cache the mover so future teleports do not have to repeat the lookup.
+                    mover = playerObj.GetComponent<PlayerMover>();
+                    target = playerObj.transform;
+                    cachedPlayerMover = mover;
+                }
+            }
+
+            if (mover == null)
+            {
+                Debug.LogWarning("Minimap debug teleport requested but no PlayerMover could be found.");
+                return;
+            }
+
+            // Halt any ongoing locomotion so we do not carry momentum into the new position.
+            mover.StopMovement();
+
+            Transform playerTransform = mover.transform;
+            Vector3 currentPosition = playerTransform.position;
+            // Preserve the existing Z value so sprite sorting layers remain correct.
+            Vector3 newPosition = new Vector3(worldPosition.x, worldPosition.y, currentPosition.z);
+            playerTransform.position = newPosition;
+
+            GameObject pet = PetDropSystem.ActivePetObject;
+            if (pet != null)
+            {
+                // Drop the pet alongside the player so it resumes following without a sudden snap.
+                Vector3 petPosition = newPosition + Vector3.right * 0.5f;
+                petPosition.z = pet.transform.position.z;
+                pet.transform.position = petPosition;
+
+                var follower = pet.GetComponent<PetFollower>();
+                if (follower != null)
+                    follower.SetPlayer(playerTransform);
+            }
+
+            // Persist the new location to keep autosaves and relogging in sync with the teleport.
+            mover.SavePosition();
         }
 
         private void ZoomIn()

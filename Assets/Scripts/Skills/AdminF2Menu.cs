@@ -367,6 +367,14 @@ namespace Skills
                 () => firemakingSkillBehaviour.EnableDebugLogging,
                 value => firemakingSkillBehaviour.EnableDebugLogging = value);
 
+            bool teleportToggle = World.Minimap.DebugTeleportOnClickEnabled;
+            bool requestedTeleportToggle = GUILayout.Toggle(teleportToggle, "Minimap Teleport On Click");
+            if (requestedTeleportToggle != teleportToggle)
+            {
+                // Wire the Admin menu toggle directly into the minimap so QA can click-to-teleport while debugging.
+                World.Minimap.DebugTeleportOnClickEnabled = requestedTeleportToggle;
+            }
+
             if (GUILayout.Button("Apply"))
             {
                 if (skillManager != null && int.TryParse(hpLevel, out var hp))
