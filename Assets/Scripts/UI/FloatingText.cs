@@ -18,6 +18,20 @@ namespace UI
         private Camera mainCamera;
         private float remainingLifetime;
 
+        /// <summary>
+        ///     Backing field for <see cref="DebugLogMessages"/> so the toggle persists between spawn calls.
+        /// </summary>
+        private static bool debugLogMessages;
+
+        /// <summary>
+        ///     When enabled via the admin debug menu, every floating text message is echoed to the console.
+        /// </summary>
+        public static bool DebugLogMessages
+        {
+            get => debugLogMessages;
+            set => debugLogMessages = value;
+        }
+
         public static void Show(string message, Vector3 position, Color? color = null, float? size = null, Sprite background = null)
         {
             GameObject go = new GameObject("FloatingText", typeof(Canvas));
@@ -58,6 +72,12 @@ namespace UI
             float finalSize = size ?? instance.textSize;
             instance.uiText.fontSize = Mathf.RoundToInt(64 * finalSize);
             instance.remainingLifetime = instance.lifetime;
+
+            if (debugLogMessages)
+            {
+                // Mirror the popup in the console so QA can diagnose why the message appeared.
+                Debug.Log($"[FloatingText] {message}");
+            }
         }
 
         private void Awake()

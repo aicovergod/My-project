@@ -16,6 +16,7 @@ using Status.Antifire;
 using Status.Poison;
 using Status.Freeze;
 using World;
+using UI;
 
 namespace Skills
 {
@@ -366,6 +367,12 @@ namespace Skills
                 () => firemakingSkillBehaviour != null,
                 () => firemakingSkillBehaviour.EnableDebugLogging,
                 value => firemakingSkillBehaviour.EnableDebugLogging = value);
+
+            // Allow QA to mirror floating text popups in the console for firemaking/cooking debugging.
+            bool echoFloatingText = FloatingText.DebugLogMessages;
+            bool requestedEchoFloatingText = GUILayout.Toggle(echoFloatingText, "Echo Floating Text to Console");
+            if (requestedEchoFloatingText != echoFloatingText)
+                FloatingText.DebugLogMessages = requestedEchoFloatingText;
 
             bool teleportToggle = World.Minimap.DebugTeleportOnClickEnabled;
             bool requestedTeleportToggle = GUILayout.Toggle(teleportToggle, "Minimap Teleport On Click");
