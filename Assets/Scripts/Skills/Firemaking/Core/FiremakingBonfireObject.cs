@@ -39,10 +39,7 @@ namespace Skills.Firemaking
         private void Awake()
         {
             EnsurePlayerReferences();
-
-            var mainCamera = Camera.main;
-            if (mainCamera != null && mainCamera.GetComponent<Physics2DRaycaster>() == null)
-                mainCamera.gameObject.AddComponent<Physics2DRaycaster>();
+            EnsureCameraRaycaster();
         }
 
         /// <summary>
@@ -53,6 +50,7 @@ namespace Skills.Firemaking
         private void OnEnable()
         {
             EnsurePlayerReferences();
+            EnsureCameraRaycaster();
         }
 
         /// <summary>
@@ -103,6 +101,9 @@ namespace Skills.Firemaking
             if (eventData == null || eventData.button != PointerEventData.InputButton.Left)
                 return;
 
+            if (!EnsureCameraRaycaster())
+                return;
+
             if (!EnsurePlayerReferences(true))
                 return;
 
@@ -137,6 +138,29 @@ namespace Skills.Firemaking
 
             // Clear the inventory highlight so repeated clicks continue to use the same log stack.
             inventory.ClearSelection();
+        }
+
+        /// <summary>
+        ///     Makes sure the active main camera can emit 2D physics raycasts so UI
+        ///     clicks reach the bonfire collider. When a camera is present but already
+        ///     configured with a <see cref="Physics2DRaycaster"/> the helper exits
+        ///     without creating duplicates. Returns false if no main camera is currently
+        ///     available so the caller can retry on future frames.
+        /// </summary>
+        /// <returns>
+        ///     True when a raycaster is guaranteed to exist; otherwise false.
+        /// </returns>
+        private bool EnsureCameraRaycaster()
+        {
+            var mainCamera = Camera.main;
+            if (mainCamera == null)
+                return false;
+
+            if (mainCamera.TryGetComponent<Physics2DRaycaster>(out var existingRaycaster) && existingRaycaster != null)
+                return true;
+
+            mainCamera.gameObject.AddComponent<Physics2DRaycaster>();
+            return true;
         }
 
         /// <summary>
