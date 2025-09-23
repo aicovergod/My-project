@@ -14,7 +14,12 @@ namespace Skills.Cooking
     {
         [SerializeField]
         [Tooltip("Layer mask used when searching for cooking stations.")]
-        private LayerMask cookingStationMask = LayerMask.GetMask("Interactable");
+        private LayerMask cookingStationMask;
+
+        /// <summary>
+        ///     Layer name automatically used when the inspector has not provided a mask override.
+        /// </summary>
+        private const string DefaultCookingLayerName = "Interactable";
 
         private Inventory.Inventory inventory;
         private CookableRecipe cachedRecipe;
@@ -35,8 +40,8 @@ namespace Skills.Cooking
                 inventory = GetComponent<Inventory.Inventory>();
             if (inventory == null && CookingSkill != null)
                 inventory = CookingSkill.GetComponent<Inventory.Inventory>();
-            if (cookingStationMask == 0)
-                cookingStationMask = ~0;
+
+            EnsureCookingStationMaskConfigured();
         }
 
         /// <summary>
@@ -220,6 +225,25 @@ namespace Skills.Cooking
             cachedStation = null;
             cachedQuantity = 0;
             cachedFailureMessage = string.Empty;
+        }
+
+        /// <summary>
+        ///     Ensure a sensible default layer mask is applied when the inspector has not supplied one.
+        ///     Defaults to the "Interactable" layer when available and falls back to every layer otherwise.
+        /// </summary>
+        private void EnsureCookingStationMaskConfigured()
+        {
+            if (cookingStationMask != 0)
+                return;
+
+            int interactableMask = LayerMask.GetMask(DefaultCookingLayerName);
+            if (interactableMask != 0)
+            {
+                cookingStationMask = interactableMask;
+                return;
+            }
+
+            cookingStationMask = ~0;
         }
 
         private void HandleSkillStopped()
