@@ -18,7 +18,7 @@ namespace Skills.Firemaking
         [Header("Bonfire Search")]
         [SerializeField]
         [Tooltip("Physics layers that contain bonfires the player can fuel.")]
-        private LayerMask bonfireMask = LayerMask.GetMask(InteractableLayerName);
+        private LayerMask bonfireMask;
 
         [Header("Inventory")]
         [SerializeField]
@@ -39,6 +39,18 @@ namespace Skills.Firemaking
             if (inventory == null)
                 inventory = GetComponent<Inventory.Inventory>();
         }
+
+#if UNITY_EDITOR
+        /// <summary>
+        ///     Ensure newly added components default to the interactable layer mask while still allowing
+        ///     designers to override the value in the inspector.
+        /// </summary>
+        private void Reset()
+        {
+            if (bonfireMask == 0)
+                bonfireMask = ResolveDefaultMask();
+        }
+#endif
 
         /// <summary>
         ///     Bonfires should continue to accept clicks even if the pointer is hovering UI, matching
