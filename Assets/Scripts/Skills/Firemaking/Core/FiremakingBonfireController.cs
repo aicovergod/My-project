@@ -1,5 +1,7 @@
 using Inventory;
 using Skills.Common;
+using Skills.Cooking;
+using UI;
 using UnityEngine;
 
 namespace Skills.Firemaking
@@ -25,6 +27,14 @@ namespace Skills.Firemaking
         [Tooltip("Inventory providing the highlighted log selection for bonfire fueling.")]
         private Inventory.Inventory inventory;
 
+        [Header("Cooking Integration")]
+        [SerializeField]
+        [Tooltip("Player cooking skill used to coordinate cookable interactions with bonfires.")]
+        private CookingSkill cookingSkill;
+
+        private FiremakingBonfireObject pendingBonfire;
+        private int pendingLogSlot = -1;
+
         /// <summary>
         ///     Cache optional references on Awake while still letting the base controller wire the
         ///     shared gathering dependencies.
@@ -38,6 +48,35 @@ namespace Skills.Firemaking
 
             if (inventory == null)
                 inventory = GetComponent<Inventory.Inventory>();
+
+            if (cookingSkill == null)
+                cookingSkill = GetComponent<CookingSkill>();
+        }
+
+        /// <summary>
+        ///     Subscribe to cooking stop events so queued log fueling can begin immediately after fish finish cooking.
+        /// </summary>
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+
+            if (cookingSkill == null)
+                cookingSkill = GetComponent<CookingSkill>();
+
+            if (cookingSkill != null)
+                cookingSkill.OnStopCooking += HandleCookingStopped;
+        }
+
+        /// <summary>
+        ///     Ensure queued state is cleared and cooking callbacks are released when the controller is disabled.
+        /// </summary>
+        protected override void OnDisable()
+        {
+            if (cookingSkill != null)
+                cookingSkill.OnStopCooking -= HandleCookingStopped;
+
+            ClearPendingBonfire();
+            base.OnDisable();
         }
 
 #if UNITY_EDITOR
@@ -129,6 +168,25 @@ namespace Skills.Firemaking
             }
 
             int selectedIndex = inventory.selectedIndex;
+
+            var cookableResult = CookingInventoryHelper.FindCookableRecipe(inventory, cookingSkill, selectedIndex);
+            bool selectedSlotCookable = cookableResult.HasRecipe && cookableResult.UsesPreferredSlot;
+
+            if (cookableResult.CanCook)
+            {
+                int logSlot = ResolvePendingLogSlot(selectedIndex);
+                QueuePendingBonfire(node, logSlot);
+                return false;
+            }
+
+            if (selectedSlotCookable)
+            {
+                ClearPendingBonfire();
+                return false;
+            }
+
+            ClearPendingBonfire();
+
             if (selectedIndex < 0)
             {
                 failureMessage = "Select a log to feed the bonfire.";
@@ -138,6 +196,7 @@ namespace Skills.Firemaking
             if (!Skill.TryStartBonfireFeeding(node, selectedIndex, out failureMessage))
                 return false;
 
+            ClearPendingBonfire();
             inventory.ClearSelection();
             return true;
         }
@@ -153,6 +212,86 @@ namespace Skills.Firemaking
                 return 1 << interactableLayer;
 
             return Physics2D.AllLayers;
+        }
+
+        /// <summary>
+        ///     Resolves the inventory slot that should be used for bonfire fueling once cooking has completed.
+        /// </summary>
+        private int ResolvePendingLogSlot(int preferredSlot)
+        {
+            if (inventory == null || Skill == null)
+                return -1;
+
+            if (preferredSlot >= 0)
+            {
+                var selectedEntry = inventory.GetSlot(preferredSlot);
+                if (selectedEntry.item != null && Skill.GetDefinitionForItem(selectedEntry.item.id) != null)
+                    return preferredSlot;
+            }
+
+            for (int i = 0; i < inventory.size; i++)
+            {
+                var slot = inventory.GetSlot(i);
+                if (slot.item == null)
+                    continue;
+
+                if (Skill.GetDefinitionForItem(slot.item.id) != null)
+                    return i;
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        ///     Stores the bonfire/log slot pair to process once the cooking controller finishes.
+        /// </summary>
+        private void QueuePendingBonfire(FiremakingBonfireObject bonfire, int logSlot)
+        {
+            if (bonfire == null || logSlot < 0)
+            {
+                ClearPendingBonfire();
+                return;
+            }
+
+            pendingBonfire = bonfire;
+            pendingLogSlot = logSlot;
+        }
+
+        /// <summary>
+        ///     Clears any queued bonfire fueling request.
+        /// </summary>
+        private void ClearPendingBonfire()
+        {
+            pendingBonfire = null;
+            pendingLogSlot = -1;
+        }
+
+        /// <summary>
+        ///     Attempts to fuel the queued bonfire immediately after cooking stops.
+        /// </summary>
+        private void HandleCookingStopped()
+        {
+            if (pendingBonfire == null || pendingLogSlot < 0)
+            {
+                ClearPendingBonfire();
+                return;
+            }
+
+            var bonfire = pendingBonfire;
+            int logSlot = pendingLogSlot;
+            ClearPendingBonfire();
+
+            if (Skill == null)
+                return;
+
+            if (Skill.TryStartBonfireFeeding(bonfire, logSlot, out string failure))
+            {
+                inventory?.ClearSelection();
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(failure))
+                FloatingText.Show(failure, bonfire.transform.position);
         }
     }
 }
