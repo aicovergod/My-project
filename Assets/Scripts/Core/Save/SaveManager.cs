@@ -174,6 +174,45 @@ namespace Core.Save
         }
 
         /// <summary>
+        /// Updates the bound account with the latest scene and position metadata so the login flow
+        /// can restore the player to the correct location on the next session.
+        /// </summary>
+        /// <param name="scene">Scene name that should be persisted for the active account.</param>
+        /// <param name="position">World position that should be recorded.</param>
+        internal static void UpdateLastKnownLocation(string scene, Vector3 position)
+        {
+            if (boundAccount == null)
+                return;
+
+            string resolvedScene = scene ?? string.Empty;
+            bool changed = false;
+
+            if (!string.Equals(boundAccount.savedSceneName, resolvedScene, StringComparison.Ordinal))
+            {
+                boundAccount.savedSceneName = resolvedScene;
+                changed = true;
+            }
+
+            if (!Mathf.Approximately(boundAccount.savedX, position.x))
+            {
+                boundAccount.savedX = position.x;
+                changed = true;
+            }
+
+            if (!Mathf.Approximately(boundAccount.savedY, position.y))
+            {
+                boundAccount.savedY = position.y;
+                changed = true;
+            }
+
+            if (!changed)
+                return;
+
+            cacheDirty = true;
+            FlushActiveAccount();
+        }
+
+        /// <summary>
         /// Normalises and activates a profile for subsequent save and load operations. Provided for
         /// backwards compatibility; prefer <see cref="BindAccount"/> when authenticating users.
         /// </summary>

@@ -523,6 +523,7 @@ namespace Player
                 scene = SceneManager.GetActiveScene().name
             };
             SaveManager.Save(PositionKey, data);
+            SaveManager.UpdateLastKnownLocation(data.scene, pos);
         }
 
         /// <summary>
