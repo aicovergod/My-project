@@ -36,10 +36,14 @@ namespace Skills.Firemaking
         [SerializeField] private bool allowTileSnapping = true;
         [SerializeField] private Vector2 tileSnapSize = Vector2.one;
 
+        private const int BonfireTicksPerLog = 4;
+        private const float BonfireXpMultiplier = 0.8f;
+
         private SkillManager skills;
         private Dictionary<string, FiremakingLogDefinition> logLookup;
         private Dictionary<string, ItemData> itemCache;
         private FiremakingAttempt currentAttempt;
+        private BonfireSession bonfireSession;
         private readonly List<FiremakingFire> activeFires = new();
         private SkillingOutfitProgress firemakingOutfit;
         private int attemptTicksElapsed;
@@ -54,10 +58,29 @@ namespace Skills.Firemaking
             public bool feedingExistingFire;
         }
 
+        private struct BonfireSession
+        {
+            public FiremakingBonfireObject bonfire;
+            public FiremakingLogDefinition definition;
+            public int ticksRequired;
+            public int ticksElapsed;
+            public float cancelDistance;
+        }
+
         /// <summary>
         ///     True whenever the player is mid-ignition attempt.
         /// </summary>
         public bool IsLighting => currentAttempt.definition != null;
+
+        /// <summary>
+        ///     True when the player is currently feeding logs into a permanent bonfire.
+        /// </summary>
+        public bool IsFeedingBonfire => bonfireSession.definition != null;
+
+        /// <summary>
+        ///     Bonfire that is currently receiving logs from the fueling workflow.
+        /// </summary>
+        public FiremakingBonfireObject ActiveBonfire => bonfireSession.bonfire;
 
         /// <summary>
         ///     Normalised 0..1 representation of the current ignition progress.
@@ -188,6 +211,7 @@ namespace Skills.Firemaking
         protected override void OnDisable()
         {
             base.OnDisable();
+            StopBonfireFeeding(false, null);
             CancelAttempt(true);
             ClearActiveFires();
         }
@@ -216,6 +240,12 @@ namespace Skills.Firemaking
         public bool TryBeginLighting(int inventorySlot, Vector3 worldPosition, FiremakingFire existingFire, out string failureReason)
         {
             failureReason = string.Empty;
+
+            if (IsFeedingBonfire)
+            {
+                failureReason = "You are already tending a bonfire.";
+                return false;
+            }
 
             if (IsLighting)
             {
@@ -348,6 +378,111 @@ namespace Skills.Firemaking
         }
 
         /// <summary>
+        ///     Attempts to begin a bonfire fueling session using the selected logs.
+        /// </summary>
+        /// <param name="bonfire">Bonfire object receiving the fuel.</param>
+        /// <param name="inventorySlot">Inventory slot containing the selected logs.</param>
+        /// <param name="failureReason">Populated when the fueling session cannot start.</param>
+        /// <returns><c>true</c> when fueling begins successfully.</returns>
+        public bool TryStartBonfireFeeding(FiremakingBonfireObject bonfire, int inventorySlot, out string failureReason)
+        {
+            failureReason = string.Empty;
+
+            if (bonfire == null)
+            {
+                failureReason = "That bonfire is no longer available.";
+                return false;
+            }
+
+            if (!bonfire.isActiveAndEnabled)
+            {
+                failureReason = "That bonfire is no longer available.";
+                return false;
+            }
+
+            if (IsLighting)
+            {
+                failureReason = "You are already trying to light a fire.";
+                return false;
+            }
+
+            if (IsFeedingBonfire)
+            {
+                failureReason = bonfireSession.bonfire == bonfire
+                    ? "You are already feeding this bonfire."
+                    : "You are already tending a bonfire.";
+                return false;
+            }
+
+            if (inventory == null)
+            {
+                failureReason = "You need an inventory to add logs.";
+                return false;
+            }
+
+            if (inventorySlot < 0)
+            {
+                failureReason = "Select a log to feed the bonfire.";
+                return false;
+            }
+
+            var entry = inventory.GetSlot(inventorySlot);
+            if (entry.item == null)
+            {
+                failureReason = "You need logs to add to the bonfire.";
+                return false;
+            }
+
+            var definition = GetDefinitionForItem(entry.item.id);
+            if (definition == null)
+            {
+                failureReason = "That isn't a firemaking log.";
+                return false;
+            }
+
+            if (!string.Equals(entry.item.id, definition.logItemId, StringComparison.Ordinal))
+            {
+                failureReason = "You need to select the correct logs.";
+                return false;
+            }
+
+            int level = skills != null ? skills.GetLevel(SkillType.Firemaking) : 1;
+            if (level < definition.requiredLevel)
+            {
+                failureReason = $"You need Firemaking level {definition.requiredLevel}.";
+                return false;
+            }
+
+            if (!inventory.HasItem(definition.logItemId))
+            {
+                failureReason = "You have no logs to add.";
+                return false;
+            }
+
+            Vector3 bonfirePosition = bonfire.transform != null ? bonfire.transform.position : transform.position;
+            bonfirePosition.z = 0f;
+            float cancelDistance = Mathf.Max(0f, bonfire.CancelDistance);
+            if (cancelDistance > 0f && transform != null &&
+                Vector3.Distance(transform.position, bonfirePosition) > cancelDistance)
+            {
+                failureReason = "You are too far away from the bonfire.";
+                return false;
+            }
+
+            bonfireSession = new BonfireSession
+            {
+                bonfire = bonfire,
+                definition = definition,
+                ticksRequired = Mathf.Max(1, BonfireTicksPerLog),
+                ticksElapsed = 0,
+                cancelDistance = cancelDistance
+            };
+
+            LogDebug($"Started feeding {definition.displayName} into bonfire '{bonfire.name}'.");
+            return true;
+        }
+
+        /// <summary>
         ///     Cancels the active attempt, optionally informing the player via floating text.
         /// </summary>
         /// <param name="showMessage">True to display the default cancellation feedback message.</param>
@@ -361,6 +496,13 @@ namespace Skills.Firemaking
         /// </summary>
         protected override void HandleTick()
         {
+            if (IsFeedingBonfire)
+            {
+                HandleBonfireFeedingTick();
+                if (IsFeedingBonfire)
+                    return;
+            }
+
             if (!IsLighting)
                 return;
 
@@ -534,6 +676,155 @@ namespace Skills.Firemaking
 
             LogDebug($"Successfully lit {definition.displayName} at {currentAttempt.worldPosition}.");
             FinishAttempt();
+        }
+
+        /// <summary>
+        ///     Processes the active bonfire fueling session, consuming logs every four ticks and
+        ///     cancelling when movement or distance requirements are violated.
+        /// </summary>
+        private void HandleBonfireFeedingTick()
+        {
+            var session = bonfireSession;
+            if (session.definition == null)
+            {
+                StopBonfireFeeding(false, null);
+                return;
+            }
+
+            var bonfire = session.bonfire;
+            if (bonfire == null || !bonfire.isActiveAndEnabled)
+            {
+                StopBonfireFeeding(true, "The bonfire is no longer available.");
+                return;
+            }
+
+            if (inventory == null)
+            {
+                StopBonfireFeeding(false, null);
+                return;
+            }
+
+            if (!inventory.HasItem(session.definition.logItemId))
+            {
+                StopBonfireFeeding(true, "You have no logs to add.");
+                return;
+            }
+
+            if (playerMover != null && playerMover.IsMoving)
+            {
+                StopBonfireFeeding(true, "You stop tending the bonfire.");
+                return;
+            }
+
+            Transform bonfireTransform = bonfire.transform;
+            Vector3 anchorPosition = bonfireTransform != null ? bonfireTransform.position : transform.position;
+
+            if (session.cancelDistance > 0f && transform != null &&
+                Vector3.Distance(transform.position, anchorPosition) > session.cancelDistance)
+            {
+                StopBonfireFeeding(true, "You move too far away from the bonfire.");
+                return;
+            }
+
+            if (session.ticksRequired <= 0)
+                session.ticksRequired = Mathf.Max(1, BonfireTicksPerLog);
+
+            session.ticksElapsed++;
+            LogDebug($"Bonfire tick {session.ticksElapsed}/{session.ticksRequired} for {session.definition.displayName}.");
+
+            if (session.ticksElapsed < session.ticksRequired)
+            {
+                bonfireSession = session;
+                return;
+            }
+
+            session.ticksElapsed = 0;
+            bonfireSession = session;
+
+            if (!inventory.RemoveItem(session.definition.logItemId))
+            {
+                StopBonfireFeeding(true, "You have no logs to add.");
+                return;
+            }
+
+            ApplyBonfireRewards(session.definition, bonfire);
+
+            if (!inventory.HasItem(session.definition.logItemId))
+                StopBonfireFeeding(true, "You have no logs to add.");
+        }
+
+        /// <summary>
+        ///     Applies XP, outfit rolls, and pet checks after a log successfully feeds the bonfire.
+        /// </summary>
+        /// <param name="definition">Definition describing the log that was consumed.</param>
+        /// <param name="bonfire">Bonfire object being fueled.</param>
+        private void ApplyBonfireRewards(FiremakingLogDefinition definition, FiremakingBonfireObject bonfire)
+        {
+            if (definition == null)
+                return;
+
+            Transform bonfireTransform = bonfire != null ? bonfire.transform : null;
+            Transform anchor = bonfireTransform != null
+                ? bonfireTransform
+                : (floatingTextAnchor != null ? floatingTextAnchor : transform);
+            Vector3 anchorPosition = anchor != null ? anchor.position : transform.position;
+
+            ShowFeedback("You add a log to the bonfire.", anchorPosition);
+
+            var context = GatheringRewardContextBuilder.BuildContext(new GatheringRewardContextBuilder.ContextArgs
+            {
+                Runner = this,
+                Skills = skills,
+                SkillType = SkillType.Firemaking,
+                Inventory = inventory,
+                Item = null,
+                RewardDisplayName = definition.displayName,
+                Quantity = 1,
+                XpPerItem = definition.xp * BonfireXpMultiplier,
+                PetAssistExtraQuantity = 0,
+                FloatingTextAnchor = anchor,
+                FallbackAnchor = transform,
+                Equipment = equipment,
+                EquipmentXpBonusEvaluator = data => data != null ? data.firemakingXpBonusMultiplier : 0f,
+                CustomAddItemHandler = _ => true,
+                ShowItemFloatingText = false,
+                OnSuccess = _ =>
+                {
+                    if (definition.phoenixPetRoll > 0)
+                        SkillingPetRewarder.TryRollPet("firemaking", skills, bonfireTransform, definition.phoenixPetRoll, transform);
+                    TryAwardFiremakingOutfitPiece();
+                },
+                LevelUpFloatingTextFormatter = result => $"Firemaking level {result.NewLevel}",
+                OnLevelUp = level => OnLevelUp?.Invoke(level)
+            });
+
+            GatheringRewardProcessor.Process(context);
+
+            LogDebug($"Fed {definition.displayName} into bonfire '{(bonfire != null ? bonfire.name : "Unknown")}'.");
+        }
+
+        /// <summary>
+        ///     Stops the bonfire fueling workflow and optionally shows player feedback.
+        /// </summary>
+        /// <param name="showMessage">True to display the supplied message.</param>
+        /// <param name="message">Reason shown to the player when the workflow ends.</param>
+        public void StopBonfireFeeding(bool showMessage, string message)
+        {
+            if (!IsFeedingBonfire)
+                return;
+
+            Vector3 anchorPosition = transform != null ? transform.position : Vector3.zero;
+            if (bonfireSession.bonfire != null && bonfireSession.bonfire.transform != null)
+                anchorPosition = bonfireSession.bonfire.transform.position;
+
+            bonfireSession = default;
+
+            if (showMessage && !string.IsNullOrEmpty(message))
+                ShowFeedback(message, anchorPosition);
+
+            LogDebug(!string.IsNullOrEmpty(message)
+                ? $"Stopped bonfire fueling: {message}"
+                : "Stopped bonfire fueling.");
         }
 
         /// <summary>
