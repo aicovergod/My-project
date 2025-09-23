@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7680200274280740377}
   - component: {fileID: 2365698409868650532}
   - component: {fileID: 3735100137238362388}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cooking Range
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -56,6 +56,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -77,8 +79,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: -160616933
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 199325c26618bbd42a8895f5251aa3c6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

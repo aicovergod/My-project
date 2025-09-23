@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5170575729460666961}
   - component: {fileID: 7894283540505189486}
   - component: {fileID: 2852276777876745431}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Yew Tree
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -56,6 +56,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -77,8 +79,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: -160616933
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 97ee3f31fc25cce40b14ed2a11d4d744, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -104,6 +107,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   offset: -1
+  directionOffset: 0
 --- !u!50 &5170575729460666961
 Rigidbody2D:
   serializedVersion: 5

@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 1812166576515017962}
   - component: {fileID: 5270648237372662350}
   - component: {fileID: 4427638869284253039}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: NPC_ElderRowan
-  m_TagString: Untagged
+  m_TagString: NPC
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -55,6 +55,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -76,8 +78,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: -160616933
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -177,4 +180,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shop: {fileID: 0}
   menuPrefab: {fileID: 0}
+  playerInput: {fileID: 0}
+  openMenuActionReference: {fileID: 0}
   dialogueData: {fileID: 11400000, guid: 6881d7fe4e1fd2449bdb4d43eeb18898, type: 2}

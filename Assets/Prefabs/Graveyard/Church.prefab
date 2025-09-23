@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3971055925278027058}
   - component: {fileID: 6187867358093497375}
   - component: {fileID: 260221822078665378}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Church
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -56,6 +56,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -77,8 +79,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: -160616933
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: fdc92f9e0372db04d9f863a20676ed5b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -104,6 +107,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   offset: -1
+  directionOffset: 0
 --- !u!50 &6187867358093497375
 Rigidbody2D:
   serializedVersion: 5
@@ -188,7 +192,7 @@ GameObject:
   - component: {fileID: 7048104609888007045}
   - component: {fileID: 5819704994951227730}
   - component: {fileID: 5178319541102474122}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Respawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -230,6 +234,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -251,6 +257,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -277,3 +284,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e1334c6ac8a446cbcdae3bfbac57bc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  linkedSpawnPoint: {fileID: 0}

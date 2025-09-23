@@ -79,9 +79,8 @@ GameObject:
   - component: {fileID: -8837884572014598511}
   - component: {fileID: -2219103460593389809}
   - component: {fileID: 4293722103470127009}
-  - component: {fileID: 1218445456886628537}
   m_Layer: 8
-  m_Name: Player
+  m_Name: Player 1
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -147,8 +146,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: -160616933
-  m_SortingLayer: 4
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -1447395906653738743, guid: 0f388a5ca87873947b65aa4e52c82acf, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -950,32 +949,3 @@ MonoBehaviour:
   enableDebugLogging: 0
   allowTileSnapping: 1
   tileSnapSize: {x: 1, y: 1}
---- !u!114 &1218445456886628537
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4297641342699346684}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 716da45a93c34af5b5b06ff231a5d6fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  defaultInteractRange: 1.5
-  defaultCancelDistance: 3
-  interactionCooldownSeconds: 0.2
-  prospectCooldownSeconds: 3
-  autoMoveIntoRange: 1
-  autoMoveStopBuffer: 0.1
-  playerInput: {fileID: 7000745351061079601}
-  interactActionReference: {fileID: 0}
-  prospectActionReference: {fileID: 0}
-  cancelActionReference: {fileID: 0}
-  skill: {fileID: 4293722103470127009}
-  playerMover: {fileID: 5825080390935697164}
-  worldCamera: {fileID: 0}
-  bonfireMask:
-    serializedVersion: 2
-    m_Bits: 128
-  inventory: {fileID: 491447706204386932}

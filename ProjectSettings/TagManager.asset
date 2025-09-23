@@ -16,7 +16,8 @@ TagManager:
   - Interactable
   - Player
   - Pets
-  -
+  - 
+  - 
   - 
   - 
   - 
@@ -38,29 +39,20 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Background
-    uniqueID: 1024167745
-    locked: 0
-  - name: Ground
-    uniqueID: 150374869
-    locked: 0
-  - name: Props
-    uniqueID: 826101265
-    locked: 0
-  - name: Interactable
-    uniqueID: 2185824803
-    locked: 0
-  - name: Characters
-    uniqueID: 2202900243
-    locked: 0
-  - name: VFX
-    uniqueID: 177133877
-    locked: 0
-  - name: UI
-    uniqueID: 520199689
-    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Ground
+    uniqueID: 2379111673
+    locked: 0
+  - name: Ground Decoration
+    uniqueID: 3269955463
+    locked: 0
+  - name: Obstacles
+    uniqueID: 2729231093
+    locked: 0
+  - name: Physical Objects
+    uniqueID: 4134350363
     locked: 0
   m_RenderingLayers:
   - Default
