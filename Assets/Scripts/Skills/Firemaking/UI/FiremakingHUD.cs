@@ -226,8 +226,7 @@ namespace Skills.Firemaking
             currentFill = 0f;
             nextFill = progressStep;
             tickTimer = 0f;
-            if (progressFill != null)
-                progressFill.fillAmount = 0f;
+            SetProgressFill(0f);
             if (progressRoot != null)
             {
                 progressRoot.SetActive(true);
@@ -255,8 +254,7 @@ namespace Skills.Firemaking
             currentFill = 0f;
             nextFill = progressStep;
             tickTimer = 0f;
-            if (progressFill != null)
-                progressFill.fillAmount = 0f;
+            SetProgressFill(0f);
             if (progressRoot != null)
             {
                 progressRoot.SetActive(true);
@@ -324,12 +322,12 @@ namespace Skills.Firemaking
             tickTimer += Time.deltaTime;
             if (segmentDuration <= 0f)
             {
-                progressFill.fillAmount = nextFill;
+                SetProgressFill(nextFill);
                 return;
             }
 
             float t = Mathf.Clamp01(tickTimer / segmentDuration);
-            progressFill.fillAmount = Mathf.Lerp(currentFill, nextFill, t);
+            SetProgressFill(Mathf.Lerp(currentFill, nextFill, t));
         }
 
         public void OnTick()
@@ -400,12 +398,11 @@ namespace Skills.Firemaking
             var fill = new GameObject("Fill");
             fill.transform.SetParent(bg.transform, false);
             progressFill = fill.AddComponent<Image>();
-            progressFill.color = Color.green;
             progressFill.sprite = bgSprite;
             progressFill.type = Image.Type.Filled;
             progressFill.fillMethod = Image.FillMethod.Horizontal;
             progressFill.fillOrigin = (int)Image.OriginHorizontal.Left;
-            progressFill.fillAmount = 0f;
+            SetProgressFill(0f);
             var fillRect = progressFill.rectTransform;
             fillRect.anchorMin = Vector2.zero;
             fillRect.anchorMax = Vector2.one;
@@ -436,6 +433,20 @@ namespace Skills.Firemaking
 
             PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
             sceneGateSubscribed = true;
+        }
+
+        /// <summary>
+        /// Applies the requested fill amount and synchronises the rainbow gradient with the current progress.
+        /// </summary>
+        /// <param name="normalizedValue">Progress value between 0 and 1.</param>
+        private void SetProgressFill(float normalizedValue)
+        {
+            if (progressFill == null)
+                return;
+
+            float clamped = Mathf.Clamp01(normalizedValue);
+            progressFill.fillAmount = clamped;
+            progressFill.color = SkillingProgressColorGradient.Evaluate(clamped);
         }
 
         private void HandleSceneGateEvaluation(Scene scene, bool allowed)
