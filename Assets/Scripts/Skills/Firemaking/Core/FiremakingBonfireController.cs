@@ -187,6 +187,9 @@ namespace Skills.Firemaking
 
             ClearPendingBonfire();
 
+            if (TryGetCombinedBonfireCookingFailure(node, cookableResult, out failureMessage))
+                return false;
+
             if (selectedIndex < 0)
             {
                 failureMessage = "Select a log to feed the bonfire.";
@@ -212,6 +215,39 @@ namespace Skills.Firemaking
                 return 1 << interactableLayer;
 
             return Physics2D.AllLayers;
+        }
+
+        /// <summary>
+        ///     Determines whether the current interaction should surface the shared bonfire/cooking
+        ///     failure message instead of the standard log selection prompt.
+        /// </summary>
+        private bool TryGetCombinedBonfireCookingFailure(
+            FiremakingBonfireObject node,
+            CookingInventoryHelper.CookableInventorySearchResult cookableResult,
+            out string failureMessage)
+        {
+            failureMessage = string.Empty;
+
+            if (node == null)
+                return false;
+
+            if (!node.TryGetComponent<CookingObject>(out _))
+                return false;
+
+            bool lacksCookable = !cookableResult.HasRecipe || !cookableResult.HasRequiredQuantity;
+            if (!lacksCookable)
+                return false;
+
+            if (Skill == null || inventory == null)
+                return false;
+
+            if (Skill.HasAnyLogsInInventory(inventory))
+                return false;
+
+            if (BonfireCookingMessageUtility.TryAcquireCombinedMessage(out var combinedMessage))
+                failureMessage = combinedMessage;
+
+            return true;
         }
 
         /// <summary>

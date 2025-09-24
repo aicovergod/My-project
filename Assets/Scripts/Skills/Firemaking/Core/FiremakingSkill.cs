@@ -230,6 +230,32 @@ namespace Skills.Firemaking
         }
 
         /// <summary>
+        ///     Determines whether the supplied inventory currently contains any registered Firemaking logs.
+        /// </summary>
+        /// <param name="sourceInventory">Inventory to inspect for log items.</param>
+        /// <returns><c>true</c> when at least one log is present.</returns>
+        public bool HasAnyLogsInInventory(Inventory.Inventory sourceInventory)
+        {
+            if (sourceInventory == null)
+                return false;
+
+            if (logLookup == null || logLookup.Count == 0)
+                return false;
+
+            for (int i = 0; i < sourceInventory.size; i++)
+            {
+                var entry = sourceInventory.GetSlot(i);
+                if (entry.item == null || string.IsNullOrEmpty(entry.item.id))
+                    continue;
+
+                if (GetDefinitionForItem(entry.item.id) != null)
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         ///     Validates and begins a new ignition attempt using the specified inventory slot and world position.
         /// </summary>
         /// <param name="inventorySlot">Slot index containing the selected logs.</param>
