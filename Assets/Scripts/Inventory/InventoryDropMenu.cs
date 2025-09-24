@@ -14,6 +14,8 @@ namespace Inventory
         private int slotIndex;
         private Font font;
         private RectTransform rect;
+        private Canvas menuCanvas;
+        private Camera canvasCamera;
 
         public static InventoryDropMenu Create(Transform parent, Font font)
         {
@@ -30,6 +32,17 @@ namespace Inventory
         private void Awake()
         {
             rect ??= GetComponent<RectTransform>();
+            menuCanvas = GetComponentInParent<Canvas>();
+
+            // Cache the correct camera reference so hover checks work with any canvas render mode.
+            if (menuCanvas != null && menuCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            {
+                canvasCamera = menuCanvas.worldCamera;
+            }
+            else
+            {
+                canvasCamera = null;
+            }
         }
 
         private void Update()
@@ -37,9 +50,19 @@ namespace Inventory
             if (!gameObject.activeSelf)
                 return;
 
+            var isCursorOverMenu = RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition, canvasCamera);
+
+            // Immediately hide the menu when the cursor leaves so it behaves like the OSRS context menu.
+            if (!isCursorOverMenu)
+            {
+                Hide();
+                return;
+            }
+
             if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
             {
-                if (!RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition))
+                // Reuse the hover state so clicks outside still close the menu without recalculating the hit test.
+                if (!isCursorOverMenu)
                     Hide();
             }
         }
