@@ -44,6 +44,7 @@ namespace Skills.Firemaking
         private const float PhoenixDoubleXpChance = 1f / 20f;
         private const float PhoenixDoubleXpBonus = 1f; // Adds +100% XP when triggered
         private const string PhoenixDoubleXpMessage = "Your phoenix flares brightly, doubling your Firemaking XP!";
+        private const string PhoenixDoubleXpCry = "Bwaaaak";
 
         private SkillManager skills;
         private Dictionary<string, FiremakingLogDefinition> logLookup;
@@ -981,10 +982,25 @@ namespace Skills.Firemaking
         /// <param name="result">Result data provided by the gathering reward processor.</param>
         private void ShowPhoenixDoubleXpFeedback(in GatheringRewardResult result)
         {
+            ShowPhoenixCry();
+
             Vector3 position = result.HasResourcePosition
                 ? result.ResourcePosition
                 : (result.Anchor != null ? result.Anchor.position : transform.position);
             ShowFeedback(PhoenixDoubleXpMessage, position);
+        }
+
+        /// <summary>
+        ///     Emits the Phoenix pet's signature cry above the pet when the double XP proc triggers.
+        /// </summary>
+        private void ShowPhoenixCry()
+        {
+            var activePet = PetDropSystem.ActivePet;
+            if (activePet == null || !string.Equals(activePet.id, PhoenixPetId, StringComparison.Ordinal))
+                return;
+
+            if (PetDropSystem.TryShowFloatingText(PhoenixDoubleXpCry))
+                LogDebug("Phoenix cry displayed for double XP proc.");
         }
 
         /// <summary>

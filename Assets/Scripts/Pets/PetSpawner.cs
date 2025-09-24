@@ -172,6 +172,11 @@ namespace Pets
                 go.AddComponent<CookingObject>();
             }
 
+            var floatingTextController = go.GetComponent<PetFloatingTextController>();
+            if (floatingTextController == null)
+                floatingTextController = go.AddComponent<PetFloatingTextController>();
+            floatingTextController.RefreshAnchorPosition();
+
             return go;
         }
     }

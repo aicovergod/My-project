@@ -21,6 +21,11 @@ namespace Pets
         public static PetDefinition ActivePet => activePetDef;
         public static GameObject ActivePetObject => activePetGO;
         public static PetCombatController ActivePetCombat => activePetGO != null ? activePetGO.GetComponent<PetCombatController>() : null;
+
+        /// <summary>
+        ///     Provides the floating-text controller for the active pet instance when available.
+        /// </summary>
+        public static PetFloatingTextController ActivePetFloatingText => activePetGO != null ? activePetGO.GetComponent<PetFloatingTextController>() : null;
         public static bool DebugPetRolls { get; set; }
         public static bool GuardModeEnabled { get; set; }
         public static bool PetInventoryVisible { get; set; }
@@ -248,6 +253,26 @@ namespace Pets
         }
 
         /// <summary>
+        ///     Attempts to display floating text using the active pet's anchor when available.
+        /// </summary>
+        /// <param name="message">Message to display above the active pet.</param>
+        /// <param name="color">Optional colour override.</param>
+        /// <param name="size">Optional text scale override.</param>
+        /// <param name="background">Optional background sprite for the text.</param>
+        /// <returns>True when the message is shown successfully.</returns>
+        public static bool TryShowFloatingText(string message, Color? color = null, float? size = null, Sprite background = null)
+        {
+            if (string.IsNullOrEmpty(message))
+                return false;
+
+            var controller = ActivePetFloatingText;
+            if (controller == null)
+                return false;
+
+            return controller.TryShowMessage(message, color, size, background);
+        }
+
+        /// <summary>
         /// Spawns a pet directly at the given world position.
         /// </summary>
         public static GameObject SpawnPet(PetDefinition pet, Vector3 position)
@@ -287,6 +312,8 @@ namespace Pets
                 var storage = activePetGO.GetComponent<PetStorage>();
                 storage?.StartCoroutine(storage.OpenDelayed());
             }
+
+            ActivePetFloatingText?.RefreshAnchorPosition();
 
             return activePetGO;
         }
