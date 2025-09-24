@@ -193,8 +193,8 @@ namespace Skills.Firemaking
 
             if (cookableResult.CanCook)
             {
-                int logSlot = ResolvePendingLogSlot(selectedIndex);
-                QueuePendingBonfire(node, logSlot);
+                int queuedLogSlot = ResolvePendingLogSlot(selectedIndex);
+                QueuePendingBonfire(node, queuedLogSlot);
                 return false;
             }
 
