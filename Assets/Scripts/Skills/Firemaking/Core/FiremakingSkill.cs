@@ -103,6 +103,30 @@ namespace Skills.Firemaking
         }
 
         /// <summary>
+        ///     Normalised 0..1 representation of the active bonfire fueling progress.
+        /// </summary>
+        public float BonfireFeedingProgressNormalized
+        {
+            get
+            {
+                if (!IsFeedingBonfire)
+                    return 0f;
+
+                int required = bonfireSession.ticksRequired > 0 ? bonfireSession.ticksRequired : BonfireTicksPerLog;
+                if (required <= 0)
+                    return 0f;
+
+                return Mathf.Clamp01((float)bonfireSession.ticksElapsed / required);
+            }
+        }
+
+        /// <summary>
+        ///     Number of ticks required to add a single log to the bonfire that is currently being fueled.
+        /// </summary>
+        public int BonfireFeedingTicksRequired =>
+            Mathf.Max(1, bonfireSession.ticksRequired > 0 ? bonfireSession.ticksRequired : BonfireTicksPerLog);
+
+        /// <summary>
         ///     World position where the current ignition attempt is centred.
         /// </summary>
         public Vector3 CurrentAttemptPosition => currentAttempt.definition != null ? currentAttempt.worldPosition : transform.position;
@@ -135,6 +159,16 @@ namespace Skills.Firemaking
         ///     Invoked when an ignition attempt ends for any reason.
         /// </summary>
         public event Action IgnitionStopped;
+
+        /// <summary>
+        ///     Raised when the player begins channeling logs into a bonfire object.
+        /// </summary>
+        public event Action<FiremakingBonfireObject, FiremakingLogDefinition> BonfireFeedingStarted;
+
+        /// <summary>
+        ///     Raised when the bonfire fueling workflow ends for any reason.
+        /// </summary>
+        public event Action BonfireFeedingStopped;
 
         /// <summary>
         ///     Raised whenever a bonfire gains fuel (either from a fresh log or by feeding an existing fire).
@@ -512,6 +546,7 @@ namespace Skills.Firemaking
             };
 
             LogDebug($"Started feeding {definition.displayName} into bonfire '{bonfire.name}'.");
+            BonfireFeedingStarted?.Invoke(bonfire, definition);
             return true;
         }
 
@@ -766,11 +801,10 @@ namespace Skills.Firemaking
             session.ticksElapsed++;
             LogDebug($"Bonfire tick {session.ticksElapsed}/{session.ticksRequired} for {session.definition.displayName}.");
 
+            bonfireSession = session;
+
             if (session.ticksElapsed < session.ticksRequired)
-            {
-                bonfireSession = session;
                 return;
-            }
 
             session.ticksElapsed = 0;
             bonfireSession = session;
@@ -848,9 +882,10 @@ namespace Skills.Firemaking
             if (!IsFeedingBonfire)
                 return;
 
+            var session = bonfireSession;
             Vector3 anchorPosition = transform != null ? transform.position : Vector3.zero;
-            if (bonfireSession.bonfire != null && bonfireSession.bonfire.transform != null)
-                anchorPosition = bonfireSession.bonfire.transform.position;
+            if (session.bonfire != null && session.bonfire.transform != null)
+                anchorPosition = session.bonfire.transform.position;
 
             bonfireSession = default;
 
@@ -860,6 +895,8 @@ namespace Skills.Firemaking
             LogDebug(!string.IsNullOrEmpty(message)
                 ? $"Stopped bonfire fueling: {message}"
                 : "Stopped bonfire fueling.");
+
+            BonfireFeedingStopped?.Invoke();
         }
 
         /// <summary>

@@ -43,6 +43,11 @@ namespace Skills.Cooking
         public float CookProgressNormalized => CookIntervalTicks <= 1 ? 0f : (float)cookProgress / (CookIntervalTicks - 1);
 
         /// <summary>
+        ///     Number of OSRS-style ticks required to cook a single item.
+        /// </summary>
+        public int CookTicksPerItem => CookIntervalTicks;
+
+        /// <summary>
         ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
         /// </summary>
         public bool EnableDebugLogging
