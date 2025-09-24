@@ -209,13 +209,17 @@ namespace Skills.Firemaking
             if (TryGetCombinedBonfireCookingFailure(node, cookableResult, out failureMessage))
                 return false;
 
-            if (selectedIndex < 0)
+            int logSlot = selectedIndex;
+            if (logSlot < 0)
+                logSlot = ResolvePendingLogSlot(-1);
+
+            if (logSlot < 0)
             {
                 failureMessage = "Select a log to feed the bonfire.";
                 return false;
             }
 
-            if (!Skill.TryStartBonfireFeeding(node, selectedIndex, out failureMessage))
+            if (!Skill.TryStartBonfireFeeding(node, logSlot, out failureMessage))
                 return false;
 
             ClearPendingBonfire();

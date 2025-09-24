@@ -149,6 +149,9 @@ namespace Skills.Cooking
                     return false;
                 }
 
+                if (ShouldSilenceBonfireLogAvailability(node))
+                    return false;
+
                 failureMessage = !string.IsNullOrEmpty(searchResult.FailureMessage)
                     ? searchResult.FailureMessage
                     : "You need something raw to cook";
@@ -163,6 +166,9 @@ namespace Skills.Cooking
                     cachedFailureMessage = failureMessage;
                     return false;
                 }
+
+                if (ShouldSilenceBonfireLogAvailability(node))
+                    return false;
 
                 failureMessage = !string.IsNullOrEmpty(searchResult.FailureMessage)
                     ? searchResult.FailureMessage
@@ -218,6 +224,27 @@ namespace Skills.Cooking
                 failureMessage = combinedMessage;
 
             return true;
+        }
+
+        /// <summary>
+        ///     Determines whether the current interaction targets a bonfire with available logs, allowing the
+        ///     Firemaking controller to process the click without surfacing additional cooking failure text.
+        /// </summary>
+        private bool ShouldSilenceBonfireLogAvailability(CookingObject node)
+        {
+            if (node == null || inventory == null)
+                return false;
+
+            if (!node.TryGetComponent<FiremakingBonfireObject>(out _))
+                return false;
+
+            if (firemakingSkill == null)
+                firemakingSkill = GetComponent<FiremakingSkill>();
+
+            if (firemakingSkill == null)
+                return false;
+
+            return firemakingSkill.HasAnyLogsInInventory(inventory);
         }
 
         /// <inheritdoc />
