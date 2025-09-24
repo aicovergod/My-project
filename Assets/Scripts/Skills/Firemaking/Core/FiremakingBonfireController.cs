@@ -362,7 +362,13 @@ namespace Skills.Firemaking
             }
 
             if (!string.IsNullOrWhiteSpace(failure))
-                FloatingText.Show(failure, bonfire.transform.position);
+            {
+                Transform anchor = FeedbackAnchor != null ? FeedbackAnchor : transform;
+                if (anchor != null)
+                    GatheringFloatingTextService.TryShowNow(failure, anchor, bonfire.transform.position);
+                else
+                    FloatingText.Show(failure, bonfire.transform.position);
+            }
         }
     }
 }

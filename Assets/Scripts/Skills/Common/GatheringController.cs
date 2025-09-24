@@ -404,7 +404,7 @@ namespace Skills.Common
 
             if (!ValidateInteractionPrerequisites(node, out string failure))
             {
-                ShowFeedback(failure);
+                ShowFeedback(failure, node);
                 return;
             }
 
@@ -422,7 +422,7 @@ namespace Skills.Common
             }
             else
             {
-                ShowFeedback(failure);
+                ShowFeedback(failure, node);
             }
         }
 
@@ -477,7 +477,7 @@ namespace Skills.Common
 
             if (playerMover == null)
             {
-                ShowFeedback(GetOutOfRangeMessage(node));
+                ShowFeedback(GetOutOfRangeMessage(node), node);
                 return;
             }
 
@@ -624,13 +624,35 @@ namespace Skills.Common
         /// <summary>
         ///     Displays floating feedback text when a validation fails.
         /// </summary>
-        private void ShowFeedback(string message)
+        private void ShowFeedback(string message, TNode node = null)
         {
             if (string.IsNullOrWhiteSpace(message))
                 return;
 
             Transform anchor = FeedbackAnchor != null ? FeedbackAnchor : transform;
-            FloatingText.Show(message, anchor.position);
+            if (anchor == null)
+                return;
+
+            Vector3? resourcePosition = null;
+            if (node != null)
+            {
+                resourcePosition = GetNodePosition(node);
+            }
+            else if (CurrentNode != null)
+            {
+                resourcePosition = GetNodePosition(CurrentNode);
+            }
+            else if (isApproachingNode && approachingNode != null)
+            {
+                resourcePosition = GetNodePosition(approachingNode);
+            }
+
+            bool displayed = false;
+            if (resourcePosition.HasValue)
+                displayed = GatheringFloatingTextService.TryShowNow(message, anchor, resourcePosition.Value);
+
+            if (!displayed && !resourcePosition.HasValue)
+                FloatingText.Show(message, anchor.position);
         }
 
         /// <summary>

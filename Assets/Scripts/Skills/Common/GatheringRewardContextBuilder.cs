@@ -86,6 +86,7 @@ namespace Skills.Common
             public int PetAssistExtraQuantity;
             public Transform FloatingTextAnchor;
             public Transform FallbackAnchor;
+            public Vector3? ResourcePosition;
             public Inventory.Equipment Equipment;
             public Func<ItemData, float> EquipmentXpBonusEvaluator;
             public Func<float> AdditionalXpBonusCalculator;
@@ -124,6 +125,7 @@ namespace Skills.Common
                 petAssistExtraQuantity = Mathf.Max(0, args.PetAssistExtraQuantity),
                 floatingTextAnchor = args.FloatingTextAnchor,
                 fallbackAnchor = args.FallbackAnchor,
+                resourcePosition = args.ResourcePosition,
                 equipment = args.Equipment,
                 equipmentXpBonusEvaluator = args.EquipmentXpBonusEvaluator,
                 additionalXpBonusCalculator = args.AdditionalXpBonusCalculator,
@@ -169,7 +171,14 @@ namespace Skills.Common
                     {
                         string message = levelUpFormatter.Invoke(result);
                         if (!string.IsNullOrEmpty(message))
-                            FloatingText.Show(message, result.Anchor.position);
+                        {
+                            bool displayed = false;
+                            if (result.HasResourcePosition)
+                                displayed = GatheringFloatingTextService.TryShowNow(message, result.Anchor, result.ResourcePosition);
+
+                            if (!displayed && !result.HasResourcePosition)
+                                FloatingText.Show(message, result.Anchor.position);
+                        }
                     }
 
                     levelUpCallback?.Invoke(result.NewLevel);

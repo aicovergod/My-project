@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using Util;
-using UI;
+using Skills.Common;
 
 namespace Skills.Mining
 {
@@ -92,9 +92,11 @@ namespace Skills.Mining
             if (requester == null)
                 yield break;
 
-            FloatingText.Show("Prospecting...", requester.position);
+            Vector3 resourcePosition = transform.position;
+            GatheringFloatingTextService.TryShowNow("Prospecting...", requester, resourcePosition);
             yield return new WaitForSeconds(Ticker.TickDuration * 2f);
-            FloatingText.Show($"This rock contains {rockDef.Ore.DisplayName} here", requester.position);
+            string message = $"This rock contains {rockDef.Ore.DisplayName} here";
+            GatheringFloatingTextService.TryShowNow(message, requester, resourcePosition);
         }
     }
 }

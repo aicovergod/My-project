@@ -1,11 +1,9 @@
 using System;
-using System.Collections;
 using Inventory;
 using Pets;
 using Skills;
 using UI;
 using UnityEngine;
-using Util;
 
 namespace Skills.Common
 {
@@ -28,6 +26,7 @@ namespace Skills.Common
         public int petAssistExtraQuantity;
         public Transform floatingTextAnchor;
         public Transform fallbackAnchor;
+        public Vector3? resourcePosition;
         public Equipment equipment;
         public Func<ItemData, float> equipmentXpBonusEvaluator;
         public Func<float> additionalXpBonusCalculator;
@@ -61,6 +60,8 @@ namespace Skills.Common
         public Transform Anchor;
         public ItemData Item;
         public string DisplayName;
+        public bool HasResourcePosition;
+        public Vector3 ResourcePosition;
     }
 
     /// <summary>
@@ -69,11 +70,10 @@ namespace Skills.Common
     /// </summary>
     public static class GatheringRewardProcessor
     {
-        private const float DefaultXpPopupDelayTicks = 5f;
-
         public static GatheringRewardResult Process(in GatheringRewardContext context)
         {
             var anchor = context.floatingTextAnchor != null ? context.floatingTextAnchor : context.fallbackAnchor;
+            Vector3? resourcePosition = context.resourcePosition;
             string displayName = !string.IsNullOrEmpty(context.rewardDisplayName)
                 ? context.rewardDisplayName
                 : context.item != null ? context.item.itemName : string.Empty;
@@ -92,7 +92,9 @@ namespace Skills.Common
                 XpPerItem = context.xpPerItem,
                 Anchor = anchor,
                 Item = context.item,
-                DisplayName = displayName
+                DisplayName = displayName,
+                HasResourcePosition = resourcePosition.HasValue,
+                ResourcePosition = resourcePosition ?? (anchor != null ? anchor.position : Vector3.zero)
             };
 
             if (result.RequestedQuantity <= 0)
@@ -108,7 +110,14 @@ namespace Skills.Common
                     ? "Your inventory is full"
                     : context.inventoryFullMessage;
                 if (anchor != null)
-                    FloatingText.Show(fullMessage, anchor.position);
+                {
+                    bool displayed = false;
+                    if (resourcePosition.HasValue)
+                        displayed = GatheringFloatingTextService.TryShowNow(fullMessage, anchor, resourcePosition.Value);
+
+                    if (!displayed && !resourcePosition.HasValue)
+                        FloatingText.Show(fullMessage, anchor.position);
+                }
                 result.InventoryFull = true;
                 result.NewLevel = result.PreviousLevel;
                 context.onFailure?.Invoke(result);
@@ -127,7 +136,14 @@ namespace Skills.Common
                     ? context.rewardMessageFormatter(result.QuantityAwarded)
                     : $"+{result.QuantityAwarded} {displayName}";
                 if (!string.IsNullOrEmpty(rewardMessage))
-                    FloatingText.Show(rewardMessage, anchor.position);
+                {
+                    bool displayed = false;
+                    if (resourcePosition.HasValue)
+                        displayed = GatheringFloatingTextService.TryShowNow(rewardMessage, anchor, resourcePosition.Value);
+
+                    if (!displayed && !resourcePosition.HasValue)
+                        FloatingText.Show(rewardMessage, anchor.position);
+                }
             }
 
             context.onItemsGranted?.Invoke(result);
@@ -145,10 +161,10 @@ namespace Skills.Common
                 result.NewLevel = newLevel;
                 result.LeveledUp = newLevel > oldLevel;
 
-                if (context.showXpPopup && context.runner != null && anchor != null)
+                if (context.showXpPopup && anchor != null)
                 {
-                    float delayTicks = context.xpPopupDelayTicks > 0f ? context.xpPopupDelayTicks : DefaultXpPopupDelayTicks;
-                    context.runner.StartCoroutine(ShowXpPopupAfterDelay(xpGain, anchor, delayTicks));
+                    Vector3 xpSource = resourcePosition ?? anchor.position;
+                    GatheringFloatingTextService.QueueDelayedXpPopup(xpGain, anchor, xpSource, context.xpPopupDelayTicks);
                 }
             }
             else
@@ -207,15 +223,6 @@ namespace Skills.Common
                 totalBonus += context.additionalXpBonusCalculator.Invoke();
 
             return totalBonus;
-        }
-
-        private static IEnumerator ShowXpPopupAfterDelay(int xp, Transform anchor, float delayTicks)
-        {
-            float delaySeconds = Mathf.Max(0f, delayTicks) * Ticker.TickDuration;
-            if (delaySeconds > 0f)
-                yield return new WaitForSeconds(delaySeconds);
-            if (anchor != null)
-                FloatingText.Show($"+{xp} XP", anchor.position);
         }
     }
 }

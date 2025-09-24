@@ -145,6 +145,7 @@ namespace Skills.Woodcutting
                     PetAssistExtraQuantity = amount - 1,
                     FloatingTextAnchor = floatingTextAnchor,
                     FallbackAnchor = transform,
+                    ResourcePosition = currentTree != null ? currentTree.transform.position : (Vector3?)null,
                     Equipment = equipment,
                     EquipmentXpBonusEvaluator = data => data != null ? data.woodcuttingXpBonusMultiplier : 0f,
                     RewardMessageFormatter = qty => $"+{qty} {logName}",
