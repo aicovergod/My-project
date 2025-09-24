@@ -1,5 +1,6 @@
 using Inventory;
 using Skills.Common;
+using Skills.Firemaking;
 using UnityEngine;
 
 namespace Skills.Cooking
@@ -15,6 +16,10 @@ namespace Skills.Cooking
         [SerializeField]
         [Tooltip("Layer mask used when searching for cooking stations.")]
         private LayerMask cookingStationMask;
+
+        [SerializeField]
+        [Tooltip("Optional Firemaking skill reference used to coordinate bonfire messaging.")]
+        private FiremakingSkill firemakingSkill;
 
         /// <summary>
         ///     Layer name automatically used when the inspector has not provided a mask override.
@@ -40,6 +45,9 @@ namespace Skills.Cooking
                 inventory = GetComponent<Inventory.Inventory>();
             if (inventory == null && CookingSkill != null)
                 inventory = CookingSkill.GetComponent<Inventory.Inventory>();
+
+            if (firemakingSkill == null)
+                firemakingSkill = GetComponent<FiremakingSkill>();
 
             EnsureCookingStationMaskConfigured();
         }
@@ -135,6 +143,12 @@ namespace Skills.Cooking
 
             if (!searchResult.HasRecipe)
             {
+                if (TryHandleCombinedBonfireFailure(node, out failureMessage))
+                {
+                    cachedFailureMessage = failureMessage;
+                    return false;
+                }
+
                 failureMessage = !string.IsNullOrEmpty(searchResult.FailureMessage)
                     ? searchResult.FailureMessage
                     : "You need something raw to cook";
@@ -144,6 +158,12 @@ namespace Skills.Cooking
 
             if (!searchResult.HasRequiredQuantity)
             {
+                if (TryHandleCombinedBonfireFailure(node, out failureMessage))
+                {
+                    cachedFailureMessage = failureMessage;
+                    return false;
+                }
+
                 failureMessage = !string.IsNullOrEmpty(searchResult.FailureMessage)
                     ? searchResult.FailureMessage
                     : "You need something raw to cook";
@@ -164,6 +184,39 @@ namespace Skills.Cooking
             cachedRecipe = searchResult.Recipe;
             cachedRawItem = searchResult.RawItem;
             cachedQuantity = searchResult.Quantity;
+            return true;
+        }
+
+        /// <summary>
+        ///     Checks whether the current interaction targets a bonfire/cooking hybrid while the player
+        ///     lacks both raw ingredients and logs. Returns the combined failure message when the helper
+        ///     has not already issued it this frame so duplicate feedback is avoided.
+        /// </summary>
+        private bool TryHandleCombinedBonfireFailure(CookingObject node, out string failureMessage)
+        {
+            failureMessage = string.Empty;
+
+            if (node == null)
+                return false;
+
+            if (!node.TryGetComponent<FiremakingBonfireObject>(out _))
+                return false;
+
+            if (inventory == null)
+                return false;
+
+            if (firemakingSkill == null)
+                firemakingSkill = GetComponent<FiremakingSkill>();
+
+            if (firemakingSkill == null)
+                return false;
+
+            if (firemakingSkill.HasAnyLogsInInventory(inventory))
+                return false;
+
+            if (BonfireCookingMessageUtility.TryAcquireCombinedMessage(out var combinedMessage))
+                failureMessage = combinedMessage;
+
             return true;
         }
 
