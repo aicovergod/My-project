@@ -4,6 +4,7 @@ using BankSystem;
 using Core.Save;
 using Inventory;
 using MyGame.Drops;
+using Pets;
 using Player;
 using Skills.Common;
 using Skills.Outfits;
@@ -38,6 +39,11 @@ namespace Skills.Firemaking
 
         private const int BonfireTicksPerLog = 4;
         private const float BonfireXpMultiplier = 0.8f;
+        private const string PhoenixPetId = "Phoenix";
+        private const float PhoenixXpBonus = 0.001f; // 0.10% Firemaking XP boost
+        private const float PhoenixDoubleXpChance = 1f / 20f;
+        private const float PhoenixDoubleXpBonus = 1f; // Adds +100% XP when triggered
+        private const string PhoenixDoubleXpMessage = "Your phoenix flares brightly, doubling your Firemaking XP!";
 
         private SkillManager skills;
         private Dictionary<string, FiremakingLogDefinition> logLookup;
@@ -671,7 +677,7 @@ namespace Skills.Firemaking
                 : "The fire catches alight.";
             ShowFeedback(successMessage, currentAttempt.worldPosition);
 
-            var context = GatheringRewardContextBuilder.BuildContext(new GatheringRewardContextBuilder.ContextArgs
+            var context = BuildFiremakingRewardContext(new GatheringRewardContextBuilder.ContextArgs
             {
                 Runner = this,
                 Skills = skills,
@@ -798,7 +804,7 @@ namespace Skills.Firemaking
 
             ShowFeedback("You add a log to the bonfire.", anchorPosition);
 
-            var context = GatheringRewardContextBuilder.BuildContext(new GatheringRewardContextBuilder.ContextArgs
+            var context = BuildFiremakingRewardContext(new GatheringRewardContextBuilder.ContextArgs
             {
                 Runner = this,
                 Skills = skills,
@@ -916,6 +922,69 @@ namespace Skills.Firemaking
                 "Firemaking",
                 "You receive a piece of the pyromancer outfit.",
                 "A pyromancer outfit piece has been sent to your bank.");
+        }
+
+        /// <summary>
+        ///     Wraps the shared gathering context builder to inject the Phoenix pet XP bonuses and feedback hooks.
+        /// </summary>
+        /// <param name="args">Base arguments describing the reward resolution.</param>
+        /// <returns>Context ready for processing with Phoenix bonuses applied.</returns>
+        private GatheringRewardContext BuildFiremakingRewardContext(GatheringRewardContextBuilder.ContextArgs args)
+        {
+            bool phoenixDoubleXpTriggered = false;
+
+            var existingBonusCalculator = args.AdditionalXpBonusCalculator;
+            args.AdditionalXpBonusCalculator = () =>
+            {
+                float bonus = existingBonusCalculator != null ? existingBonusCalculator() : 0f;
+                bonus += EvaluatePhoenixXpBonus(ref phoenixDoubleXpTriggered);
+                return bonus;
+            };
+
+            var existingBeforeLevelCallback = args.OnXpAppliedBeforeLevelCheck;
+            args.OnXpAppliedBeforeLevelCheck = result =>
+            {
+                existingBeforeLevelCallback?.Invoke(result);
+                if (phoenixDoubleXpTriggered)
+                    ShowPhoenixDoubleXpFeedback(in result);
+            };
+
+            return GatheringRewardContextBuilder.BuildContext(args);
+        }
+
+        /// <summary>
+        ///     Calculates the Phoenix pet XP bonuses, applying both the passive 0.10% boost and the 1/20 double XP proc.
+        /// </summary>
+        /// <param name="doubleXpTriggered">Tracks whether the double XP bonus has already been applied this tick.</param>
+        /// <returns>Total additive XP multiplier supplied by the Phoenix.</returns>
+        private float EvaluatePhoenixXpBonus(ref bool doubleXpTriggered)
+        {
+            var activePet = PetDropSystem.ActivePet;
+            if (activePet == null || !string.Equals(activePet.id, PhoenixPetId, StringComparison.Ordinal))
+                return 0f;
+
+            float bonus = PhoenixXpBonus;
+
+            if (!doubleXpTriggered && Random.value <= PhoenixDoubleXpChance)
+            {
+                doubleXpTriggered = true;
+                bonus += PhoenixDoubleXpBonus;
+                LogDebug("Phoenix double XP proc triggered.");
+            }
+
+            return bonus;
+        }
+
+        /// <summary>
+        ///     Emits floating text feedback when the Phoenix doubles the XP gain for a log or bonfire offering.
+        /// </summary>
+        /// <param name="result">Result data provided by the gathering reward processor.</param>
+        private void ShowPhoenixDoubleXpFeedback(in GatheringRewardResult result)
+        {
+            Vector3 position = result.HasResourcePosition
+                ? result.ResourcePosition
+                : (result.Anchor != null ? result.Anchor.position : transform.position);
+            ShowFeedback(PhoenixDoubleXpMessage, position);
         }
 
         /// <summary>
