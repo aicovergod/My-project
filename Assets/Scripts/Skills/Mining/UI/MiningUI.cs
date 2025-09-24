@@ -190,11 +190,11 @@ namespace Skills.Mining
             var fill = new GameObject("Fill");
             fill.transform.SetParent(bg.transform, false);
             progressImage = fill.AddComponent<Image>();
-            progressImage.color = Color.green;
+            progressImage.color = SkillingProgressColorGradient.Evaluate(0f);
             progressImage.sprite = bgSprite;
             progressImage.type = Image.Type.Filled;
             progressImage.fillMethod = Image.FillMethod.Horizontal;
-            progressImage.fillAmount = 0f;
+            SetProgressFill(0f);
             var fillRect = progressImage.rectTransform;
             fillRect.anchorMin = Vector2.zero;
             fillRect.anchorMax = Vector2.one;
@@ -220,7 +220,7 @@ namespace Skills.Mining
         {
             EnsureProgressObjects();
             target = rock.transform;
-            progressImage.fillAmount = 0f;
+            SetProgressFill(0f);
             currentFill = 0f;
             tickTimer = 0f;
             step = skill.CurrentSwingSpeedTicks > 0 ? 1f / skill.CurrentSwingSpeedTicks : 0f;
@@ -297,12 +297,12 @@ namespace Skills.Mining
             tickTimer += Time.deltaTime;
             if (segmentDuration <= 0f)
             {
-                progressImage.fillAmount = nextFill;
+                SetProgressFill(nextFill);
                 return;
             }
 
             float t = Mathf.Clamp01(tickTimer / segmentDuration);
-            progressImage.fillAmount = Mathf.Lerp(currentFill, nextFill, t);
+            SetProgressFill(Mathf.Lerp(currentFill, nextFill, t));
         }
 
         public void OnTick()
@@ -318,8 +318,7 @@ namespace Skills.Mining
                 currentFill = 0f;
                 nextFill = 0f;
                 awaitingResetTick = false;
-                if (progressImage != null)
-                    progressImage.fillAmount = 0f;
+                SetProgressFill(0f);
                 return;
             }
 
@@ -328,8 +327,7 @@ namespace Skills.Mining
                 awaitingResetTick = false;
                 currentFill = 0f;
                 nextFill = step;
-                if (progressImage != null)
-                    progressImage.fillAmount = 0f;
+                SetProgressFill(0f);
                 return;
             }
 
@@ -363,6 +361,16 @@ namespace Skills.Mining
 
             PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
             sceneGateSubscribed = true;
+        }
+
+        private void SetProgressFill(float normalizedValue)
+        {
+            if (progressImage == null)
+                return;
+
+            float clamped = Mathf.Clamp01(normalizedValue);
+            progressImage.fillAmount = clamped;
+            progressImage.color = SkillingProgressColorGradient.Evaluate(clamped);
         }
 
         private void HandleSceneGateEvaluation(Scene scene, bool allowed)

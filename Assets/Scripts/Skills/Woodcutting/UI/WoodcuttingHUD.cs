@@ -188,11 +188,11 @@ namespace Skills.Woodcutting
             var fill = new GameObject("Fill");
             fill.transform.SetParent(bg.transform, false);
             progressImage = fill.AddComponent<Image>();
-            progressImage.color = Color.green;
+            progressImage.color = SkillingProgressColorGradient.Evaluate(0f);
             progressImage.sprite = bgSprite;
             progressImage.type = Image.Type.Filled;
             progressImage.fillMethod = Image.FillMethod.Horizontal;
-            progressImage.fillAmount = 0f;
+            SetProgressFill(0f);
             var fillRect = progressImage.rectTransform;
             fillRect.anchorMin = Vector2.zero;
             fillRect.anchorMax = Vector2.one;
@@ -218,7 +218,7 @@ namespace Skills.Woodcutting
         {
             EnsureProgressObjects();
             target = tree.transform;
-            progressImage.fillAmount = 0f;
+            SetProgressFill(0f);
             currentFill = 0f;
             tickTimer = 0f;
             step = skill.CurrentChopIntervalTicks > 0 ? 1f / skill.CurrentChopIntervalTicks : 0f;
@@ -298,12 +298,12 @@ namespace Skills.Woodcutting
             tickTimer += Time.deltaTime;
             if (segmentDuration <= 0f)
             {
-                progressImage.fillAmount = nextFill;
+                SetProgressFill(nextFill);
                 return;
             }
 
             float t = Mathf.Clamp01(tickTimer / segmentDuration);
-            progressImage.fillAmount = Mathf.Lerp(currentFill, nextFill, t);
+            SetProgressFill(Mathf.Lerp(currentFill, nextFill, t));
         }
 
         public void OnTick()
@@ -319,8 +319,7 @@ namespace Skills.Woodcutting
                 currentFill = 0f;
                 nextFill = 0f;
                 awaitingResetTick = false;
-                if (progressImage != null)
-                    progressImage.fillAmount = 0f;
+                SetProgressFill(0f);
                 return;
             }
 
@@ -330,8 +329,7 @@ namespace Skills.Woodcutting
                 awaitingResetTick = false;
                 currentFill = 0f;
                 nextFill = step;
-                if (progressImage != null)
-                    progressImage.fillAmount = 0f;
+                SetProgressFill(0f);
                 return;
             }
 
@@ -348,6 +346,16 @@ namespace Skills.Woodcutting
             {
                 nextFill = Mathf.Min(1f, currentFill + step);
             }
+        }
+
+        private void SetProgressFill(float normalizedValue)
+        {
+            if (progressImage == null)
+                return;
+
+            float clamped = Mathf.Clamp01(normalizedValue);
+            progressImage.fillAmount = clamped;
+            progressImage.color = SkillingProgressColorGradient.Evaluate(clamped);
         }
 
         private void EnsureSceneLoadedSubscription()
