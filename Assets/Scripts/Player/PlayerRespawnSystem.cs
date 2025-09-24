@@ -110,6 +110,17 @@ namespace Player
             {
                 playerMover?.StopMovement();
                 combatController?.CancelCombat();
+                if (poisonController == null && hitpoints != null)
+                {
+                    // Cache the poison controller the first time it is needed so subsequent deaths
+                    // can immediately clear lingering poison damage-over-time effects.
+                    poisonController = hitpoints.GetComponent<PoisonController>();
+
+                    // If the hitpoints component lives on a different GameObject than the poison
+                    // controller, rebuild all cached player references so the lookup succeeds.
+                    if (poisonController == null)
+                        FindPlayer();
+                }
                 poisonController?.CurePoison(0f);
                 if (BuffTimerService.Instance != null && hitpoints != null)
                     BuffTimerService.Instance.RemoveAllBuffs(hitpoints.gameObject, BuffEndReason.Manual);
