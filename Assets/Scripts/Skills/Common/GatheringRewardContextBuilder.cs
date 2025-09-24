@@ -2,7 +2,6 @@ using System;
 using Inventory;
 using Pets;
 using Skills;
-using UI;
 using UnityEngine;
 
 namespace Skills.Common
@@ -177,7 +176,7 @@ namespace Skills.Common
                                 displayed = GatheringFloatingTextService.TryShowNow(message, result.Anchor, result.ResourcePosition);
 
                             if (!displayed && !result.HasResourcePosition)
-                                FloatingText.Show(message, result.Anchor.position);
+                                GatheringFloatingTextService.TryShowAtAnchor(message, result.Anchor);
                         }
                     }
 

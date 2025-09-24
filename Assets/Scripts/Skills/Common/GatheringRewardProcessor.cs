@@ -2,7 +2,6 @@ using System;
 using Inventory;
 using Pets;
 using Skills;
-using UI;
 using UnityEngine;
 
 namespace Skills.Common
@@ -116,7 +115,7 @@ namespace Skills.Common
                         displayed = GatheringFloatingTextService.TryShowNow(fullMessage, anchor, resourcePosition.Value);
 
                     if (!displayed && !resourcePosition.HasValue)
-                        FloatingText.Show(fullMessage, anchor.position);
+                        GatheringFloatingTextService.TryShowAtAnchor(fullMessage, anchor);
                 }
                 result.InventoryFull = true;
                 result.NewLevel = result.PreviousLevel;
@@ -142,7 +141,7 @@ namespace Skills.Common
                         displayed = GatheringFloatingTextService.TryShowNow(rewardMessage, anchor, resourcePosition.Value);
 
                     if (!displayed && !resourcePosition.HasValue)
-                        FloatingText.Show(rewardMessage, anchor.position);
+                        GatheringFloatingTextService.TryShowAtAnchor(rewardMessage, anchor);
                 }
             }
 
