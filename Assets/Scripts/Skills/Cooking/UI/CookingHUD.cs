@@ -4,29 +4,26 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Util;
 using World;
-using Skills;
 
-namespace Skills.Firemaking
+namespace Skills.Cooking
 {
     /// <summary>
-    ///     Displays Firemaking progress above the current ignition point using a world space progress bar.
+    ///     Displays a world-space progress bar whenever the player is actively cooking items.
+    ///     The HUD mirrors the shared gathering HUD lifecycle so it survives scene loads and
+    ///     automatically binds to the local <see cref="CookingSkill"/> instance when the player spawns.
     /// </summary>
-    public sealed class FiremakingHUD : GatheringSkillHudBase<FiremakingSkill>, ITickable
+    public sealed class CookingHUD : GatheringSkillHudBase<CookingSkill>, ITickable
     {
-        private enum FiremakingHudMode
-        {
-            None,
-            Ignition,
-            Bonfire
-        }
-
-        private static FiremakingHUD instance;
+        private static CookingHUD instance;
         private static bool waitingForAllowedScene;
         private static bool applicationIsQuitting;
 
-        private const string HudName = nameof(FiremakingHUD);
+        private const string HudName = nameof(CookingHUD);
 
-        public static FiremakingHUD Instance => instance;
+        /// <summary>
+        ///     Singleton accessor used by other systems that need to poke the HUD at runtime.
+        /// </summary>
+        public static CookingHUD Instance => instance;
 
         private bool sceneGateSubscribed;
         private bool sceneLoadedSubscribed;
@@ -39,14 +36,13 @@ namespace Skills.Firemaking
 
         private bool hasTarget;
         private Vector3 targetPosition;
+        private Transform activeStationAnchor;
+
         private float currentFill;
         private float nextFill;
         private float tickTimer;
         private float segmentDuration = Ticker.TickDuration;
         private float progressStep = 1f;
-        private FiremakingHudMode mode = FiremakingHudMode.None;
-        private FiremakingBonfireObject activeBonfire;
-        private SkillManager skillManager;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -83,15 +79,15 @@ namespace Skills.Firemaking
 
             var go = new GameObject(HudName);
             Object.DontDestroyOnLoad(go);
-            go.AddComponent<FiremakingHUD>();
+            go.AddComponent<CookingHUD>();
         }
 
-        private static FiremakingHUD FindExistingInstance()
+        private static CookingHUD FindExistingInstance()
         {
 #if UNITY_2023_1_OR_NEWER
-            return Object.FindFirstObjectByType<FiremakingHUD>();
+            return Object.FindFirstObjectByType<CookingHUD>();
 #else
-            return Object.FindObjectOfType<FiremakingHUD>();
+            return Object.FindObjectOfType<CookingHUD>();
 #endif
         }
 
@@ -169,88 +165,52 @@ namespace Skills.Firemaking
 
         private void OnDestroy()
         {
-            if (instance == this)
+            if (instance != this)
+                return;
+
+            if (sceneGateSubscribed)
             {
-                if (sceneGateSubscribed)
-                {
-                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                    sceneGateSubscribed = false;
-                }
-
-                if (sceneLoadedSubscribed)
-                {
-                    SceneManager.sceneLoaded -= HandleSceneLoaded;
-                    sceneLoadedSubscribed = false;
-                }
-
-                HandleStop();
-                DetachFromSkill();
-                CancelSkillRefreshRoutine();
-                UnsubscribeFromTicker();
-
-                if (!applicationIsQuitting)
-                    BeginWaitingForAllowedScene();
-
-                instance = null;
+                PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
+                sceneGateSubscribed = false;
             }
+
+            if (sceneLoadedSubscribed)
+            {
+                SceneManager.sceneLoaded -= HandleSceneLoaded;
+                sceneLoadedSubscribed = false;
+            }
+
+            HandleStop();
+            DetachFromSkill();
+            CancelSkillRefreshRoutine();
+            UnsubscribeFromTicker();
+
+            if (!applicationIsQuitting)
+                BeginWaitingForAllowedScene();
+
+            instance = null;
         }
 
-        protected override void OnSkillLocated(FiremakingSkill located)
+        protected override void OnSkillLocated(CookingSkill located)
         {
             EnsureProgressObjects();
-            skillManager = located.GetComponent<SkillManager>();
-            located.IgnitionStarted += HandleIgnitionStarted;
-            located.IgnitionStopped += HandleIgnitionStopped;
-            located.BonfireFeedingStarted += HandleBonfireFeedingStarted;
-            located.BonfireFeedingStopped += HandleBonfireFeedingStopped;
+            located.OnStartCooking += HandleStartCooking;
+            located.OnStopCooking += HandleStopCooking;
         }
 
-        protected override void OnSkillDetached(FiremakingSkill previous)
+        protected override void OnSkillDetached(CookingSkill previous)
         {
-            previous.IgnitionStarted -= HandleIgnitionStarted;
-            previous.IgnitionStopped -= HandleIgnitionStopped;
-            previous.BonfireFeedingStarted -= HandleBonfireFeedingStarted;
-            previous.BonfireFeedingStopped -= HandleBonfireFeedingStopped;
-            skillManager = null;
+            previous.OnStartCooking -= HandleStartCooking;
+            previous.OnStopCooking -= HandleStopCooking;
             HandleStop();
         }
 
-        private void HandleIgnitionStarted(FiremakingLogDefinition definition, Vector3 position)
+        private void HandleStartCooking(CookableRecipe recipe)
         {
             EnsureProgressObjects();
-            mode = FiremakingHudMode.Ignition;
-            activeBonfire = null;
             hasTarget = true;
-            targetPosition = position;
-            UpdateSegmentSettings();
-            currentFill = 0f;
-            nextFill = progressStep;
-            tickTimer = 0f;
-            if (progressFill != null)
-                progressFill.fillAmount = 0f;
-            if (progressRoot != null)
-            {
-                progressRoot.SetActive(true);
-                progressRoot.transform.position = position + offset;
-            }
-
-            SubscribeToTicker();
-        }
-
-        private void HandleIgnitionStopped()
-        {
-            if (mode == FiremakingHudMode.Ignition)
-                HandleStop();
-        }
-
-        private void HandleBonfireFeedingStarted(FiremakingBonfireObject bonfire, FiremakingLogDefinition definition)
-        {
-            _ = definition; // The definition is currently unused but retained for future HUD expansions.
-            EnsureProgressObjects();
-            mode = FiremakingHudMode.Bonfire;
-            activeBonfire = bonfire;
-            hasTarget = true;
-            targetPosition = ResolveBonfirePosition();
+            activeStationAnchor = ResolveActiveStationAnchor();
+            targetPosition = ResolveTargetPosition();
             UpdateSegmentSettings();
             currentFill = 0f;
             nextFill = progressStep;
@@ -266,10 +226,9 @@ namespace Skills.Firemaking
             SubscribeToTicker();
         }
 
-        private void HandleBonfireFeedingStopped()
+        private void HandleStopCooking()
         {
-            if (mode == FiremakingHudMode.Bonfire)
-                HandleStop();
+            HandleStop();
         }
 
         private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -278,47 +237,18 @@ namespace Skills.Firemaking
             RefreshSkillSubscription();
         }
 
-        private Vector3 ResolveBonfirePosition()
-        {
-            if (activeBonfire != null && activeBonfire.transform != null)
-                return activeBonfire.transform.position;
-
-            if (skill != null && skill.transform != null)
-                return skill.transform.position;
-
-            return targetPosition;
-        }
-
         private void LateUpdate()
         {
             if (!hasTarget || progressRoot == null || progressFill == null)
                 return;
 
-            switch (mode)
+            if (skill == null || !skill.IsCooking)
             {
-                case FiremakingHudMode.Ignition:
-                    if (skill == null || !skill.IsLighting)
-                    {
-                        HandleStop();
-                        return;
-                    }
-
-                    targetPosition = skill.CurrentAttemptPosition;
-                    break;
-                case FiremakingHudMode.Bonfire:
-                    if (skill == null || !skill.IsFeedingBonfire)
-                    {
-                        HandleStop();
-                        return;
-                    }
-
-                    targetPosition = ResolveBonfirePosition();
-                    break;
-                default:
-                    HandleStop();
-                    return;
+                HandleStop();
+                return;
             }
 
+            targetPosition = ResolveTargetPosition();
             progressRoot.transform.position = targetPosition + offset;
 
             tickTimer += Time.deltaTime;
@@ -334,25 +264,7 @@ namespace Skills.Firemaking
 
         public void OnTick()
         {
-            if (!hasTarget || skill == null)
-            {
-                HandleStop();
-                return;
-            }
-
-            if (mode == FiremakingHudMode.Ignition && !skill.IsLighting)
-            {
-                HandleStop();
-                return;
-            }
-
-            if (mode == FiremakingHudMode.Bonfire && !skill.IsFeedingBonfire)
-            {
-                HandleStop();
-                return;
-            }
-
-            if (mode == FiremakingHudMode.None)
+            if (!hasTarget || skill == null || !skill.IsCooking)
             {
                 HandleStop();
                 return;
@@ -361,14 +273,7 @@ namespace Skills.Firemaking
             tickTimer = 0f;
             UpdateSegmentSettings();
             currentFill = progressFill != null ? progressFill.fillAmount : currentFill;
-
-            float normalized = 0f;
-            if (mode == FiremakingHudMode.Ignition)
-                normalized = Mathf.Clamp01(skill.IgnitionProgressNormalized);
-            else if (mode == FiremakingHudMode.Bonfire)
-                normalized = Mathf.Clamp01(skill.BonfireFeedingProgressNormalized);
-
-            // Ensure the bar always advances even if the skill reports stale progress (e.g. after a failure retry).
+            float normalized = Mathf.Clamp01(skill.CookProgressNormalized);
             float targetFill = Mathf.Clamp01(currentFill + progressStep);
             nextFill = Mathf.Max(normalized, targetFill);
         }
@@ -378,7 +283,7 @@ namespace Skills.Firemaking
             if (progressRoot != null)
                 return;
 
-            progressRoot = new GameObject("FiremakingProgress");
+            progressRoot = new GameObject("CookingProgress");
             progressRoot.transform.SetParent(transform, false);
 
             progressCanvas = progressRoot.AddComponent<Canvas>();
@@ -400,7 +305,7 @@ namespace Skills.Firemaking
             var fill = new GameObject("Fill");
             fill.transform.SetParent(bg.transform, false);
             progressFill = fill.AddComponent<Image>();
-            progressFill.color = Color.green;
+            progressFill.color = new Color(1f, 0.64f, 0f, 1f);
             progressFill.sprite = bgSprite;
             progressFill.type = Image.Type.Filled;
             progressFill.fillMethod = Image.FillMethod.Horizontal;
@@ -417,9 +322,8 @@ namespace Skills.Firemaking
 
         private void HandleStop()
         {
-            mode = FiremakingHudMode.None;
-            activeBonfire = null;
             hasTarget = false;
+            activeStationAnchor = null;
             currentFill = 0f;
             nextFill = 0f;
             tickTimer = 0f;
@@ -482,41 +386,40 @@ namespace Skills.Firemaking
 
             if (Ticker.Instance != null)
                 Ticker.Instance.Unsubscribe(this);
+
             tickerSubscribed = false;
+        }
+
+        private Transform ResolveActiveStationAnchor()
+        {
+            if (skill != null && skill.ActiveCookingObject != null)
+                return skill.ActiveCookingObject.ApproachAnchor;
+
+            return skill != null ? skill.transform : null;
+        }
+
+        private Vector3 ResolveTargetPosition()
+        {
+            if (activeStationAnchor == null)
+                activeStationAnchor = ResolveActiveStationAnchor();
+
+            if (activeStationAnchor != null)
+                return activeStationAnchor.position;
+
+            return skill != null && skill.transform != null ? skill.transform.position : targetPosition;
         }
 
         private void UpdateSegmentSettings()
         {
             segmentDuration = Ticker.TickDuration;
-
             if (skill == null)
             {
                 progressStep = 1f;
                 return;
             }
 
-            switch (mode)
-            {
-                case FiremakingHudMode.Ignition:
-                    var definition = skill.CurrentDefinition;
-                    if (definition == null)
-                    {
-                        progressStep = 1f;
-                        return;
-                    }
-
-                    int level = skillManager != null ? skillManager.GetLevel(SkillType.Firemaking) : 1;
-                    int ignitionTicks = Mathf.Max(1, definition.GetIgnitionTicks(level));
-                    progressStep = 1f / ignitionTicks;
-                    break;
-                case FiremakingHudMode.Bonfire:
-                    int bonfireTicks = Mathf.Max(1, skill.BonfireFeedingTicksRequired);
-                    progressStep = 1f / bonfireTicks;
-                    break;
-                default:
-                    progressStep = 1f;
-                    break;
-            }
+            int ticksRequired = Mathf.Max(1, skill.CookTicksPerItem);
+            progressStep = 1f / ticksRequired;
         }
     }
 }
