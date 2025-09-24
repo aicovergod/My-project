@@ -63,8 +63,6 @@ namespace World
         private const float ZoomStep = 5f;
         private const float MinZoom = 5f;
         private const float MaxZoom = 100f;
-        private const float MarkerScale = 0.25f;
-        private const float SmallIconScaleMultiplier = 0.5f;
         private const int SmallMapZoomSteps = 3;
         private const float DefaultZoom = 25f;
         private float SmallMapZoom => DefaultZoom - ZoomStep * SmallMapZoomSteps;
@@ -376,7 +374,7 @@ namespace World
             {
                 if (!markers.Contains(marker))
                     markers.Add(marker);
-                CreateIcons(marker);
+                ValidateManualIcons(marker);
             }
         }
 
@@ -457,8 +455,8 @@ namespace World
                 foreach (var marker in markers)
                 {
                     if (marker == null) continue;
-                    UpdateIconPosition(marker.smallIcon, marker.transform.position, smallMapRect);
-                    UpdateIconPosition(marker.bigIcon, marker.transform.position, expandedMapRect);
+                    UpdateIconPosition(marker.SmallIcon, marker.transform.position, smallMapRect);
+                    UpdateIconPosition(marker.BigIcon, marker.transform.position, expandedMapRect);
                 }
             }
         }
@@ -718,7 +716,7 @@ namespace World
             if (!markers.Contains(marker))
                 markers.Add(marker);
 
-            CreateIcons(marker);
+            ValidateManualIcons(marker);
         }
 
         private void EnsureSceneGateSubscription()
@@ -767,31 +765,42 @@ namespace World
             iconCache.Clear();
         }
 
-        private void CreateIcons(MinimapMarker marker)
+        private void ValidateManualIcons(MinimapMarker marker)
         {
             if (marker == null)
                 return;
 
-            if (smallMapRect != null && marker.smallIcon == null)
+            if (smallMapRect != null && marker.SmallIcon == null)
             {
-                var smallGO = new GameObject("Marker", typeof(Image));
-                smallGO.transform.SetParent(smallMapRect, false);
-                var img = smallGO.GetComponent<Image>();
-                img.sprite = GetMarkerSprite(marker.type);
-                img.preserveAspect = true;
-                marker.smallIcon = img.rectTransform;
-                marker.smallIcon.localScale = Vector3.one * MarkerScale * SmallIconScaleMultiplier;
+                Debug.LogWarning(
+                    $"Minimap marker '{marker.name}' is missing a small icon assignment and will not appear on the minimap. " +
+                    "Assign a RectTransform reference to the marker so it can be positioned manually.");
             }
 
-            if (expandedMapRect != null && marker.bigIcon == null)
+            if (expandedMapRect != null && marker.BigIcon == null)
             {
-                var bigGO = new GameObject("Marker", typeof(Image));
-                bigGO.transform.SetParent(expandedMapRect, false);
-                var img = bigGO.GetComponent<Image>();
-                img.sprite = GetMarkerSprite(marker.type);
-                img.preserveAspect = true;
-                marker.bigIcon = img.rectTransform;
-                marker.bigIcon.localScale = Vector3.one * MarkerScale;
+                Debug.LogWarning(
+                    $"Minimap marker '{marker.name}' is missing an expanded icon assignment and will not appear on the expanded minimap. " +
+                    "Assign a RectTransform reference to the marker so it can be positioned manually.");
+            }
+
+            AssignSpriteIfMissing(marker.SmallIcon, marker.type);
+            AssignSpriteIfMissing(marker.BigIcon, marker.type);
+        }
+
+        private void AssignSpriteIfMissing(RectTransform icon, MinimapMarker.MarkerType type)
+        {
+            if (icon == null)
+                return;
+
+            var image = icon.GetComponent<Image>();
+            if (image == null)
+                return;
+
+            if (image.sprite == null)
+            {
+                image.sprite = GetMarkerSprite(type);
+                image.preserveAspect = true;
             }
         }
 
@@ -801,10 +810,6 @@ namespace World
                 return;
 
             markers.Remove(marker);
-            if (marker.smallIcon != null)
-                Destroy(marker.smallIcon.gameObject);
-            if (marker.bigIcon != null)
-                Destroy(marker.bigIcon.gameObject);
         }
 
         private Sprite GetMarkerSprite(MinimapMarker.MarkerType type)
