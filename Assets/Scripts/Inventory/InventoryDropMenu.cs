@@ -10,6 +10,10 @@ namespace Inventory
     /// </summary>
     public class InventoryDropMenu : MonoBehaviour
     {
+        [SerializeField]
+        [Tooltip("Screen-space padding the cursor can move beyond the menu before the popup auto-closes.")]
+        private float closePaddingPixels = 12f;
+
         private Inventory inventory;
         private int slotIndex;
         private Font font;
@@ -50,10 +54,10 @@ namespace Inventory
             if (!gameObject.activeSelf)
                 return;
 
-            var isCursorOverMenu = RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition, canvasCamera);
+            var isCursorWithinSafeZone = IsCursorWithinSafeZone(out var isCursorOverMenu);
 
-            // Immediately hide the menu when the cursor leaves so it behaves like the OSRS context menu.
-            if (!isCursorOverMenu)
+            // Immediately hide the menu when the cursor leaves the padded safe zone to keep the OSRS-style feel.
+            if (!isCursorWithinSafeZone)
             {
                 Hide();
                 return;
@@ -61,10 +65,37 @@ namespace Inventory
 
             if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
             {
-                // Reuse the hover state so clicks outside still close the menu without recalculating the hit test.
+                // Only close on clicks that land outside the strict menu rectangle.
                 if (!isCursorOverMenu)
                     Hide();
             }
+        }
+
+        /// <summary>
+        /// Determines if the cursor remains within the menu rectangle plus a tolerance band to prevent accidental closures.
+        /// </summary>
+        private bool IsCursorWithinSafeZone(out bool insideMenu)
+        {
+            insideMenu = RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition, canvasCamera);
+
+            if (closePaddingPixels <= 0f)
+            {
+                return insideMenu;
+            }
+
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, Input.mousePosition, canvasCamera, out var localPoint))
+            {
+                // If the conversion fails, fall back to the strict rectangle check to preserve existing behaviour.
+                return insideMenu;
+            }
+
+            var paddedRect = rect.rect;
+            paddedRect.xMin -= closePaddingPixels;
+            paddedRect.xMax += closePaddingPixels;
+            paddedRect.yMin -= closePaddingPixels;
+            paddedRect.yMax += closePaddingPixels;
+
+            return paddedRect.Contains(localPoint);
         }
 
         private void BuildUI()
