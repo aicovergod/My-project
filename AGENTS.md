@@ -22,9 +22,12 @@
   - Woodcutting demonstrates tick integration (`Woodcutting/Core/WoodcuttingSkill`), outfit tracking, pet bonuses, and inventory interactions.
   - Fishing/Cooking use ScriptableObject databases in `Assets/Resources` (`FishingDatabase`, `CookingDatabase`).
   - Woodcutting, Mining, Fishing, and Cooking now expose `EnableDebugLogging` toggles that gate verbose log output and ticker subscription traces. Toggle them via the in-game `AdminF2Menu` (F2) or in the inspector when diagnosing tick cadence, loot rolls, or state transitions. The fishing `BycatchManager` also defaults `useDailySeed` to true so bycatch rolls key off the shared daily seed—leave that enabled unless a feature needs session-based randomness.
+  - Firemaking joins the core gathering suite. `Firemaking/Core/FiremakingSkill` drives ignition, bonfire fueling, Phoenix pet XP bonuses, and outfit rolls while `Firemaking/UI/FiremakingHUD` mirrors progress bars from skill events. Log definitions live under `Assets/Resources/Firemaking/Logs` as `FiremakingLogDefinition` assets.
+  - Shared floating-text behaviour for gathering skills flows through `Skills/Common/GatheringFloatingTextService`. Use the helper for OSRS-range validation, popup cooldowns, and delayed XP to keep Firemaking, Woodcutting, Mining, and Fishing feedback consistent.
 - **Combat** (`Assets/Scripts/Combat`, `Assets/Scripts/NPC/Combat`, `Assets/NPCCombatProfile`)
   - `CombatController`, `CombatMath`, and `CombatEnums` coordinate player combat ticks, max hit calculations, spell elements, and hitsplat visuals via `Resources/HitSplatLibrary`.
   - NPC combat uses `NpcAttackController`, projectile logic, and drop resolution (`Drops` folder). Pet-assisted combat hooks exist in `Pets`.
+  - Attach `Combat/OnHitPoisonApplier` to weapons or projectiles when you need configurable poison procs. It consumes `PoisonConfig` assets, honours `requiresDamage`, and should be invoked alongside the combat hit confirmation pipeline.
 - **Magic System** (`Assets/Scripts/Magic`, `Assets/Resources/Spells`, `Assets/Prefabs/Spells`)
   - `SpellDefinition` ScriptableObjects set spell range, projectile speed, hit FX, max hit, elemental type, and optional freeze settings. Respect `loadOrder` for UI sorting, keep `requiredMagicLevel` aligned with `SkillManager`, and pair freeze toggles with `Status/FrozenStatusController` listeners.
   - Projectile prefabs (`FireProjectile`) and hit effect prefabs (`HitEffect`) live under `Assets/Prefabs/Spells`. Sprite VFX are in `Assets/Sprites/GFX/Spells` and should stay 64×64 transparent assets matching the ScriptableObject name.
@@ -38,9 +41,16 @@
   - Dialogue data/manager/UI implement OSRS-style panels. Quests use `QuestManager` (saveable) with ScriptableObject quest definitions in `Resources/Quests`.
 - **NPCs & World** (`Assets/Scripts/NPC`, `Assets/Scripts/World`)
   - NPC interaction, navigation, and movement wrappers live here. Minimap, doors, scene transitions, and respawns sit under `World`.
+  - `World/SceneTransitionManager` now owns additive scene swaps, persistent-object callbacks, spawn point routing, and fade timing. Use `SceneTransitionInteractable` to trigger transitions, populate `SceneTransitionManager.NextSpawnPoint`, and keep persistent services registered via `IScenePersistent` so they receive unload/load callbacks.
+  - `Player/PlayerRespawnSystem` cooperates with `World/RespawnPoint` markers to cache death return data, stop combat/buffs, play the OSRS death jingle through `Audio/SoundManager`, and fade via `World/ScreenFader` before respawning the player in the correct scene.
 - **UI Layer** (`Assets/Scripts/UI`, `Assets/Scripts/Player`, `Assets/Scripts/Status`)
   - HUDs such as `HealthHUD`, merge timers, tab buttons, and combat/skill overlays expect LegacyRuntime fonts and OSRS layout cues. `UI/PersistentEventSystem` maintains input modules across scenes.
   - `UI/MagicUI` is a `PersistentSceneSingleton` that builds the spellbook grid from `Resources/Spells`, caches strike spells for max-hit syncing, and drives the active spell/last selected spell state consumed by `CombatController` and `PlayerCombatLoadout`.
+  - `UI/InterfaceTabButtons` spawns the bottom-right OSRS tab strip (Quest, Inventory, Skills, Equipment, Attack Style, Magic). Let it toggle windows instead of duplicating button logic, and rely on `UIManager`'s auto-close behaviour for AttackStyle.
+  - Buff tracking now runs through `UI/HUD/BuffHudManager` and its `BuffInfoBox`/`BuffTooltipController` prefabs. Query the singleton to refresh icons, handle expiry audio, or respond to `BuffEvents` updates.
+- **Audio & Screen Fades** (`Assets/Scripts/Audio`, `Assets/Scripts/World`)
+  - `Audio/SoundManager` centralises SFX/music playback and exposes the `SoundEffect` enum (e.g., death jingle). Register clips there and let `SceneTransitionManager`'s `EnsureSingleAudioListener` prevent duplicate listeners after scene swaps.
+  - `World/ScreenFader` provides black fade in/out routines used by `SceneTransitionManager` and `PlayerRespawnSystem`. Reuse it for any other screen transitions so fade timing stays consistent.
 - **Status Effects** (`Assets/Scripts/Status`)
   - `BuffTimerService` owns timed buffs (poison, freeze, antifire, stamina, etc.) and relays updates via `BuffTimerInstance`. Always raise effects through the static `BuffEvents` hub so combat, inventory, pets, and scripted encounters stay decoupled.
   - `BuffStateSaveBridge` snapshots active timers for persistence. Attach it to entities that must keep buffs between loads; legacy `PoisonSaveBridge` is deprecated and should remain disabled unless debugging old data.
@@ -48,6 +58,7 @@
   - `Status/Freeze/FrozenStatusController` pauses locomotion for targets with freeze buffs and expects spells that set `SpellDefinition.appliesFreeze` to raise buffs via `BuffEvents`.
 - **Pets & Drops** (`Assets/Scripts/Pets`, `Assets/Scripts/Drops`)
   - Pets include drop systems, storage, level bars, and context menus. Drop tables combine scriptable entries with RNG helpers and tie into `NpcDropper` and `GroundItemSpawner`.
+  - The Phoenix familiar now synergises with Firemaking (`Skills/Firemaking/Core/FiremakingSkill`). When active it adds passive XP bonuses, rolls 1/20 double XP procs, and emits floating text/audio via `PetDropSystem` helpers, so ensure pet IDs match (`"Phoenix"`).
 - **Books & Lore** (`Assets/Scripts/Books`, `Assets/Resources/Books`)
   - `BookData` ScriptableObjects (use `\f` delimiters within `content`) drive lore pages while `BookProgressManager` tracks per-book page progress via `PersistentSceneSingleton`. `BookItemData` links inventory entries to the underlying book asset.
 
@@ -57,6 +68,8 @@
 - **Sprites & Tiles**: Sprites under `Assets/Sprites`, `TileAssets`, and `WorldPalette`. Maintain 64×64 resolution with transparent backgrounds.
 - **Spells**: Spell ScriptableObjects reside in `Assets/Resources/Spells`, with corresponding projectile and hit-effect prefabs under `Assets/Prefabs/Spells` and sprite sheets in `Assets/Sprites/GFX/Spells`. Keep naming aligned so `MagicUI` can auto-load visuals.
 - **Buff Icons & Status Configs**: HUD sprites reside in `Assets/Resources/UI/Buffs` while status configs (poison defaults, etc.) live in `Assets/Resources/Status`. Align icon IDs with `BuffTimerDefinition.iconId` and keep `PoisonConfig.Id` stable for saves.
+- **Firemaking Data**: Log ScriptableObjects live under `Assets/Resources/Firemaking/Logs`. Populate new entries there when introducing log tiers, bonfire lifetimes, ashes, or Phoenix XP hooks so `FiremakingSkill` can load them automatically.
+- **Audio**: The central `Assets/Scripts/Audio/SoundManager` component exposes the `SoundEffect` enum for UI/gameplay cues (including death jingles). Register new clips there when wiring fresh feedback.
 - **Book Content**: Lore assets live in `Assets/Resources/Books`. Use `\f` within `BookData.content` to break pages and avoid relying on the obsolete `pages` list.
 
 ## Code Conventions
@@ -86,6 +99,7 @@
   - Controllers now auto-walk the player into interaction range when `autoMoveIntoRange` is enabled (default). Override `AllowAutoMoveToNodes` or tweak `autoMoveStopBuffer` if a future skill needs bespoke approach behaviour.
 - `GatheringRewardProcessor` standardises how resource rewards, XP, outfit rolls, and floating text are resolved. Build a `GatheringRewardContext` and run it through the processor so outfit hooks, XP multipliers, and pet assistance are honoured automatically.
 - `GatheringRewardContextBuilder` composes the shared `GatheringRewardContext` payload and the OSRS-style success roll. Supply the per-skill reward data plus lambdas for quest, pet, or outfit hooks so you don't duplicate boilerplate when wiring future gathering skills.
+- `GatheringFloatingTextService` centralises distance checks, cooldowns, and delayed XP popups for all gathering popups. Request immediate/delayed feedback through the static helpers instead of calling `FloatingText` directly so skills stay consistent.
 - `GatheringInventoryHelper` (new) owns the shared `Resources.Load` cache for `ItemData` lookups and the pet overflow capacity rules. When adding or updating gathering skills call `GatheringInventoryHelper.CanAcceptGatheredItem` instead of duplicating inventory checks. Pass the per-skill dictionary field by reference so the helper can bind it to the shared cache, and supply the double-drop pet ID ("Beaver", "Heron", "Rock Golem", etc.) to keep bonus rolls consistent.
 - When a pet doubles resource output the helper will automatically probe the pet's `PetStorage` inventory. Ensure any new pets that offer a similar bonus have a matching `id` string and an attached `PetStorage` component so overflow routing continues to work.
 - `Skills/Common/UI/GatheringSkillHudBase` now centralises the coroutine-based retry logic for gathering HUDs. Derive new progress UIs (or refactors of Fishing, Mining, Woodcutting) from this base instead of copying the FindObjectOfType polling code.
