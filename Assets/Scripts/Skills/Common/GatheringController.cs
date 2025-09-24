@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using Player;
-using UI;
 using Core.Input;
 
 namespace Skills.Common
@@ -652,7 +651,7 @@ namespace Skills.Common
                 displayed = GatheringFloatingTextService.TryShowNow(message, anchor, resourcePosition.Value);
 
             if (!displayed && !resourcePosition.HasValue)
-                FloatingText.Show(message, anchor.position);
+                GatheringFloatingTextService.TryShowAtAnchor(message, anchor);
         }
 
         /// <summary>

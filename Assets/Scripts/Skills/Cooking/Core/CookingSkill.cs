@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using Inventory;
 using Util;
-using UI;
 using BankSystem;
 using Pets;
 using Skills.Outfits;
@@ -214,7 +213,7 @@ namespace Skills.Cooking
                     displayed = GatheringFloatingTextService.TryShowNow("Burned", anchor, stationPosition.Value);
 
                 if (!displayed && !stationPosition.HasValue)
-                    FloatingText.Show("Burned", anchor.position);
+                    GatheringFloatingTextService.TryShowAtAnchor("Burned", anchor);
                 LogDebug($"Burned {currentRecipe.cookedItemId} (burn chance {burnChance:P2})");
             }
             else

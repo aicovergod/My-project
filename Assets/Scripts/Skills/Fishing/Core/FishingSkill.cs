@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Inventory;
 using Util;
-using UI;
 using Pets;
 using Core;
 using BankSystem;
@@ -176,7 +175,7 @@ namespace Skills.Fishing
                         displayed = GatheringFloatingTextService.TryShowNow("You need bait", anchor, spotPosition.Value);
 
                     if (!displayed && !spotPosition.HasValue)
-                        FloatingText.Show("You need bait", anchor.position);
+                        GatheringFloatingTextService.TryShowAtAnchor("You need bait", anchor);
                     LogDebug("Bait requirement not met; cancelling fishing session.");
                     StopFishing();
                     return;
@@ -190,7 +189,7 @@ namespace Skills.Fishing
                         displayed = GatheringFloatingTextService.TryShowNow(message, anchor, spotPosition.Value);
 
                     if (!displayed && !spotPosition.HasValue)
-                        FloatingText.Show(message, anchor.position);
+                        GatheringFloatingTextService.TryShowAtAnchor(message, anchor);
                 }
                 else
                 {
@@ -200,7 +199,7 @@ namespace Skills.Fishing
                         displayed = GatheringFloatingTextService.TryShowNow(fallbackMessage, anchor, spotPosition.Value);
 
                     if (!displayed && !spotPosition.HasValue)
-                        FloatingText.Show(fallbackMessage, anchor.position);
+                        GatheringFloatingTextService.TryShowAtAnchor(fallbackMessage, anchor);
                 }
             }
 
@@ -369,7 +368,7 @@ namespace Skills.Fishing
                     displayed = GatheringFloatingTextService.TryShowNow("Your inventory is full", anchor, spotPosition.Value);
 
                 if (!displayed && !spotPosition.HasValue)
-                    FloatingText.Show("Your inventory is full", anchor.position);
+                    GatheringFloatingTextService.TryShowAtAnchor("Your inventory is full", anchor);
                 return;
             }
 
@@ -379,7 +378,7 @@ namespace Skills.Fishing
                 rewardDisplayed = GatheringFloatingTextService.TryShowNow(message, anchor, spotPosition.Value);
 
             if (!rewardDisplayed && !spotPosition.HasValue)
-                FloatingText.Show(message, anchor.position);
+                GatheringFloatingTextService.TryShowAtAnchor(message, anchor);
         }
 
         private FishingTool MapTool(FishingToolDefinition tool)
@@ -426,7 +425,7 @@ namespace Skills.Fishing
                         displayed = GatheringFloatingTextService.TryShowNow("You need bait", anchor, spotPosition.Value);
 
                     if (!displayed && !spotPosition.HasValue)
-                        FloatingText.Show("You need bait", anchor.position);
+                        GatheringFloatingTextService.TryShowAtAnchor("You need bait", anchor);
                     LogDebug("Unable to start fishing: missing bait.");
                     return;
                 }
