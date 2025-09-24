@@ -8,11 +8,15 @@ This project currently targets **Unity 6000.2.3f1**.
 
 ## Major Systems
 - **Saving System** – Provides persistent player data using components like `SaveManager` and player-specific save bridges.
-- **Skill System** – A modular framework for training skills such as woodcutting and mining through `SkillManager` and skill-specific modules.
-- **Gathering HUD Infrastructure** – Shared base logic in `Skills/Common/UI/GatheringSkillHudBase` keeps fishing, mining, and woodcutting progress bars in sync with players even when the skill component spawns late.
+- **Skill System** – `SkillManager` orchestrates XP/levels across gathering/combat skills (Woodcutting, Mining, Fishing, Cooking, Beastmaster, etc.) while the in-game `AdminF2Menu` handles debug level overrides.
+- **Firemaking & Bonfires** – New Firemaking content lives in `Skills/Firemaking`. `FiremakingSkill` covers ignition, bonfire fueling, Phoenix pet bonuses, outfit rolls, and ashes, while `FiremakingHUD` mirrors tick progress. Expand the skill by authoring `FiremakingLogDefinition` assets under `Resources/Firemaking/Logs`.
+- **Gathering Feedback Services** – `Skills/Common/GatheringFloatingTextService` centralises OSRS-style floating text, range checks, cooldowns, and delayed XP popups so Woodcutting, Mining, Fishing, and Firemaking share consistent messaging.
 - **Shop System** – Supports buying and selling items via `Shop` and `ShopUI` components.
-- **Status & Buff System** – Centralises timed effects with `Status/BuffTimerService`, `BuffEvents`, and `BuffStateSaveBridge` so combat, consumables, and scripted encounters can apply poison, antifire, freeze, and other buffs while persisting through saves.
-- **Magic Combat & Spellbook** – `MagicUI` surfaces strike spells and other definitions stored in `Assets/Resources/Spells`. Spells configure projectile prefabs (`Magic/FireProjectile`), hit effects, elemental types, and optional freeze durations that hook into `Status/FrozenStatusController`.
+- **Status & Buff System** – Centralises timed effects with `Status/BuffTimerService`, `BuffEvents`, and `BuffStateSaveBridge`. Buff icons and expiry audio now route through `UI/HUD/BuffHudManager`, `BuffInfoBox`, and `BuffTooltipController`.
+- **Magic & Combat Hooks** – `MagicUI` builds the spellbook from `Resources/Spells`, while combat flow leverages `CombatController` and modular add-ons like `OnHitPoisonApplier` for weapon-based status effects.
+- **Scene Transition & Respawn** – `World/SceneTransitionManager` performs additive scene swaps with fades via `ScreenFader`, keeps persistent singletons informed, and hands off spawn IDs. `Player/PlayerRespawnSystem` cooperates with `World/RespawnPoint` markers to clear buffs, play the death jingle, and restore the player.
+- **Interface Tabs & UI Shell** – `UI/InterfaceTabButtons` spawns the OSRS-style tab strip (Quest, Inventory, Skills, Equipment, Attack Style, Magic) and works alongside `UIManager` to auto-close conflicting panels.
+- **Audio & Feedback** – `Audio/SoundManager` exposes the `SoundEffect` enum for music/SFX (including the death jingle) and keeps AudioListener duplication in check during transitions.
 - **Lore & Books** – Scriptable `BookData` assets back in-world books while `BookProgressManager` tracks which page each player has reached when reading from items or world interactions.
 - **Daily Time Service** – `Core/Time/DailyGameTimeService` caches the current UTC day, raises a `DayChanged` event for daily resets, and exposes `ComposeDailySeed` so features like fishing bycatch, rotating shops, or quests can share deterministic per-day RNG.
 
