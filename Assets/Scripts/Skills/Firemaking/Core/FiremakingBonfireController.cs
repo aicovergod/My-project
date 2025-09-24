@@ -148,6 +148,25 @@ namespace Skills.Firemaking
         }
 
         /// <inheritdoc />
+        protected override bool ValidateNode(FiremakingBonfireObject node, out string failureMessage)
+        {
+            if (!base.ValidateNode(node, out failureMessage))
+                return false;
+
+            if (inventory == null)
+                inventory = GetComponent<Inventory.Inventory>();
+
+            if (ShouldBlockDueToMissingFuelAndFood(node, out string combinedFailure))
+            {
+                failureMessage = combinedFailure;
+                return false;
+            }
+
+            failureMessage = string.Empty;
+            return true;
+        }
+
+        /// <inheritdoc />
         protected override bool TryStartAction(FiremakingBonfireObject node, out string failureMessage)
         {
             failureMessage = string.Empty;
@@ -248,6 +267,22 @@ namespace Skills.Firemaking
                 failureMessage = combinedMessage;
 
             return true;
+        }
+
+        /// <summary>
+        ///     Prevents the player from auto-walking to the bonfire when they lack both raw food and logs.
+        /// </summary>
+        private bool ShouldBlockDueToMissingFuelAndFood(FiremakingBonfireObject node, out string failureMessage)
+        {
+            failureMessage = string.Empty;
+
+            if (Skill == null)
+                return false;
+
+            int selectedIndex = inventory != null ? inventory.selectedIndex : -1;
+            var cookableResult = CookingInventoryHelper.FindCookableRecipe(inventory, cookingSkill, selectedIndex);
+
+            return TryGetCombinedBonfireCookingFailure(node, cookableResult, out failureMessage);
         }
 
         /// <summary>
