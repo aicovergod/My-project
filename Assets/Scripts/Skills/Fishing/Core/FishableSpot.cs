@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Util;
-using UI;
 using Skills.Common;
 using Random = UnityEngine.Random;
 
@@ -106,7 +105,8 @@ namespace Skills.Fishing
             if (requester == null)
                 yield break;
 
-            FloatingText.Show("Checking...", requester.position);
+            Vector3 resourcePosition = transform.position;
+            GatheringFloatingTextService.TryShowNow("Checking...", requester, resourcePosition);
             yield return new WaitForSeconds(Ticker.TickDuration * 2f);
 
             var fishNames = new List<string>();
@@ -130,7 +130,7 @@ namespace Skills.Fishing
             else
                 message = $"This spot contains {string.Join(" & ", fishNames)} here";
 
-            FloatingText.Show(message, requester.position);
+            GatheringFloatingTextService.TryShowNow(message, requester, resourcePosition);
         }
     }
 }

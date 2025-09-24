@@ -201,6 +201,7 @@ namespace Skills.Cooking
 
             itemsRemaining--;
             Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
+            Vector3? stationPosition = ActiveCookingObject != null ? ActiveCookingObject.transform.position : (Vector3?)null;
 
             int level = skills != null ? skills.GetLevel(SkillType.Cooking) : 1;
             float burnChance = CalculateBurnChance(level, currentRecipe);
@@ -208,7 +209,12 @@ namespace Skills.Cooking
             bool burned = UnityEngine.Random.value < burnChance;
             if (burned)
             {
-                FloatingText.Show("Burned", anchor.position);
+                bool displayed = false;
+                if (stationPosition.HasValue)
+                    displayed = GatheringFloatingTextService.TryShowNow("Burned", anchor, stationPosition.Value);
+
+                if (!displayed && !stationPosition.HasValue)
+                    FloatingText.Show("Burned", anchor.position);
                 LogDebug($"Burned {currentRecipe.cookedItemId} (burn chance {burnChance:P2})");
             }
             else
@@ -229,6 +235,7 @@ namespace Skills.Cooking
                     PetAssistExtraQuantity = 0,
                     FloatingTextAnchor = floatingTextAnchor,
                     FallbackAnchor = transform,
+                    ResourcePosition = stationPosition,
                     Equipment = equipment,
                     EquipmentXpBonusEvaluator = data => data != null ? data.cookingXpBonusMultiplier : 0f,
                     RewardMessageFormatter = qty => $"+{qty} {cookedName}",

@@ -684,6 +684,7 @@ namespace Skills.Firemaking
                 PetAssistExtraQuantity = 0,
                 FloatingTextAnchor = floatingTextAnchor,
                 FallbackAnchor = transform,
+                ResourcePosition = currentAttempt.worldPosition,
                 Equipment = equipment,
                 EquipmentXpBonusEvaluator = data => data != null ? data.firemakingXpBonusMultiplier : 0f,
                 CustomAddItemHandler = _ => true,
@@ -810,6 +811,7 @@ namespace Skills.Firemaking
                 PetAssistExtraQuantity = 0,
                 FloatingTextAnchor = anchor,
                 FallbackAnchor = transform,
+                ResourcePosition = bonfireTransform != null ? bonfireTransform.position : (Vector3?)null,
                 Equipment = equipment,
                 EquipmentXpBonusEvaluator = data => data != null ? data.firemakingXpBonusMultiplier : 0f,
                 CustomAddItemHandler = _ => true,
@@ -926,7 +928,11 @@ namespace Skills.Firemaking
             if (string.IsNullOrEmpty(message))
                 return;
 
-            FloatingText.Show(message, position);
+            Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
+            if (anchor == null)
+                return;
+
+            GatheringFloatingTextService.TryShowNow(message, anchor, position);
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 using Inventory;
+using Skills.Common;
 using UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -85,12 +86,20 @@ namespace Skills.Firemaking
                     if (!skill.BeginLightingFromInventory(inventory.selectedIndex, out var helperFailure) &&
                         !string.IsNullOrEmpty(helperFailure))
                     {
-                        FloatingText.Show(helperFailure, snapped);
+                        Transform anchor = skill != null ? skill.transform : null;
+                        if (anchor != null)
+                            GatheringFloatingTextService.TryShowNow(helperFailure, anchor, snapped);
+                        else
+                            FloatingText.Show(helperFailure, snapped);
                     }
                 }
                 else if (!string.IsNullOrEmpty(manualPlacementDisabledMessage))
                 {
-                    FloatingText.Show(manualPlacementDisabledMessage, snapped);
+                    Transform anchor = skill != null ? skill.transform : null;
+                    if (anchor != null)
+                        GatheringFloatingTextService.TryShowNow(manualPlacementDisabledMessage, anchor, snapped);
+                    else
+                        FloatingText.Show(manualPlacementDisabledMessage, snapped);
                 }
 
                 return;
@@ -99,7 +108,13 @@ namespace Skills.Firemaking
             if (!skill.TryBeginLighting(inventory.selectedIndex, snapped, targetFire, out var failureReason))
             {
                 if (!string.IsNullOrEmpty(failureReason))
-                    FloatingText.Show(failureReason, snapped);
+                {
+                    Transform anchor = skill != null ? skill.transform : null;
+                    if (anchor != null)
+                        GatheringFloatingTextService.TryShowNow(failureReason, anchor, snapped);
+                    else
+                        FloatingText.Show(failureReason, snapped);
+                }
             }
         }
 

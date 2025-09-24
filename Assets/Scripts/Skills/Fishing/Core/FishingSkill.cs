@@ -165,21 +165,43 @@ namespace Skills.Fishing
                 StopFishing();
                 return;
             }
+            Vector3? spotPosition = currentSpot != null ? currentSpot.transform.position : (Vector3?)null;
             if (!string.IsNullOrEmpty(currentSpot.def.BaitItemId))
             {
                 Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
                 if (inventory == null || !inventory.RemoveItem(currentSpot.def.BaitItemId))
                 {
-                    FloatingText.Show("You need bait", anchor.position);
+                    bool displayed = false;
+                    if (spotPosition.HasValue)
+                        displayed = GatheringFloatingTextService.TryShowNow("You need bait", anchor, spotPosition.Value);
+
+                    if (!displayed && !spotPosition.HasValue)
+                        FloatingText.Show("You need bait", anchor.position);
                     LogDebug("Bait requirement not met; cancelling fishing session.");
                     StopFishing();
                     return;
                 }
                 var baitItem = ItemDatabase.GetItem(currentSpot.def.BaitItemId);
                 if (baitItem != null)
-                    FloatingText.Show($"-1 {baitItem.itemName}", anchor.position);
+                {
+                    bool displayed = false;
+                    string message = $"-1 {baitItem.itemName}";
+                    if (spotPosition.HasValue)
+                        displayed = GatheringFloatingTextService.TryShowNow(message, anchor, spotPosition.Value);
+
+                    if (!displayed && !spotPosition.HasValue)
+                        FloatingText.Show(message, anchor.position);
+                }
                 else
-                    FloatingText.Show("-1 bait", anchor.position);
+                {
+                    const string fallbackMessage = "-1 bait";
+                    bool displayed = false;
+                    if (spotPosition.HasValue)
+                        displayed = GatheringFloatingTextService.TryShowNow(fallbackMessage, anchor, spotPosition.Value);
+
+                    if (!displayed && !spotPosition.HasValue)
+                        FloatingText.Show(fallbackMessage, anchor.position);
+                }
             }
 
             float chance = GatheringRewardContextBuilder.CalculateSuccessChance(new GatheringRewardContextBuilder.SuccessChanceArgs
@@ -212,6 +234,7 @@ namespace Skills.Fishing
                     PetAssistExtraQuantity = amount - 1,
                     FloatingTextAnchor = floatingTextAnchor,
                     FallbackAnchor = transform,
+                    ResourcePosition = spotPosition,
                     Equipment = equipment,
                     EquipmentXpBonusEvaluator = data =>
                         data != null && (data.fishingXpBonusWaterTypes & waterType) != 0
@@ -270,6 +293,7 @@ namespace Skills.Fishing
                 return;
 
             var waterType = currentSpot.def != null ? currentSpot.def.WaterType : WaterType.Any;
+            Vector3? spotPosition = currentSpot != null ? currentSpot.transform.position : (Vector3?)null;
             int streak = bycatchManager.GetStreak(waterType);
             int playerIdHash = gameObject.GetInstanceID();
             int nodeHash = currentSpot.def != null ? currentSpot.def.Id.GetHashCode() : currentSpot.GetInstanceID();
@@ -340,11 +364,22 @@ namespace Skills.Fishing
             var itemData = ItemDatabase.GetItem(res.item.ItemId);
             if (itemData == null || inventory == null || !inventory.AddItem(itemData, res.quantity))
             {
-                FloatingText.Show("Your inventory is full", anchor.position);
+                bool displayed = false;
+                if (spotPosition.HasValue)
+                    displayed = GatheringFloatingTextService.TryShowNow("Your inventory is full", anchor, spotPosition.Value);
+
+                if (!displayed && !spotPosition.HasValue)
+                    FloatingText.Show("Your inventory is full", anchor.position);
                 return;
             }
 
-            FloatingText.Show($"+{res.quantity} {res.item.DisplayName}", anchor.position);
+            string message = $"+{res.quantity} {res.item.DisplayName}";
+            bool rewardDisplayed = false;
+            if (spotPosition.HasValue)
+                rewardDisplayed = GatheringFloatingTextService.TryShowNow(message, anchor, spotPosition.Value);
+
+            if (!rewardDisplayed && !spotPosition.HasValue)
+                FloatingText.Show(message, anchor.position);
         }
 
         private FishingTool MapTool(FishingToolDefinition tool)
@@ -385,7 +420,13 @@ namespace Skills.Fishing
                 if (inventory == null || !inventory.HasItem(spot.def.BaitItemId))
                 {
                     Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
-                    FloatingText.Show("You need bait", anchor.position);
+                    Vector3? spotPosition = spot != null ? spot.transform.position : (Vector3?)null;
+                    bool displayed = false;
+                    if (spotPosition.HasValue)
+                        displayed = GatheringFloatingTextService.TryShowNow("You need bait", anchor, spotPosition.Value);
+
+                    if (!displayed && !spotPosition.HasValue)
+                        FloatingText.Show("You need bait", anchor.position);
                     LogDebug("Unable to start fishing: missing bait.");
                     return;
                 }
