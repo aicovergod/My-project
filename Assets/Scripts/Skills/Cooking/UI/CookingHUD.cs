@@ -44,6 +44,11 @@ namespace Skills.Cooking
         private float segmentDuration = Ticker.TickDuration;
         private float progressStep = 1f;
 
+        /// <summary>
+        ///     Tolerance used when detecting when a new cooking cycle starts so the bar can reset cleanly.
+        /// </summary>
+        private const float ProgressResetThreshold = 0.001f;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
         {
@@ -273,6 +278,13 @@ namespace Skills.Cooking
             UpdateSegmentSettings();
             currentFill = progressFill != null ? progressFill.fillAmount : currentFill;
             float normalized = Mathf.Clamp01(skill.CookProgressNormalized);
+
+            if (normalized + ProgressResetThreshold < currentFill)
+            {
+                currentFill = normalized;
+                SetProgressFill(normalized);
+            }
+
             float targetFill = Mathf.Clamp01(currentFill + progressStep);
             nextFill = Mathf.Max(normalized, targetFill);
         }
