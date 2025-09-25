@@ -22,6 +22,26 @@ namespace Inventory
     {
         public static InventoryDebugMenu Instance;
 
+        /// <summary>
+        /// Name assigned to the search text field so other systems can detect when it owns the
+        /// keyboard focus.
+        /// </summary>
+        private const string SearchControlName = "InventoryDebugMenu_Search";
+
+        /// <summary>
+        /// Name assigned to the amount text field displayed when right-clicking an item button.
+        /// </summary>
+        private const string AmountControlName = "InventoryDebugMenu_Amount";
+
+        /// <summary>
+        /// Indicates whether any text field inside the debug menu currently has keyboard focus.
+        /// Movement systems query this so typing in the menu does not trigger gameplay input.
+        /// </summary>
+        public static bool HasTextInputFocus { get; private set; }
+
+        /// <summary>True while the debug menu window is visible.</summary>
+        public bool Visible => visible;
+
         [Tooltip("Inventory to add items to. If not set the component tries to find one in the scene.")]
         public Inventory inventory;
 
@@ -71,13 +91,29 @@ namespace Inventory
             if (Input.GetKeyDown(KeyCode.F1))
             {
                 visible = !visible;
+
+                if (!visible)
+                {
+                    // Close the amount popup and release keyboard focus whenever the menu hides so
+                    // gameplay input can resume immediately.
+                    amountItem = null;
+                    HasTextInputFocus = false;
+                }
             }
         }
 
         private void OnGUI()
         {
             if (!visible || allItems == null)
+            {
+                HasTextInputFocus = false;
                 return;
+            }
+
+            // Reset the focus flag for this repaint; it will be re-enabled below if one of the text
+            // fields has focus. Doing the reset here ensures the property reflects the current GUI
+            // state even when Unity renders the window multiple times per frame.
+            HasTextInputFocus = false;
 
             const float width = 200f;
             const float height = 300f;
@@ -85,7 +121,10 @@ namespace Inventory
             GUILayout.BeginArea(area, GUI.skin.box);
 
             GUILayout.Label("Search:");
+            GUI.SetNextControlName(SearchControlName);
             searchText = GUILayout.TextField(searchText);
+            if (GUI.GetNameOfFocusedControl() == SearchControlName)
+                HasTextInputFocus = true;
 
             scroll = GUILayout.BeginScrollView(scroll);
 
@@ -115,9 +154,11 @@ namespace Inventory
                 Rect popup = new Rect(area.x + width + 10f, area.y, 180f, 100f);
                 GUILayout.BeginArea(popup, GUI.skin.box);
                 GUILayout.Label($"Spawn {amountItem.name}");
-                GUI.SetNextControlName("AmountField");
+                GUI.SetNextControlName(AmountControlName);
                 amountText = GUILayout.TextField(amountText);
-                GUI.FocusControl("AmountField");
+                if (GUI.GetNameOfFocusedControl() == AmountControlName)
+                    HasTextInputFocus = true;
+                GUI.FocusControl(AmountControlName);
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("OK"))
                 {
@@ -137,6 +178,14 @@ namespace Inventory
                 GUILayout.EndHorizontal();
                 GUILayout.EndArea();
             }
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+                Instance = null;
+
+            HasTextInputFocus = false;
         }
     }
 }
