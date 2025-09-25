@@ -139,6 +139,20 @@ namespace Skills.Cooking
                 return false;
             }
 
+            if (firemakingSkill == null)
+                firemakingSkill = GetComponent<FiremakingSkill>();
+
+            if (firemakingSkill != null && firemakingSkill.IsFeedingBonfire &&
+                node.TryGetComponent<FiremakingBonfireObject>(out var bonfire) &&
+                firemakingSkill.ActiveBonfire == bonfire)
+            {
+                // When Firemaking is actively fueling this exact bonfire we avoid interrupting the
+                // workflow so the Firemaking controller can continue consuming queued logs.
+                failureMessage = string.Empty;
+                cachedFailureMessage = string.Empty;
+                return false;
+            }
+
             var searchResult = CookingInventoryHelper.FindCookableRecipe(inventory, CookingSkill, inventory.selectedIndex);
 
             if (inventory != null && firemakingSkill != null && inventory.selectedIndex >= 0)
