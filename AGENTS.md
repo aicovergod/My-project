@@ -78,7 +78,6 @@
 - Tick-sensitive systems prefer `ITickable` + `Ticker` over raw `Update`. Use coroutines sparingly and clean up subscriptions in `OnDisable`/`OnDestroy`.
 - Follow the `enableDebugLogging` pattern from the gathering skills when adding verbose logging so toggles can be driven from `AdminF2Menu` and hook into `TickedSkillBehaviour.LogTickerSubscription`.
 - UI text defaults to `LegacyRuntime.ttf` via `Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf")` unless a serialized font override is provided.
-- Follow the existing commenting style (XML summaries and inline comments explaining intent) and keep logic modular for future skills/items.
 - For assets, maintain 64×64 resolution, transparent backgrounds, and URP-compatible import settings.
 
 ## Working With Systems

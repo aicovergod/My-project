@@ -980,6 +980,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   inventory: {fileID: 491447706204386932}
+  cookingSkill: {fileID: -2219103460593389809}
 --- !u!114 &2038440844503587638
 MonoBehaviour:
   m_ObjectHideFlags: 0

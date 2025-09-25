@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 3244907390266376697}
   - component: {fileID: 6070147374573012547}
   - component: {fileID: 5826013684839782429}
-  - component: {fileID: 1334518141455398624}
   m_Layer: 7
   m_Name: Oak Woodcutting Tree - Level 15
   m_TagString: Untagged
@@ -238,16 +237,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   offset: -1
   directionOffset: 0
---- !u!114 &1334518141455398624
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5912612152994619936}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c081796b31d84299b4870b32ca9e2f94, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: 3
