@@ -253,6 +253,15 @@ namespace Player
                 return;
             }
 
+            if (Inventory.InventoryDebugMenu.HasTextInputFocus)
+            {
+                moveDir = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
+                anim.SetBool("IsMoving", false);
+                HandleForcedIdle();
+                return;
+            }
+
             if (inventory != null && inventory.BankOpen)
             {
                 moveDir = Vector2.zero;
