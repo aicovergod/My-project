@@ -187,20 +187,46 @@ namespace Skills.Firemaking
             }
 
             int selectedIndex = inventory.selectedIndex;
+            bool hasManualSelection = selectedIndex >= 0;
+            bool selectedSlotIsLog = false;
+
+            if (hasManualSelection)
+            {
+                // Resolve whether the highlighted slot already targets a registered log so we can
+                // immediately feed the bonfire without deferring to the cooking controller.
+                var selectedSlot = inventory.GetSlot(selectedIndex);
+                if (selectedSlot.item != null && Skill != null)
+                    selectedSlotIsLog = Skill.GetDefinitionForItem(selectedSlot.item.id) != null;
+            }
 
             var cookableResult = CookingInventoryHelper.FindCookableRecipe(inventory, cookingSkill, selectedIndex);
             bool selectedSlotCookable = cookableResult.HasRecipe && cookableResult.UsesPreferredSlot;
 
-            if (cookableResult.CanCook)
-            {
-                int queuedLogSlot = ResolvePendingLogSlot(selectedIndex);
-                QueuePendingBonfire(node, queuedLogSlot);
-                return false;
-            }
-
             if (selectedSlotCookable)
             {
                 ClearPendingBonfire();
+                return false;
+            }
+
+            int resolvedLogSlot = selectedSlotIsLog ? selectedIndex : -1;
+
+            if (cookableResult.CanCook && !selectedSlotIsLog)
+            {
+                if (!hasManualSelection)
+                {
+                    // Legacy behaviour: clicking the bonfire without selecting an item should cook
+                    // first and only queue log fueling once fish stop cooking.
+                    if (resolvedLogSlot < 0)
+                        resolvedLogSlot = ResolvePendingLogSlot(selectedIndex);
+                    QueuePendingBonfire(node, resolvedLogSlot);
+                }
+                else
+                {
+                    // Manual selections that are not logs should avoid queuing logs so cooking can
+                    // process the item without unexpected fueling afterwards.
+                    ClearPendingBonfire();
+                }
+
                 return false;
             }
 
@@ -209,9 +235,10 @@ namespace Skills.Firemaking
             if (TryGetCombinedBonfireCookingFailure(node, cookableResult, out failureMessage))
                 return false;
 
-            int logSlot = selectedIndex;
-            if (logSlot < 0)
-                logSlot = ResolvePendingLogSlot(-1);
+            if (resolvedLogSlot < 0)
+                resolvedLogSlot = ResolvePendingLogSlot(selectedIndex);
+
+            int logSlot = resolvedLogSlot;
 
             if (logSlot < 0)
             {
