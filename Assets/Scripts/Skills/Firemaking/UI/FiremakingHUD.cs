@@ -44,6 +44,11 @@ namespace Skills.Firemaking
         private float tickTimer;
         private float segmentDuration = Ticker.TickDuration;
         private float progressStep = 1f;
+
+        /// <summary>
+        ///     Tolerance used when detecting when a new progress cycle begins so the bar can reset cleanly.
+        /// </summary>
+        private const float ProgressResetThreshold = 0.001f;
         private FiremakingHudMode mode = FiremakingHudMode.None;
         private FiremakingBonfireObject activeBonfire;
         private SkillManager skillManager;
@@ -365,6 +370,13 @@ namespace Skills.Firemaking
                 normalized = Mathf.Clamp01(skill.IgnitionProgressNormalized);
             else if (mode == FiremakingHudMode.Bonfire)
                 normalized = Mathf.Clamp01(skill.BonfireFeedingProgressNormalized);
+
+            // If the skill reports a lower progress value we have started a new cycle (new log/feed).
+            if (normalized + ProgressResetThreshold < currentFill)
+            {
+                currentFill = normalized;
+                SetProgressFill(normalized);
+            }
 
             // Ensure the bar always advances even if the skill reports stale progress (e.g. after a failure retry).
             float targetFill = Mathf.Clamp01(currentFill + progressStep);
