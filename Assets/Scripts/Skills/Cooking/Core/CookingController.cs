@@ -141,6 +141,19 @@ namespace Skills.Cooking
 
             var searchResult = CookingInventoryHelper.FindCookableRecipe(inventory, CookingSkill, inventory.selectedIndex);
 
+            if (inventory != null && firemakingSkill != null && inventory.selectedIndex >= 0)
+            {
+                // When the player has a log highlighted, allow the firemaking controller to consume
+                // the interaction instead of beginning a cooking action immediately.
+                var selectedSlot = inventory.GetSlot(inventory.selectedIndex);
+                if (selectedSlot.item != null && firemakingSkill.GetDefinitionForItem(selectedSlot.item.id) != null)
+                {
+                    failureMessage = string.Empty;
+                    cachedFailureMessage = string.Empty;
+                    return false;
+                }
+            }
+
             if (!searchResult.HasRecipe)
             {
                 if (TryHandleCombinedBonfireFailure(node, out failureMessage))
