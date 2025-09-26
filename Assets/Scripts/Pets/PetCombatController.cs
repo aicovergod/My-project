@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Combat;
 using EquipmentSystem;
@@ -21,6 +22,9 @@ namespace Pets
         [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
         private HitSplatLibrary hitSplatLibrary;
 
+        [SerializeField, Tooltip("Vertical offset for hitsplats when no floating text anchor exists.")]
+        private float hitsplatFallbackOffset = 1f;
+
         /// <summary>
         /// Shared cache so pets reuse a single hitsplat library loaded from the Resources
         /// folder whenever no explicit reference has been assigned in the inspector.
@@ -39,6 +43,7 @@ namespace Pets
         private Sprite damageHitsplat;
         private Sprite zeroHitsplat;
         private Sprite maxHitHitsplat;
+        private readonly Dictionary<Transform, FloatingTextAnchorUtility.AnchorCache> hitsplatAnchorCache = new Dictionary<Transform, FloatingTextAnchorUtility.AnchorCache>();
 
         public bool IsAlive => true;
         public DamageType PreferredDefenceType => DamageType.Melee;
@@ -236,7 +241,8 @@ namespace Pets
                     source = ownerTarget;
                 int finalDamage = target.ApplyDamage(dmg, attacker.DamageType, SpellElement.None, source);
                 var sprite = finalDamage == maxHit ? maxHitHitsplat : damageHitsplat;
-                FloatingText.Show(finalDamage.ToString(), target.transform.position, Color.white, null, sprite);
+                Vector3 hitsplatPosition = FloatingTextAnchorUtility.ResolveAnchorPosition(target.transform, hitsplatFallbackOffset, hitsplatAnchorCache);
+                FloatingText.Show(finalDamage.ToString(), hitsplatPosition, Color.white, null, sprite);
                 if (npc != null)
                 {
                     var npcAttack = npc.GetComponent<NpcAttackController>();
@@ -246,7 +252,8 @@ namespace Pets
             }
             else
             {
-                FloatingText.Show("0", target.transform.position, Color.white, null, zeroHitsplat);
+                Vector3 hitsplatPosition = FloatingTextAnchorUtility.ResolveAnchorPosition(target.transform, hitsplatFallbackOffset, hitsplatAnchorCache);
+                FloatingText.Show("0", hitsplatPosition, Color.white, null, zeroHitsplat);
             }
         }
 

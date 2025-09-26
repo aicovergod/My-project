@@ -87,10 +87,14 @@ namespace Combat
         [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
         private HitSplatLibrary hitSplatLibrary;
 
+        [SerializeField, Tooltip("Vertical offset used when no dedicated floating text anchor is found.")]
+        private float hitsplatFallbackOffset = 1.1f;
+
         private Sprite damageHitsplat;
         private Sprite zeroHitsplat;
         private Sprite maxHitHitsplat;
         private IReadOnlyDictionary<SpellElement, Sprite> elementHitsplats;
+        private readonly Dictionary<Transform, FloatingTextAnchorUtility.AnchorCache> hitsplatAnchorCache = new Dictionary<Transform, FloatingTextAnchorUtility.AnchorCache>();
 
         private void Awake()
         {
@@ -439,22 +443,23 @@ namespace Combat
                 finalDamage = target.ApplyDamage(damage, type, element, source);
                 Sprite sprite;
                 Color textColor = Color.white;
+                Vector3 hitsplatPosition = FloatingTextAnchorUtility.ResolveAnchorPosition(target.transform, hitsplatFallbackOffset, hitsplatAnchorCache);
                 if (finalDamage == 0)
                 {
                     sprite = zeroHitsplat;
-                    FloatingText.Show("0", target.transform.position, textColor, null, sprite);
+                    FloatingText.Show("0", hitsplatPosition, textColor, null, sprite);
                 }
                 else if (type == DamageType.Magic && elementHitsplats != null && elementHitsplats.TryGetValue(element, out var elemSprite) && elemSprite != null)
                 {
                     sprite = elemSprite;
                     if (element == SpellElement.Air)
                         textColor = Color.black;
-                    FloatingText.Show(finalDamage.ToString(), target.transform.position, textColor, null, sprite);
+                    FloatingText.Show(finalDamage.ToString(), hitsplatPosition, textColor, null, sprite);
                 }
                 else
                 {
                     sprite = finalDamage == maxHit ? maxHitHitsplat : damageHitsplat;
-                    FloatingText.Show(finalDamage.ToString(), target.transform.position, textColor, null, sprite);
+                    FloatingText.Show(finalDamage.ToString(), hitsplatPosition, textColor, null, sprite);
                 }
                 AwardXp(finalDamage, style, type);
                 if (finalDamage > 0 && !target.IsAlive)
@@ -467,7 +472,8 @@ namespace Combat
             }
             else
             {
-                FloatingText.Show("0", target.transform.position, Color.white, null, zeroHitsplat);
+                Vector3 hitsplatPosition = FloatingTextAnchorUtility.ResolveAnchorPosition(target.transform, hitsplatFallbackOffset, hitsplatAnchorCache);
+                FloatingText.Show("0", hitsplatPosition, Color.white, null, zeroHitsplat);
                 Debug.Log($"Player missed {targetName}.");
                 OnAttackLanded?.Invoke(0, false);
             }

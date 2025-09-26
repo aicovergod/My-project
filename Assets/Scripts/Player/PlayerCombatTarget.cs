@@ -18,6 +18,9 @@ namespace Player
         [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
         private HitSplatLibrary hitSplatLibrary;
 
+        [SerializeField, Tooltip("Vertical offset applied when spawning hitsplats without an explicit anchor.")]
+        private float hitsplatFallbackOffset = 1.1f;
+
         private PlayerHitpoints hitpoints;
         private Sprite damageHitsplat;
         private Sprite zeroHitsplat;
@@ -25,6 +28,7 @@ namespace Player
         private Sprite poisonHitsplat;
         private IReadOnlyDictionary<SpellElement, Sprite> elementHitsplats;
         private AntifireProtectionController antifireProtection;
+        private FloatingTextAnchorUtility.AnchorCache hitsplatAnchorCache;
 
         private void Awake()
         {
@@ -92,7 +96,8 @@ namespace Player
             }
             else
                 sprite = damageHitsplat;
-            FloatingText.Show(mitigatedAmount.ToString(), transform.position, textColor, null, sprite);
+            Vector3 hitsplatPosition = FloatingTextAnchorUtility.ResolveAnchorPosition(transform, hitsplatFallbackOffset, ref hitsplatAnchorCache);
+            FloatingText.Show(mitigatedAmount.ToString(), hitsplatPosition, textColor, null, sprite);
 
             if (mitigatedAmount != amount)
                 Debug.Log($"Player took {mitigatedAmount} damage ({amount} before antifire mitigation).");
