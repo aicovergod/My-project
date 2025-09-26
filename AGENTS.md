@@ -28,21 +28,27 @@
   - `CombatController`, `CombatMath`, and `CombatEnums` coordinate player combat ticks, max hit calculations, spell elements, and hitsplat visuals via `Resources/HitSplatLibrary`.
   - NPC combat uses `NpcAttackController`, projectile logic, and drop resolution (`Drops` folder). Pet-assisted combat hooks exist in `Pets`.
   - Attach `Combat/OnHitPoisonApplier` to weapons or projectiles when you need configurable poison procs. It consumes `PoisonConfig` assets, honours `requiresDamage`, and should be invoked alongside the combat hit confirmation pipeline.
+- **Player Systems** (`Assets/Scripts/Player`)
+  - `PlayerMover` persists across scenes, auto-walks gathering nodes, saves position ticks, and respects freeze or respawn locks while keeping autosaves fresh.
+  - `PlayerCombatLoadout`, `PlayerCombatTarget`, and `PlayerHitpoints` aggregate combat stats, weapon-driven poison hooks, and hitpoint changes for UI and respawn systems.
+  - `PlayerRespawnSystem` cooperates with `World/RespawnPoint`, clears buffs via `BuffTimerService`, and triggers screen fades/death jingle through `SoundManager`. `PlayerEat` handles 0.6 s food ticks for OSRS-style healing windows.
 - **Magic System** (`Assets/Scripts/Magic`, `Assets/Resources/Spells`, `Assets/Prefabs/Spells`)
   - `SpellDefinition` ScriptableObjects set spell range, projectile speed, hit FX, max hit, elemental type, and optional freeze settings. Respect `loadOrder` for UI sorting, keep `requiredMagicLevel` aligned with `SkillManager`, and pair freeze toggles with `Status/FrozenStatusController` listeners.
   - Projectile prefabs (`FireProjectile`) and hit effect prefabs (`HitEffect`) live under `Assets/Prefabs/Spells`. Sprite VFX are in `Assets/Sprites/GFX/Spells` and should stay 64×64 transparent assets matching the ScriptableObject name.
   - Spells load from `Resources/Spells`, so keep asset names unique and consistent with prefabs/icons. New strike-tier spells should call `MagicUI.UpdateStrikeMaxHits` logic by following the naming convention (`*Strike`).
 - **Inventory, Equipment & Items** (`Assets/Scripts/Inventory`, `Assets/Scripts/Items`)
-  - Inventory UI defaults to LegacyRuntime, supports stack splitting, drag/drop, ground loot via `Drops/GroundItemSpawner`, and equipment synergy through `EquipmentAggregator`.
+  - `Inventory`, `ItemUseResolver`, `StackSplitDialog`, and `InventoryDropMenu` underpin the OSRS-style bag. Equipment data flows through `Equipment`, `EquipmentAggregator`, and slot UI scripts.
+  - `Items/Consumables` and `Items/ItemCombatStats` define stat blocks, while `PlayerEat` and `Inventory/ItemUseResolver` translate consumables into heals or buffs.
   - Scriptable item data resides in `Assets/Item` and `Assets/Resources/Items`. Combination recipes live in `Resources/ItemCombinationDatabase`.
 - **Economy** (`Assets/Scripts/Shop`, `Assets/Scripts/Bank`)
   - Shop UIs share fonts/settings with inventory, reference `Shop`/`ShopUI` scripts, and rely on item databases. Bank UI reuses the same font default.
+  - `BankUI`, `BankDepositMenu`, and `BankWithdrawMenu` process deposits/withdrawals with inventory hooks, while `BankOpener` gates world interactions.
 - **Dialogue & Quests** (`Assets/Scripts/Dialogue`, `Assets/Scripts/Quests`)
   - Dialogue data/manager/UI implement OSRS-style panels. Quests use `QuestManager` (saveable) with ScriptableObject quest definitions in `Resources/Quests`.
 - **NPCs & World** (`Assets/Scripts/NPC`, `Assets/Scripts/World`)
-  - NPC interaction, navigation, and movement wrappers live here. Minimap, doors, scene transitions, and respawns sit under `World`.
+  - NPC combat/movement live under `NPC/Combat`, `NPC/Movement`, and `NPC/Navigation`; interaction/UI wrappers route right-click menus and HUDs. `NpcFaction` powers faction-aware tests.
   - `World/SceneTransitionManager` now owns additive scene swaps, persistent-object callbacks, spawn point routing, and fade timing. Use `SceneTransitionInteractable` to trigger transitions, populate `SceneTransitionManager.NextSpawnPoint`, and keep persistent services registered via `IScenePersistent` so they receive unload/load callbacks.
-  - `Player/PlayerRespawnSystem` cooperates with `World/RespawnPoint` markers to cache death return data, stop combat/buffs, play the OSRS death jingle through `Audio/SoundManager`, and fade via `World/ScreenFader` before respawning the player in the correct scene.
+  - `World/Minimap` & `MinimapMarker` render the overworld HUD, `PopupText`/`PopupTextPool` feed floating world text, and `Environment/FenceColliderFoot` supplies nav blockers for fence kits.
 - **UI Layer** (`Assets/Scripts/UI`, `Assets/Scripts/Player`, `Assets/Scripts/Status`)
   - HUDs such as `HealthHUD`, merge timers, tab buttons, and combat/skill overlays expect LegacyRuntime fonts and OSRS layout cues. `UI/PersistentEventSystem` maintains input modules across scenes.
   - `UI/MagicUI` is a `PersistentSceneSingleton` that builds the spellbook grid from `Resources/Spells`, caches strike spells for max-hit syncing, and drives the active spell/last selected spell state consumed by `CombatController` and `PlayerCombatLoadout`.
@@ -70,6 +76,7 @@
 - **Buff Icons & Status Configs**: HUD sprites reside in `Assets/Resources/UI/Buffs` while status configs (poison defaults, etc.) live in `Assets/Resources/Status`. Align icon IDs with `BuffTimerDefinition.iconId` and keep `PoisonConfig.Id` stable for saves.
 - **Firemaking Data**: Log ScriptableObjects live under `Assets/Resources/Firemaking/Logs`. Populate new entries there when introducing log tiers, bonfire lifetimes, ashes, or Phoenix XP hooks so `FiremakingSkill` can load them automatically.
 - **Audio**: The central `Assets/Scripts/Audio/SoundManager` component exposes the `SoundEffect` enum for UI/gameplay cues (including death jingles). Register new clips there when wiring fresh feedback.
+- **Sprite Depth**: `Assets/Scripts/Util/SpriteDepth` offsets render order using the object's world Y so sprites overlap consistently in the 2.5D stack.
 - **Book Content**: Lore assets live in `Assets/Resources/Books`. Use `\f` within `BookData.content` to break pages and avoid relying on the obsolete `pages` list.
 
 ## Code Conventions
