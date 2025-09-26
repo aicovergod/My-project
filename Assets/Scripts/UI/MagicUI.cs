@@ -25,6 +25,10 @@ namespace UI
 
         // Strike spell references cached for max hit adjustments
         private readonly List<SpellDefinition> strikeSpells = new();
+        // Runtime map preserving each strike's original max hit so ScriptableObjects are never mutated.
+        private readonly Dictionary<SpellDefinition, int> strikeOriginalMaxHits = new();
+        // Runtime map storing the boosted max hit values currently applied to each strike spell.
+        private readonly Dictionary<SpellDefinition, int> strikeRuntimeMaxHits = new();
 
         /// <summary>Currently selected spell.</summary>
         public static SpellDefinition ActiveSpell { get; private set; }
@@ -34,7 +38,19 @@ namespace UI
         public static SpellDefinition LastSelectedSpell { get; private set; } = null;
 
         /// <summary>Maximum hit for the active spell.</summary>
-        public static int ActiveSpellMaxHit => ActiveSpell != null ? ActiveSpell.maxHit : 0;
+        public static int ActiveSpellMaxHit
+        {
+            get
+            {
+                if (ActiveSpell == null)
+                    return 0;
+
+                var ui = Instance ?? FindObjectOfType<MagicUI>();
+                return ui != null
+                    ? ui.GetRuntimeMaxHit(ActiveSpell)
+                    : ActiveSpell.maxHit;
+            }
+        }
 
         public static void ClearActiveSpell()
         {
@@ -107,12 +123,18 @@ namespace UI
         private void CacheStrikeSpells()
         {
             strikeSpells.Clear();
+            strikeOriginalMaxHits.Clear();
+            strikeRuntimeMaxHits.Clear();
             string[] names = { "WindStrike", "WaterStrike", "EarthStrike", "ElectricStrike", "FireStrike" };
             foreach (var name in names)
             {
                 var spell = spells.Find(s => s.name == name);
                 if (spell != null)
+                {
                     strikeSpells.Add(spell);
+                    strikeOriginalMaxHits[spell] = spell.maxHit;
+                    strikeRuntimeMaxHits[spell] = spell.maxHit;
+                }
             }
         }
 
@@ -180,18 +202,34 @@ namespace UI
             int highest = 0;
             foreach (var spell in strikeSpells)
             {
-                if (spell.requiredMagicLevel <= level && spell.maxHit > highest)
-                    highest = spell.maxHit;
+                var baseMaxHit = strikeOriginalMaxHits.TryGetValue(spell, out var original)
+                    ? original
+                    : spell.maxHit;
+                if (spell.requiredMagicLevel <= level && baseMaxHit > highest)
+                    highest = baseMaxHit;
             }
-
-            if (highest == 0)
-                return;
 
             foreach (var spell in strikeSpells)
             {
-                if (spell.requiredMagicLevel <= level)
-                    spell.maxHit = highest;
+                var baseMaxHit = strikeOriginalMaxHits.TryGetValue(spell, out var original)
+                    ? original
+                    : spell.maxHit;
+                if (spell.requiredMagicLevel <= level && highest > 0)
+                    strikeRuntimeMaxHits[spell] = highest;
+                else
+                    strikeRuntimeMaxHits[spell] = baseMaxHit;
             }
+        }
+
+        private int GetRuntimeMaxHit(SpellDefinition spell)
+        {
+            if (spell == null)
+                return 0;
+
+            if (strikeRuntimeMaxHits.TryGetValue(spell, out var strikeMaxHit))
+                return strikeMaxHit;
+
+            return spell.maxHit;
         }
 
         public void Toggle()
