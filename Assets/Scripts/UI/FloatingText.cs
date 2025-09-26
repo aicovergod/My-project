@@ -17,6 +17,7 @@ namespace UI
         private Vector3 worldPosition;
         private Camera mainCamera;
         private float remainingLifetime;
+        private bool needsInitialSnap = true;
 
         /// <summary>
         ///     Backing field for <see cref="DebugLogMessages"/> so the toggle persists between spawn calls.
@@ -72,6 +73,7 @@ namespace UI
             float finalSize = size ?? instance.textSize;
             instance.uiText.fontSize = Mathf.RoundToInt(64 * finalSize);
             instance.remainingLifetime = instance.lifetime;
+            instance.needsInitialSnap = true;
 
             if (debugLogMessages)
             {
@@ -85,13 +87,25 @@ namespace UI
             remainingLifetime = lifetime;
         }
 
-        private void Update()
+        private void LateUpdate()
         {
-            worldPosition += floatSpeed * Time.deltaTime;
+            // Ensure we always have the latest camera reference in case the active camera changed mid-session.
             if (mainCamera == null)
                 mainCamera = Camera.main;
-            if (rectTransform != null && mainCamera != null)
+
+            if (rectTransform == null || mainCamera == null)
+                return;
+
+            // Reapply the first projection in LateUpdate so the spawn frame respects any camera movement that
+            // occurred after the popup was created earlier in the frame.
+            if (needsInitialSnap)
+            {
                 rectTransform.position = mainCamera.WorldToScreenPoint(worldPosition);
+                needsInitialSnap = false;
+            }
+
+            worldPosition += floatSpeed * Time.deltaTime;
+            rectTransform.position = mainCamera.WorldToScreenPoint(worldPosition);
 
             remainingLifetime -= Time.deltaTime;
             if (remainingLifetime <= 0f)
