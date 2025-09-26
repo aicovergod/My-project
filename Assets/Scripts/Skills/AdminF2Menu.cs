@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using Player;
 using Beastmaster;
 using Pets;
+using NPC;
 using BankSystem;
 using Skills.Cooking;
 using Skills.Fishing;
@@ -368,6 +369,8 @@ namespace Skills
                 () => firemakingSkillBehaviour.EnableDebugLogging,
                 value => firemakingSkillBehaviour.EnableDebugLogging = value);
 
+            DrawNpcDamageLoggingControls();
+
             // Allow QA to mirror floating text popups in the console for firemaking/cooking debugging.
             bool echoFloatingText = FloatingText.DebugLogMessages;
             bool requestedEchoFloatingText = GUILayout.Toggle(echoFloatingText, "Echo Floating Text to Console");
@@ -546,6 +549,57 @@ namespace Skills
                 setValue(updated);
 
             GUI.enabled = previousEnabled;
+        }
+
+        /// <summary>
+        /// Draws Admin menu controls that allow QA to toggle NPC combat damage logging at runtime.
+        /// </summary>
+        private void DrawNpcDamageLoggingControls()
+        {
+            GUILayout.Space(10f);
+            GUILayout.Label("NPC Debug");
+
+            var combatants = NpcCombatant.ActiveCombatants;
+            bool anyCombatants = false;
+
+            for (int i = 0; i < combatants.Count; i++)
+            {
+                var combatant = combatants[i];
+                if (combatant == null)
+                    continue;
+
+                anyCombatants = true;
+
+                bool current = combatant.LogDamage;
+                bool updated = GUILayout.Toggle(current, $"{combatant.name} Damage Logs");
+
+                if (updated != current)
+                    combatant.LogDamage = updated;
+            }
+
+            if (!anyCombatants)
+            {
+                GUILayout.Label("No NPC combatants active.");
+                return;
+            }
+
+            if (GUILayout.Button("Enable Damage Logs for All NPCs"))
+            {
+                foreach (var combatant in combatants)
+                {
+                    if (combatant != null)
+                        combatant.LogDamage = true;
+                }
+            }
+
+            if (GUILayout.Button("Disable Damage Logs for All NPCs"))
+            {
+                foreach (var combatant in combatants)
+                {
+                    if (combatant != null)
+                        combatant.LogDamage = false;
+                }
+            }
         }
 
         /// <summary>

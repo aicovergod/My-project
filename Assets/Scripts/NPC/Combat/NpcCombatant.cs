@@ -30,6 +30,8 @@ namespace NPC
         public static IReadOnlyList<NpcCombatant> ActiveCombatants => activeCombatants;
 
         [SerializeField] private NpcCombatProfile profile;
+        [SerializeField, Tooltip("When enabled this NPC will emit detailed damage logs to the console for debugging.")]
+        private bool logDamage = false;
         [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
         private HitSplatLibrary hitSplatLibrary;
 
@@ -60,6 +62,16 @@ namespace NPC
         public int CurrentHP => currentHp;
         public int MaxHP => profile != null ? profile.HitpointsLevel : currentHp;
         public NpcCombatProfile Profile => profile;
+
+        /// <summary>
+        /// When true this NPC will emit verbose console logging whenever damage is applied.
+        /// Exposed so the AdminF2Menu can toggle the behaviour at runtime for QA.
+        /// </summary>
+        public bool LogDamage
+        {
+            get => logDamage;
+            set => logDamage = value;
+        }
 
         /// <summary>Returns true when this NPC can be affected by the frozen status effect.</summary>
         public bool IsFreezable => profile == null || !profile.NotFreezable;
@@ -142,7 +154,10 @@ namespace NPC
                 }
             }
             currentHp = Mathf.Max(0, currentHp - finalAmount);
-            Debug.Log($"{name} took {finalAmount} damage ({currentHp}/{MaxHP}).");
+            if (logDamage)
+            {
+                Debug.Log($"{name} took {finalAmount} damage ({currentHp}/{MaxHP}).", this);
+            }
             if (finalAmount > 0)
             {
                 flashEffect?.TriggerFlash(finalAmount, MaxHP);
