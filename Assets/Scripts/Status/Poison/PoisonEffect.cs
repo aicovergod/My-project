@@ -5,6 +5,15 @@ using Combat;
 namespace Status.Poison
 {
     /// <summary>
+    /// Shared poison utility values so controllers/effects remain synchronised.
+    /// </summary>
+    internal static class PoisonDefaults
+    {
+        /// <summary>Fallback tick interval when a config does not provide one.</summary>
+        public const float DefaultIntervalSeconds = 15f;
+    }
+
+    /// <summary>
     /// Runtime poison state and ticking logic.
     /// </summary>
     public class PoisonEffect
@@ -61,10 +70,13 @@ namespace Status.Poison
         {
             if (!active)
                 return;
+            float intervalSeconds = Config.tickIntervalSeconds > 0f
+                ? Config.tickIntervalSeconds
+                : PoisonDefaults.DefaultIntervalSeconds;
             TickTimer += delta;
-            if (TickTimer >= Config.tickIntervalSeconds)
+            if (TickTimer >= intervalSeconds)
             {
-                TickTimer -= Config.tickIntervalSeconds;
+                TickTimer -= intervalSeconds;
                 dealTrueDamage?.Invoke(CurrentDamage);
                 OnPoisonTick?.Invoke(CurrentDamage);
                 TicksSinceDecay++;

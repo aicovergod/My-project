@@ -13,8 +13,6 @@ namespace Status.Poison
         [Tooltip("Stats component implementing CombatTarget for this entity.")]
         [SerializeField] private MonoBehaviour statsComponent;
 
-        private const float DefaultPoisonInterval = 15f;
-
         private CombatTarget stats;
         private CombatController combat;
         private PoisonEffect active;
@@ -161,7 +159,9 @@ namespace Status.Poison
 
             if (lifetimeSeconds > 0f && cfg.decayAmountPerStep > 0 && cfg.hitsPerDecayStep > 0)
             {
-                float intervalSeconds = cfg.tickIntervalSeconds > 0f ? cfg.tickIntervalSeconds : DefaultPoisonInterval;
+                float intervalSeconds = cfg.tickIntervalSeconds > 0f
+                    ? cfg.tickIntervalSeconds
+                    : PoisonDefaults.DefaultIntervalSeconds;
                 int decayAmount = Mathf.Max(1, cfg.decayAmountPerStep);
                 int hitsPerStep = Mathf.Max(1, cfg.hitsPerDecayStep);
                 // Determine how many full decay steps have completed so we can subtract their elapsed ticks.
@@ -289,7 +289,9 @@ namespace Status.Poison
                 return;
             }
 
-            float intervalSeconds = cfg.tickIntervalSeconds > 0f ? cfg.tickIntervalSeconds : DefaultPoisonInterval;
+            float intervalSeconds = cfg.tickIntervalSeconds > 0f
+                ? cfg.tickIntervalSeconds
+                : PoisonDefaults.DefaultIntervalSeconds;
             intervalTicks = Mathf.Max(1, Mathf.CeilToInt(intervalSeconds / Ticker.TickDuration));
             float clampedTimer = Mathf.Clamp(currentTickTimer, 0f, intervalSeconds);
             float remainingSeconds = Mathf.Max(0f, intervalSeconds - clampedTimer);
@@ -305,7 +307,9 @@ namespace Status.Poison
             if (cfg == null)
                 return 0f;
 
-            float intervalSeconds = cfg.tickIntervalSeconds > 0f ? cfg.tickIntervalSeconds : DefaultPoisonInterval;
+            float intervalSeconds = cfg.tickIntervalSeconds > 0f
+                ? cfg.tickIntervalSeconds
+                : PoisonDefaults.DefaultIntervalSeconds;
             if (cfg.decayAmountPerStep <= 0 || cfg.hitsPerDecayStep <= 0)
                 return 0f;
 
