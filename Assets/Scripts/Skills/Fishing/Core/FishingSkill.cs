@@ -19,6 +19,9 @@ namespace Skills.Fishing
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
+        private const string DefaultBycatchProfileKey = "anon-profile";
+        private static readonly int DefaultBycatchProfileHash = ComputeStableStringHash(DefaultBycatchProfileKey);
+
         private BycatchManager bycatchManager;
         private bool waitingForServices;
 
@@ -294,7 +297,10 @@ namespace Skills.Fishing
             var waterType = currentSpot.def != null ? currentSpot.def.WaterType : WaterType.Any;
             Vector3? spotPosition = currentSpot != null ? currentSpot.transform.position : (Vector3?)null;
             int streak = bycatchManager.GetStreak(waterType);
-            int playerIdHash = gameObject.GetInstanceID();
+            string profileId = SaveManager.ActiveProfileId;
+            int playerIdHash = !string.IsNullOrEmpty(profileId)
+                ? ComputeStableStringHash(profileId)
+                : DefaultBycatchProfileHash;
             int nodeHash = currentSpot.def != null ? currentSpot.def.Id.GetHashCode() : currentSpot.GetInstanceID();
 
             int chanceRollIndex = bycatchRollIndex++;
@@ -379,6 +385,30 @@ namespace Skills.Fishing
 
             if (!rewardDisplayed && !spotPosition.HasValue)
                 GatheringFloatingTextService.TryShowAtAnchor(message, anchor);
+        }
+
+        /// <summary>
+        ///     Computes a deterministic hash for the supplied string so bycatch RNG seeds
+        ///     stay stable across sessions and platforms.
+        /// </summary>
+        /// <param name="value">Profile identifier that should be transformed into a hash.</param>
+        /// <returns>Stable 32-bit hash derived from the provided string.</returns>
+        private static int ComputeStableStringHash(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return 0;
+
+            const uint fnvOffsetBasis = 2166136261u;
+            const uint fnvPrime = 16777619u;
+
+            uint hash = fnvOffsetBasis;
+            foreach (char c in value)
+            {
+                hash ^= c;
+                hash *= fnvPrime;
+            }
+
+            return unchecked((int)hash);
         }
 
         private FishingTool MapTool(FishingToolDefinition tool)
