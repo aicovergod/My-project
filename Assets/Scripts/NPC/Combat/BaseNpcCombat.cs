@@ -253,11 +253,27 @@ namespace NPC
 
         protected virtual IEnumerator AttackRoutine(CombatTarget target)
         {
-            var wait = new WaitForSeconds(4 * CombatMath.TICK_SECONDS);
+            // Cache the WaitForSeconds instance that matches the current attack speed so we
+            // avoid allocating a new one every loop iteration while still responding to
+            // runtime changes (e.g., debuffs modifying the profile's attack speed).
+            WaitForSeconds cachedAttackDelay = null;
+            int cachedAttackSpeedTicks = -1;
 
             // Wait until the player is within melee range before performing the first attack.
             while (combatant.IsAlive && target != null && target.IsAlive)
             {
+                // Determine the current attack speed, defaulting to four ticks when no profile
+                // data is available, and clamp so that NPCs always attack at least once per tick.
+                var profile = combatant.Profile;
+                int attackSpeedTicks = profile != null ? profile.AttackSpeedTicks : 4;
+                attackSpeedTicks = Mathf.Max(1, attackSpeedTicks);
+
+                if (attackSpeedTicks != cachedAttackSpeedTicks || cachedAttackDelay == null)
+                {
+                    cachedAttackSpeedTicks = attackSpeedTicks;
+                    cachedAttackDelay = new WaitForSeconds(cachedAttackSpeedTicks * CombatMath.TICK_SECONDS);
+                }
+
                 float distance = Vector2.Distance(target.transform.position, transform.position);
                 if (distance > 15f)
                 {
@@ -268,7 +284,7 @@ namespace NPC
                 if (distance <= CombatMath.MELEE_RANGE)
                 {
                     ResolveAttack(target);
-                    yield return wait;
+                    yield return cachedAttackDelay;
                 }
                 else
                 {
