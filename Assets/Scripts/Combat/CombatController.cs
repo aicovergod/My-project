@@ -467,7 +467,7 @@ namespace Combat
                 Debug.Log($"Player dealt {finalDamage} damage to {targetName}.");
                 var applier = GetComponentInChildren<OnHitPoisonApplier>();
                 if (applier != null && targetMb != null)
-                    applier.TryApply(targetMb.gameObject, finalDamage > 0);
+                    applier.TryApply(targetMb.gameObject, finalDamage > 0, source);
                 OnAttackLanded?.Invoke(finalDamage, hit);
             }
             else

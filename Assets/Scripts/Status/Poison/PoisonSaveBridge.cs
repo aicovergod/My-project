@@ -329,7 +329,7 @@ namespace Status.Poison
             {
                 float savedImmune = controller.ImmunityTimer;
                 controller.ImmunityTimer = 0f;
-                controller.ApplyPoison(config);
+                controller.ApplyPoison(config, null);
 
                 var effect = controller.ActiveEffect;
                 if (effect != null && effect.IsActive)

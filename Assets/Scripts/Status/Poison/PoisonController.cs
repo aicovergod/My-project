@@ -22,6 +22,8 @@ namespace Status.Poison
         private int ticksUntilNextDamage;
         private int intervalTicks;
         private bool tickerSubscribed;
+        // Tracks the last combatant who applied poison so delayed ticks attribute damage correctly.
+        private CombatTarget lastPoisonSource;
         // Cached timer definition so removal payloads mirror the most recent HUD entry.
         private BuffTimerDefinition lastPoisonDefinition;
         private bool hasLastPoisonDefinition;
@@ -84,13 +86,17 @@ namespace Status.Poison
         /// <summary>
         /// Apply a poison configuration to this entity, refreshing if already poisoned.
         /// </summary>
-        public void ApplyPoison(PoisonConfig cfg)
+        /// <param name="cfg">Configuration describing the poison.</param>
+        /// <param name="source">Combatant responsible for applying the poison.</param>
+        public void ApplyPoison(PoisonConfig cfg, CombatTarget source)
         {
             ResolveStatsComponent();
             if (IsImmune || cfg == null)
                 return;
             if (stats != null && !stats.IsAlive)
                 return;
+            // Cache the attacker so poison ticks are attributed to the correct combatant.
+            lastPoisonSource = source;
             if (active == null)
             {
                 active = new PoisonEffect(cfg);
@@ -118,6 +124,7 @@ namespace Status.Poison
             UnsubscribeFromTicker();
             immunityTimer = Mathf.Max(immunityTimer, immunitySeconds);
             hasPendingBuffTimer = false;
+            lastPoisonSource = null;
         }
 
         /// <summary>
@@ -212,6 +219,7 @@ namespace Status.Poison
             intervalTicks = 0;
             UnsubscribeFromTicker();
             hasPendingBuffTimer = false;
+            lastPoisonSource = null;
         }
 
         /// <summary>
@@ -219,7 +227,8 @@ namespace Status.Poison
         /// </summary>
         private bool DealTrueDamageBridge(int amount)
         {
-            stats?.ApplyDamage(amount, DamageType.Poison, SpellElement.None, this);
+            var damageSource = (object)lastPoisonSource ?? this;
+            stats?.ApplyDamage(amount, DamageType.Poison, SpellElement.None, damageSource);
             return true;
         }
 
@@ -238,6 +247,7 @@ namespace Status.Poison
             NotifyBuffRemoved(cfg);
             OnPoisonEnd?.Invoke();
             active = null;
+            lastPoisonSource = null;
         }
 
         /// <summary>

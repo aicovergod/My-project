@@ -519,7 +519,7 @@ namespace Status
             }
 
             controller.ImmunityTimer = 0f;
-            controller.ApplyPoison(config);
+            controller.ApplyPoison(config, null);
 
             var effect = controller.ActiveEffect;
             bool effectRestored = false;

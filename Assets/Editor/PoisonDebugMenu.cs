@@ -42,7 +42,7 @@ public static class PoisonDebugMenu
             controller = go.AddComponent<PoisonController>();
         var cfg = Resources.Load<PoisonConfig>($"Status/Poison/{id}");
         if (cfg != null)
-            controller.ApplyPoison(cfg);
+            controller.ApplyPoison(cfg, null);
         Debug.Log($"Applied {id} at {Time.time}");
     }
 
