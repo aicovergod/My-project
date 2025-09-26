@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,9 +6,9 @@ namespace UI
 {
     /// <summary>
     /// Utility helpers that resolve the ideal world position for floating combat text. The
-    /// resolution order mirrors OSRS behaviour: prefer a dedicated <c>FloatingTextAnchor</c>,
-    /// fall back to sprite or collider bounds, then finally apply a configurable upward
-    /// offset to the root transform.
+    /// resolution order mirrors OSRS behaviour: prefer a dedicated <c>FloatingTextAnchor</c>
+    /// or <c>HitSplatAnchor</c>, fall back to sprite or collider bounds, then finally apply a
+    /// configurable upward offset to the root transform.
     /// </summary>
     public static class FloatingTextAnchorUtility
     {
@@ -29,7 +30,7 @@ namespace UI
             }
         }
 
-        private const string AnchorName = "FloatingTextAnchor";
+        private static readonly string[] AnchorNames = { "FloatingTextAnchor", "HitSplatAnchor" };
 
         /// <summary>
         /// Resolve the best floating text position, maintaining cache state for the supplied
@@ -113,15 +114,24 @@ namespace UI
             return position;
         }
 
-        /// <summary>Search the hierarchy for a child named <c>FloatingTextAnchor</c>.</summary>
+        /// <summary>
+        /// Search the hierarchy for a child named <c>FloatingTextAnchor</c> or
+        /// <c>HitSplatAnchor</c>, allowing designers to use either naming convention.
+        /// </summary>
         private static Transform FindFloatingTextAnchor(Transform root)
         {
             var transforms = root.GetComponentsInChildren<Transform>(true);
             for (int i = 0; i < transforms.Length; i++)
             {
                 var child = transforms[i];
-                if (child != null && child != root && child.name == AnchorName)
-                    return child;
+                if (child == null || child == root)
+                    continue;
+
+                for (int j = 0; j < AnchorNames.Length; j++)
+                {
+                    if (string.Equals(child.name, AnchorNames[j], StringComparison.Ordinal))
+                        return child;
+                }
             }
             return null;
         }
