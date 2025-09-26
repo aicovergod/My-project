@@ -118,6 +118,7 @@ namespace NPC
                 }
                 if (remove)
                 {
+                    Transform targetTransform = t != null ? t.transform : null;
                     threatLevels.Remove(t);
                     lastDamageTimes.Remove(t);
                     if (activeAttacks.TryGetValue(t, out var c))
@@ -125,7 +126,8 @@ namespace NPC
                         if (c != null)
                             StopCoroutine(c);
                         activeAttacks.Remove(t);
-                        wanderer?.ExitCombat(t.transform);
+                        if (targetTransform != null)
+                            wanderer?.ExitCombat(targetTransform);
                     }
                 }
             }
@@ -200,7 +202,10 @@ namespace NPC
                 float bestDist = float.MaxValue;
                 foreach (var t in activeAttacks.Keys)
                 {
-                    float dist = Vector2.Distance(t.transform.position, transform.position);
+                    Transform targetTransform = t != null ? t.transform : null;
+                    if (targetTransform == null)
+                        continue;
+                    float dist = Vector2.Distance(targetTransform.position, transform.position);
                     if (dist < bestDist)
                     {
                         bestDist = dist;
@@ -208,7 +213,11 @@ namespace NPC
                     }
                 }
                 if (closest != null)
-                    npcFacing?.FaceTarget(closest.transform);
+                {
+                    Transform closestTransform = closest.transform;
+                    if (closestTransform != null)
+                        npcFacing?.FaceTarget(closestTransform);
+                }
             }
         }
 
@@ -268,10 +277,16 @@ namespace NPC
                 }
             }
 
-            wanderer?.ExitCombat(target.transform);
-            activeAttacks.Remove(target);
-            threatLevels.Remove(target);
-            lastDamageTimes.Remove(target);
+            Transform targetTransform = target != null ? target.transform : null;
+            if (targetTransform != null)
+                wanderer?.ExitCombat(targetTransform);
+
+            if (target != null)
+            {
+                activeAttacks.Remove(target);
+                threatLevels.Remove(target);
+                lastDamageTimes.Remove(target);
+            }
             if (activeAttacks.Count == 0)
             {
                 wanderer?.ForceReturnToOrigin();
