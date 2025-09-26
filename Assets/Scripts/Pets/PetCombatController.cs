@@ -85,7 +85,10 @@ namespace Pets
         public void CommandAttack(CombatTarget target)
         {
             if (!CanFight || target == null || !target.IsAlive)
+            {
+                CancelAttack();
                 return;
+            }
 
             // Prevent restarting the attack routine when already attacking the same target.
             if (currentTarget == target && attackRoutine != null)
@@ -131,11 +134,7 @@ namespace Pets
                     yield return null;
                 }
             }
-            if (spriteAnimator != null)
-                spriteAnimator.UpdateVisuals(Vector2.zero);
-            follower.enabled = true;
-            attackRoutine = null;
-            currentTarget = null;
+            CancelAttackInternal(false);
         }
 
         private void ResolveAttack(CombatTarget target)
@@ -275,11 +274,7 @@ namespace Pets
 
         private void OnDisable()
         {
-            if (attackRoutine != null)
-                StopCoroutine(attackRoutine);
-            if (spriteSwapRoutine != null)
-                StopCoroutine(spriteSwapRoutine);
-            currentTarget = null;
+            CancelAttack();
         }
 
         private IEnumerator AttackSpriteSwap()
@@ -288,6 +283,45 @@ namespace Pets
             yield return new WaitForSeconds(0.2f);
             spriteRenderer.sprite = defaultSprite;
             spriteSwapRoutine = null;
+        }
+
+        /// <summary>
+        /// Stops any active attack behaviour and restores the follower state so pets resume
+        /// trailing their owner immediately after being hidden or disabled.
+        /// </summary>
+        private void CancelAttack()
+        {
+            CancelAttackInternal(true);
+        }
+
+        /// <summary>
+        /// Shared cancellation logic used by both external callers and the attack coroutine
+        /// itself. When <paramref name="stopCoroutine"/> is true the active attack coroutine
+        /// is halted, otherwise the caller is responsible for exiting the routine gracefully.
+        /// </summary>
+        private void CancelAttackInternal(bool stopCoroutine)
+        {
+            if (stopCoroutine && attackRoutine != null)
+                StopCoroutine(attackRoutine);
+
+            attackRoutine = null;
+
+            if (spriteSwapRoutine != null)
+            {
+                StopCoroutine(spriteSwapRoutine);
+                spriteSwapRoutine = null;
+            }
+
+            currentTarget = null;
+
+            if (spriteAnimator != null)
+                spriteAnimator.UpdateVisuals(Vector2.zero);
+
+            if (spriteRenderer != null && defaultSprite != null)
+                spriteRenderer.sprite = defaultSprite;
+
+            if (follower != null)
+                follower.enabled = true;
         }
     }
 }
