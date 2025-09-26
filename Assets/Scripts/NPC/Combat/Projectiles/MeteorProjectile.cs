@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Combat;
 
@@ -16,6 +17,9 @@ namespace NPC
         public float speed = 8f;
         public BaseNpcCombat owner;
         [SerializeField] private float selfDestructTime = 10f;
+        [SerializeField]
+        [Tooltip("Radius around the impact point used to apply the meteor's damage.")]
+        private float impactRadius = 1.5f;
         private float timer;
 
         private void Awake()
@@ -40,6 +44,30 @@ namespace NPC
 
         private void Impact()
         {
+            // Apply the meteor's hit damage before spawning persistent ground flames so initial impact still hurts targets.
+            if (impactDamage > 0)
+            {
+                var hits = Physics2D.OverlapCircleAll(target, impactRadius);
+                if (hits.Length > 0)
+                {
+                    var processedTargets = new HashSet<CombatTarget>();
+                    var source = (object)owner ?? this;
+                    var ownerTarget = owner != null ? owner.GetComponent<CombatTarget>() : null;
+
+                    foreach (var hit in hits)
+                    {
+                        var combatTarget = hit.GetComponent<CombatTarget>() ?? hit.GetComponentInParent<CombatTarget>();
+                        if (combatTarget == null || processedTargets.Contains(combatTarget) || !combatTarget.IsAlive)
+                            continue;
+                        if (ownerTarget != null && combatTarget == ownerTarget)
+                            continue;
+
+                        combatTarget.ApplyDamage(impactDamage, DamageType.Magic, SpellElement.Fire, source);
+                        processedTargets.Add(combatTarget);
+                    }
+                }
+            }
+
             SpawnBurningGround();
             Destroy(gameObject);
         }
