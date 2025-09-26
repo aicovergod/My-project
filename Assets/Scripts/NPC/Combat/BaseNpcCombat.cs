@@ -152,9 +152,13 @@ namespace NPC
             var myFaction = combatant as IFactionProvider;
             if (myFaction != null)
             {
-                foreach (var npc in FindObjectsOfType<NpcCombatant>())
+                var activeCombatants = NpcCombatant.ActiveCombatants;
+                for (int i = 0; i < activeCombatants.Count; i++)
                 {
-                    if (npc == combatant || !npc.IsAlive)
+                    var npc = activeCombatants[i];
+                    if (npc == null || npc == combatant)
+                        continue;
+                    if (!npc.isActiveAndEnabled || !npc.IsAlive)
                         continue;
                     var otherFaction = npc as IFactionProvider;
                     if (otherFaction == null || !myFaction.IsEnemy(otherFaction.Faction))
