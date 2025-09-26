@@ -22,7 +22,8 @@ namespace Combat
         /// </summary>
         /// <param name="target">Target game object.</param>
         /// <param name="didDealDamage">Whether the hit dealt damage.</param>
-        public void TryApply(GameObject target, bool didDealDamage)
+        /// <param name="applier">Combatant attempting to apply the poison.</param>
+        public void TryApply(GameObject target, bool didDealDamage, CombatTarget applier)
         {
             if (poison == null || target == null)
                 return;
@@ -32,7 +33,7 @@ namespace Combat
                 return;
             var controller = target.GetComponent<PoisonController>();
             if (controller != null && !controller.IsImmune)
-                controller.ApplyPoison(poison);
+                controller.ApplyPoison(poison, applier);
         }
     }
 }

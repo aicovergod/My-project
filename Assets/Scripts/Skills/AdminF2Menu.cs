@@ -570,7 +570,7 @@ namespace Skills
                 }
             }
 
-            controller.ApplyPoison(poisonPConfig);
+            controller.ApplyPoison(poisonPConfig, null);
         }
 
         /// <summary>

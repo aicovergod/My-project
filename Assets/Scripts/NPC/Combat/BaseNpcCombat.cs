@@ -408,7 +408,7 @@ namespace NPC
                 var applier = GetComponentInChildren<OnHitPoisonApplier>();
                 var targetMb = target as MonoBehaviour;
                 if (applier != null && targetMb != null)
-                    applier.TryApply(targetMb.gameObject, finalDamage > 0);
+                    applier.TryApply(targetMb.gameObject, finalDamage > 0, combatant);
             }
             else
             {
