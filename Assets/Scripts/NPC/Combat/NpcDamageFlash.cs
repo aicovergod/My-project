@@ -14,7 +14,7 @@ namespace NPC
     {
         [Header("Flash Settings")]
         [SerializeField, Tooltip("Tint applied to the sprite while the damage flash is playing.")]
-        private Color flashColor = Color.white;
+        private Color flashColor = new Color(1f, 0.35f, 0.35f, 1f);
 
         [SerializeField, Tooltip("Duration of the flash animation in seconds.")]
         private float flashDuration = 0.1f;
