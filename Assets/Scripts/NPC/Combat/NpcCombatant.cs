@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Combat;
 using MyGame.Drops;
@@ -15,6 +16,19 @@ namespace NPC
     [DisallowMultipleComponent, RequireComponent(typeof(NpcDropper)), RequireComponent(typeof(FrozenStatusController))]
     public class NpcCombatant : MonoBehaviour, CombatTarget, IFactionProvider
     {
+        /// <summary>
+        /// Global cache of NPC combatants that are currently active in the scene. This allows
+        /// other systems to iterate nearby NPCs without paying the cost of repeated
+        /// <see cref="Object.FindObjectsOfType{T}()"/> calls each frame.
+        /// </summary>
+        private static readonly List<NpcCombatant> activeCombatants = new();
+
+        /// <summary>
+        /// Read-only view of the currently active NPC combatants. Consumers should treat the
+        /// collection as volatile; items may be removed if NPCs are disabled or destroyed.
+        /// </summary>
+        public static IReadOnlyList<NpcCombatant> ActiveCombatants => activeCombatants;
+
         [SerializeField] private NpcCombatProfile profile;
         [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
         private HitSplatLibrary hitSplatLibrary;
@@ -36,6 +50,7 @@ namespace NPC
         private int npcDamage;
         private Sprite poisonHitsplat;
         private FloatingTextAnchorUtility.AnchorCache hitsplatAnchorCache;
+        private bool isRegisteredWithRegistry;
 
         public event System.Action<int, int> OnHealthChanged; // current, max
         public event System.Action OnDeath;
@@ -89,6 +104,23 @@ namespace NPC
                 applier.applyChance = profile.PoisonChance;
                 applier.requiresDamage = profile.PoisonRequiresDamage;
             }
+        }
+
+        private void OnEnable()
+        {
+            RegisterCombatant();
+        }
+
+        private void OnDisable()
+        {
+            UnregisterCombatant();
+        }
+
+        private void OnDestroy()
+        {
+            // OnDisable is invoked before OnDestroy, but we defensively unregister in case
+            // destruction occurs while the component is disabled.
+            UnregisterCombatant();
         }
 
         /// <summary>Apply damage to this NPC.</summary>
@@ -227,6 +259,30 @@ namespace NPC
 
             if (sharedHitSplatLibrary != null)
                 hitSplatLibrary = sharedHitSplatLibrary;
+        }
+
+        /// <summary>
+        /// Adds this combatant to the global registry if it is not already present.
+        /// </summary>
+        private void RegisterCombatant()
+        {
+            if (isRegisteredWithRegistry)
+                return;
+
+            activeCombatants.Add(this);
+            isRegisteredWithRegistry = true;
+        }
+
+        /// <summary>
+        /// Removes this combatant from the global registry if it is currently registered.
+        /// </summary>
+        private void UnregisterCombatant()
+        {
+            if (!isRegisteredWithRegistry)
+                return;
+
+            activeCombatants.Remove(this);
+            isRegisteredWithRegistry = false;
         }
     }
 }
