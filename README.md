@@ -12,13 +12,33 @@ This project currently targets **Unity 6000.2.3f1**.
 - **Firemaking & Bonfires** – New Firemaking content lives in `Skills/Firemaking`. `FiremakingSkill` covers ignition, bonfire fueling, Phoenix pet bonuses, outfit rolls, and ashes, while `FiremakingHUD` mirrors tick progress. Expand the skill by authoring `FiremakingLogDefinition` assets under `Resources/Firemaking/Logs`.
 - **Gathering Feedback Services** – `Skills/Common/GatheringFloatingTextService` centralises OSRS-style floating text, range checks, cooldowns, and delayed XP popups so Woodcutting, Mining, Fishing, and Firemaking share consistent messaging.
 - **Shop System** – Supports buying and selling items via `Shop` and `ShopUI` components.
+- **Inventory, Equipment & Bank** – `Inventory`, `ItemUseResolver`, `StackSplitDialog`, and `InventoryDropMenu` provide drag/drop, stack splitting, and consumable handling, while `EquipmentAggregator` aggregates bonuses. Bank interactions run through `BankUI`, `BankDepositMenu`, and `BankWithdrawMenu` with `BankOpener` world hooks.
 - **Status & Buff System** – Centralises timed effects with `Status/BuffTimerService`, `BuffEvents`, and `BuffStateSaveBridge`. Buff icons and expiry audio now route through `UI/HUD/BuffHudManager`, `BuffInfoBox`, and `BuffTooltipController`.
 - **Magic & Combat Hooks** – `MagicUI` builds the spellbook from `Resources/Spells`, while combat flow leverages `CombatController` and modular add-ons like `OnHitPoisonApplier` for weapon-based status effects.
-- **Scene Transition & Respawn** – `World/SceneTransitionManager` performs additive scene swaps with fades via `ScreenFader`, keeps persistent singletons informed, and hands off spawn IDs. `Player/PlayerRespawnSystem` cooperates with `World/RespawnPoint` markers to clear buffs, play the death jingle, and restore the player.
+- **Scene Transition & Respawn** – `World/SceneTransitionManager` performs additive scene swaps with fades via `ScreenFader`, keeps persistent singletons informed, and hands off spawn IDs. `Player/PlayerRespawnSystem` cooperates with `World/RespawnPoint` markers to clear buffs, play the death jingle, and restore the player, while `PlayerMover` persists across scenes, auto-walks gathering nodes, and saves recent positions for the autosave loop.
 - **Interface Tabs & UI Shell** – `UI/InterfaceTabButtons` spawns the OSRS-style tab strip (Quest, Inventory, Skills, Equipment, Attack Style, Magic) and works alongside `UIManager` to auto-close conflicting panels.
 - **Audio & Feedback** – `Audio/SoundManager` exposes the `SoundEffect` enum for music/SFX (including the death jingle) and keeps AudioListener duplication in check during transitions.
 - **Lore & Books** – Scriptable `BookData` assets back in-world books while `BookProgressManager` tracks which page each player has reached when reading from items or world interactions.
 - **Daily Time Service** – `Core/Time/DailyGameTimeService` caches the current UTC day, raises a `DayChanged` event for daily resets, and exposes `ComposeDailySeed` so features like fishing bycatch, rotating shops, or quests can share deterministic per-day RNG.
+
+## Project Structure
+
+- `Assets/Scripts/Core` – Bootstraps the project through `GameManager`, exposes save helpers via `SaveManager`, resolves input with `Core/Input/InputActionResolver`, and maintains the daily time service.
+- `Assets/Scripts/Player` – Contains `PlayerMover`, `PlayerCombatLoadout`, `PlayerCombatTarget`, `PlayerHitpoints`, `PlayerRespawnSystem`, and supporting HUD scripts such as `HealthHUD`.
+- `Assets/Scripts/Combat` – Houses `CombatController`, `CombatMath`, `CombatWeaponHUD`, `OnHitPoisonApplier`, and combat enums/targets used by players and NPCs.
+- `Assets/Scripts/Skills` – Includes `SkillManager`, gathering skills (Woodcutting, Mining, Fishing, Cooking, Firemaking), Beastmaster content, outfits, and shared gathering utilities.
+- `Assets/Scripts/Inventory` & `Assets/Scripts/Items` – Provide the bag/equipment UI (`Inventory`, `Equipment`, `StackSplitDialog`, `ItemUseResolver`) plus `Items/Consumables` and `ItemCombatStats` definitions.
+- `Assets/Scripts/Bank` & `Assets/Scripts/Shop` – Implement OSRS-style bank panels (`BankUI`, deposit/withdraw menus) and merchant interfaces (`Shop`, `ShopUI`).
+- `Assets/Scripts/Magic` – Defines spells via `SpellDefinition` and projectile/hit effect prefabs (`FireProjectile`, `HitEffect`).
+- `Assets/Scripts/NPC` – Covers NPC combat (`NpcAttackController`, `NpcCombatant`), navigation, interactions, and HUD helpers.
+- `Assets/Scripts/World` – Manages persistent objects, scene transitions, respawn markers, minimap/popup text systems, and screen fades.
+- `Assets/Scripts/UI` – Centralises OSRS-style UI shells (`UIManager`, `InterfaceTabButtons`, `PersistentEventSystem`, `MagicUI`, HUD widgets).
+- `Assets/Scripts/Status` – Contains `BuffTimerService`, `BuffEvents`, antifire/freeze/poison controllers, and save bridges.
+- `Assets/Scripts/Pets` & `Assets/Scripts/Drops` – Run pet followers/storage, pet XP, drop tables (`DropResolver`, `GroundItemSpawner`), and pet drop UI.
+- `Assets/Scripts/Audio` – Provides `SoundManager` and the `SoundEffect` enum for SFX/music routing.
+- `Assets/Scripts/Books`, `Assets/Scripts/Dialogue`, `Assets/Scripts/Quests` – Supply lore ScriptableObjects, dialogue UI/data, and quest management/definitions.
+- `Assets/Scripts/Environment` & `Assets/Scripts/Util` – Offer environmental helpers like `FenceColliderFoot` and cross-cutting utilities (`Ticker`, `SpriteDepth`, `ITickable`).
+- `Assets/Tests` – NUnit tests covering cooking, NPC factions, and elemental modifiers; execute them through the Unity Test Runner (`Unity -runTests`).
 
 ## Input & Rebinding
 - The project relies on the Unity Input System with the `Assets/InputSystem_Actions.inputactions` asset. The **Player** map now
