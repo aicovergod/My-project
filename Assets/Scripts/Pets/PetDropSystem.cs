@@ -71,7 +71,7 @@ namespace Pets
             else if (activePetDef != null)
             {
                 Vector3 pos = player != null ? player.transform.position : Vector3.zero;
-                SpawnPetInternal(activePetDef, pos);
+                SpawnPetInternal(activePetDef, pos, true);
             }
         }
 
@@ -110,7 +110,7 @@ namespace Pets
 
             var player = GameObject.FindGameObjectWithTag("Player");
             Vector3 pos = player != null ? player.transform.position : Vector3.zero;
-            SpawnPetInternal(pet, pos);
+            SpawnPetInternal(pet, pos, true);
         }
 
         /// <summary>
@@ -283,7 +283,7 @@ namespace Pets
             return SpawnPetInternal(pet, position);
         }
 
-        private static GameObject SpawnPetInternal(PetDefinition pet, Vector3 position)
+        private static GameObject SpawnPetInternal(PetDefinition pet, Vector3 position, bool isRespawnFromSave = false)
         {
             if (pet == null)
             {
@@ -302,7 +302,7 @@ namespace Pets
             PetSaveBridge.Save(pet.id);
             var exp = activePetGO.GetComponent<PetExperience>();
             PetLevelBarHUD.CreateForPet(exp);
-            PetToastUI.Show("You have a funny feeling like you're being followed…", pet.messageColor);
+            ShowSpawnToast(pet, isRespawnFromSave);
             Debug.Log($"Spawned pet '{pet.displayName}' at {spawnPos}.");
 
             var playerInventory = playerTransform != null ? playerTransform.GetComponent<Inventory.Inventory>() : null;
@@ -316,6 +316,26 @@ namespace Pets
             ActivePetFloatingText?.RefreshAnchorPosition();
 
             return activePetGO;
+        }
+
+        /// <summary>
+        /// Displays the appropriate toast message for the pet spawn context.
+        /// </summary>
+        /// <param name="pet">The pet that was spawned.</param>
+        /// <param name="isRespawnFromSave">True when the pet is being restored after a load, false when this is a brand-new drop.</param>
+        private static void ShowSpawnToast(PetDefinition pet, bool isRespawnFromSave)
+        {
+            if (pet == null)
+                return;
+
+            if (isRespawnFromSave)
+            {
+                PetToastUI.Show("Your pet appears by your side", pet.messageColor);
+            }
+            else
+            {
+                PetToastUI.Show("You have a funny feeling like you're being followed…", pet.messageColor);
+            }
         }
 
         /// <summary>
