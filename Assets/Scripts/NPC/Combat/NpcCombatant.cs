@@ -19,6 +19,9 @@ namespace NPC
         [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
         private HitSplatLibrary hitSplatLibrary;
 
+        [SerializeField, Tooltip("Vertical offset applied when no floating text anchor is present.")]
+        private float hitsplatFallbackOffset = 1f;
+
         /// <summary>
         /// Shared cached reference so NPCs can automatically use the global hitsplat
         /// library without paying the cost of repeated Resources lookups.
@@ -32,6 +35,7 @@ namespace NPC
         private int playerDamage;
         private int npcDamage;
         private Sprite poisonHitsplat;
+        private FloatingTextAnchorUtility.AnchorCache hitsplatAnchorCache;
 
         public event System.Action<int, int> OnHealthChanged; // current, max
         public event System.Action OnDeath;
@@ -113,7 +117,10 @@ namespace NPC
             }
             OnHealthChanged?.Invoke(currentHp, MaxHP);
             if (type == DamageType.Poison && poisonHitsplat != null)
-                FloatingText.Show(finalAmount.ToString(), transform.position, Color.white, null, poisonHitsplat);
+            {
+                Vector3 hitsplatPosition = FloatingTextAnchorUtility.ResolveAnchorPosition(transform, hitsplatFallbackOffset, ref hitsplatAnchorCache);
+                FloatingText.Show(finalAmount.ToString(), hitsplatPosition, Color.white, null, poisonHitsplat);
+            }
             var combatSource = source as CombatTarget;
             bool creditedToPlayer = false;
             if (combatSource != null)
