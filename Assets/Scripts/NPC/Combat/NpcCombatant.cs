@@ -28,7 +28,7 @@ namespace NPC
         private Collider2D collider2D;
         private SpriteRenderer spriteRenderer;
         private NpcWanderer wanderer;
-        private NpcDamageFlash damageFlash; // visual damage feedback handler
+        private NpcFlashEffect flashEffect; // visual damage feedback handler
         private int playerDamage;
         private int npcDamage;
         private Sprite poisonHitsplat;
@@ -57,10 +57,10 @@ namespace NPC
             collider2D = GetComponent<Collider2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
             wanderer = GetComponent<NpcWanderer>();
-            damageFlash = GetComponent<NpcDamageFlash>();
-            if (damageFlash == null && spriteRenderer != null)
+            flashEffect = GetComponent<NpcFlashEffect>();
+            if (flashEffect == null && spriteRenderer != null)
             {
-                damageFlash = gameObject.AddComponent<NpcDamageFlash>();
+                flashEffect = gameObject.AddComponent<NpcFlashEffect>();
             }
             ResetDamageCounters();
             OnHealthChanged?.Invoke(currentHp, MaxHP);
@@ -109,7 +109,7 @@ namespace NPC
             Debug.Log($"{name} took {finalAmount} damage ({currentHp}/{MaxHP}).");
             if (finalAmount > 0)
             {
-                damageFlash?.TriggerFlash(finalAmount, MaxHP);
+                flashEffect?.TriggerFlash(finalAmount, MaxHP);
             }
             OnHealthChanged?.Invoke(currentHp, MaxHP);
             if (type == DamageType.Poison && poisonHitsplat != null)
