@@ -31,6 +31,9 @@ namespace NPC
             new Keyframe(0f, 0.35f, 0f, 1f),
             new Keyframe(1f, 1f, 0f, 0f));
 
+        [SerializeField, Range(0f, 1f), Tooltip("Minimum flash blend strength to guarantee consistent hit feedback even on glancing blows.")]
+        private float minimumFlashIntensity = 0.7f;
+
         private SpriteRenderer spriteRenderer;
         private Color restingColor;
         private Coroutine flashRoutine;
@@ -85,8 +88,10 @@ namespace NPC
             if (scaleWithDamageFraction && maxHealth > 0)
             {
                 float fraction = Mathf.Clamp01(damageAmount / (float)maxHealth);
-                intensity = Mathf.Clamp01(damageToFlashIntensity.Evaluate(fraction));
+                intensity = damageToFlashIntensity.Evaluate(fraction);
             }
+
+            intensity = Mathf.Max(minimumFlashIntensity, intensity);
 
             flashRoutine = StartCoroutine(PlayFlash(intensity));
         }
@@ -98,14 +103,14 @@ namespace NPC
         {
             float duration = Mathf.Max(0.01f, flashDuration);
             float elapsed = 0f;
-            Color targetColor = Color.Lerp(restingColor, flashColor, intensity);
+            Color targetColor = Color.LerpUnclamped(restingColor, flashColor, intensity);
 
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / duration);
                 float curveValue = Mathf.Clamp01(flashCurve.Evaluate(t));
-                spriteRenderer.color = Color.Lerp(restingColor, targetColor, curveValue);
+                spriteRenderer.color = Color.LerpUnclamped(restingColor, targetColor, curveValue);
                 yield return null;
             }
 
