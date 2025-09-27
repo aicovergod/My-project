@@ -44,6 +44,7 @@ namespace NPC
         private float _waitTimer;
         private Vector2 _lastPos;
         private readonly System.Collections.Generic.List<Transform> _combatTargets = new();
+        private NpcCombatant _combatant;
 
         // Per-tick interpolation
         private Vector2 _from;
@@ -85,6 +86,7 @@ namespace NPC
         {
             _rb = GetComponent<Rigidbody2D>();
             if (_rb != null) _rb.bodyType = RigidbodyType2D.Kinematic;
+            _combatant = GetComponent<NpcCombatant>();
             if (spriteAnimator == null)
                 spriteAnimator = GetComponent<NpcSpriteAnimator>() ?? GetComponentInChildren<NpcSpriteAnimator>();
         }
@@ -261,9 +263,27 @@ namespace NPC
             _tickerSubscribed = true;
         }
 
+        /// <summary>
+        /// Resolves the preferred attack distance for the attached combatant so pursuit stops at
+        /// the same range the combat loop expects when firing attacks.
+        /// </summary>
+        private float GetPreferredAttackRange()
+        {
+            if (_combatant == null)
+                _combatant = GetComponent<NpcCombatant>();
+
+            var profile = _combatant != null ? _combatant.Profile : null;
+            if (profile == null)
+                return CombatMath.MELEE_RANGE;
+
+            float range = profile.GetPreferredAttackRange();
+            return range > 0f ? range : CombatMath.MELEE_RANGE;
+        }
+
         public void OnTick()
         {
             float delta = Ticker.TickDuration;
+            const float DISTANCE_EPSILON = 0.05f;
 
             if (_frozen)
             {
@@ -291,10 +311,11 @@ namespace NPC
                 if (closest != null)
                 {
                     Vector2 targetPos = closest.position;
-                    if (best > CombatMath.MELEE_RANGE)
+                    float desiredRange = Mathf.Max(GetPreferredAttackRange(), DISTANCE_EPSILON);
+                    if (best > desiredRange + DISTANCE_EPSILON)
                     {
                         Vector2 direction = (targetPos - _from).normalized;
-                        Vector2 desired = targetPos - direction * CombatMath.MELEE_RANGE;
+                        Vector2 desired = targetPos - direction * desiredRange;
                         Vector2 step = Vector2.MoveTowards(_from, desired, moveSpeed * delta);
                         if (useAreaSize)
                         {

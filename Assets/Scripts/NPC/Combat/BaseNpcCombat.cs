@@ -259,7 +259,11 @@ namespace NPC
             WaitForSeconds cachedAttackDelay = null;
             int cachedAttackSpeedTicks = -1;
 
-            // Wait until the player is within melee range before performing the first attack.
+            // Wait until the target is within the preferred range for the active attack style
+            // before performing each swing so melee, ranged, and magic NPCs respect their
+            // configured stand-off distances.
+            const float DISTANCE_EPSILON = 0.05f;
+
             while (combatant.IsAlive && target != null && target.IsAlive)
             {
                 // Determine the current attack speed, defaulting to four ticks when no profile
@@ -275,13 +279,14 @@ namespace NPC
                 }
 
                 float distance = Vector2.Distance(target.transform.position, transform.position);
+                float desiredDistance = profile != null ? profile.GetPreferredAttackRange() : CombatMath.MELEE_RANGE;
                 if (distance > 15f)
                 {
                     wanderer?.ForceReturnToOrigin();
                     break;
                 }
 
-                if (distance <= CombatMath.MELEE_RANGE)
+                if (distance <= desiredDistance + DISTANCE_EPSILON)
                 {
                     ResolveAttack(target);
                     yield return cachedAttackDelay;
