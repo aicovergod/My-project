@@ -82,14 +82,32 @@ namespace World
             // some platforms and ensures the overworld becomes the active scene.
             var currentScene = SceneManager.GetActiveScene();
             var loadOp = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
+            if (loadOp == null)
+            {
+                yield return RecoverFromFailedTransition(sceneToLoad, currentScene, "LoadSceneAsync returned null.");
+                yield break;
+            }
+
             while (!loadOp.isDone)
                 yield return null;
 
             var loadedScene = SceneManager.GetSceneByName(sceneToLoad);
+            if (!loadedScene.IsValid() || !loadedScene.isLoaded)
+            {
+                yield return RecoverFromFailedTransition(sceneToLoad, currentScene, "Loaded scene was invalid or failed to load.");
+                yield break;
+            }
+
             SceneManager.SetActiveScene(loadedScene);
 
             var unloadOp = SceneManager.UnloadSceneAsync(currentScene);
-            while (unloadOp != null && !unloadOp.isDone)
+            if (unloadOp == null)
+            {
+                Debug.LogError($"[SceneTransitionManager] Failed to unload scene '{currentScene.name}'. UnloadSceneAsync returned null.");
+                yield break;
+            }
+
+            while (!unloadOp.isDone)
                 yield return null;
         }
 
@@ -117,6 +135,27 @@ namespace World
 
         private void OnFadeInComplete()
         {
+            IsTransitioning = false;
+            TransitionCompleted?.Invoke();
+        }
+
+        /// <summary>
+        /// Restores state when a scene load fails so the manager can accept future transitions.
+        /// </summary>
+        private IEnumerator RecoverFromFailedTransition(string sceneToLoad, Scene fallbackScene, string reason)
+        {
+            Debug.LogError($"[SceneTransitionManager] Failed to load scene '{sceneToLoad}'. {reason}");
+
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+
+            foreach (var obj in _persistentObjects)
+                obj.OnAfterSceneLoad(fallbackScene);
+
+            NextSpawnPoint = null;
+
+            if (ScreenFader.Instance != null)
+                yield return ScreenFader.Instance.FadeIn();
+
             IsTransitioning = false;
             TransitionCompleted?.Invoke();
         }
