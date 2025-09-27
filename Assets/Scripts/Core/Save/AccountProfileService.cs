@@ -117,29 +117,34 @@ namespace Core.Save
                 return AccountLoadStatus.NotFound;
 
             string path = GetAccountPath(slug);
-            if (!File.Exists(path))
-                return AccountLoadStatus.NotFound;
+            string backupPath = path + ".bak";
+            string backupTempPath = backupPath + ".tmp";
 
-            try
-            {
-                string json = File.ReadAllText(path, Encoding.UTF8);
-                var loaded = JsonUtility.FromJson<AccountSave>(json);
-                if (loaded == null)
-                {
-                    Debug.LogError($"AccountManager: The save file for '{slug}' exists but could not be deserialised. The file may be corrupted.");
-                    return AccountLoadStatus.FailedToDeserialize;
-                }
-
-                EnsureDefaults(loaded, slug, username);
-                save = loaded;
+            AccountLoadStatus status = LoadAccountFromDisk(path, slug, username, out save);
+            if (status == AccountLoadStatus.Success)
                 return AccountLoadStatus.Success;
-            }
-            catch (Exception ex)
+
+            bool backupExists = File.Exists(backupPath);
+            if (!backupExists)
+                return status;
+
+            bool restoreSucceeded = TryRestoreBackup(slug, path, backupPath, backupTempPath, status == AccountLoadStatus.FailedToDeserialize);
+            if (!restoreSucceeded)
             {
-                Debug.LogError($"AccountManager: Failed to load account '{slug}': {ex}");
                 save = null;
                 return AccountLoadStatus.FailedToDeserialize;
             }
+
+            status = LoadAccountFromDisk(path, slug, username, out save);
+            if (status == AccountLoadStatus.Success)
+            {
+                Debug.Log($"AccountManager: Loaded account '{slug}' successfully after restoring the backup save.");
+                return AccountLoadStatus.Success;
+            }
+
+            Debug.LogError($"AccountManager: Backup save for '{slug}' was restored but the data is still unreadable.");
+            save = null;
+            return AccountLoadStatus.FailedToDeserialize;
         }
 
         /// <summary>
@@ -221,6 +226,12 @@ namespace Core.Save
         /// Saves the supplied account to disk using atomic file replacement.
         /// </summary>
         /// <param name="save">Account that should be persisted.</param>
+        /// <remarks>
+        /// Manual QA validation: trigger a save (e.g., equip an item), watch for the creation of the
+        /// <c>.json.tmp</c> file inside the persistent save directory, and then force-close the
+        /// application while the write is in progress. Relaunching the game should log that the
+        /// backup was restored and the profile should load normally using the recovered data.
+        /// </remarks>
         public static async Task SaveAsync(AccountSave save)
         {
             if (save == null)
@@ -390,6 +401,142 @@ namespace Core.Save
         /// reference it when needed (e.g., global data migration helpers).
         /// </summary>
         internal static string BaseDirectory => BaseSavePath;
+
+        private static AccountLoadStatus LoadAccountFromDisk(string path, string slug, string username, out AccountSave save)
+        {
+            save = null;
+
+            try
+            {
+                if (!File.Exists(path))
+                    return AccountLoadStatus.NotFound;
+
+                string json = File.ReadAllText(path, Encoding.UTF8);
+                var loaded = JsonUtility.FromJson<AccountSave>(json);
+                if (loaded == null)
+                {
+                    Debug.LogError($"AccountManager: The save file for '{slug}' exists but could not be deserialised. The file may be corrupted.");
+                    return AccountLoadStatus.FailedToDeserialize;
+                }
+
+                EnsureDefaults(loaded, slug, username);
+                save = loaded;
+                return AccountLoadStatus.Success;
+            }
+            catch (FileNotFoundException)
+            {
+                return AccountLoadStatus.NotFound;
+            }
+            catch (DirectoryNotFoundException)
+            {
+                return AccountLoadStatus.NotFound;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"AccountManager: Failed to load account '{slug}': {ex}");
+                save = null;
+                return AccountLoadStatus.FailedToDeserialize;
+            }
+        }
+
+        private static bool TryRestoreBackup(string slug, string primaryPath, string backupPath, string backupTempPath, bool primaryWasCorrupted)
+        {
+            if (!File.Exists(backupPath))
+                return false;
+
+            string safetyCopyPath = backupPath + ".restore";
+            bool safetyCopyCreated = false;
+
+            try
+            {
+                if (File.Exists(backupTempPath))
+                {
+                    try
+                    {
+                        File.Delete(backupTempPath);
+                    }
+                    catch (Exception tmpEx)
+                    {
+                        Debug.LogWarning($"AccountManager: Unable to delete stale backup temp '{backupTempPath}' while restoring '{slug}': {tmpEx}");
+                    }
+                }
+
+                try
+                {
+                    File.Copy(backupPath, safetyCopyPath, true);
+                    safetyCopyCreated = true;
+                }
+                catch (Exception copyEx)
+                {
+                    Debug.LogWarning($"AccountManager: Failed to create safety copy '{safetyCopyPath}' while restoring '{slug}': {copyEx}");
+                }
+
+                if (File.Exists(primaryPath))
+                {
+                    string corruptBasePath = primaryPath + ".corrupt";
+                    string corruptPath = corruptBasePath;
+                    int suffix = 0;
+                    while (File.Exists(corruptPath))
+                    {
+                        suffix++;
+                        corruptPath = $"{corruptBasePath}.{suffix}";
+                    }
+
+                    File.Move(primaryPath, corruptPath);
+                }
+
+                File.Move(backupPath, primaryPath);
+
+                if (safetyCopyCreated)
+                {
+                    try
+                    {
+                        File.Delete(safetyCopyPath);
+                        safetyCopyCreated = false;
+                    }
+                    catch (Exception cleanupEx)
+                    {
+                        Debug.LogWarning($"AccountManager: Restored '{slug}' but failed to delete safety copy '{safetyCopyPath}': {cleanupEx}");
+                    }
+                }
+
+                Debug.Log($"AccountManager: Restored backup save for '{slug}' after {(primaryWasCorrupted ? "corrupted" : "missing")} primary data.");
+                return true;
+            }
+            catch (Exception restoreEx)
+            {
+                Debug.LogError($"AccountManager: Failed to restore backup save for '{slug}': {restoreEx}");
+
+                if (safetyCopyCreated && !File.Exists(backupPath) && File.Exists(safetyCopyPath))
+                {
+                    try
+                    {
+                        File.Move(safetyCopyPath, backupPath);
+                        safetyCopyCreated = false;
+                    }
+                    catch (Exception revertEx)
+                    {
+                        Debug.LogWarning($"AccountManager: Failed to revert safety copy for '{slug}' after restore failure: {revertEx}");
+                    }
+                }
+
+                return false;
+            }
+            finally
+            {
+                if (File.Exists(backupTempPath))
+                {
+                    try
+                    {
+                        File.Delete(backupTempPath);
+                    }
+                    catch (Exception tmpCleanupEx)
+                    {
+                        Debug.LogWarning($"AccountManager: Cleanup of backup temp '{backupTempPath}' after restore attempt for '{slug}' failed: {tmpCleanupEx}");
+                    }
+                }
+            }
+        }
 
         private static void EnsureDefaults(AccountSave save, string slug, string username)
         {
