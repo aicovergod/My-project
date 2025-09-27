@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Core.Save
@@ -26,6 +28,12 @@ namespace Core.Save
 
         private static GlobalData globalCache;
 
+        private static readonly object flushLock = new object();
+        private static bool flushLoopRunning;
+        private static Task flushTask;
+        private static CancellationTokenSource flushCancellation;
+        private static readonly TimeSpan FlushInterval = TimeSpan.FromMilliseconds(100);
+
         static SaveManager()
         {
             Application.quitting += HandleApplicationQuitting;
@@ -34,6 +42,7 @@ namespace Core.Save
         private static void HandleApplicationQuitting()
         {
             SaveAll();
+            WaitForPendingWrites();
         }
 
         /// <summary>
@@ -85,24 +94,39 @@ namespace Core.Save
         /// <param name="reload">When true, triggers <see cref="LoadAll"/> after switching accounts.</param>
         internal static void BindAccount(AccountSave account, bool reload = true)
         {
-            boundAccount = account;
-            cache = null;
-            cacheDirty = false;
-            ActiveProfileId = account != null ? account.usernameSlug : string.Empty;
+            WaitForPendingWrites();
 
-            if (boundAccount != null)
+            lock (flushLock)
             {
-                if (string.IsNullOrEmpty(boundAccount.usernameSlug))
-                    boundAccount.usernameSlug = AccountManager.SanitizeUsername(boundAccount.username);
+                if (flushCancellation != null)
+                {
+                    flushCancellation.Dispose();
+                    flushCancellation = null;
+                }
 
-                if (boundAccount.data == null)
-                    boundAccount.data = new AccountSave.AccountData { version = SaveDataVersion, entries = new List<AccountSave.AccountDataEntry>() };
+                flushTask = null;
+                flushLoopRunning = false;
+                cache = null;
+                cacheDirty = false;
+                boundAccount = account;
+                ActiveProfileId = account != null ? account.usernameSlug : string.Empty;
+            }
+
+            var activeAccount = boundAccount;
+
+            if (activeAccount != null)
+            {
+                if (string.IsNullOrEmpty(activeAccount.usernameSlug))
+                    activeAccount.usernameSlug = AccountManager.SanitizeUsername(activeAccount.username);
+
+                if (activeAccount.data == null)
+                    activeAccount.data = new AccountSave.AccountData { version = SaveDataVersion, entries = new List<AccountSave.AccountDataEntry>() };
                 else
                 {
-                    if (boundAccount.data.entries == null)
-                        boundAccount.data.entries = new List<AccountSave.AccountDataEntry>();
-                    if (boundAccount.data.version != SaveDataVersion)
-                        boundAccount.data.version = SaveDataVersion;
+                    if (activeAccount.data.entries == null)
+                        activeAccount.data.entries = new List<AccountSave.AccountDataEntry>();
+                    if (activeAccount.data.version != SaveDataVersion)
+                        activeAccount.data.version = SaveDataVersion;
                 }
             }
 
@@ -181,35 +205,40 @@ namespace Core.Save
         /// <param name="position">World position that should be recorded.</param>
         internal static void UpdateLastKnownLocation(string scene, Vector3 position)
         {
-            if (boundAccount == null)
-                return;
-
-            string resolvedScene = scene ?? string.Empty;
-            bool changed = false;
-
-            if (!string.Equals(boundAccount.savedSceneName, resolvedScene, StringComparison.Ordinal))
+            lock (flushLock)
             {
-                boundAccount.savedSceneName = resolvedScene;
-                changed = true;
+                if (boundAccount == null)
+                    return;
+
+                string resolvedScene = scene ?? string.Empty;
+                bool changed = false;
+
+                if (!string.Equals(boundAccount.savedSceneName, resolvedScene, StringComparison.Ordinal))
+                {
+                    boundAccount.savedSceneName = resolvedScene;
+                    changed = true;
+                }
+
+                if (!Mathf.Approximately(boundAccount.savedX, position.x))
+                {
+                    boundAccount.savedX = position.x;
+                    changed = true;
+                }
+
+                if (!Mathf.Approximately(boundAccount.savedY, position.y))
+                {
+                    boundAccount.savedY = position.y;
+                    changed = true;
+                }
+
+                if (!changed)
+                    return;
+
+                cacheDirty = true;
+
+                if (!flushLoopRunning)
+                    StartFlushLoopLocked();
             }
-
-            if (!Mathf.Approximately(boundAccount.savedX, position.x))
-            {
-                boundAccount.savedX = position.x;
-                changed = true;
-            }
-
-            if (!Mathf.Approximately(boundAccount.savedY, position.y))
-            {
-                boundAccount.savedY = position.y;
-                changed = true;
-            }
-
-            if (!changed)
-                return;
-
-            cacheDirty = true;
-            FlushActiveAccount();
         }
 
         /// <summary>
@@ -218,9 +247,23 @@ namespace Core.Save
         /// </summary>
         public static void SetActiveProfile(string profileId, bool reload = true)
         {
-            ActiveProfileId = NormalizeProfileId(profileId);
-            cache = null;
-            cacheDirty = false;
+            WaitForPendingWrites();
+
+            lock (flushLock)
+            {
+                ActiveProfileId = NormalizeProfileId(profileId);
+                cache = null;
+                cacheDirty = false;
+                flushLoopRunning = false;
+
+                if (flushCancellation != null)
+                {
+                    flushCancellation.Dispose();
+                    flushCancellation = null;
+                }
+
+                flushTask = null;
+            }
 
             if (reload)
                 LoadAll();
@@ -228,28 +271,41 @@ namespace Core.Save
 
         private static void SaveInternal<T>(string key, T data)
         {
-            var store = EnsureDataStore();
             string json = JsonUtility.ToJson(new Wrapper<T> { value = data });
-            var entry = store.entries.Find(e => e.key == key);
-            if (entry != null)
-                entry.value = json;
-            else
-                store.entries.Add(new AccountSave.AccountDataEntry { key = key, value = json });
 
-            cacheDirty = true;
-            FlushActiveAccount();
+            lock (flushLock)
+            {
+                var store = EnsureDataStore();
+                var entry = store.entries.Find(e => e.key == key);
+                if (entry != null)
+                    entry.value = json;
+                else
+                    store.entries.Add(new AccountSave.AccountDataEntry { key = key, value = json });
+
+                cacheDirty = true;
+
+                if (boundAccount != null && !flushLoopRunning)
+                    StartFlushLoopLocked();
+            }
         }
 
         private static T LoadInternal<T>(string key)
         {
-            var store = EnsureDataStore();
-            var entry = store.entries.Find(e => e.key == key);
-            if (entry == null || string.IsNullOrEmpty(entry.value))
-                return default;
+            string json = null;
+
+            lock (flushLock)
+            {
+                var store = EnsureDataStore();
+                var entry = store.entries.Find(e => e.key == key);
+                if (entry == null || string.IsNullOrEmpty(entry.value))
+                    return default;
+
+                json = entry.value;
+            }
 
             try
             {
-                var wrapper = JsonUtility.FromJson<Wrapper<T>>(entry.value);
+                var wrapper = JsonUtility.FromJson<Wrapper<T>>(json);
                 return wrapper != null ? wrapper.value : default;
             }
             catch
@@ -260,11 +316,16 @@ namespace Core.Save
 
         private static void DeleteInternal(string key)
         {
-            var store = EnsureDataStore();
-            if (store.entries.RemoveAll(e => e.key == key) > 0)
+            lock (flushLock)
             {
-                cacheDirty = true;
-                FlushActiveAccount();
+                var store = EnsureDataStore();
+                if (store.entries.RemoveAll(e => e.key == key) > 0)
+                {
+                    cacheDirty = true;
+
+                    if (boundAccount != null && !flushLoopRunning)
+                        StartFlushLoopLocked();
+                }
             }
         }
 
@@ -296,17 +357,177 @@ namespace Core.Save
 
         private static void FlushActiveAccount()
         {
-            if (!cacheDirty || boundAccount == null)
+            lock (flushLock)
+            {
+                if (!cacheDirty || boundAccount == null || flushLoopRunning)
+                    return;
+
+                StartFlushLoopLocked();
+            }
+        }
+
+        private static void StartFlushLoopLocked()
+        {
+            if (boundAccount == null)
                 return;
+
+            flushLoopRunning = true;
+
+            if (flushCancellation != null)
+            {
+                flushCancellation.Cancel();
+                flushCancellation.Dispose();
+            }
+
+            flushCancellation = new CancellationTokenSource();
+            var source = flushCancellation;
+            flushTask = Task.Run(() => FlushLoopAsync(source));
+        }
+
+        private static async Task FlushLoopAsync(CancellationTokenSource source)
+        {
+            var token = source.Token;
 
             try
             {
-                AccountManager.SaveAsync(boundAccount).GetAwaiter().GetResult();
-                cacheDirty = false;
+                while (true)
+                {
+                    AccountSave snapshot;
+
+                    lock (flushLock)
+                    {
+                        if (token.IsCancellationRequested || boundAccount == null)
+                            return;
+
+                        if (!cacheDirty)
+                            return;
+
+                        snapshot = CreateAccountSnapshot(boundAccount);
+                        cacheDirty = false;
+                    }
+
+                    try
+                    {
+                        await AccountManager.SaveAsync(snapshot).ConfigureAwait(false);
+                    }
+                    catch (Exception ex) when (!(ex is OperationCanceledException))
+                    {
+                        Debug.LogError($"SaveManager: Background flush failed for '{snapshot?.usernameSlug}': {ex}");
+
+                        lock (flushLock)
+                        {
+                            cacheDirty = true;
+                        }
+
+                        try
+                        {
+                            await Task.Delay(FlushInterval, token).ConfigureAwait(false);
+                        }
+                        catch (TaskCanceledException)
+                        {
+                            return;
+                        }
+
+                        continue;
+                    }
+
+                    try
+                    {
+                        await Task.Delay(FlushInterval, token).ConfigureAwait(false);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        return;
+                    }
+                }
             }
-            catch (Exception ex)
+            catch (OperationCanceledException)
             {
-                Debug.LogError($"SaveManager: Failed to persist account '{boundAccount.usernameSlug}': {ex}");
+                // Cancellation is expected when changing accounts or quitting the application.
+            }
+            finally
+            {
+                lock (flushLock)
+                {
+                    if (ReferenceEquals(flushCancellation, source))
+                    {
+                        flushCancellation.Dispose();
+                        flushCancellation = null;
+                    }
+
+                    flushLoopRunning = false;
+                    flushTask = null;
+
+                    if (cacheDirty && boundAccount != null)
+                        StartFlushLoopLocked();
+                }
+            }
+        }
+
+        private static AccountSave CreateAccountSnapshot(AccountSave source)
+        {
+            if (source == null)
+                return null;
+
+            var snapshot = new AccountSave
+            {
+                schemaVersion = source.schemaVersion,
+                username = source.username,
+                usernameSlug = source.usernameSlug,
+                passwordHash = source.passwordHash,
+                passwordSalt = source.passwordSalt,
+                savedSceneName = source.savedSceneName,
+                savedX = source.savedX,
+                savedY = source.savedY,
+                createdAtUtc = source.createdAtUtc,
+                lastLoginUtc = source.lastLoginUtc,
+                data = new AccountSave.AccountData
+                {
+                    version = source.data != null ? source.data.version : SaveDataVersion,
+                    entries = new List<AccountSave.AccountDataEntry>()
+                }
+            };
+
+            if (source.data?.entries != null)
+            {
+                foreach (var entry in source.data.entries)
+                {
+                    snapshot.data.entries.Add(new AccountSave.AccountDataEntry
+                    {
+                        key = entry.key,
+                        value = entry.value,
+                    });
+                }
+            }
+
+            return snapshot;
+        }
+
+        private static void WaitForPendingWrites()
+        {
+            while (true)
+            {
+                Task pendingTask;
+
+                lock (flushLock)
+                {
+                    pendingTask = flushTask;
+                    if (pendingTask == null)
+                        return;
+                }
+
+                try
+                {
+                    pendingTask.Wait();
+                }
+                catch (AggregateException ex)
+                {
+                    ex.Handle(e => e is TaskCanceledException || e is OperationCanceledException);
+                }
+                catch (OperationCanceledException)
+                {
+                    // Ignored; the flush loop was cancelled intentionally.
+                }
             }
         }
 
