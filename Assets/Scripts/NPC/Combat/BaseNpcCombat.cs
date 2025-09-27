@@ -106,33 +106,42 @@ namespace NPC
             float aggroRadius = wanderer != null ? wanderer.AggroRadius : 5f;
             foreach (var t in new List<CombatTarget>(threatLevels.Keys))
             {
-                bool remove = t == null || !t.IsAlive;
-                if (!remove)
+                var unityTarget = t as Object;
+                Transform targetTransform = null;
+                bool unityMissing = unityTarget == null || !TryResolveTargetTransform(t, unityTarget, out targetTransform);
+
+                bool remove = unityMissing;
+                if (!remove && !t.IsAlive)
+                    remove = true;
+
+                if (!remove && targetTransform != null)
                 {
-                    float dist = Vector2.Distance(t.transform.position, transform.position);
+                    float dist = Vector2.Distance(targetTransform.position, transform.position);
                     if (dist > 15f)
                     {
                         wanderer?.ForceReturnToOrigin();
                         remove = true;
                     }
                 }
-                if (remove)
-                {
-                    Transform targetTransform = t != null ? t.transform : null;
-                    threatLevels.Remove(t);
-                    lastDamageTimes.Remove(t);
-                    if (activeAttacks.TryGetValue(t, out var c))
-                    {
-                        if (c != null)
-                            StopCoroutine(c);
-                        activeAttacks.Remove(t);
-                    }
 
-                    // Always notify the wanderer that this combatant is no longer engaged, even when
-                    // the cached transform instance has been Unity-nullified. Passing the cached
-                    // reference allows the wanderer to purge any lingering slot keyed to the target.
-                    wanderer?.ExitCombat(targetTransform);
-                }
+                if (!remove)
+                    continue;
+
+                threatLevels.Remove(t);
+                lastDamageTimes.Remove(t);
+
+                StopAndRemoveActiveAttack(t);
+
+                // Always notify the wanderer that this combatant is no longer engaged, even when
+                // the cached transform instance has been Unity-nullified. Passing the cached
+                // reference allows the wanderer to purge any lingering slot keyed to the target.
+                wanderer?.ExitCombat(targetTransform);
+                if (targetTransform == null)
+                    wanderer?.ExitCombat();
+
+                RemoveCachedTargetFromDictionary(threatLevels, t);
+                RemoveCachedTargetFromDictionary(lastDamageTimes, t);
+                RemoveCachedTargetFromDictionary(activeAttacks, t);
             }
 
             if (threatLevels.Count == 0 && activeAttacks.Count == 0)
@@ -202,25 +211,33 @@ namespace NPC
             if (activeAttacks.Count > 0)
             {
                 CombatTarget closest = null;
+                Transform closestTransform = null;
                 float bestDist = float.MaxValue;
-                foreach (var t in activeAttacks.Keys)
+                foreach (var t in new List<CombatTarget>(activeAttacks.Keys))
                 {
-                    Transform targetTransform = t != null ? t.transform : null;
-                    if (targetTransform == null)
+                    var unityTarget = t as Object;
+                    Transform targetTransform;
+                    if (unityTarget == null || !TryResolveTargetTransform(t, unityTarget, out targetTransform))
+                    {
+                        StopAndRemoveActiveAttack(t);
+                        RemoveCachedTargetFromDictionary(threatLevels, t);
+                        RemoveCachedTargetFromDictionary(lastDamageTimes, t);
                         continue;
+                    }
+
+                    if (!t.IsAlive)
+                        continue;
+
                     float dist = Vector2.Distance(targetTransform.position, transform.position);
                     if (dist < bestDist)
                     {
                         bestDist = dist;
                         closest = t;
+                        closestTransform = targetTransform;
                     }
                 }
-                if (closest != null)
-                {
-                    Transform closestTransform = closest.transform;
-                    if (closestTransform != null)
-                        npcFacing?.FaceTarget(closestTransform);
-                }
+                if (closestTransform != null)
+                    npcFacing?.FaceTarget(closestTransform);
             }
         }
 
@@ -228,9 +245,22 @@ namespace NPC
         {
             if (target == null)
                 return;
+
+            var unityTarget = target as Object;
+            if (unityTarget == null)
+            {
+                CleanupDestroyedTargetReferences(target);
+                return;
+            }
+
+            if (!TryResolveTargetTransform(target, unityTarget, out var targetTransform))
+            {
+                CleanupDestroyedTargetReferences(target);
+                return;
+            }
             spawnPosition = transform.position;
             wanderer?.SetOrigin(spawnPosition);
-            wanderer?.EnterCombat(target.transform);
+            wanderer?.EnterCombat(targetTransform);
             if (!activeAttacks.ContainsKey(target))
             {
                 var routine = StartCoroutine(AttackRoutine(target));
@@ -245,9 +275,22 @@ namespace NPC
                 return;
             if (target == null || activeAttacks.ContainsKey(target))
                 return;
+
+            var unityTarget = target as Object;
+            if (unityTarget == null)
+            {
+                CleanupDestroyedTargetReferences(target);
+                return;
+            }
+
+            if (!TryResolveTargetTransform(target, unityTarget, out var targetTransform))
+            {
+                CleanupDestroyedTargetReferences(target);
+                return;
+            }
             if (activeAttacks.Count == 0)
                 hasHitPlayer = false;
-            wanderer?.EnterCombat(target.transform);
+            wanderer?.EnterCombat(targetTransform);
             var routine = StartCoroutine(AttackRoutine(target));
             activeAttacks[target] = routine;
             if (activeAttacks.Count == 1)
@@ -260,7 +303,10 @@ namespace NPC
             // Unity nulls the parameter after the target is destroyed. This ensures dictionary keys
             // and wanderer state are always cleared when the coroutine ends.
             CombatTarget cachedTarget = target;
-            Transform cachedTargetTransform = cachedTarget != null ? cachedTarget.transform : null;
+            Object cachedUnityTarget = cachedTarget as Object;
+            Transform cachedTargetTransform = null;
+            if (cachedUnityTarget != null)
+                TryResolveTargetTransform(cachedTarget, cachedUnityTarget, out cachedTargetTransform);
 
             // Cache the WaitForSeconds instance that matches the current attack speed so we
             // avoid allocating a new one every loop iteration while still responding to
@@ -273,8 +319,17 @@ namespace NPC
             // configured stand-off distances.
             const float DISTANCE_EPSILON = 0.05f;
 
-            while (combatant.IsAlive && target != null && target.IsAlive)
+            while (combatant.IsAlive)
             {
+                var unityTarget = target as Object;
+                if (unityTarget == null || !TryResolveTargetTransform(target, unityTarget, out var targetTransform))
+                    break;
+
+                cachedTargetTransform = targetTransform ?? cachedTargetTransform;
+
+                if (!target.IsAlive)
+                    break;
+
                 // Determine the current attack speed, defaulting to four ticks when no profile
                 // data is available, and clamp so that NPCs always attack at least once per tick.
                 var profile = combatant.Profile;
@@ -287,7 +342,9 @@ namespace NPC
                     cachedAttackDelay = new WaitForSeconds(cachedAttackSpeedTicks * CombatMath.TICK_SECONDS);
                 }
 
-                float distance = Vector2.Distance(target.transform.position, transform.position);
+                float distance = targetTransform != null
+                    ? Vector2.Distance(targetTransform.position, transform.position)
+                    : float.MaxValue;
                 float desiredDistance = profile != null ? profile.GetPreferredAttackRange() : CombatMath.MELEE_RANGE;
                 if (distance > 15f)
                 {
@@ -302,7 +359,8 @@ namespace NPC
                 }
                 else
                 {
-                    npcFacing?.FaceTarget(target.transform);
+                    if (targetTransform != null)
+                        npcFacing?.FaceTarget(targetTransform);
                     yield return null;
                 }
             }
@@ -324,6 +382,58 @@ namespace NPC
                 wanderer?.ForceReturnToOrigin();
                 SetCombatState(false);
             }
+        }
+
+        private void CleanupDestroyedTargetReferences(CombatTarget target)
+        {
+            StopAndRemoveActiveAttack(target);
+            RemoveCachedTargetFromDictionary(threatLevels, target);
+            RemoveCachedTargetFromDictionary(lastDamageTimes, target);
+        }
+
+        private void StopAndRemoveActiveAttack(CombatTarget target)
+        {
+            if (activeAttacks.Count == 0)
+                return;
+
+            if (activeAttacks.TryGetValue(target, out var routine))
+            {
+                if (routine != null)
+                    StopCoroutine(routine);
+                activeAttacks.Remove(target);
+            }
+            else
+            {
+                CombatTarget keyToRemove = null;
+                Coroutine routineToStop = null;
+                foreach (var kvp in activeAttacks)
+                {
+                    if (ReferenceEquals(kvp.Key, target))
+                    {
+                        keyToRemove = kvp.Key;
+                        routineToStop = kvp.Value;
+                        break;
+                    }
+                }
+
+                if (routineToStop != null)
+                    StopCoroutine(routineToStop);
+
+                if (keyToRemove != null)
+                    activeAttacks.Remove(keyToRemove);
+            }
+
+            RemoveCachedTargetFromDictionary(activeAttacks, target);
+        }
+
+        private static bool TryResolveTargetTransform(CombatTarget target, Object unityTarget, out Transform resolvedTransform)
+        {
+            resolvedTransform = null;
+            if (target == null || unityTarget == null)
+                return false;
+
+            resolvedTransform = target.transform;
+            return resolvedTransform != null;
         }
 
         /// <summary>
