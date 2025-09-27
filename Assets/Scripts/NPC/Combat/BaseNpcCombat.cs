@@ -253,6 +253,12 @@ namespace NPC
 
         protected virtual IEnumerator AttackRoutine(CombatTarget target)
         {
+            // Cache the original target reference and transform up-front so we can clean up even if
+            // Unity nulls the parameter after the target is destroyed. This ensures dictionary keys
+            // and wanderer state are always cleared when the coroutine ends.
+            CombatTarget cachedTarget = target;
+            Transform cachedTargetTransform = cachedTarget != null ? cachedTarget.transform : null;
+
             // Cache the WaitForSeconds instance that matches the current attack speed so we
             // avoid allocating a new one every loop iteration while still responding to
             // runtime changes (e.g., debuffs modifying the profile's attack speed).
@@ -298,21 +304,47 @@ namespace NPC
                 }
             }
 
-            Transform targetTransform = target != null ? target.transform : null;
-            if (targetTransform != null)
-                wanderer?.ExitCombat(targetTransform);
+            bool onlyTrackedTarget = activeAttacks.Count <= 1;
 
-            if (target != null)
-            {
-                activeAttacks.Remove(target);
-                threatLevels.Remove(target);
-                lastDamageTimes.Remove(target);
-            }
+            if (cachedTargetTransform != null)
+                wanderer?.ExitCombat(cachedTargetTransform);
+            else if (onlyTrackedTarget)
+                wanderer?.ExitCombat();
+
+            RemoveCachedTargetFromDictionary(activeAttacks, cachedTarget);
+            RemoveCachedTargetFromDictionary(threatLevels, cachedTarget);
+            RemoveCachedTargetFromDictionary(lastDamageTimes, cachedTarget);
             if (activeAttacks.Count == 0)
             {
                 wanderer?.ForceReturnToOrigin();
                 SetCombatState(false);
             }
+        }
+
+        /// <summary>
+        /// Ensures dictionary entries keyed by the provided <paramref name="cachedTarget"/> are removed even
+        /// when Unity has nullified the reference after the underlying object is destroyed.
+        /// </summary>
+        private static void RemoveCachedTargetFromDictionary<TValue>(Dictionary<CombatTarget, TValue> dictionary, CombatTarget cachedTarget)
+        {
+            if (dictionary == null || dictionary.Count == 0)
+                return;
+
+            if (dictionary.Remove(cachedTarget))
+                return;
+
+            CombatTarget keyToRemove = null;
+            foreach (var key in dictionary.Keys)
+            {
+                if (ReferenceEquals(key, cachedTarget))
+                {
+                    keyToRemove = key;
+                    break;
+                }
+            }
+
+            if (keyToRemove != null)
+                dictionary.Remove(keyToRemove);
         }
 
         protected virtual void ResolveAttack(CombatTarget target)
