@@ -299,8 +299,15 @@ namespace NPC
                 _from = _rb != null ? _rb.position : (Vector2)transform.position;
                 Transform closest = null;
                 float best = float.MaxValue;
-                foreach (var t in _combatTargets)
+                for (int i = _combatTargets.Count - 1; i >= 0; i--)
                 {
+                    Transform t = _combatTargets[i];
+                    if (t == null)
+                    {
+                        _combatTargets.RemoveAt(i);
+                        continue;
+                    }
+
                     float d = Vector2.Distance(_from, t.position);
                     if (d < best)
                     {

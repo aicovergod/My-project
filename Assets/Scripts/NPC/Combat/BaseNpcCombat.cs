@@ -126,9 +126,12 @@ namespace NPC
                         if (c != null)
                             StopCoroutine(c);
                         activeAttacks.Remove(t);
-                        if (targetTransform != null)
-                            wanderer?.ExitCombat(targetTransform);
                     }
+
+                    // Always notify the wanderer that this combatant is no longer engaged, even when
+                    // the cached transform instance has been Unity-nullified. Passing the cached
+                    // reference allows the wanderer to purge any lingering slot keyed to the target.
+                    wanderer?.ExitCombat(targetTransform);
                 }
             }
 
@@ -306,9 +309,11 @@ namespace NPC
 
             bool onlyTrackedTarget = activeAttacks.Count <= 1;
 
-            if (cachedTargetTransform != null)
-                wanderer?.ExitCombat(cachedTargetTransform);
-            else if (onlyTrackedTarget)
+            // Always pass the cached transform back to the wanderer (even when it compares equal to
+            // null) so any stale combat slot keyed by this target reference is released immediately.
+            wanderer?.ExitCombat(cachedTargetTransform);
+
+            if (cachedTargetTransform == null && onlyTrackedTarget)
                 wanderer?.ExitCombat();
 
             RemoveCachedTargetFromDictionary(activeAttacks, cachedTarget);
