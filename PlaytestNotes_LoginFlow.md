@@ -17,3 +17,8 @@ These scenarios help verify the revised login resume logic for both established 
 5. Wait for at least 10 seconds so an autosave occurs, then return to the login screen and log in again. The new account should now resume in the overworld at the last saved position, demonstrating that the initial placement was persisted correctly.
 
 Document any deviations from the above behaviour so regressions can be triaged quickly.
+
+## Automated Coverage
+- `LoadGlobalStore_RecoversFromInterruptedSwap`
+- `LoadGlobalStore_RecoversWhenLiveFileMissing`
+- `LoadGlobalStore_RecoversFromCorruptedLiveFile`
