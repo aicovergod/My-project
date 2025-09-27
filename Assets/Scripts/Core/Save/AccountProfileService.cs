@@ -237,12 +237,16 @@ namespace Core.Save
 
             string path = GetAccountPath(save.usernameSlug);
             string tempPath = path + ".tmp";
+            string backupPath = path + ".bak";
             string json = JsonUtility.ToJson(save, true);
 
             try
             {
                 await Task.Run(() =>
                 {
+                    bool backupCreated = false;
+                    bool swapSucceeded = false;
+
                     // Write the JSON payload to a temp file first so the main save is only
                     // touched once we know the data reached disk successfully.
                     using (var tempStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None))
@@ -255,36 +259,110 @@ namespace Core.Save
 
                     try
                     {
-                        // Grab an exclusive handle on the destination file (creating it when
-                        // missing) so any concurrent readers/writers fail fast.
-                        using (var destinationLock = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
-                        {
-                            destinationLock.Flush(true);
-                        }
-                    }
-                    catch (Exception lockEx)
-                    {
-                        throw new IOException($"AccountManager: Unable to access save file '{path}' for writing.", lockEx);
-                    }
-
-                    try
-                    {
                         if (File.Exists(path))
                         {
-                            File.Delete(path);
+                            try
+                            {
+                                // Grab an exclusive handle on the destination file so any
+                                // concurrent access fails fast before we touch the data.
+                                using (var destinationLock = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                                {
+                                    destinationLock.Flush(true);
+                                }
+                            }
+                            catch (Exception lockEx)
+                            {
+                                throw new IOException($"AccountManager: Unable to access save file '{path}' for writing.", lockEx);
+                            }
+
+                            if (File.Exists(backupPath))
+                            {
+                                try
+                                {
+                                    File.Delete(backupPath);
+                                }
+                                catch (Exception deleteEx)
+                                {
+                                    throw new IOException($"AccountManager: Unable to clear stale backup '{backupPath}' before saving.", deleteEx);
+                                }
+                            }
+
+                            File.Move(path, backupPath);
+                            backupCreated = true;
                         }
 
-                        File.Move(tempPath, path);
-
-                        // Defensive cleanup in case the platform leaves the temp file behind.
-                        if (File.Exists(tempPath))
+                        try
                         {
-                            File.Delete(tempPath);
+                            File.Move(tempPath, path);
+                            swapSucceeded = true;
+                        }
+                        catch (Exception moveEx)
+                        {
+                            throw new IOException($"AccountManager: Unable to swap temp save '{tempPath}' into '{path}'.", moveEx);
+                        }
+
+                        if (backupCreated)
+                        {
+                            try
+                            {
+                                if (File.Exists(backupPath))
+                                {
+                                    File.Delete(backupPath);
+                                }
+                                backupCreated = false;
+                            }
+                            catch (Exception cleanupEx)
+                            {
+                                throw new IOException($"AccountManager: Failed to delete backup save '{backupPath}' after writing '{path}'.", cleanupEx);
+                            }
                         }
                     }
-                    catch (Exception swapEx)
+                    catch (Exception operationEx)
                     {
-                        throw new IOException($"AccountManager: Unable to swap temp save '{tempPath}' into '{path}'.", swapEx);
+                        if (backupCreated && !swapSucceeded)
+                        {
+                            try
+                            {
+                                if (!File.Exists(path) && File.Exists(backupPath))
+                                {
+                                    File.Move(backupPath, path);
+                                }
+                                backupCreated = false;
+                            }
+                            catch (Exception restoreEx)
+                            {
+                                throw new IOException($"AccountManager: Failed to restore backup save '{backupPath}' after swap failure.", new AggregateException(operationEx, restoreEx));
+                            }
+                        }
+
+                        throw;
+                    }
+                    finally
+                    {
+                        try
+                        {
+                            if (File.Exists(tempPath))
+                                File.Delete(tempPath);
+                        }
+                        catch
+                        {
+                            // Ignored; temp cleanup best-effort.
+                        }
+
+                        if (backupCreated && swapSucceeded)
+                        {
+                            try
+                            {
+                                if (File.Exists(backupPath))
+                                {
+                                    File.Delete(backupPath);
+                                }
+                            }
+                            catch
+                            {
+                                // Ignored here; an earlier exception already signalled the issue.
+                            }
+                        }
                     }
                 }).ConfigureAwait(false);
             }
