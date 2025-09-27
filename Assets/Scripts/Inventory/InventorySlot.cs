@@ -1,5 +1,8 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace Inventory
 {
@@ -65,7 +68,18 @@ namespace Inventory
                 return;
             }
 
-            bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            // Determine whether a shift modifier is active, supporting both legacy and new input backends.
+            bool shift = false;
+#if ENABLE_LEGACY_INPUT_MANAGER
+            shift |= Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+#endif
+#if ENABLE_INPUT_SYSTEM
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard != null)
+            {
+                shift |= keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed;
+            }
+#endif
             if (inventory != null && inventory.InShop && eventData.button == PointerEventData.InputButton.Left)
             {
                 if (shift) inventory.PromptStackSplit(index, StackSplitType.Sell);
