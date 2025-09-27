@@ -22,25 +22,67 @@ namespace NPC
         [SerializeField] private float dropHeight = 8f;
         [SerializeField] private float meteorSpeed = 8f;
 
+        private Coroutine meteorRoutineHandle;
+
         public override void BeginAttacking(CombatTarget target)
         {
             base.BeginAttacking(target);
             if (target != null)
-                StartCoroutine(MeteorRoutine(target));
+            {
+                StopMeteorRoutine();
+                meteorRoutineHandle = StartCoroutine(MeteorRoutine(target));
+            }
+        }
+
+        public override void ResetCombatState(bool resetSpawnPosition = false)
+        {
+            base.ResetCombatState(resetSpawnPosition);
+            StopMeteorRoutine();
+        }
+
+        private void OnDisable()
+        {
+            StopMeteorRoutine();
+        }
+
+        /// <summary>
+        /// Stop the meteor barrage coroutine if it is currently active.
+        /// </summary>
+        private void StopMeteorRoutine()
+        {
+            if (meteorRoutineHandle != null)
+            {
+                StopCoroutine(meteorRoutineHandle);
+                meteorRoutineHandle = null;
+            }
         }
 
         private IEnumerator MeteorRoutine(CombatTarget target)
         {
             var wait = new WaitForSeconds(meteorInterval);
-            while (target != null && target.IsAlive && combatant.IsAlive)
+            while (ShouldContinueMeteorRoutine(target))
             {
                 yield return wait;
-                if (target == null || !target.IsAlive || !combatant.IsAlive)
+                if (!ShouldContinueMeteorRoutine(target))
                     break;
                 MeteorShowerBarrage.Perform(this, target, meteorCount, spreadRadius,
                     impactDamage, burnDamagePerTick, burnDuration,
                     meteorPrefab, burnPrefab, dropHeight, meteorSpeed);
             }
+            meteorRoutineHandle = null;
+        }
+
+        /// <summary>
+        /// Determines whether the warmage should keep scheduling meteor waves against the
+        /// current target.
+        /// </summary>
+        private bool ShouldContinueMeteorRoutine(CombatTarget target)
+        {
+            if (target == null || !combatant.IsAlive)
+                return false;
+            if (!target.IsAlive)
+                return false;
+            return activeAttacks.ContainsKey(target);
         }
     }
 }
