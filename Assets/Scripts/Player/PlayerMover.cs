@@ -519,7 +519,9 @@ namespace Player
         }
 
         /// <summary>
-        /// Persist the player's current position to the active save profile.
+        /// Persist the player's current position to the active save profile. The data is queued for
+        /// asynchronous persistence by <see cref="SaveManager"/> so callers should not assume the
+        /// save has reached disk immediately after this method returns.
         /// </summary>
         public void SavePosition()
         {
