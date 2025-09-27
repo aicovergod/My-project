@@ -19,20 +19,28 @@ namespace NPC
 
         private bool slamReady;
         private Coroutine slamCooldownRoutine;
+        // Caches the slam watcher coroutine so it can be cancelled when combat state changes.
+        private Coroutine slamWatcherRoutine;
 
         public override void BeginAttacking(CombatTarget target)
         {
             base.BeginAttacking(target);
-            if (target != null)
-            {
-                if (slamCooldownRoutine == null)
-                    slamCooldownRoutine = combatant.StartCoroutine(SlamCooldown());
+            if (target == null || !activeAttacks.ContainsKey(target))
+                return;
 
-                StartCoroutine(SlamWatcher(target));
-                if (slamReady)
-                {
-                    // slam fires immediately on re-engagement
-                }
+            if (slamCooldownRoutine == null)
+                slamCooldownRoutine = combatant.StartCoroutine(SlamCooldown());
+
+            if (slamWatcherRoutine != null)
+            {
+                StopCoroutine(slamWatcherRoutine);
+                slamWatcherRoutine = null;
+            }
+
+            slamWatcherRoutine = StartCoroutine(SlamWatcher(target));
+            if (slamReady)
+            {
+                // slam fires immediately on re-engagement
             }
         }
 
@@ -47,6 +55,9 @@ namespace NPC
         {
             while (target != null && target.IsAlive && combatant.IsAlive)
             {
+                if (!activeAttacks.ContainsKey(target))
+                    break;
+
                 if (slamReady)
                 {
                     GoblinWarChiefSlam.Perform(this, target, slamDamage, slamDustPrefab, slamRange, shakeDuration, shakeMagnitude);
@@ -55,6 +66,48 @@ namespace NPC
                 }
                 yield return null;
             }
+
+            slamWatcherRoutine = null;
+        }
+
+        public override void ResetCombatState(bool resetSpawnPosition = false)
+        {
+            base.ResetCombatState(resetSpawnPosition);
+            StopSlamWatcher();
+            StopSlamCooldown();
+            slamReady = false;
+        }
+
+        private void OnDisable()
+        {
+            StopSlamWatcher();
+            StopSlamCooldown();
+            slamReady = false;
+        }
+
+        /// <summary>
+        /// Stops the active slam watcher coroutine if one is running.
+        /// </summary>
+        private void StopSlamWatcher()
+        {
+            if (slamWatcherRoutine == null)
+                return;
+
+            StopCoroutine(slamWatcherRoutine);
+            slamWatcherRoutine = null;
+        }
+
+        /// <summary>
+        /// Stops the slam cooldown coroutine that was started on the combatant component.
+        /// </summary>
+        private void StopSlamCooldown()
+        {
+            if (slamCooldownRoutine == null)
+                return;
+
+            if (combatant != null)
+                combatant.StopCoroutine(slamCooldownRoutine);
+            slamCooldownRoutine = null;
         }
     }
 }
