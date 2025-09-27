@@ -8,6 +8,9 @@ using ShopSystem;
 using Player;
 using UnityEngine.EventSystems;
 using Pets;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace World
 {
@@ -421,19 +424,53 @@ namespace World
                 cachedPlayerMover = target.GetComponent<PlayerMover>();
             }
 
+#if ENABLE_INPUT_SYSTEM
+            var mouse = Mouse.current;
+            var keyboard = Keyboard.current;
+#endif
+
+            Vector3 pointerPosition = Vector3.zero;
+            Vector2 pointerDelta = Vector2.zero;
+            float scrollDelta = 0f;
+            bool toggleRequested = false;
+            bool dragButtonPressed = false;
+            bool leftClickPressed = false;
+
+#if ENABLE_LEGACY_INPUT_MANAGER
+            pointerPosition = Input.mousePosition;
+            pointerDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+            scrollDelta = Input.mouseScrollDelta.y;
+            dragButtonPressed = Input.GetMouseButton(1) || Input.GetMouseButton(2);
+            toggleRequested = Input.GetKeyDown(KeyCode.M);
+            leftClickPressed = Input.GetMouseButtonDown(0);
+#elif ENABLE_INPUT_SYSTEM
+            if (mouse != null)
+            {
+                Vector2 mousePosition = mouse.position.ReadValue();
+                pointerPosition = new Vector3(mousePosition.x, mousePosition.y, 0f);
+                pointerDelta = mouse.delta.ReadValue();
+                scrollDelta = mouse.scroll.ReadValue().y;
+                dragButtonPressed = mouse.rightButton.isPressed || mouse.middleButton.isPressed;
+                leftClickPressed = mouse.leftButton.wasPressedThisFrame;
+            }
+
+            if (keyboard != null)
+                toggleRequested = keyboard.mKey.wasPressedThisFrame;
+#endif
+
             if (mapCamera != null)
             {
-                if (IsExpanded && expandedMapRect != null && (Input.GetMouseButton(1) || Input.GetMouseButton(2)))
+                if (IsExpanded && expandedMapRect != null && dragButtonPressed)
                 {
                     float worldPerPixel = (mapCamera.orthographicSize * 2f) / expandedMapRect.rect.height;
-                    dragOffset += new Vector3(-Input.GetAxis("Mouse X"), -Input.GetAxis("Mouse Y"), 0f) * worldPerPixel * 10f;
+                    dragOffset += new Vector3(-pointerDelta.x, -pointerDelta.y, 0f) * worldPerPixel * 10f;
                 }
                 else if (!IsExpanded)
                 {
                     dragOffset = Vector3.zero;
                 }
 
-                HandleExpandedScrollZoom();
+                HandleExpandedScrollZoom(scrollDelta, pointerPosition);
             }
 
             if (target != null && mapCamera != null)
@@ -442,13 +479,13 @@ namespace World
                 mapCamera.transform.position = new Vector3(pos.x, pos.y, -10f);
             }
 
-            if (Input.GetKeyDown(KeyCode.M))
+            if (toggleRequested)
             {
                 ToggleExpanded();
             }
 
             if (DebugTeleportOnClickEnabled)
-                HandleDebugTeleportClick();
+                HandleDebugTeleportClick(leftClickPressed, pointerPosition);
 
             if (mapCamera != null)
             {
@@ -464,16 +501,16 @@ namespace World
         /// <summary>
         ///     Handles scroll-wheel zooming while the expanded minimap is visible and the pointer is over the map.
         /// </summary>
-        private void HandleExpandedScrollZoom()
+        /// <param name="scrollDelta">The scroll value reported by the active input backend.</param>
+        /// <param name="screenPosition">The pointer position in screen space.</param>
+        private void HandleExpandedScrollZoom(float scrollDelta, Vector3 screenPosition)
         {
             if (mapCamera == null || expandedMapRect == null || !IsExpanded)
                 return;
 
-            float scroll = Input.mouseScrollDelta.y;
-            if (Mathf.Approximately(scroll, 0f))
+            if (Mathf.Approximately(scrollDelta, 0f))
                 return;
 
-            Vector3 screenPosition = Input.mousePosition;
             var referenceCamera = minimapCanvas != null ? minimapCanvas.worldCamera : null;
             if (!RectTransformUtility.RectangleContainsScreenPoint(expandedMapRect, screenPosition, referenceCamera))
                 return;
@@ -481,22 +518,20 @@ namespace World
             if (PointerHitsBlockingControl(screenPosition))
                 return;
 
-            float newSize = Mathf.Clamp(mapCamera.orthographicSize - scroll * ZoomStep, MinZoom, MaxZoom);
+            float newSize = Mathf.Clamp(mapCamera.orthographicSize - scrollDelta * ZoomStep, MinZoom, MaxZoom);
             mapCamera.orthographicSize = newSize;
         }
 
         /// <summary>
         ///     Processes left-clicks on the minimap while the debug toggle is enabled and teleports the player when appropriate.
         /// </summary>
-        private void HandleDebugTeleportClick()
+        /// <param name="leftClickPressed">Whether the primary pointer button was pressed during the current frame.</param>
+        /// <param name="screenPosition">The pointer position in screen space.</param>
+        private void HandleDebugTeleportClick(bool leftClickPressed, Vector3 screenPosition)
         {
-            if (mapCamera == null)
+            if (mapCamera == null || !leftClickPressed)
                 return;
 
-            if (!Input.GetMouseButtonDown(0))
-                return;
-
-            Vector3 screenPosition = Input.mousePosition;
             // Operate entirely in screen space so UI checks and rect conversions agree on coordinates.
 
             if (PointerHitsBlockingControl(screenPosition))
