@@ -2,6 +2,8 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
+using Core.Input;
 using Skills;
 
 namespace World
@@ -42,32 +44,51 @@ namespace World
         [Tooltip("How close the player must be in tiles to activate this interactable.")]
         public float useRadius = 2f;
 
+        [Header("Input")]
+        [SerializeField]
+        [Tooltip("Player input component supplying the default action map. Auto-resolved when omitted.")]
+        private PlayerInput playerInput;
+
+        [SerializeField]
+        [Tooltip("Optional override for the interact/confirm action used to trigger the transition.")]
+        private InputActionReference interactActionReference;
+
         private bool _transitioning;
+        private InputAction interactAction;
+        private bool interactActionOwned;
 
         private void OnEnable()
         {
             SceneTransitionManager.TransitionStarted += OnTransitionStarted;
             SceneTransitionManager.TransitionCompleted += OnTransitionCompleted;
+            SubscribeToInput();
         }
 
         private void OnDisable()
         {
             SceneTransitionManager.TransitionStarted -= OnTransitionStarted;
             SceneTransitionManager.TransitionCompleted -= OnTransitionCompleted;
+            UnsubscribeFromInput();
         }
 
-        private void Update()
+        private void HandleInteractAction(InputAction.CallbackContext context)
         {
+            if (!context.performed)
+                return;
+
             if (_transitioning)
                 return;
 
-            if (!Input.GetMouseButtonDown(0))
+            if (IsPointerBlockedByUI(context))
                 return;
 
-            if (IsPointerOverUI())
+            Camera activeCamera = Camera.main;
+            if (activeCamera == null)
                 return;
 
-            var worldPoint = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 screenPosition = ResolveScreenPosition(context);
+            Vector2 worldPoint = activeCamera.ScreenToWorldPoint(screenPosition);
+
             foreach (var col in Physics2D.OverlapPointAll(worldPoint))
             {
                 if (col.gameObject == gameObject)
@@ -171,6 +192,89 @@ namespace World
                 return EventSystem.current.IsPointerOverGameObject();
 
             return false;
+        }
+
+        /// <summary>
+        ///     Determines whether the current interaction press should be blocked because the pointer is over a UI element.
+        ///     Uses touch specific pointer IDs when available so mobile presses continue to honour EventSystem filtering.
+        /// </summary>
+        private static bool IsPointerBlockedByUI(InputAction.CallbackContext context)
+        {
+            if (EventSystem.current == null)
+                return false;
+
+            if (context.control != null)
+            {
+                if (context.control.parent is TouchControl touchControl)
+                {
+                    int touchId = touchControl.touchId.ReadValue();
+                    if (EventSystem.current.IsPointerOverGameObject(touchId))
+                        return true;
+                }
+                else if (context.control.device is Pointer pointer && !(pointer is Touchscreen))
+                {
+                    if (EventSystem.current.IsPointerOverGameObject())
+                        return true;
+                }
+            }
+
+            return IsPointerOverUI();
+        }
+
+        /// <summary>
+        ///     Resolves the screen position associated with the current input context, falling back to the active pointer device
+        ///     when the action originates from a non-pointer binding (e.g. controller confirm).
+        /// </summary>
+        private static Vector2 ResolveScreenPosition(InputAction.CallbackContext context)
+        {
+            if (context.control != null)
+            {
+                if (context.control.parent is TouchControl touchControl)
+                    return touchControl.position.ReadValue();
+
+                if (context.control.device is Pointer pointerDevice)
+                    return pointerDevice.position.ReadValue();
+            }
+
+            Pointer pointer = Pointer.current;
+            if (pointer != null)
+                return pointer.position.ReadValue();
+
+            return new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+        }
+
+        /// <summary>
+        ///     Resolves and subscribes to the configured interact action so pointer and controller inputs remain functional.
+        /// </summary>
+        private void SubscribeToInput()
+        {
+            UnsubscribeFromInput();
+
+            if (playerInput == null)
+            {
+                playerInput = GetComponent<PlayerInput>();
+                if (playerInput == null)
+                    playerInput = GetComponentInParent<PlayerInput>();
+            }
+
+            interactAction = InputActionResolver.Resolve(playerInput, interactActionReference, "Interact", out interactActionOwned);
+            if (interactAction != null)
+                interactAction.performed += HandleInteractAction;
+        }
+
+        /// <summary>
+        ///     Cleans up input callbacks and disables actions that were enabled through the resolver.
+        /// </summary>
+        private void UnsubscribeFromInput()
+        {
+            if (interactAction != null)
+            {
+                interactAction.performed -= HandleInteractAction;
+                if (interactActionOwned)
+                    interactAction.Disable();
+                interactAction = null;
+                interactActionOwned = false;
+            }
         }
     }
 }
