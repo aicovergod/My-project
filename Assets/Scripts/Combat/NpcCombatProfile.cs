@@ -37,6 +37,12 @@ namespace Combat
         [Tooltip("Seconds to keep aggro on a target after it moves beyond the chase radius.")]
         public float AggroTimeoutSeconds = 5f;
 
+        [Header("Attack Range")]
+        [Tooltip("Preferred distance when using ranged attacks. Defaults to a mid-range bow distance if unset.")]
+        [Min(0f)] public float RangedAttackRange = 6f;
+        [Tooltip("Preferred distance when using magic attacks. Defaults to a typical strike spell range if unset.")]
+        [Min(0f)] public float MagicAttackRange = 7f;
+
         [Tooltip("When enabled the NPC ignores freeze effects while still taking damage.")]
         public bool NotFreezable;
 
@@ -58,5 +64,25 @@ namespace Combat
         public bool PoisonRequiresDamage = true;
 
         public List<ElementalModifier> elementalModifiers = new();
+
+        private const float MINIMUM_ATTACK_RANGE = 0.1f;
+        private const float DEFAULT_RANGED_RANGE = 6f;
+        private const float DEFAULT_MAGIC_RANGE = 7f;
+
+        /// <summary>
+        /// Returns the preferred attack distance based on the configured <see cref="AttackType"/>,
+        /// falling back to sensible defaults when no explicit range has been supplied.
+        /// </summary>
+        public float GetPreferredAttackRange()
+        {
+            return AttackType switch
+            {
+                DamageType.Ranged => Mathf.Max(MINIMUM_ATTACK_RANGE,
+                    RangedAttackRange > 0f ? RangedAttackRange : DEFAULT_RANGED_RANGE),
+                DamageType.Magic => Mathf.Max(MINIMUM_ATTACK_RANGE,
+                    MagicAttackRange > 0f ? MagicAttackRange : DEFAULT_MAGIC_RANGE),
+                _ => Mathf.Max(MINIMUM_ATTACK_RANGE, CombatMath.MELEE_RANGE)
+            };
+        }
     }
 }
