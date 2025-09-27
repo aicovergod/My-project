@@ -568,23 +568,95 @@ namespace Core.Save
             if (globalCache != null)
                 return globalCache;
 
-            try
+            string backupPath = GlobalFilePath + ".bak";
+            string tempPath = GlobalFilePath + ".tmp";
+
+            bool TryRestoreFromBackup(string reason)
             {
-                Directory.CreateDirectory(AccountManager.BaseDirectory);
-                if (File.Exists(GlobalFilePath))
+                if (!File.Exists(backupPath))
+                    return false;
+
+                try
                 {
-                    string json = File.ReadAllText(GlobalFilePath, Encoding.UTF8);
-                    globalCache = JsonUtility.FromJson<GlobalData>(json);
+                    Debug.LogWarning($"SaveManager: {reason}. Attempting to restore global save from backup.");
+
+                    if (File.Exists(GlobalFilePath))
+                    {
+                        File.Delete(GlobalFilePath);
+                    }
+
+                    File.Move(backupPath, GlobalFilePath);
+
+                    if (File.Exists(tempPath))
+                    {
+                        File.Delete(tempPath);
+                    }
+
+                    Debug.LogWarning("SaveManager: Successfully restored global save from backup. Retrying load.");
+                    return true;
+                }
+                catch (Exception restoreEx)
+                {
+                    Debug.LogError($"SaveManager: Failed to restore global save backup: {restoreEx}");
+                    return false;
                 }
             }
-            catch (Exception ex)
+
+            Directory.CreateDirectory(AccountManager.BaseDirectory);
+
+            bool retry;
+            do
             {
-                Debug.LogError($"SaveManager: Failed to read global save file: {ex}");
+                retry = false;
+
+                try
+                {
+                    if (File.Exists(GlobalFilePath))
+                    {
+                        string json = File.ReadAllText(GlobalFilePath, Encoding.UTF8);
+
+                        if (string.IsNullOrWhiteSpace(json))
+                        {
+                            Debug.LogWarning("SaveManager: Global save file is empty.");
+                            if (TryRestoreFromBackup("Global save file empty"))
+                            {
+                                globalCache = null;
+                                retry = true;
+                                continue;
+                            }
+                        }
+
+                        globalCache = JsonUtility.FromJson<GlobalData>(json);
+
+                        if (globalCache == null)
+                        {
+                            Debug.LogWarning("SaveManager: Failed to deserialize global save file (received null).");
+                            if (TryRestoreFromBackup("Global save file failed to deserialize"))
+                            {
+                                retry = true;
+                            }
+                        }
+                    }
+                    else if (TryRestoreFromBackup("Global save file missing"))
+                    {
+                        retry = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"SaveManager: Failed to read global save file: {ex}");
+                    if (TryRestoreFromBackup("Global save file unreadable"))
+                        retry = true;
+                }
             }
+            while (retry);
 
             if (globalCache == null || globalCache.entries == null)
                 globalCache = new GlobalData { entries = new List<GlobalEntry>() };
 
+            // Regression test plan: simulate autosave interruption during the temp-to-live swap by killing the application
+            // after the .tmp file is written but before the main file is replaced. On next launch verify that the backup is
+            // restored, stale .tmp is cleaned, and that subsequent saves rewrite the store without errors.
             return globalCache;
         }
 
