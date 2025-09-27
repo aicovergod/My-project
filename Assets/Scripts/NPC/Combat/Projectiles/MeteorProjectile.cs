@@ -44,26 +44,44 @@ namespace NPC
 
         private void Impact()
         {
+            // Cache owner lookups before we iterate so faction checks stay cheap.
+            var ownerTarget = owner != null ? owner.GetComponent<CombatTarget>() : null;
+            var ownerFaction = owner != null
+                ? owner.GetComponent<IFactionProvider>()
+                : null;
+
             // Apply the meteor's hit damage before spawning persistent ground flames so initial impact still hurts targets.
             if (impactDamage > 0)
             {
                 var hits = Physics2D.OverlapCircleAll(target, impactRadius);
                 if (hits.Length > 0)
                 {
-                    var processedTargets = new HashSet<CombatTarget>();
+                    var processedTargets = new Dictionary<CombatTarget, IFactionProvider>();
                     var source = (object)owner ?? this;
-                    var ownerTarget = owner != null ? owner.GetComponent<CombatTarget>() : null;
 
                     foreach (var hit in hits)
                     {
                         var combatTarget = hit.GetComponent<CombatTarget>() ?? hit.GetComponentInParent<CombatTarget>();
-                        if (combatTarget == null || processedTargets.Contains(combatTarget) || !combatTarget.IsAlive)
+                        if (combatTarget == null || !combatTarget.IsAlive)
                             continue;
+
                         if (ownerTarget != null && combatTarget == ownerTarget)
                             continue;
 
+                        if (!processedTargets.TryGetValue(combatTarget, out var targetFaction))
+                        {
+                            targetFaction = hit.GetComponent<IFactionProvider>() ?? hit.GetComponentInParent<IFactionProvider>();
+                            processedTargets.Add(combatTarget, targetFaction);
+                        }
+                        else
+                        {
+                            continue;
+                        }
+
+                        if (ownerFaction != null && targetFaction != null && !ownerFaction.IsEnemy(targetFaction.Faction))
+                            continue;
+
                         combatTarget.ApplyDamage(impactDamage, DamageType.Magic, SpellElement.Fire, source);
-                        processedTargets.Add(combatTarget);
                     }
                 }
             }
