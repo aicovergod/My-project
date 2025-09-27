@@ -194,6 +194,9 @@ namespace UI.Login
             {
                 bool accountExists = AccountManager.TryLoadAccount(username, out AccountSave save);
 
+                // Capture the login moment so the account history reflects the successful authentication.
+                string loginTimestamp = DateTime.UtcNow.ToString("O");
+
                 if (accountExists)
                 {
                     if (!AccountManager.VerifyPassword(save, password))
@@ -210,6 +213,9 @@ namespace UI.Login
                     save = AccountManager.CreateNewAccount(username, password);
                     SetStatus($"Created new account for {save.username}.", successColour);
                 }
+
+                // Persist the login timestamp explicitly rather than letting autosaves advance it.
+                save.lastLoginUtc = loginTimestamp;
 
                 SaveManager.BindAccount(save, reload: true);
                 await AccountManager.SaveAsync(save);
