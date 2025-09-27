@@ -594,11 +594,15 @@ namespace Core.Save
                 return;
 
             string tempPath = GlobalFilePath + ".tmp";
+            string backupPath = GlobalFilePath + ".bak";
 
             try
             {
                 Directory.CreateDirectory(AccountManager.BaseDirectory);
                 string json = JsonUtility.ToJson(globalCache);
+
+                bool backupCreated = false;
+                bool swapSucceeded = false;
 
                 using (var tempStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None))
                 using (var writer = new StreamWriter(tempStream, Encoding.UTF8))
@@ -610,33 +614,108 @@ namespace Core.Save
 
                 try
                 {
-                    using (var destinationLock = new FileStream(GlobalFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
-                    {
-                        destinationLock.Flush(true);
-                    }
-                }
-                catch (Exception lockEx)
-                {
-                    throw new IOException($"SaveManager: Unable to access global save file '{GlobalFilePath}' for writing.", lockEx);
-                }
-
-                try
-                {
                     if (File.Exists(GlobalFilePath))
                     {
-                        File.Delete(GlobalFilePath);
+                        try
+                        {
+                            using (var destinationLock = new FileStream(GlobalFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                            {
+                                destinationLock.Flush(true);
+                            }
+                        }
+                        catch (Exception lockEx)
+                        {
+                            throw new IOException($"SaveManager: Unable to access global save file '{GlobalFilePath}' for writing.", lockEx);
+                        }
+
+                        if (File.Exists(backupPath))
+                        {
+                            try
+                            {
+                                File.Delete(backupPath);
+                            }
+                            catch (Exception deleteEx)
+                            {
+                                throw new IOException($"SaveManager: Unable to clear stale global backup '{backupPath}' before saving.", deleteEx);
+                            }
+                        }
+
+                        File.Move(GlobalFilePath, backupPath);
+                        backupCreated = true;
                     }
 
-                    File.Move(tempPath, GlobalFilePath);
-
-                    if (File.Exists(tempPath))
+                    try
                     {
-                        File.Delete(tempPath);
+                        File.Move(tempPath, GlobalFilePath);
+                        swapSucceeded = true;
+                    }
+                    catch (Exception moveEx)
+                    {
+                        throw new IOException($"SaveManager: Unable to swap temp global save '{tempPath}' into '{GlobalFilePath}'.", moveEx);
+                    }
+
+                    if (backupCreated)
+                    {
+                        try
+                        {
+                            if (File.Exists(backupPath))
+                            {
+                                File.Delete(backupPath);
+                            }
+                            backupCreated = false;
+                        }
+                        catch (Exception cleanupEx)
+                        {
+                            throw new IOException($"SaveManager: Failed to delete global backup '{backupPath}' after writing '{GlobalFilePath}'.", cleanupEx);
+                        }
                     }
                 }
-                catch (Exception swapEx)
+                catch (Exception operationEx)
                 {
-                    throw new IOException($"SaveManager: Unable to swap temp global save '{tempPath}' into '{GlobalFilePath}'.", swapEx);
+                    if (backupCreated && !swapSucceeded)
+                    {
+                        try
+                        {
+                            if (!File.Exists(GlobalFilePath) && File.Exists(backupPath))
+                            {
+                                File.Move(backupPath, GlobalFilePath);
+                            }
+                            backupCreated = false;
+                        }
+                        catch (Exception restoreEx)
+                        {
+                            throw new IOException($"SaveManager: Failed to restore global backup '{backupPath}' after swap failure.", new AggregateException(operationEx, restoreEx));
+                        }
+                    }
+
+                    throw;
+                }
+                finally
+                {
+                    try
+                    {
+                        if (File.Exists(tempPath))
+                            File.Delete(tempPath);
+                    }
+                    catch
+                    {
+                        // Ignore temp cleanup failure.
+                    }
+
+                    if (backupCreated && swapSucceeded)
+                    {
+                        try
+                        {
+                            if (File.Exists(backupPath))
+                            {
+                                File.Delete(backupPath);
+                            }
+                        }
+                        catch
+                        {
+                            // Cleanup best effort when an earlier exception already surfaced.
+                        }
+                    }
                 }
             }
             catch (Exception ex)
