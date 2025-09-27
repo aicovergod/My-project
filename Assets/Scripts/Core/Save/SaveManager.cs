@@ -599,17 +599,44 @@ namespace Core.Save
             {
                 Directory.CreateDirectory(AccountManager.BaseDirectory);
                 string json = JsonUtility.ToJson(globalCache);
-                File.WriteAllText(tempPath, json, Encoding.UTF8);
-                if (File.Exists(GlobalFilePath))
+
+                using (var tempStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                using (var writer = new StreamWriter(tempStream, Encoding.UTF8))
                 {
-                    File.Replace(tempPath, GlobalFilePath, null);
+                    writer.Write(json);
+                    writer.Flush();
+                    tempStream.Flush(true);
                 }
-                else
+
+                try
+                {
+                    using (var destinationLock = new FileStream(GlobalFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
+                    {
+                        destinationLock.Flush(true);
+                    }
+                }
+                catch (Exception lockEx)
+                {
+                    throw new IOException($"SaveManager: Unable to access global save file '{GlobalFilePath}' for writing.", lockEx);
+                }
+
+                try
                 {
                     if (File.Exists(GlobalFilePath))
+                    {
                         File.Delete(GlobalFilePath);
+                    }
 
                     File.Move(tempPath, GlobalFilePath);
+
+                    if (File.Exists(tempPath))
+                    {
+                        File.Delete(tempPath);
+                    }
+                }
+                catch (Exception swapEx)
+                {
+                    throw new IOException($"SaveManager: Unable to swap temp global save '{tempPath}' into '{GlobalFilePath}'.", swapEx);
                 }
             }
             catch (Exception ex)
