@@ -192,7 +192,18 @@ namespace UI.Login
 
             try
             {
-                bool accountExists = AccountManager.TryLoadAccount(username, out AccountSave save);
+                AccountManager.AccountLoadStatus loadStatus = AccountManager.TryLoadAccount(username, out AccountSave save);
+
+                if (loadStatus == AccountManager.AccountLoadStatus.FailedToDeserialize)
+                {
+                    string accountPath = AccountManager.GetAccountPath(username);
+                    Debug.LogError($"LoginScreenController: Save file at '{accountPath}' exists but could not be read. Prompting the player to back up and repair the profile.", this);
+                    SetStatus($"Your save data appears corrupted. Back up the file at:\n{accountPath}\nand repair or restore it before logging in to avoid losing progress.", errorColour);
+                    SetLoginButtonInteractable(true);
+                    return;
+                }
+
+                bool accountExists = loadStatus == AccountManager.AccountLoadStatus.Success;
 
                 // Capture the login moment so the account history reflects the successful authentication.
                 string loginTimestamp = DateTime.UtcNow.ToString("O");

@@ -83,39 +83,62 @@ namespace Core.Save
         }
 
         /// <summary>
+        /// Enumerates the possible outcomes when probing the on-disk profile for an account.
+        /// </summary>
+        public enum AccountLoadStatus
+        {
+            /// <summary>
+            /// The save file was located and deserialised successfully.
+            /// </summary>
+            Success,
+            /// <summary>
+            /// No save file exists for the provided username/slug.
+            /// </summary>
+            NotFound,
+            /// <summary>
+            /// A save file exists but could not be deserialised. The file is likely corrupted or
+            /// incompatible with the current schema.
+            /// </summary>
+            FailedToDeserialize,
+        }
+
+        /// <summary>
         /// Attempts to load an account save file using the provided username or slug.
         /// </summary>
         /// <param name="username">Raw username supplied by the player.</param>
         /// <param name="save">Outputs the loaded account when successful.</param>
-        /// <returns>True when a matching account file was found and deserialised.</returns>
-        public static bool TryLoadAccount(string username, out AccountSave save)
+        /// <returns>A status describing whether the save was found, missing, or corrupted.</returns>
+        public static AccountLoadStatus TryLoadAccount(string username, out AccountSave save)
         {
             save = null;
 
             string slug = SanitizeUsername(username);
             if (string.IsNullOrEmpty(slug))
-                return false;
+                return AccountLoadStatus.NotFound;
 
             string path = GetAccountPath(slug);
             if (!File.Exists(path))
-                return false;
+                return AccountLoadStatus.NotFound;
 
             try
             {
                 string json = File.ReadAllText(path, Encoding.UTF8);
                 var loaded = JsonUtility.FromJson<AccountSave>(json);
                 if (loaded == null)
-                    return false;
+                {
+                    Debug.LogError($"AccountManager: The save file for '{slug}' exists but could not be deserialised. The file may be corrupted.");
+                    return AccountLoadStatus.FailedToDeserialize;
+                }
 
                 EnsureDefaults(loaded, slug, username);
                 save = loaded;
-                return true;
+                return AccountLoadStatus.Success;
             }
             catch (Exception ex)
             {
                 Debug.LogError($"AccountManager: Failed to load account '{slug}': {ex}");
                 save = null;
-                return false;
+                return AccountLoadStatus.FailedToDeserialize;
             }
         }
 
