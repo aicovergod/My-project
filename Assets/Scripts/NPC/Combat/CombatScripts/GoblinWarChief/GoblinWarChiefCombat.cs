@@ -19,6 +19,7 @@ namespace NPC
 
         private bool slamReady;
         private Coroutine slamCooldownRoutine;
+        private Coroutine slamWatcherRoutine;
 
         public override void BeginAttacking(CombatTarget target)
         {
@@ -28,12 +29,37 @@ namespace NPC
                 if (slamCooldownRoutine == null)
                     slamCooldownRoutine = combatant.StartCoroutine(SlamCooldown());
 
-                StartCoroutine(SlamWatcher(target));
+                if (slamWatcherRoutine != null)
+                {
+                    StopCoroutine(slamWatcherRoutine);
+                    slamWatcherRoutine = null;
+                }
+
+                slamWatcherRoutine = StartCoroutine(SlamWatcher(target));
                 if (slamReady)
                 {
                     // slam fires immediately on re-engagement
                 }
             }
+        }
+
+        public override void ResetCombatState(bool resetSpawnPosition = false)
+        {
+            if (slamWatcherRoutine != null)
+            {
+                StopCoroutine(slamWatcherRoutine);
+                slamWatcherRoutine = null;
+            }
+
+            if (slamCooldownRoutine != null && combatant != null)
+            {
+                combatant.StopCoroutine(slamCooldownRoutine);
+                slamCooldownRoutine = null;
+            }
+
+            slamReady = false;
+
+            base.ResetCombatState(resetSpawnPosition);
         }
 
         private IEnumerator SlamCooldown()
@@ -47,6 +73,9 @@ namespace NPC
         {
             while (target != null && target.IsAlive && combatant.IsAlive)
             {
+                if (!activeAttacks.ContainsKey(target))
+                    break;
+
                 if (slamReady)
                 {
                     GoblinWarChiefSlam.Perform(this, target, slamDamage, slamDustPrefab, slamRange, shakeDuration, shakeMagnitude);
@@ -55,6 +84,8 @@ namespace NPC
                 }
                 yield return null;
             }
+
+            slamWatcherRoutine = null;
         }
     }
 }
