@@ -206,7 +206,11 @@ namespace Core.Save
             EnsureBaseDirectory();
             EnsureDefaults(save, save.usernameSlug, save.username);
 
-            save.lastLoginUtc = DateTime.UtcNow.ToString("O");
+            if (string.IsNullOrEmpty(save.lastLoginUtc))
+            {
+                // Guard against overwriting the real login timestamp during background saves.
+                save.lastLoginUtc = DateTime.UtcNow.ToString("O");
+            }
 
             string path = GetAccountPath(save.usernameSlug);
             string tempPath = path + ".tmp";
