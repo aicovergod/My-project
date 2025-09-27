@@ -243,17 +243,48 @@ namespace Core.Save
             {
                 await Task.Run(() =>
                 {
-                    File.WriteAllText(tempPath, json, Encoding.UTF8);
-                    if (File.Exists(path))
+                    // Write the JSON payload to a temp file first so the main save is only
+                    // touched once we know the data reached disk successfully.
+                    using (var tempStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                    using (var writer = new StreamWriter(tempStream, Encoding.UTF8))
                     {
-                        File.Replace(tempPath, path, null);
+                        writer.Write(json);
+                        writer.Flush();
+                        tempStream.Flush(true);
                     }
-                    else
+
+                    try
+                    {
+                        // Grab an exclusive handle on the destination file (creating it when
+                        // missing) so any concurrent readers/writers fail fast.
+                        using (var destinationLock = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
+                        {
+                            destinationLock.Flush(true);
+                        }
+                    }
+                    catch (Exception lockEx)
+                    {
+                        throw new IOException($"AccountManager: Unable to access save file '{path}' for writing.", lockEx);
+                    }
+
+                    try
                     {
                         if (File.Exists(path))
+                        {
                             File.Delete(path);
+                        }
 
                         File.Move(tempPath, path);
+
+                        // Defensive cleanup in case the platform leaves the temp file behind.
+                        if (File.Exists(tempPath))
+                        {
+                            File.Delete(tempPath);
+                        }
+                    }
+                    catch (Exception swapEx)
+                    {
+                        throw new IOException($"AccountManager: Unable to swap temp save '{tempPath}' into '{path}'.", swapEx);
                     }
                 }).ConfigureAwait(false);
             }
