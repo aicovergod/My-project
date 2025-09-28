@@ -9,10 +9,10 @@ namespace NPC
     /// <summary>
     /// Allows the player to left click an NPC to begin combat.
     /// </summary>
-    [RequireComponent(typeof(NPCCombatHandler))]
-    public class NPCAttackOnClick : MonoBehaviour
+    [RequireComponent(typeof(NpcCombatant))]
+    public class NpcAttackOnClick : MonoBehaviour
     {
-        private NPCCombatHandler combatant;
+        private NpcCombatant combatant;
 
         /// <summary>
         /// Tracks any coroutine that is holding an attack command while the player is frozen so
@@ -22,7 +22,7 @@ namespace NPC
 
         private void Awake()
         {
-            combatant = GetComponent<NPCCombatHandler>();
+            combatant = GetComponent<NpcCombatant>();
         }
 
         private void OnDisable()
@@ -93,7 +93,7 @@ namespace NPC
             CombatController playerController,
             PlayerMover playerMover,
             FrozenStatusController freezeController,
-            NPCCombatHandler target)
+            NpcCombatant target)
         {
             // Small guard to avoid running the routine when any critical dependency is missing.
             if (playerController == null || playerMover == null || freezeController == null || target == null)

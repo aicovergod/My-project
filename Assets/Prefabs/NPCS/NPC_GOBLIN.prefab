@@ -370,7 +370,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0ade83d186a2426484d785699fb0c95b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NPC.NPCFacing
+  m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcFacing
 --- !u!114 &8901135699789091071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -382,7 +382,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dca80bb4288709741ab3ec706acff2b3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NPC.NPCFlashEffect
+  m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcFlashEffect
   flashMaterial: {fileID: 2100000, guid: aac8e0a02d9cbc141a628564823e0278, type: 2}
   flashAmountProperty: _FlashAmount
   flashColorProperty: _FlashColor

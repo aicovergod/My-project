@@ -12,16 +12,16 @@ namespace NPC
     /// <summary>
     /// Shared combat behaviour for NPCs, handling aggro, targeting and basic attacks.
     /// </summary>
-    [RequireComponent(typeof(NPCCombatHandler), typeof(NPCFacing))]
-    public abstract class NPCCombatBehaviour : MonoBehaviour
+    [RequireComponent(typeof(NpcCombatant), typeof(NpcFacing))]
+    public abstract class BaseNpcCombat : MonoBehaviour
     {
-        protected NPCCombatHandler combatant;
+        protected NpcCombatant combatant;
         protected NpcWanderer wanderer;
         protected PlayerCombatTarget playerTarget;
         protected bool hasHitPlayer;
         protected Vector2 spawnPosition;
         public Vector2 SpawnPosition => spawnPosition;
-        protected NPCFacing npcFacing;
+        protected NpcFacing npcFacing;
         protected Coroutine spriteSwapRoutine;
 
         protected readonly Dictionary<CombatTarget, float> threatLevels = new();
@@ -49,11 +49,11 @@ namespace NPC
 
         protected virtual void Awake()
         {
-            combatant = GetComponent<NPCCombatHandler>();
+            combatant = GetComponent<NpcCombatant>();
             wanderer = GetComponent<NpcWanderer>();
             playerTarget = FindObjectOfType<PlayerCombatTarget>();
             spawnPosition = transform.position;
-            npcFacing = GetComponent<NPCFacing>();
+            npcFacing = GetComponent<NpcFacing>();
             nextAttackTimestamp = Time.time;
         }
 
@@ -249,7 +249,7 @@ namespace NPC
 
             if (myFaction != null)
             {
-                var activeCombatants = NPCCombatHandler.ActiveCombatants;
+                var activeCombatants = NpcCombatant.ActiveCombatants;
                 for (int i = 0; i < activeCombatants.Count; i++)
                 {
                     var npc = activeCombatants[i];
@@ -503,7 +503,7 @@ namespace NPC
         /// <param name="aggroRadius">Radius within which aggression should be evaluated.</param>
         private bool HasAggressiveFactionTargets(IFactionProvider myFaction, float aggroRadius)
         {
-            var active = NPCCombatHandler.ActiveCombatants;
+            var active = NpcCombatant.ActiveCombatants;
             for (int i = 0; i < active.Count; i++)
             {
                 var npc = active[i];

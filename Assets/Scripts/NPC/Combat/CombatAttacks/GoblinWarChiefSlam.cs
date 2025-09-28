@@ -7,7 +7,7 @@ namespace NPC
 {
     public static class GoblinWarChiefSlam
     {
-        public static void Perform(NPCCombatBehaviour owner, CombatTarget target, int slamDamage, GameObject slamDustPrefab, float slamRange, float shakeDuration, float shakeMagnitude)
+        public static void Perform(BaseNpcCombat owner, CombatTarget target, int slamDamage, GameObject slamDustPrefab, float slamRange, float shakeDuration, float shakeMagnitude)
         {
             if (owner == null)
                 return;

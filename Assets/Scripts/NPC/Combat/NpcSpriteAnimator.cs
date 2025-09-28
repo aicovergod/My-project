@@ -5,7 +5,7 @@ namespace NPC
     /// <summary>
     /// Handles sprite-based visuals for NPCs using either an Animator or manual sprite swapping.
     /// </summary>
-    public class NPCSpriteAnimator : MonoBehaviour
+    public class NpcSpriteAnimator : MonoBehaviour
     {
         public enum VisualMode { Animator, SpriteSwap }
 
