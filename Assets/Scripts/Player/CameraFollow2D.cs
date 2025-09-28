@@ -2,6 +2,7 @@
 
 using Core.Input;
 using UnityEngine;
+using UnityEngine.U2D;
 using World;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -37,6 +38,10 @@ namespace Player
         [SerializeField] private InputActionReference zoomActionReference;
 #endif
 
+        [Header("Pixel Perfect")]
+        [Tooltip("Optional PixelPerfectCamera that should track orthographic zoom changes.")]
+        [SerializeField] private PixelPerfectCamera pixelPerfectCamera;
+
         [Header("Pixel Snapping")]
         public bool snapToPixels = true;
         public int pixelsPerUnit = 64;
@@ -48,6 +53,8 @@ namespace Player
         private Vector3 velocity;
         private Camera cam;
         private float targetZoom;
+        private float baselineOrthographicSize;
+        private int baselinePixelPerfectResolutionY;
 #if ENABLE_INPUT_SYSTEM
         private InputAction zoomAction;
         private bool zoomActionEnabledByResolver;
@@ -57,6 +64,8 @@ namespace Player
         {
             base.Awake();
             cam = GetComponent<Camera>();
+            if (pixelPerfectCamera == null)
+                pixelPerfectCamera = GetComponent<PixelPerfectCamera>();
             InitialiseZoomTargets();
         }
 
@@ -143,11 +152,18 @@ namespace Player
 
             float initialSize = cam.orthographicSize;
 
+            if (baselineOrthographicSize <= 0f)
+                baselineOrthographicSize = Mathf.Max(0.0001f, initialSize);
+
+            if (pixelPerfectCamera != null && baselinePixelPerfectResolutionY <= 0)
+                baselinePixelPerfectResolutionY = Mathf.Max(1, pixelPerfectCamera.refResolutionY);
+
             if (defaultZoom > 0f)
                 initialSize = defaultZoom;
 
             targetZoom = Mathf.Clamp(initialSize, lowerBound, upperBound);
             cam.orthographicSize = targetZoom;
+            SynchronisePixelPerfectCamera(targetZoom);
         }
 
         /// <summary>
@@ -193,11 +209,14 @@ namespace Player
             if (zoomSmoothing <= 0f)
             {
                 cam.orthographicSize = targetZoom;
+                SynchronisePixelPerfectCamera(targetZoom);
                 return;
             }
 
             float t = Mathf.Clamp01(zoomSmoothing * Time.deltaTime);
-            cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, targetZoom, t);
+            float newSize = Mathf.Lerp(cam.orthographicSize, targetZoom, t);
+            cam.orthographicSize = newSize;
+            SynchronisePixelPerfectCamera(newSize);
         }
 
         /// <summary>
@@ -233,6 +252,27 @@ namespace Player
 #endif
 
             return 0f;
+        }
+
+        /// <summary>
+        ///     Keeps the optional PixelPerfectCamera in sync with orthographic zoom updates so zooming the
+        ///     world camera reproduces identical scaling through the pixel-perfect pipeline.
+        /// </summary>
+        /// <param name="currentOrthographicSize">The orthographic size currently applied to the world camera.</param>
+        private void SynchronisePixelPerfectCamera(float currentOrthographicSize)
+        {
+            if (pixelPerfectCamera == null)
+                return;
+
+            if (baselineOrthographicSize <= 0f || baselinePixelPerfectResolutionY <= 0)
+                return;
+
+            float zoomRatio = currentOrthographicSize / baselineOrthographicSize;
+            if (zoomRatio <= 0f || float.IsNaN(zoomRatio) || float.IsInfinity(zoomRatio))
+                return;
+
+            int scaledResolution = Mathf.Max(1, Mathf.RoundToInt(baselinePixelPerfectResolutionY * zoomRatio));
+            pixelPerfectCamera.refResolutionY = scaledResolution;
         }
     }
 }
