@@ -68,6 +68,7 @@ namespace Player
         private int baselinePixelPerfectResolutionY;
         private Type pixelPerfectCameraType;
         private PropertyInfo pixelPerfectResolutionProperty;
+        private int lastAppliedPixelPerfectResolutionY = -1;
 #if ENABLE_INPUT_SYSTEM
         private InputAction zoomAction;
         private bool zoomActionEnabledByResolver;
@@ -228,17 +229,19 @@ namespace Player
             GetOrderedZoomBounds(out float lowerBound, out float upperBound);
             targetZoom = Mathf.Clamp(targetZoom, lowerBound, upperBound);
 
+            float desiredZoom = targetZoom;
+
             if (zoomSmoothing <= 0f)
             {
-                cam.orthographicSize = targetZoom;
-                SynchronisePixelPerfectCamera(targetZoom);
+                cam.orthographicSize = desiredZoom;
+                SynchronisePixelPerfectCamera(desiredZoom);
                 return;
             }
 
             float t = Mathf.Clamp01(zoomSmoothing * Time.deltaTime);
-            float newSize = Mathf.Lerp(cam.orthographicSize, targetZoom, t);
+            float newSize = Mathf.Lerp(cam.orthographicSize, desiredZoom, t);
             cam.orthographicSize = newSize;
-            SynchronisePixelPerfectCamera(newSize);
+            SynchronisePixelPerfectCamera(desiredZoom);
         }
 
         /// <summary>
@@ -280,8 +283,8 @@ namespace Player
         ///     Keeps the optional PixelPerfectCamera in sync with orthographic zoom updates so zooming the
         ///     world camera reproduces identical scaling through the pixel-perfect pipeline.
         /// </summary>
-        /// <param name="currentOrthographicSize">The orthographic size currently applied to the world camera.</param>
-        private void SynchronisePixelPerfectCamera(float currentOrthographicSize)
+        /// <param name="desiredOrthographicSize">The orthographic size the camera is moving toward.</param>
+        private void SynchronisePixelPerfectCamera(float desiredOrthographicSize)
         {
             if (pixelPerfectCameraBehaviour == null || pixelPerfectResolutionProperty == null)
                 return;
@@ -289,12 +292,16 @@ namespace Player
             if (baselineOrthographicSize <= 0f || baselinePixelPerfectResolutionY <= 0)
                 return;
 
-            float zoomRatio = currentOrthographicSize / baselineOrthographicSize;
+            float zoomRatio = desiredOrthographicSize / baselineOrthographicSize;
             if (zoomRatio <= 0f || float.IsNaN(zoomRatio) || float.IsInfinity(zoomRatio))
                 return;
 
             int scaledResolution = Mathf.Max(1, Mathf.RoundToInt(baselinePixelPerfectResolutionY * zoomRatio));
+            if (scaledResolution == lastAppliedPixelPerfectResolutionY)
+                return;
+
             pixelPerfectResolutionProperty.SetValue(pixelPerfectCameraBehaviour, scaledResolution);
+            lastAppliedPixelPerfectResolutionY = scaledResolution;
         }
 
         /// <summary>
@@ -304,6 +311,7 @@ namespace Player
         private void CachePixelPerfectCameraBindings()
         {
             pixelPerfectResolutionProperty = null;
+            lastAppliedPixelPerfectResolutionY = -1;
             pixelPerfectCameraType = ResolvePixelPerfectCameraType();
 
             if (pixelPerfectCameraBehaviour != null && pixelPerfectCameraType != null &&
