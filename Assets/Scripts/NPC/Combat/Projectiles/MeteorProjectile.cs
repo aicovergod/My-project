@@ -15,7 +15,7 @@ namespace NPC
         public float burnDuration;
         public GameObject burnPrefab;
         public float speed = 8f;
-        public BaseNpcCombat owner;
+        public NPCCombatBehaviour owner;
         [SerializeField] private float selfDestructTime = 10f;
         [SerializeField]
         [Tooltip("Radius around the impact point used to apply the meteor's damage.")]

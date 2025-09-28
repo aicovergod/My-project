@@ -567,16 +567,16 @@ namespace Skills
             GUILayout.Space(10f);
             GUILayout.Label("NPC Debug");
 
-            var combatants = NpcCombatant.ActiveCombatants;
+            var combatants = NPCCombatHandler.ActiveCombatants;
             if (combatants.Count == 0)
             {
                 GUILayout.Label("No NPC combatants active.");
             }
 
-            bool globalLoggingEnabled = NpcCombatant.GlobalDamageLoggingEnabled;
+            bool globalLoggingEnabled = NPCCombatHandler.GlobalDamageLoggingEnabled;
             bool requestedGlobalLogging = GUILayout.Toggle(globalLoggingEnabled, "Enable Damage Logs for All NPCs");
             if (requestedGlobalLogging != globalLoggingEnabled)
-                NpcCombatant.GlobalDamageLoggingEnabled = requestedGlobalLogging;
+                NPCCombatHandler.GlobalDamageLoggingEnabled = requestedGlobalLogging;
         }
 
         /// <summary>

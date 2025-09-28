@@ -9,7 +9,7 @@ namespace NPC.Combat.Editor
 {
     /// <summary>
     /// Utility menu items that author the default NPC flash shader/material assets so designers can
-    /// hook the <see cref="NpcFlashEffect"/> component up in a single click during content creation.
+    /// hook the <see cref="NPCFlashEffect"/> component up in a single click during content creation.
     /// </summary>
     public static class NpcFlashMaterialUtility
     {
@@ -17,7 +17,7 @@ namespace NPC.Combat.Editor
         private const string MaterialAssetPath = "Assets/GeneratedAssets/NPC/Combat/NpcFlashSprite.mat";
         private const string CreateMaterialMenuPath = "Tools/NPC/Create Flash Material";
         private const string AssignMaterialMenuPath = "Tools/NPC/Assign Flash Material To Selected";
-        private const string ContextAssignPath = "CONTEXT/NpcFlashEffect/Assign Default Flash Material";
+        private const string ContextAssignPath = "CONTEXT/NPCFlashEffect/Assign Default Flash Material";
 
         private static readonly Color DefaultFlashColor = new Color(1f, 0.35f, 0.35f, 1f);
 
@@ -51,7 +51,7 @@ namespace NPC.Combat.Editor
         }
 
         /// <summary>
-        /// Assigns the generated flash material to all selected <see cref="NpcFlashEffect"/> components.
+        /// Assigns the generated flash material to all selected <see cref="NPCFlashEffect"/> components.
         /// </summary>
         [MenuItem(AssignMaterialMenuPath, priority = 200)]
         public static void AssignFlashMaterialToSelection()
@@ -79,7 +79,7 @@ namespace NPC.Combat.Editor
             GameObject[] selectedObjects = Selection.gameObjects;
             if (selectedObjects == null || selectedObjects.Length == 0)
             {
-                Debug.LogWarning("No game objects selected. Select NPCs that contain NpcFlashEffect components.");
+                Debug.LogWarning("No game objects selected. Select NPCs that contain NPCFlashEffect components.");
                 return;
             }
 
@@ -89,7 +89,7 @@ namespace NPC.Combat.Editor
                 if (go == null)
                     continue;
 
-                NpcFlashEffect flashEffect = go.GetComponent<NpcFlashEffect>();
+                NPCFlashEffect flashEffect = go.GetComponent<NPCFlashEffect>();
                 if (flashEffect == null)
                     continue;
 
@@ -107,16 +107,16 @@ namespace NPC.Combat.Editor
 
             if (assignmentCount > 0)
             {
-                Debug.Log($"Assigned NPC flash material to {assignmentCount} NpcFlashEffect component(s).");
+                Debug.Log($"Assigned NPC flash material to {assignmentCount} NPCFlashEffect component(s).");
             }
             else
             {
-                Debug.LogWarning("No NpcFlashEffect components found on the current selection. Nothing was assigned.");
+                Debug.LogWarning("No NPCFlashEffect components found on the current selection. Nothing was assigned.");
             }
         }
 
         /// <summary>
-        /// Context menu hook that allows designers to right-click an <see cref="NpcFlashEffect"/> component
+        /// Context menu hook that allows designers to right-click an <see cref="NPCFlashEffect"/> component
         /// and automatically assign the generated flash material asset.
         /// </summary>
         [MenuItem(ContextAssignPath)]
@@ -125,7 +125,7 @@ namespace NPC.Combat.Editor
             if (command == null || command.context == null)
                 return;
 
-            if (command.context is not NpcFlashEffect flashEffect)
+            if (command.context is not NPCFlashEffect flashEffect)
                 return;
 
             Material material = AssetDatabase.LoadAssetAtPath<Material>(MaterialAssetPath);
