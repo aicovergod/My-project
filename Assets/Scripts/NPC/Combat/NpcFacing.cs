@@ -5,9 +5,9 @@ namespace NPC
     /// <summary>
     /// Computes and applies sprite facing direction for NPCs.
     /// </summary>
-    public class NPCFacing : MonoBehaviour
+    public class NpcFacing : MonoBehaviour
     {
-        private NPCSpriteAnimator spriteAnimator;
+        private NpcSpriteAnimator spriteAnimator;
         private SpriteRenderer spriteRenderer;
 
         /// <summary>
@@ -19,7 +19,7 @@ namespace NPC
         /// <summary>
         /// Animator used for sprite swaps and attack animations.
         /// </summary>
-        public NPCSpriteAnimator Animator => spriteAnimator;
+        public NpcSpriteAnimator Animator => spriteAnimator;
 
         /// <summary>
         /// Renderer for simple sprite flipping when no animator is present.
@@ -28,7 +28,7 @@ namespace NPC
 
         private void Awake()
         {
-            spriteAnimator = GetComponent<NPCSpriteAnimator>() ?? GetComponentInChildren<NPCSpriteAnimator>();
+            spriteAnimator = GetComponent<NpcSpriteAnimator>() ?? GetComponentInChildren<NpcSpriteAnimator>();
             spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
         }
 

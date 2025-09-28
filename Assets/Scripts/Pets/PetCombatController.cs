@@ -183,7 +183,7 @@ namespace Pets
                     attacker.StrengthLevel = Mathf.RoundToInt(attacker.StrengthLevel * (1f + definition.strengthLevelPerBeastmasterLevel * beastmasterLevel));
             }
 
-            var npc = target as NPCCombatHandler;
+            var npc = target as NpcCombatant;
             CombatantStats defender;
             if (npc != null)
                 defender = npc.GetCombatantStats();
@@ -253,7 +253,7 @@ namespace Pets
                 FloatingText.Show(finalDamage.ToString(), hitsplatPosition, Color.white, null, sprite);
                 if (npc != null)
                 {
-                    var npcAttack = npc.GetComponent<NPCAttackController>();
+                    var npcAttack = npc.GetComponent<NpcAttackController>();
                     npcAttack?.BeginAttacking(this);
                 }
                 BeastmasterXp.TryGrantFromPetDamage(owner != null ? owner.gameObject : null, finalDamage);

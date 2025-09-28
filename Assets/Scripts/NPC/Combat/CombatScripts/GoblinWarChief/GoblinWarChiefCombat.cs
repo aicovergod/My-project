@@ -8,7 +8,7 @@ namespace NPC
     /// Combat controller for the Goblin War Chief. Performs standard melee attacks
     /// and executes a periodic slam dealing area damage with visual effects.
     /// </summary>
-    public class GoblinWarChiefCombat : NPCCombatBehaviour
+    public class GoblinWarChiefCombat : BaseNpcCombat
     {
         [SerializeField] private float slamInterval = 10f;
         [SerializeField] private int slamDamage = 10;

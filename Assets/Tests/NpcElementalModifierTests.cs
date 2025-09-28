@@ -6,12 +6,12 @@ using NPC;
 
 public class NpcElementalModifierTests
 {
-    private static NPCCombatHandler CreateCombatant(NpcCombatProfile profile)
+    private static NpcCombatant CreateCombatant(NpcCombatProfile profile)
     {
         var go = new GameObject();
         go.SetActive(false);
-        var combatant = go.AddComponent<NPCCombatHandler>();
-        typeof(NPCCombatHandler).GetField("profile", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(combatant, profile);
+        var combatant = go.AddComponent<NpcCombatant>();
+        typeof(NpcCombatant).GetField("profile", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(combatant, profile);
         go.SetActive(true);
         return combatant;
     }

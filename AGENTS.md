@@ -26,7 +26,7 @@
   - Shared floating-text behaviour for gathering skills flows through `Skills/Common/GatheringFloatingTextService`. Use the helper for OSRS-range validation, popup cooldowns, and delayed XP to keep Firemaking, Woodcutting, Mining, and Fishing feedback consistent.
 - **Combat** (`Assets/Scripts/Combat`, `Assets/Scripts/NPC/Combat`, `Assets/NPCCombatProfile`)
   - `CombatController`, `CombatMath`, and `CombatEnums` coordinate player combat ticks, max hit calculations, spell elements, and hitsplat visuals via `Resources/HitSplatLibrary`.
-  - NPC combat uses `NPCAttackController`, projectile logic, and drop resolution (`Drops` folder). Pet-assisted combat hooks exist in `Pets`.
+  - NPC combat uses `NpcAttackController`, projectile logic, and drop resolution (`Drops` folder). Pet-assisted combat hooks exist in `Pets`.
   - Attach `Combat/OnHitPoisonApplier` to weapons or projectiles when you need configurable poison procs. It consumes `PoisonConfig` assets, honours `requiresDamage`, and should be invoked alongside the combat hit confirmation pipeline.
 - **Player Systems** (`Assets/Scripts/Player`)
   - `PlayerMover` persists across scenes, auto-walks gathering nodes, saves position ticks, and respects freeze or respawn locks while keeping autosaves fresh.

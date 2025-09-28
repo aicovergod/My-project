@@ -35,7 +35,7 @@ namespace NPC
 
         [Header("Visuals")]
         [Tooltip("Component handling sprite animation/animator updates.")]
-        public NPCSpriteAnimator spriteAnimator;
+        public NpcSpriteAnimator spriteAnimator;
 
         private Rigidbody2D _rb;
         private Vector2 _origin;
@@ -44,7 +44,7 @@ namespace NPC
         private float _waitTimer;
         private Vector2 _lastPos;
         private readonly System.Collections.Generic.List<Transform> _combatTargets = new();
-        private NPCCombatHandler _combatant;
+        private NpcCombatant _combatant;
 
         // Per-tick interpolation
         private Vector2 _from;
@@ -79,16 +79,16 @@ namespace NPC
 
         private void Reset()
         {
-            spriteAnimator = GetComponent<NPCSpriteAnimator>() ?? GetComponentInChildren<NPCSpriteAnimator>();
+            spriteAnimator = GetComponent<NpcSpriteAnimator>() ?? GetComponentInChildren<NpcSpriteAnimator>();
         }
 
         private void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();
             if (_rb != null) _rb.bodyType = RigidbodyType2D.Kinematic;
-            _combatant = GetComponent<NPCCombatHandler>();
+            _combatant = GetComponent<NpcCombatant>();
             if (spriteAnimator == null)
-                spriteAnimator = GetComponent<NPCSpriteAnimator>() ?? GetComponentInChildren<NPCSpriteAnimator>();
+                spriteAnimator = GetComponent<NpcSpriteAnimator>() ?? GetComponentInChildren<NpcSpriteAnimator>();
         }
 
         private void Start()
@@ -270,7 +270,7 @@ namespace NPC
         private float GetPreferredAttackRange()
         {
             if (_combatant == null)
-                _combatant = GetComponent<NPCCombatHandler>();
+                _combatant = GetComponent<NpcCombatant>();
 
             var profile = _combatant != null ? _combatant.Profile : null;
             if (profile == null)

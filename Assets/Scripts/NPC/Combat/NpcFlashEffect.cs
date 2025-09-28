@@ -10,7 +10,7 @@ namespace NPC
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(SpriteRenderer))]
-    public class NPCFlashEffect : MonoBehaviour
+    public class NpcFlashEffect : MonoBehaviour
     {
         [Header("Flash Material")]
         [SerializeField, Tooltip("Material used to render the flash overlay. A runtime clone is created per NPC so shared assets remain untouched.")]
@@ -221,7 +221,7 @@ namespace NPC
                 {
                     if (!hasLoggedMissingMaterial)
                     {
-                        Debug.LogWarning($"NPCFlashEffect on {name} has no flash material assigned, flash skipped.", this);
+                        Debug.LogWarning($"NpcFlashEffect on {name} has no flash material assigned, flash skipped.", this);
                         hasLoggedMissingMaterial = true;
                     }
 

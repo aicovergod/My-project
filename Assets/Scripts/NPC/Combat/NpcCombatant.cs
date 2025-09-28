@@ -14,20 +14,20 @@ namespace NPC
     /// Simple adaptor tying an NPC to the combat system using a combat profile.
     /// </summary>
     [DisallowMultipleComponent, RequireComponent(typeof(NpcDropper)), RequireComponent(typeof(FrozenStatusController))]
-    public class NPCCombatHandler : MonoBehaviour, CombatTarget, IFactionProvider
+    public class NpcCombatant : MonoBehaviour, CombatTarget, IFactionProvider
     {
         /// <summary>
         /// Global cache of NPC combatants that are currently active in the scene. This allows
         /// other systems to iterate nearby NPCs without paying the cost of repeated
         /// <see cref="Object.FindObjectsOfType{T}()"/> calls each frame.
         /// </summary>
-        private static readonly List<NPCCombatHandler> activeCombatants = new();
+        private static readonly List<NpcCombatant> activeCombatants = new();
 
         /// <summary>
         /// Read-only view of the currently active NPC combatants. Consumers should treat the
         /// collection as volatile; items may be removed if NPCs are disabled or destroyed.
         /// </summary>
-        public static IReadOnlyList<NPCCombatHandler> ActiveCombatants => activeCombatants;
+        public static IReadOnlyList<NpcCombatant> ActiveCombatants => activeCombatants;
 
         [SerializeField] private NpcCombatProfile profile;
         [SerializeField, Tooltip("When enabled this NPC will emit detailed damage logs to the console for debugging.")]
@@ -47,7 +47,7 @@ namespace NPC
         private Collider2D collider2D;
         private SpriteRenderer spriteRenderer;
         private NpcWanderer wanderer;
-        private NPCFlashEffect flashEffect; // visual damage feedback handler
+        private NpcFlashEffect flashEffect; // visual damage feedback handler
         private int playerDamage;
         private int npcDamage;
         private Sprite poisonHitsplat;
@@ -116,10 +116,10 @@ namespace NPC
             collider2D = GetComponent<Collider2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
             wanderer = GetComponent<NpcWanderer>();
-            flashEffect = GetComponent<NPCFlashEffect>();
+            flashEffect = GetComponent<NpcFlashEffect>();
             if (flashEffect == null && spriteRenderer != null)
             {
-                flashEffect = gameObject.AddComponent<NPCFlashEffect>();
+                flashEffect = gameObject.AddComponent<NpcFlashEffect>();
             }
             ClearDamageContributors("Awake initialisation");
             OnHealthChanged?.Invoke(currentHp, MaxHP);
@@ -128,7 +128,7 @@ namespace NPC
 
             if (hitSplatLibrary == null)
             {
-                Debug.LogError("NPCCombatHandler requires a HitSplatLibrary reference. Assign one in the inspector.", this);
+                Debug.LogError("NpcCombatant requires a HitSplatLibrary reference. Assign one in the inspector.", this);
             }
             else
             {
@@ -199,7 +199,7 @@ namespace NPC
                 Vector3 hitsplatPosition = FloatingTextAnchorUtility.ResolveAnchorPosition(transform, hitsplatFallbackOffset, ref hitsplatAnchorCache);
                 FloatingText.Show(damageToApply.ToString(), hitsplatPosition, Color.white, null, poisonHitsplat);
             }
-            var combat = GetComponent<NPCCombatBehaviour>();
+            var combat = GetComponent<BaseNpcCombat>();
             var combatSource = source as CombatTarget;
             bool creditedToPlayer = false;
             if (combatSource != null)
@@ -295,7 +295,7 @@ namespace NPC
             if (collider2D) collider2D.enabled = true;
             if (spriteRenderer) spriteRenderer.enabled = true;
             if (wanderer != null) wanderer.enabled = true;
-            var combat = GetComponent<NPCCombatBehaviour>();
+            var combat = GetComponent<BaseNpcCombat>();
             Vector2 spawn = combat != null ? combat.SpawnPosition : (Vector2)transform.position;
             transform.position = spawn;
             wanderer?.SetOrigin(spawn);

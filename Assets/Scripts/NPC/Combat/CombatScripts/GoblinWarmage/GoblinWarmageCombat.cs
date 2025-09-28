@@ -8,7 +8,7 @@ namespace NPC
     /// Combat controller for the Goblin Warmage. Performs standard attacks
     /// and periodically bombards the target area with a meteor shower barrage.
     /// </summary>
-    public class GoblinWarmageCombat : NPCCombatBehaviour
+    public class GoblinWarmageCombat : BaseNpcCombat
     {
         [Header("Meteor Shower Settings")]
         [SerializeField] private float meteorInterval = 12f;

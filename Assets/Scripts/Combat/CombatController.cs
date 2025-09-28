@@ -396,7 +396,7 @@ namespace Combat
             CombatantStats stats = null;
             DamageType incomingType = attacker != null ? attacker.DamageType : DamageType.Melee;
 
-            if (target is NPCCombatHandler npc)
+            if (target is NpcCombatant npc)
             {
                 stats = npc.GetCombatantStats();
             }
@@ -572,7 +572,7 @@ namespace Combat
             if (behaviour == null)
                 return;
 
-            var npc = behaviour.GetComponent<NPCCombatHandler>() ?? behaviour.GetComponentInParent<NPCCombatHandler>();
+            var npc = behaviour.GetComponent<NpcCombatant>() ?? behaviour.GetComponentInParent<NpcCombatant>();
             if (npc != null && !npc.IsFreezable)
                 return;
 
