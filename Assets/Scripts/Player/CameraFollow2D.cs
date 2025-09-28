@@ -1,8 +1,9 @@
 ﻿// Assets/Scripts/Camera/CameraFollow2D.cs
 
+using System;
+using System.Reflection;
 using Core.Input;
 using UnityEngine;
-using UnityEngine.U2D;
 using World;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -39,8 +40,8 @@ namespace Player
 #endif
 
         [Header("Pixel Perfect")]
-        [Tooltip("Optional PixelPerfectCamera that should track orthographic zoom changes.")]
-        [SerializeField] private PixelPerfectCamera pixelPerfectCamera;
+        [Tooltip("Optional pixel-perfect camera component. The script will detect Unity's PixelPerfectCamera type at runtime.")]
+        [SerializeField] private Behaviour pixelPerfectCameraBehaviour;
 
         [Header("Pixel Snapping")]
         public bool snapToPixels = true;
@@ -55,6 +56,8 @@ namespace Player
         private float targetZoom;
         private float baselineOrthographicSize;
         private int baselinePixelPerfectResolutionY;
+        private Type pixelPerfectCameraType;
+        private PropertyInfo pixelPerfectResolutionProperty;
 #if ENABLE_INPUT_SYSTEM
         private InputAction zoomAction;
         private bool zoomActionEnabledByResolver;
@@ -64,13 +67,13 @@ namespace Player
         {
             base.Awake();
             cam = GetComponent<Camera>();
-            if (pixelPerfectCamera == null)
-                pixelPerfectCamera = GetComponent<PixelPerfectCamera>();
+            CachePixelPerfectCameraBindings();
             InitialiseZoomTargets();
         }
 
         private void OnEnable()
         {
+            CachePixelPerfectCameraBindings();
             SceneTransitionManager.RegisterPersistentObject(this);
 #if ENABLE_INPUT_SYSTEM
             zoomAction = InputActionResolver.Resolve(playerInput, zoomActionReference, "ZoomCamera", out zoomActionEnabledByResolver);
@@ -89,6 +92,11 @@ namespace Player
             zoomActionEnabledByResolver = false;
 #endif
             SceneTransitionManager.UnregisterPersistentObject(this);
+        }
+
+        private void OnValidate()
+        {
+            CachePixelPerfectCameraBindings();
         }
 
         void LateUpdate()
@@ -155,8 +163,12 @@ namespace Player
             if (baselineOrthographicSize <= 0f)
                 baselineOrthographicSize = Mathf.Max(0.0001f, initialSize);
 
-            if (pixelPerfectCamera != null && baselinePixelPerfectResolutionY <= 0)
-                baselinePixelPerfectResolutionY = Mathf.Max(1, pixelPerfectCamera.refResolutionY);
+            if (pixelPerfectCameraBehaviour != null && pixelPerfectResolutionProperty != null && baselinePixelPerfectResolutionY <= 0)
+            {
+                object value = pixelPerfectResolutionProperty.GetValue(pixelPerfectCameraBehaviour);
+                if (value is int resolution)
+                    baselinePixelPerfectResolutionY = Mathf.Max(1, resolution);
+            }
 
             if (defaultZoom > 0f)
                 initialSize = defaultZoom;
@@ -261,7 +273,7 @@ namespace Player
         /// <param name="currentOrthographicSize">The orthographic size currently applied to the world camera.</param>
         private void SynchronisePixelPerfectCamera(float currentOrthographicSize)
         {
-            if (pixelPerfectCamera == null)
+            if (pixelPerfectCameraBehaviour == null || pixelPerfectResolutionProperty == null)
                 return;
 
             if (baselineOrthographicSize <= 0f || baselinePixelPerfectResolutionY <= 0)
@@ -272,7 +284,65 @@ namespace Player
                 return;
 
             int scaledResolution = Mathf.Max(1, Mathf.RoundToInt(baselinePixelPerfectResolutionY * zoomRatio));
-            pixelPerfectCamera.refResolutionY = scaledResolution;
+            pixelPerfectResolutionProperty.SetValue(pixelPerfectCameraBehaviour, scaledResolution);
+        }
+
+        /// <summary>
+        ///     Resolves Unity's pixel-perfect camera component using reflection so the script no longer
+        ///     requires a compile-time reference to the PixelPerfectCamera type.
+        /// </summary>
+        private void CachePixelPerfectCameraBindings()
+        {
+            pixelPerfectResolutionProperty = null;
+            pixelPerfectCameraType = ResolvePixelPerfectCameraType();
+
+            if (pixelPerfectCameraType == null)
+            {
+                pixelPerfectCameraBehaviour = null;
+                return;
+            }
+
+            if (pixelPerfectCameraBehaviour == null || !pixelPerfectCameraType.IsInstanceOfType(pixelPerfectCameraBehaviour))
+            {
+                var component = GetComponent(pixelPerfectCameraType) as Behaviour;
+                if (component != null)
+                    pixelPerfectCameraBehaviour = component;
+            }
+
+            if (pixelPerfectCameraBehaviour != null && pixelPerfectCameraType.IsInstanceOfType(pixelPerfectCameraBehaviour))
+            {
+                pixelPerfectResolutionProperty = pixelPerfectCameraType.GetProperty(
+                    "refResolutionY",
+                    BindingFlags.Instance | BindingFlags.Public
+                );
+            }
+            else
+            {
+                pixelPerfectCameraBehaviour = null;
+            }
+        }
+
+        /// <summary>
+        ///     Attempts to load the PixelPerfectCamera type from any known assembly shipped with Unity's
+        ///     pixel-perfect packages. The assembly name varies depending on Unity version and render pipeline.
+        /// </summary>
+        private static Type ResolvePixelPerfectCameraType()
+        {
+            string[] candidateTypeNames =
+            {
+                "UnityEngine.U2D.PixelPerfectCamera, Unity.2D.PixelPerfect.Runtime",
+                "UnityEngine.U2D.PixelPerfectCamera, Unity.2D.PixelPerfect",
+                "UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera, Unity.RenderPipelines.Universal.Runtime"
+            };
+
+            foreach (string candidate in candidateTypeNames)
+            {
+                Type resolvedType = Type.GetType(candidate);
+                if (resolvedType != null)
+                    return resolvedType;
+            }
+
+            return null;
         }
     }
 }
