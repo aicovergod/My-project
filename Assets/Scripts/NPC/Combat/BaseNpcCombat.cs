@@ -97,13 +97,21 @@ namespace NPC
             if (!combatant.IsAlive)
                 return;
             var profile = combatant.Profile;
-            if (profile == null || (!profile.IsAggressive && threatLevels.Count == 0))
+            if (profile == null)
                 return;
+
+            float aggroRadius = wanderer != null ? wanderer.AggroRadius : 5f;
+            bool hasThreat = threatLevels.Count > 0;
+            var myFaction = combatant as IFactionProvider;
+
+            if (!profile.IsAggressive && !hasThreat)
+            {
+                if (myFaction == null || !HasAggressiveFactionTargets(myFaction, aggroRadius))
+                    return;
+            }
 
             if (playerTarget == null)
                 playerTarget = FindObjectOfType<PlayerCombatTarget>();
-
-            float aggroRadius = wanderer != null ? wanderer.AggroRadius : 5f;
             foreach (var t in new List<CombatTarget>(threatLevels.Keys))
             {
                 var unityTarget = t as Object;
@@ -158,12 +166,15 @@ namespace NPC
 
             if (playerTarget != null && playerTarget.IsAlive)
             {
-                float playerDist = Vector2.Distance(playerTarget.transform.position, spawnPosition);
-                if (playerDist <= aggroRadius)
-                    potentials.Add(playerTarget);
+                bool playerHasThreat = threatLevels.ContainsKey(playerTarget);
+                if (profile.IsAggressive || playerHasThreat)
+                {
+                    float playerDist = Vector2.Distance(playerTarget.transform.position, spawnPosition);
+                    if (playerDist <= aggroRadius)
+                        potentials.Add(playerTarget);
+                }
             }
 
-            var myFaction = combatant as IFactionProvider;
             if (myFaction != null)
             {
                 var activeCombatants = NpcCombatant.ActiveCombatants;
@@ -176,6 +187,10 @@ namespace NPC
                         continue;
                     var otherFaction = npc as IFactionProvider;
                     if (otherFaction == null || !myFaction.IsEnemy(otherFaction.Faction))
+                        continue;
+                    bool hasExistingThreat = threatLevels.ContainsKey(npc);
+                    bool factionAggressive = FactionUtility.IsAggressiveTowardFaction(myFaction.Faction, otherFaction.Faction);
+                    if (!profile.IsAggressive && !factionAggressive && !hasExistingThreat)
                         continue;
                     float dist = Vector2.Distance(npc.transform.position, spawnPosition);
                     if (dist <= aggroRadius)
@@ -382,6 +397,38 @@ namespace NPC
                 wanderer?.ForceReturnToOrigin();
                 SetCombatState(false);
             }
+        }
+
+        /// <summary>
+        /// Determines whether any hostile faction targets that this NPC is configured to
+        /// proactively attack are currently within the supplied aggro radius.
+        /// </summary>
+        /// <param name="myFaction">Faction component representing this NPC.</param>
+        /// <param name="aggroRadius">Radius within which aggression should be evaluated.</param>
+        private bool HasAggressiveFactionTargets(IFactionProvider myFaction, float aggroRadius)
+        {
+            var active = NpcCombatant.ActiveCombatants;
+            for (int i = 0; i < active.Count; i++)
+            {
+                var npc = active[i];
+                if (npc == null || npc == combatant)
+                    continue;
+                if (!npc.isActiveAndEnabled || !npc.IsAlive)
+                    continue;
+
+                if (npc is not IFactionProvider otherFaction)
+                    continue;
+                if (!myFaction.IsEnemy(otherFaction.Faction))
+                    continue;
+                if (!FactionUtility.IsAggressiveTowardFaction(myFaction.Faction, otherFaction.Faction))
+                    continue;
+
+                float distance = Vector2.Distance(npc.transform.position, spawnPosition);
+                if (distance <= aggroRadius)
+                    return true;
+            }
+
+            return false;
         }
 
         private void CleanupDestroyedTargetReferences(CombatTarget target)

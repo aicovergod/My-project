@@ -22,5 +22,14 @@ public class NpcFactionTests
             Assert.IsFalse(FactionUtility.IsEnemy(id, FactionId.Neutral));
         }
     }
+
+    [Test]
+    public void GoblinClansAreAggressiveTowardEachOtherOnly()
+    {
+        Assert.IsTrue(FactionUtility.IsAggressiveTowardFaction(FactionId.GoblinGreen, FactionId.GoblinRed));
+        Assert.IsTrue(FactionUtility.IsAggressiveTowardFaction(FactionId.GoblinRed, FactionId.GoblinGreen));
+        Assert.IsFalse(FactionUtility.IsAggressiveTowardFaction(FactionId.GoblinGreen, FactionId.Neutral));
+        Assert.IsFalse(FactionUtility.IsAggressiveTowardFaction(FactionId.GoblinRed, FactionId.Neutral));
+    }
 }
 
