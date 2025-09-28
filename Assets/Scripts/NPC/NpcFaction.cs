@@ -39,10 +39,26 @@ namespace NPC
             /* GoblinRed */  { false,   true,       false },
         };
 
+        // Aggression matrix: [aggressor, target] => will proactively attack when nearby.
+        private static readonly bool[,] AggressiveRelationships =
+        {
+            //                Neutral, GoblinGreen, GoblinRed
+            /* Neutral */    { false,   false,      false },
+            /* GoblinGreen */{ false,   false,      true  },
+            /* GoblinRed */  { false,   true,       false },
+        };
+
         /// <summary>
         /// Determine if two factions are enemies.
         /// </summary>
         public static bool IsEnemy(FactionId a, FactionId b) => Relationships[(int)a, (int)b];
+
+        /// <summary>
+        /// Determine if <paramref name="aggressor"/> will initiate combat when spotting
+        /// <paramref name="target"/>.
+        /// </summary>
+        public static bool IsAggressiveTowardFaction(FactionId aggressor, FactionId target) =>
+            AggressiveRelationships[(int)aggressor, (int)target];
     }
 }
 
