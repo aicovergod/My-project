@@ -191,6 +191,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   profile: {fileID: 11400000, guid: a2f9345330f24e74da31849069a079ad, type: 2}
   hitSplatLibrary: {fileID: 0}
+  hitsplatFallbackOffset: 1
 --- !u!114 &7573619506058784387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245,6 +246,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   heightOffset: 0.6
+  sortingOrder: 5000
   fadeDuration: 0.25
 --- !u!114 &4408143068028046321
 MonoBehaviour:
@@ -368,7 +370,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slamInterval: 10
   slamDamage: 10
-  slamDustPrefab: {fileID: 0}
+  slamDustPrefab: {fileID: 6111494187698877684, guid: 6af1b55044c31a34db2173e37299b34e, type: 3}
   slamRange: 1.5
   shakeDuration: 0.2
   shakeMagnitude: 0.1

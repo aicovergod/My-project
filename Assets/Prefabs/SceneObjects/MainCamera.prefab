@@ -154,6 +154,13 @@ MonoBehaviour:
   target: {fileID: 0}
   offset: {x: 0, y: 0}
   smoothTime: 0.12
+  defaultZoom: 25
+  minZoom: 10
+  maxZoom: 40
+  zoomStep: 2
+  zoomSmoothing: 12
+  playerInput: {fileID: 7000745351061079601, guid: ac4dc3793be1bee4caf981f7340bf02d, type: 3}
+  zoomActionReference: {fileID: 0}
   snapToPixels: 1
   pixelsPerUnit: 64
   confineToBounds: 0
