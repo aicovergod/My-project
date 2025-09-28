@@ -505,21 +505,37 @@ namespace World
         /// <param name="screenPosition">The pointer position in screen space.</param>
         private void HandleExpandedScrollZoom(float scrollDelta, Vector3 screenPosition)
         {
-            if (mapCamera == null || expandedMapRect == null || !IsExpanded)
+            if (mapCamera == null)
                 return;
 
             if (Mathf.Approximately(scrollDelta, 0f))
                 return;
 
-            var referenceCamera = minimapCanvas != null ? minimapCanvas.worldCamera : null;
-            if (!RectTransformUtility.RectangleContainsScreenPoint(expandedMapRect, screenPosition, referenceCamera))
-                return;
-
-            if (PointerHitsBlockingControl(screenPosition))
+            if (!ShouldBlockWorldCameraZoom(new Vector2(screenPosition.x, screenPosition.y)))
                 return;
 
             float newSize = Mathf.Clamp(mapCamera.orthographicSize - scrollDelta * ZoomStep, MinZoom, MaxZoom);
             mapCamera.orthographicSize = newSize;
+        }
+
+        /// <summary>
+        ///     Determines whether the expanded minimap should consume the current scroll event rather than
+        ///     allowing the world camera to zoom.
+        /// </summary>
+        /// <param name="screenPosition">Pointer position in screen space.</param>
+        public bool ShouldBlockWorldCameraZoom(Vector2 screenPosition)
+        {
+            if (!IsExpanded || expandedMapRect == null)
+                return false;
+
+            var referenceCamera = minimapCanvas != null ? minimapCanvas.worldCamera : null;
+            if (!RectTransformUtility.RectangleContainsScreenPoint(expandedMapRect, screenPosition, referenceCamera))
+                return false;
+
+            if (PointerHitsBlockingControl(screenPosition))
+                return false;
+
+            return true;
         }
 
         /// <summary>

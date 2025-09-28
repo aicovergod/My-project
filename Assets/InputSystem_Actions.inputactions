@@ -113,6 +113,15 @@
                     "processors": "",
                     "interactions": "Press",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ZoomCamera",
+                    "type": "Value",
+                    "id": "07a16281-cffb-4996-b26b-0a471b65b728",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -575,6 +584,28 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "OpenMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5ae59107-0521-4b9b-9a40-ddfdb351f325",
+                    "path": "<Mouse>/scroll/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "ZoomCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "eba3d66a-5027-4546-b7a6-3866609874ba",
+                    "path": "<Gamepad>/rightStick/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "ZoomCamera",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
