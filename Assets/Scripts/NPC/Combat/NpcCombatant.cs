@@ -54,6 +54,12 @@ namespace NPC
         private FloatingTextAnchorUtility.AnchorCache hitsplatAnchorCache;
         private bool isRegisteredWithRegistry;
 
+        /// <summary>
+        /// Tracks whether the global NPC combat damage logging override is enabled. When true all
+        /// combatants emit verbose logs regardless of their inspector configuration.
+        /// </summary>
+        private static bool globalDamageLoggingEnabled;
+
         public event System.Action<int, int> OnHealthChanged; // current, max
         public event System.Action OnDeath;
 
@@ -71,6 +77,28 @@ namespace NPC
         {
             get => logDamage;
             set => logDamage = value;
+        }
+
+        /// <summary>
+        /// Gets or sets whether NPC combatants should emit damage logs globally. When toggled the
+        /// state is immediately pushed to all active combatants and will be applied to any NPCs that
+        /// spawn in the future.
+        /// </summary>
+        public static bool GlobalDamageLoggingEnabled
+        {
+            get => globalDamageLoggingEnabled;
+            set
+            {
+                if (globalDamageLoggingEnabled == value)
+                    return;
+
+                globalDamageLoggingEnabled = value;
+                foreach (var combatant in activeCombatants)
+                {
+                    if (combatant != null)
+                        combatant.ApplyGlobalDamageLoggingState();
+                }
+            }
         }
 
         /// <summary>Returns true when this NPC can be affected by the frozen status effect.</summary>
@@ -121,6 +149,7 @@ namespace NPC
         private void OnEnable()
         {
             RegisterCombatant();
+            ApplyGlobalDamageLoggingState();
         }
 
         private void OnDisable()
@@ -336,6 +365,16 @@ namespace NPC
 
             activeCombatants.Remove(this);
             isRegisteredWithRegistry = false;
+        }
+
+        /// <summary>
+        /// Applies the global NPC damage logging override to this combatant, forcing the current
+        /// logging flag to match the shared setting. When disabled the NPC will stop emitting
+        /// damage logs until a system explicitly re-enables them.
+        /// </summary>
+        private void ApplyGlobalDamageLoggingState()
+        {
+            logDamage = globalDamageLoggingEnabled;
         }
     }
 }
