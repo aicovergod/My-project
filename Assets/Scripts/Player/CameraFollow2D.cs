@@ -332,7 +332,8 @@ namespace Player
             {
                 "UnityEngine.U2D.PixelPerfectCamera, Unity.2D.PixelPerfect.Runtime",
                 "UnityEngine.U2D.PixelPerfectCamera, Unity.2D.PixelPerfect",
-                "UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera, Unity.RenderPipelines.Universal.Runtime"
+                "UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera, Unity.RenderPipelines.Universal.Runtime",
+                "UnityEngine.Rendering.Universal.PixelPerfectCamera, Unity.RenderPipelines.Universal.Runtime"
             };
 
             foreach (string candidate in candidateTypeNames)
