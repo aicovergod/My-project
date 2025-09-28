@@ -2,8 +2,10 @@
 
 using System;
 using System.Reflection;
+using BankSystem;
 using Core.Input;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using World;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -69,6 +71,19 @@ namespace Player
         private Type pixelPerfectCameraType;
         private PropertyInfo pixelPerfectResolutionProperty;
         private int lastAppliedPixelPerfectResolutionY = -1;
+
+        /// <summary>
+        ///     Remembers the most recent zoom applied by the player so scene transitions
+        ///     can restore the orthographic size without snapping back to the default.
+        /// </summary>
+        private static float savedZoom;
+
+        /// <summary>
+        ///     Tracks whether <see cref="savedZoom"/> currently stores a valid value captured
+        ///     from gameplay. The static flag lets newly spawned cameras adopt the existing
+        ///     zoom even if they were created in a different scene.
+        /// </summary>
+        private static bool hasSavedZoom;
 #if ENABLE_INPUT_SYSTEM
         private InputAction zoomAction;
         private bool zoomActionEnabledByResolver;
@@ -80,6 +95,7 @@ namespace Player
             cam = GetComponent<Camera>();
             CachePixelPerfectCameraBindings();
             InitialiseZoomTargets();
+            RestoreSavedZoom();
         }
 
         private void OnEnable()
@@ -103,6 +119,27 @@ namespace Player
             zoomActionEnabledByResolver = false;
 #endif
             SceneTransitionManager.UnregisterPersistentObject(this);
+        }
+
+        /// <summary>
+        ///     Captures the active zoom before the scene unloads so the camera can preserve
+        ///     player preference across scene boundaries.
+        /// </summary>
+        public override void OnBeforeSceneUnload()
+        {
+            base.OnBeforeSceneUnload();
+            SaveCurrentZoom();
+        }
+
+        /// <summary>
+        ///     Restores the previously saved zoom after the new scene finishes loading. This
+        ///     keeps transitions seamless and avoids popping back to the default zoom level.
+        /// </summary>
+        /// <param name="scene">Scene that finished loading.</param>
+        public override void OnAfterSceneLoad(Scene scene)
+        {
+            base.OnAfterSceneLoad(scene);
+            RestoreSavedZoom();
         }
 
         private void OnValidate()
@@ -197,6 +234,9 @@ namespace Player
             if (cam == null)
                 return;
 
+            if (BankUI.Instance != null && BankUI.Instance.IsOpen)
+                return;
+
             float scrollDelta = ReadZoomInput();
 
             if (!Mathf.Approximately(scrollDelta, 0f))
@@ -242,6 +282,37 @@ namespace Player
             float newSize = Mathf.Lerp(cam.orthographicSize, desiredZoom, t);
             cam.orthographicSize = newSize;
             SynchronisePixelPerfectCamera(desiredZoom);
+        }
+
+        /// <summary>
+        ///     Stores the player's current zoom level so it can be restored after the next
+        ///     scene loads. The value is clamped to the configured bounds to guard against
+        ///     inspector tweaks between scenes.
+        /// </summary>
+        private void SaveCurrentZoom()
+        {
+            if (cam == null)
+                return;
+
+            GetOrderedZoomBounds(out float lowerBound, out float upperBound);
+            savedZoom = Mathf.Clamp(cam.orthographicSize, lowerBound, upperBound);
+            hasSavedZoom = true;
+        }
+
+        /// <summary>
+        ///     Applies the most recently saved zoom to the active camera instance. Newly spawned
+        ///     cameras adopt the stored value immediately so scene transitions feel seamless.
+        /// </summary>
+        private void RestoreSavedZoom()
+        {
+            if (!hasSavedZoom || cam == null)
+                return;
+
+            GetOrderedZoomBounds(out float lowerBound, out float upperBound);
+            float restored = Mathf.Clamp(savedZoom, lowerBound, upperBound);
+            targetZoom = restored;
+            cam.orthographicSize = restored;
+            SynchronisePixelPerfectCamera(restored);
         }
 
         /// <summary>
