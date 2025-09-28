@@ -29,6 +29,12 @@ namespace NPC
         // Tracks the last time each target dealt damage to this NPC.
         protected readonly Dictionary<CombatTarget, float> lastDamageTimes = new();
 
+        /// <summary>
+        /// Shared timestamp that gates how quickly this NPC can execute successive
+        /// attacks regardless of how many simultaneous targets they are facing.
+        /// </summary>
+        protected float nextAttackTimestamp;
+
         private bool inCombat;
         public bool InCombat => inCombat;
         public event System.Action<bool> OnCombatStateChanged;
@@ -48,6 +54,7 @@ namespace NPC
             playerTarget = FindObjectOfType<PlayerCombatTarget>();
             spawnPosition = transform.position;
             npcFacing = GetComponent<NpcFacing>();
+            nextAttackTimestamp = Time.time;
         }
 
         public virtual void ResetCombatState(bool resetSpawnPosition = false)
@@ -61,6 +68,7 @@ namespace NPC
             threatLevels.Clear();
             lastDamageTimes.Clear();
             hasHitPlayer = false;
+            nextAttackTimestamp = Time.time;
             combatant?.ClearDamageContributors("ResetCombatState invoked");
             if (resetSpawnPosition)
                 spawnPosition = transform.position;
@@ -387,15 +395,10 @@ namespace NPC
             if (cachedUnityTarget != null)
                 TryResolveTargetTransform(cachedTarget, cachedUnityTarget, out cachedTargetTransform);
 
-            // Cache the WaitForSeconds instance that matches the current attack speed so we
-            // avoid allocating a new one every loop iteration while still responding to
-            // runtime changes (e.g., debuffs modifying the profile's attack speed).
-            WaitForSeconds cachedAttackDelay = null;
-            int cachedAttackSpeedTicks = -1;
-
             // Wait until the target is within the preferred range for the active attack style
             // before performing each swing so melee, ranged, and magic NPCs respect their
-            // configured stand-off distances.
+            // configured stand-off distances. A shared timestamp ensures simultaneous routines
+            // cannot exceed the NPC's configured attack speed when swapping targets.
             const float DISTANCE_EPSILON = 0.05f;
 
             while (combatant.IsAlive)
@@ -414,12 +417,7 @@ namespace NPC
                 var profile = combatant.Profile;
                 int attackSpeedTicks = profile != null ? profile.AttackSpeedTicks : 4;
                 attackSpeedTicks = Mathf.Max(1, attackSpeedTicks);
-
-                if (attackSpeedTicks != cachedAttackSpeedTicks || cachedAttackDelay == null)
-                {
-                    cachedAttackSpeedTicks = attackSpeedTicks;
-                    cachedAttackDelay = new WaitForSeconds(cachedAttackSpeedTicks * CombatMath.TICK_SECONDS);
-                }
+                float attackIntervalSeconds = attackSpeedTicks * CombatMath.TICK_SECONDS;
 
                 float distance = targetTransform != null
                     ? Vector2.Distance(targetTransform.position, transform.position)
@@ -433,15 +431,49 @@ namespace NPC
 
                 if (distance <= desiredDistance + DISTANCE_EPSILON)
                 {
+                    // Ensure we respect the shared attack timestamp even when swapping
+                    // between multiple concurrent targets. New coroutines will wait here
+                    // until any outstanding cooldown has elapsed.
+                    bool lostTargetDuringCooldown = false;
+                    while (Time.time < nextAttackTimestamp)
+                    {
+                        yield return null;
+
+                        // Break out early if the target is lost while we are waiting for the
+                        // shared attack window. This keeps retreat logic responsive when the
+                        // coroutine is cancelled mid-wait.
+                        unityTarget = target as Object;
+                        if (unityTarget == null || !TryResolveTargetTransform(target, unityTarget, out targetTransform))
+                        {
+                            lostTargetDuringCooldown = true;
+                            break;
+                        }
+
+                        if (!target.IsAlive)
+                        {
+                            lostTargetDuringCooldown = true;
+                            break;
+                        }
+                    }
+
+                    if (lostTargetDuringCooldown)
+                        break;
+
                     ResolveAttack(target);
-                    yield return cachedAttackDelay;
+
+                    // Advance the shared timestamp so every active target respects the NPC's
+                    // configured attack speed.
+                    float now = Time.time;
+                    float baseTimestamp = Mathf.Max(nextAttackTimestamp, now);
+                    nextAttackTimestamp = baseTimestamp + attackIntervalSeconds;
                 }
                 else
                 {
                     if (targetTransform != null)
                         npcFacing?.FaceTarget(targetTransform);
-                    yield return null;
                 }
+
+                yield return null;
             }
 
             bool onlyTrackedTarget = activeAttacks.Count <= 1;
