@@ -14,6 +14,16 @@ namespace Player
     [RequireComponent(typeof(Camera))]
     public class CameraFollow2D : ScenePersistentObject
     {
+        private static readonly string[] PixelPerfectTypeCandidates =
+        {
+            "UnityEngine.U2D.PixelPerfectCamera",
+            "UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera",
+            "UnityEngine.Rendering.Universal.PixelPerfectCamera"
+        };
+
+        private static Type cachedPixelPerfectCameraType;
+        private static bool hasCachedPixelPerfectCameraType;
+
         public Transform target;
         public Vector2 offset = Vector2.zero;
         [Tooltip("0 = instant, higher = smoother (e.g., 0.12)")]
@@ -296,49 +306,69 @@ namespace Player
             pixelPerfectResolutionProperty = null;
             pixelPerfectCameraType = ResolvePixelPerfectCameraType();
 
-            if (pixelPerfectCameraType == null)
+            if (pixelPerfectCameraBehaviour != null && pixelPerfectCameraType != null &&
+                !pixelPerfectCameraType.IsInstanceOfType(pixelPerfectCameraBehaviour))
             {
                 pixelPerfectCameraBehaviour = null;
-                return;
             }
 
-            if (pixelPerfectCameraBehaviour == null || !pixelPerfectCameraType.IsInstanceOfType(pixelPerfectCameraBehaviour))
+            if (pixelPerfectCameraBehaviour == null && pixelPerfectCameraType != null)
             {
                 var component = GetComponent(pixelPerfectCameraType) as Behaviour;
                 if (component != null)
                     pixelPerfectCameraBehaviour = component;
             }
 
-            if (pixelPerfectCameraBehaviour != null && pixelPerfectCameraType.IsInstanceOfType(pixelPerfectCameraBehaviour))
+            if (pixelPerfectCameraBehaviour != null && pixelPerfectCameraType != null)
             {
                 pixelPerfectResolutionProperty = pixelPerfectCameraType.GetProperty(
                     "refResolutionY",
                     BindingFlags.Instance | BindingFlags.Public
                 );
-            }
-            else
-            {
-                pixelPerfectCameraBehaviour = null;
+
+                if (pixelPerfectResolutionProperty == null)
+                    pixelPerfectCameraBehaviour = null;
             }
         }
 
         /// <summary>
-        ///     Attempts to load the PixelPerfectCamera type from any known assembly shipped with Unity's
-        ///     pixel-perfect packages. The assembly name varies depending on Unity version and render pipeline.
+        ///     Searches the loaded assemblies for Unity's PixelPerfectCamera component. Unity 6.2 moved the
+        ///     component into a new assembly, so we iterate the known namespaces and scan AppDomain assemblies
+        ///     to stay compatible with future upgrades. We deliberately avoid Type.GetType(string) because it
+        ///     requires assembly-qualified names that would immediately go stale when Unity renames assemblies.
         /// </summary>
+        /// <returns>The PixelPerfectCamera type if it is available in any loaded assembly; otherwise null.</returns>
         private static Type ResolvePixelPerfectCameraType()
         {
-            string[] candidateTypeNames =
-            {
-                "UnityEngine.U2D.PixelPerfectCamera, Unity.2D.PixelPerfect.Runtime",
-                "UnityEngine.U2D.PixelPerfectCamera, Unity.2D.PixelPerfect",
-                "UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera, Unity.RenderPipelines.Universal.Runtime",
-                "UnityEngine.Rendering.Universal.PixelPerfectCamera, Unity.RenderPipelines.Universal.Runtime"
-            };
+            if (hasCachedPixelPerfectCameraType)
+                return cachedPixelPerfectCameraType;
 
-            foreach (string candidate in candidateTypeNames)
+            foreach (string candidate in PixelPerfectTypeCandidates)
             {
-                Type resolvedType = Type.GetType(candidate);
+                Type resolvedType = FindPixelPerfectCameraType(candidate);
+                if (resolvedType != null)
+                {
+                    cachedPixelPerfectCameraType = resolvedType;
+                    hasCachedPixelPerfectCameraType = true;
+                    return cachedPixelPerfectCameraType;
+                }
+            }
+
+            hasCachedPixelPerfectCameraType = true;
+            cachedPixelPerfectCameraType = null;
+            return null;
+        }
+
+        /// <summary>
+        ///     Iterates the current AppDomain assemblies to locate a type by its namespace-qualified name.
+        /// </summary>
+        /// <param name="typeName">The namespace-qualified PixelPerfectCamera type to search for.</param>
+        /// <returns>The matching <see cref="Type"/> instance if found; otherwise null.</returns>
+        private static Type FindPixelPerfectCameraType(string typeName)
+        {
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                Type resolvedType = assembly.GetType(typeName, false);
                 if (resolvedType != null)
                     return resolvedType;
             }
