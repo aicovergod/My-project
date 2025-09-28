@@ -39,6 +39,7 @@ namespace Pets
         private Coroutine spriteSwapRoutine;
         private CombatTarget currentTarget;
         private Coroutine attackRoutine;
+        private float nextAttackTime;
 
         private Sprite damageHitsplat;
         private Sprite zeroHitsplat;
@@ -119,7 +120,15 @@ namespace Pets
                 float dist = Vector2.Distance(transform.position, currentTarget.transform.position);
                 if (dist <= CombatMath.MELEE_RANGE)
                 {
+                    if (Time.time < nextAttackTime)
+                    {
+                        // Continue chasing the target but hold attacks until the shared cooldown expires.
+                        yield return null;
+                        continue;
+                    }
+
                     ResolveAttack(currentTarget);
+                    nextAttackTime = Time.time + definition.attackSpeedTicks * CombatMath.TICK_SECONDS;
                     int waitTicks = definition.attackSpeedTicks;
                     if (currentTarget == null || !currentTarget.IsAlive)
                         waitTicks = Mathf.Min(waitTicks, 2);
