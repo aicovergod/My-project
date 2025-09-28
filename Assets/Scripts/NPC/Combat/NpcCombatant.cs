@@ -93,7 +93,7 @@ namespace NPC
             {
                 flashEffect = gameObject.AddComponent<NpcFlashEffect>();
             }
-            ResetDamageCounters();
+            ClearDamageContributors("Awake initialisation");
             OnHealthChanged?.Invoke(currentHp, MaxHP);
 
             EnsureHitSplatLibrary();
@@ -168,6 +168,7 @@ namespace NPC
                 Vector3 hitsplatPosition = FloatingTextAnchorUtility.ResolveAnchorPosition(transform, hitsplatFallbackOffset, ref hitsplatAnchorCache);
                 FloatingText.Show(finalAmount.ToString(), hitsplatPosition, Color.white, null, poisonHitsplat);
             }
+            var combat = GetComponent<BaseNpcCombat>();
             var combatSource = source as CombatTarget;
             bool creditedToPlayer = false;
             if (combatSource != null)
@@ -194,7 +195,6 @@ namespace NPC
                 {
                     npcDamage += finalAmount;
                 }
-                var combat = GetComponent<BaseNpcCombat>();
                 combat?.AddThreat(combatSource, finalAmount);
                 combat?.RecordDamageFrom(combatSource);
                 if (combat != null && !combat.InCombat)
@@ -216,11 +216,30 @@ namespace NPC
                 // Trigger drops before other death listeners in case they
                 // destroy this NPC immediately (e.g. when killed by pets).
                 var dropper = GetComponent<NpcDropper>();
+                float dropCreditWindow = profile != null
+                    ? Mathf.Max(profile.AggroTimeoutSeconds, CombatMath.TICK_SECONDS)
+                    : CombatMath.TICK_SECONDS;
+                bool hasRecentPlayerContribution = false;
+                float secondsSincePlayerContribution = float.PositiveInfinity;
+                if (combat != null)
+                    hasRecentPlayerContribution = combat.HasRecentPlayerContribution(dropCreditWindow, out secondsSincePlayerContribution);
+
+                if (logDamage)
+                {
+                    string contributionSummary = hasRecentPlayerContribution
+                        ? $"last player contribution {secondsSincePlayerContribution:F1}s ago (window {dropCreditWindow:F1}s)"
+                        : $"no player contribution within the {dropCreditWindow:F1}s window";
+                    Debug.Log($"{name} evaluating drop credit: playerDamage={playerDamage}, npcDamage={npcDamage}, {contributionSummary}.", this);
+                }
+
+                Debug.Assert(!hasRecentPlayerContribution || playerDamage > 0,
+                    $"{name} recorded recent player damage but has no tracked playerDamage. Ensure ClearDamageContributors is invoked when combat resets.");
+
                 if (killedByPlayer || playerDamage > npcDamage)
                     dropper?.OnDeath();
 
-                ResetDamageCounters();
-                GetComponent<BaseNpcCombat>()?.ResetCombatState();
+                ClearDamageContributors("NPC death resolution");
+                combat?.ResetCombatState();
                 if (wanderer != null) wanderer.enabled = false;
                 OnDeath?.Invoke();
                 if (collider2D) collider2D.enabled = false;
@@ -250,8 +269,25 @@ namespace NPC
             transform.position = spawn;
             wanderer?.SetOrigin(spawn);
             combat?.ResetCombatState(true);
-            ResetDamageCounters();
+            ClearDamageContributors("Respawned");
             OnHealthChanged?.Invoke(currentHp, MaxHP);
+        }
+
+        /// <summary>
+        /// Public helper used by other systems to clear any cached damage attribution. This wraps
+        /// the legacy <see cref="ResetDamageCounters"/> logic so threat resets, retreats, or
+        /// timeout events always wipe player/NPC damage tallies in a single, auditable place.
+        /// </summary>
+        /// <param name="reason">Optional human readable context written to the console when
+        /// <see cref="LogDamage"/> is enabled.</param>
+        public void ClearDamageContributors(string reason = null)
+        {
+            ResetDamageCounters();
+            if (logDamage)
+            {
+                string context = string.IsNullOrEmpty(reason) ? "without context" : reason;
+                Debug.Log($"{name} cleared damage contributors ({context}).", this);
+            }
         }
 
         private void ResetDamageCounters()
