@@ -153,20 +153,22 @@ namespace NPC
                     }
                 }
             }
-            currentHp = Mathf.Max(0, currentHp - finalAmount);
+            // Clamp the outgoing damage so downstream systems only see the actual amount removed.
+            int damageToApply = Mathf.Min(finalAmount, currentHp);
+            currentHp = Mathf.Max(0, currentHp - damageToApply);
             if (logDamage)
             {
-                Debug.Log($"{name} took {finalAmount} damage ({currentHp}/{MaxHP}).", this);
+                Debug.Log($"{name} took {damageToApply} damage ({currentHp}/{MaxHP}).", this);
             }
-            if (finalAmount > 0)
+            if (damageToApply > 0)
             {
-                flashEffect?.TriggerFlash(finalAmount, MaxHP);
+                flashEffect?.TriggerFlash(damageToApply, MaxHP);
             }
             OnHealthChanged?.Invoke(currentHp, MaxHP);
             if (type == DamageType.Poison && poisonHitsplat != null)
             {
                 Vector3 hitsplatPosition = FloatingTextAnchorUtility.ResolveAnchorPosition(transform, hitsplatFallbackOffset, ref hitsplatAnchorCache);
-                FloatingText.Show(finalAmount.ToString(), hitsplatPosition, Color.white, null, poisonHitsplat);
+                FloatingText.Show(damageToApply.ToString(), hitsplatPosition, Color.white, null, poisonHitsplat);
             }
             var combat = GetComponent<BaseNpcCombat>();
             var combatSource = source as CombatTarget;
@@ -175,7 +177,7 @@ namespace NPC
             {
                 if (combatSource is PlayerCombatTarget)
                 {
-                    playerDamage += finalAmount;
+                    playerDamage += damageToApply;
                     creditedToPlayer = true;
                 }
                 else if (combatSource is PetCombatController pet)
@@ -183,19 +185,19 @@ namespace NPC
                     var owner = pet.GetComponent<PetFollower>()?.Player;
                     if (owner != null && owner.TryGetComponent<PlayerCombatTarget>(out _))
                     {
-                        playerDamage += finalAmount;
+                        playerDamage += damageToApply;
                         creditedToPlayer = true;
                     }
                     else
                     {
-                        npcDamage += finalAmount;
+                        npcDamage += damageToApply;
                     }
                 }
                 else
                 {
-                    npcDamage += finalAmount;
+                    npcDamage += damageToApply;
                 }
-                combat?.AddThreat(combatSource, finalAmount);
+                combat?.AddThreat(combatSource, damageToApply);
                 combat?.RecordDamageFrom(combatSource);
                 if (combat != null && !combat.InCombat)
                 {
@@ -208,7 +210,7 @@ namespace NPC
             }
             else
             {
-                npcDamage += finalAmount;
+                npcDamage += damageToApply;
             }
             var killedByPlayer = creditedToPlayer;
             if (currentHp <= 0)
@@ -248,7 +250,7 @@ namespace NPC
                     StartCoroutine(RespawnRoutine());
             }
 
-            return finalAmount;
+            return damageToApply;
         }
 
         /// <summary>Get combat stats for this NPC.</summary>
