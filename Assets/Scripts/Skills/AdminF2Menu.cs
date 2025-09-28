@@ -48,7 +48,7 @@ namespace Skills
         private bool visible;
         private bool noclip;
         private bool showFreezePopup;
-        private Rect freezePopupRect = new Rect(240f, 10f, 240f, 150f);
+        private Rect freezePopupRect = new Rect(460f, 10f, 240f, 150f);
         private string freezeTickInput = "8";
         private string freezeError = string.Empty;
         private string hpLevel = "";
@@ -65,6 +65,25 @@ namespace Skills
 
         // Scroll position for the debug menu
         private Vector2 scrollPos;
+
+        /// <summary>
+        /// Indicates whether any text field inside the Admin F2 menu currently has keyboard focus.
+        /// Movement systems query this so typing in the menu does not trigger gameplay input.
+        /// </summary>
+        public static bool HasTextInputFocus { get; private set; }
+
+        private const string HpLevelControlName = "AdminF2Menu_HpLevel";
+        private const string AttackLevelControlName = "AdminF2Menu_AttackLevel";
+        private const string StrengthLevelControlName = "AdminF2Menu_StrengthLevel";
+        private const string DefenceLevelControlName = "AdminF2Menu_DefenceLevel";
+        private const string MagicLevelControlName = "AdminF2Menu_MagicLevel";
+        private const string MiningLevelControlName = "AdminF2Menu_MiningLevel";
+        private const string FishingLevelControlName = "AdminF2Menu_FishingLevel";
+        private const string CookingLevelControlName = "AdminF2Menu_CookingLevel";
+        private const string FiremakingLevelControlName = "AdminF2Menu_FiremakingLevel";
+        private const string WoodcuttingLevelControlName = "AdminF2Menu_WoodcuttingLevel";
+        private const string BeastmasterLevelControlName = "AdminF2Menu_BeastmasterLevel";
+        private const string FreezeTickControlName = "AdminF2Menu_FreezeTicks";
 
         private MiningSkill miningSkillBehaviour;
         private WoodcuttingSkill woodcuttingSkillBehaviour;
@@ -180,6 +199,8 @@ namespace Skills
                 if (!applicationIsQuitting)
                     BeginWaitingForAllowedScene();
             }
+
+            HasTextInputFocus = false;
         }
 
         private void EnsureSceneGateSubscription()
@@ -214,6 +235,8 @@ namespace Skills
                 visible = !visible;
                 if (visible)
                     RefreshFields();
+                else
+                    HasTextInputFocus = false;
             }
 
             if (!visible)
@@ -288,48 +311,33 @@ namespace Skills
         private void OnGUI()
         {
             if (!visible)
+            {
+                HasTextInputFocus = false;
                 return;
+            }
 
-            const float width = 220f;
-            const float height = 240f;
+            // Reset focus tracking; if any text field owns focus later in this repaint the flag will be restored.
+            HasTextInputFocus = false;
+
+            const float width = 440f;
+            const float height = 480f;
             Rect area = new Rect(10f, 10f, width, height);
             GUILayout.BeginArea(area, GUI.skin.box);
 
             // Begin scroll view so all fields are accessible even if the window is small
             scrollPos = GUILayout.BeginScrollView(scrollPos, false, true);
 
-            GUILayout.Label("Hitpoints Level");
-            hpLevel = GUILayout.TextField(hpLevel);
-
-            GUILayout.Label("Attack Level");
-            attackLevel = GUILayout.TextField(attackLevel);
-
-            GUILayout.Label("Strength Level");
-            strengthLevel = GUILayout.TextField(strengthLevel);
-
-            GUILayout.Label("Defence Level");
-            defenceLevel = GUILayout.TextField(defenceLevel);
-
-            GUILayout.Label("Magic Level");
-            magicLevel = GUILayout.TextField(magicLevel);
-
-            GUILayout.Label("Mining Level");
-            miningLevel = GUILayout.TextField(miningLevel);
-
-            GUILayout.Label("Fishing Level");
-            fishingLevel = GUILayout.TextField(fishingLevel);
-
-            GUILayout.Label("Cooking Level");
-            cookingLevel = GUILayout.TextField(cookingLevel);
-
-            GUILayout.Label("Firemaking Level");
-            firemakingLevel = GUILayout.TextField(firemakingLevel);
-
-            GUILayout.Label("Woodcutting Level");
-            woodcuttingLevel = GUILayout.TextField(woodcuttingLevel);
-
-            GUILayout.Label("Beastmaster Level");
-            beastmasterLevel = GUILayout.TextField(beastmasterLevel);
+            hpLevel = DrawLevelField("Hitpoints Level", HpLevelControlName, hpLevel);
+            attackLevel = DrawLevelField("Attack Level", AttackLevelControlName, attackLevel);
+            strengthLevel = DrawLevelField("Strength Level", StrengthLevelControlName, strengthLevel);
+            defenceLevel = DrawLevelField("Defence Level", DefenceLevelControlName, defenceLevel);
+            magicLevel = DrawLevelField("Magic Level", MagicLevelControlName, magicLevel);
+            miningLevel = DrawLevelField("Mining Level", MiningLevelControlName, miningLevel);
+            fishingLevel = DrawLevelField("Fishing Level", FishingLevelControlName, fishingLevel);
+            cookingLevel = DrawLevelField("Cooking Level", CookingLevelControlName, cookingLevel);
+            firemakingLevel = DrawLevelField("Firemaking Level", FiremakingLevelControlName, firemakingLevel);
+            woodcuttingLevel = DrawLevelField("Woodcutting Level", WoodcuttingLevelControlName, woodcuttingLevel);
+            beastmasterLevel = DrawLevelField("Beastmaster Level", BeastmasterLevelControlName, beastmasterLevel);
             if (mergeConfig != null && int.TryParse(beastmasterLevel, out var bmLevel))
             {
                 if (mergeConfig.TryGetMergeParams(bmLevel, out var dur, out var cd, out var locked))
@@ -560,24 +568,7 @@ namespace Skills
             GUILayout.Label("NPC Debug");
 
             var combatants = NpcCombatant.ActiveCombatants;
-            bool anyCombatants = false;
-
-            for (int i = 0; i < combatants.Count; i++)
-            {
-                var combatant = combatants[i];
-                if (combatant == null)
-                    continue;
-
-                anyCombatants = true;
-
-                bool current = combatant.LogDamage;
-                bool updated = GUILayout.Toggle(current, $"{combatant.name} Damage Logs");
-
-                if (updated != current)
-                    combatant.LogDamage = updated;
-            }
-
-            if (!anyCombatants)
+            if (combatants.Count == 0)
             {
                 GUILayout.Label("No NPC combatants active.");
                 return;
@@ -600,6 +591,23 @@ namespace Skills
                         combatant.LogDamage = false;
                 }
             }
+        }
+
+        /// <summary>
+        /// Draws a labeled text field and tracks whether the control owns keyboard focus.
+        /// </summary>
+        /// <param name="label">Label describing the field.</param>
+        /// <param name="controlName">Unique control name used to monitor focus.</param>
+        /// <param name="currentValue">Current value displayed in the text field.</param>
+        /// <returns>The potentially updated text entered by the player.</returns>
+        private string DrawLevelField(string label, string controlName, string currentValue)
+        {
+            GUILayout.Label(label);
+            GUI.SetNextControlName(controlName);
+            string updatedValue = GUILayout.TextField(currentValue);
+            if (GUI.GetNameOfFocusedControl() == controlName)
+                HasTextInputFocus = true;
+            return updatedValue;
         }
 
         /// <summary>
@@ -722,8 +730,10 @@ namespace Skills
             }
 
             GUILayout.Label("Duration (ticks, 0.6s each)");
-            GUI.SetNextControlName("FreezeTickField");
+            GUI.SetNextControlName(FreezeTickControlName);
             freezeTickInput = GUILayout.TextField(freezeTickInput);
+            if (GUI.GetNameOfFocusedControl() == FreezeTickControlName)
+                HasTextInputFocus = true;
 
             if (!string.IsNullOrEmpty(freezeError))
             {
@@ -793,6 +803,7 @@ namespace Skills
             showFreezePopup = false;
             freezeError = string.Empty;
             GUI.FocusControl(null);
+            HasTextInputFocus = false;
         }
     }
 }

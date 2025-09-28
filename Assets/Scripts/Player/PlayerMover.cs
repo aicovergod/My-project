@@ -10,6 +10,7 @@ using World;
 using Pets;
 using Util;
 using Combat;
+using Skills;
 using Status.Freeze;
 
 namespace Player
@@ -253,7 +254,7 @@ namespace Player
                 return;
             }
 
-            if (Inventory.InventoryDebugMenu.HasTextInputFocus)
+            if (Inventory.InventoryDebugMenu.HasTextInputFocus || AdminF2Menu.HasTextInputFocus)
             {
                 moveDir = Vector2.zero;
                 rb.linearVelocity = Vector2.zero;
