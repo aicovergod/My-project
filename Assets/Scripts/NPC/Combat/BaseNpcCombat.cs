@@ -61,6 +61,7 @@ namespace NPC
             threatLevels.Clear();
             lastDamageTimes.Clear();
             hasHitPlayer = false;
+            combatant?.ClearDamageContributors("ResetCombatState invoked");
             if (resetSpawnPosition)
                 spawnPosition = transform.position;
             wanderer?.ExitCombat();
@@ -92,6 +93,46 @@ namespace NPC
             lastDamageTimes[attacker] = Time.time;
         }
 
+        /// <summary>
+        /// Determines whether any player-controlled combatant has contributed damage within the
+        /// supplied time window.
+        /// </summary>
+        /// <param name="windowSeconds">Time window in seconds. When zero or negative, any recorded
+        /// contribution counts regardless of age.</param>
+        /// <param name="secondsSinceMostRecent">Outputs the number of seconds since the most recent
+        /// qualifying contribution when one is found. Undefined when no contributors are present.</param>
+        public bool HasRecentPlayerContribution(float windowSeconds, out float secondsSinceMostRecent)
+        {
+            secondsSinceMostRecent = float.PositiveInfinity;
+            if (lastDamageTimes.Count == 0)
+                return false;
+
+            float now = Time.time;
+            float allowedWindow = windowSeconds > 0f ? windowSeconds : float.PositiveInfinity;
+            bool found = false;
+
+            foreach (var kvp in lastDamageTimes)
+            {
+                if (!IsPlayerControlled(kvp.Key))
+                    continue;
+
+                float elapsed = now - kvp.Value;
+                if (elapsed > allowedWindow)
+                    continue;
+
+                if (!found || elapsed < secondsSinceMostRecent)
+                    secondsSinceMostRecent = elapsed;
+                found = true;
+            }
+
+            return found;
+        }
+
+        private static bool IsPlayerControlled(CombatTarget target)
+        {
+            return target is PlayerCombatTarget || target is PetCombatController;
+        }
+
         protected virtual void Update()
         {
             if (!combatant.IsAlive)
@@ -119,6 +160,7 @@ namespace NPC
                 bool unityMissing = unityTarget == null || !TryResolveTargetTransform(t, unityTarget, out targetTransform);
 
                 bool remove = unityMissing;
+                bool removedForAggroTimeout = false;
                 if (!remove && !t.IsAlive)
                     remove = true;
 
@@ -129,6 +171,25 @@ namespace NPC
                     {
                         wanderer?.ForceReturnToOrigin();
                         remove = true;
+                    }
+                    else if (profile != null && profile.AggroTimeoutSeconds > 0f)
+                    {
+                        float distanceFromSpawn = Vector2.Distance(targetTransform.position, spawnPosition);
+                        float chaseRadius = wanderer != null ? wanderer.AggroRadius : 5f;
+                        if (distanceFromSpawn > chaseRadius && lastDamageTimes.TryGetValue(t, out float lastDamage))
+                        {
+                            float elapsed = Time.time - lastDamage;
+                            if (elapsed >= profile.AggroTimeoutSeconds)
+                            {
+                                remove = true;
+                                removedForAggroTimeout = true;
+                                if (combatant != null && combatant.LogDamage)
+                                {
+                                    string targetName = targetTransform != null ? targetTransform.name : "unknown";
+                                    Debug.Log($"{name} removed threat {targetName} after {elapsed:F1}s outside chase radius (timeout {profile.AggroTimeoutSeconds:F1}s).", this);
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -150,6 +211,9 @@ namespace NPC
                 RemoveCachedTargetFromDictionary(threatLevels, t);
                 RemoveCachedTargetFromDictionary(lastDamageTimes, t);
                 RemoveCachedTargetFromDictionary(activeAttacks, t);
+
+                if (removedForAggroTimeout)
+                    combatant?.ClearDamageContributors("Aggro timeout cleared credit");
             }
 
             if (threatLevels.Count == 0 && activeAttacks.Count == 0)
