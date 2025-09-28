@@ -27,7 +27,7 @@ namespace NPC
         /// <param name="burnPrefab">Prefab used for the burning ground effect.</param>
         /// <param name="dropHeight">Height above the ground to spawn meteors.</param>
         /// <param name="meteorSpeed">Speed at which meteors fall.</param>
-        public static void Perform(BaseNpcCombat owner, CombatTarget target,
+        public static void Perform(NPCCombatBehaviour owner, CombatTarget target,
             int meteorCount, float spreadRadius, int impactDamage,
             int burnDamagePerTick, float burnDuration,
             GameObject meteorPrefab, GameObject burnPrefab,
@@ -41,7 +41,7 @@ namespace NPC
                 dropHeight, meteorSpeed));
         }
 
-        private static IEnumerator SpawnMeteors(BaseNpcCombat owner, CombatTarget target,
+        private static IEnumerator SpawnMeteors(NPCCombatBehaviour owner, CombatTarget target,
             int meteorCount, float spreadRadius, int impactDamage,
             int burnDamagePerTick, float burnDuration,
             GameObject meteorPrefab, GameObject burnPrefab,

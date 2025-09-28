@@ -8,11 +8,11 @@ namespace NPC
     /// <summary>
     /// Simple world-space health bar displayed above an NPC while in combat.
     /// </summary>
-    [RequireComponent(typeof(NpcCombatant))]
-    public class NpcHealthHUD : MonoBehaviour
+    [RequireComponent(typeof(NPCCombatHandler))]
+    public class NPCHealthHud : MonoBehaviour
     {
-        private NpcCombatant combatant;
-        private BaseNpcCombat combat;
+        private NPCCombatHandler combatant;
+        private NPCCombatBehaviour combat;
         private Canvas canvas;
         private CanvasGroup canvasGroup;
         private Image fill;
@@ -26,8 +26,8 @@ namespace NPC
 
         private void Awake()
         {
-            combatant = GetComponent<NpcCombatant>();
-            combat = GetComponent<BaseNpcCombat>();
+            combatant = GetComponent<NPCCombatHandler>();
+            combat = GetComponent<NPCCombatBehaviour>();
             combatant.OnHealthChanged += HandleHealthChanged;
             combatant.OnDeath += HandleDeath;
             if (combat != null)
@@ -41,7 +41,7 @@ namespace NPC
 
         private void CreateHud()
         {
-            var go = new GameObject("NpcHealthHUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            var go = new GameObject("NPCHealthHud", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             canvas = go.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
             canvas.overrideSorting = true; // Force the HUD to obey the explicit sorting order so it can render above world geometry.

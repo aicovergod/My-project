@@ -30,7 +30,7 @@ This project currently targets **Unity 6000.2.3f1**.
 - `Assets/Scripts/Inventory` & `Assets/Scripts/Items` – Provide the bag/equipment UI (`Inventory`, `Equipment`, `StackSplitDialog`, `ItemUseResolver`) plus `Items/Consumables` and `ItemCombatStats` definitions.
 - `Assets/Scripts/Bank` & `Assets/Scripts/Shop` – Implement OSRS-style bank panels (`BankUI`, deposit/withdraw menus) and merchant interfaces (`Shop`, `ShopUI`).
 - `Assets/Scripts/Magic` – Defines spells via `SpellDefinition` and projectile/hit effect prefabs (`FireProjectile`, `HitEffect`).
-- `Assets/Scripts/NPC` – Covers NPC combat (`NpcAttackController`, `NpcCombatant`), navigation, interactions, and HUD helpers.
+- `Assets/Scripts/NPC` – Covers NPC combat (`NPCAttackController`, `NPCCombatHandler`), navigation, interactions, and HUD helpers.
 - `Assets/Scripts/World` – Manages persistent objects, scene transitions, respawn markers, minimap/popup text systems, and screen fades.
 - `Assets/Scripts/UI` – Centralises OSRS-style UI shells (`UIManager`, `InterfaceTabButtons`, `PersistentEventSystem`, `MagicUI`, HUD widgets).
 - `Assets/Scripts/Status` – Contains `BuffTimerService`, `BuffEvents`, antifire/freeze/poison controllers, and save bridges.
