@@ -448,14 +448,21 @@ namespace NPC
         {
             Vector2 clampedPosition = ClampWithWanderer(position);
 
-            if (body != null)
-            {
-                body.MovePosition(clampedPosition);
-            }
-            else
+            if (body == null)
             {
                 transform.position = new Vector3(clampedPosition.x, clampedPosition.y, transform.position.z);
+                return;
             }
+
+            if (body.bodyType == RigidbodyType2D.Dynamic)
+            {
+                // Dynamic bodies are advanced during FixedUpdate, so defer to MovePosition to keep physics contacts stable.
+                body.MovePosition(clampedPosition);
+                return;
+            }
+
+            // Kinematic (and other non-dynamic) bodies expect direct position assignment so they respect the Update-driven lerp.
+            body.position = clampedPosition;
         }
 
         /// <summary>
