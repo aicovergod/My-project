@@ -491,10 +491,24 @@ namespace NPC
         /// </summary>
         private void ResumeWandererIfNeeded()
         {
-            if (wanderer != null && wandererSuspended)
+            if (wanderer == null)
+            {
+                return;
+            }
+
+            Vector2 syncedPosition = ClampWithWanderer(GetCurrentPosition());
+
+            if (wandererSuspended)
             {
                 wanderer.enabled = true;
                 wandererSuspended = false;
+                wanderer.SyncToExternalPosition(syncedPosition);
+                return;
+            }
+
+            if (wanderer.enabled)
+            {
+                wanderer.SyncToExternalPosition(syncedPosition);
             }
         }
 
