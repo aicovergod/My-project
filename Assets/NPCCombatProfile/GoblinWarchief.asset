@@ -24,8 +24,10 @@ MonoBehaviour:
   RespawnSeconds: 30
   AttackType: 0
   Style: 0
-  IsAggressive: 1
+  IsAggressive: 0
   AggroTimeoutSeconds: 5
+  RangedAttackRange: 6
+  MagicAttackRange: 7
   NotFreezable: 0
   MaxConcurrentTargets: 6
   PlayerAggroWeight: 1

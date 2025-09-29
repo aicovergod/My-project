@@ -228,7 +228,8 @@ namespace Skills.Firemaking
                 "Pyromancer Hood",
                 "Pyromancer Garb",
                 "Pyromancer Robes",
-                "Pyromancer Boots"
+                "Pyromancer Boots",
+                "Pyromancer Gloves"
             }, "FiremakingOutfitOwned");
         }
 

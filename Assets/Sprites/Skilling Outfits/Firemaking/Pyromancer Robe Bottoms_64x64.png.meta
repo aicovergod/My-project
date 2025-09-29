@@ -1,13 +1,10 @@
 fileFormatVersion: 2
-guid: ce37d7f5da562584d9fcdebb58d153f2
+guid: bcdb639105194af4184fceb10137efd4
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7009569286853137654
-    second: Pyromancer Gloves_0
-  - first:
-      213: -6957740594625284651
-    second: Pyromancer Gloves_1
+      213: 7738056223396508189
+    second: Pyromancer Robe Bottoms_64x64_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -49,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -116,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Pyromancer Gloves_0
+      name: Pyromancer Robe Bottoms_64x64_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 8
-        width: 1024
-        height: 1480
+        x: 4
+        y: 0
+        width: 55
+        height: 63
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -131,30 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 6f49e5bc02ef64160800000000000000
-      internalID: 7009569286853137654
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Pyromancer Gloves_1
-      rect:
-        serializedVersion: 2
-        x: 119
-        y: 423
-        width: 352
-        height: 666
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 5d57b0afac3217f90800000000000000
-      internalID: -6957740594625284651
+      spriteID: d12bc8f1329136b60800000000000000
+      internalID: 7738056223396508189
       vertices: []
       indices: 
       edges: []
@@ -163,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -173,8 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Pyromancer Gloves_0: 7009569286853137654
-      Pyromancer Gloves_1: -6957740594625284651
+      Pyromancer Robe Bottoms_64x64_0: 7738056223396508189
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

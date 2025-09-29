@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 733bc79ffd060d244acb0e92962f236c
+guid: 71995474b452a8c4e821f9dbb0751947
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7437857792038114271
-    second: Pyromancer Hood_0
+      213: 2031727175560977136
+    second: Pyromancer Hood_64x64_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Pyromancer Hood_0
+      name: Pyromancer Hood_64x64_0
       rect:
         serializedVersion: 2
-        x: 231
-        y: 88
-        width: 561
-        height: 790
+        x: 14
+        y: 9
+        width: 36
+        height: 47
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 12c62bfdebb67c890800000000000000
-      internalID: -7437857792038114271
+      spriteID: 0fad1d30a15223c10800000000000000
+      internalID: 2031727175560977136
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Pyromancer Hood_0: -7437857792038114271
+      Pyromancer Hood_64x64_0: 2031727175560977136
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
