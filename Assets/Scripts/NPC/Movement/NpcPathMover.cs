@@ -44,6 +44,7 @@ namespace NPC
         private Rigidbody2D body;
         private NpcWanderer wanderer;
         private NpcFacing facing;
+        private NpcSpriteAnimator spriteAnimator;
         private PathfindingService pathService;
 
         private bool subscribedToTicker;
@@ -90,6 +91,11 @@ namespace NPC
 
             wanderer = GetComponent<NpcWanderer>();
             facing = GetComponent<NpcFacing>();
+            spriteAnimator = facing != null ? facing.Animator : null;
+            if (spriteAnimator == null)
+            {
+                spriteAnimator = GetComponent<NpcSpriteAnimator>() ?? GetComponentInChildren<NpcSpriteAnimator>();
+            }
             pathService = PathfindingService.Instance;
         }
 
@@ -135,7 +141,11 @@ namespace NPC
                 previousStepPosition = currentStepTarget;
                 stepping = false;
                 lastProgressTimestamp = Time.time;
-                TryAdvanceToNextWaypoint();
+                bool advanced = TryAdvanceToNextWaypoint();
+                if (!advanced)
+                {
+                    UpdateMovementVisuals(Vector2.zero);
+                }
             }
         }
 
@@ -178,6 +188,7 @@ namespace NPC
             activeRequestId = -1;
             hasDestination = false;
             TryAdvanceToNextWaypoint();
+            UpdateMovementVisuals(Vector2.zero);
         }
 
         /// <inheritdoc />
@@ -240,6 +251,7 @@ namespace NPC
                 stepping = false;
                 hasDestination = false;
                 TryAdvanceToNextWaypoint();
+                UpdateMovementVisuals(Vector2.zero);
                 return;
             }
 
@@ -251,6 +263,7 @@ namespace NPC
                 }
 
                 ScheduleRetry();
+                UpdateMovementVisuals(Vector2.zero);
                 return;
             }
 
@@ -296,7 +309,28 @@ namespace NPC
             if (direction.sqrMagnitude > Mathf.Epsilon)
             {
                 facing?.FaceDirection(direction);
+                float duration = Mathf.Max(0.0001f, tileTraverseDuration);
+                UpdateMovementVisuals(direction / duration);
             }
+            else
+            {
+                UpdateMovementVisuals(Vector2.zero);
+            }
+        }
+
+        /// <summary>
+        /// Updates the sprite animator (when present) so locomotion visuals match movement velocity.
+        /// </summary>
+        /// <param name="velocity">World-space velocity used to drive directional animation.</param>
+        private void UpdateMovementVisuals(Vector2 velocity)
+        {
+            if (spriteAnimator == null)
+            {
+                return;
+            }
+
+            Vector2 resolvedVelocity = velocity.sqrMagnitude > 0.0001f ? velocity : Vector2.zero;
+            spriteAnimator.UpdateVisuals(resolvedVelocity);
         }
 
         /// <summary>
@@ -305,11 +339,6 @@ namespace NPC
         /// <param name="currentPosition">Interpolated position applied during the current step.</param>
         private void UpdateFacingDuringStep(Vector2 currentPosition)
         {
-            if (facing == null)
-            {
-                return;
-            }
-
             Vector2 delta = currentPosition - previousStepPosition;
             if (delta.sqrMagnitude <= 0.0001f)
             {
@@ -318,11 +347,18 @@ namespace NPC
                 delta = currentStepTarget - currentPosition;
                 if (delta.sqrMagnitude <= Mathf.Epsilon)
                 {
+                    UpdateMovementVisuals(Vector2.zero);
                     return;
                 }
             }
 
-            facing.FaceDirection(delta);
+            if (facing != null)
+            {
+                facing.FaceDirection(delta);
+            }
+
+            float deltaTime = Mathf.Max(Time.deltaTime, 0.0001f);
+            UpdateMovementVisuals(delta / deltaTime);
             previousStepPosition = currentPosition;
         }
 
@@ -340,6 +376,7 @@ namespace NPC
             if (waypointQueue.Count == 0)
             {
                 ResumeWandererIfNeeded();
+                UpdateMovementVisuals(Vector2.zero);
                 return false;
             }
 
@@ -347,6 +384,7 @@ namespace NPC
             if (!IsWaypointWalkable(next))
             {
                 ForceReplan();
+                UpdateMovementVisuals(Vector2.zero);
                 return false;
             }
 
@@ -383,6 +421,7 @@ namespace NPC
         private void EvaluateArrival()
         {
             Vector2 current = GetCurrentPosition();
+            UpdateMovementVisuals(Vector2.zero);
             if (Vector2.Distance(current, desiredDestination) <= stopDistance + waypointTolerance)
             {
                 DestinationReached?.Invoke(this);
@@ -430,6 +469,7 @@ namespace NPC
                 {
                     Debug.LogWarning($"NPC {name} cannot request path: service missing.", this);
                 }
+                UpdateMovementVisuals(Vector2.zero);
                 return;
             }
 
@@ -447,6 +487,7 @@ namespace NPC
             lastRequestedDestination = destination;
             nextAllowedRepathTime = Time.time + repathCooldownSeconds;
             lastDestinationUpdate = Time.time;
+            UpdateMovementVisuals(Vector2.zero);
 
             Vector2 start = GetCurrentPosition();
             activeRequestId = pathService.RequestPath(this, start, destination);
@@ -459,6 +500,7 @@ namespace NPC
                 {
                     Debug.LogWarning($"NPC {name} failed to queue a path request.", this);
                 }
+                UpdateMovementVisuals(Vector2.zero);
                 return;
             }
 
