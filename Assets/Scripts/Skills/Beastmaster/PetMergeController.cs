@@ -32,6 +32,7 @@ namespace Beastmaster
         private float durationRemaining;
         private float cooldownRemaining;
         private float originalMoveSpeed;
+        private bool hudTimerWarningLogged;
 
         private const string MERGE_KEY = "BM_Merge_Remaining";
         private const string COOLDOWN_KEY = "BM_Merge_Cooldown";
@@ -66,8 +67,7 @@ namespace Beastmaster
             beastmaster = beastmasterServiceComponent as IBeastmasterService;
             petService = petServiceComponent as IPetService;
 
-            if (hudTimer == null)
-                hudTimer = GetComponentInChildren<MergeHudTimer>(true) ?? FindObjectOfType<MergeHudTimer>(true);
+            EnsureHudTimer();
             if (playerMover == null)
                 playerMover = GetComponent<PlayerMover>();
 
@@ -75,8 +75,6 @@ namespace Beastmaster
                 Debug.LogWarning("PetMergeController missing IBeastmasterService component.");
             if (petService == null)
                 Debug.LogWarning("PetMergeController missing IPetService component.");
-            if (hudTimer == null)
-                Debug.LogWarning("PetMergeController missing MergeHudTimer component.");
 
             LoadState();
         }
@@ -91,6 +89,7 @@ namespace Beastmaster
         {
             if (merged)
             {
+                EnsureHudTimer();
                 durationRemaining -= Time.deltaTime;
                 if (durationRemaining <= 0f)
                 {
@@ -163,6 +162,7 @@ namespace Beastmaster
             combatBinder?.UseProfile(combat);
             mergedEquipStats = combat != null ? combat.GetCombatStats().Equip : default;
             ApplySpeedModifier();
+            EnsureHudTimer();
             hudTimer?.Show(TimeSpan.FromSeconds(durationRemaining));
             SaveState();
             return true;
@@ -179,6 +179,7 @@ namespace Beastmaster
             combatBinder?.RestorePlayerProfile();
             petService?.ShowActivePet(transform.position);
             mergedEquipStats = default;
+            EnsureHudTimer();
             hudTimer?.Hide();
             SaveState();
         }
@@ -191,6 +192,7 @@ namespace Beastmaster
             cooldownRemaining = 0f;
             durationRemaining = 0f;
             mergedEquipStats = default;
+            EnsureHudTimer();
             hudTimer?.Hide();
             SaveState();
         }
@@ -226,11 +228,32 @@ namespace Beastmaster
                 combatBinder?.UseProfile(combat);
                 mergedEquipStats = combat != null ? combat.GetCombatStats().Equip : default;
                 ApplySpeedModifier();
+                EnsureHudTimer();
                 hudTimer?.Show(TimeSpan.FromSeconds(durationRemaining));
             }
             else
             {
                 durationRemaining = 0f;
+            }
+        }
+
+        /// <summary>
+        /// Ensures the merge HUD timer reference is resolved when the prefab spawns.
+        /// </summary>
+        private void EnsureHudTimer()
+        {
+            if (hudTimer != null)
+                return;
+
+            hudTimer = GetComponentInChildren<MergeHudTimer>(true) ?? FindObjectOfType<MergeHudTimer>(true);
+            if (hudTimer == null && !hudTimerWarningLogged)
+            {
+                Debug.LogWarning("PetMergeController missing MergeHudTimer component.");
+                hudTimerWarningLogged = true;
+            }
+            else if (hudTimer != null)
+            {
+                hudTimerWarningLogged = false;
             }
         }
     }
