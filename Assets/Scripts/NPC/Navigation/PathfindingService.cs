@@ -33,7 +33,9 @@ namespace NPC
             public AStarSearch Search;
             public Vector2Int StartCell;
             public Vector2Int GoalCell;
+            public Vector2Int DesiredGoalCell;
             public bool Prepared;
+            public bool UsedStartFallback;
 
             public PathRequest(int id, NpcPathMover mover, Vector2 start, Vector2 goal)
             {
@@ -339,6 +341,17 @@ namespace NPC
                     continue;
                 }
 
+                if (request.UsedStartFallback && request.DesiredGoalCell != request.StartCell)
+                {
+                    if (enableDebugLogging)
+                    {
+                        Debug.LogWarning($"Path request {request.Id} goal unreachable. Fallback returned start cell.", this);
+                    }
+
+                    CompleteRequest(request, PathStatus.GoalUnreachable, null);
+                    continue;
+                }
+
                 activeRequest = request;
                 cachedGridRevision = navGrid != null ? navGrid.Revision : 0;
                 return;
@@ -364,7 +377,7 @@ namespace NPC
                 ? tempGoal
                 : grid.WorldToCellClamped(request.GoalWorld);
 
-            Vector2Int resolvedGoal = ResolveNearestWalkable(goalCell, startCell);
+            Vector2Int resolvedGoal = ResolveNearestWalkable(goalCell, startCell, out bool usedStartFallback);
             if (resolvedGoal == startCell && !grid.IsCellWalkable(resolvedGoal))
             {
                 return false;
@@ -372,6 +385,8 @@ namespace NPC
 
             request.StartCell = startCell;
             request.GoalCell = resolvedGoal;
+            request.DesiredGoalCell = goalCell;
+            request.UsedStartFallback = usedStartFallback;
             request.Search.OpenSet.Clear();
             request.Search.ClosedSet.Clear();
             request.Search.Records.Clear();
@@ -393,10 +408,12 @@ namespace NPC
 
         /// <summary>
         /// Finds the closest walkable cell to the desired goal, falling back toward the start when necessary.
+        /// Outputs whether the start cell had to be used as that fallback so callers can surface unreachable goals.
         /// </summary>
-        private Vector2Int ResolveNearestWalkable(Vector2Int desired, Vector2Int start)
+        private Vector2Int ResolveNearestWalkable(Vector2Int desired, Vector2Int start, out bool usedStartFallback)
         {
             var grid = navGrid;
+            usedStartFallback = false;
             if (grid.IsCellWalkable(desired))
             {
                 return desired;
@@ -406,6 +423,7 @@ namespace NPC
             HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
             frontier.Enqueue(desired);
             visited.Add(desired);
+            bool encounteredStart = desired == start;
 
             while (frontier.Count > 0)
             {
@@ -422,7 +440,15 @@ namespace NPC
                         continue;
                     }
 
-                    if (grid.IsCellWalkable(neighbour) || neighbour == start)
+                    if (neighbour == start)
+                    {
+                        // Track that we brushed past the start cell but keep exploring in case another walkable target exists.
+                        encounteredStart = true;
+                        frontier.Enqueue(neighbour);
+                        continue;
+                    }
+
+                    if (grid.IsCellWalkable(neighbour))
                     {
                         return neighbour;
                     }
@@ -431,6 +457,7 @@ namespace NPC
                 }
             }
 
+            usedStartFallback = start != desired && encounteredStart;
             return start;
         }
 
