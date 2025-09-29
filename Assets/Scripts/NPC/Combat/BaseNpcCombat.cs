@@ -74,10 +74,12 @@ namespace NPC
         /// </summary>
         private void EnsureObstructionMaskConfigured()
         {
-            if (obstructionMask.value != 0)
-                return;
+            int defaultMask = LayerMask.GetMask(DefaultObstructionLayers);
 
-            obstructionMask = LayerMask.GetMask(DefaultObstructionLayers);
+            // Keep the NPC obstruction mask aligned with the shared defaults while preserving
+            // any bespoke overrides applied in prefabs or instances.
+            int combinedMask = obstructionMask.value | defaultMask;
+            obstructionMask = combinedMask;
         }
 
         public virtual void ResetCombatState(bool resetSpawnPosition = false)
