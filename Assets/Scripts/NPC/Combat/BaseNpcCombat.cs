@@ -79,6 +79,17 @@ namespace NPC
             // Keep the NPC obstruction mask aligned with the shared defaults while preserving
             // any bespoke overrides applied in prefabs or instances.
             int combinedMask = obstructionMask.value | defaultMask;
+
+            // In play mode we also honour the active navigation grid so line-of-sight checks use
+            // the same blockers that pathfinding respects. Guard all lookups to stay editor-safe.
+            if (Application.isPlaying)
+            {
+                var blockingMask = PathfindingService.Instance?.ActiveGrid?.BlockingLayerMask;
+                if (blockingMask.HasValue)
+                {
+                    combinedMask |= blockingMask.Value.value;
+                }
+            }
             obstructionMask = combinedMask;
         }
 

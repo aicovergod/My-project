@@ -113,6 +113,12 @@ namespace NPC
         /// </summary>
         public int Revision => revision;
 
+        /// <summary>
+        /// Physics mask used to determine which layers block navigation during grid baking.
+        /// Exposed so other systems (combat, LOS checks) can remain aligned with the baked data.
+        /// </summary>
+        public LayerMask BlockingLayerMask => blockingLayers;
+
         private void Reset()
         {
             SanitizeBlockingTags();
