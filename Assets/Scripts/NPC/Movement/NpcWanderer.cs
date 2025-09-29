@@ -548,11 +548,7 @@ namespace NPC
         {
             Vector2 origin = _originInitialized ? _origin : (_rb != null ? _rb.position : (Vector2)transform.position);
 
-            ResolveMovementBounds(origin, out float minX, out float maxX, out float minY, out float maxY);
-
-            float clampedX = Mathf.Clamp(worldPosition.x, minX, maxX);
-            float clampedY = Mathf.Clamp(worldPosition.y, minY, maxY);
-            Vector2 clamped = new Vector2(clampedX, clampedY);
+            Vector2 clamped = ClampWithinConfiguredBounds(origin, worldPosition, out float minX, out float maxX, out float minY, out float maxY);
 
             NavGridBuilder grid = PathfindingService.Instance?.ActiveGrid;
             if (grid == null || !grid.HasGrid)
@@ -609,6 +605,32 @@ namespace NPC
             }
 
             return clamped;
+        }
+
+        /// <summary>
+        /// Clamps the provided world position to the wanderer's configured movement bounds without
+        /// performing any navgrid snapping. This is used when interpolation needs to remain smooth
+        /// between tiles while still respecting the patrol rectangle.
+        /// </summary>
+        /// <param name="worldPosition">Target position in world space.</param>
+        /// <returns>The clamped position limited to the configured patrol bounds.</returns>
+        public Vector2 ClampToMovementBoundsNoSnap(Vector2 worldPosition)
+        {
+            Vector2 origin = _originInitialized ? _origin : (_rb != null ? _rb.position : (Vector2)transform.position);
+            return ClampWithinConfiguredBounds(origin, worldPosition, out _, out _, out _, out _);
+        }
+
+        /// <summary>
+        /// Internal helper that clamps the world position against the configured patrol bounds and
+        /// exposes the resolved min/max values for optional navgrid snapping.
+        /// </summary>
+        private Vector2 ClampWithinConfiguredBounds(Vector2 origin, Vector2 worldPosition, out float minX, out float maxX, out float minY, out float maxY)
+        {
+            ResolveMovementBounds(origin, out minX, out maxX, out minY, out maxY);
+
+            float clampedX = Mathf.Clamp(worldPosition.x, minX, maxX);
+            float clampedY = Mathf.Clamp(worldPosition.y, minY, maxY);
+            return new Vector2(clampedX, clampedY);
         }
 
         private static bool IsWithinBounds(Vector2 position, float minX, float maxX, float minY, float maxY)
