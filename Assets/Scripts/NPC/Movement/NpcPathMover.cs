@@ -53,6 +53,7 @@ namespace NPC
         private bool stepping;
         private Vector2 currentStepStart;
         private Vector2 currentStepTarget;
+        private Vector2 previousStepPosition;
         private float stepTimer;
         private float lastProgressTimestamp;
         private float nextAllowedRepathTime;
@@ -126,10 +127,12 @@ namespace NPC
             float progress = Mathf.Clamp01(stepTimer / duration);
             Vector2 interpolated = Vector2.Lerp(currentStepStart, currentStepTarget, progress);
             ApplyPosition(interpolated, snapToGrid: false);
+            UpdateFacingDuringStep(interpolated);
 
             if (progress >= 1f - Mathf.Epsilon)
             {
                 ApplyPosition(currentStepTarget, snapToGrid: true);
+                previousStepPosition = currentStepTarget;
                 stepping = false;
                 lastProgressTimestamp = Time.time;
                 TryAdvanceToNextWaypoint();
@@ -284,6 +287,7 @@ namespace NPC
             SuspendWanderer();
             currentStepStart = ClampWithWanderer(GetCurrentPosition());
             currentStepTarget = ClampWithWanderer(destination);
+            previousStepPosition = currentStepStart;
             stepTimer = 0f;
             stepping = true;
             lastProgressTimestamp = Time.time;
@@ -293,6 +297,33 @@ namespace NPC
             {
                 facing?.FaceDirection(direction);
             }
+        }
+
+        /// <summary>
+        /// Keeps the NPC's facing direction aligned with the most recent movement delta.
+        /// </summary>
+        /// <param name="currentPosition">Interpolated position applied during the current step.</param>
+        private void UpdateFacingDuringStep(Vector2 currentPosition)
+        {
+            if (facing == null)
+            {
+                return;
+            }
+
+            Vector2 delta = currentPosition - previousStepPosition;
+            if (delta.sqrMagnitude <= 0.0001f)
+            {
+                // When interpolation produces an extremely small delta (e.g., during the final frame
+                // of a step), fall back to the remaining distance so the NPC still faces the goal.
+                delta = currentStepTarget - currentPosition;
+                if (delta.sqrMagnitude <= Mathf.Epsilon)
+                {
+                    return;
+                }
+            }
+
+            facing.FaceDirection(delta);
+            previousStepPosition = currentPosition;
         }
 
         /// <summary>
