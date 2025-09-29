@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditorInternal;
+#endif
 
 namespace NPC
 {
@@ -112,12 +115,14 @@ namespace NPC
 
         private void Reset()
         {
+            SanitizeBlockingTags();
             lastRecordedPosition = transform.position;
             lastRecordedScale = transform.lossyScale;
         }
 
         private void Awake()
         {
+            SanitizeBlockingTags();
             lastRecordedPosition = transform.position;
             lastRecordedScale = transform.lossyScale;
             if (autoBuildOnEnable)
@@ -144,10 +149,7 @@ namespace NPC
             areaSize.x = Mathf.Max(tileSize, Mathf.Abs(areaSize.x));
             areaSize.y = Mathf.Max(tileSize, Mathf.Abs(areaSize.y));
             samplingPadding = Mathf.Clamp(samplingPadding, 0.1f, 1.2f);
-            if (blockingTags != null)
-            {
-                blockingTags.RemoveAll(string.IsNullOrWhiteSpace);
-            }
+            SanitizeBlockingTags();
             gridDirty = true;
 
             if (!Application.isPlaying && autoBuildOnEnable)
@@ -437,21 +439,89 @@ namespace NPC
         /// </summary>
         private bool DoesObjectMatchTag(GameObject obj, string tag)
         {
-            try
+            if (obj == null || string.IsNullOrEmpty(tag))
             {
-                return obj.CompareTag(tag);
-            }
-            catch (UnityException)
-            {
-                if (reportedMissingTags.Add(tag))
-                {
-#if UNITY_EDITOR
-                    Debug.LogWarning($"NavGridBuilder blocking tag \"{tag}\" is not defined in the Tag Manager and will be ignored.", this);
-#endif
-                }
-
                 return false;
             }
+
+            if (!IsTagRegistered(tag))
+            {
+                ReportMissingTag(tag);
+                return false;
+            }
+
+            return string.Equals(obj.tag, tag, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Removes blank or undefined tag entries from the serialized blocking tag list so we do not keep
+        /// resaving invalid data to prefabs or scenes.
+        /// </summary>
+        private void SanitizeBlockingTags()
+        {
+            if (blockingTags == null)
+            {
+                return;
+            }
+
+            for (int i = blockingTags.Count - 1; i >= 0; i--)
+            {
+                string tag = blockingTags[i];
+                if (string.IsNullOrWhiteSpace(tag))
+                {
+                    blockingTags.RemoveAt(i);
+                    continue;
+                }
+
+                if (!IsTagRegistered(tag))
+                {
+                    ReportMissingTag(tag);
+                    blockingTags.RemoveAt(i);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns <c>true</c> when the supplied tag exists in the Unity Tag Manager. Outside of the editor we
+        /// optimistically assume serialized tags are valid because the build no longer has access to the editor API.
+        /// </summary>
+        private bool IsTagRegistered(string tag)
+        {
+#if UNITY_EDITOR
+            if (string.IsNullOrEmpty(tag))
+            {
+                return false;
+            }
+
+            string[] tags = InternalEditorUtility.tags;
+            for (int i = 0; i < tags.Length; i++)
+            {
+                if (tags[i] == tag)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+#else
+            return !string.IsNullOrEmpty(tag);
+#endif
+        }
+
+        /// <summary>
+        /// Emits a single warning the first time we encounter a missing tag so designers receive actionable feedback
+        /// without flooding the console when grids are rebuilt repeatedly.
+        /// </summary>
+        private void ReportMissingTag(string tag)
+        {
+            if (!reportedMissingTags.Add(tag))
+            {
+                return;
+            }
+
+#if UNITY_EDITOR
+            Debug.LogWarning($"NavGridBuilder blocking tag \"{tag}\" is not defined in the Tag Manager and will be ignored.", this);
+#endif
         }
 
 #if UNITY_EDITOR
