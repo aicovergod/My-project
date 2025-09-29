@@ -25,7 +25,8 @@ GameObject:
   - component: {fileID: 1214185441905924890}
   - component: {fileID: 6410839004971985729}
   - component: {fileID: -1616939295907987060}
-  m_Layer: 7
+  - component: {fileID: 1174345271934556159}
+  m_Layer: 10
   m_Name: NPC_GOBLIN_WARCHIEF
   m_TagString: NPC
   m_Icon: {fileID: 0}
@@ -239,6 +240,8 @@ MonoBehaviour:
   obstructionMask:
     serializedVersion: 2
     m_Bits: 64
+  replanCooldownSeconds: 0.6
+  enablePathDebugLogging: 0
 --- !u!114 &1276688815178828107
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -441,3 +444,24 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1174345271934556159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb1fbc3bf94e10c479dbc5d6e2a09d26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcPathMover
+  tileTraverseDuration: 0.6
+  waypointTolerance: 0.05
+  stopDistance: 1
+  repathCooldownSeconds: 0.6
+  stuckTimeoutSeconds: 3
+  destinationRepathThreshold: 0.75
+  enableDebugLogging: 0
+  drawDebugPath: 1
+  debugPathColor: {r: 1, g: 0.75, b: 0, a: 0.9}
