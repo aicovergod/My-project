@@ -191,6 +191,42 @@ namespace NPC
         }
 
         /// <summary>
+        /// Synchronises the wanderer to an externally supplied world position (for example when a
+        /// navigation system teleports or walks the NPC). This ensures future wander ticks start from
+        /// the provided coordinate instead of continuing toward an obsolete target.
+        /// </summary>
+        /// <param name="worldPosition">The desired world position to align to the wander loop.</param>
+        public void SyncToExternalPosition(Vector2 worldPosition)
+        {
+            CancelKnockback();
+
+            Vector2 clamped = ClampToMovementBounds(worldPosition);
+
+            if (_rb != null)
+            {
+                _rb.position = clamped;
+#if UNITY_2023_1_OR_NEWER
+                _rb.linearVelocity = Vector2.zero;
+#else
+                _rb.velocity = Vector2.zero;
+#endif
+            }
+            else
+            {
+                transform.position = new Vector3(clamped.x, clamped.y, transform.position.z);
+            }
+
+            _from = clamped;
+            _to = clamped;
+            _lastPos = clamped;
+            _target = clamped;
+            _lerpTime = Ticker.TickDuration;
+            _waiting = false;
+            _waitTimer = 0f;
+            spriteAnimator?.UpdateVisuals(Vector2.zero);
+        }
+
+        /// <summary>
         /// Applies a knockback impulse handled by this wanderer. The NPC will interpolate
         /// between the current position and the resolved destination using the supplied curve.
         /// </summary>
