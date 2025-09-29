@@ -85,7 +85,7 @@ namespace World
         /// </summary>
         private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            EnsurePersistentObjects();
+            EnsurePersistentObjects(scene);
         }
 
         /// <summary>
@@ -95,13 +95,22 @@ namespace World
         /// </summary>
         private void EnsurePersistentObjects()
         {
-            // Resolve the currently active scene so the catalog can opt-out of spawning
-            // persistent prefabs for non-gameplay contexts such as login or menus.
-            Scene activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid())
+            EnsurePersistentObjects(SceneManager.GetActiveScene());
+        }
+
+        /// <summary>
+        /// Instantiates any missing prefabs for the supplied scene if the catalog allows
+        /// spawning there.
+        /// </summary>
+        /// <param name="scene">Scene currently being evaluated for persistent prefabs.</param>
+        private void EnsurePersistentObjects(Scene scene)
+        {
+            // Validate the supplied scene so the catalog can opt-out of spawning persistent
+            // prefabs for non-gameplay contexts such as login or menus.
+            if (!scene.IsValid())
                 return;
 
-            if (!catalog.ShouldSpawnInScene(activeScene.name))
+            if (!catalog.ShouldSpawnInScene(scene.name))
                 return;
 
             IReadOnlyList<GameObject> prefabs = catalog.Prefabs;
