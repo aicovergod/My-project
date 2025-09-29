@@ -236,6 +236,21 @@ namespace NPC
             activeRequestId = -1;
             desiredDestination = goalWorld;
 
+            if (status == PathfindingService.PathStatus.GoalUnreachable)
+            {
+                if (enableDebugLogging)
+                {
+                    Debug.LogWarning($"NPC {name} path request {requestId} reached fallback -> goal unreachable.", this);
+                }
+
+                waypointQueue.Clear();
+                debugPath.Clear();
+                stepping = false;
+                hasDestination = false;
+                ResumeWandererIfNeeded();
+                return;
+            }
+
             if (status != PathfindingService.PathStatus.Success || worldPath == null)
             {
                 if (enableDebugLogging)
