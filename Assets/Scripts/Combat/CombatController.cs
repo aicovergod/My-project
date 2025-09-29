@@ -147,10 +147,12 @@ namespace Combat
         /// </summary>
         private void EnsureObstructionMaskConfigured()
         {
-            if (obstructionMask.value != 0)
-                return;
+            int defaultMask = LayerMask.GetMask(DefaultObstructionLayers);
 
-            obstructionMask = LayerMask.GetMask(DefaultObstructionLayers);
+            // Always merge in the default layers so inspector overrides can't accidentally drop
+            // physical blockers like AntiMeleeObstacle colliders from the mask.
+            int combinedMask = obstructionMask.value | defaultMask;
+            obstructionMask = combinedMask;
         }
 
         /// <summary>

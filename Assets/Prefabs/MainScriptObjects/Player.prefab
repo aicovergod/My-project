@@ -609,8 +609,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d02d43035d14f0f44b973eec23f7e118, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
+  obstructionMask:
+    serializedVersion: 2
+    m_Bits: 64
   hitSplatLibrary: {fileID: 11400000, guid: 3bdb17896f374e8bb098d628ca4ba2f4, type: 2}
 --- !u!114 &2480528448797343508
 MonoBehaviour:
