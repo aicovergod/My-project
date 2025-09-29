@@ -35,7 +35,7 @@ namespace NPC
         /// </summary>
         protected float nextAttackTimestamp;
 
-        private static readonly string[] DefaultObstructionLayers = { "Obstacles", "Physical Objects" };
+        private static readonly string[] DefaultObstructionLayers = { "Obstacles", "Obstacle", "Physical Objects" };
 
         [Header("Line of Sight")]
         [SerializeField, Tooltip("Layers treated as solid when determining whether attacks can reach a target.")]

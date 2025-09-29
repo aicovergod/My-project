@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 3665449629679586575}
   - component: {fileID: 1214185441905924890}
   - component: {fileID: 6410839004971985729}
+  - component: {fileID: -1616939295907987060}
   m_Layer: 7
   m_Name: NPC_GOBLIN_WARCHIEF
   m_TagString: NPC
@@ -190,7 +191,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   profile: {fileID: 11400000, guid: a2f9345330f24e74da31849069a079ad, type: 2}
-  hitSplatLibrary: {fileID: 0}
+  logDamage: 0
+  hitSplatLibrary: {fileID: 11400000, guid: 3bdb17896f374e8bb098d628ca4ba2f4, type: 2}
+  knockbackReceiver: {fileID: -1616939295907987060}
   hitsplatFallbackOffset: 1
 --- !u!114 &7573619506058784387
 MonoBehaviour:
@@ -233,6 +236,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3499121a43ce7a4c81402d2529f06e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  obstructionMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!114 &1276688815178828107
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -368,6 +374,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58d974d03c6542e0a33364a3dac3fa1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  obstructionMask:
+    serializedVersion: 2
+    m_Bits: 0
   slamInterval: 10
   slamDamage: 10
   slamDustPrefab: {fileID: 6111494187698877684, guid: 6af1b55044c31a34db2173e37299b34e, type: 3}
@@ -389,3 +398,46 @@ MonoBehaviour:
   playerMover: {fileID: 0}
   npcWanderer: {fileID: -7034281214918345802}
   rigidBody: {fileID: 1285495058149382175}
+--- !u!114 &-1616939295907987060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a6a9b1d4474b0f41b7f62e6a86fba13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcKnockbackReceiver
+  enableKnockback: 1
+  baseDistance: 0.75
+  knockbackDuration: 0.3
+  scaleWithDamage: 1
+  distancePerDamagePoint: 0.02
+  maxScaledDistance: 1.8
+  clampToMovementBounds: 1
+  knockbackCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

@@ -91,7 +91,7 @@ namespace Combat
         private float hitsplatFallbackOffset = 1.1f;
 
         [Header("Line of Sight")]
-        private static readonly string[] DefaultObstructionLayers = { "Obstacles", "Physical Objects" };
+        private static readonly string[] DefaultObstructionLayers = { "Obstacles", "Obstacle", "Physical Objects" };
 
         [SerializeField, Tooltip("Layers considered solid when checking whether swings or spells have a clear path to the target.")]
         private LayerMask obstructionMask;

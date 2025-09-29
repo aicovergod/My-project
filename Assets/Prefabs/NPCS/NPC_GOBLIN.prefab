@@ -192,7 +192,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   profile: {fileID: 11400000, guid: 99be5545587046b409a3d4e9f2a85c70, type: 2}
-  hitSplatLibrary: {fileID: 0}
+  logDamage: 0
+  hitSplatLibrary: {fileID: 11400000, guid: 3bdb17896f374e8bb098d628ca4ba2f4, type: 2}
+  knockbackReceiver: {fileID: 330093352596913383}
   hitsplatFallbackOffset: 1
 --- !u!114 &7573619506058784387
 MonoBehaviour:
@@ -235,6 +237,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3499121a43ce7a4c81402d2529f06e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  obstructionMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!114 &1276688815178828107
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -382,13 +387,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a6a9b1d4474b0f41b7f62e6a86fba13, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   enableKnockback: 1
-  baseDistance: 0.9
+  baseDistance: 0.5
   knockbackDuration: 0.3
   scaleWithDamage: 1
-  distancePerDamagePoint: 0.03
+  distancePerDamagePoint: 0.02
   maxScaledDistance: 1.8
   clampToMovementBounds: 1
   knockbackCurve:
