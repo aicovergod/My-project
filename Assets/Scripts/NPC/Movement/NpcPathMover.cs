@@ -132,10 +132,7 @@ namespace NPC
                 ApplyPosition(currentStepTarget);
                 stepping = false;
                 lastProgressTimestamp = Time.time;
-                if (waypointQueue.Count == 0)
-                {
-                    ResumeWandererIfNeeded();
-                }
+                TryAdvanceToNextWaypoint();
             }
         }
 
@@ -177,7 +174,7 @@ namespace NPC
             stepping = false;
             activeRequestId = -1;
             hasDestination = false;
-            ResumeWandererIfNeeded();
+            TryAdvanceToNextWaypoint();
         }
 
         /// <inheritdoc />
@@ -189,17 +186,9 @@ namespace NPC
                 EvaluateDestinationDrift();
             }
 
-            if (!stepping && waypointQueue.Count > 0)
+            if (!stepping)
             {
-                Vector2 next = ClampWithWanderer(waypointQueue.Peek());
-                if (!IsWaypointWalkable(next))
-                {
-                    ForceReplan();
-                    return;
-                }
-
-                waypointQueue.Dequeue();
-                BeginStep(next);
+                TryAdvanceToNextWaypoint();
             }
 
             if (stepping)
@@ -247,7 +236,7 @@ namespace NPC
                 debugPath.Clear();
                 stepping = false;
                 hasDestination = false;
-                ResumeWandererIfNeeded();
+                TryAdvanceToNextWaypoint();
                 return;
             }
 
@@ -304,6 +293,35 @@ namespace NPC
             {
                 facing?.FaceDirection(direction);
             }
+        }
+
+        /// <summary>
+        /// Attempts to advance to the next waypoint immediately, resuming the wanderer when no waypoints remain.
+        /// </summary>
+        /// <returns>True if a new waypoint step began; otherwise false.</returns>
+        private bool TryAdvanceToNextWaypoint()
+        {
+            if (stepping)
+            {
+                return true;
+            }
+
+            if (waypointQueue.Count == 0)
+            {
+                ResumeWandererIfNeeded();
+                return false;
+            }
+
+            Vector2 next = ClampWithWanderer(waypointQueue.Peek());
+            if (!IsWaypointWalkable(next))
+            {
+                ForceReplan();
+                return false;
+            }
+
+            waypointQueue.Dequeue();
+            BeginStep(next);
+            return true;
         }
 
         /// <summary>
