@@ -35,7 +35,13 @@ namespace NPC
         /// </summary>
         protected float nextAttackTimestamp;
 
-        private static readonly string[] DefaultObstructionLayers = { "Obstacles", "Obstacle", "Physical Objects" };
+        private static readonly string[] DefaultObstructionLayers =
+        {
+            "Obstacles",
+            "Obstacle",
+            "Physical Objects",
+            LineOfSightUtility.AntiMeleeObstacleLayerName
+        };
 
         [Header("Line of Sight")]
         [SerializeField, Tooltip("Layers treated as solid when determining whether attacks can reach a target.")]
@@ -641,6 +647,7 @@ namespace NPC
 
             Vector2 origin = transform.position;
             Vector2 destination = targetTransform.position;
+            DamageType attackType = DetermineActiveDamageType();
 
             return LineOfSightUtility.HasLineOfSight(
                 origin,
@@ -648,10 +655,28 @@ namespace NPC
                 obstructionMask,
                 transform,
                 targetTransform,
-                collider => ShouldIgnoreCollider(collider, target));
+                collider => ShouldIgnoreCollider(collider, target, attackType));
         }
 
-        private bool ShouldIgnoreCollider(Collider2D collider, CombatTarget target)
+        /// <summary>
+        /// Resolves the damage type the NPC will use for its current attack cycle.
+        /// Default behaviour inspects the combat profile but can be overridden for
+        /// special-case bosses with dynamic styles.
+        /// </summary>
+        protected virtual DamageType DetermineActiveDamageType()
+        {
+            if (combatant == null)
+                return DamageType.Melee;
+
+            var profile = combatant.Profile;
+            if (profile != null)
+                return profile.AttackType;
+
+            var stats = combatant.GetCombatantStats();
+            return stats != null ? stats.DamageType : DamageType.Melee;
+        }
+
+        private bool ShouldIgnoreCollider(Collider2D collider, CombatTarget target, DamageType attackType)
         {
             if (collider == null)
                 return false;
@@ -659,6 +684,9 @@ namespace NPC
             var hitTransform = collider.transform;
             if (hitTransform == null)
                 return false;
+
+            if (LineOfSightUtility.IsAntiMeleeObstacle(collider))
+                return attackType != DamageType.Melee;
 
             // Ignore this NPC's own colliders and those belonging to the intended target.
             if (combatant != null && hitTransform.GetComponentInParent<NpcCombatant>() == combatant)

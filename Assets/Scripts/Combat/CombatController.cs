@@ -91,7 +91,13 @@ namespace Combat
         private float hitsplatFallbackOffset = 1.1f;
 
         [Header("Line of Sight")]
-        private static readonly string[] DefaultObstructionLayers = { "Obstacles", "Obstacle", "Physical Objects" };
+        private static readonly string[] DefaultObstructionLayers =
+        {
+            "Obstacles",
+            "Obstacle",
+            "Physical Objects",
+            LineOfSightUtility.AntiMeleeObstacleLayerName
+        };
 
         [SerializeField, Tooltip("Layers considered solid when checking whether swings or spells have a clear path to the target.")]
         private LayerMask obstructionMask;
@@ -522,8 +528,34 @@ namespace Combat
 
             Vector2 origin = transform.position;
             Vector2 destination = targetTransform.position;
+            DamageType attackType = DetermineActiveDamageType();
 
-            return LineOfSightUtility.HasLineOfSight(origin, destination, obstructionMask, transform, targetTransform);
+            return LineOfSightUtility.HasLineOfSight(
+                origin,
+                destination,
+                obstructionMask,
+                transform,
+                targetTransform,
+                collider => ShouldIgnoreLineOfSightCollider(collider, attackType));
+        }
+
+        /// <summary>
+        /// Determines whether the supplied collider should be ignored for the current
+        /// attack when resolving line-of-sight. Anti-melee obstacles only block melee
+        /// swings while allowing ranged and magic projectiles to pass through.
+        /// </summary>
+        /// <param name="collider">Collider hit by the visibility raycast.</param>
+        /// <param name="attackType">Damage type for the pending attack.</param>
+        /// <returns>True when the collider should be skipped.</returns>
+        protected virtual bool ShouldIgnoreLineOfSightCollider(Collider2D collider, DamageType attackType)
+        {
+            if (collider == null)
+                return false;
+
+            if (attackType != DamageType.Melee && LineOfSightUtility.IsAntiMeleeObstacle(collider))
+                return true;
+
+            return false;
         }
 
         protected virtual void ResolveAttack(CombatTarget target)
