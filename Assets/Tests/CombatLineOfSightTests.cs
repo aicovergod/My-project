@@ -1,3 +1,8 @@
+// These integration-style tests rely on Unity's play mode test runner. They are wrapped
+// in UNITY_INCLUDE_TESTS so the file is excluded from player builds where the test
+// assemblies are not available, preventing compile errors from missing UnityTest
+// attributes when the Test Runner package is stripped.
+#if UNITY_INCLUDE_TESTS
 using System.Collections;
 using System.Reflection;
 using Combat;
@@ -220,3 +225,4 @@ public class CombatLineOfSightTests
         Object.DestroyImmediate(spawner);
     }
 }
+#endif
