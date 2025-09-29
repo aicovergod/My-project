@@ -37,6 +37,14 @@ namespace NPC
         [Tooltip("Component handling sprite animation/animator updates.")]
         public NpcSpriteAnimator spriteAnimator;
 
+        private static readonly Vector2Int[] FourWayOffsets =
+        {
+            new Vector2Int(1, 0),
+            new Vector2Int(-1, 0),
+            new Vector2Int(0, 1),
+            new Vector2Int(0, -1)
+        };
+
         private Rigidbody2D _rb;
         private Vector2 _origin;
         private bool _originInitialized;
@@ -158,6 +166,7 @@ namespace NPC
                 float y = Random.Range(minOffset.y, maxOffset.y);
                 _target = _origin + new Vector2(x, y);
             }
+            _target = ClampToMovementBounds(_target);
             _waiting = false;
         }
 
@@ -186,7 +195,7 @@ namespace NPC
         public void ForceReturnToOrigin()
         {
             CancelKnockback();
-            _target = _origin;
+            _target = ClampToMovementBounds(_origin);
             _waiting = false;
         }
 
@@ -437,6 +446,7 @@ namespace NPC
                     {
                         Vector2 direction = (targetPos - _from).normalized;
                         Vector2 desired = targetPos - direction * desiredRange;
+                        desired = ClampToMovementBounds(desired);
                         Vector2 step = Vector2.MoveTowards(_from, desired, moveSpeed * delta);
                         _to = ClampToMovementBounds(step);
                     }
@@ -528,7 +538,9 @@ namespace NPC
         /// <summary>
         /// Clamps the provided world position to the wanderer's configured movement bounds so the
         /// NPC never leaves its permitted patrol area, even when external systems (such as
-        /// knockback) attempt to move it beyond the limits.
+        /// knockback) attempt to move it beyond the limits. When a navigation grid is available the
+        /// result is additionally snapped to the nearest walkable nav-cell so the wanderer honours
+        /// baked blockers and does not drift into invalid tiles.
         /// </summary>
         /// <param name="worldPosition">Target position in world space.</param>
         /// <returns>The clamped world position respecting the configured bounds.</returns>
@@ -540,7 +552,68 @@ namespace NPC
 
             float clampedX = Mathf.Clamp(worldPosition.x, minX, maxX);
             float clampedY = Mathf.Clamp(worldPosition.y, minY, maxY);
-            return new Vector2(clampedX, clampedY);
+            Vector2 clamped = new Vector2(clampedX, clampedY);
+
+            NavGridBuilder grid = PathfindingService.Instance?.ActiveGrid;
+            if (grid == null || !grid.HasGrid)
+            {
+                return clamped;
+            }
+
+            Vector2Int cell;
+            if (!grid.TryGetCell(clamped, out cell))
+            {
+                cell = grid.WorldToCellClamped(clamped);
+            }
+
+            if (!grid.IsCellWithinBounds(cell))
+            {
+                return clamped;
+            }
+
+            Vector2 cellCenter = grid.GetCellCenter(cell);
+            if (grid.IsCellWalkable(cell) && IsWithinBounds(cellCenter, minX, maxX, minY, maxY))
+            {
+                return cellCenter;
+            }
+
+            Queue<Vector2Int> frontier = new Queue<Vector2Int>();
+            HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
+            frontier.Enqueue(cell);
+            visited.Add(cell);
+
+            while (frontier.Count > 0)
+            {
+                Vector2Int current = frontier.Dequeue();
+                for (int i = 0; i < FourWayOffsets.Length; i++)
+                {
+                    Vector2Int neighbour = current + FourWayOffsets[i];
+                    if (!grid.IsCellWithinBounds(neighbour) || !visited.Add(neighbour))
+                    {
+                        continue;
+                    }
+
+                    Vector2 neighbourCenter = grid.GetCellCenter(neighbour);
+                    if (!IsWithinBounds(neighbourCenter, minX, maxX, minY, maxY))
+                    {
+                        continue;
+                    }
+
+                    if (grid.IsCellWalkable(neighbour))
+                    {
+                        return neighbourCenter;
+                    }
+
+                    frontier.Enqueue(neighbour);
+                }
+            }
+
+            return clamped;
+        }
+
+        private static bool IsWithinBounds(Vector2 position, float minX, float maxX, float minY, float maxY)
+        {
+            return position.x >= minX && position.x <= maxX && position.y >= minY && position.y <= maxY;
         }
 
         /// <summary>
