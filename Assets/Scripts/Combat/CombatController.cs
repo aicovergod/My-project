@@ -90,6 +90,10 @@ namespace Combat
         [SerializeField, Tooltip("Vertical offset used when no dedicated floating text anchor is found.")]
         private float hitsplatFallbackOffset = 1.1f;
 
+        [Header("Line of Sight")]
+        [SerializeField, Tooltip("Layers considered solid when checking whether swings or spells have a clear path to the target.")]
+        private LayerMask obstructionMask = LayerMask.GetMask("Obstacles", "Physical Objects");
+
         private Sprite damageHitsplat;
         private Sprite zeroHitsplat;
         private Sprite maxHitHitsplat;
@@ -138,6 +142,11 @@ namespace Combat
                 return false;
             if (Vector2.Distance(transform.position, target.transform.position) > GetCurrentAttackRange())
                 return false;
+            if (!HasLineOfSight(target.transform))
+            {
+                nextAttackTime = Mathf.Max(nextAttackTime, Time.time + CombatMath.TICK_SECONDS);
+                return false;
+            }
             if (Time.time < nextAttackTime && attackRoutine == null)
                 return false;
             if (attackRoutine != null)
@@ -333,6 +342,11 @@ namespace Combat
             {
                 if (Vector2.Distance(transform.position, target.transform.position) > GetCurrentAttackRange())
                     break;
+                if (!HasLineOfSight(target.transform))
+                {
+                    yield return new WaitForSeconds(CombatMath.TICK_SECONDS * 0.25f);
+                    continue;
+                }
                 mover?.FaceTarget(target.transform);
                 OnAttackStart?.Invoke();
                 ResolveAttack(target);
@@ -481,7 +495,18 @@ namespace Combat
             return finalDamage;
         }
 
-        private void ResolveAttack(CombatTarget target)
+        protected virtual bool HasLineOfSight(Transform targetTransform)
+        {
+            if (targetTransform == null)
+                return false;
+
+            Vector2 origin = transform.position;
+            Vector2 destination = targetTransform.position;
+
+            return LineOfSightUtility.HasLineOfSight(origin, destination, obstructionMask, transform, targetTransform);
+        }
+
+        protected virtual void ResolveAttack(CombatTarget target)
         {
             CombatantStats attacker;
             if (combatBinder != null)
