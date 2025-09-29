@@ -35,6 +35,10 @@ namespace NPC
         /// </summary>
         protected float nextAttackTimestamp;
 
+        [Header("Line of Sight")]
+        [SerializeField, Tooltip("Layers treated as solid when determining whether attacks can reach a target.")]
+        protected LayerMask obstructionMask = LayerMask.GetMask("Obstacles", "Physical Objects");
+
         private bool inCombat;
         public bool InCombat => inCombat;
         public event System.Action<bool> OnCombatStateChanged;
@@ -459,6 +463,12 @@ namespace NPC
                     if (lostTargetDuringCooldown)
                         break;
 
+                    if (!HasLineOfSight(target, targetTransform))
+                    {
+                        yield return new WaitForSeconds(CombatMath.TICK_SECONDS * 0.25f);
+                        continue;
+                    }
+
                     ResolveAttack(target);
 
                     // Advance the shared timestamp so every active target respects the NPC's
@@ -603,6 +613,61 @@ namespace NPC
 
             if (keyToRemove != null)
                 dictionary.Remove(keyToRemove);
+        }
+
+        protected virtual bool HasLineOfSight(CombatTarget target, Transform targetTransform)
+        {
+            if (targetTransform == null)
+                return false;
+
+            Vector2 origin = transform.position;
+            Vector2 destination = targetTransform.position;
+
+            return LineOfSightUtility.HasLineOfSight(
+                origin,
+                destination,
+                obstructionMask,
+                transform,
+                targetTransform,
+                collider => ShouldIgnoreCollider(collider, target));
+        }
+
+        private bool ShouldIgnoreCollider(Collider2D collider, CombatTarget target)
+        {
+            if (collider == null)
+                return false;
+
+            var hitTransform = collider.transform;
+            if (hitTransform == null)
+                return false;
+
+            // Ignore this NPC's own colliders and those belonging to the intended target.
+            if (combatant != null && hitTransform.GetComponentInParent<NpcCombatant>() == combatant)
+                return true;
+
+            if (target != null)
+            {
+                var targetCombatant = hitTransform.GetComponentInParent<CombatTarget>();
+                if (ReferenceEquals(targetCombatant, target))
+                    return true;
+            }
+
+            // Allow pets and friendly NPCs to stand between combatants without blocking attacks.
+            var pet = hitTransform.GetComponentInParent<PetCombatController>();
+            if (pet != null)
+                return true;
+
+            if (combatant != null)
+            {
+                var otherNpc = hitTransform.GetComponentInParent<NpcCombatant>();
+                if (otherNpc != null && otherNpc != combatant)
+                {
+                    if (!combatant.IsEnemy(otherNpc.Faction))
+                        return true;
+                }
+            }
+
+            return false;
         }
 
         protected virtual void ResolveAttack(CombatTarget target)
