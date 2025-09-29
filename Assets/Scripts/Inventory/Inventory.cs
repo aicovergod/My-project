@@ -677,6 +677,7 @@ namespace Inventory
                 : defaultFont;
             tooltipDescriptionText.alignment = TextAnchor.UpperLeft;
             tooltipDescriptionText.color = tooltipDescriptionColor;
+            tooltipDescriptionText.supportRichText = true;
             tooltipDescriptionText.raycastTarget = false;
             tooltipDescriptionText.horizontalOverflow = HorizontalWrapMode.Wrap;
             tooltipDescriptionText.verticalOverflow = VerticalWrapMode.Overflow;
@@ -1310,7 +1311,12 @@ namespace Inventory
             // OSRS-style heal summary so the tooltip communicates how much health is
             // restored when consumed.
             if (item.healAmount > 0)
-                return $"Heals +{item.healAmount} hp";
+            {
+                // Unity's legacy Text component supports rich text colour tags. Highlight
+                // the heal amount in red so the restorative value stands out immediately
+                // when comparing food options inside the inventory tooltip.
+                return $"Heals <color=#FF0000>+{item.healAmount}</color> hp";
+            }
 
             return item.description;
         }
