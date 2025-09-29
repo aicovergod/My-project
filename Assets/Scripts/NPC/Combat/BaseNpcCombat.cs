@@ -35,9 +35,11 @@ namespace NPC
         /// </summary>
         protected float nextAttackTimestamp;
 
+        private static readonly string[] DefaultObstructionLayers = { "Obstacles", "Physical Objects" };
+
         [Header("Line of Sight")]
         [SerializeField, Tooltip("Layers treated as solid when determining whether attacks can reach a target.")]
-        protected LayerMask obstructionMask = LayerMask.GetMask("Obstacles", "Physical Objects");
+        protected LayerMask obstructionMask;
 
         private bool inCombat;
         public bool InCombat => inCombat;
@@ -53,12 +55,29 @@ namespace NPC
 
         protected virtual void Awake()
         {
+            EnsureObstructionMaskConfigured();
             combatant = GetComponent<NpcCombatant>();
             wanderer = GetComponent<NpcWanderer>();
             playerTarget = FindObjectOfType<PlayerCombatTarget>();
             spawnPosition = transform.position;
             npcFacing = GetComponent<NpcFacing>();
             nextAttackTimestamp = Time.time;
+        }
+
+        protected virtual void OnValidate()
+        {
+            EnsureObstructionMaskConfigured();
+        }
+
+        /// <summary>
+        /// Ensures the obstruction mask defaults to the expected obstacle layers when unset.
+        /// </summary>
+        private void EnsureObstructionMaskConfigured()
+        {
+            if (obstructionMask.value != 0)
+                return;
+
+            obstructionMask = LayerMask.GetMask(DefaultObstructionLayers);
         }
 
         public virtual void ResetCombatState(bool resetSpawnPosition = false)
