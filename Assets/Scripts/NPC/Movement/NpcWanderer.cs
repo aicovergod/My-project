@@ -39,6 +39,7 @@ namespace NPC
 
         private Rigidbody2D _rb;
         private Vector2 _origin;
+        private bool _originInitialized;
         private Vector2 _target;
         private bool _waiting;
         private float _waitTimer;
@@ -103,6 +104,7 @@ namespace NPC
         private void Start()
         {
             _origin = _rb != null ? _rb.position : (Vector2)transform.position;
+            _originInitialized = true;
             _lastPos = _origin;
             _from = _to = _origin;
             _lerpTime = Ticker.TickDuration;
@@ -116,6 +118,7 @@ namespace NPC
         {
             CancelKnockback();
             _origin = origin;
+            _originInitialized = true;
             _lastPos = origin;
             _from = _to = origin;
             chaseRadius = ComputeChaseRadius();
@@ -399,27 +402,7 @@ namespace NPC
                         Vector2 direction = (targetPos - _from).normalized;
                         Vector2 desired = targetPos - direction * desiredRange;
                         Vector2 step = Vector2.MoveTowards(_from, desired, moveSpeed * delta);
-                        if (useAreaSize)
-                        {
-                            Vector2 half = areaSize * 0.5f;
-                            float minX = _origin.x - half.x;
-                            float maxX = _origin.x + half.x;
-                            float minY = _origin.y - half.y;
-                            float maxY = _origin.y + half.y;
-                            _to = new Vector2(
-                                Mathf.Clamp(step.x, minX, maxX),
-                                Mathf.Clamp(step.y, minY, maxY));
-                        }
-                        else
-                        {
-                            float minX = _origin.x + minOffset.x;
-                            float maxX = _origin.x + maxOffset.x;
-                            float minY = _origin.y + minOffset.y;
-                            float maxY = _origin.y + maxOffset.y;
-                            _to = new Vector2(
-                                Mathf.Clamp(step.x, minX, maxX),
-                                Mathf.Clamp(step.y, minY, maxY));
-                        }
+                        _to = ClampToMovementBounds(step);
                     }
                     else
                     {
@@ -442,6 +425,7 @@ namespace NPC
 
             _from = _rb != null ? _rb.position : (Vector2)transform.position;
             _to = Vector2.MoveTowards(_from, _target, moveSpeed * delta);
+            _to = ClampToMovementBounds(_to);
             _lerpTime = 0f;
 
             if (Vector2.Distance(_to, _target) <= arriveDistance)
@@ -496,12 +480,59 @@ namespace NPC
             _lerpTime += Time.deltaTime;
             float t = Mathf.Clamp01(_lerpTime / Ticker.TickDuration);
             Vector2 pos = Vector2.Lerp(_from, _to, t);
+            pos = ClampToMovementBounds(pos);
             if (_rb != null) _rb.MovePosition(pos);
             else transform.position = pos;
 
             Vector2 velocity = (pos - _lastPos) / Mathf.Max(Time.deltaTime, 0.0001f);
             spriteAnimator?.UpdateVisuals(velocity);
             _lastPos = pos;
+        }
+
+        /// <summary>
+        /// Clamps the provided world position to the wanderer's configured movement bounds so the
+        /// NPC never leaves its permitted patrol area, even when external systems (such as
+        /// knockback) attempt to move it beyond the limits.
+        /// </summary>
+        /// <param name="worldPosition">Target position in world space.</param>
+        /// <returns>The clamped world position respecting the configured bounds.</returns>
+        public Vector2 ClampToMovementBounds(Vector2 worldPosition)
+        {
+            Vector2 origin = _originInitialized ? _origin : (_rb != null ? _rb.position : (Vector2)transform.position);
+
+            ResolveMovementBounds(origin, out float minX, out float maxX, out float minY, out float maxY);
+
+            float clampedX = Mathf.Clamp(worldPosition.x, minX, maxX);
+            float clampedY = Mathf.Clamp(worldPosition.y, minY, maxY);
+            return new Vector2(clampedX, clampedY);
+        }
+
+        /// <summary>
+        /// Calculates the minimum and maximum world-space bounds the wanderer is allowed to move
+        /// within based on the configured offset or area settings.
+        /// </summary>
+        private void ResolveMovementBounds(Vector2 origin, out float minX, out float maxX, out float minY, out float maxY)
+        {
+            if (useAreaSize)
+            {
+                Vector2 absArea = new Vector2(Mathf.Abs(areaSize.x), Mathf.Abs(areaSize.y));
+                Vector2 half = absArea * 0.5f;
+                minX = origin.x - half.x;
+                maxX = origin.x + half.x;
+                minY = origin.y - half.y;
+                maxY = origin.y + half.y;
+                return;
+            }
+
+            float offsetMinX = Mathf.Min(minOffset.x, maxOffset.x);
+            float offsetMaxX = Mathf.Max(minOffset.x, maxOffset.x);
+            float offsetMinY = Mathf.Min(minOffset.y, maxOffset.y);
+            float offsetMaxY = Mathf.Max(minOffset.y, maxOffset.y);
+
+            minX = origin.x + offsetMinX;
+            maxX = origin.x + offsetMaxX;
+            minY = origin.y + offsetMinY;
+            maxY = origin.y + offsetMaxY;
         }
 
 #if UNITY_EDITOR
