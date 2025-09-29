@@ -35,7 +35,7 @@ namespace NPC
         [SerializeField] private LayerMask blockingLayers = 0;
 
         [Tooltip("Optional tags that should mark colliders as blocking even when they sit outside the layer mask.")]
-        [SerializeField] private List<string> blockingTags = new List<string> { "Obstacle", "Blocking", "Wall" };
+        [SerializeField] private List<string> blockingTags = new List<string>();
 
         [Tooltip("Treat trigger colliders as solid when building the grid.")]
         [SerializeField] private bool includeTriggerColliders;
@@ -61,6 +61,8 @@ namespace NPC
 
         [Tooltip("Elevates gizmos slightly so they do not z-fight with sprites in the scene.")]
         [SerializeField] private float gizmoHeightOffset = 0.05f;
+
+        private static readonly HashSet<string> reportedMissingTags = new HashSet<string>();
 
         private bool[,] walkableGrid;
         private Vector2Int gridSize;
@@ -142,6 +144,10 @@ namespace NPC
             areaSize.x = Mathf.Max(tileSize, Mathf.Abs(areaSize.x));
             areaSize.y = Mathf.Max(tileSize, Mathf.Abs(areaSize.y));
             samplingPadding = Mathf.Clamp(samplingPadding, 0.1f, 1.2f);
+            if (blockingTags != null)
+            {
+                blockingTags.RemoveAll(string.IsNullOrWhiteSpace);
+            }
             gridDirty = true;
 
             if (!Application.isPlaying && autoBuildOnEnable)
@@ -410,7 +416,12 @@ namespace NPC
                 for (int i = 0; i < blockingTags.Count; i++)
                 {
                     string tag = blockingTags[i];
-                    if (!string.IsNullOrEmpty(tag) && obj.CompareTag(tag))
+                    if (string.IsNullOrWhiteSpace(tag))
+                    {
+                        continue;
+                    }
+
+                    if (DoesObjectMatchTag(obj, tag))
                     {
                         return true;
                     }
@@ -418,6 +429,29 @@ namespace NPC
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Safely compares an object's tag while tolerating undefined tags in the Tag Manager.
+        /// When a tag is missing we ignore it and emit a single warning so designers know to add it back if required.
+        /// </summary>
+        private bool DoesObjectMatchTag(GameObject obj, string tag)
+        {
+            try
+            {
+                return obj.CompareTag(tag);
+            }
+            catch (UnityException)
+            {
+                if (reportedMissingTags.Add(tag))
+                {
+#if UNITY_EDITOR
+                    Debug.LogWarning($"NavGridBuilder blocking tag \"{tag}\" is not defined in the Tag Manager and will be ignored.", this);
+#endif
+                }
+
+                return false;
+            }
         }
 
 #if UNITY_EDITOR
