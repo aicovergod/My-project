@@ -39,11 +39,24 @@ namespace NPC
         {
             if (target == null)
                 return;
+
             Vector2 diff = target.position - transform.position;
-            if (Mathf.Abs(diff.x) > Mathf.Abs(diff.y))
-                FacingDirection = diff.x < 0f ? 1 : 2;
+            FaceDirection(diff);
+        }
+
+        /// <summary>
+        /// Faces the supplied direction vector, updating any linked sprite animator or renderer.
+        /// </summary>
+        /// <param name="direction">Direction the NPC should face.</param>
+        public void FaceDirection(Vector2 direction)
+        {
+            if (direction.sqrMagnitude <= Mathf.Epsilon)
+                return;
+
+            if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+                FacingDirection = direction.x < 0f ? 1 : 2;
             else
-                FacingDirection = diff.y < 0f ? 0 : 3;
+                FacingDirection = direction.y < 0f ? 0 : 3;
 
             if (spriteAnimator != null)
                 spriteAnimator.SetFacing(FacingDirection);
