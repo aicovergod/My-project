@@ -34,6 +34,8 @@ namespace NPC
         private bool logDamage = false;
         [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
         private HitSplatLibrary hitSplatLibrary;
+        [SerializeField, Tooltip("Optional knockback receiver for handling physical impulses when the NPC takes damage.")]
+        private NpcKnockbackReceiver knockbackReceiver;
 
         [SerializeField, Tooltip("Vertical offset applied when no floating text anchor is present.")]
         private float hitsplatFallbackOffset = 1f;
@@ -116,6 +118,8 @@ namespace NPC
             collider2D = GetComponent<Collider2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
             wanderer = GetComponent<NpcWanderer>();
+            if (knockbackReceiver == null)
+                knockbackReceiver = GetComponent<NpcKnockbackReceiver>();
             flashEffect = GetComponent<NpcFlashEffect>();
             if (flashEffect == null && spriteRenderer != null)
             {
@@ -202,12 +206,15 @@ namespace NPC
             var combat = GetComponent<BaseNpcCombat>();
             var combatSource = source as CombatTarget;
             bool creditedToPlayer = false;
+            Transform knockbackSource = null;
             if (combatSource != null)
             {
                 if (combatSource is PlayerCombatTarget)
                 {
                     playerDamage += damageToApply;
                     creditedToPlayer = true;
+                    if (combatSource is Component component)
+                        knockbackSource = component.transform;
                 }
                 else if (combatSource is PetCombatController pet)
                 {
@@ -216,6 +223,7 @@ namespace NPC
                     {
                         playerDamage += damageToApply;
                         creditedToPlayer = true;
+                        knockbackSource = pet.transform;
                     }
                     else
                     {
@@ -226,6 +234,10 @@ namespace NPC
                 {
                     npcDamage += damageToApply;
                 }
+
+                if (damageToApply > 0 && knockbackSource != null)
+                    knockbackReceiver?.ApplyKnockbackFrom(knockbackSource, damageToApply);
+
                 combat?.AddThreat(combatSource, damageToApply);
                 combat?.RecordDamageFrom(combatSource);
                 if (combat != null && !combat.InCombat)
@@ -234,7 +246,7 @@ namespace NPC
                     float radius = wanderer != null ? wanderer.AggroRadius : 5f;
                     if (dist > radius)
                         combat.ReengageFromRetreat(combatSource);
-                    }
+                }
                 combat?.BeginAttacking(combatSource);
             }
             else
@@ -296,6 +308,7 @@ namespace NPC
             if (spriteRenderer) spriteRenderer.enabled = true;
             if (wanderer != null) wanderer.enabled = true;
             var combat = GetComponent<BaseNpcCombat>();
+            knockbackReceiver?.CancelKnockback();
             Vector2 spawn = combat != null ? combat.SpawnPosition : (Vector2)transform.position;
             transform.position = spawn;
             wanderer?.SetOrigin(spawn);
@@ -313,6 +326,7 @@ namespace NPC
         /// <see cref="LogDamage"/> is enabled.</param>
         public void ClearDamageContributors(string reason = null)
         {
+            knockbackReceiver?.CancelKnockback();
             ResetDamageCounters();
             if (logDamage)
             {

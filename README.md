@@ -72,3 +72,7 @@ This project currently targets **Unity 6000.2.3f1**.
 3. Run existing tests through the Unity Test Runner before submitting.
 4. Open a pull request with a clear description of your changes.
 
+## NPC Setup Notes
+- Add `NpcKnockbackReceiver` alongside `NpcWanderer` on light NPC prefabs to enable damage-driven knockback. The receiver defaults to easing the displacement over a short duration while clamping to wander bounds so goblins stay near their spawn tile.
+- Heavy or raid-class NPCs can omit the receiver (or disable the `enableKnockback` toggle) to stay rooted. Leaving the component absent on `NPC_GOBLIN_WARCHIEF` keeps the boss-style goblin stationary.
+- Designers can tune knockback by adjusting the base distance, duration, and damage scaling curve directly on the component. The wanderer now exposes `ApplyKnockback`/`CancelKnockback` helpers should scripted events need to fire custom impulses.

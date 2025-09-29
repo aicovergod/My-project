@@ -52,6 +52,15 @@ namespace NPC
         private float _lerpTime;
         private bool _frozen;
 
+        // Knockback state
+        private bool _knockbackActive;
+        private float _knockbackTimer;
+        private float _knockbackDuration;
+        private Vector2 _knockbackStart;
+        private Vector2 _knockbackEnd;
+        private AnimationCurve _knockbackCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+        private bool _knockbackClamp;
+
         // Ticker subscription management
         private Coroutine _tickerSubscriptionRoutine;
         private bool _tickerSubscribed;
@@ -105,6 +114,7 @@ namespace NPC
 
         public void SetOrigin(Vector2 origin)
         {
+            CancelKnockback();
             _origin = origin;
             _lastPos = origin;
             _from = _to = origin;
@@ -118,11 +128,13 @@ namespace NPC
 
         private void OnDisable()
         {
+            CancelKnockback();
             ReleaseTickerSubscription();
         }
 
         private void BeginIdle()
         {
+            CancelKnockback();
             _waiting = true;
             _waitTimer = Random.Range(minIdleTime, maxIdleTime);
             spriteAnimator?.UpdateVisuals(Vector2.zero);
@@ -148,6 +160,7 @@ namespace NPC
 
         public void EnterCombat(Transform target)
         {
+            CancelKnockback();
             if (!_combatTargets.Contains(target))
                 _combatTargets.Add(target);
             _target = _rb != null ? _rb.position : (Vector2)transform.position;
@@ -169,8 +182,64 @@ namespace NPC
 
         public void ForceReturnToOrigin()
         {
+            CancelKnockback();
             _target = _origin;
             _waiting = false;
+        }
+
+        /// <summary>
+        /// Applies a knockback impulse handled by this wanderer. The NPC will interpolate
+        /// between the current position and the resolved destination using the supplied curve.
+        /// </summary>
+        public void ApplyKnockback(Vector2 direction, float distance, float duration, bool clamp, AnimationCurve curve)
+        {
+            if (direction.sqrMagnitude <= Mathf.Epsilon || distance <= 0f)
+                return;
+
+            Vector2 current = _rb != null ? _rb.position : (Vector2)transform.position;
+            CancelKnockback();
+
+            Vector2 normalisedDirection = direction.normalized;
+            Vector2 destination = current + normalisedDirection * distance;
+            if (clamp)
+                destination = ClampToMovementBounds(destination);
+
+            if (Vector2.Distance(current, destination) <= Mathf.Epsilon)
+                return;
+
+            _knockbackStart = current;
+            _knockbackEnd = destination;
+            _knockbackDuration = Mathf.Max(0.01f, duration);
+            _knockbackTimer = 0f;
+            _knockbackCurve = curve != null && curve.length > 0 ? curve : AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+            _knockbackClamp = clamp;
+            _knockbackActive = true;
+            _waiting = false;
+            _from = current;
+            _to = current;
+            _lerpTime = Ticker.TickDuration;
+        }
+
+        /// <summary>
+        /// Aborts any active knockback motion and locks the NPC to its current position.
+        /// </summary>
+        public void CancelKnockback()
+        {
+            bool wasActive = _knockbackActive;
+            _knockbackActive = false;
+            _knockbackTimer = 0f;
+
+            if (!wasActive)
+                return;
+
+            Vector2 current = _rb != null ? _rb.position : (Vector2)transform.position;
+            _knockbackStart = current;
+            _knockbackEnd = current;
+            _from = current;
+            _to = current;
+            _lerpTime = Ticker.TickDuration;
+            _lastPos = current;
+            spriteAnimator?.UpdateVisuals(Vector2.zero);
         }
 
         /// <summary>True when a freeze effect is preventing the NPC from moving.</summary>
@@ -285,6 +354,12 @@ namespace NPC
             float delta = Ticker.TickDuration;
             const float DISTANCE_EPSILON = 0.05f;
 
+            if (_knockbackActive)
+            {
+                _lerpTime = Ticker.TickDuration;
+                return;
+            }
+
             if (_frozen)
             {
                 _from = _rb != null ? _rb.position : (Vector2)transform.position;
@@ -375,6 +450,32 @@ namespace NPC
 
         private void Update()
         {
+            if (_knockbackActive)
+            {
+                _knockbackTimer += Time.deltaTime;
+                float progress = _knockbackDuration > 0f ? Mathf.Clamp01(_knockbackTimer / _knockbackDuration) : 1f;
+                float eased = _knockbackCurve != null && _knockbackCurve.length > 0 ? _knockbackCurve.Evaluate(progress) : progress;
+                Vector2 target = Vector2.LerpUnclamped(_knockbackStart, _knockbackEnd, eased);
+                if (_knockbackClamp)
+                    target = ClampToMovementBounds(target);
+
+                if (_rb != null) _rb.MovePosition(target);
+                else transform.position = target;
+
+                Vector2 knockbackVelocity = (target - _lastPos) / Mathf.Max(Time.deltaTime, 0.0001f);
+                spriteAnimator?.UpdateVisuals(knockbackVelocity);
+                _lastPos = target;
+
+                if (_knockbackTimer >= _knockbackDuration)
+                {
+                    _knockbackActive = false;
+                    _from = target;
+                    _to = target;
+                    _lerpTime = Ticker.TickDuration;
+                }
+                return;
+            }
+
             if (_frozen)
             {
                 // Maintain the frozen position without reusing the interpolated movement variable name below.

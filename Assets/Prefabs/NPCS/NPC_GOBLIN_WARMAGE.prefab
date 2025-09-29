@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 4856330758820000550}
   - component: {fileID: 3665449629679586575}
   - component: {fileID: 8760582560412806108}
+  - component: {fileID: 686960219074157846}
   - component: {fileID: 6410839004971985729}
   m_Layer: 7
   m_Name: NPC_GOBLIN_WARMAGE
@@ -376,6 +377,49 @@ MonoBehaviour:
   burnPrefab: {fileID: 6111494187698877684, guid: 9e9effd4291159241bc8f42d478e4569, type: 3}
   dropHeight: 8
   meteorSpeed: 5
+--- !u!114 &686960219074157846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a6a9b1d4474b0f41b7f62e6a86fba13, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  enableKnockback: 1
+  baseDistance: 1.1
+  knockbackDuration: 0.32
+  scaleWithDamage: 1
+  distancePerDamagePoint: 0.035
+  maxScaledDistance: 2.2
+  clampToMovementBounds: 1
+  knockbackCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &6410839004971985729
 MonoBehaviour:
   m_ObjectHideFlags: 0
