@@ -41,6 +41,33 @@ namespace Pets
         private Coroutine attackRoutine;
         private float nextAttackTime;
 
+        /// <summary>
+        /// Tracks the most recent non-zero chase velocity so the sprite animator can
+        /// continue playing a directional idle when the pet is in melee range but
+        /// waiting for its cooldown to expire.
+        /// </summary>
+        private Vector2 lastNonZeroChaseVelocity;
+
+        /// <summary>
+        /// Flag indicating whether <see cref="lastNonZeroChaseVelocity"/> has been
+        /// populated. This prevents accidental use of the default zero vector before
+        /// the pet has actually moved.
+        /// </summary>
+        private bool hasLastNonZeroChaseVelocity;
+
+        /// <summary>
+        /// Cached target position from the previous frame so we can infer the
+        /// opponent's movement while the pet is idling in range.
+        /// </summary>
+        private Vector3 previousTargetPosition;
+
+        /// <summary>
+        /// Indicates whether <see cref="previousTargetPosition"/> currently stores a
+        /// valid reading. Reset whenever combat is cancelled so future engagements
+        /// start fresh.
+        /// </summary>
+        private bool hasPreviousTargetPosition;
+
         private Sprite damageHitsplat;
         private Sprite zeroHitsplat;
         private Sprite maxHitHitsplat;
@@ -104,29 +131,51 @@ namespace Pets
         private IEnumerator AttackRoutine()
         {
             follower.enabled = false;
+            hasLastNonZeroChaseVelocity = false;
+            hasPreviousTargetPosition = false;
             while (currentTarget != null && currentTarget.IsAlive)
             {
+                float deltaTime = Mathf.Max(Time.deltaTime, Mathf.Epsilon);
                 Vector3 pos = transform.position;
                 Vector3 targetPos = currentTarget.transform.position;
-                Vector3 newPos = Vector3.MoveTowards(pos, targetPos, moveSpeed * Time.deltaTime);
-                Vector2 velocity = (newPos - pos) / Time.deltaTime;
+                Vector3 targetDelta = Vector3.zero;
+                if (hasPreviousTargetPosition)
+                    targetDelta = targetPos - previousTargetPosition;
+                previousTargetPosition = targetPos;
+                hasPreviousTargetPosition = true;
+                Vector3 newPos = Vector3.MoveTowards(pos, targetPos, moveSpeed * deltaTime);
+                Vector2 velocity = (newPos - pos) / deltaTime;
+                bool hasChaseVelocity = velocity.sqrMagnitude > 0.0001f;
+                if (hasChaseVelocity)
+                {
+                    lastNonZeroChaseVelocity = velocity;
+                    hasLastNonZeroChaseVelocity = true;
+                }
+                Vector2 visualVelocity = velocity;
+                bool targetMovedWhileWaiting = targetDelta.sqrMagnitude > 0.0001f;
+                Vector2 targetMovementVelocity = targetMovedWhileWaiting ? (Vector2)(targetDelta / deltaTime) : Vector2.zero;
                 transform.position = newPos;
-
-                if (spriteAnimator != null)
-                    spriteAnimator.UpdateVisuals(velocity);
-                else if (spriteRenderer != null)
-                    spriteRenderer.flipX = velocity.x > 0f;
 
                 float dist = Vector2.Distance(transform.position, currentTarget.transform.position);
                 if (dist <= CombatMath.MELEE_RANGE)
                 {
                     if (Time.time < nextAttackTime)
                     {
+                        if (!hasChaseVelocity)
+                        {
+                            if (targetMovedWhileWaiting)
+                                visualVelocity = targetMovementVelocity;
+                            else if (hasLastNonZeroChaseVelocity)
+                                visualVelocity = lastNonZeroChaseVelocity;
+                        }
+
+                        ApplyVisualVelocity(visualVelocity);
                         // Continue chasing the target but hold attacks until the shared cooldown expires.
                         yield return null;
                         continue;
                     }
 
+                    ApplyVisualVelocity(visualVelocity);
                     ResolveAttack(currentTarget);
                     nextAttackTime = Time.time + definition.attackSpeedTicks * CombatMath.TICK_SECONDS;
                     int waitTicks = definition.attackSpeedTicks;
@@ -136,10 +185,12 @@ namespace Pets
                 }
                 else if (dist > CombatMath.MELEE_RANGE * 5f)
                 {
+                    ApplyVisualVelocity(visualVelocity);
                     break;
                 }
                 else
                 {
+                    ApplyVisualVelocity(visualVelocity);
                     yield return null;
                 }
             }
@@ -315,6 +366,11 @@ namespace Pets
 
             attackRoutine = null;
 
+            hasLastNonZeroChaseVelocity = false;
+            hasPreviousTargetPosition = false;
+            lastNonZeroChaseVelocity = Vector2.zero;
+            previousTargetPosition = Vector3.zero;
+
             if (spriteSwapRoutine != null)
             {
                 StopCoroutine(spriteSwapRoutine);
@@ -331,6 +387,19 @@ namespace Pets
 
             if (follower != null)
                 follower.enabled = true;
+        }
+
+        /// <summary>
+        /// Applies the supplied velocity to whichever sprite system the pet is using
+        /// so facing and animation continue to reflect the last movement direction.
+        /// </summary>
+        /// <param name="velocity">Velocity to forward to the animator/renderer.</param>
+        private void ApplyVisualVelocity(Vector2 velocity)
+        {
+            if (spriteAnimator != null)
+                spriteAnimator.UpdateVisuals(velocity);
+            else if (spriteRenderer != null)
+                spriteRenderer.flipX = velocity.x > 0f;
         }
     }
 }
