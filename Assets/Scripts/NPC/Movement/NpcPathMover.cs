@@ -17,7 +17,7 @@ namespace NPC
         [Tooltip("Seconds spent traversing a single tile. Defaults to the OSRS tick length for grid-accurate pacing.")]
         [SerializeField] private float tileTraverseDuration = Ticker.TickDuration;
 
-        [Tooltip("Distance considered ""close enough"" to consume a waypoint.")]
+        [Tooltip("Distance considered \"close enough\" to consume a waypoint.")]
         [SerializeField] private float waypointTolerance = 0.05f;
 
         [Tooltip("Desired stand-off distance from the destination. Updated by combat controllers when chasing targets.")]
