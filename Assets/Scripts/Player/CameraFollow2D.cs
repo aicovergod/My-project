@@ -4,8 +4,10 @@ using System;
 using System.Reflection;
 using BankSystem;
 using Core.Input;
+using Inventory;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Skills;
 using World;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -235,6 +237,14 @@ namespace Player
                 return;
 
             if (BankUI.Instance != null && BankUI.Instance.IsOpen)
+                return;
+
+            // Prevent camera zoom adjustments while developer menus are open so scrolling within
+            // those windows does not inadvertently modify the world view.
+            if (InventoryDebugMenu.Instance != null && InventoryDebugMenu.Instance.Visible)
+                return;
+
+            if (AdminF2Menu.IsVisible)
                 return;
 
             float scrollDelta = ReadZoomInput();

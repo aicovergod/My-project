@@ -34,6 +34,13 @@ namespace Skills
 
         public static AdminF2Menu Instance => instance;
 
+        /// <summary>
+        /// Indicates whether the Admin F2 debug menu is currently visible.
+        /// External systems can query this to disable gameplay input while the
+        /// menu overlays the screen.
+        /// </summary>
+        public static bool IsVisible => instance != null && instance.visible;
+
         private bool sceneGateSubscribed;
 
         private PlayerHitpoints hitpoints;
