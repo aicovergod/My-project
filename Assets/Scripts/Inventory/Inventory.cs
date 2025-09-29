@@ -677,6 +677,7 @@ namespace Inventory
                 : defaultFont;
             tooltipDescriptionText.alignment = TextAnchor.UpperLeft;
             tooltipDescriptionText.color = tooltipDescriptionColor;
+            tooltipDescriptionText.supportRichText = true;
             tooltipDescriptionText.raycastTarget = false;
             tooltipDescriptionText.horizontalOverflow = HorizontalWrapMode.Wrap;
             tooltipDescriptionText.verticalOverflow = VerticalWrapMode.Overflow;
@@ -1247,7 +1248,7 @@ namespace Inventory
 
             string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
             tooltipNameText.text = name;
-            tooltipDescriptionText.text = item.description;
+            tooltipDescriptionText.text = BuildTooltipDescription(item);
 
             var tooltipRect = tooltip.GetComponent<RectTransform>();
             LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
@@ -1270,7 +1271,7 @@ namespace Inventory
 
             string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
             tooltipNameText.text = name;
-            tooltipDescriptionText.text = item.description;
+            tooltipDescriptionText.text = BuildTooltipDescription(item);
 
             var tooltipRect = tooltip.GetComponent<RectTransform>();
             LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
@@ -1291,6 +1292,33 @@ namespace Inventory
         {
             if (tooltip != null)
                 tooltip.SetActive(false);
+        }
+
+        /// <summary>
+        /// Builds the tooltip body text for the provided item, overriding the default
+        /// description for consumables that restore hitpoints so players can see the
+        /// precise heal value at a glance.
+        /// </summary>
+        /// <param name="item">Item displayed in the tooltip.</param>
+        /// <returns>Formatted description string for the tooltip body.</returns>
+        private static string BuildTooltipDescription(ItemData item)
+        {
+            if (item == null)
+                return string.Empty;
+
+            // Cooked food and other consumables that heal the player expose their
+            // potency through ItemData.healAmount. Replace the flavour text with an
+            // OSRS-style heal summary so the tooltip communicates how much health is
+            // restored when consumed.
+            if (item.healAmount > 0)
+            {
+                // Unity's legacy Text component supports rich text colour tags. Highlight
+                // the heal amount in red so the restorative value stands out immediately
+                // when comparing food options inside the inventory tooltip.
+                return $"Heals <color=#FF0000>+{item.healAmount}</color> hp";
+            }
+
+            return item.description;
         }
 
         public void ShowDropMenu(int slotIndex, Vector2 position)
