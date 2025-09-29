@@ -191,7 +191,7 @@ namespace NPC
 
             if (!stepping && waypointQueue.Count > 0)
             {
-                Vector2 next = waypointQueue.Peek();
+                Vector2 next = ClampWithWanderer(waypointQueue.Peek());
                 if (!IsWaypointWalkable(next))
                 {
                     ForceReplan();
@@ -253,8 +253,9 @@ namespace NPC
             for (int i = 0; i < worldPath.Count; i++)
             {
                 Vector2 waypoint = worldPath[i];
-                waypointQueue.Enqueue(waypoint);
-                debugPath.Add(waypoint);
+                Vector2 clampedWaypoint = ClampWithWanderer(waypoint);
+                waypointQueue.Enqueue(clampedWaypoint);
+                debugPath.Add(clampedWaypoint);
             }
 
             if (enableDebugLogging)
@@ -277,8 +278,8 @@ namespace NPC
         private void BeginStep(Vector2 destination)
         {
             SuspendWanderer();
-            currentStepStart = GetCurrentPosition();
-            currentStepTarget = destination;
+            currentStepStart = ClampWithWanderer(GetCurrentPosition());
+            currentStepTarget = ClampWithWanderer(destination);
             stepTimer = 0f;
             stepping = true;
             lastProgressTimestamp = Time.time;
@@ -430,13 +431,15 @@ namespace NPC
         /// </summary>
         private void ApplyPosition(Vector2 position)
         {
+            Vector2 clampedPosition = ClampWithWanderer(position);
+
             if (body != null)
             {
-                body.MovePosition(position);
+                body.MovePosition(clampedPosition);
             }
             else
             {
-                transform.position = new Vector3(position.x, position.y, transform.position.z);
+                transform.position = new Vector3(clampedPosition.x, clampedPosition.y, transform.position.z);
             }
         }
 
@@ -446,6 +449,14 @@ namespace NPC
         private Vector2 GetCurrentPosition()
         {
             return body != null ? body.position : (Vector2)transform.position;
+        }
+
+        /// <summary>
+        /// Resolves the provided position against the owning wanderer's bounds when available.
+        /// </summary>
+        private Vector2 ClampWithWanderer(Vector2 position)
+        {
+            return wanderer != null ? wanderer.ClampToMovementBounds(position) : position;
         }
 
         /// <summary>
