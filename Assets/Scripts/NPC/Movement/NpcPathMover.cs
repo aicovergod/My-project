@@ -125,11 +125,11 @@ namespace NPC
             float duration = Mathf.Max(0.01f, tileTraverseDuration);
             float progress = Mathf.Clamp01(stepTimer / duration);
             Vector2 interpolated = Vector2.Lerp(currentStepStart, currentStepTarget, progress);
-            ApplyPosition(interpolated);
+            ApplyPosition(interpolated, snapToGrid: false);
 
             if (progress >= 1f - Mathf.Epsilon)
             {
-                ApplyPosition(currentStepTarget);
+                ApplyPosition(currentStepTarget, snapToGrid: true);
                 stepping = false;
                 lastProgressTimestamp = Time.time;
                 TryAdvanceToNextWaypoint();
@@ -462,9 +462,9 @@ namespace NPC
         /// <summary>
         /// Moves the NPC to the supplied position, using the rigidbody when available.
         /// </summary>
-        private void ApplyPosition(Vector2 position)
+        private void ApplyPosition(Vector2 position, bool snapToGrid)
         {
-            Vector2 clampedPosition = ClampWithWanderer(position);
+            Vector2 clampedPosition = ClampWithWanderer(position, snapToGrid);
 
             if (body == null)
             {
@@ -494,9 +494,14 @@ namespace NPC
         /// <summary>
         /// Resolves the provided position against the owning wanderer's bounds when available.
         /// </summary>
-        private Vector2 ClampWithWanderer(Vector2 position)
+        private Vector2 ClampWithWanderer(Vector2 position, bool snapToGrid = true)
         {
-            return wanderer != null ? wanderer.ClampToMovementBounds(position) : position;
+            if (wanderer == null)
+            {
+                return position;
+            }
+
+            return snapToGrid ? wanderer.ClampToMovementBounds(position) : wanderer.ClampToMovementBoundsNoSnap(position);
         }
 
         /// <summary>
