@@ -91,8 +91,10 @@ namespace Combat
         private float hitsplatFallbackOffset = 1.1f;
 
         [Header("Line of Sight")]
+        private static readonly string[] DefaultObstructionLayers = { "Obstacles", "Physical Objects" };
+
         [SerializeField, Tooltip("Layers considered solid when checking whether swings or spells have a clear path to the target.")]
-        private LayerMask obstructionMask = LayerMask.GetMask("Obstacles", "Physical Objects");
+        private LayerMask obstructionMask;
 
         private Sprite damageHitsplat;
         private Sprite zeroHitsplat;
@@ -102,6 +104,8 @@ namespace Combat
 
         private void Awake()
         {
+            EnsureObstructionMaskConfigured();
+
             // Grab required components from this object, falling back to parent/children so the
             // controller still works if supporting components live elsewhere in the hierarchy.
             skills = GetComponent<SkillManager>() ?? GetComponentInParent<SkillManager>() ?? GetComponentInChildren<SkillManager>();
@@ -131,6 +135,22 @@ namespace Combat
                 maxHitHitsplat = hitSplatLibrary.MaxHitHitsplat;
                 elementHitsplats = hitSplatLibrary.ElementHitsplats;
             }
+        }
+
+        private void OnValidate()
+        {
+            EnsureObstructionMaskConfigured();
+        }
+
+        /// <summary>
+        /// Ensures the obstruction mask contains the expected default layers when unset.
+        /// </summary>
+        private void EnsureObstructionMaskConfigured()
+        {
+            if (obstructionMask.value != 0)
+                return;
+
+            obstructionMask = LayerMask.GetMask(DefaultObstructionLayers);
         }
 
         /// <summary>
