@@ -524,15 +524,24 @@ namespace NPC
             }
 
             _lerpTime += Time.deltaTime;
-            float t = Mathf.Clamp01(_lerpTime / Ticker.TickDuration);
-            Vector2 pos = Vector2.Lerp(_from, _to, t);
-            pos = ClampToMovementBounds(pos);
-            if (_rb != null) _rb.MovePosition(pos);
-            else transform.position = pos;
+            float tickDuration = Ticker.TickDuration;
+            float t = Mathf.Clamp01(_lerpTime / tickDuration);
 
-            Vector2 velocity = (pos - _lastPos) / Mathf.Max(Time.deltaTime, 0.0001f);
+            // Interpolate between the previous tick position and the target.
+            Vector2 pos = Vector2.Lerp(_from, _to, t);
+
+            // Maintain smooth interpolation between tiles by clamping without navgrid snapping
+            // until the tick finishes. Once the tick completes we fall back to the snapping
+            // variant so the NPC respects both the patrol rectangle and walkable cells.
+            bool tickFinished = t >= 1f || _lerpTime >= tickDuration;
+            Vector2 clamped = tickFinished ? ClampToMovementBounds(pos) : ClampToMovementBoundsNoSnap(pos);
+
+            if (_rb != null) _rb.MovePosition(clamped);
+            else transform.position = clamped;
+
+            Vector2 velocity = (clamped - _lastPos) / Mathf.Max(Time.deltaTime, 0.0001f);
             spriteAnimator?.UpdateVisuals(velocity);
-            _lastPos = pos;
+            _lastPos = clamped;
         }
 
         /// <summary>
