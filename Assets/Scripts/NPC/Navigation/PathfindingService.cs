@@ -423,7 +423,6 @@ namespace NPC
             HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
             frontier.Enqueue(desired);
             visited.Add(desired);
-            bool encounteredStart = desired == start;
 
             while (frontier.Count > 0)
             {
@@ -440,24 +439,29 @@ namespace NPC
                         continue;
                     }
 
-                    if (neighbour == start)
+                    bool isStart = neighbour == start;
+                    bool isWalkable = grid.IsCellWalkable(neighbour);
+
+                    if (!isWalkable && !isStart)
+                    {
+                        // Skip blocked neighbours entirely so we only explore reachable space.
+                        continue;
+                    }
+
+                    if (isStart)
                     {
                         // Track that we brushed past the start cell but keep exploring in case another walkable target exists.
-                        encounteredStart = true;
                         frontier.Enqueue(neighbour);
                         continue;
                     }
 
-                    if (grid.IsCellWalkable(neighbour))
-                    {
-                        return neighbour;
-                    }
-
-                    frontier.Enqueue(neighbour);
+                    // Found the nearest reachable walkable neighbour.
+                    return neighbour;
                 }
             }
 
-            usedStartFallback = start != desired && encounteredStart;
+            // No valid neighbour could be resolved; fall back to the start cell and flag the dead-end.
+            usedStartFallback = start != desired;
             return start;
         }
 
