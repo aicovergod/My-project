@@ -47,9 +47,148 @@ namespace NPC
             }
         }
 
+        /// <summary>
+        /// Lightweight binary min-heap used to manage open set exploration order without repeatedly scanning lists.
+        /// Stores generic payloads that provide a comparable priority (f-cost in our case).
+        /// </summary>
+        private sealed class MinHeap<T>
+        {
+            private readonly List<T> elements = new List<T>();
+            private readonly IComparer<T> comparer;
+
+            public MinHeap()
+                : this(null)
+            {
+            }
+
+            public MinHeap(IComparer<T> customComparer)
+            {
+                comparer = customComparer ?? Comparer<T>.Default;
+            }
+
+            /// <summary>
+            /// Number of elements currently stored in the heap.
+            /// </summary>
+            public int Count => elements.Count;
+
+            /// <summary>
+            /// Removes all entries while keeping the allocated buffer for reuse.
+            /// </summary>
+            public void Clear()
+            {
+                elements.Clear();
+            }
+
+            /// <summary>
+            /// Inserts a new element and restores the heap invariant by bubbling it upward as needed.
+            /// </summary>
+            public void Insert(T value)
+            {
+                elements.Add(value);
+                HeapifyUp(elements.Count - 1);
+            }
+
+            /// <summary>
+            /// Extracts the smallest element. Returns false when the heap is empty so callers can gracefully abort.
+            /// </summary>
+            public bool TryExtractMin(out T value)
+            {
+                if (elements.Count == 0)
+                {
+                    value = default;
+                    return false;
+                }
+
+                value = elements[0];
+                int lastIndex = elements.Count - 1;
+                elements[0] = elements[lastIndex];
+                elements.RemoveAt(lastIndex);
+                if (elements.Count > 0)
+                {
+                    HeapifyDown(0);
+                }
+
+                return true;
+            }
+
+            private void HeapifyUp(int index)
+            {
+                while (index > 0)
+                {
+                    int parentIndex = (index - 1) / 2;
+                    if (comparer.Compare(elements[index], elements[parentIndex]) >= 0)
+                    {
+                        break;
+                    }
+
+                    (elements[index], elements[parentIndex]) = (elements[parentIndex], elements[index]);
+                    index = parentIndex;
+                }
+            }
+
+            private void HeapifyDown(int index)
+            {
+                while (true)
+                {
+                    int leftChild = index * 2 + 1;
+                    int rightChild = leftChild + 1;
+                    int smallest = index;
+
+                    if (leftChild < elements.Count && comparer.Compare(elements[leftChild], elements[smallest]) < 0)
+                    {
+                        smallest = leftChild;
+                    }
+
+                    if (rightChild < elements.Count && comparer.Compare(elements[rightChild], elements[smallest]) < 0)
+                    {
+                        smallest = rightChild;
+                    }
+
+                    if (smallest == index)
+                    {
+                        break;
+                    }
+
+                    (elements[index], elements[smallest]) = (elements[smallest], elements[index]);
+                    index = smallest;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Compact node descriptor pushed onto the heap so we can compare entries by f-cost while
+        /// still resolving the authoritative <see cref="NodeRecord"/> data from the dictionary when expanding nodes.
+        /// </summary>
+        private readonly struct NodeRecordWrapper : IComparable<NodeRecordWrapper>
+        {
+            public NodeRecordWrapper(Vector2Int node, float fCost, float hCost)
+            {
+                Node = node;
+                FCost = fCost;
+                HCost = hCost;
+            }
+
+            public Vector2Int Node { get; }
+
+            public float FCost { get; }
+
+            private float HCost { get; }
+
+            public int CompareTo(NodeRecordWrapper other)
+            {
+                int fComparison = FCost.CompareTo(other.FCost);
+                if (fComparison != 0)
+                {
+                    return fComparison;
+                }
+
+                return HCost.CompareTo(other.HCost);
+            }
+        }
+
         private sealed class AStarSearch
         {
-            public readonly List<Vector2Int> OpenSet = new List<Vector2Int>();
+            public readonly MinHeap<NodeRecordWrapper> OpenSet = new MinHeap<NodeRecordWrapper>();
             public readonly HashSet<Vector2Int> ClosedSet = new HashSet<Vector2Int>();
             public readonly Dictionary<Vector2Int, NodeRecord> Records = new Dictionary<Vector2Int, NodeRecord>();
             public Vector2Int Start;
@@ -65,6 +204,12 @@ namespace NPC
 
             public float FCost => GCost + HCost;
         }
+
+        /// <summary>
+        /// Tolerance used when comparing f-costs fetched from the heap against the authoritative node record.
+        /// Prevents floating point precision drift from flagging fresh entries as stale.
+        /// </summary>
+        private const float HeapCostEpsilon = 0.0001f;
 
         private static PathfindingService instance;
 
@@ -263,7 +408,8 @@ namespace NPC
                 return;
             }
 
-            for (int i = 0; i < maxNodesPerTick; i++)
+            int expandedThisTick = 0;
+            while (expandedThisTick < maxNodesPerTick)
             {
                 if (search.OpenSet.Count == 0)
                 {
@@ -273,7 +419,35 @@ namespace NPC
                     return;
                 }
 
-                Vector2Int current = PopLowestCostNode(search.OpenSet, search.Records);
+                if (!search.OpenSet.TryExtractMin(out var currentWrapper))
+                {
+                    CompleteRequest(activeRequest, PathStatus.GoalUnreachable, null);
+                    activeRequest = null;
+                    TryBeginNextRequest();
+                    return;
+                }
+
+                Vector2Int current = currentWrapper.Node;
+                if (!search.Records.TryGetValue(current, out var currentRecord))
+                {
+                    // The entry is stale (the node was removed from the record dictionary after a cheaper insertion).
+                    continue;
+                }
+
+                if (search.ClosedSet.Contains(current))
+                {
+                    // A better path already expanded this node; ignore the stale heap entry.
+                    continue;
+                }
+
+                if (currentWrapper.FCost > currentRecord.FCost + HeapCostEpsilon)
+                {
+                    // The wrapper references an older, more expensive cost. Skip until the cheapest version surfaces.
+                    continue;
+                }
+
+                expandedThisTick++;
+
                 if (current == search.Goal)
                 {
                     var pathCells = ReconstructPath(search, current);
@@ -286,7 +460,6 @@ namespace NPC
 
                 search.ClosedSet.Add(current);
 
-                var currentRecord = search.Records[current];
                 foreach (var neighbour in EnumerateNeighbours(current))
                 {
                     if (!grid.IsCellWithinBounds(neighbour))
@@ -313,10 +486,7 @@ namespace NPC
                         neighbourRecord.HasParent = true;
                         search.Records[neighbour] = neighbourRecord;
 
-                        if (!search.OpenSet.Contains(neighbour))
-                        {
-                            search.OpenSet.Add(neighbour);
-                        }
+                        search.OpenSet.Insert(new NodeRecordWrapper(neighbour, neighbourRecord.FCost, neighbourRecord.HCost));
                     }
                 }
             }
@@ -401,7 +571,7 @@ namespace NPC
                 HasParent = false
             };
             request.Search.Records[startCell] = startRecord;
-            request.Search.OpenSet.Add(startCell);
+            request.Search.OpenSet.Insert(new NodeRecordWrapper(startCell, startRecord.FCost, startRecord.HCost));
             request.Prepared = true;
             return true;
         }
@@ -520,33 +690,6 @@ namespace NPC
             }
 
             return path;
-        }
-
-        /// <summary>
-        /// Extracts the node with the lowest f-cost from the open set.
-        /// </summary>
-        private static Vector2Int PopLowestCostNode(List<Vector2Int> openSet, Dictionary<Vector2Int, NodeRecord> records)
-        {
-            int bestIndex = 0;
-            float bestCost = float.PositiveInfinity;
-            float bestHeuristic = float.PositiveInfinity;
-
-            for (int i = 0; i < openSet.Count; i++)
-            {
-                Vector2Int cell = openSet[i];
-                var record = records[cell];
-                float fCost = record.FCost;
-                if (fCost < bestCost || (Mathf.Approximately(fCost, bestCost) && record.HCost < bestHeuristic))
-                {
-                    bestCost = fCost;
-                    bestHeuristic = record.HCost;
-                    bestIndex = i;
-                }
-            }
-
-            Vector2Int result = openSet[bestIndex];
-            openSet.RemoveAt(bestIndex);
-            return result;
         }
 
         /// <summary>
