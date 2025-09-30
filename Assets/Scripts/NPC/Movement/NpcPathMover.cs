@@ -252,7 +252,7 @@ namespace NPC
         /// <summary>
         /// Consumes the outcome of a path request issued through <see cref="PathfindingService"/>.
         /// </summary>
-        internal void HandlePathResult(int requestId, PathfindingService.PathStatus status, List<Vector2> worldPath, Vector2 goalWorld)
+        internal void HandlePathResult(int requestId, PathfindingService.PathStatus status, List<Vector2> worldPath, Vector2 resolvedGoalWorld)
         {
             if (requestId != activeRequestId)
             {
@@ -261,7 +261,8 @@ namespace NPC
 
             awaitingPath = false;
             activeRequestId = -1;
-            desiredDestination = goalWorld;
+            desiredDestination = resolvedGoalWorld;
+            lastRequestedDestination = resolvedGoalWorld;
 
             if (status == PathfindingService.PathStatus.GoalUnreachable)
             {

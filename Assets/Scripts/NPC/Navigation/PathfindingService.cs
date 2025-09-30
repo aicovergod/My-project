@@ -31,6 +31,13 @@ namespace NPC
             public readonly Vector2 StartWorld;
             public readonly Vector2 GoalWorld;
 
+            /// <summary>
+            /// Resolved world position that the navigation grid determined was reachable.
+            /// Cached so the mover can align its destination with the actual walkable cell even if the
+            /// goal had to be clamped or redirected during preparation.
+            /// </summary>
+            public Vector2 ResolvedGoalWorld;
+
             public AStarSearch Search;
             public Vector2Int StartCell;
             public Vector2Int GoalCell;
@@ -764,6 +771,7 @@ namespace NPC
             request.StartCell = startCell;
             request.GoalCell = resolvedGoal;
             request.DesiredGoalCell = goalCell;
+            request.ResolvedGoalWorld = grid.GetCellCenter(resolvedGoal);
             request.UsedStartFallback = usedStartFallback;
             request.Search.OpenSet.Clear();
             request.Search.ClosedSet.Clear();
@@ -856,8 +864,20 @@ namespace NPC
                 return;
             }
 
+            Vector2 resolvedGoalWorld = request.ResolvedGoalWorld;
+            if (navGrid != null && navGrid.HasGrid)
+            {
+                resolvedGoalWorld = navGrid.GetCellCenter(request.GoalCell);
+            }
+            else if (!request.Prepared)
+            {
+                // If preparation never succeeded we cannot reliably compute a resolved goal, so fall back to
+                // the originally requested world-space target.
+                resolvedGoalWorld = request.GoalWorld;
+            }
+
             RemoveMoverTracking(request, onlyWhenIdMatches: true);
-            mover.HandlePathResult(request.Id, status, worldPath, request.GoalWorld);
+            mover.HandlePathResult(request.Id, status, worldPath, resolvedGoalWorld);
         }
 
         /// <summary>
