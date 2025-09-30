@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using Util;
 using World;
@@ -44,6 +45,54 @@ namespace NPC
                 StartWorld = start;
                 GoalWorld = goal;
                 Search = new AStarSearch();
+            }
+        }
+
+        private sealed class MoverReferenceComparer : IEqualityComparer<WeakReference<NpcPathMover>>
+        {
+            public static readonly MoverReferenceComparer Instance = new MoverReferenceComparer();
+
+            public bool Equals(WeakReference<NpcPathMover> x, WeakReference<NpcPathMover> y)
+            {
+                if (ReferenceEquals(x, y))
+                {
+                    return true;
+                }
+
+                if (x == null || y == null)
+                {
+                    return false;
+                }
+
+                bool xValid = x.TryGetTarget(out var xTarget) && xTarget != null;
+                bool yValid = y.TryGetTarget(out var yTarget) && yTarget != null;
+
+                if (xValid && yValid)
+                {
+                    return ReferenceEquals(xTarget, yTarget);
+                }
+
+                if (!xValid && !yValid)
+                {
+                    return ReferenceEquals(x, y);
+                }
+
+                return false;
+            }
+
+            public int GetHashCode(WeakReference<NpcPathMover> obj)
+            {
+                if (obj == null)
+                {
+                    return 0;
+                }
+
+                if (obj.TryGetTarget(out var target) && target != null)
+                {
+                    return RuntimeHelpers.GetHashCode(target);
+                }
+
+                return RuntimeHelpers.GetHashCode(obj);
             }
         }
 
@@ -225,6 +274,9 @@ namespace NPC
         [SerializeField] private bool enableDebugLogging;
 
         private readonly Queue<PathRequest> pendingRequests = new Queue<PathRequest>();
+        private readonly Dictionary<WeakReference<NpcPathMover>, int> latestQueuedRequestIdByMover =
+            new Dictionary<WeakReference<NpcPathMover>, int>(MoverReferenceComparer.Instance);
+        private readonly List<WeakReference<NpcPathMover>> moverCleanupBuffer = new List<WeakReference<NpcPathMover>>();
         private PathRequest activeRequest;
         private int nextRequestId = 1;
         private bool subscribedToTicker;
@@ -342,8 +394,13 @@ namespace NPC
                 return -1;
             }
 
+            PruneDeadMoverReferences();
+
             int id = nextRequestId++;
+            RemovePendingRequestsForMover(mover, id);
+
             var request = new PathRequest(id, mover, start, goal);
+            latestQueuedRequestIdByMover[request.MoverReference] = id;
             pendingRequests.Enqueue(request);
 
             if (enableDebugLogging)
@@ -357,6 +414,8 @@ namespace NPC
         /// <inheritdoc />
         public void OnTick()
         {
+            PruneDeadMoverReferences();
+
             if (!EnsureGridReference())
             {
                 if (activeRequest != null)
@@ -398,6 +457,25 @@ namespace NPC
         /// </summary>
         private void StepActiveRequest()
         {
+            if (activeRequest == null)
+            {
+                return;
+            }
+
+            if (IsRequestSuperseded(activeRequest, out int supersedingId))
+            {
+                if (enableDebugLogging && activeRequest.MoverReference.TryGetTarget(out var supersededMover) && supersededMover != null)
+                {
+                    Debug.Log(
+                        $"Abandoning active path request {activeRequest.Id} for {supersededMover.name} because request {supersedingId} superseded it.",
+                        this);
+                }
+
+                activeRequest = null;
+                TryBeginNextRequest();
+                return;
+            }
+
             var search = activeRequest.Search;
             var grid = navGrid;
             if (search.OpenSet.Count == 0)
@@ -450,6 +528,20 @@ namespace NPC
 
                 if (current == search.Goal)
                 {
+                    if (IsRequestSuperseded(activeRequest, out supersedingId))
+                    {
+                        if (enableDebugLogging && activeRequest.MoverReference.TryGetTarget(out var supersededDuringCompletion) && supersededDuringCompletion != null)
+                        {
+                            Debug.Log(
+                                $"Discarded completed path for request {activeRequest.Id} because request {supersedingId} superseded it before dispatch.",
+                                this);
+                        }
+
+                        activeRequest = null;
+                        TryBeginNextRequest();
+                        return;
+                    }
+
                     var pathCells = ReconstructPath(search, current);
                     var worldPath = ConvertCellsToWorld(pathCells, activeRequest.StartCell);
                     CompleteRequest(activeRequest, PathStatus.Success, worldPath);
@@ -497,11 +589,26 @@ namespace NPC
         /// </summary>
         private void TryBeginNextRequest()
         {
+            PruneDeadMoverReferences();
+
             while (pendingRequests.Count > 0)
             {
                 var request = pendingRequests.Dequeue();
                 if (!request.MoverReference.TryGetTarget(out var mover) || mover == null)
                 {
+                    RemoveMoverTracking(request, onlyWhenIdMatches: true);
+                    continue;
+                }
+
+                if (IsRequestSuperseded(request, out int supersedingId))
+                {
+                    if (enableDebugLogging)
+                    {
+                        Debug.Log(
+                            $"Discarded stale path request {request.Id} for {mover.name} because request {supersedingId} is newer.",
+                            this);
+                    }
+
                     continue;
                 }
 
@@ -526,6 +633,98 @@ namespace NPC
                 cachedGridRevision = navGrid != null ? navGrid.Revision : 0;
                 return;
             }
+        }
+
+        private void RemovePendingRequestsForMover(NpcPathMover mover, int supersedingRequestId)
+        {
+            if (mover == null)
+            {
+                return;
+            }
+
+            int pendingCount = pendingRequests.Count;
+            for (int i = 0; i < pendingCount; i++)
+            {
+                var existing = pendingRequests.Dequeue();
+                bool discard = false;
+
+                if (!existing.MoverReference.TryGetTarget(out var existingMover) || existingMover == null)
+                {
+                    discard = true;
+                }
+                else if (ReferenceEquals(existingMover, mover))
+                {
+                    discard = true;
+                    if (enableDebugLogging)
+                    {
+                        Debug.Log($"Discarded pending path request {existing.Id} for {existingMover.name} because request {supersedingRequestId} superseded it.", this);
+                    }
+                }
+
+                if (discard)
+                {
+                    RemoveMoverTracking(existing, onlyWhenIdMatches: true);
+                    continue;
+                }
+
+                pendingRequests.Enqueue(existing);
+            }
+        }
+
+        private void RemoveMoverTracking(PathRequest request, bool onlyWhenIdMatches)
+        {
+            if (request == null)
+            {
+                return;
+            }
+
+            if (latestQueuedRequestIdByMover.TryGetValue(request.MoverReference, out var latestId))
+            {
+                if (!onlyWhenIdMatches || latestId == request.Id)
+                {
+                    latestQueuedRequestIdByMover.Remove(request.MoverReference);
+                }
+            }
+        }
+
+        private bool IsRequestSuperseded(PathRequest request, out int latestId)
+        {
+            latestId = -1;
+            if (request == null)
+            {
+                return false;
+            }
+
+            if (!latestQueuedRequestIdByMover.TryGetValue(request.MoverReference, out latestId))
+            {
+                return false;
+            }
+
+            return latestId != request.Id;
+        }
+
+        private void PruneDeadMoverReferences()
+        {
+            if (latestQueuedRequestIdByMover.Count == 0)
+            {
+                return;
+            }
+
+            moverCleanupBuffer.Clear();
+            foreach (var entry in latestQueuedRequestIdByMover)
+            {
+                if (!entry.Key.TryGetTarget(out var mover) || mover == null)
+                {
+                    moverCleanupBuffer.Add(entry.Key);
+                }
+            }
+
+            for (int i = 0; i < moverCleanupBuffer.Count; i++)
+            {
+                latestQueuedRequestIdByMover.Remove(moverCleanupBuffer[i]);
+            }
+
+            moverCleanupBuffer.Clear();
         }
 
         /// <summary>
@@ -642,9 +841,11 @@ namespace NPC
         {
             if (!request.MoverReference.TryGetTarget(out var mover) || mover == null)
             {
+                RemoveMoverTracking(request, onlyWhenIdMatches: true);
                 return;
             }
 
+            RemoveMoverTracking(request, onlyWhenIdMatches: true);
             mover.HandlePathResult(request.Id, status, worldPath, request.GoalWorld);
         }
 
@@ -662,6 +863,7 @@ namespace NPC
             activeRequest.Search.ClosedSet.Clear();
             activeRequest.Search.Records.Clear();
             activeRequest.Prepared = false;
+            latestQueuedRequestIdByMover[activeRequest.MoverReference] = activeRequest.Id;
             pendingRequests.Enqueue(activeRequest);
             activeRequest = null;
         }
