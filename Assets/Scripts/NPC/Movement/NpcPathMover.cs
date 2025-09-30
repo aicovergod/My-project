@@ -99,6 +99,24 @@ namespace NPC
             pathService = PathfindingService.Instance;
         }
 
+        private void OnValidate()
+        {
+            tileTraverseDuration = Mathf.Max(0.01f, tileTraverseDuration);
+
+            if (stuckTimeoutSeconds <= tileTraverseDuration)
+            {
+                float correctedValue = Mathf.Max(tileTraverseDuration + 0.01f, tileTraverseDuration * 1.1f);
+                if (!Mathf.Approximately(stuckTimeoutSeconds, correctedValue))
+                {
+                    Debug.LogWarning(
+                        $"NpcPathMover '{name}' adjusted stuck timeout from {stuckTimeoutSeconds:F2}s to {correctedValue:F2}s so it exceeds the tile traverse duration.",
+                        this);
+                }
+
+                stuckTimeoutSeconds = correctedValue;
+            }
+        }
+
         private void OnEnable()
         {
             SubscribeToTicker();
@@ -213,7 +231,8 @@ namespace NPC
                     return;
                 }
 
-                if (Time.time - lastProgressTimestamp >= stuckTimeoutSeconds)
+                float timeSinceProgress = Time.time - lastProgressTimestamp;
+                if (lastProgressTimestamp > 0f && timeSinceProgress >= stuckTimeoutSeconds)
                 {
                     ForceReplan(true);
                     return;
@@ -359,6 +378,11 @@ namespace NPC
 
             float deltaTime = Mathf.Max(Time.deltaTime, 0.0001f);
             UpdateMovementVisuals(delta / deltaTime);
+            if (delta.sqrMagnitude > 0.000001f)
+            {
+                // Only treat meaningful deltas as progress so the stuck timer ignores sub-pixel noise.
+                lastProgressTimestamp = Time.time;
+            }
             previousStepPosition = currentPosition;
         }
 
