@@ -32,6 +32,12 @@ namespace NPC
         [Tooltip("Minimum world-space movement required before a frame counts as progress for stall detection.")]
         public float movementDeltaEpsilon = 0.01f;
 
+        [Header("Navigation Safety")]
+        [Tooltip("When enabled the wanderer consults the active nav grid to verify that sampled patrol tiles are reachable. Disable for wide open patrol zones to skip the additional breadth-first search cost.")]
+        [SerializeField] private bool validatePatrolReachability = true;
+        [Tooltip("Maximum number of times the wanderer will resample patrol targets when the reachability check rejects a tile before falling back to the origin.")]
+        [SerializeField, Min(1)] private int maxReachabilitySampleAttempts = 8;
+
         [Header("Chasing")]
         [Tooltip("Maximum distance from the spawn position that the NPC may chase a target.")]
         public float chaseRadius = 5f;
@@ -166,22 +172,110 @@ namespace NPC
             spriteAnimator?.UpdateVisuals(Vector2.zero);
         }
 
+        /// <summary>
+        /// Samples a new patrol destination and, when available, verifies the chosen cell can be
+        /// reached from the wanderer's current nav tile using the active <see cref="NavGridBuilder"/>.
+        /// </summary>
         private void ChooseNewTarget()
         {
-            if (useAreaSize)
+            Vector2 currentPosition = _rb != null ? _rb.position : (Vector2)transform.position;
+            Vector2 origin = _originInitialized ? _origin : currentPosition;
+            Vector2 currentWithinBounds = ClampWithinConfiguredBounds(origin, currentPosition, out float minX, out float maxX, out float minY, out float maxY);
+
+            NavGridBuilder grid = validatePatrolReachability ? PathfindingService.Instance?.ActiveGrid : null;
+            bool canValidate = validatePatrolReachability && grid != null && grid.HasGrid;
+
+            Vector2Int startCell = default;
+            if (canValidate)
             {
-                Vector2 half = areaSize * 0.5f;
-                float x = Random.Range(-half.x, half.x);
-                float y = Random.Range(-half.y, half.y);
-                _target = _origin + new Vector2(x, y);
+                if (!grid.TryGetCell(currentWithinBounds, out startCell))
+                {
+                    startCell = grid.WorldToCellClamped(currentWithinBounds);
+                }
+
+                if (!grid.IsCellWithinBounds(startCell))
+                {
+                    ForceReturnToOrigin();
+                    return;
+                }
+
+                if (!grid.IsCellWalkable(startCell) || !IsWithinBounds(grid.GetCellCenter(startCell), minX, maxX, minY, maxY))
+                {
+                    if (!TryFindNearestWalkableCellWithinBounds(startCell, grid, minX, maxX, minY, maxY, out Vector2Int adjustedStart))
+                    {
+                        ForceReturnToOrigin();
+                        return;
+                    }
+
+                    startCell = adjustedStart;
+                    currentWithinBounds = grid.GetCellCenter(startCell);
+                }
             }
-            else
+
+            Vector2 candidateTarget = currentWithinBounds;
+            bool found = false;
+            int attempts = canValidate ? Mathf.Max(1, maxReachabilitySampleAttempts) : 1;
+
+            for (int attempt = 0; attempt < attempts; attempt++)
             {
-                float x = Random.Range(minOffset.x, maxOffset.x);
-                float y = Random.Range(minOffset.y, maxOffset.y);
-                _target = _origin + new Vector2(x, y);
+                Vector2 sample;
+                if (useAreaSize)
+                {
+                    Vector2 half = areaSize * 0.5f;
+                    float x = Random.Range(-half.x, half.x);
+                    float y = Random.Range(-half.y, half.y);
+                    sample = origin + new Vector2(x, y);
+                }
+                else
+                {
+                    float x = Random.Range(minOffset.x, maxOffset.x);
+                    float y = Random.Range(minOffset.y, maxOffset.y);
+                    sample = origin + new Vector2(x, y);
+                }
+
+                Vector2 clamped = ClampToMovementBounds(sample);
+
+                if (canValidate)
+                {
+                    if (!grid.TryGetCell(clamped, out Vector2Int goalCell))
+                    {
+                        goalCell = grid.WorldToCellClamped(clamped);
+                    }
+
+                    if (!grid.IsCellWithinBounds(goalCell))
+                    {
+                        continue;
+                    }
+
+                    if (!grid.IsCellWalkable(goalCell) || !IsWithinBounds(grid.GetCellCenter(goalCell), minX, maxX, minY, maxY))
+                    {
+                        if (!TryFindNearestWalkableCellWithinBounds(goalCell, grid, minX, maxX, minY, maxY, out Vector2Int adjustedGoal))
+                        {
+                            continue;
+                        }
+
+                        goalCell = adjustedGoal;
+                        clamped = grid.GetCellCenter(goalCell);
+                    }
+
+                    if (!IsCellReachableWithinBounds(startCell, goalCell, grid, minX, maxX, minY, maxY))
+                    {
+                        continue;
+                    }
+                }
+
+                candidateTarget = clamped;
+                found = true;
+                break;
             }
-            _target = ClampToMovementBounds(_target);
+
+            if (!found)
+            {
+                ForceReturnToOrigin();
+                return;
+            }
+
+            _target = candidateTarget;
             _waiting = false;
         }
 
@@ -668,6 +762,101 @@ namespace NPC
         {
             Vector2 origin = _originInitialized ? _origin : (_rb != null ? _rb.position : (Vector2)transform.position);
             return ClampWithinConfiguredBounds(origin, worldPosition, out _, out _, out _, out _);
+        }
+
+        private bool TryFindNearestWalkableCellWithinBounds(Vector2Int seedCell, NavGridBuilder grid, float minX, float maxX, float minY, float maxY, out Vector2Int result)
+        {
+            Queue<Vector2Int> frontier = new Queue<Vector2Int>();
+            HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
+            frontier.Enqueue(seedCell);
+            visited.Add(seedCell);
+
+            while (frontier.Count > 0)
+            {
+                Vector2Int current = frontier.Dequeue();
+                if (!grid.IsCellWithinBounds(current))
+                {
+                    continue;
+                }
+
+                Vector2 center = grid.GetCellCenter(current);
+                if (!IsWithinBounds(center, minX, maxX, minY, maxY))
+                {
+                    continue;
+                }
+
+                if (grid.IsCellWalkable(current))
+                {
+                    result = current;
+                    return true;
+                }
+
+                for (int i = 0; i < FourWayOffsets.Length; i++)
+                {
+                    Vector2Int neighbour = current + FourWayOffsets[i];
+                    if (!grid.IsCellWithinBounds(neighbour) || !visited.Add(neighbour))
+                    {
+                        continue;
+                    }
+
+                    Vector2 neighbourCenter = grid.GetCellCenter(neighbour);
+                    if (!IsWithinBounds(neighbourCenter, minX, maxX, minY, maxY))
+                    {
+                        continue;
+                    }
+
+                    frontier.Enqueue(neighbour);
+                }
+            }
+
+            result = seedCell;
+            return false;
+        }
+
+        private bool IsCellReachableWithinBounds(Vector2Int startCell, Vector2Int goalCell, NavGridBuilder grid, float minX, float maxX, float minY, float maxY)
+        {
+            if (startCell == goalCell)
+            {
+                return true;
+            }
+
+            Queue<Vector2Int> frontier = new Queue<Vector2Int>();
+            HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
+            frontier.Enqueue(startCell);
+            visited.Add(startCell);
+
+            while (frontier.Count > 0)
+            {
+                Vector2Int current = frontier.Dequeue();
+                for (int i = 0; i < FourWayOffsets.Length; i++)
+                {
+                    Vector2Int neighbour = current + FourWayOffsets[i];
+                    if (!grid.IsCellWithinBounds(neighbour) || !visited.Add(neighbour))
+                    {
+                        continue;
+                    }
+
+                    Vector2 centre = grid.GetCellCenter(neighbour);
+                    if (!IsWithinBounds(centre, minX, maxX, minY, maxY))
+                    {
+                        continue;
+                    }
+
+                    if (!grid.IsCellWalkable(neighbour))
+                    {
+                        continue;
+                    }
+
+                    if (neighbour == goalCell)
+                    {
+                        return true;
+                    }
+
+                    frontier.Enqueue(neighbour);
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
