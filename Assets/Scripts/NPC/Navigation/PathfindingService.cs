@@ -843,6 +843,14 @@ namespace NPC
                         continue;
                     }
 
+                    if (!grid.HasClearLineBetweenCells(neighbour, desired))
+                    {
+                        // The neighbour is walkable but a straight corridor back to the desired goal is obstructed.
+                        // Re-enqueue it so the breadth-first search can continue expanding outward from this tile.
+                        resolveFrontier.Enqueue(neighbour);
+                        continue;
+                    }
+
                     // Found the nearest reachable walkable neighbour.
                     return neighbour;
                 }

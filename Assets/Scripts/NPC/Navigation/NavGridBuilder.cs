@@ -288,6 +288,77 @@ namespace NPC
         }
 
         /// <summary>
+        /// Determines whether a straight corridor between two grid cells remains free of blockers.
+        /// The evaluation walks a Bresenham line and ignores the final goal cell so interactions that target
+        /// a blocked tile (such as a fence) can still approach the closest open neighbour.
+        /// </summary>
+        public bool HasClearLineBetweenCells(Vector2Int origin, Vector2Int goal)
+        {
+            if (!HasGrid)
+            {
+                return true;
+            }
+
+            if (!IsCellWithinBounds(origin) || !IsCellWithinBounds(goal))
+            {
+                return false;
+            }
+
+            if (origin == goal)
+            {
+                return IsCellWalkable(origin);
+            }
+
+            if (!IsCellWalkable(origin))
+            {
+                return false;
+            }
+
+            int x = origin.x;
+            int y = origin.y;
+            int endX = goal.x;
+            int endY = goal.y;
+
+            int dx = Mathf.Abs(endX - x);
+            int dy = Mathf.Abs(endY - y);
+            int stepX = x < endX ? 1 : (x > endX ? -1 : 0);
+            int stepY = y < endY ? 1 : (y > endY ? -1 : 0);
+            int error = dx - dy;
+            Vector2Int currentCell = new Vector2Int(x, y);
+
+            while (true)
+            {
+                int error2 = error * 2;
+                if (error2 > -dy)
+                {
+                    error -= dy;
+                    x += stepX;
+                }
+
+                if (error2 < dx)
+                {
+                    error += dx;
+                    y += stepY;
+                }
+
+                currentCell.x = x;
+                currentCell.y = y;
+
+                if (x == endX && y == endY)
+                {
+                    break;
+                }
+
+                if (!IsCellWithinBounds(currentCell) || !IsCellWalkable(currentCell))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Converts a world-space position to a grid cell. Returns <c>false</c> when the position lies outside the grid.
         /// </summary>
         public bool TryGetCell(Vector2 worldPosition, out Vector2Int cell)
