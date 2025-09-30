@@ -65,6 +65,11 @@ namespace NPC
         private bool hasDestination;
         private int activeRequestId = -1;
         private bool wandererSuspended;
+        private Vector2 lastManualPosition;
+        private bool hasManualPositionSample;
+
+        private const float ManualResyncTolerance = 0.01f;
+        private const float ManualResyncToleranceSqr = ManualResyncTolerance * ManualResyncTolerance;
 
         /// <summary>
         /// Raised whenever the mover reaches its destination within the configured stop distance.
@@ -674,6 +679,8 @@ namespace NPC
         {
             if (wanderer != null && wanderer.enabled)
             {
+                lastManualPosition = ClampWithWanderer(GetCurrentPosition());
+                hasManualPositionSample = true;
                 wanderer.enabled = false;
                 wandererSuspended = true;
             }
@@ -696,12 +703,28 @@ namespace NPC
                 wanderer.enabled = true;
                 wandererSuspended = false;
                 wanderer.SyncToExternalPosition(syncedPosition);
+                lastManualPosition = syncedPosition;
+                hasManualPositionSample = true;
                 return;
             }
 
-            if (wanderer.enabled)
+            if (!wanderer.enabled)
+            {
+                return;
+            }
+
+            if (!hasManualPositionSample)
+            {
+                lastManualPosition = syncedPosition;
+                hasManualPositionSample = true;
+                return;
+            }
+
+            Vector2 displacement = syncedPosition - lastManualPosition;
+            if (displacement.sqrMagnitude > ManualResyncToleranceSqr)
             {
                 wanderer.SyncToExternalPosition(syncedPosition);
+                lastManualPosition = syncedPosition;
             }
         }
 
