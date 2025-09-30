@@ -27,6 +27,10 @@ namespace NPC
         public float minIdleTime = 0.5f;
         [Tooltip("Maximum idle time before choosing a new target.")]
         public float maxIdleTime = 2f;
+        [Tooltip("Maximum time the NPC may remain without moving before forcing a new wander target.")]
+        public float stallTimeoutSeconds = 6f;
+        [Tooltip("Minimum world-space movement required before a frame counts as progress for stall detection.")]
+        public float movementDeltaEpsilon = 0.01f;
 
         [Header("Chasing")]
         [Tooltip("Maximum distance from the spawn position that the NPC may chase a target.")]
@@ -54,6 +58,8 @@ namespace NPC
         private Vector2 _lastPos;
         private readonly System.Collections.Generic.List<Transform> _combatTargets = new();
         private NpcCombatant _combatant;
+        private float _deterministicTickerTime;
+        private float _lastMovementTimestamp;
 
         // Per-tick interpolation
         private Vector2 _from;
@@ -116,6 +122,8 @@ namespace NPC
             _lastPos = _origin;
             _from = _to = _origin;
             _lerpTime = Ticker.TickDuration;
+            _deterministicTickerTime = 0f;
+            _lastMovementTimestamp = 0f;
 
             chaseRadius = ComputeChaseRadius();
 
@@ -148,6 +156,13 @@ namespace NPC
             CancelKnockback();
             _waiting = true;
             _waitTimer = Random.Range(minIdleTime, maxIdleTime);
+            Vector2 current = _rb != null ? _rb.position : (Vector2)transform.position;
+            _from = current;
+            _to = current;
+            _target = current;
+            _lerpTime = Ticker.TickDuration;
+            _lastPos = current;
+            _lastMovementTimestamp = _deterministicTickerTime;
             spriteAnimator?.UpdateVisuals(Vector2.zero);
         }
 
@@ -232,6 +247,7 @@ namespace NPC
             _lerpTime = Ticker.TickDuration;
             _waiting = false;
             _waitTimer = 0f;
+            _lastMovementTimestamp = _deterministicTickerTime;
             spriteAnimator?.UpdateVisuals(Vector2.zero);
         }
 
@@ -400,12 +416,23 @@ namespace NPC
         public void OnTick()
         {
             float delta = Ticker.TickDuration;
+            _deterministicTickerTime += delta;
             const float DISTANCE_EPSILON = 0.05f;
 
             if (_knockbackActive)
             {
                 _lerpTime = Ticker.TickDuration;
                 return;
+            }
+
+            if (!_waiting && !_frozen && !_knockbackActive && stallTimeoutSeconds > 0f)
+            {
+                float stalledDuration = _deterministicTickerTime - _lastMovementTimestamp;
+                if (stalledDuration >= stallTimeoutSeconds)
+                {
+                    BeginIdle();
+                    return;
+                }
             }
 
             if (_frozen)
@@ -492,8 +519,10 @@ namespace NPC
                 if (_rb != null) _rb.MovePosition(target);
                 else transform.position = target;
 
-                Vector2 knockbackVelocity = (target - _lastPos) / Mathf.Max(Time.deltaTime, 0.0001f);
+                Vector2 delta = target - _lastPos;
+                Vector2 knockbackVelocity = delta / Mathf.Max(Time.deltaTime, 0.0001f);
                 spriteAnimator?.UpdateVisuals(knockbackVelocity);
+                RegisterMovementDelta(delta);
                 _lastPos = target;
 
                 if (_knockbackTimer >= _knockbackDuration)
@@ -539,9 +568,21 @@ namespace NPC
             if (_rb != null) _rb.MovePosition(clamped);
             else transform.position = clamped;
 
-            Vector2 velocity = (clamped - _lastPos) / Mathf.Max(Time.deltaTime, 0.0001f);
+            Vector2 deltaPos = clamped - _lastPos;
+            Vector2 velocity = deltaPos / Mathf.Max(Time.deltaTime, 0.0001f);
             spriteAnimator?.UpdateVisuals(velocity);
+            RegisterMovementDelta(deltaPos);
             _lastPos = clamped;
+        }
+
+        private void RegisterMovementDelta(Vector2 delta)
+        {
+            float epsilon = Mathf.Max(0f, movementDeltaEpsilon);
+            float epsilonSqr = epsilon * epsilon;
+            if (delta.sqrMagnitude > epsilonSqr)
+            {
+                _lastMovementTimestamp = _deterministicTickerTime;
+            }
         }
 
         /// <summary>
