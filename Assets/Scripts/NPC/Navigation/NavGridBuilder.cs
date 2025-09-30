@@ -13,7 +13,7 @@ namespace NPC
     /// </summary>
     [ExecuteAlways]
     [DisallowMultipleComponent]
-    public sealed class NavGridBuilder : MonoBehaviour
+    public sealed class NavGridBuilder : MonoBehaviour, ISerializationCallbackReceiver
     {
         /// <summary>
         /// Event raised whenever the grid is rebuilt.
@@ -76,6 +76,8 @@ namespace NPC
         private int revision;
 
         private readonly Dictionary<Vector2Int, bool> manualOverrides = new Dictionary<Vector2Int, bool>();
+        [SerializeField, HideInInspector] private List<Vector2Int> serializedManualOverrideKeys = new List<Vector2Int>();
+        [SerializeField, HideInInspector] private List<bool> serializedManualOverrideValues = new List<bool>();
         private readonly List<Vector2Int> overrideCleanupBuffer = new List<Vector2Int>();
 
         private Vector3 lastRecordedPosition;
@@ -120,6 +122,36 @@ namespace NPC
         /// Manual walkable overrides keyed by cell coordinates. When populated the stored value takes priority over collider sampling.
         /// </summary>
         public IReadOnlyDictionary<Vector2Int, bool> ManualOverrides => manualOverrides;
+
+        /// <inheritdoc />
+        public void OnBeforeSerialize()
+        {
+            // Mirror the runtime dictionary into serializable lists so Unity can persist manual overrides in scenes/prefabs.
+            serializedManualOverrideKeys.Clear();
+            serializedManualOverrideValues.Clear();
+
+            foreach (KeyValuePair<Vector2Int, bool> kvp in manualOverrides)
+            {
+                serializedManualOverrideKeys.Add(kvp.Key);
+                serializedManualOverrideValues.Add(kvp.Value);
+            }
+        }
+
+        /// <inheritdoc />
+        public void OnAfterDeserialize()
+        {
+            // Restore the dictionary from the serialized lists. We clamp to the shorter list length in case of mismatched data.
+            manualOverrides.Clear();
+            int restoreCount = Mathf.Min(serializedManualOverrideKeys.Count, serializedManualOverrideValues.Count);
+            for (int i = 0; i < restoreCount; i++)
+            {
+                manualOverrides[serializedManualOverrideKeys[i]] = serializedManualOverrideValues[i];
+            }
+
+            // Lists are only used during serialization, so clear them to avoid leaking duplicate state during edits.
+            serializedManualOverrideKeys.Clear();
+            serializedManualOverrideValues.Clear();
+        }
 
         /// <summary>
         /// Physics mask used to determine which layers block navigation during grid baking.
