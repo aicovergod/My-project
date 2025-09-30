@@ -75,6 +75,9 @@ namespace NPC
         private int blockedCellCount;
         private int revision;
 
+        private readonly Dictionary<Vector2Int, bool> manualOverrides = new Dictionary<Vector2Int, bool>();
+        private readonly List<Vector2Int> overrideCleanupBuffer = new List<Vector2Int>();
+
         private Vector3 lastRecordedPosition;
         private Vector3 lastRecordedScale;
 
@@ -112,6 +115,11 @@ namespace NPC
         /// Tracks how many times the grid has been rebuilt. Consumers can cache this value and detect changes.
         /// </summary>
         public int Revision => revision;
+
+        /// <summary>
+        /// Manual walkable overrides keyed by cell coordinates. When populated the stored value takes priority over collider sampling.
+        /// </summary>
+        public IReadOnlyDictionary<Vector2Int, bool> ManualOverrides => manualOverrides;
 
         /// <summary>
         /// Physics mask used to determine which layers block navigation during grid baking.
@@ -208,39 +216,22 @@ namespace NPC
             walkableGrid = new bool[gridSize.x, gridSize.y];
             blockedCellCount = 0;
 
-            float halfTile = tileSize * 0.5f;
-            Vector2 sampleExtents = Vector2.one * halfTile * samplingPadding * 2f;
-            // Because OverlapBox expects size rather than extents we double the extents.
+            Vector2 samplingSize = GetSamplingSize();
+            // OverlapBox expects a size vector rather than half extents, so we pass the computed sampling size directly.
 
             for (int y = 0; y < gridSize.y; y++)
             {
                 for (int x = 0; x < gridSize.x; x++)
                 {
                     Vector2 cellCenter = GetCellCenter(new Vector2Int(x, y));
-                    bool blocked = SampleBlocked(cellCenter, sampleExtents);
+                    bool blocked = SampleBlocked(cellCenter, samplingSize);
                     walkableGrid[x, y] = !blocked;
-                    if (blocked)
-                    {
-                        blockedCellCount++;
-                    }
                 }
             }
 
-            gridDirty = false;
-            revision++;
+            ApplyManualOverridesToGrid();
 
-            if (enableDebugLogging)
-            {
-                int totalCells = gridSize.x * gridSize.y;
-                int walkableCells = totalCells - blockedCellCount;
-                Debug.Log($"NavGridBuilder rebuilt {name}: {walkableCells} walkable / {blockedCellCount} blocked (tile size {tileSize:F2}).", this);
-            }
-
-            GridRebuilt?.Invoke(this);
-            if (Application.isPlaying)
-            {
-                PathfindingService.Instance?.RegisterNavGrid(this);
-            }
+            FinalizeGridMutation(logSummary: true);
         }
 
         /// <summary>
@@ -404,6 +395,211 @@ namespace NPC
             }
 
             return blocked;
+        }
+
+        /// <summary>
+        /// Computes the overlap box size used when sampling colliders for a grid cell.
+        /// </summary>
+        private Vector2 GetSamplingSize()
+        {
+            float clampedPadding = Mathf.Clamp(samplingPadding, 0.1f, 1.2f);
+            float halfTile = Mathf.Max(0.0001f, tileSize * 0.5f);
+            return Vector2.one * halfTile * clampedPadding * 2f;
+        }
+
+        /// <summary>
+        /// Applies cached manual overrides to the active walkable grid, removing entries that no longer fit inside the bounds.
+        /// </summary>
+        private void ApplyManualOverridesToGrid()
+        {
+            if (!HasGrid || manualOverrides.Count == 0)
+            {
+                return;
+            }
+
+            overrideCleanupBuffer.Clear();
+
+            foreach (KeyValuePair<Vector2Int, bool> kvp in manualOverrides)
+            {
+                Vector2Int storedCell = kvp.Key;
+                if (!IsCellWithinBounds(storedCell))
+                {
+                    overrideCleanupBuffer.Add(storedCell);
+                    continue;
+                }
+
+                Vector2Int clampedCell = ClampToBounds(storedCell);
+                walkableGrid[clampedCell.x, clampedCell.y] = kvp.Value;
+            }
+
+            for (int i = 0; i < overrideCleanupBuffer.Count; i++)
+            {
+                manualOverrides.Remove(overrideCleanupBuffer[i]);
+            }
+
+            overrideCleanupBuffer.Clear();
+        }
+
+        /// <summary>
+        /// Attempts to add or update a manual walkability override for the supplied cell.
+        /// </summary>
+        public bool TrySetManualOverride(Vector2Int cell, bool walkable)
+        {
+            if (!HasGrid || !IsCellWithinBounds(cell))
+            {
+                return false;
+            }
+
+            manualOverrides[cell] = walkable;
+            ApplyManualOverrideToGrid(cell, walkable);
+            FinalizeGridMutation(logSummary: false);
+            return true;
+        }
+
+        /// <summary>
+        /// Attempts to add or update a manual walkability override for the cell mapped from the supplied world position.
+        /// </summary>
+        public bool TrySetManualOverride(Vector2 worldPosition, bool walkable)
+        {
+            if (!TryGetCell(worldPosition, out Vector2Int cell))
+            {
+                return false;
+            }
+
+            return TrySetManualOverride(cell, walkable);
+        }
+
+        /// <summary>
+        /// Clears an existing manual override for the supplied cell and restores the collider-sampled state.
+        /// </summary>
+        public bool ClearManualOverride(Vector2Int cell)
+        {
+            if (!HasGrid || !IsCellWithinBounds(cell))
+            {
+                return false;
+            }
+
+            if (!manualOverrides.Remove(cell))
+            {
+                return false;
+            }
+
+            bool walkable = SampleAutomaticWalkableState(cell);
+            walkableGrid[cell.x, cell.y] = walkable;
+            FinalizeGridMutation(logSummary: false);
+            return true;
+        }
+
+        /// <summary>
+        /// Clears a manual override for the cell mapped from the supplied world position, restoring the baked state.
+        /// </summary>
+        public bool ClearManualOverride(Vector2 worldPosition)
+        {
+            if (!TryGetCell(worldPosition, out Vector2Int cell))
+            {
+                return false;
+            }
+
+            return ClearManualOverride(cell);
+        }
+
+        /// <summary>
+        /// Toggles the manual override state for the supplied cell. When no override exists the current walkability is inverted.
+        /// </summary>
+        public bool ToggleManualOverride(Vector2Int cell)
+        {
+            if (!HasGrid || !IsCellWithinBounds(cell))
+            {
+                return false;
+            }
+
+            bool newState = manualOverrides.TryGetValue(cell, out bool existing)
+                ? !existing
+                : !walkableGrid[cell.x, cell.y];
+
+            manualOverrides[cell] = newState;
+            ApplyManualOverrideToGrid(cell, newState);
+            FinalizeGridMutation(logSummary: false);
+            return true;
+        }
+
+        /// <summary>
+        /// Toggles the manual override mapped from the supplied world position.
+        /// </summary>
+        public bool ToggleManualOverride(Vector2 worldPosition)
+        {
+            if (!TryGetCell(worldPosition, out Vector2Int cell))
+            {
+                return false;
+            }
+
+            return ToggleManualOverride(cell);
+        }
+
+        private void ApplyManualOverrideToGrid(Vector2Int cell, bool walkable)
+        {
+            Vector2Int clampedCell = ClampToBounds(cell);
+            walkableGrid[clampedCell.x, clampedCell.y] = walkable;
+        }
+
+        private bool SampleAutomaticWalkableState(Vector2Int cell)
+        {
+            Vector2 samplingSize = GetSamplingSize();
+            Vector2 cellCenter = GetCellCenter(cell);
+            bool blocked = SampleBlocked(cellCenter, samplingSize);
+            return !blocked;
+        }
+
+        private void FinalizeGridMutation(bool logSummary)
+        {
+            if (!HasGrid)
+            {
+                return;
+            }
+
+            blockedCellCount = CountBlockedCells();
+            gridDirty = false;
+            revision++;
+
+            if (logSummary && enableDebugLogging)
+            {
+                int totalCells = gridSize.x * gridSize.y;
+                int walkableCells = totalCells - blockedCellCount;
+                Debug.Log($"NavGridBuilder rebuilt {name}: {walkableCells} walkable / {blockedCellCount} blocked (tile size {tileSize:F2}).", this);
+            }
+
+            RaiseGridRebuilt();
+        }
+
+        private int CountBlockedCells()
+        {
+            if (!HasGrid)
+            {
+                return 0;
+            }
+
+            int blocked = 0;
+            for (int y = 0; y < gridSize.y; y++)
+            {
+                for (int x = 0; x < gridSize.x; x++)
+                {
+                    if (!walkableGrid[x, y])
+                    {
+                        blocked++;
+                    }
+                }
+            }
+
+            return blocked;
+        }
+
+        private void RaiseGridRebuilt()
+        {
+            GridRebuilt?.Invoke(this);
+            if (Application.isPlaying)
+            {
+                PathfindingService.Instance?.RegisterNavGrid(this);
+            }
         }
 
         private bool IsColliderBlocking(GameObject obj)
