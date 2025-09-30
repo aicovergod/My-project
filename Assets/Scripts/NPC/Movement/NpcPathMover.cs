@@ -62,7 +62,9 @@ namespace NPC
 
         private Vector2 desiredDestination;
         private Vector2 lastRequestedDestination;
+        private Vector2 resolvedPathDestination;
         private bool hasDestination;
+        private bool hasResolvedPathDestination;
         private int activeRequestId = -1;
         private bool wandererSuspended;
         private Vector2 lastManualPosition;
@@ -210,6 +212,8 @@ namespace NPC
             stepping = false;
             activeRequestId = -1;
             hasDestination = false;
+            hasResolvedPathDestination = false;
+            resolvedPathDestination = default;
             TryAdvanceToNextWaypoint();
             UpdateMovementVisuals(Vector2.zero);
         }
@@ -261,8 +265,8 @@ namespace NPC
 
             awaitingPath = false;
             activeRequestId = -1;
-            desiredDestination = resolvedGoalWorld;
-            lastRequestedDestination = resolvedGoalWorld;
+            hasResolvedPathDestination = false;
+            resolvedPathDestination = default;
 
             if (status == PathfindingService.PathStatus.GoalUnreachable)
             {
@@ -275,6 +279,8 @@ namespace NPC
                 debugPath.Clear();
                 stepping = false;
                 hasDestination = false;
+                hasResolvedPathDestination = false;
+                resolvedPathDestination = default;
                 TryAdvanceToNextWaypoint();
                 UpdateMovementVisuals(Vector2.zero);
                 return;
@@ -287,10 +293,15 @@ namespace NPC
                     Debug.LogWarning($"NPC {name} path request {requestId} failed: {status}.", this);
                 }
 
+                hasResolvedPathDestination = false;
+                resolvedPathDestination = default;
                 ScheduleRetry();
                 UpdateMovementVisuals(Vector2.zero);
                 return;
             }
+
+            resolvedPathDestination = resolvedGoalWorld;
+            hasResolvedPathDestination = true;
 
             waypointQueue.Clear();
             debugPath.Clear();
@@ -487,12 +498,33 @@ namespace NPC
                 {
                     DestinationReached?.Invoke(this);
                     hasDestination = false;
+                    hasResolvedPathDestination = false;
+                    resolvedPathDestination = default;
                     waypointQueue.Clear();
                     ResumeWandererIfNeeded();
                 }
                 else
                 {
-                    ForceReplan(ignoreCooldown: true);
+                    bool atResolvedFallback = hasResolvedPathDestination &&
+                        Vector2.Distance(current, resolvedPathDestination) <= waypointTolerance;
+
+                    if (atResolvedFallback)
+                    {
+                        if (enableDebugLogging)
+                        {
+                            Debug.LogWarning($"NPC {name} reached resolved fallback but cannot see desired destination. Marking goal unreachable.", this);
+                        }
+
+                        hasDestination = false;
+                        hasResolvedPathDestination = false;
+                        resolvedPathDestination = default;
+                        waypointQueue.Clear();
+                        ResumeWandererIfNeeded();
+                    }
+                    else
+                    {
+                        ForceReplan(ignoreCooldown: true);
+                    }
                 }
             }
             else if (Time.time >= nextAllowedRepathTime)
@@ -559,7 +591,8 @@ namespace NPC
             stepping = false;
             waypointQueue.Clear();
             debugPath.Clear();
-            desiredDestination = destination;
+            hasResolvedPathDestination = false;
+            resolvedPathDestination = default;
             lastRequestedDestination = destination;
             nextAllowedRepathTime = Time.time + repathCooldownSeconds;
             lastDestinationUpdate = Time.time;
