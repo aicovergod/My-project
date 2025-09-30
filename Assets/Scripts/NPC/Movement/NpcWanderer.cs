@@ -91,6 +91,42 @@ namespace NPC
         private bool _tickerSubscribed;
 
         /// <summary>
+        /// Reusable BFS frontier for <see cref="ClampToMovementBounds(Vector2)"/> so nav validation
+        /// does not allocate each frame while clamping wander targets.
+        /// </summary>
+        private readonly Queue<Vector2Int> _clampFrontier = new();
+
+        /// <summary>
+        /// Reusable BFS visited set for <see cref="ClampToMovementBounds(Vector2)"/> to prevent
+        /// per-call garbage while scanning nearby tiles.
+        /// </summary>
+        private readonly HashSet<Vector2Int> _clampVisited = new();
+
+        /// <summary>
+        /// Reusable BFS frontier for <see cref="TryFindNearestWalkableCellWithinBounds"/>. Keeping a
+        /// dedicated cache avoids clashes with other searches that may run within the same frame.
+        /// </summary>
+        private readonly Queue<Vector2Int> _nearestCellFrontier = new();
+
+        /// <summary>
+        /// Reusable BFS visited set for <see cref="TryFindNearestWalkableCellWithinBounds"/> so search
+        /// attempts remain allocation-free during heavy NPC patrol sampling.
+        /// </summary>
+        private readonly HashSet<Vector2Int> _nearestCellVisited = new();
+
+        /// <summary>
+        /// Reusable BFS frontier for <see cref="IsCellReachableWithinBounds"/> to avoid per-frame
+        /// allocations when validating patrol reachability.
+        /// </summary>
+        private readonly Queue<Vector2Int> _reachabilityFrontier = new();
+
+        /// <summary>
+        /// Reusable BFS visited set for <see cref="IsCellReachableWithinBounds"/> so repeated
+        /// reachability checks remain GC-neutral.
+        /// </summary>
+        private readonly HashSet<Vector2Int> _reachabilityVisited = new();
+
+        /// <summary>
         /// True when the wanderer should query the navigation grid for reachability/snapping checks.
         /// </summary>
         public bool NavValidationEnabled => validatePatrolReachability;
@@ -711,7 +747,8 @@ namespace NPC
         /// knockback) attempt to move it beyond the limits. When navigation validation is enabled and
         /// a grid is available the result is additionally snapped to the nearest walkable nav-cell so
         /// the wanderer honours baked blockers. When validation is disabled the method falls back to
-        /// simple bounds clamping without any nav-grid lookups.
+        /// simple bounds clamping without any nav-grid lookups. The nav-grid search reuses cached BFS
+        /// buffers to avoid per-frame allocations while NPCs idle and sample new patrol points.
         /// </summary>
         /// <param name="worldPosition">Target position in world space.</param>
         /// <returns>The clamped world position respecting the configured bounds.</returns>
@@ -749,8 +786,10 @@ namespace NPC
                 return cellCenter;
             }
 
-            Queue<Vector2Int> frontier = new Queue<Vector2Int>();
-            HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
+            Queue<Vector2Int> frontier = _clampFrontier;
+            HashSet<Vector2Int> visited = _clampVisited;
+            frontier.Clear();
+            visited.Clear();
             frontier.Enqueue(cell);
             visited.Add(cell);
 
@@ -796,10 +835,16 @@ namespace NPC
             return ClampWithinConfiguredBounds(origin, worldPosition, out _, out _, out _, out _);
         }
 
+        /// <summary>
+        /// Finds the nearest walkable cell within the patrol bounds using the cached BFS buffers to
+        /// remain allocation-free even when invoked multiple times per frame.
+        /// </summary>
         private bool TryFindNearestWalkableCellWithinBounds(Vector2Int seedCell, NavGridBuilder grid, float minX, float maxX, float minY, float maxY, out Vector2Int result)
         {
-            Queue<Vector2Int> frontier = new Queue<Vector2Int>();
-            HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
+            Queue<Vector2Int> frontier = _nearestCellFrontier;
+            HashSet<Vector2Int> visited = _nearestCellVisited;
+            frontier.Clear();
+            visited.Clear();
             frontier.Enqueue(seedCell);
             visited.Add(seedCell);
 
@@ -845,6 +890,10 @@ namespace NPC
             return false;
         }
 
+        /// <summary>
+        /// Validates that a path exists between two nav cells while remaining inside the patrol
+        /// bounds, leveraging cached BFS buffers to keep reachability checks allocation-free.
+        /// </summary>
         private bool IsCellReachableWithinBounds(Vector2Int startCell, Vector2Int goalCell, NavGridBuilder grid, float minX, float maxX, float minY, float maxY)
         {
             if (startCell == goalCell)
@@ -852,8 +901,10 @@ namespace NPC
                 return true;
             }
 
-            Queue<Vector2Int> frontier = new Queue<Vector2Int>();
-            HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
+            Queue<Vector2Int> frontier = _reachabilityFrontier;
+            HashSet<Vector2Int> visited = _reachabilityVisited;
+            frontier.Clear();
+            visited.Clear();
             frontier.Enqueue(startCell);
             visited.Add(startCell);
 
