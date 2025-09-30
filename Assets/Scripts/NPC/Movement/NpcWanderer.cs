@@ -33,7 +33,7 @@ namespace NPC
         public float movementDeltaEpsilon = 0.01f;
 
         [Header("Navigation Safety")]
-        [Tooltip("When enabled the wanderer consults the active nav grid to verify that sampled patrol tiles are reachable. Disable for wide open patrol zones to skip the additional breadth-first search cost.")]
+        [Tooltip("When enabled the wanderer consults the active nav grid to verify and snap patrol tiles to walkable cells. Disable for wide open patrol zones to skip nav-grid searches and allow freeform bounds clamping.")]
         [SerializeField] private bool validatePatrolReachability = true;
         [Tooltip("Maximum number of times the wanderer will resample patrol targets when the reachability check rejects a tile before falling back to the origin.")]
         [SerializeField, Min(1)] private int maxReachabilitySampleAttempts = 8;
@@ -89,6 +89,11 @@ namespace NPC
         // Ticker subscription management
         private Coroutine _tickerSubscriptionRoutine;
         private bool _tickerSubscribed;
+
+        /// <summary>
+        /// True when the wanderer should query the navigation grid for reachability/snapping checks.
+        /// </summary>
+        public bool NavValidationEnabled => validatePatrolReachability;
 
         private float ComputeChaseRadius()
         {
@@ -189,8 +194,8 @@ namespace NPC
             Vector2 origin = _originInitialized ? _origin : currentPosition;
             Vector2 currentWithinBounds = ClampWithinConfiguredBounds(origin, currentPosition, out float minX, out float maxX, out float minY, out float maxY);
 
-            NavGridBuilder grid = validatePatrolReachability ? PathfindingService.Instance?.ActiveGrid : null;
-            bool canValidate = validatePatrolReachability && grid != null && grid.HasGrid;
+            NavGridBuilder grid = NavValidationEnabled ? PathfindingService.Instance?.ActiveGrid : null;
+            bool canValidate = NavValidationEnabled && grid != null && grid.HasGrid;
 
             Vector2Int startCell = default;
             if (canValidate)
@@ -311,7 +316,7 @@ namespace NPC
         public void ForceReturnToOrigin()
         {
             CancelKnockback();
-            _target = ClampToMovementBounds(_origin);
+            _target = NavValidationEnabled ? ClampToMovementBounds(_origin) : ClampToMovementBoundsNoSnap(_origin);
             _waiting = false;
         }
 
@@ -325,7 +330,7 @@ namespace NPC
         {
             CancelKnockback();
 
-            Vector2 clamped = ClampToMovementBounds(worldPosition);
+            Vector2 clamped = NavValidationEnabled ? ClampToMovementBounds(worldPosition) : ClampToMovementBoundsNoSnap(worldPosition);
 
             if (_rb != null)
             {
@@ -368,7 +373,7 @@ namespace NPC
             Vector2 normalisedDirection = direction.normalized;
             Vector2 destination = current + normalisedDirection * distance;
             if (clamp)
-                destination = ClampToMovementBounds(destination);
+                destination = NavValidationEnabled ? ClampToMovementBounds(destination) : ClampToMovementBoundsNoSnap(destination);
 
             if (Vector2.Distance(current, destination) <= Mathf.Epsilon)
                 return;
@@ -525,6 +530,7 @@ namespace NPC
             _deterministicTickerTime += delta;
             _movementProgressThisTick = 0f;
             const float DISTANCE_EPSILON = 0.05f;
+            bool snapToNavGrid = NavValidationEnabled;
 
             if (_knockbackActive)
             {
@@ -580,9 +586,9 @@ namespace NPC
                     {
                         Vector2 direction = (targetPos - _from).normalized;
                         Vector2 desired = targetPos - direction * desiredRange;
-                        desired = ClampToMovementBounds(desired);
+                        desired = snapToNavGrid ? ClampToMovementBounds(desired) : ClampToMovementBoundsNoSnap(desired);
                         Vector2 step = Vector2.MoveTowards(_from, desired, moveSpeed * delta);
-                        _to = ClampToMovementBounds(step);
+                        _to = snapToNavGrid ? ClampToMovementBounds(step) : ClampToMovementBoundsNoSnap(step);
                     }
                     else
                     {
@@ -605,7 +611,7 @@ namespace NPC
 
             _from = _rb != null ? _rb.position : (Vector2)transform.position;
             _to = Vector2.MoveTowards(_from, _target, moveSpeed * delta);
-            _to = ClampToMovementBounds(_to);
+            _to = snapToNavGrid ? ClampToMovementBounds(_to) : ClampToMovementBoundsNoSnap(_to);
             _lerpTime = 0f;
 
             if (Vector2.Distance(_to, _target) <= arriveDistance)
@@ -621,7 +627,7 @@ namespace NPC
                 float eased = _knockbackCurve != null && _knockbackCurve.length > 0 ? _knockbackCurve.Evaluate(progress) : progress;
                 Vector2 target = Vector2.LerpUnclamped(_knockbackStart, _knockbackEnd, eased);
                 if (_knockbackClamp)
-                    target = ClampToMovementBounds(target);
+                    target = NavValidationEnabled ? ClampToMovementBounds(target) : ClampToMovementBoundsNoSnap(target);
 
                 if (_rb != null) _rb.MovePosition(target);
                 else transform.position = target;
@@ -665,12 +671,13 @@ namespace NPC
 
             // Interpolate between the previous tick position and the target.
             Vector2 pos = Vector2.Lerp(_from, _to, t);
+            bool snapToNavGrid = NavValidationEnabled;
 
             // Maintain smooth interpolation between tiles by clamping without navgrid snapping
             // until the tick finishes. Once the tick completes we fall back to the snapping
             // variant so the NPC respects both the patrol rectangle and walkable cells.
             bool tickFinished = t >= 1f || _lerpTime >= tickDuration;
-            Vector2 clamped = tickFinished ? ClampToMovementBounds(pos) : ClampToMovementBoundsNoSnap(pos);
+            Vector2 clamped = (tickFinished && snapToNavGrid) ? ClampToMovementBounds(pos) : ClampToMovementBoundsNoSnap(pos);
 
             if (_rb != null) _rb.MovePosition(clamped);
             else transform.position = clamped;
@@ -701,14 +708,20 @@ namespace NPC
         /// <summary>
         /// Clamps the provided world position to the wanderer's configured movement bounds so the
         /// NPC never leaves its permitted patrol area, even when external systems (such as
-        /// knockback) attempt to move it beyond the limits. When a navigation grid is available the
-        /// result is additionally snapped to the nearest walkable nav-cell so the wanderer honours
-        /// baked blockers and does not drift into invalid tiles.
+        /// knockback) attempt to move it beyond the limits. When navigation validation is enabled and
+        /// a grid is available the result is additionally snapped to the nearest walkable nav-cell so
+        /// the wanderer honours baked blockers. When validation is disabled the method falls back to
+        /// simple bounds clamping without any nav-grid lookups.
         /// </summary>
         /// <param name="worldPosition">Target position in world space.</param>
         /// <returns>The clamped world position respecting the configured bounds.</returns>
         public Vector2 ClampToMovementBounds(Vector2 worldPosition)
         {
+            if (!NavValidationEnabled)
+            {
+                return ClampToMovementBoundsNoSnap(worldPosition);
+            }
+
             Vector2 origin = _originInitialized ? _origin : (_rb != null ? _rb.position : (Vector2)transform.position);
 
             Vector2 clamped = ClampWithinConfiguredBounds(origin, worldPosition, out float minX, out float maxX, out float minY, out float maxY);

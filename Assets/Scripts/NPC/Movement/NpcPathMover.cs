@@ -663,7 +663,8 @@ namespace NPC
                 return position;
             }
 
-            return snapToGrid ? wanderer.ClampToMovementBounds(position) : wanderer.ClampToMovementBoundsNoSnap(position);
+            bool shouldSnap = snapToGrid && wanderer.NavValidationEnabled;
+            return shouldSnap ? wanderer.ClampToMovementBounds(position) : wanderer.ClampToMovementBoundsNoSnap(position);
         }
 
         /// <summary>
