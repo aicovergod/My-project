@@ -426,11 +426,16 @@ namespace NPC
             if (hasDestination)
             {
                 Vector2 currentPosition = GetCurrentPosition();
+                bool hasClearStopLine = HasClearStopLine(currentPosition, desiredDestination);
+
                 if (IsWithinStopRange(currentPosition))
                 {
-                    waypointQueue.Clear();
-                    EvaluateArrival();
-                    return false;
+                    if (hasClearStopLine)
+                    {
+                        waypointQueue.Clear();
+                        EvaluateArrival();
+                        return false;
+                    }
                 }
 
                 float distanceToNext = Vector2.Distance(currentPosition, next);
@@ -438,9 +443,12 @@ namespace NPC
                 // current position (common when replans enqueue redundant nodes).
                 if (IsWithinStopRange(next) && distanceToNext <= waypointTolerance * 2f)
                 {
-                    waypointQueue.Clear();
-                    EvaluateArrival(next);
-                    return false;
+                    if (hasClearStopLine)
+                    {
+                        waypointQueue.Clear();
+                        EvaluateArrival(next);
+                        return false;
+                    }
                 }
             }
 
