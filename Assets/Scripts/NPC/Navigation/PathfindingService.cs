@@ -277,6 +277,15 @@ namespace NPC
         private readonly Dictionary<WeakReference<NpcPathMover>, int> latestQueuedRequestIdByMover =
             new Dictionary<WeakReference<NpcPathMover>, int>(MoverReferenceComparer.Instance);
         private readonly List<WeakReference<NpcPathMover>> moverCleanupBuffer = new List<WeakReference<NpcPathMover>>();
+        /// <summary>
+        /// Reusable frontier used when resolving the nearest walkable fallback cell so we avoid per-call queue allocations.
+        /// </summary>
+        private readonly Queue<Vector2Int> resolveFrontier = new Queue<Vector2Int>();
+
+        /// <summary>
+        /// Reusable visited set used by <see cref="ResolveNearestWalkable"/> to prevent revisiting cells while keeping GC churn minimal.
+        /// </summary>
+        private readonly HashSet<Vector2Int> resolveVisited = new HashSet<Vector2Int>();
         private PathRequest activeRequest;
         private int nextRequestId = 1;
         private bool subscribedToTicker;
@@ -783,19 +792,21 @@ namespace NPC
         {
             var grid = navGrid;
             usedStartFallback = false;
+            resolveFrontier.Clear();
+            resolveVisited.Clear();
+
             if (grid.IsCellWalkable(desired))
             {
                 return desired;
             }
 
-            Queue<Vector2Int> frontier = new Queue<Vector2Int>();
-            HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
-            frontier.Enqueue(desired);
-            visited.Add(desired);
+            // The service ticks on the main thread, so reusing these collections is safe and avoids GC churn for frequent path requests.
+            resolveFrontier.Enqueue(desired);
+            resolveVisited.Add(desired);
 
-            while (frontier.Count > 0)
+            while (resolveFrontier.Count > 0)
             {
-                Vector2Int current = frontier.Dequeue();
+                Vector2Int current = resolveFrontier.Dequeue();
                 foreach (var neighbour in EnumerateNeighbours(current))
                 {
                     if (!grid.IsCellWithinBounds(neighbour))
@@ -803,7 +814,7 @@ namespace NPC
                         continue;
                     }
 
-                    if (!visited.Add(neighbour))
+                    if (!resolveVisited.Add(neighbour))
                     {
                         continue;
                     }
@@ -820,7 +831,7 @@ namespace NPC
                     if (isStart)
                     {
                         // Track that we brushed past the start cell but keep exploring in case another walkable target exists.
-                        frontier.Enqueue(neighbour);
+                        resolveFrontier.Enqueue(neighbour);
                         continue;
                     }
 
