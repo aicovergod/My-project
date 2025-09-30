@@ -448,9 +448,16 @@ namespace NPC
             UpdateMovementVisuals(Vector2.zero);
             if (Vector2.Distance(current, desiredDestination) <= stopDistance + waypointTolerance)
             {
-                DestinationReached?.Invoke(this);
-                hasDestination = false;
-                ResumeWandererIfNeeded();
+                if (HasClearStopLine(current, desiredDestination))
+                {
+                    DestinationReached?.Invoke(this);
+                    hasDestination = false;
+                    ResumeWandererIfNeeded();
+                }
+                else
+                {
+                    ForceReplan(ignoreCooldown: true);
+                }
             }
             else if (Time.time >= nextAllowedRepathTime)
             {
@@ -554,6 +561,64 @@ namespace NPC
             }
 
             return grid.IsWorldPositionWalkable(waypoint);
+        }
+
+        /// <summary>
+        /// Checks whether the straight corridor between two positions remains free of nav-grid blockers.
+        /// </summary>
+        private bool HasClearStopLine(Vector2 origin, Vector2 goal)
+        {
+            var grid = pathService != null ? pathService.ActiveGrid : PathfindingService.Instance?.ActiveGrid;
+            if (grid == null || !grid.HasGrid)
+            {
+                return true;
+            }
+
+            if (!grid.TryGetCell(origin, out var startCell) || !grid.TryGetCell(goal, out var goalCell))
+            {
+                // When either endpoint lies outside the baked grid we cannot evaluate blockers reliably,
+                // so allow the move completion to proceed and fall back to the standard arrival logic.
+                return true;
+            }
+
+            int x = startCell.x;
+            int y = startCell.y;
+            int endX = goalCell.x;
+            int endY = goalCell.y;
+
+            int dx = Mathf.Abs(endX - x);
+            int dy = Mathf.Abs(endY - y);
+            int stepX = x < endX ? 1 : (x > endX ? -1 : 0);
+            int stepY = y < endY ? 1 : (y > endY ? -1 : 0);
+            int error = dx - dy;
+
+            while (true)
+            {
+                if (!grid.IsCellWalkable(new Vector2Int(x, y)))
+                {
+                    return false;
+                }
+
+                if (x == endX && y == endY)
+                {
+                    break;
+                }
+
+                int error2 = error * 2;
+                if (error2 > -dy)
+                {
+                    error -= dy;
+                    x += stepX;
+                }
+
+                if (error2 < dx)
+                {
+                    error += dx;
+                    y += stepY;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
