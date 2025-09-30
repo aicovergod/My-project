@@ -66,6 +66,10 @@ namespace NPC
         private NpcCombatant _combatant;
         private float _deterministicTickerTime;
         private float _lastMovementTimestamp;
+        // Tracks how much the NPC has physically moved during the current tick so stall detection can
+        // distinguish between jitter and genuine progress. Reset each tick and when states resync
+        // _from/_to to new anchors so stale motion does not hide a stall.
+        private float _movementProgressThisTick;
 
         // Per-tick interpolation
         private Vector2 _from;
@@ -130,6 +134,7 @@ namespace NPC
             _lerpTime = Ticker.TickDuration;
             _deterministicTickerTime = 0f;
             _lastMovementTimestamp = 0f;
+            _movementProgressThisTick = 0f;
 
             chaseRadius = ComputeChaseRadius();
 
@@ -144,6 +149,7 @@ namespace NPC
             _lastPos = origin;
             _from = _to = origin;
             chaseRadius = ComputeChaseRadius();
+            _movementProgressThisTick = 0f;
         }
 
         private void OnEnable()
@@ -169,6 +175,7 @@ namespace NPC
             _lerpTime = Ticker.TickDuration;
             _lastPos = current;
             _lastMovementTimestamp = _deterministicTickerTime;
+            _movementProgressThisTick = 0f;
             spriteAnimator?.UpdateVisuals(Vector2.zero);
         }
 
@@ -342,6 +349,7 @@ namespace NPC
             _waiting = false;
             _waitTimer = 0f;
             _lastMovementTimestamp = _deterministicTickerTime;
+            _movementProgressThisTick = 0f;
             spriteAnimator?.UpdateVisuals(Vector2.zero);
         }
 
@@ -376,6 +384,7 @@ namespace NPC
             _from = current;
             _to = current;
             _lerpTime = Ticker.TickDuration;
+            _movementProgressThisTick = 0f;
         }
 
         /// <summary>
@@ -397,6 +406,7 @@ namespace NPC
             _to = current;
             _lerpTime = Ticker.TickDuration;
             _lastPos = current;
+            _movementProgressThisTick = 0f;
             spriteAnimator?.UpdateVisuals(Vector2.zero);
         }
 
@@ -424,10 +434,12 @@ namespace NPC
                     _rb.velocity = Vector2.zero;
 #endif
                 spriteAnimator?.UpdateVisuals(Vector2.zero);
+                _movementProgressThisTick = 0f;
             }
             else
             {
                 _lerpTime = Ticker.TickDuration;
+                _movementProgressThisTick = 0f;
             }
         }
 
@@ -511,6 +523,7 @@ namespace NPC
         {
             float delta = Ticker.TickDuration;
             _deterministicTickerTime += delta;
+            _movementProgressThisTick = 0f;
             const float DISTANCE_EPSILON = 0.05f;
 
             if (_knockbackActive)
@@ -672,8 +685,14 @@ namespace NPC
         private void RegisterMovementDelta(Vector2 delta)
         {
             float epsilon = Mathf.Max(0f, movementDeltaEpsilon);
-            float epsilonSqr = epsilon * epsilon;
-            if (delta.sqrMagnitude > epsilonSqr)
+            if (epsilon <= 0f)
+            {
+                _lastMovementTimestamp = _deterministicTickerTime;
+                return;
+            }
+
+            _movementProgressThisTick += delta.magnitude;
+            if (_movementProgressThisTick >= epsilon)
             {
                 _lastMovementTimestamp = _deterministicTickerTime;
             }
