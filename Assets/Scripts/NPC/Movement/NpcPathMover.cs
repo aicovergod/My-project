@@ -410,6 +410,28 @@ namespace NPC
             }
 
             Vector2 next = ClampWithWanderer(waypointQueue.Peek());
+
+            if (hasDestination)
+            {
+                Vector2 currentPosition = GetCurrentPosition();
+                if (IsWithinStopRange(currentPosition))
+                {
+                    waypointQueue.Clear();
+                    EvaluateArrival();
+                    return false;
+                }
+
+                float distanceToNext = Vector2.Distance(currentPosition, next);
+                // Guard against consuming a waypoint that is already inside the preferred stop range when it overlaps the NPC's
+                // current position (common when replans enqueue redundant nodes).
+                if (IsWithinStopRange(next) && distanceToNext <= waypointTolerance * 2f)
+                {
+                    waypointQueue.Clear();
+                    EvaluateArrival(next);
+                    return false;
+                }
+            }
+
             if (!IsWaypointWalkable(next))
             {
                 ForceReplan();
@@ -447,16 +469,24 @@ namespace NPC
         /// <summary>
         /// Validates whether the NPC is close enough to its destination or if another replan is required.
         /// </summary>
-        private void EvaluateArrival()
+        /// <param name="stopRangeSampleOverride">Optional position sample (e.g., peeked waypoint) to evaluate against the stop range.</param>
+        private void EvaluateArrival(Vector2? stopRangeSampleOverride = null)
         {
             Vector2 current = GetCurrentPosition();
             UpdateMovementVisuals(Vector2.zero);
-            if (Vector2.Distance(current, desiredDestination) <= stopDistance + waypointTolerance)
+            bool withinStopRange = IsWithinStopRange(current);
+            if (!withinStopRange && stopRangeSampleOverride.HasValue)
+            {
+                withinStopRange = IsWithinStopRange(stopRangeSampleOverride.Value);
+            }
+
+            if (withinStopRange)
             {
                 if (HasClearStopLine(current, desiredDestination))
                 {
                     DestinationReached?.Invoke(this);
                     hasDestination = false;
+                    waypointQueue.Clear();
                     ResumeWandererIfNeeded();
                 }
                 else
@@ -468,6 +498,15 @@ namespace NPC
             {
                 RequestPathInternal(desiredDestination, true);
             }
+        }
+
+        /// <summary>
+        /// Determines whether a position falls within the configured stop distance (including tolerance).
+        /// </summary>
+        /// <param name="position">World position to evaluate.</param>
+        private bool IsWithinStopRange(Vector2 position)
+        {
+            return Vector2.Distance(position, desiredDestination) <= stopDistance + waypointTolerance;
         }
 
         /// <summary>
