@@ -3,6 +3,7 @@ using Combat;
 using Core.Save;
 using Skills.Common;
 using Skills;
+using UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -39,6 +40,14 @@ namespace Skills.Mining
         private float totalLifetimeSeconds;
         private float remainingLifetimeSeconds;
         private bool isExpired;
+        private bool isOwnedByLocalProfile;
+
+        /// <summary>
+        ///     Indicates whether the active local profile owns the node. The value updates whenever
+        ///     <see cref="ConfigureOwnershipVisibility"/> runs so ownership checks remain cached for
+        ///     quick queries.
+        /// </summary>
+        public bool IsOwnedByLocalProfile => isOwnedByLocalProfile;
 
         /// <summary>
         ///     Raised whenever the node's remaining lifetime changes. Provides the node instance,
@@ -116,11 +125,10 @@ namespace Skills.Mining
             remainingLifetimeSeconds = totalLifetimeSeconds;
             isExpired = false;
 
-            if (interactionCollider != null)
-                interactionCollider.enabled = true;
+            LegacyFontProvider.ApplyTo(ownerOnlyText);
 
-            UpdateOwnerOnlyVisuals();
             ApplyDefinitionVisuals();
+            ConfigureOwnershipVisibility();
             RaiseLifetimeChanged();
 
             if (totalLifetimeSeconds <= 0f)
@@ -132,6 +140,20 @@ namespace Skills.Mining
             {
                 TrySubscribeToTicker();
             }
+        }
+
+        /// <summary>
+        ///     Allows external systems to change ownership at runtime and immediately updates visibility.
+        /// </summary>
+        /// <param name="newOwnerId">New owner profile identifier.</param>
+        public void UpdateOwnerProfile(string newOwnerId)
+        {
+            string normalizedOwnerId = string.IsNullOrWhiteSpace(newOwnerId) ? string.Empty : newOwnerId;
+            if (string.Equals(ownerProfileId, normalizedOwnerId, StringComparison.Ordinal))
+                return;
+
+            ownerProfileId = normalizedOwnerId;
+            ConfigureOwnershipVisibility();
         }
 
         /// <summary>
@@ -150,14 +172,12 @@ namespace Skills.Mining
                 return false;
             }
 
-            if (!string.IsNullOrEmpty(ownerProfileId))
+            RefreshOwnershipCacheIfNeeded();
+
+            if (!string.IsNullOrEmpty(ownerProfileId) && !isOwnedByLocalProfile)
             {
-                string activeProfileId = SaveManager.ActiveProfileId ?? string.Empty;
-                if (!string.Equals(ownerProfileId, activeProfileId, StringComparison.Ordinal))
-                {
-                    failureMessage = "Only the victorious miner can claim this ore.";
-                    return false;
-                }
+                failureMessage = "Only the victorious miner can claim this ore.";
+                return false;
             }
 
             if (sourceDefinition != null && sourceDefinition.RequiresCombatLevel)
@@ -185,6 +205,8 @@ namespace Skills.Mining
             if (isExpired)
                 return;
 
+            RefreshOwnershipCacheIfNeeded();
+
             remainingLifetimeSeconds = Mathf.Max(0f, remainingLifetimeSeconds - Util.Ticker.TickDuration);
             RaiseLifetimeChanged();
 
@@ -210,24 +232,7 @@ namespace Skills.Mining
                 RaiseLifetimeChanged();
 
             CancelTickerSubscription();
-
-            if (interactionCollider != null)
-                interactionCollider.enabled = false;
-
-            if (ownerOnlyCanvas != null)
-                ownerOnlyCanvas.enabled = false;
-            if (ownerOnlyText != null)
-                ownerOnlyText.enabled = false;
-            if (ownerOnlyIcon != null)
-                ownerOnlyIcon.enabled = false;
-            if (ownerOnlySpriteRenderers != null)
-            {
-                for (int i = 0; i < ownerOnlySpriteRenderers.Length; i++)
-                {
-                    if (ownerOnlySpriteRenderers[i] != null)
-                        ownerOnlySpriteRenderers[i].enabled = false;
-                }
-            }
+            ConfigureOwnershipVisibility();
 
             if (playVfx && despawnVfxPrefab != null)
             {
@@ -245,17 +250,21 @@ namespace Skills.Mining
         /// <summary>
         ///     Applies the ownership visibility rules based on whether the active profile matches the owner.
         /// </summary>
-        private void UpdateOwnerOnlyVisuals()
+        private void ConfigureOwnershipVisibility()
         {
-            bool isOwner = string.IsNullOrEmpty(ownerProfileId) ||
-                           string.Equals(ownerProfileId, SaveManager.ActiveProfileId ?? string.Empty, StringComparison.Ordinal);
+            isOwnedByLocalProfile = DetermineLocalOwnership();
+
+            bool shouldShowOwnerVisuals = isOwnedByLocalProfile && !isExpired;
 
             if (ownerOnlyCanvas != null)
-                ownerOnlyCanvas.enabled = isOwner;
+                ownerOnlyCanvas.enabled = shouldShowOwnerVisuals;
             if (ownerOnlyText != null)
-                ownerOnlyText.enabled = isOwner;
+                ownerOnlyText.enabled = shouldShowOwnerVisuals;
             if (ownerOnlyIcon != null)
-                ownerOnlyIcon.enabled = isOwner && ownerOnlyIcon.sprite != null;
+                ownerOnlyIcon.enabled = shouldShowOwnerVisuals && ownerOnlyIcon.sprite != null;
+
+            if (interactionCollider != null)
+                interactionCollider.enabled = shouldShowOwnerVisuals;
 
             if (ownerOnlySpriteRenderers == null)
                 return;
@@ -263,8 +272,18 @@ namespace Skills.Mining
             for (int i = 0; i < ownerOnlySpriteRenderers.Length; i++)
             {
                 if (ownerOnlySpriteRenderers[i] != null)
-                    ownerOnlySpriteRenderers[i].enabled = isOwner;
+                    ownerOnlySpriteRenderers[i].enabled = shouldShowOwnerVisuals;
             }
+        }
+
+        /// <summary>
+        ///     Re-evaluates the cached ownership flag and reconfigures visuals when the value changes.
+        /// </summary>
+        private void RefreshOwnershipCacheIfNeeded()
+        {
+            bool currentOwnership = DetermineLocalOwnership();
+            if (currentOwnership != isOwnedByLocalProfile)
+                ConfigureOwnershipVisibility();
         }
 
         /// <summary>
@@ -275,11 +294,8 @@ namespace Skills.Mining
             if (sourceDefinition == null)
                 return;
 
-            if (ownerOnlyIcon != null && sourceDefinition.SoloLockSprite != null)
-            {
+            if (ownerOnlyIcon != null)
                 ownerOnlyIcon.sprite = sourceDefinition.SoloLockSprite;
-                ownerOnlyIcon.enabled = ownerOnlyCanvas == null || ownerOnlyCanvas.enabled;
-            }
 
             if (ownerOnlySpriteRenderers == null)
                 return;
@@ -293,6 +309,31 @@ namespace Skills.Mining
         }
 
         /// <summary>
+        ///     Updates the countdown label with the formatted remaining lifetime if a label is present.
+        /// </summary>
+        private void UpdateCountdownVisuals()
+        {
+            if (ownerOnlyText == null)
+                return;
+
+            int secondsRemaining = Mathf.Max(0, Mathf.CeilToInt(RemainingLifetimeSeconds));
+            var remaining = TimeSpan.FromSeconds(secondsRemaining);
+            ownerOnlyText.text = remaining.ToString("mm\\:ss");
+        }
+
+        /// <summary>
+        ///     Evaluates whether the currently active profile owns this personal node.
+        /// </summary>
+        private bool DetermineLocalOwnership()
+        {
+            if (string.IsNullOrEmpty(ownerProfileId))
+                return true;
+
+            string activeProfileId = SaveManager.ActiveProfileId ?? string.Empty;
+            return string.Equals(ownerProfileId, activeProfileId, StringComparison.Ordinal);
+        }
+
+        /// <summary>
         ///     Helper that raises the lifetime changed event with the current normalized value.
         /// </summary>
         private void RaiseLifetimeChanged()
@@ -301,6 +342,7 @@ namespace Skills.Mining
                 ? Mathf.Clamp01(RemainingLifetimeSeconds / totalLifetimeSeconds)
                 : 0f;
 
+            UpdateCountdownVisuals();
             LifetimeChanged?.Invoke(this, RemainingLifetimeSeconds, normalized);
         }
     }
