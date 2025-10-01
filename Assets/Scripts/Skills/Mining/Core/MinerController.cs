@@ -66,6 +66,12 @@ namespace Skills.Mining
                 return false;
             }
 
+            var personalNode = node.GetComponent<PersonalOreNode>();
+            if (personalNode != null && !personalNode.CanMine(MiningSkill, out failureMessage))
+            {
+                return false;
+            }
+
             cachedPickaxe = pickaxeSelector != null ? pickaxeSelector.GetBestPickaxe() : null;
             if (cachedPickaxe == null)
             {
