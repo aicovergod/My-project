@@ -35,6 +35,7 @@ namespace Skills.Mining
         [SerializeField] private SpriteRenderer[] ownerOnlySpriteRenderers;
 
         private MiningPersonalNodeController ownerController;
+        private MineableRock mineableRock;
         private OreMonsterNodeDefinition sourceDefinition;
         private string ownerProfileId = string.Empty;
         private float totalLifetimeSeconds;
@@ -97,7 +98,7 @@ namespace Skills.Mining
         private void Awake()
         {
             // Ensure the required mineable rock component exists so the prefab remains valid.
-            GetComponent<MineableRock>();
+            mineableRock = GetComponent<MineableRock>();
 
             // Fall back to the attached collider when no explicit interaction collider has been
             // assigned via the inspector. This keeps prefabs flexible while enforcing safe mining.
@@ -124,6 +125,12 @@ namespace Skills.Mining
             totalLifetimeSeconds = Mathf.Max(0f, lifetimeSeconds);
             remainingLifetimeSeconds = totalLifetimeSeconds;
             isExpired = false;
+
+            if (mineableRock == null)
+                mineableRock = GetComponent<MineableRock>();
+
+            if (mineableRock != null && definition != null && definition.PersonalRockDefinition != null)
+                mineableRock.rockDef = definition.PersonalRockDefinition;
 
             LegacyFontProvider.ApplyTo(ownerOnlyText);
 

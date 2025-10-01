@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a6b363ec0e84e199fc8b1461b1cf6c9, type: 3}
+  m_Name: Coal Ore Monster Node
+  m_EditorClassIdentifier:
+  monsterCombatProfile: {fileID: 11400000, guid: a2f9345330f24e74da31849069a079ad, type: 2}
+  personalOreNodePrefab: {fileID: 100000, guid: b517a91277d2435e8530e04eb6679bfd, type: 3}
+  personalRockDefinition: {fileID: 11400000, guid: 271071a82b1140f8b543a7b5196bf06d, type: 2}
+  baseLifetimeSeconds: 240
+  charmLifetimeSeconds: 420
+  charmItemId: personal_coal_charm
+  requiresCombatLevel: 1
+  requiredCombatLevel: 35
+  soloLockSprite: {fileID: 0}
+  spawnOffset: {x: 0, y: 0.25, z: 0}

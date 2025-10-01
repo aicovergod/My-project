@@ -18,6 +18,10 @@ namespace Skills.Mining
         [Tooltip("Prefab for the personal ore node that becomes available after defeating the monster.")]
         [SerializeField] private PersonalOreNode personalOreNodePrefab;
 
+        [Header("Personal Node Data")]
+        [Tooltip("Rock definition applied to the spawned personal node so ore rewards remain data-driven.")]
+        [SerializeField] private RockDefinition personalRockDefinition;
+
         [Header("Lifetime (Seconds)")]
         [Tooltip("Default lifetime for the personal ore node before it despawns.")]
         [Min(0f)]
@@ -56,6 +60,11 @@ namespace Skills.Mining
         public PersonalOreNode PersonalOreNodePrefab => personalOreNodePrefab;
 
         /// <summary>
+        /// Rock definition assigned to the personal node so it yields the correct ore rewards.
+        /// </summary>
+        public RockDefinition PersonalRockDefinition => personalRockDefinition;
+
+        /// <summary>
         /// Lifetime applied when no charm bonus is active.
         /// </summary>
         public float BaseLifetimeSeconds => baseLifetimeSeconds;
@@ -83,7 +92,7 @@ namespace Skills.Mining
         /// <summary>
         /// Solo-lock indicator sprite shown when the node is reserved for the defeating player.
         /// </summary>
-        public Sprite SoloLockSprite => soloLockSprite;
+        public Sprite SoloLockSprite => soloLockSprite != null ? soloLockSprite : SoloLockSpriteLibrary.DefaultSprite;
 
         /// <summary>
         /// World-space offset used when spawning the monster relative to its target rock.
