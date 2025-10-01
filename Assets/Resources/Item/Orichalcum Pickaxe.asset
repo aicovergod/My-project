@@ -19,11 +19,21 @@ MonoBehaviour:
 
     rocks'
   stackable: 0
-  maxStack: 0
+  maxStack: 1
   splittable: 1
+  isUndroppable: 0
+  healAmount: 0
+  replacementItemId: 
   equipmentSlot: 10
+  bycatchChanceBonus: 0
+  fishingXpBonusMultiplier: 0
+  fishingXpBonusWaterTypes: -1
+  woodcuttingXpBonusMultiplier: 0
+  miningXpBonusMultiplier: 0
+  cookingXpBonusMultiplier: 0
+  firemakingXpBonusMultiplier: 0
   skillRequirements:
-  - skill: 4
+  - skill: 6
     level: 25
   - skill: 0
     level: 25
@@ -36,3 +46,12 @@ MonoBehaviour:
     RangeDefence: 0
     MagicDefence: 0
     AttackSpeedTicks: 4
+  onHitPoison: {fileID: 0}
+  poisonApplyChance: 0.25
+  poisonRequiresDamage: 1
+  isHalberd: 0
+  aoeRadiusTiles: 0
+  coneAngleDeg: 0
+  aoeMaxTargets: 0
+  aoeMultiplier: 0
+  buffEffects: []
