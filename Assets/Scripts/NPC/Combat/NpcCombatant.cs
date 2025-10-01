@@ -442,7 +442,7 @@ namespace NPC
 
             var follower = component.GetComponentInParent<PetFollower>();
             if (follower != null && follower.Player != null && follower.Player.TryGetComponent<PlayerCombatTarget>(out _))
-                return follower.Player;
+                return follower.Player.gameObject;
 
             return null;
         }
