@@ -100,12 +100,10 @@ namespace Skills.Mining
             RegisterNodeCallbacks(activeNode);
             ActiveNodeChanged?.Invoke(activeNode);
 
-            activeNode.Initialise(ownerProfileId, lifetimeSeconds);
+            activeNode.Initialise(this, definition, ownerProfileId, lifetimeSeconds);
 
             LogDebug(
                 $"Spawned personal ore node '{prefab.name}' at {spawnPosition} with lifetime {lifetimeSeconds:0.00}s (charm equipped: {charmEquipped}).");
-
-            ActiveNodeTimerUpdated?.Invoke(lifetimeSeconds, lifetimeSeconds > 0f ? 1f : 0f);
         }
 
         /// <summary>
@@ -141,8 +139,8 @@ namespace Skills.Mining
             if (node == null)
                 return;
 
-            node.LifetimeExpired += HandleActiveNodeExpired;
-            node.LifetimeTimerUpdated += HandleActiveNodeTimerUpdated;
+            node.Expired += HandleActiveNodeExpired;
+            node.LifetimeChanged += HandleActiveNodeLifetimeChanged;
         }
 
         private void UnregisterNodeCallbacks(PersonalOreNode node)
@@ -150,8 +148,8 @@ namespace Skills.Mining
             if (node == null)
                 return;
 
-            node.LifetimeExpired -= HandleActiveNodeExpired;
-            node.LifetimeTimerUpdated -= HandleActiveNodeTimerUpdated;
+            node.Expired -= HandleActiveNodeExpired;
+            node.LifetimeChanged -= HandleActiveNodeLifetimeChanged;
         }
 
         private void HandleActiveNodeExpired(PersonalOreNode node)
@@ -168,16 +166,16 @@ namespace Skills.Mining
             ActiveNodeTimerUpdated?.Invoke(0f, 0f);
         }
 
-        private void HandleActiveNodeTimerUpdated(PersonalOreNode node, float remainingSeconds)
+        private void HandleActiveNodeLifetimeChanged(PersonalOreNode node, float remainingSeconds, float normalized)
         {
             if (node != activeNode)
                 return;
 
-            float normalized = activeNodeLifetimeSeconds > 0f
+            float normalizedLifetime = activeNodeLifetimeSeconds > 0f
                 ? Mathf.Clamp01(remainingSeconds / activeNodeLifetimeSeconds)
-                : 0f;
+                : Mathf.Clamp01(normalized);
 
-            ActiveNodeTimerUpdated?.Invoke(Mathf.Max(0f, remainingSeconds), normalized);
+            ActiveNodeTimerUpdated?.Invoke(Mathf.Max(0f, remainingSeconds), normalizedLifetime);
         }
 
         private bool HasCharmEquipped(string charmItemId)
