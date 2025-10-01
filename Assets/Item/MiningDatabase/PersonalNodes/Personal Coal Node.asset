@@ -11,11 +11,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 478a3efbdba08cb42910fd0005addf6d, type: 3}
   m_Name: Personal Coal Node
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   id: Personal Coal Node
   ore: {fileID: 11400000, guid: d6216817fc6a570448ad73e0e6a901e7, type: 2}
   depletionRoll: 0
   depleteAfterNOres: 0
-  respawnTimeSecondsMin: 15
-  respawnTimeSecondsMax: 30
+  respawnTimeSecondsMin: 0
+  respawnTimeSecondsMax: 0
   requiresToolTier: 2

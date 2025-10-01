@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2934156379953286805}
   - component: {fileID: 5567743148573218289}
   m_Layer: 7
-  m_Name: PersonalOreNode
+  m_Name: PersonalTinOreNode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

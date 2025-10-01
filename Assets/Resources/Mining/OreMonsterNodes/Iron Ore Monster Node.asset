@@ -11,14 +11,14 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a6b363ec0e84e199fc8b1461b1cf6c9, type: 3}
   m_Name: Iron Ore Monster Node
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   monsterCombatProfile: {fileID: 11400000, guid: 99be5545587046b409a3d4e9f2a85c70, type: 2}
   personalOreNodePrefab: {fileID: 100000, guid: b517a91277d2435e8530e04eb6679bfd, type: 3}
   personalRockDefinition: {fileID: 11400000, guid: cd5c81cbac9f43f08eb733b3448aa70e, type: 2}
   baseLifetimeSeconds: 210
   charmLifetimeSeconds: 360
-  charmItemId: personal_iron_charm
-  requiresCombatLevel: 1
+  charmItemId: Orekeepers Charm
+  requiresCombatLevel: 0
   requiredCombatLevel: 20
-  soloLockSprite: {fileID: 0}
+  soloLockSprite: {fileID: 21300000, guid: c1c83649dd98b5e499472899ac364b8b, type: 3}
   spawnOffset: {x: 0, y: 0.25, z: 0}

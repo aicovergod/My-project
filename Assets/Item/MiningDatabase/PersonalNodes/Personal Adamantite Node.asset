@@ -11,11 +11,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 478a3efbdba08cb42910fd0005addf6d, type: 3}
   m_Name: Personal Adamantite Node
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   id: Personal Adamantite Node
   ore: {fileID: 11400000, guid: 3027fbd7818b9a6448613444b53c9ca3, type: 2}
   depletionRoll: 0
   depleteAfterNOres: 0
-  respawnTimeSecondsMin: 90
-  respawnTimeSecondsMax: 180
+  respawnTimeSecondsMin: 0
+  respawnTimeSecondsMax: 0
   requiresToolTier: 4

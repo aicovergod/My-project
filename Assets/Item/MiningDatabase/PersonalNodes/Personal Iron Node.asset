@@ -11,11 +11,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 478a3efbdba08cb42910fd0005addf6d, type: 3}
   m_Name: Personal Iron Node
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   id: Personal Iron Node
   ore: {fileID: 11400000, guid: 0c99a27b936219b4d997f8625c9b5b22, type: 2}
   depletionRoll: 0
   depleteAfterNOres: 0
-  respawnTimeSecondsMin: 4
-  respawnTimeSecondsMax: 7
+  respawnTimeSecondsMin: 0
+  respawnTimeSecondsMax: 0
   requiresToolTier: 1
