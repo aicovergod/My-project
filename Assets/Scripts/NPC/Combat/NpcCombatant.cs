@@ -64,6 +64,7 @@ namespace NPC
 
         public event System.Action<int, int> OnHealthChanged; // current, max
         public event System.Action OnDeath;
+        public event System.Action<NpcCombatant, GameObject> OnKilledByPlayer;
 
         public bool IsAlive => currentHp > 0;
         public DamageType PreferredDefenceType => profile != null ? profile.AttackType : DamageType.Melee;
@@ -205,39 +206,33 @@ namespace NPC
             }
             var combat = GetComponent<BaseNpcCombat>();
             var combatSource = source as CombatTarget;
+            GameObject killingPlayer = null;
             bool creditedToPlayer = false;
             Transform knockbackSource = null;
+            var resolvedPlayer = ResolvePlayerFromDamageSource(source);
+            if (resolvedPlayer != null)
+            {
+                playerDamage += damageToApply;
+                creditedToPlayer = true;
+                killingPlayer = resolvedPlayer;
+
+                if (source is Component componentSource)
+                    knockbackSource = componentSource.transform;
+                else if (combatSource is Component combatComponent)
+                    knockbackSource = combatComponent.transform;
+                else
+                    knockbackSource = resolvedPlayer.transform;
+            }
+            else
+            {
+                npcDamage += damageToApply;
+            }
+
+            if (damageToApply > 0 && knockbackSource != null)
+                knockbackReceiver?.ApplyKnockbackFrom(knockbackSource, damageToApply);
+
             if (combatSource != null)
             {
-                if (combatSource is PlayerCombatTarget)
-                {
-                    playerDamage += damageToApply;
-                    creditedToPlayer = true;
-                    if (combatSource is Component component)
-                        knockbackSource = component.transform;
-                }
-                else if (combatSource is PetCombatController pet)
-                {
-                    var owner = pet.GetComponent<PetFollower>()?.Player;
-                    if (owner != null && owner.TryGetComponent<PlayerCombatTarget>(out _))
-                    {
-                        playerDamage += damageToApply;
-                        creditedToPlayer = true;
-                        knockbackSource = pet.transform;
-                    }
-                    else
-                    {
-                        npcDamage += damageToApply;
-                    }
-                }
-                else
-                {
-                    npcDamage += damageToApply;
-                }
-
-                if (damageToApply > 0 && knockbackSource != null)
-                    knockbackReceiver?.ApplyKnockbackFrom(knockbackSource, damageToApply);
-
                 combat?.AddThreat(combatSource, damageToApply);
                 combat?.RecordDamageFrom(combatSource);
                 if (combat != null && !combat.InCombat)
@@ -249,10 +244,7 @@ namespace NPC
                 }
                 combat?.BeginAttacking(combatSource);
             }
-            else
-            {
-                npcDamage += damageToApply;
-            }
+
             var killedByPlayer = creditedToPlayer;
             if (currentHp <= 0)
             {
@@ -277,6 +269,9 @@ namespace NPC
 
                 Debug.Assert(!hasRecentPlayerContribution || playerDamage > 0,
                     $"{name} recorded recent player damage but has no tracked playerDamage. Ensure ClearDamageContributors is invoked when combat resets.");
+
+                if (killedByPlayer && killingPlayer != null)
+                    OnKilledByPlayer?.Invoke(this, killingPlayer);
 
                 if (killedByPlayer || playerDamage > npcDamage)
                     dropper?.OnDeath();
@@ -389,6 +384,67 @@ namespace NPC
         private void ApplyGlobalDamageLoggingState()
         {
             logDamage = globalDamageLoggingEnabled;
+        }
+
+        /// <summary>
+        /// Resolves the player GameObject responsible for a given damage source. Handles direct players,
+        /// pet proxies, and component references so fatal blows can be attributed consistently.
+        /// </summary>
+        /// <param name="source">Damage source passed to <see cref="ApplyDamage"/>.</param>
+        /// <returns>The owning player GameObject when one can be identified; otherwise <c>null</c>.</returns>
+        private GameObject ResolvePlayerFromDamageSource(object source)
+        {
+            if (source == null)
+                return null;
+
+            if (source is PlayerCombatTarget directPlayer)
+                return directPlayer.gameObject;
+
+            if (source is Component componentSource)
+            {
+                var player = ResolvePlayerFromComponent(componentSource);
+                if (player != null)
+                    return player;
+            }
+
+            if (source is GameObject sourceObject)
+            {
+                var player = ResolvePlayerFromComponent(sourceObject.transform);
+                if (player != null)
+                    return player;
+            }
+
+            if (source is CombatTarget combatTarget && combatTarget is Component combatComponent)
+            {
+                var player = ResolvePlayerFromComponent(combatComponent);
+                if (player != null)
+                    return player;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Attempts to locate a player GameObject starting from a component reference, searching both the
+        /// component hierarchy and associated pet followers.
+        /// </summary>
+        private GameObject ResolvePlayerFromComponent(Component component)
+        {
+            if (component == null)
+                return null;
+
+            if (component.TryGetComponent<PlayerCombatTarget>(out var directPlayer))
+                return directPlayer.gameObject;
+
+            var parentPlayer = component.GetComponentInParent<PlayerCombatTarget>();
+            if (parentPlayer != null)
+                return parentPlayer.gameObject;
+
+            var follower = component.GetComponentInParent<PetFollower>();
+            if (follower != null && follower.Player != null && follower.Player.TryGetComponent<PlayerCombatTarget>(out _))
+                return follower.Player;
+
+            return null;
         }
     }
 }
