@@ -9,6 +9,7 @@ using Skills.Common;
 using Skills.Mining;
 using UI;
 using Player;
+using Util;
 
 namespace Pets
 {
@@ -278,25 +279,22 @@ namespace Pets
             float chance = CombatMath.ChanceToHit(atkRoll, defRoll);
             bool hit = Random.value < chance;
 
-            int facingDir = 0;
             Vector2 diff = target.transform.position - transform.position;
-            if (Mathf.Abs(diff.x) > Mathf.Abs(diff.y))
-                facingDir = diff.x < 0f ? 1 : 2;
-            else
-                facingDir = diff.y < 0f ? 0 : 3;
+            Direction8 facingDir = Direction8Utility.FromVector(diff, allowDiagonals: true, fallback: Direction8.Down);
+            int animatorFacing = Direction8Utility.ToAnimatorIndex(facingDir);
 
             if (spriteAnimator != null)
-                spriteAnimator.SetFacing(facingDir);
+                spriteAnimator.SetFacing(animatorFacing);
             else if (spriteRenderer != null)
-                spriteRenderer.flipX = facingDir == 2;
+                spriteRenderer.flipX = Direction8Utility.IsFacingRight(facingDir);
 
             if (animator != null)
                 animator.SetTrigger("Attack");
-            else if (spriteAnimator != null && spriteAnimator.HasHitAnimation(facingDir))
+            else if (spriteAnimator != null && spriteAnimator.HasHitAnimation(animatorFacing))
             {
                 if (spriteSwapRoutine != null)
                     StopCoroutine(spriteSwapRoutine);
-                spriteSwapRoutine = StartCoroutine(spriteAnimator.PlayHitAnimation(facingDir));
+                spriteSwapRoutine = StartCoroutine(spriteAnimator.PlayHitAnimation(animatorFacing));
             }
             else if (spriteRenderer != null && definition != null && definition.attackSprite != null)
             {

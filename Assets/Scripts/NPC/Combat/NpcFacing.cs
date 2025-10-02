@@ -1,4 +1,5 @@
 using UnityEngine;
+using Util;
 
 namespace NPC
 {
@@ -11,10 +12,9 @@ namespace NPC
         private SpriteRenderer spriteRenderer;
 
         /// <summary>
-        /// Most recent facing direction.
-        /// 0 = down, 1 = left, 2 = right, 3 = up.
+        /// Most recent facing direction resolved through the shared <see cref="Direction8"/> helpers.
         /// </summary>
-        public int FacingDirection { get; private set; }
+        public Direction8 FacingDirection { get; private set; } = Direction8.Down;
 
         /// <summary>
         /// Animator used for sprite swaps and attack animations.
@@ -53,15 +53,12 @@ namespace NPC
             if (direction.sqrMagnitude <= Mathf.Epsilon)
                 return;
 
-            if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
-                FacingDirection = direction.x < 0f ? 1 : 2;
-            else
-                FacingDirection = direction.y < 0f ? 0 : 3;
+            FacingDirection = Direction8Utility.FromVector(direction, allowDiagonals: true, fallback: FacingDirection);
 
             if (spriteAnimator != null)
-                spriteAnimator.SetFacing(FacingDirection);
+                spriteAnimator.SetFacing(Direction8Utility.ToAnimatorIndex(FacingDirection));
             else if (spriteRenderer != null)
-                spriteRenderer.flipX = FacingDirection == 2;
+                spriteRenderer.flipX = Direction8Utility.IsFacingRight(FacingDirection);
         }
     }
 }

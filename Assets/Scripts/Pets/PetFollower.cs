@@ -159,13 +159,13 @@ namespace Pets
             if (spriteAnimator != null)
             {
                 if (!playerMoving && playerMover != null)
-                    spriteAnimator.SetFacing(playerMover.FacingDir);
+                    spriteAnimator.SetFacing(Direction8Utility.ToAnimatorIndex(playerMover.FacingDir));
                 spriteAnimator.UpdateVisuals(playerMoving ? velocity : Vector2.zero);
             }
             else if (sprite != null)
             {
                 if (!playerMoving && playerMover != null)
-                    sprite.flipX = playerMover.FacingDir == 1;
+                    sprite.flipX = Direction8Utility.IsFacingLeft(playerMover.FacingDir);
                 else
                     sprite.flipX = newPos.x > player.position.x;
             }

@@ -37,10 +37,13 @@ namespace Player
         [Tooltip("If assigned, these sprites will be applied directly each frame based on Dir/IsMoving. Leave null to rely on Animator clips.")]
         public Sprite idleDown, idleLeft, idleRight, idleUp;
         public Sprite walkDown, walkLeft, walkRight, walkUp;
-        [Tooltip("If true, flip right-facing sprites for left-facing movement/idle.")]
-        public bool useFlipXForLeft;
-        [Tooltip("If true, flip left-facing sprites for right-facing movement/idle.")]
-        public bool useFlipXForRight;
+        [Header("Mirroring")]
+        [Tooltip("If true, reuse right-facing sprites for any left-facing orientation (including diagonals).")]
+        [SerializeField]
+        private bool useFlipXForLeft;
+        [Tooltip("If true, reuse left-facing sprites for any right-facing orientation (including diagonals).")]
+        [SerializeField]
+        private bool useFlipXForRight;
 
 #if ENABLE_INPUT_SYSTEM
         [Header("Input")]
@@ -96,12 +99,11 @@ namespace Player
 
         private const string PositionKey = "PlayerPosition";
 
-        // 0=Down, 1=Left, 2=Right, 3=Up
-        private int facingDir = 0;
+        private Direction8 facingDir = Direction8.Down;
         private Vector2 moveDir;
 
-        /// <summary>Current facing direction: 0=Down, 1=Left, 2=Right, 3=Up.</summary>
-        public int FacingDir => facingDir;
+        /// <summary>Current facing direction.</summary>
+        public Direction8 FacingDir => facingDir;
 
         public bool IsMoving => moveDir.sqrMagnitude > 0f;
 
@@ -272,26 +274,23 @@ namespace Player
                 return;
             }
 
-            float x = 0f, y = 0f;
+            Vector2 inputDir = Vector2.zero;
 
 #if ENABLE_INPUT_SYSTEM
             Vector2 raw = moveAction != null ? moveActionValue : Vector2.zero;
             // Snap analog to -1/0/1 so animations are stable
-            x = Mathf.Abs(raw.x) < gamepadDeadzone ? 0f : Mathf.Sign(raw.x);
-            y = Mathf.Abs(raw.y) < gamepadDeadzone ? 0f : Mathf.Sign(raw.y);
+            raw.x = Mathf.Abs(raw.x) < gamepadDeadzone ? 0f : Mathf.Sign(raw.x);
+            raw.y = Mathf.Abs(raw.y) < gamepadDeadzone ? 0f : Mathf.Sign(raw.y);
 #else
             // Legacy input fallback if project uses Old/Both
-            x = Input.GetAxisRaw("Horizontal");
-            y = Input.GetAxisRaw("Vertical");
+            Vector2 raw = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 #endif
 
-            if (fourWayOnly)
+            if (raw.sqrMagnitude > 0f)
             {
-                if (Mathf.Abs(y) > Mathf.Abs(x)) x = 0f;
-                else if (Mathf.Abs(x) > Mathf.Abs(y)) y = 0f;
+                Direction8 inputFacing = Direction8Utility.FromVector(raw, !fourWayOnly, facingDir);
+                inputDir = fourWayOnly ? Direction8Utility.ToCardinalVector(inputFacing) : Direction8Utility.ToVector(inputFacing);
             }
-
-            Vector2 inputDir = new Vector2(x, y).normalized;
 
             if (inputDir.sqrMagnitude > 0f)
             {
@@ -312,10 +311,7 @@ namespace Player
 
             if (moveDir.sqrMagnitude > 0f)
             {
-                if (Mathf.Abs(moveDir.x) > Mathf.Abs(moveDir.y))
-                    facingDir = moveDir.x < 0 ? 1 : 2; // left/right
-                else
-                    facingDir = moveDir.y < 0 ? 0 : 3; // down/up
+                facingDir = Direction8Utility.FromVector(moveDir, allowDiagonals: true, fallback: facingDir);
             }
 
             // Drive Animator (kept for future use and for state visibility)
@@ -326,20 +322,29 @@ namespace Player
 
         private void RefreshAnimator(bool isMoving)
         {
-            anim.SetBool("IsMoving", isMoving);
-            anim.SetInteger("Dir", facingDir);
+            if (anim == null)
+                return;
 
-            // --- OPTIONAL: Direct sprite override (solves your 'stuck on IdleDown_0' instantly) ---
+            Direction8 visualDir = facingDir;
+            int animatorDir = Direction8Utility.ToAnimatorIndex(visualDir);
+            Direction8 spriteDir = Direction8Utility.SnapToFourWay(visualDir);
+
+            anim.SetBool("IsMoving", isMoving);
+            anim.SetInteger("Dir", animatorDir);
+
+            if (sr == null)
+                return;
+
             Sprite desired = null;
             bool flip = false;
             if (isMoving)
             {
-                switch (facingDir)
+                switch (spriteDir)
                 {
-                    case 0:
+                    case Direction8.Down:
                         desired = walkDown ? walkDown : idleDown;
                         break;
-                    case 1:
+                    case Direction8.Left:
                         if (useFlipXForLeft)
                         {
                             desired = walkRight ? walkRight : idleRight;
@@ -350,7 +355,7 @@ namespace Player
                             desired = walkLeft ? walkLeft : idleLeft;
                         }
                         break;
-                    case 2:
+                    case Direction8.Right:
                         if (useFlipXForRight)
                         {
                             desired = walkLeft ? walkLeft : idleLeft;
@@ -361,19 +366,19 @@ namespace Player
                             desired = walkRight ? walkRight : idleRight;
                         }
                         break;
-                    case 3:
+                    case Direction8.Up:
                         desired = walkUp ? walkUp : idleUp;
                         break;
                 }
             }
             else
             {
-                switch (facingDir)
+                switch (spriteDir)
                 {
-                    case 0:
+                    case Direction8.Down:
                         desired = idleDown;
                         break;
-                    case 1:
+                    case Direction8.Left:
                         if (useFlipXForLeft)
                         {
                             desired = idleRight ? idleRight : walkRight;
@@ -384,7 +389,7 @@ namespace Player
                             desired = idleLeft;
                         }
                         break;
-                    case 2:
+                    case Direction8.Right:
                         if (useFlipXForRight)
                         {
                             desired = idleLeft ? idleLeft : walkLeft;
@@ -395,11 +400,12 @@ namespace Player
                             desired = idleRight;
                         }
                         break;
-                    case 3:
+                    case Direction8.Up:
                         desired = idleUp;
                         break;
                 }
             }
+
             if (desired != null && !freezeSprite)
             {
                 if (sr.flipX != flip)
@@ -442,10 +448,7 @@ namespace Player
                 return;
 
             Vector2 dir = (Vector2)target.position - (Vector2)transform.position;
-            if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
-                facingDir = dir.x < 0 ? 1 : 2;
-            else
-                facingDir = dir.y < 0 ? 0 : 3;
+            facingDir = Direction8Utility.FromVector(dir, allowDiagonals: true, fallback: facingDir);
 
             RefreshAnimator(moveDir.sqrMagnitude > 0f);
         }
