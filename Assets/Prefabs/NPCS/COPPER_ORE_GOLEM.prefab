@@ -28,6 +28,7 @@ GameObject:
   - component: {fileID: 8901135699789091071}
   - component: {fileID: 1174345271934556159}
   - component: {fileID: 3099355452794840895}
+  - component: {fileID: -3744258465739700549}
   m_Layer: 10
   m_Name: COPPER_ORE_GOLEM
   m_TagString: NPC
@@ -98,7 +99,7 @@ SpriteRenderer:
   m_SortingLayerID: -160616933
   m_SortingLayer: 4
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: ddb451032db5ac64ba8cea360a6beab3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3ac5525a34ba9ec4382ca8c0d8d554ce, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -174,7 +175,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1.5}
+    oldSize: {x: 1.3333334, y: 1.3333334}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -294,31 +295,71 @@ MonoBehaviour:
   attackTrigger: Attack
   spriteRenderer: {fileID: 7487083981726320206}
   idleDown:
-  - {fileID: 21300000, guid: ddb451032db5ac64ba8cea360a6beab3, type: 3}
-  idleLeft: []
+  - {fileID: 21300000, guid: 3ac5525a34ba9ec4382ca8c0d8d554ce, type: 3}
+  idleDownRight:
+  - {fileID: 21300000, guid: a1a50fb0795f5a049be55bec44055f42, type: 3}
   idleRight:
-  - {fileID: 21300000, guid: 4c5a726ecaecce44e9d36dde0a8d6e4c, type: 3}
+  - {fileID: 21300000, guid: 17725d7d0f6a76d4285c5324aa391cf3, type: 3}
+  idleUpRight:
+  - {fileID: 21300000, guid: 876a552a4fd22e74687db1c2a14c0db8, type: 3}
   idleUp:
-  - {fileID: 21300000, guid: 55a8dc89060ff8f47801b1122fe4e85f, type: 3}
+  - {fileID: 21300000, guid: 991c693cf275c7e4ab5435032d2334a0, type: 3}
+  idleUpLeft: []
+  idleLeft: []
+  idleDownLeft: []
   walkDown:
-  - {fileID: 21300000, guid: 284c320b1aa5ff045a6988bc88bcb7a3, type: 3}
-  walkLeft: []
+  - {fileID: 4264677132743317796, guid: c4689a25061ccce478b6a1d4800eef29, type: 3}
+  - {fileID: -4601544738350663688, guid: c4689a25061ccce478b6a1d4800eef29, type: 3}
+  walkDownRight:
+  - {fileID: -1881782397555886869, guid: c4689a25061ccce478b6a1d4800eef29, type: 3}
+  - {fileID: 465429116855445153, guid: c4689a25061ccce478b6a1d4800eef29, type: 3}
+  - {fileID: -1881782397555886869, guid: c4689a25061ccce478b6a1d4800eef29, type: 3}
   walkRight:
-  - {fileID: 21300000, guid: 0eecb7d7b9418ae40b337fdd587dd757, type: 3}
+  - {fileID: -5454393654779066981, guid: c4689a25061ccce478b6a1d4800eef29, type: 3}
+  - {fileID: -8736821659539890209, guid: c4689a25061ccce478b6a1d4800eef29, type: 3}
+  - {fileID: -2219267162058482911, guid: c4689a25061ccce478b6a1d4800eef29, type: 3}
+  walkUpRight:
+  - {fileID: 2372706768342411361, guid: c4689a25061ccce478b6a1d4800eef29, type: 3}
+  - {fileID: -3229296086749562216, guid: c4689a25061ccce478b6a1d4800eef29, type: 3}
+  - {fileID: -820304226242520513, guid: c4689a25061ccce478b6a1d4800eef29, type: 3}
   walkUp:
-  - {fileID: 21300000, guid: 55a8dc89060ff8f47801b1122fe4e85f, type: 3}
+  - {fileID: 9048906295791529608, guid: c4689a25061ccce478b6a1d4800eef29, type: 3}
+  - {fileID: 4887853248735948688, guid: c4689a25061ccce478b6a1d4800eef29, type: 3}
+  walkUpLeft: []
+  walkLeft: []
+  walkDownLeft: []
   attackDown:
-  - {fileID: 21300000, guid: 0dfe8689332448d48a8463a355145007, type: 3}
-  attackLeft: []
+  - {fileID: 3985044446492982854, guid: 781fe8271df22264cacefae264f0d2d9, type: 3}
+  - {fileID: 2589208470527171391, guid: 781fe8271df22264cacefae264f0d2d9, type: 3}
+  attackDownRight:
+  - {fileID: 1097073686355694505, guid: 15c1572d1eda7b44bb5b9f04740243fb, type: 3}
+  - {fileID: -3103149391838098712, guid: 15c1572d1eda7b44bb5b9f04740243fb, type: 3}
   attackRight:
-  - {fileID: 21300000, guid: 6fd9cbf7740b00d4fae89454b9f32e47, type: 3}
+  - {fileID: 5843781096370528848, guid: 781fe8271df22264cacefae264f0d2d9, type: 3}
+  - {fileID: -9201808156478178174, guid: 781fe8271df22264cacefae264f0d2d9, type: 3}
+  attackUpRight:
+  - {fileID: -6095616235118687409, guid: 15c1572d1eda7b44bb5b9f04740243fb, type: 3}
+  - {fileID: 6109706247333602965, guid: 15c1572d1eda7b44bb5b9f04740243fb, type: 3}
   attackUp:
-  - {fileID: 21300000, guid: 8f4fd96c9b8ebdf46be853ae5e9a31ad, type: 3}
+  - {fileID: -5886626361052238683, guid: 781fe8271df22264cacefae264f0d2d9, type: 3}
+  - {fileID: -8007290458281961127, guid: 781fe8271df22264cacefae264f0d2d9, type: 3}
+  attackUpLeft: []
+  attackLeft: []
+  attackDownLeft: []
   useFlipXForLeft: 1
   useFlipXForRight: 0
+  useFlipXForDownRight: 0
+  useFlipXForUpRight: 0
+  useFlipXForUpLeft: 1
+  useFlipXForDownLeft: 1
   useFlipXForLeftAttack: 1
   useFlipXForRightAttack: 0
+  useFlipXForDownRightAttack: 0
+  useFlipXForUpRightAttack: 0
+  useFlipXForUpLeftAttack: 1
+  useFlipXForDownLeftAttack: 1
   animationFPS: 6
+  singleFrameAttackHoldSeconds: 0.6
 --- !u!114 &-3175024997635208073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -548,6 +589,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Skills.Mining.OreMonsterRewardController
   nodeDefinition: {fileID: 11400000, guid: 3e914c8850a440bfbd9eb305a597d565, type: 2}
   enableDebugLogging: 0
+--- !u!95 &-3744258465739700549
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &8276902036755621917
 GameObject:
   m_ObjectHideFlags: 0

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 487381587706843324}
-  m_Layer: 8
+  m_Layer: 7
   m_Name: FloatingTextAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -82,7 +82,7 @@ GameObject:
   - component: {fileID: 1218445456886628537}
   - component: {fileID: 2038440844503587638}
   - component: {fileID: 6425351818328045159}
-  m_Layer: 8
+  m_Layer: 7
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -230,15 +230,27 @@ MonoBehaviour:
   CanDrop: 1
   freezeSprite: 0
   idleDown: {fileID: -1447395906653738743, guid: 0f388a5ca87873947b65aa4e52c82acf, type: 3}
-  idleLeft: {fileID: 3575416043233628204, guid: b36fd53cfd8d78140a1ddc1a76f5d25a, type: 3}
+  idleDownRight: {fileID: 0}
   idleRight: {fileID: -6001299320980459286, guid: ebf9d747eb53f354a9b1eb6ab69e26e0, type: 3}
+  idleUpRight: {fileID: 0}
   idleUp: {fileID: -7774987061422140978, guid: 1a6a48544ffc20640b61eb558ee1a1e8, type: 3}
+  idleUpLeft: {fileID: 0}
+  idleLeft: {fileID: 3575416043233628204, guid: b36fd53cfd8d78140a1ddc1a76f5d25a, type: 3}
+  idleDownLeft: {fileID: 0}
   walkDown: {fileID: 6918485297987577717, guid: fc8bc365d3e8a674f974335b29964c7d, type: 3}
-  walkLeft: {fileID: 1380965295750415974, guid: 92a11b3dfbcccc34886c31d77dd8d69b, type: 3}
+  walkDownRight: {fileID: 0}
   walkRight: {fileID: -6001299320980459286, guid: ebf9d747eb53f354a9b1eb6ab69e26e0, type: 3}
+  walkUpRight: {fileID: 0}
   walkUp: {fileID: -7774987061422140978, guid: 1a6a48544ffc20640b61eb558ee1a1e8, type: 3}
+  walkUpLeft: {fileID: 0}
+  walkLeft: {fileID: 1380965295750415974, guid: 92a11b3dfbcccc34886c31d77dd8d69b, type: 3}
+  walkDownLeft: {fileID: 0}
   useFlipXForLeft: 0
   useFlipXForRight: 0
+  useFlipXForDownLeft: 1
+  useFlipXForUpLeft: 1
+  useFlipXForUpRight: 0
+  useFlipXForDownRight: 0
   playerInput: {fileID: 7000745351061079601}
   moveActionReference: {fileID: 0}
 --- !u!114 &6554036775103191577
@@ -618,6 +630,7 @@ MonoBehaviour:
   obstructionMask:
     serializedVersion: 2
     m_Bits: 2240
+  floatingTextAnchor: {fileID: 487381587706843324}
 --- !u!114 &2480528448797343508
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -27,6 +27,7 @@ GameObject:
   - component: {fileID: 330093352596913383}
   - component: {fileID: 8901135699789091071}
   - component: {fileID: 1174345271934556159}
+  - component: {fileID: 3370003897924781013}
   m_Layer: 10
   m_Name: NPC_GOBLIN
   m_TagString: NPC
@@ -194,7 +195,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   profile: {fileID: 11400000, guid: 99be5545587046b409a3d4e9f2a85c70, type: 2}
-  logDamage: 0
+  logDamage: 1
   hitSplatLibrary: {fileID: 11400000, guid: 3bdb17896f374e8bb098d628ca4ba2f4, type: 2}
   knockbackReceiver: {fileID: 330093352596913383}
   hitsplatFallbackOffset: 1
@@ -335,13 +336,28 @@ MonoBehaviour:
   walkDownLeft: []
   attackDown:
   - {fileID: 9103874461932266169, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  - {fileID: 9103874461932266169, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  - {fileID: 9103874461932266169, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  - {fileID: 9103874461932266169, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
   attackDownRight:
+  - {fileID: 3116209339957350709, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  - {fileID: 3116209339957350709, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  - {fileID: 3116209339957350709, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
   - {fileID: 3116209339957350709, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
   attackRight:
   - {fileID: -6116303017828154014, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  - {fileID: -6116303017828154014, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  - {fileID: -6116303017828154014, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  - {fileID: -6116303017828154014, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
   attackUpRight:
   - {fileID: -8675127573068675785, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  - {fileID: -8675127573068675785, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  - {fileID: -8675127573068675785, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  - {fileID: -8675127573068675785, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
   attackUp:
+  - {fileID: -7610565169656860958, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  - {fileID: -7610565169656860958, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  - {fileID: -7610565169656860958, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
   - {fileID: -7610565169656860958, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
   attackUpLeft: []
   attackLeft: []
@@ -359,6 +375,7 @@ MonoBehaviour:
   useFlipXForUpLeftAttack: 1
   useFlipXForDownLeftAttack: 1
   animationFPS: 6
+  singleFrameAttackHoldSeconds: 0.6
 --- !u!114 &-3175024997635208073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -574,6 +591,28 @@ MonoBehaviour:
   enableDebugLogging: 0
   drawDebugPath: 1
   debugPathColor: {r: 1, g: 0.75, b: 0, a: 0.9}
+--- !u!95 &3370003897924781013
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &8276902036755621917
 GameObject:
   m_ObjectHideFlags: 0
