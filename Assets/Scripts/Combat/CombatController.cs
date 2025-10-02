@@ -549,8 +549,24 @@ namespace Combat
 
             Vector2 origin = transform.position;
             Vector2 destination = targetTransform.position;
+            DamageType damageType = DetermineActiveDamageType();
 
-            return LineOfSightUtility.HasLineOfSight(origin, destination, obstructionMask, transform, targetTransform);
+            bool ShouldIgnoreCollider(Collider2D collider)
+            {
+                if (collider == null)
+                    return false;
+
+                var bypass = collider.GetComponentInParent<CombatLineOfSightBypass>();
+                return bypass != null && bypass.AllowsDamageType(damageType);
+            }
+
+            return LineOfSightUtility.HasLineOfSight(
+                origin,
+                destination,
+                obstructionMask,
+                transform,
+                targetTransform,
+                ShouldIgnoreCollider);
         }
 
         protected virtual void ResolveAttack(CombatTarget target)
