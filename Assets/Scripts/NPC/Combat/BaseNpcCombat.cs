@@ -37,6 +37,20 @@ namespace NPC
         protected float nextAttackTimestamp;
 
         private static readonly string[] DefaultObstructionLayers = { "Obstacles", "Obstacle", "Physical Objects" };
+        private static readonly string[] NonBlockingLineOfSightLayers = { "Interactable", "Player", "Pets", "NPC" };
+        private static readonly int AntiMeleeObstacleLayer = LayerMask.NameToLayer("AntiMeleeObstacle");
+
+        /// <summary>
+        /// Runtime mask used by line of sight checks after applying defaults and filtering out
+        /// layers that should not stop melee swings (e.g. general interactables).
+        /// </summary>
+        private LayerMask runtimeObstructionMask;
+
+        /// <summary>
+        /// Cached mask for the layers that should be ignored for LOS when they are not explicit
+        /// melee blockers. We lazily build it because some projects omit optional layers.
+        /// </summary>
+        private static int cachedNonBlockingLineOfSightMask = -1;
 
         [Header("Line of Sight")]
         [SerializeField, Tooltip("Layers treated as solid when determining whether attacks can reach a target.")]
@@ -75,23 +89,77 @@ namespace NPC
         /// </summary>
         private void EnsureObstructionMaskConfigured()
         {
-            int defaultMask = LayerMask.GetMask(DefaultObstructionLayers);
+            int defaultMask = BuildLayerMask(DefaultObstructionLayers);
 
-            // Keep the NPC obstruction mask aligned with the shared defaults while preserving
-            // any bespoke overrides applied in prefabs or instances.
-            int combinedMask = obstructionMask.value | defaultMask;
+            // Preserve any bespoke overrides provided via prefabs/instances while forcing the
+            // default obstacle layers to remain enabled for LOS testing.
+            int configuredMask = obstructionMask.value;
+            if (configuredMask == 0)
+                configuredMask = defaultMask;
+            else
+                configuredMask |= defaultMask;
 
-            // In play mode we also honour the active navigation grid so line-of-sight checks use
-            // the same blockers that pathfinding respects. Guard all lookups to stay editor-safe.
+            obstructionMask = configuredMask;
+
+            // Build the runtime mask used for raycasts. We start from the inspector configuration
+            // and add pathfinding blockers so movement and LOS stay aligned for genuine walls.
+            int runtimeMask = configuredMask;
             if (Application.isPlaying)
             {
                 var blockingMask = PathfindingService.Instance?.ActiveGrid?.BlockingLayerMask;
                 if (blockingMask.HasValue)
                 {
-                    combinedMask |= blockingMask.Value.value;
+                    runtimeMask |= blockingMask.Value.value;
                 }
             }
-            obstructionMask = combinedMask;
+
+            // Strip out layers that should not prevent melee swings (general interactables,
+            // players, pets, friendly NPCs, etc.). Designers that need a prop to block melee can
+            // place it on the dedicated AntiMeleeObstacle layer or attach a bypass component.
+            int nonBlockingMask = GetNonBlockingLineOfSightMask();
+            if (nonBlockingMask != 0)
+            {
+                runtimeMask &= ~nonBlockingMask;
+            }
+
+            runtimeObstructionMask = runtimeMask;
+        }
+
+        /// <summary>
+        /// Resolves the mask representing layers that should be ignored during LOS checks unless
+        /// a collider explicitly opts into blocking melee (via AntiMeleeObstacle or bypass data).
+        /// </summary>
+        private static int GetNonBlockingLineOfSightMask()
+        {
+            if (cachedNonBlockingLineOfSightMask == -1)
+            {
+                cachedNonBlockingLineOfSightMask = BuildLayerMask(NonBlockingLineOfSightLayers);
+            }
+
+            return cachedNonBlockingLineOfSightMask;
+        }
+
+        /// <summary>
+        /// Builds a mask from the provided layer names, skipping entries that are unset in the
+        /// project to remain editor-safe when optional layers are missing.
+        /// </summary>
+        private static int BuildLayerMask(IEnumerable<string> layerNames)
+        {
+            if (layerNames == null)
+                return 0;
+
+            int mask = 0;
+            foreach (string layerName in layerNames)
+            {
+                if (string.IsNullOrEmpty(layerName))
+                    continue;
+
+                int layer = LayerMask.NameToLayer(layerName);
+                if (layer >= 0)
+                    mask |= 1 << layer;
+            }
+
+            return mask;
         }
 
         public virtual void ResetCombatState(bool resetSpawnPosition = false)
@@ -656,10 +724,12 @@ namespace NPC
             Vector2 origin = transform.position;
             Vector2 destination = targetTransform.position;
 
+            LayerMask maskToUse = runtimeObstructionMask.value != 0 ? runtimeObstructionMask : obstructionMask;
+
             return LineOfSightUtility.HasLineOfSight(
                 origin,
                 destination,
-                obstructionMask,
+                maskToUse,
                 transform,
                 targetTransform,
                 collider => ShouldIgnoreCollider(collider, target));
@@ -709,6 +779,22 @@ namespace NPC
             var pet = hitTransform.GetComponentInParent<PetCombatController>();
             if (pet != null)
                 return true;
+
+            if (attackType == DamageType.Melee)
+            {
+                int colliderLayer = hitTransform.gameObject.layer;
+                if (colliderLayer >= 0)
+                {
+                    // Colliders on the AntiMeleeObstacle layer intentionally block melee swings,
+                    // so only skip entries that belong to the general non-blocking set.
+                    if (colliderLayer != AntiMeleeObstacleLayer)
+                    {
+                        int nonBlockingMask = GetNonBlockingLineOfSightMask();
+                        if (nonBlockingMask != 0 && (nonBlockingMask & (1 << colliderLayer)) != 0)
+                            return true;
+                    }
+                }
+            }
 
             if (combatant != null)
             {
