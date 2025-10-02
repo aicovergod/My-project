@@ -123,18 +123,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Util.SpriteDepth
   offset: 0
   directionOffset: 0
---- !u!114 &-3026031017390257781
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8625610357521118339}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52a183722b4c00843aeae862af643c52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Combat.CombatLineOfSightBypass
-  allowMelee: 0
-  allowRanged: 1
-  allowMagic: 1

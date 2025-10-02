@@ -261,21 +261,6 @@ MonoBehaviour:
   ownerOnlySpriteRenderers:
   - {fileID: 0}
   ownerDespawnDistanceTiles: 12
---- !u!114 &6176812076659153440
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1953538185238979234}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52a183722b4c00843aeae862af643c52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Combat.CombatLineOfSightBypass
-  allowMelee: 0
-  allowRanged: 1
-  allowMagic: 1
 --- !u!1 &6012164185261679023
 GameObject:
   m_ObjectHideFlags: 0
