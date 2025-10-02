@@ -918,8 +918,20 @@ namespace NPC
             if (spriteAnimator != null)
             {
                 Direction8 facingDir = npcFacing.FacingDirection;
-                spriteAnimator.animator?.SetInteger(spriteAnimator.dirParam, Direction8Utility.ToAnimatorIndex8(facingDir));
-                if (spriteAnimator.HasAttackAnimation(facingDir))
+                bool usingAnimator = spriteAnimator.visualMode == NpcSpriteAnimator.VisualMode.Animator && spriteAnimator.animator != null;
+
+                if (usingAnimator)
+                {
+                    if (spriteSwapRoutine != null)
+                    {
+                        StopCoroutine(spriteSwapRoutine);
+                        spriteSwapRoutine = null;
+                    }
+
+                    spriteAnimator.animator.SetInteger(spriteAnimator.dirParam, Direction8Utility.ToAnimatorIndex8(facingDir));
+                    StartCoroutine(spriteAnimator.PlayAttackAnimation(facingDir));
+                }
+                else if (spriteAnimator.HasAttackAnimation(facingDir))
                 {
                     if (spriteSwapRoutine != null)
                         StopCoroutine(spriteSwapRoutine);
