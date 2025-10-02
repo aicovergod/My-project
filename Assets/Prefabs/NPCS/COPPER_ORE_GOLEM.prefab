@@ -198,6 +198,8 @@ MonoBehaviour:
   hitSplatLibrary: {fileID: 11400000, guid: 3bdb17896f374e8bb098d628ca4ba2f4, type: 2}
   knockbackReceiver: {fileID: 330093352596913383}
   hitsplatFallbackOffset: 1
+  pendingRespawnDelaySeconds: 0
+  respawnSuppressed: 1
 --- !u!114 &7573619506058784387
 MonoBehaviour:
   m_ObjectHideFlags: 0

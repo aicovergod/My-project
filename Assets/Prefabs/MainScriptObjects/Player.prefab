@@ -403,6 +403,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 43212d05622ddc24b9589ef081a176ef, type: 2}
   - {fileID: 11400000, guid: c20e17523dc02e848a3f5b15d82aa376, type: 2}
   - {fileID: 11400000, guid: b27f88278183049479c7e478c63df422, type: 2}
+  - {fileID: 11400000, guid: 9d813e1f8f833dc408de7bd0181c4e22, type: 2}
   inventory: {fileID: 491447706204386932}
   equipment: {fileID: 8439072058276114910}
   skill: {fileID: 6125646337061022332}
