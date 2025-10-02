@@ -5,6 +5,8 @@ using Combat;
 using EquipmentSystem;
 using NPC;
 using Skills;
+using Skills.Common;
+using Skills.Mining;
 using UI;
 using Player;
 
@@ -24,6 +26,9 @@ namespace Pets
 
         [SerializeField, Tooltip("Vertical offset for hitsplats when no floating text anchor exists.")]
         private float hitsplatFallbackOffset = 1f;
+
+        [SerializeField, Tooltip("Controller that maintains the floating text anchor for this pet.")]
+        private PetFloatingTextController floatingTextController;
 
         /// <summary>
         /// Shared cache so pets reuse a single hitsplat library loaded from the Resources
@@ -104,16 +109,27 @@ namespace Pets
                 zeroHitsplat = hitSplatLibrary.ZeroDamageHitsplat;
                 maxHitHitsplat = hitSplatLibrary.MaxHitHitsplat;
             }
+
+            if (floatingTextController == null)
+                floatingTextController = GetComponent<PetFloatingTextController>() ?? GetComponentInChildren<PetFloatingTextController>();
         }
 
         /// <summary>Returns true if this pet has combat capabilities.</summary>
         public bool CanFight => definition != null && definition.canFight;
 
         /// <summary>Order the pet to attack the given combat target.</summary>
-        public void CommandAttack(CombatTarget target)
+        public void CommandAttack(CombatTarget target, bool fromDirectCommand = false)
         {
             if (!CanFight || target == null || !target.IsAlive)
             {
+                CancelAttack();
+                return;
+            }
+
+            if (IsOreGolemTarget(target))
+            {
+                if (fromDirectCommand)
+                    ShowOreGolemBlockedFeedback();
                 CancelAttack();
                 return;
             }
@@ -314,6 +330,33 @@ namespace Pets
                 Vector3 hitsplatPosition = FloatingTextAnchorUtility.ResolveAnchorPosition(target.transform, hitsplatFallbackOffset, hitsplatAnchorCache);
                 FloatingText.Show("0", hitsplatPosition, Color.white, null, zeroHitsplat);
             }
+        }
+
+        private bool IsOreGolemTarget(CombatTarget target)
+        {
+            if (target == null)
+                return false;
+
+            if (target is NpcCombatant npcCombatant)
+                return npcCombatant.GetComponent<OreMonsterRewardController>() != null;
+
+            if (target is MonoBehaviour behaviour)
+                return behaviour.GetComponent<OreMonsterRewardController>() != null;
+
+            return false;
+        }
+
+        private void ShowOreGolemBlockedFeedback()
+        {
+            string petName = definition != null && !string.IsNullOrWhiteSpace(definition.displayName)
+                ? definition.displayName
+                : name;
+            string message = $"\"{petName}\" cannot harm the Golem, due to its magical properties";
+            Transform anchor = floatingTextController != null ? floatingTextController.FloatingTextAnchor : transform;
+            if (anchor == null)
+                anchor = transform;
+
+            GatheringFloatingTextService.TryShowAtAnchor(message, anchor);
         }
 
         /// <summary>

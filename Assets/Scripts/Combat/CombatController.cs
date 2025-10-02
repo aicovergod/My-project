@@ -4,6 +4,8 @@ using UnityEngine;
 using Audio;
 using EquipmentSystem;
 using Skills;
+using Skills.Common;
+using Skills.Mining;
 using Player;
 using NPC;
 using Pets;
@@ -102,6 +104,12 @@ namespace Combat
         private IReadOnlyDictionary<SpellElement, Sprite> elementHitsplats;
         private readonly Dictionary<Transform, FloatingTextAnchorUtility.AnchorCache> hitsplatAnchorCache = new Dictionary<Transform, FloatingTextAnchorUtility.AnchorCache>();
 
+        [Header("Feedback")]
+        [SerializeField, Tooltip("Anchor used when displaying combat restriction feedback popups.")]
+        private Transform floatingTextAnchor;
+
+        private const string PickaxeRequirementMessage = "This golem, can only be harmed with a pickaxe";
+
         private void Awake()
         {
             EnsureObstructionMaskConfigured();
@@ -135,6 +143,13 @@ namespace Combat
                 maxHitHitsplat = hitSplatLibrary.MaxHitHitsplat;
                 elementHitsplats = hitSplatLibrary.ElementHitsplats;
             }
+
+            if (floatingTextAnchor == null)
+            {
+                floatingTextAnchor = transform.Find("FloatingTextAnchor");
+                if (floatingTextAnchor == null)
+                    floatingTextAnchor = transform;
+            }
         }
 
         private void OnValidate()
@@ -162,6 +177,11 @@ namespace Combat
         {
             if (target == null || !target.IsAlive)
                 return false;
+            if (RequiresPickaxeForTarget(target) && !HasPickaxeEquipped())
+            {
+                ShowPickaxeRequirementFeedback();
+                return false;
+            }
             if (Vector2.Distance(transform.position, target.transform.position) > GetCurrentAttackRange())
                 return false;
             if (!HasLineOfSight(target.transform))
@@ -181,7 +201,7 @@ namespace Combat
             if (PetDropSystem.GuardModeEnabled)
             {
                 var pet = PetDropSystem.ActivePetCombat;
-                pet?.CommandAttack(target);
+                pet?.CommandAttack(target, false);
             }
             return true;
         }
@@ -368,6 +388,11 @@ namespace Combat
                 {
                     yield return new WaitForSeconds(CombatMath.TICK_SECONDS * 0.25f);
                     continue;
+                }
+                if (RequiresPickaxeForTarget(target) && !HasPickaxeEquipped())
+                {
+                    ShowPickaxeRequirementFeedback();
+                    break;
                 }
                 mover?.FaceTarget(target.transform);
                 OnAttackStart?.Invoke();
@@ -634,6 +659,44 @@ namespace Combat
             }
 
             FreezeUtility.ApplyFreezeTicks(freezeController.gameObject, spell.freezeDurationTicks, BuffSourceType.Combat, spell.name);
+        }
+
+        private bool RequiresPickaxeForTarget(CombatTarget target)
+        {
+            if (target == null)
+                return false;
+
+            if (target is NpcCombatant npcCombatant)
+                return npcCombatant.GetComponent<OreMonsterRewardController>() != null;
+
+            if (target is MonoBehaviour behaviour)
+            {
+                return behaviour.GetComponent<OreMonsterRewardController>() != null;
+            }
+
+            return false;
+        }
+
+        private bool HasPickaxeEquipped()
+        {
+            if (equipmentComponent == null)
+                return false;
+
+            Inventory.InventoryEntry weaponEntry = equipmentComponent.GetEquipped(Inventory.EquipmentSlot.Weapon);
+            var item = weaponEntry.item;
+            if (item == null)
+                return false;
+
+            return PickaxeUtility.IsPickaxe(item);
+        }
+
+        private void ShowPickaxeRequirementFeedback()
+        {
+            var anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
+            if (anchor == null)
+                anchor = transform;
+
+            GatheringFloatingTextService.TryShowAtAnchor(PickaxeRequirementMessage, anchor);
         }
 
         private void ApplyHalberdAoe(CombatantStats attacker, CombatTarget primaryTarget, int primaryDamage, int maxHit)

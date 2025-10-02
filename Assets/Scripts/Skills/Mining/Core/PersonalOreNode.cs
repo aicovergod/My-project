@@ -34,6 +34,10 @@ namespace Skills.Mining
         [Tooltip("Sprite renderers that should only be visible to the owning player.")]
         [SerializeField] private SpriteRenderer[] ownerOnlySpriteRenderers;
 
+        [Header("Despawn Rules")]
+        [Tooltip("Maximum distance (in tiles) the owner can move away before the node despawns.")]
+        [SerializeField] private float ownerDespawnDistanceTiles = 12f;
+
         private MiningPersonalNodeController ownerController;
         private MineableRock mineableRock;
         private OreMonsterNodeDefinition sourceDefinition;
@@ -214,6 +218,13 @@ namespace Skills.Mining
 
             RefreshOwnershipCacheIfNeeded();
 
+            if (ShouldExpireDueToOwnerDistance())
+            {
+                // Owner moved too far away; silently collapse the node without VFX spam.
+                ForceExpire(false);
+                return;
+            }
+
             remainingLifetimeSeconds = Mathf.Max(0f, remainingLifetimeSeconds - Util.Ticker.TickDuration);
             RaiseLifetimeChanged();
 
@@ -351,6 +362,32 @@ namespace Skills.Mining
 
             UpdateCountdownVisuals();
             LifetimeChanged?.Invoke(this, RemainingLifetimeSeconds, normalized);
+        }
+
+        /// <summary>
+        ///     Determines whether the owning player has exceeded the despawn distance threshold.
+        ///     When the owner leaves the allowed radius the node should immediately expire.
+        /// </summary>
+        private bool ShouldExpireDueToOwnerDistance()
+        {
+            if (ownerController == null)
+                return true;
+
+            var controllerTransform = ownerController.transform;
+            if (controllerTransform == null || !ownerController.isActiveAndEnabled)
+                return true;
+
+            float maxDistanceTiles = Mathf.Max(0f, ownerDespawnDistanceTiles);
+            if (maxDistanceTiles <= 0f)
+                return false;
+
+            Vector2 ownerPosition = controllerTransform.position;
+            Vector2 nodePosition = transform.position;
+            float sqrDistance = (ownerPosition - nodePosition).sqrMagnitude;
+            float maxDistanceWorld = maxDistanceTiles; // Tile size is 1 unit in world space.
+            float maxDistanceSqr = maxDistanceWorld * maxDistanceWorld;
+
+            return sqrDistance > maxDistanceSqr;
         }
     }
 }
