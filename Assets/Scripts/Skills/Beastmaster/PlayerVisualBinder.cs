@@ -54,8 +54,8 @@ namespace Beastmaster
                 origWalkLeft = playerMover.walkLeft;
                 origWalkRight = playerMover.walkRight;
                 origWalkUp = playerMover.walkUp;
-                origUseFlipXForLeft = playerMover.useFlipXForLeft;
-                origUseFlipXForRight = playerMover.useFlipXForRight;
+                origUseFlipXForLeft = playerMover.UseFlipXForLeft;
+                origUseFlipXForRight = playerMover.UseFlipXForRight;
             }
             origScale = transform.localScale;
             origFlipX = spriteRenderer != null && spriteRenderer.flipX;
@@ -84,8 +84,8 @@ namespace Beastmaster
                     if (profile.walkLeft != null) playerMover.walkLeft = profile.walkLeft;
                     if (profile.walkRight != null) playerMover.walkRight = profile.walkRight;
                     if (profile.walkUp != null) playerMover.walkUp = profile.walkUp;
-                    playerMover.useFlipXForLeft = profile.useFlipXForLeft;
-                    playerMover.useFlipXForRight = profile.useFlipXForRight;
+                    playerMover.UseFlipXForLeft = profile.useFlipXForLeft;
+                    playerMover.UseFlipXForRight = profile.useFlipXForRight;
                 }
                 else
                 {
@@ -128,8 +128,8 @@ namespace Beastmaster
                 playerMover.walkLeft = origWalkLeft;
                 playerMover.walkRight = origWalkRight;
                 playerMover.walkUp = origWalkUp;
-                playerMover.useFlipXForLeft = origUseFlipXForLeft;
-                playerMover.useFlipXForRight = origUseFlipXForRight;
+                playerMover.UseFlipXForLeft = origUseFlipXForLeft;
+                playerMover.UseFlipXForRight = origUseFlipXForRight;
             }
             attackAnimator?.ClearPetLook();
         }
