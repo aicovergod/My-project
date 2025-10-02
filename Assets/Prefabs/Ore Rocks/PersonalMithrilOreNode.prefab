@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 2934156379953286805}
   - component: {fileID: 5567743148573218289}
   m_Layer: 7
-  m_Name: PersonalTinOreNode
+  m_Name: PersonalMithrilOreNode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -164,7 +164,7 @@ SpriteRenderer:
   m_SortingLayerID: -160616933
   m_SortingLayer: 4
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 4aa8955303db7ab4188af10d826d315d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: aa7a1b86b8019af479b00d1fb9848ea9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -187,9 +187,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eaeca4ebf1961d646be160b9b0493572, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rockDef: {fileID: 11400000, guid: a15e519114c7412eb4c5ce566f4c4bf0, type: 2}
+  rockDef: {fileID: 11400000, guid: ec9d44a520cd49419d4956399650692b, type: 2}
   spriteRenderer: {fileID: 7445129156621080460}
-  fullSprite: {fileID: 21300000, guid: 4aa8955303db7ab4188af10d826d315d, type: 3}
+  fullSprite: {fileID: 21300000, guid: aa7a1b86b8019af479b00d1fb9848ea9, type: 3}
   depletedSprite: {fileID: 21300000, guid: 760efa6975d83c24ba0ecd4d9d8e949a, type: 3}
 --- !u!114 &4389721864341208886
 MonoBehaviour:

@@ -26,8 +26,9 @@ GameObject:
   - component: {fileID: 330093352596913383}
   - component: {fileID: 8901135699789091071}
   - component: {fileID: 1174345271934556159}
+  - component: {fileID: 3099355452794840895}
   m_Layer: 10
-  m_Name: NPC_GOBLIN
+  m_Name: COPPER_ORE_GOLEM
   m_TagString: NPC
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -192,7 +193,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c8879afbf7db8d49a91bc2160c8f49a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  profile: {fileID: 11400000, guid: 99be5545587046b409a3d4e9f2a85c70, type: 2}
+  profile: {fileID: 11400000, guid: 59de4073d9caf3a45a7cab05187d6de7, type: 2}
   logDamage: 0
   hitSplatLibrary: {fileID: 11400000, guid: 3bdb17896f374e8bb098d628ca4ba2f4, type: 2}
   knockbackReceiver: {fileID: 330093352596913383}
@@ -209,7 +210,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61bb65ffa90bdaa4f9a868dc200e9550, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dropTable: {fileID: 11400000, guid: 56ac6f73b090aff489409239c1f8abaa, type: 2}
+  dropTable: {fileID: 0}
   luckMultiplier: 1
   spawnSpreadRadius: 0.35
   spawnAtFeet: 1
@@ -329,11 +330,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3264207daa560b40bd49e240e104270, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useAreaSize: 0
-  areaSize: {x: 10, y: 10}
+  useAreaSize: 1
+  areaSize: {x: 5, y: 5}
   minOffset: {x: -5, y: -5}
   maxOffset: {x: 5, y: 5}
-  moveSpeed: 2
+  moveSpeed: 1
   arriveDistance: 0.05
   minIdleTime: 0.5
   maxIdleTime: 2
@@ -516,6 +517,20 @@ MonoBehaviour:
   enableDebugLogging: 0
   drawDebugPath: 1
   debugPathColor: {r: 1, g: 0.75, b: 0, a: 0.9}
+--- !u!114 &3099355452794840895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fc5db4776283fd43b541aa91b4e1752, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Skills.Mining.OreMonsterRewardController
+  nodeDefinition: {fileID: 11400000, guid: 3e914c8850a440bfbd9eb305a597d565, type: 2}
+  enableDebugLogging: 0
 --- !u!1 &8276902036755621917
 GameObject:
   m_ObjectHideFlags: 0

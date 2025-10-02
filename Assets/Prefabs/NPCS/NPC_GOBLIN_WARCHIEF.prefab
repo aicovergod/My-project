@@ -239,7 +239,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   obstructionMask:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 2240
   replanCooldownSeconds: 0.6
   enablePathDebugLogging: 0
 --- !u!114 &1276688815178828107
@@ -337,6 +337,10 @@ MonoBehaviour:
   arriveDistance: 0.05
   minIdleTime: 0.5
   maxIdleTime: 2
+  stallTimeoutSeconds: 6
+  movementDeltaEpsilon: 0.01
+  validatePatrolReachability: 1
+  maxReachabilitySampleAttempts: 8
   chaseRadius: 5
   spriteAnimator: {fileID: 4408143068028046321}
 --- !u!114 &4856330758820000550
