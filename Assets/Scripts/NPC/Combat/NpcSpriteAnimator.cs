@@ -1,3 +1,4 @@
+using Combat;
 using UnityEngine;
 using Util;
 
@@ -92,6 +93,11 @@ namespace NPC
         [Tooltip("Frames per second for SpriteSwap animation.")]
         public float animationFPS = 6f;
 
+        [Header("Attack Timing")]
+        [Tooltip("Minimum duration a single-frame attack pose should remain visible.")]
+        [SerializeField]
+        private float singleFrameAttackHoldSeconds = CombatMath.TICK_SECONDS;
+
         private Direction8 _currentDir = Direction8.Down;
         private bool _currentlyMoving = false;
         private float _animClock = 0f;
@@ -180,11 +186,16 @@ namespace NPC
             _overridePlaying = true;
             _currentDir = dir;
             float fps = Mathf.Max(0.01f, animationFPS);
+            float baseFrameDuration = 1f / fps;
+            float frameDuration = frames == 1
+                ? Mathf.Max(singleFrameAttackHoldSeconds, baseFrameDuration)
+                : baseFrameDuration;
+
             for (int i = 0; i < frames; i++)
             {
                 spriteRenderer.sprite = set[i];
                 spriteRenderer.flipX = flip;
-                yield return new WaitForSeconds(1f / fps);
+                yield return new WaitForSeconds(frameDuration);
             }
             _overridePlaying = false;
             _animClock = 0f;
