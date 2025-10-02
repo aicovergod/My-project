@@ -24,15 +24,11 @@ namespace Util
             int dir = 0;
             if (player != null)
             {
-                switch (player.FacingDir)
-                {
-                    case 0: // facing down
-                        dir = directionOffset;
-                        break;
-                    case 3: // facing up
-                        dir = -directionOffset;
-                        break;
-                }
+                Direction8 facing = player.FacingDir;
+                if (Direction8Utility.IsFacingDown(facing))
+                    dir = directionOffset;
+                else if (Direction8Utility.IsFacingUp(facing))
+                    dir = -directionOffset;
             }
 
             // Larger (more negative) Y => lower sorting order => appears behind

@@ -13,6 +13,7 @@ using UI;
 using Magic;
 using Status;
 using Status.Freeze;
+using Util;
 
 namespace Combat
 {
@@ -734,7 +735,8 @@ namespace Combat
                 return;
 
             Vector2 origin = transform.position;
-            Vector2 forward = FacingDirToVector(mover != null ? mover.FacingDir : 0);
+            Direction8 forwardDir = mover != null ? mover.FacingDir : Direction8.Down;
+            Vector2 forward = FacingDirToVector(forwardDir);
             if (forward.sqrMagnitude <= Mathf.Epsilon)
                 forward = Vector2.down;
 
@@ -804,19 +806,9 @@ namespace Combat
             }
         }
 
-        private static Vector2 FacingDirToVector(int facingDir)
+        private static Vector2 FacingDirToVector(Direction8 facingDir)
         {
-            switch (facingDir)
-            {
-                case 1:
-                    return Vector2.left;
-                case 2:
-                    return Vector2.right;
-                case 3:
-                    return Vector2.up;
-                default:
-                    return Vector2.down;
-            }
+            return Direction8Utility.ToVector(facingDir);
         }
 
         private void AwardXp(int damage, CombatStyle style, DamageType type)

@@ -2,6 +2,7 @@ using UnityEngine;
 using Combat;
 using Pets;
 using Player;
+using Util;
 
 namespace Beastmaster
 {
@@ -67,11 +68,12 @@ namespace Beastmaster
 
         private void HandleAttack()
         {
-            int dir = mover != null ? mover.FacingDir : 0;
+            Direction8 dir = mover != null ? mover.FacingDir : Direction8.Down;
+            int animatorDir = Direction8Utility.ToAnimatorIndex(dir);
             if (animator != null && animator.runtimeAnimatorController != null)
                 animator.SetTrigger("Attack");
-            if (spriteAnimator != null && spriteAnimator.HasHitAnimation(dir))
-                StartCoroutine(PlayHit(dir));
+            if (spriteAnimator != null && spriteAnimator.HasHitAnimation(animatorDir))
+                StartCoroutine(PlayHit(animatorDir));
         }
 
         private System.Collections.IEnumerator PlayHit(int dir)

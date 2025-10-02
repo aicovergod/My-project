@@ -6,6 +6,7 @@ using EquipmentSystem;
 using Skills;
 using Player;
 using Pets;
+using Util;
 
 namespace NPC
 {
@@ -802,7 +803,7 @@ namespace NPC
             var animator = npcFacing?.Animator;
             if (animator != null)
             {
-                int facingDir = npcFacing.FacingDirection;
+                int facingDir = Direction8Utility.ToAnimatorIndex(npcFacing.FacingDirection);
                 if (animator.HasAttackAnimation(facingDir))
                 {
                     if (spriteSwapRoutine != null)
