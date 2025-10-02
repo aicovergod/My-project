@@ -55,6 +55,11 @@ namespace NPC
         private Sprite poisonHitsplat;
         private FloatingTextAnchorUtility.AnchorCache hitsplatAnchorCache;
         private bool isRegisteredWithRegistry;
+        [SerializeField, Tooltip("Cached respawn delay used when scheduling or resuming respawns after suppression.")]
+        private float pendingRespawnDelaySeconds;
+        [SerializeField, Tooltip("Tracks whether respawning is temporarily suppressed by external systems (e.g. personal nodes).")]
+        private bool respawnSuppressed;
+        private Coroutine respawnCoroutine;
 
         /// <summary>
         /// Tracks whether the global NPC combat damage logging override is enabled. When true all
@@ -283,7 +288,7 @@ namespace NPC
                 if (collider2D) collider2D.enabled = false;
                 if (spriteRenderer) spriteRenderer.enabled = false;
                 if (profile != null && profile.RespawnSeconds > 0f)
-                    StartCoroutine(RespawnRoutine());
+                    ScheduleRespawn(profile.RespawnSeconds);
             }
 
             return damageToApply;
@@ -295,9 +300,29 @@ namespace NPC
             return CombatantStats.ForNpc(profile);
         }
 
-        private IEnumerator RespawnRoutine()
+        private void ScheduleRespawn(float delaySeconds)
         {
-            yield return new WaitForSeconds(profile.RespawnSeconds);
+            pendingRespawnDelaySeconds = Mathf.Max(0f, delaySeconds);
+
+            if (respawnCoroutine != null)
+            {
+                StopCoroutine(respawnCoroutine);
+                respawnCoroutine = null;
+            }
+
+            if (respawnSuppressed)
+                return;
+
+            respawnCoroutine = StartCoroutine(RespawnRoutine(pendingRespawnDelaySeconds));
+        }
+
+        private IEnumerator RespawnRoutine(float delaySeconds)
+        {
+            if (delaySeconds > 0f)
+                yield return new WaitForSeconds(delaySeconds);
+            else
+                yield return null;
+
             currentHp = profile != null ? profile.HitpointsLevel : 1;
             if (collider2D) collider2D.enabled = true;
             if (spriteRenderer) spriteRenderer.enabled = true;
@@ -310,6 +335,37 @@ namespace NPC
             combat?.ResetCombatState(true);
             ClearDamageContributors("Respawned");
             OnHealthChanged?.Invoke(currentHp, MaxHP);
+            respawnCoroutine = null;
+            pendingRespawnDelaySeconds = 0f;
+        }
+
+        /// <summary>
+        ///     Prevents the NPC from scheduling or running a respawn routine. Any active
+        ///     respawn coroutine is cancelled so external systems can control the lifecycle.
+        /// </summary>
+        public void SuppressRespawn()
+        {
+            respawnSuppressed = true;
+            if (respawnCoroutine != null)
+            {
+                StopCoroutine(respawnCoroutine);
+                respawnCoroutine = null;
+            }
+        }
+
+        /// <summary>
+        ///     Re-enables respawning after a suppression period. The respawn routine will be
+        ///     scheduled using the supplied delay override or the cached pending delay if no
+        ///     override is provided.
+        /// </summary>
+        /// <param name="delayOverride">
+        ///     Optional delay in seconds that replaces the cached pending delay when provided.
+        /// </param>
+        public void ResumeRespawn(float? delayOverride = null)
+        {
+            respawnSuppressed = false;
+            float delay = delayOverride.HasValue ? delayOverride.Value : pendingRespawnDelaySeconds;
+            ScheduleRespawn(delay);
         }
 
         /// <summary>
