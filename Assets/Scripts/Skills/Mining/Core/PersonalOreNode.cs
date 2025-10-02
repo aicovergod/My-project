@@ -39,9 +39,15 @@ namespace Skills.Mining
         [SerializeField] private float ownerDespawnDistanceTiles = 12f;
 
         private static readonly string[] OwnerOverlayPreferredSortingLayerNames = { "UI", "Characters" };
+        private static readonly string[] CharacterLayerNames = { "Player", "Pets", "NPC" };
+
         private const string OwnerOverlayLayerName = "UI";
         private const int OwnerOverlaySortingOrderOffset = 50;
         private const int OwnerOverlayMinimumSortingOrder = 1000;
+        private const int CharacterLayerSortingSafetyOffset = 10;
+
+        private static int[] cachedCharacterLayers;
+        private static bool characterLayerCacheInitialized;
 
         private MiningPersonalNodeController ownerController;
         private MineableRock mineableRock;
@@ -382,6 +388,14 @@ namespace Skills.Mining
                     referenceRenderer.sortingOrder + OwnerOverlaySortingOrderOffset);
             }
 
+            int characterSortingCeiling = ResolveActiveCharacterSortingOrder();
+            if (characterSortingCeiling > int.MinValue)
+            {
+                desiredOrder = Mathf.Max(
+                    desiredOrder,
+                    characterSortingCeiling + CharacterLayerSortingSafetyOffset);
+            }
+
             ownerOnlyCanvas.sortingOrder = desiredOrder;
 
             if (ownerOnlySpriteRenderers == null)
@@ -403,6 +417,42 @@ namespace Skills.Mining
         }
 
         /// <summary>
+        ///     Scans active character sprite renderers so other systems can align their sorting
+        ///     orders with the currently visible actors.
+        /// </summary>
+        /// <returns>
+        ///     Highest sorting order used by characters on the Player, Pets, or NPC layers, or
+        ///     <see cref="int.MinValue"/> when none are active.
+        /// </returns>
+        public static int ResolveActiveCharacterSortingOrder()
+        {
+            EnsureCharacterLayerCache();
+
+#if UNITY_2023_1_OR_NEWER
+            var renderers = Object.FindObjectsByType<SpriteRenderer>(
+                FindObjectsInactive.Exclude,
+                FindObjectsSortMode.None);
+#else
+            var renderers = Object.FindObjectsOfType<SpriteRenderer>();
+#endif
+
+            int maximumOrder = int.MinValue;
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                var renderer = renderers[i];
+                if (renderer == null || !renderer.isActiveAndEnabled)
+                    continue;
+
+                if (!IsCharacterLayer(renderer.gameObject.layer))
+                    continue;
+
+                maximumOrder = Mathf.Max(maximumOrder, renderer.sortingOrder);
+            }
+
+            return maximumOrder;
+        }
+
+        /// <summary>
         ///     Determines the most appropriate sorting layer for the owner overlay.
         /// </summary>
         private static string ResolveOwnerOverlaySortingLayerName()
@@ -415,6 +465,49 @@ namespace Skills.Mining
             }
 
             return string.Empty;
+        }
+
+        /// <summary>
+        ///     Ensures the character layer indices are cached so repeated lookups remain efficient.
+        /// </summary>
+        private static void EnsureCharacterLayerCache()
+        {
+            if (characterLayerCacheInitialized && cachedCharacterLayers != null &&
+                cachedCharacterLayers.Length == CharacterLayerNames.Length)
+            {
+                return;
+            }
+
+            if (cachedCharacterLayers == null || cachedCharacterLayers.Length != CharacterLayerNames.Length)
+                cachedCharacterLayers = new int[CharacterLayerNames.Length];
+
+            for (int i = 0; i < CharacterLayerNames.Length; i++)
+                cachedCharacterLayers[i] = LayerMask.NameToLayer(CharacterLayerNames[i]);
+
+            characterLayerCacheInitialized = true;
+        }
+
+        /// <summary>
+        ///     Determines whether the supplied layer index corresponds to one of the configured
+        ///     character layers.
+        /// </summary>
+        private static bool IsCharacterLayer(int layer)
+        {
+            if (layer < 0)
+                return false;
+
+            EnsureCharacterLayerCache();
+
+            if (cachedCharacterLayers == null)
+                return false;
+
+            for (int i = 0; i < cachedCharacterLayers.Length; i++)
+            {
+                if (cachedCharacterLayers[i] == layer && cachedCharacterLayers[i] >= 0)
+                    return true;
+            }
+
+            return false;
         }
 
         /// <summary>
