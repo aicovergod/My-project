@@ -684,6 +684,26 @@ namespace NPC
                     return true;
             }
 
+            DamageType attackType = DamageType.Melee;
+            if (combatant != null)
+            {
+                var profile = combatant.Profile;
+                if (profile != null)
+                {
+                    attackType = profile.AttackType;
+                }
+                else
+                {
+                    var stats = combatant.GetCombatantStats();
+                    if (stats != null)
+                        attackType = stats.DamageType;
+                }
+            }
+
+            var bypass = hitTransform.GetComponentInParent<CombatLineOfSightBypass>();
+            if (bypass != null && bypass.AllowsDamageType(attackType))
+                return true;
+
             // Allow pets and friendly NPCs to stand between combatants without blocking attacks.
             var pet = hitTransform.GetComponentInParent<PetCombatController>();
             if (pet != null)
