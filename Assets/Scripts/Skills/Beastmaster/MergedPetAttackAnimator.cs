@@ -49,11 +49,19 @@ namespace Beastmaster
             if (spriteAnimator.spriteRenderer == null)
                 spriteAnimator.spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
             spriteAnimator.hitDown = profile.hitDown;
-            spriteAnimator.hitLeft = profile.hitLeft;
+            spriteAnimator.hitDownRight = profile.hitDownRight;
             spriteAnimator.hitRight = profile.hitRight;
+            spriteAnimator.hitUpRight = profile.hitUpRight;
             spriteAnimator.hitUp = profile.hitUp;
+            spriteAnimator.hitUpLeft = profile.hitUpLeft;
+            spriteAnimator.hitLeft = profile.hitLeft;
+            spriteAnimator.hitDownLeft = profile.hitDownLeft;
             spriteAnimator.useFlipXForLeft = profile.useFlipXForLeft;
             spriteAnimator.useFlipXForRight = profile.useFlipXForRight;
+            spriteAnimator.useFlipXForDownLeft = profile.useFlipXForDownLeft;
+            spriteAnimator.useFlipXForUpLeft = profile.useFlipXForUpLeft;
+            spriteAnimator.useFlipXForUpRight = profile.useFlipXForUpRight;
+            spriteAnimator.useFlipXForDownRight = profile.useFlipXForDownRight;
         }
 
         public void ClearPetLook()
@@ -61,22 +69,28 @@ namespace Beastmaster
             if (spriteAnimator == null)
                 return;
             spriteAnimator.hitDown = null;
+            spriteAnimator.hitDownRight = null;
             spriteAnimator.hitLeft = null;
             spriteAnimator.hitRight = null;
             spriteAnimator.hitUp = null;
+            spriteAnimator.hitUpRight = null;
+            spriteAnimator.hitUpLeft = null;
+            spriteAnimator.hitDownLeft = null;
         }
 
         private void HandleAttack()
         {
             Direction8 dir = mover != null ? mover.FacingDir : Direction8.Down;
-            int animatorDir = Direction8Utility.ToAnimatorIndex(dir);
             if (animator != null && animator.runtimeAnimatorController != null)
+            {
+                animator.SetInteger("Dir", Direction8Utility.ToAnimatorIndex8(dir));
                 animator.SetTrigger("Attack");
-            if (spriteAnimator != null && spriteAnimator.HasHitAnimation(animatorDir))
-                StartCoroutine(PlayHit(animatorDir));
+            }
+            if (spriteAnimator != null && spriteAnimator.HasHitAnimation(dir))
+                StartCoroutine(PlayHit(dir));
         }
 
-        private System.Collections.IEnumerator PlayHit(int dir)
+        private System.Collections.IEnumerator PlayHit(Direction8 dir)
         {
             if (mover != null)
                 mover.freezeSprite = true;

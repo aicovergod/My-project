@@ -35,8 +35,8 @@ namespace Player
 
         [Header("(Optional) Direct Sprite Override")]
         [Tooltip("If assigned, these sprites will be applied directly each frame based on Dir/IsMoving. Leave null to rely on Animator clips.")]
-        public Sprite idleDown, idleLeft, idleRight, idleUp;
-        public Sprite walkDown, walkLeft, walkRight, walkUp;
+        public Sprite idleDown, idleDownRight, idleRight, idleUpRight, idleUp, idleUpLeft, idleLeft, idleDownLeft;
+        public Sprite walkDown, walkDownRight, walkRight, walkUpRight, walkUp, walkUpLeft, walkLeft, walkDownLeft;
         [Header("Mirroring")]
         [Tooltip("If true, reuse right-facing sprites for any left-facing orientation (including diagonals).")]
         [SerializeField]
@@ -44,6 +44,18 @@ namespace Player
         [Tooltip("If true, reuse left-facing sprites for any right-facing orientation (including diagonals).")]
         [SerializeField]
         private bool useFlipXForRight;
+        [Tooltip("If true, reuse Down-Right sprites for Down-Left facings by mirroring them.")]
+        [SerializeField]
+        private bool useFlipXForDownLeft = true;
+        [Tooltip("If true, reuse Up-Right sprites for Up-Left facings by mirroring them.")]
+        [SerializeField]
+        private bool useFlipXForUpLeft = true;
+        [Tooltip("If true, reuse Up-Left sprites for Up-Right facings by mirroring them.")]
+        [SerializeField]
+        private bool useFlipXForUpRight;
+        [Tooltip("If true, reuse Down-Left sprites for Down-Right facings by mirroring them.")]
+        [SerializeField]
+        private bool useFlipXForDownRight;
 
 #if ENABLE_INPUT_SYSTEM
         [Header("Input")]
@@ -327,7 +339,7 @@ namespace Player
 
             Direction8 visualDir = facingDir;
             int animatorDir = Direction8Utility.ToAnimatorIndex(visualDir);
-            Direction8 spriteDir = Direction8Utility.SnapToFourWay(visualDir);
+            Direction8 spriteDir = visualDir;
 
             anim.SetBool("IsMoving", isMoving);
             anim.SetInteger("Dir", animatorDir);
@@ -337,74 +349,7 @@ namespace Player
 
             Sprite desired = null;
             bool flip = false;
-            if (isMoving)
-            {
-                switch (spriteDir)
-                {
-                    case Direction8.Down:
-                        desired = walkDown ? walkDown : idleDown;
-                        break;
-                    case Direction8.Left:
-                        if (useFlipXForLeft)
-                        {
-                            desired = walkRight ? walkRight : idleRight;
-                            flip = true;
-                        }
-                        else
-                        {
-                            desired = walkLeft ? walkLeft : idleLeft;
-                        }
-                        break;
-                    case Direction8.Right:
-                        if (useFlipXForRight)
-                        {
-                            desired = walkLeft ? walkLeft : idleLeft;
-                            flip = true;
-                        }
-                        else
-                        {
-                            desired = walkRight ? walkRight : idleRight;
-                        }
-                        break;
-                    case Direction8.Up:
-                        desired = walkUp ? walkUp : idleUp;
-                        break;
-                }
-            }
-            else
-            {
-                switch (spriteDir)
-                {
-                    case Direction8.Down:
-                        desired = idleDown;
-                        break;
-                    case Direction8.Left:
-                        if (useFlipXForLeft)
-                        {
-                            desired = idleRight ? idleRight : walkRight;
-                            flip = true;
-                        }
-                        else
-                        {
-                            desired = idleLeft;
-                        }
-                        break;
-                    case Direction8.Right:
-                        if (useFlipXForRight)
-                        {
-                            desired = idleLeft ? idleLeft : walkLeft;
-                            flip = true;
-                        }
-                        else
-                        {
-                            desired = idleRight;
-                        }
-                        break;
-                    case Direction8.Up:
-                        desired = idleUp;
-                        break;
-                }
-            }
+            desired = ResolveOverrideSprite(spriteDir, isMoving, out flip);
 
             if (desired != null && !freezeSprite)
             {
@@ -412,6 +357,117 @@ namespace Player
                     sr.flipX = flip;
                 if (sr.sprite != desired)
                     sr.sprite = desired;
+            }
+        }
+
+        /// <summary>
+        ///     Resolves the sprite to display for the supplied direction using the optional override fields. The lookup
+        ///     respects diagonal-specific art, mirrors configured directions when requested, and gracefully falls back to
+        ///     cardinal frames when bespoke assets are unavailable.
+        /// </summary>
+        private Sprite ResolveOverrideSprite(Direction8 direction, bool moving, out bool flip)
+        {
+            foreach (var lookup in Direction8Utility.BuildSpriteFallbackOrder(direction, ShouldMirrorOverride))
+            {
+                Sprite sprite = GetSpriteForDirection(lookup.Direction, moving);
+                if (sprite != null)
+                {
+                    flip = lookup.FlipX;
+                    return sprite;
+                }
+            }
+
+            flip = false;
+            return null;
+        }
+
+        /// <summary>Returns true when the supplied direction is configured to borrow sprites from its mirrored counterpart.</summary>
+        private bool ShouldMirrorOverride(Direction8 direction)
+        {
+            switch (direction)
+            {
+                case Direction8.Left:
+                    return useFlipXForLeft;
+                case Direction8.Right:
+                    return useFlipXForRight;
+                case Direction8.DownLeft:
+                    return useFlipXForDownLeft;
+                case Direction8.UpLeft:
+                    return useFlipXForUpLeft;
+                case Direction8.UpRight:
+                    return useFlipXForUpRight;
+                case Direction8.DownRight:
+                    return useFlipXForDownRight;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        ///     Retrieves the idle/walk sprite assigned for the requested direction. When one of the pair is missing the
+        ///     available sprite is returned regardless of movement state so fallback logic still has something to render.
+        /// </summary>
+        private Sprite GetSpriteForDirection(Direction8 direction, bool moving)
+        {
+            GetOverrideSprites(direction, out Sprite idleSprite, out Sprite walkSprite);
+            if (moving)
+            {
+                if (walkSprite != null)
+                    return walkSprite;
+                if (idleSprite != null)
+                    return idleSprite;
+            }
+            else
+            {
+                if (idleSprite != null)
+                    return idleSprite;
+                if (walkSprite != null)
+                    return walkSprite;
+            }
+
+            return null;
+        }
+
+        /// <summary>Populates the idle and walk sprite references for a given direction.</summary>
+        private void GetOverrideSprites(Direction8 direction, out Sprite idleSprite, out Sprite walkSprite)
+        {
+            idleSprite = null;
+            walkSprite = null;
+
+            switch (direction)
+            {
+                case Direction8.Down:
+                    idleSprite = idleDown;
+                    walkSprite = walkDown;
+                    break;
+                case Direction8.DownRight:
+                    idleSprite = idleDownRight;
+                    walkSprite = walkDownRight;
+                    break;
+                case Direction8.Right:
+                    idleSprite = idleRight;
+                    walkSprite = walkRight;
+                    break;
+                case Direction8.UpRight:
+                    idleSprite = idleUpRight;
+                    walkSprite = walkUpRight;
+                    break;
+                case Direction8.Up:
+                    idleSprite = idleUp;
+                    walkSprite = walkUp;
+                    break;
+                case Direction8.UpLeft:
+                    idleSprite = idleUpLeft;
+                    walkSprite = walkUpLeft;
+                    break;
+                case Direction8.Left:
+                    idleSprite = idleLeft;
+                    walkSprite = walkLeft;
+                    break;
+                case Direction8.DownLeft:
+                    idleSprite = idleDownLeft;
+                    walkSprite = walkDownLeft;
+                    break;
             }
         }
 

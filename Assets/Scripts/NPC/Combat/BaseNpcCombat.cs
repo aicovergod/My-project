@@ -800,15 +800,16 @@ namespace NPC
             }
 
             npcFacing?.FaceTarget(target.transform);
-            var animator = npcFacing?.Animator;
-            if (animator != null)
+            var spriteAnimator = npcFacing?.Animator;
+            if (spriteAnimator != null)
             {
-                int facingDir = Direction8Utility.ToAnimatorIndex(npcFacing.FacingDirection);
-                if (animator.HasAttackAnimation(facingDir))
+                Direction8 facingDir = npcFacing.FacingDirection;
+                spriteAnimator.animator?.SetInteger(spriteAnimator.dirParam, Direction8Utility.ToAnimatorIndex8(facingDir));
+                if (spriteAnimator.HasAttackAnimation(facingDir))
                 {
                     if (spriteSwapRoutine != null)
                         StopCoroutine(spriteSwapRoutine);
-                    spriteSwapRoutine = StartCoroutine(animator.PlayAttackAnimation(facingDir));
+                    spriteSwapRoutine = StartCoroutine(spriteAnimator.PlayAttackAnimation(facingDir));
                 }
             }
 
