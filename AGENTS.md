@@ -49,6 +49,7 @@
   - NPC combat/movement live under `NPC/Combat`, `NPC/Movement`, and `NPC/Navigation`; interaction/UI wrappers route right-click menus and HUDs. `NpcFaction` powers faction-aware tests.
   - `World/SceneTransitionManager` now owns additive scene swaps, persistent-object callbacks, spawn point routing, and fade timing. Use `SceneTransitionInteractable` to trigger transitions, populate `SceneTransitionManager.NextSpawnPoint`, and keep persistent services registered via `IScenePersistent` so they receive unload/load callbacks.
   - `World/Minimap` & `MinimapMarker` render the overworld HUD, `PopupText`/`PopupTextPool` feed floating world text, and `Environment/FenceColliderFoot` supplies nav blockers for fence kits.
+  - Lighter NPC prefabs should include `NpcKnockbackReceiver` alongside `NpcWanderer` so damage-driven knockback eases displacement without breaking wander bounds. Heavy or boss NPCs can disable or omit the receiver to stay rooted.
 - **UI Layer** (`Assets/Scripts/UI`, `Assets/Scripts/Player`, `Assets/Scripts/Status`)
   - HUDs such as `HealthHUD`, merge timers, tab buttons, and combat/skill overlays expect LegacyRuntime fonts and OSRS layout cues. `UI/PersistentEventSystem` maintains input modules across scenes.
   - `UI/MagicUI` is a `PersistentSceneSingleton` that builds the spellbook grid from `Resources/Spells`, caches strike spells for max-hit syncing, and drives the active spell/last selected spell state consumed by `CombatController` and `PlayerCombatLoadout`.
@@ -78,6 +79,24 @@
 - **Audio**: The central `Assets/Scripts/Audio/SoundManager` component exposes the `SoundEffect` enum for UI/gameplay cues (including death jingles). Register new clips there when wiring fresh feedback.
 - **Sprite Depth**: `Assets/Scripts/Util/SpriteDepth` offsets render order using the object's world Y so sprites overlap consistently in the 2.5D stack.
 - **Book Content**: Lore assets live in `Assets/Resources/Books`. Use `\f` within `BookData.content` to break pages and avoid relying on the obsolete `pages` list.
+
+## Build & Editor Setup
+- **Unity Version**: Open and build the project with Unity **6000.2.3f1** (Unity 6.2, DX12). Earlier editors risk serialization drift on URP assets and input bindings.
+- **Initial Setup**:
+  1. Clone the repository and open it through Unity Hub, targeting the `My-project` folder.
+  2. Load a gameplay scene such as `Assets/Scenes/OverWorld.unity` to ensure persistent singletons spawn correctly.
+  3. Use **File > Build Settings** to configure platform targets; URP assets are already configured for desktop. Keep the default color space and render pipeline settings unless a task explicitly requests changes.
+- **Play Mode**: Enter Play Mode from the overworld or appropriate test scene. Persistent systems (`PersistentObjects.asset`) will bootstrap automatically via `GameManager`.
+- **Standalone Builds**: Build via **File > Build Settings**. Verify that persistent bootstrap scenes are included and that the login/autosave flow continues to function in the player build.
+
+## Input & Rebinding
+- The project relies on the Unity Input System asset `Assets/InputSystem_Actions.inputactions`.
+- The **Player** action map exposes `Move`, `Interact`, `Prospect`, `Cancel`, and `OpenMenu`. Share these bindings across gameplay, NPC interaction, and UI to keep inputs consistent.
+- When introducing new bindings:
+  1. Update the action asset via the Input Actions editor and apply changes.
+  2. Ensure any `PlayerInput` components reference the updated asset.
+  3. Resolve actions through `Core/Input/InputActionResolver.Resolve`, optionally exposing an `InputActionReference` in scripts for prefab overrides so the lifecycle stays centralised.
+- Gathering systems, NPC interactables, and UI toggles should avoid hardcoded keycodes—always query the shared action map.
 
 ## Code Conventions
 - Unity C# only. Scripts live under `Assets/Scripts/...` with folder-aligned namespaces (e.g., `namespace Skills.Woodcutting`).
@@ -116,6 +135,8 @@
 ## Testing & Validation
 - Play mode and edit mode tests live in `Assets/Tests` (currently NUnit-based unit tests like `CookingSkillTests`, `NpcFactionTests`, `NpcElementalModifierTests`). Run them through the Unity Test Runner or an equivalent CLI invocation (`Unity -runTests`) whenever you touch gameplay logic.
 - Validate scenes by loading `Assets/Scenes/OverWorld.unity` and ensuring persistent objects (`PersistentObjects.asset`) spawn correctly.
+- Follow the login flow regression checklist in `PlaytestNotes_LoginFlow.md` after touching authentication, scene loading, autosave, or player placement logic. Cover both returning-account and new-account scenarios and confirm the autosave loop resumes post-login.
+- Automated save recovery coverage exists in the playmode tests `LoadGlobalStore_RecoversFromInterruptedSwap`, `LoadGlobalStore_RecoversWhenLiveFileMissing`, and `LoadGlobalStore_RecoversFromCorruptedLiveFile`; keep them green when adjusting persistence.
 
 ## Workflow Notes
 - Do **not** rename or delete existing assets/scenes unless explicitly requested. Extend systems via new components or ScriptableObjects.
