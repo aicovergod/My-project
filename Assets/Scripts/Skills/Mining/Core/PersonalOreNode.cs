@@ -429,11 +429,11 @@ namespace Skills.Mining
             EnsureCharacterLayerCache();
 
 #if UNITY_2023_1_OR_NEWER
-            var renderers = Object.FindObjectsByType<SpriteRenderer>(
+            var renderers = UnityEngine.Object.FindObjectsByType<SpriteRenderer>(
                 FindObjectsInactive.Exclude,
                 FindObjectsSortMode.None);
 #else
-            var renderers = Object.FindObjectsOfType<SpriteRenderer>();
+            var renderers = UnityEngine.Object.FindObjectsOfType<SpriteRenderer>();
 #endif
 
             int maximumOrder = int.MinValue;
