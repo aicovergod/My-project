@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Black Pickaxe
   displayName: Black Pickaxe
-  tier: 3
+  tier: 4
   levelRequirement: 5
   miningRollBonus: 0.03
   swingSpeedTicks: 4

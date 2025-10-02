@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Iron Pickaxe
   m_EditorClassIdentifier: 
   id: Iron Pickaxe
-  displayName: Iron pickaxe
+  displayName: Iron Pickaxe
   tier: 2
   levelRequirement: 1
   miningRollBonus: 0.01

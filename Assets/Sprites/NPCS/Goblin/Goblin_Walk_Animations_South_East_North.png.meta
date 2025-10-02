@@ -1,0 +1,442 @@
+fileFormatVersion: 2
+guid: d76721852252ab94ca5c00734333cdbc
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -2323196122670215034
+    second: Goblin_Walk_Animations_South_East_North_0
+  - first:
+      213: 6523920306455535454
+    second: Goblin_Walk_Animations_South_East_North_1
+  - first:
+      213: 7495098495689942010
+    second: Goblin_Walk_Animations_South_East_North_2
+  - first:
+      213: -8765916559057752899
+    second: Goblin_Walk_Animations_South_East_North_3
+  - first:
+      213: -7019649401805722723
+    second: Goblin_Walk_Animations_South_East_North_4
+  - first:
+      213: 6177790391075924807
+    second: Goblin_Walk_Animations_South_East_North_5
+  - first:
+      213: -6416225153047532562
+    second: Goblin_Walk_Animations_South_East_North_6
+  - first:
+      213: 6220749907203746531
+    second: Goblin_Walk_Animations_South_East_North_7
+  - first:
+      213: 312958824630394532
+    second: Goblin_Walk_Animations_South_East_North_8
+  - first:
+      213: 8467598214702152235
+    second: Goblin_Walk_Animations_South_East_North_9
+  - first:
+      213: -9062082026372605741
+    second: Goblin_Walk_Animations_South_East_North_10
+  - first:
+      213: 6412477626529264319
+    second: Goblin_Walk_Animations_South_East_North_11
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Goblin_Walk_Animations_South_East_North_0
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 0
+        width: 54
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6805dac6f6952cfd0800000000000000
+      internalID: -2323196122670215034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Walk_Animations_South_East_North_1
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 0
+        width: 56
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5f5d3914fe998a50800000000000000
+      internalID: 6523920306455535454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Walk_Animations_South_East_North_2
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 0
+        width: 57
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: af3e9200f50f30860800000000000000
+      internalID: 7495098495689942010
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Walk_Animations_South_East_North_3
+      rect:
+        serializedVersion: 2
+        x: 196
+        y: 0
+        width: 56
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dbce5a65555395680800000000000000
+      internalID: -8765916559057752899
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Walk_Animations_South_East_North_4
+      rect:
+        serializedVersion: 2
+        x: 264
+        y: 6
+        width: 41
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d9b269d8f02359e90800000000000000
+      internalID: -7019649401805722723
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Walk_Animations_South_East_North_5
+      rect:
+        serializedVersion: 2
+        x: 328
+        y: 5
+        width: 41
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74be6ec11abebb550800000000000000
+      internalID: 6177790391075924807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Walk_Animations_South_East_North_6
+      rect:
+        serializedVersion: 2
+        x: 392
+        y: 5
+        width: 41
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eebeca9c73df4f6a0800000000000000
+      internalID: -6416225153047532562
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Walk_Animations_South_East_North_7
+      rect:
+        serializedVersion: 2
+        x: 456
+        y: 5
+        width: 41
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ea6c67e41b845650800000000000000
+      internalID: 6220749907203746531
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Walk_Animations_South_East_North_8
+      rect:
+        serializedVersion: 2
+        x: 514
+        y: 1
+        width: 58
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ae1b63946ad75400800000000000000
+      internalID: 312958824630394532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Walk_Animations_South_East_North_9
+      rect:
+        serializedVersion: 2
+        x: 580
+        y: 1
+        width: 57
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b2abd0886b3f28570800000000000000
+      internalID: 8467598214702152235
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Walk_Animations_South_East_North_10
+      rect:
+        serializedVersion: 2
+        x: 644
+        y: 0
+        width: 57
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d8db94f8640d3280800000000000000
+      internalID: -9062082026372605741
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin_Walk_Animations_South_East_North_11
+      rect:
+        serializedVersion: 2
+        x: 708
+        y: 1
+        width: 57
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb2ba633d62bdf850800000000000000
+      internalID: 6412477626529264319
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Goblin_Walk_Animations_South_East_North_0: -2323196122670215034
+      Goblin_Walk_Animations_South_East_North_1: 6523920306455535454
+      Goblin_Walk_Animations_South_East_North_10: -9062082026372605741
+      Goblin_Walk_Animations_South_East_North_11: 6412477626529264319
+      Goblin_Walk_Animations_South_East_North_2: 7495098495689942010
+      Goblin_Walk_Animations_South_East_North_3: -8765916559057752899
+      Goblin_Walk_Animations_South_East_North_4: -7019649401805722723
+      Goblin_Walk_Animations_South_East_North_5: 6177790391075924807
+      Goblin_Walk_Animations_South_East_North_6: -6416225153047532562
+      Goblin_Walk_Animations_South_East_North_7: 6220749907203746531
+      Goblin_Walk_Animations_South_East_North_8: 312958824630394532
+      Goblin_Walk_Animations_South_East_North_9: 8467598214702152235
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

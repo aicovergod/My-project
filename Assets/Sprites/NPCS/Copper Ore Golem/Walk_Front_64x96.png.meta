@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 290ee90a121184c48864215991a92851
+guid: 284c320b1aa5ff045a6988bc88bcb7a3
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7286173055465429985
-    second: Idle_Right_0_64x64_0
+      213: -527229526793528300
+    second: Walk_Front_64x96_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,17 +96,30 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Idle_Right_0_64x64_0
+      name: Walk_Front_64x96_0
       rect:
         serializedVersion: 2
-        x: 5
-        y: 3
-        width: 46
-        height: 56
+        x: 3
+        y: 6
+        width: 56
+        height: 83
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1eb1a074acfad1560800000000000000
-      internalID: 7286173055465429985
+      spriteID: 41cdf5ce987eea8f0800000000000000
+      internalID: -527229526793528300
       vertices: []
       indices: 
       edges: []
@@ -135,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Idle_Right_0_64x64_0: 7286173055465429985
+      Walk_Front_64x96_0: -527229526793528300
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

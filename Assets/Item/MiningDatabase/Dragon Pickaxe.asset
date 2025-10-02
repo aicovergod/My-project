@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b36d396f16be00488c917308c981b20, type: 3}
   m_Name: Dragon Pickaxe
   m_EditorClassIdentifier: 
-  id: pickaxe_rune
-  displayName: Rune pickaxe
-  tier: 6
+  id: Dragon Pickaxe
+  displayName: Dragon Pickaxe
+  tier: 9
   levelRequirement: 40
   miningRollBonus: 0.06
   swingSpeedTicks: 3

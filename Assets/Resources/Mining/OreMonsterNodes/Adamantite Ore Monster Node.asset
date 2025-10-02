@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a6b363ec0e84e199fc8b1461b1cf6c9, type: 3}
   m_Name: Adamantite Ore Monster Node
   m_EditorClassIdentifier: 
-  monsterCombatProfile: {fileID: 11400000, guid: a2f9345330f24e74da31849069a079ad, type: 2}
-  personalOreNodePrefab: {fileID: 100000, guid: b517a91277d2435e8530e04eb6679bfd, type: 3}
+  monsterCombatProfile: {fileID: 11400000, guid: 1a8fa793bcd44f74499c346e9d9a788e, type: 2}
+  personalOreNodePrefab: {fileID: 5567743148573218289, guid: 88d20009dc630ff4daad403400850b7a, type: 3}
   personalRockDefinition: {fileID: 11400000, guid: b915dff922d04fdca34f29c6915b5be7, type: 2}
-  baseLifetimeSeconds: 300
-  charmLifetimeSeconds: 480
+  baseLifetimeSeconds: 90
+  charmLifetimeSeconds: 120
   charmItemId: Orekeepers Charm
   requiresCombatLevel: 0
   requiredCombatLevel: 65

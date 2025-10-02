@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Adamant Pickaxe
   displayName: Adamant pickaxe
-  tier: 5
+  tier: 7
   levelRequirement: 30
   miningRollBonus: 0.05
   swingSpeedTicks: 3

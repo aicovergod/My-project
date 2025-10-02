@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 147800649009725271}
   - component: {fileID: 6768648691993575175}
   - component: {fileID: -175244872139964884}
+  - component: {fileID: -1290750935914847764}
   m_Layer: 7
   m_Name: Bonfire
   m_TagString: Untagged
@@ -200,3 +201,18 @@ MonoBehaviour:
   interactionRange: 1.5
   cancelDistance: 3
   approachAnchor: {fileID: 0}
+--- !u!114 &-1290750935914847764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4440929773989253178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52a183722b4c00843aeae862af643c52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Combat.CombatLineOfSightBypass
+  allowMelee: 0
+  allowRanged: 1
+  allowMagic: 1

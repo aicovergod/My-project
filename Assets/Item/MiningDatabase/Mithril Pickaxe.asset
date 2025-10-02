@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Mithril Pickaxe
   m_EditorClassIdentifier: 
   id: Mithril Pickaxe
-  displayName: Mithril pickaxe
-  tier: 4
+  displayName: Mithril Pickaxe
+  tier: 5
   levelRequirement: 20
   miningRollBonus: 0.03
   swingSpeedTicks: 4

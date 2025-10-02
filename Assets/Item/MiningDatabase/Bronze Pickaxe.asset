@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Bronze Pickaxe
   m_EditorClassIdentifier: 
   id: Bronze Pickaxe
-  displayName: Bronze pickaxe
+  displayName: Bronze Pickaxe
   tier: 1
   levelRequirement: 1
   miningRollBonus: 0

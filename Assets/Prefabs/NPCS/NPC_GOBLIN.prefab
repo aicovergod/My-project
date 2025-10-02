@@ -96,12 +96,12 @@ SpriteRenderer:
   m_SortingLayerID: -160616933
   m_SortingLayer: 4
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 91dfdb742bde12b4794aeaa4930b9f2e, type: 3}
+  m_Sprite: {fileID: 9130647759989690307, guid: e65335adf4afee846b622a6c2deca637, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.875, y: 0.84375}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -172,8 +172,8 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
+    oldSize: {x: 0.875, y: 0.84375}
+    newSize: {x: 0.875, y: 0.84375}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -197,6 +197,8 @@ MonoBehaviour:
   hitSplatLibrary: {fileID: 11400000, guid: 3bdb17896f374e8bb098d628ca4ba2f4, type: 2}
   knockbackReceiver: {fileID: 330093352596913383}
   hitsplatFallbackOffset: 1
+  pendingRespawnDelaySeconds: 0
+  respawnSuppressed: 0
 --- !u!114 &7573619506058784387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -277,29 +279,71 @@ MonoBehaviour:
   attackTrigger: Attack
   spriteRenderer: {fileID: 7487083981726320206}
   idleDown:
-  - {fileID: 21300000, guid: 91dfdb742bde12b4794aeaa4930b9f2e, type: 3}
-  idleLeft:
-  - {fileID: 21300000, guid: 4485f3722153ec446a32d90e62b6be01, type: 3}
+  - {fileID: 9130647759989690307, guid: e65335adf4afee846b622a6c2deca637, type: 3}
+  idleDownRight:
+  - {fileID: 1368956883174936208, guid: e65335adf4afee846b622a6c2deca637, type: 3}
   idleRight:
-  - {fileID: 21300000, guid: 290ee90a121184c48864215991a92851, type: 3}
+  - {fileID: 6361711507835937641, guid: e65335adf4afee846b622a6c2deca637, type: 3}
+  idleUpRight:
+  - {fileID: 6260978701604189543, guid: e65335adf4afee846b622a6c2deca637, type: 3}
   idleUp:
-  - {fileID: 21300000, guid: e20b8672692009a4eb814a9fbfe59bf5, type: 3}
+  - {fileID: 7010029454280353678, guid: e65335adf4afee846b622a6c2deca637, type: 3}
+  idleUpLeft: []
+  idleLeft: []
+  idleDownLeft: []
   walkDown:
-  - {fileID: 21300000, guid: 91dfdb742bde12b4794aeaa4930b9f2e, type: 3}
-  walkLeft:
-  - {fileID: 21300000, guid: 4485f3722153ec446a32d90e62b6be01, type: 3}
+  - {fileID: -2323196122670215034, guid: d76721852252ab94ca5c00734333cdbc, type: 3}
+  - {fileID: 6523920306455535454, guid: d76721852252ab94ca5c00734333cdbc, type: 3}
+  - {fileID: 7495098495689942010, guid: d76721852252ab94ca5c00734333cdbc, type: 3}
+  - {fileID: -8765916559057752899, guid: d76721852252ab94ca5c00734333cdbc, type: 3}
+  walkDownRight:
+  - {fileID: -6217159144059275648, guid: 21d290167a7073644ab54d54efece2e0, type: 3}
+  - {fileID: -7580493686375245734, guid: 21d290167a7073644ab54d54efece2e0, type: 3}
+  - {fileID: 5146591993594807466, guid: 21d290167a7073644ab54d54efece2e0, type: 3}
+  - {fileID: -5170166156809850445, guid: 21d290167a7073644ab54d54efece2e0, type: 3}
   walkRight:
-  - {fileID: 21300000, guid: 290ee90a121184c48864215991a92851, type: 3}
+  - {fileID: -7019649401805722723, guid: d76721852252ab94ca5c00734333cdbc, type: 3}
+  - {fileID: 6177790391075924807, guid: d76721852252ab94ca5c00734333cdbc, type: 3}
+  - {fileID: 6177790391075924807, guid: d76721852252ab94ca5c00734333cdbc, type: 3}
+  - {fileID: 6220749907203746531, guid: d76721852252ab94ca5c00734333cdbc, type: 3}
+  walkUpRight:
+  - {fileID: 8669169091894733767, guid: 21d290167a7073644ab54d54efece2e0, type: 3}
+  - {fileID: 560459495449272323, guid: 21d290167a7073644ab54d54efece2e0, type: 3}
+  - {fileID: -3460837788117910222, guid: 21d290167a7073644ab54d54efece2e0, type: 3}
+  - {fileID: 1364226392741766790, guid: 21d290167a7073644ab54d54efece2e0, type: 3}
   walkUp:
-  - {fileID: 21300000, guid: e20b8672692009a4eb814a9fbfe59bf5, type: 3}
-  attackDown: []
+  - {fileID: 312958824630394532, guid: d76721852252ab94ca5c00734333cdbc, type: 3}
+  - {fileID: 8467598214702152235, guid: d76721852252ab94ca5c00734333cdbc, type: 3}
+  - {fileID: -9062082026372605741, guid: d76721852252ab94ca5c00734333cdbc, type: 3}
+  - {fileID: 6412477626529264319, guid: d76721852252ab94ca5c00734333cdbc, type: 3}
+  walkUpLeft: []
+  walkLeft: []
+  walkDownLeft: []
+  attackDown:
+  - {fileID: 9103874461932266169, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  attackDownRight:
+  - {fileID: 3116209339957350709, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  attackRight:
+  - {fileID: -6116303017828154014, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  attackUpRight:
+  - {fileID: -8675127573068675785, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  attackUp:
+  - {fileID: -7610565169656860958, guid: 57344f4d023fed440b9f78f228ecd556, type: 3}
+  attackUpLeft: []
   attackLeft: []
-  attackRight: []
-  attackUp: []
-  useFlipXForLeft: 0
+  attackDownLeft: []
+  useFlipXForLeft: 1
   useFlipXForRight: 0
+  useFlipXForDownRight: 0
+  useFlipXForUpRight: 0
+  useFlipXForUpLeft: 1
+  useFlipXForDownLeft: 1
   useFlipXForLeftAttack: 1
   useFlipXForRightAttack: 0
+  useFlipXForDownRightAttack: 0
+  useFlipXForUpRightAttack: 0
+  useFlipXForUpLeftAttack: 1
+  useFlipXForDownLeftAttack: 1
   animationFPS: 6
 --- !u!114 &-3175024997635208073
 MonoBehaviour:

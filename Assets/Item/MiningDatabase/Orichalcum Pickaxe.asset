@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Orichalcum Pickaxe
   m_EditorClassIdentifier: 
   id: Orichalcum Pickaxe
-  displayName: Orichalcum pickaxe
-  tier: 5
+  displayName: Orichalcum Pickaxe
+  tier: 6
   levelRequirement: 25
   miningRollBonus: 0.04
   swingSpeedTicks: 3

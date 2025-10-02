@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 4485f3722153ec446a32d90e62b6be01
+guid: 641810a179cf6cf42adf1b2406f4ea4d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -136149972180094403
-    second: Idle_Left_0_64x64_0
+      213: -3233264440600578161
+    second: Goblin_North_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 64
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -96,17 +96,30 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Idle_Left_0_64x64_0
+      name: Goblin_North_0
       rect:
         serializedVersion: 2
-        x: 11
-        y: 3
-        width: 46
-        height: 56
+        x: 4
+        y: 5
+        width: 56
+        height: 54
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d32b608525c4c1ef0800000000000000
-      internalID: -136149972180094403
+      spriteID: f87b9113f132123d0800000000000000
+      internalID: -3233264440600578161
       vertices: []
       indices: 
       edges: []
@@ -125,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Idle_Left_0_64x64_0: -136149972180094403
+      Goblin_North_0: -3233264440600578161
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

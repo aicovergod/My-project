@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 91dfdb742bde12b4794aeaa4930b9f2e
+guid: 4c5a726ecaecce44e9d36dde0a8d6e4c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7564532596042325361
-    second: Idle_Down_0_64x64_0
+      213: -8815692228427879368
+    second: Idle_Right_64_96_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,17 +96,30 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Idle_Down_0_64x64_0
+      name: Idle_Right_64_96_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 2
-        width: 58
-        height: 57
+        x: 10
+        y: 8
+        width: 45
+        height: 82
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: f82a809bea1650790800000000000000
-      internalID: -7564532596042325361
+      spriteID: 83c626330ae58a580800000000000000
+      internalID: -8815692228427879368
       vertices: []
       indices: 
       edges: []
@@ -135,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Idle_Down_0_64x64_0: -7564532596042325361
+      Idle_Right_64_96_0: -8815692228427879368
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

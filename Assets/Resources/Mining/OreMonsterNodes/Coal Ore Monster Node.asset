@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a6b363ec0e84e199fc8b1461b1cf6c9, type: 3}
   m_Name: Coal Ore Monster Node
   m_EditorClassIdentifier: 
-  monsterCombatProfile: {fileID: 11400000, guid: a2f9345330f24e74da31849069a079ad, type: 2}
-  personalOreNodePrefab: {fileID: 100000, guid: b517a91277d2435e8530e04eb6679bfd, type: 3}
+  monsterCombatProfile: {fileID: 11400000, guid: c425d6c705fc0524092ede8c2c973a2e, type: 2}
+  personalOreNodePrefab: {fileID: 5567743148573218289, guid: 228dc4d64af6ba64eb7c541f768a8dc5, type: 3}
   personalRockDefinition: {fileID: 11400000, guid: 271071a82b1140f8b543a7b5196bf06d, type: 2}
-  baseLifetimeSeconds: 240
-  charmLifetimeSeconds: 420
+  baseLifetimeSeconds: 90
+  charmLifetimeSeconds: 120
   charmItemId: Orekeepers Charm
   requiresCombatLevel: 0
   requiredCombatLevel: 35

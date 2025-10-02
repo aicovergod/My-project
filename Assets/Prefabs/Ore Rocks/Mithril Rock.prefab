@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 9158371086379293641}
   - component: {fileID: -3399186540181322053}
   - component: {fileID: 6890880795155135750}
+  - component: {fileID: 7427452077109631370}
   m_Layer: 7
   m_Name: Mithril Rock
   m_TagString: Untagged
@@ -159,3 +160,18 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.35
+--- !u!114 &7427452077109631370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2853819158990723001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52a183722b4c00843aeae862af643c52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Combat.CombatLineOfSightBypass
+  allowMelee: 0
+  allowRanged: 1
+  allowMagic: 1

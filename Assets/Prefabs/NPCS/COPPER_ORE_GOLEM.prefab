@@ -97,7 +97,7 @@ SpriteRenderer:
   m_SortingLayerID: -160616933
   m_SortingLayer: 4
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 91dfdb742bde12b4794aeaa4930b9f2e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ddb451032db5ac64ba8cea360a6beab3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -173,7 +173,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 1, y: 1.5}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -280,26 +280,27 @@ MonoBehaviour:
   attackTrigger: Attack
   spriteRenderer: {fileID: 7487083981726320206}
   idleDown:
-  - {fileID: 21300000, guid: 91dfdb742bde12b4794aeaa4930b9f2e, type: 3}
-  idleLeft:
-  - {fileID: 21300000, guid: 4485f3722153ec446a32d90e62b6be01, type: 3}
+  - {fileID: 21300000, guid: ddb451032db5ac64ba8cea360a6beab3, type: 3}
+  idleLeft: []
   idleRight:
-  - {fileID: 21300000, guid: 290ee90a121184c48864215991a92851, type: 3}
+  - {fileID: 21300000, guid: 4c5a726ecaecce44e9d36dde0a8d6e4c, type: 3}
   idleUp:
-  - {fileID: 21300000, guid: e20b8672692009a4eb814a9fbfe59bf5, type: 3}
+  - {fileID: 21300000, guid: 55a8dc89060ff8f47801b1122fe4e85f, type: 3}
   walkDown:
-  - {fileID: 21300000, guid: 91dfdb742bde12b4794aeaa4930b9f2e, type: 3}
-  walkLeft:
-  - {fileID: 21300000, guid: 4485f3722153ec446a32d90e62b6be01, type: 3}
+  - {fileID: 21300000, guid: 284c320b1aa5ff045a6988bc88bcb7a3, type: 3}
+  walkLeft: []
   walkRight:
-  - {fileID: 21300000, guid: 290ee90a121184c48864215991a92851, type: 3}
+  - {fileID: 21300000, guid: 0eecb7d7b9418ae40b337fdd587dd757, type: 3}
   walkUp:
-  - {fileID: 21300000, guid: e20b8672692009a4eb814a9fbfe59bf5, type: 3}
-  attackDown: []
+  - {fileID: 21300000, guid: 55a8dc89060ff8f47801b1122fe4e85f, type: 3}
+  attackDown:
+  - {fileID: 21300000, guid: 0dfe8689332448d48a8463a355145007, type: 3}
   attackLeft: []
-  attackRight: []
-  attackUp: []
-  useFlipXForLeft: 0
+  attackRight:
+  - {fileID: 21300000, guid: 6fd9cbf7740b00d4fae89454b9f32e47, type: 3}
+  attackUp:
+  - {fileID: 21300000, guid: 8f4fd96c9b8ebdf46be853ae5e9a31ad, type: 3}
+  useFlipXForLeft: 1
   useFlipXForRight: 0
   useFlipXForLeftAttack: 1
   useFlipXForRightAttack: 0

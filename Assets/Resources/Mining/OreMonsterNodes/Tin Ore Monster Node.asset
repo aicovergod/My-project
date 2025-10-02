@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Tin Ore Monster Node
   m_EditorClassIdentifier: 
   monsterCombatProfile: {fileID: 11400000, guid: 99be5545587046b409a3d4e9f2a85c70, type: 2}
-  personalOreNodePrefab: {fileID: 100000, guid: b517a91277d2435e8530e04eb6679bfd, type: 3}
+  personalOreNodePrefab: {fileID: 5567743148573218289, guid: b517a91277d2435e8530e04eb6679bfd, type: 3}
   personalRockDefinition: {fileID: 11400000, guid: a15e519114c7412eb4c5ce566f4c4bf0, type: 2}
-  baseLifetimeSeconds: 180
-  charmLifetimeSeconds: 300
+  baseLifetimeSeconds: 90
+  charmLifetimeSeconds: 120
   charmItemId: Orekeepers Charm
   requiresCombatLevel: 0
   requiredCombatLevel: 1

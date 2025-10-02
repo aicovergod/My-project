@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a6b363ec0e84e199fc8b1461b1cf6c9, type: 3}
   m_Name: Copper Ore Monster Node
   m_EditorClassIdentifier: 
-  monsterCombatProfile: {fileID: 11400000, guid: 99be5545587046b409a3d4e9f2a85c70, type: 2}
-  personalOreNodePrefab: {fileID: 100000, guid: b517a91277d2435e8530e04eb6679bfd, type: 3}
+  monsterCombatProfile: {fileID: 11400000, guid: 59de4073d9caf3a45a7cab05187d6de7, type: 2}
+  personalOreNodePrefab: {fileID: 5567743148573218289, guid: 1c3e445b8b5555240ac73f9613b2eeb7, type: 3}
   personalRockDefinition: {fileID: 11400000, guid: 056a87e9c43f4ac2808203fa84cacef0, type: 2}
   baseLifetimeSeconds: 90
   charmLifetimeSeconds: 120
