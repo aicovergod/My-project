@@ -38,7 +38,20 @@ namespace NPC
 
         private static readonly string[] DefaultObstructionLayers = { "Obstacles", "Obstacle", "Physical Objects" };
         private static readonly string[] NonBlockingLineOfSightLayers = { "Interactable", "Player", "Pets", "NPC" };
-        private static readonly int AntiMeleeObstacleLayer = LayerMask.NameToLayer("AntiMeleeObstacle");
+        private const string AntiMeleeObstacleLayerName = "AntiMeleeObstacle";
+
+        /// <summary>
+        /// Sentinel used so we can detect when the anti-melee obstacle layer lookup has not yet been
+        /// performed. Unity forbids NameToLayer calls during static initialization, so we perform the
+        /// lookup lazily the first time we need the value at runtime.
+        /// </summary>
+        private const int LayerLookupNotPerformed = int.MinValue;
+
+        /// <summary>
+        /// Cached result of the AntiMeleeObstacle layer lookup. We lazily populate this the first time
+        /// it is queried to remain compliant with Unity's script serialization restrictions.
+        /// </summary>
+        private static int cachedAntiMeleeObstacleLayer = LayerLookupNotPerformed;
 
         /// <summary>
         /// Runtime mask used by line of sight checks after applying defaults and filtering out
@@ -160,6 +173,23 @@ namespace NPC
             }
 
             return mask;
+        }
+
+        /// <summary>
+        /// Resolves the project layer index used for deliberate melee blockers. We avoid performing
+        /// the lookup during static initialization because Unity forbids NameToLayer calls before the
+        /// engine finishes constructing behaviours. Instead, the result is cached the first time it is
+        /// required at runtime and reused for subsequent queries.
+        /// </summary>
+        private static int GetAntiMeleeObstacleLayer()
+        {
+            if (cachedAntiMeleeObstacleLayer == LayerLookupNotPerformed)
+            {
+                int layer = LayerMask.NameToLayer(AntiMeleeObstacleLayerName);
+                cachedAntiMeleeObstacleLayer = layer >= 0 ? layer : -1;
+            }
+
+            return cachedAntiMeleeObstacleLayer;
         }
 
         public virtual void ResetCombatState(bool resetSpawnPosition = false)
@@ -787,7 +817,9 @@ namespace NPC
                 {
                     // Colliders on the AntiMeleeObstacle layer intentionally block melee swings,
                     // so only skip entries that belong to the general non-blocking set.
-                    if (colliderLayer != AntiMeleeObstacleLayer)
+                    int antiMeleeLayer = GetAntiMeleeObstacleLayer();
+                    bool colliderIsDedicatedBlocker = antiMeleeLayer >= 0 && colliderLayer == antiMeleeLayer;
+                    if (!colliderIsDedicatedBlocker)
                     {
                         int nonBlockingMask = GetNonBlockingLineOfSightMask();
                         if (nonBlockingMask != 0 && (nonBlockingMask & (1 << colliderLayer)) != 0)
