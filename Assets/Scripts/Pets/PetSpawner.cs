@@ -24,6 +24,14 @@ namespace Pets
             var go = new GameObject($"Pet_{def.id}");
             go.transform.position = position;
 
+            // Ensure the spawned pet uses the dedicated physics layer so collision filters,
+            // targeting, and raycasts that operate on layer masks treat the familiar correctly.
+            // The live project names the layer "Pets" (layer index 9) but we honour a couple of
+            // legacy names in case older data still relies on a different capitalisation.
+            int petLayer = ResolveLayerIndex("Pets", "Pet", "PET");
+            if (petLayer >= 0)
+                go.layer = petLayer;
+
             var sr = go.AddComponent<SpriteRenderer>();
             sr.sortingLayerName = "Characters";
             if (player != null)
@@ -178,6 +186,29 @@ namespace Pets
             floatingTextController.RefreshAnchorPosition();
 
             return go;
+        }
+
+        /// <summary>
+        ///     Attempts to resolve the first valid physics layer index from the supplied list of
+        ///     potential names. Returns -1 when none of the names map to a configured layer.
+        /// </summary>
+        private static int ResolveLayerIndex(params string[] layerNames)
+        {
+            if (layerNames == null || layerNames.Length == 0)
+                return -1;
+
+            for (int i = 0; i < layerNames.Length; i++)
+            {
+                string layerName = layerNames[i];
+                if (string.IsNullOrEmpty(layerName))
+                    continue;
+
+                int layer = LayerMask.NameToLayer(layerName);
+                if (layer >= 0)
+                    return layer;
+            }
+
+            return -1;
         }
     }
 }
