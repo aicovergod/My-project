@@ -801,10 +801,6 @@ namespace NPC
                 }
             }
 
-            var bypass = hitTransform.GetComponentInParent<CombatLineOfSightBypass>();
-            if (bypass != null && bypass.AllowsDamageType(attackType))
-                return true;
-
             // Allow pets and friendly NPCs to stand between combatants without blocking attacks.
             var pet = hitTransform.GetComponentInParent<PetCombatController>();
             if (pet != null)
