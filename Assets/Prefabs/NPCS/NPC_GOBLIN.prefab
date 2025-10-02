@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7487083981726320206}
   - component: {fileID: 1285495058149382175}
   - component: {fileID: 1225287366087380678}
+  - component: {fileID: 3553260803050964942}
   - component: {fileID: 4462744165104283374}
   - component: {fileID: 7573619506058784387}
   - component: {fileID: 2394211271730700276}
@@ -164,7 +165,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -199,6 +200,19 @@ MonoBehaviour:
   hitsplatFallbackOffset: 1
   pendingRespawnDelaySeconds: 0
   respawnSuppressed: 0
+--- !u!114 &3553260803050964942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 943236ba5ba2478c969c9675931910a8, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  interactionCollider: {fileID: 1225287366087380678}
 --- !u!114 &7573619506058784387
 MonoBehaviour:
   m_ObjectHideFlags: 0
