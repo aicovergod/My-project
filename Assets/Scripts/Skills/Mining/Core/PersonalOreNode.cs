@@ -38,6 +38,11 @@ namespace Skills.Mining
         [Tooltip("Maximum distance (in tiles) the owner can move away before the node despawns.")]
         [SerializeField] private float ownerDespawnDistanceTiles = 12f;
 
+        private static readonly string[] OwnerOverlayPreferredSortingLayerNames = { "UI", "Characters" };
+        private const string OwnerOverlayLayerName = "UI";
+        private const int OwnerOverlaySortingOrderOffset = 50;
+        private const int OwnerOverlayMinimumSortingOrder = 1000;
+
         private MiningPersonalNodeController ownerController;
         private MineableRock mineableRock;
         private OreMonsterNodeDefinition sourceDefinition;
@@ -99,6 +104,23 @@ namespace Skills.Mining
         /// </summary>
         public bool IsExpired => isExpired;
 
+        /// <summary>
+        ///     Canvas that renders the solo-lock icon and lifetime timer for the owning player.
+        /// </summary>
+        public Canvas OwnerOnlyCanvas => ownerOnlyCanvas;
+
+        /// <summary>
+        ///     Sorting layer identifier applied to the ownership canvas so other systems can align
+        ///     world-space UI (such as the mining progress bar) without guessing priorities.
+        /// </summary>
+        public int OwnerOverlaySortingLayerId => ownerOnlyCanvas != null ? ownerOnlyCanvas.sortingLayerID : 0;
+
+        /// <summary>
+        ///     Sorting order assigned to the ownership canvas. Returns <see cref="int.MinValue"/>
+        ///     when no canvas is configured so callers can detect the absence of overlay data.
+        /// </summary>
+        public int OwnerOverlaySortingOrder => ownerOnlyCanvas != null ? ownerOnlyCanvas.sortingOrder : int.MinValue;
+
         private void Awake()
         {
             // Ensure the required mineable rock component exists so the prefab remains valid.
@@ -139,6 +161,7 @@ namespace Skills.Mining
             LegacyFontProvider.ApplyTo(ownerOnlyText);
 
             ApplyDefinitionVisuals();
+            ConfigureOwnerOverlaySorting();
             ConfigureOwnershipVisibility();
             RaiseLifetimeChanged();
 
@@ -323,6 +346,162 @@ namespace Skills.Mining
                 var renderer = ownerOnlySpriteRenderers[i];
                 if (renderer != null && sourceDefinition.SoloLockSprite != null)
                     renderer.sprite = sourceDefinition.SoloLockSprite;
+            }
+        }
+
+        /// <summary>
+        ///     Ensures the ownership overlay (solo-lock icon and timer) renders above the rock and
+        ///     other character layers so the player can always see their reservation details.
+        /// </summary>
+        private void ConfigureOwnerOverlaySorting()
+        {
+            if (ownerOnlyCanvas == null)
+                return;
+
+            ApplyOwnerOverlayLayer();
+            ownerOnlyCanvas.overrideSorting = true;
+
+            var referenceRenderer = ResolveReferenceRenderer();
+
+            string overlaySortingLayerName = ResolveOwnerOverlaySortingLayerName();
+
+            if (!string.IsNullOrEmpty(overlaySortingLayerName))
+            {
+                ownerOnlyCanvas.sortingLayerName = overlaySortingLayerName;
+            }
+            else if (referenceRenderer != null)
+            {
+                ownerOnlyCanvas.sortingLayerID = referenceRenderer.sortingLayerID;
+            }
+
+            int desiredOrder = OwnerOverlayMinimumSortingOrder;
+            if (referenceRenderer != null)
+            {
+                desiredOrder = Mathf.Max(
+                    desiredOrder,
+                    referenceRenderer.sortingOrder + OwnerOverlaySortingOrderOffset);
+            }
+
+            ownerOnlyCanvas.sortingOrder = desiredOrder;
+
+            if (ownerOnlySpriteRenderers == null)
+                return;
+
+            for (int i = 0; i < ownerOnlySpriteRenderers.Length; i++)
+            {
+                var renderer = ownerOnlySpriteRenderers[i];
+                if (renderer == null)
+                    continue;
+
+                if (!string.IsNullOrEmpty(overlaySortingLayerName))
+                    renderer.sortingLayerName = overlaySortingLayerName;
+                else if (referenceRenderer != null)
+                    renderer.sortingLayerID = referenceRenderer.sortingLayerID;
+
+                renderer.sortingOrder = desiredOrder;
+            }
+        }
+
+        /// <summary>
+        ///     Determines the most appropriate sorting layer for the owner overlay.
+        /// </summary>
+        private static string ResolveOwnerOverlaySortingLayerName()
+        {
+            for (int i = 0; i < OwnerOverlayPreferredSortingLayerNames.Length; i++)
+            {
+                string candidate = OwnerOverlayPreferredSortingLayerNames[i];
+                if (SortingLayerExists(candidate))
+                    return candidate;
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        ///     Applies the UI physics layer to the ownership overlay so it renders above characters
+        ///     and participates in layer-based filtering correctly.
+        /// </summary>
+        private void ApplyOwnerOverlayLayer()
+        {
+            if (ownerOnlyCanvas == null)
+                return;
+
+            ApplyOwnerOverlayLayer(ownerOnlyCanvas.gameObject);
+
+            if (ownerOnlySpriteRenderers == null)
+                return;
+
+            for (int i = 0; i < ownerOnlySpriteRenderers.Length; i++)
+            {
+                var renderer = ownerOnlySpriteRenderers[i];
+                if (renderer != null)
+                    ApplyOwnerOverlayLayer(renderer.gameObject);
+            }
+        }
+
+        /// <summary>
+        ///     Applies the configured overlay layer to the provided game object and its children.
+        /// </summary>
+        private void ApplyOwnerOverlayLayer(GameObject target)
+        {
+            if (target == null)
+                return;
+
+            int overlayLayer = LayerMask.NameToLayer(OwnerOverlayLayerName);
+            if (overlayLayer < 0)
+                return;
+
+            SetLayerRecursively(target.transform, overlayLayer);
+        }
+
+        /// <summary>
+        ///     Attempts to locate the sprite renderer responsible for visualising the rock so the
+        ///     overlay can inherit sensible sorting priorities.
+        /// </summary>
+        private SpriteRenderer ResolveReferenceRenderer()
+        {
+            if (mineableRock != null)
+            {
+                var renderer = mineableRock.GetComponent<SpriteRenderer>();
+                if (renderer != null)
+                    return renderer;
+            }
+
+            return GetComponent<SpriteRenderer>();
+        }
+
+        /// <summary>
+        ///     Determines whether a sorting layer with the supplied name exists in the project.
+        /// </summary>
+        private static bool SortingLayerExists(string layerName)
+        {
+            if (string.IsNullOrEmpty(layerName))
+                return false;
+
+            var layers = SortingLayer.layers;
+            for (int i = 0; i < layers.Length; i++)
+            {
+                if (string.Equals(layers[i].name, layerName, StringComparison.Ordinal))
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        ///     Recursively assigns the provided layer index to the transform and all of its children.
+        /// </summary>
+        private static void SetLayerRecursively(Transform target, int layer)
+        {
+            if (target == null)
+                return;
+
+            target.gameObject.layer = layer;
+            for (int i = 0; i < target.childCount; i++)
+            {
+                var child = target.GetChild(i);
+                if (child != null)
+                    SetLayerRecursively(child, layer);
             }
         }
 

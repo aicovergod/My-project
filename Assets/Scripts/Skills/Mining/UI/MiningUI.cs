@@ -28,6 +28,7 @@ namespace Skills.Mining
         private GameObject pickaxeRoot;
         private SpriteRenderer pickaxeRenderer;
         private Canvas progressCanvas;
+        private const string ProgressLayerName = "UI";
         // Offset from the targeted rock's position where the progress bar will appear.
         // Reduced the vertical component to half of its previous value so the bar sits closer to the object.
         private readonly Vector3 offset = new Vector3(0f, 0.75f, 0f);
@@ -170,6 +171,7 @@ namespace Skills.Mining
 
             progressRoot = new GameObject("MiningProgress");
             progressRoot.transform.SetParent(transform);
+            ApplyProgressLayer(progressRoot);
 
             progressCanvas = progressRoot.AddComponent<Canvas>();
             progressCanvas.renderMode = RenderMode.WorldSpace;
@@ -180,6 +182,7 @@ namespace Skills.Mining
 
             var bg = new GameObject("Background");
             bg.transform.SetParent(progressRoot.transform, false);
+            ApplyProgressLayer(bg);
             var bgImage = bg.AddComponent<Image>();
             bgImage.color = new Color(0f, 0f, 0f, 0.5f);
             var bgSprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
@@ -189,6 +192,7 @@ namespace Skills.Mining
 
             var fill = new GameObject("Fill");
             fill.transform.SetParent(bg.transform, false);
+            ApplyProgressLayer(fill);
             progressImage = fill.AddComponent<Image>();
             progressImage.color = SkillingProgressColorGradient.Evaluate(0f);
             progressImage.sprite = bgSprite;
@@ -211,9 +215,43 @@ namespace Skills.Mining
 
             pickaxeRoot = new GameObject("MiningPickaxe");
             pickaxeRoot.transform.SetParent(transform);
+            ApplyProgressLayer(pickaxeRoot);
             pickaxeRenderer = pickaxeRoot.AddComponent<SpriteRenderer>();
             pickaxeRenderer.sortingOrder = 100;
             pickaxeRoot.SetActive(false);
+        }
+
+        /// <summary>
+        ///     Applies the configured UI physics layer to the provided game object so the HUD
+        ///     participates in layer-based filtering correctly.
+        /// </summary>
+        private void ApplyProgressLayer(GameObject target)
+        {
+            if (target == null)
+                return;
+
+            int uiLayer = LayerMask.NameToLayer(ProgressLayerName);
+            if (uiLayer < 0)
+                return;
+
+            SetLayerRecursively(target.transform, uiLayer);
+        }
+
+        /// <summary>
+        ///     Recursively applies the given layer index to the provided transform and all children.
+        /// </summary>
+        private static void SetLayerRecursively(Transform root, int layer)
+        {
+            if (root == null)
+                return;
+
+            root.gameObject.layer = layer;
+            for (int i = 0; i < root.childCount; i++)
+            {
+                var child = root.GetChild(i);
+                if (child != null)
+                    SetLayerRecursively(child, layer);
+            }
         }
 
         private void HandleStart(MineableRock rock)
@@ -238,20 +276,78 @@ namespace Skills.Mining
                     pickaxeRoot.SetActive(true);
                 }
             }
+
             var targetRenderer = rock.GetComponent<SpriteRenderer>();
-            if (targetRenderer != null)
+            var personalNode = rock.GetComponent<PersonalOreNode>();
+            if (personalNode == null)
+                personalNode = rock.GetComponentInParent<PersonalOreNode>();
+
+            if (targetRenderer != null && pickaxeRenderer != null)
             {
-                if (progressCanvas != null)
-                {
-                    progressCanvas.sortingLayerID = targetRenderer.sortingLayerID;
-                    progressCanvas.sortingOrder = targetRenderer.sortingOrder + 1;
-                }
-                if (pickaxeRenderer != null)
-                {
-                    pickaxeRenderer.sortingLayerID = targetRenderer.sortingLayerID;
-                    pickaxeRenderer.sortingOrder = targetRenderer.sortingOrder + 2;
-                }
+                pickaxeRenderer.sortingLayerID = targetRenderer.sortingLayerID;
+                pickaxeRenderer.sortingOrder = targetRenderer.sortingOrder + 2;
             }
+
+            if (progressCanvas != null)
+            {
+                int progressLayerId = progressCanvas.sortingLayerID;
+                int progressOrder = progressCanvas.sortingOrder;
+                int minimumOrder = int.MinValue;
+
+                if (targetRenderer != null)
+                {
+                    progressLayerId = targetRenderer.sortingLayerID;
+                    minimumOrder = targetRenderer.sortingOrder + 1;
+                    progressOrder = minimumOrder;
+                }
+
+                if (personalNode != null)
+                {
+                    var overlayCanvas = personalNode.OwnerOnlyCanvas;
+                    if (overlayCanvas != null)
+                    {
+                        int overlayLayerId = personalNode.OwnerOverlaySortingLayerId;
+                        if (overlayLayerId != 0)
+                        {
+                            progressLayerId = overlayLayerId;
+                        }
+                        else if (!string.IsNullOrEmpty(overlayCanvas.sortingLayerName))
+                        {
+                            progressCanvas.sortingLayerName = overlayCanvas.sortingLayerName;
+                            progressLayerId = progressCanvas.sortingLayerID;
+                        }
+
+                        int overlayOrder = personalNode.OwnerOverlaySortingOrder;
+                        if (overlayOrder > int.MinValue + 1)
+                        {
+                            int maxOrder = overlayOrder - 1;
+                            if (minimumOrder == int.MinValue)
+                            {
+                                progressOrder = maxOrder;
+                            }
+                            else if (maxOrder >= minimumOrder)
+                            {
+                                progressOrder = Mathf.Clamp(progressOrder, minimumOrder, maxOrder);
+                            }
+                            else
+                            {
+                                progressOrder = minimumOrder;
+                            }
+                        }
+                    }
+                }
+                else if (minimumOrder != int.MinValue)
+                {
+                    progressOrder = minimumOrder;
+                }
+
+                if (minimumOrder != int.MinValue)
+                    progressOrder = Mathf.Max(progressOrder, minimumOrder);
+
+                progressCanvas.sortingLayerID = progressLayerId;
+                progressCanvas.sortingOrder = progressOrder;
+            }
+
             if (Ticker.Instance != null)
                 Ticker.Instance.Subscribe(this);
         }
