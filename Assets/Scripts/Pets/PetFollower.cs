@@ -159,7 +159,7 @@ namespace Pets
             if (spriteAnimator != null)
             {
                 if (!playerMoving && playerMover != null)
-                    spriteAnimator.SetFacing(Direction8Utility.ToAnimatorIndex(playerMover.FacingDir));
+                    spriteAnimator.SetFacing(playerMover.FacingDir);
                 spriteAnimator.UpdateVisuals(playerMoving ? velocity : Vector2.zero);
             }
             else if (sprite != null)

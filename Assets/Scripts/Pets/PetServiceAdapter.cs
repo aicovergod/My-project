@@ -56,19 +56,35 @@ namespace Pets
                 if (psa != null)
                 {
                     if (psa.idleDown != null && psa.idleDown.Length > 0) profile.idleDown = psa.idleDown[0];
-                    if (psa.idleLeft != null && psa.idleLeft.Length > 0) profile.idleLeft = psa.idleLeft[0];
+                    if (psa.idleDownRight != null && psa.idleDownRight.Length > 0) profile.idleDownRight = psa.idleDownRight[0];
                     if (psa.idleRight != null && psa.idleRight.Length > 0) profile.idleRight = psa.idleRight[0];
+                    if (psa.idleUpRight != null && psa.idleUpRight.Length > 0) profile.idleUpRight = psa.idleUpRight[0];
                     if (psa.idleUp != null && psa.idleUp.Length > 0) profile.idleUp = psa.idleUp[0];
+                    if (psa.idleUpLeft != null && psa.idleUpLeft.Length > 0) profile.idleUpLeft = psa.idleUpLeft[0];
+                    if (psa.idleLeft != null && psa.idleLeft.Length > 0) profile.idleLeft = psa.idleLeft[0];
+                    if (psa.idleDownLeft != null && psa.idleDownLeft.Length > 0) profile.idleDownLeft = psa.idleDownLeft[0];
                     if (psa.walkDown != null && psa.walkDown.Length > 0) profile.walkDown = psa.walkDown[0];
-                    if (psa.walkLeft != null && psa.walkLeft.Length > 0) profile.walkLeft = psa.walkLeft[0];
+                    if (psa.walkDownRight != null && psa.walkDownRight.Length > 0) profile.walkDownRight = psa.walkDownRight[0];
                     if (psa.walkRight != null && psa.walkRight.Length > 0) profile.walkRight = psa.walkRight[0];
+                    if (psa.walkUpRight != null && psa.walkUpRight.Length > 0) profile.walkUpRight = psa.walkUpRight[0];
                     if (psa.walkUp != null && psa.walkUp.Length > 0) profile.walkUp = psa.walkUp[0];
+                    if (psa.walkUpLeft != null && psa.walkUpLeft.Length > 0) profile.walkUpLeft = psa.walkUpLeft[0];
+                    if (psa.walkLeft != null && psa.walkLeft.Length > 0) profile.walkLeft = psa.walkLeft[0];
+                    if (psa.walkDownLeft != null && psa.walkDownLeft.Length > 0) profile.walkDownLeft = psa.walkDownLeft[0];
                     if (psa.hitDown != null && psa.hitDown.Length > 0) profile.hitDown = psa.hitDown;
-                    if (psa.hitLeft != null && psa.hitLeft.Length > 0) profile.hitLeft = psa.hitLeft;
+                    if (psa.hitDownRight != null && psa.hitDownRight.Length > 0) profile.hitDownRight = psa.hitDownRight;
                     if (psa.hitRight != null && psa.hitRight.Length > 0) profile.hitRight = psa.hitRight;
+                    if (psa.hitUpRight != null && psa.hitUpRight.Length > 0) profile.hitUpRight = psa.hitUpRight;
                     if (psa.hitUp != null && psa.hitUp.Length > 0) profile.hitUp = psa.hitUp;
+                    if (psa.hitUpLeft != null && psa.hitUpLeft.Length > 0) profile.hitUpLeft = psa.hitUpLeft;
+                    if (psa.hitLeft != null && psa.hitLeft.Length > 0) profile.hitLeft = psa.hitLeft;
+                    if (psa.hitDownLeft != null && psa.hitDownLeft.Length > 0) profile.hitDownLeft = psa.hitDownLeft;
                     profile.useFlipXForLeft = psa.useFlipXForLeft;
                     profile.useFlipXForRight = psa.useFlipXForRight;
+                    profile.useFlipXForDownLeft = psa.useFlipXForDownLeft;
+                    profile.useFlipXForUpLeft = psa.useFlipXForUpLeft;
+                    profile.useFlipXForUpRight = psa.useFlipXForUpRight;
+                    profile.useFlipXForDownRight = psa.useFlipXForDownRight;
                 }
             }
             return profile;

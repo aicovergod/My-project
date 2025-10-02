@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Util
@@ -68,6 +69,25 @@ namespace Util
                 angle += 360f;
             int index = Mathf.RoundToInt(angle / 45f) % 8;
             return (Direction8)index;
+        }
+
+        /// <summary>
+        ///     Lightweight descriptor returned when building sprite fallback orders. It packages together the
+        ///     source direction to probe for art and whether that lookup expects a horizontal flip when rendered.
+        /// </summary>
+        public readonly struct SpriteLookup
+        {
+            public SpriteLookup(Direction8 direction, bool flipX)
+            {
+                Direction = direction;
+                FlipX = flipX;
+            }
+
+            /// <summary>The direction whose sprite data should be queried.</summary>
+            public Direction8 Direction { get; }
+
+            /// <summary>True when the resolved sprite should be mirrored horizontally.</summary>
+            public bool FlipX { get; }
         }
 
         /// <summary>
@@ -185,6 +205,92 @@ namespace Util
                 vec.y = -vec.y;
 
             return FromVector(vec, allowDiagonals: true, fallback: direction);
+        }
+
+        /// <summary>
+        ///     Extracts the horizontal and vertical cardinal components that make up a diagonal direction. When the
+        ///     supplied direction is already cardinal the method simply returns that direction for both outputs.
+        /// </summary>
+        /// <param name="direction">Direction to decompose.</param>
+        /// <param name="vertical">Receives the vertical component (Up/Down).</param>
+        /// <param name="horizontal">Receives the horizontal component (Left/Right).</param>
+        public static void GetDiagonalComponents(Direction8 direction, out Direction8 vertical, out Direction8 horizontal)
+        {
+            switch (direction)
+            {
+                case Direction8.UpRight:
+                    vertical = Direction8.Up;
+                    horizontal = Direction8.Right;
+                    break;
+                case Direction8.UpLeft:
+                    vertical = Direction8.Up;
+                    horizontal = Direction8.Left;
+                    break;
+                case Direction8.DownRight:
+                    vertical = Direction8.Down;
+                    horizontal = Direction8.Right;
+                    break;
+                case Direction8.DownLeft:
+                    vertical = Direction8.Down;
+                    horizontal = Direction8.Left;
+                    break;
+                default:
+                    vertical = SnapToFourWay(direction);
+                    horizontal = vertical;
+                    break;
+            }
+        }
+
+        /// <summary>
+        ///     Enumerates a best-effort lookup order for sprite assets that can represent the supplied direction. Diagonal
+        ///     facings fall back to their horizontal and vertical components before defaulting to down-facing art. The
+        ///     <paramref name="shouldMirror"/> callback is used to decide whether a lookup should pull from the mirrored
+        ///     counterpart and apply a horizontal flip.
+        /// </summary>
+        /// <param name="direction">Desired facing direction.</param>
+        /// <param name="shouldMirror">Callback returning true when the specified direction prefers mirrored art.</param>
+        /// <returns>Sequence of sprite lookups ordered by preference.</returns>
+        public static IEnumerable<SpriteLookup> BuildSpriteFallbackOrder(Direction8 direction, System.Func<Direction8, bool> shouldMirror)
+        {
+            yield return new SpriteLookup(direction, false);
+
+            Direction8 mirror = MirrorHorizontally(direction);
+            bool mirrorAdded = false;
+            if (mirror != direction && shouldMirror(direction))
+            {
+                yield return new SpriteLookup(mirror, true);
+                mirrorAdded = true;
+            }
+
+            if (IsDiagonal(direction))
+            {
+                GetDiagonalComponents(direction, out var vertical, out var horizontal);
+
+                yield return new SpriteLookup(horizontal, false);
+                if (shouldMirror(horizontal))
+                    yield return new SpriteLookup(MirrorHorizontally(horizontal), true);
+
+                yield return new SpriteLookup(vertical, false);
+                if (shouldMirror(vertical))
+                    yield return new SpriteLookup(MirrorHorizontally(vertical), true);
+
+                if (!mirrorAdded && mirror != direction && shouldMirror(mirror))
+                    yield return new SpriteLookup(mirror, true);
+            }
+            else if (!mirrorAdded && mirror != direction && shouldMirror(mirror))
+            {
+                // If the mirrored direction stores the authoritative art, probe it before falling back to Down.
+                yield return new SpriteLookup(mirror, true);
+            }
+
+            if (direction != Direction8.Down)
+                yield return new SpriteLookup(Direction8.Down, false);
+        }
+
+        /// <summary>Maps the direction to its eight-way animator index (Down=0 ... DownLeft=7).</summary>
+        public static int ToAnimatorIndex8(Direction8 direction)
+        {
+            return (int)direction;
         }
     }
 }

@@ -281,20 +281,21 @@ namespace Pets
 
             Vector2 diff = target.transform.position - transform.position;
             Direction8 facingDir = Direction8Utility.FromVector(diff, allowDiagonals: true, fallback: Direction8.Down);
-            int animatorFacing = Direction8Utility.ToAnimatorIndex(facingDir);
-
             if (spriteAnimator != null)
-                spriteAnimator.SetFacing(animatorFacing);
+                spriteAnimator.SetFacing(facingDir);
             else if (spriteRenderer != null)
                 spriteRenderer.flipX = Direction8Utility.IsFacingRight(facingDir);
 
             if (animator != null)
+            {
+                animator.SetInteger("Dir", Direction8Utility.ToAnimatorIndex8(facingDir));
                 animator.SetTrigger("Attack");
-            else if (spriteAnimator != null && spriteAnimator.HasHitAnimation(animatorFacing))
+            }
+            else if (spriteAnimator != null && spriteAnimator.HasHitAnimation(facingDir))
             {
                 if (spriteSwapRoutine != null)
                     StopCoroutine(spriteSwapRoutine);
-                spriteSwapRoutine = StartCoroutine(spriteAnimator.PlayHitAnimation(animatorFacing));
+                spriteSwapRoutine = StartCoroutine(spriteAnimator.PlayHitAnimation(facingDir));
             }
             else if (spriteRenderer != null && definition != null && definition.attackSprite != null)
             {

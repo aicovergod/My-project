@@ -16,19 +16,35 @@ namespace Pets
         public RuntimeAnimatorController controller;
         public Sprite baseSprite;
         public Sprite idleDown;
+        public Sprite idleDownRight;
         public Sprite idleLeft;
         public Sprite idleRight;
         public Sprite idleUp;
+        public Sprite idleUpRight;
+        public Sprite idleUpLeft;
+        public Sprite idleDownLeft;
         public Sprite walkDown;
+        public Sprite walkDownRight;
         public Sprite walkLeft;
         public Sprite walkRight;
         public Sprite walkUp;
+        public Sprite walkUpRight;
+        public Sprite walkUpLeft;
+        public Sprite walkDownLeft;
         public Sprite[] hitDown;
+        public Sprite[] hitDownRight;
         public Sprite[] hitLeft;
         public Sprite[] hitRight;
         public Sprite[] hitUp;
+        public Sprite[] hitUpRight;
+        public Sprite[] hitUpLeft;
+        public Sprite[] hitDownLeft;
         public bool useFlipXForLeft;
         public bool useFlipXForRight;
+        public bool useFlipXForDownLeft;
+        public bool useFlipXForUpLeft;
+        public bool useFlipXForUpRight;
+        public bool useFlipXForDownRight;
         public Vector3 localScale = Vector3.one;
     }
 

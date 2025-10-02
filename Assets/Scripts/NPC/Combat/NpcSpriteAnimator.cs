@@ -1,4 +1,5 @@
 using UnityEngine;
+using Util;
 
 namespace NPC
 {
@@ -12,7 +13,7 @@ namespace NPC
         [Header("Visuals")]
         public VisualMode visualMode = VisualMode.Animator;
 
-        [Tooltip("Animator with parameters Dir(int 0=Down,1=Left,2=Right,3=Up) and IsMoving(bool). Used in Animator mode.")]
+        [Tooltip("Animator with parameters Dir(int 0-7 following Direction8 order) and IsMoving(bool). Used in Animator mode.")]
         public Animator animator;
         public string dirParam = "Dir";
         public string isMovingParam = "IsMoving";
@@ -22,23 +23,35 @@ namespace NPC
         public SpriteRenderer spriteRenderer;
 
         [Header("SpriteSwap Sets (used only in SpriteSwap mode)")]
-        [Tooltip("Frames used when idle (Down). Leave empty to fall back to first frame of WalkDown.")]
+        [Tooltip("Frames used when idle (Down/Diagonals/Cardinals). Leave empty to fall back to matching walk frames.")]
         public Sprite[] idleDown;
-        public Sprite[] idleLeft;
+        public Sprite[] idleDownRight;
         public Sprite[] idleRight;
+        public Sprite[] idleUpRight;
         public Sprite[] idleUp;
+        public Sprite[] idleUpLeft;
+        public Sprite[] idleLeft;
+        public Sprite[] idleDownLeft;
 
-        [Tooltip("Frames used when moving (Down/Left/Right/Up).")]
+        [Tooltip("Frames used when moving (Down/Diagonals/Cardinals).")]
         public Sprite[] walkDown;
-        public Sprite[] walkLeft;
+        public Sprite[] walkDownRight;
         public Sprite[] walkRight;
+        public Sprite[] walkUpRight;
         public Sprite[] walkUp;
+        public Sprite[] walkUpLeft;
+        public Sprite[] walkLeft;
+        public Sprite[] walkDownLeft;
 
-        [Tooltip("Frames used when attacking (Down/Left/Right/Up).")]
+        [Tooltip("Frames used when attacking (Down/Diagonals/Cardinals).")]
         public Sprite[] attackDown;
-        public Sprite[] attackLeft;
+        public Sprite[] attackDownRight;
         public Sprite[] attackRight;
+        public Sprite[] attackUpRight;
         public Sprite[] attackUp;
+        public Sprite[] attackUpLeft;
+        public Sprite[] attackLeft;
+        public Sprite[] attackDownLeft;
 
         [Tooltip("If true, ignore Left arrays and flip the Right sprites for left-facing.")]
         public bool useFlipXForLeft = true;
@@ -46,16 +59,40 @@ namespace NPC
         [Tooltip("If true, ignore Right arrays and flip the Left sprites for right-facing.")]
         public bool useFlipXForRight = false;
 
+        [Tooltip("If true, reuse Down-Left sprites for Down-Right facings by mirroring them.")]
+        public bool useFlipXForDownRight = false;
+
+        [Tooltip("If true, reuse Up-Left sprites for Up-Right facings by mirroring them.")]
+        public bool useFlipXForUpRight = false;
+
+        [Tooltip("If true, reuse Up-Right sprites for Up-Left facings by mirroring them.")]
+        public bool useFlipXForUpLeft = true;
+
+        [Tooltip("If true, reuse Down-Right sprites for Down-Left facings by mirroring them.")]
+        public bool useFlipXForDownLeft = true;
+
         [Tooltip("If true, ignore Left attack arrays and flip the Right sprites for left-facing attacks.")]
         public bool useFlipXForLeftAttack = true;
 
         [Tooltip("If true, ignore Right attack arrays and flip the Left sprites for right-facing attacks.")]
         public bool useFlipXForRightAttack = false;
 
+        [Tooltip("If true, reuse Down-Left attack sprites for Down-Right facings by mirroring them.")]
+        public bool useFlipXForDownRightAttack = false;
+
+        [Tooltip("If true, reuse Up-Left attack sprites for Up-Right facings by mirroring them.")]
+        public bool useFlipXForUpRightAttack = false;
+
+        [Tooltip("If true, reuse Up-Right attack sprites for Up-Left facings by mirroring them.")]
+        public bool useFlipXForUpLeftAttack = true;
+
+        [Tooltip("If true, reuse Down-Right attack sprites for Down-Left facings by mirroring them.")]
+        public bool useFlipXForDownLeftAttack = true;
+
         [Tooltip("Frames per second for SpriteSwap animation.")]
         public float animationFPS = 6f;
 
-        private int _currentDir = 0;
+        private Direction8 _currentDir = Direction8.Down;
         private bool _currentlyMoving = false;
         private float _animClock = 0f;
         private int _animFrame = 0;
@@ -78,175 +115,252 @@ namespace NPC
         /// </summary>
         public void UpdateVisuals(Vector2 velocity)
         {
-            if (_overridePlaying) return;
+            if (_overridePlaying)
+                return;
 
             _currentlyMoving = velocity.sqrMagnitude > 0.0001f;
 
             if (_currentlyMoving)
             {
-                if (Mathf.Abs(velocity.x) > Mathf.Abs(velocity.y))
-                    _currentDir = velocity.x < 0f ? 1 : 2; // Left : Right
-                else
-                    _currentDir = velocity.y < 0f ? 0 : 3; // Down : Up
+                _currentDir = Direction8Utility.FromVector(velocity, allowDiagonals: true, fallback: _currentDir);
             }
 
             if (visualMode == VisualMode.Animator)
             {
-                if (animator == null) return;
+                if (animator == null)
+                    return;
                 animator.SetBool(isMovingParam, _currentlyMoving);
-                if (_currentlyMoving)
-                    animator.SetInteger(dirParam, _currentDir);
+                animator.SetInteger(dirParam, Direction8Utility.ToAnimatorIndex8(_currentDir));
                 return;
             }
 
-            if (spriteRenderer == null) return;
+            if (spriteRenderer == null)
+                return;
 
             float fps = Mathf.Max(0.01f, animationFPS);
             _animClock += Time.fixedDeltaTime * fps;
-            int frames;
-            Sprite[] set = SelectSpriteSet(_currentlyMoving, _currentDir, out frames);
+            Sprite[] set = SelectSpriteSet(_currentlyMoving, _currentDir, out int frames, out bool flip);
 
-            if (frames <= 0) return;
+            if (frames <= 0)
+                return;
 
             _animFrame = Mathf.FloorToInt(_animClock) % frames;
-            spriteRenderer.flipX = false;
-
-            if (useFlipXForLeft && _currentDir == 1)
-            {
-                Sprite[] rightSet = SelectSpriteSet(_currentlyMoving, 2, out frames);
-                if (frames > 0)
-                {
-                    _animFrame = Mathf.FloorToInt(_animClock) % frames;
-                    spriteRenderer.sprite = rightSet[_animFrame];
-                    spriteRenderer.flipX = true;
-                    return;
-                }
-            }
-
-            if (useFlipXForRight && _currentDir == 2)
-            {
-                bool prevFlipLeft = useFlipXForLeft;
-                useFlipXForLeft = false;
-                Sprite[] leftSet = SelectSpriteSet(_currentlyMoving, 1, out frames);
-                useFlipXForLeft = prevFlipLeft;
-                if (frames > 0)
-                {
-                    _animFrame = Mathf.FloorToInt(_animClock) % frames;
-                    spriteRenderer.sprite = leftSet[_animFrame];
-                    spriteRenderer.flipX = true;
-                    return;
-                }
-            }
-
+            spriteRenderer.flipX = flip;
             spriteRenderer.sprite = set[_animFrame];
         }
 
-        /// <summary>Force the animator to face the given direction (0=Down,1=Left,2=Right,3=Up).</summary>
-        public void SetFacing(int dir)
+        /// <summary>Force the animator to face the given direction.</summary>
+        public void SetFacing(Direction8 dir)
         {
-            _currentDir = Mathf.Clamp(dir, 0, 3);
+            _currentDir = dir;
         }
 
-        public bool HasAttackAnimation(int dir)
+        public bool HasAttackAnimation(Direction8 dir)
         {
-            Sprite[] set = SelectAttackSpriteSet(dir, out int frames);
+            Sprite[] set = SelectAttackSpriteSet(dir, out int frames, out _);
             return frames > 0;
         }
 
-        public System.Collections.IEnumerator PlayAttackAnimation(int dir)
+        public System.Collections.IEnumerator PlayAttackAnimation(Direction8 dir)
         {
             if (visualMode == VisualMode.Animator)
             {
                 if (animator != null)
                 {
-                    animator.SetInteger(dirParam, Mathf.Clamp(dir, 0, 3));
+                    animator.SetInteger(dirParam, Direction8Utility.ToAnimatorIndex8(dir));
                     animator.SetTrigger(attackTrigger);
                 }
                 yield break;
             }
 
-            Sprite[] set = SelectAttackSpriteSet(dir, out int frames);
+            Sprite[] set = SelectAttackSpriteSet(dir, out int frames, out bool flip);
             if (frames == 0 || spriteRenderer == null)
                 yield break;
 
             _overridePlaying = true;
-            _currentDir = Mathf.Clamp(dir, 0, 3);
+            _currentDir = dir;
             float fps = Mathf.Max(0.01f, animationFPS);
             for (int i = 0; i < frames; i++)
             {
                 spriteRenderer.sprite = set[i];
-                spriteRenderer.flipX = (_currentDir == 1 && useFlipXForLeftAttack) || (_currentDir == 2 && useFlipXForRightAttack);
+                spriteRenderer.flipX = flip;
                 yield return new WaitForSeconds(1f / fps);
             }
             _overridePlaying = false;
             _animClock = 0f;
         }
 
-        private Sprite[] SelectSpriteSet(bool moving, int dir, out int frames)
+        /// <summary>
+        ///     Resolves the appropriate idle or walk sprite set for the requested direction, mirroring as configured
+        ///     and falling back to cardinal facings when bespoke diagonal art is unavailable.
+        /// </summary>
+        private Sprite[] SelectSpriteSet(bool moving, Direction8 dir, out int frames, out bool flip)
         {
-            Sprite[] set = null;
+            foreach (var lookup in Direction8Utility.BuildSpriteFallbackOrder(dir, ShouldMirrorMovement))
+            {
+                Sprite[] set = GetMovementSprites(lookup.Direction, moving);
+                if (set != null && set.Length > 0)
+                {
+                    frames = set.Length;
+                    flip = lookup.FlipX;
+                    return set;
+                }
+            }
+
+            frames = 0;
+            flip = false;
+            return System.Array.Empty<Sprite>();
+        }
+
+        /// <summary>
+        ///     Locates the correct attack animation frames for the supplied direction, using mirroring and down-facing
+        ///     defaults where needed so attacks never fail to render.
+        /// </summary>
+        private Sprite[] SelectAttackSpriteSet(Direction8 dir, out int frames, out bool flip)
+        {
+            foreach (var lookup in Direction8Utility.BuildSpriteFallbackOrder(dir, ShouldMirrorAttack))
+            {
+                Sprite[] set = GetAttackSprites(lookup.Direction);
+                if (set != null && set.Length > 0)
+                {
+                    frames = set.Length;
+                    flip = lookup.FlipX;
+                    return set;
+                }
+            }
+
+            frames = 0;
+            flip = false;
+            return System.Array.Empty<Sprite>();
+        }
+
+        /// <summary>Returns either the idle or walk frames for the specified direction, depending on movement state.</summary>
+        private Sprite[] GetMovementSprites(Direction8 dir, bool moving)
+        {
+            Sprite[] idle = null;
+            Sprite[] walk = null;
+            switch (dir)
+            {
+                case Direction8.Down:
+                    idle = idleDown;
+                    walk = walkDown;
+                    break;
+                case Direction8.DownRight:
+                    idle = idleDownRight;
+                    walk = walkDownRight;
+                    break;
+                case Direction8.Right:
+                    idle = idleRight;
+                    walk = walkRight;
+                    break;
+                case Direction8.UpRight:
+                    idle = idleUpRight;
+                    walk = walkUpRight;
+                    break;
+                case Direction8.Up:
+                    idle = idleUp;
+                    walk = walkUp;
+                    break;
+                case Direction8.UpLeft:
+                    idle = idleUpLeft;
+                    walk = walkUpLeft;
+                    break;
+                case Direction8.Left:
+                    idle = idleLeft;
+                    walk = walkLeft;
+                    break;
+                case Direction8.DownLeft:
+                    idle = idleDownLeft;
+                    walk = walkDownLeft;
+                    break;
+            }
 
             if (moving)
             {
-                switch (dir)
-                {
-                    case 0: set = walkDown; break;
-                    case 1: set = useFlipXForLeft ? walkRight : walkLeft; break;
-                    case 2: set = useFlipXForRight ? walkLeft : walkRight; break;
-                    case 3: set = walkUp; break;
-                }
+                if (walk != null && walk.Length > 0)
+                    return walk;
+                if (idle != null && idle.Length > 0)
+                    return idle;
             }
             else
             {
-                switch (dir)
-                {
-                    case 0: set = idleDown != null && idleDown.Length > 0 ? idleDown : (walkDown ?? idleDown); break;
-                    case 1:
-                        set = useFlipXForLeft
-                            ? (idleRight != null && idleRight.Length > 0 ? idleRight : walkRight)
-                            : (idleLeft != null && idleLeft.Length > 0 ? idleLeft : walkLeft);
-                        break;
-                    case 2:
-                        set = useFlipXForRight
-                            ? (idleLeft != null && idleLeft.Length > 0 ? idleLeft : walkLeft)
-                            : (idleRight != null && idleRight.Length > 0 ? idleRight : walkRight);
-                        break;
-                    case 3: set = idleUp != null && idleUp.Length > 0 ? idleUp : (walkUp ?? idleUp); break;
-                }
+                if (idle != null && idle.Length > 0)
+                    return idle;
+                if (walk != null && walk.Length > 0)
+                    return walk;
             }
 
-            if (set == null || set.Length == 0)
-            {
-                if (!moving)
-                {
-                    if (idleDown != null && idleDown.Length > 0) { frames = idleDown.Length; return idleDown; }
-                    if (walkDown != null && walkDown.Length > 0) { frames = walkDown.Length; return walkDown; }
-                }
-                else
-                {
-                    if (useFlipXForRight && walkLeft != null && walkLeft.Length > 0) { frames = walkLeft.Length; return walkLeft; }
-                    if (walkRight != null && walkRight.Length > 0) { frames = walkRight.Length; return walkRight; }
-                    if (walkDown != null && walkDown.Length > 0) { frames = walkDown.Length; return walkDown; }
-                }
-            }
-
-            frames = set != null ? set.Length : 0;
-            return set ?? System.Array.Empty<Sprite>();
+            return null;
         }
 
-        private Sprite[] SelectAttackSpriteSet(int dir, out int frames)
+        /// <summary>Retrieves the configured attack frames for the supplied direction.</summary>
+        private Sprite[] GetAttackSprites(Direction8 dir)
         {
-            Sprite[] set = null;
             switch (dir)
             {
-                case 0: set = attackDown; break;
-                case 1: set = useFlipXForLeftAttack ? attackRight : attackLeft; break;
-                case 2: set = useFlipXForRightAttack ? attackLeft : attackRight; break;
-                case 3: set = attackUp; break;
+                case Direction8.Down:
+                    return attackDown;
+                case Direction8.DownRight:
+                    return attackDownRight;
+                case Direction8.Right:
+                    return attackRight;
+                case Direction8.UpRight:
+                    return attackUpRight;
+                case Direction8.Up:
+                    return attackUp;
+                case Direction8.UpLeft:
+                    return attackUpLeft;
+                case Direction8.Left:
+                    return attackLeft;
+                case Direction8.DownLeft:
+                    return attackDownLeft;
+                default:
+                    return null;
             }
+        }
 
-            frames = set != null ? set.Length : 0;
-            return set ?? System.Array.Empty<Sprite>();
+        /// <summary>Determines whether the movement animation for the given direction should be mirrored from its counterpart.</summary>
+        private bool ShouldMirrorMovement(Direction8 dir)
+        {
+            switch (dir)
+            {
+                case Direction8.Left:
+                    return useFlipXForLeft;
+                case Direction8.Right:
+                    return useFlipXForRight;
+                case Direction8.DownLeft:
+                    return useFlipXForDownLeft;
+                case Direction8.UpLeft:
+                    return useFlipXForUpLeft;
+                case Direction8.UpRight:
+                    return useFlipXForUpRight;
+                case Direction8.DownRight:
+                    return useFlipXForDownRight;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>Determines whether the attack animation for the given direction should reuse the mirrored counterpart.</summary>
+        private bool ShouldMirrorAttack(Direction8 dir)
+        {
+            switch (dir)
+            {
+                case Direction8.Left:
+                    return useFlipXForLeftAttack;
+                case Direction8.Right:
+                    return useFlipXForRightAttack;
+                case Direction8.DownLeft:
+                    return useFlipXForDownLeftAttack;
+                case Direction8.UpLeft:
+                    return useFlipXForUpLeftAttack;
+                case Direction8.UpRight:
+                    return useFlipXForUpRightAttack;
+                case Direction8.DownRight:
+                    return useFlipXForDownRightAttack;
+                default:
+                    return false;
+            }
         }
     }
 }

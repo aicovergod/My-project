@@ -56,7 +56,7 @@ namespace NPC
             FacingDirection = Direction8Utility.FromVector(direction, allowDiagonals: true, fallback: FacingDirection);
 
             if (spriteAnimator != null)
-                spriteAnimator.SetFacing(Direction8Utility.ToAnimatorIndex(FacingDirection));
+                spriteAnimator.SetFacing(FacingDirection);
             else if (spriteRenderer != null)
                 spriteRenderer.flipX = Direction8Utility.IsFacingRight(FacingDirection);
         }
