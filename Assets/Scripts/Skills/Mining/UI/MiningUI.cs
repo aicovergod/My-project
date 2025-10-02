@@ -293,12 +293,22 @@ namespace Skills.Mining
                 int progressLayerId = progressCanvas.sortingLayerID;
                 int progressOrder = progressCanvas.sortingOrder;
                 int minimumOrder = int.MinValue;
+                int overlayOrder = int.MinValue;
+                int characterSortingCeiling = PersonalOreNode.ResolveActiveCharacterSortingOrder();
 
                 if (targetRenderer != null)
                 {
                     progressLayerId = targetRenderer.sortingLayerID;
                     minimumOrder = targetRenderer.sortingOrder + 1;
                     progressOrder = minimumOrder;
+                }
+
+                if (characterSortingCeiling > int.MinValue)
+                {
+                    if (minimumOrder == int.MinValue)
+                        minimumOrder = characterSortingCeiling;
+                    else
+                        minimumOrder = Mathf.Max(minimumOrder, characterSortingCeiling);
                 }
 
                 if (personalNode != null)
@@ -317,32 +327,29 @@ namespace Skills.Mining
                             progressLayerId = progressCanvas.sortingLayerID;
                         }
 
-                        int overlayOrder = personalNode.OwnerOverlaySortingOrder;
-                        if (overlayOrder > int.MinValue + 1)
-                        {
-                            int maxOrder = overlayOrder - 1;
-                            if (minimumOrder == int.MinValue)
-                            {
-                                progressOrder = maxOrder;
-                            }
-                            else if (maxOrder >= minimumOrder)
-                            {
-                                progressOrder = Mathf.Clamp(progressOrder, minimumOrder, maxOrder);
-                            }
-                            else
-                            {
-                                progressOrder = minimumOrder;
-                            }
-                        }
+                        overlayOrder = personalNode.OwnerOverlaySortingOrder;
+                    }
+                }
+
+                if (overlayOrder > int.MinValue + 1)
+                {
+                    int maxOrder = overlayOrder - 1;
+                    if (minimumOrder != int.MinValue)
+                    {
+                        if (maxOrder >= minimumOrder)
+                            progressOrder = Mathf.Clamp(progressOrder, minimumOrder, maxOrder);
+                        else
+                            progressOrder = minimumOrder;
+                    }
+                    else
+                    {
+                        progressOrder = Mathf.Min(progressOrder, maxOrder);
                     }
                 }
                 else if (minimumOrder != int.MinValue)
                 {
-                    progressOrder = minimumOrder;
-                }
-
-                if (minimumOrder != int.MinValue)
                     progressOrder = Mathf.Max(progressOrder, minimumOrder);
+                }
 
                 progressCanvas.sortingLayerID = progressLayerId;
                 progressCanvas.sortingOrder = progressOrder;
