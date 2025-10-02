@@ -440,7 +440,13 @@ namespace Skills.Mining
             for (int i = 0; i < renderers.Length; i++)
             {
                 var renderer = renderers[i];
-                if (renderer == null || !renderer.isActiveAndEnabled)
+                if (renderer == null)
+                    continue;
+
+                // SpriteRenderers do not inherit from Behaviour, so they do not expose
+                // isActiveAndEnabled. Instead, validate both the GameObject hierarchy
+                // state and the renderer's enabled flag to ensure the sprite is visible.
+                if (!renderer.gameObject.activeInHierarchy || !renderer.enabled)
                     continue;
 
                 if (!IsCharacterLayer(renderer.gameObject.layer))
