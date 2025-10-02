@@ -811,7 +811,7 @@ namespace NPC
             if (!hasHitPlayer && playerTarget != null && PetDropSystem.GuardModeEnabled)
             {
                 var pet = PetDropSystem.ActivePetCombat;
-                pet?.CommandAttack(combatant);
+                pet?.CommandAttack(combatant, false);
                 hasHitPlayer = true;
             }
         }

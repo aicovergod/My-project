@@ -84,7 +84,7 @@ namespace NPC
             var combatTarget = GetComponent<CombatTarget>();
             if (!PetDropSystem.GuardModeEnabled && PetDropSystem.ActivePetCombat != null && combatTarget != null)
             {
-                PetDropSystem.ActivePetCombat.CommandAttack(combatTarget);
+                PetDropSystem.ActivePetCombat.CommandAttack(combatTarget, true);
                 return;
             }
 
@@ -205,7 +205,7 @@ namespace NPC
             var pet = PetDropSystem.ActivePetCombat;
             var target = GetComponent<CombatTarget>();
             if (pet != null && target != null)
-                pet.CommandAttack(target);
+                pet.CommandAttack(target, true);
         }
     }
 }
