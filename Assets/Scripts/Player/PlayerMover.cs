@@ -129,6 +129,28 @@ namespace Player
         /// </summary>
         public bool IsAutoMoving => isAutoMoving;
 
+        /// <summary>
+        ///     Allows external systems to check or override whether the mover mirrors right-facing sprites when
+        ///     travelling left. Beastmaster visual swaps rely on being able to persist and restore this value when
+        ///     temporarily applying a pet's appearance to the player.
+        /// </summary>
+        public bool UseFlipXForLeft
+        {
+            get => useFlipXForLeft;
+            set => useFlipXForLeft = value;
+        }
+
+        /// <summary>
+        ///     Allows external systems to check or override whether the mover mirrors left-facing sprites when
+        ///     travelling right. This mirrors <see cref="UseFlipXForLeft"/> for the opposite direction and is exposed
+        ///     for the same Beastmaster visual swap workflow.
+        /// </summary>
+        public bool UseFlipXForRight
+        {
+            get => useFlipXForRight;
+            set => useFlipXForRight = value;
+        }
+
 #if ENABLE_INPUT_SYSTEM
         private InputAction moveAction;
         private bool moveActionEnabledByResolver;
