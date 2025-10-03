@@ -66,15 +66,32 @@ namespace Player
 
             ResolveMovementState(out Direction8 facingDirection, out _);
 
+            bool cachedFreezeSprite = spriteController != null && spriteController.FreezeSprite;
+            bool spriteFreezeChangedByEat = false;
+
             movementFrozenByEat = false;
             if (TryFreezeMovement())
+            {
                 movementFrozenByEat = true;
+
+                if (spriteController != null)
+                {
+                    spriteFreezeChangedByEat = spriteController.FreezeSprite != false;
+                    spriteController.FreezeSprite = false;
+                }
+            }
 
             if (spriteController != null)
             {
+                bool capturedMovementFrozenByEat = movementFrozenByEat;
+                bool capturedSpriteFreezeChanged = spriteFreezeChangedByEat;
+                bool capturedCachedFreezeSprite = cachedFreezeSprite;
+
                 spriteController.PlayConsumeAnimation(facingDirection, () =>
                 {
-                    if (movementFrozenByEat)
+                    RestoreSpriteFreezeState(capturedSpriteFreezeChanged, capturedCachedFreezeSprite);
+
+                    if (capturedMovementFrozenByEat)
                         RestoreMovement();
 
                     ForceMovementVisualRefresh();
@@ -83,9 +100,12 @@ namespace Player
                         nextEatTime = Time.time;
                 });
             }
-            else if (movementFrozenByEat)
+            else
             {
-                RestoreMovement();
+                RestoreSpriteFreezeState(spriteFreezeChangedByEat, cachedFreezeSprite);
+
+                if (movementFrozenByEat)
+                    RestoreMovement();
             }
 
             nextEatTime = Time.time + EatDelay;
@@ -162,6 +182,19 @@ namespace Player
 
             direction = Direction8.Down;
             isMoving = false;
+        }
+
+        /// <summary>
+        /// Restores the sprite freeze flag to its cached value if this component modified it.
+        /// </summary>
+        /// <param name="changedByEat">True if the eat action changed the freeze state.</param>
+        /// <param name="cachedState">The cached freeze state captured before eating.</param>
+        private void RestoreSpriteFreezeState(bool changedByEat, bool cachedState)
+        {
+            if (!changedByEat || spriteController == null)
+                return;
+
+            spriteController.FreezeSprite = cachedState;
         }
     }
 }
