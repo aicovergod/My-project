@@ -27,7 +27,7 @@ namespace NPC
         private sealed class PathRequest
         {
             public readonly int Id;
-            public readonly WeakReference<NpcPathMover> MoverReference;
+            public readonly WeakReference<IPathMoverClient> MoverReference;
             public readonly Vector2 StartWorld;
             public readonly Vector2 GoalWorld;
 
@@ -45,21 +45,21 @@ namespace NPC
             public bool Prepared;
             public bool UsedStartFallback;
 
-            public PathRequest(int id, NpcPathMover mover, Vector2 start, Vector2 goal)
+            public PathRequest(int id, IPathMoverClient mover, Vector2 start, Vector2 goal)
             {
                 Id = id;
-                MoverReference = new WeakReference<NpcPathMover>(mover);
+                MoverReference = new WeakReference<IPathMoverClient>(mover);
                 StartWorld = start;
                 GoalWorld = goal;
                 Search = new AStarSearch();
             }
         }
 
-        private sealed class MoverReferenceComparer : IEqualityComparer<WeakReference<NpcPathMover>>
+        private sealed class MoverReferenceComparer : IEqualityComparer<WeakReference<IPathMoverClient>>
         {
             public static readonly MoverReferenceComparer Instance = new MoverReferenceComparer();
 
-            public bool Equals(WeakReference<NpcPathMover> x, WeakReference<NpcPathMover> y)
+            public bool Equals(WeakReference<IPathMoverClient> x, WeakReference<IPathMoverClient> y)
             {
                 if (ReferenceEquals(x, y))
                 {
@@ -87,7 +87,7 @@ namespace NPC
                 return false;
             }
 
-            public int GetHashCode(WeakReference<NpcPathMover> obj)
+            public int GetHashCode(WeakReference<IPathMoverClient> obj)
             {
                 if (obj == null)
                 {
@@ -281,9 +281,9 @@ namespace NPC
         [SerializeField] private bool enableDebugLogging;
 
         private readonly Queue<PathRequest> pendingRequests = new Queue<PathRequest>();
-        private readonly Dictionary<WeakReference<NpcPathMover>, int> latestQueuedRequestIdByMover =
-            new Dictionary<WeakReference<NpcPathMover>, int>(MoverReferenceComparer.Instance);
-        private readonly List<WeakReference<NpcPathMover>> moverCleanupBuffer = new List<WeakReference<NpcPathMover>>();
+        private readonly Dictionary<WeakReference<IPathMoverClient>, int> latestQueuedRequestIdByMover =
+            new Dictionary<WeakReference<IPathMoverClient>, int>(MoverReferenceComparer.Instance);
+        private readonly List<WeakReference<IPathMoverClient>> moverCleanupBuffer = new List<WeakReference<IPathMoverClient>>();
         /// <summary>
         /// Reusable frontier used when resolving the nearest walkable fallback cell so we avoid per-call queue allocations.
         /// </summary>
@@ -403,7 +403,7 @@ namespace NPC
         /// <summary>
         /// Queues a path request. The service will deliver the result asynchronously via the supplied mover.
         /// </summary>
-        public int RequestPath(NpcPathMover mover, Vector2 start, Vector2 goal)
+        public int RequestPath(IPathMoverClient mover, Vector2 start, Vector2 goal)
         {
             if (mover == null)
             {
@@ -421,7 +421,7 @@ namespace NPC
 
             if (enableDebugLogging)
             {
-                Debug.Log($"Queued path request {id} for {mover.name} -> {goal}.", this);
+                Debug.Log($"Queued path request {id} for {GetMoverName(mover)} -> {goal}.", this);
             }
 
             return id;
@@ -621,7 +621,7 @@ namespace NPC
                     if (enableDebugLogging)
                     {
                         Debug.Log(
-                            $"Discarded stale path request {request.Id} for {mover.name} because request {supersedingId} is newer.",
+                            $"Discarded stale path request {request.Id} for {GetMoverName(mover)} because request {supersedingId} is newer.",
                             this);
                     }
 
@@ -651,7 +651,7 @@ namespace NPC
             }
         }
 
-        private void RemovePendingRequestsForMover(NpcPathMover mover, int supersedingRequestId)
+        private void RemovePendingRequestsForMover(IPathMoverClient mover, int supersedingRequestId)
         {
             if (mover == null)
             {
@@ -673,7 +673,7 @@ namespace NPC
                     discard = true;
                     if (enableDebugLogging)
                     {
-                        Debug.Log($"Discarded pending path request {existing.Id} for {existingMover.name} because request {supersedingRequestId} superseded it.", this);
+                        Debug.Log($"Discarded pending path request {existing.Id} for {GetMoverName(existingMover)} because request {supersedingRequestId} superseded it.", this);
                     }
                 }
 
@@ -685,6 +685,16 @@ namespace NPC
 
                 pendingRequests.Enqueue(existing);
             }
+        }
+
+        private static string GetMoverName(IPathMoverClient mover)
+        {
+            if (mover is Component component)
+            {
+                return component.name;
+            }
+
+            return mover != null ? mover.ToString() : "<null>";
         }
 
         private void RemoveMoverTracking(PathRequest request, bool onlyWhenIdMatches)
