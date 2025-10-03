@@ -79,6 +79,10 @@ namespace Beastmaster
             spriteAnimator.useFlipXForUpLeft = profile.useFlipXForUpLeft;
             spriteAnimator.useFlipXForUpRight = profile.useFlipXForUpRight;
             spriteAnimator.useFlipXForDownRight = profile.useFlipXForDownRight;
+            spriteAnimator.animationFPS = profile.animationFPS > 0f ? profile.animationFPS : 6f;
+            spriteAnimator.idleAnimationFPS = profile.idleAnimationFPS;
+            spriteAnimator.walkAnimationFPS = profile.walkAnimationFPS;
+            spriteAnimator.hitAnimationFPS = profile.hitAnimationFPS;
         }
 
         public void ClearPetLook()
@@ -93,6 +97,10 @@ namespace Beastmaster
             spriteAnimator.hitUpRight = null;
             spriteAnimator.hitUpLeft = null;
             spriteAnimator.hitDownLeft = null;
+            spriteAnimator.animationFPS = 6f;
+            spriteAnimator.idleAnimationFPS = 0f;
+            spriteAnimator.walkAnimationFPS = 0f;
+            spriteAnimator.hitAnimationFPS = 0f;
         }
 
         private void HandleAttack()

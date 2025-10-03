@@ -50,48 +50,110 @@ namespace Pets
         [Tooltip("Sprite used when attacking if no Animator is present.")]
         public Sprite attackSprite;
 
-        [Tooltip("Frames for hit animation when facing up.")]
-        public Sprite[] hitUp;
-
         [Tooltip("Frames for hit animation when facing down.")]
         public Sprite[] hitDown;
 
-        [Tooltip("Frames for hit animation when facing left.")]
-        public Sprite[] hitLeft;
+        [Tooltip("Frames for hit animation when facing down-right.")]
+        public Sprite[] hitDownRight;
 
         [Tooltip("Frames for hit animation when facing right.")]
         public Sprite[] hitRight;
 
+        [Tooltip("Frames for hit animation when facing up-right.")]
+        public Sprite[] hitUpRight;
+
+        [Tooltip("Frames for hit animation when facing up.")]
+        public Sprite[] hitUp;
+
+        [Tooltip("Frames for hit animation when facing up-left.")]
+        public Sprite[] hitUpLeft;
+
+        [Tooltip("Frames for hit animation when facing left.")]
+        public Sprite[] hitLeft;
+
+        [Tooltip("Frames for hit animation when facing down-left.")]
+        public Sprite[] hitDownLeft;
+
         [Header("Frame-based Sprites")]
-        [Tooltip("Frames for idle animation when facing up.")]
-        public Sprite[] idleUp;
-
-        [Tooltip("Frames for walking animation when facing up.")]
-        public Sprite[] walkUp;
-
         [Tooltip("Frames for idle animation when facing down.")]
         public Sprite[] idleDown;
 
-        [Tooltip("Frames for walking animation when facing down.")]
-        public Sprite[] walkDown;
-
-        [Tooltip("Frames for idle animation when facing left.")]
-        public Sprite[] idleLeft;
-
-        [Tooltip("Frames for walking animation when facing left.")]
-        public Sprite[] walkLeft;
+        [Tooltip("Frames for idle animation when facing down-right.")]
+        public Sprite[] idleDownRight;
 
         [Tooltip("Frames for idle animation when facing right.")]
         public Sprite[] idleRight;
 
+        [Tooltip("Frames for idle animation when facing up-right.")]
+        public Sprite[] idleUpRight;
+
+        [Tooltip("Frames for idle animation when facing up.")]
+        public Sprite[] idleUp;
+
+        [Tooltip("Frames for idle animation when facing up-left.")]
+        public Sprite[] idleUpLeft;
+
+        [Tooltip("Frames for idle animation when facing left.")]
+        public Sprite[] idleLeft;
+
+        [Tooltip("Frames for idle animation when facing down-left.")]
+        public Sprite[] idleDownLeft;
+
+        [Tooltip("Frames for walking animation when facing down.")]
+        public Sprite[] walkDown;
+
+        [Tooltip("Frames for walking animation when facing down-right.")]
+        public Sprite[] walkDownRight;
+
         [Tooltip("Frames for walking animation when facing right.")]
         public Sprite[] walkRight;
 
-        [Tooltip("If true, flip right-facing sprites to use for left-facing animations (idle/walk/hit).")] 
+        [Tooltip("Frames for walking animation when facing up-right.")]
+        public Sprite[] walkUpRight;
+
+        [Tooltip("Frames for walking animation when facing up.")]
+        public Sprite[] walkUp;
+
+        [Tooltip("Frames for walking animation when facing up-left.")]
+        public Sprite[] walkUpLeft;
+
+        [Tooltip("Frames for walking animation when facing left.")]
+        public Sprite[] walkLeft;
+
+        [Tooltip("Frames for walking animation when facing down-left.")]
+        public Sprite[] walkDownLeft;
+
+        [Header("Sprite Mirroring")]
+        [Tooltip("If true, flip right-facing sprites to use for left-facing animations (idle/walk/hit).")]
         public bool useRightSpritesForLeft = true;
 
-        [Tooltip("If true, flip left-facing sprites to use for right-facing animations (idle/walk/hit).")] 
+        [Tooltip("If true, flip left-facing sprites to use for right-facing animations (idle/walk/hit).")]
         public bool useLeftSpritesForRight = false;
+
+        [Tooltip("If true, flip down-right sprites to use for down-left animations (idle/walk/hit).")]
+        public bool useRightSpritesForDownLeft = true;
+
+        [Tooltip("If true, flip down-left sprites to use for down-right animations (idle/walk/hit).")]
+        public bool useLeftSpritesForDownRight = false;
+
+        [Tooltip("If true, flip up-right sprites to use for up-left animations (idle/walk/hit).")]
+        public bool useRightSpritesForUpLeft = true;
+
+        [Tooltip("If true, flip up-left sprites to use for up-right animations (idle/walk/hit).")]
+        public bool useLeftSpritesForUpRight = false;
+
+        [Header("Frame Animation Settings")]
+        [Tooltip("Base frames per second used for sprite animations when state overrides are not provided.")]
+        public float baseAnimationFPS = 6f;
+
+        [Tooltip("Frames per second to use for idle animations. Set to 0 or lower to fall back to Base Animation FPS.")]
+        public float idleAnimationFPS = 0f;
+
+        [Tooltip("Frames per second to use for walk animations. Set to 0 or lower to fall back to Base Animation FPS.")]
+        public float walkAnimationFPS = 0f;
+
+        [Tooltip("Frames per second to use for hit animations. Set to 0 or lower to fall back to Base Animation FPS.")]
+        public float hitAnimationFPS = 0f;
 
         [Header("Combat")]
         [Tooltip("If true, this pet can participate in combat.")]

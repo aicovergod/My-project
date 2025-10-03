@@ -45,12 +45,20 @@ namespace Pets
             {
                 if (def.idleDown != null && def.idleDown.Length > 0) sr.sprite = def.idleDown[0];
                 else if (def.walkDown != null && def.walkDown.Length > 0) sr.sprite = def.walkDown[0];
+                else if (def.idleDownRight != null && def.idleDownRight.Length > 0) sr.sprite = def.idleDownRight[0];
+                else if (def.walkDownRight != null && def.walkDownRight.Length > 0) sr.sprite = def.walkDownRight[0];
                 else if (def.idleRight != null && def.idleRight.Length > 0) sr.sprite = def.idleRight[0];
                 else if (def.walkRight != null && def.walkRight.Length > 0) sr.sprite = def.walkRight[0];
+                else if (def.idleUpRight != null && def.idleUpRight.Length > 0) sr.sprite = def.idleUpRight[0];
+                else if (def.walkUpRight != null && def.walkUpRight.Length > 0) sr.sprite = def.walkUpRight[0];
                 else if (def.idleUp != null && def.idleUp.Length > 0) sr.sprite = def.idleUp[0];
                 else if (def.walkUp != null && def.walkUp.Length > 0) sr.sprite = def.walkUp[0];
+                else if (def.idleUpLeft != null && def.idleUpLeft.Length > 0) sr.sprite = def.idleUpLeft[0];
+                else if (def.walkUpLeft != null && def.walkUpLeft.Length > 0) sr.sprite = def.walkUpLeft[0];
                 else if (def.idleLeft != null && def.idleLeft.Length > 0) sr.sprite = def.idleLeft[0];
                 else if (def.walkLeft != null && def.walkLeft.Length > 0) sr.sprite = def.walkLeft[0];
+                else if (def.idleDownLeft != null && def.idleDownLeft.Length > 0) sr.sprite = def.idleDownLeft[0];
+                else if (def.walkDownLeft != null && def.walkDownLeft.Length > 0) sr.sprite = def.walkDownLeft[0];
             }
             if (sr.sprite != null && sr.sprite.texture != null)
                 sr.sprite.texture.filterMode = FilterMode.Point;
@@ -64,37 +72,70 @@ namespace Pets
             }
 
             bool hasFrameSprites =
-                (def.idleUp != null && def.idleUp.Length > 0) ||
-                (def.walkUp != null && def.walkUp.Length > 0) ||
                 (def.idleDown != null && def.idleDown.Length > 0) ||
                 (def.walkDown != null && def.walkDown.Length > 0) ||
-                (def.idleLeft != null && def.idleLeft.Length > 0) ||
-                (def.walkLeft != null && def.walkLeft.Length > 0) ||
+                (def.idleDownRight != null && def.idleDownRight.Length > 0) ||
+                (def.walkDownRight != null && def.walkDownRight.Length > 0) ||
                 (def.idleRight != null && def.idleRight.Length > 0) ||
                 (def.walkRight != null && def.walkRight.Length > 0) ||
-                (def.hitUp != null && def.hitUp.Length > 0) ||
+                (def.idleUpRight != null && def.idleUpRight.Length > 0) ||
+                (def.walkUpRight != null && def.walkUpRight.Length > 0) ||
+                (def.idleUp != null && def.idleUp.Length > 0) ||
+                (def.walkUp != null && def.walkUp.Length > 0) ||
+                (def.idleUpLeft != null && def.idleUpLeft.Length > 0) ||
+                (def.walkUpLeft != null && def.walkUpLeft.Length > 0) ||
+                (def.idleLeft != null && def.idleLeft.Length > 0) ||
+                (def.walkLeft != null && def.walkLeft.Length > 0) ||
+                (def.idleDownLeft != null && def.idleDownLeft.Length > 0) ||
+                (def.walkDownLeft != null && def.walkDownLeft.Length > 0) ||
                 (def.hitDown != null && def.hitDown.Length > 0) ||
+                (def.hitDownRight != null && def.hitDownRight.Length > 0) ||
+                (def.hitRight != null && def.hitRight.Length > 0) ||
+                (def.hitUpRight != null && def.hitUpRight.Length > 0) ||
+                (def.hitUp != null && def.hitUp.Length > 0) ||
+                (def.hitUpLeft != null && def.hitUpLeft.Length > 0) ||
                 (def.hitLeft != null && def.hitLeft.Length > 0) ||
-                (def.hitRight != null && def.hitRight.Length > 0);
+                (def.hitDownLeft != null && def.hitDownLeft.Length > 0);
 
             if (hasFrameSprites && (def.animationClips == null || def.animationClips.Length == 0))
             {
                 var spriteAnim = go.AddComponent<PetSpriteAnimator>();
                 spriteAnim.spriteRenderer = sr;
-                spriteAnim.idleUp = def.idleUp;
-                spriteAnim.walkUp = def.walkUp;
                 spriteAnim.idleDown = def.idleDown;
-                spriteAnim.walkDown = def.walkDown;
-                spriteAnim.idleLeft = def.idleLeft;
-                spriteAnim.walkLeft = def.walkLeft;
+                spriteAnim.idleDownRight = def.idleDownRight;
                 spriteAnim.idleRight = def.idleRight;
+                spriteAnim.idleUpRight = def.idleUpRight;
+                spriteAnim.idleUp = def.idleUp;
+                spriteAnim.idleUpLeft = def.idleUpLeft;
+                spriteAnim.idleLeft = def.idleLeft;
+                spriteAnim.idleDownLeft = def.idleDownLeft;
+                spriteAnim.walkDown = def.walkDown;
+                spriteAnim.walkDownRight = def.walkDownRight;
                 spriteAnim.walkRight = def.walkRight;
-                spriteAnim.hitUp = def.hitUp;
+                spriteAnim.walkUpRight = def.walkUpRight;
+                spriteAnim.walkUp = def.walkUp;
+                spriteAnim.walkUpLeft = def.walkUpLeft;
+                spriteAnim.walkLeft = def.walkLeft;
+                spriteAnim.walkDownLeft = def.walkDownLeft;
                 spriteAnim.hitDown = def.hitDown;
-                spriteAnim.hitLeft = def.hitLeft;
+                spriteAnim.hitDownRight = def.hitDownRight;
                 spriteAnim.hitRight = def.hitRight;
+                spriteAnim.hitUpRight = def.hitUpRight;
+                spriteAnim.hitUp = def.hitUp;
+                spriteAnim.hitUpLeft = def.hitUpLeft;
+                spriteAnim.hitLeft = def.hitLeft;
+                spriteAnim.hitDownLeft = def.hitDownLeft;
                 spriteAnim.useFlipXForLeft = def.useRightSpritesForLeft;
                 spriteAnim.useFlipXForRight = def.useLeftSpritesForRight;
+                spriteAnim.useFlipXForDownLeft = def.useRightSpritesForDownLeft;
+                spriteAnim.useFlipXForDownRight = def.useLeftSpritesForDownRight;
+                spriteAnim.useFlipXForUpLeft = def.useRightSpritesForUpLeft;
+                spriteAnim.useFlipXForUpRight = def.useLeftSpritesForUpRight;
+                if (def.baseAnimationFPS > 0f)
+                    spriteAnim.animationFPS = def.baseAnimationFPS;
+                spriteAnim.idleAnimationFPS = def.idleAnimationFPS;
+                spriteAnim.walkAnimationFPS = def.walkAnimationFPS;
+                spriteAnim.hitAnimationFPS = def.hitAnimationFPS;
             }
 
             if (def.animationClips != null && def.animationClips.Length > 0)

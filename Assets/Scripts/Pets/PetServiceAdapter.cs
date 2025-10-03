@@ -85,6 +85,10 @@ namespace Pets
                     profile.useFlipXForUpLeft = psa.useFlipXForUpLeft;
                     profile.useFlipXForUpRight = psa.useFlipXForUpRight;
                     profile.useFlipXForDownRight = psa.useFlipXForDownRight;
+                    profile.animationFPS = psa.animationFPS;
+                    profile.idleAnimationFPS = psa.idleAnimationFPS;
+                    profile.walkAnimationFPS = psa.walkAnimationFPS;
+                    profile.hitAnimationFPS = psa.hitAnimationFPS;
                 }
             }
             return profile;
