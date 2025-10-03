@@ -30,8 +30,7 @@ namespace Skills.Fishing
 
         private FishableSpot currentSpot;
         private FishingToolDefinition currentTool;
-        private int catchProgress;
-        private int currentIntervalTicks;
+        private readonly TickProgressTracker catchProgressTracker = new TickProgressTracker();
         private int bycatchRollIndex;
         private int consecutiveFails;
 
@@ -48,8 +47,18 @@ namespace Skills.Fishing
         public bool IsFishing => currentSpot != null;
         public FishableSpot CurrentSpot => currentSpot;
         public FishingToolDefinition CurrentTool => currentTool;
-        public float CatchProgressNormalized => currentIntervalTicks <= 1 ? 0f : (float)catchProgress / (currentIntervalTicks - 1);
-        public int CurrentCatchIntervalTicks => currentIntervalTicks;
+        public float CatchProgressNormalized
+        {
+            get
+            {
+                int required = catchProgressTracker.RequiredTicks;
+                if (required <= 1)
+                    return 0f;
+
+                return Mathf.Clamp01((float)catchProgressTracker.ProgressTicks / (required - 1));
+            }
+        }
+        public int CurrentCatchIntervalTicks => catchProgressTracker.RequiredTicks;
 
         /// <summary>
         ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
@@ -69,6 +78,7 @@ namespace Skills.Fishing
             if (equipment == null)
                 equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
+            catchProgressTracker.TickAdvanced += HandleCatchProgressAdvanced;
             PreloadFishItems();
             fishingOutfit = new SkillingOutfitProgress(new[]
             {
@@ -149,12 +159,11 @@ namespace Skills.Fishing
                 StopFishing();
                 return;
             }
-            catchProgress++;
-            LogDebug($"Fishing tick: {catchProgress}/{currentIntervalTicks}");
-            if (catchProgress >= currentIntervalTicks)
+            if (catchProgressTracker.Advance())
             {
-                catchProgress = 0;
                 AttemptCatch();
+                if (IsFishing)
+                    catchProgressTracker.Reset(catchProgressTracker.RequiredTicks);
             }
         }
 
@@ -462,8 +471,8 @@ namespace Skills.Fishing
             }
             currentSpot = spot;
             currentTool = tool;
-            catchProgress = 0;
-            currentIntervalTicks = Mathf.Max(1, Mathf.RoundToInt(spot.def.CatchIntervalTicks / Mathf.Max(0.01f, tool.SwingSpeedMultiplier)));
+            int intervalTicks = Mathf.Max(1, Mathf.RoundToInt(spot.def.CatchIntervalTicks / Mathf.Max(0.01f, tool.SwingSpeedMultiplier)));
+            catchProgressTracker.Reset(intervalTicks);
             currentSpot.IsBusy = true;
             LogDebug($"Started fishing {spot.name} with {tool.DisplayName}");
             OnStartFishing?.Invoke(spot);
@@ -477,8 +486,7 @@ namespace Skills.Fishing
                 currentSpot.IsBusy = false;
             currentSpot = null;
             currentTool = null;
-            catchProgress = 0;
-            currentIntervalTicks = 0;
+            catchProgressTracker.Reset(0);
             LogDebug("Stopped fishing");
             OnStopFishing?.Invoke();
         }
@@ -529,6 +537,14 @@ namespace Skills.Fishing
                 return;
 
             Debug.Log($"[FishingSkill] {message}");
+        }
+
+        private void HandleCatchProgressAdvanced(int progress, int required)
+        {
+            if (!IsFishing)
+                return;
+
+            LogDebug($"Fishing tick: {progress}/{required}");
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Skills.Mining
 
         private MineableRock currentRock;
         private PickaxeDefinition currentPickaxe;
-        private int swingProgress;
+        private readonly TickProgressTracker swingProgressTracker = new TickProgressTracker();
 
         private SkillManager skills;
         private Dictionary<string, ItemData> oreItems;
@@ -49,9 +49,16 @@ namespace Skills.Mining
         public PickaxeDefinition CurrentPickaxe => currentPickaxe;
         public int CurrentSwingSpeedTicks => currentPickaxe?.SwingSpeedTicks ?? 0;
         public float SwingProgressNormalized
-            => currentPickaxe == null || currentPickaxe.SwingSpeedTicks <= 1
-                ? 0f
-                : (float)swingProgress / (currentPickaxe.SwingSpeedTicks - 1);
+        {
+            get
+            {
+                int required = currentPickaxe != null ? Mathf.Max(1, currentPickaxe.SwingSpeedTicks) : 0;
+                if (required <= 1)
+                    return 0f;
+
+                return Mathf.Clamp01((float)swingProgressTracker.ProgressTicks / (required - 1));
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
@@ -69,6 +76,7 @@ namespace Skills.Mining
             if (equipment == null)
                 equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
+            swingProgressTracker.TickAdvanced += HandleSwingProgressAdvanced;
             PreloadOreItems();
             miningOutfit = new SkillingOutfitProgress(new[]
             {
@@ -102,12 +110,11 @@ namespace Skills.Mining
                 return;
             }
 
-            swingProgress++;
-            LogDebug($"Mining tick: {swingProgress}/{currentPickaxe?.SwingSpeedTicks ?? 0}");
-            if (swingProgress >= currentPickaxe.SwingSpeedTicks)
+            if (swingProgressTracker.Advance())
             {
-                swingProgress = 0;
                 AttemptMine();
+                if (IsMining && currentPickaxe != null)
+                    swingProgressTracker.Reset(currentPickaxe.SwingSpeedTicks);
             }
         }
 
@@ -208,7 +215,7 @@ namespace Skills.Mining
 
             currentRock = rock;
             currentPickaxe = pickaxe;
-            swingProgress = 0;
+            swingProgressTracker.Reset(Mathf.Max(1, pickaxe.SwingSpeedTicks));
             LogDebug($"Started mining {rock.name} with {pickaxe.DisplayName}");
             OnStartMining?.Invoke(rock);
         }
@@ -221,7 +228,7 @@ namespace Skills.Mining
             LogDebug("Stopped mining");
             currentRock = null;
             currentPickaxe = null;
-            swingProgress = 0;
+            swingProgressTracker.Reset(0);
             OnStopMining?.Invoke();
         }
 
@@ -274,6 +281,14 @@ namespace Skills.Mining
                 return;
 
             Debug.Log($"[MiningSkill] {message}");
+        }
+
+        private void HandleSwingProgressAdvanced(int progress, int required)
+        {
+            if (!IsMining)
+                return;
+
+            LogDebug($"Mining tick: {progress}/{required}");
         }
     }
 }
