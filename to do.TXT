@@ -14,26 +14,27 @@ Add power amulet
 Add defence amulet
 
 
-
-- add pyromancer armor
-- Make firemaking pet phoenix give 0.10% firemaking exp boost when spawned + a 1/20 chance of doubling exp
-
 - add system to receive a wand, from the wandmaker (random choice out of 50 wands), wands have affinities towards certain elements
 so some wands would be weaker casting certain spells, some stronger.
 
-- fix the bug with floating text popping up when using bonfire to cook or throw logs in
+- BUG: Fix hitsplats. When i land a hit, and my player is moving around, the hitsplat that appears in flickering about, when it rises up, and its like, when my player is moving around, it slightly being sucked towards my player, depending on where they are moving. 
+
+
+BUG: When i load into the game, the npc damage logs are already activated, and showing in the console, i dont want them always activated, when starting the game. They are meant to only work when enabled VIA the admin f2 debug menu. Also the npc Debug log butons in the admin f2 menu, dont do anything, they dont work. Fix this
+
+BUG: Sometimes, when a pet attacks an npcs, and hits a "0" 0 it uses the red hitsplat, and not the blue hitsplat, suggest a fix
+
+BUG: When im landing a hit on an npc, and when the hitsplat pops up, for about 0,2 seconds it appears away from the npc, then moves to the correct position on top of the npc, then floats up. The bug is that its appearing about 1 tile away from the npc, for about 0.2 seconds, before it moves to the correct positon visually
+
 
 - Add dragonfire shield (upgraded 100% defence)
 - Add anti dragonfire shield (provides 85% protection
 
 - Add projectile & Hit GFX for bind & ensnare
 
-- NPC Healthbar is drawing ground objects fix this
+- NPC Healthbar is drawing underneath objects marked as ground objects fix this
 
 - Tidy up the save_data.json file as it is so untidy, and makes manual file editing near impossible
-
-BUG: If the player dies of poison, after they have loaded into the game, the health bar remains red, (First Death) and only updates to green, when the health bar receives an update. But if a player is poisoned and dies for the second time, (Second Death) the bar  correctly changes to green when they respawn. There is a bug somewhere when the player spawns into the game when clicking play, and dies for the first time while poisoned. Because if the player dies for a second time while poisoned, the bar correctly updates and changes to green.
-
 
 Bug: MissingComponentException: There is no 'Canvas' attached to the "AudioSettingsUI" game object, but a script is trying to access it.
 You probably need to add a Canvas to the game object "AudioSettingsUI". Or your script needs to check if the component is attached before using it.

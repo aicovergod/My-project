@@ -82,6 +82,12 @@ GameObject:
   - component: {fileID: 1218445456886628537}
   - component: {fileID: 2038440844503587638}
   - component: {fileID: 6425351818328045159}
+  - component: {fileID: 2793536999350240794}
+  - component: {fileID: 3728791927169536694}
+  - component: {fileID: 3968416059274634973}
+  - component: {fileID: 7826943123202149709}
+  - component: {fileID: 5214551407693897022}
+  - component: {fileID: 8211744507035446029}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -160,7 +166,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!50 &5384127360561436123
@@ -224,35 +230,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0541fb8a224b4738bddd6e556cf13c3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 3.5
-  fourWayOnly: 1
-  gamepadDeadzone: 0.3
+  movementController: {fileID: 2793536999350240794}
+  movementInput: {fileID: 3728791927169536694}
+  spriteController: {fileID: 3968416059274634973}
   CanDrop: 1
-  freezeSprite: 0
-  idleDown: {fileID: -1447395906653738743, guid: 0f388a5ca87873947b65aa4e52c82acf, type: 3}
-  idleDownRight: {fileID: 0}
-  idleRight: {fileID: -6001299320980459286, guid: ebf9d747eb53f354a9b1eb6ab69e26e0, type: 3}
-  idleUpRight: {fileID: 0}
-  idleUp: {fileID: -7774987061422140978, guid: 1a6a48544ffc20640b61eb558ee1a1e8, type: 3}
-  idleUpLeft: {fileID: 0}
-  idleLeft: {fileID: 3575416043233628204, guid: b36fd53cfd8d78140a1ddc1a76f5d25a, type: 3}
-  idleDownLeft: {fileID: 0}
-  walkDown: {fileID: 6918485297987577717, guid: fc8bc365d3e8a674f974335b29964c7d, type: 3}
-  walkDownRight: {fileID: 0}
-  walkRight: {fileID: -6001299320980459286, guid: ebf9d747eb53f354a9b1eb6ab69e26e0, type: 3}
-  walkUpRight: {fileID: 0}
-  walkUp: {fileID: -7774987061422140978, guid: 1a6a48544ffc20640b61eb558ee1a1e8, type: 3}
-  walkUpLeft: {fileID: 0}
-  walkLeft: {fileID: 1380965295750415974, guid: 92a11b3dfbcccc34886c31d77dd8d69b, type: 3}
-  walkDownLeft: {fileID: 0}
-  useFlipXForLeft: 0
-  useFlipXForRight: 0
-  useFlipXForDownLeft: 1
-  useFlipXForUpLeft: 1
-  useFlipXForUpRight: 0
-  useFlipXForDownRight: 0
-  playerInput: {fileID: 7000745351061079601}
-  moveActionReference: {fileID: 0}
 --- !u!114 &6554036775103191577
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -338,12 +319,12 @@ MonoBehaviour:
   prospectCooldownSeconds: 3
   autoMoveIntoRange: 1
   autoMoveStopBuffer: 0.1
-  playerInput: {fileID: 0}
+  playerInput: {fileID: 7000745351061079601}
   interactActionReference: {fileID: 0}
   prospectActionReference: {fileID: 0}
   cancelActionReference: {fileID: 0}
   skill: {fileID: 6125646337061022332}
-  playerMover: {fileID: 5825080390935697164}
+  explicitMovementController: {fileID: 2793536999350240794}
   worldCamera: {fileID: 0}
   rockMask:
     serializedVersion: 2
@@ -469,12 +450,12 @@ MonoBehaviour:
   prospectCooldownSeconds: 3
   autoMoveIntoRange: 1
   autoMoveStopBuffer: 0.1
-  playerInput: {fileID: 0}
+  playerInput: {fileID: 7000745351061079601}
   interactActionReference: {fileID: 0}
   prospectActionReference: {fileID: 0}
   cancelActionReference: {fileID: 0}
   skill: {fileID: 4484345410366226628}
-  playerMover: {fileID: 5825080390935697164}
+  explicitMovementController: {fileID: 2793536999350240794}
   worldCamera: {fileID: 0}
   treeMask:
     serializedVersion: 2
@@ -713,7 +694,7 @@ MonoBehaviour:
   visualBinder: {fileID: 1099567880523368060}
   combatBinder: {fileID: 8069331157420240731}
   hudTimer: {fileID: 0}
-  playerMover: {fileID: 0}
+  playerMover: {fileID: 5825080390935697164}
 --- !u!114 &1099567880523368060
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -728,8 +709,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 6802587434335318896}
   animator: {fileID: 0}
-  playerMover: {fileID: 0}
-  attackAnimator: {fileID: 0}
+  spriteController: {fileID: 3968416059274634973}
+  attackAnimator: {fileID: 7826943123202149709}
 --- !u!114 &1418513688407256015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -778,12 +759,12 @@ MonoBehaviour:
   prospectCooldownSeconds: 3
   autoMoveIntoRange: 1
   autoMoveStopBuffer: 0.1
-  playerInput: {fileID: 0}
+  playerInput: {fileID: 7000745351061079601}
   interactActionReference: {fileID: 0}
   prospectActionReference: {fileID: 0}
   cancelActionReference: {fileID: 0}
   skill: {fileID: 1188243290273898710}
-  playerMover: {fileID: 5825080390935697164}
+  explicitMovementController: {fileID: 2793536999350240794}
   worldCamera: {fileID: 0}
   spotMask:
     serializedVersion: 2
@@ -896,7 +877,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Status.Antifire.AntifireProtectionController
   equipment: {fileID: 8439072058276114910}
   dragonfireShieldIdentifiers:
-  - dragonfire_shield
+  - dragonfire shield
   - Dragonfire shield
 --- !u!114 &8582261054864833439
 MonoBehaviour:
@@ -994,7 +975,7 @@ MonoBehaviour:
   prospectActionReference: {fileID: 0}
   cancelActionReference: {fileID: 0}
   skill: {fileID: 4293722103470127009}
-  playerMover: {fileID: 5825080390935697164}
+  explicitMovementController: {fileID: 2793536999350240794}
   worldCamera: {fileID: 0}
   bonfireMask:
     serializedVersion: 2
@@ -1024,12 +1005,12 @@ MonoBehaviour:
   prospectActionReference: {fileID: 0}
   cancelActionReference: {fileID: 0}
   skill: {fileID: -2219103460593389809}
-  playerMover: {fileID: 5825080390935697164}
+  explicitMovementController: {fileID: 2793536999350240794}
   worldCamera: {fileID: 0}
   cookingStationMask:
     serializedVersion: 2
     m_Bits: 128
-  firemakingSkill: {fileID: 0}
+  firemakingSkill: {fileID: 4293722103470127009}
 --- !u!114 &6425351818328045159
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1046,3 +1027,145 @@ MonoBehaviour:
   skillManager: {fileID: 5028650979715864874}
   equipment: {fileID: 8439072058276114910}
   enableDebugLogging: 1
+--- !u!114 &2793536999350240794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d82bcadeae4187b49926b3b9741e9871, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.Movement.PlayerMovementController
+  moveSpeed: 3.5
+  fourWayOnly: 0
+  movementInput: {fileID: 3728791927169536694}
+  spriteController: {fileID: 3968416059274634973}
+  combatController: {fileID: 4934220548873172218}
+  inventory: {fileID: 491447706204386932}
+--- !u!114 &3728791927169536694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c909a43a4a65ba64c92040335140c8ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.Input.PlayerMovementInput
+  gamepadDeadzone: 0.3
+  playerInput: {fileID: 7000745351061079601}
+  moveActionReference: {fileID: 0}
+--- !u!114 &3968416059274634973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27513fa144fa0a6419d62cf5538fba9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.Visuals.PlayerSpriteController
+  idleDown: {fileID: -7159198287974934165, guid: 2fe75efa9d99d824392551c260d68d9a, type: 3}
+  idleDownRight: {fileID: 7356372625641980461, guid: 2fe75efa9d99d824392551c260d68d9a, type: 3}
+  idleRight: {fileID: 2027276343794157613, guid: 2fe75efa9d99d824392551c260d68d9a, type: 3}
+  idleUpRight: {fileID: -3015562322144020876, guid: 2fe75efa9d99d824392551c260d68d9a, type: 3}
+  idleUp: {fileID: 7949689850559645817, guid: 2fe75efa9d99d824392551c260d68d9a, type: 3}
+  idleUpLeft: {fileID: 0}
+  idleLeft: {fileID: 0}
+  idleDownLeft: {fileID: 0}
+  walkDown: {fileID: -7159198287974934165, guid: 2fe75efa9d99d824392551c260d68d9a, type: 3}
+  walkDownRight: {fileID: 7356372625641980461, guid: 2fe75efa9d99d824392551c260d68d9a, type: 3}
+  walkRight: {fileID: 2027276343794157613, guid: 2fe75efa9d99d824392551c260d68d9a, type: 3}
+  walkUpRight: {fileID: -3015562322144020876, guid: 2fe75efa9d99d824392551c260d68d9a, type: 3}
+  walkUp: {fileID: 7949689850559645817, guid: 2fe75efa9d99d824392551c260d68d9a, type: 3}
+  walkUpLeft: {fileID: 0}
+  walkLeft: {fileID: 0}
+  walkDownLeft: {fileID: 0}
+  useFlipXForLeft: 1
+  useFlipXForRight: 0
+  useFlipXForDownLeft: 1
+  useFlipXForUpLeft: 1
+  useFlipXForUpRight: 0
+  useFlipXForDownRight: 0
+  freezeSprite: 0
+--- !u!114 &7826943123202149709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d9590849e43392498e3f2b27cbd5bb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Beastmaster.MergedPetAttackAnimator
+  combat: {fileID: 4934220548873172218}
+  movementController: {fileID: 2793536999350240794}
+  spriteController: {fileID: 3968416059274634973}
+  animator: {fileID: 0}
+  spriteAnimator: {fileID: 5214551407693897022}
+--- !u!114 &5214551407693897022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 447823ddefe54844f98997177824c1a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Pets.PetSpriteAnimator
+  spriteRenderer: {fileID: 6802587434335318896}
+  idleDown: []
+  idleDownRight: []
+  idleRight: []
+  idleUpRight: []
+  idleUp: []
+  idleUpLeft: []
+  idleLeft: []
+  idleDownLeft: []
+  walkDown: []
+  walkDownRight: []
+  walkRight: []
+  walkUpRight: []
+  walkUp: []
+  walkUpLeft: []
+  walkLeft: []
+  walkDownLeft: []
+  hitDown: []
+  hitDownRight: []
+  hitRight: []
+  hitUpRight: []
+  hitUp: []
+  hitUpLeft: []
+  hitLeft: []
+  hitDownLeft: []
+  useFlipXForLeft: 1
+  useFlipXForRight: 0
+  useFlipXForDownLeft: 1
+  useFlipXForUpLeft: 1
+  useFlipXForUpRight: 0
+  useFlipXForDownRight: 0
+  animationFPS: 6
+--- !u!114 &8211744507035446029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b121baa100eeae94fa7bceed10cdbafb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.MergeHudTimer
+  font: {fileID: 0}
