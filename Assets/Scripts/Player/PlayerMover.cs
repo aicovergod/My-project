@@ -112,6 +112,9 @@ namespace Player
         /// <summary>True while the movement controller is executing an auto-move routine.</summary>
         public bool IsAutoMoving => movementController != null && movementController.IsAutoMoving;
 
+        /// <summary>True while the movement controller reports active displacement from player input or auto-walk.</summary>
+        public bool IsMoving => movementController != null && movementController.IsMoving;
+
         /// <summary>True while movement input is frozen by external systems.</summary>
         public bool IsMovementFrozen => movementController != null && movementController.IsMovementFrozen;
 
