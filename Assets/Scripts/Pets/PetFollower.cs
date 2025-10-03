@@ -96,6 +96,7 @@ namespace Pets
         private bool usingNavPath;
         private NavGridBuilder cachedWanderGrid;
         private int cachedWanderGridRevision = -1;
+        private bool navWanderFailureLogged;
         private Vector2 navFinalDestination;
         private Vector2Int navFinalCell;
         private readonly Queue<Vector2> navWanderWaypoints = new();
@@ -198,6 +199,7 @@ namespace Pets
                 wandering = false;
                 usingNavPath = false;
                 navWanderWaypoints.Clear();
+                navWanderFailureLogged = false;
                 Vector2 heading = ((Vector2)playerVel).normalized;
                 if (lastHeading == Vector2.zero || Vector2.Angle(lastHeading, heading) > headingRefreshAngle)
                 {
@@ -215,6 +217,7 @@ namespace Pets
                     wanderTimer = Random.Range(wanderDelayRange.x, wanderDelayRange.y);
                     usingNavPath = false;
                     navWanderWaypoints.Clear();
+                    navWanderFailureLogged = false;
                 }
             }
 
@@ -245,7 +248,7 @@ namespace Pets
                     }
                     else
                     {
-                        wanderTarget = playerPos + (Vector3)Random.insideUnitCircle * wanderRadius;
+                        HandleNavWanderFailure(playerPos, activeWanderGrid);
                     }
                 }
             }
@@ -266,12 +269,23 @@ namespace Pets
                         if (usingNavPath)
                         {
                             wanderTarget = navFinalDestination;
+                            wanderTimer = Random.Range(wanderDelayRange.x, wanderDelayRange.y);
                         }
                         else
                         {
-                            wanderTarget = playerPos + (Vector3)Random.insideUnitCircle * wanderRadius;
+                            bool fallbackResolved = HandleNavWanderFailure(playerPos, activeWanderGridValid ? activeWanderGrid : null);
+                            if (fallbackResolved && wandering)
+                            {
+                                wanderTimer = Random.Range(wanderDelayRange.x, wanderDelayRange.y);
+                            }
+                            else
+                            {
+                                currentVelocity = Vector3.zero;
+                                if (spriteAnimator != null)
+                                    spriteAnimator.UpdateVisuals(Vector2.zero);
+                                return;
+                            }
                         }
-                        wanderTimer = Random.Range(wanderDelayRange.x, wanderDelayRange.y);
                     }
                 }
 
@@ -509,6 +523,9 @@ namespace Pets
             if (!grid.IsCellWalkable(startCell) && !TryFindNearestWalkableCell(startCell, grid, maxCellRadius, out startCell))
                 return false;
 
+            bool sampledCellValid = false;
+            Vector2Int lastSampledCell = startCell;
+
             for (int attempt = 0; attempt < navigationSampleAttempts; attempt++)
             {
                 Vector2 candidate = origin + Random.insideUnitCircle * sampleRadius;
@@ -519,6 +536,9 @@ namespace Pets
                     if (!TryFindNearestWalkableCell(goalCell, grid, maxCellRadius, out goalCell))
                         continue;
                 }
+
+                sampledCellValid = true;
+                lastSampledCell = goalCell;
 
                 if (!IsWithinCellRadius(startCell, goalCell, maxCellRadius))
                 {
@@ -537,10 +557,112 @@ namespace Pets
 
                 navFinalCell = goalCell;
                 navFinalDestination = grid.GetCellCenter(goalCell);
+                navWanderFailureLogged = false;
                 return true;
             }
 
+            if (sampledCellValid)
+            {
+                Vector2Int snappedCell = lastSampledCell;
+                if (!TryFindNearestWalkableCell(snappedCell, grid, maxCellRadius, out snappedCell))
+                {
+                    navWanderWaypoints.Clear();
+                    return false;
+                }
+
+                if (snappedCell != startCell && TryBuildPath(startCell, snappedCell, grid, maxCellRadius, navWanderWaypoints) && navWanderWaypoints.Count > 0)
+                {
+                    navFinalCell = snappedCell;
+                    navFinalDestination = grid.GetCellCenter(snappedCell);
+                    navWanderFailureLogged = false;
+                    return true;
+                }
+            }
+
             navWanderWaypoints.Clear();
+            return false;
+        }
+
+        /// <summary>
+        /// Handles navigation-aware wander failures by attempting to locate a walkable fallback cell. When
+        /// navigation is respected and no fallback exists the pet will idle until the next wander window.
+        /// </summary>
+        private bool HandleNavWanderFailure(Vector2 origin, NavGridBuilder grid)
+        {
+            usingNavPath = false;
+            navWanderWaypoints.Clear();
+
+            if (respectNavigation && grid != null && grid.HasGrid)
+            {
+                if (TryResolveFallbackWanderTarget(origin, grid, out Vector3 fallbackTarget))
+                {
+                    wanderTarget = fallbackTarget;
+                    navWanderFailureLogged = false;
+                    return true;
+                }
+
+                if (!navWanderFailureLogged)
+                {
+                    Debug.LogWarning($"[{nameof(PetFollower)}] Unable to resolve a walkable wander destination for '{name}'. Pet will remain idle until a valid nav cell is available.", this);
+                    navWanderFailureLogged = true;
+                }
+
+                wanderTarget = transform.position;
+                wandering = false;
+                idleTimer = 0f;
+                wanderTimer = 0f;
+                return false;
+            }
+
+            wanderTarget = origin + (Vector3)Random.insideUnitCircle * wanderRadius;
+            navWanderFailureLogged = false;
+            return true;
+        }
+
+        /// <summary>
+        /// Samples a walkable fallback wander destination from the navigation grid so legacy motion can still
+        /// respect blocked cells when nav-aware pathing fails.
+        /// </summary>
+        private bool TryResolveFallbackWanderTarget(Vector2 origin, NavGridBuilder grid, out Vector3 fallbackTarget)
+        {
+            fallbackTarget = transform.position;
+
+            if (grid == null || !grid.HasGrid)
+            {
+                return false;
+            }
+
+            float baseRadius = Mathf.Max(0.1f, wanderRadius);
+            float navRadius = navigationSampleRadius > 0f ? navigationSampleRadius : baseRadius;
+            float sampleRadius = Mathf.Min(baseRadius, navRadius > 0f ? navRadius : baseRadius);
+            float searchRadius = Mathf.Max(navRadius, sampleRadius);
+            int maxCellRadius = Mathf.Max(1, Mathf.CeilToInt(searchRadius / Mathf.Max(grid.TileSize, 0.0001f)));
+
+            Vector2 currentPos = transform.position;
+            Vector2Int startCell = grid.TryGetCell(currentPos, out var lookupStart) ? lookupStart : grid.WorldToCellClamped(currentPos);
+            if (!grid.IsCellWalkable(startCell) && !TryFindNearestWalkableCell(startCell, grid, maxCellRadius, out startCell))
+            {
+                return false;
+            }
+
+            for (int attempt = 0; attempt < navigationSampleAttempts; attempt++)
+            {
+                Vector2 candidate = origin + Random.insideUnitCircle * sampleRadius;
+                Vector2Int goalCell = grid.TryGetCell(candidate, out var lookupGoal) ? lookupGoal : grid.WorldToCellClamped(candidate);
+                if (!grid.IsCellWalkable(goalCell) && !TryFindNearestWalkableCell(goalCell, grid, maxCellRadius, out goalCell))
+                {
+                    continue;
+                }
+
+                if (!IsWithinCellRadius(startCell, goalCell, maxCellRadius))
+                {
+                    continue;
+                }
+
+                fallbackTarget = grid.GetCellCenter(goalCell);
+                return true;
+            }
+
             return false;
         }
 
