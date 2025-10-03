@@ -46,6 +46,7 @@ namespace Player.Movement
 
         private Rigidbody2D body;
         private Vector2 moveDir;
+        private Vector2 pendingInput;
         private Direction8 facingDir = Direction8.Down;
         private Coroutine moveRoutine;
         private bool moveRoutineActive;
