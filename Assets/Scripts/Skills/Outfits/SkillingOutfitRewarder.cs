@@ -49,7 +49,8 @@ namespace Skills.Outfits
             if (progress.owned == null)
                 progress.owned = new HashSet<string>();
 
-            if (progress.allPieceIds == null || progress.allPieceIds.Length == 0)
+            var piecePool = progress.AllPieceIds;
+            if (piecePool == null || piecePool.Count == 0)
             {
                 Debug.LogWarning($"[{debugSkillLabel}] Outfit roll skipped because no piece ids were supplied");
                 return false;
@@ -95,10 +96,10 @@ namespace Skills.Outfits
                 Debug.LogWarning($"[{debugSkillLabel}] Outfit reward duplicate detected for '{chosenId}'");
 
             // Sanity check to ensure owned count never exceeds the number of possible pieces.
-            if (progress.owned.Count > progress.allPieceIds.Length)
+            if (progress.owned.Count > piecePool.Count)
             {
                 Debug.LogWarning(
-                    $"[{debugSkillLabel}] Outfit owned count ({progress.owned.Count}) exceeds available piece count ({progress.allPieceIds.Length})");
+                    $"[{debugSkillLabel}] Outfit owned count ({progress.owned.Count}) exceeds available piece count ({piecePool.Count})");
             }
 
             return true;
@@ -107,8 +108,18 @@ namespace Skills.Outfits
         private static List<string> GetMissingPieces(SkillingOutfitProgress progress)
         {
             var missing = new List<string>();
-            foreach (var id in progress.allPieceIds)
+            if (progress == null)
+                return missing;
+
+            var pool = progress.AllPieceIds;
+            if (pool == null)
+                return missing;
+
+            foreach (var id in pool)
             {
+                if (string.IsNullOrWhiteSpace(id))
+                    continue;
+
                 if (!progress.owned.Contains(id))
                     missing.Add(id);
             }

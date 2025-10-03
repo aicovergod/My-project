@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d5c0f831e3c4b21a02407d1f6a6d385, type: 3}
+  m_Name: Fishing Outfit Definition
+  m_EditorClassIdentifier:
+  saveKey: FishingOutfitOwned
+  pieceItemIds:
+  - Fishing Helmet
+  - Fishing Top
+  - Fishing Pants
+  - Fishing Boots
+  - Fishing Gloves
+  displayName: Fishing Outfit
+  associatedPetId: Heron
+  bonusDescription: Provides stacking Fishing XP bonuses when worn.

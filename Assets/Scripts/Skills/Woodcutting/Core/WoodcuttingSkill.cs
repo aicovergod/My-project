@@ -9,7 +9,6 @@ using Skills.Common;
 using Pets;
 using Quests;
 using BankSystem;
-using Core.Save;
 using Skills.Outfits;
 using Random = UnityEngine.Random;
 
@@ -26,6 +25,10 @@ namespace Skills.Woodcutting
         [SerializeField] private Transform floatingTextAnchor;
         [SerializeField, Tooltip("Enables verbose debug logging for woodcutting actions.")]
         private bool enableDebugLogging;
+        [SerializeField, Tooltip("ScriptableObject containing the Lumberjack outfit configuration.")]
+        private SkillingOutfitDefinition woodcuttingOutfitDefinition;
+
+        private const string WoodcuttingOutfitResourcePath = "Skills/Outfits/WoodcuttingOutfitDefinition";
 
         private TreeNode currentTree;
         private AxeDefinition currentAxe;
@@ -78,19 +81,22 @@ namespace Skills.Woodcutting
             skills = GetComponent<SkillManager>();
             chopProgressTracker.TickAdvanced += HandleChopProgressAdvanced;
             PreloadLogItems();
-            woodcuttingOutfit = new SkillingOutfitProgress(new[]
+            if (woodcuttingOutfitDefinition == null)
+                woodcuttingOutfitDefinition = Resources.Load<SkillingOutfitDefinition>(WoodcuttingOutfitResourcePath);
+            if (woodcuttingOutfitDefinition != null)
             {
-                "Lumberjack Helmet",
-                "Lumberjack Shirt",
-                "Lumberjack Pants",
-                "Lumberjack Boots",
-                "Lumberjack Gloves"
-            }, "WoodcuttingOutfitOwned");
+                woodcuttingOutfit = new SkillingOutfitProgress(woodcuttingOutfitDefinition);
+            }
+            else
+            {
+                Debug.LogWarning("WoodcuttingSkill is missing a SkillingOutfitDefinition reference; outfit rewards are disabled.");
+            }
         }
 
         private void OnDestroy()
         {
-            SaveManager.Unregister(woodcuttingOutfit);
+            SkillingOutfitProgress.Unregister(woodcuttingOutfit);
+            woodcuttingOutfit = null;
         }
 
         /// <summary>

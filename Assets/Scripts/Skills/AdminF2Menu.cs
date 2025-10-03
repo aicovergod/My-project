@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Player;
@@ -515,6 +516,8 @@ namespace Skills
                 SkillingOutfitProgress.DebugChance = !SkillingOutfitProgress.DebugChance;
             }
 
+            DrawActiveOutfitDefinitions();
+
             if (GUILayout.Button("Open Bank"))
             {
                 BankUI.Instance?.Open();
@@ -564,6 +567,66 @@ namespace Skills
                 setValue(updated);
 
             GUI.enabled = previousEnabled;
+        }
+
+        /// <summary>
+        ///     Lists the skilling outfit definitions currently registered at runtime.
+        ///     Helps QA verify which outfits are active after the move to ScriptableObjects.
+        /// </summary>
+        private void DrawActiveOutfitDefinitions()
+        {
+            GUILayout.Space(5f);
+            GUILayout.Label("Skilling Outfits");
+
+            var trackers = SkillingOutfitProgress.ActiveProgressTrackers;
+            if (trackers == null || trackers.Count == 0)
+            {
+                GUILayout.Label("  No active outfit trackers registered.");
+                return;
+            }
+
+            var seenDefinitions = new HashSet<SkillingOutfitDefinition>();
+            bool missingDefinitionReported = false;
+
+            foreach (var tracker in trackers)
+            {
+                if (tracker == null)
+                    continue;
+
+                var definition = tracker.Definition;
+                if (definition == null)
+                {
+                    if (!missingDefinitionReported)
+                    {
+                        GUILayout.Label("  Outfit tracker missing definition reference.");
+                        missingDefinitionReported = true;
+                    }
+
+                    continue;
+                }
+
+                if (!seenDefinitions.Add(definition))
+                    continue;
+
+                int ownedCount = tracker.owned != null ? tracker.owned.Count : 0;
+                int totalCount = tracker.AllPieceIds != null ? tracker.AllPieceIds.Count : 0;
+                if (totalCount <= 0 && definition.PieceItemIds != null)
+                    totalCount = definition.PieceItemIds.Count;
+
+                GUILayout.Label($"  {definition.DisplayName} ({ownedCount}/{Mathf.Max(0, totalCount)})");
+
+                if (!string.IsNullOrEmpty(definition.SaveKey))
+                    GUILayout.Label($"    Save Key: {definition.SaveKey}");
+
+                var metadataParts = new List<string>(2);
+                if (!string.IsNullOrEmpty(definition.AssociatedPetId))
+                    metadataParts.Add($"Pet: {definition.AssociatedPetId}");
+                if (!string.IsNullOrEmpty(definition.BonusDescription))
+                    metadataParts.Add(definition.BonusDescription);
+
+                if (metadataParts.Count > 0)
+                    GUILayout.Label($"    {string.Join(" • ", metadataParts)}");
+            }
         }
 
         /// <summary>

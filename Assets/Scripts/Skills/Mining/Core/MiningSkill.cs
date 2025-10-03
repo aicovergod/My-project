@@ -9,7 +9,6 @@ using Skills.Common;
 using Pets;
 using Quests;
 using BankSystem;
-using Core.Save;
 using Skills.Outfits;
 using Random = UnityEngine.Random;
 using UI;
@@ -27,6 +26,10 @@ namespace Skills.Mining
         [SerializeField] private Transform floatingTextAnchor;
         [SerializeField, Tooltip("Enables verbose debug logging for mining tick processing.")]
         private bool enableDebugLogging;
+        [SerializeField, Tooltip("ScriptableObject containing the Prospector outfit configuration.")]
+        private SkillingOutfitDefinition miningOutfitDefinition;
+
+        private const string MiningOutfitResourcePath = "Skills/Outfits/MiningOutfitDefinition";
 
         private MineableRock currentRock;
         private PickaxeDefinition currentPickaxe;
@@ -78,19 +81,22 @@ namespace Skills.Mining
             skills = GetComponent<SkillManager>();
             swingProgressTracker.TickAdvanced += HandleSwingProgressAdvanced;
             PreloadOreItems();
-            miningOutfit = new SkillingOutfitProgress(new[]
+            if (miningOutfitDefinition == null)
+                miningOutfitDefinition = Resources.Load<SkillingOutfitDefinition>(MiningOutfitResourcePath);
+            if (miningOutfitDefinition != null)
             {
-                "Mining Helmet",
-                "Mining Jacket",
-                "Mining Pants",
-                "Mining Boots",
-                "Mining Gloves"
-            }, "MiningOutfitOwned");
+                miningOutfit = new SkillingOutfitProgress(miningOutfitDefinition);
+            }
+            else
+            {
+                Debug.LogWarning("MiningSkill is missing a SkillingOutfitDefinition reference; outfit rewards are disabled.");
+            }
         }
 
         private void OnDestroy()
         {
-            SaveManager.Unregister(miningOutfit);
+            SkillingOutfitProgress.Unregister(miningOutfit);
+            miningOutfit = null;
         }
 
         /// <summary>

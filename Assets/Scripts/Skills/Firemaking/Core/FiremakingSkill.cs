@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using BankSystem;
-using Core.Save;
 using Inventory;
 using MyGame.Drops;
 using Pets;
@@ -34,6 +33,10 @@ namespace Skills.Firemaking
         [SerializeField] private float maxIgniteDistance = 1.6f;
         [SerializeField, Tooltip("Enables verbose logging while diagnosing Firemaking behaviour.")]
         private bool enableDebugLogging;
+        [SerializeField, Tooltip("ScriptableObject containing the Pyromancer outfit configuration.")]
+        private SkillingOutfitDefinition firemakingOutfitDefinition;
+
+        private const string FiremakingOutfitResourcePath = "Skills/Outfits/FiremakingOutfitDefinition";
         [SerializeField] private bool allowTileSnapping = true;
         [SerializeField] private Vector2 tileSnapSize = Vector2.one;
 
@@ -233,14 +236,16 @@ namespace Skills.Firemaking
 
             LoadLogDefinitions();
 
-            firemakingOutfit = new SkillingOutfitProgress(new[]
+            if (firemakingOutfitDefinition == null)
+                firemakingOutfitDefinition = Resources.Load<SkillingOutfitDefinition>(FiremakingOutfitResourcePath);
+            if (firemakingOutfitDefinition != null)
             {
-                "Pyromancer Hood",
-                "Pyromancer Garb",
-                "Pyromancer Robes",
-                "Pyromancer Boots",
-                "Pyromancer Gloves"
-            }, "FiremakingOutfitOwned");
+                firemakingOutfit = new SkillingOutfitProgress(firemakingOutfitDefinition);
+            }
+            else
+            {
+                Debug.LogWarning("FiremakingSkill is missing a SkillingOutfitDefinition reference; outfit rewards are disabled.");
+            }
         }
 
         /// <summary>
@@ -248,7 +253,8 @@ namespace Skills.Firemaking
         /// </summary>
         private void OnDestroy()
         {
-            SaveManager.Unregister(firemakingOutfit);
+            SkillingOutfitProgress.Unregister(firemakingOutfit);
+            firemakingOutfit = null;
             ClearActiveFires();
         }
 
