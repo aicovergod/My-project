@@ -1074,6 +1074,7 @@ MonoBehaviour:
   downOverrides:
     singleIdle: {fileID: 21300000, guid: 154f62b6757a86d42b299daf7ed015f8, type: 3}
     singleWalk: {fileID: 0}
+    singleConsume: {fileID: 0}
     idleFrames:
     - {fileID: 21300000, guid: fb443207481a82d438d328b4af2dbd77, type: 3}
     - {fileID: 21300000, guid: 154f62b6757a86d42b299daf7ed015f8, type: 3}
@@ -1088,9 +1089,17 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 2226059c83310df40b024496b134059e, type: 3}
     - {fileID: 21300000, guid: fd364aa3020c27e439cb3736c2253a4c, type: 3}
     - {fileID: 21300000, guid: 6052306d0c149ac408ef24e1bbd2d50e, type: 3}
+    consumeFrames:
+    - {fileID: 21300000, guid: d148d16db0c208e4f8ceded751e847eb, type: 3}
+    - {fileID: 21300000, guid: d4395ce8136b0ac469d6fb119e7d4a5f, type: 3}
+    - {fileID: 21300000, guid: 29fee3dba1aaa21458fcc114644b3f5f, type: 3}
+    - {fileID: 21300000, guid: 51422308142e83a499c3e5105a44d62f, type: 3}
+    - {fileID: 21300000, guid: 4f78f2e8c7eab52409f8813145759718, type: 3}
+    - {fileID: 21300000, guid: 6830cc8ecb7959d4ab2fc5add4ef509c, type: 3}
   downRightOverrides:
     singleIdle: {fileID: 8115644005664255767, guid: bf70642666abe8f4b9ca9e2341815a6c, type: 3}
     singleWalk: {fileID: 0}
+    singleConsume: {fileID: 0}
     idleFrames:
     - {fileID: -1808982527863717971, guid: 5089f5157988b0e499eea695efebc852, type: 3}
     - {fileID: 8115644005664255767, guid: bf70642666abe8f4b9ca9e2341815a6c, type: 3}
@@ -1105,9 +1114,17 @@ MonoBehaviour:
     - {fileID: 21300000, guid: f036895429c7885499dcdd1854eb61df, type: 3}
     - {fileID: 21300000, guid: 3814ff381bf1cdf499f88d79715c759e, type: 3}
     - {fileID: 21300000, guid: 636b2752abf80d647a29814307c0d9c6, type: 3}
+    consumeFrames:
+    - {fileID: 21300000, guid: d5635b20c2933af4fb272edd5da4e4f0, type: 3}
+    - {fileID: 21300000, guid: a46915a0ce9422448b4876380b8b133d, type: 3}
+    - {fileID: 21300000, guid: 02de61379c5e3324f8c2731914ea8b56, type: 3}
+    - {fileID: 21300000, guid: f77a4b0678cfc10459d053aa6a7bef52, type: 3}
+    - {fileID: 21300000, guid: 020acfa50a46d414cbe0c2cbcfb3d712, type: 3}
+    - {fileID: 21300000, guid: fc4dead7d6758b246ab54c00200a2c23, type: 3}
   rightOverrides:
     singleIdle: {fileID: 21300000, guid: de699b6aa1cbd4b4097e9d683e5d1faf, type: 3}
     singleWalk: {fileID: 0}
+    singleConsume: {fileID: 0}
     idleFrames:
     - {fileID: 21300000, guid: e17ae38e87717264dadb107e1b8f33ee, type: 3}
     - {fileID: 21300000, guid: de699b6aa1cbd4b4097e9d683e5d1faf, type: 3}
@@ -1122,9 +1139,17 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 48b4912015f95e94db09657fa163e75b, type: 3}
     - {fileID: 21300000, guid: e9275d1ba297e2c4994a57831e5bd5cd, type: 3}
     - {fileID: 21300000, guid: ce66328d0385fcd45bd021a932ffae0a, type: 3}
+    consumeFrames:
+    - {fileID: 21300000, guid: d86360284e8e58f4fb793966c6723a22, type: 3}
+    - {fileID: 21300000, guid: a068313b6102cac428dc83c0340c49fe, type: 3}
+    - {fileID: 21300000, guid: 90f78a785519f574ca578ef35b579bca, type: 3}
+    - {fileID: 21300000, guid: 5963917fb7f36924a9012370370875fb, type: 3}
+    - {fileID: 21300000, guid: 96fc358c455945e45b13651acd8e6bfd, type: 3}
+    - {fileID: 21300000, guid: 3abd7d39faec74843b514bb7859776ec, type: 3}
   upRightOverrides:
     singleIdle: {fileID: 21300000, guid: f820140bc9bd7a94688005b0653f99ba, type: 3}
     singleWalk: {fileID: 0}
+    singleConsume: {fileID: 0}
     idleFrames:
     - {fileID: 21300000, guid: 14c1fe78857ae3c4fa37c5849cba4986, type: 3}
     - {fileID: 21300000, guid: f820140bc9bd7a94688005b0653f99ba, type: 3}
@@ -1139,9 +1164,17 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 344ce56878cdc8343acb51c11b6d1734, type: 3}
     - {fileID: 21300000, guid: b710437d0cd5af64d95e066f1e201ccf, type: 3}
     - {fileID: 21300000, guid: d0018b22b9f3f904f91226dce6843d75, type: 3}
+    consumeFrames:
+    - {fileID: 21300000, guid: 8115ffbac6f1da44d8fd48e54c297877, type: 3}
+    - {fileID: 21300000, guid: c2456d74fdc6552438a5aad41d0512d0, type: 3}
+    - {fileID: 21300000, guid: f2eac9d3697cfc5448d9562c04f396cf, type: 3}
+    - {fileID: 21300000, guid: da1d2c6f46cc4314ab2c3d354cf19cf1, type: 3}
+    - {fileID: 21300000, guid: bdecf856c59b3744da10591f4d60174a, type: 3}
+    - {fileID: 21300000, guid: 92dbc14f01eff3242b30229f541e4ff5, type: 3}
   upOverrides:
     singleIdle: {fileID: 21300000, guid: c7835898b543b284ea7cee3686484834, type: 3}
     singleWalk: {fileID: 0}
+    singleConsume: {fileID: 0}
     idleFrames:
     - {fileID: 21300000, guid: 018b348b13fdf094ba8a21877d4b0176, type: 3}
     - {fileID: 21300000, guid: c7835898b543b284ea7cee3686484834, type: 3}
@@ -1156,23 +1189,37 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 7788c6d9d158a3e47863e6ab521772ff, type: 3}
     - {fileID: 21300000, guid: cc9c4384dac34ae40b30d45857b0c30b, type: 3}
     - {fileID: 21300000, guid: f3475cf9bc02e904292ea42d8b8d247a, type: 3}
+    consumeFrames:
+    - {fileID: 21300000, guid: b3be5d9657c68b9419f1bf3a622cf116, type: 3}
+    - {fileID: 21300000, guid: cf66c75782b28a646bd49e94eb3b876e, type: 3}
+    - {fileID: 21300000, guid: 1ea0a22bf6ff7bc40a746420bb36a92e, type: 3}
+    - {fileID: 21300000, guid: 058e89013fff3d54f9ecb4779b23cd49, type: 3}
+    - {fileID: 21300000, guid: 0e4178124f87f6d4e8490050942cbb1d, type: 3}
+    - {fileID: 21300000, guid: 5a6c98a963b7b8748b454950281618ec, type: 3}
   upLeftOverrides:
     singleIdle: {fileID: 0}
     singleWalk: {fileID: 0}
+    singleConsume: {fileID: 0}
     idleFrames: []
     walkFrames: []
+    consumeFrames: []
   leftOverrides:
     singleIdle: {fileID: 0}
     singleWalk: {fileID: 0}
+    singleConsume: {fileID: 0}
     idleFrames: []
     walkFrames: []
+    consumeFrames: []
   downLeftOverrides:
     singleIdle: {fileID: 0}
     singleWalk: {fileID: 0}
+    singleConsume: {fileID: 0}
     idleFrames: []
     walkFrames: []
+    consumeFrames: []
   idleAnimationFps: 4
   walkAnimationFps: 8
+  consumeAnimationFps: 6
   useFlipXForLeft: 1
   useFlipXForRight: 0
   useFlipXForDownLeft: 1
