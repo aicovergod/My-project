@@ -6,6 +6,7 @@ using UI;
 using EquipmentSystem;
 using Player;
 using Player.Movement;
+using World;
 
 namespace Beastmaster
 {
@@ -68,8 +69,7 @@ namespace Beastmaster
             beastmaster = beastmasterServiceComponent as IBeastmasterService;
             petService = petServiceComponent as IPetService;
 
-            if (hudTimer == null)
-                hudTimer = GetComponentInChildren<MergeHudTimer>(true) ?? FindObjectOfType<MergeHudTimer>(true);
+            EnsureHudTimer();
             if (playerMover == null)
                 playerMover = GetComponent<PlayerMover>();
             movementController = playerMover != null ? playerMover.MovementController : GetComponent<PlayerMovementController>();
@@ -81,17 +81,28 @@ namespace Beastmaster
             if (hudTimer == null)
                 Debug.LogWarning("PetMergeController missing MergeHudTimer component.");
 
+            SceneTransitionManager.TransitionCompleted += EnsureHudTimer;
+
             LoadState();
+        }
+
+        private void Start()
+        {
+            EnsureHudTimer();
         }
 
         private void OnDestroy()
         {
             if (instance == this)
                 instance = null;
+
+            SceneTransitionManager.TransitionCompleted -= EnsureHudTimer;
         }
 
         private void Update()
         {
+            EnsureHudTimer();
+
             if (merged)
             {
                 durationRemaining -= Time.deltaTime;
@@ -151,6 +162,8 @@ namespace Beastmaster
         /// <summary>Attempt to start merging with the active pet.</summary>
         public bool TryStartMerge()
         {
+            EnsureHudTimer();
+
             if (!CanMerge)
                 return false;
             if (!config.TryGetMergeParams(beastmaster.CurrentLevel, out var dur, out var cd, out var locked) || locked)
@@ -222,6 +235,8 @@ namespace Beastmaster
 
         private void LoadState()
         {
+            EnsureHudTimer();
+
             durationRemaining = PlayerPrefs.GetFloat(MERGE_KEY, 0f);
             cooldownRemaining = PlayerPrefs.GetFloat(COOLDOWN_KEY, 0f);
             if (durationRemaining > 0f && petService != null && petService.TryGetActiveCombatPet(out var pet))
@@ -239,6 +254,29 @@ namespace Beastmaster
             else
             {
                 durationRemaining = 0f;
+            }
+        }
+
+        /// <summary>
+        /// Ensures the merge HUD timer reference is resolved, attempting to locate it if missing.
+        /// </summary>
+        private void EnsureHudTimer()
+        {
+            if (hudTimer != null)
+                return;
+
+            hudTimer = GetComponentInChildren<MergeHudTimer>(true) ?? FindObjectOfType<MergeHudTimer>(true);
+
+            if (hudTimer == null)
+                return;
+
+            if (merged)
+            {
+                hudTimer.Show(TimeSpan.FromSeconds(durationRemaining));
+            }
+            else
+            {
+                hudTimer.Hide();
             }
         }
     }
