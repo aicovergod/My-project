@@ -242,6 +242,16 @@ namespace NPC
                     return;
                 }
 
+                Vector2 currentPosition = GetCurrentPosition();
+                if (!HasClearStepLine(currentPosition, currentStepTarget))
+                {
+                    // Path smoothing can collapse long straight corridors into a single waypoint. If a new
+                    // blocker appears mid-segment we need to detect it immediately instead of waiting until
+                    // the next waypoint is consumed, otherwise the NPC keeps marching into the obstacle.
+                    ForceReplan(ignoreCooldown: true);
+                    return;
+                }
+
                 float timeSinceProgress = Time.time - lastProgressTimestamp;
                 if (lastProgressTimestamp > 0f && timeSinceProgress >= stuckTimeoutSeconds)
                 {
@@ -708,6 +718,31 @@ namespace NPC
             {
                 // When either endpoint lies outside the baked grid we cannot evaluate blockers reliably,
                 // so allow the move completion to proceed and fall back to the standard arrival logic.
+                return true;
+            }
+
+            return grid.HasClearLineBetweenCells(startCell, goalCell);
+        }
+
+        /// <summary>
+        /// Verifies that the straight corridor to the current step target remains unobstructed.
+        /// This keeps smoothed paths responsive when new blockers appear mid-segment.
+        /// </summary>
+        /// <param name="origin">NPC position sample used for the corridor test.</param>
+        /// <param name="goal">Current waypoint being traversed.</param>
+        private bool HasClearStepLine(Vector2 origin, Vector2 goal)
+        {
+            var grid = pathService != null ? pathService.ActiveGrid : PathfindingService.Instance?.ActiveGrid;
+            if (grid == null || !grid.HasGrid)
+            {
+                return true;
+            }
+
+            if (!grid.TryGetCell(origin, out var startCell) || !grid.TryGetCell(goal, out var goalCell))
+            {
+                // When either endpoint lies outside the grid we cannot conclusively evaluate the corridor,
+                // so fall back to allowing the current step to continue. Arrival logic will perform the
+                // standard validation once the NPC reaches the waypoint.
                 return true;
             }
 
