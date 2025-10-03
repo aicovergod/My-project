@@ -202,9 +202,9 @@ namespace Player
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.J))
+            if (UnityEngine.Input.GetKeyDown(KeyCode.J))
                 ApplyDamage(1);
-            if (Input.GetKeyDown(KeyCode.H))
+            if (UnityEngine.Input.GetKeyDown(KeyCode.H))
                 Heal(1);
         }
 #endif
