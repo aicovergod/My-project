@@ -44,6 +44,7 @@ namespace NPC
             public Vector2Int DesiredGoalCell;
             public bool Prepared;
             public bool UsedStartFallback;
+            public int GridRevisionAtStart;
 
             public PathRequest(int id, IPathMoverClient mover, Vector2 start, Vector2 goal)
             {
@@ -281,6 +282,9 @@ namespace NPC
         [Tooltip("Maximum number of nodes expanded per tick. Lower values spread work across more ticks at the cost of latency.")]
         [SerializeField, Range(4, 512)] private int maxNodesPerTick = 128;
 
+        [Tooltip("Maximum number of path searches stepped in parallel each tick.")]
+        [SerializeField, Range(1, 16)] private int maxConcurrentRequests = 4;
+
         [Header("Smoothing")]
         [Tooltip("Removes redundant intermediate cells from generated paths so movers follow cleaner corridors.")]
         [SerializeField] private bool enablePathSmoothing = true;
@@ -305,11 +309,11 @@ namespace NPC
         /// Reusable visited set used by <see cref="ResolveNearestWalkable"/> to prevent revisiting cells while keeping GC churn minimal.
         /// </summary>
         private readonly HashSet<Vector2Int> resolveVisited = new HashSet<Vector2Int>();
-        private PathRequest activeRequest;
+        private readonly List<PathRequest> activeRequests = new List<PathRequest>();
         private int nextRequestId = 1;
         private bool subscribedToTicker;
         private Coroutine tickerSubscriptionRoutine;
-        private int cachedGridRevision;
+        private int nextActiveRequestIndex;
 
         /// <summary>
         /// Active singleton instance.
@@ -396,7 +400,6 @@ namespace NPC
             }
 
             navGrid = builder;
-            cachedGridRevision = navGrid != null ? navGrid.Revision : 0;
             if (navGrid != null)
             {
                 navGrid.GridRebuilt += HandleGridRebuilt;
@@ -404,6 +407,17 @@ namespace NPC
                 {
                     navGrid.BuildGrid();
                 }
+            }
+
+            if (activeRequests.Count > 0)
+            {
+                for (int i = 0; i < activeRequests.Count; i++)
+                {
+                    RequeueRequest(activeRequests[i]);
+                }
+
+                activeRequests.Clear();
+                nextActiveRequestIndex = 0;
             }
 
             if (enableDebugLogging && navGrid != null)
@@ -446,137 +460,300 @@ namespace NPC
 
             if (!EnsureGridReference())
             {
-                if (activeRequest != null)
+                if (activeRequests.Count > 0)
                 {
-                    CompleteRequest(activeRequest, PathStatus.GridUnavailable, null);
-                    activeRequest = null;
+                    for (int i = 0; i < activeRequests.Count; i++)
+                    {
+                        CompleteRequest(activeRequests[i], PathStatus.GridUnavailable, null);
+                    }
+
+                    activeRequests.Clear();
+                    nextActiveRequestIndex = 0;
                 }
                 return;
             }
 
-            if (activeRequest == null)
+            int remainingBudget = Mathf.Max(0, maxNodesPerTick);
+            while (remainingBudget > 0)
             {
-                TryBeginNextRequest();
-            }
-
-            if (activeRequest == null)
-            {
-                return;
-            }
-
-            if (cachedGridRevision != navGrid.Revision)
-            {
-                if (enableDebugLogging)
+                bool startedAny = StartRequestsWhilePossible();
+                if (activeRequests.Count == 0)
                 {
-                    Debug.Log("Nav grid changed while processing a request. Restarting search.", this);
+                    if (!startedAny)
+                    {
+                        break;
+                    }
+
+                    continue;
                 }
 
-                // Re-queue the request so it can restart with the new grid data.
-                RequeueActiveRequest();
-                TryBeginNextRequest();
-                return;
-            }
+                int budgetBeforeStep = remainingBudget;
+                StepActiveRequests(ref remainingBudget);
 
-            StepActiveRequest();
+                if (activeRequests.Count == 0 && pendingRequests.Count == 0)
+                {
+                    break;
+                }
+
+                if (remainingBudget == budgetBeforeStep)
+                {
+                    if (activeRequests.Count == 0 && pendingRequests.Count > 0)
+                    {
+                        continue;
+                    }
+
+                    break;
+                }
+            }
         }
 
         /// <summary>
-        /// Advances the active A* search, expanding up to <see cref="maxNodesPerTick"/> nodes.
+        /// Pulls queued requests until either the concurrency limit is reached or no more entries are available.
+        /// Returns whether at least one request was activated.
         /// </summary>
-        private void StepActiveRequest()
+        private bool StartRequestsWhilePossible()
         {
-            if (activeRequest == null)
+            bool startedAny = false;
+
+            while (activeRequests.Count < maxConcurrentRequests && pendingRequests.Count > 0)
+            {
+                var request = pendingRequests.Dequeue();
+                if (!request.MoverReference.TryGetTarget(out var mover) || mover == null)
+                {
+                    RemoveMoverTracking(request, onlyWhenIdMatches: true);
+                    continue;
+                }
+
+                if (IsRequestSuperseded(request, out int supersedingId))
+                {
+                    if (enableDebugLogging)
+                    {
+                        Debug.Log(
+                            $"Discarded stale path request {request.Id} for {GetMoverName(mover)} because request {supersedingId} is newer.",
+                            this);
+                    }
+
+                    continue;
+                }
+
+                if (!PrepareRequest(request))
+                {
+                    CompleteRequest(request, PathStatus.GridUnavailable, null);
+                    continue;
+                }
+
+                if (request.UsedStartFallback && request.DesiredGoalCell != request.StartCell)
+                {
+                    if (enableDebugLogging)
+                    {
+                        Debug.LogWarning($"Path request {request.Id} goal unreachable. Fallback returned start cell.", this);
+                    }
+
+                    CompleteRequest(request, PathStatus.GoalUnreachable, null);
+                    continue;
+                }
+
+                request.GridRevisionAtStart = navGrid != null ? navGrid.Revision : 0;
+                activeRequests.Add(request);
+                startedAny = true;
+            }
+
+            return startedAny;
+        }
+
+        private enum RequestStepOutcome
+        {
+            Continue,
+            Completed,
+            Abandoned,
+            Requeued
+        }
+
+        /// <summary>
+        /// Steps all active requests while distributing the remaining budget across them.
+        /// </summary>
+        private void StepActiveRequests(ref int remainingBudget)
+        {
+            if (remainingBudget <= 0 || activeRequests.Count == 0)
             {
                 return;
             }
 
-            if (IsRequestSuperseded(activeRequest, out int supersedingId))
+            if (nextActiveRequestIndex >= activeRequests.Count)
             {
-                if (enableDebugLogging && activeRequest.MoverReference.TryGetTarget(out var supersededMover) && supersededMover != null)
+                nextActiveRequestIndex = 0;
+            }
+
+            int processedThisCycle = 0;
+            int currentIndex = nextActiveRequestIndex;
+
+            while (remainingBudget > 0 && activeRequests.Count > 0 && processedThisCycle < activeRequests.Count)
+            {
+                if (currentIndex >= activeRequests.Count)
+                {
+                    currentIndex = 0;
+                }
+
+                var request = activeRequests[currentIndex];
+                int remainingRequests = activeRequests.Count - processedThisCycle;
+                int allocation = Mathf.Max(1, remainingBudget / remainingRequests);
+
+                RequestStepOutcome outcome;
+                int spent = StepRequest(request, allocation, out outcome);
+                remainingBudget -= spent;
+
+                if (outcome == RequestStepOutcome.Completed || outcome == RequestStepOutcome.Abandoned || outcome == RequestStepOutcome.Requeued)
+                {
+                    if (outcome == RequestStepOutcome.Requeued)
+                    {
+                        RequeueRequest(request);
+                    }
+
+                    activeRequests.RemoveAt(currentIndex);
+
+                    if (activeRequests.Count == 0)
+                    {
+                        nextActiveRequestIndex = 0;
+                        break;
+                    }
+
+                    if (currentIndex >= activeRequests.Count)
+                    {
+                        currentIndex = 0;
+                    }
+
+                    // The element that shifted into the current index has not been processed this cycle yet,
+                    // so do not advance the processed counter to guarantee it receives time this tick.
+                    continue;
+                }
+
+                currentIndex++;
+                processedThisCycle++;
+            }
+
+            if (activeRequests.Count > 0)
+            {
+                nextActiveRequestIndex = currentIndex % activeRequests.Count;
+            }
+        }
+
+        /// <summary>
+        /// Advances a single request by expanding up to <paramref name="allocation"/> nodes.
+        /// Returns how many nodes were actually expanded.
+        /// </summary>
+        private int StepRequest(PathRequest request, int allocation, out RequestStepOutcome outcome)
+        {
+            outcome = RequestStepOutcome.Continue;
+
+            if (request == null || allocation <= 0)
+            {
+                return 0;
+            }
+
+            if (!request.MoverReference.TryGetTarget(out var mover) || mover == null)
+            {
+                RemoveMoverTracking(request, onlyWhenIdMatches: true);
+                outcome = RequestStepOutcome.Abandoned;
+                return 0;
+            }
+
+            if (IsRequestSuperseded(request, out int supersedingId))
+            {
+                if (enableDebugLogging)
                 {
                     Debug.Log(
-                        $"Abandoning active path request {activeRequest.Id} for {supersededMover.name} because request {supersedingId} superseded it.",
+                        $"Abandoning active path request {request.Id} for {GetMoverName(mover)} because request {supersedingId} superseded it.",
                         this);
                 }
 
-                activeRequest = null;
-                TryBeginNextRequest();
-                return;
+                outcome = RequestStepOutcome.Abandoned;
+                return 0;
             }
 
-            var search = activeRequest.Search;
+            if (navGrid == null)
+            {
+                CompleteRequest(request, PathStatus.GridUnavailable, null);
+                outcome = RequestStepOutcome.Completed;
+                return 0;
+            }
+
+            if (request.GridRevisionAtStart != navGrid.Revision)
+            {
+                if (enableDebugLogging)
+                {
+                    Debug.Log($"Nav grid changed while processing request {request.Id}. Re-queueing.", this);
+                }
+
+                outcome = RequestStepOutcome.Requeued;
+                return 0;
+            }
+
+            var search = request.Search;
             var grid = navGrid;
+
             if (search.OpenSet.Count == 0)
             {
-                CompleteRequest(activeRequest, PathStatus.GoalUnreachable, null);
-                activeRequest = null;
-                TryBeginNextRequest();
-                return;
+                CompleteRequest(request, PathStatus.GoalUnreachable, null);
+                outcome = RequestStepOutcome.Completed;
+                return 0;
             }
 
-            int expandedThisTick = 0;
-            while (expandedThisTick < maxNodesPerTick)
+            int expanded = 0;
+            while (expanded < allocation)
             {
                 if (search.OpenSet.Count == 0)
                 {
-                    CompleteRequest(activeRequest, PathStatus.GoalUnreachable, null);
-                    activeRequest = null;
-                    TryBeginNextRequest();
-                    return;
+                    CompleteRequest(request, PathStatus.GoalUnreachable, null);
+                    outcome = RequestStepOutcome.Completed;
+                    return expanded;
                 }
 
                 if (!search.OpenSet.TryExtractMin(out var currentWrapper))
                 {
-                    CompleteRequest(activeRequest, PathStatus.GoalUnreachable, null);
-                    activeRequest = null;
-                    TryBeginNextRequest();
-                    return;
+                    CompleteRequest(request, PathStatus.GoalUnreachable, null);
+                    outcome = RequestStepOutcome.Completed;
+                    return expanded;
                 }
 
                 Vector2Int current = currentWrapper.Node;
                 if (!search.Records.TryGetValue(current, out var currentRecord))
                 {
-                    // The entry is stale (the node was removed from the record dictionary after a cheaper insertion).
                     continue;
                 }
 
                 if (search.ClosedSet.Contains(current))
                 {
-                    // A better path already expanded this node; ignore the stale heap entry.
                     continue;
                 }
 
                 if (currentWrapper.FCost > currentRecord.FCost + HeapCostEpsilon)
                 {
-                    // The wrapper references an older, more expensive cost. Skip until the cheapest version surfaces.
                     continue;
                 }
 
-                expandedThisTick++;
+                expanded++;
 
                 if (current == search.Goal)
                 {
-                    if (IsRequestSuperseded(activeRequest, out supersedingId))
+                    if (IsRequestSuperseded(request, out int supersededDuringCompletion))
                     {
-                        if (enableDebugLogging && activeRequest.MoverReference.TryGetTarget(out var supersededDuringCompletion) && supersededDuringCompletion != null)
+                        if (enableDebugLogging)
                         {
                             Debug.Log(
-                                $"Discarded completed path for request {activeRequest.Id} because request {supersedingId} superseded it before dispatch.",
+                                $"Discarded completed path for request {request.Id} because request {supersededDuringCompletion} superseded it before dispatch.",
                                 this);
                         }
 
-                        activeRequest = null;
-                        TryBeginNextRequest();
-                        return;
+                        outcome = RequestStepOutcome.Abandoned;
+                        return expanded;
                     }
 
                     var pathCells = ReconstructPath(search, current);
-                    var smoothedCells = SmoothPathCells(pathCells, activeRequest.StartCell) ?? pathCells;
-                    var worldPath = ConvertCellsToWorld(smoothedCells, activeRequest.StartCell);
-                    CompleteRequest(activeRequest, PathStatus.Success, worldPath);
-                    activeRequest = null;
-                    TryBeginNextRequest();
-                    return;
+                    var smoothedCells = SmoothPathCells(pathCells, request.StartCell) ?? pathCells;
+                    var worldPath = ConvertCellsToWorld(smoothedCells, request.StartCell);
+                    CompleteRequest(request, PathStatus.Success, worldPath);
+                    outcome = RequestStepOutcome.Completed;
+                    return expanded;
                 }
 
                 search.ClosedSet.Add(current);
@@ -618,57 +795,26 @@ namespace NPC
                     }
                 }
             }
+
+            return expanded;
         }
 
         /// <summary>
-        /// Pulls the next queued request and prepares it for execution.
+        /// Re-enqueues a request so it can restart after a grid rebuild or other interruption.
         /// </summary>
-        private void TryBeginNextRequest()
+        private void RequeueRequest(PathRequest request)
         {
-            PruneDeadMoverReferences();
-
-            while (pendingRequests.Count > 0)
+            if (request == null)
             {
-                var request = pendingRequests.Dequeue();
-                if (!request.MoverReference.TryGetTarget(out var mover) || mover == null)
-                {
-                    RemoveMoverTracking(request, onlyWhenIdMatches: true);
-                    continue;
-                }
-
-                if (IsRequestSuperseded(request, out int supersedingId))
-                {
-                    if (enableDebugLogging)
-                    {
-                        Debug.Log(
-                            $"Discarded stale path request {request.Id} for {GetMoverName(mover)} because request {supersedingId} is newer.",
-                            this);
-                    }
-
-                    continue;
-                }
-
-                if (!PrepareRequest(request))
-                {
-                    CompleteRequest(request, PathStatus.GridUnavailable, null);
-                    continue;
-                }
-
-                if (request.UsedStartFallback && request.DesiredGoalCell != request.StartCell)
-                {
-                    if (enableDebugLogging)
-                    {
-                        Debug.LogWarning($"Path request {request.Id} goal unreachable. Fallback returned start cell.", this);
-                    }
-
-                    CompleteRequest(request, PathStatus.GoalUnreachable, null);
-                    continue;
-                }
-
-                activeRequest = request;
-                cachedGridRevision = navGrid != null ? navGrid.Revision : 0;
                 return;
             }
+
+            request.Search.OpenSet.Clear();
+            request.Search.ClosedSet.Clear();
+            request.Search.Records.Clear();
+            request.Prepared = false;
+            latestQueuedRequestIdByMover[request.MoverReference] = request.Id;
+            pendingRequests.Enqueue(request);
         }
 
         private void RemovePendingRequestsForMover(IPathMoverClient mover, int supersedingRequestId)
@@ -925,25 +1071,6 @@ namespace NPC
         }
 
         /// <summary>
-        /// Re-enqueues the active request so it can be retried after the grid changes.
-        /// </summary>
-        private void RequeueActiveRequest()
-        {
-            if (activeRequest == null)
-            {
-                return;
-            }
-
-            activeRequest.Search.OpenSet.Clear();
-            activeRequest.Search.ClosedSet.Clear();
-            activeRequest.Search.Records.Clear();
-            activeRequest.Prepared = false;
-            latestQueuedRequestIdByMover[activeRequest.MoverReference] = activeRequest.Id;
-            pendingRequests.Enqueue(activeRequest);
-            activeRequest = null;
-        }
-
-        /// <summary>
         /// Maps a list of grid cells back into world-space positions.
         /// </summary>
         private static List<Vector2> ConvertCellsToWorld(List<Vector2Int> cells, Vector2Int startCell)
@@ -1179,7 +1306,6 @@ namespace NPC
                 navGrid.BuildGrid();
             }
 
-            cachedGridRevision = navGrid.Revision;
             return navGrid.HasGrid;
         }
 
@@ -1193,15 +1319,20 @@ namespace NPC
                 return;
             }
 
-            cachedGridRevision = builder.Revision;
             if (enableDebugLogging)
             {
-                Debug.Log($"Nav grid rebuilt (revision {cachedGridRevision}).", this);
+                Debug.Log($"Nav grid rebuilt (revision {builder.Revision}).", this);
             }
 
-            if (activeRequest != null)
+            if (activeRequests.Count > 0)
             {
-                RequeueActiveRequest();
+                for (int i = 0; i < activeRequests.Count; i++)
+                {
+                    RequeueRequest(activeRequests[i]);
+                }
+
+                activeRequests.Clear();
+                nextActiveRequestIndex = 0;
             }
         }
 
