@@ -267,6 +267,11 @@ namespace NPC
         /// </summary>
         private const float HeapCostEpsilon = 0.0001f;
 
+        /// <summary>
+        /// Cost assigned to a single diagonal step. Matches the distance covered when traversing a square grid.
+        /// </summary>
+        private static readonly float DiagonalStepCost = Mathf.Sqrt(2f);
+
         private static PathfindingService instance;
 
         [Header("Grid Source")]
@@ -580,12 +585,19 @@ namespace NPC
                         continue;
                     }
 
+                    if (!HasClearDiagonal(current, neighbour, grid))
+                    {
+                        // Prevent cutting through corners by only allowing diagonal traversal when both flank tiles are free.
+                        continue;
+                    }
+
                     if (search.ClosedSet.Contains(neighbour))
                     {
                         continue;
                     }
 
-                    float tentativeG = currentRecord.GCost + 1f;
+                    float stepCost = IsDiagonalMove(current, neighbour) ? DiagonalStepCost : 1f;
+                    float tentativeG = currentRecord.GCost + stepCost;
                     if (!search.Records.TryGetValue(neighbour, out var neighbourRecord) || tentativeG < neighbourRecord.GCost)
                     {
                         neighbourRecord.GCost = tentativeG;
@@ -832,6 +844,12 @@ namespace NPC
                         continue;
                     }
 
+                    if (!HasClearDiagonal(current, neighbour, grid))
+                    {
+                        // Skip diagonals that would clip through blocked corners when looking for a fallback target.
+                        continue;
+                    }
+
                     if (!resolveVisited.Add(neighbour))
                     {
                         continue;
@@ -944,15 +962,19 @@ namespace NPC
         }
 
         /// <summary>
-        /// Manhattan distance heuristic for the 4-way grid.
+        /// Octile distance heuristic for an 8-way grid. Remains admissible when diagonal movement is allowed.
         /// </summary>
         private static float Heuristic(Vector2Int a, Vector2Int b)
         {
-            return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
+            int dx = Mathf.Abs(a.x - b.x);
+            int dy = Mathf.Abs(a.y - b.y);
+            int min = Mathf.Min(dx, dy);
+            int max = Mathf.Max(dx, dy);
+            return (DiagonalStepCost - 1f) * min + max;
         }
 
         /// <summary>
-        /// Enumerates the four orthogonal neighbours of a grid cell.
+        /// Enumerates the eight neighbours (four orthogonal + four diagonal) of a grid cell.
         /// </summary>
         private static IEnumerable<Vector2Int> EnumerateNeighbours(Vector2Int cell)
         {
@@ -960,6 +982,38 @@ namespace NPC
             yield return new Vector2Int(cell.x - 1, cell.y);
             yield return new Vector2Int(cell.x, cell.y + 1);
             yield return new Vector2Int(cell.x, cell.y - 1);
+            yield return new Vector2Int(cell.x + 1, cell.y + 1);
+            yield return new Vector2Int(cell.x + 1, cell.y - 1);
+            yield return new Vector2Int(cell.x - 1, cell.y + 1);
+            yield return new Vector2Int(cell.x - 1, cell.y - 1);
+        }
+
+        /// <summary>
+        /// Returns whether the move between two cells is diagonal on the grid.
+        /// </summary>
+        private static bool IsDiagonalMove(Vector2Int origin, Vector2Int target)
+        {
+            return origin.x != target.x && origin.y != target.y;
+        }
+
+        /// <summary>
+        /// Verifies that a diagonal traversal between two cells is valid by checking the orthogonal flank cells.
+        /// </summary>
+        private static bool HasClearDiagonal(Vector2Int origin, Vector2Int target, NavGridBuilder grid)
+        {
+            if (!IsDiagonalMove(origin, target))
+            {
+                return true;
+            }
+
+            if (grid == null)
+            {
+                return true;
+            }
+
+            Vector2Int horizontal = new Vector2Int(target.x, origin.y);
+            Vector2Int vertical = new Vector2Int(origin.x, target.y);
+            return grid.IsCellWalkable(horizontal) && grid.IsCellWalkable(vertical);
         }
 
         /// <summary>
