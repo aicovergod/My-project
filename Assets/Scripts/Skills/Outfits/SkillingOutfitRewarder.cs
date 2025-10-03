@@ -26,6 +26,7 @@ namespace Skills.Outfits
         /// <param name="debugSkillLabel">Label used when logging debug roll information.</param>
         /// <param name="successToast">Toast text displayed when the item enters the inventory.</param>
         /// <param name="bankToast">Toast text displayed when the reward is routed to the bank.</param>
+        /// <param name="skillLevel">Caller supplied skill level used to scale the roll odds.</param>
         /// <param name="rollRange">Exclusive upper bound for the roll check. Defaults to 2500.</param>
         /// <param name="winningRoll">The integer result that indicates success. Defaults to 0.</param>
         /// <returns>True if a piece was awarded, otherwise false.</returns>
@@ -37,6 +38,7 @@ namespace Skills.Outfits
             string debugSkillLabel,
             string successToast,
             string bankToast,
+            int skillLevel,
             int rollRange = DefaultRollRange,
             int winningRoll = DefaultWinningRoll)
         {
@@ -57,10 +59,16 @@ namespace Skills.Outfits
             }
 
             var rollFunc = rng ?? UnityEngine.Random.Range;
-            int roll = rollFunc(0, Mathf.Max(1, rollRange));
+            int clampedLevel = Mathf.Clamp(skillLevel, 1, 99);
+            float normalizedLevel = Mathf.InverseLerp(1f, 99f, clampedLevel);
+            int effectiveRollRange = Mathf.Max(1, Mathf.RoundToInt(Mathf.Lerp(5000f, rollRange, normalizedLevel)));
+            int roll = rollFunc(0, effectiveRollRange);
 
             if (SkillingOutfitProgress.DebugChance)
-                Debug.Log($"[{debugSkillLabel}] Skilling outfit roll: {roll} (chance 1 in {Mathf.Max(1, rollRange)})");
+            {
+                Debug.Log(
+                    $"[{debugSkillLabel}] Skilling outfit roll: {roll} (level {clampedLevel}, chance 1 in {effectiveRollRange})");
+            }
 
             if (roll != winningRoll)
                 return false;

@@ -269,7 +269,8 @@ namespace Skills.Mining
                 Random.Range,
                 "Mining",
                 "You've received a piece of mining outfit",
-                "A piece of mining outfit has been added to your bank");
+                "A piece of mining outfit has been added to your bank",
+                Level);
         }
 
         private void PreloadOreItems()

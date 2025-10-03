@@ -974,7 +974,8 @@ namespace Skills.Firemaking
                 Random.Range,
                 "Firemaking",
                 "You receive a piece of the pyromancer outfit.",
-                "A pyromancer outfit piece has been sent to your bank.");
+                "A pyromancer outfit piece has been sent to your bank.",
+                skills != null ? skills.GetLevel(SkillType.Firemaking) : 1);
         }
 
         /// <summary>
