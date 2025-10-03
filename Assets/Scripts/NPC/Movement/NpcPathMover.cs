@@ -11,7 +11,7 @@ namespace NPC
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody2D))]
-    public sealed class NpcPathMover : MonoBehaviour, ITickable
+    public sealed class NpcPathMover : MonoBehaviour, ITickable, IPathMoverClient
     {
         [Header("Movement")]
         [Tooltip("Seconds spent traversing a single tile. Defaults to the OSRS tick length for grid-accurate pacing.")]
@@ -256,7 +256,7 @@ namespace NPC
         /// <summary>
         /// Consumes the outcome of a path request issued through <see cref="PathfindingService"/>.
         /// </summary>
-        internal void HandlePathResult(int requestId, PathfindingService.PathStatus status, List<Vector2> worldPath, Vector2 resolvedGoalWorld)
+        public void HandlePathResult(int requestId, PathfindingService.PathStatus status, List<Vector2> worldPath, Vector2 resolvedGoalWorld)
         {
             if (requestId != activeRequestId)
             {
