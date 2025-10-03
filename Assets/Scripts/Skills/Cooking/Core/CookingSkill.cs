@@ -27,7 +27,7 @@ namespace Skills.Cooking
         private SkillManager skills;
         private CookableRecipe currentRecipe;
         private int itemsRemaining;
-        private int cookProgress;
+        private readonly TickProgressTracker cookProgressTracker = new TickProgressTracker();
         private const int CookIntervalTicks = 5;
         private SkillingOutfitProgress cookingOutfit;
 
@@ -40,7 +40,17 @@ namespace Skills.Cooking
         public float Xp => skills != null ? skills.GetXp(SkillType.Cooking) : 0f;
         public CookingObject ActiveCookingObject { get; private set; }
         public bool IsCooking => currentRecipe != null && itemsRemaining > 0 && ActiveCookingObject != null;
-        public float CookProgressNormalized => CookIntervalTicks <= 1 ? 0f : (float)cookProgress / (CookIntervalTicks - 1);
+        public float CookProgressNormalized
+        {
+            get
+            {
+                int required = cookProgressTracker.RequiredTicks;
+                if (required <= 1)
+                    return 0f;
+
+                return Mathf.Clamp01((float)cookProgressTracker.ProgressTicks / (required - 1));
+            }
+        }
 
         /// <summary>
         ///     Number of OSRS-style ticks required to cook a single item.
@@ -63,6 +73,7 @@ namespace Skills.Cooking
             if (equipment == null)
                 equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
+            cookProgressTracker.TickAdvanced += HandleCookProgressAdvanced;
             cookingOutfit = new SkillingOutfitProgress(new[]
             {
                 "Chefs Hat",
@@ -76,6 +87,7 @@ namespace Skills.Cooking
         private void OnDestroy()
         {
             SaveManager.Unregister(cookingOutfit);
+            cookProgressTracker.TickAdvanced -= HandleCookProgressAdvanced;
         }
 
         /// <summary>
@@ -138,7 +150,7 @@ namespace Skills.Cooking
             ActiveCookingObject = station;
             currentRecipe = recipe;
             itemsRemaining = quantity;
-            cookProgress = 0;
+            cookProgressTracker.Reset(CookIntervalTicks);
             LogDebug($"Started cooking {recipe.cookedItemId} x{quantity}");
             OnStartCooking?.Invoke(recipe);
             return true;
@@ -153,7 +165,7 @@ namespace Skills.Cooking
 
             currentRecipe = null;
             itemsRemaining = 0;
-            cookProgress = 0;
+            cookProgressTracker.Reset(0);
             ActiveCookingObject = null;
 
             if (!hadActiveSession)
@@ -169,12 +181,12 @@ namespace Skills.Cooking
         {
             if (!IsCooking)
                 return;
-            cookProgress++;
-            LogDebug($"Cooking tick: {cookProgress}/{CookIntervalTicks}");
-            if (cookProgress >= CookIntervalTicks)
+
+            if (cookProgressTracker.Advance())
             {
-                cookProgress = 0;
                 AttemptCook();
+                if (IsCooking)
+                    cookProgressTracker.Reset(CookIntervalTicks);
             }
         }
 
@@ -302,6 +314,14 @@ namespace Skills.Cooking
                 return;
 
             Debug.Log($"[CookingSkill] {message}");
+        }
+
+        private void HandleCookProgressAdvanced(int progress, int required)
+        {
+            if (!IsCooking)
+                return;
+
+            LogDebug($"Cooking tick: {progress}/{required}");
         }
     }
 }

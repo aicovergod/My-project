@@ -53,7 +53,8 @@ namespace Skills.Firemaking
         private BonfireSession bonfireSession;
         private readonly List<FiremakingFire> activeFires = new();
         private SkillingOutfitProgress firemakingOutfit;
-        private int attemptTicksElapsed;
+        private readonly TickProgressTracker ignitionProgressTracker = new TickProgressTracker();
+        private readonly TickProgressTracker bonfireProgressTracker = new TickProgressTracker();
 
         private struct FiremakingAttempt
         {
@@ -70,7 +71,6 @@ namespace Skills.Firemaking
             public FiremakingBonfireObject bonfire;
             public FiremakingLogDefinition definition;
             public int ticksRequired;
-            public int ticksElapsed;
             public float cancelDistance;
         }
 
@@ -96,9 +96,14 @@ namespace Skills.Firemaking
         {
             get
             {
-                if (!IsLighting || currentAttempt.ticksRequired <= 0)
+                if (!IsLighting)
                     return 0f;
-                return Mathf.Clamp01((float)attemptTicksElapsed / currentAttempt.ticksRequired);
+
+                int required = currentAttempt.ticksRequired > 0 ? currentAttempt.ticksRequired : 0;
+                if (required <= 0)
+                    return 0f;
+
+                return Mathf.Clamp01((float)ignitionProgressTracker.ProgressTicks / required);
             }
         }
 
@@ -112,11 +117,13 @@ namespace Skills.Firemaking
                 if (!IsFeedingBonfire)
                     return 0f;
 
-                int required = bonfireSession.ticksRequired > 0 ? bonfireSession.ticksRequired : BonfireTicksPerLog;
+                int required = bonfireProgressTracker.RequiredTicks > 0
+                    ? bonfireProgressTracker.RequiredTicks
+                    : Mathf.Max(1, BonfireTicksPerLog);
                 if (required <= 0)
                     return 0f;
 
-                return Mathf.Clamp01((float)bonfireSession.ticksElapsed / required);
+                return Mathf.Clamp01((float)bonfireProgressTracker.ProgressTicks / required);
             }
         }
 
@@ -124,7 +131,7 @@ namespace Skills.Firemaking
         ///     Number of ticks required to add a single log to the bonfire that is currently being fueled.
         /// </summary>
         public int BonfireFeedingTicksRequired =>
-            Mathf.Max(1, bonfireSession.ticksRequired > 0 ? bonfireSession.ticksRequired : BonfireTicksPerLog);
+            Mathf.Max(1, bonfireProgressTracker.RequiredTicks > 0 ? bonfireProgressTracker.RequiredTicks : BonfireTicksPerLog);
 
         /// <summary>
         ///     World position where the current ignition attempt is centred.
@@ -220,6 +227,9 @@ namespace Skills.Firemaking
             skills = GetComponent<SkillManager>();
             logLookup = new Dictionary<string, FiremakingLogDefinition>(StringComparer.Ordinal);
             itemCache = null;
+
+            ignitionProgressTracker.TickAdvanced += HandleIgnitionProgressAdvanced;
+            bonfireProgressTracker.TickAdvanced += HandleBonfireProgressAdvanced;
 
             LoadLogDefinitions();
 
@@ -413,7 +423,7 @@ namespace Skills.Firemaking
                 ticksRequired = Mathf.Max(1, definition.GetIgnitionTicks(level)),
                 feedingExistingFire = feedingExisting
             };
-            attemptTicksElapsed = 0;
+            ignitionProgressTracker.Reset(currentAttempt.ticksRequired);
 
             IgnitionStarted?.Invoke(definition, snappedPosition);
             LogDebug($"Started lighting {definition.displayName} at {snappedPosition} (feeding existing: {feedingExisting}).");
@@ -542,9 +552,10 @@ namespace Skills.Firemaking
                 bonfire = bonfire,
                 definition = definition,
                 ticksRequired = Mathf.Max(1, BonfireTicksPerLog),
-                ticksElapsed = 0,
                 cancelDistance = cancelDistance
             };
+
+            bonfireProgressTracker.Reset(bonfireSession.ticksRequired);
 
             LogDebug($"Started feeding {definition.displayName} into bonfire '{bonfire.name}'.");
             BonfireFeedingStarted?.Invoke(bonfire, definition);
@@ -613,13 +624,11 @@ namespace Skills.Firemaking
                 return;
             }
 
-            attemptTicksElapsed++;
-            LogDebug($"Firemaking tick {attemptTicksElapsed}/{currentAttempt.ticksRequired}.");
-
-            if (attemptTicksElapsed < currentAttempt.ticksRequired)
+            if (!ignitionProgressTracker.Advance())
                 return;
 
-            attemptTicksElapsed = 0;
+            ignitionProgressTracker.Reset(currentAttempt.ticksRequired);
+
             int level = skills != null ? skills.GetLevel(SkillType.Firemaking) : 1;
             float chance = definition.GetSuccessChance(level, currentAttempt.feedingExistingFire);
             bool success = Random.value <= chance;
@@ -797,18 +806,16 @@ namespace Skills.Firemaking
             }
 
             if (session.ticksRequired <= 0)
+            {
                 session.ticksRequired = Mathf.Max(1, BonfireTicksPerLog);
+                bonfireSession = session;
+                bonfireProgressTracker.Reset(session.ticksRequired);
+            }
 
-            session.ticksElapsed++;
-            LogDebug($"Bonfire tick {session.ticksElapsed}/{session.ticksRequired} for {session.definition.displayName}.");
-
-            bonfireSession = session;
-
-            if (session.ticksElapsed < session.ticksRequired)
+            if (!bonfireProgressTracker.Advance())
                 return;
 
-            session.ticksElapsed = 0;
-            bonfireSession = session;
+            bonfireProgressTracker.Reset(session.ticksRequired);
 
             if (!inventory.RemoveItem(session.definition.logItemId))
             {
@@ -889,6 +896,7 @@ namespace Skills.Firemaking
                 anchorPosition = session.bonfire.transform.position;
 
             bonfireSession = default;
+            bonfireProgressTracker.Reset(0);
 
             if (showMessage && !string.IsNullOrEmpty(message))
                 ShowFeedback(message, anchorPosition);
@@ -1081,7 +1089,7 @@ namespace Skills.Firemaking
         private void FinishAttempt()
         {
             currentAttempt = default;
-            attemptTicksElapsed = 0;
+            ignitionProgressTracker.Reset(0);
             IgnitionStopped?.Invoke();
         }
 
@@ -1151,6 +1159,23 @@ namespace Skills.Firemaking
             }
 
             return groundItemSpawner;
+        }
+
+        private void HandleIgnitionProgressAdvanced(int progress, int required)
+        {
+            if (!IsLighting)
+                return;
+
+            LogDebug($"Firemaking tick {progress}/{required}.");
+        }
+
+        private void HandleBonfireProgressAdvanced(int progress, int required)
+        {
+            if (!IsFeedingBonfire)
+                return;
+
+            string logName = bonfireSession.definition != null ? bonfireSession.definition.displayName : "Unknown";
+            LogDebug($"Bonfire tick {progress}/{required} for {logName}.");
         }
 
         /// <summary>

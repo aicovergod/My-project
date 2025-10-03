@@ -29,8 +29,7 @@ namespace Skills.Woodcutting
 
         private TreeNode currentTree;
         private AxeDefinition currentAxe;
-        private int chopProgress;
-        private int currentIntervalTicks;
+        private readonly TickProgressTracker chopProgressTracker = new TickProgressTracker();
 
         private SkillManager skills;
 
@@ -47,10 +46,19 @@ namespace Skills.Woodcutting
         public float Xp => skills != null ? skills.GetXp(SkillType.Woodcutting) : 0f;
         public bool IsChopping => currentTree != null;
         public TreeNode CurrentTree => currentTree;
-        public int CurrentChopIntervalTicks => currentIntervalTicks;
+        public int CurrentChopIntervalTicks => chopProgressTracker.RequiredTicks;
         public AxeDefinition CurrentAxe => currentAxe;
         public float ChopProgressNormalized
-            => currentIntervalTicks <= 1 ? 0f : (float)chopProgress / (currentIntervalTicks - 1);
+        {
+            get
+            {
+                int required = chopProgressTracker.RequiredTicks;
+                if (required <= 1)
+                    return 0f;
+
+                return Mathf.Clamp01((float)chopProgressTracker.ProgressTicks / (required - 1));
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
@@ -68,6 +76,7 @@ namespace Skills.Woodcutting
             if (equipment == null)
                 equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
+            chopProgressTracker.TickAdvanced += HandleChopProgressAdvanced;
             PreloadLogItems();
             woodcuttingOutfit = new SkillingOutfitProgress(new[]
             {
@@ -100,12 +109,11 @@ namespace Skills.Woodcutting
                 return;
             }
 
-            chopProgress++;
-            LogDebug($"Woodcutting tick: {chopProgress}/{currentIntervalTicks}");
-            if (chopProgress >= currentIntervalTicks)
+            if (chopProgressTracker.Advance())
             {
-                chopProgress = 0;
                 AttemptChop();
+                if (IsChopping)
+                    chopProgressTracker.Reset(chopProgressTracker.RequiredTicks);
             }
         }
 
@@ -202,8 +210,8 @@ namespace Skills.Woodcutting
 
             currentTree = tree;
             currentAxe = axe;
-            chopProgress = 0;
-            currentIntervalTicks = Mathf.Max(1, Mathf.RoundToInt(tree.def.ChopIntervalTicks / Mathf.Max(0.01f, axe.SwingSpeedMultiplier)));
+            int intervalTicks = Mathf.Max(1, Mathf.RoundToInt(tree.def.ChopIntervalTicks / Mathf.Max(0.01f, axe.SwingSpeedMultiplier)));
+            chopProgressTracker.Reset(intervalTicks);
             LogDebug($"Started chopping {tree.name} with {axe.DisplayName}");
             currentTree.IsBusy = true;
             OnStartChopping?.Invoke(tree);
@@ -219,8 +227,7 @@ namespace Skills.Woodcutting
                 currentTree.IsBusy = false;
             currentTree = null;
             currentAxe = null;
-            chopProgress = 0;
-            currentIntervalTicks = 0;
+            chopProgressTracker.Reset(0);
             OnStopChopping?.Invoke();
         }
 
@@ -273,6 +280,14 @@ namespace Skills.Woodcutting
                 return;
 
             Debug.Log($"[WoodcuttingSkill] {message}");
+        }
+
+        private void HandleChopProgressAdvanced(int progress, int required)
+        {
+            if (!IsChopping)
+                return;
+
+            LogDebug($"Woodcutting tick: {progress}/{required}");
         }
     }
 }
