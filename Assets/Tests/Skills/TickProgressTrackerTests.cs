@@ -36,7 +36,6 @@ public class TickProgressTrackerTests
     public void EventsFireInSequence()
     {
         var tracker = new TickProgressTracker();
-        tracker.Reset(2);
 
         int resets = 0;
         int advancedCount = 0;
@@ -60,6 +59,8 @@ public class TickProgressTrackerTests
             completedCount++;
             lastComplete = (progress, required);
         };
+
+        tracker.Reset(2);
 
         tracker.Advance();
         tracker.Advance();
