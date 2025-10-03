@@ -53,7 +53,8 @@ namespace Pets
         private bool pendingTeleport;
         private Vector2 teleportDestination;
         private bool pendingWanderFailure;
-        private bool serviceReferenceResolved;
+        // Tracks whether we have already warned about the missing pathfinding service to avoid log spam while waiting.
+        private bool hasLoggedMissingService;
 
         private Func<Vector2> followAnchorResolver;
         private Func<Vector2> wanderDestinationResolver;
@@ -417,18 +418,26 @@ namespace Pets
 
         private bool EnsureServiceReference()
         {
-            if (serviceReferenceResolved && pathService == null)
+            if (pathService != null)
             {
+                return true;
+            }
+
+            PathfindingService instance = PathfindingService.Instance;
+            if (instance == null)
+            {
+                if (!hasLoggedMissingService && enableDebugLogging)
+                {
+                    Debug.LogWarning($"{name} is waiting for PathfindingService to initialise before processing pet navigation.", this);
+                    hasLoggedMissingService = true;
+                }
+
                 return false;
             }
 
-            if (pathService == null)
-            {
-                pathService = PathfindingService.Instance;
-                serviceReferenceResolved = true;
-            }
-
-            return pathService != null;
+            pathService = instance;
+            hasLoggedMissingService = false;
+            return true;
         }
 
         private void RequestPath(Vector2 start, Vector2 goal, Mode mode)
