@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Player.Visuals;
 
 namespace Status.Freeze
 {
@@ -14,6 +15,7 @@ namespace Status.Freeze
     {
         [SerializeField, Tooltip("Optional explicit player movement component to control when frozen.")]
         private Player.PlayerMover playerMover;
+        private IPlayerSpriteController playerSpriteController;
 
         [SerializeField, Tooltip("Optional NPC wanderer component that should pause when frozen.")]
         private NPC.NpcWanderer npcWanderer;
@@ -36,7 +38,7 @@ namespace Status.Freeze
         /// <summary>Flag indicating whether the entity is currently frozen.</summary>
         private bool frozen;
 
-        /// <summary>Caches the previous value of <see cref="Player.PlayerMover.freezeSprite"/> so it can be restored.</summary>
+        /// <summary>Caches the previous sprite freeze flag so it can be restored when the effect ends.</summary>
         private bool cachedFreezeSpriteValue;
 
         /// <summary>Provides external visibility of the frozen state for debugging.</summary>
@@ -57,6 +59,10 @@ namespace Status.Freeze
                 npcWanderer = GetComponent<NPC.NpcWanderer>();
             if (rigidBody == null)
                 rigidBody = GetComponent<Rigidbody2D>();
+            if (playerSpriteController == null && playerMover != null)
+                playerSpriteController = playerMover.SpriteController;
+            if (playerSpriteController == null)
+                playerSpriteController = GetComponent<PlayerSpriteController>();
         }
 
         private void OnEnable()
@@ -223,13 +229,17 @@ namespace Status.Freeze
             {
                 if (frozen)
                 {
-                    cachedFreezeSpriteValue = playerMover.freezeSprite;
+                    if (playerSpriteController == null)
+                        playerSpriteController = playerMover.SpriteController ?? playerMover.GetComponent<PlayerSpriteController>();
+
+                    cachedFreezeSpriteValue = playerSpriteController != null && playerSpriteController.FreezeSprite;
                     playerMover.SetMovementFrozen(true);
                 }
                 else
                 {
                     playerMover.SetMovementFrozen(false);
-                    playerMover.freezeSprite = cachedFreezeSpriteValue;
+                    if (playerSpriteController != null)
+                        playerSpriteController.FreezeSprite = cachedFreezeSpriteValue;
                 }
             }
 

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using Player;
+using Player.Movement;
 using Core.Input;
 
 namespace Skills.Common
@@ -70,8 +71,8 @@ namespace Skills.Common
         private TSkill skill;
 
         [SerializeField]
-        [Tooltip("Player mover used to detect when the character begins to walk away from the resource.")]
-        private PlayerMover playerMover;
+        [Tooltip("Movement controller used to detect when the character begins to walk away from the resource.")]
+        private PlayerMovementController explicitMovementController;
 
         [SerializeField]
         [Tooltip("Camera used for translating screen clicks into world positions.")]
@@ -112,7 +113,9 @@ namespace Skills.Common
         /// <summary>
         ///     Cached reference to the movement controller used for cancellation checks.
         /// </summary>
-        protected PlayerMover PlayerMover => playerMover;
+        protected IPlayerMovementController MovementController => playerMovement;
+
+        private IPlayerMovementController playerMovement;
 
         /// <summary>
         ///     Camera used for cursor raycasts. Falls back to <see cref="Camera.main"/> when left empty.
@@ -145,7 +148,7 @@ namespace Skills.Common
         protected float ProspectCooldownSeconds => prospectCooldownSeconds;
 
         /// <summary>
-        ///     When <c>true</c> the controller will instruct the <see cref="PlayerMover"/> to walk into range before
+        ///     When <c>true</c> the controller will instruct the <see cref="IPlayerMovementController"/> to walk into range before
         ///     attempting to start the gathering action.
         /// </summary>
         protected virtual bool AllowAutoMoveToNodes => autoMoveIntoRange;
@@ -197,8 +200,24 @@ namespace Skills.Common
         {
             if (skill == null)
                 skill = GetComponent<TSkill>();
-            if (playerMover == null)
-                playerMover = GetComponent<PlayerMover>();
+
+            if (playerMovement == null && explicitMovementController != null)
+                playerMovement = explicitMovementController;
+
+            if (playerMovement == null)
+            {
+                playerMovement = GetComponent<PlayerMovementController>()
+                    ?? GetComponentInParent<PlayerMovementController>()
+                    ?? GetComponentInChildren<PlayerMovementController>();
+
+                if (playerMovement == null)
+                {
+                    var moverFacade = GetComponent<PlayerMover>() ?? GetComponentInParent<PlayerMover>() ?? GetComponentInChildren<PlayerMover>();
+                    if (moverFacade != null)
+                        playerMovement = moverFacade.MovementController;
+                }
+            }
+
             if (worldCamera == null)
                 worldCamera = Camera.main;
             if (playerInput == null)
@@ -351,7 +370,7 @@ namespace Skills.Common
             if (!IsPerformingAction)
                 return;
 
-            if (CancelOnPlayerMovement && playerMover != null && playerMover.IsMoving)
+            if (CancelOnPlayerMovement && playerMovement != null && playerMovement.IsMoving)
             {
                 RequestStopAction();
                 return;
@@ -474,7 +493,7 @@ namespace Skills.Common
             if (!AllowAutoMoveToNodes)
                 return;
 
-            if (playerMover == null)
+            if (playerMovement == null)
             {
                 ShowFeedback(GetOutOfRangeMessage(node), node);
                 return;
@@ -491,9 +510,9 @@ namespace Skills.Common
             float stopDistance = CalculateAutoApproachStopDistance(approachingRange);
 
             if (approachingTransform != null)
-                playerMover.MoveTo(approachingTransform, stopDistance, HandleAutoApproachComplete);
+                playerMovement.MoveTo(approachingTransform, stopDistance, HandleAutoApproachComplete);
             else
-                playerMover.MoveTo((Vector2)approachingPoint, stopDistance, HandleAutoApproachComplete);
+                playerMovement.MoveTo((Vector2)approachingPoint, stopDistance, HandleAutoApproachComplete);
         }
 
         /// <summary>
@@ -516,13 +535,13 @@ namespace Skills.Common
                 return;
             }
 
-            if (playerMover == null)
+            if (playerMovement == null)
             {
                 CancelAutoApproach(true);
                 return;
             }
 
-            if (playerMover.IsAutoMoving)
+            if (playerMovement.IsAutoMoving)
                 return;
 
             if (IsWithinInteractionRange(approachingNode))
@@ -538,7 +557,7 @@ namespace Skills.Common
         }
 
         /// <summary>
-        ///     Callback invoked by <see cref="PlayerMover.MoveTo(Vector2,float,System.Action)"/> once the player reaches the
+        ///     Callback invoked by <see cref="IPlayerMovementController.MoveTo(Vector2,float,System.Action)"/> once the player reaches the
         ///     desired position. Revalidates the node before attempting to start the action.
         /// </summary>
         private void HandleAutoApproachComplete()
@@ -569,8 +588,8 @@ namespace Skills.Common
             if (!isApproachingNode)
                 return;
 
-            if (stopMovement && playerMover != null)
-                playerMover.StopMovement();
+            if (stopMovement && playerMovement != null)
+                playerMovement.StopMovement();
 
             ClearAutoApproachState();
         }
@@ -588,7 +607,7 @@ namespace Skills.Common
         }
 
         /// <summary>
-        ///     Calculates the distance the <see cref="PlayerMover"/> should use when auto moving towards a node.
+        ///     Calculates the distance the <see cref="IPlayerMovementController"/> should use when auto moving towards a node.
         /// </summary>
         private float CalculateAutoApproachStopDistance(float interactionRange)
         {

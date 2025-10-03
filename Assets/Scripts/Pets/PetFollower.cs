@@ -1,5 +1,6 @@
 using UnityEngine;
 using Player;
+using Player.Movement;
 using Util;
 
 namespace Pets
@@ -35,7 +36,7 @@ namespace Pets
         private SpriteRenderer sprite;
         private SpriteDepth spriteDepth;
         private PetSpriteAnimator spriteAnimator;
-        private PlayerMover playerMover;
+        private IPlayerMovementController movementController;
         private SpriteRenderer playerSprite;
         private Vector3 currentVelocity;
         private float idleTimer;
@@ -61,12 +62,13 @@ namespace Pets
         public void SetPlayer(Transform newPlayer)
         {
             player = newPlayer;
-            playerMover = null;
+            movementController = null;
             playerSprite = null;
             if (player != null)
             {
                 lastPlayerPos = player.position;
-                playerMover = player.GetComponent<PlayerMover>();
+                movementController = player.GetComponent<PlayerMovementController>()
+                    ?? player.GetComponent<PlayerMover>()?.MovementController;
                 playerSprite = player.GetComponent<SpriteRenderer>();
                 if (playerSprite != null && sprite != null)
                     sprite.sortingLayerID = playerSprite.sortingLayerID;
@@ -158,14 +160,14 @@ namespace Pets
 
             if (spriteAnimator != null)
             {
-                if (!playerMoving && playerMover != null)
-                    spriteAnimator.SetFacing(playerMover.FacingDir);
+                if (!playerMoving && movementController != null)
+                    spriteAnimator.SetFacing(movementController.FacingDirection);
                 spriteAnimator.UpdateVisuals(playerMoving ? velocity : Vector2.zero);
             }
             else if (sprite != null)
             {
-                if (!playerMoving && playerMover != null)
-                    sprite.flipX = Direction8Utility.IsFacingLeft(playerMover.FacingDir);
+                if (!playerMoving && movementController != null)
+                    sprite.flipX = Direction8Utility.IsFacingLeft(movementController.FacingDirection);
                 else
                     sprite.flipX = newPos.x > player.position.x;
             }

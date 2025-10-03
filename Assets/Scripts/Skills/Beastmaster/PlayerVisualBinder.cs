@@ -1,6 +1,8 @@
 using UnityEngine;
 using Pets;
 using Player;
+using Player.Visuals;
+using Util;
 
 namespace Beastmaster
 {
@@ -11,7 +13,7 @@ namespace Beastmaster
     {
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private Animator animator;
-        [SerializeField] private PlayerMover playerMover;
+        [SerializeField] private PlayerSpriteController spriteController;
         [SerializeField] private MergedPetAttackAnimator attackAnimator;
 
         private RuntimeAnimatorController originalController;
@@ -32,10 +34,14 @@ namespace Beastmaster
                 animator = GetComponent<Animator>();
             if (animator == null)
                 animator = GetComponentInChildren<Animator>();
-            if (playerMover == null)
-                playerMover = GetComponent<PlayerMover>();
-            if (playerMover == null)
-                playerMover = GetComponentInChildren<PlayerMover>();
+            if (spriteController == null)
+                spriteController = GetComponent<PlayerSpriteController>() ?? GetComponentInChildren<PlayerSpriteController>();
+            if (spriteController == null)
+            {
+                var mover = GetComponent<PlayerMover>() ?? GetComponentInChildren<PlayerMover>();
+                if (mover != null)
+                    spriteController = mover.SpriteController;
+            }
             if (attackAnimator == null)
                 attackAnimator = GetComponent<MergedPetAttackAnimator>();
             if (attackAnimator == null)
@@ -44,18 +50,18 @@ namespace Beastmaster
                 originalSprite = spriteRenderer.sprite;
             if (animator != null)
                 originalController = animator.runtimeAnimatorController;
-            if (playerMover != null)
+            if (spriteController != null)
             {
-                origIdleDown = playerMover.idleDown;
-                origIdleLeft = playerMover.idleLeft;
-                origIdleRight = playerMover.idleRight;
-                origIdleUp = playerMover.idleUp;
-                origWalkDown = playerMover.walkDown;
-                origWalkLeft = playerMover.walkLeft;
-                origWalkRight = playerMover.walkRight;
-                origWalkUp = playerMover.walkUp;
-                origUseFlipXForLeft = playerMover.UseFlipXForLeft;
-                origUseFlipXForRight = playerMover.UseFlipXForRight;
+                origIdleDown = spriteController.GetIdleSprite(Direction8.Down);
+                origIdleLeft = spriteController.GetIdleSprite(Direction8.Left);
+                origIdleRight = spriteController.GetIdleSprite(Direction8.Right);
+                origIdleUp = spriteController.GetIdleSprite(Direction8.Up);
+                origWalkDown = spriteController.GetWalkSprite(Direction8.Down);
+                origWalkLeft = spriteController.GetWalkSprite(Direction8.Left);
+                origWalkRight = spriteController.GetWalkSprite(Direction8.Right);
+                origWalkUp = spriteController.GetWalkSprite(Direction8.Up);
+                origUseFlipXForLeft = spriteController.UseFlipXForLeft;
+                origUseFlipXForRight = spriteController.UseFlipXForRight;
             }
             origScale = transform.localScale;
             origFlipX = spriteRenderer != null && spriteRenderer.flipX;
@@ -72,31 +78,31 @@ namespace Beastmaster
                 animator.runtimeAnimatorController = profile.controller;
             if (spriteRenderer != null && profile.baseSprite != null)
                 spriteRenderer.sprite = profile.baseSprite;
-            if (playerMover != null)
+            if (spriteController != null)
             {
                 if (profile.controller == null)
                 {
-                    if (profile.idleDown != null) playerMover.idleDown = profile.idleDown;
-                    if (profile.idleLeft != null) playerMover.idleLeft = profile.idleLeft;
-                    if (profile.idleRight != null) playerMover.idleRight = profile.idleRight;
-                    if (profile.idleUp != null) playerMover.idleUp = profile.idleUp;
-                    if (profile.walkDown != null) playerMover.walkDown = profile.walkDown;
-                    if (profile.walkLeft != null) playerMover.walkLeft = profile.walkLeft;
-                    if (profile.walkRight != null) playerMover.walkRight = profile.walkRight;
-                    if (profile.walkUp != null) playerMover.walkUp = profile.walkUp;
-                    playerMover.UseFlipXForLeft = profile.useFlipXForLeft;
-                    playerMover.UseFlipXForRight = profile.useFlipXForRight;
+                    if (profile.idleDown != null) spriteController.SetIdleSprite(Direction8.Down, profile.idleDown);
+                    if (profile.idleLeft != null) spriteController.SetIdleSprite(Direction8.Left, profile.idleLeft);
+                    if (profile.idleRight != null) spriteController.SetIdleSprite(Direction8.Right, profile.idleRight);
+                    if (profile.idleUp != null) spriteController.SetIdleSprite(Direction8.Up, profile.idleUp);
+                    if (profile.walkDown != null) spriteController.SetWalkSprite(Direction8.Down, profile.walkDown);
+                    if (profile.walkLeft != null) spriteController.SetWalkSprite(Direction8.Left, profile.walkLeft);
+                    if (profile.walkRight != null) spriteController.SetWalkSprite(Direction8.Right, profile.walkRight);
+                    if (profile.walkUp != null) spriteController.SetWalkSprite(Direction8.Up, profile.walkUp);
+                    spriteController.UseFlipXForLeft = profile.useFlipXForLeft;
+                    spriteController.UseFlipXForRight = profile.useFlipXForRight;
                 }
                 else
                 {
-                    playerMover.idleDown = null;
-                    playerMover.idleLeft = null;
-                    playerMover.idleRight = null;
-                    playerMover.idleUp = null;
-                    playerMover.walkDown = null;
-                    playerMover.walkLeft = null;
-                    playerMover.walkRight = null;
-                    playerMover.walkUp = null;
+                    spriteController.SetIdleSprite(Direction8.Down, null);
+                    spriteController.SetIdleSprite(Direction8.Left, null);
+                    spriteController.SetIdleSprite(Direction8.Right, null);
+                    spriteController.SetIdleSprite(Direction8.Up, null);
+                    spriteController.SetWalkSprite(Direction8.Down, null);
+                    spriteController.SetWalkSprite(Direction8.Left, null);
+                    spriteController.SetWalkSprite(Direction8.Right, null);
+                    spriteController.SetWalkSprite(Direction8.Up, null);
                 }
             }
             transform.localScale = profile.localScale;
@@ -118,18 +124,18 @@ namespace Beastmaster
                 spriteRenderer.flipX = origFlipX;
             }
             transform.localScale = origScale;
-            if (playerMover != null)
+            if (spriteController != null)
             {
-                playerMover.idleDown = origIdleDown;
-                playerMover.idleLeft = origIdleLeft;
-                playerMover.idleRight = origIdleRight;
-                playerMover.idleUp = origIdleUp;
-                playerMover.walkDown = origWalkDown;
-                playerMover.walkLeft = origWalkLeft;
-                playerMover.walkRight = origWalkRight;
-                playerMover.walkUp = origWalkUp;
-                playerMover.UseFlipXForLeft = origUseFlipXForLeft;
-                playerMover.UseFlipXForRight = origUseFlipXForRight;
+                spriteController.SetIdleSprite(Direction8.Down, origIdleDown);
+                spriteController.SetIdleSprite(Direction8.Left, origIdleLeft);
+                spriteController.SetIdleSprite(Direction8.Right, origIdleRight);
+                spriteController.SetIdleSprite(Direction8.Up, origIdleUp);
+                spriteController.SetWalkSprite(Direction8.Down, origWalkDown);
+                spriteController.SetWalkSprite(Direction8.Left, origWalkLeft);
+                spriteController.SetWalkSprite(Direction8.Right, origWalkRight);
+                spriteController.SetWalkSprite(Direction8.Up, origWalkUp);
+                spriteController.UseFlipXForLeft = origUseFlipXForLeft;
+                spriteController.UseFlipXForRight = origUseFlipXForRight;
             }
             attackAnimator?.ClearPetLook();
         }
