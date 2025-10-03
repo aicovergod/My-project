@@ -49,11 +49,31 @@ namespace Pets
         [SerializeField, Min(1)] private int navigationSampleAttempts = 6;
 
         /// <summary>
+        /// Optional toggle that allows pets to use the active navigation grid while following the
+        /// player. When disabled the component falls back to the legacy smooth-damp chase even if a
+        /// grid exists.
+        /// </summary>
+        [SerializeField] private bool useNavigationForFollowing = true;
+
+        /// <summary>
         /// Distance in world units considered close enough to a queued navigation waypoint for it to
         /// be consumed. This mirrors the tolerance used by <see cref="NPC.NpcWanderer"/> so pets feel
         /// consistent with NPC motion.
         /// </summary>
         [SerializeField, Min(0.01f)] private float navigationWaypointArrivalThreshold = 0.05f;
+
+        /// <summary>
+        /// Distance threshold that triggers a follow-path rebuild when the player travels a meaningful
+        /// distance without teleporting. Keeps the queued waypoints aligned with the player's latest
+        /// position.
+        /// </summary>
+        [SerializeField, Min(0.05f)] private float navigationFollowRebuildDistance = 0.75f;
+
+        /// <summary>
+        /// Teleport detection threshold. When the player moves more than this distance between fixed
+        /// updates the queued navigation path is discarded so the pet can recover immediately.
+        /// </summary>
+        [SerializeField, Min(0.5f)] private float navigationFollowTeleportThreshold = 3f;
 
         [SerializeField] private Transform player;
         [SerializeField] private int depthOffset = 1;
@@ -77,12 +97,21 @@ namespace Pets
         private Vector2 navFinalDestination;
         private Vector2Int navFinalCell;
         private readonly Queue<Vector2> navWanderWaypoints = new();
+        private readonly Queue<Vector2> navFollowWaypoints = new();
         private readonly Queue<Vector2Int> navNearestFrontier = new();
         private readonly HashSet<Vector2Int> navNearestVisited = new();
         private readonly Queue<Vector2Int> navPathFrontier = new();
         private readonly HashSet<Vector2Int> navPathVisited = new();
         private readonly Dictionary<Vector2Int, Vector2Int> navPathCameFrom = new();
         private readonly List<Vector2Int> navPathBuffer = new();
+        private bool usingNavFollowPath;
+        private Vector2 navFollowFinalDestination;
+        private Vector2Int navFollowFinalCell;
+        private Vector3 lastFollowAnchor;
+        private Vector3 lastPlayerNavSample;
+        private NavGridBuilder cachedFollowGrid;
+        private int cachedFollowGridRevision;
+        private bool navFollowPathDirty = true;
 
         private static readonly Vector2Int[] FourWayOffsets =
         {
@@ -97,7 +126,11 @@ namespace Pets
             respectNavigation = true;
             navigationSampleRadius = wanderRadius;
             navigationSampleAttempts = 6;
+            useNavigationForFollowing = true;
             navigationWaypointArrivalThreshold = 0.05f;
+            navigationFollowRebuildDistance = 0.75f;
+            navigationFollowTeleportThreshold = 3f;
+            navFollowPathDirty = true;
         }
 
         private void Awake()
@@ -120,9 +153,14 @@ namespace Pets
             player = newPlayer;
             movementController = null;
             playerSprite = null;
+            navFollowWaypoints.Clear();
+            usingNavFollowPath = false;
+            navFollowPathDirty = true;
             if (player != null)
             {
                 lastPlayerPos = player.position;
+                lastPlayerNavSample = player.position;
+                lastFollowAnchor = lastPlayerNavSample;
                 movementController = player.GetComponent<PlayerMovementController>()
                     ?? player.GetComponent<PlayerMover>()?.MovementController;
                 playerSprite = player.GetComponent<SpriteRenderer>();
@@ -143,8 +181,9 @@ namespace Pets
             if (player == null)
                 return;
 
+            Vector3 previousPlayerPos = lastPlayerPos;
             Vector3 playerPos = player.position;
-            Vector3 playerVel = (playerPos - lastPlayerPos) / Time.fixedDeltaTime;
+            Vector3 playerVel = (playerPos - previousPlayerPos) / Time.fixedDeltaTime;
             lastPlayerPos = playerPos;
 
             bool playerMoving = playerVel.sqrMagnitude > 0.01f;
@@ -259,16 +298,130 @@ namespace Pets
 
             offset = Vector3.Lerp(offset, targetOffset, Time.fixedDeltaTime * offsetLerpSpeed);
 
-            Vector3 target = playerPos + offset;
-            float dist = Vector3.Distance(transform.position, target);
+            Vector3 currentPosition = transform.position;
+            Vector3 desiredAnchor = playerPos + offset;
+            float distanceToAnchor = Vector3.Distance(currentPosition, desiredAnchor);
+            Vector3 followTarget = distanceToAnchor > maxDistance ? playerPos : desiredAnchor;
 
-            if (dist > maxDistance)
-                target = playerPos;
+            bool navFollowActive = false;
+            NavGridBuilder activeGrid = useNavigationForFollowing ? PathfindingService.Instance?.ActiveGrid : null;
 
-            newPos = Vector3.SmoothDamp(transform.position, target, ref currentVelocity, smoothTime, moveSpeed, Time.fixedDeltaTime);
+            if (useNavigationForFollowing && activeGrid != null && activeGrid.HasGrid)
+            {
+                bool gridChanged = activeGrid != cachedFollowGrid || activeGrid.Revision != cachedFollowGridRevision;
+                if (gridChanged)
+                {
+                    cachedFollowGrid = activeGrid;
+                    cachedFollowGridRevision = activeGrid.Revision;
+                    navFollowWaypoints.Clear();
+                    usingNavFollowPath = false;
+                    navFollowPathDirty = true;
+                }
 
-            velocity = currentVelocity;
+                float playerDisplacement = Vector3.Distance(playerPos, previousPlayerPos);
+                bool teleportDetected = playerDisplacement >= navigationFollowTeleportThreshold;
+                if (teleportDetected)
+                {
+                    navFollowWaypoints.Clear();
+                    usingNavFollowPath = false;
+                    navFollowPathDirty = true;
+                }
+
+                Vector2 followTarget2D = followTarget;
+                Vector2 current2D = currentPosition;
+                Vector2Int targetCell = activeGrid.TryGetCell(followTarget2D, out var lookupGoal)
+                    ? lookupGoal
+                    : activeGrid.WorldToCellClamped(followTarget2D);
+
+                bool destinationShifted = Vector2.Distance(followTarget2D, navFollowFinalDestination) >= navigationFollowRebuildDistance
+                    || targetCell != navFollowFinalCell;
+                bool anchorShifted = Vector3.Distance(followTarget, lastFollowAnchor) >= navigationFollowRebuildDistance;
+                bool playerShifted = Vector3.Distance(playerPos, lastPlayerNavSample) >= navigationFollowRebuildDistance;
+                bool queueExhausted = usingNavFollowPath && navFollowWaypoints.Count == 0
+                    && Vector2.Distance(current2D, navFollowFinalDestination) > navigationWaypointArrivalThreshold;
+
+                if (destinationShifted || anchorShifted || playerShifted || queueExhausted)
+                {
+                    navFollowPathDirty = true;
+                }
+
+                if (navFollowPathDirty)
+                {
+                    if (TryResolveNavFollowPath(current2D, followTarget2D, activeGrid))
+                    {
+                        usingNavFollowPath = true;
+                        navFollowPathDirty = false;
+                    }
+                    else
+                    {
+                        usingNavFollowPath = false;
+                        navFollowWaypoints.Clear();
+                        navFollowFinalDestination = followTarget2D;
+                        navFollowFinalCell = targetCell;
+                        navFollowPathDirty = false;
+                    }
+                }
+
+                if (usingNavFollowPath)
+                {
+                    Vector2 nextPos = current2D;
+                    if (navFollowWaypoints.Count > 0)
+                    {
+                        Vector2 waypoint = navFollowWaypoints.Peek();
+                        Vector2 stepped = Vector2.MoveTowards(current2D, waypoint, moveSpeed * Time.fixedDeltaTime);
+                        Vector2Int currentCell = activeGrid.TryGetCell(current2D, out var currentLookup)
+                            ? currentLookup
+                            : activeGrid.WorldToCellClamped(current2D);
+                        Vector2Int steppedCell = activeGrid.TryGetCell(stepped, out var steppedLookup)
+                            ? steppedLookup
+                            : activeGrid.WorldToCellClamped(stepped);
+                        nextPos = steppedCell != currentCell ? activeGrid.GetCellCenter(steppedCell) : stepped;
+
+                        if (Vector2.Distance(nextPos, waypoint) <= navigationWaypointArrivalThreshold)
+                        {
+                            navFollowWaypoints.Dequeue();
+                            if (navFollowWaypoints.Count == 0)
+                            {
+                                nextPos = activeGrid.GetCellCenter(navFollowFinalCell);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        nextPos = activeGrid.GetCellCenter(navFollowFinalCell);
+                        if (Vector2.Distance(nextPos, current2D) <= navigationWaypointArrivalThreshold)
+                        {
+                            usingNavFollowPath = false;
+                            navFollowWaypoints.Clear();
+                            nextPos = current2D;
+                        }
+                    }
+
+                    Vector2 delta = nextPos - current2D;
+                    velocity = delta / Mathf.Max(Time.fixedDeltaTime, 0.0001f);
+                    currentVelocity = velocity;
+                    newPos = new Vector3(nextPos.x, nextPos.y, currentPosition.z);
+                    navFollowActive = true;
+                }
+            }
+            else if (useNavigationForFollowing && cachedFollowGrid != null)
+            {
+                cachedFollowGrid = null;
+                cachedFollowGridRevision = 0;
+                navFollowWaypoints.Clear();
+                usingNavFollowPath = false;
+                navFollowPathDirty = true;
+            }
+
+            if (!navFollowActive)
+            {
+                newPos = Vector3.SmoothDamp(currentPosition, followTarget, ref currentVelocity, smoothTime, moveSpeed, Time.fixedDeltaTime);
+                velocity = currentVelocity;
+            }
+
             body.MovePosition(newPos);
+            lastFollowAnchor = followTarget;
+            lastPlayerNavSample = playerPos;
 
             if (Vector3.Distance(transform.position, playerPos) < followRadius * 0.5f)
                 ChooseOffset(lastHeading);
@@ -277,12 +430,14 @@ namespace Pets
             {
                 if (!playerMoving && movementController != null)
                     spriteAnimator.SetFacing(movementController.FacingDirection);
-                spriteAnimator.UpdateVisuals(playerMoving ? velocity : Vector2.zero);
+                spriteAnimator.UpdateVisuals(playerMoving || navFollowActive ? velocity : Vector2.zero);
             }
             else if (sprite != null)
             {
-                if (!playerMoving && movementController != null)
+                if (!playerMoving && !navFollowActive && movementController != null)
                     sprite.flipX = Direction8Utility.IsFacingLeft(movementController.FacingDirection);
+                else if (navFollowActive)
+                    sprite.flipX = velocity.x > 0f;
                 else
                     sprite.flipX = newPos.x > player.position.x;
             }
@@ -334,7 +489,7 @@ namespace Pets
                     continue;
                 }
 
-                if (!TryBuildPath(startCell, goalCell, grid, maxCellRadius))
+                if (!TryBuildPath(startCell, goalCell, grid, maxCellRadius, navWanderWaypoints))
                 {
                     continue;
                 }
@@ -400,10 +555,59 @@ namespace Pets
         }
 
         /// <summary>
-        /// Performs a BFS over four-way neighbours to ensure the sampled wander goal is reachable and
-        /// populates the queued waypoints when successful.
+        /// Builds a navigation-aware follow path from the pet's current position to the supplied goal.
+        /// When a path is produced the queued follow waypoints are populated so the FixedUpdate loop
+        /// can consume them incrementally.
         /// </summary>
-        private bool TryBuildPath(Vector2Int startCell, Vector2Int goalCell, NavGridBuilder grid, int maxCellRadius)
+        private bool TryResolveNavFollowPath(Vector2 startWorld, Vector2 goalWorld, NavGridBuilder grid)
+        {
+            navFollowWaypoints.Clear();
+
+            if (grid == null || !grid.HasGrid)
+            {
+                return false;
+            }
+
+            int maxCellRadius = Mathf.Max(1, Mathf.Max(grid.GridSize.x, grid.GridSize.y));
+
+            Vector2Int startCell = grid.TryGetCell(startWorld, out var lookupStart)
+                ? lookupStart
+                : grid.WorldToCellClamped(startWorld);
+            if (!grid.IsCellWalkable(startCell) && !TryFindNearestWalkableCell(startCell, grid, maxCellRadius, out startCell))
+            {
+                return false;
+            }
+
+            Vector2Int goalCell = grid.TryGetCell(goalWorld, out var lookupGoal)
+                ? lookupGoal
+                : grid.WorldToCellClamped(goalWorld);
+            if (!grid.IsCellWalkable(goalCell) && !TryFindNearestWalkableCell(goalCell, grid, maxCellRadius, out goalCell))
+            {
+                return false;
+            }
+
+            navFollowFinalCell = goalCell;
+            navFollowFinalDestination = grid.GetCellCenter(goalCell);
+
+            if (startCell == goalCell)
+            {
+                return true;
+            }
+
+            if (!TryBuildPath(startCell, goalCell, grid, maxCellRadius, navFollowWaypoints))
+            {
+                return false;
+            }
+
+            return navFollowWaypoints.Count > 0;
+        }
+
+        /// <summary>
+        /// Performs a BFS over four-way neighbours to ensure the sampled goal is reachable and populates
+        /// the provided waypoint queue when successful. Shared by the wander and follow helpers so we
+        /// reuse the cached frontier/visited collections without additional allocations.
+        /// </summary>
+        private bool TryBuildPath(Vector2Int startCell, Vector2Int goalCell, NavGridBuilder grid, int maxCellRadius, Queue<Vector2> waypointQueue)
         {
             if (startCell == goalCell)
                 return false;
@@ -432,14 +636,14 @@ namespace Pets
                         current = parent;
                     }
 
-                    navWanderWaypoints.Clear();
+                    waypointQueue.Clear();
                     for (int i = buffer.Count - 2; i >= 0; i--)
                     {
                         Vector2Int cell = buffer[i];
-                        navWanderWaypoints.Enqueue(grid.GetCellCenter(cell));
+                        waypointQueue.Enqueue(grid.GetCellCenter(cell));
                     }
 
-                    return navWanderWaypoints.Count > 0;
+                    return waypointQueue.Count > 0;
                 }
 
                 for (int i = 0; i < FourWayOffsets.Length; i++)
