@@ -268,7 +268,8 @@ namespace Skills.Woodcutting
                 Random.Range,
                 "Woodcutting",
                 "You've received a piece of woodcutting outfit",
-                "A piece of woodcutting outfit has been added to your bank");
+                "A piece of woodcutting outfit has been added to your bank",
+                Level);
         }
 
         private void PreloadLogItems()

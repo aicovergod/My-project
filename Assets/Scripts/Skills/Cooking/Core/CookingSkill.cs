@@ -307,7 +307,8 @@ namespace Skills.Cooking
                 UnityEngine.Random.Range,
                 "Cooking",
                 "You've received a piece of cooking outfit",
-                "A piece of cooking outfit has been added to your bank");
+                "A piece of cooking outfit has been added to your bank",
+                Level);
         }
 
         /// <summary>

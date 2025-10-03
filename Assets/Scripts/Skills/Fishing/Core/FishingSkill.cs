@@ -526,7 +526,8 @@ namespace Skills.Fishing
                 UnityEngine.Random.Range,
                 "Fishing",
                 "You've received a piece of fishing outfit",
-                "A piece of fishing outfit has been added to your bank");
+                "A piece of fishing outfit has been added to your bank",
+                Level);
         }
 
         private void PreloadFishItems()
