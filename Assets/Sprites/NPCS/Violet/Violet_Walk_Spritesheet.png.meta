@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: d0f629517cd3ea64eb71658260883318
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 9080343774691907023
+    second: Violet_Walk_Spritesheet_0
+  - first:
+      213: -904212770873675117
+    second: Violet_Walk_Spritesheet_1
+  - first:
+      213: 7662937491856862521
+    second: Violet_Walk_Spritesheet_2
+  - first:
+      213: 1855620042087803191
+    second: Violet_Walk_Spritesheet_3
+  - first:
+      213: 1944371570099932678
+    second: Violet_Walk_Spritesheet_4
+  - first:
+      213: -7970350525815946386
+    second: Violet_Walk_Spritesheet_5
+  - first:
+      213: 3640566186483670126
+    second: Violet_Walk_Spritesheet_6
+  - first:
+      213: -2391251384259654449
+    second: Violet_Walk_Spritesheet_7
+  - first:
+      213: 5163468883409590936
+    second: Violet_Walk_Spritesheet_8
+  - first:
+      213: 5306554081544728950
+    second: Violet_Walk_Spritesheet_9
+  - first:
+      213: -1993676082998123920
+    second: Violet_Walk_Spritesheet_10
+  - first:
+      213: 1623057924889477069
+    second: Violet_Walk_Spritesheet_11
+  - first:
+      213: 4350020426946438817
+    second: Violet_Walk_Spritesheet_12
+  - first:
+      213: -5480178759425768621
+    second: Violet_Walk_Spritesheet_13
+  - first:
+      213: -862278918251247370
+    second: Violet_Walk_Spritesheet_14
+  - first:
+      213: -8328295332736654644
+    second: Violet_Walk_Spritesheet_15
+  - first:
+      213: 4314199090695959474
+    second: Violet_Walk_Spritesheet_16
+  - first:
+      213: 5212832559678979638
+    second: Violet_Walk_Spritesheet_17
+  - first:
+      213: -8454943666815661034
+    second: Violet_Walk_Spritesheet_18
+  - first:
+      213: -4893420410107034238
+    second: Violet_Walk_Spritesheet_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_0
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 0
+        width: 32
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc5d0f8ad8cd30e70800000000000000
+      internalID: 9080343774691907023
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_1
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 0
+        width: 32
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 392f3be86479373f0800000000000000
+      internalID: -904212770873675117
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_2
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 0
+        width: 34
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93da6228c09385a60800000000000000
+      internalID: 7662937491856862521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_3
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 0
+        width: 34
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7392db6c89c70c910800000000000000
+      internalID: 1855620042087803191
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_4
+      rect:
+        serializedVersion: 2
+        x: 278
+        y: 2
+        width: 27
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60ecc2b24abcbfa10800000000000000
+      internalID: 1944371570099932678
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_5
+      rect:
+        serializedVersion: 2
+        x: 342
+        y: 2
+        width: 27
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e63846dec60a36190800000000000000
+      internalID: -7970350525815946386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_6
+      rect:
+        serializedVersion: 2
+        x: 404
+        y: 2
+        width: 29
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6c58a678a3e58230800000000000000
+      internalID: 3640566186483670126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_7
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 2
+        width: 27
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fccca80198190ded0800000000000000
+      internalID: -2391251384259654449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_8
+      rect:
+        serializedVersion: 2
+        x: 526
+        y: 2
+        width: 35
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89a596c979358a740800000000000000
+      internalID: 5163468883409590936
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_9
+      rect:
+        serializedVersion: 2
+        x: 590
+        y: 2
+        width: 35
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6717fd362daa4a940800000000000000
+      internalID: 5306554081544728950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_10
+      rect:
+        serializedVersion: 2
+        x: 654
+        y: 0
+        width: 34
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07264bb5a2a0554e0800000000000000
+      internalID: -1993676082998123920
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_11
+      rect:
+        serializedVersion: 2
+        x: 718
+        y: 2
+        width: 35
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dcf7be65592468610800000000000000
+      internalID: 1623057924889477069
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_12
+      rect:
+        serializedVersion: 2
+        x: 789
+        y: 0
+        width: 28
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a6e5d9e7806e5c30800000000000000
+      internalID: 4350020426946438817
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_13
+      rect:
+        serializedVersion: 2
+        x: 852
+        y: 0
+        width: 28
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35349ca147e72f3b0800000000000000
+      internalID: -5480178759425768621
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_14
+      rect:
+        serializedVersion: 2
+        x: 914
+        y: 0
+        width: 37
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f8835474e19804f0800000000000000
+      internalID: -862278918251247370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_15
+      rect:
+        serializedVersion: 2
+        x: 980
+        y: 0
+        width: 28
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc220b32583fb6c80800000000000000
+      internalID: -8328295332736654644
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_16
+      rect:
+        serializedVersion: 2
+        x: 1040
+        y: 3
+        width: 30
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b3fe33273d1fdb30800000000000000
+      internalID: 4314199090695959474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_17
+      rect:
+        serializedVersion: 2
+        x: 1106
+        y: 1
+        width: 26
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63e71412893b75840800000000000000
+      internalID: 5212832559678979638
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_18
+      rect:
+        serializedVersion: 2
+        x: 1169
+        y: 1
+        width: 27
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61c838ff7810aaa80800000000000000
+      internalID: -8454943666815661034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Violet_Walk_Spritesheet_19
+      rect:
+        serializedVersion: 2
+        x: 1234
+        y: 1
+        width: 26
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2858cee3014171cb0800000000000000
+      internalID: -4893420410107034238
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Violet_Walk_Spritesheet_0: 9080343774691907023
+      Violet_Walk_Spritesheet_1: -904212770873675117
+      Violet_Walk_Spritesheet_10: -1993676082998123920
+      Violet_Walk_Spritesheet_11: 1623057924889477069
+      Violet_Walk_Spritesheet_12: 4350020426946438817
+      Violet_Walk_Spritesheet_13: -5480178759425768621
+      Violet_Walk_Spritesheet_14: -862278918251247370
+      Violet_Walk_Spritesheet_15: -8328295332736654644
+      Violet_Walk_Spritesheet_16: 4314199090695959474
+      Violet_Walk_Spritesheet_17: 5212832559678979638
+      Violet_Walk_Spritesheet_18: -8454943666815661034
+      Violet_Walk_Spritesheet_19: -4893420410107034238
+      Violet_Walk_Spritesheet_2: 7662937491856862521
+      Violet_Walk_Spritesheet_3: 1855620042087803191
+      Violet_Walk_Spritesheet_4: 1944371570099932678
+      Violet_Walk_Spritesheet_5: -7970350525815946386
+      Violet_Walk_Spritesheet_6: 3640566186483670126
+      Violet_Walk_Spritesheet_7: -2391251384259654449
+      Violet_Walk_Spritesheet_8: 5163468883409590936
+      Violet_Walk_Spritesheet_9: 5306554081544728950
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
