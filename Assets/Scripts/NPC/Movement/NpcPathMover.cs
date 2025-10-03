@@ -56,6 +56,7 @@ namespace NPC
         private Vector2 currentStepTarget;
         private Vector2 previousStepPosition;
         private float stepTimer;
+        private float currentStepDuration = Ticker.TickDuration;
         private float lastProgressTimestamp;
         private float nextAllowedRepathTime;
         private float lastDestinationUpdate;
@@ -154,7 +155,7 @@ namespace NPC
             }
 
             stepTimer += Time.deltaTime;
-            float duration = Mathf.Max(0.01f, tileTraverseDuration);
+            float duration = Mathf.Max(0.01f, currentStepDuration);
             float progress = Mathf.Clamp01(stepTimer / duration);
             Vector2 interpolated = Vector2.Lerp(currentStepStart, currentStepTarget, progress);
             ApplyPosition(interpolated, snapToGrid: false);
@@ -211,6 +212,7 @@ namespace NPC
             debugPath.Clear();
             stepping = false;
             activeRequestId = -1;
+            currentStepDuration = Mathf.Max(0.01f, tileTraverseDuration);
             hasDestination = false;
             hasResolvedPathDestination = false;
             resolvedPathDestination = default;
@@ -340,18 +342,60 @@ namespace NPC
             stepTimer = 0f;
             stepping = true;
             lastProgressTimestamp = Time.time;
+            currentStepDuration = ResolveStepDuration(currentStepStart, currentStepTarget);
 
             Vector2 direction = currentStepTarget - currentStepStart;
             if (direction.sqrMagnitude > Mathf.Epsilon)
             {
                 facing?.FaceDirection(direction);
-                float duration = Mathf.Max(0.0001f, tileTraverseDuration);
+                float duration = Mathf.Max(0.0001f, currentStepDuration);
                 UpdateMovementVisuals(direction / duration);
             }
             else
             {
                 UpdateMovementVisuals(Vector2.zero);
             }
+        }
+
+        /// <summary>
+        /// Calculates how long the mover should spend traversing the current segment based on grid distance.
+        /// </summary>
+        private float ResolveStepDuration(Vector2 start, Vector2 target)
+        {
+            float baseDuration = Mathf.Max(0.01f, tileTraverseDuration);
+            var grid = pathService != null ? pathService.ActiveGrid : PathfindingService.Instance?.ActiveGrid;
+
+            if (grid != null && grid.HasGrid)
+            {
+                if (grid.TryGetCell(start, out var startCell) && grid.TryGetCell(target, out var targetCell))
+                {
+                    int dx = Mathf.Abs(targetCell.x - startCell.x);
+                    int dy = Mathf.Abs(targetCell.y - startCell.y);
+                    int steps = Mathf.Max(dx, dy);
+                    if (steps <= 0)
+                    {
+                        return baseDuration;
+                    }
+
+                    return baseDuration * steps;
+                }
+
+                float approxSteps = Vector2.Distance(start, target) / Mathf.Max(0.0001f, grid.TileSize);
+                if (approxSteps > 1f)
+                {
+                    return baseDuration * approxSteps;
+                }
+
+                return baseDuration;
+            }
+
+            float worldDistance = Vector2.Distance(start, target);
+            if (worldDistance <= Mathf.Epsilon)
+            {
+                return baseDuration;
+            }
+
+            return baseDuration * Mathf.Max(1f, worldDistance);
         }
 
         /// <summary>
@@ -667,44 +711,7 @@ namespace NPC
                 return true;
             }
 
-            int x = startCell.x;
-            int y = startCell.y;
-            int endX = goalCell.x;
-            int endY = goalCell.y;
-
-            int dx = Mathf.Abs(endX - x);
-            int dy = Mathf.Abs(endY - y);
-            int stepX = x < endX ? 1 : (x > endX ? -1 : 0);
-            int stepY = y < endY ? 1 : (y > endY ? -1 : 0);
-            int error = dx - dy;
-
-            while (true)
-            {
-                if (!grid.IsCellWalkable(new Vector2Int(x, y)))
-                {
-                    return false;
-                }
-
-                if (x == endX && y == endY)
-                {
-                    break;
-                }
-
-                int error2 = error * 2;
-                if (error2 > -dy)
-                {
-                    error -= dy;
-                    x += stepX;
-                }
-
-                if (error2 < dx)
-                {
-                    error += dx;
-                    y += stepY;
-                }
-            }
-
-            return true;
+            return grid.HasClearLineBetweenCells(startCell, goalCell);
         }
 
         /// <summary>

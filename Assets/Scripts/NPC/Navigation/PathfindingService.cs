@@ -281,6 +281,13 @@ namespace NPC
         [Tooltip("Maximum number of nodes expanded per tick. Lower values spread work across more ticks at the cost of latency.")]
         [SerializeField, Range(4, 512)] private int maxNodesPerTick = 128;
 
+        [Header("Smoothing")]
+        [Tooltip("Removes redundant intermediate cells from generated paths so movers follow cleaner corridors.")]
+        [SerializeField] private bool enablePathSmoothing = true;
+
+        [Tooltip("Attempts to merge straight corridors whenever a clear line exists between cell endpoints.")]
+        [SerializeField] private bool useLineOfSightForSmoothing = true;
+
         [Header("Debug")]
         [Tooltip("Writes verbose logging for path requests and failures.")]
         [SerializeField] private bool enableDebugLogging;
@@ -564,7 +571,8 @@ namespace NPC
                     }
 
                     var pathCells = ReconstructPath(search, current);
-                    var worldPath = ConvertCellsToWorld(pathCells, activeRequest.StartCell);
+                    var smoothedCells = SmoothPathCells(pathCells, activeRequest.StartCell) ?? pathCells;
+                    var worldPath = ConvertCellsToWorld(smoothedCells, activeRequest.StartCell);
                     CompleteRequest(activeRequest, PathStatus.Success, worldPath);
                     activeRequest = null;
                     TryBeginNextRequest();
@@ -942,20 +950,27 @@ namespace NPC
         {
             var grid = instance?.navGrid;
             var path = new List<Vector2>();
-            if (grid == null)
+            if (grid == null || cells == null || cells.Count == 0)
             {
                 return path;
             }
 
+            Vector2Int? lastAddedCell = null;
             for (int i = 0; i < cells.Count; i++)
             {
                 Vector2Int cell = cells[i];
-                if (cell == startCell)
+                if (cell == startCell && !lastAddedCell.HasValue)
+                {
+                    continue;
+                }
+
+                if (lastAddedCell.HasValue && lastAddedCell.Value == cell)
                 {
                     continue;
                 }
 
                 path.Add(grid.GetCellCenter(cell));
+                lastAddedCell = cell;
             }
 
             return path;
@@ -1033,6 +1048,106 @@ namespace NPC
 
             path.Reverse();
             return path;
+        }
+
+        /// <summary>
+        /// Collapses redundant cells from the reconstructed path so movers receive the minimal set of bends.
+        /// Optionally applies a line-of-sight pass that merges straight corridors when nothing blocks the route.
+        /// </summary>
+        private List<Vector2Int> SmoothPathCells(List<Vector2Int> pathCells, Vector2Int startCell)
+        {
+            if (!enablePathSmoothing || pathCells == null || pathCells.Count <= 2)
+            {
+                return pathCells;
+            }
+
+            var collapsed = new List<Vector2Int>(pathCells.Count)
+            {
+                pathCells[0]
+            };
+
+            if (pathCells[0] != startCell)
+            {
+                collapsed.Insert(0, startCell);
+            }
+
+            if (pathCells.Count > 1)
+            {
+                Vector2Int previousDirection = NormalizeDirection(pathCells[1] - pathCells[0]);
+                for (int i = 1; i < pathCells.Count; i++)
+                {
+                    Vector2Int previous = pathCells[i - 1];
+                    Vector2Int current = pathCells[i];
+                    Vector2Int direction = NormalizeDirection(current - previous);
+
+                    if (i > 1 && direction != previousDirection)
+                    {
+                        Vector2Int turnCell = previous;
+                        if (collapsed[collapsed.Count - 1] != turnCell)
+                        {
+                            collapsed.Add(turnCell);
+                        }
+
+                        previousDirection = direction;
+                    }
+                    else if (i == 1)
+                    {
+                        previousDirection = direction;
+                    }
+
+                    if (i == pathCells.Count - 1)
+                    {
+                        if (collapsed[collapsed.Count - 1] != current)
+                        {
+                            collapsed.Add(current);
+                        }
+                    }
+                }
+            }
+
+            if (!useLineOfSightForSmoothing || navGrid == null || !navGrid.HasGrid || collapsed.Count <= 2)
+            {
+                return collapsed;
+            }
+
+            var optimised = new List<Vector2Int>(collapsed.Count)
+            {
+                collapsed[0]
+            };
+
+            int anchorIndex = 0;
+            while (anchorIndex < collapsed.Count - 1)
+            {
+                int nextIndex = anchorIndex + 1;
+                for (int i = collapsed.Count - 1; i > anchorIndex; i--)
+                {
+                    if (navGrid.HasClearLineBetweenCells(collapsed[anchorIndex], collapsed[i]))
+                    {
+                        nextIndex = i;
+                        break;
+                    }
+                }
+
+                Vector2Int nextCell = collapsed[nextIndex];
+                if (optimised[optimised.Count - 1] != nextCell)
+                {
+                    optimised.Add(nextCell);
+                }
+
+                anchorIndex = nextIndex;
+            }
+
+            return optimised;
+        }
+
+        /// <summary>
+        /// Normalises a grid-space delta so each axis is clamped to -1, 0, or 1 for direction comparisons.
+        /// </summary>
+        private static Vector2Int NormalizeDirection(Vector2Int delta)
+        {
+            int x = delta.x == 0 ? 0 : (delta.x > 0 ? 1 : -1);
+            int y = delta.y == 0 ? 0 : (delta.y > 0 ? 1 : -1);
+            return new Vector2Int(x, y);
         }
 
         /// <summary>
