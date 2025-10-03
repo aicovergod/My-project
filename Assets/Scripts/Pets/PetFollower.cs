@@ -94,6 +94,8 @@ namespace Pets
         private float wanderTimer;
         private bool wandering;
         private bool usingNavPath;
+        private NavGridBuilder cachedWanderGrid;
+        private int cachedWanderGridRevision = -1;
         private Vector2 navFinalDestination;
         private Vector2Int navFinalCell;
         private readonly Queue<Vector2> navWanderWaypoints = new();
@@ -110,7 +112,7 @@ namespace Pets
         private Vector3 lastFollowAnchor;
         private Vector3 lastPlayerNavSample;
         private NavGridBuilder cachedFollowGrid;
-        private int cachedFollowGridRevision;
+        private int cachedFollowGridRevision = -1;
         private bool navFollowPathDirty = true;
 
         private static readonly Vector2Int[] FourWayOffsets =
@@ -187,6 +189,8 @@ namespace Pets
             lastPlayerPos = playerPos;
 
             bool playerMoving = playerVel.sqrMagnitude > 0.01f;
+            NavGridBuilder activeWanderGrid = respectNavigation ? PathfindingService.Instance?.ActiveGrid : null;
+            bool activeWanderGridValid = activeWanderGrid != null && activeWanderGrid.HasGrid;
 
             if (playerMoving)
             {
@@ -211,6 +215,38 @@ namespace Pets
                     wanderTimer = Random.Range(wanderDelayRange.x, wanderDelayRange.y);
                     usingNavPath = false;
                     navWanderWaypoints.Clear();
+                }
+            }
+
+            if (!activeWanderGridValid)
+            {
+                if (cachedWanderGrid != null || cachedWanderGridRevision != -1)
+                {
+                    cachedWanderGrid = null;
+                    cachedWanderGridRevision = -1;
+                    navWanderWaypoints.Clear();
+                    usingNavPath = false;
+                }
+            }
+            else if (activeWanderGrid != cachedWanderGrid || activeWanderGrid.Revision != cachedWanderGridRevision)
+            {
+                cachedWanderGrid = activeWanderGrid;
+                cachedWanderGridRevision = activeWanderGrid.Revision;
+                navWanderWaypoints.Clear();
+                usingNavPath = false;
+
+                if (wandering)
+                {
+                    bool resolvedPath = TryResolveNavWanderPath(playerPos);
+                    usingNavPath = resolvedPath && navWanderWaypoints.Count > 0;
+                    if (usingNavPath)
+                    {
+                        wanderTarget = navFinalDestination;
+                    }
+                    else
+                    {
+                        wanderTarget = playerPos + (Vector3)Random.insideUnitCircle * wanderRadius;
+                    }
                 }
             }
 
@@ -242,7 +278,7 @@ namespace Pets
                 if (usingNavPath)
                 {
                     Vector2 current2D = currentPosition;
-                    NavGridBuilder grid = respectNavigation ? PathfindingService.Instance?.ActiveGrid : null;
+                    NavGridBuilder grid = activeWanderGridValid ? activeWanderGrid : null;
                     if (grid == null || !grid.HasGrid)
                     {
                         usingNavPath = false;
@@ -407,7 +443,7 @@ namespace Pets
             else if (useNavigationForFollowing && cachedFollowGrid != null)
             {
                 cachedFollowGrid = null;
-                cachedFollowGridRevision = 0;
+                cachedFollowGridRevision = -1;
                 navFollowWaypoints.Clear();
                 usingNavFollowPath = false;
                 navFollowPathDirty = true;
