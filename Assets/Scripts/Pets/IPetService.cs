@@ -46,6 +46,10 @@ namespace Pets
         public bool useFlipXForUpRight;
         public bool useFlipXForDownRight;
         public Vector3 localScale = Vector3.one;
+        public float animationFPS = 6f;
+        public float idleAnimationFPS;
+        public float walkAnimationFPS;
+        public float hitAnimationFPS;
     }
 
     /// <summary>

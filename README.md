@@ -34,7 +34,7 @@ This project currently targets **Unity 6000.2.3f1**.
 - `Assets/Scripts/World` – Manages persistent objects, scene transitions, respawn markers, minimap/popup text systems, and screen fades.
 - `Assets/Scripts/UI` – Centralises OSRS-style UI shells (`UIManager`, `InterfaceTabButtons`, `PersistentEventSystem`, `MagicUI`, HUD widgets).
 - `Assets/Scripts/Status` – Contains `BuffTimerService`, `BuffEvents`, antifire/freeze/poison controllers, and save bridges.
-- `Assets/Scripts/Pets` & `Assets/Scripts/Drops` – Run pet followers/storage, pet XP, drop tables (`DropResolver`, `GroundItemSpawner`), and pet drop UI.
+- `Assets/Scripts/Pets` & `Assets/Scripts/Drops` – Run pet followers/storage, pet XP, drop tables (`DropResolver`, `GroundItemSpawner`), and pet drop UI. `PetDefinition` exposes eight-direction idle/walk/hit sprite arrays, per-state FPS overrides, and mirroring toggles so pet art can be sourced from single-sided sheets.
 - `Assets/Scripts/Audio` – Provides `SoundManager` and the `SoundEffect` enum for SFX/music routing.
 - `Assets/Scripts/Books`, `Assets/Scripts/Dialogue`, `Assets/Scripts/Quests` – Supply lore ScriptableObjects, dialogue UI/data, and quest management/definitions.
 - `Assets/Scripts/Environment` & `Assets/Scripts/Util` – Offer environmental helpers like `FenceColliderFoot` and cross-cutting utilities (`Ticker`, `SpriteDepth`, `ITickable`).

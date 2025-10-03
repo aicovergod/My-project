@@ -62,6 +62,15 @@ namespace Pets
         [Tooltip("Frames per second for the sprite swapping animation.")]
         public float animationFPS = 6f;
 
+        [Tooltip("Override frames per second while idle. Values <= 0 fall back to Animation FPS.")]
+        public float idleAnimationFPS = 0f;
+
+        [Tooltip("Override frames per second while walking. Values <= 0 fall back to Animation FPS.")]
+        public float walkAnimationFPS = 0f;
+
+        [Tooltip("Override frames per second while playing hit animations. Values <= 0 fall back to Animation FPS.")]
+        public float hitAnimationFPS = 0f;
+
         private Direction8 _currentDir = Direction8.Down;
         private bool _currentlyMoving = false;
         private float _animClock = 0f;
@@ -92,7 +101,7 @@ namespace Pets
             if (spriteRenderer == null)
                 return;
 
-            float fps = Mathf.Max(0.01f, animationFPS);
+            float fps = ResolveAnimationFps(_currentlyMoving ? walkAnimationFPS : idleAnimationFPS);
             _animClock += Time.deltaTime * fps;
             Sprite[] set = SelectSpriteSet(_currentlyMoving, _currentDir, out int frames, out bool flip);
 
@@ -124,7 +133,7 @@ namespace Pets
 
             _overridePlaying = true;
             _currentDir = dir;
-            float fps = Mathf.Max(0.01f, animationFPS);
+            float fps = ResolveAnimationFps(hitAnimationFPS);
             for (int i = 0; i < frames; i++)
             {
                 spriteRenderer.sprite = set[i];
@@ -290,6 +299,14 @@ namespace Pets
         private bool ShouldMirrorHit(Direction8 dir)
         {
             return ShouldMirrorMovement(dir);
+        }
+
+        /// <summary>Resolves the effective FPS taking per-state overrides into account.</summary>
+        private float ResolveAnimationFps(float overrideFps)
+        {
+            float baseFps = animationFPS > 0f ? animationFPS : 6f;
+            float resolved = overrideFps > 0f ? overrideFps : baseFps;
+            return Mathf.Max(0.01f, resolved);
         }
     }
 }

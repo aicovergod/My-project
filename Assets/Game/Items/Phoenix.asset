@@ -21,26 +21,46 @@ MonoBehaviour:
   evolutionTiers: []
   animationClips: []
   attackSprite: {fileID: 6666414941200281703, guid: 22d9a71bef5d9ec4283f7ca895561c02, type: 3}
-  hitUp: []
   hitDown: []
-  hitLeft: []
+  hitDownRight: []
   hitRight: []
-  idleUp:
-  - {fileID: 21300000, guid: c6d85a396d438034cb27e906ab88f84b, type: 3}
-  walkUp:
-  - {fileID: 21300000, guid: c6d85a396d438034cb27e906ab88f84b, type: 3}
+  hitUpRight: []
+  hitUp: []
+  hitUpLeft: []
+  hitLeft: []
+  hitDownLeft: []
   idleDown:
   - {fileID: 21300000, guid: d67f5f8dc921e5f489e398af97faa2f9, type: 3}
-  walkDown:
-  - {fileID: 21300000, guid: d67f5f8dc921e5f489e398af97faa2f9, type: 3}
-  idleLeft: []
-  walkLeft: []
+  idleDownRight: []
   idleRight:
   - {fileID: 21300000, guid: 721f9d69e32794243957606cc7df8855, type: 3}
+  idleUpRight: []
+  idleUp:
+  - {fileID: 21300000, guid: c6d85a396d438034cb27e906ab88f84b, type: 3}
+  idleUpLeft: []
+  idleLeft: []
+  idleDownLeft: []
+  walkDown:
+  - {fileID: 21300000, guid: d67f5f8dc921e5f489e398af97faa2f9, type: 3}
+  walkDownRight: []
   walkRight:
   - {fileID: 21300000, guid: 721f9d69e32794243957606cc7df8855, type: 3}
+  walkUpRight: []
+  walkUp:
+  - {fileID: 21300000, guid: c6d85a396d438034cb27e906ab88f84b, type: 3}
+  walkUpLeft: []
+  walkLeft: []
+  walkDownLeft: []
   useRightSpritesForLeft: 1
   useLeftSpritesForRight: 0
+  useRightSpritesForDownLeft: 1
+  useLeftSpritesForDownRight: 0
+  useRightSpritesForUpLeft: 1
+  useLeftSpritesForUpRight: 0
+  baseAnimationFPS: 6
+  idleAnimationFPS: 0
+  walkAnimationFPS: 0
+  hitAnimationFPS: 0
   canFight: 1
   petAttackLevel: 0
   petStrengthLevel: 0
