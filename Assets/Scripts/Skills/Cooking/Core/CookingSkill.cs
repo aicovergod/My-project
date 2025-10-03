@@ -5,7 +5,6 @@ using Util;
 using BankSystem;
 using Pets;
 using Skills.Outfits;
-using Core.Save;
 using Skills.Common;
 
 namespace Skills.Cooking
@@ -23,6 +22,10 @@ namespace Skills.Cooking
         [SerializeField] private Transform floatingTextAnchor;
         [SerializeField, Tooltip("Enables verbose debug logging for cooking actions.")]
         private bool enableDebugLogging;
+        [SerializeField, Tooltip("ScriptableObject containing the Chef outfit configuration.")]
+        private SkillingOutfitDefinition cookingOutfitDefinition;
+
+        private const string CookingOutfitResourcePath = "Skills/Outfits/CookingOutfitDefinition";
 
         private SkillManager skills;
         private CookableRecipe currentRecipe;
@@ -74,19 +77,22 @@ namespace Skills.Cooking
                 equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
             cookProgressTracker.TickAdvanced += HandleCookProgressAdvanced;
-            cookingOutfit = new SkillingOutfitProgress(new[]
+            if (cookingOutfitDefinition == null)
+                cookingOutfitDefinition = Resources.Load<SkillingOutfitDefinition>(CookingOutfitResourcePath);
+            if (cookingOutfitDefinition != null)
             {
-                "Chefs Hat",
-                "Chefs Top",
-                "Chefs Pants",
-                "Chefs Boots",
-                "Cooking Mittens"
-            }, "CookingOutfitOwned");
+                cookingOutfit = new SkillingOutfitProgress(cookingOutfitDefinition);
+            }
+            else
+            {
+                Debug.LogWarning("CookingSkill is missing a SkillingOutfitDefinition reference; outfit rewards are disabled.");
+            }
         }
 
         private void OnDestroy()
         {
-            SaveManager.Unregister(cookingOutfit);
+            SkillingOutfitProgress.Unregister(cookingOutfit);
+            cookingOutfit = null;
             cookProgressTracker.TickAdvanced -= HandleCookProgressAdvanced;
         }
 

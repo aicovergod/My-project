@@ -27,6 +27,10 @@ namespace Skills.Fishing
 
         [SerializeField, Tooltip("Enables verbose debug logging for fishing actions.")]
         private bool enableDebugLogging;
+        [SerializeField, Tooltip("ScriptableObject containing the Fisherman outfit configuration.")]
+        private SkillingOutfitDefinition fishingOutfitDefinition;
+
+        private const string FishingOutfitResourcePath = "Skills/Outfits/FishingOutfitDefinition";
 
         private FishableSpot currentSpot;
         private FishingToolDefinition currentTool;
@@ -80,14 +84,16 @@ namespace Skills.Fishing
             skills = GetComponent<SkillManager>();
             catchProgressTracker.TickAdvanced += HandleCatchProgressAdvanced;
             PreloadFishItems();
-            fishingOutfit = new SkillingOutfitProgress(new[]
+            if (fishingOutfitDefinition == null)
+                fishingOutfitDefinition = Resources.Load<SkillingOutfitDefinition>(FishingOutfitResourcePath);
+            if (fishingOutfitDefinition != null)
             {
-                "Fishing Helmet",
-                "Fishing Top",
-                "Fishing Pants",
-                "Fishing Boots",
-                "Fishing Gloves"
-            }, "FishingOutfitOwned");
+                fishingOutfit = new SkillingOutfitProgress(fishingOutfitDefinition);
+            }
+            else
+            {
+                Debug.LogWarning("FishingSkill is missing a SkillingOutfitDefinition reference; outfit rewards are disabled.");
+            }
             TryResolveBycatchManager();
             if (bycatchManager == null)
                 SubscribeToServicesReady();
@@ -100,7 +106,8 @@ namespace Skills.Fishing
                 GameManager.ServicesReady -= HandleGameManagerServicesReady;
                 waitingForServices = false;
             }
-            SaveManager.Unregister(fishingOutfit);
+            SkillingOutfitProgress.Unregister(fishingOutfit);
+            fishingOutfit = null;
         }
 
         protected override bool LogTickerSubscription => enableDebugLogging;
