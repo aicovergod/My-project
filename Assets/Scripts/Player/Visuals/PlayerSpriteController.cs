@@ -31,6 +31,8 @@ namespace Player.Visuals
         private float idleAnimationFps = 6f;
         [SerializeField, Min(0.1f), Tooltip("Frames-per-second used when resolving walking frame lists.")]
         private float walkAnimationFps = 10f;
+        [SerializeField, Min(0.1f), Tooltip("Frames-per-second used when resolving consume frame lists.")]
+        private float consumeAnimationFps = 12f;
 
         [Header("Mirroring")]
         [Tooltip("If true, reuse right-facing sprites for any left-facing orientation (including diagonals).")]
@@ -54,10 +56,21 @@ namespace Player.Visuals
 
         private Direction8 cachedLookupDirection;
         private bool cachedIsMoving;
-        private MovementVisualState cachedResolvedState;
+        private PlayerVisualState cachedResolvedState;
         private Sprite[] cachedResolvedFrames;
         private int cachedFrameIndex;
         private float nextFrameTime;
+
+        private bool isPlayingConsume;
+        private Sprite[] activeConsumeFrames;
+        private int consumeFrameIndex;
+        private float consumeNextFrameTime;
+        private PlayerVisualState consumeResolvedState;
+        private bool consumeFlipX;
+        private Action consumeOnComplete;
+        private Direction8 lastRequestedDirection;
+        private bool lastRequestedIsMoving;
+        private bool hasLastRequestedMovement;
 
         /// <inheritdoc />
         public bool FreezeSprite
@@ -80,6 +93,9 @@ namespace Player.Visuals
             set => useFlipXForRight = value;
         }
 
+        /// <inheritdoc />
+        public bool IsPlayingConsumeAnimation => isPlayingConsume;
+
         private void Awake()
         {
             animator = GetComponent<Animator>();
@@ -89,6 +105,10 @@ namespace Player.Visuals
         /// <inheritdoc />
         public void ApplyMovementVisuals(Direction8 direction, bool isMoving)
         {
+            hasLastRequestedMovement = true;
+            lastRequestedDirection = direction;
+            lastRequestedIsMoving = isMoving;
+
             if (animator != null)
             {
                 animator.SetBool("IsMoving", isMoving);
@@ -101,7 +121,12 @@ namespace Player.Visuals
             if (freezeSprite)
                 return;
 
-            if (!TryResolveVisualState(direction, isMoving, out Sprite[] frames, out Sprite desired, out MovementVisualState resolvedState, out Direction8 lookupDirection, out bool flip))
+            if (isPlayingConsume)
+                return;
+
+            var priorities = isMoving ? movementMovingPriority : movementIdlePriority;
+
+            if (!TryResolveVisualState(direction, priorities, out Sprite[] frames, out Sprite desired, out PlayerVisualState resolvedState, out Direction8 lookupDirection, out bool flip))
                 return;
 
             if (spriteRenderer.flipX != flip)
@@ -129,6 +154,7 @@ namespace Player.Visuals
                 var frameSprite = frames[Mathf.Clamp(cachedFrameIndex, 0, frames.Length - 1)];
                 if (spriteRenderer.sprite != frameSprite)
                     spriteRenderer.sprite = frameSprite;
+
             }
             else if (desired != null)
             {
@@ -141,7 +167,111 @@ namespace Player.Visuals
 
                 if (spriteRenderer.sprite != desired)
                     spriteRenderer.sprite = desired;
+
             }
+        }
+
+        /// <inheritdoc />
+        public void PlayConsumeAnimation(Direction8 direction, Action onComplete = null)
+        {
+            if (spriteRenderer == null)
+            {
+                onComplete?.Invoke();
+                return;
+            }
+
+            if (isPlayingConsume)
+                CompleteConsumeAnimation(false, false);
+
+            if (!TryResolveVisualState(direction, consumePriority, out Sprite[] frames, out Sprite single, out PlayerVisualState resolvedState, out _, out bool flip))
+            {
+                onComplete?.Invoke();
+                return;
+            }
+
+            if (frames == null || frames.Length == 0)
+            {
+                if (single == null)
+                {
+                    onComplete?.Invoke();
+                    return;
+                }
+
+                frames = new[] { single };
+            }
+
+            isPlayingConsume = true;
+            activeConsumeFrames = frames;
+            consumeFrameIndex = 0;
+            consumeResolvedState = resolvedState;
+            consumeFlipX = flip;
+            consumeOnComplete = onComplete;
+            consumeNextFrameTime = Time.time + GetFrameInterval(consumeResolvedState);
+
+            if (spriteRenderer.flipX != consumeFlipX)
+                spriteRenderer.flipX = consumeFlipX;
+
+            if (activeConsumeFrames.Length > 0)
+                spriteRenderer.sprite = activeConsumeFrames[consumeFrameIndex];
+
+            if (!hasLastRequestedMovement)
+            {
+                lastRequestedDirection = direction;
+                lastRequestedIsMoving = false;
+                hasLastRequestedMovement = true;
+            }
+        }
+
+        private void Update()
+        {
+            if (!isPlayingConsume || spriteRenderer == null)
+                return;
+
+            if (activeConsumeFrames == null || activeConsumeFrames.Length == 0)
+            {
+                CompleteConsumeAnimation();
+                return;
+            }
+
+            if (Time.time >= consumeNextFrameTime)
+            {
+                consumeFrameIndex++;
+
+                if (consumeFrameIndex >= activeConsumeFrames.Length)
+                {
+                    CompleteConsumeAnimation();
+                    return;
+                }
+
+                consumeNextFrameTime = Time.time + GetFrameInterval(consumeResolvedState);
+            }
+
+            var frame = activeConsumeFrames[Mathf.Clamp(consumeFrameIndex, 0, activeConsumeFrames.Length - 1)];
+
+            if (!freezeSprite)
+            {
+                if (spriteRenderer.flipX != consumeFlipX)
+                    spriteRenderer.flipX = consumeFlipX;
+
+                if (spriteRenderer.sprite != frame)
+                    spriteRenderer.sprite = frame;
+            }
+        }
+
+        private void CompleteConsumeAnimation(bool invokeCallback = true, bool restoreMovement = true)
+        {
+            var callback = invokeCallback ? consumeOnComplete : null;
+
+            isPlayingConsume = false;
+            activeConsumeFrames = null;
+            consumeOnComplete = null;
+            consumeFrameIndex = 0;
+            consumeNextFrameTime = 0f;
+
+            if (restoreMovement && hasLastRequestedMovement)
+                ApplyMovementVisuals(lastRequestedDirection, lastRequestedIsMoving);
+
+            callback?.Invoke();
         }
 
         /// <summary>Determines whether the supplied direction should mirror its counterpart when resolving overrides.</summary>
@@ -215,6 +345,7 @@ namespace Player.Visuals
         {
             idleAnimationFps = Mathf.Max(0.1f, idleAnimationFps);
             walkAnimationFps = Mathf.Max(0.1f, walkAnimationFps);
+            consumeAnimationFps = Mathf.Max(0.1f, consumeAnimationFps);
 
             SeedLegacyFrames(ref downOverrides);
             SeedLegacyFrames(ref downRightOverrides);
@@ -231,89 +362,43 @@ namespace Player.Visuals
             overrides.SeedFrameArraysFromLegacySingles();
         }
 
-        private float GetFrameInterval(MovementVisualState state)
+        private float GetFrameInterval(PlayerVisualState state)
         {
-            var fps = state == MovementVisualState.Walk ? walkAnimationFps : idleAnimationFps;
+            var fps = state switch
+            {
+                PlayerVisualState.Walk => walkAnimationFps,
+                PlayerVisualState.Idle => idleAnimationFps,
+                PlayerVisualState.Consume => consumeAnimationFps,
+                _ => 0f
+            };
             return fps <= 0f ? float.MaxValue : 1f / fps;
         }
 
-        private bool TryResolveVisualState(Direction8 direction, bool moving, out Sprite[] frames, out Sprite sprite, out MovementVisualState resolvedState, out Direction8 lookupDirection, out bool flip)
+        private bool TryResolveVisualState(Direction8 direction, PlayerVisualState[] priorities, out Sprite[] frames, out Sprite sprite, out PlayerVisualState resolvedState, out Direction8 lookupDirection, out bool flip)
         {
+            var searchPriorities = priorities != null && priorities.Length > 0 ? priorities : movementIdlePriority;
+
             foreach (var lookup in Direction8Utility.BuildSpriteFallbackOrder(direction, ShouldMirrorOverride))
             {
                 var overrides = GetOverride(lookup.Direction);
-
-                if (moving)
+                foreach (var state in searchPriorities)
                 {
-                    if (overrides.TryGetFrames(MovementVisualState.Walk, out frames))
+                    if (overrides.TryGetFrames(state, out frames))
                     {
                         sprite = null;
-                        resolvedState = MovementVisualState.Walk;
-                        lookupDirection = lookup.Direction;
-                        flip = lookup.FlipX;
-                        return true;
-                    }
-
-                    if (overrides.TryGetFrames(MovementVisualState.Idle, out frames))
-                    {
-                        sprite = null;
-                        resolvedState = MovementVisualState.Idle;
-                        lookupDirection = lookup.Direction;
-                        flip = lookup.FlipX;
-                        return true;
-                    }
-
-                    if (overrides.TryGetSingle(MovementVisualState.Walk, out sprite))
-                    {
-                        frames = null;
-                        resolvedState = MovementVisualState.Walk;
-                        lookupDirection = lookup.Direction;
-                        flip = lookup.FlipX;
-                        return true;
-                    }
-
-                    if (overrides.TryGetSingle(MovementVisualState.Idle, out sprite))
-                    {
-                        frames = null;
-                        resolvedState = MovementVisualState.Idle;
+                        resolvedState = state;
                         lookupDirection = lookup.Direction;
                         flip = lookup.FlipX;
                         return true;
                     }
                 }
-                else
+
+                foreach (var state in searchPriorities)
                 {
-                    if (overrides.TryGetFrames(MovementVisualState.Idle, out frames))
-                    {
-                        sprite = null;
-                        resolvedState = MovementVisualState.Idle;
-                        lookupDirection = lookup.Direction;
-                        flip = lookup.FlipX;
-                        return true;
-                    }
-
-                    if (overrides.TryGetFrames(MovementVisualState.Walk, out frames))
-                    {
-                        sprite = null;
-                        resolvedState = MovementVisualState.Walk;
-                        lookupDirection = lookup.Direction;
-                        flip = lookup.FlipX;
-                        return true;
-                    }
-
-                    if (overrides.TryGetSingle(MovementVisualState.Idle, out sprite))
+                    if (overrides.TryGetSingle(state, out sprite))
                     {
                         frames = null;
-                        resolvedState = MovementVisualState.Idle;
-                        lookupDirection = lookup.Direction;
-                        flip = lookup.FlipX;
-                        return true;
-                    }
-
-                    if (overrides.TryGetSingle(MovementVisualState.Walk, out sprite))
-                    {
-                        frames = null;
-                        resolvedState = MovementVisualState.Walk;
+                        resolvedState = state;
                         lookupDirection = lookup.Direction;
                         flip = lookup.FlipX;
                         return true;
@@ -323,7 +408,7 @@ namespace Player.Visuals
 
             frames = null;
             sprite = null;
-            resolvedState = moving ? MovementVisualState.Walk : MovementVisualState.Idle;
+            resolvedState = searchPriorities[0];
             lookupDirection = direction;
             flip = false;
             return false;
@@ -370,10 +455,15 @@ namespace Player.Visuals
             }
         }
 
-        private enum MovementVisualState
+        private static readonly PlayerVisualState[] movementMovingPriority = { PlayerVisualState.Walk, PlayerVisualState.Idle };
+        private static readonly PlayerVisualState[] movementIdlePriority = { PlayerVisualState.Idle, PlayerVisualState.Walk };
+        private static readonly PlayerVisualState[] consumePriority = { PlayerVisualState.Consume, PlayerVisualState.Idle, PlayerVisualState.Walk };
+
+        private enum PlayerVisualState
         {
             Idle,
-            Walk
+            Walk,
+            Consume
         }
 
         [System.Serializable]
@@ -388,10 +478,16 @@ namespace Player.Visuals
             private Sprite singleWalk;
 
             [SerializeField]
+            private Sprite singleConsume;
+
+            [SerializeField]
             private Sprite[] idleFrames;
 
             [SerializeField]
             private Sprite[] walkFrames;
+
+            [SerializeField]
+            private Sprite[] consumeFrames;
 
             public Sprite SingleIdle
             {
@@ -431,9 +527,30 @@ namespace Player.Visuals
                 }
             }
 
+            public Sprite SingleConsume
+            {
+                readonly get => singleConsume;
+                set
+                {
+                    singleConsume = value;
+
+                    if (consumeFrames == null || consumeFrames.Length == 0)
+                    {
+                        if (value != null)
+                            consumeFrames = new[] { value };
+                    }
+                    else if (consumeFrames.Length == 1)
+                    {
+                        consumeFrames[0] = value;
+                    }
+                }
+            }
+
             public Sprite[] IdleFrames => idleFrames;
 
             public Sprite[] WalkFrames => walkFrames;
+
+            public Sprite[] ConsumeFrames => consumeFrames;
 
             public void SeedFrameArraysFromLegacySingles()
             {
@@ -442,11 +559,20 @@ namespace Player.Visuals
 
                 if ((walkFrames == null || walkFrames.Length == 0) && singleWalk != null)
                     walkFrames = new[] { singleWalk };
+
+                if ((consumeFrames == null || consumeFrames.Length == 0) && singleConsume != null)
+                    consumeFrames = new[] { singleConsume };
             }
 
-            public bool TryGetFrames(MovementVisualState state, out Sprite[] frames)
+            public bool TryGetFrames(PlayerVisualState state, out Sprite[] frames)
             {
-                frames = state == MovementVisualState.Walk ? walkFrames : idleFrames;
+                frames = state switch
+                {
+                    PlayerVisualState.Walk => walkFrames,
+                    PlayerVisualState.Idle => idleFrames,
+                    PlayerVisualState.Consume => consumeFrames,
+                    _ => null
+                };
                 if (frames != null && frames.Length > 0)
                     return true;
 
@@ -454,9 +580,15 @@ namespace Player.Visuals
                 return false;
             }
 
-            public bool TryGetSingle(MovementVisualState state, out Sprite sprite)
+            public bool TryGetSingle(PlayerVisualState state, out Sprite sprite)
             {
-                sprite = state == MovementVisualState.Walk ? singleWalk : singleIdle;
+                sprite = state switch
+                {
+                    PlayerVisualState.Walk => singleWalk,
+                    PlayerVisualState.Idle => singleIdle,
+                    PlayerVisualState.Consume => singleConsume,
+                    _ => null
+                };
                 return sprite != null;
             }
         }
@@ -478,6 +610,12 @@ namespace Player.Visuals
 
         /// <summary>Applies the supplied movement visuals to the animator and sprite renderer.</summary>
         void ApplyMovementVisuals(Direction8 direction, bool isMoving);
+
+        /// <summary>Starts the consume animation sequence for the supplied direction.</summary>
+        void PlayConsumeAnimation(Direction8 direction, Action onComplete = null);
+
+        /// <summary>Gets whether the consume animation is currently playing.</summary>
+        bool IsPlayingConsumeAnimation { get; }
 
         /// <summary>Gets the configured frames-per-second for idle animations.</summary>
         float IdleAnimationFps { get; }
