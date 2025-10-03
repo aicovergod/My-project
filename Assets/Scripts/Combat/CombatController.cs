@@ -7,6 +7,7 @@ using Skills;
 using Skills.Common;
 using Skills.Mining;
 using Player;
+using Player.Movement;
 using NPC;
 using Pets;
 using UI;
@@ -75,7 +76,7 @@ namespace Combat
         private Inventory.Equipment equipmentComponent;
         private Player.PlayerCombatLoadout loadout;
         private PlayerCombatBinder combatBinder;
-        private PlayerMover mover;
+        private IPlayerMovementController movementController;
         private Coroutine attackRoutine;
         private CombatTarget currentTarget;
         private float nextAttackTime;
@@ -123,7 +124,15 @@ namespace Combat
             equipmentComponent = GetComponent<Inventory.Equipment>() ?? GetComponentInParent<Inventory.Equipment>() ?? GetComponentInChildren<Inventory.Equipment>();
             loadout = GetComponent<Player.PlayerCombatLoadout>() ?? GetComponentInParent<Player.PlayerCombatLoadout>() ?? GetComponentInChildren<Player.PlayerCombatLoadout>();
             combatBinder = GetComponent<PlayerCombatBinder>() ?? GetComponentInParent<PlayerCombatBinder>() ?? GetComponentInChildren<PlayerCombatBinder>();
-            mover = GetComponent<PlayerMover>() ?? GetComponentInParent<PlayerMover>() ?? GetComponentInChildren<PlayerMover>();
+            movementController = GetComponent<PlayerMovementController>()
+                ?? GetComponentInParent<PlayerMovementController>()
+                ?? GetComponentInChildren<PlayerMovementController>();
+
+            if (movementController == null)
+            {
+                var moverFacade = GetComponent<PlayerMover>() ?? GetComponentInParent<PlayerMover>() ?? GetComponentInChildren<PlayerMover>();
+                movementController = moverFacade != null ? moverFacade.MovementController : null;
+            }
 
             if (skills == null)
                 Debug.LogWarning("CombatController could not find a SkillManager; damage will use level 1 stats.", this);
@@ -395,7 +404,7 @@ namespace Combat
                     ShowPickaxeRequirementFeedback();
                     break;
                 }
-                mover?.FaceTarget(target.transform);
+                movementController?.FaceTarget(target.transform);
                 OnAttackStart?.Invoke();
                 ResolveAttack(target);
                 // If the target died from the attack, exit immediately so listeners are notified
@@ -724,7 +733,7 @@ namespace Combat
                 return;
 
             Vector2 origin = transform.position;
-            Direction8 forwardDir = mover != null ? mover.FacingDir : Direction8.Down;
+            Direction8 forwardDir = movementController != null ? movementController.FacingDirection : Direction8.Down;
             Vector2 forward = FacingDirToVector(forwardDir);
             if (forward.sqrMagnitude <= Mathf.Epsilon)
                 forward = Vector2.down;

@@ -2,6 +2,8 @@ using UnityEngine;
 using Combat;
 using Pets;
 using Player;
+using Player.Movement;
+using Player.Visuals;
 using Util;
 
 namespace Beastmaster
@@ -12,7 +14,8 @@ namespace Beastmaster
     public class MergedPetAttackAnimator : MonoBehaviour
     {
         [SerializeField] private CombatController combat;
-        [SerializeField] private PlayerMover mover;
+        [SerializeField] private PlayerMovementController movementController;
+        [SerializeField] private PlayerSpriteController spriteController;
         [SerializeField] private Animator animator;
         [SerializeField] private PetSpriteAnimator spriteAnimator;
 
@@ -20,8 +23,22 @@ namespace Beastmaster
         {
             if (combat == null)
                 combat = GetComponent<CombatController>() ?? GetComponentInParent<CombatController>();
-            if (mover == null)
-                mover = GetComponent<PlayerMover>() ?? GetComponentInChildren<PlayerMover>();
+            if (movementController == null)
+                movementController = GetComponent<PlayerMovementController>() ?? GetComponentInChildren<PlayerMovementController>();
+            if (movementController == null)
+            {
+                var moverFacade = GetComponent<PlayerMover>() ?? GetComponentInChildren<PlayerMover>();
+                if (moverFacade != null)
+                    movementController = moverFacade.MovementController;
+            }
+            if (spriteController == null)
+                spriteController = GetComponent<PlayerSpriteController>() ?? GetComponentInChildren<PlayerSpriteController>();
+            if (spriteController == null)
+            {
+                var moverFacade = GetComponent<PlayerMover>() ?? GetComponentInChildren<PlayerMover>();
+                if (moverFacade != null)
+                    spriteController = moverFacade.SpriteController;
+            }
             if (animator == null)
                 animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
             if (spriteAnimator == null)
@@ -80,7 +97,7 @@ namespace Beastmaster
 
         private void HandleAttack()
         {
-            Direction8 dir = mover != null ? mover.FacingDir : Direction8.Down;
+            Direction8 dir = movementController != null ? movementController.FacingDirection : Direction8.Down;
             if (animator != null && animator.runtimeAnimatorController != null)
             {
                 animator.SetInteger("Dir", Direction8Utility.ToAnimatorIndex8(dir));
@@ -92,11 +109,12 @@ namespace Beastmaster
 
         private System.Collections.IEnumerator PlayHit(Direction8 dir)
         {
-            if (mover != null)
-                mover.freezeSprite = true;
+            bool originalFreeze = spriteController != null && spriteController.FreezeSprite;
+            if (spriteController != null)
+                spriteController.FreezeSprite = true;
             yield return StartCoroutine(spriteAnimator.PlayHitAnimation(dir));
-            if (mover != null)
-                mover.freezeSprite = false;
+            if (spriteController != null)
+                spriteController.FreezeSprite = originalFreeze;
         }
     }
 }

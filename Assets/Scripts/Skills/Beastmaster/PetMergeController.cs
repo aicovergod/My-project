@@ -5,6 +5,7 @@ using Pets;
 using UI;
 using EquipmentSystem;
 using Player;
+using Player.Movement;
 
 namespace Beastmaster
 {
@@ -23,6 +24,7 @@ namespace Beastmaster
         [SerializeField] private PlayerCombatBinder combatBinder;
         [SerializeField] private MergeHudTimer hudTimer;
         [SerializeField] private PlayerMover playerMover;
+        private IPlayerMovementController movementController;
 
         private IBeastmasterService beastmaster;
         private IPetService petService;
@@ -70,6 +72,7 @@ namespace Beastmaster
                 hudTimer = GetComponentInChildren<MergeHudTimer>(true) ?? FindObjectOfType<MergeHudTimer>(true);
             if (playerMover == null)
                 playerMover = GetComponent<PlayerMover>();
+            movementController = playerMover != null ? playerMover.MovementController : GetComponent<PlayerMovementController>();
 
             if (beastmaster == null)
                 Debug.LogWarning("PetMergeController missing IBeastmasterService component.");
@@ -109,12 +112,17 @@ namespace Beastmaster
 
         private void ApplySpeedModifier()
         {
-            if (playerMover == null)
-                playerMover = GetComponent<PlayerMover>();
-            if (playerMover == null)
+            if (movementController == null)
+            {
+                if (playerMover == null)
+                    playerMover = GetComponent<PlayerMover>();
+                movementController = playerMover != null ? playerMover.MovementController : GetComponent<PlayerMovementController>();
+            }
+
+            if (movementController == null)
                 return;
-            originalMoveSpeed = playerMover.moveSpeed;
-            playerMover.moveSpeed = originalMoveSpeed * GetSpeedMultiplier();
+            originalMoveSpeed = movementController.MoveSpeed;
+            movementController.MoveSpeed = originalMoveSpeed * GetSpeedMultiplier();
         }
 
         private float GetSpeedMultiplier()
@@ -136,8 +144,8 @@ namespace Beastmaster
 
         private void RestoreSpeed()
         {
-            if (playerMover != null)
-                playerMover.moveSpeed = originalMoveSpeed;
+            if (movementController != null)
+                movementController.MoveSpeed = originalMoveSpeed;
         }
 
         /// <summary>Attempt to start merging with the active pet.</summary>

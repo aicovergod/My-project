@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using Combat;
 using Player;
+using Player.Movement;
 using Status.Freeze;
 
 namespace NPC
@@ -40,8 +41,9 @@ namespace NPC
             var playerController = FindObjectOfType<CombatController>();
             if (playerController == null)
                 return;
-            var playerMover = playerController.GetComponent<PlayerMover>();
-            if (playerMover == null)
+            var movementController = playerController.GetComponent<PlayerMovementController>()
+                ?? playerController.GetComponent<PlayerMover>()?.MovementController;
+            if (movementController == null)
                 return;
 
             if (heldAttackRoutine != null)
@@ -53,8 +55,9 @@ namespace NPC
             // Determine whether the player is currently frozen so we can decide how to handle
             // the attack click. Frozen players should not be able to move but should retain the
             // attack command so it can fire if the NPC walks into range.
+            var moverFacade = playerController.GetComponent<PlayerMover>() ?? playerController.GetComponentInChildren<PlayerMover>();
             var freezeController = playerController.GetComponent<FrozenStatusController>()
-                ?? playerMover.GetComponent<FrozenStatusController>();
+                ?? moverFacade?.GetComponent<FrozenStatusController>();
             bool playerFrozen = freezeController != null && freezeController.IsFrozen;
 
             float range = playerController.CurrentAttackRange;
@@ -74,7 +77,7 @@ namespace NPC
                 // check whether the NPC moves into range or the freeze expires.
                 heldAttackRoutine = StartCoroutine(HoldAttackWhileFrozen(
                     playerController,
-                    playerMover,
+                    movementController,
                     freezeController,
                     combatant));
                 return;
@@ -82,7 +85,7 @@ namespace NPC
 
             // Default behaviour for mobile players remains unchanged – auto walk into range and
             // fire once close enough.
-            playerMover.MoveTo(transform, range, () => playerController.TryAttackTarget(combatant));
+            movementController.MoveTo(transform, range, () => playerController.TryAttackTarget(combatant));
         }
 
         /// <summary>
@@ -91,12 +94,12 @@ namespace NPC
         /// </summary>
         private IEnumerator HoldAttackWhileFrozen(
             CombatController playerController,
-            PlayerMover playerMover,
+            IPlayerMovementController movementController,
             FrozenStatusController freezeController,
             NpcCombatant target)
         {
             // Small guard to avoid running the routine when any critical dependency is missing.
-            if (playerController == null || playerMover == null || freezeController == null || target == null)
+            if (playerController == null || movementController == null || freezeController == null || target == null)
             {
                 heldAttackRoutine = null;
                 yield break;
@@ -126,11 +129,11 @@ namespace NPC
                 {
                     playerController.TryAttackTarget(target);
                 }
-                else if (!freezeController.IsFrozen && playerMover != null)
+                else if (!freezeController.IsFrozen && movementController != null)
                 {
                     // Once the freeze effect ends resume the standard auto movement logic so the
                     // player chases the NPC if they are still out of range.
-                    playerMover.MoveTo(target.transform, range, () => playerController.TryAttackTarget(target));
+                    movementController.MoveTo(target.transform, range, () => playerController.TryAttackTarget(target));
                 }
             }
 

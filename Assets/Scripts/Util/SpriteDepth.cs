@@ -1,5 +1,6 @@
 using UnityEngine;
 using Player;
+using Player.Movement;
 
 namespace Util
 {
@@ -11,20 +12,26 @@ namespace Util
         public int directionOffset;   // magnitude for direction-based tweak
 
         private SpriteRenderer sr;
-        private PlayerMover player;
+        private IPlayerMovementController movementController;
 
         void Awake()
         {
             sr = GetComponent<SpriteRenderer>();
-            player = FindObjectOfType<PlayerMover>();
+            movementController = FindObjectOfType<PlayerMovementController>();
+            if (movementController == null)
+            {
+                var mover = FindObjectOfType<PlayerMover>();
+                if (mover != null)
+                    movementController = mover.MovementController;
+            }
         }
 
         void LateUpdate()
         {
             int dir = 0;
-            if (player != null)
+            if (movementController != null)
             {
-                Direction8 facing = player.FacingDir;
+                Direction8 facing = movementController.FacingDirection;
                 if (Direction8Utility.IsFacingDown(facing))
                     dir = directionOffset;
                 else if (Direction8Utility.IsFacingUp(facing))
