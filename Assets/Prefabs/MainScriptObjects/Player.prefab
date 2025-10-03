@@ -805,6 +805,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6179177d197d4fa199e195fa4b769bcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerMover: {fileID: 5825080390935697164}
+  movementController: {fileID: 2793536999350240794}
+  spriteController: {fileID: 3968416059274634973}
 --- !u!114 &4675609188221558876
 MonoBehaviour:
   m_ObjectHideFlags: 0
