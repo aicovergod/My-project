@@ -244,6 +244,7 @@ namespace Combat.Ranged
             var context = new RangedAttackContext
             {
                 combatController = combatController,
+                rangedController = this,
                 attacker = attacker,
                 target = target,
                 weapon = currentWeapon,
@@ -251,7 +252,9 @@ namespace Combat.Ranged
                 origin = projectileSpawnPoint != null ? projectileSpawnPoint.position : transform.position,
                 targetPosition = target != null ? target.transform.position : transform.position,
                 damageResult = new CombatController.DamageResult { damage = damage, hit = hit, maxHit = maxHit },
-                ammoConsumed = false
+                ammoConsumed = false,
+                finalAccuracyMultiplier = accuracyMultiplier,
+                finalDamageMultiplier = damageMultiplier
             };
 
             ShotPrepared?.Invoke(context);
@@ -364,6 +367,59 @@ namespace Combat.Ranged
 
             float projectileSpeed = weaponReference != null ? weaponReference.projectileSpeed : 10f;
             projectile.Initialise(this, context.target, context, projectileSpeed);
+        }
+
+        /// <summary>
+        /// Helper used by splash effects (such as chinchompas) to roll additional ranged hits
+        /// against nearby targets without committing the results. The method replays the accuracy
+        /// calculation using the cached multipliers from <see cref="RangedAttackContext"/> so
+        /// secondary damage honours the same gear, prayer, and ammo modifiers as the primary shot.
+        /// Callers are expected to forward the returned result to <see cref="CombatController.ApplyDamageResult"/>
+        /// when they wish to apply the splash damage.
+        /// </summary>
+        /// <param name="context">Context captured when the primary projectile was fired.</param>
+        /// <param name="secondaryTarget">Additional target receiving the splash roll.</param>
+        /// <param name="damageScale">Multiplier applied to the cached max hit before rolling damage.</param>
+        internal CombatController.DamageResult RollSecondaryRangedDamage(in RangedAttackContext context, CombatTarget secondaryTarget, float damageScale)
+        {
+            var controller = context.combatController != null ? context.combatController : combatController;
+            if (controller == null || secondaryTarget == null)
+                return default;
+
+            var attackerStats = context.attacker;
+            if (attackerStats == null)
+                return default;
+
+            damageScale = Mathf.Max(0f, damageScale);
+
+            float accuracyMultiplier = context.finalAccuracyMultiplier;
+            if (accuracyMultiplier <= 0f)
+                accuracyMultiplier = context.rangedController == null ? 1f : 0f;
+            accuracyMultiplier = Mathf.Max(0f, accuracyMultiplier);
+            int effectiveAttack = CombatMath.GetEffectiveRanged(attackerStats.RangedLevel, attackerStats.Style);
+            int attackBonus = Mathf.Max(0, Mathf.RoundToInt(attackerStats.Equip.range * accuracyMultiplier));
+            int attackRoll = CombatMath.GetAttackRoll(effectiveAttack, attackBonus);
+
+            var defender = controller.GetDefenderStats(secondaryTarget, attackerStats);
+            if (defender == null)
+                return default;
+            int defenderEff = CombatMath.GetEffectiveDefence(defender.DefenceLevel, defender.Style);
+            int defenderBonus = defender.Equip.rangeDef;
+            int defenceRoll = CombatMath.GetDefenceRoll(defenderEff, defenderBonus);
+            float chanceToHit = CombatMath.ChanceToHit(attackRoll, defenceRoll);
+            bool hit = UnityEngine.Random.value < chanceToHit;
+
+            int scaledMaxHit = Mathf.RoundToInt(Mathf.Max(0f, context.damageResult.maxHit) * damageScale);
+            if (scaledMaxHit < 0)
+                scaledMaxHit = 0;
+
+            int damage = hit ? CombatMath.RollDamage(scaledMaxHit) : 0;
+            return new CombatController.DamageResult
+            {
+                damage = damage,
+                hit = hit,
+                maxHit = scaledMaxHit
+            };
         }
 
         private void ApplyRangedDamage(RangedAttackContext context)

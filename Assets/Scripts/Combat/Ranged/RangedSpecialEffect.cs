@@ -8,6 +8,11 @@ namespace Combat.Ranged
     public struct RangedAttackContext
     {
         public CombatController combatController;
+        /// <summary>
+        /// Owning ranged combat controller responsible for preparing and releasing the shot.
+        /// Enables downstream effects to query helper methods or state during follow-up rolls.
+        /// </summary>
+        public RangedCombatController rangedController;
         public CombatantStats attacker;
         public CombatTarget target;
         public RangedWeaponData weapon;
@@ -16,6 +21,16 @@ namespace Combat.Ranged
         public Vector3 origin;
         public Vector3 targetPosition;
         public bool ammoConsumed;
+        /// <summary>
+        /// Final stacked accuracy multiplier applied when the primary shot was resolved.
+        /// Splash effects reuse this value so their secondary rolls honour the same modifiers.
+        /// </summary>
+        public float finalAccuracyMultiplier;
+        /// <summary>
+        /// Final stacked damage multiplier applied when the primary shot was resolved.
+        /// Secondary damage calculations scale from this cached value to remain deterministic.
+        /// </summary>
+        public float finalDamageMultiplier;
 
         /// <summary>
         /// True when the accuracy roll landed and damage should be considered.
