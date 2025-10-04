@@ -334,8 +334,12 @@ namespace Pets
             if (zeroForIdle || zeroForDeadZone)
             {
                 visualVelocity = Vector2.zero;
-                currentVelocity = Vector3.zero;
-                pathMover?.ResetCachedVelocity();
+
+                if (!positionApplied || navTeleported)
+                {
+                    currentVelocity = Vector3.zero;
+                    pathMover?.ResetCachedVelocity();
+                }
             }
 
             UpdateVisuals(visualVelocity, playerMoving, navUsed);
@@ -420,8 +424,12 @@ namespace Pets
             if (zeroForDeadZone)
             {
                 visualVelocity = Vector2.zero;
-                currentVelocity = Vector3.zero;
-                pathMover?.ResetCachedVelocity();
+
+                if (!positionApplied)
+                {
+                    currentVelocity = Vector3.zero;
+                    pathMover?.ResetCachedVelocity();
+                }
             }
 
             UpdateVisuals(visualVelocity, playerMoving: false, navUsed);
