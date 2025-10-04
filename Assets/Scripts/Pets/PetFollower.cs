@@ -225,10 +225,18 @@ namespace Pets
             Vector3 currentPosition = transform.position;
             Vector3 desiredAnchor = playerPos + offset;
             float distanceToAnchor = Vector3.Distance(currentPosition, desiredAnchor);
-            followAnchor = distanceToAnchor > maxDistance ? playerPos : desiredAnchor;
+            bool needsCatchUp = distanceToAnchor > maxDistance;
+
+            followAnchor = desiredAnchor;
+
+            if (needsCatchUp)
+            {
+                pathMover?.ResetFollowTracking();
+            }
 
             bool navUsed = false;
             Vector2 navVelocity = Vector2.zero;
+            float effectiveMoveSpeed = needsCatchUp ? moveSpeed * 2f : moveSpeed;
 
             if (useNavigationForFollowing && navAvailable && pathMover != null)
             {
@@ -236,7 +244,7 @@ namespace Pets
                 Vector2 navNext;
                 if (pathMover.TryStepFollow(
                         Time.fixedDeltaTime,
-                        moveSpeed,
+                        effectiveMoveSpeed,
                         Mathf.Max(0.1f, followRadius * 0.5f),
                         navigationWaypointArrivalThreshold,
                         navigationFollowRebuildDistance,
@@ -263,15 +271,28 @@ namespace Pets
 
             if (!navUsed)
             {
-                Vector3 smoothPosition = Vector3.SmoothDamp(
-                    currentPosition,
-                    followAnchor,
-                    ref currentVelocity,
-                    smoothTime,
-                    moveSpeed,
-                    Time.fixedDeltaTime);
+                if (needsCatchUp)
+                {
+                    Vector3 catchUpPosition = Vector3.MoveTowards(
+                        currentPosition,
+                        desiredAnchor,
+                        effectiveMoveSpeed * Time.fixedDeltaTime);
 
-                body.MovePosition(smoothPosition);
+                    body.MovePosition(catchUpPosition);
+                    currentVelocity = (catchUpPosition - currentPosition) / Time.fixedDeltaTime;
+                }
+                else
+                {
+                    Vector3 smoothPosition = Vector3.SmoothDamp(
+                        currentPosition,
+                        followAnchor,
+                        ref currentVelocity,
+                        smoothTime,
+                        moveSpeed,
+                        Time.fixedDeltaTime);
+
+                    body.MovePosition(smoothPosition);
+                }
             }
 
             if (Vector3.Distance(transform.position, playerPos) < followRadius * 0.5f)
