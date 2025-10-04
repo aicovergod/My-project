@@ -23,16 +23,18 @@ namespace NPC
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            var tgt = other.GetComponent<CombatTarget>();
-            if (tgt != null)
-                targets.Add(tgt);
+            // Probe both the collider and its parents so characters that expose child hitboxes still register correctly.
+            var target = other.GetComponent<CombatTarget>() ?? other.GetComponentInParent<CombatTarget>();
+            if (target != null)
+                targets.Add(target);
         }
 
         private void OnTriggerExit2D(Collider2D other)
         {
-            var tgt = other.GetComponent<CombatTarget>();
-            if (tgt != null)
-                targets.Remove(tgt);
+            // Mirror the entry lookup to ensure we remove the exact tracked target instance.
+            var target = other.GetComponent<CombatTarget>() ?? other.GetComponentInParent<CombatTarget>();
+            if (target != null)
+                targets.Remove(target);
         }
 
         private IEnumerator BurnRoutine()

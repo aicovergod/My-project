@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Combat;
 using Player;
@@ -15,14 +16,19 @@ namespace NPC
             var myFaction = owner.GetComponent<IFactionProvider>();
             var ownerTarget = owner.GetComponent<CombatTarget>();
             var hits = Physics2D.OverlapCircleAll(owner.transform.position, slamRange);
+            var processedTargets = new HashSet<CombatTarget>();
             foreach (var hit in hits)
             {
-                var otherTarget = hit.GetComponent<CombatTarget>();
+                // Resolve the combat target from either the collider or one of its parents so nested hitboxes are supported.
+                var otherTarget = hit.GetComponent<CombatTarget>() ?? hit.GetComponentInParent<CombatTarget>();
                 if (otherTarget == null || otherTarget == ownerTarget || !otherTarget.IsAlive)
+                    continue;
+                if (!processedTargets.Add(otherTarget))
                     continue;
                 if (myFaction != null)
                 {
-                    var otherFaction = hit.GetComponent<IFactionProvider>();
+                    // Apply the same parent-aware lookup for faction providers to respect pet/player faction settings.
+                    var otherFaction = hit.GetComponent<IFactionProvider>() ?? hit.GetComponentInParent<IFactionProvider>();
                     if (otherFaction != null && !myFaction.IsEnemy(otherFaction.Faction))
                         continue;
                 }
