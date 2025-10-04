@@ -141,12 +141,32 @@ public sealed class NpcPathfindingServiceDiagonalTests
 
         public Vector2 ResolvedGoal { get; private set; }
 
+        public DynamicNavOccupancyService.ReservationHandle ActiveReservation { get; private set; }
+
         public void HandlePathResult(int requestId, PathfindingService.PathStatus status, List<Vector2> worldPath, Vector2 resolvedGoalWorld)
         {
             HasResult = true;
             Status = status;
             Path = worldPath;
             ResolvedGoal = resolvedGoalWorld;
+        }
+
+        public int GetReservationRadius()
+        {
+            // Test movers do not need to reserve additional cells around their path.
+            return 0;
+        }
+
+        public int GetReservationDurationTicks()
+        {
+            // Returning 0 keeps reservations alive until the service explicitly clears them during the tests.
+            return 0;
+        }
+
+        public void BindReservationHandle(int requestId, DynamicNavOccupancyService.ReservationHandle handle)
+        {
+            // Store the handle so the tests can inspect it if necessary.
+            ActiveReservation = handle;
         }
     }
 }
