@@ -1,0 +1,84 @@
+using System.Collections;
+using UnityEngine;
+
+namespace Combat.Ranged
+{
+    /// <summary>
+    /// Handles projectile flight for ranged attacks. The behaviour is intentionally light weight so prefab
+    /// authors can layer additional visual components on top (trail renderers, particles, etc.).
+    /// </summary>
+    [DisallowMultipleComponent]
+    public class RangedProjectile : MonoBehaviour
+    {
+        [Tooltip("Seconds before the projectile self-destructs if it cannot find a target.")]
+        [SerializeField] private float maxLifetime = 10f;
+
+        private RangedCombatController owner;
+        private CombatTarget target;
+        private RangedAttackContext context;
+        private float speed;
+        private Coroutine travelRoutine;
+
+        /// <summary>
+        /// Initialises the projectile for travel towards <paramref name="target"/>.
+        /// </summary>
+        public void Initialise(RangedCombatController controller, CombatTarget target, RangedAttackContext ctx, float projectileSpeed)
+        {
+            owner = controller;
+            this.target = target;
+            context = ctx;
+            speed = Mathf.Max(0.1f, projectileSpeed);
+
+            if (travelRoutine != null)
+                StopCoroutine(travelRoutine);
+            travelRoutine = StartCoroutine(TravelRoutine());
+        }
+
+        private IEnumerator TravelRoutine()
+        {
+            float lifetime = 0f;
+            while (lifetime < maxLifetime)
+            {
+                Vector3 destination = ResolveDestination();
+                Vector3 toTarget = destination - transform.position;
+                float sqrDistance = toTarget.sqrMagnitude;
+                float step = speed * Time.deltaTime;
+                float sqrStep = step * step;
+
+                if (sqrDistance <= sqrStep || speed <= 0.001f)
+                {
+                    transform.position = destination;
+                    break;
+                }
+
+                transform.position += toTarget.normalized * step;
+                context.targetPosition = destination;
+                lifetime += Time.deltaTime;
+                yield return null;
+            }
+
+            travelRoutine = null;
+            owner?.HandleProjectileImpact(context, this);
+        }
+
+        private Vector3 ResolveDestination()
+        {
+            if (target != null)
+            {
+                context.targetPosition = target.transform.position;
+                return target.transform.position;
+            }
+
+            return context.targetPosition;
+        }
+
+        private void OnDisable()
+        {
+            if (travelRoutine != null)
+            {
+                StopCoroutine(travelRoutine);
+                travelRoutine = null;
+            }
+        }
+    }
+}
