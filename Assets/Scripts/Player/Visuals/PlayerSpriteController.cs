@@ -495,16 +495,7 @@ namespace Player.Visuals
                 set
                 {
                     singleIdle = value;
-
-                    if (idleFrames == null || idleFrames.Length == 0)
-                    {
-                        if (value != null)
-                            idleFrames = new[] { value };
-                    }
-                    else if (idleFrames.Length == 1)
-                    {
-                        idleFrames[0] = value;
-                    }
+                    idleFrames = value != null ? new[] { value } : null;
                 }
             }
 
@@ -514,16 +505,7 @@ namespace Player.Visuals
                 set
                 {
                     singleWalk = value;
-
-                    if (walkFrames == null || walkFrames.Length == 0)
-                    {
-                        if (value != null)
-                            walkFrames = new[] { value };
-                    }
-                    else if (walkFrames.Length == 1)
-                    {
-                        walkFrames[0] = value;
-                    }
+                    walkFrames = value != null ? new[] { value } : null;
                 }
             }
 
@@ -533,16 +515,7 @@ namespace Player.Visuals
                 set
                 {
                     singleConsume = value;
-
-                    if (consumeFrames == null || consumeFrames.Length == 0)
-                    {
-                        if (value != null)
-                            consumeFrames = new[] { value };
-                    }
-                    else if (consumeFrames.Length == 1)
-                    {
-                        consumeFrames[0] = value;
-                    }
+                    consumeFrames = value != null ? new[] { value } : null;
                 }
             }
 
