@@ -20,6 +20,7 @@ namespace Pets
         {
             None,
             Follow,
+            Attack,
             Wander
         }
 
@@ -54,6 +55,7 @@ namespace Pets
         private bool pendingTeleport;
         private Vector2 teleportDestination;
         private bool pendingWanderFailure;
+        private bool pendingAttackFailure;
         // Tracks whether we have already warned about the missing pathfinding service to avoid log spam while waiting.
         private bool hasLoggedMissingService;
         private DynamicNavOccupancyService.ReservationHandle activeReservationHandle;
@@ -92,6 +94,18 @@ namespace Pets
         /// drive sprites.
         /// </summary>
         public Vector2 CurrentVelocity => currentVelocity;
+
+        /// <summary>
+        /// Indicates whether the mover currently has an active navigation grid available. Callers can use this
+        /// to decide when to fall back to direct movement.
+        /// </summary>
+        public bool HasActiveNavigationGrid
+        {
+            get
+            {
+                return pathService != null && pathService.ActiveGrid != null && pathService.ActiveGrid.HasGrid;
+            }
+        }
 
         /// <summary>
         /// Returns true if the most recent wander request failed because the goal was unreachable. Call
@@ -250,6 +264,152 @@ namespace Pets
         }
 
         /// <summary>
+        /// Provides an attack step mirroring the follow logic while allowing callers to
+        /// supply a bespoke resolver for the target position. This keeps combat code free
+        /// from navigation concerns while ensuring pets correctly path around obstacles to
+        /// reach NPCs.
+        /// </summary>
+        /// <param name="deltaTime">Frame delta used when advancing along the path.</param>
+        /// <param name="moveSpeed">Movement speed applied while pursuing the target.</param>
+        /// <param name="stopDistance">Preferred distance to stop from the resolved goal.</param>
+        /// <param name="waypointTolerance">Tolerance applied when consuming waypoints.</param>
+        /// <param name="targetResolver">Resolver that returns the target position each frame.</param>
+        /// <param name="replanDistance">Distance the target must move before forcing a replan.</param>
+        /// <param name="teleportDistance">Distance that indicates the target teleported.</param>
+        /// <param name="nextPosition">Next world position produced by the path.</param>
+        /// <param name="velocity">Velocity to forward to movement/animation systems.</param>
+        /// <param name="teleported">True if the mover should snap directly to the goal.</param>
+        /// <param name="goalUnreachable">True if the pathfinder reported the goal as unreachable.</param>
+        /// <returns>True when navigation data produced a movement step.</returns>
+        public bool TryStepAttack(
+            float deltaTime,
+            float moveSpeed,
+            float stopDistance,
+            float waypointTolerance,
+            Func<Vector2> targetResolver,
+            float replanDistance,
+            float teleportDistance,
+            out Vector2 nextPosition,
+            out Vector2 velocity,
+            out bool teleported,
+            out bool goalUnreachable)
+        {
+            nextPosition = transform.position;
+            velocity = Vector2.zero;
+            teleported = false;
+            goalUnreachable = pendingAttackFailure;
+            currentVelocity = Vector2.zero;
+
+            if (pendingAttackFailure)
+            {
+                return false;
+            }
+
+            if (targetResolver == null)
+            {
+                ResetAttackTracking();
+                return false;
+            }
+
+            Vector2 target = targetResolver();
+            Vector2 currentPosition = transform.position;
+
+            SwitchMode(Mode.Attack);
+
+            if (pendingTeleport)
+            {
+                pendingTeleport = false;
+                teleported = true;
+                nextPosition = teleportDestination;
+                ClearPathData();
+                return true;
+            }
+
+            if (!EnsureServiceReference())
+            {
+                ResetAttackTracking();
+                return false;
+            }
+
+            var grid = pathService.ActiveGrid;
+            if (grid == null || !grid.HasGrid)
+            {
+                ResetAttackTracking();
+                return false;
+            }
+
+            float targetDelta = hasLastRequestedDestination
+                ? Vector2.Distance(target, lastRequestedDestination)
+                : float.MaxValue;
+
+            bool targetTeleported = Vector2.Distance(currentPosition, target) >= teleportDistance;
+            bool targetShifted = targetDelta >= replanDistance;
+            bool destinationShifted = hasResolvedDestination && Vector2.Distance(resolvedDestination, target) >= replanDistance;
+
+            if (targetTeleported)
+            {
+                if (enableDebugLogging)
+                {
+                    Debug.Log($"{name} detected attack target teleport. Snapping to {target}.", this);
+                }
+
+                teleportDestination = target;
+                pendingTeleport = true;
+                teleported = true;
+                nextPosition = teleportDestination;
+                ClearPathData();
+                return true;
+            }
+
+            if (!awaitingPath && (waypointQueue.Count == 0 || targetShifted || destinationShifted))
+            {
+                RequestPath(currentPosition, target, Mode.Attack);
+            }
+            else if (awaitingPath && targetShifted)
+            {
+                CancelOutstandingRequest();
+                RequestPath(currentPosition, target, Mode.Attack);
+            }
+
+            if (awaitingPath)
+            {
+                return false;
+            }
+
+            if (hasResolvedDestination)
+            {
+                float distanceToDestination = Vector2.Distance(currentPosition, resolvedDestination);
+                if (distanceToDestination <= Mathf.Max(stopDistance, waypointTolerance))
+                {
+                    ClearPathData();
+                    return false;
+                }
+            }
+
+            if (waypointQueue.Count == 0)
+            {
+                Vector2 destination = hasResolvedDestination ? resolvedDestination : target;
+                return StepToward(destination, currentPosition, moveSpeed, deltaTime, out nextPosition, out velocity, waypointTolerance, target);
+            }
+
+            Vector2 waypoint = waypointQueue.Peek();
+            bool stepped = StepToward(waypoint, currentPosition, moveSpeed, deltaTime, out nextPosition, out velocity, waypointTolerance, target);
+
+            if (stepped && Vector2.Distance(nextPosition, waypoint) <= Mathf.Max(waypointTolerance, defaultWaypointTolerance))
+            {
+                waypointQueue.Dequeue();
+                activeReservationHandle?.MarkWaypointConsumed();
+            }
+
+            if (Time.time - lastProgressTimestamp >= stuckTimeoutSeconds)
+            {
+                ForceReplan(target, currentPosition, Mode.Attack);
+            }
+
+            return stepped;
+        }
+
+        /// <summary>
         /// Provides a wander step when navigation data is available.
         /// </summary>
         public bool TryStepWander(
@@ -356,6 +516,22 @@ namespace Pets
         }
 
         /// <summary>
+        /// Clears attack state so future engagements start with a clean navigation slate.
+        /// </summary>
+        public void ResetAttackTracking()
+        {
+            if (currentMode == Mode.Attack)
+            {
+                ClearPathData();
+            }
+
+            pendingTeleport = false;
+            pendingAttackFailure = false;
+            hasLastRequestedDestination = false;
+            ReleaseReservationHandle();
+        }
+
+        /// <summary>
         /// Clears wander state and abandons pending requests.
         /// </summary>
         public void ResetWanderTracking()
@@ -400,6 +576,7 @@ namespace Pets
                 }
 
                 pendingWanderFailure = false;
+                pendingAttackFailure = false;
                 lastProgressTimestamp = Time.time;
                 return;
             }
@@ -415,6 +592,10 @@ namespace Pets
                 else if (currentMode == Mode.Wander)
                 {
                     pendingWanderFailure = true;
+                }
+                else if (currentMode == Mode.Attack)
+                {
+                    pendingAttackFailure = true;
                 }
 
                 if (enableDebugLogging)
@@ -517,6 +698,7 @@ namespace Pets
             currentMode = mode;
             pendingTeleport = false;
             pendingWanderFailure = false;
+            pendingAttackFailure = false;
             hasLastRequestedDestination = false;
         }
 
