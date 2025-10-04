@@ -161,7 +161,9 @@ namespace Pets
             hasPreviousTargetPosition = false;
             while (currentTarget != null && currentTarget.IsAlive)
             {
-                float deltaTime = Mathf.Max(Time.deltaTime, Mathf.Epsilon);
+                float navDeltaTime = hasRigidbody2D
+                    ? Mathf.Max(Time.fixedDeltaTime, Mathf.Epsilon)
+                    : Mathf.Max(Time.deltaTime, Mathf.Epsilon);
                 Vector3 startingPosition = transform.position;
                 Vector3 currentTargetPosition = currentTarget.transform.position;
                 Vector3 targetDelta = hasPreviousTargetPosition ? currentTargetPosition - previousTargetPosition : Vector3.zero;
@@ -180,7 +182,7 @@ namespace Pets
                     Vector2 nextPosition;
                     Vector2 navVelocity;
                     navigationStepTaken = pathMover.TryStepAttack(
-                        deltaTime,
+                        navDeltaTime,
                         moveSpeed,
                         CombatMath.MELEE_RANGE * 0.5f,
                         0.1f,
@@ -232,8 +234,8 @@ namespace Pets
                 if (!navigationStepTaken && navigationUnavailable)
                 {
                     Vector3 fallbackTargetPosition = currentTarget.transform.position;
-                    Vector3 newPos = Vector3.MoveTowards(startingPosition, fallbackTargetPosition, moveSpeed * deltaTime);
-                    movementVelocity = (newPos - startingPosition) / deltaTime;
+                    Vector3 newPos = Vector3.MoveTowards(startingPosition, fallbackTargetPosition, moveSpeed * navDeltaTime);
+                    movementVelocity = (newPos - startingPosition) / navDeltaTime;
 
                     if (hasRigidbody2D)
                     {
@@ -265,7 +267,9 @@ namespace Pets
 
                 visualVelocity = movementVelocity;
                 bool targetMovedWhileWaiting = targetDelta.sqrMagnitude > 0.0001f;
-                Vector2 targetMovementVelocity = targetMovedWhileWaiting ? (Vector2)(targetDelta / deltaTime) : Vector2.zero;
+                Vector2 targetMovementVelocity = targetMovedWhileWaiting
+                    ? (Vector2)(targetDelta / navDeltaTime)
+                    : Vector2.zero;
 
                 float dist = Vector2.Distance(transform.position, currentTarget.transform.position);
                 if (dist <= CombatMath.MELEE_RANGE)
