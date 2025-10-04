@@ -63,6 +63,9 @@ namespace Skills
         private string attackLevel = "";
         private string strengthLevel = "";
         private string defenceLevel = "";
+        [SerializeField]
+        [Tooltip("Serialized so QA can stage Ranged level overrides directly in the inspector when debugging scenes.")]
+        private string rangedLevel = "";
         private string magicLevel = "";
         private string miningLevel = "";
         private string woodcuttingLevel = "";
@@ -84,6 +87,7 @@ namespace Skills
         private const string AttackLevelControlName = "AdminF2Menu_AttackLevel";
         private const string StrengthLevelControlName = "AdminF2Menu_StrengthLevel";
         private const string DefenceLevelControlName = "AdminF2Menu_DefenceLevel";
+        private const string RangedLevelControlName = "AdminF2Menu_RangedLevel";
         private const string MagicLevelControlName = "AdminF2Menu_MagicLevel";
         private const string MiningLevelControlName = "AdminF2Menu_MiningLevel";
         private const string FishingLevelControlName = "AdminF2Menu_FishingLevel";
@@ -307,6 +311,7 @@ namespace Skills
             attackLevel = skillManager != null ? skillManager.GetLevel(SkillType.Attack).ToString() : "";
             strengthLevel = skillManager != null ? skillManager.GetLevel(SkillType.Strength).ToString() : "";
             defenceLevel = skillManager != null ? skillManager.GetLevel(SkillType.Defence).ToString() : "";
+            rangedLevel = skillManager != null ? skillManager.GetLevel(SkillType.Ranged).ToString() : "";
             magicLevel = skillManager != null ? skillManager.GetLevel(SkillType.Magic).ToString() : "";
             miningLevel = skillManager != null ? skillManager.GetLevel(SkillType.Mining).ToString() : "";
             woodcuttingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Woodcutting).ToString() : "";
@@ -339,6 +344,7 @@ namespace Skills
             attackLevel = DrawLevelField("Attack Level", AttackLevelControlName, attackLevel);
             strengthLevel = DrawLevelField("Strength Level", StrengthLevelControlName, strengthLevel);
             defenceLevel = DrawLevelField("Defence Level", DefenceLevelControlName, defenceLevel);
+            rangedLevel = DrawLevelField("Ranged Level", RangedLevelControlName, rangedLevel);
             magicLevel = DrawLevelField("Magic Level", MagicLevelControlName, magicLevel);
             miningLevel = DrawLevelField("Mining Level", MiningLevelControlName, miningLevel);
             fishingLevel = DrawLevelField("Fishing Level", FishingLevelControlName, fishingLevel);
@@ -415,6 +421,8 @@ namespace Skills
                     skillManager.DebugSetLevel(SkillType.Strength, str);
                 if (skillManager != null && int.TryParse(defenceLevel, out var def))
                     skillManager.DebugSetLevel(SkillType.Defence, def);
+                if (skillManager != null && int.TryParse(rangedLevel, out var rng))
+                    skillManager.DebugSetLevel(SkillType.Ranged, rng);
                 if (skillManager != null && int.TryParse(magicLevel, out var mag))
                     skillManager.DebugSetLevel(SkillType.Magic, mag);
                 if (skillManager != null && int.TryParse(miningLevel, out var mine))
