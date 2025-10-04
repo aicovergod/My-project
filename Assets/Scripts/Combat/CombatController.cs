@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Audio;
+using Combat.Ranged;
 using EquipmentSystem;
 using Skills;
 using Skills.Common;
@@ -109,6 +110,7 @@ namespace Combat
         private Coroutine attackRoutine;
         private CombatTarget currentTarget;
         private float nextAttackTime;
+        private RangedCombatController rangedController;
 
         [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
         private HitSplatLibrary hitSplatLibrary;
@@ -150,11 +152,19 @@ namespace Combat
                 ?? GetComponentInParent<PlayerMovementController>()
                 ?? GetComponentInChildren<PlayerMovementController>();
 
+            rangedController = rangedController
+                ?? GetComponent<RangedCombatController>()
+                ?? GetComponentInParent<RangedCombatController>()
+                ?? GetComponentInChildren<RangedCombatController>();
+
             if (movementController == null)
             {
                 var moverFacade = GetComponent<PlayerMover>() ?? GetComponentInParent<PlayerMover>() ?? GetComponentInChildren<PlayerMover>();
                 movementController = moverFacade != null ? moverFacade.MovementController : null;
             }
+
+            if (rangedController != null)
+                rangedController.BindCombatController(this);
 
             if (skills == null)
                 Debug.LogWarning("CombatController could not find a SkillManager; damage will use level 1 stats.", this);
@@ -351,7 +361,7 @@ namespace Combat
         /// <summary>
         /// Fetch the currently equipped weapon, returning null when unarmed.
         /// </summary>
-        private Inventory.ItemData GetEquippedWeapon()
+        internal Inventory.ItemData GetEquippedWeapon()
         {
             if (equipmentComponent == null)
                 return null;
@@ -377,14 +387,11 @@ namespace Combat
         /// </summary>
         private float GetRangedWeaponRange()
         {
-            float range = DEFAULT_RANGED_RANGE_TILES * TILE_SIZE;
-            var weapon = GetEquippedWeapon();
-            if (weapon == null)
-                return range;
+            float defaultRange = DEFAULT_RANGED_RANGE_TILES * TILE_SIZE;
+            if (rangedController != null)
+                return rangedController.ResolveRangedRange(defaultRange);
 
-            // Designers can introduce explicit ranged reach values later; until then the default is
-            // used for every projectile weapon.
-            return range;
+            return defaultRange;
         }
 
         /// <summary>
@@ -436,20 +443,23 @@ namespace Combat
             attackRoutine = null;
         }
 
-        private struct DamageResult
+        internal struct DamageResult
         {
             public int damage;
             public bool hit;
             public int maxHit;
         }
 
-        private DamageResult CalculateDamage(CombatantStats attacker, CombatTarget target)
+        internal DamageResult CalculateDamage(CombatantStats attacker, CombatTarget target)
         {
             var defender = GetDefenderStats(target, attacker);
 
-            int attEff = attacker.DamageType == DamageType.Magic
-                ? CombatMath.GetEffectiveAttack(attacker.MagicLevel, CombatStyle.Accurate)
-                : CombatMath.GetEffectiveAttack(attacker.AttackLevel, attacker.Style);
+            int attEff = attacker.DamageType switch
+            {
+                DamageType.Magic => CombatMath.GetEffectiveAttack(attacker.MagicLevel, CombatStyle.Accurate),
+                DamageType.Ranged => CombatMath.GetEffectiveRanged(attacker.RangedLevel, attacker.Style),
+                _ => CombatMath.GetEffectiveAttack(attacker.AttackLevel, attacker.Style)
+            };
             int defEff = CombatMath.GetEffectiveDefence(defender.DefenceLevel, defender.Style);
             // Mirror OSRS combat by selecting the correct offensive bonus based on the damage type.
             // Melee continues to rely on the weapon's attack rating, magic uses spell accuracy, and
@@ -473,10 +483,14 @@ namespace Combat
 
             int maxHit;
             if (attacker.DamageType == DamageType.Magic)
+            {
                 maxHit = MagicUI.ActiveSpellMaxHit + Mathf.FloorToInt(attacker.Equip.magic / 10f);
+            }
             else
             {
-                int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
+                int strEff = attacker.DamageType == DamageType.Ranged
+                    ? CombatMath.GetEffectiveRangedStrength(attacker.RangedLevel, attacker.Style)
+                    : CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
                 int strengthBonus = attacker.DamageType == DamageType.Ranged
                     ? attacker.Equip.range
                     : attacker.Equip.strength;
@@ -486,7 +500,7 @@ namespace Combat
             return new DamageResult { damage = damage, hit = hit, maxHit = maxHit };
         }
 
-        private CombatantStats GetDefenderStats(CombatTarget target, CombatantStats attacker)
+        internal CombatantStats GetDefenderStats(CombatTarget target, CombatantStats attacker)
         {
             CombatantStats stats = null;
             DamageType incomingType = attacker != null ? attacker.DamageType : DamageType.Melee;
@@ -512,6 +526,7 @@ namespace Combat
                 {
                     AttackLevel = 1,
                     StrengthLevel = 1,
+                    RangedLevel = 1,
                     DefenceLevel = 1,
                     MagicLevel = 1,
                     Equip = new EquipmentAggregator.CombinedStats(),
@@ -527,7 +542,7 @@ namespace Combat
             return stats;
         }
 
-        private int ApplyDamageResult(CombatTarget target, int damage, bool hit, int maxHit, CombatStyle style, DamageType type, SpellElement element)
+        internal int ApplyDamageResult(CombatTarget target, int damage, bool hit, int maxHit, CombatStyle style, DamageType type, SpellElement element)
         {
             var targetMb = target as MonoBehaviour;
             string targetName = targetMb != null ? targetMb.name : "target";
@@ -636,6 +651,10 @@ namespace Combat
                 {
                     ApplySpellDamage(target, context);
                 }
+            }
+            else if (attacker.DamageType == DamageType.Ranged && rangedController != null)
+            {
+                rangedController.ResolveRangedAttack(attacker, target, result);
             }
             else
             {
@@ -839,6 +858,23 @@ namespace Combat
             if (type == DamageType.Magic)
             {
                 skills?.AddXP(SkillType.Magic, 4 * damage);
+                return;
+            }
+            if (type == DamageType.Ranged)
+            {
+                float total = 4f * damage;
+                switch (style)
+                {
+                    case CombatStyle.Defensive:
+                    case CombatStyle.Controlled:
+                        float split = total * 0.5f;
+                        skills?.AddXP(SkillType.Ranged, split);
+                        skills?.AddXP(SkillType.Defence, split);
+                        break;
+                    default:
+                        skills?.AddXP(SkillType.Ranged, total);
+                        break;
+                }
                 return;
             }
             switch (style)

@@ -136,6 +136,7 @@ namespace Inventory
         private bool lastMergeState;
 
         private Sprite emptySlotSprite;
+        private Color ammoDefaultColor = Color.white;
 
         public int TotalAttackBonus { get; private set; }
         public int TotalDefenceBonus { get; private set; }
@@ -377,6 +378,68 @@ namespace Inventory
                 OnEquipmentChanged?.Invoke(slot);
                 ItemUseResolver.NotifyItemUsed(gameObject, entry.item, ItemUseType.Unequipped);
             }
+        }
+
+        /// <summary>
+        /// Consumes a quantity from the specified equipped stack. Returns false when insufficient ammo is available.
+        /// </summary>
+        /// <param name="slot">Equipment slot to consume from.</param>
+        /// <param name="amount">Number of items to remove.</param>
+        /// <param name="remaining">Outputs the stack size after consumption.</param>
+        public bool ConsumeEquipped(EquipmentSlot slot, int amount, out int remaining)
+        {
+            remaining = 0;
+            int index = SlotIndex(slot);
+            if (amount <= 0 || index < 0 || index >= equipped.Length)
+                return false;
+
+            var entry = equipped[index];
+            if (entry.item == null || entry.count < amount)
+                return false;
+
+            entry.count -= amount;
+            if (entry.count <= 0)
+            {
+                entry.item = null;
+                entry.count = 0;
+            }
+
+            equipped[index] = entry;
+            UpdateSlotVisual(slot);
+            OnEquipmentChanged?.Invoke(slot);
+            remaining = entry.count;
+            return true;
+        }
+
+        /// <summary>
+        /// Overrides the ammo slot stack text so gameplay systems can display warnings or custom counts.
+        /// Passing <c>null</c> restores the default behaviour that mirrors the equipped stack size.
+        /// </summary>
+        /// <param name="message">Custom message to display. Null to revert to default count display.</param>
+        /// <param name="color">Optional text colour override.</param>
+        public void OverrideAmmoLabel(string message, Color? color = null)
+        {
+            int index = SlotIndex(EquipmentSlot.Arrow);
+            if (slotCountTexts == null || index < 0 || index >= slotCountTexts.Length)
+                return;
+
+            var label = slotCountTexts[index];
+            if (label == null)
+                return;
+
+            if (message == null)
+            {
+                var entry = GetEquipped(EquipmentSlot.Arrow);
+                if (entry.item != null && entry.item.stackable && entry.count > 1)
+                    label.text = entry.count.ToString();
+                else
+                    label.text = string.Empty;
+                label.color = ammoDefaultColor;
+                return;
+            }
+
+            label.text = message;
+            label.color = color ?? ammoDefaultColor;
         }
 
         private void UpdateSlotVisual(EquipmentSlot slot)
@@ -706,6 +769,8 @@ namespace Inventory
                     countText.raycastTarget = false;
                     countText.color = Color.white;
                     countText.text = string.Empty;
+                    if (slot == EquipmentSlot.Arrow)
+                        ammoDefaultColor = countText.color;
                     var countRect = countGO.GetComponent<RectTransform>();
                     countRect.anchorMin = Vector2.zero;
                     countRect.anchorMax = Vector2.one;

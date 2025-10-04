@@ -41,6 +41,32 @@ namespace Combat
             return level + bonus + 8;
         }
 
+        /// <summary>
+        /// Mirrors the OSRS ranged effective level calculation. Accurate adds +3, defensive styles grant
+        /// +1 and rapid-style shots (represented by <see cref="CombatStyle.Aggressive"/>) provide no
+        /// bonus. A constant 8 is applied to keep low level accuracy consistent with melee and magic.
+        /// </summary>
+        public static int GetEffectiveRanged(int level, CombatStyle style)
+        {
+            int bonus = style switch
+            {
+                CombatStyle.Accurate => 3,
+                CombatStyle.Defensive => 1,
+                CombatStyle.Controlled => 1,
+                _ => 0
+            };
+            return level + bonus + 8;
+        }
+
+        /// <summary>
+        /// Effective strength when rolling ranged max hits. OSRS uses the same bonuses as accuracy,
+        /// so the helper simply mirrors <see cref="GetEffectiveRanged"/> while keeping the intent clear.
+        /// </summary>
+        public static int GetEffectiveRangedStrength(int level, CombatStyle style)
+        {
+            return GetEffectiveRanged(level, style);
+        }
+
         public static int GetEffectiveDefence(int level, CombatStyle style)
         {
             int bonus = style switch

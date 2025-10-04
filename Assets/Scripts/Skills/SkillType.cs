@@ -16,6 +16,7 @@ namespace Skills
         Hitpoints,
         Attack,
         Strength,
+        Ranged,
         Defence,
         Magic,
         Fishing

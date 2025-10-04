@@ -32,6 +32,7 @@ namespace Skills
             SkillType.Hitpoints,
             SkillType.Attack,
             SkillType.Strength,
+            SkillType.Ranged,
             SkillType.Defence,
             SkillType.Magic,
             SkillType.Beastmaster,
