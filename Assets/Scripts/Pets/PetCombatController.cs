@@ -43,6 +43,9 @@ namespace Pets
         private PetSpriteAnimator spriteAnimator;
         private Sprite defaultSprite;
         private Coroutine spriteSwapRoutine;
+        private PetPathMover pathMover;
+        private Rigidbody2D petRigidbody;
+        private bool hasRigidbody2D;
         private CombatTarget currentTarget;
         private Coroutine attackRoutine;
         private float nextAttackTime;
@@ -88,6 +91,7 @@ namespace Pets
         private void Awake()
         {
             follower = GetComponent<PetFollower>();
+            pathMover = GetComponent<PetPathMover>();
             animator = GetComponent<Animator>();
             spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
             spriteAnimator = GetComponent<PetSpriteAnimator>();
@@ -97,6 +101,10 @@ namespace Pets
                 col.isTrigger = true;
             if (TryGetComponent<Collider2D>(out var col2d))
                 col2d.isTrigger = true;
+            if (TryGetComponent(out petRigidbody))
+            {
+                hasRigidbody2D = true;
+            }
 
             EnsureHitSplatLibrary();
 
@@ -148,30 +156,116 @@ namespace Pets
         private IEnumerator AttackRoutine()
         {
             follower.enabled = false;
+            pathMover?.ResetAttackTracking();
             hasLastNonZeroChaseVelocity = false;
             hasPreviousTargetPosition = false;
             while (currentTarget != null && currentTarget.IsAlive)
             {
                 float deltaTime = Mathf.Max(Time.deltaTime, Mathf.Epsilon);
-                Vector3 pos = transform.position;
-                Vector3 targetPos = currentTarget.transform.position;
-                Vector3 targetDelta = Vector3.zero;
-                if (hasPreviousTargetPosition)
-                    targetDelta = targetPos - previousTargetPosition;
-                previousTargetPosition = targetPos;
+                Vector3 startingPosition = transform.position;
+                Vector3 currentTargetPosition = currentTarget.transform.position;
+                Vector3 targetDelta = hasPreviousTargetPosition ? currentTargetPosition - previousTargetPosition : Vector3.zero;
+                previousTargetPosition = currentTargetPosition;
                 hasPreviousTargetPosition = true;
-                Vector3 newPos = Vector3.MoveTowards(pos, targetPos, moveSpeed * deltaTime);
-                Vector2 velocity = (newPos - pos) / deltaTime;
-                bool hasChaseVelocity = velocity.sqrMagnitude > 0.0001f;
+
+                Vector2 movementVelocity = Vector2.zero;
+                bool hasChaseVelocity = false;
+                Vector2 visualVelocity;
+                bool navigationStepTaken = false;
+                bool goalUnreachable;
+
+                if (pathMover != null && pathMover.isActiveAndEnabled)
+                {
+                    bool teleported;
+                    Vector2 nextPosition;
+                    Vector2 navVelocity;
+                    navigationStepTaken = pathMover.TryStepAttack(
+                        deltaTime,
+                        moveSpeed,
+                        CombatMath.MELEE_RANGE * 0.5f,
+                        0.1f,
+                        ResolveAttackTargetPosition,
+                        CombatMath.MELEE_RANGE * 0.75f,
+                        CombatMath.MELEE_RANGE * 6f,
+                        out nextPosition,
+                        out navVelocity,
+                        out teleported,
+                        out goalUnreachable);
+
+                    if (goalUnreachable)
+                    {
+                        ApplyVisualVelocity(Vector2.zero);
+                        break;
+                    }
+
+                    if (navigationStepTaken)
+                    {
+                        if (hasRigidbody2D)
+                        {
+                            if (teleported)
+                            {
+                                petRigidbody.position = nextPosition;
+                                petRigidbody.velocity = Vector2.zero;
+                            }
+                            else
+                            {
+                                petRigidbody.MovePosition(nextPosition);
+                                petRigidbody.velocity = navVelocity;
+                            }
+                        }
+                        else
+                        {
+                            transform.position = nextPosition;
+                        }
+
+                        movementVelocity = navVelocity;
+                        hasChaseVelocity = movementVelocity.sqrMagnitude > 0.0001f;
+                    }
+                }
+                else
+                {
+                    goalUnreachable = false;
+                }
+
+                bool navigationUnavailable = pathMover == null || !pathMover.isActiveAndEnabled || !pathMover.HasActiveNavigationGrid;
+
+                if (!navigationStepTaken && navigationUnavailable)
+                {
+                    Vector3 fallbackTargetPosition = currentTarget.transform.position;
+                    Vector3 newPos = Vector3.MoveTowards(startingPosition, fallbackTargetPosition, moveSpeed * deltaTime);
+                    movementVelocity = (newPos - startingPosition) / deltaTime;
+
+                    if (hasRigidbody2D)
+                    {
+                        petRigidbody.MovePosition(newPos);
+                        petRigidbody.velocity = movementVelocity;
+                    }
+                    else
+                    {
+                        transform.position = newPos;
+                    }
+
+                    hasChaseVelocity = movementVelocity.sqrMagnitude > 0.0001f;
+                }
+
+                if (!navigationStepTaken && !navigationUnavailable)
+                {
+                    movementVelocity = Vector2.zero;
+                    if (hasRigidbody2D)
+                    {
+                        petRigidbody.velocity = Vector2.zero;
+                    }
+                }
+
                 if (hasChaseVelocity)
                 {
-                    lastNonZeroChaseVelocity = velocity;
+                    lastNonZeroChaseVelocity = movementVelocity;
                     hasLastNonZeroChaseVelocity = true;
                 }
-                Vector2 visualVelocity = velocity;
+
+                visualVelocity = movementVelocity;
                 bool targetMovedWhileWaiting = targetDelta.sqrMagnitude > 0.0001f;
                 Vector2 targetMovementVelocity = targetMovedWhileWaiting ? (Vector2)(targetDelta / deltaTime) : Vector2.zero;
-                transform.position = newPos;
 
                 float dist = Vector2.Distance(transform.position, currentTarget.transform.position);
                 if (dist <= CombatMath.MELEE_RANGE)
@@ -412,6 +506,13 @@ namespace Pets
             hasPreviousTargetPosition = false;
             lastNonZeroChaseVelocity = Vector2.zero;
             previousTargetPosition = Vector3.zero;
+            pathMover?.ResetAttackTracking();
+            pathMover?.ResetCachedVelocity();
+
+            if (hasRigidbody2D)
+            {
+                petRigidbody.velocity = Vector2.zero;
+            }
 
             if (spriteSwapRoutine != null)
             {
@@ -442,6 +543,16 @@ namespace Pets
                 spriteAnimator.UpdateVisuals(velocity);
             else if (spriteRenderer != null)
                 spriteRenderer.flipX = velocity.x > 0f;
+        }
+
+        private Vector2 ResolveAttackTargetPosition()
+        {
+            if (currentTarget == null)
+            {
+                return transform.position;
+            }
+
+            return currentTarget.transform.position;
         }
     }
 }
