@@ -207,12 +207,12 @@ namespace Pets
                             if (teleported)
                             {
                                 petRigidbody.position = nextPosition;
-                                petRigidbody.velocity = Vector2.zero;
+                                petRigidbody.linearVelocity = Vector2.zero;
                             }
                             else
                             {
                                 petRigidbody.MovePosition(nextPosition);
-                                petRigidbody.velocity = navVelocity;
+                                petRigidbody.linearVelocity = navVelocity;
                             }
                         }
                         else
@@ -240,7 +240,7 @@ namespace Pets
                     if (hasRigidbody2D)
                     {
                         petRigidbody.MovePosition(newPos);
-                        petRigidbody.velocity = movementVelocity;
+                        petRigidbody.linearVelocity = movementVelocity;
                     }
                     else
                     {
@@ -255,7 +255,7 @@ namespace Pets
                     movementVelocity = Vector2.zero;
                     if (hasRigidbody2D)
                     {
-                        petRigidbody.velocity = Vector2.zero;
+                        petRigidbody.linearVelocity = Vector2.zero;
                     }
                 }
 
@@ -298,7 +298,7 @@ namespace Pets
                     visualVelocity = Vector2.zero;
 
                     if (hasRigidbody2D)
-                        petRigidbody.velocity = Vector2.zero;
+                        petRigidbody.linearVelocity = Vector2.zero;
 
                     ApplyVisualVelocity(visualVelocity);
                     nextAttackTime = Time.time + definition.attackSpeedTicks * CombatMath.TICK_SECONDS;
@@ -524,7 +524,7 @@ namespace Pets
 
             if (hasRigidbody2D)
             {
-                petRigidbody.velocity = Vector2.zero;
+                petRigidbody.linearVelocity = Vector2.zero;
             }
 
             if (spriteSwapRoutine != null)
