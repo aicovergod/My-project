@@ -451,9 +451,16 @@ namespace Combat
                 ? CombatMath.GetEffectiveAttack(attacker.MagicLevel, CombatStyle.Accurate)
                 : CombatMath.GetEffectiveAttack(attacker.AttackLevel, attacker.Style);
             int defEff = CombatMath.GetEffectiveDefence(defender.DefenceLevel, defender.Style);
-            int atkRoll = attacker.DamageType == DamageType.Magic
-                ? CombatMath.GetAttackRoll(attEff, attacker.Equip.magic)
-                : CombatMath.GetAttackRoll(attEff, attacker.Equip.attack);
+            // Mirror OSRS combat by selecting the correct offensive bonus based on the damage type.
+            // Melee continues to rely on the weapon's attack rating, magic uses spell accuracy, and
+            // ranged now honours the weapon's range accuracy bonus instead of the melee attack value.
+            int attackBonus = attacker.DamageType switch
+            {
+                DamageType.Magic => attacker.Equip.magic,
+                DamageType.Ranged => attacker.Equip.range,
+                _ => attacker.Equip.attack
+            };
+            int atkRoll = CombatMath.GetAttackRoll(attEff, attackBonus);
             int defBonus = attacker.DamageType switch
             {
                 DamageType.Magic => defender.Equip.magicDef,
@@ -470,7 +477,10 @@ namespace Combat
             else
             {
                 int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
-                maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
+                int strengthBonus = attacker.DamageType == DamageType.Ranged
+                    ? attacker.Equip.range
+                    : attacker.Equip.strength;
+                maxHit = CombatMath.GetMaxHit(strEff, strengthBonus);
             }
             int damage = hit ? CombatMath.RollDamage(maxHit) : 0;
             return new DamageResult { damage = damage, hit = hit, maxHit = maxHit };
