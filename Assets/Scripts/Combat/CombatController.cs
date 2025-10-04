@@ -19,6 +19,35 @@ using Util;
 namespace Combat
 {
     /// <summary>
+    /// Captures the data required to apply a single spell impact. The payload persists while a
+    /// projectile travels so the combat controller can resolve hits consistently regardless of
+    /// whether the spell lands instantly or after a delay.
+    /// </summary>
+    public struct SpellImpactContext
+    {
+        /// <summary>True when the accuracy roll succeeded and damage should be applied.</summary>
+        public bool hit;
+
+        /// <summary>The raw damage value rolled for this spell impact.</summary>
+        public int damage;
+
+        /// <summary>The maximum possible hit for the spell when it was cast.</summary>
+        public int maxHit;
+
+        /// <summary>The combat style that awarded XP for the cast.</summary>
+        public CombatStyle style;
+
+        /// <summary>The damage category associated with the cast.</summary>
+        public DamageType damageType;
+
+        /// <summary>The elemental type of the spell that landed.</summary>
+        public SpellElement element;
+
+        /// <summary>The definition backing the spell, used for status effect application.</summary>
+        public SpellDefinition spell;
+    }
+
+    /// <summary>
     /// Handles combat resolution and XP assignment using OSRS-style formulas.
     /// </summary>
     [DisallowMultipleComponent]
@@ -80,13 +109,6 @@ namespace Combat
         private Coroutine attackRoutine;
         private CombatTarget currentTarget;
         private float nextAttackTime;
-
-        private CombatStyle pendingStyle;
-        private DamageType pendingType;
-        private int pendingMaxHit;
-        private SpellElement pendingElement;
-        private SpellDefinition pendingSpell;
-        private bool pendingSpellHit;
 
         [SerializeField, Tooltip("Centralised hitsplat sprite references assigned via the inspector.")]
         private HitSplatLibrary hitSplatLibrary;
@@ -276,8 +298,8 @@ namespace Combat
         public float CurrentAttackRange => GetCurrentAttackRange();
 
         /// <summary>
-        /// Determine the effective range for the next attack based on the pending combat data and
-        /// the currently equipped weapon. Melee styles respect the melee reach, ranged defaults to
+        /// Determine the effective range for the next attack based on the combat data returned by the
+        /// loadout and currently equipped weapon. Melee styles respect the melee reach, ranged defaults to
         /// a configured projectile span, and magic defers to the active spell definition.
         /// </summary>
         private float GetCurrentAttackRange()
@@ -295,24 +317,12 @@ namespace Combat
         }
 
         /// <summary>
-        /// Resolve the most accurate damage type for the upcoming attack. When a combat routine is
-        /// active the pending type captured during resolution is preferred; otherwise fall back to
-        /// the loadout and equipped weapon to infer whether the player is wielding ranged or magic
-        /// gear.
+        /// Resolve the most accurate damage type for the upcoming attack. The active combat stats
+        /// dictate the preferred type, falling back to the active spell, loadout, or equipped weapon
+        /// when necessary.
         /// </summary>
         private DamageType DetermineActiveDamageType()
         {
-            // Pending attack data provides the most up-to-date style while an attack coroutine is
-            // running. This ensures projectiles or queued swings keep their intended damage type
-            // even if the player swaps gear mid-action.
-            if (attackRoutine != null)
-            {
-                if (pendingType == DamageType.Magic || pendingType == DamageType.Ranged)
-                    return pendingType;
-                if (pendingSpell != null)
-                    return DamageType.Magic;
-            }
-
             CombatantStats stats = null;
             if (combatBinder != null)
                 stats = combatBinder.GetCombatantStats();
@@ -321,6 +331,10 @@ namespace Combat
 
             if (stats != null)
                 return stats.DamageType;
+
+            var activeSpell = MagicUI.ActiveSpell;
+            if (activeSpell != null)
+                return DamageType.Magic;
 
             var weapon = GetEquippedWeapon();
             if (weapon != null)
@@ -331,7 +345,7 @@ namespace Combat
                     return DamageType.Ranged;
             }
 
-            return pendingType != DamageType.Melee ? pendingType : DamageType.Melee;
+            return DamageType.Melee;
         }
 
         /// <summary>
@@ -578,34 +592,31 @@ namespace Combat
             else
                 attacker = CombatantStats.ForPlayer(skills, equipment, CombatStyle.Accurate, DamageType.Melee);
 
-            pendingSpell = null;
-            pendingSpellHit = false;
-
             var result = CalculateDamage(attacker, target);
             var activeSpell = MagicUI.ActiveSpell;
 
             if (attacker.DamageType == DamageType.Magic)
             {
+                SpellImpactContext context = new SpellImpactContext
+                {
+                    hit = result.hit,
+                    damage = result.damage,
+                    maxHit = result.maxHit,
+                    style = attacker.Style,
+                    damageType = attacker.DamageType,
+                    element = activeSpell != null ? activeSpell.element : SpellElement.None,
+                    spell = activeSpell
+                };
+
                 if (activeSpell != null && activeSpell.projectilePrefab != null)
                 {
-                    pendingStyle = attacker.Style;
-                    pendingType = attacker.DamageType;
-                    pendingMaxHit = result.maxHit;
-                    pendingElement = activeSpell.element;
-                    pendingSpell = activeSpell;
-                    pendingSpellHit = result.hit;
-
                     var projObj = Instantiate(activeSpell.projectilePrefab, transform.position, Quaternion.identity);
                     var proj = projObj.GetComponent<Magic.FireProjectile>();
                     if (proj != null)
                     {
-                        proj.target = target;
-                        proj.damage = result.damage;
-                        proj.maxHit = result.maxHit;
-                        proj.owner = this;
-                        proj.style = attacker.Style;
-                        proj.damageType = attacker.DamageType;
-                        proj.speed = activeSpell.speed;
+                        proj.Initialise(this, target, context);
+                        if (activeSpell.speed > 0f)
+                            proj.speed = activeSpell.speed;
                         proj.hitFadeTime = activeSpell.hitFadeTime;
                         if (activeSpell.hitEffectPrefab != null)
                             proj.hitEffectPrefab = activeSpell.hitEffectPrefab;
@@ -613,10 +624,7 @@ namespace Combat
                 }
                 else
                 {
-                    SpellElement element = activeSpell != null ? activeSpell.element : SpellElement.None;
-                    int primaryDamage = ApplyDamageResult(target, result.damage, result.hit, result.maxHit, attacker.Style, attacker.DamageType, element);
-                    if (activeSpell != null)
-                        TryApplySpellStatusEffects(target, activeSpell, result.hit);
+                    ApplySpellDamage(target, context);
                 }
             }
             else
@@ -626,19 +634,23 @@ namespace Combat
             }
         }
 
-        public void ApplySpellDamage(CombatTarget target, int damage)
+        /// <summary>
+        /// Applies the outcome of a spell cast to the supplied target using a prepared impact
+        /// context. Shared by both instant-hit and projectile-driven spells so damage, XP, and
+        /// status effects remain consistent.
+        /// </summary>
+        public void ApplySpellDamage(CombatTarget target, SpellImpactContext context)
         {
-            bool hit = pendingSpellHit;
-            int resolvedDamage = hit ? Mathf.Max(0, damage) : 0;
-            var spell = pendingSpell;
+            if (target == null)
+                return;
 
-            ApplyDamageResult(target, resolvedDamage, hit, pendingMaxHit, pendingStyle, pendingType, pendingElement);
+            bool hit = context.hit;
+            int resolvedDamage = hit ? Mathf.Max(0, context.damage) : 0;
 
-            if (hit && spell != null)
-                TryApplySpellStatusEffects(target, spell, hit);
+            ApplyDamageResult(target, resolvedDamage, hit, context.maxHit, context.style, context.damageType, context.element);
 
-            pendingSpell = null;
-            pendingSpellHit = false;
+            if (hit && context.spell != null)
+                TryApplySpellStatusEffects(target, context.spell, hit);
         }
 
         private void TryApplySpellStatusEffects(CombatTarget target, SpellDefinition spell, bool hit)

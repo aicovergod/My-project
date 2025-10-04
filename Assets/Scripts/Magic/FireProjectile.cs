@@ -9,18 +9,39 @@ namespace Magic
     [RequireComponent(typeof(SpriteRenderer))]
     public class FireProjectile : MonoBehaviour
     {
-        public CombatTarget target;
+        [Tooltip("Projectile travel speed in world units per second.")]
         public float speed = 8f;
-        public int damage;
-        public int maxHit;
+
+        [Tooltip("Optional impact effect spawned when the projectile collides with its target.")]
         public GameObject hitEffectPrefab;
+
+        [Tooltip("Time the spawned hit effect remains active before fading.")]
         public float hitFadeTime = 0.5f;
+
+        [Tooltip("Sprite displayed for the projectile while travelling.")]
         public Sprite projectileSprite;
-        public CombatController owner;
-        public CombatStyle style;
-        public DamageType damageType = DamageType.Magic;
-        [SerializeField] private float selfDestructTime = 10f;
+
+        [SerializeField, Tooltip("Failsafe lifetime so orphaned projectiles self-destruct.")]
+        private float selfDestructTime = 10f;
+
+        private CombatTarget target;
+        private CombatController owner;
+        private SpellImpactContext impactContext;
+        private bool hasImpactContext;
         private float timer;
+
+        /// <summary>
+        /// Configures the projectile to travel toward the supplied target using the provided impact
+        /// context. The context persists until impact so damage and status effect resolution matches
+        /// instant-cast spells.
+        /// </summary>
+        public void Initialise(CombatController ownerController, CombatTarget combatTarget, SpellImpactContext context)
+        {
+            owner = ownerController;
+            target = combatTarget;
+            impactContext = context;
+            hasImpactContext = true;
+        }
 
         private void Awake()
         {
@@ -39,7 +60,8 @@ namespace Magic
             }
 
             Vector2 dir = (Vector2)(target.transform.position - transform.position);
-            transform.up = dir;
+            if (dir.sqrMagnitude > Mathf.Epsilon)
+                transform.up = dir;
 
             transform.position = Vector2.MoveTowards(transform.position,
                 target.transform.position, speed * Time.deltaTime);
@@ -65,7 +87,11 @@ namespace Magic
                     effect.Initialize(hitFadeTime);
             }
 
-            owner?.ApplySpellDamage(target, damage);
+            if (hasImpactContext)
+                owner?.ApplySpellDamage(target, impactContext);
+            else
+                Debug.LogWarning("FireProjectile impacted without a valid impact context; no damage applied.", this);
+
             Destroy(gameObject);
         }
     }
