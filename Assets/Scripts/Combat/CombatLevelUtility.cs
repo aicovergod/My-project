@@ -20,11 +20,14 @@ namespace Combat
         /// <summary>Multiplier used for the magic style before the offensive weight is applied.</summary>
         internal const float MagicStyleMultiplier = 2f;
 
+        /// <summary>Multiplier used for the ranged style before the offensive weight is applied.</summary>
+        internal const float RangedStyleMultiplier = 2f;
+
         /// <summary>
         /// Lightweight breakdown data produced alongside the combat level
         /// calculation. Keeping this structure available means future unit tests
-        /// can assert exact contribution values without duplicating the combat
-        /// formula.
+        /// can assert exact contribution values across melee, magic, and ranged
+        /// styles without duplicating the combat formula.
         /// </summary>
         public readonly struct CombatLevelBreakdown
         {
@@ -43,6 +46,9 @@ namespace Combat
             /// <summary>Raw Magic level pulled from the <see cref="SkillManager"/>.</summary>
             public readonly int MagicLevel;
 
+            /// <summary>Raw Ranged level pulled from the <see cref="SkillManager"/>.</summary>
+            public readonly int RangedLevel;
+
             /// <summary>Contribution from defensive stats prior to flooring.</summary>
             public readonly float BaseContribution;
 
@@ -51,6 +57,9 @@ namespace Combat
 
             /// <summary>Magic offensive contribution prior to flooring.</summary>
             public readonly float MagicContribution;
+
+            /// <summary>Ranged offensive contribution prior to flooring.</summary>
+            public readonly float RangedContribution;
 
             /// <summary>Offensive contribution selected for the final total.</summary>
             public readonly float SelectedOffensiveContribution;
@@ -64,9 +73,11 @@ namespace Combat
                 int attackLevel,
                 int strengthLevel,
                 int magicLevel,
+                int rangedLevel,
                 float baseContribution,
                 float meleeContribution,
                 float magicContribution,
+                float rangedContribution,
                 float selectedOffensiveContribution,
                 int combatLevel)
             {
@@ -75,9 +86,11 @@ namespace Combat
                 AttackLevel = attackLevel;
                 StrengthLevel = strengthLevel;
                 MagicLevel = magicLevel;
+                RangedLevel = rangedLevel;
                 BaseContribution = baseContribution;
                 MeleeContribution = meleeContribution;
                 MagicContribution = magicContribution;
+                RangedContribution = rangedContribution;
                 SelectedOffensiveContribution = selectedOffensiveContribution;
                 CombatLevel = combatLevel;
             }
@@ -105,19 +118,21 @@ namespace Combat
         internal static CombatLevelBreakdown CalculateCombatLevelInternal(SkillManager skills)
         {
             if (skills == null)
-                return new CombatLevelBreakdown(0, 0, 0, 0, 0, 0f, 0f, 0f, 0f, 1);
+                return new CombatLevelBreakdown(0, 0, 0, 0, 0, 0, 0f, 0f, 0f, 0f, 0f, 1);
 
             int defence = Mathf.Max(0, skills.GetLevel(SkillType.Defence));
             int hitpoints = Mathf.Max(0, skills.GetLevel(SkillType.Hitpoints));
             int attack = Mathf.Max(0, skills.GetLevel(SkillType.Attack));
             int strength = Mathf.Max(0, skills.GetLevel(SkillType.Strength));
             int magic = Mathf.Max(0, skills.GetLevel(SkillType.Magic));
+            int ranged = Mathf.Max(0, skills.GetLevel(SkillType.Ranged));
 
             float baseContribution = (defence + hitpoints) * BaseContributionWeight;
             float meleeContribution = (attack + strength) * OffensiveContributionWeight;
             float magicContribution = magic * MagicStyleMultiplier * OffensiveContributionWeight;
+            float rangedContribution = ranged * RangedStyleMultiplier * OffensiveContributionWeight;
 
-            float selectedOffensiveContribution = Mathf.Max(meleeContribution, magicContribution);
+            float selectedOffensiveContribution = Mathf.Max(meleeContribution, Mathf.Max(magicContribution, rangedContribution));
             float combatLevelValue = baseContribution + selectedOffensiveContribution;
             int combatLevel = Mathf.Max(1, Mathf.FloorToInt(combatLevelValue));
 
@@ -127,9 +142,11 @@ namespace Combat
                 attack,
                 strength,
                 magic,
+                ranged,
                 baseContribution,
                 meleeContribution,
                 magicContribution,
+                rangedContribution,
                 selectedOffensiveContribution,
                 combatLevel);
         }
