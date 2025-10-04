@@ -292,6 +292,15 @@ namespace Pets
 
                     ApplyVisualVelocity(visualVelocity);
                     ResolveAttack(currentTarget);
+
+                    // Reset any residual velocity so the pet remains parked next to the target while waiting for the next swing.
+                    movementVelocity = Vector2.zero;
+                    visualVelocity = Vector2.zero;
+
+                    if (hasRigidbody2D)
+                        petRigidbody.velocity = Vector2.zero;
+
+                    ApplyVisualVelocity(visualVelocity);
                     nextAttackTime = Time.time + definition.attackSpeedTicks * CombatMath.TICK_SECONDS;
                     int waitTicks = definition.attackSpeedTicks;
                     if (currentTarget == null || !currentTarget.IsAlive)
