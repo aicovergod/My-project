@@ -371,9 +371,11 @@ namespace Pets
             }
 
             bool navUsed = false;
+            bool waitingOnNavigation = false;
             Vector2 navVelocity = Vector2.zero;
+            bool navigationEligible = respectNavigation && navAvailable && pathMover != null;
 
-            if (respectNavigation && navAvailable && pathMover != null)
+            if (navigationEligible)
             {
                 Vector2 navNext;
                 if (pathMover.TryStepWander(
@@ -391,17 +393,31 @@ namespace Pets
                     resolvedPosition = navPosition3D;
                     positionApplied = true;
                 }
+                else
+                {
+                    // Navigation is active but still resolving (e.g. awaiting a path), so pause in place.
+                    waitingOnNavigation = true;
+                    currentVelocity = Vector3.zero;
+                    pathMover.ResetCachedVelocity();
+                    body.velocity = Vector2.zero;
+                }
 
                 if (pathMover.HasPendingWanderFailure)
                 {
                     pathMover.ConsumePendingWanderFailure();
                     wanderTarget = SampleWanderTarget(playerPos, grid);
                     pathMover.ResetWanderTracking();
-                    navUsed = false;
+                    waitingOnNavigation = true;
+                    if (!navUsed)
+                    {
+                        currentVelocity = Vector3.zero;
+                        pathMover.ResetCachedVelocity();
+                        body.velocity = Vector2.zero;
+                    }
                 }
             }
 
-            if (!navUsed)
+            if (!navUsed && !navigationEligible)
             {
                 Vector3 smoothPosition = Vector3.SmoothDamp(
                     currentPosition,
@@ -427,12 +443,13 @@ namespace Pets
                 }
             }
 
+            bool zeroForWaiting = waitingOnNavigation;
             bool zeroForDeadZone = visualVelocity.sqrMagnitude <= MovementDeadZoneSqr;
-            if (zeroForDeadZone)
+            if (zeroForDeadZone || zeroForWaiting)
             {
                 visualVelocity = Vector2.zero;
 
-                if (!positionApplied)
+                if (!positionApplied || zeroForWaiting)
                 {
                     currentVelocity = Vector3.zero;
                     pathMover?.ResetCachedVelocity();
