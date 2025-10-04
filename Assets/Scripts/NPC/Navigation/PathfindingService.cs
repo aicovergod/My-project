@@ -45,6 +45,8 @@ namespace NPC
             public bool Prepared;
             public bool UsedStartFallback;
             public int GridRevisionAtStart;
+            public bool WaitingOnOccupancy;
+            public int OccupancyResumeTick;
 
             public PathRequest(int id, IPathMoverClient mover, Vector2 start, Vector2 goal)
             {
@@ -285,6 +287,10 @@ namespace NPC
         [Tooltip("Maximum number of path searches stepped in parallel each tick.")]
         [SerializeField, Range(1, 16)] private int maxConcurrentRequests = 4;
 
+        [Header("Dynamic Occupancy")]
+        [Tooltip("Optional occupancy service that tracks temporary tile reservations while movers follow their paths.")]
+        [SerializeField] private DynamicNavOccupancyService occupancyService;
+
         [Header("Smoothing")]
         [Tooltip("Removes redundant intermediate cells from generated paths so movers follow cleaner corridors.")]
         [SerializeField] private bool enablePathSmoothing = true;
@@ -310,10 +316,12 @@ namespace NPC
         /// </summary>
         private readonly HashSet<Vector2Int> resolveVisited = new HashSet<Vector2Int>();
         private readonly List<PathRequest> activeRequests = new List<PathRequest>();
+        private readonly List<PathRequest> occupancyDelayedRequests = new List<PathRequest>();
         private int nextRequestId = 1;
         private bool subscribedToTicker;
         private Coroutine tickerSubscriptionRoutine;
         private int nextActiveRequestIndex;
+        private bool occupancyServiceSubscribed;
 
         /// <summary>
         /// Active singleton instance.
@@ -343,6 +351,7 @@ namespace NPC
             base.Awake();
             instance = this;
             EnsureGridReference();
+            EnsureOccupancyService();
         }
 
         private void Start()
@@ -359,11 +368,13 @@ namespace NPC
 
             SubscribeToTicker();
             EnsureGridReference();
+            EnsureOccupancyService();
         }
 
         private void OnDisable()
         {
             UnsubscribeFromTicker();
+            DetachOccupancyService();
         }
 
         private void OnDestroy()
@@ -375,6 +386,7 @@ namespace NPC
                 {
                     navGrid.GridRebuilt -= HandleGridRebuilt;
                 }
+                DetachOccupancyService();
                 instance = null;
             }
         }
@@ -458,6 +470,9 @@ namespace NPC
         {
             PruneDeadMoverReferences();
 
+            EnsureOccupancyService();
+            PromoteDelayedRequests();
+
             if (!EnsureGridReference())
             {
                 if (activeRequests.Count > 0)
@@ -524,6 +539,16 @@ namespace NPC
                     continue;
                 }
 
+                if (request.WaitingOnOccupancy)
+                {
+                    if (!occupancyDelayedRequests.Contains(request))
+                    {
+                        occupancyDelayedRequests.Add(request);
+                    }
+
+                    continue;
+                }
+
                 if (IsRequestSuperseded(request, out int supersedingId))
                 {
                     if (enableDebugLogging)
@@ -553,6 +578,8 @@ namespace NPC
                     continue;
                 }
 
+                request.WaitingOnOccupancy = false;
+                request.OccupancyResumeTick = 0;
                 request.GridRevisionAtStart = navGrid != null ? navGrid.Revision : 0;
                 activeRequests.Add(request);
                 startedAny = true;
@@ -688,11 +715,22 @@ namespace NPC
                 return 0;
             }
 
+            bool encounteredReservation = false;
+            bool encounteredIndefiniteReservation = false;
+            int earliestFiniteExpiryTick = int.MaxValue;
+
+            EnsureOccupancyService();
+
             var search = request.Search;
             var grid = navGrid;
 
             if (search.OpenSet.Count == 0)
             {
+                if (TryScheduleRequeueDueToOccupancy(request, encounteredReservation, encounteredIndefiniteReservation, earliestFiniteExpiryTick, out outcome))
+                {
+                    return 0;
+                }
+
                 CompleteRequest(request, PathStatus.GoalUnreachable, null);
                 outcome = RequestStepOutcome.Completed;
                 return 0;
@@ -703,6 +741,11 @@ namespace NPC
             {
                 if (search.OpenSet.Count == 0)
                 {
+                    if (TryScheduleRequeueDueToOccupancy(request, encounteredReservation, encounteredIndefiniteReservation, earliestFiniteExpiryTick, out outcome))
+                    {
+                        return expanded;
+                    }
+
                     CompleteRequest(request, PathStatus.GoalUnreachable, null);
                     outcome = RequestStepOutcome.Completed;
                     return expanded;
@@ -710,6 +753,11 @@ namespace NPC
 
                 if (!search.OpenSet.TryExtractMin(out var currentWrapper))
                 {
+                    if (TryScheduleRequeueDueToOccupancy(request, encounteredReservation, encounteredIndefiniteReservation, earliestFiniteExpiryTick, out outcome))
+                    {
+                        return expanded;
+                    }
+
                     CompleteRequest(request, PathStatus.GoalUnreachable, null);
                     outcome = RequestStepOutcome.Completed;
                     return expanded;
@@ -735,6 +783,26 @@ namespace NPC
 
                 if (current == search.Goal)
                 {
+                    if (occupancyService != null && occupancyService.IsCellReservedForOthers(current, mover, request.Id, out int goalExpiry))
+                    {
+                        encounteredReservation = true;
+                        if (goalExpiry < 0)
+                        {
+                            encounteredIndefiniteReservation = true;
+                        }
+                        else
+                        {
+                            earliestFiniteExpiryTick = Mathf.Min(earliestFiniteExpiryTick, goalExpiry);
+                        }
+
+                        if (TryScheduleRequeueDueToOccupancy(request, encounteredReservation, encounteredIndefiniteReservation, earliestFiniteExpiryTick, out outcome))
+                        {
+                            return expanded;
+                        }
+
+                        continue;
+                    }
+
                     if (IsRequestSuperseded(request, out int supersededDuringCompletion))
                     {
                         if (enableDebugLogging)
@@ -751,7 +819,7 @@ namespace NPC
                     var pathCells = ReconstructPath(search, current);
                     var smoothedCells = SmoothPathCells(pathCells, request.StartCell) ?? pathCells;
                     var worldPath = ConvertCellsToWorld(smoothedCells, request.StartCell);
-                    CompleteRequest(request, PathStatus.Success, worldPath);
+                    CompleteRequest(request, PathStatus.Success, worldPath, smoothedCells);
                     outcome = RequestStepOutcome.Completed;
                     return expanded;
                 }
@@ -781,6 +849,21 @@ namespace NPC
                         continue;
                     }
 
+                    if (occupancyService != null && occupancyService.IsCellReservedForOthers(neighbour, mover, request.Id, out int reservationExpiry))
+                    {
+                        encounteredReservation = true;
+                        if (reservationExpiry < 0)
+                        {
+                            encounteredIndefiniteReservation = true;
+                        }
+                        else
+                        {
+                            earliestFiniteExpiryTick = Mathf.Min(earliestFiniteExpiryTick, reservationExpiry);
+                        }
+
+                        continue;
+                    }
+
                     float stepCost = IsDiagonalMove(current, neighbour) ? DiagonalStepCost : 1f;
                     float tentativeG = currentRecord.GCost + stepCost;
                     if (!search.Records.TryGetValue(neighbour, out var neighbourRecord) || tentativeG < neighbourRecord.GCost)
@@ -799,6 +882,43 @@ namespace NPC
             return expanded;
         }
 
+        private bool TryScheduleRequeueDueToOccupancy(
+            PathRequest request,
+            bool encounteredReservation,
+            bool encounteredIndefiniteReservation,
+            int earliestFiniteExpiryTick,
+            out RequestStepOutcome outcome)
+        {
+            outcome = RequestStepOutcome.Continue;
+
+            if (request == null || !encounteredReservation)
+            {
+                return false;
+            }
+
+            if (!EnsureOccupancyService())
+            {
+                return false;
+            }
+
+            int resumeTick = occupancyService != null ? occupancyService.CurrentTick + 1 : 1;
+            if (!encounteredIndefiniteReservation && earliestFiniteExpiryTick != int.MaxValue)
+            {
+                resumeTick = Mathf.Max(resumeTick, earliestFiniteExpiryTick);
+            }
+
+            request.WaitingOnOccupancy = true;
+            request.OccupancyResumeTick = resumeTick;
+            outcome = RequestStepOutcome.Requeued;
+
+            if (enableDebugLogging)
+            {
+                Debug.Log($"Path request {request.Id} paused for occupancy until tick {resumeTick}.", this);
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Re-enqueues a request so it can restart after a grid rebuild or other interruption.
         /// </summary>
@@ -814,6 +934,16 @@ namespace NPC
             request.Search.Records.Clear();
             request.Prepared = false;
             latestQueuedRequestIdByMover[request.MoverReference] = request.Id;
+            if (request.WaitingOnOccupancy && EnsureOccupancyService())
+            {
+                if (!occupancyDelayedRequests.Contains(request))
+                {
+                    occupancyDelayedRequests.Add(request);
+                }
+
+                return;
+            }
+
             pendingRequests.Enqueue(request);
         }
 
@@ -1046,7 +1176,7 @@ namespace NPC
         /// <summary>
         /// Dispatches the resolved path back to the requesting mover.
         /// </summary>
-        private void CompleteRequest(PathRequest request, PathStatus status, List<Vector2> worldPath)
+        private void CompleteRequest(PathRequest request, PathStatus status, List<Vector2> worldPath, List<Vector2Int> cellPath = null)
         {
             if (!request.MoverReference.TryGetTarget(out var mover) || mover == null)
             {
@@ -1068,6 +1198,20 @@ namespace NPC
 
             RemoveMoverTracking(request, onlyWhenIdMatches: true);
             mover.HandlePathResult(request.Id, status, worldPath, resolvedGoalWorld);
+
+            if (status == PathStatus.Success && worldPath != null && cellPath != null && cellPath.Count > 0 && EnsureOccupancyService())
+            {
+                int radius = Mathf.Max(0, mover.GetReservationRadius());
+                int duration = mover.GetReservationDurationTicks();
+                var handle = occupancyService != null
+                    ? occupancyService.ReservePath(mover, request.Id, cellPath, radius, duration)
+                    : null;
+                mover.BindReservationHandle(request.Id, handle);
+            }
+            else
+            {
+                mover.BindReservationHandle(request.Id, null);
+            }
         }
 
         /// <summary>
@@ -1275,6 +1419,96 @@ namespace NPC
             int x = delta.x == 0 ? 0 : (delta.x > 0 ? 1 : -1);
             int y = delta.y == 0 ? 0 : (delta.y > 0 ? 1 : -1);
             return new Vector2Int(x, y);
+        }
+
+        /// <summary>
+        /// Ensures the dynamic occupancy service reference is valid and that we are subscribed to reservation change events.
+        /// </summary>
+        private bool EnsureOccupancyService()
+        {
+            if (occupancyService != null)
+            {
+                if (!occupancyServiceSubscribed)
+                {
+                    occupancyService.ReservationsChanged += HandleOccupancyChanged;
+                    occupancyServiceSubscribed = true;
+                }
+
+                return true;
+            }
+
+            var located = FindObjectOfType<DynamicNavOccupancyService>();
+            if (located == null)
+            {
+                return false;
+            }
+
+            occupancyService = located;
+            occupancyService.ReservationsChanged += HandleOccupancyChanged;
+            occupancyServiceSubscribed = true;
+            return true;
+        }
+
+        /// <summary>
+        /// Detaches the occupancy service event subscription while preserving the configured reference.
+        /// </summary>
+        private void DetachOccupancyService()
+        {
+            if (occupancyService != null && occupancyServiceSubscribed)
+            {
+                occupancyService.ReservationsChanged -= HandleOccupancyChanged;
+                occupancyServiceSubscribed = false;
+            }
+        }
+
+        /// <summary>
+        /// Reactivates any requests that were waiting on a reservation to expire.
+        /// </summary>
+        private void PromoteDelayedRequests()
+        {
+            if (occupancyDelayedRequests.Count == 0)
+            {
+                return;
+            }
+
+            if (!EnsureOccupancyService())
+            {
+                return;
+            }
+
+            int currentTick = occupancyService != null ? occupancyService.CurrentTick : 0;
+            for (int i = occupancyDelayedRequests.Count - 1; i >= 0; i--)
+            {
+                var request = occupancyDelayedRequests[i];
+                if (request == null)
+                {
+                    occupancyDelayedRequests.RemoveAt(i);
+                    continue;
+                }
+
+                if (!request.WaitingOnOccupancy)
+                {
+                    occupancyDelayedRequests.RemoveAt(i);
+                    pendingRequests.Enqueue(request);
+                    continue;
+                }
+
+                if (currentTick >= request.OccupancyResumeTick)
+                {
+                    request.WaitingOnOccupancy = false;
+                    request.OccupancyResumeTick = 0;
+                    occupancyDelayedRequests.RemoveAt(i);
+                    pendingRequests.Enqueue(request);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called whenever the occupancy service clears reservations so pending requests can retry quickly.
+        /// </summary>
+        private void HandleOccupancyChanged()
+        {
+            PromoteDelayedRequests();
         }
 
         /// <summary>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using NPC;
 using UnityEngine;
+using Util;
 
 namespace Pets
 {
@@ -55,6 +56,7 @@ namespace Pets
         private bool pendingWanderFailure;
         // Tracks whether we have already warned about the missing pathfinding service to avoid log spam while waiting.
         private bool hasLoggedMissingService;
+        private DynamicNavOccupancyService.ReservationHandle activeReservationHandle;
 
         private Func<Vector2> followAnchorResolver;
         private Func<Vector2> wanderDestinationResolver;
@@ -228,6 +230,7 @@ namespace Pets
             if (stepped && Vector2.Distance(nextPosition, waypoint) <= Mathf.Max(waypointTolerance, defaultWaypointTolerance))
             {
                 waypointQueue.Dequeue();
+                activeReservationHandle?.MarkWaypointConsumed();
             }
 
             if (Time.time - lastProgressTimestamp >= stuckTimeoutSeconds)
@@ -318,6 +321,7 @@ namespace Pets
             if (stepped && Vector2.Distance(nextPosition, waypoint) <= Mathf.Max(waypointTolerance, defaultWaypointTolerance))
             {
                 waypointQueue.Dequeue();
+                activeReservationHandle?.MarkWaypointConsumed();
             }
 
             if (Time.time - lastProgressTimestamp >= stuckTimeoutSeconds)
@@ -340,6 +344,7 @@ namespace Pets
 
             pendingTeleport = false;
             hasLastRequestedDestination = false;
+            ReleaseReservationHandle();
         }
 
         /// <summary>
@@ -354,6 +359,7 @@ namespace Pets
 
             pendingWanderFailure = false;
             hasLastRequestedDestination = false;
+            ReleaseReservationHandle();
         }
 
         /// <inheritdoc />
@@ -392,6 +398,7 @@ namespace Pets
 
             if (status == PathfindingService.PathStatus.GoalUnreachable)
             {
+                ReleaseReservationHandle();
                 if (currentMode == Mode.Follow)
                 {
                     teleportDestination = resolvedGoalWorld;
@@ -410,6 +417,7 @@ namespace Pets
                 return;
             }
 
+            ReleaseReservationHandle();
             if (enableDebugLogging)
             {
                 Debug.LogWarning($"{name} pet path request {requestId} failed: {status}.", this);
@@ -476,6 +484,7 @@ namespace Pets
         {
             awaitingPath = false;
             activeRequestId = -1;
+            ReleaseReservationHandle();
         }
 
         private void ForceReplan(Vector2 goal, Vector2 currentPosition, Mode mode)
@@ -505,6 +514,7 @@ namespace Pets
 
         private void ClearPathData()
         {
+            ReleaseReservationHandle();
             waypointQueue.Clear();
             awaitingPath = false;
             activeRequestId = -1;
@@ -545,6 +555,43 @@ namespace Pets
             }
 
             return true;
+        }
+
+        private void ReleaseReservationHandle()
+        {
+            if (activeReservationHandle == null)
+            {
+                return;
+            }
+
+            activeReservationHandle.ReleaseAll();
+            activeReservationHandle = null;
+        }
+
+        public int GetReservationRadius()
+        {
+            return 0;
+        }
+
+        public int GetReservationDurationTicks()
+        {
+            float durationTicks = stuckTimeoutSeconds / Mathf.Max(Ticker.TickDuration, 0.0001f);
+            return Mathf.Max(1, Mathf.CeilToInt(durationTicks));
+        }
+
+        public void BindReservationHandle(int requestId, DynamicNavOccupancyService.ReservationHandle handle)
+        {
+            if (handle == activeReservationHandle)
+            {
+                return;
+            }
+
+            if (activeReservationHandle != null)
+            {
+                activeReservationHandle.ReleaseAll();
+            }
+
+            activeReservationHandle = handle;
         }
     }
 }

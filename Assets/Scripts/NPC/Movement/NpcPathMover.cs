@@ -70,6 +70,7 @@ namespace NPC
         private bool wandererSuspended;
         private Vector2 lastManualPosition;
         private bool hasManualPositionSample;
+        private DynamicNavOccupancyService.ReservationHandle activeReservationHandle;
 
         private const float ManualResyncTolerance = 0.01f;
         private const float ManualResyncToleranceSqr = ManualResyncTolerance * ManualResyncTolerance;
@@ -167,6 +168,7 @@ namespace NPC
                 previousStepPosition = currentStepTarget;
                 stepping = false;
                 lastProgressTimestamp = Time.time;
+                activeReservationHandle?.MarkWaypointConsumed();
                 bool advanced = TryAdvanceToNextWaypoint();
                 if (!advanced)
                 {
@@ -216,6 +218,7 @@ namespace NPC
             hasDestination = false;
             hasResolvedPathDestination = false;
             resolvedPathDestination = default;
+            ReleaseReservationHandle();
             TryAdvanceToNextWaypoint();
             UpdateMovementVisuals(Vector2.zero);
         }
@@ -282,6 +285,7 @@ namespace NPC
 
             if (status == PathfindingService.PathStatus.GoalUnreachable)
             {
+                ReleaseReservationHandle();
                 if (enableDebugLogging)
                 {
                     Debug.LogWarning($"NPC {name} path request {requestId} reached fallback -> goal unreachable.", this);
@@ -300,6 +304,7 @@ namespace NPC
 
             if (status != PathfindingService.PathStatus.Success || worldPath == null)
             {
+                ReleaseReservationHandle();
                 if (enableDebugLogging)
                 {
                     Debug.LogWarning($"NPC {name} path request {requestId} failed: {status}.", this);
@@ -558,6 +563,7 @@ namespace NPC
             {
                 if (HasClearStopLine(current, desiredDestination))
                 {
+                    ReleaseReservationHandle();
                     DestinationReached?.Invoke(this);
                     hasDestination = false;
                     hasResolvedPathDestination = false;
@@ -572,6 +578,7 @@ namespace NPC
 
                     if (atResolvedFallback)
                     {
+                        ReleaseReservationHandle();
                         if (enableDebugLogging)
                         {
                             Debug.LogWarning($"NPC {name} reached resolved fallback but cannot see desired destination. Marking goal unreachable.", this);
@@ -643,6 +650,7 @@ namespace NPC
                 return;
             }
 
+            ReleaseReservationHandle();
             if (!force && Time.time < nextAllowedRepathTime)
             {
                 return;
@@ -849,6 +857,49 @@ namespace NPC
                 wanderer.SyncToExternalPosition(syncedPosition);
                 lastManualPosition = syncedPosition;
             }
+        }
+
+        /// <summary>
+        /// Releases the current occupancy reservation so other movers can claim the freed tiles.
+        /// </summary>
+        private void ReleaseReservationHandle()
+        {
+            if (activeReservationHandle == null)
+            {
+                return;
+            }
+
+            activeReservationHandle.ReleaseAll();
+            activeReservationHandle = null;
+        }
+
+        /// <inheritdoc />
+        public int GetReservationRadius()
+        {
+            return 0;
+        }
+
+        /// <inheritdoc />
+        public int GetReservationDurationTicks()
+        {
+            float traverseTicks = tileTraverseDuration <= 0f ? 1f : tileTraverseDuration / Ticker.TickDuration;
+            return Mathf.Max(1, Mathf.CeilToInt(traverseTicks) + 1);
+        }
+
+        /// <inheritdoc />
+        public void BindReservationHandle(int requestId, DynamicNavOccupancyService.ReservationHandle handle)
+        {
+            if (handle == activeReservationHandle)
+            {
+                return;
+            }
+
+            if (activeReservationHandle != null)
+            {
+                activeReservationHandle.ReleaseAll();
+            }
+
+            activeReservationHandle = handle;
         }
 
         /// <summary>
