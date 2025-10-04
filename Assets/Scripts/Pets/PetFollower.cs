@@ -70,6 +70,12 @@ namespace Pets
         private bool wandering;
         private PetPathMover pathMover;
 
+        /// <summary>
+        /// Dead zone used when evaluating movement vectors so the animator can remain idle without
+        /// reacting to floating point noise produced by SmoothDamp integration.
+        /// </summary>
+        private const float MovementDeadZoneSqr = 0.01f;
+
         private static readonly Vector2Int[] FourWayOffsets =
         {
             new Vector2Int(1, 0),
@@ -220,7 +226,8 @@ namespace Pets
 
         private void HandleFollow(Vector3 playerPos, bool playerMoving, bool navAvailable)
         {
-            offset = Vector3.Lerp(offset, targetOffset, Time.fixedDeltaTime * offsetLerpSpeed);
+            float deltaTime = Time.fixedDeltaTime;
+            offset = Vector3.Lerp(offset, targetOffset, deltaTime * offsetLerpSpeed);
 
             Vector3 currentPosition = transform.position;
             Vector3 desiredAnchor = playerPos + offset;
@@ -237,13 +244,16 @@ namespace Pets
             bool navUsed = false;
             Vector2 navVelocity = Vector2.zero;
             float effectiveMoveSpeed = needsCatchUp ? moveSpeed * 2f : moveSpeed;
+            Vector3 resolvedPosition = currentPosition;
+            bool positionApplied = false;
+            bool navTeleported = false;
 
             if (useNavigationForFollowing && navAvailable && pathMover != null)
             {
                 bool teleported;
                 Vector2 navNext;
                 if (pathMover.TryStepFollow(
-                        Time.fixedDeltaTime,
+                        deltaTime,
                         effectiveMoveSpeed,
                         Mathf.Max(0.1f, followRadius * 0.5f),
                         navigationWaypointArrivalThreshold,
@@ -258,6 +268,7 @@ namespace Pets
                     {
                         body.position = navPosition3D;
                         transform.position = navPosition3D;
+                        navTeleported = true;
                     }
                     else
                     {
@@ -266,6 +277,8 @@ namespace Pets
 
                     currentVelocity = new Vector3(navVelocity.x, navVelocity.y, 0f);
                     navUsed = true;
+                    resolvedPosition = navPosition3D;
+                    positionApplied = true;
                 }
             }
 
@@ -276,10 +289,13 @@ namespace Pets
                     Vector3 catchUpPosition = Vector3.MoveTowards(
                         currentPosition,
                         desiredAnchor,
-                        effectiveMoveSpeed * Time.fixedDeltaTime);
+                        effectiveMoveSpeed * deltaTime);
 
                     body.MovePosition(catchUpPosition);
-                    currentVelocity = (catchUpPosition - currentPosition) / Time.fixedDeltaTime;
+                    Vector3 catchUpDelta = catchUpPosition - currentPosition;
+                    currentVelocity = catchUpDelta / deltaTime;
+                    resolvedPosition = catchUpPosition;
+                    positionApplied = true;
                 }
                 else
                 {
@@ -289,9 +305,11 @@ namespace Pets
                         ref currentVelocity,
                         smoothTime,
                         moveSpeed,
-                        Time.fixedDeltaTime);
+                        deltaTime);
 
                     body.MovePosition(smoothPosition);
+                    resolvedPosition = smoothPosition;
+                    positionApplied = true;
                 }
             }
 
@@ -300,20 +318,39 @@ namespace Pets
                 ChooseOffset(lastHeading);
             }
 
-            Vector2 visualVelocity = navUsed
-                ? navVelocity
-                : new Vector2(currentVelocity.x, currentVelocity.y);
+            Vector2 visualVelocity = Vector2.zero;
+            if (positionApplied && !navTeleported)
+            {
+                Vector3 displacement = resolvedPosition - currentPosition;
+                visualVelocity = new Vector2(displacement.x, displacement.y) / deltaTime;
+                if (navUsed)
+                {
+                    currentVelocity = new Vector3(visualVelocity.x, visualVelocity.y, 0f);
+                }
+            }
+
+            bool zeroForIdle = !playerMoving;
+            bool zeroForDeadZone = visualVelocity.sqrMagnitude <= MovementDeadZoneSqr;
+            if (zeroForIdle || zeroForDeadZone)
+            {
+                visualVelocity = Vector2.zero;
+                currentVelocity = Vector3.zero;
+                pathMover?.ResetCachedVelocity();
+            }
 
             UpdateVisuals(visualVelocity, playerMoving, navUsed);
         }
 
         private void HandleWander(Vector3 playerPos, NavGridBuilder grid, bool navAvailable)
         {
+            float deltaTime = Time.fixedDeltaTime;
             Vector3 currentPosition = transform.position;
+            Vector3 resolvedPosition = currentPosition;
+            bool positionApplied = false;
 
             if (Vector3.Distance(currentPosition, wanderTarget) < 0.1f)
             {
-                wanderTimer -= Time.fixedDeltaTime;
+                wanderTimer -= deltaTime;
                 if (wanderTimer <= 0f)
                 {
                     wanderTarget = SampleWanderTarget(playerPos, navAvailable && respectNavigation ? grid : null);
@@ -329,7 +366,7 @@ namespace Pets
             {
                 Vector2 navNext;
                 if (pathMover.TryStepWander(
-                        Time.fixedDeltaTime,
+                        deltaTime,
                         wanderMoveSpeed,
                         navigationWaypointArrivalThreshold,
                         navigationWaypointArrivalThreshold,
@@ -340,6 +377,8 @@ namespace Pets
                     body.MovePosition(navPosition3D);
                     currentVelocity = new Vector3(navVelocity.x, navVelocity.y, 0f);
                     navUsed = true;
+                    resolvedPosition = navPosition3D;
+                    positionApplied = true;
                 }
 
                 if (pathMover.HasPendingWanderFailure)
@@ -359,14 +398,31 @@ namespace Pets
                     ref currentVelocity,
                     smoothTime,
                     wanderMoveSpeed,
-                    Time.fixedDeltaTime);
+                    deltaTime);
 
                 body.MovePosition(smoothPosition);
+                resolvedPosition = smoothPosition;
+                positionApplied = true;
             }
 
-            Vector2 visualVelocity = navUsed
-                ? navVelocity
-                : new Vector2(currentVelocity.x, currentVelocity.y);
+            Vector2 visualVelocity = Vector2.zero;
+            if (positionApplied)
+            {
+                Vector3 displacement = resolvedPosition - currentPosition;
+                visualVelocity = new Vector2(displacement.x, displacement.y) / deltaTime;
+                if (navUsed)
+                {
+                    currentVelocity = new Vector3(visualVelocity.x, visualVelocity.y, 0f);
+                }
+            }
+
+            bool zeroForDeadZone = visualVelocity.sqrMagnitude <= MovementDeadZoneSqr;
+            if (zeroForDeadZone)
+            {
+                visualVelocity = Vector2.zero;
+                currentVelocity = Vector3.zero;
+                pathMover?.ResetCachedVelocity();
+            }
 
             UpdateVisuals(visualVelocity, playerMoving: false, navUsed);
         }

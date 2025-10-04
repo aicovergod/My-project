@@ -108,6 +108,14 @@ namespace Pets
         }
 
         /// <summary>
+        /// Resets the cached velocity so callers can clear animation drift when movement settles.
+        /// </summary>
+        public void ResetCachedVelocity()
+        {
+            currentVelocity = Vector2.zero;
+        }
+
+        /// <summary>
         /// Provides a follow step using the active navigation grid. When the grid is unavailable the method
         /// returns <c>false</c> so callers can fall back to smooth damp behaviour.
         /// </summary>
