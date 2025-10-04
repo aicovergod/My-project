@@ -310,7 +310,9 @@ namespace Combat.Ranged
 
         private IEnumerator FireAfterDraw(RangedAttackContext context)
         {
-            float drawSeconds = Mathf.Max(0f, currentWeapon != null ? currentWeapon.drawTicks * CombatMath.TICK_SECONDS : 0f);
+            float drawSeconds = 0f;
+            if (context.weapon != null)
+                drawSeconds = Mathf.Max(0f, context.weapon.drawTicks * CombatMath.TICK_SECONDS);
             if (drawSeconds > 0f)
                 yield return new WaitForSeconds(drawSeconds);
 
@@ -320,7 +322,8 @@ namespace Combat.Ranged
 
         private void LaunchProjectile(RangedAttackContext context)
         {
-            var prefab = currentWeapon != null ? currentWeapon.projectilePrefab : null;
+            RangedWeaponData weaponReference = context.weapon != null ? context.weapon : currentWeapon;
+            var prefab = weaponReference != null ? weaponReference.projectilePrefab : null;
             if (prefab == null)
             {
                 ShotFired?.Invoke(context);
@@ -359,7 +362,7 @@ namespace Combat.Ranged
             if (context.weapon != null && !string.IsNullOrEmpty(context.weapon.releaseSoundId))
                 SoundManager.Instance?.PlaySfxByFileName(context.weapon.releaseSoundId);
 
-            float projectileSpeed = context.weapon != null ? context.weapon.projectileSpeed : currentWeapon != null ? currentWeapon.projectileSpeed : 10f;
+            float projectileSpeed = weaponReference != null ? weaponReference.projectileSpeed : 10f;
             projectile.Initialise(this, context.target, context, projectileSpeed);
         }
 
