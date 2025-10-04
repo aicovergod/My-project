@@ -42,7 +42,7 @@ namespace Pets
         [SerializeField, Min(1)] private int navigationSampleAttempts = 6;
 
         [Tooltip("When disabled the follower always relies on smooth damp instead of navigation grids.")]
-        [SerializeField] private bool useNavigationForFollowing = true;
+        [SerializeField] private bool useNavigationForFollowing = false;
 
         [SerializeField, Min(0.01f)] private float navigationWaypointArrivalThreshold = 0.05f;
         [SerializeField, Min(0.05f)] private float navigationFollowRebuildDistance = 0.75f;
@@ -91,7 +91,7 @@ namespace Pets
             respectNavigation = true;
             navigationSampleRadius = wanderRadius;
             navigationSampleAttempts = 6;
-            useNavigationForFollowing = true;
+            useNavigationForFollowing = false;
             navigationWaypointArrivalThreshold = 0.05f;
             navigationFollowRebuildDistance = 0.75f;
             navigationFollowTeleportThreshold = 3f;
@@ -114,6 +114,13 @@ namespace Pets
             {
                 pathMover.FollowAnchorResolver = () => followAnchor;
                 pathMover.WanderDestinationResolver = () => (Vector2)wanderTarget;
+            }
+
+            if (useNavigationForFollowing)
+            {
+                // Ensure legacy prefab instances adopt the smooth follow default and clear any cached path data.
+                useNavigationForFollowing = false;
+                pathMover?.ResetFollowTracking();
             }
 
             if (player != null)
