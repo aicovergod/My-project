@@ -399,7 +399,7 @@ namespace Pets
                     waitingOnNavigation = true;
                     currentVelocity = Vector3.zero;
                     pathMover.ResetCachedVelocity();
-                    body.velocity = Vector2.zero;
+                    body.linearVelocity = Vector2.zero;
                 }
 
                 if (pathMover.HasPendingWanderFailure)
@@ -412,7 +412,7 @@ namespace Pets
                     {
                         currentVelocity = Vector3.zero;
                         pathMover.ResetCachedVelocity();
-                        body.velocity = Vector2.zero;
+                        body.linearVelocity = Vector2.zero;
                     }
                 }
             }

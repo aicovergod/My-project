@@ -415,6 +415,7 @@ MonoBehaviour:
   equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
   enableDebugLogging: 0
+  miningOutfitDefinition: {fileID: 11400000, guid: 7fb20f9846b84a7fa9ef024a9b7b21b8, type: 2}
 --- !u!114 &4484345410366226628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -431,6 +432,7 @@ MonoBehaviour:
   equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
   enableDebugLogging: 0
+  woodcuttingOutfitDefinition: {fileID: 11400000, guid: 7338c8c1dc5a4dcab05a4ac881f0d83d, type: 2}
 --- !u!114 &224529023114725345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -740,6 +742,7 @@ MonoBehaviour:
   equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
   enableDebugLogging: 0
+  fishingOutfitDefinition: {fileID: 11400000, guid: 0d1b5c3f6a0b42f0901a1a65573e1c1e, type: 2}
 --- !u!114 &8168772117157042845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -925,6 +928,7 @@ MonoBehaviour:
   equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
   enableDebugLogging: 0
+  cookingOutfitDefinition: {fileID: 11400000, guid: 1db8f384d0b94f1896f3b11d571c5824, type: 2}
 --- !u!114 &4293722103470127009
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -952,6 +956,7 @@ MonoBehaviour:
   tinderboxItemId: Tinderbox
   maxIgniteDistance: 1.6
   enableDebugLogging: 0
+  firemakingOutfitDefinition: {fileID: 11400000, guid: 497b3d4ad6b2453bab60ac0b74d447df, type: 2}
   allowTileSnapping: 1
   tileSnapSize: {x: 1, y: 1}
 --- !u!114 &1218445456886628537

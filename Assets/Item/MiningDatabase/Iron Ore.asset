@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1b7e985039a28148b8e71d7db0a2c78, type: 3}
   m_Name: Iron Ore
   m_EditorClassIdentifier: 
-  id: Iron ore
-  displayName: Iron ore
+  id: Iron Ore
+  displayName: Iron
   levelRequirement: 15
   xpPerOre: 35
   petDropChance: 6000

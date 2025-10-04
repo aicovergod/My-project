@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9d5c0f831e3c4b21a02407d1f6a6d385, type: 3}
-  m_Name: Firemaking Outfit Definition
-  m_EditorClassIdentifier:
+  m_Name: FiremakingOutfitDefinition
+  m_EditorClassIdentifier: 
   saveKey: FiremakingOutfitOwned
   pieceItemIds:
   - Pyromancer Hood
@@ -21,4 +21,5 @@ MonoBehaviour:
   - Pyromancer Gloves
   displayName: Pyromancer Outfit
   associatedPetId: Phoenix
-  bonusDescription: Provides stacking Firemaking XP bonuses and synergises with the Phoenix pet.
+  bonusDescription: Provides stacking Firemaking XP bonuses and synergises with the
+    Phoenix pet.
