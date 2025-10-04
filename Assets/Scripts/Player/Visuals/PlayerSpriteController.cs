@@ -94,6 +94,34 @@ namespace Player.Visuals
         }
 
         /// <inheritdoc />
+        public bool UseFlipXForDownLeft
+        {
+            get => useFlipXForDownLeft;
+            set => useFlipXForDownLeft = value;
+        }
+
+        /// <inheritdoc />
+        public bool UseFlipXForUpLeft
+        {
+            get => useFlipXForUpLeft;
+            set => useFlipXForUpLeft = value;
+        }
+
+        /// <inheritdoc />
+        public bool UseFlipXForUpRight
+        {
+            get => useFlipXForUpRight;
+            set => useFlipXForUpRight = value;
+        }
+
+        /// <inheritdoc />
+        public bool UseFlipXForDownRight
+        {
+            get => useFlipXForDownRight;
+            set => useFlipXForDownRight = value;
+        }
+
+        /// <inheritdoc />
         public bool IsPlayingConsumeAnimation => isPlayingConsume;
 
         private void Awake()
@@ -580,6 +608,18 @@ namespace Player.Visuals
 
         /// <summary>Gets or sets whether left-facing sprites should be mirrored for right facings.</summary>
         bool UseFlipXForRight { get; set; }
+
+        /// <summary>Gets or sets whether down-right facings should be mirrored for down-left facings.</summary>
+        bool UseFlipXForDownLeft { get; set; }
+
+        /// <summary>Gets or sets whether up-right facings should be mirrored for up-left facings.</summary>
+        bool UseFlipXForUpLeft { get; set; }
+
+        /// <summary>Gets or sets whether up-left facings should be mirrored for up-right facings.</summary>
+        bool UseFlipXForUpRight { get; set; }
+
+        /// <summary>Gets or sets whether down-left facings should be mirrored for down-right facings.</summary>
+        bool UseFlipXForDownRight { get; set; }
 
         /// <summary>Applies the supplied movement visuals to the animator and sprite renderer.</summary>
         void ApplyMovementVisuals(Direction8 direction, bool isMoving);
