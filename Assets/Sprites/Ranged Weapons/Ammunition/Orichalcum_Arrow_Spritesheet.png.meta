@@ -203,12 +203,12 @@ TextureImporter:
       name: Orichalcum_Arrow_Spritesheet_0
       rect:
         serializedVersion: 2
-        x: 26
-        y: 2
-        width: 13
-        height: 59
+        x: 0
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -225,12 +225,12 @@ TextureImporter:
       name: Orichalcum_Arrow_Spritesheet_1
       rect:
         serializedVersion: 2
-        x: 90
-        y: 2
-        width: 13
-        height: 59
+        x: 64
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -247,12 +247,12 @@ TextureImporter:
       name: Orichalcum_Arrow_Spritesheet_2
       rect:
         serializedVersion: 2
-        x: 102
-        y: 2
-        width: 13
-        height: 59
+        x: 128
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -269,12 +269,12 @@ TextureImporter:
       name: Orichalcum_Arrow_Spritesheet_3
       rect:
         serializedVersion: 2
-        x: 142
-        y: 2
-        width: 13
-        height: 59
+        x: 192
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -291,12 +291,12 @@ TextureImporter:
       name: Orichalcum_Arrow_Spritesheet_4
       rect:
         serializedVersion: 2
-        x: 154
-        y: 2
-        width: 13
-        height: 59
+        x: 256
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -313,12 +313,12 @@ TextureImporter:
       name: Orichalcum_Arrow_Spritesheet_5
       rect:
         serializedVersion: 2
-        x: 166
-        y: 2
-        width: 13
-        height: 59
+        x: 320
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -335,12 +335,12 @@ TextureImporter:
       name: Orichalcum_Arrow_Spritesheet_6
       rect:
         serializedVersion: 2
-        x: 194
-        y: 2
-        width: 13
-        height: 59
+        x: 384
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -357,12 +357,12 @@ TextureImporter:
       name: Orichalcum_Arrow_Spritesheet_7
       rect:
         serializedVersion: 2
-        x: 206
-        y: 2
-        width: 13
-        height: 59
+        x: 448
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -379,12 +379,12 @@ TextureImporter:
       name: Orichalcum_Arrow_Spritesheet_8
       rect:
         serializedVersion: 2
-        x: 218
-        y: 2
-        width: 13
-        height: 59
+        x: 512
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -401,12 +401,12 @@ TextureImporter:
       name: Orichalcum_Arrow_Spritesheet_9
       rect:
         serializedVersion: 2
-        x: 230
-        y: 2
-        width: 13
-        height: 59
+        x: 576
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -419,451 +419,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_10
-      rect:
-        serializedVersion: 2
-        x: 258
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: b3ea6fea24a2676f0800000000000000
-      internalID: -687315427235811781
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_11
-      rect:
-        serializedVersion: 2
-        x: 270
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 35b7fe7de047b05c0800000000000000
-      internalID: -4248174216392770733
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_12
-      rect:
-        serializedVersion: 2
-        x: 282
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d083febfbafc94e90800000000000000
-      internalID: -7040868204843943923
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_13
-      rect:
-        serializedVersion: 2
-        x: 294
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: b74769ad238c96bb0800000000000000
-      internalID: -4942198995321195397
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_14
-      rect:
-        serializedVersion: 2
-        x: 306
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 3d48b5b3090b9f6c0800000000000000
-      internalID: -4109059051481234221
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_15
-      rect:
-        serializedVersion: 2
-        x: 346
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: dfc0cbd14c9c5b920800000000000000
-      internalID: 3005530170489310461
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_16
-      rect:
-        serializedVersion: 2
-        x: 410
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 17df5c88c8ab81fd0800000000000000
-      internalID: -2370940091057701519
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_17
-      rect:
-        serializedVersion: 2
-        x: 422
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 2e08c860e386cba80800000000000000
-      internalID: -8449764185246760734
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_18
-      rect:
-        serializedVersion: 2
-        x: 462
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 3e3bd8f6ffe7e07c0800000000000000
-      internalID: -4103202574934625309
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_19
-      rect:
-        serializedVersion: 2
-        x: 474
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: bfb719268827dac80800000000000000
-      internalID: -8309859807333876741
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_20
-      rect:
-        serializedVersion: 2
-        x: 486
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d6d89854928137db0800000000000000
-      internalID: -4795462612680077971
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_21
-      rect:
-        serializedVersion: 2
-        x: 514
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 8cefa64bacb867cc0800000000000000
-      internalID: -3713627139993829688
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_22
-      rect:
-        serializedVersion: 2
-        x: 526
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: b617331727992ccc0800000000000000
-      internalID: -3692220027685867157
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_23
-      rect:
-        serializedVersion: 2
-        x: 538
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 93d5d07ce3616a830800000000000000
-      internalID: 4081974571141258553
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_24
-      rect:
-        serializedVersion: 2
-        x: 550
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: aa3a5dab3ee6aa820800000000000000
-      internalID: 2930276431929123754
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_25
-      rect:
-        serializedVersion: 2
-        x: 578
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 73b94981ec7637500800000000000000
-      internalID: 392771727384681271
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_26
-      rect:
-        serializedVersion: 2
-        x: 590
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7a1b7bd26352318e0800000000000000
-      internalID: -1723993317727293017
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_27
-      rect:
-        serializedVersion: 2
-        x: 602
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 0ae1af3912150e3b0800000000000000
-      internalID: -5485295141478850912
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_28
-      rect:
-        serializedVersion: 2
-        x: 614
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: b2648e27e4ce933f0800000000000000
-      internalID: -920444827141126613
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orichalcum_Arrow_Spritesheet_29
-      rect:
-        serializedVersion: 2
-        x: 626
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 045941b155866e0f0800000000000000
-      internalID: -1088067545227553472
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 96c739b0c91416c4fa18281144eea376
     internalID: 0
     vertices: []
     indices: 
@@ -871,31 +431,13 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       Orichalcum_Arrow_Spritesheet_0: 1366458327017872482
       Orichalcum_Arrow_Spritesheet_1: 8633066019857398883
-      Orichalcum_Arrow_Spritesheet_10: -687315427235811781
-      Orichalcum_Arrow_Spritesheet_11: -4248174216392770733
-      Orichalcum_Arrow_Spritesheet_12: -7040868204843943923
-      Orichalcum_Arrow_Spritesheet_13: -4942198995321195397
-      Orichalcum_Arrow_Spritesheet_14: -4109059051481234221
-      Orichalcum_Arrow_Spritesheet_15: 3005530170489310461
-      Orichalcum_Arrow_Spritesheet_16: -2370940091057701519
-      Orichalcum_Arrow_Spritesheet_17: -8449764185246760734
-      Orichalcum_Arrow_Spritesheet_18: -4103202574934625309
-      Orichalcum_Arrow_Spritesheet_19: -8309859807333876741
       Orichalcum_Arrow_Spritesheet_2: -3943762742010418893
-      Orichalcum_Arrow_Spritesheet_20: -4795462612680077971
-      Orichalcum_Arrow_Spritesheet_21: -3713627139993829688
-      Orichalcum_Arrow_Spritesheet_22: -3692220027685867157
-      Orichalcum_Arrow_Spritesheet_23: 4081974571141258553
-      Orichalcum_Arrow_Spritesheet_24: 2930276431929123754
-      Orichalcum_Arrow_Spritesheet_25: 392771727384681271
-      Orichalcum_Arrow_Spritesheet_26: -1723993317727293017
-      Orichalcum_Arrow_Spritesheet_27: -5485295141478850912
-      Orichalcum_Arrow_Spritesheet_28: -920444827141126613
-      Orichalcum_Arrow_Spritesheet_29: -1088067545227553472
       Orichalcum_Arrow_Spritesheet_3: 1977741114367997909
       Orichalcum_Arrow_Spritesheet_4: 6907151878036673503
       Orichalcum_Arrow_Spritesheet_5: -2310139161856567806

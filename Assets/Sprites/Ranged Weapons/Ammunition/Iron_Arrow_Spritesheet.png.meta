@@ -203,12 +203,12 @@ TextureImporter:
       name: Iron_Arrow_Spritesheet_0
       rect:
         serializedVersion: 2
-        x: 26
-        y: 2
-        width: 13
-        height: 59
+        x: 0
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -225,12 +225,12 @@ TextureImporter:
       name: Iron_Arrow_Spritesheet_1
       rect:
         serializedVersion: 2
-        x: 90
-        y: 2
-        width: 13
-        height: 59
+        x: 64
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -247,12 +247,12 @@ TextureImporter:
       name: Iron_Arrow_Spritesheet_2
       rect:
         serializedVersion: 2
-        x: 102
-        y: 2
-        width: 13
-        height: 59
+        x: 128
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -269,12 +269,12 @@ TextureImporter:
       name: Iron_Arrow_Spritesheet_3
       rect:
         serializedVersion: 2
-        x: 142
-        y: 2
-        width: 13
-        height: 59
+        x: 192
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -291,12 +291,12 @@ TextureImporter:
       name: Iron_Arrow_Spritesheet_4
       rect:
         serializedVersion: 2
-        x: 154
-        y: 2
-        width: 13
-        height: 59
+        x: 256
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -313,12 +313,12 @@ TextureImporter:
       name: Iron_Arrow_Spritesheet_5
       rect:
         serializedVersion: 2
-        x: 166
-        y: 2
-        width: 13
-        height: 59
+        x: 320
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -335,12 +335,12 @@ TextureImporter:
       name: Iron_Arrow_Spritesheet_6
       rect:
         serializedVersion: 2
-        x: 194
-        y: 2
-        width: 13
-        height: 59
+        x: 384
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -357,12 +357,12 @@ TextureImporter:
       name: Iron_Arrow_Spritesheet_7
       rect:
         serializedVersion: 2
-        x: 206
-        y: 2
-        width: 13
-        height: 59
+        x: 448
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -379,12 +379,12 @@ TextureImporter:
       name: Iron_Arrow_Spritesheet_8
       rect:
         serializedVersion: 2
-        x: 218
-        y: 2
-        width: 13
-        height: 59
+        x: 512
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -401,12 +401,12 @@ TextureImporter:
       name: Iron_Arrow_Spritesheet_9
       rect:
         serializedVersion: 2
-        x: 230
-        y: 2
-        width: 13
-        height: 59
+        x: 576
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -419,451 +419,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_10
-      rect:
-        serializedVersion: 2
-        x: 258
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 697a25c04a0f432c0800000000000000
-      internalID: -4452669544190531690
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_11
-      rect:
-        serializedVersion: 2
-        x: 270
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: da5f23f2ed7b63a50800000000000000
-      internalID: 6500585277058381229
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_12
-      rect:
-        serializedVersion: 2
-        x: 282
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: ccf39e600a69afe90800000000000000
-      internalID: -6991109857484390452
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_13
-      rect:
-        serializedVersion: 2
-        x: 294
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 2271e1ed21cf945d0800000000000000
-      internalID: -3077651712364898526
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_14
-      rect:
-        serializedVersion: 2
-        x: 306
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 28caf6238e9eeaca0800000000000000
-      internalID: -6003604069750428542
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_15
-      rect:
-        serializedVersion: 2
-        x: 346
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: eb94b0ce9141559e0800000000000000
-      internalID: -1633377188285036098
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_16
-      rect:
-        serializedVersion: 2
-        x: 410
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 55b5f4c6bea9760c0800000000000000
-      internalID: -4582523759901058219
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_17
-      rect:
-        serializedVersion: 2
-        x: 422
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 1ca1ebb94479cc760800000000000000
-      internalID: 7479519402082048705
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_18
-      rect:
-        serializedVersion: 2
-        x: 462
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d15568a9236608500800000000000000
-      internalID: 396429134735496477
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_19
-      rect:
-        serializedVersion: 2
-        x: 474
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: c7d8536afea0ef040800000000000000
-      internalID: 4683192686913883516
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_20
-      rect:
-        serializedVersion: 2
-        x: 486
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: f20b7757198251c00800000000000000
-      internalID: 870646708172206127
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_21
-      rect:
-        serializedVersion: 2
-        x: 514
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 98f8ab400ca5a5be0800000000000000
-      internalID: -1487776946132971639
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_22
-      rect:
-        serializedVersion: 2
-        x: 526
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 3263d669e5d595c30800000000000000
-      internalID: 4348609576034973219
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_23
-      rect:
-        serializedVersion: 2
-        x: 538
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 01756bfc5256d61a0800000000000000
-      internalID: -6814679448068663536
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_24
-      rect:
-        serializedVersion: 2
-        x: 550
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: b1dccaeafbd5d9800800000000000000
-      internalID: 620755401497693467
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_25
-      rect:
-        serializedVersion: 2
-        x: 578
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 547e6c769aaf1e050800000000000000
-      internalID: 5828214998291638085
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_26
-      rect:
-        serializedVersion: 2
-        x: 590
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 1d5a2bc5188696f70800000000000000
-      internalID: 9180984220186748369
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_27
-      rect:
-        serializedVersion: 2
-        x: 602
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d14d426393ac2bd00800000000000000
-      internalID: 987073615417889821
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_28
-      rect:
-        serializedVersion: 2
-        x: 614
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 1a4d66942b9a5cd10800000000000000
-      internalID: 2145307380712658081
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Iron_Arrow_Spritesheet_29
-      rect:
-        serializedVersion: 2
-        x: 626
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 9e2bb03ed870d0f50800000000000000
-      internalID: 6849138914281370345
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 2a3db17d8753bfb4d8079a7f6b26eef7
     internalID: 0
     vertices: []
     indices: 
@@ -871,31 +431,13 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       Iron_Arrow_Spritesheet_0: -325307832043968259
       Iron_Arrow_Spritesheet_1: 8732166432836382154
-      Iron_Arrow_Spritesheet_10: -4452669544190531690
-      Iron_Arrow_Spritesheet_11: 6500585277058381229
-      Iron_Arrow_Spritesheet_12: -6991109857484390452
-      Iron_Arrow_Spritesheet_13: -3077651712364898526
-      Iron_Arrow_Spritesheet_14: -6003604069750428542
-      Iron_Arrow_Spritesheet_15: -1633377188285036098
-      Iron_Arrow_Spritesheet_16: -4582523759901058219
-      Iron_Arrow_Spritesheet_17: 7479519402082048705
-      Iron_Arrow_Spritesheet_18: 396429134735496477
-      Iron_Arrow_Spritesheet_19: 4683192686913883516
       Iron_Arrow_Spritesheet_2: -935840143644945037
-      Iron_Arrow_Spritesheet_20: 870646708172206127
-      Iron_Arrow_Spritesheet_21: -1487776946132971639
-      Iron_Arrow_Spritesheet_22: 4348609576034973219
-      Iron_Arrow_Spritesheet_23: -6814679448068663536
-      Iron_Arrow_Spritesheet_24: 620755401497693467
-      Iron_Arrow_Spritesheet_25: 5828214998291638085
-      Iron_Arrow_Spritesheet_26: 9180984220186748369
-      Iron_Arrow_Spritesheet_27: 987073615417889821
-      Iron_Arrow_Spritesheet_28: 2145307380712658081
-      Iron_Arrow_Spritesheet_29: 6849138914281370345
       Iron_Arrow_Spritesheet_3: 1429198715850313282
       Iron_Arrow_Spritesheet_4: 2201493954094089813
       Iron_Arrow_Spritesheet_5: -6009345382238069540

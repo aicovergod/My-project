@@ -533,7 +533,7 @@ MonoBehaviour:
   maxHitFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
   maxHitColor: {r: 1, g: 1, b: 1, a: 1}
   defenceHeaderFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
-  defenceHeaderColor: {r: 0.7215686, g: 0.5254902, b: 0.04313726, a: 1}
+  defenceHeaderColor: {r: 0.72156864, g: 0.5254902, b: 0.043137256, a: 1}
   meleeDefFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
   meleeDefColor: {r: 1, g: 1, b: 1, a: 1}
   rangeDefFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
