@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c64994854f88f0c6a98692151190e0bdf33581fb -->
+## 2025-10-05T18:40:09+01:00 — Fix Random ambiguity in combat calculations
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Combat/CombatController.cs
+- Diff: 2 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:575e71b12192de5a8c04b15740306f0c8759ce8d -->
 ## 2025-10-05T18:37:14+01:00 — Merge pull request #1014 from aicovergod/codex/update-determineactivedamagetype-with-case-insensitive-check
 
