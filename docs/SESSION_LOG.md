@@ -1,12 +1,21 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:d6505188847fcf85aabd2b17c2bce7cfb3e6476c -->
-## 2025-10-05T16:43:59+01:00 — ammo
+<!-- commit:1cca7bc72a6976532f7c4c306af472fcc3d74d27 -->
+## 2025-10-05T16:45:38+01:00 — Merge branch 'main' into codex/update-itemdata-stackspriteoverrides-handling
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (35): Assets/Prefabs/MainScriptObjects/Player.prefab, Assets/Resources/Combat.meta, Assets/Resources/Combat/Ranged.meta, Assets/Resources/Combat/Ranged/Ammunition.meta, Assets/Resources/Combat/Ranged/Ammunition/AmmunitionData.asset, Assets/Resources/Combat/Ranged/Ammunition/AmmunitionData.asset.meta, Assets/Resources/Combat/Ranged/Weapons.meta, Assets/Resources/Combat/Ranged/Weapons/Magic Shortbow.asset, Assets/Resources/Combat/Ranged/Weapons/Magic Shortbow.asset.meta, Assets/Resources/Combat/Ranged/Weapons/Maple Shortbow.asset, Assets/Resources/Combat/Ranged/Weapons/Maple Shortbow.asset.meta, Assets/Resources/Combat/Ranged/Weapons/Oak Shortbow.asset, Assets/Resources/Combat/Ranged/Weapons/Oak Shortbow.asset.meta, Assets/Resources/Combat/Ranged/Weapons/Shortbow.asset, Assets/Resources/Combat/Ranged/Weapons/Shortbow.asset.meta, Assets/Resources/Combat/Ranged/Weapons/Willow Shortbow.asset, Assets/Resources/Combat/Ranged/Weapons/Willow Shortbow.asset.meta, Assets/Resources/Combat/Ranged/Weapons/Yew Shortbow.asset, Assets/Resources/Combat/Ranged/Weapons/Yew Shortbow.asset.meta, Assets/Resources/Item/Bronze Arrow.asset, Assets/Resources/Item/Bronze Arrow.asset.meta, Assets/Resources/Item/Magic Shortbow.asset, Assets/Resources/Item/Maple Shortbow.asset, Assets/Resources/Item/Oak Shortbow.asset, Assets/Resources/Item/Shortbow.asset, Assets/Resources/Item/Willow Shortbow.asset, Assets/Resources/Item/Yew Shortbow.asset, Assets/Sprites/Ranged Weapons/Ammunition/Adamant_Arrow_Spritesheet.png.meta, Assets/Sprites/Ranged Weapons/Ammunition/Black_Arrow_Spritesheet.png.meta, Assets/Sprites/Ranged Weapons/Ammunition/Bronze_Arrows.png.meta, Assets/Sprites/Ranged Weapons/Ammunition/Iron_Arrow_Spritesheet.png.meta, Assets/Sprites/Ranged Weapons/Ammunition/Mithril_Arrow_Spritesheet.png.meta, Assets/Sprites/Ranged Weapons/Ammunition/Orichalcum_Arrow_Spritesheet.png.meta, Assets/Sprites/Ranged Weapons/Ammunition/Rune_Arrow_Spritesheet.png.meta, Assets/Sprites/Ranged Weapons/Ammunition/Steel_Arrow_Spritesheet.png.meta
+- Changed files (0): —
 - Diff: 829 ++ / 4103 --
+- Notes:
+  —
+---
+<!-- commit:63f0c49e0f06a595adce002e9bed94b58e530b90 -->
+## 2025-10-05T16:44:16+01:00 — Preserve placeholder stack sprite overrides
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/ItemData.cs
+- Diff: 29 ++ / 8 --
 - Notes:
   —
 ---
