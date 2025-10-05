@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a429eb81485c56035137b82208f621eb1b3d0ccd -->
+## 2025-10-05T18:26:09+01:00 — Merge pull request #1013 from aicovergod/codex/update-determineactivedamagetype-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 36 ++ / 2 --
+- Notes:
+  Adjust damage type detection to respect equipped weapon
+---
+<!-- commit:d65f3fd547662cf33d80807c8cb9868d08bc1ace -->
+## 2025-10-05T18:25:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:e0656a606936ed81d1273f842b90bcbed13247e1 -->
 ## 2025-10-05T18:25:46+01:00 — Adjust damage type detection to respect equipped weapon
 
