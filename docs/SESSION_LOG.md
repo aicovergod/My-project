@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:460e86a8a3b5ff4c9c3350d2f316078fc5316b69 -->
+## 2025-10-05T15:47:07+01:00 — Handle two-handed weapon equipment conflicts
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Equipment.cs, Assets/Scripts/Inventory/ItemData.cs
+- Diff: 66 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:334777bfe9393a7e459c3f7eefb4a6906ebc0b8b -->
 ## 2025-10-05T15:32:56+01:00 — Merge pull request #1003 from aicovergod/codex/update-ranged-combat-calculations-and-detection
 
