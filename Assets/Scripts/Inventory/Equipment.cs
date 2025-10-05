@@ -923,18 +923,18 @@ namespace Inventory
             float magicLineY = -3f * lineHeight;
             magicBonusText = CreateText(playerBonusPanel.transform, "Magic", "Magic = 0", magicLineY, magicFont, magicColor);
 
-            float bonusesHeaderLineY = magicLineY - lineHeight;
-            CreateText(playerBonusPanel.transform, "BonusesHeader", "Bonuses:", bonusesHeaderLineY, combatHeaderFont, combatHeaderColor);
-            meleeBonusText = CreateText(playerBonusPanel.transform, "Melee", "Melee = 0", bonusesHeaderLineY - lineHeight, strengthFont, strengthColor);
-            rangeStrengthBonusText = CreateText(playerBonusPanel.transform, "RangeStrength", "Ranged = 0", bonusesHeaderLineY - 2f * lineHeight, rangeFont, rangeColor);
-
-            float defenceHeaderLineY = bonusesHeaderLineY - 3f * lineHeight;
+            float defenceHeaderLineY = magicLineY - lineHeight;
             CreateText(playerBonusPanel.transform, "DefenceHeader", "Defence:", defenceHeaderLineY, defenceHeaderFont, defenceHeaderColor);
             meleeDefenceBonusText = CreateText(playerBonusPanel.transform, "MeleeDef", "Melee = 0", defenceHeaderLineY - lineHeight, meleeDefFont, meleeDefColor);
             rangedDefenceBonusText = CreateText(playerBonusPanel.transform, "RangeDef", "Range = 0", defenceHeaderLineY - 2f * lineHeight, rangeDefFont, rangeDefColor);
             magicDefenceBonusText = CreateText(playerBonusPanel.transform, "MagicDef", "Magic = 0", defenceHeaderLineY - 3f * lineHeight, magicDefFont, magicDefColor);
 
-            float maxHitHeaderLineY = defenceHeaderLineY - 4f * lineHeight;
+            float bonusesHeaderLineY = defenceHeaderLineY - 4f * lineHeight;
+            CreateText(playerBonusPanel.transform, "BonusesHeader", "Bonuses:", bonusesHeaderLineY, combatHeaderFont, combatHeaderColor);
+            meleeBonusText = CreateText(playerBonusPanel.transform, "Melee", "Melee = 0", bonusesHeaderLineY - lineHeight, strengthFont, strengthColor);
+            rangeStrengthBonusText = CreateText(playerBonusPanel.transform, "RangeStrength", "Ranged = 0", bonusesHeaderLineY - 2f * lineHeight, rangeFont, rangeColor);
+
+            float maxHitHeaderLineY = bonusesHeaderLineY - 3f * lineHeight;
             CreateText(playerBonusPanel.transform, "MaxHitHeader", "Max Hit:", maxHitHeaderLineY, maxHitHeaderFont, maxHitHeaderColor);
             maxHitText = CreateText(playerBonusPanel.transform, "MaxHit", "Total = 0", maxHitHeaderLineY - lineHeight, maxHitFont, maxHitColor);
 
