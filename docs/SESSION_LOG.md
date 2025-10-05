@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:09e5a47441238265f6f0bc03c6975f514f16142c -->
+## 2025-10-05T16:16:26+01:00 — Merge pull request #1007 from aicovergod/codex/update-ui-layout-in-equipment.cs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 16 ++ / 7 --
+- Notes:
+  Reorder equipment bonus sections
+---
+<!-- commit:6326374709c2e96763fe98115c7f6691397835f8 -->
+## 2025-10-05T16:16:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:66c7ebbcecade77d6aa2da071e9cde4437f8672f -->
 ## 2025-10-05T16:15:49+01:00 — Reorder equipment bonus sections
 
