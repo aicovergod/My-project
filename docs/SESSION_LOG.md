@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:09b4b3a84026199d5974018205264c1477a84b73 -->
+## 2025-10-05T16:08:56+01:00 — Merge pull request #1006 from aicovergod/codex/rename-range-accuracy-and-ranged-strength
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 32 ++ / 15 --
+- Notes:
+  Rename ranged stats and adjust bonuses header layout
+---
+<!-- commit:954a7d8a5ef2cfa669a17d604891dbd8d2dbec93 -->
+## 2025-10-05T16:08:47+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f7beaeef33d561e5fc8119536334bcc1fea230fe -->
 ## 2025-10-05T16:08:36+01:00 — Update ranged labels and reposition bonuses header
 
