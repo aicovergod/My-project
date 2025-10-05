@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1cca7bc72a6976532f7c4c306af472fcc3d74d27 -->
+## 2025-10-05T16:45:38+01:00 — Merge branch 'main' into codex/update-itemdata-stackspriteoverrides-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 829 ++ / 4103 --
+- Notes:
+  —
+---
 <!-- commit:63f0c49e0f06a595adce002e9bed94b58e530b90 -->
 ## 2025-10-05T16:44:16+01:00 — Preserve placeholder stack sprite overrides
 
