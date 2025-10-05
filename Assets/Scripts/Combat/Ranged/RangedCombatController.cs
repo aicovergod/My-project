@@ -416,7 +416,12 @@ namespace Combat.Ranged
             float chanceToHit = CombatMath.ChanceToHit(attackRoll, defenceRoll);
             bool hit = UnityEngine.Random.value < chanceToHit;
 
-            int scaledMaxHit = Mathf.RoundToInt(Mathf.Max(0f, context.damageResult.maxHit) * damageScale);
+            int effectiveStrength = CombatMath.GetEffectiveRangedStrength(attackerStats.RangedLevel, attackerStats.Style);
+            int strengthBonus = Mathf.Max(0, attackerStats.Equip.rangeStrength);
+            int baseMaxHit = CombatMath.GetMaxHit(effectiveStrength, strengthBonus);
+            float damageMultiplier = Mathf.Max(0f, context.finalDamageMultiplier);
+            float scaledDamageMultiplier = Mathf.Max(0f, damageScale) * damageMultiplier;
+            int scaledMaxHit = Mathf.RoundToInt(baseMaxHit * scaledDamageMultiplier);
             if (scaledMaxHit < 0)
                 scaledMaxHit = 0;
 

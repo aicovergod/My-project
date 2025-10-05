@@ -876,7 +876,7 @@ namespace NPC
                     break;
                 case DamageType.Ranged:
                     attEff = CombatMath.GetEffectiveRanged(attacker.RangedLevel, attacker.Style);
-                    attackBonus = attacker.Equip.range;
+                    attackBonus = Mathf.Max(0, attacker.Equip.range);
                     break;
                 default:
                     attEff = CombatMath.GetEffectiveAttack(attacker.AttackLevel, attacker.Style);
@@ -902,7 +902,8 @@ namespace NPC
                 case DamageType.Ranged:
                 {
                     int strEff = CombatMath.GetEffectiveRangedStrength(attacker.RangedLevel, attacker.Style);
-                    maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.rangeStrength);
+                    int strengthBonus = Mathf.Max(0, attacker.Equip.rangeStrength);
+                    maxHit = CombatMath.GetMaxHit(strEff, strengthBonus);
                     break;
                 }
                 default:

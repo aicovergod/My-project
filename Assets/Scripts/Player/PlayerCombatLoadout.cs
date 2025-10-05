@@ -119,7 +119,7 @@ namespace Player
                     if (MagicUI.ActiveSpell == null)
                         MagicUI.RestoreLastSpell();
                 }
-                else if (weapon.combat.Range > 0)
+                else if (weapon.combat.Range > 0 || weapon.combat.RangeStrength > 0)
                     damageType = DamageType.Ranged;
                 else
                 {

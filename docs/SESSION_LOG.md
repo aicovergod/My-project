@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5122d3d86093ceea08d71694715dbb25631ff4af -->
+## 2025-10-05T15:32:38+01:00 — Align ranged damage with range strength
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Combat/Ranged/RangedCombatController.cs, Assets/Scripts/NPC/Combat/BaseNpcCombat.cs, Assets/Scripts/Player/PlayerCombatLoadout.cs
+- Diff: 12 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:08615e5d0748696fd6dce6bccdcaeeb0e7359a91 -->
 ## 2025-10-05T15:26:44+01:00 — Merge pull request #1002 from aicovergod/codex/add-rangestrength-field-to-itemcombatstats
 
