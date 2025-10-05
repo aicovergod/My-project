@@ -1,0 +1,30 @@
+name: dotnet-format
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "Assets/**/*.cs"
+      - ".editorconfig"
+  push:
+    branches: [ main ]
+    paths:
+      - "Assets/**/*.cs"
+      - ".editorconfig"
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate synthetic Unity solution
+        run: python3 tools/generate_unity_sln.py --root Assets --sln ci/UnityAnalysis.sln --csproj ci/UnityAnalysis.csproj
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '8.0.x' }
+      - name: Restore
+        run: dotnet restore ci/UnityAnalysis.csproj
+      - name: Verify formatting
+        run: dotnet format ci/UnityAnalysis.sln --verify-no-changes --severity info
