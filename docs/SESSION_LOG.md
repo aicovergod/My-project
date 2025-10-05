@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8f3738d304c98490b962a371be961dab58c6c74e -->
+## 2025-10-05T19:17:34+01:00 — Merge pull request #1017 from aicovergod/codex/align-arrow-projectiles-with-spell-direction-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 18 ++ / 0 --
+- Notes:
+  Align ranged projectiles with their travel direction
+---
+<!-- commit:61dbe48247c45df01689fb0b7661f10baa949af4 -->
+## 2025-10-05T19:17:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2d94c98f646ba86ff1b4b27edcf036878fc487a6 -->
 ## 2025-10-05T19:17:03+01:00 — Align ranged projectile orientation with travel direction
 
