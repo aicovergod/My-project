@@ -335,7 +335,11 @@ namespace Combat.Ranged
         {
             context = EnsureContextWeapon(context);
             RangedWeaponData weaponReference = context.weapon;
-            var prefab = weaponReference != null ? weaponReference.projectilePrefab : null;
+            GameObject prefab = null;
+            if (context.ammunition != null && context.ammunition.projectilePrefab != null)
+                prefab = context.ammunition.projectilePrefab;
+            else if (weaponReference != null)
+                prefab = weaponReference.projectilePrefab;
             if (prefab == null)
             {
                 ShotFired?.Invoke(context);
@@ -375,6 +379,8 @@ namespace Combat.Ranged
                 SoundManager.Instance?.PlaySfxByFileName(context.weapon.releaseSoundId);
 
             float projectileSpeed = weaponReference != null ? weaponReference.projectileSpeed : 10f;
+            if (context.ammunition != null && context.ammunition.projectileSpeedOverride > 0f)
+                projectileSpeed = context.ammunition.projectileSpeedOverride;
             projectile.Initialise(this, context.target, context, projectileSpeed);
         }
 
