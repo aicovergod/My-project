@@ -10,20 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
-  m_Name: Bronze Arrow
+  m_Name: Adamant Arrow (p)
   m_EditorClassIdentifier: 
-  id: Bronze Arrow
-  itemName: Bronze Arrow
-  icon: {fileID: -8432237086019948641, guid: f8a8e8244facc3d4a945ff2add1e4fc6, type: 3}
+  id: Adamant Arrow (p)
+  itemName: Adamant Arrow (p)
+  icon: {fileID: 5549280638276806016, guid: 17845b90d2f5c5441a2aee11f8142412, type: 3}
   stackSpriteOverrides:
   - minStack: 2
-    variantSprite: {fileID: 575918915291440535, guid: f8a8e8244facc3d4a945ff2add1e4fc6, type: 3}
+    variantSprite: {fileID: 8926804362744771726, guid: 17845b90d2f5c5441a2aee11f8142412, type: 3}
   - minStack: 3
-    variantSprite: {fileID: -3434675324135391346, guid: f8a8e8244facc3d4a945ff2add1e4fc6, type: 3}
+    variantSprite: {fileID: -2737890903392924131, guid: 17845b90d2f5c5441a2aee11f8142412, type: 3}
   - minStack: 4
-    variantSprite: {fileID: -915504277080202784, guid: f8a8e8244facc3d4a945ff2add1e4fc6, type: 3}
+    variantSprite: {fileID: -3064148924573322505, guid: 17845b90d2f5c5441a2aee11f8142412, type: 3}
   - minStack: 5
-    variantSprite: {fileID: 7128945047934073520, guid: f8a8e8244facc3d4a945ff2add1e4fc6, type: 3}
+    variantSprite: {fileID: 1658818828382166448, guid: 17845b90d2f5c5441a2aee11f8142412, type: 3}
   description: An arrow used in a bow
   stackable: 1
   maxStack: 2147483647
@@ -45,7 +45,7 @@ MonoBehaviour:
     Attack: 0
     Strength: 0
     Range: 0
-    RangeStrength: 7
+    RangeStrength: 31
     Magic: 0
     MeleeDefence: 0
     RangeDefence: 0

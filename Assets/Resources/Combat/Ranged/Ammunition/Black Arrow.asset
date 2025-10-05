@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1db774648a024104b970aab64b0ad35b, type: 3}
-  m_Name: AmmunitionData
+  m_Name: Black Arrow
   m_EditorClassIdentifier: Assembly-CSharp::Combat.Ranged.AmmunitionData
-  ammoIdOverride: Bronze Arrow (p)
-  ammoItem: {fileID: 0}
+  ammoIdOverride: Black Arrow
+  ammoItem: {fileID: 11400000, guid: 0338e725eef40ef40b5b8328572ee8a2, type: 2}
   category: 1
   infinite: 0
   accuracyMultiplier: 1
   damageMultiplier: 1
   rangeBonusTiles: 0
   specialEffect: {fileID: 0}
-  appliesPoison: 1
+  appliesPoison: 0
   poisonApplyChance: 0.25
   recoveryChanceOnHit: 0
   recoveryChanceOnMiss: 0

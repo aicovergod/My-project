@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1db774648a024104b970aab64b0ad35b, type: 3}
+  m_Name: Mithril Arrow (p)
+  m_EditorClassIdentifier: Assembly-CSharp::Combat.Ranged.AmmunitionData
+  ammoIdOverride: Mithril Arrow (p)
+  ammoItem: {fileID: 11400000, guid: 99d64ee2de255ff46a78ccf555b34fdd, type: 2}
+  category: 1
+  infinite: 0
+  accuracyMultiplier: 1
+  damageMultiplier: 1
+  rangeBonusTiles: 0
+  specialEffect: {fileID: 0}
+  appliesPoison: 1
+  poisonApplyChance: 0.25
+  recoveryChanceOnHit: 0
+  recoveryChanceOnMiss: 0
+  spawnRecoveryAsGroundItem: 1
