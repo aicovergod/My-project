@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
-  m_Name: Mr Frying Pan
+  m_Name: Brown Chicken
   m_EditorClassIdentifier: 
-  id: Mr Frying Pan
-  itemName: Mr Frying Pan
-  icon: {fileID: -3605078035109053185, guid: 85a8b4d805c86f546afc6acce879dbab, type: 3}
-  description: 'a lucky reward
+  id: Brown Chicken
+  itemName: Brown Chicken
+  icon: {fileID: 5593316685834553651, guid: dd6781ad70c07bc42916fd8fd208865c, type: 3}
+  description: 'A cute little
 
-    from cooking'
+    chicken pet'
   stackable: 0
   maxStack: 1
   splittable: 0

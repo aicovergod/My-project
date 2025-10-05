@@ -1296,3 +1296,6 @@ MonoBehaviour:
   useFlipXForUpRight: 0
   useFlipXForDownRight: 0
   animationFPS: 6
+  idleAnimationFPS: 0
+  walkAnimationFPS: 0
+  hitAnimationFPS: 0

@@ -21,26 +21,50 @@ MonoBehaviour:
   evolutionTiers: []
   animationClips: []
   attackSprite: {fileID: 0}
-  hitUp: []
   hitDown: []
-  hitLeft: []
+  hitDownRight: []
   hitRight: []
-  idleUp:
-  - {fileID: 21300000, guid: 1ea442114cace24419659de4349efb55, type: 3}
-  walkUp:
-  - {fileID: 21300000, guid: 1ea442114cace24419659de4349efb55, type: 3}
+  hitUpRight: []
+  hitUp: []
+  hitUpLeft: []
+  hitLeft: []
+  hitDownLeft: []
   idleDown:
-  - {fileID: 21300000, guid: 143e540cf34394749aef16e3944654fe, type: 3}
-  walkDown:
-  - {fileID: 21300000, guid: cac98805679bbd841bb95f3ffebf58cf, type: 3}
-  idleLeft: []
-  walkLeft: []
+  - {fileID: -3605078035109053185, guid: 85a8b4d805c86f546afc6acce879dbab, type: 3}
+  idleDownRight:
+  - {fileID: 5716452077048331211, guid: 85a8b4d805c86f546afc6acce879dbab, type: 3}
   idleRight:
-  - {fileID: 21300000, guid: 7f43058ee46991b4b8571b907f154165, type: 3}
+  - {fileID: -4508664212043571226, guid: 85a8b4d805c86f546afc6acce879dbab, type: 3}
+  idleUpRight:
+  - {fileID: -5129079994834126738, guid: 85a8b4d805c86f546afc6acce879dbab, type: 3}
+  idleUp:
+  - {fileID: -4474262388102920162, guid: 85a8b4d805c86f546afc6acce879dbab, type: 3}
+  idleUpLeft: []
+  idleLeft: []
+  idleDownLeft: []
+  walkDown:
+  - {fileID: -3605078035109053185, guid: 85a8b4d805c86f546afc6acce879dbab, type: 3}
+  walkDownRight:
+  - {fileID: 5716452077048331211, guid: 85a8b4d805c86f546afc6acce879dbab, type: 3}
   walkRight:
-  - {fileID: 21300000, guid: c782dd7d21592644aa355b93259bdd2b, type: 3}
+  - {fileID: -4508664212043571226, guid: 85a8b4d805c86f546afc6acce879dbab, type: 3}
+  walkUpRight:
+  - {fileID: -5129079994834126738, guid: 85a8b4d805c86f546afc6acce879dbab, type: 3}
+  walkUp:
+  - {fileID: -4474262388102920162, guid: 85a8b4d805c86f546afc6acce879dbab, type: 3}
+  walkUpLeft: []
+  walkLeft: []
+  walkDownLeft: []
   useRightSpritesForLeft: 1
   useLeftSpritesForRight: 0
+  useRightSpritesForDownLeft: 1
+  useLeftSpritesForDownRight: 0
+  useRightSpritesForUpLeft: 1
+  useLeftSpritesForUpRight: 0
+  baseAnimationFPS: 6
+  idleAnimationFPS: 0
+  walkAnimationFPS: 0
+  hitAnimationFPS: 0
   canFight: 0
   petAttackLevel: 1
   petStrengthLevel: 1

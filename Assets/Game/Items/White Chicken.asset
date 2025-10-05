@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c72479de709848e3ab024450652154e5, type: 3}
+  m_Name: White Chicken
+  m_EditorClassIdentifier: 
+  id: White Chicken
+  displayName: White Chicken
+  pickupItem: {fileID: 11400000, guid: c1b7457d0cd8c3e4aadfc3d905272dff, type: 2}
+  hasInventory: 0
+  sprite: {fileID: 0}
+  pixelsPerUnit: 96
+  evolutionTiers: []
+  animationClips: []
+  attackSprite: {fileID: 0}
+  hitDown:
+  - {fileID: -8597270233999426306, guid: 993fb3b6bdc092a46b38c8f40835edff, type: 3}
+  hitDownRight:
+  - {fileID: 4035985101531318109, guid: 993fb3b6bdc092a46b38c8f40835edff, type: 3}
+  hitRight:
+  - {fileID: -9026679774376605427, guid: 993fb3b6bdc092a46b38c8f40835edff, type: 3}
+  hitUpRight:
+  - {fileID: -7219971124718812326, guid: 993fb3b6bdc092a46b38c8f40835edff, type: 3}
+  hitUp:
+  - {fileID: 6220717200485138105, guid: 993fb3b6bdc092a46b38c8f40835edff, type: 3}
+  hitUpLeft: []
+  hitLeft: []
+  hitDownLeft: []
+  idleDown:
+  - {fileID: -8597270233999426306, guid: 993fb3b6bdc092a46b38c8f40835edff, type: 3}
+  idleDownRight:
+  - {fileID: 4035985101531318109, guid: 993fb3b6bdc092a46b38c8f40835edff, type: 3}
+  idleRight:
+  - {fileID: -9026679774376605427, guid: 993fb3b6bdc092a46b38c8f40835edff, type: 3}
+  idleUpRight:
+  - {fileID: -7219971124718812326, guid: 993fb3b6bdc092a46b38c8f40835edff, type: 3}
+  idleUp:
+  - {fileID: 6220717200485138105, guid: 993fb3b6bdc092a46b38c8f40835edff, type: 3}
+  idleUpLeft: []
+  idleLeft: []
+  idleDownLeft: []
+  walkDown:
+  - {fileID: -8597270233999426306, guid: 993fb3b6bdc092a46b38c8f40835edff, type: 3}
+  walkDownRight:
+  - {fileID: 4035985101531318109, guid: 993fb3b6bdc092a46b38c8f40835edff, type: 3}
+  walkRight:
+  - {fileID: -9026679774376605427, guid: 993fb3b6bdc092a46b38c8f40835edff, type: 3}
+  walkUpRight:
+  - {fileID: -7219971124718812326, guid: 993fb3b6bdc092a46b38c8f40835edff, type: 3}
+  walkUp:
+  - {fileID: 6220717200485138105, guid: 993fb3b6bdc092a46b38c8f40835edff, type: 3}
+  walkUpLeft: []
+  walkLeft: []
+  walkDownLeft: []
+  useRightSpritesForLeft: 1
+  useLeftSpritesForRight: 0
+  useRightSpritesForDownLeft: 1
+  useLeftSpritesForDownRight: 0
+  useRightSpritesForUpLeft: 1
+  useLeftSpritesForUpRight: 0
+  baseAnimationFPS: 1
+  idleAnimationFPS: 1
+  walkAnimationFPS: 1
+  hitAnimationFPS: 1
+  canFight: 0
+  petAttackLevel: 1
+  petStrengthLevel: 1
+  attackSpeedTicks: 4
+  accuracyBonus: 0
+  damageBonus: 0
+  attackLevelPerBeastmasterLevel: 0
+  strengthLevelPerBeastmasterLevel: 0
+  maxHitPerBeastmasterLevel: 0
+  messageColor: {r: 1, g: 1, b: 1, a: 1}
+  debugBeastmasterLevel: 1
