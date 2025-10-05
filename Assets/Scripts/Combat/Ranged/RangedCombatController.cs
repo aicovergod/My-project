@@ -233,7 +233,7 @@ namespace Combat.Ranged
             bool hit = UnityEngine.Random.value < chanceToHit;
 
             int effectiveStrength = CombatMath.GetEffectiveRangedStrength(attacker.RangedLevel, attacker.Style);
-            int strengthBonus = Mathf.Max(0, attacker.Equip.range);
+            int strengthBonus = Mathf.Max(0, attacker.Equip.rangeStrength);
             int maxHit = CombatMath.GetMaxHit(effectiveStrength, strengthBonus);
             maxHit = Mathf.RoundToInt(maxHit * Mathf.Max(0f, damageMultiplier));
             if (maxHit < 0)

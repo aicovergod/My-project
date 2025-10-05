@@ -20,6 +20,7 @@ namespace EquipmentSystem
             public int attack;
             public int strength;
             public int range;
+            public int rangeStrength;
             public int magic;
             public int meleeDef;
             public int rangeDef;
@@ -54,6 +55,7 @@ namespace EquipmentSystem
                     result.attack += stats.Attack;
                     result.strength += stats.Strength;
                     result.range += stats.Range;
+                    result.rangeStrength += stats.RangeStrength;
                     result.magic += stats.Magic;
                     result.meleeDef += stats.MeleeDefence;
                     result.rangeDef += stats.RangeDefence;
@@ -69,6 +71,7 @@ namespace EquipmentSystem
                 result.attack += pet.attack;
                 result.strength += pet.strength;
                 result.range += pet.range;
+                result.rangeStrength += pet.rangeStrength;
                 result.magic += pet.magic;
                 result.meleeDef += pet.meleeDef;
                 result.rangeDef += pet.rangeDef;

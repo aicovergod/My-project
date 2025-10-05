@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fba63de6a89a0927830728336e1ee27570453ef6 -->
+## 2025-10-05T15:26:26+01:00 — Add ranged strength stat and propagate through combat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (8): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Combat/CombatantStats.cs, Assets/Scripts/Combat/Ranged/RangedCombatController.cs, Assets/Scripts/Equipment/EquipmentAggregator.cs, Assets/Scripts/Items/ItemCombatStats.cs, Assets/Scripts/NPC/Combat/BaseNpcCombat.cs, Assets/Scripts/Pets/PetCombatController.cs, Assets/Scripts/Pets/PetServiceAdapter.cs
+- Diff: 22 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:42490cfc2bc3ce160a7b0e2a909764686d806202 -->
 ## 2025-10-05T14:59:30+01:00 — bows
 

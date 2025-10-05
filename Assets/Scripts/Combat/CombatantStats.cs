@@ -52,6 +52,7 @@ namespace Combat
                     attack = 0,
                     strength = 0,
                     range = 0,
+                    rangeStrength = 0,
                     magic = 0,
                     meleeDef = profile != null ? profile.MeleeDefence : 0,
                     rangeDef = profile != null ? profile.RangeDefence : 0,
