@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:933b2438fea3486db1f88705f1d8d1104fda30bc -->
+## 2025-10-05T14:57:51+01:00 — Prevent duplicate session log entries
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): docs/SESSION_LOG.md, tools/ci_session_logger.py
+- Diff: 40 ++ / 11 --
+- Notes:
+  —
+---
 <!-- commit:147f1af9f7ab88bb2f80c47c5ed715b2dfe4b890 -->
 ## 2025-10-05T13:45:43+01:00 — Update SESSION_LOG [ci]
 
