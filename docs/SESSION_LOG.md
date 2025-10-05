@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:334777bfe9393a7e459c3f7eefb4a6906ebc0b8b -->
+## 2025-10-05T15:32:56+01:00 — Merge pull request #1003 from aicovergod/codex/update-ranged-combat-calculations-and-detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 21 ++ / 6 --
+- Notes:
+  Align ranged damage with range strength stat
+---
+<!-- commit:0203d9deece41243667603a2dbe74a32d96d1e79 -->
+## 2025-10-05T15:32:50+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:5122d3d86093ceea08d71694715dbb25631ff4af -->
 ## 2025-10-05T15:32:38+01:00 — Align ranged damage with range strength
 
