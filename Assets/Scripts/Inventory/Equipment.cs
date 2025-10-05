@@ -115,8 +115,9 @@ namespace Inventory
         private PlayerCombatLoadout combatLoadout;
 
         private Text attackBonusText;
-        private Text strengthBonusText;
-        private Text rangeBonusText;
+        private Text meleeBonusText;
+        private Text rangeAccuracyBonusText;
+        private Text rangeStrengthBonusText;
         private Text magicBonusText;
         private Text maxHitText;
         private Text meleeDefenceBonusText;
@@ -547,7 +548,11 @@ namespace Inventory
 
         private void UpdatePlayerBonuses()
         {
-            int attack = 0, strength = 0, range = 0, magic = 0;
+            int attack = 0;
+            int meleeStrength = 0;
+            int rangeAccuracy = 0;
+            int rangeStrength = 0;
+            int magic = 0;
             int meleeDef = 0, rangeDef = 0, magicDef = 0;
 
             foreach (var entry in equipped)
@@ -557,8 +562,9 @@ namespace Inventory
 
                 var stats = entry.item.combat;
                 attack += stats.Attack;
-                strength += stats.Strength;
-                range += stats.Range;
+                meleeStrength += stats.Strength;
+                rangeAccuracy += stats.Range;
+                rangeStrength += stats.RangeStrength;
                 magic += stats.Magic;
                 meleeDef += stats.MeleeDefence;
                 rangeDef += stats.RangeDefence;
@@ -566,14 +572,15 @@ namespace Inventory
             }
 
             if (attackBonusText != null) attackBonusText.text = $"Attack = {attack}";
-            if (strengthBonusText != null) strengthBonusText.text = $"Strength = {strength}";
-            if (rangeBonusText != null) rangeBonusText.text = $"Range = {range}";
+            if (rangeAccuracyBonusText != null) rangeAccuracyBonusText.text = $"Range Accuracy = {rangeAccuracy}";
+            if (meleeBonusText != null) meleeBonusText.text = $"Melee = {meleeStrength}";
+            if (rangeStrengthBonusText != null) rangeStrengthBonusText.text = $"Ranged Strength = {rangeStrength}";
             if (magicBonusText != null) magicBonusText.text = $"Magic = {magic}";
 
             int strengthLevel = skillManager != null ? skillManager.GetLevel(SkillType.Strength) : 1;
             CombatStyle style = combatLoadout != null ? combatLoadout.Style : CombatStyle.Accurate;
             int effStr = CombatMath.GetEffectiveStrength(strengthLevel, style);
-            int maxHit = CombatMath.GetMaxHit(effStr, strength);
+            int maxHit = CombatMath.GetMaxHit(effStr, meleeStrength);
             if (maxHitText != null) maxHitText.text = $"Total = {maxHit}";
 
             if (meleeDefenceBonusText != null) meleeDefenceBonusText.text = $"Melee = {meleeDef}";
@@ -582,6 +589,19 @@ namespace Inventory
 
             TotalAttackBonus = attack;
             TotalDefenceBonus = meleeDef + rangeDef + magicDef;
+        }
+
+        private void ResetPlayerBonusTexts()
+        {
+            if (attackBonusText != null) attackBonusText.text = "Attack = 0";
+            if (rangeAccuracyBonusText != null) rangeAccuracyBonusText.text = "Range Accuracy = 0";
+            if (meleeBonusText != null) meleeBonusText.text = "Melee = 0";
+            if (rangeStrengthBonusText != null) rangeStrengthBonusText.text = "Ranged Strength = 0";
+            if (magicBonusText != null) magicBonusText.text = "Magic = 0";
+            if (meleeDefenceBonusText != null) meleeDefenceBonusText.text = "Melee = 0";
+            if (rangedDefenceBonusText != null) rangedDefenceBonusText.text = "Range = 0";
+            if (magicDefenceBonusText != null) magicDefenceBonusText.text = "Magic = 0";
+            if (maxHitText != null) maxHitText.text = "Total = 0";
         }
 
         private void UpdatePetBonuses()
@@ -633,7 +653,10 @@ namespace Inventory
             if (petBonusPanel != null)
                 petBonusPanel.SetActive(merged);
             if (merged)
+            {
+                ResetPlayerBonusTexts();
                 UpdatePetBonuses();
+            }
             else
                 UpdatePlayerBonuses();
         }
@@ -895,15 +918,17 @@ namespace Inventory
 
             CreateText(playerBonusPanel.transform, "CombatHeader", "Combat:", 0f, combatHeaderFont, combatHeaderColor);
             attackBonusText = CreateText(playerBonusPanel.transform, "Attack", "Attack = 0", -lineHeight, attackFont, attackColor);
-            strengthBonusText = CreateText(playerBonusPanel.transform, "Strength", "Strength = 0", -2f * lineHeight, strengthFont, strengthColor);
-            rangeBonusText = CreateText(playerBonusPanel.transform, "Range", "Range = 0", -3f * lineHeight, rangeFont, rangeColor);
-            magicBonusText = CreateText(playerBonusPanel.transform, "Magic", "Magic = 0", -4f * lineHeight, magicFont, magicColor);
-            CreateText(playerBonusPanel.transform, "DefenceHeader", "Defence:", -5f * lineHeight, defenceHeaderFont, defenceHeaderColor);
-            meleeDefenceBonusText = CreateText(playerBonusPanel.transform, "MeleeDef", "Melee = 0", -6f * lineHeight, meleeDefFont, meleeDefColor);
-            rangedDefenceBonusText = CreateText(playerBonusPanel.transform, "RangeDef", "Range = 0", -7f * lineHeight, rangeDefFont, rangeDefColor);
-            magicDefenceBonusText = CreateText(playerBonusPanel.transform, "MagicDef", "Magic = 0", -8f * lineHeight, magicDefFont, magicDefColor);
-            CreateText(playerBonusPanel.transform, "MaxHitHeader", "Max Hit:", -9f * lineHeight, maxHitHeaderFont, maxHitHeaderColor);
-            maxHitText = CreateText(playerBonusPanel.transform, "MaxHit", "Total = 0", -10f * lineHeight, maxHitFont, maxHitColor);
+            rangeAccuracyBonusText = CreateText(playerBonusPanel.transform, "RangeAccuracy", "Range Accuracy = 0", -2f * lineHeight, rangeFont, rangeColor);
+            magicBonusText = CreateText(playerBonusPanel.transform, "Magic", "Magic = 0", -3f * lineHeight, magicFont, magicColor);
+            CreateText(playerBonusPanel.transform, "BonusesHeader", "Bonuses:", -4f * lineHeight, combatHeaderFont, combatHeaderColor);
+            meleeBonusText = CreateText(playerBonusPanel.transform, "Melee", "Melee = 0", -5f * lineHeight, strengthFont, strengthColor);
+            rangeStrengthBonusText = CreateText(playerBonusPanel.transform, "RangeStrength", "Ranged Strength = 0", -6f * lineHeight, rangeFont, rangeColor);
+            CreateText(playerBonusPanel.transform, "DefenceHeader", "Defence:", -7f * lineHeight, defenceHeaderFont, defenceHeaderColor);
+            meleeDefenceBonusText = CreateText(playerBonusPanel.transform, "MeleeDef", "Melee = 0", -8f * lineHeight, meleeDefFont, meleeDefColor);
+            rangedDefenceBonusText = CreateText(playerBonusPanel.transform, "RangeDef", "Range = 0", -9f * lineHeight, rangeDefFont, rangeDefColor);
+            magicDefenceBonusText = CreateText(playerBonusPanel.transform, "MagicDef", "Magic = 0", -10f * lineHeight, magicDefFont, magicDefColor);
+            CreateText(playerBonusPanel.transform, "MaxHitHeader", "Max Hit:", -11f * lineHeight, maxHitHeaderFont, maxHitHeaderColor);
+            maxHitText = CreateText(playerBonusPanel.transform, "MaxHit", "Total = 0", -12f * lineHeight, maxHitFont, maxHitColor);
 
             petHeaderText = CreateText(petBonusPanel.transform, "PetHeader", "Pet:", 0f, petHeaderFont, petHeaderColor);
             petAttackLevelText = CreateText(petBonusPanel.transform, "PetAttackLevel", "Attack Level = 0 - Attack = 0", -lineHeight, petAttackLevelFont, petAttackLevelColor);
