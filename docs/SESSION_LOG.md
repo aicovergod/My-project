@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d52806ffe4069db246f37e26044e6d935a12ce2b -->
+## 2025-10-05T17:45:17+01:00 — Allow ammunition to override projectile visuals
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (18): Assets/Resources/Combat/Ranged/Ammunition/Adamant Arrow (p).asset, Assets/Resources/Combat/Ranged/Ammunition/Adamant Arrow.asset, Assets/Resources/Combat/Ranged/Ammunition/Black Arrow (p).asset, Assets/Resources/Combat/Ranged/Ammunition/Black Arrow.asset, Assets/Resources/Combat/Ranged/Ammunition/Bronze Arrow (p).asset, Assets/Resources/Combat/Ranged/Ammunition/Bronze Arrow.asset, Assets/Resources/Combat/Ranged/Ammunition/Iron Arrow (p).asset, Assets/Resources/Combat/Ranged/Ammunition/Iron Arrow.asset, Assets/Resources/Combat/Ranged/Ammunition/Mithril Arrow (p).asset, Assets/Resources/Combat/Ranged/Ammunition/Mithril Arrow.asset, Assets/Resources/Combat/Ranged/Ammunition/Orichalcum Arrow (p).asset, Assets/Resources/Combat/Ranged/Ammunition/Orichalcum Arrow.asset, Assets/Resources/Combat/Ranged/Ammunition/Rune Arrow (p).asset, Assets/Resources/Combat/Ranged/Ammunition/Rune Arrow.asset, Assets/Resources/Combat/Ranged/Ammunition/Steel Arrow (p).asset, Assets/Resources/Combat/Ranged/Ammunition/Steel Arrow.asset, Assets/Scripts/Combat/Ranged/AmmunitionData.cs, Assets/Scripts/Combat/Ranged/RangedCombatController.cs
+- Diff: 46 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:5ce211b75af78384c6d8348ea125bcb33953363b -->
 ## 2025-10-05T17:40:09+01:00 — Merge pull request #1011 from aicovergod/codex/add-ammo-restrictions-to-ranged-weapons
 
