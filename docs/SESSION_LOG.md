@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e162a39972169a8ef26e1d7fa925996c37b9a07a -->
+## 2025-10-05T15:57:36+01:00 — Refine equipment bonus display
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Equipment.cs
+- Diff: 42 ++ / 17 --
+- Notes:
+  —
+---
 <!-- commit:15d00cb0bc0d931ec45e953804750654c67d73a4 -->
 ## 2025-10-05T15:47:27+01:00 — Merge pull request #1004 from aicovergod/codex/add-two-handed-weapon-support
 
