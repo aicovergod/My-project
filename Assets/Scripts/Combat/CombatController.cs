@@ -351,7 +351,7 @@ namespace Combat
             {
                 if (weapon.combat.Magic > 0)
                     return DamageType.Magic;
-                if (weapon.combat.Range > 0)
+                if (weapon.combat.Range > 0 || weapon.combat.RangeStrength > 0)
                     return DamageType.Ranged;
             }
 
@@ -496,7 +496,7 @@ namespace Combat
                     ? CombatMath.GetEffectiveRangedStrength(attacker.RangedLevel, attacker.Style)
                     : CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
                 int strengthBonus = attacker.DamageType == DamageType.Ranged
-                    ? attacker.Equip.rangeStrength
+                    ? Mathf.Max(0, attacker.Equip.rangeStrength)
                     : attacker.Equip.strength;
                 maxHit = CombatMath.GetMaxHit(strEff, strengthBonus);
             }
