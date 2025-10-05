@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:83e8155083fb8664826987c1ec4590882b58a0a9 -->
+## 2025-10-05T16:36:26+01:00 — Scale equipment UI layout
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Equipment.cs
+- Diff: 56 ++ / 33 --
+- Notes:
+  —
+---
 <!-- commit:09e5a47441238265f6f0bc03c6975f514f16142c -->
 ## 2025-10-05T16:16:26+01:00 — Merge pull request #1007 from aicovergod/codex/update-ui-layout-in-equipment.cs
 
