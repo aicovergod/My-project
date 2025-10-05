@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Items;
 using Skills;
@@ -13,6 +14,47 @@ namespace Inventory
     {
         public SkillType skill;
         public int level;
+    }
+
+    /// <summary>
+    /// Defines an alternate sprite that should be shown once an item stack
+    /// reaches the configured minimum quantity. Designers configure these
+    /// overrides directly on <see cref="ItemData"/> assets in the inspector.
+    /// </summary>
+    [Serializable]
+    public struct StackSpriteOverride
+    {
+        [SerializeField]
+        [Tooltip("Minimum stack count required before this sprite is used.")]
+        private int minStack;
+
+        [SerializeField]
+        [Tooltip("Sprite displayed when the minimum stack count is met.")]
+        private Sprite variantSprite;
+
+        /// <summary>
+        /// Minimum stack size required before the override sprite is applied.
+        /// </summary>
+        public int MinStack => minStack;
+
+        /// <summary>
+        /// Sprite shown when <see cref="MinStack"/> is satisfied.
+        /// </summary>
+        public Sprite VariantSprite => variantSprite;
+
+        /// <summary>
+        /// Ensures the minimum stack value stored in the inspector never drops
+        /// below one so runtime lookups behave predictably.
+        /// </summary>
+        public void ClampMinStack()
+        {
+            minStack = Mathf.Max(1, minStack);
+        }
+
+        /// <summary>
+        /// Returns true when a sprite has been assigned for this override.
+        /// </summary>
+        public bool HasSprite => variantSprite != null;
     }
 
     /// <summary>
@@ -48,6 +90,15 @@ namespace Inventory
 
         [Header("Display")] public string itemName;
         public Sprite icon;
+
+        [Header("Stack Sprites")]
+        [SerializeField]
+        private StackSpriteOverride[] stackSpriteOverrides = Array.Empty<StackSpriteOverride>();
+
+        /// <summary>
+        /// Ordered list of stack sprite overrides exposed for editor tooling.
+        /// </summary>
+        public IReadOnlyList<StackSpriteOverride> StackSpriteOverrides => stackSpriteOverrides;
 
         [Header("Description")] [TextArea] public string description;
 
@@ -90,6 +141,66 @@ namespace Inventory
         {
             // Keep the serialized value in sync for inspector visibility.
             maxStack = stackable ? OSRS_MAX_STACK : 1;
+
+            if (stackSpriteOverrides == null)
+            {
+                stackSpriteOverrides = Array.Empty<StackSpriteOverride>();
+                return;
+            }
+
+            if (stackSpriteOverrides.Length == 0)
+                return;
+
+            var sanitized = new List<StackSpriteOverride>(stackSpriteOverrides.Length);
+            for (int i = 0; i < stackSpriteOverrides.Length; i++)
+            {
+                var spriteOverride = stackSpriteOverrides[i];
+                spriteOverride.ClampMinStack();
+                if (!spriteOverride.HasSprite)
+                    continue;
+
+                sanitized.Add(spriteOverride);
+            }
+
+            if (sanitized.Count == 0)
+            {
+                stackSpriteOverrides = Array.Empty<StackSpriteOverride>();
+                return;
+            }
+
+            sanitized.Sort((a, b) => a.MinStack.CompareTo(b.MinStack));
+            stackSpriteOverrides = sanitized.ToArray();
+        }
+
+        /// <summary>
+        /// Returns the sprite that should represent this item for the provided
+        /// stack count. The base icon is used when no overrides match, the item
+        /// is not stackable, or the stack count is zero/negative.
+        /// </summary>
+        /// <param name="stackCount">Current quantity of this item in the stack.</param>
+        /// <returns>The sprite that should be displayed for this stack size.</returns>
+        public Sprite GetIconForCount(int stackCount)
+        {
+            if (!stackable || stackCount <= 0)
+                return icon;
+
+            if (stackSpriteOverrides == null || stackSpriteOverrides.Length == 0)
+                return icon;
+
+            Sprite chosen = icon;
+            for (int i = 0; i < stackSpriteOverrides.Length; i++)
+            {
+                var spriteOverride = stackSpriteOverrides[i];
+                if (!spriteOverride.HasSprite)
+                    continue;
+
+                if (stackCount >= spriteOverride.MinStack)
+                    chosen = spriteOverride.VariantSprite;
+                else
+                    break;
+            }
+
+            return chosen;
         }
 
         [Header("Equipment")] [Tooltip("Slot this item can be equipped to. Use None for non-equippable items.")]
