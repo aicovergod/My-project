@@ -40,21 +40,17 @@ namespace Combat.Ranged
             while (lifetime < maxLifetime)
             {
                 Vector3 destination = ResolveDestination();
-                Vector3 toTarget = destination - transform.position;
-                float sqrDistance = toTarget.sqrMagnitude;
                 float step = speed * Time.deltaTime;
-                float sqrStep = step * step;
+                Vector3 newPosition = Vector3.MoveTowards(transform.position, destination, step);
+                bool reachedDestination = newPosition == destination || speed <= 0.001f;
 
-                if (sqrDistance <= sqrStep || speed <= 0.001f)
-                {
-                    transform.position = destination;
-                    break;
-                }
-
-                transform.position += toTarget.normalized * step;
+                transform.position = newPosition;
                 context.targetPosition = destination;
                 lifetime += Time.deltaTime;
                 yield return null;
+
+                if (reachedDestination)
+                    break;
             }
 
             travelRoutine = null;
