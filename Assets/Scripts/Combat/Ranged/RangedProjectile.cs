@@ -41,6 +41,15 @@ namespace Combat.Ranged
             {
                 Vector3 destination = ResolveDestination();
                 float step = speed * Time.deltaTime;
+
+                // Align the projectile so the sprite always faces the direction of travel, matching
+                // the behaviour used by spell projectiles. This keeps arrow sprites (authored to
+                // point upward) visually pointing along their flight path regardless of target
+                // movement.
+                Vector3 toDestination = destination - transform.position;
+                if (toDestination.sqrMagnitude > 0.0001f)
+                    transform.up = toDestination;
+
                 Vector3 newPosition = Vector3.MoveTowards(transform.position, destination, step);
                 bool reachedDestination = newPosition == destination || speed <= 0.001f;
 
