@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Inventory;
 
@@ -86,6 +87,14 @@ namespace Combat.Ranged
         [Tooltip("If true, recovered ammo is spawned in the world when the inventory is full.")]
         public bool spawnRecoveryAsGroundItem = true;
 
+        [Header("Ammo Restrictions")]
+        [Tooltip("When true the allowed ammunition list becomes authoritative. Only entries explicitly listed are permitted.")]
+        public bool restrictAmmoByList;
+        [Tooltip("Specific ammunition assets this weapon is allowed to fire when restriction mode is enabled.")]
+        public AmmunitionData[] allowedAmmunition = Array.Empty<AmmunitionData>();
+        [Tooltip("Ammunition definitions the weapon can never use even when restriction mode is disabled.")]
+        public AmmunitionData[] blockedAmmunition = Array.Empty<AmmunitionData>();
+
         [Header("Feedback")]
         [Tooltip("Optional sound effect identifier consumed by SoundManager when the projectile is released.")]
         public string releaseSoundId;
@@ -109,6 +118,47 @@ namespace Combat.Ranged
         /// </summary>
         public float AttackIntervalSeconds => attackSpeedTicks * CombatMath.TICK_SECONDS;
 
+        /// <summary>
+        /// Returns true when the supplied ammunition asset is considered valid for this weapon.
+        /// Restriction mode enforces an allow-list while the block list functions regardless of the toggle.
+        /// </summary>
+        /// <param name="ammo">Ammunition definition resolved from the currently equipped stack.</param>
+        public bool IsAmmoAllowed(AmmunitionData ammo)
+        {
+            if (ammo == null)
+                return true;
+
+            if (restrictAmmoByList)
+            {
+                if (allowedAmmunition == null || allowedAmmunition.Length == 0)
+                    return false;
+
+                bool found = false;
+                for (int i = 0; i < allowedAmmunition.Length; i++)
+                {
+                    if (allowedAmmunition[i] == ammo)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                    return false;
+            }
+
+            if (blockedAmmunition != null)
+            {
+                for (int i = 0; i < blockedAmmunition.Length; i++)
+                {
+                    if (blockedAmmunition[i] == ammo)
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
         private void OnValidate()
         {
             attackSpeedTicks = Mathf.Max(1, attackSpeedTicks);
@@ -117,6 +167,9 @@ namespace Combat.Ranged
             projectileSpeed = Mathf.Max(0.1f, projectileSpeed);
             accuracyMultiplier = Mathf.Max(0f, accuracyMultiplier);
             damageMultiplier = Mathf.Max(0f, damageMultiplier);
+
+            allowedAmmunition ??= Array.Empty<AmmunitionData>();
+            blockedAmmunition ??= Array.Empty<AmmunitionData>();
 
             if (weaponItem != null && string.IsNullOrWhiteSpace(weaponIdOverride))
                 weaponIdOverride = weaponItem.id;

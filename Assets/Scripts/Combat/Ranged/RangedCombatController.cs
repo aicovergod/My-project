@@ -77,6 +77,8 @@ namespace Combat.Ranged
         private string currentWeaponId;
         private string currentAmmoId;
         private int currentAmmoCount;
+        private string lastRejectedAmmoId;
+        private string lastRejectedWeaponId;
         private int initialAmmoCount;
         private float nextUiRefresh;
         private float lastAmmoWarningTime;
@@ -521,19 +523,24 @@ namespace Combat.Ranged
             if (equipmentComponent != null)
                 equipmentComponent.OverrideAmmoLabel(ammoEmptyLabel, ammoDepletedColor);
 
-            if (Time.unscaledTime - lastAmmoWarningTime >= WarningCooldownSeconds)
-            {
-                FloatingText.Show("You have run out of ammo!", transform.position + Vector3.up * 0.5f, Color.white);
-                if (!string.IsNullOrEmpty(ammoDepletedSoundId))
-                    SoundManager.Instance?.PlaySfxByFileName(ammoDepletedSoundId);
-                lastAmmoWarningTime = Time.unscaledTime;
-            }
+            ShowAmmoWarning("You have run out of ammo!", true);
         }
 
         private bool HasRequiredAmmo(RangedWeaponData weapon, AmmunitionData ammo)
         {
             if (weapon == null)
                 return false;
+
+            if (ammo != null && !weapon.IsAmmoAllowed(ammo))
+            {
+                if (currentAmmo == ammo)
+                {
+                    RejectCurrentAmmo(
+                        $"Ammunition '{ammo.name}' is blocked by '{weapon.name}' restriction data.",
+                        "Your weapon cannot use that ammo.");
+                }
+                return false;
+            }
 
             if (weapon.consumesWeaponStack)
                 return currentAmmoCount > 0;
@@ -542,6 +549,45 @@ namespace Combat.Ranged
                 return true;
 
             return currentAmmoCount > 0;
+        }
+
+        private void ShowAmmoWarning(string message, bool playDepletedSound)
+        {
+            if (string.IsNullOrEmpty(message))
+                return;
+
+            if (Time.unscaledTime - lastAmmoWarningTime < WarningCooldownSeconds)
+                return;
+
+            FloatingText.Show(message, transform.position + Vector3.up * 0.5f, Color.white);
+            if (playDepletedSound && !string.IsNullOrEmpty(ammoDepletedSoundId))
+                SoundManager.Instance?.PlaySfxByFileName(ammoDepletedSoundId);
+            lastAmmoWarningTime = Time.unscaledTime;
+        }
+
+        private void RejectCurrentAmmo(string debugMessage, string playerMessage, bool playAmmoDepletedSound = false, bool refreshUi = true)
+        {
+            if (!string.IsNullOrEmpty(debugMessage))
+            {
+                Debug.LogWarning(debugMessage, this);
+                Log(debugMessage);
+            }
+
+            if (!string.IsNullOrEmpty(currentWeaponId))
+                lastRejectedWeaponId = currentWeaponId;
+            if (!string.IsNullOrEmpty(currentAmmoId))
+                lastRejectedAmmoId = currentAmmoId;
+
+            currentAmmo = null;
+            currentAmmoId = null;
+            currentAmmoCount = 0;
+
+            if (equipmentComponent != null)
+                equipmentComponent.OverrideAmmoLabel(ammoEmptyLabel, ammoDepletedColor);
+
+            ShowAmmoWarning(playerMessage, playAmmoDepletedSound);
+            if (refreshUi)
+                UpdateAmmoUi();
         }
 
         private void CacheModifierProviders()
@@ -557,8 +603,15 @@ namespace Combat.Ranged
 
             var weaponEntry = equipmentComponent.GetEquipped(EquipmentSlot.Weapon);
             string weaponId = weaponEntry.item != null ? weaponEntry.item.id : null;
-            if (force || !string.Equals(currentWeaponId, weaponId, StringComparison.Ordinal))
+            bool weaponChanged = !string.Equals(currentWeaponId, weaponId, StringComparison.Ordinal);
+            if (force || weaponChanged)
             {
+                if (weaponChanged)
+                {
+                    lastRejectedAmmoId = null;
+                    lastRejectedWeaponId = null;
+                }
+
                 currentWeaponId = weaponId;
                 currentWeapon = !string.IsNullOrEmpty(weaponId) ? ResolveWeapon(weaponId) : null;
                 if (currentWeapon == null && !string.IsNullOrEmpty(weaponId))
@@ -577,27 +630,73 @@ namespace Combat.Ranged
             }
 
             string ammoId = ammoEntry.item != null ? ammoEntry.item.id : null;
-            if (force || !string.Equals(currentAmmoId, ammoId, StringComparison.Ordinal))
+            bool ammoChanged = !string.Equals(currentAmmoId, ammoId, StringComparison.Ordinal);
+            if (force || ammoChanged)
             {
-                currentAmmoId = ammoId;
-            currentAmmo = !string.IsNullOrEmpty(ammoId) ? ResolveAmmo(ammoId) : null;
-            if (currentAmmo == null && !string.IsNullOrEmpty(ammoId) && currentWeapon != null && !currentWeapon.consumesWeaponStack)
-                Log($"No AmmunitionData found for '{ammoId}'.");
-            initialAmmoCount = ammoEntry.count;
-        }
+                if (ammoChanged && !string.Equals(ammoId, lastRejectedAmmoId, StringComparison.Ordinal))
+                {
+                    lastRejectedAmmoId = null;
+                    lastRejectedWeaponId = null;
+                }
 
-        currentAmmoCount = ammoEntry.count;
-        if (currentAmmoCount > initialAmmoCount)
-            initialAmmoCount = currentAmmoCount;
-        if (currentWeapon != null && !currentWeapon.consumesWeaponStack && currentAmmo != null && currentAmmo.category != currentWeapon.ammunitionCategory)
-        {
-            Debug.LogWarning($"Ammunition '{currentAmmo.name}' is not compatible with weapon '{currentWeapon.name}'. Expected {currentWeapon.ammunitionCategory} but received {currentAmmo.category}.");
-            currentAmmo = null;
-            currentAmmoId = null;
-            currentAmmoCount = 0;
+                currentAmmoId = ammoId;
+                currentAmmo = !string.IsNullOrEmpty(ammoId) ? ResolveAmmo(ammoId) : null;
+                if (currentAmmo == null && !string.IsNullOrEmpty(ammoId) && currentWeapon != null && !currentWeapon.consumesWeaponStack)
+                    Log($"No AmmunitionData found for '{ammoId}'.");
+                initialAmmoCount = ammoEntry.count;
+            }
+
+            currentAmmoCount = ammoEntry.count;
+            if (currentAmmoCount > initialAmmoCount)
+                initialAmmoCount = currentAmmoCount;
+
+            if (currentWeapon != null && currentAmmo != null)
+            {
+                bool alreadyRejected = string.Equals(lastRejectedWeaponId, currentWeaponId, StringComparison.Ordinal) &&
+                    string.Equals(lastRejectedAmmoId, currentAmmoId, StringComparison.Ordinal);
+
+                if (!currentWeapon.consumesWeaponStack && currentAmmo.category != currentWeapon.ammunitionCategory)
+                {
+                    if (alreadyRejected)
+                    {
+                        currentAmmo = null;
+                        currentAmmoId = null;
+                        currentAmmoCount = 0;
+                        if (equipmentComponent != null)
+                            equipmentComponent.OverrideAmmoLabel(ammoEmptyLabel, ammoDepletedColor);
+                    }
+                    else
+                    {
+                        RejectCurrentAmmo(
+                            $"Ammunition '{currentAmmo.name}' is not compatible with weapon '{currentWeapon.name}'. Expected {currentWeapon.ammunitionCategory} but received {currentAmmo.category}.",
+                            "That ammo type doesn't fit your weapon.",
+                            false,
+                            false);
+                    }
+                }
+                else if (!currentWeapon.IsAmmoAllowed(currentAmmo))
+                {
+                    if (alreadyRejected)
+                    {
+                        currentAmmo = null;
+                        currentAmmoId = null;
+                        currentAmmoCount = 0;
+                        if (equipmentComponent != null)
+                            equipmentComponent.OverrideAmmoLabel(ammoEmptyLabel, ammoDepletedColor);
+                    }
+                    else
+                    {
+                        RejectCurrentAmmo(
+                            $"Ammunition '{currentAmmo.name}' is rejected by weapon '{currentWeapon.name}' due to explicit restriction lists.",
+                            "Your weapon cannot use that ammo.",
+                            false,
+                            false);
+                    }
+                }
+            }
+
+            UpdateAmmoUi();
         }
-        UpdateAmmoUi();
-    }
 
         private void UpdateAmmoUi()
         {
