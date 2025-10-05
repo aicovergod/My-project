@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:21c885c49f2eacd954475234fe03f65f1e83fc14 -->
+## 2025-10-05T15:57:57+01:00 — Merge pull request #1005 from aicovergod/codex/modify-inventory-ui-for-range-stats
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 51 ++ / 17 --
+- Notes:
+  Update equipment bonuses to include ranged strength
+---
+<!-- commit:c5d2e2ace6ac8da0d84f2ca92fa90f9701d2f4f8 -->
+## 2025-10-05T15:57:49+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:e162a39972169a8ef26e1d7fa925996c37b9a07a -->
 ## 2025-10-05T15:57:36+01:00 — Refine equipment bonus display
 
