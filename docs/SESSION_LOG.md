@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:15d00cb0bc0d931ec45e953804750654c67d73a4 -->
+## 2025-10-05T15:47:27+01:00 — Merge pull request #1004 from aicovergod/codex/add-two-handed-weapon-support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 75 ++ / 1 --
+- Notes:
+  Handle two-handed equipment conflicts before equipping
+---
+<!-- commit:54bfbb75275f8a708fd9c463d24243c13428bac1 -->
+## 2025-10-05T15:47:20+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:460e86a8a3b5ff4c9c3350d2f316078fc5316b69 -->
 ## 2025-10-05T15:47:07+01:00 — Handle two-handed weapon equipment conflicts
 
