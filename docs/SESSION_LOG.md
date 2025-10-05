@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:66c7ebbcecade77d6aa2da071e9cde4437f8672f -->
+## 2025-10-05T16:15:49+01:00 — Reorder equipment bonus sections
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Equipment.cs
+- Diff: 7 ++ / 7 --
+- Notes:
+  —
+---
 <!-- commit:09b4b3a84026199d5974018205264c1477a84b73 -->
 ## 2025-10-05T16:08:56+01:00 — Merge pull request #1006 from aicovergod/codex/rename-range-accuracy-and-ranged-strength
 
