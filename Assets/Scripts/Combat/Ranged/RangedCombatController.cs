@@ -266,7 +266,7 @@ namespace Combat.Ranged
                 attackCooldownTicks = currentWeapon.attackSpeedTicks;
 
             bool consumeAmmo = ammoConsumptionMultiplier > 0f && (ammo == null || !ammo.infinite);
-            int remaining;
+            int remaining = currentAmmoCount;
             if (consumeAmmo && !ConsumeAmmo(currentWeapon, ammo, out remaining))
             {
                 HandleNoAmmo();
