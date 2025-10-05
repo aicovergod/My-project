@@ -544,7 +544,7 @@ namespace Combat
             };
             int defRoll = CombatMath.GetDefenceRoll(defEff, defBonus);
             float chance = CombatMath.ChanceToHit(atkRoll, defRoll);
-            bool hit = Random.value < chance;
+            bool hit = UnityEngine.Random.value < chance;
 
             int maxHit;
             if (attacker.DamageType == DamageType.Magic)
@@ -985,7 +985,7 @@ namespace Combat
             for (int i = 0; i < 10000; i++)
             {
                 float chance = CombatMath.ChanceToHit(atkRoll, defRoll);
-                if (Random.value < chance)
+                if (UnityEngine.Random.value < chance)
                 {
                     int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
                     int maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
