@@ -29,5 +29,24 @@ MonoBehaviour:
   recoveryChanceOnHit: 0.5
   recoveryChanceOnMiss: 0.2
   spawnRecoveryAsGroundItem: 1
-  releaseSoundId: 
+  restrictAmmoByList: 1
+  allowedAmmunition:
+  - {fileID: 11400000, guid: ee7fb6b5c91aa2d45ac94429e1377b7a, type: 2}
+  - {fileID: 11400000, guid: 2147ff14e11d13747996fb66b9ba3302, type: 2}
+  - {fileID: 11400000, guid: 32fbee3b40be44d4b9948543c649124c, type: 2}
+  - {fileID: 11400000, guid: f3034fe20e173264e91f2c8f57ccecbd, type: 2}
+  - {fileID: 11400000, guid: 1f844aed9846cbc46bb44ae0885596fb, type: 2}
+  - {fileID: 11400000, guid: 13a14b417cf9bbb49a7ec67b8c19acc2, type: 2}
+  - {fileID: 11400000, guid: a5ecf981d093e2046950927df575f845, type: 2}
+  - {fileID: 11400000, guid: a8e04f45145a0884ca0842861b848e3a, type: 2}
+  - {fileID: 11400000, guid: d414ac2465f127f4f96879b2db35db85, type: 2}
+  - {fileID: 11400000, guid: b60468d07f1f0784989cd51a8de6b427, type: 2}
+  - {fileID: 11400000, guid: e1e9aaba597d3ac43b1d223b905292e8, type: 2}
+  - {fileID: 11400000, guid: dc83e672a0a18074f8b3887436f43f08, type: 2}
+  - {fileID: 11400000, guid: baa48e48c08441043aff90914d2bc7ef, type: 2}
+  - {fileID: 11400000, guid: 7ee7c95fae0aee94086a215564355a27, type: 2}
+  - {fileID: 11400000, guid: dab7e75933c9f344783e22f0d90dca32, type: 2}
+  - {fileID: 11400000, guid: 004f6eb2ece44f949a4d61122d1a2e84, type: 2}
+  blockedAmmunition: []
+  releaseSoundId:
   specialEffect: {fileID: 0}

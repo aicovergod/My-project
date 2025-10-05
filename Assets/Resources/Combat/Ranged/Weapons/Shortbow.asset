@@ -29,5 +29,12 @@ MonoBehaviour:
   recoveryChanceOnHit: 0.5
   recoveryChanceOnMiss: 0.2
   spawnRecoveryAsGroundItem: 1
-  releaseSoundId: 
+  restrictAmmoByList: 1
+  allowedAmmunition:
+  - {fileID: 11400000, guid: ee7fb6b5c91aa2d45ac94429e1377b7a, type: 2}
+  - {fileID: 11400000, guid: 2147ff14e11d13747996fb66b9ba3302, type: 2}
+  - {fileID: 11400000, guid: 32fbee3b40be44d4b9948543c649124c, type: 2}
+  - {fileID: 11400000, guid: f3034fe20e173264e91f2c8f57ccecbd, type: 2}
+  blockedAmmunition: []
+  releaseSoundId:
   specialEffect: {fileID: 0}
