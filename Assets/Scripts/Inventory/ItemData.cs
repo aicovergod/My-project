@@ -131,6 +131,9 @@ namespace Inventory
         [Tooltip("If true, this item cannot be dropped.")]
         public bool isUndroppable = false;
 
+        [Tooltip("If true, this weapon occupies both the weapon and shield slots.")]
+        public bool isTwoHanded = false;
+
         [Header("Consumable")]
         [Tooltip("Hitpoints restored when this item is consumed.")]
         public int healAmount = 0;
