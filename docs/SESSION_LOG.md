@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e2c3d8fd90be9aaabd19e929a15b65b5b5c47429 -->
+## 2025-10-05T18:40:38+01:00 — Merge pull request #1015 from aicovergod/codex/fix-ambiguous-reference-to-random
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 2 --
+- Notes:
+  Fix Random ambiguity in combat calculations
+---
+<!-- commit:408321734dd07c60d8d8b5eacef42e73dda128b3 -->
+## 2025-10-05T18:40:21+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c64994854f88f0c6a98692151190e0bdf33581fb -->
 ## 2025-10-05T18:40:09+01:00 — Fix Random ambiguity in combat calculations
 
