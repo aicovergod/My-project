@@ -126,6 +126,7 @@ namespace Pets
                     {
                         attack = def.accuracyBonus,
                         strength = def.damageBonus,
+                        rangeStrength = def.damageBonus,
                         attackSpeedTicks = def.attackSpeedTicks
                     },
                     Style = CombatStyle.Accurate,
@@ -138,6 +139,7 @@ namespace Pets
                 stats.StrengthLevel = Mathf.RoundToInt(stats.StrengthLevel * mult);
                 stats.Equip.attack = Mathf.RoundToInt(stats.Equip.attack * mult);
                 stats.Equip.strength = Mathf.RoundToInt(stats.Equip.strength * mult);
+                stats.Equip.rangeStrength = Mathf.RoundToInt(stats.Equip.rangeStrength * mult);
 
                 var follower = controller.GetComponent<PetFollower>();
                 var owner = follower != null ? follower.Player : null;

@@ -858,7 +858,7 @@ namespace NPC
                     AttackLevel = 1,
                     StrengthLevel = 1,
                     DefenceLevel = 1,
-                    Equip = new EquipmentAggregator.CombinedStats(),
+                    Equip = new EquipmentAggregator.CombinedStats { rangeStrength = 0 },
                     Style = CombatStyle.Defensive,
                     DamageType = target.PreferredDefenceType
                 };
@@ -902,7 +902,7 @@ namespace NPC
                 case DamageType.Ranged:
                 {
                     int strEff = CombatMath.GetEffectiveRangedStrength(attacker.RangedLevel, attacker.Style);
-                    maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.range);
+                    maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.rangeStrength);
                     break;
                 }
                 default:

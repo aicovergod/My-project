@@ -11,7 +11,14 @@ namespace Items
     {
         public int Attack;
         public int Strength;
+        /// <summary>
+        /// Ranged accuracy bonus used when rolling chance to hit.
+        /// </summary>
         public int Range;
+        /// <summary>
+        /// Ranged strength bonus used when calculating maximum hit rolls.
+        /// </summary>
+        public int RangeStrength;
         public int Magic;
         public int MeleeDefence;
         public int RangeDefence;
@@ -29,6 +36,7 @@ namespace Items
             Attack = 0,
             Strength = 0,
             Range = 0,
+            RangeStrength = 0,
             Magic = 0,
             MeleeDefence = 0,
             RangeDefence = 0,

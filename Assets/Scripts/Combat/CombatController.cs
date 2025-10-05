@@ -496,7 +496,7 @@ namespace Combat
                     ? CombatMath.GetEffectiveRangedStrength(attacker.RangedLevel, attacker.Style)
                     : CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
                 int strengthBonus = attacker.DamageType == DamageType.Ranged
-                    ? attacker.Equip.range
+                    ? attacker.Equip.rangeStrength
                     : attacker.Equip.strength;
                 maxHit = CombatMath.GetMaxHit(strEff, strengthBonus);
             }
@@ -533,7 +533,7 @@ namespace Combat
                     RangedLevel = 1,
                     DefenceLevel = 1,
                     MagicLevel = 1,
-                    Equip = new EquipmentAggregator.CombinedStats(),
+                    Equip = new EquipmentAggregator.CombinedStats { rangeStrength = 0 },
                     Style = CombatStyle.Defensive,
                     DamageType = target != null ? target.PreferredDefenceType : incomingType
                 };

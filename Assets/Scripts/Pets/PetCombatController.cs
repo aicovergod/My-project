@@ -332,6 +332,7 @@ namespace Pets
                 {
                     attack = definition.accuracyBonus,
                     strength = definition.damageBonus,
+                    rangeStrength = definition.damageBonus,
                     attackSpeedTicks = definition.attackSpeedTicks
                 },
                 Style = CombatStyle.Accurate,
@@ -343,6 +344,7 @@ namespace Pets
             attacker.StrengthLevel = Mathf.RoundToInt(attacker.StrengthLevel * statMult);
             attacker.Equip.attack = Mathf.RoundToInt(attacker.Equip.attack * statMult);
             attacker.Equip.strength = Mathf.RoundToInt(attacker.Equip.strength * statMult);
+            attacker.Equip.rangeStrength = Mathf.RoundToInt(attacker.Equip.rangeStrength * statMult);
 
             // scale stats based on the owner's Beastmaster level
             var owner = follower != null ? follower.Player : null;
@@ -368,7 +370,7 @@ namespace Pets
                     AttackLevel = 1,
                     StrengthLevel = 1,
                     DefenceLevel = 1,
-                    Equip = new EquipmentAggregator.CombinedStats(),
+                    Equip = new EquipmentAggregator.CombinedStats { rangeStrength = 0 },
                     Style = CombatStyle.Defensive,
                     DamageType = target.PreferredDefenceType
                 };
