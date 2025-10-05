@@ -321,13 +321,14 @@ namespace Inventory
             if (slot == EquipmentSlot.None)
                 return false;
 
+            Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
+
             if (entry.item != null && skillManager != null && entry.item.skillRequirements != null)
             {
                 foreach (var req in entry.item.skillRequirements)
                 {
                     if (skillManager.GetLevel(req.skill) < req.level)
                     {
-                        Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
                         FloatingText.Show($"You need {req.level} {req.skill} to wield this", anchor.position);
                         return false;
                     }
@@ -338,11 +339,72 @@ namespace Inventory
             if (index < 0 || index >= equipped.Length)
                 return false;
 
+            // Handle mutually exclusive weapon/shield pairing before mutating any slots.
+            if (slot == EquipmentSlot.Weapon && entry.item != null && entry.item.isTwoHanded)
+            {
+                int shieldIndex = SlotIndex(EquipmentSlot.Shield);
+                if (shieldIndex >= 0 && shieldIndex < equipped.Length)
+                {
+                    var shieldEntry = equipped[shieldIndex];
+                    if (shieldEntry.item != null)
+                    {
+                        if (inventory == null || !inventory.CanAddItem(shieldEntry.item, shieldEntry.count))
+                        {
+                            FloatingText.Show("Your inventory is full", anchor.position);
+                            return false;
+                        }
+
+                        if (!inventory.AddItem(shieldEntry.item, shieldEntry.count))
+                        {
+                            FloatingText.Show("Your inventory is full", anchor.position);
+                            return false;
+                        }
+
+                        equipped[shieldIndex] = default;
+                        UpdateSlotVisual(EquipmentSlot.Shield);
+                        UpdateBonuses();
+                        OnEquipmentChanged?.Invoke(EquipmentSlot.Shield);
+                        ItemUseResolver.NotifyItemUsed(gameObject, shieldEntry.item, ItemUseType.Unequipped);
+                    }
+                }
+            }
+            else if (slot == EquipmentSlot.Shield)
+            {
+                int weaponIndex = SlotIndex(EquipmentSlot.Weapon);
+                if (weaponIndex >= 0 && weaponIndex < equipped.Length)
+                {
+                    var weaponEntry = equipped[weaponIndex];
+                    if (weaponEntry.item != null && weaponEntry.item.isTwoHanded)
+                    {
+                        if (inventory == null || !inventory.CanAddItem(weaponEntry.item, weaponEntry.count))
+                        {
+                            FloatingText.Show("Your inventory is full", anchor.position);
+                            return false;
+                        }
+
+                        if (!inventory.AddItem(weaponEntry.item, weaponEntry.count))
+                        {
+                            FloatingText.Show("Your inventory is full", anchor.position);
+                            return false;
+                        }
+
+                        equipped[weaponIndex] = default;
+                        UpdateSlotVisual(EquipmentSlot.Weapon);
+                        UpdateBonuses();
+                        OnEquipmentChanged?.Invoke(EquipmentSlot.Weapon);
+                        ItemUseResolver.NotifyItemUsed(gameObject, weaponEntry.item, ItemUseType.Unequipped);
+                    }
+                }
+            }
+
             var current = equipped[index];
             if (current.item != null)
             {
                 if (inventory != null && !inventory.AddItem(current.item, current.count))
+                {
+                    FloatingText.Show("Your inventory is full", anchor.position);
                     return false;
+                }
                 ItemUseResolver.NotifyItemUsed(gameObject, current.item, ItemUseType.Unequipped);
             }
 
