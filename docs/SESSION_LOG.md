@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:40c7f1f10287a4066e4b7e25600b62c8c0b0cf42 -->
+## 2025-10-05T19:10:13+01:00 — Merge pull request #1016 from aicovergod/codex/modify-rangedprojectile-travelroutine
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 15 ++ / 10 --
+- Notes:
+  Ensure ranged projectiles persist for a frame at impact
+---
+<!-- commit:e376f76da8d3edc09c4f4ac07e3b0c881c7a9792 -->
+## 2025-10-05T19:09:21+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:06c1e0c1352e7672c5001ae0e36487e1d713fabb -->
 ## 2025-10-05T19:09:04+01:00 — Ensure ranged projectiles persist for a frame at impact
 
