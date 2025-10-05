@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2460a9ed1e95145f6c9b283291cfd5df3fbd98de -->
+## 2025-10-05T16:37:55+01:00 — Merge pull request #1008 from aicovergod/codex/add-ui-scaling-to-equipment-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 65 ++ / 33 --
+- Notes:
+  Scale equipment UI layout
+---
+<!-- commit:a4a7792b8414c3c01f22d8c811ab8845611e1229 -->
+## 2025-10-05T16:36:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:83e8155083fb8664826987c1ec4590882b58a0a9 -->
 ## 2025-10-05T16:36:26+01:00 — Scale equipment UI layout
 
