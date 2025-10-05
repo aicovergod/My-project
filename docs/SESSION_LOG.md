@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d40ec7e961bf85c38b0092460c84bd957be726d0 -->
+## 2025-10-05T16:45:57+01:00 — Merge pull request #1009 from aicovergod/codex/update-itemdata-stackspriteoverrides-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 41 ++ / 11 --
+- Notes:
+  Preserve placeholder stack sprite overrides
+---
+<!-- commit:b9a9a7a1c0129cb10df917909042f6e593ed2d9c -->
+## 2025-10-05T16:45:49+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:1cca7bc72a6976532f7c4c306af472fcc3d74d27 -->
 ## 2025-10-05T16:45:38+01:00 — Merge branch 'main' into codex/update-itemdata-stackspriteoverrides-handling
 
