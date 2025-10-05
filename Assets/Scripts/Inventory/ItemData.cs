@@ -154,25 +154,46 @@ namespace Inventory
             if (stackSpriteOverrides.Length == 0)
                 return;
 
-            var sanitized = new List<StackSpriteOverride>(stackSpriteOverrides.Length);
+            var withSprites = new List<StackSpriteOverride>(stackSpriteOverrides.Length);
+            var placeholders = new List<StackSpriteOverride>();
             for (int i = 0; i < stackSpriteOverrides.Length; i++)
             {
                 var spriteOverride = stackSpriteOverrides[i];
                 spriteOverride.ClampMinStack();
-                if (!spriteOverride.HasSprite)
-                    continue;
 
-                sanitized.Add(spriteOverride);
+                if (spriteOverride.HasSprite)
+                {
+                    withSprites.Add(spriteOverride);
+                }
+                else
+                {
+                    placeholders.Add(spriteOverride);
+                }
             }
 
-            if (sanitized.Count == 0)
+            // Keep entries without sprites so designers can finish configuring
+            // them, but ensure the configured overrides remain sorted for
+            // stable inspector ordering.
+            withSprites.Sort((a, b) => a.MinStack.CompareTo(b.MinStack));
+
+            if (placeholders.Count == 0)
             {
-                stackSpriteOverrides = Array.Empty<StackSpriteOverride>();
+                stackSpriteOverrides = withSprites.Count == 0
+                    ? Array.Empty<StackSpriteOverride>()
+                    : withSprites.ToArray();
                 return;
             }
 
-            sanitized.Sort((a, b) => a.MinStack.CompareTo(b.MinStack));
-            stackSpriteOverrides = sanitized.ToArray();
+            if (withSprites.Count == 0)
+            {
+                stackSpriteOverrides = placeholders.ToArray();
+                return;
+            }
+
+            var combined = new StackSpriteOverride[withSprites.Count + placeholders.Count];
+            withSprites.CopyTo(combined, 0);
+            placeholders.CopyTo(combined, withSprites.Count);
+            stackSpriteOverrides = combined;
         }
 
         /// <summary>
