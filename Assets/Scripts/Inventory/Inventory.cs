@@ -742,7 +742,14 @@ namespace Inventory
             var item = entry.item;
             if (item != null)
             {
-                slotImages[index].sprite = item.icon ? item.icon : slotFrameSprite;
+                Sprite sprite = item.GetIconForCount(entry.count);
+                if (sprite == null)
+                    sprite = item.icon != null ? item.icon : slotFrameSprite;
+
+                if (sprite == null)
+                    sprite = slotFrameSprite;
+
+                slotImages[index].sprite = sprite;
                 slotImages[index].type = (slotImages[index].sprite == slotFrameSprite && slotFrameSprite != null)
                     ? Image.Type.Sliced : Image.Type.Simple;
                 slotImages[index].color = Color.white;
@@ -1398,7 +1405,12 @@ namespace Inventory
             draggingIcon.transform.SetAsLastSibling();
             var img = draggingIcon.GetComponent<Image>();
             img.raycastTarget = false;
-            img.sprite = item.icon ? item.icon : slotFrameSprite;
+            Sprite dragSprite = item.GetIconForCount(entry.count);
+            if (dragSprite == null)
+                dragSprite = item.icon != null ? item.icon : slotFrameSprite;
+            if (dragSprite == null)
+                dragSprite = slotFrameSprite;
+            img.sprite = dragSprite;
             img.color = Color.white;
             var rect = draggingIcon.GetComponent<RectTransform>();
             rect.sizeDelta = slotSize;

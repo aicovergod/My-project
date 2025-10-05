@@ -377,7 +377,10 @@ namespace BankSystem
 
             if (hasItem)
             {
-                image.sprite = entry.item.icon;
+                Sprite sprite = entry.item.GetIconForCount(entry.count);
+                if (sprite == null)
+                    sprite = entry.item.icon;
+                image.sprite = sprite;
                 image.type = Image.Type.Simple;
                 image.color = Color.white;
 
@@ -500,7 +503,10 @@ namespace BankSystem
             draggingIcon.transform.SetParent(uiRoot.transform, false);
             var img = draggingIcon.GetComponent<Image>();
             img.raycastTarget = false;
-            img.sprite = entry.item.icon;
+            Sprite sprite = entry.item.GetIconForCount(entry.count);
+            if (sprite == null)
+                sprite = entry.item.icon;
+            img.sprite = sprite;
             img.color = Color.white;
             var rect = draggingIcon.GetComponent<RectTransform>();
             rect.sizeDelta = slotSize;

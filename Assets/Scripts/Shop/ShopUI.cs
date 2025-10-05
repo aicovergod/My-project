@@ -360,7 +360,12 @@ namespace ShopSystem
                     var entry = currentShop.stock[i];
                     if (entry.item != null && entry.quantity > 0)
                     {
-                        img.sprite = entry.item.icon != null ? entry.item.icon : slotFrameSprite;
+                        Sprite sprite = entry.item.GetIconForCount(entry.quantity);
+                        if (sprite == null)
+                            sprite = entry.item.icon != null ? entry.item.icon : slotFrameSprite;
+                        if (sprite == null)
+                            sprite = slotFrameSprite;
+                        img.sprite = sprite;
                         img.color = Color.white;
                         img.enabled = true;
                         // Display only the quantity in the slot, not the price
