@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:08615e5d0748696fd6dce6bccdcaeeb0e7359a91 -->
+## 2025-10-05T15:26:44+01:00 — Merge pull request #1002 from aicovergod/codex/add-rangestrength-field-to-itemcombatstats
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 31 ++ / 6 --
+- Notes:
+  Add ranged strength stat and propagate through combat
+---
+<!-- commit:19f834834368fef1b0905b385c7ac61c3e409d6e -->
+## 2025-10-05T15:26:37+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:fba63de6a89a0927830728336e1ee27570453ef6 -->
 ## 2025-10-05T15:26:26+01:00 — Add ranged strength stat and propagate through combat
 
