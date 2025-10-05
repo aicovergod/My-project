@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b077d76c6faf8ed7b054084bb77a518056122bf7 -->
+## 2025-10-05T17:39:44+01:00 — Implement ranged ammo restrictions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (8): Assets/Resources/Combat/Ranged/Weapons/Magic Shortbow.asset, Assets/Resources/Combat/Ranged/Weapons/Maple Shortbow.asset, Assets/Resources/Combat/Ranged/Weapons/Oak Shortbow.asset, Assets/Resources/Combat/Ranged/Weapons/Shortbow.asset, Assets/Resources/Combat/Ranged/Weapons/Willow Shortbow.asset, Assets/Resources/Combat/Ranged/Weapons/Yew Shortbow.asset, Assets/Scripts/Combat/Ranged/RangedCombatController.cs, Assets/Scripts/Combat/Ranged/RangedWeaponData.cs
+- Diff: 265 ++ / 31 --
+- Notes:
+  —
+---
 <!-- commit:19c3b1e63f7c13a06677ad00aaee41a112312785 -->
 ## 2025-10-05T17:25:55+01:00 — prefabs
 
