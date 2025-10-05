@@ -443,7 +443,11 @@ namespace Combat
             attackRoutine = null;
         }
 
-        internal struct DamageResult
+        /// <summary>
+        /// Represents the outcome of a combat damage roll so that other combat systems like
+        /// ranged projectiles can forward the result without duplicating the calculation logic.
+        /// </summary>
+        public struct DamageResult
         {
             public int damage;
             public bool hit;
