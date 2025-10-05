@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e0656a606936ed81d1273f842b90bcbed13247e1 -->
+## 2025-10-05T18:25:46+01:00 — Adjust damage type detection to respect equipped weapon
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Combat/CombatController.cs
+- Diff: 27 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:65d3ad33095222a1beff14e867904ce7f1548838 -->
 ## 2025-10-05T17:46:50+01:00 — Merge pull request #1012 from aicovergod/codex/add-projectile-prefab-and-speed-override
 
