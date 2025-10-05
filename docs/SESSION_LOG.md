@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:575e71b12192de5a8c04b15740306f0c8759ce8d -->
+## 2025-10-05T18:37:14+01:00 — Merge pull request #1014 from aicovergod/codex/update-determineactivedamagetype-with-case-insensitive-check
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 45 ++ / 0 --
+- Notes:
+  Handle ranged weapon keywords in combat controller
+---
+<!-- commit:1b241134402b8c326460043f92e6abeeaa6420e6 -->
+## 2025-10-05T18:37:08+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f4423877bce7caa1d40e95f5e0e5bdf1c87f85b6 -->
 ## 2025-10-05T18:36:52+01:00 — Adjust ranged damage detection for thrown weapons
 
