@@ -339,14 +339,39 @@ namespace Combat
             else if (loadout != null)
                 stats = loadout.GetCombatantStats();
 
+            // Cache the currently equipped weapon once so multiple checks all reference
+            // the same item data. This avoids recomputing lookups when we need to cross
+            // validate the combat profile with the actual equipment.
+            var weapon = GetEquippedWeapon();
+
             if (stats != null)
-                return stats.DamageType;
+            {
+                var reportedType = stats.DamageType;
+
+                if (reportedType == DamageType.Melee && weapon != null)
+                {
+                    // Some merged combat profiles default to melee even when the player
+                    // equips a ranged or magic weapon (for example when using pet merge
+                    // loadouts). In those cases we trust the weapon's combat stats over
+                    // the profile so movement and range checks line up with the equipped
+                    // item.
+                    if (weapon.combat.Magic > 0)
+                        return DamageType.Magic;
+
+                    if (weapon.combat.Range > 0 || weapon.combat.RangeStrength > 0)
+                        return DamageType.Ranged;
+                }
+
+                // Pet merge profiles that explicitly flag ranged or magic combat types
+                // should retain their declared damage category, so only melee defaults
+                // are adjusted above.
+                return reportedType;
+            }
 
             var activeSpell = MagicUI.ActiveSpell;
             if (activeSpell != null)
                 return DamageType.Magic;
 
-            var weapon = GetEquippedWeapon();
             if (weapon != null)
             {
                 if (weapon.combat.Magic > 0)
