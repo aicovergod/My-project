@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:65d3ad33095222a1beff14e867904ce7f1548838 -->
+## 2025-10-05T17:46:50+01:00 — Merge pull request #1012 from aicovergod/codex/add-projectile-prefab-and-speed-override
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 55 ++ / 1 --
+- Notes:
+  Allow ammunition to override projectile visuals
+---
+<!-- commit:52064fff9cdcb534839663bbeb5e4dc83f7fa2e0 -->
+## 2025-10-05T17:45:31+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d52806ffe4069db246f37e26044e6d935a12ce2b -->
 ## 2025-10-05T17:45:17+01:00 — Allow ammunition to override projectile visuals
 
