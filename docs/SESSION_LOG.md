@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4f0335fae5990ca1fdd3bc852ecc28b2359fc428 -->
+## 2025-10-05T17:25:24+01:00 — Merge pull request #1010 from aicovergod/codex/set-up-ci-for-unity-c#-static-analysis
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 224 ++ / 0 --
+- Notes:
+  Add static analysis CI for Unity C# scripts
+---
+<!-- commit:91d7c7322d903f1c5873e2b7fb51445793aa5ce8 -->
+## 2025-10-05T17:25:11+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2e76b64217963322439260dfb112e2ab560116c9 -->
 ## 2025-10-05T17:24:56+01:00 — Add static analysis CI for Unity C# scripts
 
