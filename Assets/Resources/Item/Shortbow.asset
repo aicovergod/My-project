@@ -21,6 +21,7 @@ MonoBehaviour:
   maxStack: 1
   splittable: 0
   isUndroppable: 0
+  isTwoHanded: 1
   healAmount: 0
   replacementItemId: 
   equipmentSlot: 10
@@ -36,6 +37,7 @@ MonoBehaviour:
     Attack: 0
     Strength: 0
     Range: 8
+    RangeStrength: 0
     Magic: 0
     MeleeDefence: 0
     RangeDefence: 0

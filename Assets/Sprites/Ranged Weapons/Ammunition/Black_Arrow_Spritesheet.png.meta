@@ -203,12 +203,12 @@ TextureImporter:
       name: Black_Arrow_Spritesheet_0
       rect:
         serializedVersion: 2
-        x: 26
-        y: 2
-        width: 13
-        height: 59
+        x: 0
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -225,12 +225,12 @@ TextureImporter:
       name: Black_Arrow_Spritesheet_1
       rect:
         serializedVersion: 2
-        x: 90
-        y: 2
-        width: 13
-        height: 59
+        x: 64
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -247,12 +247,12 @@ TextureImporter:
       name: Black_Arrow_Spritesheet_2
       rect:
         serializedVersion: 2
-        x: 102
-        y: 2
-        width: 13
-        height: 59
+        x: 128
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -269,12 +269,12 @@ TextureImporter:
       name: Black_Arrow_Spritesheet_3
       rect:
         serializedVersion: 2
-        x: 142
-        y: 2
-        width: 13
-        height: 59
+        x: 192
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -291,12 +291,12 @@ TextureImporter:
       name: Black_Arrow_Spritesheet_4
       rect:
         serializedVersion: 2
-        x: 154
-        y: 2
-        width: 13
-        height: 59
+        x: 256
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -313,12 +313,12 @@ TextureImporter:
       name: Black_Arrow_Spritesheet_5
       rect:
         serializedVersion: 2
-        x: 166
-        y: 2
-        width: 13
-        height: 59
+        x: 320
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -335,12 +335,12 @@ TextureImporter:
       name: Black_Arrow_Spritesheet_6
       rect:
         serializedVersion: 2
-        x: 194
-        y: 2
-        width: 13
-        height: 59
+        x: 384
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -357,12 +357,12 @@ TextureImporter:
       name: Black_Arrow_Spritesheet_7
       rect:
         serializedVersion: 2
-        x: 206
-        y: 2
-        width: 13
-        height: 59
+        x: 448
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -379,12 +379,12 @@ TextureImporter:
       name: Black_Arrow_Spritesheet_8
       rect:
         serializedVersion: 2
-        x: 218
-        y: 2
-        width: 13
-        height: 59
+        x: 512
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -401,12 +401,12 @@ TextureImporter:
       name: Black_Arrow_Spritesheet_9
       rect:
         serializedVersion: 2
-        x: 230
-        y: 2
-        width: 13
-        height: 59
+        x: 576
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -419,451 +419,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_10
-      rect:
-        serializedVersion: 2
-        x: 258
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: fa1aa2781e3518250800000000000000
-      internalID: 5945125211206230447
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_11
-      rect:
-        serializedVersion: 2
-        x: 270
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7ae950deb3bad28d0800000000000000
-      internalID: -2869449113697149273
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_12
-      rect:
-        serializedVersion: 2
-        x: 282
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 2510665856320af30800000000000000
-      internalID: 4584703339599888722
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_13
-      rect:
-        serializedVersion: 2
-        x: 294
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 1273c0257d105ce60800000000000000
-      internalID: 7981787938890200865
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_14
-      rect:
-        serializedVersion: 2
-        x: 306
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: ed1f769da3cebf350800000000000000
-      internalID: 6051690261802119646
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_15
-      rect:
-        serializedVersion: 2
-        x: 346
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: e0e5673f6fa367d50800000000000000
-      internalID: 6734635125100142094
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_16
-      rect:
-        serializedVersion: 2
-        x: 410
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: bbe906ccba37267e0800000000000000
-      internalID: -1773728121525068101
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_17
-      rect:
-        serializedVersion: 2
-        x: 422
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 544533938e716b240800000000000000
-      internalID: 4807055938424099909
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_18
-      rect:
-        serializedVersion: 2
-        x: 462
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 77db526fab6d84470800000000000000
-      internalID: 8379183205204737399
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_19
-      rect:
-        serializedVersion: 2
-        x: 474
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: f2a5cbf3a75995680800000000000000
-      internalID: -8765810847412102609
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_20
-      rect:
-        serializedVersion: 2
-        x: 486
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 1d5ae6452c6a2fee0800000000000000
-      internalID: -1228736394748320303
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_21
-      rect:
-        serializedVersion: 2
-        x: 514
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 97764c5ffc3386df0800000000000000
-      internalID: -186842416261339271
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_22
-      rect:
-        serializedVersion: 2
-        x: 526
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 3f7e696fb523ee2f0800000000000000
-      internalID: -941759901513357325
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_23
-      rect:
-        serializedVersion: 2
-        x: 538
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7c84b5c1725685c20800000000000000
-      internalID: 3195415154273241287
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_24
-      rect:
-        serializedVersion: 2
-        x: 550
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 99ebcf8a8ace8c060800000000000000
-      internalID: 6974084232117010073
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_25
-      rect:
-        serializedVersion: 2
-        x: 578
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 81ee6df3d63311f50800000000000000
-      internalID: 6850313052522737176
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_26
-      rect:
-        serializedVersion: 2
-        x: 590
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: c8f2fc9a548671d50800000000000000
-      internalID: 6707944818402602892
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_27
-      rect:
-        serializedVersion: 2
-        x: 602
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 2bd92e1375c5d0270800000000000000
-      internalID: 8218326424589868466
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_28
-      rect:
-        serializedVersion: 2
-        x: 614
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 3a8f76b9097dd2f00800000000000000
-      internalID: 1093767300603443363
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black_Arrow_Spritesheet_29
-      rect:
-        serializedVersion: 2
-        x: 626
-        y: 2
-        width: 13
-        height: 59
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: b43902edb1b70e4f0800000000000000
-      internalID: -801505374050938037
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 036bde2e8592b2640a6470896dd3b537
     internalID: 0
     vertices: []
     indices: 
@@ -871,31 +431,13 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       Black_Arrow_Spritesheet_0: 5685093817271179149
       Black_Arrow_Spritesheet_1: 3948482810803604583
-      Black_Arrow_Spritesheet_10: 5945125211206230447
-      Black_Arrow_Spritesheet_11: -2869449113697149273
-      Black_Arrow_Spritesheet_12: 4584703339599888722
-      Black_Arrow_Spritesheet_13: 7981787938890200865
-      Black_Arrow_Spritesheet_14: 6051690261802119646
-      Black_Arrow_Spritesheet_15: 6734635125100142094
-      Black_Arrow_Spritesheet_16: -1773728121525068101
-      Black_Arrow_Spritesheet_17: 4807055938424099909
-      Black_Arrow_Spritesheet_18: 8379183205204737399
-      Black_Arrow_Spritesheet_19: -8765810847412102609
       Black_Arrow_Spritesheet_2: 956327385940939656
-      Black_Arrow_Spritesheet_20: -1228736394748320303
-      Black_Arrow_Spritesheet_21: -186842416261339271
-      Black_Arrow_Spritesheet_22: -941759901513357325
-      Black_Arrow_Spritesheet_23: 3195415154273241287
-      Black_Arrow_Spritesheet_24: 6974084232117010073
-      Black_Arrow_Spritesheet_25: 6850313052522737176
-      Black_Arrow_Spritesheet_26: 6707944818402602892
-      Black_Arrow_Spritesheet_27: 8218326424589868466
-      Black_Arrow_Spritesheet_28: 1093767300603443363
-      Black_Arrow_Spritesheet_29: -801505374050938037
       Black_Arrow_Spritesheet_3: 9122743266511029026
       Black_Arrow_Spritesheet_4: 4832911945375696496
       Black_Arrow_Spritesheet_5: 997211888678283289

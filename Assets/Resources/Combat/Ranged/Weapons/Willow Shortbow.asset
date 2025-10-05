@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0af3fa615ba6e6d419b628f91b1130bb, type: 3}
+  m_Name: Willow Shortbow
+  m_EditorClassIdentifier: Assembly-CSharp::Combat.Ranged.RangedWeaponData
+  weaponIdOverride: Willow Shortbow
+  weaponItem: {fileID: 11400000, guid: 7182ec42d8154234a87fb9cb8ab73cb0, type: 2}
+  category: 1
+  ammunitionCategory: 1
+  consumesWeaponStack: 0
+  attackSpeedTicks: 3
+  drawTicks: 1
+  baseRangeTiles: 7
+  projectilePrefab: {fileID: 0}
+  impactVfxPrefab: {fileID: 0}
+  projectileSpeed: 16
+  accuracyMultiplier: 1
+  damageMultiplier: 1
+  rangeBonusTiles: 0
+  recoveryChanceOnHit: 0.5
+  recoveryChanceOnMiss: 0.2
+  spawnRecoveryAsGroundItem: 1
+  releaseSoundId: 
+  specialEffect: {fileID: 0}
