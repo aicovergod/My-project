@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5ce211b75af78384c6d8348ea125bcb33953363b -->
+## 2025-10-05T17:40:09+01:00 — Merge pull request #1011 from aicovergod/codex/add-ammo-restrictions-to-ranged-weapons
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 274 ++ / 31 --
+- Notes:
+  Implement ammo allow-lists for ranged weapons
+---
+<!-- commit:23392d8d7c4f5d6e1ed520aea64376e73e50545f -->
+## 2025-10-05T17:39:58+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b077d76c6faf8ed7b054084bb77a518056122bf7 -->
 ## 2025-10-05T17:39:44+01:00 — Implement ranged ammo restrictions
 
