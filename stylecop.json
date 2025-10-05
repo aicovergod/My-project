@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "documentationRules": {
+      "documentPrivateElements": false,
+      "documentInternalElements": false,
+      "documentExposedElements": false
+    },
+    "layoutRules": {
+      "newlineAtEndOfFile": "require"
+    }
+  }
+}

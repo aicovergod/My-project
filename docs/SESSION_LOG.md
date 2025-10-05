@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2e76b64217963322439260dfb112e2ab560116c9 -->
+## 2025-10-05T17:24:56+01:00 — Add static analysis CI for Unity C# scripts
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (8): .editorconfig, .github/workflows/dotnet-format.yml, .github/workflows/qodana.yml, .github/workflows/stylecop-analyze.yml, Directory.Build.props, qodana.yaml, stylecop.json, tools/generate_unity_sln.py
+- Diff: 215 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d40ec7e961bf85c38b0092460c84bd957be726d0 -->
 ## 2025-10-05T16:45:57+01:00 — Merge pull request #1009 from aicovergod/codex/update-itemdata-stackspriteoverrides-handling
 
