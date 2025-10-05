@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f4423877bce7caa1d40e95f5e0e5bdf1c87f85b6 -->
+## 2025-10-05T18:36:52+01:00 — Adjust ranged damage detection for thrown weapons
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Combat/CombatController.cs
+- Diff: 36 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a429eb81485c56035137b82208f621eb1b3d0ccd -->
 ## 2025-10-05T18:26:09+01:00 — Merge pull request #1013 from aicovergod/codex/update-determineactivedamagetype-logic
 
