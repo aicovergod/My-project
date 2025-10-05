@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2d94c98f646ba86ff1b4b27edcf036878fc487a6 -->
+## 2025-10-05T19:17:03+01:00 — Align ranged projectile orientation with travel direction
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Combat/Ranged/RangedProjectile.cs
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:40c7f1f10287a4066e4b7e25600b62c8c0b0cf42 -->
 ## 2025-10-05T19:10:13+01:00 — Merge pull request #1016 from aicovergod/codex/modify-rangedprojectile-travelroutine
 
