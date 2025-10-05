@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:63f0c49e0f06a595adce002e9bed94b58e530b90 -->
+## 2025-10-05T16:44:16+01:00 — Preserve placeholder stack sprite overrides
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/ItemData.cs
+- Diff: 29 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:2460a9ed1e95145f6c9b283291cfd5df3fbd98de -->
 ## 2025-10-05T16:37:55+01:00 — Merge pull request #1008 from aicovergod/codex/add-ui-scaling-to-equipment-inventory
 
