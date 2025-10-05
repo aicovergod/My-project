@@ -84,6 +84,20 @@ def prepend_entries(existing, entries_md):
     return entries_md + existing
 
 
+def extract_logged_commits(content):
+    """Return the set of commit SHAs already present in the session log."""
+    return set(re.findall(r"<!-- commit:([0-9a-f]{40}) -->", content))
+
+
+def extract_entry_headers(content):
+    """Return the set of entry header lines already stored in the log."""
+    return {
+        line.strip()
+        for line in content.splitlines()
+        if line.startswith("## ")
+    }
+
+
 def format_entry(commit_sha):
     subject = safe_sh(["git", "show", "-s", "--format=%s", commit_sha]) or "(no subject)"
     body = safe_sh(["git", "show", "-s", "--format=%b", commit_sha]).rstrip() or "—"
@@ -96,14 +110,16 @@ def format_entry(commit_sha):
     files_list = ", ".join(files) if files else "—"
     add, rem = parse_shortstat(safe_sh(["git", "show", "--shortstat", "--pretty=", commit_sha]))
     notes = body.replace("\n", "\n  ")
+    header = f"## {when} — {subject}"
     return (
-        f"## {when} — {subject}\n\n"
+        f"<!-- commit:{commit_sha} -->\n"
+        f"{header}\n\n"
         f"- Author: {name} <{email}>\n"
         f"- Changed files ({len(files)}): {files_list}\n"
         f"- Diff: {add} ++ / {rem} --\n"
         f"- Notes:\n  {notes}\n"
         f"---\n"
-    )
+    ), header
 
 
 def main():
@@ -118,8 +134,20 @@ def main():
     LOG.parent.mkdir(parents=True, exist_ok=True)
     existing = LOG.read_text(encoding="utf-8") if LOG.exists() else ""
     existing = ensure_header(existing)
+    seen_commits = extract_logged_commits(existing)
+    seen_headers = extract_entry_headers(existing)
 
-    new_entries = [format_entry(commit) for commit in commits]
+    new_entries = []
+    for commit in commits:
+        if commit in seen_commits:
+            continue
+        entry, header = format_entry(commit)
+        if header in seen_headers:
+            continue
+        new_entries.append(entry)
+        seen_commits.add(commit)
+        seen_headers.add(header)
+
     block = "".join(new_entries)
     updated = prepend_entries(existing, block)
     if updated != existing:
