@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9055b92d4ff6d22f190b8510c44cb37b1c3fc76e -->
+## 2025-10-05T18:45:54+01:00 — uwu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (16): Assets/Prefabs/GFX/AdamantArrowProjectile.prefab, Assets/Prefabs/GFX/BlackArrowProjectile.prefab, Assets/Prefabs/GFX/BronzeArrowProjectile.prefab, Assets/Prefabs/GFX/IronArrowProjectile.prefab, Assets/Prefabs/GFX/MithrilArrowProjectile.prefab, Assets/Prefabs/GFX/OrichalcumArrowProjectile.prefab, Assets/Prefabs/GFX/PoisonAdamantArrowProjectile.prefab, Assets/Prefabs/GFX/PoisonArrowProjectile.prefab, Assets/Prefabs/GFX/PoisonBlackArrowProjectile.prefab, Assets/Prefabs/GFX/PoisonBronzeArrowProjectile.prefab, Assets/Prefabs/GFX/PoisonMithrilArrowProjectile.prefab, Assets/Prefabs/GFX/PoisonOrichalcumArrowProjectile.prefab, Assets/Prefabs/GFX/PoisonRuneArrowProjectile.prefab, Assets/Prefabs/GFX/PoisonSteelArrowProjectile.prefab, Assets/Prefabs/GFX/RuneArrowProjectile.prefab, Assets/Prefabs/GFX/SteelArrowProjectile.prefab
+- Diff: 32 ++ / 32 --
+- Notes:
+  —
+---
 <!-- commit:e2c3d8fd90be9aaabd19e929a15b65b5b5c47429 -->
 ## 2025-10-05T18:40:38+01:00 — Merge pull request #1015 from aicovergod/codex/fix-ambiguous-reference-to-random
 
