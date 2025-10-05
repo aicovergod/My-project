@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:06c1e0c1352e7672c5001ae0e36487e1d713fabb -->
+## 2025-10-05T19:09:04+01:00 — Ensure ranged projectiles persist for a frame at impact
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Combat/Ranged/RangedProjectile.cs
+- Diff: 6 ++ / 10 --
+- Notes:
+  —
+---
 <!-- commit:9055b92d4ff6d22f190b8510c44cb37b1c3fc76e -->
 ## 2025-10-05T18:45:54+01:00 — uwu
 
