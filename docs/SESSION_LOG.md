@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f7beaeef33d561e5fc8119536334bcc1fea230fe -->
+## 2025-10-05T16:08:36+01:00 — Update ranged labels and reposition bonuses header
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Equipment.cs
+- Diff: 23 ++ / 15 --
+- Notes:
+  —
+---
 <!-- commit:21c885c49f2eacd954475234fe03f65f1e83fc14 -->
 ## 2025-10-05T15:57:57+01:00 — Merge pull request #1005 from aicovergod/codex/modify-inventory-ui-for-range-stats
 
