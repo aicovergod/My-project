@@ -10,15 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bd10a448bc2cf140bb71ea5a65cca5d, type: 3}
-  m_Name: Dragon Axe
+  m_Name: Oak Shortbow
   m_EditorClassIdentifier: 
-  id: Dragon Axe
-  itemName: Dragon Axe
-  icon: {fileID: 21300000, guid: 901ac23376ada3840b13b7d622a16364, type: 3}
+  id: Oak Shortbow
+  itemName: Oak Shortbow
+  icon: {fileID: 21300000, guid: 91cb49c6ba9e5f0469fc82f1baf588e8, type: 3}
   stackSpriteOverrides: []
-  description: 'An axe for chopping
-
-    trees'
+  description: A shortbow, for firing arrows
   stackable: 0
   maxStack: 1
   splittable: 0
@@ -34,19 +32,17 @@ MonoBehaviour:
   cookingXpBonusMultiplier: 0
   firemakingXpBonusMultiplier: 0
   skillRequirements:
-  - skill: 6
-    level: 60
-  - skill: 3
-    level: 60
+  - skill: 8
+    level: 5
   combat:
-    Attack: 42
-    Strength: 42
-    Range: 0
+    Attack: 0
+    Strength: 0
+    Range: 14
     Magic: 0
     MeleeDefence: 0
     RangeDefence: 0
     MagicDefence: 0
-    AttackSpeedTicks: 4
+    AttackSpeedTicks: 3
   onHitPoison: {fileID: 0}
   poisonApplyChance: 0.25
   poisonRequiresDamage: 1

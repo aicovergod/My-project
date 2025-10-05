@@ -1,0 +1,910 @@
+fileFormatVersion: 2
+guid: 82fdc3e3ce39d05418188c008b724f67
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 220602393589542306
+    second: Rune_Arrow_Spritesheet_0
+  - first:
+      213: 5363141784165314897
+    second: Rune_Arrow_Spritesheet_1
+  - first:
+      213: -697303545851370208
+    second: Rune_Arrow_Spritesheet_2
+  - first:
+      213: 714180884863595567
+    second: Rune_Arrow_Spritesheet_3
+  - first:
+      213: -3610845785037085466
+    second: Rune_Arrow_Spritesheet_4
+  - first:
+      213: -4331527175726976826
+    second: Rune_Arrow_Spritesheet_5
+  - first:
+      213: 4902573896796577523
+    second: Rune_Arrow_Spritesheet_6
+  - first:
+      213: 7971235730010895646
+    second: Rune_Arrow_Spritesheet_7
+  - first:
+      213: -3706626784428466689
+    second: Rune_Arrow_Spritesheet_8
+  - first:
+      213: 206385413662402437
+    second: Rune_Arrow_Spritesheet_9
+  - first:
+      213: -1438555055014990403
+    second: Rune_Arrow_Spritesheet_10
+  - first:
+      213: 3233321867079599865
+    second: Rune_Arrow_Spritesheet_11
+  - first:
+      213: 8421426878309302962
+    second: Rune_Arrow_Spritesheet_12
+  - first:
+      213: -2564478938004159580
+    second: Rune_Arrow_Spritesheet_13
+  - first:
+      213: -6772127983910286297
+    second: Rune_Arrow_Spritesheet_14
+  - first:
+      213: 6199264800843911870
+    second: Rune_Arrow_Spritesheet_15
+  - first:
+      213: -5017878832625092622
+    second: Rune_Arrow_Spritesheet_16
+  - first:
+      213: 4994651169432883453
+    second: Rune_Arrow_Spritesheet_17
+  - first:
+      213: -5873654071959124192
+    second: Rune_Arrow_Spritesheet_18
+  - first:
+      213: -4676595177206227278
+    second: Rune_Arrow_Spritesheet_19
+  - first:
+      213: 8085091919178653291
+    second: Rune_Arrow_Spritesheet_20
+  - first:
+      213: 4821858014450480617
+    second: Rune_Arrow_Spritesheet_21
+  - first:
+      213: -5682322809274689596
+    second: Rune_Arrow_Spritesheet_22
+  - first:
+      213: 8238467122188072701
+    second: Rune_Arrow_Spritesheet_23
+  - first:
+      213: 2732598440245171204
+    second: Rune_Arrow_Spritesheet_24
+  - first:
+      213: -7288207540798022393
+    second: Rune_Arrow_Spritesheet_25
+  - first:
+      213: 1126110770669117821
+    second: Rune_Arrow_Spritesheet_26
+  - first:
+      213: 7344262306602283558
+    second: Rune_Arrow_Spritesheet_27
+  - first:
+      213: 7622794930136748845
+    second: Rune_Arrow_Spritesheet_28
+  - first:
+      213: -3471577805232448230
+    second: Rune_Arrow_Spritesheet_29
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_0
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ad618a45bcbf0300800000000000000
+      internalID: 220602393589542306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_1
+      rect:
+        serializedVersion: 2
+        x: 90
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1517a3d9905bd6a40800000000000000
+      internalID: 5363141784165314897
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_2
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 025a8e89e1ea256f0800000000000000
+      internalID: -697303545851370208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_3
+      rect:
+        serializedVersion: 2
+        x: 142
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f243bab1bb749e900800000000000000
+      internalID: 714180884863595567
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_4
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e4e52cb3e2b3edc0800000000000000
+      internalID: -3610845785037085466
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_5
+      rect:
+        serializedVersion: 2
+        x: 166
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c0b7dbabf253e3c0800000000000000
+      internalID: -4331527175726976826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_6
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3fe99a3fbf0790440800000000000000
+      internalID: 4902573896796577523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_7
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e15733cb9a48f9e60800000000000000
+      internalID: 7971235730010895646
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_8
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ffd513ff39a6f8cc0800000000000000
+      internalID: -3706626784428466689
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_9
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5876b24b07a3dd200800000000000000
+      internalID: 206385413662402437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_10
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dbd2dfb9cc9390ce0800000000000000
+      internalID: -1438555055014990403
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_11
+      rect:
+        serializedVersion: 2
+        x: 270
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f648c37b111fdc20800000000000000
+      internalID: 3233321867079599865
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_12
+      rect:
+        serializedVersion: 2
+        x: 282
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b28d8f802beed470800000000000000
+      internalID: 8421426878309302962
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_13
+      rect:
+        serializedVersion: 2
+        x: 294
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a38a4a3ef3296cd0800000000000000
+      internalID: -2564478938004159580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_14
+      rect:
+        serializedVersion: 2
+        x: 306
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72c8b899a719402a0800000000000000
+      internalID: -6772127983910286297
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_15
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb252e2cd76380650800000000000000
+      internalID: 6199264800843911870
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_16
+      rect:
+        serializedVersion: 2
+        x: 410
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f7fd6f99c9ec5ab0800000000000000
+      internalID: -5017878832625092622
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_17
+      rect:
+        serializedVersion: 2
+        x: 422
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df0590b96c0905540800000000000000
+      internalID: 4994651169432883453
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_18
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0278953ddb69c7ea0800000000000000
+      internalID: -5873654071959124192
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_19
+      rect:
+        serializedVersion: 2
+        x: 474
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2be5158c675691fb0800000000000000
+      internalID: -4676595177206227278
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_20
+      rect:
+        serializedVersion: 2
+        x: 486
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6e560b8344043070800000000000000
+      internalID: 8085091919178653291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_21
+      rect:
+        serializedVersion: 2
+        x: 514
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e5f0bc115eaae240800000000000000
+      internalID: 4821858014450480617
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_22
+      rect:
+        serializedVersion: 2
+        x: 526
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c7151ed2855421b0800000000000000
+      internalID: -5682322809274689596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_23
+      rect:
+        serializedVersion: 2
+        x: 538
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df631c7c23ae45270800000000000000
+      internalID: 8238467122188072701
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_24
+      rect:
+        serializedVersion: 2
+        x: 550
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4049990bdc32ce520800000000000000
+      internalID: 2732598440245171204
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_25
+      rect:
+        serializedVersion: 2
+        x: 578
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70d19613bd51bda90800000000000000
+      internalID: -7288207540798022393
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_26
+      rect:
+        serializedVersion: 2
+        x: 590
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d71697f87cfb0af00800000000000000
+      internalID: 1126110770669117821
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_27
+      rect:
+        serializedVersion: 2
+        x: 602
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 622f15208af0ce560800000000000000
+      internalID: 7344262306602283558
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_28
+      rect:
+        serializedVersion: 2
+        x: 614
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2313760a9b99c960800000000000000
+      internalID: 7622794930136748845
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rune_Arrow_Spritesheet_29
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a1d5dfc116a72dfc0800000000000000
+      internalID: -3471577805232448230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Rune_Arrow_Spritesheet_0: 220602393589542306
+      Rune_Arrow_Spritesheet_1: 5363141784165314897
+      Rune_Arrow_Spritesheet_10: -1438555055014990403
+      Rune_Arrow_Spritesheet_11: 3233321867079599865
+      Rune_Arrow_Spritesheet_12: 8421426878309302962
+      Rune_Arrow_Spritesheet_13: -2564478938004159580
+      Rune_Arrow_Spritesheet_14: -6772127983910286297
+      Rune_Arrow_Spritesheet_15: 6199264800843911870
+      Rune_Arrow_Spritesheet_16: -5017878832625092622
+      Rune_Arrow_Spritesheet_17: 4994651169432883453
+      Rune_Arrow_Spritesheet_18: -5873654071959124192
+      Rune_Arrow_Spritesheet_19: -4676595177206227278
+      Rune_Arrow_Spritesheet_2: -697303545851370208
+      Rune_Arrow_Spritesheet_20: 8085091919178653291
+      Rune_Arrow_Spritesheet_21: 4821858014450480617
+      Rune_Arrow_Spritesheet_22: -5682322809274689596
+      Rune_Arrow_Spritesheet_23: 8238467122188072701
+      Rune_Arrow_Spritesheet_24: 2732598440245171204
+      Rune_Arrow_Spritesheet_25: -7288207540798022393
+      Rune_Arrow_Spritesheet_26: 1126110770669117821
+      Rune_Arrow_Spritesheet_27: 7344262306602283558
+      Rune_Arrow_Spritesheet_28: 7622794930136748845
+      Rune_Arrow_Spritesheet_29: -3471577805232448230
+      Rune_Arrow_Spritesheet_3: 714180884863595567
+      Rune_Arrow_Spritesheet_4: -3610845785037085466
+      Rune_Arrow_Spritesheet_5: -4331527175726976826
+      Rune_Arrow_Spritesheet_6: 4902573896796577523
+      Rune_Arrow_Spritesheet_7: 7971235730010895646
+      Rune_Arrow_Spritesheet_8: -3706626784428466689
+      Rune_Arrow_Spritesheet_9: 206385413662402437
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

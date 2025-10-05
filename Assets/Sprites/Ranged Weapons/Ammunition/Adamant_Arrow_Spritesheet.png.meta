@@ -1,0 +1,910 @@
+fileFormatVersion: 2
+guid: 17845b90d2f5c5441a2aee11f8142412
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3766164305597196290
+    second: Adamant_Arrow_Spritesheet_0
+  - first:
+      213: 124713525618129190
+    second: Adamant_Arrow_Spritesheet_1
+  - first:
+      213: -8242683127111501161
+    second: Adamant_Arrow_Spritesheet_2
+  - first:
+      213: 6364634710800350291
+    second: Adamant_Arrow_Spritesheet_3
+  - first:
+      213: -7831377761212408515
+    second: Adamant_Arrow_Spritesheet_4
+  - first:
+      213: 5549280638276806016
+    second: Adamant_Arrow_Spritesheet_5
+  - first:
+      213: 8926804362744771726
+    second: Adamant_Arrow_Spritesheet_6
+  - first:
+      213: -2737890903392924131
+    second: Adamant_Arrow_Spritesheet_7
+  - first:
+      213: -3064148924573322505
+    second: Adamant_Arrow_Spritesheet_8
+  - first:
+      213: 1658818828382166448
+    second: Adamant_Arrow_Spritesheet_9
+  - first:
+      213: -492469431005332596
+    second: Adamant_Arrow_Spritesheet_10
+  - first:
+      213: -2097509743167968933
+    second: Adamant_Arrow_Spritesheet_11
+  - first:
+      213: 6658899220998766251
+    second: Adamant_Arrow_Spritesheet_12
+  - first:
+      213: 2731267292664278521
+    second: Adamant_Arrow_Spritesheet_13
+  - first:
+      213: 7295819169460011794
+    second: Adamant_Arrow_Spritesheet_14
+  - first:
+      213: 75564830944063157
+    second: Adamant_Arrow_Spritesheet_15
+  - first:
+      213: 2405903625834329328
+    second: Adamant_Arrow_Spritesheet_16
+  - first:
+      213: -6597227572990418009
+    second: Adamant_Arrow_Spritesheet_17
+  - first:
+      213: 236316090105258910
+    second: Adamant_Arrow_Spritesheet_18
+  - first:
+      213: 1020082985010015471
+    second: Adamant_Arrow_Spritesheet_19
+  - first:
+      213: 3726772138960413471
+    second: Adamant_Arrow_Spritesheet_20
+  - first:
+      213: -5196362839521523751
+    second: Adamant_Arrow_Spritesheet_21
+  - first:
+      213: -8348019404944852377
+    second: Adamant_Arrow_Spritesheet_22
+  - first:
+      213: -5778417511055661244
+    second: Adamant_Arrow_Spritesheet_23
+  - first:
+      213: -8778467952802490655
+    second: Adamant_Arrow_Spritesheet_24
+  - first:
+      213: -7046155108497498429
+    second: Adamant_Arrow_Spritesheet_25
+  - first:
+      213: 7419015509846131589
+    second: Adamant_Arrow_Spritesheet_26
+  - first:
+      213: -7899500706134492229
+    second: Adamant_Arrow_Spritesheet_27
+  - first:
+      213: -7204578645223059239
+    second: Adamant_Arrow_Spritesheet_28
+  - first:
+      213: -3949372182203036371
+    second: Adamant_Arrow_Spritesheet_29
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_0
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20860e06b7a144430800000000000000
+      internalID: 3766164305597196290
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_1
+      rect:
+        serializedVersion: 2
+        x: 90
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 629b7217a421bb100800000000000000
+      internalID: 124713525618129190
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_2
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79ab9641e5b1c9d80800000000000000
+      internalID: -8242683127111501161
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_3
+      rect:
+        serializedVersion: 2
+        x: 142
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35c30665c89b35850800000000000000
+      internalID: 6364634710800350291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_4
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3d5a092b6b515390800000000000000
+      internalID: -7831377761212408515
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_5
+      rect:
+        serializedVersion: 2
+        x: 166
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0852173d651030d40800000000000000
+      internalID: 5549280638276806016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_6
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e843fcc854162eb70800000000000000
+      internalID: 8926804362744771726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_7
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1ecd75babe010ad0800000000000000
+      internalID: -2737890903392924131
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_8
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f279e3a9c4f975d0800000000000000
+      internalID: -3064148924573322505
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_9
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0bdd2748fee450710800000000000000
+      internalID: 1658818828382166448
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_10
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8b303669a56a29f0800000000000000
+      internalID: -492469431005332596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_11
+      rect:
+        serializedVersion: 2
+        x: 270
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b596d8d600624e2e0800000000000000
+      internalID: -2097509743167968933
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_12
+      rect:
+        serializedVersion: 2
+        x: 282
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: baeb1c6af89296c50800000000000000
+      internalID: 6658899220998766251
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_13
+      rect:
+        serializedVersion: 2
+        x: 294
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9fda5edb12967e520800000000000000
+      internalID: 2731267292664278521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_14
+      rect:
+        serializedVersion: 2
+        x: 306
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 213462531e4ff3560800000000000000
+      internalID: 7295819169460011794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_15
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5beeee930d57c0100800000000000000
+      internalID: 75564830944063157
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_16
+      rect:
+        serializedVersion: 2
+        x: 410
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f4fda5c99c736120800000000000000
+      internalID: 2405903625834329328
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_17
+      rect:
+        serializedVersion: 2
+        x: 422
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a36e79d970f174a0800000000000000
+      internalID: -6597227572990418009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_18
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e93ee6d5b30974300800000000000000
+      internalID: 236316090105258910
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_19
+      rect:
+        serializedVersion: 2
+        x: 474
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fec21faf110182e00800000000000000
+      internalID: 1020082985010015471
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_20
+      rect:
+        serializedVersion: 2
+        x: 486
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f13ee8dd38728b330800000000000000
+      internalID: 3726772138960413471
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_21
+      rect:
+        serializedVersion: 2
+        x: 514
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d7874a678fc2e7b0800000000000000
+      internalID: -5196362839521523751
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_22
+      rect:
+        serializedVersion: 2
+        x: 526
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 76ab136b490e52c80800000000000000
+      internalID: -8348019404944852377
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_23
+      rect:
+        serializedVersion: 2
+        x: 538
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44761a993efeecfa0800000000000000
+      internalID: -5778417511055661244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_24
+      rect:
+        serializedVersion: 2
+        x: 550
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e69e0148ed9c2680800000000000000
+      internalID: -8778467952802490655
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_25
+      rect:
+        serializedVersion: 2
+        x: 578
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ced3bdc247073e90800000000000000
+      internalID: -7046155108497498429
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_26
+      rect:
+        serializedVersion: 2
+        x: 590
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5830e7f6c43a5f660800000000000000
+      internalID: 7419015509846131589
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_27
+      rect:
+        serializedVersion: 2
+        x: 602
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bbbf7eb06f55f5290800000000000000
+      internalID: -7899500706134492229
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_28
+      rect:
+        serializedVersion: 2
+        x: 614
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d05d17c4e1340c90800000000000000
+      internalID: -7204578645223059239
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Adamant_Arrow_Spritesheet_29
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2d8af9cce20139c0800000000000000
+      internalID: -3949372182203036371
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Adamant_Arrow_Spritesheet_0: 3766164305597196290
+      Adamant_Arrow_Spritesheet_1: 124713525618129190
+      Adamant_Arrow_Spritesheet_10: -492469431005332596
+      Adamant_Arrow_Spritesheet_11: -2097509743167968933
+      Adamant_Arrow_Spritesheet_12: 6658899220998766251
+      Adamant_Arrow_Spritesheet_13: 2731267292664278521
+      Adamant_Arrow_Spritesheet_14: 7295819169460011794
+      Adamant_Arrow_Spritesheet_15: 75564830944063157
+      Adamant_Arrow_Spritesheet_16: 2405903625834329328
+      Adamant_Arrow_Spritesheet_17: -6597227572990418009
+      Adamant_Arrow_Spritesheet_18: 236316090105258910
+      Adamant_Arrow_Spritesheet_19: 1020082985010015471
+      Adamant_Arrow_Spritesheet_2: -8242683127111501161
+      Adamant_Arrow_Spritesheet_20: 3726772138960413471
+      Adamant_Arrow_Spritesheet_21: -5196362839521523751
+      Adamant_Arrow_Spritesheet_22: -8348019404944852377
+      Adamant_Arrow_Spritesheet_23: -5778417511055661244
+      Adamant_Arrow_Spritesheet_24: -8778467952802490655
+      Adamant_Arrow_Spritesheet_25: -7046155108497498429
+      Adamant_Arrow_Spritesheet_26: 7419015509846131589
+      Adamant_Arrow_Spritesheet_27: -7899500706134492229
+      Adamant_Arrow_Spritesheet_28: -7204578645223059239
+      Adamant_Arrow_Spritesheet_29: -3949372182203036371
+      Adamant_Arrow_Spritesheet_3: 6364634710800350291
+      Adamant_Arrow_Spritesheet_4: -7831377761212408515
+      Adamant_Arrow_Spritesheet_5: 5549280638276806016
+      Adamant_Arrow_Spritesheet_6: 8926804362744771726
+      Adamant_Arrow_Spritesheet_7: -2737890903392924131
+      Adamant_Arrow_Spritesheet_8: -3064148924573322505
+      Adamant_Arrow_Spritesheet_9: 1658818828382166448
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

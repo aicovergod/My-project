@@ -1,0 +1,910 @@
+fileFormatVersion: 2
+guid: 4eb8446c8eb9d4a4d9b5d9054495575f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5685093817271179149
+    second: Black_Arrow_Spritesheet_0
+  - first:
+      213: 3948482810803604583
+    second: Black_Arrow_Spritesheet_1
+  - first:
+      213: 956327385940939656
+    second: Black_Arrow_Spritesheet_2
+  - first:
+      213: 9122743266511029026
+    second: Black_Arrow_Spritesheet_3
+  - first:
+      213: 4832911945375696496
+    second: Black_Arrow_Spritesheet_4
+  - first:
+      213: 997211888678283289
+    second: Black_Arrow_Spritesheet_5
+  - first:
+      213: 8011732636481825308
+    second: Black_Arrow_Spritesheet_6
+  - first:
+      213: 4460329939694320322
+    second: Black_Arrow_Spritesheet_7
+  - first:
+      213: 2799773791647743987
+    second: Black_Arrow_Spritesheet_8
+  - first:
+      213: -2797800599473160140
+    second: Black_Arrow_Spritesheet_9
+  - first:
+      213: 5945125211206230447
+    second: Black_Arrow_Spritesheet_10
+  - first:
+      213: -2869449113697149273
+    second: Black_Arrow_Spritesheet_11
+  - first:
+      213: 4584703339599888722
+    second: Black_Arrow_Spritesheet_12
+  - first:
+      213: 7981787938890200865
+    second: Black_Arrow_Spritesheet_13
+  - first:
+      213: 6051690261802119646
+    second: Black_Arrow_Spritesheet_14
+  - first:
+      213: 6734635125100142094
+    second: Black_Arrow_Spritesheet_15
+  - first:
+      213: -1773728121525068101
+    second: Black_Arrow_Spritesheet_16
+  - first:
+      213: 4807055938424099909
+    second: Black_Arrow_Spritesheet_17
+  - first:
+      213: 8379183205204737399
+    second: Black_Arrow_Spritesheet_18
+  - first:
+      213: -8765810847412102609
+    second: Black_Arrow_Spritesheet_19
+  - first:
+      213: -1228736394748320303
+    second: Black_Arrow_Spritesheet_20
+  - first:
+      213: -186842416261339271
+    second: Black_Arrow_Spritesheet_21
+  - first:
+      213: -941759901513357325
+    second: Black_Arrow_Spritesheet_22
+  - first:
+      213: 3195415154273241287
+    second: Black_Arrow_Spritesheet_23
+  - first:
+      213: 6974084232117010073
+    second: Black_Arrow_Spritesheet_24
+  - first:
+      213: 6850313052522737176
+    second: Black_Arrow_Spritesheet_25
+  - first:
+      213: 6707944818402602892
+    second: Black_Arrow_Spritesheet_26
+  - first:
+      213: 8218326424589868466
+    second: Black_Arrow_Spritesheet_27
+  - first:
+      213: 1093767300603443363
+    second: Black_Arrow_Spritesheet_28
+  - first:
+      213: -801505374050938037
+    second: Black_Arrow_Spritesheet_29
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_0
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d87d735b4b285ee40800000000000000
+      internalID: 5685093817271179149
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_1
+      rect:
+        serializedVersion: 2
+        x: 90
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 76c4fab4234dbc630800000000000000
+      internalID: 3948482810803604583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_2
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 883dcffc0be854d00800000000000000
+      internalID: 956327385940939656
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_3
+      rect:
+        serializedVersion: 2
+        x: 142
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2230a71aaae7a9e70800000000000000
+      internalID: 9122743266511029026
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_4
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0764cd6fec3f11340800000000000000
+      internalID: 4832911945375696496
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_5
+      rect:
+        serializedVersion: 2
+        x: 166
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9182776edeec6dd00800000000000000
+      internalID: 997211888678283289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_6
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1a27e882646f2f60800000000000000
+      internalID: 8011732636481825308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_7
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2caf484c27646ed30800000000000000
+      internalID: 4460329939694320322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_8
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ffbc9efd6bcad620800000000000000
+      internalID: 2799773791647743987
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_9
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 430070c9d273c29d0800000000000000
+      internalID: -2797800599473160140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_10
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa1aa2781e3518250800000000000000
+      internalID: 5945125211206230447
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_11
+      rect:
+        serializedVersion: 2
+        x: 270
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ae950deb3bad28d0800000000000000
+      internalID: -2869449113697149273
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_12
+      rect:
+        serializedVersion: 2
+        x: 282
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2510665856320af30800000000000000
+      internalID: 4584703339599888722
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_13
+      rect:
+        serializedVersion: 2
+        x: 294
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1273c0257d105ce60800000000000000
+      internalID: 7981787938890200865
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_14
+      rect:
+        serializedVersion: 2
+        x: 306
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed1f769da3cebf350800000000000000
+      internalID: 6051690261802119646
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_15
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e0e5673f6fa367d50800000000000000
+      internalID: 6734635125100142094
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_16
+      rect:
+        serializedVersion: 2
+        x: 410
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bbe906ccba37267e0800000000000000
+      internalID: -1773728121525068101
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_17
+      rect:
+        serializedVersion: 2
+        x: 422
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 544533938e716b240800000000000000
+      internalID: 4807055938424099909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_18
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77db526fab6d84470800000000000000
+      internalID: 8379183205204737399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_19
+      rect:
+        serializedVersion: 2
+        x: 474
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2a5cbf3a75995680800000000000000
+      internalID: -8765810847412102609
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_20
+      rect:
+        serializedVersion: 2
+        x: 486
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d5ae6452c6a2fee0800000000000000
+      internalID: -1228736394748320303
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_21
+      rect:
+        serializedVersion: 2
+        x: 514
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97764c5ffc3386df0800000000000000
+      internalID: -186842416261339271
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_22
+      rect:
+        serializedVersion: 2
+        x: 526
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f7e696fb523ee2f0800000000000000
+      internalID: -941759901513357325
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_23
+      rect:
+        serializedVersion: 2
+        x: 538
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c84b5c1725685c20800000000000000
+      internalID: 3195415154273241287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_24
+      rect:
+        serializedVersion: 2
+        x: 550
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99ebcf8a8ace8c060800000000000000
+      internalID: 6974084232117010073
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_25
+      rect:
+        serializedVersion: 2
+        x: 578
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81ee6df3d63311f50800000000000000
+      internalID: 6850313052522737176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_26
+      rect:
+        serializedVersion: 2
+        x: 590
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8f2fc9a548671d50800000000000000
+      internalID: 6707944818402602892
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_27
+      rect:
+        serializedVersion: 2
+        x: 602
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2bd92e1375c5d0270800000000000000
+      internalID: 8218326424589868466
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_28
+      rect:
+        serializedVersion: 2
+        x: 614
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a8f76b9097dd2f00800000000000000
+      internalID: 1093767300603443363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black_Arrow_Spritesheet_29
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b43902edb1b70e4f0800000000000000
+      internalID: -801505374050938037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Black_Arrow_Spritesheet_0: 5685093817271179149
+      Black_Arrow_Spritesheet_1: 3948482810803604583
+      Black_Arrow_Spritesheet_10: 5945125211206230447
+      Black_Arrow_Spritesheet_11: -2869449113697149273
+      Black_Arrow_Spritesheet_12: 4584703339599888722
+      Black_Arrow_Spritesheet_13: 7981787938890200865
+      Black_Arrow_Spritesheet_14: 6051690261802119646
+      Black_Arrow_Spritesheet_15: 6734635125100142094
+      Black_Arrow_Spritesheet_16: -1773728121525068101
+      Black_Arrow_Spritesheet_17: 4807055938424099909
+      Black_Arrow_Spritesheet_18: 8379183205204737399
+      Black_Arrow_Spritesheet_19: -8765810847412102609
+      Black_Arrow_Spritesheet_2: 956327385940939656
+      Black_Arrow_Spritesheet_20: -1228736394748320303
+      Black_Arrow_Spritesheet_21: -186842416261339271
+      Black_Arrow_Spritesheet_22: -941759901513357325
+      Black_Arrow_Spritesheet_23: 3195415154273241287
+      Black_Arrow_Spritesheet_24: 6974084232117010073
+      Black_Arrow_Spritesheet_25: 6850313052522737176
+      Black_Arrow_Spritesheet_26: 6707944818402602892
+      Black_Arrow_Spritesheet_27: 8218326424589868466
+      Black_Arrow_Spritesheet_28: 1093767300603443363
+      Black_Arrow_Spritesheet_29: -801505374050938037
+      Black_Arrow_Spritesheet_3: 9122743266511029026
+      Black_Arrow_Spritesheet_4: 4832911945375696496
+      Black_Arrow_Spritesheet_5: 997211888678283289
+      Black_Arrow_Spritesheet_6: 8011732636481825308
+      Black_Arrow_Spritesheet_7: 4460329939694320322
+      Black_Arrow_Spritesheet_8: 2799773791647743987
+      Black_Arrow_Spritesheet_9: -2797800599473160140
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

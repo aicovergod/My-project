@@ -1,0 +1,910 @@
+fileFormatVersion: 2
+guid: c5192b02e7d4f4341b049b57ef049644
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -9075377413698969891
+    second: Steel_Arrow_Spritesheet_0
+  - first:
+      213: -2014070363233236876
+    second: Steel_Arrow_Spritesheet_1
+  - first:
+      213: 8390978534122896283
+    second: Steel_Arrow_Spritesheet_2
+  - first:
+      213: 1311143195382522283
+    second: Steel_Arrow_Spritesheet_3
+  - first:
+      213: 1052413403526586244
+    second: Steel_Arrow_Spritesheet_4
+  - first:
+      213: 6081675356047232385
+    second: Steel_Arrow_Spritesheet_5
+  - first:
+      213: -8514919116021293666
+    second: Steel_Arrow_Spritesheet_6
+  - first:
+      213: -219452871568632384
+    second: Steel_Arrow_Spritesheet_7
+  - first:
+      213: 2731727106999175493
+    second: Steel_Arrow_Spritesheet_8
+  - first:
+      213: 5368148452224356234
+    second: Steel_Arrow_Spritesheet_9
+  - first:
+      213: -4617083605329477473
+    second: Steel_Arrow_Spritesheet_10
+  - first:
+      213: -5705495099880462176
+    second: Steel_Arrow_Spritesheet_11
+  - first:
+      213: -6432000094670768121
+    second: Steel_Arrow_Spritesheet_12
+  - first:
+      213: 6391864106646024534
+    second: Steel_Arrow_Spritesheet_13
+  - first:
+      213: 3262784461601513475
+    second: Steel_Arrow_Spritesheet_14
+  - first:
+      213: 1402898241642813612
+    second: Steel_Arrow_Spritesheet_15
+  - first:
+      213: -4238662385879990666
+    second: Steel_Arrow_Spritesheet_16
+  - first:
+      213: 911963047278039117
+    second: Steel_Arrow_Spritesheet_17
+  - first:
+      213: -7604189325316549771
+    second: Steel_Arrow_Spritesheet_18
+  - first:
+      213: -4386568206701402857
+    second: Steel_Arrow_Spritesheet_19
+  - first:
+      213: -4681426772382908526
+    second: Steel_Arrow_Spritesheet_20
+  - first:
+      213: 6369687721518722314
+    second: Steel_Arrow_Spritesheet_21
+  - first:
+      213: 5171837712896059815
+    second: Steel_Arrow_Spritesheet_22
+  - first:
+      213: -6723403175937245541
+    second: Steel_Arrow_Spritesheet_23
+  - first:
+      213: -3582489483156070643
+    second: Steel_Arrow_Spritesheet_24
+  - first:
+      213: 6934109188915578966
+    second: Steel_Arrow_Spritesheet_25
+  - first:
+      213: -6020021928480845688
+    second: Steel_Arrow_Spritesheet_26
+  - first:
+      213: 8192956546688491581
+    second: Steel_Arrow_Spritesheet_27
+  - first:
+      213: -8211968912680933327
+    second: Steel_Arrow_Spritesheet_28
+  - first:
+      213: 7554958004056325595
+    second: Steel_Arrow_Spritesheet_29
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_0
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dde9edd5358cd0280800000000000000
+      internalID: -9075377413698969891
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_1
+      rect:
+        serializedVersion: 2
+        x: 90
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47847d6fca59c04e0800000000000000
+      internalID: -2014070363233236876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_2
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b9bb25cf48eb27470800000000000000
+      internalID: 8390978534122896283
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_3
+      rect:
+        serializedVersion: 2
+        x: 142
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba1227a1acd123210800000000000000
+      internalID: 1311143195382522283
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_4
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 48fdf022a6cea9e00800000000000000
+      internalID: 1052413403526586244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_5
+      rect:
+        serializedVersion: 2
+        x: 166
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18d4174a383766450800000000000000
+      internalID: 6081675356047232385
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_6
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e9d1e5e8d2ee4d980800000000000000
+      internalID: -8514919116021293666
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_7
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c55639a6c854fcf0800000000000000
+      internalID: -219452871568632384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_8
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 549cdfb945b09e520800000000000000
+      internalID: 2731727106999175493
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_9
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a8f456c539e7f7a40800000000000000
+      internalID: 5368148452224356234
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_10
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f908e0e5ce2dcefb0800000000000000
+      internalID: -4617083605329477473
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_11
+      rect:
+        serializedVersion: 2
+        x: 270
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a8a4e78f6202d0b0800000000000000
+      internalID: -5705495099880462176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_12
+      rect:
+        serializedVersion: 2
+        x: 282
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 708bed9fdf1fcb6a0800000000000000
+      internalID: -6432000094670768121
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_13
+      rect:
+        serializedVersion: 2
+        x: 294
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 651b4391a8674b850800000000000000
+      internalID: 6391864106646024534
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_14
+      rect:
+        serializedVersion: 2
+        x: 306
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3002c6c4e2db74d20800000000000000
+      internalID: 3262784461601513475
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_15
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca8d3259488187310800000000000000
+      internalID: 1402898241642813612
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_16
+      rect:
+        serializedVersion: 2
+        x: 410
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67e30d6740f3d25c0800000000000000
+      internalID: -4238662385879990666
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_17
+      rect:
+        serializedVersion: 2
+        x: 422
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d405a494f81f7ac00800000000000000
+      internalID: 911963047278039117
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_18
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 57390bbe81e787690800000000000000
+      internalID: -7604189325316549771
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_19
+      rect:
+        serializedVersion: 2
+        x: 474
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7156a800577cf13c0800000000000000
+      internalID: -4386568206701402857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_20
+      rect:
+        serializedVersion: 2
+        x: 486
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29ffc1e572b380fb0800000000000000
+      internalID: -4681426772382908526
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_21
+      rect:
+        serializedVersion: 2
+        x: 514
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a0d6a431c3da56850800000000000000
+      internalID: 6369687721518722314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_22
+      rect:
+        serializedVersion: 2
+        x: 526
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a963219ffe06c740800000000000000
+      internalID: 5171837712896059815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_23
+      rect:
+        serializedVersion: 2
+        x: 538
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b9ef6800f6ca1b2a0800000000000000
+      internalID: -6723403175937245541
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_24
+      rect:
+        serializedVersion: 2
+        x: 550
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d0fd8e0cbc0784ec0800000000000000
+      internalID: -3582489483156070643
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_25
+      rect:
+        serializedVersion: 2
+        x: 578
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 658c51f9197ea3060800000000000000
+      internalID: 6934109188915578966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_26
+      rect:
+        serializedVersion: 2
+        x: 590
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88056d493f5947ca0800000000000000
+      internalID: -6020021928480845688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_27
+      rect:
+        serializedVersion: 2
+        x: 602
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d302491329a33b170800000000000000
+      internalID: 8192956546688491581
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_28
+      rect:
+        serializedVersion: 2
+        x: 614
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1382a1568c9390e80800000000000000
+      internalID: -8211968912680933327
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel_Arrow_Spritesheet_29
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bdd75ccd64a98d860800000000000000
+      internalID: 7554958004056325595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Steel_Arrow_Spritesheet_0: -9075377413698969891
+      Steel_Arrow_Spritesheet_1: -2014070363233236876
+      Steel_Arrow_Spritesheet_10: -4617083605329477473
+      Steel_Arrow_Spritesheet_11: -5705495099880462176
+      Steel_Arrow_Spritesheet_12: -6432000094670768121
+      Steel_Arrow_Spritesheet_13: 6391864106646024534
+      Steel_Arrow_Spritesheet_14: 3262784461601513475
+      Steel_Arrow_Spritesheet_15: 1402898241642813612
+      Steel_Arrow_Spritesheet_16: -4238662385879990666
+      Steel_Arrow_Spritesheet_17: 911963047278039117
+      Steel_Arrow_Spritesheet_18: -7604189325316549771
+      Steel_Arrow_Spritesheet_19: -4386568206701402857
+      Steel_Arrow_Spritesheet_2: 8390978534122896283
+      Steel_Arrow_Spritesheet_20: -4681426772382908526
+      Steel_Arrow_Spritesheet_21: 6369687721518722314
+      Steel_Arrow_Spritesheet_22: 5171837712896059815
+      Steel_Arrow_Spritesheet_23: -6723403175937245541
+      Steel_Arrow_Spritesheet_24: -3582489483156070643
+      Steel_Arrow_Spritesheet_25: 6934109188915578966
+      Steel_Arrow_Spritesheet_26: -6020021928480845688
+      Steel_Arrow_Spritesheet_27: 8192956546688491581
+      Steel_Arrow_Spritesheet_28: -8211968912680933327
+      Steel_Arrow_Spritesheet_29: 7554958004056325595
+      Steel_Arrow_Spritesheet_3: 1311143195382522283
+      Steel_Arrow_Spritesheet_4: 1052413403526586244
+      Steel_Arrow_Spritesheet_5: 6081675356047232385
+      Steel_Arrow_Spritesheet_6: -8514919116021293666
+      Steel_Arrow_Spritesheet_7: -219452871568632384
+      Steel_Arrow_Spritesheet_8: 2731727106999175493
+      Steel_Arrow_Spritesheet_9: 5368148452224356234
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,910 @@
+fileFormatVersion: 2
+guid: f8a8e8244facc3d4a945ff2add1e4fc6
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8432237086019948641
+    second: Bronze_Arrows_0
+  - first:
+      213: 575918915291440535
+    second: Bronze_Arrows_1
+  - first:
+      213: -3434675324135391346
+    second: Bronze_Arrows_2
+  - first:
+      213: -915504277080202784
+    second: Bronze_Arrows_3
+  - first:
+      213: 7128945047934073520
+    second: Bronze_Arrows_4
+  - first:
+      213: 7496899103113502277
+    second: Bronze_Arrows_5
+  - first:
+      213: -125578000759062401
+    second: Bronze_Arrows_6
+  - first:
+      213: -6254804036883908796
+    second: Bronze_Arrows_7
+  - first:
+      213: -8187145789645811770
+    second: Bronze_Arrows_8
+  - first:
+      213: 6032545334107917091
+    second: Bronze_Arrows_9
+  - first:
+      213: -2282188071972459722
+    second: Bronze_Arrows_10
+  - first:
+      213: 1971337140524630049
+    second: Bronze_Arrows_11
+  - first:
+      213: 2860370734668802780
+    second: Bronze_Arrows_12
+  - first:
+      213: 4030084124741927843
+    second: Bronze_Arrows_13
+  - first:
+      213: -4941143125136917794
+    second: Bronze_Arrows_14
+  - first:
+      213: 3379580397831483374
+    second: Bronze_Arrows_15
+  - first:
+      213: -7064915374753713378
+    second: Bronze_Arrows_16
+  - first:
+      213: -232645186234519048
+    second: Bronze_Arrows_17
+  - first:
+      213: -7496608448205477281
+    second: Bronze_Arrows_18
+  - first:
+      213: -4673600752449965928
+    second: Bronze_Arrows_19
+  - first:
+      213: -6898266058498279994
+    second: Bronze_Arrows_20
+  - first:
+      213: -596405077571140137
+    second: Bronze_Arrows_21
+  - first:
+      213: 975392040313296444
+    second: Bronze_Arrows_22
+  - first:
+      213: 2210749807882649188
+    second: Bronze_Arrows_23
+  - first:
+      213: 8729689219706192964
+    second: Bronze_Arrows_24
+  - first:
+      213: 4203658348642848356
+    second: Bronze_Arrows_25
+  - first:
+      213: 1094297355446623747
+    second: Bronze_Arrows_26
+  - first:
+      213: 4907783421725044327
+    second: Bronze_Arrows_27
+  - first:
+      213: 534682622027910844
+    second: Bronze_Arrows_28
+  - first:
+      213: 1213372120863487304
+    second: Bronze_Arrows_29
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Bronze_Arrows_0
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f9fe7e1db0daafa80800000000000000
+      internalID: -8432237086019948641
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_1
+      rect:
+        serializedVersion: 2
+        x: 90
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 795ef5db3331ef700800000000000000
+      internalID: 575918915291440535
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_2
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e8f3c1a8df49550d0800000000000000
+      internalID: -3434675324135391346
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_3
+      rect:
+        serializedVersion: 2
+        x: 142
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e1a846e5b97b43f0800000000000000
+      internalID: -915504277080202784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_4
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0baf36510c91fe260800000000000000
+      internalID: 7128945047934073520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_5
+      rect:
+        serializedVersion: 2
+        x: 166
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54e560693065a0860800000000000000
+      internalID: 7496899103113502277
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_6
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f700721497bd14ef0800000000000000
+      internalID: -125578000759062401
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_7
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 447fad92ed87239a0800000000000000
+      internalID: -6254804036883908796
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_8
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6cf83db184a616e80800000000000000
+      internalID: -8187145789645811770
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_9
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 32b41f20508e7b350800000000000000
+      internalID: 6032545334107917091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_10
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63ba2734a0a0450e0800000000000000
+      internalID: -2282188071972459722
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_11
+      rect:
+        serializedVersion: 2
+        x: 270
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12041894fa89b5b10800000000000000
+      internalID: 1971337140524630049
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_12
+      rect:
+        serializedVersion: 2
+        x: 282
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cda6bdd370412b720800000000000000
+      internalID: 2860370734668802780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_13
+      rect:
+        serializedVersion: 2
+        x: 294
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a30f2eb82cbde730800000000000000
+      internalID: 4030084124741927843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_14
+      rect:
+        serializedVersion: 2
+        x: 306
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: edab9d9c1888d6bb0800000000000000
+      internalID: -4941143125136917794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_15
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eef6e9e477ea6ee20800000000000000
+      internalID: 3379580397831483374
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_16
+      rect:
+        serializedVersion: 2
+        x: 410
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e13fb9fe5e064fd90800000000000000
+      internalID: -7064915374753713378
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_17
+      rect:
+        serializedVersion: 2
+        x: 422
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f179cb8f6a75ccf0800000000000000
+      internalID: -232645186234519048
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_18
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5a2588c552b6f790800000000000000
+      internalID: -7496608448205477281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_19
+      rect:
+        serializedVersion: 2
+        x: 474
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 890b830a0e8042fb0800000000000000
+      internalID: -4673600752449965928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_20
+      rect:
+        serializedVersion: 2
+        x: 486
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c57311819f6440a0800000000000000
+      internalID: -6898266058498279994
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_21
+      rect:
+        serializedVersion: 2
+        x: 514
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d50229edb429b7f0800000000000000
+      internalID: -596405077571140137
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_22
+      rect:
+        serializedVersion: 2
+        x: 526
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c361e9f84e9498d00800000000000000
+      internalID: 975392040313296444
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_23
+      rect:
+        serializedVersion: 2
+        x: 538
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46ebb1abc392eae10800000000000000
+      internalID: 2210749807882649188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_24
+      rect:
+        serializedVersion: 2
+        x: 550
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 444052ce716162970800000000000000
+      internalID: 8729689219706192964
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_25
+      rect:
+        serializedVersion: 2
+        x: 578
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46e46f30ff4665a30800000000000000
+      internalID: 4203658348642848356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_26
+      rect:
+        serializedVersion: 2
+        x: 590
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30e9b0e95a9bf2f00800000000000000
+      internalID: 1094297355446623747
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_27
+      rect:
+        serializedVersion: 2
+        x: 602
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 76ee87ef403fb1440800000000000000
+      internalID: 4907783421725044327
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_28
+      rect:
+        serializedVersion: 2
+        x: 614
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbe4c8903039b6700800000000000000
+      internalID: 534682622027910844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bronze_Arrows_29
+      rect:
+        serializedVersion: 2
+        x: 626
+        y: 2
+        width: 13
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8453e64e383c6d010800000000000000
+      internalID: 1213372120863487304
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Bronze_Arrows_0: -8432237086019948641
+      Bronze_Arrows_1: 575918915291440535
+      Bronze_Arrows_10: -2282188071972459722
+      Bronze_Arrows_11: 1971337140524630049
+      Bronze_Arrows_12: 2860370734668802780
+      Bronze_Arrows_13: 4030084124741927843
+      Bronze_Arrows_14: -4941143125136917794
+      Bronze_Arrows_15: 3379580397831483374
+      Bronze_Arrows_16: -7064915374753713378
+      Bronze_Arrows_17: -232645186234519048
+      Bronze_Arrows_18: -7496608448205477281
+      Bronze_Arrows_19: -4673600752449965928
+      Bronze_Arrows_2: -3434675324135391346
+      Bronze_Arrows_20: -6898266058498279994
+      Bronze_Arrows_21: -596405077571140137
+      Bronze_Arrows_22: 975392040313296444
+      Bronze_Arrows_23: 2210749807882649188
+      Bronze_Arrows_24: 8729689219706192964
+      Bronze_Arrows_25: 4203658348642848356
+      Bronze_Arrows_26: 1094297355446623747
+      Bronze_Arrows_27: 4907783421725044327
+      Bronze_Arrows_28: 534682622027910844
+      Bronze_Arrows_29: 1213372120863487304
+      Bronze_Arrows_3: -915504277080202784
+      Bronze_Arrows_4: 7128945047934073520
+      Bronze_Arrows_5: 7496899103113502277
+      Bronze_Arrows_6: -125578000759062401
+      Bronze_Arrows_7: -6254804036883908796
+      Bronze_Arrows_8: -8187145789645811770
+      Bronze_Arrows_9: 6032545334107917091
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

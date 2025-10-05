@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 3968416059274634973}
   - component: {fileID: 7826943123202149709}
   - component: {fileID: 5214551407693897022}
+  - component: {fileID: 2069911887794511935}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -625,6 +626,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a259582e902af494c85c8de6f2198060, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rangedLevel: 
 --- !u!114 &6870303436262208742
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1299,3 +1301,29 @@ MonoBehaviour:
   idleAnimationFPS: 0
   walkAnimationFPS: 0
   hitAnimationFPS: 0
+--- !u!114 &2069911887794511935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ce39c37fba30814d819596b99f99174, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Combat.Ranged.RangedCombatController
+  weaponDefinitions: []
+  ammunitionDefinitions: []
+  weaponResourcesPath: Combat/Ranged/Weapons
+  ammoResourcesPath: Combat/Ranged/Ammunition
+  projectileSpawnPoint: {fileID: 0}
+  groundItemSpawner: {fileID: 0}
+  ammoLowColor: {r: 1, g: 0.85, b: 0.2, a: 1}
+  ammoDepletedColor: {r: 1, g: 0.35, b: 0.35, a: 1}
+  ammoLowLabel: LOW
+  ammoEmptyLabel: OUT
+  ammoWarningThreshold: 0.1
+  ammoUiRefreshInterval: 0.25
+  ammoDepletedSoundId: 
+  enableDebugLogging: 0
