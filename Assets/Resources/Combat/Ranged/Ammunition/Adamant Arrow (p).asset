@@ -19,6 +19,8 @@ MonoBehaviour:
   accuracyMultiplier: 1
   damageMultiplier: 1
   rangeBonusTiles: 0
+  projectilePrefab: {fileID: 6111494187698877684, guid: 49d88a32b9d0c42409a40613d1ff07bd, type: 3}
+  projectileSpeedOverride: 0
   specialEffect: {fileID: 0}
   appliesPoison: 1
   poisonApplyChance: 0.25

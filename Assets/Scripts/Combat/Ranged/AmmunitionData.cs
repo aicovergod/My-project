@@ -27,6 +27,12 @@ namespace Combat.Ranged
         [Tooltip("Extra tiles added to the weapon's range when this ammo is loaded.")]
         public float rangeBonusTiles;
 
+        [Header("Projectiles")]
+        [Tooltip("Projectile prefab spawned when this ammunition is fired. Overrides the weapon default when assigned.")]
+        public GameObject projectilePrefab;
+        [Tooltip("Optional projectile speed override expressed in units per second. Set to 0 to use the weapon's speed.")]
+        [Min(0f)] public float projectileSpeedOverride;
+
         [Header("Effects")]
         [Tooltip("Optional special effect triggered when the projectile lands.")]
         public RangedSpecialEffect specialEffect;
@@ -59,6 +65,7 @@ namespace Combat.Ranged
         {
             accuracyMultiplier = Mathf.Max(0f, accuracyMultiplier);
             damageMultiplier = Mathf.Max(0f, damageMultiplier);
+            projectileSpeedOverride = Mathf.Max(0f, projectileSpeedOverride);
             if (ammoItem != null && string.IsNullOrWhiteSpace(ammoIdOverride))
                 ammoIdOverride = ammoItem.id;
         }
