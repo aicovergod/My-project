@@ -15,6 +15,12 @@ namespace Combat.Ranged
         public RangedCombatController rangedController;
         public CombatantStats attacker;
         public CombatTarget target;
+        /// <summary>
+        /// Unique identifier for the weapon used when the shot was prepared. This is stored
+        /// alongside the direct reference so asynchronous stages can re-resolve the correct
+        /// weapon definition if the player swaps equipment before the attack resolves.
+        /// </summary>
+        public string weaponId;
         public RangedWeaponData weapon;
         public AmmunitionData ammunition;
         public CombatController.DamageResult damageResult;

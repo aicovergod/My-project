@@ -247,6 +247,7 @@ namespace Combat.Ranged
                 rangedController = this,
                 attacker = attacker,
                 target = target,
+                weaponId = currentWeapon != null ? currentWeapon.WeaponId : null,
                 weapon = currentWeapon,
                 ammunition = ammo,
                 origin = projectileSpawnPoint != null ? projectileSpawnPoint.position : transform.position,
@@ -298,34 +299,40 @@ namespace Combat.Ranged
             if (projectile != null)
                 Destroy(projectile.gameObject);
 
-            if (context.weapon != null && context.weapon.impactVfxPrefab != null)
+            RangedAttackContext resolvedContext = EnsureContextWeapon(context);
+            var resolvedWeapon = resolvedContext.weapon;
+
+            if (resolvedWeapon != null && resolvedWeapon.impactVfxPrefab != null)
             {
-                Vector3 vfxPos = context.target != null ? context.target.transform.position : context.targetPosition;
-                Instantiate(context.weapon.impactVfxPrefab, vfxPos, Quaternion.identity);
+                Vector3 vfxPos = resolvedContext.target != null ? resolvedContext.target.transform.position : resolvedContext.targetPosition;
+                Instantiate(resolvedWeapon.impactVfxPrefab, vfxPos, Quaternion.identity);
             }
 
-            ApplyRangedDamage(context);
-            TryHandleAmmoRecovery(context, context.damageResult.hit);
-            ShotResolved?.Invoke(context);
-            context.weapon?.specialEffect?.OnImpactResolved(context);
-            context.ammunition?.specialEffect?.OnImpactResolved(context);
+            ApplyRangedDamage(resolvedContext);
+            TryHandleAmmoRecovery(resolvedContext, resolvedContext.damageResult.hit);
+            ShotResolved?.Invoke(resolvedContext);
+            resolvedWeapon?.specialEffect?.OnImpactResolved(resolvedContext);
+            resolvedContext.ammunition?.specialEffect?.OnImpactResolved(resolvedContext);
         }
 
         private IEnumerator FireAfterDraw(RangedAttackContext context)
         {
+            RangedAttackContext resolvedContext = EnsureContextWeapon(context);
+
             float drawSeconds = 0f;
-            if (context.weapon != null)
-                drawSeconds = Mathf.Max(0f, context.weapon.drawTicks * CombatMath.TICK_SECONDS);
+            if (resolvedContext.weapon != null)
+                drawSeconds = Mathf.Max(0f, resolvedContext.weapon.drawTicks * CombatMath.TICK_SECONDS);
             if (drawSeconds > 0f)
                 yield return new WaitForSeconds(drawSeconds);
 
-            LaunchProjectile(context);
+            LaunchProjectile(resolvedContext);
             drawRoutine = null;
         }
 
         private void LaunchProjectile(RangedAttackContext context)
         {
-            RangedWeaponData weaponReference = context.weapon != null ? context.weapon : currentWeapon;
+            context = EnsureContextWeapon(context);
+            RangedWeaponData weaponReference = context.weapon;
             var prefab = weaponReference != null ? weaponReference.projectilePrefab : null;
             if (prefab == null)
             {
@@ -472,6 +479,36 @@ namespace Combat.Ranged
 
             Vector3 spawnPos = context.target != null ? context.target.transform.position : context.targetPosition;
             groundItemSpawner.Spawn(item, 1, spawnPos);
+        }
+
+        /// <summary>
+        /// Ensures the ranged attack context references the correct weapon definition even if the
+        /// player swapped equipment after the shot was prepared. The method re-resolves the weapon
+        /// using the cached identifier so asynchronous stages (draw coroutine, projectile travel)
+        /// remain deterministic.
+        /// </summary>
+        private RangedAttackContext EnsureContextWeapon(RangedAttackContext context)
+        {
+            if (context.weapon != null || string.IsNullOrEmpty(context.weaponId))
+                return context;
+
+            context.weapon = ResolveWeaponForContext(context.weaponId);
+            return context;
+        }
+
+        /// <summary>
+        /// Resolves a ranged weapon definition for the supplied identifier, preferring the current
+        /// equipped weapon when it matches so we avoid redundant dictionary lookups.
+        /// </summary>
+        private RangedWeaponData ResolveWeaponForContext(string weaponId)
+        {
+            if (string.IsNullOrEmpty(weaponId))
+                return null;
+
+            if (!string.IsNullOrEmpty(currentWeaponId) && string.Equals(currentWeaponId, weaponId, StringComparison.Ordinal))
+                return currentWeapon ?? ResolveWeapon(weaponId);
+
+            return ResolveWeapon(weaponId);
         }
 
         private void HandleNoAmmo()
