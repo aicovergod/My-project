@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6c53d967295c6d98473a3f6163d11173c2aebc96 -->
+## 2025-10-05T14:58:13+01:00 — Merge pull request #1001 from aicovergod/codex/fix-codex-connector-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 49 ++ / 11 --
+- Notes:
+  Prevent duplicate session log entries
+---
+<!-- commit:9c7e5178062c39a004f60074826e9a82d79597a1 -->
+## 2025-10-05T14:58:05+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:933b2438fea3486db1f88705f1d8d1104fda30bc -->
 ## 2025-10-05T14:57:51+01:00 — Prevent duplicate session log entries
 
