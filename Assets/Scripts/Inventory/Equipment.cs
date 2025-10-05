@@ -33,6 +33,18 @@ namespace Inventory
         [Tooltip("Spacing between slots in pixels.")]
         public Vector2 slotSpacing = new(4f, 4f);
 
+        /// <summary>
+        /// UI scale factor applied across the generated equipment window so the
+        /// interface can be enlarged without manually updating every metric.
+        /// </summary>
+        private const float uiScale = 2f;
+
+        /// <summary>
+        /// Cached slot size after scaling. Stored so tooltip placement can
+        /// reference the enlarged slot bounds without recalculating them.
+        /// </summary>
+        private Vector2 scaledSlotSize;
+
         [Tooltip("Reference resolution for the UI Canvas.")]
         public Vector2 referenceResolution = new(1024f, 768f);
 
@@ -295,7 +307,8 @@ namespace Inventory
             var tooltipRect = tooltip.GetComponent<RectTransform>();
             LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
 
-            Vector3 pos = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
+            float tooltipOffsetX = scaledSlotSize.x > 0f ? scaledSlotSize.x : slotSize.x;
+            Vector3 pos = slotRect.position + new Vector3(tooltipOffsetX, 0f, 0f);
             Vector3[] corners = new Vector3[4];
             tooltipRect.GetWorldCorners(corners);
             float width = corners[2].x - corners[0].x;
@@ -789,11 +802,15 @@ namespace Inventory
             windowRect.pivot = new Vector2(0.5f, 0.5f);
             windowRect.anchoredPosition = Vector2.zero;
 
-            // Size to fit 3 columns x 5 rows
-            var contentSize = new Vector2(slotSize.x * 3 + slotSpacing.x * 2,
-                slotSize.y * 5 + slotSpacing.y * 4);
-            float bonusWidth = 120f;
-            windowRect.sizeDelta = new Vector2(contentSize.x + bonusWidth, contentSize.y) + new Vector2(16f, 16f);
+            // Apply scaling to the slot metrics so the UI can be enlarged consistently.
+            Vector2 scaledSlotSpacing = slotSpacing * uiScale;
+            scaledSlotSize = slotSize * uiScale;
+            var contentSize = new Vector2(scaledSlotSize.x * 3f + scaledSlotSpacing.x * 2f,
+                scaledSlotSize.y * 5f + scaledSlotSpacing.y * 4f);
+            float scaledBonusWidth = 120f * uiScale;
+            Vector2 scaledWindowPadding = new Vector2(16f * uiScale, 16f * uiScale);
+            float scaledPanelOffset = 8f * uiScale;
+            windowRect.sizeDelta = new Vector2(contentSize.x + scaledBonusWidth, contentSize.y) + scaledWindowPadding;
 
             var windowImg = window.GetComponent<Image>();
             windowImg.color = windowColor;
@@ -805,12 +822,12 @@ namespace Inventory
             rect.anchorMin = new Vector2(0f, 0.5f);
             rect.anchorMax = new Vector2(0f, 0.5f);
             rect.pivot = new Vector2(0f, 0.5f);
-            rect.anchoredPosition = new Vector2(8f, 0f);
+            rect.anchoredPosition = new Vector2(scaledPanelOffset, 0f);
             rect.sizeDelta = contentSize;
 
             var grid = panel.GetComponent<GridLayoutGroup>();
-            grid.cellSize = slotSize;
-            grid.spacing = slotSpacing;
+            grid.cellSize = scaledSlotSize;
+            grid.spacing = scaledSlotSpacing;
             grid.childAlignment = TextAnchor.UpperLeft;
             grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             grid.constraintCount = 3;
@@ -820,6 +837,8 @@ namespace Inventory
             slotCountTexts = new Text[equipped.Length];
 
             Font defaultFont = LegacyFontProvider.GetLegacyFont();
+            float scaledLineHeight = 14f * uiScale;
+            int scaledFontSize = Mathf.RoundToInt(scaledLineHeight);
 
             for (int i = 0; i < 15; i++)
             {
@@ -850,6 +869,7 @@ namespace Inventory
                     var countText = countGO.GetComponent<Text>();
                     if (defaultFont != null)
                         countText.font = defaultFont;
+                    countText.fontSize = scaledFontSize;
                     countText.alignment = TextAnchor.LowerRight;
                     countText.raycastTarget = false;
                     countText.color = Color.white;
@@ -883,8 +903,8 @@ namespace Inventory
             bonusRect.anchorMin = new Vector2(1f, 0.5f);
             bonusRect.anchorMax = new Vector2(1f, 0.5f);
             bonusRect.pivot = new Vector2(1f, 0.5f);
-            bonusRect.anchoredPosition = new Vector2(-8f, 0f);
-            bonusRect.sizeDelta = new Vector2(bonusWidth, contentSize.y);
+            bonusRect.anchoredPosition = new Vector2(-scaledPanelOffset, 0f);
+            bonusRect.sizeDelta = new Vector2(scaledBonusWidth, contentSize.y);
 
             petBonusPanel = new GameObject("PetBonuses", typeof(RectTransform));
             petBonusPanel.transform.SetParent(window.transform, false);
@@ -892,17 +912,17 @@ namespace Inventory
             petBonusRect.anchorMin = new Vector2(1f, 0.5f);
             petBonusRect.anchorMax = new Vector2(1f, 0.5f);
             petBonusRect.pivot = new Vector2(1f, 0.5f);
-            petBonusRect.anchoredPosition = new Vector2(-8f, 0f);
-            petBonusRect.sizeDelta = new Vector2(bonusWidth, contentSize.y);
+            petBonusRect.anchoredPosition = new Vector2(-scaledPanelOffset, 0f);
+            petBonusRect.sizeDelta = new Vector2(scaledBonusWidth, contentSize.y);
             petBonusPanel.SetActive(false);
 
-            float lineHeight = 14f;
             Text CreateText(Transform parent, string name, string txt, float y, Font font, Color color)
             {
                 GameObject go = new GameObject(name, typeof(Text));
                 go.transform.SetParent(parent, false);
                 var t = go.GetComponent<Text>();
                 t.font = font != null ? font : defaultFont;
+                t.fontSize = scaledFontSize;
                 t.alignment = TextAnchor.UpperCenter;
                 t.raycastTarget = false;
                 t.color = color;
@@ -912,37 +932,37 @@ namespace Inventory
                 rt.anchorMax = new Vector2(0f, 1f);
                 rt.pivot = new Vector2(0f, 1f);
                 rt.anchoredPosition = new Vector2(0f, y);
-                rt.sizeDelta = new Vector2(bonusWidth, lineHeight);
+                rt.sizeDelta = new Vector2(scaledBonusWidth, scaledLineHeight);
                 return t;
             }
 
             CreateText(playerBonusPanel.transform, "CombatHeader", "Combat:", 0f, combatHeaderFont, combatHeaderColor);
-            attackBonusText = CreateText(playerBonusPanel.transform, "Attack", "Attack = 0", -lineHeight, attackFont, attackColor);
-            rangeAccuracyBonusText = CreateText(playerBonusPanel.transform, "RangeAccuracy", "Ranged = 0", -2f * lineHeight, rangeFont, rangeColor);
+            attackBonusText = CreateText(playerBonusPanel.transform, "Attack", "Attack = 0", -scaledLineHeight, attackFont, attackColor);
+            rangeAccuracyBonusText = CreateText(playerBonusPanel.transform, "RangeAccuracy", "Ranged = 0", -2f * scaledLineHeight, rangeFont, rangeColor);
 
-            float magicLineY = -3f * lineHeight;
+            float magicLineY = -3f * scaledLineHeight;
             magicBonusText = CreateText(playerBonusPanel.transform, "Magic", "Magic = 0", magicLineY, magicFont, magicColor);
 
-            float defenceHeaderLineY = magicLineY - lineHeight;
+            float defenceHeaderLineY = magicLineY - scaledLineHeight;
             CreateText(playerBonusPanel.transform, "DefenceHeader", "Defence:", defenceHeaderLineY, defenceHeaderFont, defenceHeaderColor);
-            meleeDefenceBonusText = CreateText(playerBonusPanel.transform, "MeleeDef", "Melee = 0", defenceHeaderLineY - lineHeight, meleeDefFont, meleeDefColor);
-            rangedDefenceBonusText = CreateText(playerBonusPanel.transform, "RangeDef", "Range = 0", defenceHeaderLineY - 2f * lineHeight, rangeDefFont, rangeDefColor);
-            magicDefenceBonusText = CreateText(playerBonusPanel.transform, "MagicDef", "Magic = 0", defenceHeaderLineY - 3f * lineHeight, magicDefFont, magicDefColor);
+            meleeDefenceBonusText = CreateText(playerBonusPanel.transform, "MeleeDef", "Melee = 0", defenceHeaderLineY - scaledLineHeight, meleeDefFont, meleeDefColor);
+            rangedDefenceBonusText = CreateText(playerBonusPanel.transform, "RangeDef", "Range = 0", defenceHeaderLineY - 2f * scaledLineHeight, rangeDefFont, rangeDefColor);
+            magicDefenceBonusText = CreateText(playerBonusPanel.transform, "MagicDef", "Magic = 0", defenceHeaderLineY - 3f * scaledLineHeight, magicDefFont, magicDefColor);
 
-            float bonusesHeaderLineY = defenceHeaderLineY - 4f * lineHeight;
+            float bonusesHeaderLineY = defenceHeaderLineY - 4f * scaledLineHeight;
             CreateText(playerBonusPanel.transform, "BonusesHeader", "Bonuses:", bonusesHeaderLineY, combatHeaderFont, combatHeaderColor);
-            meleeBonusText = CreateText(playerBonusPanel.transform, "Melee", "Melee = 0", bonusesHeaderLineY - lineHeight, strengthFont, strengthColor);
-            rangeStrengthBonusText = CreateText(playerBonusPanel.transform, "RangeStrength", "Ranged = 0", bonusesHeaderLineY - 2f * lineHeight, rangeFont, rangeColor);
+            meleeBonusText = CreateText(playerBonusPanel.transform, "Melee", "Melee = 0", bonusesHeaderLineY - scaledLineHeight, strengthFont, strengthColor);
+            rangeStrengthBonusText = CreateText(playerBonusPanel.transform, "RangeStrength", "Ranged = 0", bonusesHeaderLineY - 2f * scaledLineHeight, rangeFont, rangeColor);
 
-            float maxHitHeaderLineY = bonusesHeaderLineY - 3f * lineHeight;
+            float maxHitHeaderLineY = bonusesHeaderLineY - 3f * scaledLineHeight;
             CreateText(playerBonusPanel.transform, "MaxHitHeader", "Max Hit:", maxHitHeaderLineY, maxHitHeaderFont, maxHitHeaderColor);
-            maxHitText = CreateText(playerBonusPanel.transform, "MaxHit", "Total = 0", maxHitHeaderLineY - lineHeight, maxHitFont, maxHitColor);
+            maxHitText = CreateText(playerBonusPanel.transform, "MaxHit", "Total = 0", maxHitHeaderLineY - scaledLineHeight, maxHitFont, maxHitColor);
 
             petHeaderText = CreateText(petBonusPanel.transform, "PetHeader", "Pet:", 0f, petHeaderFont, petHeaderColor);
-            petAttackLevelText = CreateText(petBonusPanel.transform, "PetAttackLevel", "Attack Level = 0 - Attack = 0", -lineHeight, petAttackLevelFont, petAttackLevelColor);
-            petStrengthLevelText = CreateText(petBonusPanel.transform, "PetStrengthLevel", "Strength Level = 0 - Strength = 0", -2f * lineHeight, petStrengthLevelFont, petStrengthLevelColor);
-            petAttackSpeedText = CreateText(petBonusPanel.transform, "PetAttackSpeed", "Attack Speed = 0 - Speed = 0", -3f * lineHeight, petAttackSpeedFont, petAttackSpeedColor);
-            petMaxHitText = CreateText(petBonusPanel.transform, "PetMaxHit", "Max Hit = 0", -4f * lineHeight, petMaxHitFont, petMaxHitColor);
+            petAttackLevelText = CreateText(petBonusPanel.transform, "PetAttackLevel", "Attack Level = 0 - Attack = 0", -scaledLineHeight, petAttackLevelFont, petAttackLevelColor);
+            petStrengthLevelText = CreateText(petBonusPanel.transform, "PetStrengthLevel", "Strength Level = 0 - Strength = 0", -2f * scaledLineHeight, petStrengthLevelFont, petStrengthLevelColor);
+            petAttackSpeedText = CreateText(petBonusPanel.transform, "PetAttackSpeed", "Attack Speed = 0 - Speed = 0", -3f * scaledLineHeight, petAttackSpeedFont, petAttackSpeedColor);
+            petMaxHitText = CreateText(petBonusPanel.transform, "PetMaxHit", "Max Hit = 0", -4f * scaledLineHeight, petMaxHitFont, petMaxHitColor);
 
             tooltip = new GameObject("Tooltip", typeof(Image), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
             tooltip.transform.SetParent(uiRoot.transform, false);
@@ -962,8 +982,9 @@ namespace Inventory
             layout.childControlHeight = true;
             layout.childForceExpandWidth = false;
             layout.childForceExpandHeight = false;
-            layout.padding = new RectOffset(4, 4, 4, 4);
-            layout.spacing = 2f;
+            int tooltipPadding = Mathf.RoundToInt(4f * uiScale);
+            layout.padding = new RectOffset(tooltipPadding, tooltipPadding, tooltipPadding, tooltipPadding);
+            layout.spacing = 2f * uiScale;
 
             var fitter = tooltip.GetComponent<ContentSizeFitter>();
             fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
@@ -973,6 +994,7 @@ namespace Inventory
             nameGO.transform.SetParent(tooltip.transform, false);
             tooltipNameText = nameGO.GetComponent<Text>();
             tooltipNameText.font = tooltipNameFont != null ? tooltipNameFont : defaultFont;
+            tooltipNameText.fontSize = scaledFontSize;
             tooltipNameText.alignment = TextAnchor.UpperLeft;
             tooltipNameText.color = tooltipNameColor;
             tooltipNameText.raycastTarget = false;
@@ -983,6 +1005,7 @@ namespace Inventory
             bonusGO.transform.SetParent(tooltip.transform, false);
             tooltipBonusText = bonusGO.GetComponent<Text>();
             tooltipBonusText.font = tooltipBonusFont != null ? tooltipBonusFont : defaultFont;
+            tooltipBonusText.fontSize = scaledFontSize;
             tooltipBonusText.alignment = TextAnchor.UpperLeft;
             tooltipBonusText.color = tooltipBonusColor;
             tooltipBonusText.raycastTarget = false;
