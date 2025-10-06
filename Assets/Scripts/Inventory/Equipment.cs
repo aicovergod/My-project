@@ -10,9 +10,6 @@ using Beastmaster;
 using Pets;
 using Combat;
 using Player;
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-#endif
 using Quests;
 using UI;
 using Object = UnityEngine.Object;
@@ -22,7 +19,8 @@ namespace Inventory
     /// <summary>
     /// Handles equipping items into fixed slots and displays a simple UI
     /// similar to the Old School RuneScape equipment interface. The UI is
-    /// generated at runtime and toggled with the "E" key.
+    /// generated at runtime and opened through the standard interface tab
+    /// buttons instead of a dedicated hotkey.
     /// </summary>
     [DisallowMultipleComponent]
     public class Equipment : MonoBehaviour, IUIWindow
@@ -208,24 +206,8 @@ namespace Inventory
                 instance = null;
         }
 
-        public void ToggleUI()
-        {
-            if (IsOpen)
-                Close();
-            else
-                Open();
-        }
-
         private void Update()
         {
-#if ENABLE_INPUT_SYSTEM
-            bool toggle = false;
-#else
-            bool toggle = false;
-#endif
-            if (toggle)
-                ToggleUI();
-
             bool merged = PetMergeController.Instance != null && PetMergeController.Instance.IsMerged;
             if (merged != lastMergeState)
             {
