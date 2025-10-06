@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3e77e86241bc7668b3b0ba3dc2fef49217fbcc81 -->
+## 2025-10-06T13:57:54+01:00 — Merge pull request #1022 from aicovergod/codex/remove-legacy-toggle-and-clean-up-code
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 18 --
+- Notes:
+  Remove legacy inventory toggle logic from inventory UI
+---
+<!-- commit:f7ff4c7d06d3a280093aa04c7c51d8dc275cc303 -->
+## 2025-10-06T13:57:45+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a0a3a81ee8e7134c11a898356ff3b15e32b12238 -->
 ## 2025-10-06T13:57:32+01:00 — Remove legacy inventory toggle logic
 
