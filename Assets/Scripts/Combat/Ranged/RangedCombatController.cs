@@ -225,7 +225,7 @@ namespace Combat.Ranged
             attacker.DamageType = DamageType.Ranged;
 
             int effectiveAttack = CombatMath.GetEffectiveRanged(attacker.RangedLevel, attacker.Style);
-            int attackBonus = Mathf.Max(0, Mathf.RoundToInt(attacker.Equip.range * accuracyMultiplier));
+            int attackBonus = Mathf.RoundToInt(attacker.Equip.range * accuracyMultiplier);
             int attackRoll = CombatMath.GetAttackRoll(effectiveAttack, attackBonus);
 
             int defenderEff = CombatMath.GetEffectiveDefence(defender.DefenceLevel, defender.Style);
@@ -412,7 +412,7 @@ namespace Combat.Ranged
                 accuracyMultiplier = context.rangedController == null ? 1f : 0f;
             accuracyMultiplier = Mathf.Max(0f, accuracyMultiplier);
             int effectiveAttack = CombatMath.GetEffectiveRanged(attackerStats.RangedLevel, attackerStats.Style);
-            int attackBonus = Mathf.Max(0, Mathf.RoundToInt(attackerStats.Equip.range * accuracyMultiplier));
+            int attackBonus = Mathf.RoundToInt(attackerStats.Equip.range * accuracyMultiplier);
             int attackRoll = CombatMath.GetAttackRoll(effectiveAttack, attackBonus);
 
             var defender = controller.GetDefenderStats(secondaryTarget, attackerStats);

@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ba2666223984c2288d9012b68384eb4ab7e1aa7c -->
+## 2025-10-06T09:21:40+01:00 — Allow negative ranged bonuses in attack rolls
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Combat/Ranged/RangedCombatController.cs
+- Diff: 2 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:8f3738d304c98490b962a371be961dab58c6c74e -->
 ## 2025-10-05T19:17:34+01:00 — Merge pull request #1017 from aicovergod/codex/align-arrow-projectiles-with-spell-direction-logic
 
