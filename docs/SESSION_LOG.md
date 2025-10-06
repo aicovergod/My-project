@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4a808a7b447996c3743f1d7bd15a1d2a801f966b -->
+## 2025-10-06T14:00:54+01:00 — Merge pull request #1023 from aicovergod/codex/update-equipment.cs-for-ui-changes
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 20 --
+- Notes:
+  Remove equipment hotkey toggle handling
+---
+<!-- commit:0f38210e798601c85446c278ac17f7441fec38f9 -->
+## 2025-10-06T14:00:42+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:52953a28dafe1fbb1a88a892e3227f600aa41e29 -->
 ## 2025-10-06T14:00:29+01:00 — Remove equipment hotkey toggle logic
 
