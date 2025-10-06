@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9f239050a61626892bdc87bc0def0d3de7be6236 -->
+## 2025-10-06T09:34:15+01:00 — Merge pull request #1019 from aicovergod/codex/add-poison-configuration-to-ammunition
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 137 ++ / 0 --
+- Notes:
+  Hook ranged poison payloads
+---
+<!-- commit:caf867f227fafe0e64ac310c27179d2e5b061f5a -->
+## 2025-10-06T09:34:05+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:3aabe964ee66e9600b96b76b7c6907e5004ef82a -->
 ## 2025-10-06T09:33:51+01:00 — Hook ranged poison payloads
 
