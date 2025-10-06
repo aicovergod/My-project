@@ -35,9 +35,8 @@ namespace Inventory
     }
 
     /// <summary>
-    /// Runtime inventory UI generator (Screen Space Overlay) that toggles with the OLD
-    /// Input Manager (Input.GetKeyDown). The UI is created at scene root, starts inactive,
-    /// and shows always-visible slot squares. If a slotFrameSprite is provided, it is used
+    /// Runtime inventory UI generator (Screen Space Overlay). The UI is created at scene root,
+    /// starts inactive, and shows always-visible slot squares. If a slotFrameSprite is provided, it is used
     /// as the slot frame (set to Sliced).
     /// </summary>
     [DisallowMultipleComponent]
@@ -1607,7 +1606,6 @@ namespace Inventory
 
         private void Update()
         {
-            bool toggle = false;
             if (playerMover == null)
                 return;
 
@@ -1630,20 +1628,6 @@ namespace Inventory
                 if (uiRoot != null && !uiRoot.activeSelf)
                     OpenUI();
                 return;
-            }
-            if (toggle && uiRoot != null)
-            {
-                if (!uiRoot.activeSelf)
-                {
-                    var skills = SkillsUI.Instance;
-                    if (skills != null && skills.IsOpen)
-                        skills.Close();
-                    OpenUI();
-                }
-                else
-                {
-                    CloseUI();
-                }
             }
         }
 
