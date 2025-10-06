@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a0a3a81ee8e7134c11a898356ff3b15e32b12238 -->
+## 2025-10-06T13:57:32+01:00 — Remove legacy inventory toggle logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Inventory.cs
+- Diff: 2 ++ / 18 --
+- Notes:
+  —
+---
 <!-- commit:effe9e5befbd6f0ca46c8a561432ac40dca1975e -->
 ## 2025-10-06T12:48:22+01:00 — Merge pull request #1021 from aicovergod/codex/optimize-inventory-quest-ui-handling
 
