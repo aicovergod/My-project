@@ -136,6 +136,9 @@ namespace Inventory
         private Equipment equipment;
         private FiremakingSkill firemakingSkill;
 
+        // Cached quest UI reference to avoid per-frame lookups.
+        private QuestUI questUi;
+
         // UI
         private GameObject uiRoot; // Canvas root
         private static GameObject sharedUIRoot;
@@ -306,11 +309,16 @@ namespace Inventory
         {
             EnsureInitialized();
             SaveManager.Register(this);
+            QuestUI.QuestUIOpened += OnQuestUiOpened;
+            QuestUI.QuestUIClosed += OnQuestUiClosed;
+            questUi = QuestUI.Instance;
         }
 
         private void OnDisable()
         {
             SaveManager.Unregister(this);
+            QuestUI.QuestUIOpened -= OnQuestUiOpened;
+            QuestUI.QuestUIClosed -= OnQuestUiClosed;
         }
 
         /// <summary>
@@ -1603,8 +1611,9 @@ namespace Inventory
             if (playerMover == null)
                 return;
 
-            var quest = Object.FindObjectOfType<QuestUI>();
-            if (quest != null && quest.IsOpen)
+            EnsureQuestUiReference();
+
+            if (questUi != null && questUi.IsOpen)
             {
                 if (uiRoot != null && uiRoot.activeSelf)
                     CloseUI();
@@ -1636,6 +1645,40 @@ namespace Inventory
                     CloseUI();
                 }
             }
+        }
+
+        /// <summary>
+        /// Ensures the cached quest UI reference stays valid without per-frame allocations.
+        /// </summary>
+        private void EnsureQuestUiReference()
+        {
+            if (questUi == null)
+                questUi = QuestUI.Instance;
+        }
+
+        /// <summary>
+        /// Handles quest UI open events so the inventory can immediately react.
+        /// </summary>
+        private void OnQuestUiOpened(QuestUI quest)
+        {
+            questUi = quest ?? QuestUI.Instance;
+
+            if (questUi != null && questUi.IsOpen && uiRoot != null && uiRoot.activeSelf)
+                CloseUI();
+        }
+
+        /// <summary>
+        /// Keeps the cached quest UI reference in sync when the quest window closes or is destroyed.
+        /// </summary>
+        private void OnQuestUiClosed(QuestUI quest)
+        {
+            if (quest == null)
+            {
+                questUi = null;
+                return;
+            }
+
+            questUi = quest;
         }
 
         /// <summary>

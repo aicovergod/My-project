@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,6 +28,21 @@ namespace Quests
 
         private static QuestUI instance;
 
+        /// <summary>
+        /// Raised whenever the quest UI finishes opening.
+        /// </summary>
+        public static event Action<QuestUI> QuestUIOpened;
+
+        /// <summary>
+        /// Raised whenever the quest UI finishes closing.
+        /// </summary>
+        public static event Action<QuestUI> QuestUIClosed;
+
+        /// <summary>
+        /// Cached singleton-style access for systems that need to query quest visibility.
+        /// </summary>
+        public static QuestUI Instance => instance;
+
         public bool IsOpen => canvas != null && canvas.enabled;
 
         protected override void Awake()
@@ -55,7 +71,11 @@ namespace Quests
         private void OnDestroy()
         {
             if (instance == this)
+            {
+                if (canvas != null && canvas.enabled)
+                    QuestUIClosed?.Invoke(this);
                 instance = null;
+            }
         }
 
         private void Start()
@@ -74,6 +94,7 @@ namespace Quests
 
         public void Open()
         {
+            bool wasOpen = IsOpen;
             UIManager.Instance.OpenWindow(this);
             var inv = FindObjectOfType<Inventory.Inventory>();
             if (inv != null && inv.IsOpen)
@@ -87,14 +108,22 @@ namespace Quests
                 playerMover = FindObjectOfType<PlayerMover>();
             if (playerMover != null)
                 playerMover.enabled = false;
+
+            if (!wasOpen)
+                QuestUIOpened?.Invoke(this);
         }
 
         public void Close()
         {
+            if (!IsOpen)
+                return;
+
             canvas.enabled = false;
             Clear();
             if (playerMover != null)
                 playerMover.enabled = true;
+
+            QuestUIClosed?.Invoke(this);
         }
 
         private void Update()
