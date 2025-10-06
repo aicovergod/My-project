@@ -1,5 +1,6 @@
 using UnityEngine;
 using Inventory;
+using Status.Poison;
 
 namespace Combat.Ranged
 {
@@ -40,6 +41,8 @@ namespace Combat.Ranged
         public bool appliesPoison;
         [Tooltip("Chance for poison to trigger when appliesPoison is true.")]
         [Range(0f, 1f)] public float poisonApplyChance = 0.25f;
+        [Tooltip("Explicit poison configuration applied when this ammunition procs poison. Overrides the ammo item's payload when assigned.")]
+        [SerializeField] private PoisonConfig poisonConfig;
 
         [Header("Recovery")]
         [Tooltip("Chance to recover ammo after a successful hit. Overrides weapon settings when > 0.")]
@@ -60,6 +63,11 @@ namespace Combat.Ranged
         /// Direct reference to the item asset backing this ammo entry. Null when the id is resolved purely via override.
         /// </summary>
         public ItemData AmmoItem => ammoItem;
+
+        /// <summary>
+        /// Poison configuration explicitly assigned to this ammunition entry.
+        /// </summary>
+        public PoisonConfig PoisonConfig => poisonConfig;
 
         private void OnValidate()
         {
