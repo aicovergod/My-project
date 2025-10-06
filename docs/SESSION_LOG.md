@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b2547a664e8dbcc2bf116bf82072342716d0540d -->
+## 2025-10-06T12:48:02+01:00 — Cache quest UI references for inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Quests/QuestUI.cs
+- Diff: 74 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:9b2f1703cb31b2238de1e7679aa64212132068b0 -->
 ## 2025-10-06T11:35:07+01:00 — Merge pull request #1020 from aicovergod/codex/add-ammo-deplete-handling-in-combat
 
