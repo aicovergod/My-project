@@ -642,6 +642,7 @@ namespace Combat.Ranged
                 equipmentComponent.OverrideAmmoLabel(ammoEmptyLabel, ammoDepletedColor);
 
             ShowAmmoWarning("You have run out of ammo!", true);
+            combatController?.CancelCombat();
         }
 
         private bool HasRequiredAmmo(RangedWeaponData weapon, AmmunitionData ammo)
