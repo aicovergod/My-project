@@ -7,6 +7,7 @@ using Inventory;
 using MyGame.Drops;
 using UI;
 using Util;
+using Status.Poison;
 
 namespace Combat.Ranged
 {
@@ -86,9 +87,13 @@ namespace Combat.Ranged
         private int attackCooldownTicks;
         private bool definitionsLoaded;
         private bool subscribedToTicker;
+        private CombatTarget attackerCombatTarget;
+        private PoisonConfig cachedDefaultPoisonConfig;
+        private bool attemptedDefaultPoisonLoad;
 
         private const int AmmoPerShot = 1;
         private const float WarningCooldownSeconds = 1.5f;
+        private const string DefaultPoisonResourcePath = "Status/Poison/Poison_p";
 
         /// <summary>
         /// Called by <see cref="CombatController.Awake"/> so the ranged system can share runtime state.
@@ -96,6 +101,8 @@ namespace Combat.Ranged
         public void BindCombatController(CombatController controller)
         {
             combatController = controller;
+            attackerCombatTarget = null;
+            ResolveAttackerCombatTarget();
         }
 
         private void Awake()
@@ -112,6 +119,7 @@ namespace Combat.Ranged
 
             EnsureDatabasesLoaded();
             RefreshEquipmentState(true);
+            ResolveAttackerCombatTarget();
         }
 
         private void OnEnable()
@@ -311,6 +319,7 @@ namespace Combat.Ranged
             }
 
             ApplyRangedDamage(resolvedContext);
+            TryApplyAmmoPoison(resolvedContext);
             TryHandleAmmoRecovery(resolvedContext, resolvedContext.damageResult.hit);
             ShotResolved?.Invoke(resolvedContext);
             resolvedWeapon?.specialEffect?.OnImpactResolved(resolvedContext);
@@ -349,6 +358,7 @@ namespace Combat.Ranged
                     SoundManager.Instance?.PlaySfxByFileName(context.weapon.releaseSoundId);
 
                 ApplyRangedDamage(context);
+                TryApplyAmmoPoison(context);
                 TryHandleAmmoRecovery(context, context.damageResult.hit);
                 ShotResolved?.Invoke(context);
                 context.weapon?.specialEffect?.OnImpactResolved(context);
@@ -364,6 +374,7 @@ namespace Combat.Ranged
                 Debug.LogError($"Projectile prefab '{prefab.name}' is missing a RangedProjectile component.", prefab);
                 Destroy(instance);
                 ApplyRangedDamage(context);
+                TryApplyAmmoPoison(context);
                 TryHandleAmmoRecovery(context, context.damageResult.hit);
                 ShotResolved?.Invoke(context);
                 context.weapon?.specialEffect?.OnImpactResolved(context);
@@ -492,6 +503,107 @@ namespace Combat.Ranged
 
             Vector3 spawnPos = context.target != null ? context.target.transform.position : context.targetPosition;
             groundItemSpawner.Spawn(item, 1, spawnPos);
+        }
+
+        /// <summary>
+        /// Attempts to apply an ammunition-driven poison effect after a successful ranged hit.
+        /// </summary>
+        private void TryApplyAmmoPoison(in RangedAttackContext context)
+        {
+            if (!context.damageResult.hit)
+                return;
+
+            var ammo = context.ammunition;
+            if (ammo == null || !ammo.appliesPoison)
+                return;
+
+            float chance = Mathf.Clamp01(ammo.poisonApplyChance);
+            if (chance <= 0f || UnityEngine.Random.value > chance)
+                return;
+
+            var targetComponent = context.target as Component;
+            var targetObject = targetComponent != null ? targetComponent.gameObject : null;
+            if (targetObject == null)
+                return;
+
+            var poisonController = ResolvePoisonController(targetObject);
+            if (poisonController == null || poisonController.IsImmune)
+                return;
+
+            var config = ResolveAmmoPoisonConfig(ammo);
+            if (config == null)
+                return;
+
+            var source = ResolveAttackerCombatTarget();
+            poisonController.ApplyPoison(config, source);
+        }
+
+        /// <summary>
+        /// Resolves the poison payload for the supplied ammunition, falling back to the linked item or default config.
+        /// </summary>
+        private PoisonConfig ResolveAmmoPoisonConfig(AmmunitionData ammo)
+        {
+            if (ammo == null)
+                return null;
+
+            var config = ammo.PoisonConfig;
+            if (config != null)
+                return config;
+
+            var item = ammo.AmmoItem;
+            if (item != null && item.onHitPoison != null)
+                return item.onHitPoison;
+
+            return ResolveDefaultPoisonConfig();
+        }
+
+        /// <summary>
+        /// Loads the shared fallback poison configuration when ammo does not provide an explicit payload.
+        /// </summary>
+        private PoisonConfig ResolveDefaultPoisonConfig()
+        {
+            if (cachedDefaultPoisonConfig == null && !attemptedDefaultPoisonLoad)
+            {
+                attemptedDefaultPoisonLoad = true;
+                cachedDefaultPoisonConfig = Resources.Load<PoisonConfig>(DefaultPoisonResourcePath);
+                if (cachedDefaultPoisonConfig == null)
+                    Debug.LogError($"RangedCombatController could not load default poison config at '{DefaultPoisonResourcePath}'.", this);
+            }
+
+            return cachedDefaultPoisonConfig;
+        }
+
+        /// <summary>
+        /// Attempts to resolve the owning combatant's <see cref="CombatTarget"/> so poison ticks can attribute damage correctly.
+        /// </summary>
+        private CombatTarget ResolveAttackerCombatTarget()
+        {
+            if (attackerCombatTarget != null)
+                return attackerCombatTarget;
+
+            if (combatController == null)
+                combatController = GetComponent<CombatController>();
+
+            if (combatController == null)
+                return null;
+
+            attackerCombatTarget = combatController.GetComponent<CombatTarget>()
+                ?? combatController.GetComponentInParent<CombatTarget>()
+                ?? combatController.GetComponentInChildren<CombatTarget>();
+            return attackerCombatTarget;
+        }
+
+        /// <summary>
+        /// Attempts to locate a <see cref="PoisonController"/> on the supplied target object.
+        /// </summary>
+        private static PoisonController ResolvePoisonController(GameObject targetObject)
+        {
+            if (targetObject == null)
+                return null;
+
+            return targetObject.GetComponent<PoisonController>()
+                ?? targetObject.GetComponentInChildren<PoisonController>()
+                ?? targetObject.GetComponentInParent<PoisonController>();
         }
 
         /// <summary>

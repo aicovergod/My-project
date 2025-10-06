@@ -24,6 +24,7 @@ MonoBehaviour:
   specialEffect: {fileID: 0}
   appliesPoison: 1
   poisonApplyChance: 0.25
+  poisonConfig: {fileID: 11400000, guid: 5a501ca099d54f02a1139ef22ba213c8, type: 2}
   recoveryChanceOnHit: 0
   recoveryChanceOnMiss: 0
   spawnRecoveryAsGroundItem: 1

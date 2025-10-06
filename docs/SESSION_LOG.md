@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3aabe964ee66e9600b96b76b7c6907e5004ef82a -->
+## 2025-10-06T09:33:51+01:00 — Hook ranged poison payloads
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (10): Assets/Resources/Combat/Ranged/Ammunition/Adamant Arrow (p).asset, Assets/Resources/Combat/Ranged/Ammunition/Black Arrow (p).asset, Assets/Resources/Combat/Ranged/Ammunition/Bronze Arrow (p).asset, Assets/Resources/Combat/Ranged/Ammunition/Iron Arrow (p).asset, Assets/Resources/Combat/Ranged/Ammunition/Mithril Arrow (p).asset, Assets/Resources/Combat/Ranged/Ammunition/Orichalcum Arrow (p).asset, Assets/Resources/Combat/Ranged/Ammunition/Rune Arrow (p).asset, Assets/Resources/Combat/Ranged/Ammunition/Steel Arrow (p).asset, Assets/Scripts/Combat/Ranged/AmmunitionData.cs, Assets/Scripts/Combat/Ranged/RangedCombatController.cs
+- Diff: 128 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:db4d9942c8e2fe7c4016c94f6831e2bb8c844d19 -->
 ## 2025-10-06T09:23:22+01:00 — Merge pull request #1018 from aicovergod/codex/update-rangedcombatcontroller-for-attack-rolls
 
