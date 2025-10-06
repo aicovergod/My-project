@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:546f7fbd0371b3fceaca6f68f1d2fcf478b066a0 -->
+## 2025-10-06T11:34:40+01:00 — Stop ranged combat on ammo depletion
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Combat/Ranged/RangedCombatController.cs
+- Diff: 1 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9f239050a61626892bdc87bc0def0d3de7be6236 -->
 ## 2025-10-06T09:34:15+01:00 — Merge pull request #1019 from aicovergod/codex/add-poison-configuration-to-ammunition
 
