@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:db4d9942c8e2fe7c4016c94f6831e2bb8c844d19 -->
+## 2025-10-06T09:23:22+01:00 — Merge pull request #1018 from aicovergod/codex/update-rangedcombatcontroller-for-attack-rolls
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 2 --
+- Notes:
+  Allow negative ranged bonuses in attack rolls
+---
+<!-- commit:bf3aec3db2ced3b008d2a3cde491b0022c68fe57 -->
+## 2025-10-06T09:21:59+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ba2666223984c2288d9012b68384eb4ab7e1aa7c -->
 ## 2025-10-06T09:21:40+01:00 — Allow negative ranged bonuses in attack rolls
 
