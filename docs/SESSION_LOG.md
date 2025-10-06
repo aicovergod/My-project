@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9b2f1703cb31b2238de1e7679aa64212132068b0 -->
+## 2025-10-06T11:35:07+01:00 — Merge pull request #1020 from aicovergod/codex/add-ammo-deplete-handling-in-combat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 10 ++ / 0 --
+- Notes:
+  Stop ranged combat when ammo is depleted
+---
+<!-- commit:e26015ef780249ac675eb3970ea1b9104f531be7 -->
+## 2025-10-06T11:34:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:546f7fbd0371b3fceaca6f68f1d2fcf478b066a0 -->
 ## 2025-10-06T11:34:40+01:00 — Stop ranged combat on ammo depletion
 
