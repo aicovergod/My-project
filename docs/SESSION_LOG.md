@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b78e621b6be735b0670bf7937f48a7ebd2d53ab7 -->
+## 2025-10-07T19:37:28+01:00 — Fix Unity analysis project compile paths and references
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): tools/generate_unity_sln.py
+- Diff: 122 ++ / 9 --
+- Notes:
+  —
+---
 <!-- commit:2e76b64217963322439260dfb112e2ab560116c9 -->
 ## 2025-10-05T17:24:56+01:00 — Add static analysis CI for Unity C# scripts
 
