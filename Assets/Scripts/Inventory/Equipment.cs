@@ -340,59 +340,60 @@ namespace Inventory
                 return false;
 
             // Handle mutually exclusive weapon/shield pairing before mutating any slots.
+            InventoryEntry conflictEntry = default;
+            EquipmentSlot? conflictSlot = null;
+            int conflictIndex = -1;
+            bool conflictStored = false;
+
             if (slot == EquipmentSlot.Weapon && entry.item != null && entry.item.isTwoHanded)
             {
-                int shieldIndex = SlotIndex(EquipmentSlot.Shield);
-                if (shieldIndex >= 0 && shieldIndex < equipped.Length)
+                conflictSlot = EquipmentSlot.Shield;
+                conflictIndex = SlotIndex(conflictSlot.Value);
+                if (conflictIndex >= 0 && conflictIndex < equipped.Length)
                 {
-                    var shieldEntry = equipped[shieldIndex];
-                    if (shieldEntry.item != null)
+                    conflictEntry = equipped[conflictIndex];
+                    if (conflictEntry.item != null)
                     {
-                        if (inventory == null || !inventory.CanAddItem(shieldEntry.item, shieldEntry.count))
+                        if (inventory == null || !inventory.CanAddItem(conflictEntry.item, conflictEntry.count))
                         {
                             FloatingText.Show("Your inventory is full", anchor.position);
                             return false;
                         }
 
-                        if (!inventory.AddItem(shieldEntry.item, shieldEntry.count))
+                        if (!inventory.AddItem(conflictEntry.item, conflictEntry.count))
                         {
+                            inventory.RemoveItem(conflictEntry.item, conflictEntry.count);
                             FloatingText.Show("Your inventory is full", anchor.position);
                             return false;
                         }
 
-                        equipped[shieldIndex] = default;
-                        UpdateSlotVisual(EquipmentSlot.Shield);
-                        UpdateBonuses();
-                        OnEquipmentChanged?.Invoke(EquipmentSlot.Shield);
-                        ItemUseResolver.NotifyItemUsed(gameObject, shieldEntry.item, ItemUseType.Unequipped);
+                        conflictStored = true;
                     }
                 }
             }
             else if (slot == EquipmentSlot.Shield)
             {
-                int weaponIndex = SlotIndex(EquipmentSlot.Weapon);
-                if (weaponIndex >= 0 && weaponIndex < equipped.Length)
+                conflictSlot = EquipmentSlot.Weapon;
+                conflictIndex = SlotIndex(conflictSlot.Value);
+                if (conflictIndex >= 0 && conflictIndex < equipped.Length)
                 {
-                    var weaponEntry = equipped[weaponIndex];
-                    if (weaponEntry.item != null && weaponEntry.item.isTwoHanded)
+                    conflictEntry = equipped[conflictIndex];
+                    if (conflictEntry.item != null && conflictEntry.item.isTwoHanded)
                     {
-                        if (inventory == null || !inventory.CanAddItem(weaponEntry.item, weaponEntry.count))
+                        if (inventory == null || !inventory.CanAddItem(conflictEntry.item, conflictEntry.count))
                         {
                             FloatingText.Show("Your inventory is full", anchor.position);
                             return false;
                         }
 
-                        if (!inventory.AddItem(weaponEntry.item, weaponEntry.count))
+                        if (!inventory.AddItem(conflictEntry.item, conflictEntry.count))
                         {
+                            inventory.RemoveItem(conflictEntry.item, conflictEntry.count);
                             FloatingText.Show("Your inventory is full", anchor.position);
                             return false;
                         }
 
-                        equipped[weaponIndex] = default;
-                        UpdateSlotVisual(EquipmentSlot.Weapon);
-                        UpdateBonuses();
-                        OnEquipmentChanged?.Invoke(EquipmentSlot.Weapon);
-                        ItemUseResolver.NotifyItemUsed(gameObject, weaponEntry.item, ItemUseType.Unequipped);
+                        conflictStored = true;
                     }
                 }
             }
@@ -400,12 +401,41 @@ namespace Inventory
             var current = equipped[index];
             if (current.item != null)
             {
-                if (inventory != null && !inventory.AddItem(current.item, current.count))
+                bool addedToInventory = true;
+                if (inventory != null)
+                {
+                    if (!inventory.CanAddItem(current.item, current.count))
+                    {
+                        if (conflictStored && conflictEntry.item != null)
+                            inventory.RemoveItem(conflictEntry.item, conflictEntry.count);
+
+                        FloatingText.Show("Your inventory is full", anchor.position);
+                        return false;
+                    }
+
+                    addedToInventory = inventory.AddItem(current.item, current.count);
+                    if (!addedToInventory && conflictStored && conflictEntry.item != null)
+                    {
+                        inventory.RemoveItem(conflictEntry.item, conflictEntry.count);
+                    }
+                }
+
+                if (!addedToInventory)
                 {
                     FloatingText.Show("Your inventory is full", anchor.position);
                     return false;
                 }
+
                 ItemUseResolver.NotifyItemUsed(gameObject, current.item, ItemUseType.Unequipped);
+            }
+
+            if (conflictStored && conflictSlot.HasValue && conflictIndex >= 0 && conflictIndex < equipped.Length)
+            {
+                equipped[conflictIndex] = default;
+                UpdateSlotVisual(conflictSlot.Value);
+                UpdateBonuses();
+                OnEquipmentChanged?.Invoke(conflictSlot.Value);
+                ItemUseResolver.NotifyItemUsed(gameObject, conflictEntry.item, ItemUseType.Unequipped);
             }
 
             equipped[index] = entry;
