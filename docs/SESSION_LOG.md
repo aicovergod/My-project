@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:eaca487ef630b4c6dbd3e22cf2ebcb7d4bf33de1 -->
+## 2025-10-07T19:25:22+01:00 — Ensure projectile impact dispatch survives disable
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Combat/Ranged/RangedProjectile.cs
+- Diff: 19 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:06c1e0c1352e7672c5001ae0e36487e1d713fabb -->
 ## 2025-10-05T19:09:04+01:00 — Ensure ranged projectiles persist for a frame at impact
 
