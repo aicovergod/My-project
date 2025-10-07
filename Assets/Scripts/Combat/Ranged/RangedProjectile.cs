@@ -18,6 +18,7 @@ namespace Combat.Ranged
         private RangedAttackContext context;
         private float speed;
         private Coroutine travelRoutine;
+        private bool impactDispatched;
 
         /// <summary>
         /// Initialises the projectile for travel towards <paramref name="target"/>.
@@ -37,6 +38,7 @@ namespace Combat.Ranged
         private IEnumerator TravelRoutine()
         {
             float lifetime = 0f;
+            impactDispatched = false;
             while (lifetime < maxLifetime)
             {
                 Vector3 destination = ResolveDestination();
@@ -47,14 +49,23 @@ namespace Combat.Ranged
                 transform.position = newPosition;
                 context.targetPosition = destination;
                 lifetime += Time.deltaTime;
-                yield return null;
-
                 if (reachedDestination)
+                {
+                    owner?.HandleProjectileImpact(context, this);
+                    impactDispatched = true;
+                    yield return null;
                     break;
+                }
+
+                yield return null;
             }
 
             travelRoutine = null;
-            owner?.HandleProjectileImpact(context, this);
+            if (!impactDispatched)
+            {
+                owner?.HandleProjectileImpact(context, this);
+                impactDispatched = true;
+            }
         }
 
         private Vector3 ResolveDestination()
@@ -74,6 +85,11 @@ namespace Combat.Ranged
             {
                 StopCoroutine(travelRoutine);
                 travelRoutine = null;
+                if (!impactDispatched)
+                {
+                    owner?.HandleProjectileImpact(context, this);
+                    impactDispatched = true;
+                }
             }
         }
     }
