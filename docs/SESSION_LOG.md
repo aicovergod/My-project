@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a31dc2c5c0d7ccfc98c4152ea6ef7023bd0dd751 -->
+## 2025-10-07T19:49:16+01:00 — Ensure two-handed equip restores conflicts on failure
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Equipment.cs
+- Diff: 53 ++ / 23 --
+- Notes:
+  —
+---
 <!-- commit:460e86a8a3b5ff4c9c3350d2f316078fc5316b69 -->
 ## 2025-10-05T15:47:07+01:00 — Handle two-handed weapon equipment conflicts
 
