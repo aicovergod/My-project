@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:393c8ad7d46447a7cfb2babef451ff5d253255dc -->
+## 2025-10-07T20:02:32+01:00 — Merge pull request #1031 from aicovergod/codex/implement-recovery-path-in-scenetransitionmanager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 18 ++ / 0 --
+- Notes:
+  Handle null unload operations during scene transitions
+---
+<!-- commit:cd6f87de4589323d535e867057b816f6220b2617 -->
+## 2025-10-07T20:01:44+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9a80f0dfae60a376f0c55ef38e4fde79d750a673 -->
 ## 2025-10-07T20:01:29+01:00 — Handle null unload operations during scene transitions
 
