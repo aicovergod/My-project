@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:61e07c045aab0e2deabb9eb65fd238edec779ac5 -->
+## 2025-10-07T19:49:55+01:00 — Merge pull request #1029 from aicovergod/codex/fix-two-handed-equipment-conflict-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 62 ++ / 23 --
+- Notes:
+  Ensure two-handed equip restores conflicts on failure
+---
+<!-- commit:b50c4e3395636cc6d5ae59f75517aa29ecf6ac61 -->
+## 2025-10-07T19:49:31+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a31dc2c5c0d7ccfc98c4152ea6ef7023bd0dd751 -->
 ## 2025-10-07T19:49:16+01:00 — Ensure two-handed equip restores conflicts on failure
 
