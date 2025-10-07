@@ -146,11 +146,12 @@ def main():
             if name in excluded_names or name.startswith(excluded_prefixes):
                 continue
             rel_hint = Path(os.path.relpath(dll, csproj_dir)).as_posix()
-            references.append(
+            reference = (
                 f"    <Reference Include=\"{name}\">\n"
                 f"      <HintPath>{rel_hint}</HintPath>\n"
                 "    </Reference>"
             )
+            references.append(reference)
             seen.add(name)
 
     if references:
