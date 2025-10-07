@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6b60be1af067d3cd0d4704dc5870a71d486a9afc -->
+## 2025-10-07T13:58:44+01:00 — Merge pull request #1025 from aicovergod/codex/update-agents.md-with-new-principles
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 13 ++ / 2 --
+- Notes:
+  Update Unity development principles guidance
+---
+<!-- commit:f50d7cb75e435b6e3c4ba4cad921a8cd3aaccd99 -->
+## 2025-10-07T13:58:27+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d52c4a2f79cf63edd42c52f10349b7651c118fbd -->
 ## 2025-10-07T13:58:15+01:00 — Update Unity development principles guidance
 
