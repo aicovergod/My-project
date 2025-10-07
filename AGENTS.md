@@ -1,3 +1,9 @@
+## Unity Development Principles for the RuneScape-Style Project
+1. **Maintain steady progress.** Keep iterating on gameplay, skills, UI, and NPC systems without waiting for follow-up instructions whenever the goal is clear. If you must pause, be ready to explain the blocker (missing assets, unclear requirements, technical issues, etc.).
+2. **Plan before debugging.** When behaviour in the Unity Editor or Play Mode looks off, review the relevant scripts and scene setup first. Use `Debug.Log`, the Unity Console, and targeted checks to validate assumptions about variables, object references, and execution order.
+3. **Validate changes in Unity.** After updating or creating scripts, attach them to the correct GameObjects, enter Play Mode, and confirm they function as intended. For background systems (drop tables, XP calculations, tick timing), rely on logs, breakpoints, or temporary UI to prove correctness.
+4. **Be careful with tooling and long-running tasks.** Think through any command-line or editor process—avoid starting builds or scripts that could run indefinitely without a plan. When long jobs are required (builds, analyses), run them in separate processes so regular development stays responsive, and ensure custom scripts can exit cleanly.
+
 # Agent Guidelines
 
 ## Project Snapshot
