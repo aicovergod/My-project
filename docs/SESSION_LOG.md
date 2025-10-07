@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1fa363e9759848e4ad48f5ce2683011d9c560c39 -->
+## 2025-10-07T19:38:00+01:00 — Merge pull request #1028 from aicovergod/codex/fix-high-priority-bugs-in-static-analysis-ci
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 131 ++ / 9 --
+- Notes:
+  Fix Unity analysis generator paths and Unity references
+---
+<!-- commit:ee6fe9563dc6eb839ffc9257e86c381316de4d33 -->
+## 2025-10-07T19:37:45+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b78e621b6be735b0670bf7937f48a7ebd2d53ab7 -->
 ## 2025-10-07T19:37:28+01:00 — Fix Unity analysis project compile paths and references
 
