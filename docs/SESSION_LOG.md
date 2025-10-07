@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3be779a280c4f9ebfe3bd80e4e0fac6106bc48b7 -->
+## 2025-10-07T19:55:34+01:00 — Fix Unity DLL reference append
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): tools/generate_unity_sln.py
+- Diff: 2 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:b78e621b6be735b0670bf7937f48a7ebd2d53ab7 -->
 ## 2025-10-07T19:37:28+01:00 — Fix Unity analysis project compile paths and references
 
