@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d52c4a2f79cf63edd42c52f10349b7651c118fbd -->
+## 2025-10-07T13:58:15+01:00 — Update Unity development principles guidance
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): AGENTS.md
+- Diff: 4 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:02fd171d90c2b5c3facc9a55faf13776b4239f0a -->
 ## 2025-10-07T13:09:55+01:00 — Merge pull request #1024 from aicovergod/codex/add-coding-principles-to-agents.md
 
