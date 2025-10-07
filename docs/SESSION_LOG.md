@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:04c448106bc4fa88cf2323b979d11b794896b9f8 -->
+## 2025-10-07T19:25:56+01:00 — Merge pull request #1027 from aicovergod/codex/fix-delayed-impact-callback-issue-in-rangedprojectile
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 28 ++ / 3 --
+- Notes:
+  Ensure ranged projectiles dispatch impact before disable
+---
+<!-- commit:58a3a6694e5d7af223d5ebd7ca006344a294fbf0 -->
+## 2025-10-07T19:25:36+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:eaca487ef630b4c6dbd3e22cf2ebcb7d4bf33de1 -->
 ## 2025-10-07T19:25:22+01:00 — Ensure projectile impact dispatch survives disable
 
