@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9a80f0dfae60a376f0c55ef38e4fde79d750a673 -->
+## 2025-10-07T20:01:29+01:00 — Handle null unload operations during scene transitions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/World/SceneTransitionManager.cs
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:bdb43b76f34c948122bd6e2b7d3bab414a344263 -->
 ## 2025-10-07T14:28:43+01:00 — Merge pull request #1026 from aicovergod/codex/conduct-code-review-for-bugs-and-practices
 
