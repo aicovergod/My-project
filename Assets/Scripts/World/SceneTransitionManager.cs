@@ -104,6 +104,15 @@ namespace World
             if (unloadOp == null)
             {
                 Debug.LogError($"[SceneTransitionManager] Failed to unload scene '{currentScene.name}'. UnloadSceneAsync returned null.");
+
+                SceneManager.sceneLoaded -= OnSceneLoaded;
+                NextSpawnPoint = null;
+
+                if (ScreenFader.Instance != null)
+                    yield return ScreenFader.Instance.FadeIn();
+
+                IsTransitioning = false;
+                TransitionCompleted?.Invoke();
                 yield break;
             }
 
