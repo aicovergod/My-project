@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:88cc184fdf59ea15dde33ce3950e318ce61678bd -->
+## 2025-10-08T11:00:39+01:00 — Ensure QuestUI unsubscribes from QuestManager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Quests/QuestUI.cs
+- Diff: 6 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c792e832aff18989198e70a57b4a6c8b8f1c00b5 -->
 ## 2025-10-08T10:01:59+01:00 — Merge pull request #1032 from aicovergod/codex/add-reusable-listvector2int-field
 
