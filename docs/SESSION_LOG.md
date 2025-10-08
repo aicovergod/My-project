@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:bc5001c8581d274d319d1eca86fd7d848a6f4c62 -->
+## 2025-10-08T15:31:04+01:00 — Fix stacking when equipping identical stackable items
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Equipment.cs
+- Diff: 45 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7123eb7dfa732e9592dbfb2ba01a8744b8c65c90 -->
 ## 2025-10-08T12:30:39+01:00 — Merge pull request #1036 from aicovergod/codex/fix-item-deletion-on-shop-sell
 
