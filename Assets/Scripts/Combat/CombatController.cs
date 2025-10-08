@@ -525,6 +525,7 @@ namespace Combat
                 DamageType.Ranged => CombatMath.GetEffectiveRanged(attacker.RangedLevel, attacker.Style),
                 _ => CombatMath.GetEffectiveAttack(attacker.AttackLevel, attacker.Style)
             };
+            // Longrange now contributes a +3 defensive boost here instead of modifying equipment stats.
             int defEff = CombatMath.GetEffectiveDefence(defender.DefenceLevel, defender.Style);
             // Mirror OSRS combat by selecting the correct offensive bonus based on the damage type.
             // Melee continues to rely on the weapon's attack rating, magic uses spell accuracy, and
