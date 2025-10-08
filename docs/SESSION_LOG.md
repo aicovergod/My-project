@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8d36ccfd92257e70528f49e2714e702e7e5bcd27 -->
+## 2025-10-08T16:41:40+01:00 — Merge pull request #1039 from aicovergod/codex/update-combat-styles-and-bonuses
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 32 ++ / 7 --
+- Notes:
+  Adjust ranged style bonuses
+---
+<!-- commit:f0ded614eb5f164d050c1eb6ce0a9b8d9e69b59f -->
+## 2025-10-08T16:41:32+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:8df70ff20bfbf982eb33334f4adb144648fc5576 -->
 ## 2025-10-08T16:41:20+01:00 — Adjust ranged style bonuses
 
