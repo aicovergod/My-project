@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1a1609c6821a8a29ba50339f74fbf7c8760e5904 -->
+## 2025-10-08T20:57:01+01:00 — Merge pull request #1043 from aicovergod/codex/fix-attack-speed-modifier-application
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 15 ++ / 2 --
+- Notes:
+  Follow-up: Support combat style attack speed overrides
+---
+<!-- commit:004d24692eef2621a65c524e6209c046d5b89457 -->
+## 2025-10-08T20:56:47+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:65cc741e5eaa4d45ed6c94e67b0bdcfb485fbceb -->
 ## 2025-10-08T20:56:35+01:00 — Ensure pet attack speed overrides affect cadence
 
