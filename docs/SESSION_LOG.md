@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e7bc4e853bb71e07184b23aaaceb160c956d272c -->
+## 2025-10-08T17:37:39+01:00 — Merge pull request #1040 from aicovergod/codex/remove-ranged-style-mutations-from-combatantstats
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 43 ++ / 26 --
+- Notes:
+  Stop injecting ranged style bonuses into aggregated equipment stats
+---
+<!-- commit:b37aa5f4bfb7c2084d4f794462f93df19035f7de -->
+## 2025-10-08T17:35:29+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ed41a9f036ce93db5406d5c098e2f6c1aa9e45f1 -->
 ## 2025-10-08T17:35:17+01:00 — Keep style bonuses out of aggregated ranged equipment stats
 
