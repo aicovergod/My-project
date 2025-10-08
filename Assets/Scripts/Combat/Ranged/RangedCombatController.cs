@@ -232,6 +232,8 @@ namespace Combat.Ranged
             var defender = combatController.GetDefenderStats(target, attacker);
             attacker.DamageType = DamageType.Ranged;
 
+            // CombatMath layers in defensive/longrange style bonuses here so accuracy rolls stay in
+            // sync with the player's chosen style without mutating aggregated equipment stats.
             int effectiveAttack = CombatMath.GetEffectiveRanged(attacker.RangedLevel, attacker.Style);
             int attackBonus = Mathf.RoundToInt(attacker.Equip.range * accuracyMultiplier);
             int attackRoll = CombatMath.GetAttackRoll(effectiveAttack, attackBonus);
@@ -242,6 +244,8 @@ namespace Combat.Ranged
             float chanceToHit = CombatMath.ChanceToHit(attackRoll, defenceRoll);
             bool hit = UnityEngine.Random.value < chanceToHit;
 
+            // Ranged strength retains the Accurate +3 bonus through CombatMath so the style still
+            // rewards damage rolls without influencing the hit chance traced above.
             int effectiveStrength = CombatMath.GetEffectiveRangedStrength(attacker.RangedLevel, attacker.Style);
             int strengthBonus = Mathf.Max(0, attacker.Equip.rangeStrength);
             int maxHit = CombatMath.GetMaxHit(effectiveStrength, strengthBonus);
@@ -422,6 +426,8 @@ namespace Combat.Ranged
             if (accuracyMultiplier <= 0f)
                 accuracyMultiplier = context.rangedController == null ? 1f : 0f;
             accuracyMultiplier = Mathf.Max(0f, accuracyMultiplier);
+            // Secondary rolls use the same CombatMath helpers so splash damage respects the chosen
+            // style bonuses without ever altering cached equipment stats from the context payload.
             int effectiveAttack = CombatMath.GetEffectiveRanged(attackerStats.RangedLevel, attackerStats.Style);
             int attackBonus = Mathf.RoundToInt(attackerStats.Equip.range * accuracyMultiplier);
             int attackRoll = CombatMath.GetAttackRoll(effectiveAttack, attackBonus);
