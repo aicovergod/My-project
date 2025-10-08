@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c792e832aff18989198e70a57b4a6c8b8f1c00b5 -->
+## 2025-10-08T10:01:59+01:00 — Merge pull request #1032 from aicovergod/codex/add-reusable-listvector2int-field
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 18 ++ / 5 --
+- Notes:
+  Reuse reservation key snapshot list in DynamicNavOccupancyService
+---
+<!-- commit:429d481be9ebbce4691f1f1e8dbe2ebb6177d534 -->
+## 2025-10-08T10:00:11+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ff9bb5912cd9b44c1c064d585e253f7d52ffa5f4 -->
 ## 2025-10-08T09:59:54+01:00 — Refactor nav occupancy reservation key snapshot reuse
 
