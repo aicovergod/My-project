@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:65cc741e5eaa4d45ed6c94e67b0bdcfb485fbceb -->
+## 2025-10-08T20:56:35+01:00 — Ensure pet attack speed overrides affect cadence
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Combat/CombatController.cs
+- Diff: 6 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:c82ef7ba708d752c035a95c29687adb45cffa53c -->
 ## 2025-10-08T20:43:33+01:00 — Support combat style attack speed overrides
 
