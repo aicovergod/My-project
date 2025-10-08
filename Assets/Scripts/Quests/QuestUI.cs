@@ -219,7 +219,9 @@ namespace Quests
             var closeText = CreateText("X", closeRect, Vector2.zero, Vector2.one, Vector2.zero);
             closeText.alignment = TextAnchor.MiddleCenter;
             closeBtnGO.GetComponent<Image>().color = Color.clear;
-            closeBtnGO.GetComponent<Button>().onClick.AddListener(() => canvas.enabled = false);
+            // Route the close button through the standard Close path so player movement and
+            // QuestUIClosed subscribers are restored/notified just like other exit flows.
+            closeBtnGO.GetComponent<Button>().onClick.AddListener(Close);
         }
 
         private Text CreateText(string name, RectTransform parent, Vector2 anchorMin, Vector2 anchorMax, Vector2 offset)
