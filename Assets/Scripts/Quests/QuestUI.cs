@@ -72,6 +72,12 @@ namespace Quests
         {
             if (instance == this)
             {
+                if (QuestManager.Instance != null)
+                {
+                    // Detach the refresh listener before releasing the singleton reference to avoid duplicates on future instances.
+                    QuestManager.Instance.QuestsUpdated.RemoveListener(Refresh);
+                }
+
                 if (canvas != null && canvas.enabled)
                     QuestUIClosed?.Invoke(this);
                 instance = null;
