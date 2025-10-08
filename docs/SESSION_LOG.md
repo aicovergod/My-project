@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b4641b85c130936922f6d6cb2e40fb9f7f2e20f8 -->
+## 2025-10-08T16:21:22+01:00 — Update attack styles for ranged weapons
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Combat/CombatEnums.cs, Assets/Scripts/Combat/CombatMath.cs, Assets/Scripts/Combat/CombatantStats.cs, Assets/Scripts/Player/PlayerCombatLoadout.cs, Assets/Scripts/UI/AttackStyleUI.cs
+- Diff: 236 ++ / 44 --
+- Notes:
+  —
+---
 <!-- commit:386f28dc04f6e9d5ce6b814c27b3a7f3f5bf3352 -->
 ## 2025-10-08T16:05:34+01:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
 
