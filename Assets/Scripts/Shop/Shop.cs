@@ -239,10 +239,20 @@ namespace ShopSystem
 
             if (!usedReplacement)
             {
-                if (!playerInventory.RemoveItem(item, 1))
+                int payoutAmount = config.playerSellPrice;
+
+                // Attempt to grant the payout before touching the player's item to
+                // avoid situations where a failed currency add eats the sold item.
+                if (!playerInventory.AddItem(currencyItem, payoutAmount))
                     return false;
 
-                playerInventory.AddItem(currencyItem, config.playerSellPrice);
+                if (!playerInventory.RemoveItem(item, 1))
+                {
+                    // Roll back the granted currency if the item could not be
+                    // removed for any reason (desync, concurrent removal, etc.).
+                    playerInventory.RemoveItem(currencyItem, payoutAmount);
+                    return false;
+                }
             }
 
             // Insert or update stock entry
