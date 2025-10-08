@@ -519,13 +519,17 @@ namespace Combat
         {
             var defender = GetDefenderStats(target, attacker);
 
+            // Effective level helpers bake in combat style bonuses so combined equipment stats
+            // remain purely gear driven. This keeps UI/tooling aligned with the aggregated stats
+            // while ensuring combat rolls still honour style-specific boosts.
             int attEff = attacker.DamageType switch
             {
                 DamageType.Magic => CombatMath.GetEffectiveAttack(attacker.MagicLevel, CombatStyle.Accurate),
                 DamageType.Ranged => CombatMath.GetEffectiveRanged(attacker.RangedLevel, attacker.Style),
                 _ => CombatMath.GetEffectiveAttack(attacker.AttackLevel, attacker.Style)
             };
-            // Longrange now contributes a +3 defensive boost here instead of modifying equipment stats.
+            // CombatMath handles defensive style bonuses (Longrange/Defensive/Controlled) instead
+            // of mutating equipment stats, keeping defender equipment values gear-accurate.
             int defEff = CombatMath.GetEffectiveDefence(defender.DefenceLevel, defender.Style);
             // Mirror OSRS combat by selecting the correct offensive bonus based on the damage type.
             // Melee continues to rely on the weapon's attack rating, magic uses spell accuracy, and
