@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:11f1d382322d07bd87a5f8e83597e16851f8a91d -->
+## 2025-10-08T12:04:15+01:00 — Ensure shop currency fallback to coins
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Shop/Shop.cs
+- Diff: 74 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:1a302b58c82d8581df051cf23ab68ce366ffc563 -->
 ## 2025-10-08T11:48:36+01:00 — Merge pull request #1034 from aicovergod/codex/fix-close-button-bypassing-questui.close
 

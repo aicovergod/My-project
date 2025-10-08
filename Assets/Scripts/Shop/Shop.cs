@@ -48,6 +48,25 @@ namespace ShopSystem
         [Header("Currency")]
         public ItemData currency;
 
+        /// <summary>
+        /// Item id used when the currency field is left empty. Designers often
+        /// expect shops to default to coins so we resolve that asset on demand.
+        /// </summary>
+        private const string DefaultCurrencyId = "Gold Coins";
+
+        /// <summary>
+        /// Cache of the resolved currency item so repeated lookups avoid
+        /// redundant database calls.
+        /// </summary>
+        private ItemData cachedCurrency;
+
+        /// <summary>
+        /// Tracks whether a warning about missing currency has already been
+        /// emitted to prevent spamming the console when designers misconfigure
+        /// the shop.
+        /// </summary>
+        private bool loggedMissingCurrency;
+
         [Header("Stock")]
         [Tooltip("Items available for purchase (max 30).")]
         public ShopItem[] stock = new ShopItem[MaxSlots];
@@ -67,6 +86,10 @@ namespace ShopSystem
             restockTimers = new float[stock.Length];
             for (int i = 0; i < stock.Length; i++)
                 initialStock[i] = stock[i];
+
+            // Resolve the currency immediately so fallbacks are ready before any
+            // external systems attempt to query or transact with the shop.
+            ResolveCurrency();
         }
 
         private void Reset()
@@ -109,20 +132,24 @@ namespace ShopSystem
             if (entry.item == null || entry.quantity <= 0)
                 return false;
 
+            var currencyItem = ResolveCurrency();
+            if (currencyItem == null)
+                return false;
+
             // Ensure player has enough currency and room for the item.
-            if (playerInventory.GetItemCount(currency) < entry.price)
+            if (playerInventory.GetItemCount(currencyItem) < entry.price)
                 return false;
             if (!playerInventory.CanAddItem(entry.item, 1))
                 return false;
 
-            if (!playerInventory.RemoveItem(currency, entry.price))
+            if (!playerInventory.RemoveItem(currencyItem, entry.price))
                 return false;
 
             if (!playerInventory.AddItem(entry.item, 1))
             {
                 // Should not happen because we checked CanAddItem, but just in case
                 // refund the currency.
-                playerInventory.AddItem(currency, entry.price);
+                playerInventory.AddItem(currencyItem, entry.price);
                 return false;
             }
 
@@ -188,15 +215,19 @@ namespace ShopSystem
 
             bool usedReplacement = false;
 
+            var currencyItem = ResolveCurrency();
+            if (currencyItem == null)
+                return false;
+
             // Check if the player can receive the currency normally. If not and the
             // item is non-stackable, attempt to replace the sold item's slot with
             // currency.
-            if (!playerInventory.CanAddItem(currency, config.playerSellPrice))
+            if (!playerInventory.CanAddItem(currencyItem, config.playerSellPrice))
             {
-                if (playerSlotIndex >= 0 && !item.stackable && currency != null &&
-                    currency.stackable && config.playerSellPrice <= currency.MaxStack)
+                if (playerSlotIndex >= 0 && !item.stackable && currencyItem != null &&
+                    currencyItem.stackable && config.playerSellPrice <= currencyItem.MaxStack)
                 {
-                    if (!playerInventory.ReplaceItem(playerSlotIndex, item, currency, config.playerSellPrice))
+                    if (!playerInventory.ReplaceItem(playerSlotIndex, item, currencyItem, config.playerSellPrice))
                         return false;
                     usedReplacement = true;
                 }
@@ -211,7 +242,7 @@ namespace ShopSystem
                 if (!playerInventory.RemoveItem(item, 1))
                     return false;
 
-                playerInventory.AddItem(currency, config.playerSellPrice);
+                playerInventory.AddItem(currencyItem, config.playerSellPrice);
             }
 
             // Insert or update stock entry
@@ -258,6 +289,41 @@ namespace ShopSystem
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Resolves the currency used by this shop, applying the default coins
+        /// item when designers leave the serialized field unassigned.
+        /// </summary>
+        private ItemData ResolveCurrency()
+        {
+            if (currency != null)
+            {
+                cachedCurrency = currency;
+                loggedMissingCurrency = false;
+                return currency;
+            }
+
+            if (cachedCurrency != null)
+            {
+                loggedMissingCurrency = false;
+                return cachedCurrency;
+            }
+
+            cachedCurrency = ItemDatabase.GetItem(DefaultCurrencyId);
+            if (cachedCurrency == null)
+            {
+                if (!loggedMissingCurrency)
+                {
+                    Debug.LogWarning($"[{nameof(Shop)}] Shop '{shopName}' could not locate fallback currency '{DefaultCurrencyId}'. Assign a currency asset in the inspector to enable transactions.");
+                    loggedMissingCurrency = true;
+                }
+                return null;
+            }
+
+            currency = cachedCurrency;
+            loggedMissingCurrency = false;
+            return cachedCurrency;
         }
     }
 }
