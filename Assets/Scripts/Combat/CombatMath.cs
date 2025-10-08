@@ -42,11 +42,30 @@ namespace Combat
         }
 
         /// <summary>
-        /// Mirrors the OSRS ranged effective level calculation. Accurate adds +3, defensive styles grant
-        /// +1 and rapid-style shots (represented by <see cref="CombatStyle.Aggressive"/>) provide no
-        /// bonus. A constant 8 is applied to keep low level accuracy consistent with melee and magic.
+        /// Mirrors the OSRS ranged effective level calculation. Defensive styles grant +1 and rapid-style
+        /// shots (represented by <see cref="CombatStyle.Aggressive"/>) provide no bonus. A constant 8 is
+        /// applied to keep low level accuracy consistent with melee and magic. Accurate no longer adds a
+        /// hidden +3 here so it can exclusively influence ranged strength rolls.
         /// </summary>
         public static int GetEffectiveRanged(int level, CombatStyle style)
+        {
+            int bonus = style switch
+            {
+                CombatStyle.Defensive => 1,
+                CombatStyle.Controlled => 1,
+                CombatStyle.Longrange => 1,
+                _ => 0
+            };
+            return level + bonus + 8;
+        }
+
+        /// <summary>
+        /// Effective strength when rolling ranged max hits. Accurate grants +3, defensive and controlled
+        /// styles grant +1, while Longrange maintains its +1 damage bonus even though the style now focuses
+        /// on defence within <see cref="GetEffectiveDefence"/>. A constant 8 is applied for parity with the
+        /// wider OSRS formulas.
+        /// </summary>
+        public static int GetEffectiveRangedStrength(int level, CombatStyle style)
         {
             int bonus = style switch
             {
@@ -59,21 +78,13 @@ namespace Combat
             return level + bonus + 8;
         }
 
-        /// <summary>
-        /// Effective strength when rolling ranged max hits. OSRS uses the same bonuses as accuracy,
-        /// so the helper simply mirrors <see cref="GetEffectiveRanged"/> while keeping the intent clear.
-        /// </summary>
-        public static int GetEffectiveRangedStrength(int level, CombatStyle style)
-        {
-            return GetEffectiveRanged(level, style);
-        }
-
         public static int GetEffectiveDefence(int level, CombatStyle style)
         {
             int bonus = style switch
             {
                 CombatStyle.Defensive => 3,
                 CombatStyle.Controlled => 1,
+                CombatStyle.Longrange => 3,
                 _ => 0
             };
             // Defence also needs the constant 8 for parity with OSRS calculations.

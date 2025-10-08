@@ -232,6 +232,8 @@ namespace Combat.Ranged
             var defender = combatController.GetDefenderStats(target, attacker);
             attacker.DamageType = DamageType.Ranged;
 
+            // Accurate should only increase ranged strength now, so this call intentionally omits the
+            // previous +3 accuracy boost when Accurate is selected.
             int effectiveAttack = CombatMath.GetEffectiveRanged(attacker.RangedLevel, attacker.Style);
             int attackBonus = Mathf.RoundToInt(attacker.Equip.range * accuracyMultiplier);
             int attackRoll = CombatMath.GetAttackRoll(effectiveAttack, attackBonus);
@@ -242,6 +244,8 @@ namespace Combat.Ranged
             float chanceToHit = CombatMath.ChanceToHit(attackRoll, defenceRoll);
             bool hit = UnityEngine.Random.value < chanceToHit;
 
+            // Ranged strength retains the Accurate +3 bonus, ensuring the style still rewards damage
+            // rolls without influencing the hit chance traced above.
             int effectiveStrength = CombatMath.GetEffectiveRangedStrength(attacker.RangedLevel, attacker.Style);
             int strengthBonus = Mathf.Max(0, attacker.Equip.rangeStrength);
             int maxHit = CombatMath.GetMaxHit(effectiveStrength, strengthBonus);
