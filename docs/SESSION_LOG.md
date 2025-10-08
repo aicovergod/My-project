@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1a302b58c82d8581df051cf23ab68ce366ffc563 -->
+## 2025-10-08T11:48:36+01:00 — Merge pull request #1034 from aicovergod/codex/fix-close-button-bypassing-questui.close
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 12 ++ / 1 --
+- Notes:
+  Fix quest UI close button to trigger Close workflow
+---
+<!-- commit:4516fecab060de35459724c957df84407d8365fe -->
+## 2025-10-08T11:48:26+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0e72088b0bc681ac534c013aa4fbb1a475ab981e -->
 ## 2025-10-08T11:48:14+01:00 — Fix quest UI close button to use Close method
 
