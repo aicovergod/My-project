@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:cf33410e54e9e98c98ea56af78c4e4c9de8cfbd9 -->
+## 2025-10-08T11:04:09+01:00 — Merge pull request #1033 from aicovergod/codex/update-questui-to-manage-listeners-properly
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 15 ++ / 0 --
+- Notes:
+  Fix QuestUI listener cleanup on destruction
+---
+<!-- commit:c8bfd7ca420b3d4fc682e53ee5d9bab1c6c8d60a -->
+## 2025-10-08T11:00:52+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:88cc184fdf59ea15dde33ce3950e318ce61678bd -->
 ## 2025-10-08T11:00:39+01:00 — Ensure QuestUI unsubscribes from QuestManager
 
