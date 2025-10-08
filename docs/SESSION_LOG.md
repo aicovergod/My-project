@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:852e740497658b0f08560c6c70d5a502972477a3 -->
+## 2025-10-08T12:04:45+01:00 — Merge pull request #1035 from aicovergod/codex/add-fallback-currency-for-shops
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 83 ++ / 8 --
+- Notes:
+  Add fallback coin currency for shops
+---
+<!-- commit:c01e05ac54ed7a28fab1c4e91c999599f20657d7 -->
+## 2025-10-08T12:04:28+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:11f1d382322d07bd87a5f8e83597e16851f8a91d -->
 ## 2025-10-08T12:04:15+01:00 — Ensure shop currency fallback to coins
 
