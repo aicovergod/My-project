@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c82ef7ba708d752c035a95c29687adb45cffa53c -->
+## 2025-10-08T20:43:33+01:00 — Support combat style attack speed overrides
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Combat/CombatantStats.cs, Assets/Scripts/Equipment/EquipmentAggregator.cs, Assets/Scripts/Inventory/ItemData.cs, Assets/Scripts/Items/ItemCombatStats.cs
+- Diff: 133 ++ / 42 --
+- Notes:
+  —
+---
 <!-- commit:50d1688c839f771ed622f3ee4de1d453bc23a7dc -->
 ## 2025-10-08T17:44:18+01:00 — Merge pull request #1041 from aicovergod/codex/task-title
 

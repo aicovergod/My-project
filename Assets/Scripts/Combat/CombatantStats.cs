@@ -25,7 +25,7 @@ namespace Combat
             // Equipment stats are intentionally captured without any combat style modifiers.
             // Style bonuses are layered in during combat resolution via <see cref="CombatMath"/>
             // so UI panels and logging continue to report pure equipment-derived values.
-            var combinedStats = equip != null ? equip.GetCombinedStats() : default;
+            var combinedStats = equip != null ? equip.GetCombinedStats(style) : default;
 
             return new CombatantStats
             {

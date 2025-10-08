@@ -495,7 +495,19 @@ namespace Combat
                 if (!target.IsAlive)
                     break;
 
-                float interval = equipment != null ? equipment.GetCombinedStats().attackSpeedTicks * CombatMath.TICK_SECONDS : 4 * CombatMath.TICK_SECONDS;
+                CombatStyle style = loadout != null ? loadout.Style : CombatStyle.Accurate;
+                var weapon = GetEquippedWeapon();
+                int attackSpeedTicks = weapon != null ? weapon.GetAttackSpeedTicks(style) : 0;
+
+                if (attackSpeedTicks < 1 && equipment != null)
+                {
+                    attackSpeedTicks = equipment.GetCombinedStats(style).attackSpeedTicks;
+                }
+
+                if (attackSpeedTicks < 1)
+                    attackSpeedTicks = 1;
+
+                float interval = attackSpeedTicks * CombatMath.TICK_SECONDS;
                 nextAttackTime = Time.time + interval;
                 yield return new WaitForSeconds(interval);
             }
