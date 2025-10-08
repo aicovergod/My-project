@@ -394,6 +394,51 @@ namespace Inventory
             }
 
             var current = equipped[index];
+
+            // Merge stackable equipment when the same item is already equipped instead of swapping it back
+            // into the inventory. This mirrors OSRS behaviour where throwing weapons, arrows, and similar
+            // stackables add to the equipped stack when re-equipped from the inventory.
+            if (current.item != null && entry.item != null && current.item == entry.item && current.item.stackable)
+            {
+                int maxStack = current.item.MaxStack;
+                int availableSpace = Mathf.Max(0, maxStack - current.count);
+                if (availableSpace <= 0)
+                {
+                    // The equipped stack is already capped. Notify the player and abort so the original
+                    // inventory slot restoration logic can place the stack back where it came from.
+                    FloatingText.Show("You cannot equip any more of that.", anchor.position);
+                    return false;
+                }
+
+                int transferAmount = Mathf.Min(entry.count, availableSpace);
+                if (transferAmount <= 0)
+                {
+                    FloatingText.Show("You cannot equip any more of that.", anchor.position);
+                    return false;
+                }
+
+                int overflow = entry.count - transferAmount;
+                if (overflow > 0)
+                {
+                    // Return the overflow to the inventory. If the bag is full we abort so nothing is lost
+                    // and the calling inventory logic restores the original stack.
+                    if (inventory == null || !inventory.AddItem(entry.item, overflow))
+                    {
+                        FloatingText.Show("Your inventory is full", anchor.position);
+                        return false;
+                    }
+                }
+
+                current.count += transferAmount;
+                equipped[index] = current;
+                UpdateSlotVisual(slot);
+                UpdateBonuses();
+                Save();
+                OnEquipmentChanged?.Invoke(slot);
+                ItemUseResolver.NotifyItemUsed(gameObject, entry.item, ItemUseType.Equipped);
+                return true;
+            }
+
             if (current.item != null)
             {
                 if (inventory != null && !inventory.AddItem(current.item, current.count))
