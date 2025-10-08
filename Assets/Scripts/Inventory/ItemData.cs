@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Combat;
 using Items;
 using Skills;
 using Skills.Fishing;
@@ -148,52 +149,52 @@ namespace Inventory
             if (stackSpriteOverrides == null)
             {
                 stackSpriteOverrides = Array.Empty<StackSpriteOverride>();
-                return;
             }
 
-            if (stackSpriteOverrides.Length == 0)
-                return;
-
-            var withSprites = new List<StackSpriteOverride>(stackSpriteOverrides.Length);
-            var placeholders = new List<StackSpriteOverride>();
-            for (int i = 0; i < stackSpriteOverrides.Length; i++)
+            if (stackSpriteOverrides.Length > 0)
             {
-                var spriteOverride = stackSpriteOverrides[i];
-                spriteOverride.ClampMinStack();
-
-                if (spriteOverride.HasSprite)
+                var withSprites = new List<StackSpriteOverride>(stackSpriteOverrides.Length);
+                var placeholders = new List<StackSpriteOverride>();
+                for (int i = 0; i < stackSpriteOverrides.Length; i++)
                 {
-                    withSprites.Add(spriteOverride);
+                    var spriteOverride = stackSpriteOverrides[i];
+                    spriteOverride.ClampMinStack();
+
+                    if (spriteOverride.HasSprite)
+                    {
+                        withSprites.Add(spriteOverride);
+                    }
+                    else
+                    {
+                        placeholders.Add(spriteOverride);
+                    }
+                }
+
+                // Keep entries without sprites so designers can finish configuring
+                // them, but ensure the configured overrides remain sorted for
+                // stable inspector ordering.
+                withSprites.Sort((a, b) => a.MinStack.CompareTo(b.MinStack));
+
+                if (placeholders.Count == 0)
+                {
+                    stackSpriteOverrides = withSprites.Count == 0
+                        ? Array.Empty<StackSpriteOverride>()
+                        : withSprites.ToArray();
+                }
+                else if (withSprites.Count == 0)
+                {
+                    stackSpriteOverrides = placeholders.ToArray();
                 }
                 else
                 {
-                    placeholders.Add(spriteOverride);
+                    var combined = new StackSpriteOverride[withSprites.Count + placeholders.Count];
+                    withSprites.CopyTo(combined, 0);
+                    placeholders.CopyTo(combined, withSprites.Count);
+                    stackSpriteOverrides = combined;
                 }
             }
 
-            // Keep entries without sprites so designers can finish configuring
-            // them, but ensure the configured overrides remain sorted for
-            // stable inspector ordering.
-            withSprites.Sort((a, b) => a.MinStack.CompareTo(b.MinStack));
-
-            if (placeholders.Count == 0)
-            {
-                stackSpriteOverrides = withSprites.Count == 0
-                    ? Array.Empty<StackSpriteOverride>()
-                    : withSprites.ToArray();
-                return;
-            }
-
-            if (withSprites.Count == 0)
-            {
-                stackSpriteOverrides = placeholders.ToArray();
-                return;
-            }
-
-            var combined = new StackSpriteOverride[withSprites.Count + placeholders.Count];
-            withSprites.CopyTo(combined, 0);
-            placeholders.CopyTo(combined, withSprites.Count);
-            stackSpriteOverrides = combined;
+            combat.ClampAttackSpeedValues();
         }
 
         /// <summary>
@@ -261,6 +262,14 @@ namespace Inventory
 
         [Header("Combat")]
         public ItemCombatStats combat = ItemCombatStats.Default;
+
+        /// <summary>
+        /// Returns the attack speed for the requested combat style, applying any weapon-specific overrides.
+        /// </summary>
+        public int GetAttackSpeedTicks(CombatStyle style)
+        {
+            return combat.GetAttackSpeedTicks(style);
+        }
 
         [Header("Poison")]
         public PoisonConfig onHitPoison;
