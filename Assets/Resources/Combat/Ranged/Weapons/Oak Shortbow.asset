@@ -22,7 +22,7 @@ MonoBehaviour:
   baseRangeTiles: 7
   projectilePrefab: {fileID: 0}
   impactVfxPrefab: {fileID: 0}
-  projectileSpeed: 16
+  projectileSpeed: 10
   accuracyMultiplier: 1
   damageMultiplier: 1
   rangeBonusTiles: 0
@@ -38,5 +38,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1f844aed9846cbc46bb44ae0885596fb, type: 2}
   - {fileID: 11400000, guid: 13a14b417cf9bbb49a7ec67b8c19acc2, type: 2}
   blockedAmmunition: []
-  releaseSoundId:
+  releaseSoundId: 
   specialEffect: {fileID: 0}

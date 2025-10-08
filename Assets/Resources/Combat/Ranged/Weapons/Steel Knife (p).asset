@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0af3fa615ba6e6d419b628f91b1130bb, type: 3}
+  m_Name: Steel Knife (p)
+  m_EditorClassIdentifier: Assembly-CSharp::Combat.Ranged.RangedWeaponData
+  weaponIdOverride: Steel Knife (p)
+  weaponItem: {fileID: 11400000, guid: eb57fcb0d254d0f4b84a23fa4ad53e07, type: 2}
+  category: 3
+  ammunitionCategory: 0
+  consumesWeaponStack: 1
+  attackSpeedTicks: 2
+  drawTicks: 1
+  baseRangeTiles: 4
+  projectilePrefab: {fileID: 6111494187698877684, guid: beb24dd3291c4264793054a85bce3760, type: 3}
+  impactVfxPrefab: {fileID: 0}
+  projectileSpeed: 10
+  accuracyMultiplier: 1
+  damageMultiplier: 1
+  rangeBonusTiles: 0
+  recoveryChanceOnHit: 0.5
+  recoveryChanceOnMiss: 0.2
+  spawnRecoveryAsGroundItem: 1
+  restrictAmmoByList: 1
+  allowedAmmunition: []
+  blockedAmmunition: []
+  releaseSoundId: 
+  specialEffect: {fileID: 0}

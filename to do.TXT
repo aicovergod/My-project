@@ -14,6 +14,30 @@ Add power amulet
 Add defence amulet
 
 
+Add regular - magic longbows
+add regular - rune crossbows
+Add bronze - rune javelins
+Add bronze - rune darts
+Add bronze - rune bolts
+Add bronze - rune throwing knifes
+
+Add tin ore golem
+Add coal ore golem
+Add iron ore golem
+Add mithril ore golem
+Add orichalcum ore golem
+Add runite ore golem
+
+BUG: Stackable item sprite value doesn't change in equipment tab, but it works in inventory. So for example if i have 4 bronze arrows, the sprite will show the correct  4 bronze arrow sprite, but when i equip them, and look in my equipment, it shows the 1 Bronze arrow sprite. Fix this
+
+move MiningDatabase from Item to Resources
+Move Resources/Mining to Resources/MiningDatabase
+move WoodcuttingDatabase to Resources
+
+fix pet following, sometimes when pets are wandering, they will respect obstacles and not noclip through them when wandering, but also sometimes they ust completely ignore it and then noclip through obstacles, such as fences....
+
+- Redo all pet definitions to be 8 directional
+
 - add system to receive a wand, from the wandmaker (random choice out of 50 wands), wands have affinities towards certain elements
 so some wands would be weaker casting certain spells, some stronger.
 

@@ -25,9 +25,9 @@ MonoBehaviour:
   - minStack: 5
     variantSprite: {fileID: 2201493954094089813, guid: a5293d9154f48734691b748c351d6e60, type: 3}
   description: An arrow used in a bow
-  stackable: 0
-  maxStack: 1
-  splittable: 0
+  stackable: 1
+  maxStack: 2147483647
+  splittable: 1
   isUndroppable: 0
   isTwoHanded: 0
   healAmount: 0
