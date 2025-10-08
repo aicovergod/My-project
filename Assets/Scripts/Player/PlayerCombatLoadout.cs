@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Combat;
 using EquipmentSystem;
@@ -18,6 +20,29 @@ namespace Player
         [SerializeField] private DamageType damageType = DamageType.Melee;
         private const string SaveKey = "PlayerCombatStyle";
 
+        private static readonly CombatStyle[] MeleeStyles =
+        {
+            CombatStyle.Accurate,
+            CombatStyle.Aggressive,
+            CombatStyle.Defensive,
+            CombatStyle.Controlled
+        };
+
+        private static readonly CombatStyle[] RangedStyles =
+        {
+            CombatStyle.Accurate,
+            CombatStyle.Rapid,
+            CombatStyle.Longrange
+        };
+
+        private static readonly CombatStyle[] MagicStyles = { CombatStyle.Accurate };
+
+        /// <summary>Raised whenever the combat style changes.</summary>
+        public event Action<CombatStyle> StyleChanged;
+
+        /// <summary>Raised whenever the active damage type changes.</summary>
+        public event Action<DamageType> DamageTypeChanged;
+
         private EquipmentAggregator equipmentAggregator;
         private Equipment equipment;
         private SkillManager skills;
@@ -28,10 +53,10 @@ namespace Player
             get => style;
             set
             {
-                if (style == value)
-                    return;
-                style = value;
-                Save();
+                var available = GetAvailableStylesInternal();
+                if (Array.IndexOf(available, value) < 0 && available.Length > 0)
+                    value = available[0];
+                SetStyleInternal(value, true);
             }
         }
 
@@ -61,10 +86,18 @@ namespace Player
                 CycleStyle();
         }
 
-        /// <summary>Cycle combat style in order Accurate → Aggressive → Defensive → Controlled.</summary>
+        /// <summary>Cycle combat style in the order defined for the current weapon.</summary>
         public void CycleStyle()
         {
-            Style = (CombatStyle)(((int)style + 1) % 4);
+            var styles = GetAvailableStylesInternal();
+            if (styles.Length == 0)
+                return;
+            int index = Array.IndexOf(styles, style);
+            if (index < 0)
+                index = 0;
+            else
+                index = (index + 1) % styles.Length;
+            Style = styles[index];
         }
 
         /// <summary>Get a snapshot of combat stats for the player.</summary>
@@ -76,7 +109,7 @@ namespace Player
         /// <summary>Set the current damage type.</summary>
         public void SetDamageType(DamageType type)
         {
-            damageType = type;
+            UpdateDamageType(type);
         }
 
         public void Save()
@@ -87,6 +120,58 @@ namespace Player
         public void Load()
         {
             style = SaveManager.Load<CombatStyle>(SaveKey);
+            EnsureStyleValidForCurrentWeapon(false);
+        }
+
+        /// <summary>Return the combat styles available for the current damage type.</summary>
+        public IReadOnlyList<CombatStyle> GetAvailableStyles()
+        {
+            return GetAvailableStylesInternal();
+        }
+
+        /// <summary>Check whether the provided style is valid for the current weapon category.</summary>
+        public bool IsStyleAvailable(CombatStyle candidate)
+        {
+            return Array.IndexOf(GetAvailableStylesInternal(), candidate) >= 0;
+        }
+
+        private CombatStyle[] GetAvailableStylesInternal()
+        {
+            return damageType switch
+            {
+                DamageType.Ranged => RangedStyles,
+                DamageType.Magic => MagicStyles,
+                _ => MeleeStyles
+            };
+        }
+
+        private void SetStyleInternal(CombatStyle newStyle, bool shouldSave)
+        {
+            if (style == newStyle)
+                return;
+            style = newStyle;
+            if (shouldSave)
+                Save();
+            StyleChanged?.Invoke(style);
+        }
+
+        private void EnsureStyleValidForCurrentWeapon(bool persist = true)
+        {
+            var styles = GetAvailableStylesInternal();
+            if (styles.Length == 0)
+                return;
+            if (Array.IndexOf(styles, style) >= 0)
+                return;
+            SetStyleInternal(styles[0], persist);
+        }
+
+        private void UpdateDamageType(DamageType newType)
+        {
+            if (damageType == newType)
+                return;
+            damageType = newType;
+            EnsureStyleValidForCurrentWeapon();
+            DamageTypeChanged?.Invoke(damageType);
         }
 
         private void HandleEquipmentChanged(EquipmentSlot slot)
@@ -111,27 +196,26 @@ namespace Player
                 Destroy(poisonApplier);
             }
 
+            DamageType newType = DamageType.Melee;
             if (weapon != null)
             {
                 if (weapon.combat.Magic > 0)
-                {
-                    damageType = DamageType.Magic;
-                    if (MagicUI.ActiveSpell == null)
-                        MagicUI.RestoreLastSpell();
-                }
+                    newType = DamageType.Magic;
                 else if (weapon.combat.Range > 0 || weapon.combat.RangeStrength > 0)
-                    damageType = DamageType.Ranged;
-                else
-                {
-                    damageType = DamageType.Melee;
-                    MagicUI.ClearActiveSpell();
-                }
+                    newType = DamageType.Ranged;
             }
-            else
+
+            if (newType == DamageType.Magic)
             {
-                damageType = DamageType.Melee;
+                if (MagicUI.ActiveSpell == null)
+                    MagicUI.RestoreLastSpell();
+            }
+            else if (newType == DamageType.Melee)
+            {
                 MagicUI.ClearActiveSpell();
             }
+
+            UpdateDamageType(newType);
         }
     }
 }

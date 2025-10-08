@@ -53,6 +53,7 @@ namespace Combat
                 CombatStyle.Accurate => 3,
                 CombatStyle.Defensive => 1,
                 CombatStyle.Controlled => 1,
+                CombatStyle.Longrange => 1,
                 _ => 0
             };
             return level + bonus + 8;

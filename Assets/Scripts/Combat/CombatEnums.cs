@@ -37,6 +37,8 @@ namespace Combat
         Accurate,
         Aggressive,
         Defensive,
-        Controlled
+        Controlled,
+        Rapid,
+        Longrange
     }
 }

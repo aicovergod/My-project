@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Combat;
@@ -15,10 +16,26 @@ namespace UI
 
         private GameObject uiRoot;
         private PlayerCombatLoadout loadout;
-        private Button accurateButton;
-        private Button aggressiveButton;
-        private Button defensiveButton;
-        private Button controlledButton;
+        private Transform buttonContainer;
+        private readonly Dictionary<CombatStyle, Button> styleButtons = new();
+
+        private static readonly CombatStyle[] DefaultMeleeStyles =
+        {
+            CombatStyle.Accurate,
+            CombatStyle.Aggressive,
+            CombatStyle.Defensive,
+            CombatStyle.Controlled
+        };
+
+        private static readonly Dictionary<CombatStyle, string> StyleSpriteMap = new()
+        {
+            { CombatStyle.Accurate, "Accurate" },
+            { CombatStyle.Aggressive, "Aggressive" },
+            { CombatStyle.Defensive, "Defensive" },
+            { CombatStyle.Controlled, "Controlled" },
+            { CombatStyle.Rapid, "Rapid" },
+            { CombatStyle.Longrange, "Longrange" }
+        };
 
         /// <summary>Whether the interface is currently visible.</summary>
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
@@ -43,8 +60,13 @@ namespace UI
 
             loadout = FindObjectOfType<PlayerCombatLoadout>();
             CreateUI();
+            EnsureLoadoutBound();
             if (uiRoot != null)
+            {
                 uiRoot.SetActive(false);
+                RefreshStyleButtons();
+                UpdateSelection();
+            }
             if (UIManager.Instance != null)
                 UIManager.Instance.RegisterWindow(this);
         }
@@ -54,6 +76,11 @@ namespace UI
             if (!PersistentSceneSingleton<AttackStyleUI>.HandleOnDestroy(this))
                 return;
 
+            if (loadout != null)
+            {
+                loadout.StyleChanged -= HandleLoadoutStyleChanged;
+                loadout.DamageTypeChanged -= HandleLoadoutDamageTypeChanged;
+            }
             if (UIManager.Instance != null)
                 UIManager.Instance.UnregisterWindow(this);
         }
@@ -85,17 +112,17 @@ namespace UI
             layout.childForceExpandHeight = false;
             layout.childForceExpandWidth = false;
 
-            accurateButton = CreateStyleButton(panel.transform, "Accurate", CombatStyle.Accurate);
-            aggressiveButton = CreateStyleButton(panel.transform, "Aggressive", CombatStyle.Aggressive);
-            defensiveButton = CreateStyleButton(panel.transform, "Defensive", CombatStyle.Defensive);
-            controlledButton = CreateStyleButton(panel.transform, "Controlled", CombatStyle.Controlled);
-
-            UpdateSelection();
+            buttonContainer = panel.transform;
         }
 
-        private Button CreateStyleButton(Transform parent, string spriteName, CombatStyle style)
+        private Button CreateStyleButton(Transform parent, CombatStyle style)
         {
+            if (!StyleSpriteMap.TryGetValue(style, out string spriteName))
+                return null;
+
             var sprite = Resources.Load<Sprite>("Interfaces/AttackStyle/" + spriteName);
+            if (sprite == null)
+                Debug.LogWarning($"AttackStyleUI: Missing sprite for style {style} ({spriteName}).");
             var go = new GameObject(spriteName, typeof(Image), typeof(Button));
             go.transform.SetParent(parent, false);
             var img = go.GetComponent<Image>();
@@ -105,8 +132,67 @@ namespace UI
             rect.sizeDelta = new Vector2(30f, 30f);
             rect.localScale = new Vector3(2f, 1f, 1f);
             var btn = go.GetComponent<Button>();
-            btn.onClick.AddListener(() => SetStyle(style));
             return btn;
+        }
+
+        /// <summary>Rebuild the style buttons using the current loadout configuration.</summary>
+        private void RefreshStyleButtons()
+        {
+            if (buttonContainer == null)
+                return;
+
+            EnsureLoadoutBound();
+
+            var toDestroy = new List<GameObject>();
+            foreach (Transform child in buttonContainer)
+                toDestroy.Add(child.gameObject);
+            foreach (var child in toDestroy)
+                Destroy(child);
+
+            styleButtons.Clear();
+
+            foreach (var style in GetAvailableStyles())
+            {
+                var button = CreateStyleButton(buttonContainer, style);
+                if (button == null)
+                    continue;
+                var capturedStyle = style;
+                button.onClick.AddListener(() => SetStyle(capturedStyle));
+                styleButtons[capturedStyle] = button;
+            }
+
+            if (buttonContainer is RectTransform rectTransform)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
+        }
+
+        /// <summary>Retrieve the attack styles that should be exposed in the UI.</summary>
+        private IReadOnlyList<CombatStyle> GetAvailableStyles()
+        {
+            return loadout != null ? loadout.GetAvailableStyles() : DefaultMeleeStyles;
+        }
+
+        /// <summary>Find and subscribe to the player's combat loadout component if needed.</summary>
+        private bool EnsureLoadoutBound()
+        {
+            if (loadout != null)
+                return false;
+            loadout = FindObjectOfType<PlayerCombatLoadout>();
+            if (loadout == null)
+                return false;
+            loadout.StyleChanged += HandleLoadoutStyleChanged;
+            loadout.DamageTypeChanged += HandleLoadoutDamageTypeChanged;
+            return true;
+        }
+
+        private void HandleLoadoutStyleChanged(CombatStyle _)
+        {
+            UpdateSelection();
+        }
+
+        private void HandleLoadoutDamageTypeChanged(DamageType _)
+        {
+            RefreshStyleButtons();
+            UpdateSelection();
         }
 
         /// <summary>Toggle the visibility of the UI.</summary>
@@ -125,6 +211,7 @@ namespace UI
             if (uiRoot != null)
             {
                 uiRoot.SetActive(true);
+                RefreshStyleButtons();
                 UpdateSelection();
             }
         }
@@ -138,23 +225,22 @@ namespace UI
 
         private void SetStyle(CombatStyle style)
         {
-            if (loadout == null)
-                loadout = FindObjectOfType<PlayerCombatLoadout>();
-            if (loadout != null)
-                loadout.Style = style;
+            EnsureLoadoutBound();
+            if (loadout == null || !loadout.IsStyleAvailable(style))
+                return;
+            loadout.Style = style;
             UpdateSelection();
         }
 
         private void UpdateSelection()
         {
-            if (loadout == null)
-                loadout = FindObjectOfType<PlayerCombatLoadout>();
+            bool boundNow = EnsureLoadoutBound();
+            if (boundNow)
+                RefreshStyleButtons();
             if (loadout == null)
                 return;
-            Highlight(accurateButton, loadout.Style == CombatStyle.Accurate);
-            Highlight(aggressiveButton, loadout.Style == CombatStyle.Aggressive);
-            Highlight(defensiveButton, loadout.Style == CombatStyle.Defensive);
-            Highlight(controlledButton, loadout.Style == CombatStyle.Controlled);
+            foreach (var pair in styleButtons)
+                Highlight(pair.Value, loadout.Style == pair.Key);
         }
 
         private void Highlight(Button btn, bool selected)

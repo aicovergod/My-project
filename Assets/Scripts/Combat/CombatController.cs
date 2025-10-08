@@ -932,6 +932,7 @@ namespace Combat
                 {
                     case CombatStyle.Defensive:
                     case CombatStyle.Controlled:
+                    case CombatStyle.Longrange:
                         float split = total * 0.5f;
                         skills?.AddXP(SkillType.Ranged, split);
                         skills?.AddXP(SkillType.Defence, split);
