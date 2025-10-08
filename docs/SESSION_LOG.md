@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0e72088b0bc681ac534c013aa4fbb1a475ab981e -->
+## 2025-10-08T11:48:14+01:00 — Fix quest UI close button to use Close method
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Quests/QuestUI.cs
+- Diff: 3 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:cf33410e54e9e98c98ea56af78c4e4c9de8cfbd9 -->
 ## 2025-10-08T11:04:09+01:00 — Merge pull request #1033 from aicovergod/codex/update-questui-to-manage-listeners-properly
 
