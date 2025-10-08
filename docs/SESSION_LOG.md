@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8df70ff20bfbf982eb33334f4adb144648fc5576 -->
+## 2025-10-08T16:41:20+01:00 — Adjust ranged style bonuses
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Combat/CombatMath.cs, Assets/Scripts/Combat/Ranged/RangedCombatController.cs
+- Diff: 23 ++ / 7 --
+- Notes:
+  —
+---
 <!-- commit:b4641b85c130936922f6d6cb2e40fb9f7f2e20f8 -->
 ## 2025-10-08T16:21:22+01:00 — Update attack styles for ranged weapons
 
