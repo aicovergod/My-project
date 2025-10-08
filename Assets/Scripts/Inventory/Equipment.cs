@@ -595,6 +595,8 @@ namespace Inventory
             int magic = 0;
             int meleeDef = 0, rangeDef = 0, magicDef = 0;
 
+            CombatStyle style = combatLoadout != null ? combatLoadout.Style : CombatStyle.Accurate;
+
             foreach (var entry in equipped)
             {
                 if (entry.item == null)
@@ -614,18 +616,31 @@ namespace Inventory
             if (attackBonusText != null) attackBonusText.text = $"Attack = {attack}";
             if (rangeAccuracyBonusText != null) rangeAccuracyBonusText.text = $"Ranged = {rangeAccuracy}";
             if (meleeBonusText != null) meleeBonusText.text = $"Melee = {meleeStrength}";
-            if (rangeStrengthBonusText != null) rangeStrengthBonusText.text = $"Ranged = {rangeStrength}";
+
+            int rangedLevel = skillManager != null ? skillManager.GetLevel(SkillType.Ranged) : 1;
+            // Subtract the OSRS constant + base level to isolate the style-only contribution for UI messaging.
+            int rangedStyleBonus = CombatMath.GetEffectiveRangedStrength(rangedLevel, style) - (rangedLevel + 8);
+            if (rangeStrengthBonusText != null)
+            {
+                string suffix = rangedStyleBonus > 0 ? $" (+{rangedStyleBonus} style)" : string.Empty;
+                rangeStrengthBonusText.text = $"Ranged = {rangeStrength}{suffix}";
+            }
+
             if (magicBonusText != null) magicBonusText.text = $"Magic = {magic}";
 
             int strengthLevel = skillManager != null ? skillManager.GetLevel(SkillType.Strength) : 1;
-            CombatStyle style = combatLoadout != null ? combatLoadout.Style : CombatStyle.Accurate;
             int effStr = CombatMath.GetEffectiveStrength(strengthLevel, style);
             int maxHit = CombatMath.GetMaxHit(effStr, meleeStrength);
             if (maxHitText != null) maxHitText.text = $"Total = {maxHit}";
 
-            if (meleeDefenceBonusText != null) meleeDefenceBonusText.text = $"Melee = {meleeDef}";
-            if (rangedDefenceBonusText != null) rangedDefenceBonusText.text = $"Range = {rangeDef}";
-            if (magicDefenceBonusText != null) magicDefenceBonusText.text = $"Magic = {magicDef}";
+            int defenceLevel = skillManager != null ? skillManager.GetLevel(SkillType.Defence) : 1;
+            // Defence effective levels follow the same pattern; isolating the style bonus clarifies the hidden boost.
+            int defenceStyleBonus = CombatMath.GetEffectiveDefence(defenceLevel, style) - (defenceLevel + 8);
+            string defenceSuffix = defenceStyleBonus > 0 ? $" (+{defenceStyleBonus} style)" : string.Empty;
+
+            if (meleeDefenceBonusText != null) meleeDefenceBonusText.text = $"Melee = {meleeDef}{defenceSuffix}";
+            if (rangedDefenceBonusText != null) rangedDefenceBonusText.text = $"Range = {rangeDef}{defenceSuffix}";
+            if (magicDefenceBonusText != null) magicDefenceBonusText.text = $"Magic = {magicDef}{defenceSuffix}";
 
             TotalAttackBonus = attack;
             TotalDefenceBonus = meleeDef + rangeDef + magicDef;
