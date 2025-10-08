@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ff9bb5912cd9b44c1c064d585e253f7d52ffa5f4 -->
+## 2025-10-08T09:59:54+01:00 — Refactor nav occupancy reservation key snapshot reuse
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Navigation/DynamicNavOccupancyService.cs
+- Diff: 9 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:393c8ad7d46447a7cfb2babef451ff5d253255dc -->
 ## 2025-10-07T20:02:32+01:00 — Merge pull request #1031 from aicovergod/codex/implement-recovery-path-in-scenetransitionmanager
 

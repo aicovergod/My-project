@@ -118,6 +118,7 @@ namespace NPC
         private readonly Dictionary<IPathMoverClient, ReservationHandle> handlesByMover = new Dictionary<IPathMoverClient, ReservationHandle>();
         private readonly List<Vector2Int> footprintBuffer = new List<Vector2Int>();
         private readonly List<ReservationHandle> handleCleanupBuffer = new List<ReservationHandle>();
+        private readonly List<Vector2Int> reservationKeySnapshot = new List<Vector2Int>();
 
         private int currentTick;
         private bool subscribedToTicker;
@@ -478,12 +479,13 @@ namespace NPC
         private bool PurgeExpiredReservations()
         {
             bool changed = false;
-            var keys = reservations.Keys;
-            // Copy keys to avoid modifying the dictionary during enumeration.
-            var snapshot = new List<Vector2Int>(keys);
-            for (int i = 0; i < snapshot.Count; i++)
+            // Reuse a shared list to avoid repeated allocations when scanning reservations.
+            reservationKeySnapshot.Clear();
+            reservationKeySnapshot.AddRange(reservations.Keys);
+
+            for (int i = 0; i < reservationKeySnapshot.Count; i++)
             {
-                Vector2Int cell = snapshot[i];
+                Vector2Int cell = reservationKeySnapshot[i];
                 if (!reservations.TryGetValue(cell, out var reservation))
                 {
                     continue;
@@ -495,6 +497,8 @@ namespace NPC
                     changed = true;
                 }
             }
+
+            reservationKeySnapshot.Clear();
 
             return changed;
         }
