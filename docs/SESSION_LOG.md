@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ed41a9f036ce93db5406d5c098e2f6c1aa9e45f1 -->
+## 2025-10-08T17:35:17+01:00 — Keep style bonuses out of aggregated ranged equipment stats
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Combat/CombatantStats.cs, Assets/Scripts/Combat/Ranged/RangedCombatController.cs, Assets/Scripts/Inventory/Equipment.cs
+- Diff: 34 ++ / 26 --
+- Notes:
+  —
+---
 <!-- commit:8d36ccfd92257e70528f49e2714e702e7e5bcd27 -->
 ## 2025-10-08T16:41:40+01:00 — Merge pull request #1039 from aicovergod/codex/update-combat-styles-and-bonuses
 
