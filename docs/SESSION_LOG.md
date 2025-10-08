@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a1d31ef03140f3f2ace08b1c11db9a778b72cfc8 -->
+## 2025-10-08T15:31:25+01:00 — Merge pull request #1037 from aicovergod/codex/fix-inventory-stacking-for-throwing-knives
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 54 ++ / 0 --
+- Notes:
+  Fix stacking when equipping identical stackable items
+---
+<!-- commit:01231e1cf2013f25a199fa7598fc808ebfe021c5 -->
+## 2025-10-08T15:31:16+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:bc5001c8581d274d319d1eca86fd7d848a6f4c62 -->
 ## 2025-10-08T15:31:04+01:00 — Fix stacking when equipping identical stackable items
 
