@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:15f045c0e5aa254a74b9965fb0e0bea2c56264aa -->
+## 2025-10-08T20:44:47+01:00 — Merge pull request #1042 from aicovergod/codex/add-attack-speed-override-functionality
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 142 ++ / 42 --
+- Notes:
+  Support combat style attack speed overrides
+---
+<!-- commit:e03b9f87e3db986418f0ad21ce634be4688cd504 -->
+## 2025-10-08T20:43:46+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c82ef7ba708d752c035a95c29687adb45cffa53c -->
 ## 2025-10-08T20:43:33+01:00 — Support combat style attack speed overrides
 
