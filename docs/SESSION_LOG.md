@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:bf3aa89739a0b22529b12693e7fb0717f159b316 -->
+## 2025-10-08T16:21:43+01:00 — Merge pull request #1038 from aicovergod/codex/task-title
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 245 ++ / 44 --
+- Notes:
+  Update attack styles for ranged weapons
+---
+<!-- commit:617404d0474db6b60721d03925bafd66a874568d -->
+## 2025-10-08T16:21:37+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b4641b85c130936922f6d6cb2e40fb9f7f2e20f8 -->
 ## 2025-10-08T16:21:22+01:00 — Update attack styles for ranged weapons
 
