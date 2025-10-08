@@ -499,9 +499,13 @@ namespace Combat
                 var weapon = GetEquippedWeapon();
                 int attackSpeedTicks = weapon != null ? weapon.GetAttackSpeedTicks(style) : 0;
 
-                if (attackSpeedTicks < 1 && equipment != null)
+                if (equipment != null)
                 {
-                    attackSpeedTicks = equipment.GetCombinedStats(style).attackSpeedTicks;
+                    int aggregatedTicks = equipment.GetCombinedStats(style).attackSpeedTicks;
+                    if (attackSpeedTicks > 0)
+                        attackSpeedTicks = Mathf.Max(1, aggregatedTicks);
+                    else
+                        attackSpeedTicks = aggregatedTicks;
                 }
 
                 if (attackSpeedTicks < 1)
