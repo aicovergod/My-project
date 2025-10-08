@@ -22,6 +22,24 @@ namespace Combat
         /// </summary>
         public static CombatantStats ForPlayer(SkillManager skills, EquipmentAggregator equip, CombatStyle style, DamageType type)
         {
+            var combinedStats = equip != null ? equip.GetCombinedStats() : default;
+
+            if (type == DamageType.Ranged)
+            {
+                // When the player is using ranged weapons the selected combat style
+                // grants hidden equipment-style bonuses that should not appear in the
+                // equipment window. Adjust the aggregated stats here so every combat
+                // calculation automatically respects the invisible boosts.
+                if (style == CombatStyle.Accurate)
+                    combinedStats.rangeStrength += 3;
+                else if (style == CombatStyle.Longrange)
+                {
+                    combinedStats.meleeDef += 3;
+                    combinedStats.rangeDef += 3;
+                    combinedStats.magicDef += 3;
+                }
+            }
+
             return new CombatantStats
             {
                 AttackLevel = skills != null ? skills.GetLevel(SkillType.Attack) : 1,
@@ -29,7 +47,7 @@ namespace Combat
                 DefenceLevel = skills != null ? skills.GetLevel(SkillType.Defence) : 1,
                 RangedLevel = skills != null ? skills.GetLevel(SkillType.Ranged) : 1,
                 MagicLevel = skills != null ? skills.GetLevel(SkillType.Magic) : 1,
-                Equip = equip != null ? equip.GetCombinedStats() : default,
+                Equip = combinedStats,
                 Style = style,
                 DamageType = type
             };
