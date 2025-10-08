@@ -1,57 +1,21 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:e7bc4e853bb71e07184b23aaaceb160c956d272c -->
-## 2025-10-08T17:37:39+01:00 — Merge pull request #1040 from aicovergod/codex/remove-ranged-style-mutations-from-combatantstats
+<!-- commit:bf3aa89739a0b22529b12693e7fb0717f159b316 -->
+## 2025-10-08T16:21:43+01:00 — Merge pull request #1038 from aicovergod/codex/task-title
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
 - Changed files (0): —
-- Diff: 43 ++ / 26 --
+- Diff: 245 ++ / 44 --
 - Notes:
-  Stop injecting ranged style bonuses into aggregated equipment stats
+  Update attack styles for ranged weapons
 ---
-<!-- commit:b37aa5f4bfb7c2084d4f794462f93df19035f7de -->
-## 2025-10-08T17:35:29+01:00 — Update SESSION_LOG [ci]
+<!-- commit:617404d0474db6b60721d03925bafd66a874568d -->
+## 2025-10-08T16:21:37+01:00 — Update SESSION_LOG [ci]
 
 - Author: session-log-bot <actions@github.com>
 - Changed files (1): docs/SESSION_LOG.md
 - Diff: 9 ++ / 0 --
-- Notes:
-  —
----
-<!-- commit:ed41a9f036ce93db5406d5c098e2f6c1aa9e45f1 -->
-## 2025-10-08T17:35:17+01:00 — Keep style bonuses out of aggregated ranged equipment stats
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (4): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Combat/CombatantStats.cs, Assets/Scripts/Combat/Ranged/RangedCombatController.cs, Assets/Scripts/Inventory/Equipment.cs
-- Diff: 34 ++ / 26 --
-- Notes:
-  —
----
-<!-- commit:8d36ccfd92257e70528f49e2714e702e7e5bcd27 -->
-## 2025-10-08T16:41:40+01:00 — Merge pull request #1039 from aicovergod/codex/update-combat-styles-and-bonuses
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 32 ++ / 7 --
-- Notes:
-  Adjust ranged style bonuses
----
-<!-- commit:f0ded614eb5f164d050c1eb6ce0a9b8d9e69b59f -->
-## 2025-10-08T16:41:32+01:00 — Update SESSION_LOG [ci]
-
-- Author: session-log-bot <actions@github.com>
-- Changed files (1): docs/SESSION_LOG.md
-- Diff: 9 ++ / 0 --
-- Notes:
-  —
----
-<!-- commit:8df70ff20bfbf982eb33334f4adb144648fc5576 -->
-## 2025-10-08T16:41:20+01:00 — Adjust ranged style bonuses
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (3): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Combat/CombatMath.cs, Assets/Scripts/Combat/Ranged/RangedCombatController.cs
-- Diff: 23 ++ / 7 --
 - Notes:
   —
 ---
