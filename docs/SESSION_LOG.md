@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:889ff97bc0a5bef578ed3e08a5b862968d20657c -->
+## 2025-10-09T10:25:16+01:00 — Add longrange range bonus
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Combat/Ranged/RangedCombatController.cs
+- Diff: 49 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:72015731eff248fcac5d89b3a92d2f0904d5d398 -->
 ## 2025-10-09T10:08:20+01:00 — Merge pull request #1044 from aicovergod/codex/update-subscribetoinput-for-playerinput-fallback
 
