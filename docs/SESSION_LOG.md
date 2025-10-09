@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0b96c539639985c23c765b7e820dee24d1771e7d -->
+## 2025-10-09T09:54:57+01:00 — rock
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (8): Assets/Scenes/House1Interior.unity, Assets/Scenes/OverWorld.unity, Assets/Scenes/VioletsTownMinerBuilding.unity, Assets/Sprites/Rock Decoration/ROCKS.png, Assets/Sprites/Rock Decoration/ROCKS.png.meta, Assets/TileAssets/Rocks/Rocks 3.asset, Assets/TileAssets/Rocks/Rocks 3.asset.meta, Assets/TileAssets/Rocks/Rocks.prefab
+- Diff: 1500 ++ / 215 --
+- Notes:
+  —
+---
 <!-- commit:15f045c0e5aa254a74b9965fb0e0bea2c56264aa -->
 ## 2025-10-08T20:44:47+01:00 — Merge pull request #1042 from aicovergod/codex/add-attack-speed-override-functionality
 
