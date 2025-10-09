@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:78109b302f4f259c1344f6c7c4fe9cd428e4e4e0 -->
+## 2025-10-09T10:25:39+01:00 — Merge pull request #1045 from aicovergod/codex/add-+2-tile-attack-distance-for-longrange
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 58 ++ / 0 --
+- Notes:
+  Add longrange range bonus for ranged combat
+---
+<!-- commit:9080c2d08f2347f6fc349323316189dfc8cbcd4b -->
+## 2025-10-09T10:25:30+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:889ff97bc0a5bef578ed3e08a5b862968d20657c -->
 ## 2025-10-09T10:25:16+01:00 — Add longrange range bonus
 
