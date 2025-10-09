@@ -794,7 +794,7 @@ This file is auto-updated by CI on every push. Times shown are Europe/London.
 ## 2025-10-05T17:24:56+01:00 — Add static analysis CI for Unity C# scripts
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (8): .editorconfig, .github/workflows/dotnet-format.yml, .github/workflows/qodana.yml, .github/workflows/stylecop-analyze.yml, Directory.Build.props, qodana.yaml, stylecop.json, tools/generate_unity_sln.py
+- Changed files (8): .editorconfig, Directory.Build.props, and associated automation/configuration scripts (removed in later cleanup)
 - Diff: 215 ++ / 0 --
 - Notes:
   —
