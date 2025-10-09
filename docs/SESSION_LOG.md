@@ -1,30 +1,39 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:ea883dcd1b35be5938159048504795fb60d3a025 -->
-## 2025-10-09T10:45:10+01:00 — updates
+<!-- commit:77d0492db44b99377f57724672d042b5b3405d02 -->
+## 2025-10-09T11:06:46+01:00 — chore: remove deprecated automation tooling
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (24): Assets/Resources/Item/Adamant Knife (p).asset, Assets/Resources/Item/Adamant Knife.asset, Assets/Resources/Item/Black Knife (p).asset, Assets/Resources/Item/Black Knife.asset, Assets/Resources/Item/Bronze Knife (p).asset, Assets/Resources/Item/Bronze Knife.asset, Assets/Resources/Item/Iron Knife (p).asset, Assets/Resources/Item/Iron Knife.asset, Assets/Resources/Item/Magic Shortbow.asset, Assets/Resources/Item/Maple Shortbow.asset, Assets/Resources/Item/Mithril Knife (p).asset, Assets/Resources/Item/Mithril Knife.asset, Assets/Resources/Item/Oak Shortbow.asset, Assets/Resources/Item/Orichalcum Knife (p).asset, Assets/Resources/Item/Orichalcum Knife.asset, Assets/Resources/Item/Rune Knife (p).asset, Assets/Resources/Item/Rune Knife.asset, Assets/Resources/Item/Shortbow.asset, Assets/Resources/Item/Steel Knife (p).asset, Assets/Resources/Item/Steel Knife.asset, Assets/Resources/Item/Willow Shortbow.asset, Assets/Resources/Item/Yew Shortbow.asset, Assets/Scenes/House1Interior.unity, Assets/Scenes/OverWorld.unity
-- Diff: 367 ++ / 144 --
+- Changed files (7): .github/workflows/dotnet-format.yml, .github/workflows/qodana.yml, .github/workflows/stylecop-analyze.yml, docs/SESSION_LOG.md, qodana.yaml, stylecop.json, tools/generate_unity_sln.py
+- Diff: 1 ++ / 191 --
 - Notes:
   —
 ---
-<!-- commit:a4dbf4a1e4841694d034410be40d7a4f56d224c6 -->
-## 2025-10-09T10:26:59+01:00 — Merge pull request #1046 from aicovergod/codex/task-title
+<!-- commit:16628886f9e098ed50278f41dad64291bfa4ae86 -->
+## 2025-10-09T10:39:40+01:00 — Merge pull request #1047 from aicovergod/codex/add-subscribetoinput-in-npcshopopener
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
 - Changed files (0): —
-- Diff: 62 ++ / 0 --
+- Diff: 21 ++ / 0 --
 - Notes:
-  Codex/task title
+  Ensure NpcShopOpener reconnects input when scenes load
 ---
-<!-- commit:9164cabf08c171323512f6915f3e6096c54d7fdb -->
-## 2025-10-09T10:26:47+01:00 — Update SESSION_LOG [ci]
+<!-- commit:f1910a94911d29796eb8992de57c598cb7fd2ab6 -->
+## 2025-10-09T10:39:30+01:00 — Update SESSION_LOG [ci]
 
 - Author: session-log-bot <actions@github.com>
 - Changed files (1): docs/SESSION_LOG.md
 - Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c0c12eabc60d43fa3d3419dcb054da501b14d952 -->
+## 2025-10-09T10:39:19+01:00 — Ensure NpcShopOpener reconnects input after scene load
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Interaction/NpcShopOpener.cs
+- Diff: 12 ++ / 0 --
 - Notes:
   —
 ---
@@ -794,7 +803,7 @@ This file is auto-updated by CI on every push. Times shown are Europe/London.
 ## 2025-10-05T17:24:56+01:00 — Add static analysis CI for Unity C# scripts
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (8): .editorconfig, .github/workflows/dotnet-format.yml, .github/workflows/qodana.yml, .github/workflows/stylecop-analyze.yml, Directory.Build.props, qodana.yaml, stylecop.json, tools/generate_unity_sln.py
+- Changed files (8): .editorconfig, Directory.Build.props, and associated automation/configuration scripts (removed in later cleanup)
 - Diff: 215 ++ / 0 --
 - Notes:
   —
