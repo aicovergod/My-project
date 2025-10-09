@@ -44,7 +44,14 @@ MonoBehaviour:
     MeleeDefence: 0
     RangeDefence: 0
     MagicDefence: 0
-    AttackSpeedTicks: 2
+    AttackSpeedTicks: 3
+    styleAttackSpeedOverrides:
+    - Style: 0
+      AttackSpeedTicks: 3
+    - Style: 4
+      AttackSpeedTicks: 2
+    - Style: 5
+      AttackSpeedTicks: 3
   onHitPoison: {fileID: 11400000, guid: 5a501ca099d54f02a1139ef22ba213c8, type: 2}
   poisonApplyChance: 0.25
   poisonRequiresDamage: 1
