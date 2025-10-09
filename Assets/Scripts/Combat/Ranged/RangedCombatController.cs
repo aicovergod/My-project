@@ -8,6 +8,7 @@ using MyGame.Drops;
 using UI;
 using Util;
 using Status.Poison;
+using Player;
 
 namespace Combat.Ranged
 {
@@ -72,6 +73,8 @@ namespace Combat.Ranged
         private CombatController combatController;
         private Inventory.Inventory inventory;
         private Equipment equipmentComponent;
+        private PlayerCombatLoadout playerCombatLoadout;
+        private PlayerCombatBinder combatBinder;
 
         private RangedWeaponData currentWeapon;
         private AmmunitionData currentAmmo;
@@ -110,6 +113,8 @@ namespace Combat.Ranged
             combatController = combatController != null ? combatController : GetComponent<CombatController>();
             inventory = GetComponent<Inventory.Inventory>() ?? GetComponentInParent<Inventory.Inventory>() ?? GetComponentInChildren<Inventory.Inventory>();
             equipmentComponent = GetComponent<Equipment>() ?? GetComponentInParent<Equipment>() ?? GetComponentInChildren<Equipment>();
+            playerCombatLoadout = GetComponent<PlayerCombatLoadout>() ?? GetComponentInParent<PlayerCombatLoadout>() ?? GetComponentInChildren<PlayerCombatLoadout>();
+            combatBinder = GetComponent<PlayerCombatBinder>() ?? GetComponentInParent<PlayerCombatBinder>() ?? GetComponentInChildren<PlayerCombatBinder>();
 
             if (projectileSpawnPoint == null)
                 projectileSpawnPoint = transform;
@@ -183,6 +188,9 @@ namespace Combat.Ranged
             CacheModifierProviders();
             for (int i = 0; i < modifierBuffer.Count; i++)
                 rangeBonus += modifierBuffer[i].GetAdditionalRangeTiles();
+
+            if (ResolveActiveCombatStyle() == CombatStyle.Longrange)
+                rangeBonus += 2f;
 
             return Mathf.Max(0.1f, baseRange + rangeBonus);
         }
@@ -597,6 +605,47 @@ namespace Combat.Ranged
                 ?? combatController.GetComponentInParent<CombatTarget>()
                 ?? combatController.GetComponentInChildren<CombatTarget>();
             return attackerCombatTarget;
+        }
+
+        /// <summary>
+        /// Resolves the currently active combat style so range extensions can respond to player
+        /// selections (e.g., Longrange adding defensive XP and extending attack distance).
+        /// Falls back to Accurate when the owning object has no explicit combat profile.
+        /// </summary>
+        private CombatStyle ResolveActiveCombatStyle()
+        {
+            if (playerCombatLoadout == null)
+            {
+                playerCombatLoadout = GetComponent<PlayerCombatLoadout>()
+                    ?? GetComponentInParent<PlayerCombatLoadout>()
+                    ?? GetComponentInChildren<PlayerCombatLoadout>();
+            }
+
+            if (playerCombatLoadout != null)
+                return playerCombatLoadout.Style;
+
+            if (combatBinder == null)
+            {
+                combatBinder = GetComponent<PlayerCombatBinder>()
+                    ?? GetComponentInParent<PlayerCombatBinder>()
+                    ?? GetComponentInChildren<PlayerCombatBinder>();
+
+                if (combatBinder == null && combatController != null)
+                {
+                    combatBinder = combatController.GetComponent<PlayerCombatBinder>()
+                        ?? combatController.GetComponentInParent<PlayerCombatBinder>()
+                        ?? combatController.GetComponentInChildren<PlayerCombatBinder>();
+                }
+            }
+
+            if (combatBinder != null)
+            {
+                CombatantStats stats = combatBinder.GetCombatantStats();
+                if (stats != null)
+                    return stats.Style;
+            }
+
+            return CombatStyle.Accurate;
         }
 
         /// <summary>
