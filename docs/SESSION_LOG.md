@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b62c3066e5f59b22346f937bd1624b96fbefa52d -->
+## 2025-10-09T11:07:16+01:00 — Merge pull request #1048 from aicovergod/codex/remove-obsolete-workflow-and-config-files
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 10 ++ / 191 --
+- Notes:
+  Remove unused static analysis workflows and configs
+---
+<!-- commit:e8ee8b129f8ddc49c241039f4fcc48e0b2bcebc0 -->
+## 2025-10-09T11:07:02+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:77d0492db44b99377f57724672d042b5b3405d02 -->
 ## 2025-10-09T11:06:46+01:00 — chore: remove deprecated automation tooling
 
