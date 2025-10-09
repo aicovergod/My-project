@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using ShopSystem;
 using Combat;
 using Pets;
@@ -46,13 +47,24 @@ namespace NPC
         private void OnEnable()
         {
             pointerHovering = false;
+            SceneManager.sceneLoaded += HandleSceneLoaded;
             SubscribeToInput();
         }
 
         private void OnDisable()
         {
             pointerHovering = false;
+            SceneManager.sceneLoaded -= HandleSceneLoaded;
             UnsubscribeFromInput();
+        }
+
+        /// <summary>
+        ///     Re-evaluates the player input bindings whenever a new scene loads so NPCs
+        ///     automatically reconnect after the player object spawns.
+        /// </summary>
+        private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            SubscribeToInput();
         }
 
         private void OnMouseEnter()

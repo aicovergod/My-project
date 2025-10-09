@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c0c12eabc60d43fa3d3419dcb054da501b14d952 -->
+## 2025-10-09T10:39:19+01:00 — Ensure NpcShopOpener reconnects input after scene load
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Interaction/NpcShopOpener.cs
+- Diff: 12 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f3242cf828cb03726696c099840f0d0e4a4de4f5 -->
 ## 2025-10-09T10:26:30+01:00 — Merge branch 'main' into codex/task-title
 
