@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:72015731eff248fcac5d89b3a92d2f0904d5d398 -->
+## 2025-10-09T10:08:20+01:00 — Merge pull request #1044 from aicovergod/codex/update-subscribetoinput-for-playerinput-fallback
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 13 ++ / 0 --
+- Notes:
+  Ensure scene transition doors locate player input
+---
+<!-- commit:13a70e095b14b3ae8bfa0a8b8bb904ea68eb944e -->
+## 2025-10-09T10:08:11+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:683008c354ed46670cbdd963b429f3dfb7dfe95e -->
 ## 2025-10-09T10:07:56+01:00 — Ensure scene transition doors locate player input
 
