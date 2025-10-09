@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:16628886f9e098ed50278f41dad64291bfa4ae86 -->
+## 2025-10-09T10:39:40+01:00 — Merge pull request #1047 from aicovergod/codex/add-subscribetoinput-in-npcshopopener
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 21 ++ / 0 --
+- Notes:
+  Ensure NpcShopOpener reconnects input when scenes load
+---
+<!-- commit:f1910a94911d29796eb8992de57c598cb7fd2ab6 -->
+## 2025-10-09T10:39:30+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c0c12eabc60d43fa3d3419dcb054da501b14d952 -->
 ## 2025-10-09T10:39:19+01:00 — Ensure NpcShopOpener reconnects input after scene load
 
