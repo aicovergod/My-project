@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c1fa75ca071c1fe32e9d39024ba8adfa9b687860 -->
+## 2025-10-09T11:41:32+01:00 — Ensure ShopUI resolves player inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Prefabs/SceneObjects/ShopUI.prefab, Assets/Scripts/Shop/ShopUI.cs
+- Diff: 19 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:b62c3066e5f59b22346f937bd1624b96fbefa52d -->
 ## 2025-10-09T11:07:16+01:00 — Merge pull request #1048 from aicovergod/codex/remove-obsolete-workflow-and-config-files
 

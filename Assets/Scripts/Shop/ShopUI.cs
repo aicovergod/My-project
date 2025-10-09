@@ -102,12 +102,14 @@ namespace ShopSystem
         public void Open(Shop shop, NpcWanderer npcMovement = null)
         {
             if (shop == null) return;
+            EnsurePlayerInventoryReference();
             UIManager.Instance.OpenWindow(this);
             currentShop = shop;
             Refresh();
             uiRoot.SetActive(true);
             if (playerInventory != null)
             {
+                playerInventory.OnInventoryChanged -= HandleInventoryChanged;
                 playerInventory.SetShopContext(shop);
                 playerInventory.OnInventoryChanged += HandleInventoryChanged;
             }
@@ -121,6 +123,22 @@ namespace ShopSystem
             npcMover = npcMovement;
             if (npcMover != null)
                 npcMover.enabled = false;
+        }
+
+        /// <summary>
+        /// Ensures the player inventory reference is assigned so shop interactions can function.
+        /// </summary>
+        private void EnsurePlayerInventoryReference()
+        {
+            if (playerInventory != null)
+                return;
+
+            playerInventory = FindObjectOfType<Inventory.Inventory>(true);
+            if (playerInventory == null)
+            {
+                Debug.LogWarning(
+                    "ShopUI could not locate a player Inventory in the scene. Shop purchases will be disabled until an inventory is present.");
+            }
         }
 
         /// <summary>

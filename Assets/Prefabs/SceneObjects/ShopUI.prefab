@@ -54,4 +54,4 @@ MonoBehaviour:
   extraWindowHeight: 33
   priceFont: {fileID: 0}
   priceColor: {r: 1, g: 1, b: 1, a: 1}
-  playerInventory: {fileID: 0}
+  playerInventory: {fileID: 491447706204386932, guid: ac4dc3793be1bee4caf981f7340bf02d, type: 3}
