@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:42f2b7067af61456fab5ead13b2a51bd443d4e9a -->
+## 2025-10-09T11:08:22+01:00 — Merge pull request #1049 from aicovergod/codex/remove-obsolete-workflow-and-config-files
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 32 ++ / 201 --
+- Notes:
+  Codex/remove obsolete workflow and config files
+---
+<!-- commit:317bd01d8726c31b36bdd3ee160aadd84f4eaba8 -->
+## 2025-10-09T11:08:09+01:00 — Merge branch 'main' into codex/remove-obsolete-workflow-and-config-files
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 367 ++ / 144 --
+- Notes:
+  —
+---
 <!-- commit:77d0492db44b99377f57724672d042b5b3405d02 -->
 ## 2025-10-09T11:06:46+01:00 — chore: remove deprecated automation tooling
 
