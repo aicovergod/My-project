@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:683008c354ed46670cbdd963b429f3dfb7dfe95e -->
+## 2025-10-09T10:07:56+01:00 — Ensure scene transition doors locate player input
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 4 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:bf3aa89739a0b22529b12693e7fb0717f159b316 -->
 ## 2025-10-08T16:21:43+01:00 — Merge pull request #1038 from aicovergod/codex/task-title
 
