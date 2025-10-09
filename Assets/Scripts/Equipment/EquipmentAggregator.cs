@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Combat;
 using Inventory;
 using Items;
 using Beastmaster;
@@ -38,9 +39,10 @@ namespace EquipmentSystem
         /// <summary>
         /// Sum all equipped item bonuses into a single structure.
         /// </summary>
-        public CombinedStats GetCombinedStats()
+        public CombinedStats GetCombinedStats(CombatStyle? styleOverride = null)
         {
             CombinedStats result = new CombinedStats { attackSpeedTicks = 4 };
+            CombatStyle resolvedStyle = styleOverride ?? CombatStyle.Accurate;
             if (equipment != null)
             {
                 foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
@@ -60,8 +62,12 @@ namespace EquipmentSystem
                     result.meleeDef += stats.MeleeDefence;
                     result.rangeDef += stats.RangeDefence;
                     result.magicDef += stats.MagicDefence;
-                    if (slot == EquipmentSlot.Weapon && stats.AttackSpeedTicks > 0)
-                        result.attackSpeedTicks = stats.AttackSpeedTicks;
+                    if (slot == EquipmentSlot.Weapon)
+                    {
+                        int ticks = item.GetAttackSpeedTicks(resolvedStyle);
+                        if (ticks > 0)
+                            result.attackSpeedTicks = ticks;
+                    }
                 }
             }
 
@@ -80,8 +86,7 @@ namespace EquipmentSystem
                     result.attackSpeedTicks = pet.attackSpeedTicks;
             }
 
-            if (result.attackSpeedTicks <= 0)
-                result.attackSpeedTicks = 4;
+            result.attackSpeedTicks = Mathf.Max(1, result.attackSpeedTicks);
 
             return result;
         }

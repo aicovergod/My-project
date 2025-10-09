@@ -1,17 +1,26 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:78109b302f4f259c1344f6c7c4fe9cd428e4e4e0 -->
-## 2025-10-09T10:25:39+01:00 — Merge pull request #1045 from aicovergod/codex/add-+2-tile-attack-distance-for-longrange
+<!-- commit:0b96c539639985c23c765b7e820dee24d1771e7d -->
+## 2025-10-09T09:54:57+01:00 — rock
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (8): Assets/Scenes/House1Interior.unity, Assets/Scenes/OverWorld.unity, Assets/Scenes/VioletsTownMinerBuilding.unity, Assets/Sprites/Rock Decoration/ROCKS.png, Assets/Sprites/Rock Decoration/ROCKS.png.meta, Assets/TileAssets/Rocks/Rocks 3.asset, Assets/TileAssets/Rocks/Rocks 3.asset.meta, Assets/TileAssets/Rocks/Rocks.prefab
+- Diff: 1500 ++ / 215 --
+- Notes:
+  —
+---
+<!-- commit:15f045c0e5aa254a74b9965fb0e0bea2c56264aa -->
+## 2025-10-08T20:44:47+01:00 — Merge pull request #1042 from aicovergod/codex/add-attack-speed-override-functionality
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
 - Changed files (0): —
-- Diff: 58 ++ / 0 --
+- Diff: 142 ++ / 42 --
 - Notes:
-  Add longrange range bonus for ranged combat
+  Support combat style attack speed overrides
 ---
-<!-- commit:9080c2d08f2347f6fc349323316189dfc8cbcd4b -->
-## 2025-10-09T10:25:30+01:00 — Update SESSION_LOG [ci]
+<!-- commit:e03b9f87e3db986418f0ad21ce634be4688cd504 -->
+## 2025-10-08T20:43:46+01:00 — Update SESSION_LOG [ci]
 
 - Author: session-log-bot <actions@github.com>
 - Changed files (1): docs/SESSION_LOG.md
@@ -19,39 +28,30 @@ This file is auto-updated by CI on every push. Times shown are Europe/London.
 - Notes:
   —
 ---
-<!-- commit:889ff97bc0a5bef578ed3e08a5b862968d20657c -->
-## 2025-10-09T10:25:16+01:00 — Add longrange range bonus
+<!-- commit:c82ef7ba708d752c035a95c29687adb45cffa53c -->
+## 2025-10-08T20:43:33+01:00 — Support combat style attack speed overrides
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (1): Assets/Scripts/Combat/Ranged/RangedCombatController.cs
-- Diff: 49 ++ / 0 --
+- Changed files (5): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Combat/CombatantStats.cs, Assets/Scripts/Equipment/EquipmentAggregator.cs, Assets/Scripts/Inventory/ItemData.cs, Assets/Scripts/Items/ItemCombatStats.cs
+- Diff: 133 ++ / 42 --
 - Notes:
   —
 ---
-<!-- commit:72015731eff248fcac5d89b3a92d2f0904d5d398 -->
-## 2025-10-09T10:08:20+01:00 — Merge pull request #1044 from aicovergod/codex/update-subscribetoinput-for-playerinput-fallback
+<!-- commit:50d1688c839f771ed622f3ee4de1d453bc23a7dc -->
+## 2025-10-08T17:44:18+01:00 — Merge pull request #1041 from aicovergod/codex/task-title
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
 - Changed files (0): —
-- Diff: 13 ++ / 0 --
+- Diff: 52 ++ / 28 --
 - Notes:
-  Ensure scene transition doors locate player input
+  Codex/task title
 ---
-<!-- commit:13a70e095b14b3ae8bfa0a8b8bb904ea68eb944e -->
-## 2025-10-09T10:08:11+01:00 — Update SESSION_LOG [ci]
-
-- Author: session-log-bot <actions@github.com>
-- Changed files (1): docs/SESSION_LOG.md
-- Diff: 9 ++ / 0 --
-- Notes:
-  —
----
-<!-- commit:683008c354ed46670cbdd963b429f3dfb7dfe95e -->
-## 2025-10-09T10:07:56+01:00 — Ensure scene transition doors locate player input
+<!-- commit:6dfef1b3afbb608dcced1b16686d939e92933cc1 -->
+## 2025-10-08T17:44:12+01:00 — Merge branch 'main' into codex/task-title
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (1): Assets/Scripts/World/SceneTransitionInteractable.cs
-- Diff: 4 ++ / 0 --
+- Changed files (0): —
+- Diff: 6 ++ / 42 --
 - Notes:
   —
 ---
