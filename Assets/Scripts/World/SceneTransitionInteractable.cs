@@ -255,6 +255,10 @@ namespace World
                 playerInput = GetComponent<PlayerInput>();
                 if (playerInput == null)
                     playerInput = GetComponentInParent<PlayerInput>();
+                if (playerInput == null)
+                    playerInput = FindObjectOfType<PlayerInput>();
+                if (playerInput == null)
+                    Debug.LogWarning($"SceneTransitionInteractable on {name} could not locate a PlayerInput in the scene. Interactions will be disabled until one becomes available.");
             }
 
             interactAction = InputActionResolver.Resolve(playerInput, interactActionReference, "Interact", out interactActionOwned);
