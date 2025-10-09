@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:77d0492db44b99377f57724672d042b5b3405d02 -->
+## 2025-10-09T11:06:46+01:00 — chore: remove deprecated automation tooling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): .github/workflows/dotnet-format.yml, .github/workflows/qodana.yml, .github/workflows/stylecop-analyze.yml, docs/SESSION_LOG.md, qodana.yaml, stylecop.json, tools/generate_unity_sln.py
+- Diff: 1 ++ / 191 --
+- Notes:
+  —
+---
 <!-- commit:16628886f9e098ed50278f41dad64291bfa4ae86 -->
 ## 2025-10-09T10:39:40+01:00 — Merge pull request #1047 from aicovergod/codex/add-subscribetoinput-in-npcshopopener
 
