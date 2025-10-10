@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:61b77a99c29492625ee526c584049142ef94031d -->
+## 2025-10-10T22:39:22+01:00 — Guard audio settings canvas dependencies
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Settings/AudioSettingsUI.cs
+- Diff: 12 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:c515189e8659ae44910a8cfa5d8ca264ea902a3a -->
 ## 2025-10-10T21:14:28+01:00 — Merge pull request #1053 from aicovergod/codex/update-updateslotvisual-in-equipment.cs
 
