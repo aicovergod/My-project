@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b97274c26c751a8d5d815d5814079eecca517840 -->
+## 2025-10-10T21:04:29+01:00 — Fix ShopUI resolving prefab inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Shop/ShopUI.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:c1fa75ca071c1fe32e9d39024ba8adfa9b687860 -->
 ## 2025-10-09T11:41:32+01:00 — Ensure ShopUI resolves player inventory
 
