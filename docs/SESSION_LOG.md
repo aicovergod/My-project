@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3a29fba6cc582f0ec8649377e19c374f987e6430 -->
+## 2025-10-10T21:04:55+01:00 — Merge pull request #1052 from aicovergod/codex/fix-high-priority-bug-in-shopui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 10 ++ / 1 --
+- Notes:
+  Ensure ShopUI resolves player inventory follow-up
+---
+<!-- commit:0c0441913442928a6b2f9e47b61b0c8341a3433c -->
+## 2025-10-10T21:04:42+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b97274c26c751a8d5d815d5814079eecca517840 -->
 ## 2025-10-10T21:04:29+01:00 — Fix ShopUI resolving prefab inventory
 
