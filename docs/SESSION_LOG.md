@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c515189e8659ae44910a8cfa5d8ca264ea902a3a -->
+## 2025-10-10T21:14:28+01:00 — Merge pull request #1053 from aicovergod/codex/update-updateslotvisual-in-equipment.cs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 2 --
+- Notes:
+  Fix equipment slot icons for stacked equipment items
+---
+<!-- commit:3d4d7044f487eb826d909952d1a7f8f2f26bf223 -->
+## 2025-10-10T21:14:06+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f3cec4839c96c9db28bf911b2852b97c36141cf4 -->
 ## 2025-10-10T21:13:52+01:00 — Use stack-aware icons for equipment slots
 
