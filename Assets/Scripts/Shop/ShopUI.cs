@@ -130,7 +130,7 @@ namespace ShopSystem
         /// </summary>
         private void EnsurePlayerInventoryReference()
         {
-            if (playerInventory != null)
+            if (playerInventory != null && playerInventory.gameObject.scene.IsValid())
                 return;
 
             playerInventory = FindObjectOfType<Inventory.Inventory>(true);
