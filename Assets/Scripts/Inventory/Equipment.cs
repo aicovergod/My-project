@@ -564,8 +564,11 @@ namespace Inventory
                 }
                 if (itemImg != null)
                 {
-                    itemImg.sprite = entry.item.icon;
-                    itemImg.color = entry.item.icon != null ? Color.white : Color.clear;
+                    // Stackable equipment such as arrows can provide different sprites depending on the count.
+                    // Use the helper to fetch the correct sprite for the current stack size and guard against null icons.
+                    Sprite icon = entry.item.GetIconForCount(entry.count);
+                    itemImg.sprite = icon;
+                    itemImg.color = icon != null ? Color.white : Color.clear;
                 }
                 text.text = entry.item.stackable && entry.count > 1 ? entry.count.ToString() : string.Empty;
             }
