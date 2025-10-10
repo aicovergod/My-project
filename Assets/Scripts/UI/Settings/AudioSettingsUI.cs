@@ -12,6 +12,7 @@ namespace UI.Settings
     /// until a broader settings hub is implemented.
     /// </summary>
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster))]
     public class AudioSettingsUI : MonoBehaviour, IUIWindow
     {
         private const KeyCode ToggleKey = KeyCode.F3;
@@ -110,7 +111,8 @@ namespace UI.Settings
             if (closeButton != null)
                 closeButton.onClick.AddListener(Close);
 
-            windowRoot.gameObject.SetActive(false);
+            if (windowRoot != null)
+                windowRoot.gameObject.SetActive(false);
             UIManager.Instance?.RegisterWindow(this);
             ApplyVolumeToUi(soundManager.SfxVolume);
         }
@@ -281,7 +283,15 @@ namespace UI.Settings
         /// </summary>
         private void BuildUi()
         {
-            canvas = gameObject.GetComponent<Canvas>() ?? gameObject.AddComponent<Canvas>();
+            canvas = gameObject.GetComponent<Canvas>();
+            if (canvas == null)
+                canvas = gameObject.AddComponent<Canvas>();
+
+            if (canvas == null)
+            {
+                Debug.LogError("AudioSettingsUI requires a Canvas component but none could be created.", this);
+                return;
+            }
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.pixelPerfect = true;
 
