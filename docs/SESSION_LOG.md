@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a42342b1ca94d1e724d62201b203289af6c759d0 -->
+## 2025-10-10T22:39:48+01:00 — Merge pull request #1054 from aicovergod/codex/update-audiosettingsui-for-dependencies
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 21 ++ / 2 --
+- Notes:
+  Guard audio settings canvas dependencies
+---
+<!-- commit:8339be79f8714de9f899ef45b9805d4bd93f9d8b -->
+## 2025-10-10T22:39:34+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:61b77a99c29492625ee526c584049142ef94031d -->
 ## 2025-10-10T22:39:22+01:00 — Guard audio settings canvas dependencies
 
