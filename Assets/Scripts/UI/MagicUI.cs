@@ -354,9 +354,27 @@ namespace UI
         {
             if (LastSelectedSpell == null)
                 return;
+            // Try to use the active singleton instance first so the spell selection logic
+            // (level validation, loadout damage type switching, UI updates, etc.) is reused.
+            var instance = Instance ?? FindObjectOfType<MagicUI>();
+#if UNITY_2023_1_OR_NEWER
+            var discoveredInstance = instance ?? Object.FindFirstObjectByType<MagicUI>(FindObjectsInactive.Include);
+            instance ??= discoveredInstance;
+#else
+            var discoveredInstance = instance;
+#endif
+
+            if (instance != null)
+            {
+                instance.SelectSpell(LastSelectedSpell);
+                return;
+            }
+
+            // When no instance exists (for example during teardown) we still mirror the
+            // previous behaviour by restoring the cached spell reference and refreshing any
+            // lingering UI objects if they are still present in the scene hierarchy.
             ActiveSpell = LastSelectedSpell;
-            var instance = FindObjectOfType<MagicUI>();
-            instance?.UpdateSelection();
+            discoveredInstance?.UpdateSelection();
         }
     }
 }
