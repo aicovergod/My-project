@@ -145,7 +145,11 @@ namespace UI
 
             var canvas = uiRoot.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            uiRoot.AddComponent<CanvasScaler>();
+            var scaler = uiRoot.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1024f, 768f);
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+            scaler.matchWidthOrHeight = 0.5f;
             uiRoot.AddComponent<GraphicRaycaster>();
 
             var panel = new GameObject("Panel", typeof(Image), typeof(GridLayoutGroup));
