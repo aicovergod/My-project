@@ -297,7 +297,16 @@ namespace UI
             var skills = loadout != null ? loadout.GetComponent<SkillManager>() : null;
             if (skills != null && skills.GetLevel(SkillType.Magic) < spell.requiredMagicLevel)
             {
-                var anchor = loadout.transform.Find("FloatingTextAnchor") ?? loadout.transform;
+                // Determine a safe anchor for floating text feedback. Prefer the player's
+                // dedicated floating text anchor if available, otherwise fall back to the
+                // loadout transform, and ultimately use this UI transform when no loadout is present.
+                Transform anchor = transform;
+                if (loadout != null)
+                {
+                    var loadoutTransform = loadout.transform;
+                    anchor = loadoutTransform.Find("FloatingTextAnchor") ?? loadoutTransform;
+                }
+
                 FloatingText.Show($"You need a Magic level of {spell.requiredMagicLevel} to use this spell", anchor.position);
                 return;
             }
