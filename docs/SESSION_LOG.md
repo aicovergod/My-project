@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2063e45b339aaaff886b49a334f7d566e7e571e4 -->
+## 2025-10-11T12:39:08+01:00 — Merge pull request #1062 from aicovergod/codex/modify-restorelastspell-for-singleton-usage
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 29 ++ / 2 --
+- Notes:
+  Fix MagicUI spell restoration to reuse selection logic
+---
+<!-- commit:7470e2371ddb12cea2e535158326ae1536096ea3 -->
+## 2025-10-11T12:38:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a6f1919a4c56b92279b213c9627b5118f1b88e8a -->
 ## 2025-10-11T12:38:40+01:00 — Fix magic spell restoration to respect requirements
 
