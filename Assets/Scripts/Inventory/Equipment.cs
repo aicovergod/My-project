@@ -260,7 +260,9 @@ namespace Inventory
             var uiManager = UIManager.Instance;
             if (uiRoot != null && uiManager != null)
             {
-                uiManager.OpenWindow(this);
+                if (!uiManager.TryOpenWindow(this))
+                    return;
+
                 var minimap = World.Minimap.Instance;
                 minimap?.CloseExpanded();
                 uiRoot.SetActive(true);
