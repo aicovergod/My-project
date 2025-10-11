@@ -19,6 +19,18 @@ namespace World
         private static readonly System.Collections.Generic.List<IScenePersistent> _persistentObjects = new();
         public static string NextSpawnPoint { get; private set; }
 
+        /// <summary>
+        /// Tracks whether a required item was consumed during the current transition.
+        /// When a transition fails we use this flag to restore the item.
+        /// </summary>
+        private bool _consumedRequiredItemThisTransition;
+
+        /// <summary>
+        /// Caches the identifier of the consumed item so it can be re-granted if the
+        /// transition fails after removal.
+        /// </summary>
+        private string _consumedRequiredItemId;
+
         public static void RegisterPersistentObject(IScenePersistent obj)
         {
             if (obj != null && !_persistentObjects.Contains(obj))
@@ -61,15 +73,39 @@ namespace World
             if (ScreenFader.Instance != null)
                 yield return ScreenFader.Instance.FadeOut();
 
-            NextSpawnPoint = spawnPointName;
+            // Reset tracking before attempting to consume any required key items.
+            _consumedRequiredItemThisTransition = false;
+            _consumedRequiredItemId = null;
 
             var player = GameObject.FindGameObjectWithTag("Player");
-            if (player != null && removeItemOnUse && !string.IsNullOrEmpty(requiredItemId))
+            bool removalRequired = removeItemOnUse && !string.IsNullOrEmpty(requiredItemId);
+            if (removalRequired)
             {
+                if (player == null)
+                {
+                    yield return AbortTransitionDueToItemRemovalFailure("[SceneTransitionManager] Cannot transition because the player was not found to remove the required key item.");
+                    yield break;
+                }
+
                 var inv = player.GetComponent<Inventory.Inventory>();
-                if (inv != null)
-                    inv.RemoveItem(requiredItemId);
+                if (inv == null)
+                {
+                    yield return AbortTransitionDueToItemRemovalFailure("[SceneTransitionManager] Cannot transition because the player's inventory component is missing for required item removal.");
+                    yield break;
+                }
+
+                bool removed = inv.RemoveItem(requiredItemId);
+                if (!removed)
+                {
+                    yield return AbortTransitionDueToItemRemovalFailure($"[SceneTransitionManager] Transition aborted. Player is missing required item '{requiredItemId}'.");
+                    yield break;
+                }
+
+                _consumedRequiredItemThisTransition = true;
+                _consumedRequiredItemId = requiredItemId;
             }
+
+            NextSpawnPoint = spawnPointName;
 
             foreach (var obj in _persistentObjects)
                 obj.OnBeforeSceneUnload();
@@ -146,6 +182,25 @@ namespace World
         {
             IsTransitioning = false;
             TransitionCompleted?.Invoke();
+
+            // Ensure we do not carry over key-consumption state between transitions.
+            _consumedRequiredItemThisTransition = false;
+            _consumedRequiredItemId = null;
+        }
+
+        private IEnumerator AbortTransitionDueToItemRemovalFailure(string message)
+        {
+            Debug.LogWarning(message);
+
+            NextSpawnPoint = null;
+            _consumedRequiredItemThisTransition = false;
+            _consumedRequiredItemId = null;
+
+            if (ScreenFader.Instance != null)
+                yield return ScreenFader.Instance.FadeIn();
+
+            IsTransitioning = false;
+            TransitionCompleted?.Invoke();
         }
 
         /// <summary>
@@ -156,6 +211,38 @@ namespace World
             Debug.LogError($"[SceneTransitionManager] Failed to load scene '{sceneToLoad}'. {reason}");
 
             SceneManager.sceneLoaded -= OnSceneLoaded;
+
+            if (_consumedRequiredItemThisTransition && !string.IsNullOrEmpty(_consumedRequiredItemId))
+            {
+                var player = GameObject.FindGameObjectWithTag("Player");
+                if (player != null)
+                {
+                    var inventory = player.GetComponent<Inventory.Inventory>();
+                    if (inventory != null)
+                    {
+                        var itemData = Inventory.ItemDatabase.GetItem(_consumedRequiredItemId);
+                        if (itemData != null)
+                        {
+                            inventory.AddItem(itemData, 1);
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"[SceneTransitionManager] Failed to restore required item '{_consumedRequiredItemId}' after transition error because it was not found in the item database.");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[SceneTransitionManager] Failed to restore required item after transition error because the player's inventory component is missing.");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("[SceneTransitionManager] Failed to restore required item after transition error because the player GameObject was not found.");
+                }
+
+                _consumedRequiredItemThisTransition = false;
+                _consumedRequiredItemId = null;
+            }
 
             foreach (var obj in _persistentObjects)
                 obj.OnAfterSceneLoad(fallbackScene);
