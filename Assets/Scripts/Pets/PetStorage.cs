@@ -3,6 +3,7 @@ using Inventory;
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using Skills.Cooking;
 using Skills.Fishing;
 using Skills.Woodcutting;
 using Skills.Mining;
@@ -153,6 +154,8 @@ namespace Pets
         private static HashSet<string> fishItemIds;
         private static HashSet<string> logItemIds;
         private static HashSet<string> oreItemIds;
+        private static HashSet<string> rawFoodItemIds;
+        private static HashSet<string> cookedFoodItemIds;
 
         private static void EnsureFishItemIds()
         {
@@ -211,6 +214,59 @@ namespace Pets
             }
         }
 
+        /// <summary>
+        /// Populates cached lookups for raw and cooked food identifiers so cooking
+        /// pets can validate storage requests without repeatedly touching
+        /// Resources.
+        /// </summary>
+        private static void EnsureCookingItemIds()
+        {
+            if (rawFoodItemIds != null && cookedFoodItemIds != null)
+                return;
+
+            rawFoodItemIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            cookedFoodItemIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            var recipes = Resources.LoadAll<CookableRecipe>("CookingDatabase");
+            foreach (var recipe in recipes)
+            {
+                if (recipe == null)
+                    continue;
+
+                if (!string.IsNullOrEmpty(recipe.rawItemId))
+                    rawFoodItemIds.Add(recipe.rawItemId);
+                if (!string.IsNullOrEmpty(recipe.cookedItemId))
+                    cookedFoodItemIds.Add(recipe.cookedItemId);
+            }
+
+            // Designers occasionally introduce cooked quest foods that are not
+            // produced through standard recipes. Sweep the shared item catalog so
+            // future additions continue to respect the storage filter.
+            var allItems = Resources.LoadAll<ItemData>("Item");
+            foreach (var candidate in allItems)
+            {
+                if (candidate == null || string.IsNullOrEmpty(candidate.id))
+                    continue;
+
+                bool looksCooked = candidate.itemName.IndexOf("Cooked", StringComparison.OrdinalIgnoreCase) >= 0;
+                if (!looksCooked && !string.IsNullOrEmpty(candidate.description))
+                    looksCooked = candidate.description.IndexOf("Cooked", StringComparison.OrdinalIgnoreCase) >= 0;
+
+                if (looksCooked)
+                {
+                    cookedFoodItemIds.Add(candidate.id);
+                    continue;
+                }
+
+                bool looksRaw = candidate.itemName.IndexOf("Raw", StringComparison.OrdinalIgnoreCase) >= 0;
+                if (!looksRaw && !string.IsNullOrEmpty(candidate.description))
+                    looksRaw = candidate.description.IndexOf("Raw", StringComparison.OrdinalIgnoreCase) >= 0;
+
+                if (looksRaw)
+                    rawFoodItemIds.Add(candidate.id);
+            }
+        }
+
         public bool CanStore(ItemData item)
         {
             if (definition == null || item == null)
@@ -226,6 +282,9 @@ namespace Pets
                 case "Heron":
                     EnsureFishItemIds();
                     return fishItemIds.Contains(item.id);
+                case "Mr Frying Pan":
+                    EnsureCookingItemIds();
+                    return rawFoodItemIds.Contains(item.id) || cookedFoodItemIds.Contains(item.id);
                 default:
                     return false;
             }

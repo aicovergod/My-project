@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:22933d38ebdde199a22e0ff124e5355e3eb68cc8 -->
+## 2025-10-11T15:46:00+01:00 — Add cooking item filters to pet storage
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetStorage.cs
+- Diff: 59 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6171b115196a9ea55a9bfa85fd4ae741b45c18e5 -->
 ## 2025-10-11T15:25:27+01:00 — Merge pull request #1068 from aicovergod/codex/freeze-player-movement-in-shop
 
