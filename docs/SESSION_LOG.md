@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:006408fa627519ca8e22283b411f966df30e8438 -->
+## 2025-10-11T15:25:08+01:00 — Freeze player during shop interactions and adjust inventory window
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Shop/ShopUI.cs
+- Diff: 15 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:2aa3bbf8600150ec802e04dbaa0c171bef09b876 -->
 ## 2025-10-11T15:11:18+01:00 — Merge pull request #1067 from aicovergod/codex/enhance-shop-inventory-management
 

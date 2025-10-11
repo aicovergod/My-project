@@ -96,7 +96,7 @@ namespace Inventory
         public bool centerOnScreen;
 
         [Tooltip("Anchored position of the inventory window.")]
-        public Vector2 windowPosition = new Vector2(480f, -170f);
+        public Vector2 windowPosition = new Vector2(870f, -300f);
 
         [Header("Tooltip")]
         [Tooltip("Optional: custom font for the tooltip item name. Uses LegacyRuntime if null.")]
