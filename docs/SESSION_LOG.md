@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:002477d24c146dea90a4325fb428978ba55ad54e -->
+## 2025-10-11T14:38:43+01:00 — Restrict ShopUI inventory lookup to player
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Shop/ShopUI.cs
+- Diff: 81 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:af7be40f4c335fedb361ff1dee57158071fa9b75 -->
 ## 2025-10-11T14:27:08+01:00 — Ensure ShopUI resolves player inventory
 
