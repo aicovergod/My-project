@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ed3f3b2fc3b2d0422576784ccc2cf26b74fc5ec1 -->
+## 2025-10-11T09:35:57+01:00 — Merge pull request #1056 from aicovergod/codex/update-transition-method-for-item-removal
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 100 ++ / 4 --
+- Notes:
+  Handle inventory key removal failures during scene transitions
+---
+<!-- commit:26b5d1dd92482bd90ccda6956ed23eeeff8f8996 -->
+## 2025-10-11T09:35:49+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2b1c4852c49ef449e222ddb979e195c0fc8023ec -->
 ## 2025-10-11T09:35:38+01:00 — Handle required item removal failures in scene transitions
 
