@@ -118,7 +118,19 @@ namespace Inventory
         private Image[] slotBackgroundImages;
         private Image[] slotItemImages;
         private Text[] slotCountTexts;
-        private InventoryEntry[] equipped;
+
+        /// <summary>
+        /// Number of usable equipment slots (excludes <see cref="EquipmentSlot.None"/>).
+        /// Declared as a static readonly constant so the equipped buffer can be initialised safely during field construction.
+        /// </summary>
+        private static readonly int EquipmentSlotCount = Enum.GetValues(typeof(EquipmentSlot)).Length - 1;
+
+        /// <summary>
+        /// Runtime buffer storing the player's equipped items. Initialising this eagerly guarantees that any
+        /// component querying equipment data during its own <see cref="Awake"/> cycle receives a valid array,
+        /// preventing null reference exceptions when execution order differs between components.
+        /// </summary>
+        private InventoryEntry[] equipped = new InventoryEntry[EquipmentSlotCount];
         private Inventory inventory;
         [SerializeField] private SkillManager skillManager;
         [SerializeField] private Transform floatingTextAnchor;
@@ -143,6 +155,12 @@ namespace Inventory
         private GameObject petBonusPanel;
 
         private static Equipment instance;
+
+        /// <summary>
+        /// Tracks whether this equipment window has been successfully registered with the global <see cref="UIManager"/>.
+        /// Registration must be deferred until the singleton finishes bootstrapping to avoid null reference errors.
+        /// </summary>
+        private bool registeredWithUiManager;
 
         private bool lastMergeState;
 
@@ -189,7 +207,6 @@ namespace Inventory
             combatLoadout = GetComponent<PlayerCombatLoadout>();
             if (floatingTextAnchor == null)
                 floatingTextAnchor = transform.Find("FloatingTextAnchor");
-            equipped = new InventoryEntry[Enum.GetValues(typeof(EquipmentSlot)).Length - 1];
             CreateUI();
             Load();
             lastMergeState = PetMergeController.Instance != null && PetMergeController.Instance.IsMerged;
@@ -197,17 +214,31 @@ namespace Inventory
             if (uiRoot != null)
                 uiRoot.SetActive(false);
 
-            UIManager.Instance.RegisterWindow(this);
+            TryRegisterWithUiManager();
         }
 
         private void OnDestroy()
         {
+            if (registeredWithUiManager)
+            {
+                var uiManager = UIManager.Instance;
+                if (uiManager != null)
+                    uiManager.UnregisterWindow(this);
+                registeredWithUiManager = false;
+            }
+
             if (instance == this)
                 instance = null;
         }
 
         private void Update()
         {
+            if (registeredWithUiManager && UIManager.Instance == null)
+                registeredWithUiManager = false;
+
+            if (!registeredWithUiManager)
+                TryRegisterWithUiManager();
+
             bool merged = PetMergeController.Instance != null && PetMergeController.Instance.IsMerged;
             if (merged != lastMergeState)
             {
@@ -226,9 +257,10 @@ namespace Inventory
             if (quest != null && quest.IsOpen)
                 return;
 
-            if (uiRoot != null)
+            var uiManager = UIManager.Instance;
+            if (uiRoot != null && uiManager != null)
             {
-                UIManager.Instance.OpenWindow(this);
+                uiManager.OpenWindow(this);
                 var minimap = World.Minimap.Instance;
                 minimap?.CloseExpanded();
                 uiRoot.SetActive(true);
@@ -245,6 +277,24 @@ namespace Inventory
         }
 
         public void CloseUI() => Close();
+
+        /// <summary>
+        /// Attempts to register the equipment window with the persistent <see cref="UIManager"/> singleton.
+        /// During domain reloads or custom bootstrap flows the manager may not be instantiated when this
+        /// component wakes, so the method exits gracefully and is retried during subsequent <see cref="Update"/> calls.
+        /// </summary>
+        private void TryRegisterWithUiManager()
+        {
+            if (registeredWithUiManager)
+                return;
+
+            var uiManager = UIManager.Instance;
+            if (uiManager == null)
+                return;
+
+            uiManager.RegisterWindow(this);
+            registeredWithUiManager = true;
+        }
 
         public InventoryEntry GetEquipped(EquipmentSlot slot)
         {

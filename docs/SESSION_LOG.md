@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:53683f981470de086dd0f5627f5f7bbe8be92b3f -->
+## 2025-10-11T16:11:46+01:00 — Ensure equipment initializes safely
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Equipment.cs
+- Diff: 55 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:198c50c8ef5a8621cceaf7af1d7043adb56de4c5 -->
 ## 2025-10-11T15:55:20+01:00 — Merge pull request #1071 from aicovergod/codex/update-inventory.drop-for-mr-frying-pan
 
