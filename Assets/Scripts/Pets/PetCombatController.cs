@@ -423,9 +423,28 @@ namespace Pets
                 if (owner != null && owner.TryGetComponent<PlayerCombatTarget>(out var ownerTarget))
                     source = ownerTarget;
                 int finalDamage = target.ApplyDamage(dmg, attacker.DamageType, SpellElement.None, source);
-                var sprite = finalDamage == maxHit ? maxHitHitsplat : damageHitsplat;
+
+                // Determine which hitsplat to display and ensure zero-damage hits surface the dedicated blue variant.
+                Sprite hitsplatSprite;
+                string hitsplatText;
+                if (finalDamage <= 0)
+                {
+                    hitsplatSprite = zeroHitsplat;
+                    hitsplatText = "0";
+                }
+                else if (finalDamage == maxHit)
+                {
+                    hitsplatSprite = maxHitHitsplat;
+                    hitsplatText = finalDamage.ToString();
+                }
+                else
+                {
+                    hitsplatSprite = damageHitsplat;
+                    hitsplatText = finalDamage.ToString();
+                }
+
                 Vector3 hitsplatPosition = FloatingTextAnchorUtility.ResolveAnchorPosition(target.transform, hitsplatFallbackOffset, hitsplatAnchorCache);
-                FloatingText.Show(finalDamage.ToString(), hitsplatPosition, Color.white, null, sprite);
+                FloatingText.Show(hitsplatText, hitsplatPosition, Color.white, null, hitsplatSprite);
                 if (npc != null)
                 {
                     var npcAttack = npc.GetComponent<NpcAttackController>();
