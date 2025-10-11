@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.UI;
 using Core.Input;
 using Skills;
 
@@ -288,11 +289,47 @@ namespace World
 
             if (context.control.device is Pointer pointer && !(pointer is Touchscreen))
             {
+                bool hasPointerId = TryResolveEventSystemPointerId(pointer, out int pointerId);
                 QueuePendingInteractRequest(
                     pointer.position.ReadValue(),
-                    pointer.deviceId,
+                    pointerId,
                     cameFromPointerDevice: true,
-                    hasPointerId: true);
+                    hasPointerId: hasPointerId);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        ///     Attempts to translate an input pointer device into the pointer identifier expected by the active
+        ///     event system module.
+        /// </summary>
+        private static bool TryResolveEventSystemPointerId(Pointer pointer, out int pointerId)
+        {
+            pointerId = default;
+            if (pointer == null)
+                return false;
+
+            EventSystem eventSystem = EventSystem.current;
+            if (eventSystem != null && eventSystem.currentInputModule is InputSystemUIInputModule)
+            {
+                if (pointer is Mouse)
+                {
+                    pointerId = PointerId.mousePointerId;
+                    return true;
+                }
+
+                if (pointer is Pen)
+                {
+                    pointerId = PointerId.penPointerId;
+                    return true;
+                }
+            }
+
+            if (pointer is Mouse || pointer is Pen)
+            {
+                pointerId = PointerInputModule.kMouseLeftId;
                 return true;
             }
 
