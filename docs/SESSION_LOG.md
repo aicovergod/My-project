@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:681c72dadb52734e74bba509c6b720df342fc178 -->
+## 2025-10-11T14:34:36+01:00 — Merge pull request #1065 from aicovergod/codex/fix-mouse-clicks-ignoring-ui-in-scene-transitions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 48 ++ / 2 --
+- Notes:
+  Fix pointer id resolution for UI blocking
+---
+<!-- commit:568fdce0791fc63905d0d30a4861d4c9086e334c -->
+## 2025-10-11T14:33:40+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:da7db8b79f9a00ecb62664efc72b26a4673f85fe -->
 ## 2025-10-11T14:33:27+01:00 — Fix pointer id resolution for UI blocking
 
