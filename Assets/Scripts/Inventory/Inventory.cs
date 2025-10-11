@@ -922,6 +922,10 @@ namespace Inventory
             if (item == null || count <= 0)
                 return false;
 
+            // Ensure the inventory holds enough of the requested item before mutating any slots.
+            if (GetItemCount(item) < count)
+                return false;
+
             for (int i = 0; i < items.Length && count > 0; i++)
             {
                 if (items[i].item == item)
