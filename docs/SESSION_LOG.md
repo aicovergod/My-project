@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ae01e2a039f520e70f1565cdbaacf297248347ef -->
+## 2025-10-11T09:39:10+01:00 — Merge pull request #1057 from aicovergod/codex/add-null-entry-purge-for-persistentobjects
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 32 ++ / 0 --
+- Notes:
+  Clean persistent scene objects before invoking transition callbacks
+---
+<!-- commit:bad01aa48d243dfbdc4afcd3b640441f6692484a -->
+## 2025-10-11T09:39:02+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:230076ef84bbd9715a281dac0946bc8c38763548 -->
 ## 2025-10-11T09:38:50+01:00 — Clean persistent object list before scene callbacks
 
