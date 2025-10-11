@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:21a6c1cde95553a756771e6971a42f690c7f9a53 -->
+## 2025-10-11T11:05:12+01:00 — Merge pull request #1061 from aicovergod/codex/update-canvasscaler-settings-in-magicui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 1 --
+- Notes:
+  Configure MagicUI canvas scaling
+---
+<!-- commit:bc0f7a1768d14f84ba0c85236d911a161a22b697 -->
+## 2025-10-11T11:04:55+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:77b46b15b1dc0a41277fa478cb91536ec891bf31 -->
 ## 2025-10-11T11:04:41+01:00 — Adjust MagicUI canvas scaler
 
