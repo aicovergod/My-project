@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f39a1966675ef4a2bd8e1ab9a0923980127b9849 -->
+## 2025-10-11T14:22:48+01:00 — Merge pull request #1063 from aicovergod/codex/add-pending-interact-request-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 120 ++ / 10 --
+- Notes:
+  Defer pointer-driven scene transition checks to Update
+---
+<!-- commit:0f095463e655ade9122ab44e5ef57ee8c2d6f822 -->
+## 2025-10-11T14:22:42+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a0bcfec89e46486e9f0e2ba95f188e45555937e2 -->
 ## 2025-10-11T14:22:26+01:00 — Defer pointer scene interaction processing
 
