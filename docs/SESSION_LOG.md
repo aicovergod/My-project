@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5bd6e8b0d5ff1bb1f278559503b051ccee81f3a5 -->
+## 2025-10-11T10:16:23+01:00 — Preserve pet inventory visibility when respawning
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetDropSystem.cs
+- Diff: 22 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:ae01e2a039f520e70f1565cdbaacf297248347ef -->
 ## 2025-10-11T09:39:10+01:00 — Merge pull request #1057 from aicovergod/codex/add-null-entry-purge-for-persistentobjects
 
