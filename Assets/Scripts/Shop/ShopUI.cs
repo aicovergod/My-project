@@ -45,9 +45,16 @@ namespace ShopSystem
         private PlayerMover playerMover;
         private NpcWanderer npcMover;
         private bool hasLoggedMissingInventory;
+        // Tracks the inventory visibility so we can restore the state when leaving the shop.
+        private bool inventoryWasOpenBeforeShop;
+        private bool inventoryStateCaptured;
 
         private static ShopUI instance;
         public static ShopUI Instance => instance;
+
+        // Global modal flag used by UIManager to block other windows while trading.
+        private static bool shopModalActive;
+        public static bool IsShopModalActive => shopModalActive;
 
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
 
@@ -106,6 +113,23 @@ namespace ShopSystem
         public void Open(Shop shop, NpcWanderer npcMovement = null)
         {
             if (shop == null) return;
+
+            // Capture the current inventory visibility before we manipulate any UI so we can
+            // restore the state when the shop closes.
+            inventoryStateCaptured = false;
+            if (playerInventory == null)
+                ResolvePlayerInventory(false);
+            if (playerInventory != null)
+            {
+                inventoryWasOpenBeforeShop = playerInventory.IsOpen;
+                inventoryStateCaptured = true;
+            }
+            else
+            {
+                inventoryWasOpenBeforeShop = false;
+            }
+
+            shopModalActive = true;
             UIManager.Instance.OpenWindow(this);
             currentShop = shop;
             Refresh();
@@ -117,8 +141,15 @@ namespace ShopSystem
 
             if (playerInventory != null)
             {
+                if (!inventoryStateCaptured)
+                {
+                    inventoryWasOpenBeforeShop = playerInventory.IsOpen;
+                    inventoryStateCaptured = true;
+                }
                 playerInventory.SetShopContext(shop);
                 playerInventory.OnInventoryChanged += HandleInventoryChanged;
+                if (!playerInventory.IsOpen)
+                    playerInventory.OpenUI();
             }
             if (playerMover == null)
                 playerMover = FindObjectOfType<PlayerMover>();
@@ -145,7 +176,13 @@ namespace ShopSystem
             {
                 playerInventory.OnInventoryChanged -= HandleInventoryChanged;
                 playerInventory.SetShopContext(null);
-                playerInventory.CloseUI();
+                if (inventoryStateCaptured)
+                {
+                    if (!inventoryWasOpenBeforeShop && playerInventory.IsOpen)
+                        playerInventory.CloseUI();
+                    else if (inventoryWasOpenBeforeShop && !playerInventory.IsOpen)
+                        playerInventory.OpenUI();
+                }
             }
             if (playerMover != null)
             {
@@ -157,6 +194,9 @@ namespace ShopSystem
                 npcMover.enabled = true;
                 npcMover = null;
             }
+            inventoryStateCaptured = false;
+            inventoryWasOpenBeforeShop = false;
+            shopModalActive = false;
         }
 
         /// <summary>
