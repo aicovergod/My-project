@@ -175,21 +175,97 @@ namespace ShopSystem
         private void ResolvePlayerInventory(bool logWarningOnFailure)
         {
             if (playerInventory != null)
-                return;
+            {
+                if (BelongsToPlayer(playerInventory))
+                {
+                    hasLoggedMissingInventory = false;
+                    return;
+                }
 
-            playerInventory = FindObjectOfType<Inventory.Inventory>(true);
+                playerInventory = null;
+            }
+
+            Inventory.Inventory resolved = null;
+
+            if (playerMover != null)
+                resolved = GetInventoryFromPlayerObject(playerMover.gameObject);
+
+            if (resolved == null)
+            {
+                playerMover = playerMover != null ? playerMover : FindObjectOfType<PlayerMover>(true);
+                if (playerMover != null)
+                    resolved = GetInventoryFromPlayerObject(playerMover.gameObject);
+            }
+
+            if (resolved == null)
+            {
+                GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+                if (playerObject != null)
+                    resolved = GetInventoryFromPlayerObject(playerObject);
+            }
+
+            if (resolved == null)
+            {
+                var inventories = FindObjectsOfType<Inventory.Inventory>(true);
+                foreach (var candidate in inventories)
+                {
+                    if (BelongsToPlayer(candidate))
+                    {
+                        resolved = candidate;
+                        break;
+                    }
+                }
+            }
+
+            playerInventory = resolved;
 
             if (playerInventory != null)
             {
                 hasLoggedMissingInventory = false;
-                return;
             }
-
-            if (logWarningOnFailure && !hasLoggedMissingInventory)
+            else if (logWarningOnFailure && !hasLoggedMissingInventory)
             {
                 Debug.LogWarning("[ShopUI] Unable to locate the player's Inventory component. Shop purchases will be unavailable until it spawns.", this);
                 hasLoggedMissingInventory = true;
             }
+        }
+
+        private static Inventory.Inventory GetInventoryFromPlayerObject(GameObject playerObject)
+        {
+            if (playerObject == null)
+                return null;
+
+            var inventoryComponent = playerObject.GetComponent<Inventory.Inventory>();
+            if (inventoryComponent != null)
+                return inventoryComponent;
+
+            return playerObject.GetComponentInChildren<Inventory.Inventory>(true);
+        }
+
+        private bool BelongsToPlayer(Inventory.Inventory inventoryComponent)
+        {
+            if (inventoryComponent == null)
+                return false;
+
+            if (inventoryComponent.GetComponent<PlayerMover>() != null)
+                return true;
+
+            if (inventoryComponent.GetComponentInParent<PlayerMover>(true) != null)
+                return true;
+
+            GameObject owner = inventoryComponent.gameObject;
+            if (owner.CompareTag("Player"))
+                return true;
+
+            Transform current = owner.transform.parent;
+            while (current != null)
+            {
+                if (current.CompareTag("Player"))
+                    return true;
+                current = current.parent;
+            }
+
+            return false;
         }
 
         private void HandleInventoryChanged()
