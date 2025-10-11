@@ -276,7 +276,13 @@ namespace UI
                 pageText.ForceMeshUpdate();
             }
             UpdatePage();
-            UIManager.Instance.OpenWindow(this);
+            var uiManager = UIManager.Instance;
+            if (uiManager == null)
+                return;
+
+            if (!uiManager.TryOpenWindow(this))
+                return;
+
             gameObject.SetActive(true);
         }
 

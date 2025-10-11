@@ -261,7 +261,13 @@ namespace Skills
 
         public void Open()
         {
-            UIManager.Instance.OpenWindow(this);
+            var uiManager = UIManager.Instance;
+            if (uiManager == null)
+                return;
+
+            if (!uiManager.TryOpenWindow(this))
+                return;
+
             if (uiRoot != null)
             {
                 var inv = UnityEngine.Object.FindObjectOfType<Inventory.Inventory>();

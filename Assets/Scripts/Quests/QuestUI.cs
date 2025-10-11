@@ -101,7 +101,13 @@ namespace Quests
         public void Open()
         {
             bool wasOpen = IsOpen;
-            UIManager.Instance.OpenWindow(this);
+            var uiManager = UIManager.Instance;
+            if (uiManager == null)
+                return;
+
+            if (!uiManager.TryOpenWindow(this))
+                return;
+
             var inv = FindObjectOfType<Inventory.Inventory>();
             if (inv != null && inv.IsOpen)
                 inv.CloseUI();

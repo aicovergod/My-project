@@ -55,10 +55,15 @@ namespace UI
             windows.Remove(window);
         }
 
-        public void OpenWindow(IUIWindow window)
+        /// <summary>
+        /// Attempts to bring the requested window to the foreground while respecting modal locks.
+        /// Returns <c>false</c> if a modal interface is active and the request does not target the
+        /// modal window or the inventory, allowing callers to gracefully bail out of their open flow.
+        /// </summary>
+        public bool TryOpenWindow(IUIWindow window)
         {
             if (window == null)
-                return;
+                return false;
 
             bool shopActive = ShopUI.IsShopModalActive;
             bool bankActive = BankUI.IsBankModalActive;
@@ -68,7 +73,7 @@ namespace UI
 
             // When a modal interface (shop or bank) is active, only that window and the inventory may request focus.
             if ((shopActive && !isShopWindow && !isInventoryWindow) || (bankActive && !isBankWindow && !isInventoryWindow))
-                return;
+                return false;
 
             for (int i = windows.Count - 1; i >= 0; i--)
             {
@@ -90,6 +95,8 @@ namespace UI
 
                 w.Close();
             }
+
+            return true;
         }
 
         private static UIManager CreateSingleton()

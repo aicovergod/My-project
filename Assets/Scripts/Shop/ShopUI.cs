@@ -133,7 +133,25 @@ namespace ShopSystem
             }
 
             shopModalActive = true;
-            UIManager.Instance.OpenWindow(this);
+            var uiManager = UIManager.Instance;
+            if (uiManager == null)
+            {
+                shopModalActive = false;
+                inventoryStateCaptured = false;
+                inventoryWasOpenBeforeShop = false;
+                playerMovementStateCaptured = false;
+                return;
+            }
+
+            if (!uiManager.TryOpenWindow(this))
+            {
+                shopModalActive = false;
+                inventoryStateCaptured = false;
+                inventoryWasOpenBeforeShop = false;
+                playerMovementStateCaptured = false;
+                return;
+            }
+
             currentShop = shop;
             Refresh();
             uiRoot.SetActive(true);

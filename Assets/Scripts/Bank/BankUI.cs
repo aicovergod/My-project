@@ -574,7 +574,23 @@ namespace BankSystem
             // Mark the bank as modal before asking the UIManager to focus us so other
             // interfaces are prevented from opening while banking.
             bankModalActive = true;
-            UIManager.Instance.OpenWindow(this);
+            var uiManager = UIManager.Instance;
+            if (uiManager == null)
+            {
+                bankModalActive = false;
+                inventoryWasOpen = false;
+                playerMovementStateCaptured = false;
+                return;
+            }
+
+            if (!uiManager.TryOpenWindow(this))
+            {
+                bankModalActive = false;
+                inventoryWasOpen = false;
+                playerMovementStateCaptured = false;
+                return;
+            }
+
             if (playerInventory == null)
                 playerInventory = FindObjectOfType<Inventory.Inventory>();
             if (playerInventory != null)
