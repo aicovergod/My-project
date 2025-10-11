@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2aa3bbf8600150ec802e04dbaa0c171bef09b876 -->
+## 2025-10-11T15:11:18+01:00 — Merge pull request #1067 from aicovergod/codex/enhance-shop-inventory-management
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 72 ++ / 4 --
+- Notes:
+  Prevent other UI windows from interrupting shop trades
+---
+<!-- commit:995c5d00b9eb631dc68ce16014a3bb9ac8b0420a -->
+## 2025-10-11T15:11:05+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c05912ca49510f35688a5f3b466c6bbdf0886021 -->
 ## 2025-10-11T15:10:52+01:00 — Enforce shop modal behaviour across UI windows
 
