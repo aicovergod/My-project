@@ -164,10 +164,7 @@ namespace Inventory
                 {
                     if (int.TryParse(amountText, out int n))
                     {
-                        for (int i = 0; i < n; i++)
-                        {
-                            inventory?.AddItem(amountItem);
-                        }
+                        inventory?.AddItem(amountItem, n);
                     }
                     amountItem = null;
                 }
