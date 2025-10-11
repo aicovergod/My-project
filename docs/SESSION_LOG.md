@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:606a5f5d7e23dd5dccaf8872742b620e214c9e83 -->
+## 2025-10-11T10:16:46+01:00 — Merge pull request #1058 from aicovergod/codex/update-petdropsystem-to-preserve-ui-state
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 31 ++ / 4 --
+- Notes:
+  Preserve pet storage UI state when respawning pets
+---
+<!-- commit:b5f4ceab9bd8ed9400233d26bd0d2eefdf0e2159 -->
+## 2025-10-11T10:16:36+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:5bd6e8b0d5ff1bb1f278559503b051ccee81f3a5 -->
 ## 2025-10-11T10:16:23+01:00 — Preserve pet inventory visibility when respawning
 
