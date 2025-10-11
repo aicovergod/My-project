@@ -358,7 +358,7 @@ namespace UI
             // (level validation, loadout damage type switching, UI updates, etc.) is reused.
             var instance = Instance ?? FindObjectOfType<MagicUI>();
 #if UNITY_2023_1_OR_NEWER
-            var discoveredInstance = instance ?? Object.FindFirstObjectByType<MagicUI>(FindObjectsInactive.Include);
+            var discoveredInstance = instance ?? UnityEngine.Object.FindFirstObjectByType<MagicUI>(FindObjectsInactive.Include);
             instance ??= discoveredInstance;
 #else
             var discoveredInstance = instance;

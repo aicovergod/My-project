@@ -119,17 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!114 &21417242 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7000745351061079601, guid: ac4dc3793be1bee4caf981f7340bf02d, type: 3}
-  m_PrefabInstance: {fileID: 615615815}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
 --- !u!1 &183339046
 GameObject:
   m_ObjectHideFlags: 0
@@ -227,12 +216,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 183339046}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.4, y: 0.3, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.01999998, y: 0.90000004, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 338972039}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &195906012
 GameObject:
@@ -1046,7 +1035,7 @@ MonoBehaviour:
   requiredSkillLevel: 1
   spawnPointName: VioletsTownMinerBuildingExitSpawn
   useRadius: 2
-  playerInput: {fileID: 21417242}
+  playerInput: {fileID: 0}
   interactActionReference: {fileID: 0}
 --- !u!61 &338972037
 BoxCollider2D:
@@ -1164,7 +1153,8 @@ Transform:
   m_LocalPosition: {x: -7.42, y: -0.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 183339049}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &518063638
@@ -1511,8 +1501,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -160616933
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: d0072b74cc968b441866bee3dbb0b666, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1638,9 +1628,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1953886094}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1327c6bd3da4bcaad4c2ace865e9e6d, type: 3}
+  m_Script: {fileID: 11500000, guid: adf97df505f4465792ad1b25e702c5df, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcShopOpener
+  shop: {fileID: 1953886103}
+  openDirectly: 1
+  playerInput: {fileID: 0}
+  openMenuActionReference: {fileID: 0}
 --- !u!1 &2045285959
 GameObject:
   m_ObjectHideFlags: 0
@@ -2396,7 +2390,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1485568909}
-  - {fileID: 183339049}
   - {fileID: 338972039}
   - {fileID: 1953886099}
   - {fileID: 518063638}
