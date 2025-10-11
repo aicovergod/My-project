@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a6f1919a4c56b92279b213c9627b5118f1b88e8a -->
+## 2025-10-11T12:38:40+01:00 — Fix magic spell restoration to respect requirements
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/MagicUI.cs
+- Diff: 20 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:21a6c1cde95553a756771e6971a42f690c7f9a53 -->
 ## 2025-10-11T11:05:12+01:00 — Merge pull request #1061 from aicovergod/codex/update-canvasscaler-settings-in-magicui
 
