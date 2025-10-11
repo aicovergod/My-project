@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:198c50c8ef5a8621cceaf7af1d7043adb56de4c5 -->
+## 2025-10-11T15:55:20+01:00 — Merge pull request #1071 from aicovergod/codex/update-inventory.drop-for-mr-frying-pan
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 13 ++ / 2 --
+- Notes:
+  Include Mr Frying Pan in pet storage drag filter
+---
+<!-- commit:ed6bed32c3c0ad2932b13dc9384aaec36a144713 -->
+## 2025-10-11T15:55:13+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b9d0fa2c75ac1769f17d0754b87506e658722a03 -->
 ## 2025-10-11T15:55:02+01:00 — Include cooking pet in manual drop filter
 
