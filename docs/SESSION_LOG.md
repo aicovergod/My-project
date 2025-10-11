@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:da7db8b79f9a00ecb62664efc72b26a4673f85fe -->
+## 2025-10-11T14:33:27+01:00 — Fix pointer id resolution for UI blocking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 39 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:a0bcfec89e46486e9f0e2ba95f188e45555937e2 -->
 ## 2025-10-11T14:22:26+01:00 — Defer pointer scene interaction processing
 
