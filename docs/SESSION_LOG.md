@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:cd720bbc876ed3a76c0135cf27e727555c5392a1 -->
+## 2025-10-11T09:31:06+01:00 — Merge pull request #1055 from aicovergod/codex/refactor-selectspell-to-handle-null-loadout
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 1 --
+- Notes:
+  Prevent MagicUI warning anchor null reference
+---
+<!-- commit:90d272c0b64a38aa3388e445d6a11125a849a5f7 -->
+## 2025-10-11T09:30:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:94ff3c85f01607987b870e7247753a5ef89072b2 -->
 ## 2025-10-11T09:30:44+01:00 — Handle missing loadout when showing magic requirement warning
 
