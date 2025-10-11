@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c05912ca49510f35688a5f3b466c6bbdf0886021 -->
+## 2025-10-11T15:10:52+01:00 — Enforce shop modal behaviour across UI windows
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Shop/ShopUI.cs, Assets/Scripts/UI/UIManager.cs
+- Diff: 63 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:e8706726b63ca05ba9c7ad6be2aa08a9be81e121 -->
 ## 2025-10-11T14:27:47+01:00 — Merge pull request #1064 from aicovergod/codex/resolve-playerinventory-in-shopui
 
