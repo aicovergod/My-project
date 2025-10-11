@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:820240549fbbdd2894d1d989ade1fc17efee2863 -->
+## 2025-10-11T10:25:17+01:00 — Merge pull request #1059 from aicovergod/codex/update-removeitem-method-validation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 68 ++ / 0 --
+- Notes:
+  Ensure inventory removals require sufficient quantity
+---
+<!-- commit:f389ecda8fa32604b2d4e62e16fa256677e31a07 -->
+## 2025-10-11T10:25:08+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:613e209a5975856092646447f687f4cd30d152bc -->
 ## 2025-10-11T10:24:56+01:00 — Guard inventory removals with quantity check
 
