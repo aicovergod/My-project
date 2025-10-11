@@ -56,6 +56,11 @@ namespace World
         private bool _transitioning;
         private InputAction interactAction;
         private bool interactActionOwned;
+        private bool _hasPendingInteractRequest;
+        private Vector2 _pendingScreenPosition;
+        private int _pendingPointerId = -1;
+        private bool _pendingCameFromPointerDevice;
+        private bool _pendingHasPointerId;
 
         private void OnEnable()
         {
@@ -69,6 +74,7 @@ namespace World
             SceneTransitionManager.TransitionStarted -= OnTransitionStarted;
             SceneTransitionManager.TransitionCompleted -= OnTransitionCompleted;
             UnsubscribeFromInput();
+            ClearPendingInteractRequest();
         }
 
         private void HandleInteractAction(InputAction.CallbackContext context)
@@ -79,24 +85,43 @@ namespace World
             if (_transitioning)
                 return;
 
+            if (TryQueuePointerRequest(context))
+                return;
+
             if (IsPointerBlockedByUI(context))
                 return;
 
-            Camera activeCamera = Camera.main;
-            if (activeCamera == null)
+            Vector2 screenPosition = ResolveScreenPosition(context);
+            TryResolveInteractRequest(screenPosition);
+        }
+
+        private void Update()
+        {
+            if (!_hasPendingInteractRequest)
                 return;
 
-            Vector2 screenPosition = ResolveScreenPosition(context);
-            Vector2 worldPoint = activeCamera.ScreenToWorldPoint(screenPosition);
-
-            foreach (var col in Physics2D.OverlapPointAll(worldPoint))
+            if (_transitioning)
             {
-                if (col.gameObject == gameObject)
-                {
-                    StartCoroutine(UseInteractable());
-                    break;
-                }
+                ClearPendingInteractRequest();
+                return;
             }
+
+            bool pointerBlocked = false;
+            if (_pendingCameFromPointerDevice && EventSystem.current != null)
+            {
+                pointerBlocked = _pendingHasPointerId
+                    ? EventSystem.current.IsPointerOverGameObject(_pendingPointerId)
+                    : EventSystem.current.IsPointerOverGameObject();
+            }
+
+            if (pointerBlocked)
+            {
+                ClearPendingInteractRequest();
+                return;
+            }
+
+            TryResolveInteractRequest(_pendingScreenPosition);
+            ClearPendingInteractRequest();
         }
 
         private IEnumerator UseInteractable()
@@ -241,6 +266,82 @@ namespace World
                 return pointer.position.ReadValue();
 
             return new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+        }
+
+        /// <summary>
+        ///     Attempts to queue a pointer-driven interaction so UI checks can be evaluated safely during Update.
+        /// </summary>
+        private bool TryQueuePointerRequest(InputAction.CallbackContext context)
+        {
+            if (context.control == null)
+                return false;
+
+            if (context.control.parent is TouchControl touchControl)
+            {
+                QueuePendingInteractRequest(
+                    touchControl.position.ReadValue(),
+                    touchControl.touchId.ReadValue(),
+                    cameFromPointerDevice: true,
+                    hasPointerId: true);
+                return true;
+            }
+
+            if (context.control.device is Pointer pointer && !(pointer is Touchscreen))
+            {
+                QueuePendingInteractRequest(
+                    pointer.position.ReadValue(),
+                    pointer.deviceId,
+                    cameFromPointerDevice: true,
+                    hasPointerId: true);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        ///     Executes the collider hit test using a cached screen position and begins the transition coroutine when valid.
+        /// </summary>
+        private void TryResolveInteractRequest(Vector2 screenPosition)
+        {
+            Camera activeCamera = Camera.main;
+            if (activeCamera == null)
+                return;
+
+            Vector2 worldPoint = activeCamera.ScreenToWorldPoint(screenPosition);
+
+            foreach (var col in Physics2D.OverlapPointAll(worldPoint))
+            {
+                if (col.gameObject == gameObject)
+                {
+                    StartCoroutine(UseInteractable());
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Stores the pending interaction data until it can be processed during Update.
+        /// </summary>
+        private void QueuePendingInteractRequest(Vector2 screenPosition, int pointerId, bool cameFromPointerDevice, bool hasPointerId)
+        {
+            _pendingScreenPosition = screenPosition;
+            _pendingPointerId = pointerId;
+            _pendingCameFromPointerDevice = cameFromPointerDevice;
+            _pendingHasPointerId = hasPointerId;
+            _hasPendingInteractRequest = true;
+        }
+
+        /// <summary>
+        ///     Clears any cached interaction data to avoid leaking callbacks across scene transitions or disables.
+        /// </summary>
+        private void ClearPendingInteractRequest()
+        {
+            _hasPendingInteractRequest = false;
+            _pendingScreenPosition = default;
+            _pendingPointerId = -1;
+            _pendingCameFromPointerDevice = false;
+            _pendingHasPointerId = false;
         }
 
         /// <summary>

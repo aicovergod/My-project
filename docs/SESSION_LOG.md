@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a0bcfec89e46486e9f0e2ba95f188e45555937e2 -->
+## 2025-10-11T14:22:26+01:00 — Defer pointer scene interaction processing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 111 ++ / 10 --
+- Notes:
+  —
+---
 <!-- commit:2063e45b339aaaff886b49a334f7d566e7e571e4 -->
 ## 2025-10-11T12:39:08+01:00 — Merge pull request #1062 from aicovergod/codex/modify-restorelastspell-for-singleton-usage
 
