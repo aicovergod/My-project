@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7822d4e50a2f72d5d4d17d2265e952d9e7e7e76f -->
+## 2025-10-11T18:24:52+01:00 — Ensure pet hitsplats handle zero damage
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 21 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:32f72607627cec0cbc725f4efd827c238b4cee45 -->
 ## 2025-10-11T16:40:11+01:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
 
