@@ -31,14 +31,33 @@ namespace World
         /// </summary>
         private string _consumedRequiredItemId;
 
+        /// <summary>
+        /// Removes any null references from the persistent object cache so we do
+        /// not attempt to invoke callbacks on destroyed entries.
+        /// </summary>
+        private static void RemoveNullPersistentObjects()
+        {
+            for (int i = _persistentObjects.Count - 1; i >= 0; i--)
+            {
+                if (_persistentObjects[i] == null)
+                {
+                    _persistentObjects.RemoveAt(i);
+                }
+            }
+        }
+
         public static void RegisterPersistentObject(IScenePersistent obj)
         {
+            RemoveNullPersistentObjects();
+
             if (obj != null && !_persistentObjects.Contains(obj))
                 _persistentObjects.Add(obj);
         }
 
         public static void UnregisterPersistentObject(IScenePersistent obj)
         {
+            RemoveNullPersistentObjects();
+
             if (obj != null)
                 _persistentObjects.Remove(obj);
         }
@@ -106,6 +125,8 @@ namespace World
             }
 
             NextSpawnPoint = spawnPointName;
+
+            RemoveNullPersistentObjects();
 
             foreach (var obj in _persistentObjects)
                 obj.OnBeforeSceneUnload();
@@ -243,6 +264,8 @@ namespace World
                 _consumedRequiredItemThisTransition = false;
                 _consumedRequiredItemId = null;
             }
+
+            RemoveNullPersistentObjects();
 
             foreach (var obj in _persistentObjects)
                 obj.OnAfterSceneLoad(fallbackScene);

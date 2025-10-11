@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:230076ef84bbd9715a281dac0946bc8c38763548 -->
+## 2025-10-11T09:38:50+01:00 — Clean persistent object list before scene callbacks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/World/SceneTransitionManager.cs
+- Diff: 23 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ed3f3b2fc3b2d0422576784ccc2cf26b74fc5ec1 -->
 ## 2025-10-11T09:35:57+01:00 — Merge pull request #1056 from aicovergod/codex/update-transition-method-for-item-removal
 
