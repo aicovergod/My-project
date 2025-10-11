@@ -1457,9 +1457,11 @@ namespace Inventory
                     if (petStorage != null &&
                         (petStorage.definition?.id == "Heron" ||
                          petStorage.definition?.id == "Beaver" ||
-                         petStorage.definition?.id == "Rock Golem"))
+                         petStorage.definition?.id == "Rock Golem" ||
+                         petStorage.definition?.id == "Mr Frying Pan"))
                     {
-                        // Skilling pets only accept auto-collected resources from their skill and cannot receive manual drops.
+                        // Skilling pets (Heron, Beaver, Rock Golem, Mr Frying Pan) only accept auto-collected resources from
+                        // their associated skills and cannot receive manual drops.
                         var entry = source.items[sourceIndex];
                         if (!petStorage.StoreItem(entry.item, entry.count))
                         {
