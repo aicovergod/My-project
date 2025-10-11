@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0654ae2fed1c4973b7d99f54e53c7c77adb716cb -->
+## 2025-10-11T14:39:17+01:00 — Merge pull request #1066 from aicovergod/codex/fix-shopui-inventory-lookup-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 90 ++ / 5 --
+- Notes:
+  Fix ShopUI inventory resolution
+---
+<!-- commit:1eb0d32d36e4a31869ad43c617ece96501ba204b -->
+## 2025-10-11T14:38:55+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:002477d24c146dea90a4325fb428978ba55ad54e -->
 ## 2025-10-11T14:38:43+01:00 — Restrict ShopUI inventory lookup to player
 
