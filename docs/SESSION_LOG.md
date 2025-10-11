@@ -1,6 +1,33 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0ad72b16984e0a905b0537045c60055b46ea0688 -->
+## 2025-10-11T16:39:26+01:00 — Merge pull request #1074 from aicovergod/codex/refactor-openwindow-to-boolean-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 102 ++ / 13 --
+- Notes:
+  Guard UI openings behind modal-aware helper
+---
+<!-- commit:5d108b23a924337bc49d7fa626b716a8d82649ae -->
+## 2025-10-11T16:39:18+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:5df7bec551363bd23d10c241635874b09ccf1a43 -->
+## 2025-10-11T16:39:06+01:00 — Guard UI openings behind modal-aware helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (11): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Inventory/Equipment.cs, Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Quests/QuestUI.cs, Assets/Scripts/Shop/ShopUI.cs, Assets/Scripts/Skills/SkillsUI.cs, Assets/Scripts/UI/AttackStyleUI.cs, Assets/Scripts/UI/BookUI.cs, Assets/Scripts/UI/MagicUI.cs, Assets/Scripts/UI/Settings/AudioSettingsUI.cs, Assets/Scripts/UI/UIManager.cs
+- Diff: 93 ++ / 13 --
+- Notes:
+  —
+---
 <!-- commit:2a52c4f2b83e4e7fb63945760c5e19dbce513a54 -->
 ## 2025-10-11T16:22:39+01:00 — Merge pull request #1073 from aicovergod/codex/disallow-interface-opening-when-shop-or-bank-is-open
 

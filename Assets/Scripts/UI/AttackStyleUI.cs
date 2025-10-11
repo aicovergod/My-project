@@ -207,7 +207,13 @@ namespace UI
         /// <summary>Open the attack style interface.</summary>
         public void Open()
         {
-            UIManager.Instance.OpenWindow(this);
+            var uiManager = UIManager.Instance;
+            if (uiManager == null)
+                return;
+
+            if (!uiManager.TryOpenWindow(this))
+                return;
+
             if (uiRoot != null)
             {
                 uiRoot.SetActive(true);

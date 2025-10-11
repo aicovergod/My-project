@@ -160,8 +160,11 @@ namespace UI.Settings
             if (windowRoot == null)
                 return;
 
+            var uiManager = UIManager.Instance;
+            if (uiManager != null && !uiManager.TryOpenWindow(this))
+                return;
+
             windowRoot.gameObject.SetActive(true);
-            UIManager.Instance?.OpenWindow(this);
             ApplyVolumeToUi(soundManager.SfxVolume);
         }
 
