@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b9d0fa2c75ac1769f17d0754b87506e658722a03 -->
+## 2025-10-11T15:55:02+01:00 — Include cooking pet in manual drop filter
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Inventory.cs
+- Diff: 4 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:a94245a92ed776987734f2da536578802edebbcd -->
 ## 2025-10-11T15:46:21+01:00 — Merge pull request #1070 from aicovergod/codex/add-cooking-item-storage-and-validation
 
