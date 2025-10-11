@@ -48,9 +48,9 @@ namespace ShopSystem
         // Tracks the inventory visibility so we can restore the state when leaving the shop.
         private bool inventoryWasOpenBeforeShop;
         private bool inventoryStateCaptured;
-        // Tracks the movement freeze state so we only unfreeze movement if we froze it.
+        // Tracks the movement freeze state so we only unfreeze movement if the shop actually applied the lock.
         private bool playerMovementWasFrozenBeforeShop;
-        private bool playerMovementStateCaptured;
+        private bool shopAppliedMovementFreeze;
 
         private static ShopUI instance;
         public static ShopUI Instance => instance;
@@ -154,15 +154,18 @@ namespace ShopSystem
                 if (!playerInventory.IsOpen)
                     playerInventory.OpenUI();
             }
-            playerMovementStateCaptured = false;
+            shopAppliedMovementFreeze = false;
             if (playerMover == null)
                 playerMover = FindObjectOfType<PlayerMover>();
             if (playerMover != null)
             {
                 playerMovementWasFrozenBeforeShop = playerMover.IsMovementFrozen;
-                playerMovementStateCaptured = true;
                 playerMover.StopMovement();
-                playerMover.SetMovementFrozen(true);
+                if (!playerMovementWasFrozenBeforeShop)
+                {
+                    playerMover.SetMovementFrozen(true);
+                    shopAppliedMovementFreeze = true;
+                }
                 playerMover.CanDrop = false;
             }
             npcMover = npcMovement;
@@ -193,11 +196,8 @@ namespace ShopSystem
             }
             if (playerMover != null)
             {
-                if (playerMovementStateCaptured)
-                    playerMover.SetMovementFrozen(playerMovementWasFrozenBeforeShop);
-                else
+                if (shopAppliedMovementFreeze && !playerMovementWasFrozenBeforeShop && playerMover.IsMovementFrozen)
                     playerMover.SetMovementFrozen(false);
-
                 playerMover.CanDrop = true;
             }
             if (npcMover != null)
@@ -207,7 +207,7 @@ namespace ShopSystem
             }
             inventoryStateCaptured = false;
             inventoryWasOpenBeforeShop = false;
-            playerMovementStateCaptured = false;
+            shopAppliedMovementFreeze = false;
             shopModalActive = false;
         }
 
