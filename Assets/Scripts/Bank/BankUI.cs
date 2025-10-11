@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 using Inventory;
 using Core.Save;
 using Pets;
+using Player;
 using UI;
 using World;
 
@@ -65,11 +66,16 @@ namespace BankSystem
         private string currentFilter = string.Empty;
 
         public static BankUI Instance => PersistentSceneSingleton<BankUI>.Instance;
+        private static bool bankModalActive;
+        public static bool IsBankModalActive => bankModalActive;
 
         private const string SaveKey = "BankData";
 
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
         private bool inventoryWasOpen;
+        private PlayerMover playerMover;
+        private bool playerMovementStateCaptured;
+        private bool playerMovementWasFrozenBeforeBank;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -564,6 +570,10 @@ namespace BankSystem
         {
             if (Beastmaster.PetMergeController.Instance != null && Beastmaster.PetMergeController.Instance.IsMerged)
                 return;
+
+            // Mark the bank as modal before asking the UIManager to focus us so other
+            // interfaces are prevented from opening while banking.
+            bankModalActive = true;
             UIManager.Instance.OpenWindow(this);
             if (playerInventory == null)
                 playerInventory = FindObjectOfType<Inventory.Inventory>();
@@ -575,6 +585,19 @@ namespace BankSystem
                 var pet = PetDropSystem.ActivePetObject;
                 var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
                 storage?.Close();
+            }
+            // Freeze player movement while banking to mirror shop behaviour and
+            // ensure the player cannot walk away with the window open.
+            playerMovementStateCaptured = false;
+            if (playerMover == null)
+                playerMover = FindObjectOfType<PlayerMover>();
+            if (playerMover != null)
+            {
+                playerMovementWasFrozenBeforeBank = playerMover.IsMovementFrozen;
+                playerMovementStateCaptured = true;
+                playerMover.StopMovement();
+                playerMover.SetMovementFrozen(true);
+                playerMover.CanDrop = false;
             }
             // Ensure latest saved state is loaded whenever the bank opens
             Load();
@@ -600,6 +623,16 @@ namespace BankSystem
                 else
                     playerInventory.CloseUI();
             }
+            if (playerMover != null)
+            {
+                if (playerMovementStateCaptured)
+                    playerMover.SetMovementFrozen(playerMovementWasFrozenBeforeBank);
+                else
+                    playerMover.SetMovementFrozen(false);
+                playerMover.CanDrop = true;
+            }
+            playerMovementStateCaptured = false;
+            bankModalActive = false;
             Save();
         }
 

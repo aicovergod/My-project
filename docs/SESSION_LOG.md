@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:eb238904e77d5c8a7b4edd5319ce300b30462f9e -->
+## 2025-10-11T16:22:06+01:00 — Restrict UI access while banking and freeze player movement
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/UI/UIManager.cs
+- Diff: 42 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:b7cc87f1e8069121cd98c85d2645d3e3717bc1e0 -->
 ## 2025-10-11T16:12:43+01:00 — Merge pull request #1072 from aicovergod/codex/fix-nullreferenceexception-console-errors
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using BankSystem;
 using ShopSystem;
 using UnityEngine;
 using World;
@@ -60,11 +61,13 @@ namespace UI
                 return;
 
             bool shopActive = ShopUI.IsShopModalActive;
+            bool bankActive = BankUI.IsBankModalActive;
             bool isShopWindow = window is ShopUI;
+            bool isBankWindow = window is BankUI;
             bool isInventoryWindow = window is Inventory.Inventory;
 
-            // When the shop modal is active, only the shop and inventory windows may request focus.
-            if (shopActive && !isShopWindow && !isInventoryWindow)
+            // When a modal interface (shop or bank) is active, only that window and the inventory may request focus.
+            if ((shopActive && !isShopWindow && !isInventoryWindow) || (bankActive && !isBankWindow && !isInventoryWindow))
                 return;
 
             for (int i = windows.Count - 1; i >= 0; i--)
@@ -79,8 +82,10 @@ namespace UI
                 if (w == window || !w.IsOpen)
                     continue;
 
-                // Allow the inventory and shop windows to coexist while trading.
-                if (shopActive && ((isShopWindow && w is Inventory.Inventory) || (isInventoryWindow && w is ShopUI)))
+                // Allow the inventory to coexist with modal interfaces (shop/bank) while trading/banking.
+                bool allowShopPair = shopActive && ((isShopWindow && w is Inventory.Inventory) || (isInventoryWindow && w is ShopUI));
+                bool allowBankPair = bankActive && ((isBankWindow && w is Inventory.Inventory) || (isInventoryWindow && w is BankUI));
+                if (allowShopPair || allowBankPair)
                     continue;
 
                 w.Close();
