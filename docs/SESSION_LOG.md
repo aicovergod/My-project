@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:25f3c4adffb38e5ee3f0d533653efd8ca50b87c3 -->
+## 2025-10-11T15:33:01+01:00 — Guard shop freeze restoration
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Shop/ShopUI.cs
+- Diff: 10 ++ / 10 --
+- Notes:
+  —
+---
 <!-- commit:006408fa627519ca8e22283b411f966df30e8438 -->
 ## 2025-10-11T15:25:08+01:00 — Freeze player during shop interactions and adjust inventory window
 
