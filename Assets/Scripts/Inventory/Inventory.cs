@@ -173,7 +173,8 @@ namespace Inventory
 
         public void CloseUI()
         {
-            if (BankOpen)
+            // Prevent the player inventory from closing while trading or banking to avoid inconsistent states.
+            if (BankOpen || InShop)
                 return;
             if (uiRoot != null)
                 uiRoot.SetActive(false);

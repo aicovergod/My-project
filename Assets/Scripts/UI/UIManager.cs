@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ShopSystem;
 using UnityEngine;
 using World;
 
@@ -55,6 +56,17 @@ namespace UI
 
         public void OpenWindow(IUIWindow window)
         {
+            if (window == null)
+                return;
+
+            bool shopActive = ShopUI.IsShopModalActive;
+            bool isShopWindow = window is ShopUI;
+            bool isInventoryWindow = window is Inventory.Inventory;
+
+            // When the shop modal is active, only the shop and inventory windows may request focus.
+            if (shopActive && !isShopWindow && !isInventoryWindow)
+                return;
+
             for (int i = windows.Count - 1; i >= 0; i--)
             {
                 var w = windows[i];
@@ -64,8 +76,14 @@ namespace UI
                     continue;
                 }
 
-                if (w != window && w.IsOpen)
-                    w.Close();
+                if (w == window || !w.IsOpen)
+                    continue;
+
+                // Allow the inventory and shop windows to coexist while trading.
+                if (shopActive && ((isShopWindow && w is Inventory.Inventory) || (isInventoryWindow && w is ShopUI)))
+                    continue;
+
+                w.Close();
             }
         }
 
