@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:77b46b15b1dc0a41277fa478cb91536ec891bf31 -->
+## 2025-10-11T11:04:41+01:00 — Adjust MagicUI canvas scaler
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/MagicUI.cs
+- Diff: 5 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:1838a0fd6f9a532cc794ee8eb2ec3f07862f1bb7 -->
 ## 2025-10-11T10:55:25+01:00 — Merge pull request #1060 from aicovergod/codex/update-spawn-popup-for-bulk-item-addition
 
