@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2a52c4f2b83e4e7fb63945760c5e19dbce513a54 -->
+## 2025-10-11T16:22:39+01:00 — Merge pull request #1073 from aicovergod/codex/disallow-interface-opening-when-shop-or-bank-is-open
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 51 ++ / 4 --
+- Notes:
+  Prevent other UI from opening during shop or bank sessions
+---
+<!-- commit:3a2dca93b0c6d395c5443505450896497b9a22a7 -->
+## 2025-10-11T16:22:19+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:eb238904e77d5c8a7b4edd5319ce300b30462f9e -->
 ## 2025-10-11T16:22:06+01:00 — Restrict UI access while banking and freeze player movement
 
