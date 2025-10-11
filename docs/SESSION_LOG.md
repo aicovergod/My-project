@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6171b115196a9ea55a9bfa85fd4ae741b45c18e5 -->
+## 2025-10-11T15:25:27+01:00 — Merge pull request #1068 from aicovergod/codex/freeze-player-movement-in-shop
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 3 --
+- Notes:
+  Freeze player movement when shopping and reposition inventory UI
+---
+<!-- commit:90e0668b61d6df06c0036e83eab48f7996031dac -->
+## 2025-10-11T15:25:20+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:006408fa627519ca8e22283b411f966df30e8438 -->
 ## 2025-10-11T15:25:08+01:00 — Freeze player during shop interactions and adjust inventory window
 
