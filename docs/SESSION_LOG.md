@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:94ff3c85f01607987b870e7247753a5ef89072b2 -->
+## 2025-10-11T09:30:44+01:00 — Handle missing loadout when showing magic requirement warning
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/MagicUI.cs
+- Diff: 10 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:a42342b1ca94d1e724d62201b203289af6c759d0 -->
 ## 2025-10-10T22:39:48+01:00 — Merge pull request #1054 from aicovergod/codex/update-audiosettingsui-for-dependencies
 
