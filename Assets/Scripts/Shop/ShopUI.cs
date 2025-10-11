@@ -44,6 +44,7 @@ namespace ShopSystem
         private Shop currentShop;
         private PlayerMover playerMover;
         private NpcWanderer npcMover;
+        private bool hasLoggedMissingInventory;
 
         private static ShopUI instance;
         public static ShopUI Instance => instance;
@@ -60,6 +61,9 @@ namespace ShopSystem
 
             instance = this;
             base.Awake();
+
+            // Attempt to resolve the player's inventory immediately so the shop can hook into it when opened.
+            ResolvePlayerInventory(false);
 
             if (sharedUIRoot == null)
                 sharedUIRoot = GameObject.Find("ShopUI");
@@ -106,6 +110,11 @@ namespace ShopSystem
             currentShop = shop;
             Refresh();
             uiRoot.SetActive(true);
+
+            // If the inventory wasn't available during Awake (e.g. player not yet spawned), retry here.
+            if (playerInventory == null)
+                ResolvePlayerInventory(true);
+
             if (playerInventory != null)
             {
                 playerInventory.SetShopContext(shop);
@@ -157,6 +166,30 @@ namespace ShopSystem
         {
             if (currentShop == null || playerInventory == null) return;
             currentShop.Buy(index, playerInventory);
+        }
+
+        /// <summary>
+        /// Resolves and caches the player's inventory component so the shop can manipulate it.
+        /// </summary>
+        /// <param name="logWarningOnFailure">When true, a warning is logged if the inventory cannot be found.</param>
+        private void ResolvePlayerInventory(bool logWarningOnFailure)
+        {
+            if (playerInventory != null)
+                return;
+
+            playerInventory = FindObjectOfType<Inventory.Inventory>(true);
+
+            if (playerInventory != null)
+            {
+                hasLoggedMissingInventory = false;
+                return;
+            }
+
+            if (logWarningOnFailure && !hasLoggedMissingInventory)
+            {
+                Debug.LogWarning("[ShopUI] Unable to locate the player's Inventory component. Shop purchases will be unavailable until it spawns.", this);
+                hasLoggedMissingInventory = true;
+            }
         }
 
         private void HandleInventoryChanged()

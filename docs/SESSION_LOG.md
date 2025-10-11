@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:af7be40f4c335fedb361ff1dee57158071fa9b75 -->
+## 2025-10-11T14:27:08+01:00 — Ensure ShopUI resolves player inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Shop/ShopUI.cs
+- Diff: 33 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f39a1966675ef4a2bd8e1ab9a0923980127b9849 -->
 ## 2025-10-11T14:22:48+01:00 — Merge pull request #1063 from aicovergod/codex/add-pending-interact-request-handling
 
