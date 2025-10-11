@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:48ee03ffb1da030df3b987dbef7e30095ede328a -->
+## 2025-10-11T15:33:45+01:00 — Merge pull request #1069 from aicovergod/codex/fix-high-priority-movement-freeze-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 10 --
+- Notes:
+  Address Codex review: Guard shop freeze restoration
+---
+<!-- commit:ec7d82708afc87d4e253d3807f92aeaab6d479c4 -->
+## 2025-10-11T15:33:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:25f3c4adffb38e5ee3f0d533653efd8ca50b87c3 -->
 ## 2025-10-11T15:33:01+01:00 — Guard shop freeze restoration
 
