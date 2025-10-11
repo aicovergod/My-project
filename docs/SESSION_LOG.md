@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2b9b50d968834de373c011114c0c6139b68c2620 -->
+## 2025-10-11T18:25:20+01:00 — Merge pull request #1075 from aicovergod/codex/add-zero-damage-hitsplat-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 30 ++ / 2 --
+- Notes:
+  Ensure pet hitsplats show zero-damage visuals
+---
+<!-- commit:64fdc090dd60bdee8027d6dfff6754e45d345fb6 -->
+## 2025-10-11T18:25:05+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7822d4e50a2f72d5d4d17d2265e952d9e7e7e76f -->
 ## 2025-10-11T18:24:52+01:00 — Ensure pet hitsplats handle zero damage
 
