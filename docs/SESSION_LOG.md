@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b7cc87f1e8069121cd98c85d2645d3e3717bc1e0 -->
+## 2025-10-11T16:12:43+01:00 — Merge pull request #1072 from aicovergod/codex/fix-nullreferenceexception-console-errors
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 64 ++ / 5 --
+- Notes:
+  Fix equipment initialization null references
+---
+<!-- commit:128a9bda41e3b5fa8d54055767f81950385c3620 -->
+## 2025-10-11T16:11:59+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:53683f981470de086dd0f5627f5f7bbe8be92b3f -->
 ## 2025-10-11T16:11:46+01:00 — Ensure equipment initializes safely
 
