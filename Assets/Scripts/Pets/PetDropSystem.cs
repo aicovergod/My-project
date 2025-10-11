@@ -291,6 +291,9 @@ namespace Pets
                 return null;
             }
 
+            // Remember whether the pet backpack UI was visible before we clear the existing pet.
+            bool reopenPetInventory = PetInventoryVisible;
+
             DespawnActive();
             Vector3 spawnPos = position + (Vector3)(UnityEngine.Random.insideUnitCircle * 0.5f);
 
@@ -306,11 +309,26 @@ namespace Pets
             Debug.Log($"Spawned pet '{pet.displayName}' at {spawnPos}.");
 
             var playerInventory = playerTransform != null ? playerTransform.GetComponent<Inventory.Inventory>() : null;
-            PetInventoryVisible = false;
-            if (playerInventory != null && playerInventory.IsOpen && !playerInventory.BankOpen && PetInventoryVisible)
+            var storage = activePetGO.GetComponent<PetStorage>();
+
+            // Restore the remembered visibility flag so any later toggles remain consistent.
+            PetInventoryVisible = reopenPetInventory;
+            if (PetInventoryVisible)
             {
-                var storage = activePetGO.GetComponent<PetStorage>();
-                storage?.StartCoroutine(storage.OpenDelayed());
+                if (playerInventory != null && playerInventory.IsOpen && !playerInventory.BankOpen)
+                {
+                    // The player still has their main inventory open, so reopen the pet storage UI next frame.
+                    storage?.StartCoroutine(storage.OpenDelayed());
+                    PetInventoryVisible = true;
+                }
+                else
+                {
+                    storage?.Close();
+                }
+            }
+            else
+            {
+                storage?.Close();
             }
 
             ActivePetFloatingText?.RefreshAnchorPosition();
