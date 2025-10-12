@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0cae3528e9218c62df375dc682fd06f29f5f8e5f -->
+## 2025-10-12T18:22:48+01:00 — Merge pull request #1085 from aicovergod/codex/refactor-cooking-and-firemaking-huds-for-progress-bars
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 29 ++ / 60 --
+- Notes:
+  Refactor gathering HUD progress bar construction
+---
+<!-- commit:e15a0a0c2dcd5354c9d741a26dbf86fcc01c5b61 -->
+## 2025-10-12T18:22:31+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:e65601ac9339ff1dd5d71d05656de780caf8106c -->
 ## 2025-10-12T18:22:20+01:00 — Refactor gathering HUD progress bar construction
 
