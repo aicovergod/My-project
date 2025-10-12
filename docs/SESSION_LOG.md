@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9a971fe7f6c23cd4d5e88216dd9e1656cfcd7303 -->
+## 2025-10-12T22:00:51+01:00 — Refactor button highlighting into shared utility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/UI/AttackStyleUI.cs, Assets/Scripts/UI/MagicUI.cs, Assets/Scripts/UI/Utilities/ButtonHighlightUtility.cs
+- Diff: 35 ++ / 28 --
+- Notes:
+  —
+---
 <!-- commit:c8975358265e1e24a1dab6fd40d1bbdffa68efcb -->
 ## 2025-10-12T21:56:48+01:00 — Merge pull request #1092 from aicovergod/codex/implement-manageduiwindow-and-refactor-ui
 
