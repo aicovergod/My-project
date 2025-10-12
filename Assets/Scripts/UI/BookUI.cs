@@ -3,10 +3,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using World;
+using UI.Utilities;
 
 namespace UI
 {
-    public class BookUI : MonoBehaviour, IUIWindow
+    public class BookUI : ManagedUiWindow
     {
         public static BookUI Instance => PersistentSceneSingleton<BookUI>.Instance;
 
@@ -19,8 +20,6 @@ namespace UI
         private BookData currentBook;
         private int currentPage;
         private const string BackgroundSpritePath = "Interfaces/BookUI/Parchment";
-
-        public bool IsOpen => gameObject.activeSelf;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -124,8 +123,8 @@ namespace UI
             if (nextButton != null) nextButton.onClick.AddListener(NextPage);
             if (prevButton != null) prevButton.onClick.AddListener(PreviousPage);
             if (closeButton != null) closeButton.onClick.AddListener(Close);
-            gameObject.SetActive(false);
-            UIManager.Instance?.RegisterWindow(this);
+            SetWindowRoot(gameObject);
+            RegisterWindow();
         }
 
         private void CreateUI()
@@ -276,14 +275,8 @@ namespace UI
                 pageText.ForceMeshUpdate();
             }
             UpdatePage();
-            var uiManager = UIManager.Instance;
-            if (uiManager == null)
-                return;
-
-            if (!uiManager.TryOpenWindow(this))
-                return;
-
-            gameObject.SetActive(true);
+            ForceNextOpenHooks();
+            Open();
         }
 
         private void UpdatePage()
@@ -324,19 +317,18 @@ namespace UI
             }
         }
 
-        public void Close()
-        {
-            if (currentBook != null)
-                BookProgressManager.Instance.SetPage(currentBook.id, currentPage);
-            gameObject.SetActive(false);
-        }
-
         private void OnDestroy()
         {
             if (!PersistentSceneSingleton<BookUI>.HandleOnDestroy(this))
                 return;
 
-            UIManager.Instance?.UnregisterWindow(this);
+            UnregisterWindow();
+        }
+
+        protected override void OnBeforeClose()
+        {
+            if (currentBook != null)
+                BookProgressManager.Instance.SetPage(currentBook.id, currentPage);
         }
     }
 }

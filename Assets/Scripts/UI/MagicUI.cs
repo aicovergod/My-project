@@ -7,13 +7,14 @@ using System.Collections.Generic;
 using Magic;
 using Skills;
 using World;
+using UI.Utilities;
 
 namespace UI
 {
     /// <summary>
     /// Simple spellbook interface allowing the player to select a spell.
     /// </summary>
-    public class MagicUI : MonoBehaviour, IUIWindow
+    public class MagicUI : ManagedUiWindow
     {
         private static MagicUI instance;
         public static MagicUI Instance => instance;
@@ -63,8 +64,6 @@ namespace UI
         public static float GetActiveSpellRange() =>
             ActiveSpell != null ? ActiveSpell.range : CombatMath.MELEE_RANGE;
 
-        public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
-
         /// <summary>
         /// Updates strike spell max hits based on the given magic level.
         /// </summary>
@@ -97,8 +96,8 @@ namespace UI
             CreateUI();
             EnsureUiRootPersistence();
             if (uiRoot != null)
-                uiRoot.SetActive(false);
-            UIManager.Instance?.RegisterWindow(this);
+                SetWindowRoot(uiRoot);
+            RegisterWindow();
         }
 
         private void OnEnable()
@@ -236,39 +235,12 @@ namespace UI
             return spell.maxHit;
         }
 
-        public void Toggle()
-        {
-            if (IsOpen)
-                Close();
-            else
-                Open();
-        }
-
-        public void Open()
-        {
-            var uiManager = UIManager.Instance;
-            if (uiManager == null)
-                return;
-
-            if (!uiManager.TryOpenWindow(this))
-                return;
-
-            if (uiRoot != null)
-                uiRoot.SetActive(true);
-        }
-
-        public void Close()
-        {
-            if (uiRoot != null)
-                uiRoot.SetActive(false);
-        }
-
         private void OnDestroy()
         {
             if (!PersistentSceneSingleton<MagicUI>.HandleOnDestroy(this))
                 return;
 
-            UIManager.Instance?.UnregisterWindow(this);
+            UnregisterWindow();
             TearDownUiRoot();
         }
 

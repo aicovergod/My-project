@@ -2,6 +2,7 @@ using Audio;
 using UnityEngine;
 using UnityEngine.UI;
 using World;
+using UI.Utilities;
 
 namespace UI.Settings
 {
@@ -13,7 +14,7 @@ namespace UI.Settings
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster))]
-    public class AudioSettingsUI : MonoBehaviour, IUIWindow
+    public class AudioSettingsUI : ManagedUiWindow
     {
         private const KeyCode ToggleKey = KeyCode.F3;
         private const float WindowWidth = 420f;
@@ -72,11 +73,6 @@ namespace UI.Settings
         private bool suppressCallbacks;
         private float lastNonZeroVolume = 1f;
 
-        /// <summary>
-        /// Indicates whether the window is currently visible to the player.
-        /// </summary>
-        public bool IsOpen => windowRoot != null && windowRoot.gameObject.activeSelf;
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
         {
@@ -112,8 +108,8 @@ namespace UI.Settings
                 closeButton.onClick.AddListener(Close);
 
             if (windowRoot != null)
-                windowRoot.gameObject.SetActive(false);
-            UIManager.Instance?.RegisterWindow(this);
+                SetWindowRoot(windowRoot.gameObject);
+            RegisterWindow();
             ApplyVolumeToUi(soundManager.SfxVolume);
         }
 
@@ -125,7 +121,7 @@ namespace UI.Settings
             if (!PersistentSceneSingleton<AudioSettingsUI>.HandleOnDestroy(this))
                 return;
 
-            UIManager.Instance?.UnregisterWindow(this);
+            UnregisterWindow();
 
             if (volumeSlider != null)
                 volumeSlider.onValueChanged.RemoveListener(HandleVolumeSliderChanged);
@@ -145,38 +141,8 @@ namespace UI.Settings
         {
             if (Input.GetKeyDown(ToggleKey))
             {
-                if (IsOpen)
-                    Close();
-                else
-                    Open();
+                Toggle();
             }
-        }
-
-        /// <summary>
-        /// Display the settings window and ensure the controls reflect the saved volume.
-        /// </summary>
-        public void Open()
-        {
-            if (windowRoot == null)
-                return;
-
-            var uiManager = UIManager.Instance;
-            if (uiManager != null && !uiManager.TryOpenWindow(this))
-                return;
-
-            windowRoot.gameObject.SetActive(true);
-            ApplyVolumeToUi(soundManager.SfxVolume);
-        }
-
-        /// <summary>
-        /// Hide the settings window.
-        /// </summary>
-        public void Close()
-        {
-            if (windowRoot == null)
-                return;
-
-            windowRoot.gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -568,6 +534,16 @@ namespace UI.Settings
             toggle.colors = colors;
 
             muteToggle = toggle;
+        }
+
+        protected override bool CanOpen()
+        {
+            return windowRoot != null && soundManager != null;
+        }
+
+        protected override void OnAfterOpen()
+        {
+            ApplyVolumeToUi(soundManager.SfxVolume);
         }
 
     }

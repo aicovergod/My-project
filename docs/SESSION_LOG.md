@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6dd41ff458eb3238ca5e64ed1f68d316d9f5effd -->
+## 2025-10-12T21:56:03+01:00 — Refactor shared UI windows
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (12): Assets/Scripts/Quests/QuestUI.cs, Assets/Scripts/Shop/ShopUI.cs, Assets/Scripts/Skills/SkillsUI.cs, Assets/Scripts/UI/AttackStyleUI.cs, Assets/Scripts/UI/BookUI.cs, Assets/Scripts/UI/MagicUI.cs, Assets/Scripts/UI/Settings/AudioSettingsUI.cs, Assets/Scripts/UI/Utilities.meta, Assets/Scripts/UI/Utilities/ManagedUiWindow.cs, Assets/Scripts/UI/Utilities/ManagedUiWindow.cs.meta, Assets/Scripts/UI/Utilities/SceneGatedManagedUiWindow.cs, Assets/Scripts/UI/Utilities/SceneGatedManagedUiWindow.cs.meta
+- Diff: 512 ++ / 333 --
+- Notes:
+  —
+---
 <!-- commit:fc1df673e44a9215fa78fba4a368d7508aa840b2 -->
 ## 2025-10-12T19:30:22+01:00 — Merge pull request #1091 from aicovergod/codex/create-shared-progress-hud-base-class
 
