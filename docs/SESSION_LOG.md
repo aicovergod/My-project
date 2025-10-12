@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:cec9cc20c08a78660f8057f76dbbe7dc3b72b14b -->
+## 2025-10-12T18:02:06+01:00 — Fix UI freeze release to avoid leaking locks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Shop/ShopUI.cs
+- Diff: 4 ++ / 13 --
+- Notes:
+  —
+---
 <!-- commit:cca3114c512a18b2358a01fc45321b018aeff28d -->
 ## 2025-10-12T17:33:01+01:00 — Prevent movement while shop or bank UIs are open
 
