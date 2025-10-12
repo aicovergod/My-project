@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:409c46b90ca130c4b5b1d9ec3621a47c3518d0c0 -->
+## 2025-10-12T17:07:41+01:00 — Merge pull request #1078 from aicovergod/codex/add-scenegatedsingletonbehaviour-and-refactor-huds
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 232 ++ / 1270 --
+- Notes:
+  Refactor scene-gated singletons to shared base
+---
+<!-- commit:9631ea9a13056744a02409553543a522cd20195b -->
+## 2025-10-12T17:07:32+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:25187293adfdf648b10c4345f318528d5cc9fab6 -->
 ## 2025-10-12T17:07:17+01:00 — Refactor scene-gated singletons
 
