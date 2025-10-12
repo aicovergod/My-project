@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3f1e16e79e4c83a807a4cccbd129da8e7d9a54e8 -->
+## 2025-10-12T22:11:24+01:00 — Merge pull request #1094 from aicovergod/codex/fix-high-priority-bug-in-shopui-dl0uu8
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 1 --
+- Notes:
+  Fix shop modal gating regression in ShopUI
+---
+<!-- commit:57edec44b7be90f04881e1e061ea886e6940a3dc -->
+## 2025-10-12T22:11:12+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a59339cc275b6d0a0b8366134c972709df10f4b8 -->
 ## 2025-10-12T22:10:58+01:00 — Ensure shop modal flag applied before manager gating
 
