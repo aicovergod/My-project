@@ -243,8 +243,6 @@ namespace Player
                     newType = DamageType.Magic;
                 else if (WeaponNameIndicatesRanged())
                     newType = DamageType.Ranged;
-                else if (weapon.combat.Range > 0 || weapon.combat.RangeStrength > 0)
-                    newType = DamageType.Ranged;
             }
 
             if (newType == DamageType.Magic)
@@ -253,6 +251,10 @@ namespace Player
                     MagicUI.RestoreLastSpell();
             }
             else if (newType == DamageType.Melee)
+            {
+                MagicUI.ClearActiveSpell();
+            }
+            else if (newType == DamageType.Ranged)
             {
                 MagicUI.ClearActiveSpell();
             }
