@@ -212,9 +212,13 @@ namespace ShopSystem
             if (playerMover != null)
             {
                 if (playerMovementStateCaptured)
-                    playerMover.SetMovementFrozen(playerMovementWasFrozenBeforeShop);
-                else
+                {
+                    // Release the shop's freeze request before restoring whatever state existed
+                    // when the window opened so overlapping systems remain respected.
                     playerMover.SetMovementFrozen(false);
+                    if (playerMovementWasFrozenBeforeShop && !playerMover.IsMovementFrozen)
+                        playerMover.SetMovementFrozen(true);
+                }
 
                 playerMover.CanDrop = true;
             }

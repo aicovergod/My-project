@@ -51,6 +51,7 @@ namespace Player.Movement
         private Coroutine moveRoutine;
         private bool moveRoutineActive;
         private bool movementFrozen;
+        private int movementFreezeRequestCount;
         private bool isTransitioning;
         private bool wasMoving;
         private float movementSaveTimer;
@@ -111,6 +112,16 @@ namespace Player.Movement
             moveDir = Vector2.zero;
             pendingInput = Vector2.zero;
             ApplyForcedIdle();
+
+            // Reset any outstanding freeze requests when the controller is disabled to avoid
+            // carrying stale locks across scene transitions or prefab pooling.
+            movementFreezeRequestCount = 0;
+            if (movementFrozen)
+            {
+                movementFrozen = false;
+                if (spriteController != null)
+                    spriteController.FreezeSprite = freezeSpriteStateBeforeFreeze;
+            }
         }
 
         private void OnDestroy()
@@ -157,21 +168,34 @@ namespace Player.Movement
         /// <inheritdoc />
         public void SetMovementFrozen(bool frozen)
         {
-            if (movementFrozen == frozen)
-                return;
-
-            movementFrozen = frozen;
-            if (movementFrozen)
+            if (frozen)
             {
+                // Track how many systems requested a freeze so overlapping locks do not cancel each other.
+                movementFreezeRequestCount++;
+                if (movementFreezeRequestCount > 1)
+                    return;
+
+                movementFrozen = true;
                 freezeSpriteStateBeforeFreeze = spriteController != null && spriteController.FreezeSprite;
                 StopMovement();
                 if (spriteController != null)
                     spriteController.FreezeSprite = true;
+                return;
             }
-            else if (spriteController != null)
+
+            if (movementFreezeRequestCount <= 0)
             {
-                spriteController.FreezeSprite = freezeSpriteStateBeforeFreeze;
+                // No active locks remain; ignore the release call so we do not underflow the counter.
+                return;
             }
+
+            movementFreezeRequestCount--;
+            if (movementFreezeRequestCount > 0)
+                return;
+
+            movementFrozen = false;
+            if (spriteController != null)
+                spriteController.FreezeSprite = freezeSpriteStateBeforeFreeze;
         }
 
         /// <inheritdoc />
