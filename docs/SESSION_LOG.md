@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e65601ac9339ff1dd5d71d05656de780caf8106c -->
+## 2025-10-12T18:22:20+01:00 — Refactor gathering HUD progress bar construction
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/Cooking/UI/CookingHUD.cs, Assets/Scripts/Skills/Firemaking/UI/FiremakingHUD.cs
+- Diff: 20 ++ / 60 --
+- Notes:
+  —
+---
 <!-- commit:2635daee18ddc2f63de75a62272dd7577e626d9f -->
 ## 2025-10-12T18:17:07+01:00 — Merge branch 'codex/fix-frozen-player-shop-interface-bug' into main
 
