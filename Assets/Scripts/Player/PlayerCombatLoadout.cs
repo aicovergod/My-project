@@ -182,6 +182,23 @@ namespace Player
             var entry = equipment != null ? equipment.GetEquipped(EquipmentSlot.Weapon) : default;
             var weapon = entry.item;
 
+            // Local helper resolves the equipped weapon's display name and checks for magic keywords.
+            bool WeaponNameIndicatesMagic()
+            {
+                if (weapon == null)
+                    return false;
+
+                // Prefer the designer facing itemName but fall back to the asset name when absent.
+                string displayName = !string.IsNullOrEmpty(weapon.itemName) ? weapon.itemName : weapon.name;
+                if (string.IsNullOrEmpty(displayName))
+                    return false;
+
+                return displayName.IndexOf("Wand", StringComparison.OrdinalIgnoreCase) >= 0
+                    || displayName.IndexOf("Staff", StringComparison.OrdinalIgnoreCase) >= 0
+                    || displayName.IndexOf("Trident", StringComparison.OrdinalIgnoreCase) >= 0
+                    || displayName.IndexOf("Sceptre", StringComparison.OrdinalIgnoreCase) >= 0;
+            }
+
             var poisonApplier = GetComponent<OnHitPoisonApplier>();
             if (weapon != null && weapon.onHitPoison != null)
             {
@@ -199,7 +216,7 @@ namespace Player
             DamageType newType = DamageType.Melee;
             if (weapon != null)
             {
-                if (weapon.combat.Magic > 0)
+                if (WeaponNameIndicatesMagic())
                     newType = DamageType.Magic;
                 else if (weapon.combat.Range > 0 || weapon.combat.RangeStrength > 0)
                     newType = DamageType.Ranged;
