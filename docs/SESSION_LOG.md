@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7618ef037848a47d0004aab2797612f48359ab72 -->
+## 2025-10-12T23:09:19+01:00 — Adjust ranged detection for player combat loadout
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Player/PlayerCombatLoadout.cs
+- Diff: 25 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:1d16b7b0b377c0e66ea7064f357be79535c2e4d8 -->
 ## 2025-10-12T22:55:30+01:00 — Merge pull request #1097 from aicovergod/codex/update-weapon-display-name-resolution
 
