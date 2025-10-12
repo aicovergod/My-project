@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:308f005cf5b5a4a201def5a01f273b708ddec15b -->
+## 2025-10-12T23:09:42+01:00 — Merge pull request #1098 from aicovergod/codex/extend-handleequipmentchanged-for-ranged-weapons
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 34 ++ / 0 --
+- Notes:
+  Improve ranged keyword detection for player combat loadout
+---
+<!-- commit:0e5f6880acec2ca54f57bbd1d9be5232ef053cff -->
+## 2025-10-12T23:09:35+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7618ef037848a47d0004aab2797612f48359ab72 -->
 ## 2025-10-12T23:09:19+01:00 — Adjust ranged detection for player combat loadout
 
