@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9567483e5af7acb89900f98e0d8a9143909800eb -->
+## 2025-10-12T18:32:34+01:00 — Merge pull request #1086 from aicovergod/codex/add-tooltip-for-orekeepers-charm
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 42 ++ / 0 --
+- Notes:
+  Add equipment tooltip override for Orekeepers Charm
+---
+<!-- commit:ce47ae79e5e38e0baffb2cb61ea4859a915067d6 -->
+## 2025-10-12T18:32:27+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7fc1edaf83bc57eeacaf47e3294298f1c8be0da1 -->
 ## 2025-10-12T18:32:16+01:00 — Add custom equipment tooltip for Orekeepers Charm
 
