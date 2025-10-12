@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c8975358265e1e24a1dab6fd40d1bbdffa68efcb -->
+## 2025-10-12T21:56:48+01:00 — Merge pull request #1092 from aicovergod/codex/implement-manageduiwindow-and-refactor-ui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 521 ++ / 333 --
+- Notes:
+  Refactor shared UI windows
+---
+<!-- commit:1265e09062ec5050c24f157b683c942142edb814 -->
+## 2025-10-12T21:56:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6dd41ff458eb3238ca5e64ed1f68d316d9f5effd -->
 ## 2025-10-12T21:56:03+01:00 — Refactor shared UI windows
 
