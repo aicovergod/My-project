@@ -1007,6 +1007,11 @@ namespace Inventory
             if (result == null)
                 return false;
 
+            // Cache the original slot state so we can roll back if we fail to place the result.
+            // This avoids permanently consuming ingredients when the output item cannot fit.
+            InventoryEntry originalSrc = items[srcIndex];
+            InventoryEntry originalDst = items[dstIndex];
+
             items[srcIndex].count--;
             if (items[srcIndex].count <= 0)
                 items[srcIndex].item = null;
@@ -1019,10 +1024,20 @@ namespace Inventory
 
             bool added = AddItem(result, 1);
             if (added)
+            {
+                // AddItem already saved the inventory; we fire a non-persisting notification so listeners refresh visuals.
                 NotifyInventoryChanged(false);
-            else
-                NotifyInventoryChanged();
-            return true;
+                return true;
+            }
+
+            // Failed to add the result, so restore the decremented ingredient stacks to keep the UI and data consistent.
+            items[srcIndex] = originalSrc;
+            UpdateSlotVisual(srcIndex);
+
+            items[dstIndex] = originalDst;
+            UpdateSlotVisual(dstIndex);
+
+            return false;
         }
 
         private FiremakingSkill GetFiremakingSkill()
