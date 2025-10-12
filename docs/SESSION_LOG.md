@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2dc7972d85741102a8f0e1194cf5b2b4cd4e8ace -->
+## 2025-10-12T16:26:09+01:00 — Prevent pet item loss when dropping a new pet
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Inventory.cs
+- Diff: 19 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:2b9b50d968834de373c011114c0c6139b68c2620 -->
 ## 2025-10-11T18:25:20+01:00 — Merge pull request #1075 from aicovergod/codex/add-zero-damage-hitsplat-handling
 
