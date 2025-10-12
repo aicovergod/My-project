@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a1eeb4060f97263a7ad4fbf6682668dc5b22ed98 -->
+## 2025-10-12T23:29:31+01:00 — Disable movement input when shop and bank UIs open
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Shop/ShopUI.cs
+- Diff: 46 ++ / 7 --
+- Notes:
+  —
+---
 <!-- commit:a3ff22800387367cd6491f0e448985d738ef2f24 -->
 ## 2025-10-12T23:17:47+01:00 — updates
 
