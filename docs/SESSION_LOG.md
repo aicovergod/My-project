@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2ab1f2283a0b5de4771e8579da66865c82a0ca58 -->
+## 2025-10-12T18:10:05+01:00 — Refactor gathering HUD progress bar construction
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Skills/Common/UI/GatheringProgressBarBuilder.cs, Assets/Scripts/Skills/Fishing/UI/FishingHUD.cs, Assets/Scripts/Skills/Mining/UI/MiningUI.cs, Assets/Scripts/Skills/Woodcutting/UI/WoodcuttingHUD.cs
+- Diff: 122 ++ / 95 --
+- Notes:
+  —
+---
 <!-- commit:055b5ce66287d57ca4995e7478e7d3495a5466b1 -->
 ## 2025-10-12T18:04:40+01:00 — daggers
 
