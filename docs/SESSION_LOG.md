@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7956f41c43045dbe0967331ffdaa107679c53f7f -->
+## 2025-10-12T22:55:10+01:00 — Adjust magic weapon detection keywords
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Player/PlayerCombatLoadout.cs
+- Diff: 18 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:24ce00c33300dd636e1f66727e629ed2def6e73a -->
 ## 2025-10-12T22:39:16+01:00 — Merge pull request #1096 from aicovergod/codex/add-interfacetabmutexutility-for-tab-management
 
