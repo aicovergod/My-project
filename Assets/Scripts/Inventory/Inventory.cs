@@ -1119,6 +1119,7 @@ namespace Inventory
 
             // Cache the item before modifying the slot so we can check for pets.
             var droppedItem = entry.item;
+            var originalEntry = entry;
 
             // Prevent dropping or swapping pets while merged with a pet.
             var pet = PetDropSystem.FindPetByItem(droppedItem);
@@ -1133,7 +1134,6 @@ namespace Inventory
             items[slotIndex] = entry;
             UpdateSlotVisual(slotIndex);
             HideTooltip();
-            NotifyInventoryChanged();
 
             // Attempt to spawn a pet for this item if one exists.
             if (pet != null)
@@ -1142,7 +1142,22 @@ namespace Inventory
                 // before spawning the new one so players don't lose their previous pet item.
                 var currentPet = PetDropSystem.ActivePet;
                 if (currentPet != null && currentPet != pet && currentPet.pickupItem != null)
-                    AddItem(currentPet.pickupItem);
+                {
+                    bool restored = AddItem(currentPet.pickupItem);
+                    if (!restored)
+                    {
+                        // Fallback: restore the slot and explain why the swap was blocked so the player never loses their pet item.
+                        items[slotIndex] = originalEntry;
+                        UpdateSlotVisual(slotIndex);
+                        NotifyInventoryChanged();
+
+                        var message = "You need inventory space to store your active pet before summoning a new one.";
+                        if (transform != null)
+                            FloatingText.Show(message, transform.position);
+                        Debug.LogWarning($"Blocked pet swap for '{droppedItem.name}' because there was no room to return '{currentPet.pickupItem.name}'.");
+                        return;
+                    }
+                }
 
                 var player = GameObject.FindGameObjectWithTag("Player");
                 Vector3 pos = player != null ? player.transform.position : Vector3.zero;
@@ -1153,6 +1168,8 @@ namespace Inventory
             {
                 Debug.Log($"Dropped item '{droppedItem.name}' with no associated pet.");
             }
+
+            NotifyInventoryChanged();
         }
 
         /// <summary>
