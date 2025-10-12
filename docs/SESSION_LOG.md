@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:54bcc92d5e2c70f1b2742a5eb4477bd3bf6cc9a1 -->
+## 2025-10-12T18:40:56+01:00 — Merge pull request #1087 from aicovergod/codex/add-bonuses-dropdown-menu-to-itemdefinition
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 156 ++ / 0 --
+- Notes:
+  Add ItemData inspector foldout for skill bonuses
+---
+<!-- commit:7a225386f5d2d386609fced302143db305f63cf9 -->
+## 2025-10-12T18:40:49+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:92d7b44c6af63b5e772eedadf6708e7d84456387 -->
 ## 2025-10-12T18:40:36+01:00 — Group item bonuses under inspector foldout
 
