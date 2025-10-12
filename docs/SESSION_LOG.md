@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:24ce00c33300dd636e1f66727e629ed2def6e73a -->
+## 2025-10-12T22:39:16+01:00 — Merge pull request #1096 from aicovergod/codex/add-interfacetabmutexutility-for-tab-management
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 83 ++ / 16 --
+- Notes:
+  Add mutex utility for interface tab windows
+---
+<!-- commit:a7e6e8f1b6c1544cf8929c695c79c49ab6659cb1 -->
+## 2025-10-12T22:37:24+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2d935ce9360c0f407996fb085ff3bc70bab68895 -->
 ## 2025-10-12T22:37:12+01:00 — Add interface tab mutex utility
 
