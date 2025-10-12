@@ -336,6 +336,22 @@ namespace Inventory
             AppendBonus(item.miningXpBonusMultiplier, "Mining XP");
             AppendBonus(item.cookingXpBonusMultiplier, "Cooking XP");
 
+            var tooltipLines = item.EquipmentTooltipLines;
+            if (tooltipLines != null && tooltipLines.Count > 0)
+            {
+                for (int i = 0; i < tooltipLines.Count; i++)
+                {
+                    string line = tooltipLines[i];
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+
+                    if (sb.Length > 0)
+                        sb.AppendLine();
+
+                    sb.Append(line.Trim());
+                }
+            }
+
             tooltipBonusText.text = sb.ToString();
 
             var tooltipRect = tooltip.GetComponent<RectTransform>();
