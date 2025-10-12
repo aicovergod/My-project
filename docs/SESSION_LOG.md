@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a402a5b861dab03f493c01653b3fcb90f4ea0e4a -->
+## 2025-10-12T17:57:56+01:00 — Merge pull request #1081 from aicovergod/codex/add-xp-popup-delay-to-cooking-skill
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 12 ++ / 0 --
+- Notes:
+  Adjust cooking XP popup timing
+---
+<!-- commit:73ca83782d88c1812ade407521edf0667110964c -->
+## 2025-10-12T17:57:44+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d6ef5b8d7b7f8b922cd1bdd0450b8a87ef0e4865 -->
 ## 2025-10-12T17:57:31+01:00 — Adjust cooking XP popup timing
 
