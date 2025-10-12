@@ -206,20 +206,7 @@ namespace UI
             if (loadout == null)
                 return;
             foreach (var pair in styleButtons)
-                Highlight(pair.Value, loadout.Style == pair.Key);
-        }
-
-        private void Highlight(Button btn, bool selected)
-        {
-            if (btn == null)
-                return;
-            var colors = btn.colors;
-            var color = selected ? Color.green : Color.white;
-            colors.normalColor = color;
-            colors.highlightedColor = color;
-            colors.selectedColor = color;
-            colors.pressedColor = color;
-            btn.colors = colors;
+                ButtonHighlightUtility.ApplySelectedColor(pair.Value, loadout.Style == pair.Key, Color.green, Color.white);
         }
 
         protected override void OnBeforeOpen()

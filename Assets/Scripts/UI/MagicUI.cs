@@ -311,20 +311,7 @@ namespace UI
         private void UpdateSelection()
         {
             foreach (var pair in spellButtons)
-                Highlight(pair.Value, ActiveSpell == pair.Key);
-        }
-
-        private void Highlight(Button btn, bool selected)
-        {
-            if (btn == null)
-                return;
-            var colors = btn.colors;
-            var color = selected ? Color.green : Color.white;
-            colors.normalColor = color;
-            colors.highlightedColor = color;
-            colors.selectedColor = color;
-            colors.pressedColor = color;
-            btn.colors = colors;
+                ButtonHighlightUtility.ApplySelectedColor(pair.Value, ActiveSpell == pair.Key, Color.green, Color.white);
         }
 
         /// <summary>Restore the last selected spell and update UI highlighting.</summary>
