@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Inventory;
 using Player;
+using Player.Input;
 using NPC;
 using UI;
 using UI.Utilities;
@@ -51,6 +52,7 @@ namespace ShopSystem
         private bool inventoryWasOpenBeforeShop;
         private bool inventoryStateCaptured;
         private bool playerMovementStateCaptured;
+        private bool playerMovementInputWasEnabled;
 
         private static ShopUI instance;
         public static ShopUI Instance => instance;
@@ -204,13 +206,25 @@ namespace ShopSystem
             }
 
             playerMovementStateCaptured = false;
+            playerMovementInputWasEnabled = false;
             if (playerMover == null)
                 playerMover = FindObjectOfType<PlayerMover>();
             if (playerMover != null)
             {
-                playerMovementStateCaptured = true;
                 playerMover.StopMovement();
-                playerMover.SetMovementFrozen(true);
+
+                var movementInput = playerMover.MovementInput;
+                if (movementInput != null)
+                {
+                    playerMovementInputWasEnabled = movementInput.enabled;
+                    movementInput.enabled = false;
+                    playerMovementStateCaptured = true;
+                }
+                else
+                {
+                    playerMovementStateCaptured = false;
+                }
+
                 playerMover.CanDrop = false;
             }
 
@@ -262,7 +276,12 @@ namespace ShopSystem
             if (playerMover != null)
             {
                 if (playerMovementStateCaptured)
-                    playerMover.SetMovementFrozen(false);
+                {
+                    var movementInput = playerMover.MovementInput;
+                    if (movementInput != null)
+                        movementInput.enabled = playerMovementInputWasEnabled;
+                }
+
                 playerMover.CanDrop = true;
             }
 
@@ -275,6 +294,7 @@ namespace ShopSystem
             inventoryStateCaptured = false;
             inventoryWasOpenBeforeShop = false;
             playerMovementStateCaptured = false;
+            playerMovementInputWasEnabled = false;
             shopModalActive = false;
         }
 
