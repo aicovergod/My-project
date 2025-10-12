@@ -286,39 +286,19 @@ namespace Skills.Firemaking
             if (progressRoot != null)
                 return;
 
-            progressRoot = new GameObject("FiremakingProgress");
+            var components = GatheringProgressBarBuilder.Build(
+                "FiremakingProgress",
+                transform,
+                new Vector2(120f, 24f),
+                new Color(0f, 0f, 0f, 0.6f));
+
+            progressRoot = components.Root;
             progressRoot.transform.SetParent(transform, false);
-
-            progressCanvas = progressRoot.AddComponent<Canvas>();
-            progressCanvas.renderMode = RenderMode.WorldSpace;
-            progressCanvas.overrideSorting = true;
-            progressRoot.AddComponent<CanvasScaler>();
-            progressRoot.AddComponent<GraphicRaycaster>();
-            progressRoot.transform.localScale = Vector3.one * 0.01f;
-
-            var bg = new GameObject("Background");
-            bg.transform.SetParent(progressRoot.transform, false);
-            var bgImage = bg.AddComponent<Image>();
-            bgImage.color = new Color(0f, 0f, 0f, 0.6f);
-            var bgSprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0f, 0f, 1f, 1f), new Vector2(0.5f, 0.5f));
-            bgImage.sprite = bgSprite;
-            var bgRect = bgImage.rectTransform;
-            bgRect.sizeDelta = new Vector2(120f, 24f);
-
-            var fill = new GameObject("Fill");
-            fill.transform.SetParent(bg.transform, false);
-            progressFill = fill.AddComponent<Image>();
-            progressFill.sprite = bgSprite;
-            progressFill.type = Image.Type.Filled;
-            progressFill.fillMethod = Image.FillMethod.Horizontal;
+            progressCanvas = components.Canvas;
+            progressFill = components.FillImage;
             progressFill.fillOrigin = (int)Image.OriginHorizontal.Left;
-            SetProgressFill(0f);
-            var fillRect = progressFill.rectTransform;
-            fillRect.anchorMin = Vector2.zero;
-            fillRect.anchorMax = Vector2.one;
-            fillRect.offsetMin = Vector2.zero;
-            fillRect.offsetMax = Vector2.zero;
 
+            SetProgressFill(0f);
             progressRoot.SetActive(false);
         }
 
