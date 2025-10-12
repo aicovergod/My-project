@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:cf92fcfd16d3e7174bc9928b2d554bea2d079dab -->
+## 2025-10-12T23:36:10+01:00 — Merge pull request #1100 from aicovergod/codex/update-agents.md-with-latest-changes-j8idid
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 16 ++ / 0 --
+- Notes:
+  Refresh AGENTS instructions for updated UI gating
+---
+<!-- commit:a04cd44e5f21a4b710f3e842196f7d25468c9cfb -->
+## 2025-10-12T23:36:01+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:4120020129010cc8a74cd19b0c1c329aa8fd10c9 -->
 ## 2025-10-12T23:35:47+01:00 — Update project guidelines for new UI and movement locks
 
