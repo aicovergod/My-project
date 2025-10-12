@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4120020129010cc8a74cd19b0c1c329aa8fd10c9 -->
+## 2025-10-12T23:35:47+01:00 — Update project guidelines for new UI and movement locks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): AGENTS.md
+- Diff: 7 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:e8671fa3203b6fa9b3bf17c7a7a92a2c8fc81abd -->
 ## 2025-10-12T23:29:51+01:00 — Merge pull request #1099 from aicovergod/codex/refactor-ui-to-disable-locomotion-input
 

@@ -40,6 +40,7 @@
   - `PlayerMover` persists across scenes, auto-walks gathering nodes, saves position ticks, and respects freeze or respawn locks while keeping autosaves fresh.
   - `PlayerCombatLoadout`, `PlayerCombatTarget`, and `PlayerHitpoints` aggregate combat stats, weapon-driven poison hooks, and hitpoint changes for UI and respawn systems.
   - `PlayerRespawnSystem` cooperates with `World/RespawnPoint`, clears buffs via `BuffTimerService`, and triggers screen fades/death jingle through `SoundManager`. `PlayerEat` handles 0.6 s food ticks for OSRS-style healing windows.
+  - `Player/Movement/PlayerMovementController` centralises freeze stacks coming from shops, banks, scripted freezes, and combat. Use its request helpers (surfaced through the shop/bank windows and `FreezeUtility`) instead of toggling Rigidbody constraints directly.
 - **Magic System** (`Assets/Scripts/Magic`, `Assets/Resources/Spells`, `Assets/Prefabs/Spells`)
   - `SpellDefinition` ScriptableObjects set spell range, projectile speed, hit FX, max hit, elemental type, and optional freeze settings. Respect `loadOrder` for UI sorting, keep `requiredMagicLevel` aligned with `SkillManager`, and pair freeze toggles with `Status/FrozenStatusController` listeners.
   - Projectile prefabs (`FireProjectile`) and hit effect prefabs (`HitEffect`) live under `Assets/Prefabs/Spells`. Sprite VFX are in `Assets/Sprites/GFX/Spells` and should stay 64×64 transparent assets matching the ScriptableObject name.
@@ -51,6 +52,7 @@
 - **Economy** (`Assets/Scripts/Shop`, `Assets/Scripts/Bank`)
   - Shop UIs share fonts/settings with inventory, reference `Shop`/`ShopUI` scripts, and rely on item databases. Bank UI reuses the same font default.
   - `BankUI`, `BankDepositMenu`, and `BankWithdrawMenu` process deposits/withdrawals with inventory hooks, while `BankOpener` gates world interactions.
+  - `ShopUI` and `BankUI` now capture player input state and freeze locomotion while the modal remains open. They toggle the global modal flags consumed by `UIManager` and automatically restore inventory visibility and movement once closed—new modal windows should follow the same pattern so movement locks do not leak.
 - **Dialogue & Quests** (`Assets/Scripts/Dialogue`, `Assets/Scripts/Quests`)
   - Dialogue data/manager/UI implement OSRS-style panels. Quests use `QuestManager` (saveable) with ScriptableObject quest definitions in `Resources/Quests`.
 - **NPCs & World** (`Assets/Scripts/NPC`, `Assets/Scripts/World`)
@@ -63,6 +65,10 @@
   - `UI/MagicUI` is a `PersistentSceneSingleton` that builds the spellbook grid from `Resources/Spells`, caches strike spells for max-hit syncing, and drives the active spell/last selected spell state consumed by `CombatController` and `PlayerCombatLoadout`.
   - `UI/InterfaceTabButtons` spawns the bottom-right OSRS tab strip (Quest, Inventory, Skills, Equipment, Attack Style, Magic). Let it toggle windows instead of duplicating button logic, and rely on `UIManager`'s auto-close behaviour for AttackStyle.
   - Buff tracking now runs through `UI/HUD/BuffHudManager` and its `BuffInfoBox`/`BuffTooltipController` prefabs. Query the singleton to refresh icons, handle expiry audio, or respond to `BuffEvents` updates.
+  - `UI/Utilities/ManagedUiWindow` standardises open/close flows for windows controlled by `UIManager`. Derive new modal-friendly UI from it (or `SceneGatedManagedUiWindow<T>` when persistence is required), call `RegisterWindow`/`UnregisterWindow` in the lifecycle, and rely on the base `Open`/`Close` implementations so modal gating runs through `UIManager.TryOpenWindow`.
+  - `UI/UIManager` now honours `ShopUI.IsShopModalActive` and `BankUI.IsBankModalActive` when arbitrating windows. When those flags are set only the corresponding modal and the inventory may open, and `ManagedUiWindow` handles the negotiation automatically. If you build custom windows that do not inherit from the base class, make sure to consult `UIManager.TryOpenWindow` before showing them.
+  - Use `UI/Utilities/InterfaceTabMutexUtility` whenever you expose a bottom-right tab window. It closes competing windows (Quest, Skills, Equipment, Attack Style, Magic, Inventory) so tab toggles remain mutually exclusive.
+  - `UI/Utilities/ButtonHighlightUtility` owns the shared colour swap logic for buttons that emulate OSRS selection states (Attack Style, Magic spellbook). Run selections through it instead of duplicating highlight code.
 - **Audio & Screen Fades** (`Assets/Scripts/Audio`, `Assets/Scripts/World`)
   - `Audio/SoundManager` centralises SFX/music playback and exposes the `SoundEffect` enum (e.g., death jingle). Register clips there and let `SceneTransitionManager`'s `EnsureSingleAudioListener` prevent duplicate listeners after scene swaps.
   - `World/ScreenFader` provides black fade in/out routines used by `SceneTransitionManager` and `PlayerRespawnSystem`. Reuse it for any other screen transitions so fade timing stays consistent.
@@ -139,6 +145,7 @@
 - `Skills/Common/UI/GatheringSkillHudBase` now centralises the coroutine-based retry logic for gathering HUDs. Derive new progress UIs (or refactors of Fishing, Mining, Woodcutting) from this base instead of copying the FindObjectOfType polling code.
 - `Skills/Outfits/SkillingOutfitRewarder` centralises the 1-in-2500 skilling outfit rolls. Pass the per-skill `SkillingOutfitProgress`, inventory, bank hook, toast strings, and RNG delegate so debug logging and sanity checks remain consistent across every gathering skill.
 - `Skills/Common/SkillingPetRewarder` wraps `PetDropSystem.TryRollPet` for gathering skills. Supply the source ID, `SkillManager`, best available anchor, and optional 1-in-N override so pet rolls stay consistent.
+- `Skills/Common/UI/TickedProgressHudBase`, `GatheringToolHudBase`, and `GatheringProgressBarBuilder` provide shared tick-driven progress bar generation and HUD refresh timing for cooking, firemaking, and future gathering skills. Use them to keep colour gradients, delayed XP, and progress bars consistent instead of hardcoding UI creation in each skill.
 
 ## Testing & Validation
 - Play mode and edit mode tests live in `Assets/Tests` (currently NUnit-based unit tests like `CookingSkillTests`, `NpcFactionTests`, `NpcElementalModifierTests`). Run them through the Unity Test Runner or an equivalent CLI invocation (`Unity -runTests`) whenever you touch gameplay logic.
