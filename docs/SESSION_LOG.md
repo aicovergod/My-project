@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a65b15920fc782ce3faa649cb65f6cad1e1bd3b0 -->
+## 2025-10-12T17:33:19+01:00 — Merge pull request #1080 from aicovergod/codex/fix-frozen-player-shop-interface-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 52 ++ / 11 --
+- Notes:
+  Prevent movement while shop or bank UIs are open
+---
+<!-- commit:c3cca8dd7114acc8fabc969a3aae979979ec4c69 -->
+## 2025-10-12T17:33:12+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:cca3114c512a18b2358a01fc45321b018aeff28d -->
 ## 2025-10-12T17:33:01+01:00 — Prevent movement while shop or bank UIs are open
 
