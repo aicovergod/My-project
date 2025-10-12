@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e34688ed4c4d1a535019c58b939e630c4e625ab0 -->
+## 2025-10-12T18:02:29+01:00 — Merge pull request #1082 from aicovergod/codex/fix-movement-freeze-issues-in-uis
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 13 ++ / 13 --
+- Notes:
+  Address Codex feedback for movement freeze release handling
+---
+<!-- commit:90afebc67110fe5c1f1cc4470154592dcbc67066 -->
+## 2025-10-12T18:02:18+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:cec9cc20c08a78660f8057f76dbbe7dc3b72b14b -->
 ## 2025-10-12T18:02:06+01:00 — Fix UI freeze release to avoid leaking locks
 
