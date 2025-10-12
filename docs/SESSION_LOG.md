@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fc1df673e44a9215fa78fba4a368d7508aa840b2 -->
+## 2025-10-12T19:30:22+01:00 — Merge pull request #1091 from aicovergod/codex/create-shared-progress-hud-base-class
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 507 ++ / 494 --
+- Notes:
+  Refactor ticked skill HUDs
+---
+<!-- commit:b9211ee6615ec320949266f98a0cb3068f754966 -->
+## 2025-10-12T19:30:13+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:082f868f73bbff162946270a07d0b85eac9dbb44 -->
 ## 2025-10-12T19:30:01+01:00 — Refactor ticked skill HUDs
 
