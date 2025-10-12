@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2635daee18ddc2f63de75a62272dd7577e626d9f -->
+## 2025-10-12T18:17:07+01:00 — Merge branch 'codex/fix-frozen-player-shop-interface-bug' into main
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 77 --
+- Notes:
+  —
+---
 <!-- commit:e34688ed4c4d1a535019c58b939e630c4e625ab0 -->
 ## 2025-10-12T18:02:29+01:00 — Merge pull request #1082 from aicovergod/codex/fix-movement-freeze-issues-in-uis
 
