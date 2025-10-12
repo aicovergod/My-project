@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e8671fa3203b6fa9b3bf17c7a7a92a2c8fc81abd -->
+## 2025-10-12T23:29:51+01:00 — Merge pull request #1099 from aicovergod/codex/refactor-ui-to-disable-locomotion-input
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 55 ++ / 7 --
+- Notes:
+  Disable movement input when shop and bank UIs open
+---
+<!-- commit:991fef5595d4dc6cfbf566f57aefff51cf4e04e6 -->
+## 2025-10-12T23:29:44+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a1eeb4060f97263a7ad4fbf6682668dc5b22ed98 -->
 ## 2025-10-12T23:29:31+01:00 — Disable movement input when shop and bank UIs open
 
