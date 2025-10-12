@@ -1,17 +1,17 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:2335cd0e6516e4a3a47821e8ebdc361c4baaeaa0 -->
-## 2025-10-12T18:10:41+01:00 — Merge pull request #1083 from aicovergod/codex/create-reusable-gathering-progress-bar-helper
+<!-- commit:e34688ed4c4d1a535019c58b939e630c4e625ab0 -->
+## 2025-10-12T18:02:29+01:00 — Merge pull request #1082 from aicovergod/codex/fix-movement-freeze-issues-in-uis
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
 - Changed files (0): —
-- Diff: 131 ++ / 95 --
+- Diff: 13 ++ / 13 --
 - Notes:
-  Refactor gathering HUD progress bar construction
+  Address Codex feedback for movement freeze release handling
 ---
-<!-- commit:e15cf5698985d802740950aea45cad0945a989fc -->
-## 2025-10-12T18:10:17+01:00 — Update SESSION_LOG [ci]
+<!-- commit:90afebc67110fe5c1f1cc4470154592dcbc67066 -->
+## 2025-10-12T18:02:18+01:00 — Update SESSION_LOG [ci]
 
 - Author: session-log-bot <actions@github.com>
 - Changed files (1): docs/SESSION_LOG.md
@@ -19,66 +19,12 @@ This file is auto-updated by CI on every push. Times shown are Europe/London.
 - Notes:
   —
 ---
-<!-- commit:2ab1f2283a0b5de4771e8579da66865c82a0ca58 -->
-## 2025-10-12T18:10:05+01:00 — Refactor gathering HUD progress bar construction
+<!-- commit:cec9cc20c08a78660f8057f76dbbe7dc3b72b14b -->
+## 2025-10-12T18:02:06+01:00 — Fix UI freeze release to avoid leaking locks
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (4): Assets/Scripts/Skills/Common/UI/GatheringProgressBarBuilder.cs, Assets/Scripts/Skills/Fishing/UI/FishingHUD.cs, Assets/Scripts/Skills/Mining/UI/MiningUI.cs, Assets/Scripts/Skills/Woodcutting/UI/WoodcuttingHUD.cs
-- Diff: 122 ++ / 95 --
-- Notes:
-  —
----
-<!-- commit:055b5ce66287d57ca4995e7478e7d3495a5466b1 -->
-## 2025-10-12T18:04:40+01:00 — daggers
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (34): Assets/Resources/Item/Adamant Dagger.asset, Assets/Resources/Item/Adamant Dagger.asset.meta, Assets/Resources/Item/Black Dagger.asset, Assets/Resources/Item/Black Dagger.asset.meta, Assets/Resources/Item/Bronze Dagger.asset, Assets/Resources/Item/Bronze Dagger.asset.meta, Assets/Resources/Item/Iron Dagger.asset, Assets/Resources/Item/Iron Dagger.asset.meta, Assets/Resources/Item/Mithril Dagger.asset, Assets/Resources/Item/Mithril Dagger.asset.meta, Assets/Resources/Item/Orichalcum Dagger.asset, Assets/Resources/Item/Orichalcum Dagger.asset.meta, Assets/Resources/Item/Rune Dagger.asset, Assets/Resources/Item/Rune Dagger.asset.meta, Assets/Resources/Item/Steel Dagger.asset, Assets/Resources/Item/Steel Dagger.asset.meta, Assets/Scripts/World/SceneGatedSingletonBehaviour.cs.meta, Assets/Sprites/Weapons/Dagger.meta, Assets/Sprites/Weapons/Dagger/Adamant Dagger.png, Assets/Sprites/Weapons/Dagger/Adamant Dagger.png.meta, Assets/Sprites/Weapons/Dagger/Black Dagger.png, Assets/Sprites/Weapons/Dagger/Black Dagger.png.meta, Assets/Sprites/Weapons/Dagger/Bronze Dagger.png, Assets/Sprites/Weapons/Dagger/Bronze Dagger.png.meta, Assets/Sprites/Weapons/Dagger/Iron Dagger.png, Assets/Sprites/Weapons/Dagger/Iron Dagger.png.meta, Assets/Sprites/Weapons/Dagger/Mithril Dagger.png, Assets/Sprites/Weapons/Dagger/Mithril Dagger.png.meta, Assets/Sprites/Weapons/Dagger/Orichalcum Dagger.png, Assets/Sprites/Weapons/Dagger/Orichalcum Dagger.png.meta, Assets/Sprites/Weapons/Dagger/Rune Dagger.png, Assets/Sprites/Weapons/Dagger/Rune Dagger.png.meta, Assets/Sprites/Weapons/Dagger/Steel Dagger.png, Assets/Sprites/Weapons/Dagger/Steel Dagger.png.meta
-- Diff: 1776 ++ / 0 --
-- Notes:
-  —
----
-<!-- commit:a402a5b861dab03f493c01653b3fcb90f4ea0e4a -->
-## 2025-10-12T17:57:56+01:00 — Merge pull request #1081 from aicovergod/codex/add-xp-popup-delay-to-cooking-skill
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 12 ++ / 0 --
-- Notes:
-  Adjust cooking XP popup timing
----
-<!-- commit:73ca83782d88c1812ade407521edf0667110964c -->
-## 2025-10-12T17:57:44+01:00 — Update SESSION_LOG [ci]
-
-- Author: session-log-bot <actions@github.com>
-- Changed files (1): docs/SESSION_LOG.md
-- Diff: 9 ++ / 0 --
-- Notes:
-  —
----
-<!-- commit:d6ef5b8d7b7f8b922cd1bdd0450b8a87ef0e4865 -->
-## 2025-10-12T17:57:31+01:00 — Adjust cooking XP popup timing
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (1): Assets/Scripts/Skills/Cooking/Core/CookingSkill.cs
-- Diff: 3 ++ / 0 --
-- Notes:
-  —
----
-<!-- commit:a65b15920fc782ce3faa649cb65f6cad1e1bd3b0 -->
-## 2025-10-12T17:33:19+01:00 — Merge pull request #1080 from aicovergod/codex/fix-frozen-player-shop-interface-bug
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 52 ++ / 11 --
-- Notes:
-  Prevent movement while shop or bank UIs are open
----
-<!-- commit:c3cca8dd7114acc8fabc969a3aae979979ec4c69 -->
-## 2025-10-12T17:33:12+01:00 — Update SESSION_LOG [ci]
-
-- Author: session-log-bot <actions@github.com>
-- Changed files (1): docs/SESSION_LOG.md
-- Diff: 9 ++ / 0 --
+- Changed files (2): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Shop/ShopUI.cs
+- Diff: 4 ++ / 13 --
 - Notes:
   —
 ---
