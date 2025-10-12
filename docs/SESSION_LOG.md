@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a3ff22800387367cd6491f0e448985d738ef2f24 -->
+## 2025-10-12T23:17:47+01:00 — updates
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (8): Assets/Scripts/Inventory/Editor.meta, Assets/Scripts/Inventory/Editor/ItemDataEditor.cs.meta, Assets/Scripts/Player/PlayerCombatLoadout.cs, Assets/Scripts/Skills/Common/UI/GatheringProgressBarBuilder.cs.meta, Assets/Scripts/Skills/Common/UI/GatheringToolHudBase.cs.meta, Assets/Scripts/Skills/Common/UI/TickedProgressHudBase.cs.meta, Assets/Scripts/UI/Utilities/ButtonHighlightUtility.cs.meta, Assets/Scripts/UI/Utilities/InterfaceTabMutexUtility.cs.meta
+- Diff: 24 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:308f005cf5b5a4a201def5a01f273b708ddec15b -->
 ## 2025-10-12T23:09:42+01:00 — Merge pull request #1098 from aicovergod/codex/extend-handleequipmentchanged-for-ranged-weapons
 
