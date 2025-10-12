@@ -13,6 +13,7 @@ using Skills.Firemaking;
 using Pets;
 using Quests;
 using UI;
+using UI.Utilities;
 using Books;
 using Object = UnityEngine.Object;
 
@@ -200,6 +201,7 @@ namespace Inventory
                 if (uiManager != null && !uiManager.TryOpenWindow(this))
                     return;
             }
+            InterfaceTabMutexUtility.CloseAllTabWindowsExcept(this);
             if (uiRoot != null)
                 uiRoot.SetActive(true);
             if (playerMover != null)

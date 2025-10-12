@@ -12,6 +12,7 @@ using Combat;
 using Player;
 using Quests;
 using UI;
+using UI.Utilities;
 using Object = UnityEngine.Object;
 
 namespace Inventory
@@ -253,15 +254,13 @@ namespace Inventory
 
         public void Open()
         {
-            var quest = Object.FindObjectOfType<QuestUI>();
-            if (quest != null && quest.IsOpen)
-                return;
-
             var uiManager = UIManager.Instance;
             if (uiRoot != null && uiManager != null)
             {
                 if (!uiManager.TryOpenWindow(this))
                     return;
+
+                InterfaceTabMutexUtility.CloseAllTabWindowsExcept(this);
 
                 var minimap = World.Minimap.Instance;
                 minimap?.CloseExpanded();

@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2d935ce9360c0f407996fb085ff3bc70bab68895 -->
+## 2025-10-12T22:37:12+01:00 — Add interface tab mutex utility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Inventory/Equipment.cs, Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Quests/QuestUI.cs, Assets/Scripts/Skills/SkillsUI.cs, Assets/Scripts/UI/AttackStyleUI.cs, Assets/Scripts/UI/MagicUI.cs, Assets/Scripts/UI/Utilities/InterfaceTabMutexUtility.cs
+- Diff: 74 ++ / 16 --
+- Notes:
+  —
+---
 <!-- commit:e8a0a5f629ba9a01b52ab5da7c9538c5a87318e0 -->
 ## 2025-10-12T22:12:21+01:00 — Merge branch 'codex/fix-high-priority-bug-in-shopui-dl0uu8' into main
 
