@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5c8136c14f2338fc101800c8a5e38c7c31b0d4ab -->
+## 2025-10-12T19:20:52+01:00 — Merge pull request #1090 from aicovergod/codex/create-abstract-hud-base-for-skills
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 686 ++ / 884 --
+- Notes:
+  Refactor gathering HUDs onto shared base
+---
+<!-- commit:ee96e5ebd556f6696acaa6df5ff3ea182d738b86 -->
+## 2025-10-12T19:20:20+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:10ab43abfe9680520297c2cd6bd85f62bb100a50 -->
 ## 2025-10-12T19:20:08+01:00 — Refactor gathering HUD tool base
 
