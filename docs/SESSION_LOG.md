@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:10ab43abfe9680520297c2cd6bd85f62bb100a50 -->
+## 2025-10-12T19:20:08+01:00 — Refactor gathering HUD tool base
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Skills/Common/UI/GatheringToolHudBase.cs, Assets/Scripts/Skills/Fishing/UI/FishingHUD.cs, Assets/Scripts/Skills/Mining/UI/MiningUI.cs, Assets/Scripts/Skills/Woodcutting/UI/WoodcuttingHUD.cs
+- Diff: 677 ++ / 884 --
+- Notes:
+  —
+---
 <!-- commit:93d6bcd6254a60c5ed838cdabf0ab720d4ca9263 -->
 ## 2025-10-12T18:58:10+01:00 — Merge pull request #1089 from aicovergod/codex/add-bonuses-dropdown-menu-to-itemdefinition-xw5p89
 
