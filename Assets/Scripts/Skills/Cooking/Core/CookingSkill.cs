@@ -258,6 +258,9 @@ namespace Skills.Cooking
                     FloatingTextAnchor = floatingTextAnchor,
                     FallbackAnchor = transform,
                     ResourcePosition = stationPosition,
+                    // Use a shorter delay so the popup resolves before the next cook attempt resets the cooldown, preventing
+                    // GatheringFloatingTextService.TryConsumeAnchorCooldown from rejecting it while the player is still cooking.
+                    XpPopupDelayTicks = Mathf.Max(1f, CookTicksPerItem - 1f),
                     Equipment = equipment,
                     EquipmentXpBonusEvaluator = data => data != null ? data.cookingXpBonusMultiplier : 0f,
                     RewardMessageFormatter = qty => $"+{qty} {cookedName}",

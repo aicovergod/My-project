@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d6ef5b8d7b7f8b922cd1bdd0450b8a87ef0e4865 -->
+## 2025-10-12T17:57:31+01:00 — Adjust cooking XP popup timing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Cooking/Core/CookingSkill.cs
+- Diff: 3 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a65b15920fc782ce3faa649cb65f6cad1e1bd3b0 -->
 ## 2025-10-12T17:33:19+01:00 — Merge pull request #1080 from aicovergod/codex/fix-frozen-player-shop-interface-bug
 
