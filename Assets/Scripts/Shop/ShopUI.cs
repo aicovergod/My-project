@@ -48,8 +48,6 @@ namespace ShopSystem
         // Tracks the inventory visibility so we can restore the state when leaving the shop.
         private bool inventoryWasOpenBeforeShop;
         private bool inventoryStateCaptured;
-        // Tracks the movement freeze state so we only unfreeze movement if we froze it.
-        private bool playerMovementWasFrozenBeforeShop;
         private bool playerMovementStateCaptured;
 
         private static ShopUI instance;
@@ -177,7 +175,6 @@ namespace ShopSystem
                 playerMover = FindObjectOfType<PlayerMover>();
             if (playerMover != null)
             {
-                playerMovementWasFrozenBeforeShop = playerMover.IsMovementFrozen;
                 playerMovementStateCaptured = true;
                 playerMover.StopMovement();
                 playerMover.SetMovementFrozen(true);
@@ -213,11 +210,9 @@ namespace ShopSystem
             {
                 if (playerMovementStateCaptured)
                 {
-                    // Release the shop's freeze request before restoring whatever state existed
-                    // when the window opened so overlapping systems remain respected.
+                    // Release the shop's freeze request so overlapping systems can maintain any
+                    // remaining frozen state without the shop reapplying its own lock.
                     playerMover.SetMovementFrozen(false);
-                    if (playerMovementWasFrozenBeforeShop && !playerMover.IsMovementFrozen)
-                        playerMover.SetMovementFrozen(true);
                 }
 
                 playerMover.CanDrop = true;

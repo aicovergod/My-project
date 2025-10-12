@@ -75,7 +75,6 @@ namespace BankSystem
         private bool inventoryWasOpen;
         private PlayerMover playerMover;
         private bool playerMovementStateCaptured;
-        private bool playerMovementWasFrozenBeforeBank;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -609,7 +608,6 @@ namespace BankSystem
                 playerMover = FindObjectOfType<PlayerMover>();
             if (playerMover != null)
             {
-                playerMovementWasFrozenBeforeBank = playerMover.IsMovementFrozen;
                 playerMovementStateCaptured = true;
                 playerMover.StopMovement();
                 playerMover.SetMovementFrozen(true);
@@ -643,11 +641,9 @@ namespace BankSystem
             {
                 if (playerMovementStateCaptured)
                 {
-                    // Release the bank's freeze request before restoring the pre-open state so
-                    // overlapping systems such as freeze spells maintain authority.
+                    // Release the bank's freeze request so overlapping systems such as freeze
+                    // spells maintain authority over the remaining frozen state.
                     playerMover.SetMovementFrozen(false);
-                    if (playerMovementWasFrozenBeforeBank && !playerMover.IsMovementFrozen)
-                        playerMover.SetMovementFrozen(true);
                 }
                 playerMover.CanDrop = true;
             }
