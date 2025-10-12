@@ -642,9 +642,13 @@ namespace BankSystem
             if (playerMover != null)
             {
                 if (playerMovementStateCaptured)
-                    playerMover.SetMovementFrozen(playerMovementWasFrozenBeforeBank);
-                else
+                {
+                    // Release the bank's freeze request before restoring the pre-open state so
+                    // overlapping systems such as freeze spells maintain authority.
                     playerMover.SetMovementFrozen(false);
+                    if (playerMovementWasFrozenBeforeBank && !playerMover.IsMovementFrozen)
+                        playerMover.SetMovementFrozen(true);
+                }
                 playerMover.CanDrop = true;
             }
             playerMovementStateCaptured = false;

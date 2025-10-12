@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:cca3114c512a18b2358a01fc45321b018aeff28d -->
+## 2025-10-12T17:33:01+01:00 — Prevent movement while shop or bank UIs are open
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Player/Movement/PlayerMovementController.cs, Assets/Scripts/Shop/ShopUI.cs
+- Diff: 43 ++ / 11 --
+- Notes:
+  —
+---
 <!-- commit:1f38d406760b279caf86e671d59ec4891bc09a3f -->
 ## 2025-10-12T17:26:01+01:00 — Merge pull request #1079 from aicovergod/codex/remove-dropped-item-message-from-console-log
 
