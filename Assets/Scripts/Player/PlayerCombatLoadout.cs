@@ -199,6 +199,29 @@ namespace Player
                     || displayName.IndexOf("Sceptre", StringComparison.OrdinalIgnoreCase) >= 0;
             }
 
+            // Local helper mirrors the magic keyword logic for ranged identifiers.
+            bool WeaponNameIndicatesRanged()
+            {
+                if (weapon == null)
+                    return false;
+
+                string displayName = !string.IsNullOrEmpty(weapon.itemName) ? weapon.itemName : weapon.name;
+                if (string.IsNullOrEmpty(displayName))
+                    return false;
+
+                return displayName.IndexOf("Bow", StringComparison.OrdinalIgnoreCase) >= 0
+                    || displayName.IndexOf("Shortbow", StringComparison.OrdinalIgnoreCase) >= 0
+                    || displayName.IndexOf("Longbow", StringComparison.OrdinalIgnoreCase) >= 0
+                    || displayName.IndexOf("Handcannon", StringComparison.OrdinalIgnoreCase) >= 0
+                    || displayName.IndexOf("Blowpipe", StringComparison.OrdinalIgnoreCase) >= 0
+                    || displayName.IndexOf("Crossbow", StringComparison.OrdinalIgnoreCase) >= 0
+                    || displayName.IndexOf("Chinchompa", StringComparison.OrdinalIgnoreCase) >= 0
+                    || displayName.IndexOf("Dart", StringComparison.OrdinalIgnoreCase) >= 0
+                    || displayName.IndexOf("Thrownaxe", StringComparison.OrdinalIgnoreCase) >= 0
+                    || displayName.IndexOf("Knife", StringComparison.OrdinalIgnoreCase) >= 0
+                    || displayName.IndexOf("Javelin", StringComparison.OrdinalIgnoreCase) >= 0;
+            }
+
             var poisonApplier = GetComponent<OnHitPoisonApplier>();
             if (weapon != null && weapon.onHitPoison != null)
             {
@@ -218,6 +241,8 @@ namespace Player
             {
                 if (WeaponNameIndicatesMagic())
                     newType = DamageType.Magic;
+                else if (WeaponNameIndicatesRanged())
+                    newType = DamageType.Ranged;
                 else if (weapon.combat.Range > 0 || weapon.combat.RangeStrength > 0)
                     newType = DamageType.Ranged;
             }
