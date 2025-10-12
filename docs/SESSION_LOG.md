@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:055b5ce66287d57ca4995e7478e7d3495a5466b1 -->
+## 2025-10-12T18:04:40+01:00 — daggers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (34): Assets/Resources/Item/Adamant Dagger.asset, Assets/Resources/Item/Adamant Dagger.asset.meta, Assets/Resources/Item/Black Dagger.asset, Assets/Resources/Item/Black Dagger.asset.meta, Assets/Resources/Item/Bronze Dagger.asset, Assets/Resources/Item/Bronze Dagger.asset.meta, Assets/Resources/Item/Iron Dagger.asset, Assets/Resources/Item/Iron Dagger.asset.meta, Assets/Resources/Item/Mithril Dagger.asset, Assets/Resources/Item/Mithril Dagger.asset.meta, Assets/Resources/Item/Orichalcum Dagger.asset, Assets/Resources/Item/Orichalcum Dagger.asset.meta, Assets/Resources/Item/Rune Dagger.asset, Assets/Resources/Item/Rune Dagger.asset.meta, Assets/Resources/Item/Steel Dagger.asset, Assets/Resources/Item/Steel Dagger.asset.meta, Assets/Scripts/World/SceneGatedSingletonBehaviour.cs.meta, Assets/Sprites/Weapons/Dagger.meta, Assets/Sprites/Weapons/Dagger/Adamant Dagger.png, Assets/Sprites/Weapons/Dagger/Adamant Dagger.png.meta, Assets/Sprites/Weapons/Dagger/Black Dagger.png, Assets/Sprites/Weapons/Dagger/Black Dagger.png.meta, Assets/Sprites/Weapons/Dagger/Bronze Dagger.png, Assets/Sprites/Weapons/Dagger/Bronze Dagger.png.meta, Assets/Sprites/Weapons/Dagger/Iron Dagger.png, Assets/Sprites/Weapons/Dagger/Iron Dagger.png.meta, Assets/Sprites/Weapons/Dagger/Mithril Dagger.png, Assets/Sprites/Weapons/Dagger/Mithril Dagger.png.meta, Assets/Sprites/Weapons/Dagger/Orichalcum Dagger.png, Assets/Sprites/Weapons/Dagger/Orichalcum Dagger.png.meta, Assets/Sprites/Weapons/Dagger/Rune Dagger.png, Assets/Sprites/Weapons/Dagger/Rune Dagger.png.meta, Assets/Sprites/Weapons/Dagger/Steel Dagger.png, Assets/Sprites/Weapons/Dagger/Steel Dagger.png.meta
+- Diff: 1776 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a402a5b861dab03f493c01653b3fcb90f4ea0e4a -->
 ## 2025-10-12T17:57:56+01:00 — Merge pull request #1081 from aicovergod/codex/add-xp-popup-delay-to-cooking-skill
 
