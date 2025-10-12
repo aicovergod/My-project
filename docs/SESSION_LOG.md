@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1bdba31b6fa360544df8c7f54890e07cf4609ccb -->
+## 2025-10-12T18:55:48+01:00 — Group halberd AOE controls in ItemData inspector
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Editor/ItemDataEditor.cs
+- Diff: 226 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9567483e5af7acb89900f98e0d8a9143909800eb -->
 ## 2025-10-12T18:32:34+01:00 — Merge pull request #1086 from aicovergod/codex/add-tooltip-for-orekeepers-charm
 
