@@ -123,6 +123,7 @@ namespace ShopSystem
 
             pendingShop = shop;
             pendingNpc = npcMovement;
+            shopModalActive = true;
             ForceNextOpenHooks();
             base.Open();
 
@@ -130,6 +131,7 @@ namespace ShopSystem
             {
                 pendingShop = null;
                 pendingNpc = null;
+                shopModalActive = false;
             }
         }
 
@@ -186,7 +188,6 @@ namespace ShopSystem
 
         protected override void OnBeforeOpen()
         {
-            shopModalActive = true;
             currentShop = pendingShop;
             npcMover = pendingNpc;
 
