@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:93d6bcd6254a60c5ed838cdabf0ab720d4ca9263 -->
+## 2025-10-12T18:58:10+01:00 — Merge pull request #1089 from aicovergod/codex/add-bonuses-dropdown-menu-to-itemdefinition-xw5p89
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 82 ++ / 30 --
+- Notes:
+  Group ItemData halberd AOE settings under foldout
+---
+<!-- commit:6afcb2d46c7233ef068ddfef6d5ffae669fecd1d -->
+## 2025-10-12T18:57:47+01:00 — Merge branch 'main' into codex/add-bonuses-dropdown-menu-to-itemdefinition-xw5p89
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:1bdba31b6fa360544df8c7f54890e07cf4609ccb -->
 ## 2025-10-12T18:55:48+01:00 — Group halberd AOE controls in ItemData inspector
 
