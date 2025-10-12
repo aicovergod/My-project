@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:92d7b44c6af63b5e772eedadf6708e7d84456387 -->
+## 2025-10-12T18:40:36+01:00 — Group item bonuses under inspector foldout
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Editor/ItemDataEditor.cs
+- Diff: 147 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9567483e5af7acb89900f98e0d8a9143909800eb -->
 ## 2025-10-12T18:32:34+01:00 — Merge pull request #1086 from aicovergod/codex/add-tooltip-for-orekeepers-charm
 
