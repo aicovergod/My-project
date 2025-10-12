@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2335cd0e6516e4a3a47821e8ebdc361c4baaeaa0 -->
+## 2025-10-12T18:10:41+01:00 — Merge pull request #1083 from aicovergod/codex/create-reusable-gathering-progress-bar-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 131 ++ / 95 --
+- Notes:
+  Refactor gathering HUD progress bar construction
+---
+<!-- commit:e15cf5698985d802740950aea45cad0945a989fc -->
+## 2025-10-12T18:10:17+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2ab1f2283a0b5de4771e8579da66865c82a0ca58 -->
 ## 2025-10-12T18:10:05+01:00 — Refactor gathering HUD progress bar construction
 
