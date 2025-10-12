@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1d16b7b0b377c0e66ea7064f357be79535c2e4d8 -->
+## 2025-10-12T22:55:30+01:00 — Merge pull request #1097 from aicovergod/codex/update-weapon-display-name-resolution
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 27 ++ / 1 --
+- Notes:
+  Adjust magic weapon detection keywords
+---
+<!-- commit:bb7ec0ccd4f1c24c466c8d7c8a5f88cd1e284b36 -->
+## 2025-10-12T22:55:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7956f41c43045dbe0967331ffdaa107679c53f7f -->
 ## 2025-10-12T22:55:10+01:00 — Adjust magic weapon detection keywords
 
