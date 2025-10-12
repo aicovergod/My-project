@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Util;
 using World;
 
@@ -12,89 +11,21 @@ namespace Status
     /// remain loosely coupled.
     /// </summary>
     [DisallowMultipleComponent]
-    public class BuffTimerService : MonoBehaviour, ITickable
+    public class BuffTimerService : SceneGatedSingletonBehaviour<BuffTimerService>, ITickable
     {
-        public static BuffTimerService Instance { get; private set; }
-
-        private static bool waitingForAllowedScene;
-        private static bool applicationIsQuitting;
+        public static BuffTimerService Instance => SceneGatedSingletonBehaviour<BuffTimerService>.Instance;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void EnsureServiceExists()
         {
-            if (Instance != null)
-                return;
-
-            var activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
-            {
-                BeginWaitingForAllowedScene();
-                return;
-            }
-
-            CreateOrAdoptService();
+            BootstrapSingleton(CreateServiceInstance);
         }
 
-        private static BuffTimerService FindExistingService()
+        private static BuffTimerService CreateServiceInstance()
         {
-#if UNITY_2023_1_OR_NEWER
-            return Object.FindFirstObjectByType<BuffTimerService>();
-#else
-            return Object.FindObjectOfType<BuffTimerService>();
-#endif
-        }
-
-        private static void CreateOrAdoptService()
-        {
-            if (Instance != null)
-                return;
-
-            StopWaitingForAllowedScene();
-
-            var existing = FindExistingService();
-            if (existing != null)
-            {
-                Instance = existing;
-                existing.EnsurePersistenceComponent();
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    DontDestroyOnLoad(existing.gameObject);
-                existing.EnsureSceneGateSubscription();
-                return;
-            }
-
             var go = new GameObject("BuffTimerService");
             go.AddComponent<ScenePersistentObject>();
-            go.AddComponent<BuffTimerService>();
-            DontDestroyOnLoad(go);
-        }
-
-        private static void BeginWaitingForAllowedScene()
-        {
-            if (waitingForAllowedScene)
-                return;
-
-            waitingForAllowedScene = true;
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
-        }
-
-        private static void StopWaitingForAllowedScene()
-        {
-            if (!waitingForAllowedScene)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
-            waitingForAllowedScene = false;
-        }
-
-        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
-        {
-            if (!allowed)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            CreateOrAdoptService();
+            return go.AddComponent<BuffTimerService>();
         }
 
         [Tooltip("Hard limit to avoid runaway buff spawning in error cases.")]
@@ -106,7 +37,6 @@ namespace Status
         private readonly Dictionary<BuffKey, BuffTimerInstance> activeBuffs = new();
         private readonly List<BuffKey> removalBuffer = new();
         private bool subscribedToTicker;
-        private bool sceneGateSubscribed;
         private int sequenceCounter;
 
         /// <summary>Raised when a buff becomes active for the first time.</summary>
@@ -126,20 +56,9 @@ namespace Status
 
         public IReadOnlyDictionary<BuffKey, BuffTimerInstance> ActiveBuffs => activeBuffs;
 
-        private void Awake()
+        protected override void OnSingletonAwake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
             EnsurePersistenceComponent();
-            DontDestroyOnLoad(gameObject);
-
-            StopWaitingForAllowedScene();
-            EnsureSceneGateSubscription();
         }
 
         private void OnEnable()
@@ -162,51 +81,17 @@ namespace Status
             subscribedToTicker = false;
         }
 
-        private void OnApplicationQuit()
+        protected override void OnSingletonDestroyed()
         {
-            applicationIsQuitting = true;
-        }
+            BuffEvents.BuffApplied -= HandleBuffApplied;
+            BuffEvents.BuffRefreshed -= HandleBuffRefreshed;
+            BuffEvents.BuffRemoved -= HandleBuffRemoved;
 
-        private void OnDestroy()
-        {
-            if (Instance == this)
+            if (subscribedToTicker && Ticker.Instance != null)
             {
-                if (sceneGateSubscribed)
-                {
-                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                    sceneGateSubscribed = false;
-                }
-
-                Instance = null;
-
-                if (!applicationIsQuitting)
-                    BeginWaitingForAllowedScene();
+                Ticker.Instance.Unsubscribe(this);
+                subscribedToTicker = false;
             }
-        }
-
-        private void EnsureSceneGateSubscription()
-        {
-            if (sceneGateSubscribed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
-            sceneGateSubscribed = true;
-        }
-
-        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
-        {
-            if (Instance != this)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            if (allowed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-            sceneGateSubscribed = false;
-            Destroy(gameObject);
         }
 
         /// <summary>

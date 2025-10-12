@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Player;
 using Beastmaster;
 using Pets;
@@ -26,23 +25,16 @@ namespace Skills
     /// Debug menu that allows setting player skill levels. Toggle with F2.
     /// </summary>
     [DisallowMultipleComponent]
-    public class AdminF2Menu : MonoBehaviour
+    public class AdminF2Menu : SceneGatedSingletonBehaviour<AdminF2Menu>
     {
-        private static AdminF2Menu instance;
-
-        private static bool waitingForAllowedScene;
-        private static bool applicationIsQuitting;
-
-        public static AdminF2Menu Instance => instance;
+        public static AdminF2Menu Instance => SceneGatedSingletonBehaviour<AdminF2Menu>.Instance;
 
         /// <summary>
         /// Indicates whether the Admin F2 debug menu is currently visible.
         /// External systems can query this to disable gameplay input while the
         /// menu overlays the screen.
         /// </summary>
-        public static bool IsVisible => instance != null && instance.visible;
-
-        private bool sceneGateSubscribed;
+        public static bool IsVisible => Instance != null && Instance.visible;
 
         private PlayerHitpoints hitpoints;
         private SkillManager skillManager;
@@ -106,138 +98,23 @@ namespace Skills
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
         {
-            var activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
-            {
-                BeginWaitingForAllowedScene();
-                return;
-            }
-
-            CreateOrAdoptInstance();
+            BootstrapSingleton(CreateInstance);
         }
 
-        private static void CreateOrAdoptInstance()
+        private static AdminF2Menu CreateInstance()
         {
-            if (instance != null)
-                return;
-
-            StopWaitingForAllowedScene();
-
-            var existing = FindExistingInstance();
-            if (existing != null)
-            {
-                instance = existing;
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    DontDestroyOnLoad(existing.gameObject);
-                existing.EnsureSceneGateSubscription();
-                return;
-            }
-
             var go = new GameObject(nameof(AdminF2Menu));
-            DontDestroyOnLoad(go);
-            go.AddComponent<AdminF2Menu>();
+            return go.AddComponent<AdminF2Menu>();
         }
 
-        private static AdminF2Menu FindExistingInstance()
+        protected override void OnSingletonAwake()
         {
-#if UNITY_2023_1_OR_NEWER
-            return UnityEngine.Object.FindFirstObjectByType<AdminF2Menu>();
-#else
-            return UnityEngine.Object.FindObjectOfType<AdminF2Menu>();
-#endif
+            visible = false;
         }
 
-        private static void BeginWaitingForAllowedScene()
+        protected override void OnSingletonDestroyed()
         {
-            if (waitingForAllowedScene)
-                return;
-
-            waitingForAllowedScene = true;
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
-        }
-
-        private static void StopWaitingForAllowedScene()
-        {
-            if (!waitingForAllowedScene)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
-            waitingForAllowedScene = false;
-        }
-
-        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
-        {
-            if (!allowed)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            CreateOrAdoptInstance();
-        }
-
-        private void Awake()
-        {
-            if (instance != null && instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            StopWaitingForAllowedScene();
-            EnsureSceneGateSubscription();
-        }
-
-        private void OnApplicationQuit()
-        {
-            applicationIsQuitting = true;
-        }
-
-        private void OnDestroy()
-        {
-            if (instance == this)
-            {
-                if (sceneGateSubscribed)
-                {
-                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                    sceneGateSubscribed = false;
-                }
-
-                instance = null;
-
-                if (!applicationIsQuitting)
-                    BeginWaitingForAllowedScene();
-            }
-
             HasTextInputFocus = false;
-        }
-
-        private void EnsureSceneGateSubscription()
-        {
-            if (sceneGateSubscribed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
-            sceneGateSubscribed = true;
-        }
-
-        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
-        {
-            if (instance != this)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            if (allowed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-            sceneGateSubscribed = false;
-            Destroy(gameObject);
         }
 
         private void Update()

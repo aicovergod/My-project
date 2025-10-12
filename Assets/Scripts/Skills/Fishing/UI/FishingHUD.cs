@@ -8,15 +8,8 @@ using World;
 
 namespace Skills.Fishing
 {
-    public class FishingHUD : GatheringSkillHudBase<FishingSkill>, ITickable
+    public class FishingHUD : GatheringSkillHudBase<FishingHUD, FishingSkill>, ITickable
     {
-        private static FishingHUD instance;
-        private static bool waitingForAllowedScene;
-        private static bool applicationIsQuitting;
-
-        public static FishingHUD Instance => instance;
-
-        private bool sceneGateSubscribed;
         private bool sceneLoadedSubscribed;
 
         private Transform target;
@@ -40,92 +33,17 @@ namespace Skills.Fishing
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
         {
-            var activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
-            {
-                BeginWaitingForAllowedScene();
-                return;
-            }
-
-            CreateOrAdoptInstance();
+            BootstrapSingleton(CreateInstance);
         }
 
-        private static void CreateOrAdoptInstance()
+        private static FishingHUD CreateInstance()
         {
-            if (instance != null)
-                return;
-
-            StopWaitingForAllowedScene();
-
-            var existing = FindExistingInstance();
-            if (existing != null)
-            {
-                instance = existing;
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    DontDestroyOnLoad(existing.gameObject);
-                existing.EnsureSceneGateSubscription();
-                existing.EnsureSceneLoadedSubscription();
-                existing.EnsureProgressObjects();
-                existing.RefreshSkillSubscription();
-                return;
-            }
-
             var go = new GameObject(nameof(FishingHUD));
-            DontDestroyOnLoad(go);
-            go.AddComponent<FishingHUD>();
+            return go.AddComponent<FishingHUD>();
         }
 
-        private static FishingHUD FindExistingInstance()
+        protected override void OnSingletonAwake()
         {
-#if UNITY_2023_1_OR_NEWER
-            return UnityEngine.Object.FindFirstObjectByType<FishingHUD>();
-#else
-            return UnityEngine.Object.FindObjectOfType<FishingHUD>();
-#endif
-        }
-
-        private static void BeginWaitingForAllowedScene()
-        {
-            if (waitingForAllowedScene)
-                return;
-
-            waitingForAllowedScene = true;
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
-        }
-
-        private static void StopWaitingForAllowedScene()
-        {
-            if (!waitingForAllowedScene)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
-            waitingForAllowedScene = false;
-        }
-
-        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
-        {
-            if (!allowed)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            CreateOrAdoptInstance();
-        }
-
-        private void Awake()
-        {
-            if (instance != null && instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            StopWaitingForAllowedScene();
-            EnsureSceneGateSubscription();
             EnsureSceneLoadedSubscription();
             EnsureProgressObjects();
             RefreshSkillSubscription();
@@ -352,15 +270,6 @@ namespace Skills.Fishing
             sceneLoadedSubscribed = true;
         }
 
-        private void EnsureSceneGateSubscription()
-        {
-            if (sceneGateSubscribed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
-            sceneGateSubscribed = true;
-        }
-
         private void SetProgressFill(float normalizedValue)
         {
             if (progressImage == null)
@@ -371,72 +280,37 @@ namespace Skills.Fishing
             progressImage.color = SkillingProgressColorGradient.Evaluate(clamped);
         }
 
-        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
+        protected override void OnSingletonDestroyed()
         {
-            if (instance != this)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            if (allowed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-            sceneGateSubscribed = false;
-            Destroy(gameObject);
-        }
-
-        private void OnApplicationQuit()
-        {
-            applicationIsQuitting = true;
-        }
-
-        private void OnDestroy()
-        {
-            if (instance == this)
+            if (sceneLoadedSubscribed)
             {
-                if (sceneGateSubscribed)
-                {
-                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                    sceneGateSubscribed = false;
-                }
-
-                if (sceneLoadedSubscribed)
-                {
-                    SceneManager.sceneLoaded -= HandleSceneLoaded;
-                    sceneLoadedSubscribed = false;
-                }
-
-                HandleStop();
-                DetachFromSkill();
-                CancelSkillRefreshRoutine();
-
-                if (Ticker.Instance != null)
-                    Ticker.Instance.Unsubscribe(this);
-
-                if (progressRoot != null)
-                {
-                    Destroy(progressRoot);
-                    progressRoot = null;
-                }
-
-                if (toolRoot != null)
-                {
-                    Destroy(toolRoot);
-                    toolRoot = null;
-                }
-
-                progressImage = null;
-                toolRenderer = null;
-                progressCanvas = null;
-                target = null;
-
-                instance = null;
-
-                if (!applicationIsQuitting)
-                    BeginWaitingForAllowedScene();
+                SceneManager.sceneLoaded -= HandleSceneLoaded;
+                sceneLoadedSubscribed = false;
             }
+
+            HandleStop();
+            DetachFromSkill();
+            CancelSkillRefreshRoutine();
+
+            if (Ticker.Instance != null)
+                Ticker.Instance.Unsubscribe(this);
+
+            if (progressRoot != null)
+            {
+                Destroy(progressRoot);
+                progressRoot = null;
+            }
+
+            if (toolRoot != null)
+            {
+                Destroy(toolRoot);
+                toolRoot = null;
+            }
+
+            progressImage = null;
+            toolRenderer = null;
+            progressCanvas = null;
+            target = null;
         }
 
         /// <summary>

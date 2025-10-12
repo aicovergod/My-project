@@ -11,15 +11,8 @@ namespace Skills.Woodcutting
     /// <summary>
     /// Displays woodcutting progress above the current tree.
     /// </summary>
-    public class WoodcuttingHUD : GatheringSkillHudBase<WoodcuttingSkill>, ITickable
+    public class WoodcuttingHUD : GatheringSkillHudBase<WoodcuttingHUD, WoodcuttingSkill>, ITickable
     {
-        private static WoodcuttingHUD instance;
-        private static bool waitingForAllowedScene;
-        private static bool applicationIsQuitting;
-
-        public static WoodcuttingHUD Instance => instance;
-
-        private bool sceneGateSubscribed;
         private bool sceneLoadedSubscribed;
 
         private Transform target;
@@ -43,92 +36,17 @@ namespace Skills.Woodcutting
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
         {
-            var activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
-            {
-                BeginWaitingForAllowedScene();
-                return;
-            }
-
-            CreateOrAdoptInstance();
+            BootstrapSingleton(CreateInstance);
         }
 
-        private static void CreateOrAdoptInstance()
+        private static WoodcuttingHUD CreateInstance()
         {
-            if (instance != null)
-                return;
-
-            StopWaitingForAllowedScene();
-
-            var existing = FindExistingInstance();
-            if (existing != null)
-            {
-                instance = existing;
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    DontDestroyOnLoad(existing.gameObject);
-                existing.EnsureSceneGateSubscription();
-                existing.EnsureSceneLoadedSubscription();
-                existing.EnsureProgressObjects();
-                existing.RefreshSkillSubscription();
-                return;
-            }
-
             var go = new GameObject(nameof(WoodcuttingHUD));
-            DontDestroyOnLoad(go);
-            go.AddComponent<WoodcuttingHUD>();
+            return go.AddComponent<WoodcuttingHUD>();
         }
 
-        private static WoodcuttingHUD FindExistingInstance()
+        protected override void OnSingletonAwake()
         {
-#if UNITY_2023_1_OR_NEWER
-            return UnityEngine.Object.FindFirstObjectByType<WoodcuttingHUD>();
-#else
-            return UnityEngine.Object.FindObjectOfType<WoodcuttingHUD>();
-#endif
-        }
-
-        private static void BeginWaitingForAllowedScene()
-        {
-            if (waitingForAllowedScene)
-                return;
-
-            waitingForAllowedScene = true;
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
-        }
-
-        private static void StopWaitingForAllowedScene()
-        {
-            if (!waitingForAllowedScene)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
-            waitingForAllowedScene = false;
-        }
-
-        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
-        {
-            if (!allowed)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            CreateOrAdoptInstance();
-        }
-
-        private void Awake()
-        {
-            if (instance != null && instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            StopWaitingForAllowedScene();
-            EnsureSceneGateSubscription();
             EnsureSceneLoadedSubscription();
             EnsureProgressObjects();
             RefreshSkillSubscription();
@@ -367,81 +285,37 @@ namespace Skills.Woodcutting
             sceneLoadedSubscribed = true;
         }
 
-        private void EnsureSceneGateSubscription()
+        protected override void OnSingletonDestroyed()
         {
-            if (sceneGateSubscribed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
-            sceneGateSubscribed = true;
-        }
-
-        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
-        {
-            if (instance != this)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            if (allowed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-            sceneGateSubscribed = false;
-            Destroy(gameObject);
-        }
-
-        private void OnApplicationQuit()
-        {
-            applicationIsQuitting = true;
-        }
-
-        private void OnDestroy()
-        {
-            if (instance == this)
+            if (sceneLoadedSubscribed)
             {
-                if (sceneGateSubscribed)
-                {
-                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                    sceneGateSubscribed = false;
-                }
-
-                if (sceneLoadedSubscribed)
-                {
-                    SceneManager.sceneLoaded -= HandleSceneLoaded;
-                    sceneLoadedSubscribed = false;
-                }
-
-                HandleStop();
-                DetachFromSkill();
-                CancelSkillRefreshRoutine();
-
-                if (Ticker.Instance != null)
-                    Ticker.Instance.Unsubscribe(this);
-
-                if (progressRoot != null)
-                {
-                    Destroy(progressRoot);
-                    progressRoot = null;
-                }
-
-                if (axeRoot != null)
-                {
-                    Destroy(axeRoot);
-                    axeRoot = null;
-                }
-
-                progressImage = null;
-                axeRenderer = null;
-                progressCanvas = null;
-                target = null;
-
-                instance = null;
-
-                if (!applicationIsQuitting)
-                    BeginWaitingForAllowedScene();
+                SceneManager.sceneLoaded -= HandleSceneLoaded;
+                sceneLoadedSubscribed = false;
             }
+
+            HandleStop();
+            DetachFromSkill();
+            CancelSkillRefreshRoutine();
+
+            if (Ticker.Instance != null)
+                Ticker.Instance.Unsubscribe(this);
+
+            if (progressRoot != null)
+            {
+                Destroy(progressRoot);
+                progressRoot = null;
+            }
+
+            if (axeRoot != null)
+            {
+                Destroy(axeRoot);
+                axeRoot = null;
+            }
+
+            progressImage = null;
+            axeRenderer = null;
+            progressCanvas = null;
+            target = null;
         }
 
         /// <summary>
