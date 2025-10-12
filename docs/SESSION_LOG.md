@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:082f868f73bbff162946270a07d0b85eac9dbb44 -->
+## 2025-10-12T19:30:01+01:00 — Refactor ticked skill HUDs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Skills/Common/UI/TickedProgressHudBase.cs, Assets/Scripts/Skills/Cooking/UI/CookingHUD.cs, Assets/Scripts/Skills/Firemaking/UI/FiremakingHUD.cs
+- Diff: 498 ++ / 494 --
+- Notes:
+  —
+---
 <!-- commit:5c8136c14f2338fc101800c8a5e38c7c31b0d4ab -->
 ## 2025-10-12T19:20:52+01:00 — Merge pull request #1090 from aicovergod/codex/create-abstract-hud-base-for-skills
 
