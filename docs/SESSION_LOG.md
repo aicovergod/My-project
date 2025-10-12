@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7e5b3ebea917bef8708b7808d8a398275c4645d3 -->
+## 2025-10-12T16:32:32+01:00 — Merge pull request #1077 from aicovergod/codex/modify-combineitems-for-capacity-checks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 27 ++ / 3 --
+- Notes:
+  Safeguard inventory item combination rollbacks
+---
+<!-- commit:9678353b75e7db9e30d611640bc77d1e4b9fda69 -->
+## 2025-10-12T16:32:17+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:3b3853dafa666f249437448e4a750344e810161a -->
 ## 2025-10-12T16:32:05+01:00 — Safeguard inventory combinations
 
