@@ -1179,10 +1179,7 @@ namespace Inventory
                 Debug.Log($"Dropping pet item '{droppedItem.name}', spawning pet '{pet.displayName}'.");
                 PetDropSystem.SpawnPet(pet, pos);
             }
-            else
-            {
-                Debug.Log($"Dropped item '{droppedItem.name}' with no associated pet.");
-            }
+            // If the dropped item has no associated pet we intentionally do not log to avoid console spam.
 
             NotifyInventoryChanged();
         }
