@@ -211,6 +211,7 @@ namespace UI
 
         protected override void OnBeforeOpen()
         {
+            InterfaceTabMutexUtility.CloseAllTabWindowsExcept(this);
             EnsureLoadoutBound();
         }
 

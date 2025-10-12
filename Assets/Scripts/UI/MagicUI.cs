@@ -314,6 +314,12 @@ namespace UI
                 ButtonHighlightUtility.ApplySelectedColor(pair.Value, ActiveSpell == pair.Key, Color.green, Color.white);
         }
 
+        protected override void OnBeforeOpen()
+        {
+            InterfaceTabMutexUtility.CloseAllTabWindowsExcept(this);
+            RebindLoadout();
+        }
+
         /// <summary>Restore the last selected spell and update UI highlighting.</summary>
         public static void RestoreLastSpell()
         {

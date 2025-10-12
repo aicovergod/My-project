@@ -287,12 +287,7 @@ namespace Quests
         protected override void OnBeforeOpen()
         {
             wasOpenBeforeOpen = EvaluateIsOpen();
-            var inv = FindObjectOfType<Inventory.Inventory>();
-            if (inv != null && inv.IsOpen)
-                inv.CloseUI();
-            var eq = FindObjectOfType<Inventory.Equipment>();
-            if (eq != null && eq.IsOpen)
-                eq.CloseUI();
+            InterfaceTabMutexUtility.CloseAllTabWindowsExcept(this);
             if (playerMover == null)
                 playerMover = FindObjectOfType<PlayerMover>();
             if (playerMover != null)
