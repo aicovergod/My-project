@@ -87,42 +87,13 @@ namespace Skills.Mining
             if (progressRoot != null)
                 return;
 
-            progressRoot = new GameObject("MiningProgress");
-            progressRoot.transform.SetParent(transform);
+            var components = GatheringProgressBarBuilder.Build("MiningProgress", transform);
+            progressRoot = components.Root;
             ApplyProgressLayer(progressRoot);
-
-            progressCanvas = progressRoot.AddComponent<Canvas>();
-            progressCanvas.renderMode = RenderMode.WorldSpace;
-            progressCanvas.overrideSorting = true;
-            progressRoot.AddComponent<CanvasScaler>();
-            progressRoot.AddComponent<GraphicRaycaster>();
-            progressRoot.transform.localScale = Vector3.one * 0.01f;
-
-            var bg = new GameObject("Background");
-            bg.transform.SetParent(progressRoot.transform, false);
-            ApplyProgressLayer(bg);
-            var bgImage = bg.AddComponent<Image>();
-            bgImage.color = new Color(0f, 0f, 0f, 0.5f);
-            var bgSprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
-            bgImage.sprite = bgSprite;
-            var bgRect = bgImage.rectTransform;
-            bgRect.sizeDelta = new Vector2(150f, 25f);
-
-            var fill = new GameObject("Fill");
-            fill.transform.SetParent(bg.transform, false);
-            ApplyProgressLayer(fill);
-            progressImage = fill.AddComponent<Image>();
+            progressCanvas = components.Canvas;
+            progressImage = components.FillImage;
             progressImage.color = SkillingProgressColorGradient.Evaluate(0f);
-            progressImage.sprite = bgSprite;
-            progressImage.type = Image.Type.Filled;
-            progressImage.fillMethod = Image.FillMethod.Horizontal;
             SetProgressFill(0f);
-            var fillRect = progressImage.rectTransform;
-            fillRect.anchorMin = Vector2.zero;
-            fillRect.anchorMax = Vector2.one;
-            fillRect.offsetMin = Vector2.zero;
-            fillRect.offsetMax = Vector2.zero;
-
             progressRoot.SetActive(false);
         }
 
