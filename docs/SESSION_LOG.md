@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:edfe7417286a38a6f2ade1d3ec29293307ec0e29 -->
+## 2025-10-12T22:01:23+01:00 — Merge pull request #1093 from aicovergod/codex/add-buttonhighlightutility-and-refactor-ui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 44 ++ / 28 --
+- Notes:
+  Refactor button highlighting into shared utility
+---
+<!-- commit:b5491fd03ca64d1d0216b3afde97049d80b38100 -->
+## 2025-10-12T22:01:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9a971fe7f6c23cd4d5e88216dd9e1656cfcd7303 -->
 ## 2025-10-12T22:00:51+01:00 — Refactor button highlighting into shared utility
 
