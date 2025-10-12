@@ -11,7 +11,7 @@ namespace Skills.Firemaking
     /// <summary>
     ///     Displays Firemaking progress above the current ignition point using a world space progress bar.
     /// </summary>
-    public sealed class FiremakingHUD : GatheringSkillHudBase<FiremakingSkill>, ITickable
+    public sealed class FiremakingHUD : GatheringSkillHudBase<FiremakingHUD, FiremakingSkill>, ITickable
     {
         private enum FiremakingHudMode
         {
@@ -20,15 +20,7 @@ namespace Skills.Firemaking
             Bonfire
         }
 
-        private static FiremakingHUD instance;
-        private static bool waitingForAllowedScene;
-        private static bool applicationIsQuitting;
-
         private const string HudName = nameof(FiremakingHUD);
-
-        public static FiremakingHUD Instance => instance;
-
-        private bool sceneGateSubscribed;
         private bool sceneLoadedSubscribed;
         private bool tickerSubscribed;
 
@@ -56,92 +48,17 @@ namespace Skills.Firemaking
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
         {
-            var activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
-            {
-                BeginWaitingForAllowedScene();
-                return;
-            }
-
-            CreateOrAdoptInstance();
+            BootstrapSingleton(CreateInstance);
         }
 
-        private static void CreateOrAdoptInstance()
+        private static FiremakingHUD CreateInstance()
         {
-            if (instance != null)
-                return;
-
-            StopWaitingForAllowedScene();
-
-            var existing = FindExistingInstance();
-            if (existing != null)
-            {
-                instance = existing;
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    Object.DontDestroyOnLoad(existing.gameObject);
-                existing.EnsureSceneGateSubscription();
-                existing.EnsureSceneLoadedSubscription();
-                existing.EnsureProgressObjects();
-                existing.RefreshSkillSubscription();
-                return;
-            }
-
             var go = new GameObject(HudName);
-            Object.DontDestroyOnLoad(go);
-            go.AddComponent<FiremakingHUD>();
+            return go.AddComponent<FiremakingHUD>();
         }
 
-        private static FiremakingHUD FindExistingInstance()
+        protected override void OnSingletonAwake()
         {
-#if UNITY_2023_1_OR_NEWER
-            return Object.FindFirstObjectByType<FiremakingHUD>();
-#else
-            return Object.FindObjectOfType<FiremakingHUD>();
-#endif
-        }
-
-        private static void BeginWaitingForAllowedScene()
-        {
-            if (waitingForAllowedScene)
-                return;
-
-            waitingForAllowedScene = true;
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
-        }
-
-        private static void StopWaitingForAllowedScene()
-        {
-            if (!waitingForAllowedScene)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
-            waitingForAllowedScene = false;
-        }
-
-        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
-        {
-            if (!allowed)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            CreateOrAdoptInstance();
-        }
-
-        private void Awake()
-        {
-            if (instance != null && instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            StopWaitingForAllowedScene();
-            EnsureSceneGateSubscription();
             EnsureSceneLoadedSubscription();
             EnsureProgressObjects();
             RefreshSkillSubscription();
@@ -167,37 +84,18 @@ namespace Skills.Firemaking
             UnsubscribeFromTicker();
         }
 
-        private void OnApplicationQuit()
+        protected override void OnSingletonDestroyed()
         {
-            applicationIsQuitting = true;
-        }
-
-        private void OnDestroy()
-        {
-            if (instance == this)
+            if (sceneLoadedSubscribed)
             {
-                if (sceneGateSubscribed)
-                {
-                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                    sceneGateSubscribed = false;
-                }
-
-                if (sceneLoadedSubscribed)
-                {
-                    SceneManager.sceneLoaded -= HandleSceneLoaded;
-                    sceneLoadedSubscribed = false;
-                }
-
-                HandleStop();
-                DetachFromSkill();
-                CancelSkillRefreshRoutine();
-                UnsubscribeFromTicker();
-
-                if (!applicationIsQuitting)
-                    BeginWaitingForAllowedScene();
-
-                instance = null;
+                SceneManager.sceneLoaded -= HandleSceneLoaded;
+                sceneLoadedSubscribed = false;
             }
+
+            HandleStop();
+            DetachFromSkill();
+            CancelSkillRefreshRoutine();
+            UnsubscribeFromTicker();
         }
 
         protected override void OnSkillLocated(FiremakingSkill located)
@@ -438,15 +336,6 @@ namespace Skills.Firemaking
             UnsubscribeFromTicker();
         }
 
-        private void EnsureSceneGateSubscription()
-        {
-            if (sceneGateSubscribed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
-            sceneGateSubscribed = true;
-        }
-
         /// <summary>
         /// Applies the requested fill amount and synchronises the rainbow gradient with the current progress.
         /// </summary>
@@ -460,23 +349,6 @@ namespace Skills.Firemaking
             progressFill.fillAmount = clamped;
             progressFill.color = SkillingProgressColorGradient.Evaluate(clamped);
         }
-
-        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
-        {
-            if (instance != this)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            if (allowed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-            sceneGateSubscribed = false;
-            Destroy(gameObject);
-        }
-
         private void EnsureSceneLoadedSubscription()
         {
             if (sceneLoadedSubscribed)

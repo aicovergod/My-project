@@ -12,20 +12,10 @@ namespace Skills.Cooking
     ///     The HUD mirrors the shared gathering HUD lifecycle so it survives scene loads and
     ///     automatically binds to the local <see cref="CookingSkill"/> instance when the player spawns.
     /// </summary>
-    public sealed class CookingHUD : GatheringSkillHudBase<CookingSkill>, ITickable
+    public sealed class CookingHUD : GatheringSkillHudBase<CookingHUD, CookingSkill>, ITickable
     {
-        private static CookingHUD instance;
-        private static bool waitingForAllowedScene;
-        private static bool applicationIsQuitting;
-
         private const string HudName = nameof(CookingHUD);
 
-        /// <summary>
-        ///     Singleton accessor used by other systems that need to poke the HUD at runtime.
-        /// </summary>
-        public static CookingHUD Instance => instance;
-
-        private bool sceneGateSubscribed;
         private bool sceneLoadedSubscribed;
         private bool tickerSubscribed;
 
@@ -52,92 +42,17 @@ namespace Skills.Cooking
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
         {
-            var activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
-            {
-                BeginWaitingForAllowedScene();
-                return;
-            }
-
-            CreateOrAdoptInstance();
+            BootstrapSingleton(CreateInstance);
         }
 
-        private static void CreateOrAdoptInstance()
+        private static CookingHUD CreateInstance()
         {
-            if (instance != null)
-                return;
-
-            StopWaitingForAllowedScene();
-
-            var existing = FindExistingInstance();
-            if (existing != null)
-            {
-                instance = existing;
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    Object.DontDestroyOnLoad(existing.gameObject);
-                existing.EnsureSceneGateSubscription();
-                existing.EnsureSceneLoadedSubscription();
-                existing.EnsureProgressObjects();
-                existing.RefreshSkillSubscription();
-                return;
-            }
-
             var go = new GameObject(HudName);
-            Object.DontDestroyOnLoad(go);
-            go.AddComponent<CookingHUD>();
+            return go.AddComponent<CookingHUD>();
         }
 
-        private static CookingHUD FindExistingInstance()
+        protected override void OnSingletonAwake()
         {
-#if UNITY_2023_1_OR_NEWER
-            return Object.FindFirstObjectByType<CookingHUD>();
-#else
-            return Object.FindObjectOfType<CookingHUD>();
-#endif
-        }
-
-        private static void BeginWaitingForAllowedScene()
-        {
-            if (waitingForAllowedScene)
-                return;
-
-            waitingForAllowedScene = true;
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
-        }
-
-        private static void StopWaitingForAllowedScene()
-        {
-            if (!waitingForAllowedScene)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
-            waitingForAllowedScene = false;
-        }
-
-        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
-        {
-            if (!allowed)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            CreateOrAdoptInstance();
-        }
-
-        private void Awake()
-        {
-            if (instance != null && instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            StopWaitingForAllowedScene();
-            EnsureSceneGateSubscription();
             EnsureSceneLoadedSubscription();
             EnsureProgressObjects();
             RefreshSkillSubscription();
@@ -163,22 +78,8 @@ namespace Skills.Cooking
             UnsubscribeFromTicker();
         }
 
-        private void OnApplicationQuit()
+        protected override void OnSingletonDestroyed()
         {
-            applicationIsQuitting = true;
-        }
-
-        private void OnDestroy()
-        {
-            if (instance != this)
-                return;
-
-            if (sceneGateSubscribed)
-            {
-                PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                sceneGateSubscribed = false;
-            }
-
             if (sceneLoadedSubscribed)
             {
                 SceneManager.sceneLoaded -= HandleSceneLoaded;
@@ -189,11 +90,6 @@ namespace Skills.Cooking
             DetachFromSkill();
             CancelSkillRefreshRoutine();
             UnsubscribeFromTicker();
-
-            if (!applicationIsQuitting)
-                BeginWaitingForAllowedScene();
-
-            instance = null;
         }
 
         protected override void OnSkillLocated(CookingSkill located)
@@ -343,15 +239,6 @@ namespace Skills.Cooking
             UnsubscribeFromTicker();
         }
 
-        private void EnsureSceneGateSubscription()
-        {
-            if (sceneGateSubscribed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
-            sceneGateSubscribed = true;
-        }
-
         private void SetProgressFill(float normalizedValue)
         {
             if (progressFill == null)
@@ -361,23 +248,6 @@ namespace Skills.Cooking
             progressFill.fillAmount = clamped;
             progressFill.color = SkillingProgressColorGradient.Evaluate(clamped);
         }
-
-        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
-        {
-            if (instance != this)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            if (allowed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-            sceneGateSubscribed = false;
-            Destroy(gameObject);
-        }
-
         private void EnsureSceneLoadedSubscription()
         {
             if (sceneLoadedSubscribed)

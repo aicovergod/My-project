@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:25187293adfdf648b10c4345f318528d5cc9fab6 -->
+## 2025-10-12T17:07:17+01:00 — Refactor scene-gated singletons
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (11): Assets/Scripts/Skills/AdminF2Menu.cs, Assets/Scripts/Skills/Common/UI/GatheringSkillHudBase.cs, Assets/Scripts/Skills/Cooking/UI/CookingHUD.cs, Assets/Scripts/Skills/Firemaking/UI/FiremakingHUD.cs, Assets/Scripts/Skills/Fishing/UI/FishingHUD.cs, Assets/Scripts/Skills/Mining/UI/MiningUI.cs, Assets/Scripts/Skills/SkillsUI.cs, Assets/Scripts/Skills/Woodcutting/UI/WoodcuttingHUD.cs, Assets/Scripts/Status/BuffTimerService.cs, Assets/Scripts/World/Minimap.cs, Assets/Scripts/World/SceneGatedSingletonBehaviour.cs
+- Diff: 223 ++ / 1270 --
+- Notes:
+  —
+---
 <!-- commit:7e5b3ebea917bef8708b7808d8a398275c4645d3 -->
 ## 2025-10-12T16:32:32+01:00 — Merge pull request #1077 from aicovergod/codex/modify-combineitems-for-capacity-checks
 

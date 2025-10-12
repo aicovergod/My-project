@@ -18,7 +18,7 @@ namespace World
     /// Generates a simple minimap in the top-right corner showing a top-down view of the map.
     /// Everything is created via code so no prefabs or scene objects are required.
     /// </summary>
-    public class Minimap : MonoBehaviour
+    public class Minimap : SceneGatedSingletonBehaviour<Minimap>
     {
         private Camera mapCamera;
         private RenderTexture mapTexture;
@@ -36,19 +36,13 @@ namespace World
         private readonly List<MinimapMarker> markers = new List<MinimapMarker>();
         private readonly Dictionary<MinimapMarker.MarkerType, Sprite> iconCache = new Dictionary<MinimapMarker.MarkerType, Sprite>();
 
-        private static Minimap instance;
-        public static Minimap Instance => instance;
-
-        private static bool waitingForAllowedScene;
-        private static bool applicationIsQuitting;
+        public static Minimap Instance => SceneGatedSingletonBehaviour<Minimap>.Instance;
         private static bool debugTeleportOnClickEnabled;
 
         /// <summary>
         ///     Reused buffer for UI raycasts when diagnosing debug teleports so we avoid per-click allocations.
         /// </summary>
         private static readonly List<RaycastResult> teleportRaycastBuffer = new List<RaycastResult>();
-
-        private bool sceneGateSubscribed;
 
         public RectTransform BorderRect => borderRect;
         public RectTransform SmallRootRect => smallRootRect;
@@ -74,102 +68,21 @@ namespace World
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
         {
-            var activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
-            {
-                BeginWaitingForAllowedScene();
-                return;
-            }
-
-            CreateOrAdoptInstance();
+            BootstrapSingleton(CreateInstance);
         }
 
-        private static void CreateOrAdoptInstance()
+        private static Minimap CreateInstance()
         {
-            if (instance != null)
-                return;
-
-            StopWaitingForAllowedScene();
-
-            var existing = FindExistingInstance();
-            if (existing != null)
-            {
-                instance = existing;
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    DontDestroyOnLoad(existing.gameObject);
-                existing.EnsureSceneGateSubscription();
-                existing.CreateCamera();
-                existing.CreateUI();
-                existing.RegisterExistingMarkers();
-                existing.ResetSmallMapZoom();
-                return;
-            }
-
             var go = new GameObject(nameof(Minimap));
-            DontDestroyOnLoad(go);
-            go.AddComponent<Minimap>();
+            return go.AddComponent<Minimap>();
         }
 
-        private static Minimap FindExistingInstance()
+        protected override void OnSingletonAwake()
         {
-#if UNITY_2023_1_OR_NEWER
-            return UnityEngine.Object.FindFirstObjectByType<Minimap>();
-#else
-            return UnityEngine.Object.FindObjectOfType<Minimap>();
-#endif
-        }
-
-        private static void BeginWaitingForAllowedScene()
-        {
-            if (waitingForAllowedScene)
-                return;
-
-            waitingForAllowedScene = true;
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
-        }
-
-        private static void StopWaitingForAllowedScene()
-        {
-            if (!waitingForAllowedScene)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
-            waitingForAllowedScene = false;
-        }
-
-        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
-        {
-            if (!allowed)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            CreateOrAdoptInstance();
-        }
-
-        private void Awake()
-        {
-            if (instance != null && instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            StopWaitingForAllowedScene();
-            EnsureSceneGateSubscription();
             CreateCamera();
             CreateUI();
             RegisterExistingMarkers();
             ResetSmallMapZoom();
-        }
-
-        private void OnApplicationQuit()
-        {
-            applicationIsQuitting = true;
         }
 
         private void OnEnable()
@@ -184,25 +97,10 @@ namespace World
             SceneManager.sceneLoaded -= HandleSceneLoaded;
         }
 
-        private void OnDestroy()
+        protected override void OnSingletonDestroyed()
         {
-            if (instance == this)
-            {
-                if (sceneGateSubscribed)
-                {
-                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                    sceneGateSubscribed = false;
-                }
-
-                SceneManager.sceneLoaded -= HandleSceneLoaded;
-
-                TearDownResources();
-
-                instance = null;
-
-                if (!applicationIsQuitting)
-                    BeginWaitingForAllowedScene();
-            }
+            SceneManager.sceneLoaded -= HandleSceneLoaded;
+            TearDownResources();
         }
 
         private void CreateCamera()
@@ -768,31 +666,6 @@ namespace World
                 markers.Add(marker);
 
             ValidateManualIcons(marker);
-        }
-
-        private void EnsureSceneGateSubscription()
-        {
-            if (sceneGateSubscribed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
-            sceneGateSubscribed = true;
-        }
-
-        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
-        {
-            if (instance != this)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            if (allowed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-            sceneGateSubscribed = false;
-            Destroy(gameObject);
         }
 
         private void TearDownResources()

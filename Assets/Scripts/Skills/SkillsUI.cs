@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using UI;
 using World;
 
@@ -12,11 +11,8 @@ namespace Skills
     /// Displays basic skill information such as mining and woodcutting levels and XP
     /// and can be toggled with the 'O' key.
     /// </summary>
-    public class SkillsUI : MonoBehaviour, IUIWindow
+    public class SkillsUI : SceneGatedSingletonBehaviour<SkillsUI>, IUIWindow
     {
-        private static bool waitingForAllowedScene;
-        private static bool applicationIsQuitting;
-
         private GameObject uiRoot;
         private SkillManager skillManager;
 
@@ -24,8 +20,6 @@ namespace Skills
         private readonly Dictionary<SkillType, Text> xpTexts = new();
         private readonly Dictionary<SkillType, bool> xpVisibility = new();
         private Text totalLevelText;
-
-        private bool sceneGateSubscribed;
 
         private readonly SkillType[] displayOrder =
         {
@@ -43,96 +37,24 @@ namespace Skills
             SkillType.Mining
         };
 
-        public static SkillsUI Instance { get; private set; }
+        public static SkillsUI Instance => SceneGatedSingletonBehaviour<SkillsUI>.Instance;
 
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
         {
-            var activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
-            {
-                BeginWaitingForAllowedScene();
-                return;
-            }
-
-            CreateOrAdoptInstance();
+            BootstrapSingleton(CreateInstance);
         }
 
-        private static void CreateOrAdoptInstance()
+        private static SkillsUI CreateInstance()
         {
-            if (Instance != null)
-                return;
-
-            StopWaitingForAllowedScene();
-
-            var existing = FindExistingInstance();
-            if (existing != null)
-            {
-                Instance = existing;
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    DontDestroyOnLoad(existing.gameObject);
-                existing.EnsureSceneGateSubscription();
-                existing.RebindSkillManager();
-                return;
-            }
-
             var go = new GameObject(nameof(SkillsUI));
-            DontDestroyOnLoad(go);
-            go.AddComponent<SkillsUI>();
+            return go.AddComponent<SkillsUI>();
         }
 
-        private static SkillsUI FindExistingInstance()
+        protected override void OnSingletonAwake()
         {
-#if UNITY_2023_1_OR_NEWER
-            return UnityEngine.Object.FindFirstObjectByType<SkillsUI>();
-#else
-            return UnityEngine.Object.FindObjectOfType<SkillsUI>();
-#endif
-        }
-
-        private static void BeginWaitingForAllowedScene()
-        {
-            if (waitingForAllowedScene)
-                return;
-
-            waitingForAllowedScene = true;
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
-        }
-
-        private static void StopWaitingForAllowedScene()
-        {
-            if (!waitingForAllowedScene)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
-            waitingForAllowedScene = false;
-        }
-
-        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
-        {
-            if (!allowed)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            CreateOrAdoptInstance();
-        }
-
-        private void Awake()
-        {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            StopWaitingForAllowedScene();
-            EnsureSceneGateSubscription();
             skillManager = FindObjectOfType<SkillManager>();
             CreateUI();
             if (uiRoot != null)
@@ -140,28 +62,9 @@ namespace Skills
             UIManager.Instance?.RegisterWindow(this);
         }
 
-        private void OnDestroy()
+        protected override void OnSingletonDestroyed()
         {
-            if (Instance == this)
-            {
-                UIManager.Instance?.UnregisterWindow(this);
-
-                if (sceneGateSubscribed)
-                {
-                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                    sceneGateSubscribed = false;
-                }
-
-                Instance = null;
-
-                if (!applicationIsQuitting)
-                    BeginWaitingForAllowedScene();
-            }
-        }
-
-        private void OnApplicationQuit()
-        {
-            applicationIsQuitting = true;
+            UIManager.Instance?.UnregisterWindow(this);
         }
 
         private void CreateUI()
@@ -307,31 +210,6 @@ namespace Skills
         {
             if (uiRoot != null)
                 uiRoot.SetActive(false);
-        }
-
-        private void EnsureSceneGateSubscription()
-        {
-            if (sceneGateSubscribed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
-            sceneGateSubscribed = true;
-        }
-
-        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
-        {
-            if (Instance != this)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            if (allowed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-            sceneGateSubscribed = false;
-            Destroy(gameObject);
         }
 
         private void RebindSkillManager()

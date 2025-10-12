@@ -11,15 +11,8 @@ namespace Skills.Mining
     /// <summary>
     /// Displays mining progress above the current rock.
     /// </summary>
-    public class MiningUI : GatheringSkillHudBase<MiningSkill>, ITickable
+    public class MiningUI : GatheringSkillHudBase<MiningUI, MiningSkill>, ITickable
     {
-        private static MiningUI instance;
-        private static bool waitingForAllowedScene;
-        private static bool applicationIsQuitting;
-
-        public static MiningUI Instance => instance;
-
-        private bool sceneGateSubscribed;
         private bool sceneLoadedSubscribed;
 
         private Transform target;
@@ -46,92 +39,17 @@ namespace Skills.Mining
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
         {
-            var activeScene = SceneManager.GetActiveScene();
-            if (!activeScene.IsValid() || !PersistentSceneGate.ShouldSpawnInScene(activeScene))
-            {
-                BeginWaitingForAllowedScene();
-                return;
-            }
-
-            CreateOrAdoptInstance();
+            BootstrapSingleton(CreateInstance);
         }
 
-        private static void CreateOrAdoptInstance()
+        private static MiningUI CreateInstance()
         {
-            if (instance != null)
-                return;
-
-            StopWaitingForAllowedScene();
-
-            var existing = FindExistingInstance();
-            if (existing != null)
-            {
-                instance = existing;
-                if (existing.gameObject.scene.name != "DontDestroyOnLoad")
-                    DontDestroyOnLoad(existing.gameObject);
-                existing.EnsureSceneGateSubscription();
-                existing.EnsureSceneLoadedSubscription();
-                existing.EnsureProgressObjects();
-                existing.RefreshSkillSubscription();
-                return;
-            }
-
             var go = new GameObject(nameof(MiningUI));
-            DontDestroyOnLoad(go);
-            go.AddComponent<MiningUI>();
+            return go.AddComponent<MiningUI>();
         }
 
-        private static MiningUI FindExistingInstance()
+        protected override void OnSingletonAwake()
         {
-#if UNITY_2023_1_OR_NEWER
-            return UnityEngine.Object.FindFirstObjectByType<MiningUI>();
-#else
-            return UnityEngine.Object.FindObjectOfType<MiningUI>();
-#endif
-        }
-
-        private static void BeginWaitingForAllowedScene()
-        {
-            if (waitingForAllowedScene)
-                return;
-
-            waitingForAllowedScene = true;
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneEvaluationForBootstrap;
-        }
-
-        private static void StopWaitingForAllowedScene()
-        {
-            if (!waitingForAllowedScene)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneEvaluationForBootstrap;
-            waitingForAllowedScene = false;
-        }
-
-        private static void HandleSceneEvaluationForBootstrap(Scene scene, bool allowed)
-        {
-            if (!allowed)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            CreateOrAdoptInstance();
-        }
-
-        private void Awake()
-        {
-            if (instance != null && instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            StopWaitingForAllowedScene();
-            EnsureSceneGateSubscription();
             EnsureSceneLoadedSubscription();
             EnsureProgressObjects();
             RefreshSkillSubscription();
@@ -457,15 +375,6 @@ namespace Skills.Mining
             sceneLoadedSubscribed = true;
         }
 
-        private void EnsureSceneGateSubscription()
-        {
-            if (sceneGateSubscribed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged += HandleSceneGateEvaluation;
-            sceneGateSubscribed = true;
-        }
-
         private void SetProgressFill(float normalizedValue)
         {
             if (progressImage == null)
@@ -476,72 +385,37 @@ namespace Skills.Mining
             progressImage.color = SkillingProgressColorGradient.Evaluate(clamped);
         }
 
-        private void HandleSceneGateEvaluation(Scene scene, bool allowed)
+        protected override void OnSingletonDestroyed()
         {
-            if (instance != this)
-                return;
-
-            if (scene != SceneManager.GetActiveScene())
-                return;
-
-            if (allowed)
-                return;
-
-            PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-            sceneGateSubscribed = false;
-            Destroy(gameObject);
-        }
-
-        private void OnApplicationQuit()
-        {
-            applicationIsQuitting = true;
-        }
-
-        private void OnDestroy()
-        {
-            if (instance == this)
+            if (sceneLoadedSubscribed)
             {
-                if (sceneGateSubscribed)
-                {
-                    PersistentSceneGate.SceneEvaluationChanged -= HandleSceneGateEvaluation;
-                    sceneGateSubscribed = false;
-                }
-
-                if (sceneLoadedSubscribed)
-                {
-                    SceneManager.sceneLoaded -= HandleSceneLoaded;
-                    sceneLoadedSubscribed = false;
-                }
-
-                HandleStop();
-                DetachFromSkill();
-                CancelSkillRefreshRoutine();
-
-                if (Ticker.Instance != null)
-                    Ticker.Instance.Unsubscribe(this);
-
-                if (progressRoot != null)
-                {
-                    Destroy(progressRoot);
-                    progressRoot = null;
-                }
-
-                if (pickaxeRoot != null)
-                {
-                    Destroy(pickaxeRoot);
-                    pickaxeRoot = null;
-                }
-
-                progressImage = null;
-                pickaxeRenderer = null;
-                progressCanvas = null;
-                target = null;
-
-                instance = null;
-
-                if (!applicationIsQuitting)
-                    BeginWaitingForAllowedScene();
+                SceneManager.sceneLoaded -= HandleSceneLoaded;
+                sceneLoadedSubscribed = false;
             }
+
+            HandleStop();
+            DetachFromSkill();
+            CancelSkillRefreshRoutine();
+
+            if (Ticker.Instance != null)
+                Ticker.Instance.Unsubscribe(this);
+
+            if (progressRoot != null)
+            {
+                Destroy(progressRoot);
+                progressRoot = null;
+            }
+
+            if (pickaxeRoot != null)
+            {
+                Destroy(pickaxeRoot);
+                pickaxeRoot = null;
+            }
+
+            progressImage = null;
+            pickaxeRenderer = null;
+            progressCanvas = null;
+            target = null;
         }
 
         /// <summary>

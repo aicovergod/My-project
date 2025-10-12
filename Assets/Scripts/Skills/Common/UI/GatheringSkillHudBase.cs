@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using World;
 
 namespace Skills.Common.UI
 {
@@ -8,7 +9,9 @@ namespace Skills.Common.UI
     /// when the player object spawns after the HUD initialises.
     /// </summary>
     /// <typeparam name="TSkill">The concrete skill component that the HUD observes (e.g. fishing, mining).</typeparam>
-    public abstract class GatheringSkillHudBase<TSkill> : MonoBehaviour where TSkill : MonoBehaviour
+    public abstract class GatheringSkillHudBase<TSelf, TSkill> : SceneGatedSingletonBehaviour<TSelf>
+        where TSelf : GatheringSkillHudBase<TSelf, TSkill>
+        where TSkill : MonoBehaviour
     {
         /// <summary>
         /// Cached reference to the active skill that the HUD is presenting information for.
