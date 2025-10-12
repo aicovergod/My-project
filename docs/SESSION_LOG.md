@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f88fab54cb75c8247ad7829603fbda58542f9f92 -->
+## 2025-10-12T18:47:09+01:00 — Merge branch 'main' into codex/fix-frozen-player-shop-interface-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 269 ++ / 66 --
+- Notes:
+  —
+---
 <!-- commit:54bcc92d5e2c70f1b2742a5eb4477bd3bf6cc9a1 -->
 ## 2025-10-12T18:40:56+01:00 — Merge pull request #1087 from aicovergod/codex/add-bonuses-dropdown-menu-to-itemdefinition
 
