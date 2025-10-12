@@ -103,6 +103,16 @@ namespace Inventory
 
         [Header("Description")] [TextArea] public string description;
 
+        [Header("Equipment Tooltip")]
+        [SerializeField]
+        [Tooltip("Optional custom lines appended to the equipment hover tooltip when this item is equipped.")]
+        private string[] equipmentTooltipLines = Array.Empty<string>();
+
+        /// <summary>
+        /// Additional lines that should appear on the equipment tooltip when this item is hovered.
+        /// </summary>
+        public IReadOnlyList<string> EquipmentTooltipLines => equipmentTooltipLines ?? Array.Empty<string>();
+
         [Header("Stacking")] [Tooltip("If true, multiple items can occupy a single inventory slot.")]
         public bool stackable;
 
@@ -149,6 +159,11 @@ namespace Inventory
             if (stackSpriteOverrides == null)
             {
                 stackSpriteOverrides = Array.Empty<StackSpriteOverride>();
+            }
+
+            if (equipmentTooltipLines == null)
+            {
+                equipmentTooltipLines = Array.Empty<string>();
             }
 
             if (stackSpriteOverrides.Length > 0)

@@ -1,21 +1,84 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:24ad20fe77d8b0c8319dd8beb0a9c0aff9853b10 -->
-## 2025-10-12T18:17:29+01:00 — Merge pull request #1084 from aicovergod/main
+<!-- commit:54bcc92d5e2c70f1b2742a5eb4477bd3bf6cc9a1 -->
+## 2025-10-12T18:40:56+01:00 — Merge pull request #1087 from aicovergod/codex/add-bonuses-dropdown-menu-to-itemdefinition
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
 - Changed files (0): —
-- Diff: 1910 ++ / 95 --
+- Diff: 156 ++ / 0 --
 - Notes:
-  uwu
+  Add ItemData inspector foldout for skill bonuses
 ---
-<!-- commit:479e7c6b7577b3ebf6bcc3527e67ce441b351917 -->
-## 2025-10-12T18:17:20+01:00 — Update SESSION_LOG [ci]
+<!-- commit:7a225386f5d2d386609fced302143db305f63cf9 -->
+## 2025-10-12T18:40:49+01:00 — Update SESSION_LOG [ci]
 
 - Author: session-log-bot <actions@github.com>
 - Changed files (1): docs/SESSION_LOG.md
 - Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:92d7b44c6af63b5e772eedadf6708e7d84456387 -->
+## 2025-10-12T18:40:36+01:00 — Group item bonuses under inspector foldout
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Editor/ItemDataEditor.cs
+- Diff: 147 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9567483e5af7acb89900f98e0d8a9143909800eb -->
+## 2025-10-12T18:32:34+01:00 — Merge pull request #1086 from aicovergod/codex/add-tooltip-for-orekeepers-charm
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 42 ++ / 0 --
+- Notes:
+  Add equipment tooltip override for Orekeepers Charm
+---
+<!-- commit:ce47ae79e5e38e0baffb2cb61ea4859a915067d6 -->
+## 2025-10-12T18:32:27+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:7fc1edaf83bc57eeacaf47e3294298f1c8be0da1 -->
+## 2025-10-12T18:32:16+01:00 — Add custom equipment tooltip for Orekeepers Charm
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Resources/Item/Orekeepers Charm.asset, Assets/Scripts/Inventory/Equipment.cs, Assets/Scripts/Inventory/ItemData.cs
+- Diff: 33 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0cae3528e9218c62df375dc682fd06f29f5f8e5f -->
+## 2025-10-12T18:22:48+01:00 — Merge pull request #1085 from aicovergod/codex/refactor-cooking-and-firemaking-huds-for-progress-bars
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 29 ++ / 60 --
+- Notes:
+  Refactor gathering HUD progress bar construction
+---
+<!-- commit:e15a0a0c2dcd5354c9d741a26dbf86fcc01c5b61 -->
+## 2025-10-12T18:22:31+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e65601ac9339ff1dd5d71d05656de780caf8106c -->
+## 2025-10-12T18:22:20+01:00 — Refactor gathering HUD progress bar construction
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/Cooking/UI/CookingHUD.cs, Assets/Scripts/Skills/Firemaking/UI/FiremakingHUD.cs
+- Diff: 20 ++ / 60 --
 - Notes:
   —
 ---
