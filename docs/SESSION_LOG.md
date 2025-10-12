@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7fc1edaf83bc57eeacaf47e3294298f1c8be0da1 -->
+## 2025-10-12T18:32:16+01:00 — Add custom equipment tooltip for Orekeepers Charm
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Resources/Item/Orekeepers Charm.asset, Assets/Scripts/Inventory/Equipment.cs, Assets/Scripts/Inventory/ItemData.cs
+- Diff: 33 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0cae3528e9218c62df375dc682fd06f29f5f8e5f -->
 ## 2025-10-12T18:22:48+01:00 — Merge pull request #1085 from aicovergod/codex/refactor-cooking-and-firemaking-huds-for-progress-bars
 
