@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a59339cc275b6d0a0b8366134c972709df10f4b8 -->
+## 2025-10-12T22:10:58+01:00 — Ensure shop modal flag applied before manager gating
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Shop/ShopUI.cs
+- Diff: 2 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:6dd41ff458eb3238ca5e64ed1f68d316d9f5effd -->
 ## 2025-10-12T21:56:03+01:00 — Refactor shared UI windows
 
