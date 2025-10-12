@@ -5,6 +5,7 @@ using Inventory;
 using Player;
 using NPC;
 using UI;
+using UI.Utilities;
 using World;
 
 namespace ShopSystem
@@ -13,7 +14,8 @@ namespace ShopSystem
     /// Runtime generated shop UI used to display items for sale.
     /// </summary>
     [DisallowMultipleComponent]
-    public class ShopUI : ScenePersistentObject, IUIWindow
+    [RequireComponent(typeof(ScenePersistentObject))]
+    public class ShopUI : ManagedUiWindow
     {
         [Header("Layout")]
         public Vector2 slotSize = new Vector2(32, 32);
@@ -57,9 +59,10 @@ namespace ShopSystem
         private static bool shopModalActive;
         public static bool IsShopModalActive => shopModalActive;
 
-        public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
+        private Shop pendingShop;
+        private NpcWanderer pendingNpc;
 
-        protected override void Awake()
+        private void Awake()
         {
             if (instance != null && instance != this)
             {
@@ -68,7 +71,6 @@ namespace ShopSystem
             }
 
             instance = this;
-            base.Awake();
 
             // Attempt to resolve the player's inventory immediately so the shop can hook into it when opened.
             ResolvePlayerInventory(false);
@@ -97,15 +99,18 @@ namespace ShopSystem
                 {
                     canvas.worldCamera = Camera.main;
                 }
-                uiRoot.SetActive(false);
+                SetWindowRoot(uiRoot);
             }
-            UIManager.Instance.RegisterWindow(this);
+            RegisterWindow();
         }
 
         private void OnDestroy()
         {
             if (instance == this)
+            {
                 instance = null;
+                UnregisterWindow();
+            }
         }
 
         /// <summary>
@@ -113,119 +118,27 @@ namespace ShopSystem
         /// </summary>
         public void Open(Shop shop, NpcWanderer npcMovement = null)
         {
-            if (shop == null) return;
-
-            // Capture the current inventory visibility before we manipulate any UI so we can
-            // restore the state when the shop closes.
-            inventoryStateCaptured = false;
-            if (playerInventory == null)
-                ResolvePlayerInventory(false);
-            if (playerInventory != null)
-            {
-                inventoryWasOpenBeforeShop = playerInventory.IsOpen;
-                inventoryStateCaptured = true;
-            }
-            else
-            {
-                inventoryWasOpenBeforeShop = false;
-            }
-
-            shopModalActive = true;
-            var uiManager = UIManager.Instance;
-            if (uiManager == null)
-            {
-                shopModalActive = false;
-                inventoryStateCaptured = false;
-                inventoryWasOpenBeforeShop = false;
-                playerMovementStateCaptured = false;
+            if (shop == null)
                 return;
-            }
 
-            if (!uiManager.TryOpenWindow(this))
+            pendingShop = shop;
+            pendingNpc = npcMovement;
+            ForceNextOpenHooks();
+            base.Open();
+
+            if (!IsOpen)
             {
-                shopModalActive = false;
-                inventoryStateCaptured = false;
-                inventoryWasOpenBeforeShop = false;
-                playerMovementStateCaptured = false;
-                return;
+                pendingShop = null;
+                pendingNpc = null;
             }
-
-            currentShop = shop;
-            Refresh();
-            uiRoot.SetActive(true);
-
-            // If the inventory wasn't available during Awake (e.g. player not yet spawned), retry here.
-            if (playerInventory == null)
-                ResolvePlayerInventory(true);
-
-            if (playerInventory != null)
-            {
-                if (!inventoryStateCaptured)
-                {
-                    inventoryWasOpenBeforeShop = playerInventory.IsOpen;
-                    inventoryStateCaptured = true;
-                }
-                playerInventory.SetShopContext(shop);
-                playerInventory.OnInventoryChanged += HandleInventoryChanged;
-                if (!playerInventory.IsOpen)
-                    playerInventory.OpenUI();
-            }
-            playerMovementStateCaptured = false;
-            if (playerMover == null)
-                playerMover = FindObjectOfType<PlayerMover>();
-            if (playerMover != null)
-            {
-                playerMovementStateCaptured = true;
-                playerMover.StopMovement();
-                playerMover.SetMovementFrozen(true);
-                playerMover.CanDrop = false;
-            }
-            npcMover = npcMovement;
-            if (npcMover != null)
-                npcMover.enabled = false;
         }
 
         /// <summary>
         /// Closes the shop UI.
         /// </summary>
-        public void Close()
+        public override void Close()
         {
-            uiRoot?.SetActive(false);
-            currentShop = null;
-            if (shopNameText != null)
-                shopNameText.text = string.Empty;
-            if (playerInventory != null)
-            {
-                playerInventory.OnInventoryChanged -= HandleInventoryChanged;
-                playerInventory.SetShopContext(null);
-                if (inventoryStateCaptured)
-                {
-                    if (!inventoryWasOpenBeforeShop && playerInventory.IsOpen)
-                        playerInventory.CloseUI();
-                    else if (inventoryWasOpenBeforeShop && !playerInventory.IsOpen)
-                        playerInventory.OpenUI();
-                }
-            }
-            if (playerMover != null)
-            {
-                if (playerMovementStateCaptured)
-                {
-                    // Release the shop's freeze request so overlapping systems can maintain any
-                    // remaining frozen state without the shop reapplying its own lock.
-                    playerMover.SetMovementFrozen(false);
-                }
-
-                playerMover.CanDrop = true;
-            }
-            if (npcMover != null)
-            {
-                npcMover.enabled = true;
-                npcMover = null;
-            }
-            inventoryStateCaptured = false;
-            inventoryWasOpenBeforeShop = false;
-            playerMovementStateCaptured = false;
-            shopModalActive = false;
+            base.Close();
         }
 
         /// <summary>
@@ -264,6 +177,111 @@ namespace ShopSystem
         private void HandleInventoryChanged()
         {
             Refresh();
+        }
+
+        protected override bool CanOpen()
+        {
+            return pendingShop != null && WindowRoot != null;
+        }
+
+        protected override void OnBeforeOpen()
+        {
+            shopModalActive = true;
+            currentShop = pendingShop;
+            npcMover = pendingNpc;
+
+            if (playerInventory == null)
+                ResolvePlayerInventory(false);
+
+            inventoryStateCaptured = false;
+            if (playerInventory != null)
+            {
+                inventoryWasOpenBeforeShop = playerInventory.IsOpen;
+                inventoryStateCaptured = true;
+                playerInventory.SetShopContext(currentShop);
+                playerInventory.OnInventoryChanged += HandleInventoryChanged;
+            }
+
+            playerMovementStateCaptured = false;
+            if (playerMover == null)
+                playerMover = FindObjectOfType<PlayerMover>();
+            if (playerMover != null)
+            {
+                playerMovementStateCaptured = true;
+                playerMover.StopMovement();
+                playerMover.SetMovementFrozen(true);
+                playerMover.CanDrop = false;
+            }
+
+            if (npcMover != null)
+                npcMover.enabled = false;
+        }
+
+        protected override void OnAfterOpen()
+        {
+            Refresh();
+
+            if (playerInventory == null)
+                ResolvePlayerInventory(true);
+
+            if (playerInventory != null)
+            {
+                if (!inventoryStateCaptured)
+                {
+                    inventoryWasOpenBeforeShop = playerInventory.IsOpen;
+                    inventoryStateCaptured = true;
+                    playerInventory.SetShopContext(currentShop);
+                    playerInventory.OnInventoryChanged += HandleInventoryChanged;
+                }
+
+                if (!playerInventory.IsOpen)
+                    playerInventory.OpenUI();
+            }
+
+            pendingShop = null;
+            pendingNpc = null;
+        }
+
+        protected override void OnBeforeClose()
+        {
+            if (playerInventory != null)
+            {
+                playerInventory.OnInventoryChanged -= HandleInventoryChanged;
+                playerInventory.SetShopContext(null);
+
+                if (inventoryStateCaptured)
+                {
+                    if (!inventoryWasOpenBeforeShop && playerInventory.IsOpen)
+                        playerInventory.CloseUI();
+                    else if (inventoryWasOpenBeforeShop && !playerInventory.IsOpen)
+                        playerInventory.OpenUI();
+                }
+            }
+
+            if (playerMover != null)
+            {
+                if (playerMovementStateCaptured)
+                    playerMover.SetMovementFrozen(false);
+                playerMover.CanDrop = true;
+            }
+
+            if (npcMover != null)
+            {
+                npcMover.enabled = true;
+                npcMover = null;
+            }
+
+            inventoryStateCaptured = false;
+            inventoryWasOpenBeforeShop = false;
+            playerMovementStateCaptured = false;
+            shopModalActive = false;
+        }
+
+        protected override void OnAfterClose()
+        {
+            currentShop = null;
+            if (shopNameText != null)
+                shopNameText.text = string.Empty;
         }
 
         private void CreateUI()

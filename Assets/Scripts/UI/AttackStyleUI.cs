@@ -4,13 +4,14 @@ using UnityEngine.UI;
 using Combat;
 using Player;
 using World;
+using UI.Utilities;
 
 namespace UI
 {
     /// <summary>
     /// Simple interface for selecting the player's combat style.
     /// </summary>
-    public class AttackStyleUI : MonoBehaviour, IUIWindow
+    public class AttackStyleUI : ManagedUiWindow
     {
         public static AttackStyleUI Instance => PersistentSceneSingleton<AttackStyleUI>.Instance;
 
@@ -37,9 +38,6 @@ namespace UI
             { CombatStyle.Longrange, "Longrange" }
         };
 
-        /// <summary>Whether the interface is currently visible.</summary>
-        public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Init()
         {
@@ -62,13 +60,10 @@ namespace UI
             CreateUI();
             EnsureLoadoutBound();
             if (uiRoot != null)
-            {
-                uiRoot.SetActive(false);
-                RefreshStyleButtons();
-                UpdateSelection();
-            }
-            if (UIManager.Instance != null)
-                UIManager.Instance.RegisterWindow(this);
+                SetWindowRoot(uiRoot);
+            RefreshStyleButtons();
+            UpdateSelection();
+            RegisterWindow();
         }
 
         private void OnDestroy()
@@ -81,8 +76,7 @@ namespace UI
                 loadout.StyleChanged -= HandleLoadoutStyleChanged;
                 loadout.DamageTypeChanged -= HandleLoadoutDamageTypeChanged;
             }
-            if (UIManager.Instance != null)
-                UIManager.Instance.UnregisterWindow(this);
+            UnregisterWindow();
         }
 
         private void CreateUI()
@@ -195,40 +189,6 @@ namespace UI
             UpdateSelection();
         }
 
-        /// <summary>Toggle the visibility of the UI.</summary>
-        public void Toggle()
-        {
-            if (IsOpen)
-                Close();
-            else
-                Open();
-        }
-
-        /// <summary>Open the attack style interface.</summary>
-        public void Open()
-        {
-            var uiManager = UIManager.Instance;
-            if (uiManager == null)
-                return;
-
-            if (!uiManager.TryOpenWindow(this))
-                return;
-
-            if (uiRoot != null)
-            {
-                uiRoot.SetActive(true);
-                RefreshStyleButtons();
-                UpdateSelection();
-            }
-        }
-
-        /// <summary>Close the attack style interface.</summary>
-        public void Close()
-        {
-            if (uiRoot != null)
-                uiRoot.SetActive(false);
-        }
-
         private void SetStyle(CombatStyle style)
         {
             EnsureLoadoutBound();
@@ -260,6 +220,17 @@ namespace UI
             colors.selectedColor = color;
             colors.pressedColor = color;
             btn.colors = colors;
+        }
+
+        protected override void OnBeforeOpen()
+        {
+            EnsureLoadoutBound();
+        }
+
+        protected override void OnAfterOpen()
+        {
+            RefreshStyleButtons();
+            UpdateSelection();
         }
     }
 }

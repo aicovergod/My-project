@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UI;
-using World;
+using UI.Utilities;
 
 namespace Skills
 {
@@ -11,7 +11,7 @@ namespace Skills
     /// Displays basic skill information such as mining and woodcutting levels and XP
     /// and can be toggled with the 'O' key.
     /// </summary>
-    public class SkillsUI : SceneGatedSingletonBehaviour<SkillsUI>, IUIWindow
+    public class SkillsUI : SceneGatedManagedUiWindow<SkillsUI>
     {
         private GameObject uiRoot;
         private SkillManager skillManager;
@@ -37,9 +37,7 @@ namespace Skills
             SkillType.Mining
         };
 
-        public static SkillsUI Instance => SceneGatedSingletonBehaviour<SkillsUI>.Instance;
-
-        public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
+        public static new SkillsUI Instance => SceneGatedManagedUiWindow<SkillsUI>.Instance;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -58,13 +56,13 @@ namespace Skills
             skillManager = FindObjectOfType<SkillManager>();
             CreateUI();
             if (uiRoot != null)
-                uiRoot.SetActive(false);
-            UIManager.Instance?.RegisterWindow(this);
+                SetWindowRoot(uiRoot);
+            RegisterWindow();
         }
 
         protected override void OnSingletonDestroyed()
         {
-            UIManager.Instance?.UnregisterWindow(this);
+            UnregisterWindow();
         }
 
         private void CreateUI()
@@ -154,38 +152,9 @@ namespace Skills
             xpTexts[type].gameObject.SetActive(xpVisibility[type]);
         }
 
-        public void Toggle()
-        {
-            if (IsOpen)
-                Close();
-            else
-                Open();
-        }
-
-        public void Open()
-        {
-            var uiManager = UIManager.Instance;
-            if (uiManager == null)
-                return;
-
-            if (!uiManager.TryOpenWindow(this))
-                return;
-
-            if (uiRoot != null)
-            {
-                var inv = UnityEngine.Object.FindObjectOfType<Inventory.Inventory>();
-                if (inv != null && inv.IsOpen)
-                    inv.CloseUI();
-                var eq = UnityEngine.Object.FindObjectOfType<Inventory.Equipment>();
-                if (eq != null && eq.IsOpen)
-                    eq.CloseUI();
-                uiRoot.SetActive(true);
-            }
-        }
-
         private void Update()
         {
-            if (uiRoot != null && uiRoot.activeSelf && skillManager != null)
+            if (IsOpen && skillManager != null)
             {
                 int totalLevel = 0;
                 foreach (var type in displayOrder)
@@ -206,16 +175,21 @@ namespace Skills
             }
         }
 
-        public void Close()
-        {
-            if (uiRoot != null)
-                uiRoot.SetActive(false);
-        }
-
         private void RebindSkillManager()
         {
             if (skillManager == null)
                 skillManager = FindObjectOfType<SkillManager>();
+        }
+
+        protected override void OnBeforeOpen()
+        {
+            RebindSkillManager();
+            var inv = UnityEngine.Object.FindObjectOfType<Inventory.Inventory>();
+            if (inv != null && inv.IsOpen)
+                inv.CloseUI();
+            var eq = UnityEngine.Object.FindObjectOfType<Inventory.Equipment>();
+            if (eq != null && eq.IsOpen)
+                eq.CloseUI();
         }
     }
 }

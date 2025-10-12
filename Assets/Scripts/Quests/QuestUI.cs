@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Inventory;
 using Player;
 using UI;
+using UI.Utilities;
 using World;
 
 namespace Quests
@@ -12,7 +13,8 @@ namespace Quests
     /// <summary>
     /// Simple quest log UI built entirely in code.
     /// </summary>
-    public class QuestUI : ScenePersistentObject, IUIWindow
+    [DisallowMultipleComponent]
+    public class QuestUI : ManagedUiWindow
     {
         private RectTransform listContent;
         private Text titleText;
@@ -43,9 +45,9 @@ namespace Quests
         /// </summary>
         public static QuestUI Instance => instance;
 
-        public bool IsOpen => canvas != null && canvas.enabled;
+        private bool wasOpenBeforeOpen;
 
-        protected override void Awake()
+        private void Awake()
         {
             if (instance != null && instance != this)
             {
@@ -53,11 +55,15 @@ namespace Quests
                 return;
             }
 
-            base.Awake();
+            var persistent = GetComponent<ScenePersistentObject>();
+            if (persistent == null)
+                persistent = gameObject.AddComponent<ScenePersistentObject>();
 
             instance = this;
             name = "QuestUI";
-            canvas = gameObject.AddComponent<Canvas>();
+            canvas = GetComponent<Canvas>();
+            if (canvas == null)
+                canvas = gameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             gameObject.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             gameObject.AddComponent<GraphicRaycaster>();
@@ -65,7 +71,8 @@ namespace Quests
             BuildLayout();
             canvas.enabled = false;
             playerMover = FindObjectOfType<PlayerMover>();
-            UIManager.Instance.RegisterWindow(this);
+            SetWindowRoot(gameObject, deactivateOnAssign: false);
+            RegisterWindow();
         }
 
         private void OnDestroy()
@@ -78,8 +85,9 @@ namespace Quests
                     QuestManager.Instance.QuestsUpdated.RemoveListener(Refresh);
                 }
 
-                if (canvas != null && canvas.enabled)
+                if (EvaluateIsOpen())
                     QuestUIClosed?.Invoke(this);
+                UnregisterWindow();
                 instance = null;
             }
         }
@@ -88,54 +96,6 @@ namespace Quests
         {
             if (QuestManager.Instance != null)
                 QuestManager.Instance.QuestsUpdated.AddListener(Refresh);
-        }
-
-        public void Toggle()
-        {
-            if (IsOpen)
-                Close();
-            else
-                Open();
-        }
-
-        public void Open()
-        {
-            bool wasOpen = IsOpen;
-            var uiManager = UIManager.Instance;
-            if (uiManager == null)
-                return;
-
-            if (!uiManager.TryOpenWindow(this))
-                return;
-
-            var inv = FindObjectOfType<Inventory.Inventory>();
-            if (inv != null && inv.IsOpen)
-                inv.CloseUI();
-            var eq = FindObjectOfType<Inventory.Equipment>();
-            if (eq != null && eq.IsOpen)
-                eq.CloseUI();
-            canvas.enabled = true;
-            Refresh();
-            if (playerMover == null)
-                playerMover = FindObjectOfType<PlayerMover>();
-            if (playerMover != null)
-                playerMover.enabled = false;
-
-            if (!wasOpen)
-                QuestUIOpened?.Invoke(this);
-        }
-
-        public void Close()
-        {
-            if (!IsOpen)
-                return;
-
-            canvas.enabled = false;
-            Clear();
-            if (playerMover != null)
-                playerMover.enabled = true;
-
-            QuestUIClosed?.Invoke(this);
         }
 
         private void Update()
@@ -311,6 +271,51 @@ namespace Quests
             descriptionText.text = quest.Description;
             stepsText.text = string.Join("\n", quest.Steps.Select(s => $"{(s.IsComplete ? "[\u2714]" : "[ ]")} {s.StepDescription}"));
             rewardsText.text = quest.Rewards;
+        }
+
+        protected override bool EvaluateIsOpen()
+        {
+            return canvas != null && canvas.enabled;
+        }
+
+        protected override void SetWindowActive(bool active)
+        {
+            if (canvas != null)
+                canvas.enabled = active;
+        }
+
+        protected override void OnBeforeOpen()
+        {
+            wasOpenBeforeOpen = EvaluateIsOpen();
+            var inv = FindObjectOfType<Inventory.Inventory>();
+            if (inv != null && inv.IsOpen)
+                inv.CloseUI();
+            var eq = FindObjectOfType<Inventory.Equipment>();
+            if (eq != null && eq.IsOpen)
+                eq.CloseUI();
+            if (playerMover == null)
+                playerMover = FindObjectOfType<PlayerMover>();
+            if (playerMover != null)
+                playerMover.enabled = false;
+        }
+
+        protected override void OnAfterOpen()
+        {
+            Refresh();
+            if (!wasOpenBeforeOpen)
+                QuestUIOpened?.Invoke(this);
+        }
+
+        protected override void OnBeforeClose()
+        {
+            if (playerMover != null)
+                playerMover.enabled = true;
+        }
+
+        protected override void OnAfterClose()
+        {
+            Clear();
+            QuestUIClosed?.Invoke(this);
         }
     }
 }
