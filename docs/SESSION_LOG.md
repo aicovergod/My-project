@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8e2dd0a6f7c6a91f8fbf2ba6f14df689e9528cb3 -->
+## 2025-10-13T14:16:29+01:00 — Refactor hitsplat library resolution
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Combat/HitSplatLibraryResolver.cs, Assets/Scripts/NPC/Combat/NpcCombatant.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 40 ++ / 44 --
+- Notes:
+  —
+---
 <!-- commit:eec97f41aecbb582dd74e8bcc1867bca9f432bd5 -->
 ## 2025-10-13T13:58:04+01:00 — Merge pull request #1106 from aicovergod/codex/add-gatheringtooliconresolver-utility
 
