@@ -5,9 +5,8 @@ using UnityEngine.EventSystems;
 using Inventory;
 using Core.Save;
 using Pets;
-using Player;
-using Player.Input;
 using UI;
+using UI.Utilities;
 using World;
 
 namespace BankSystem
@@ -74,9 +73,7 @@ namespace BankSystem
 
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
         private bool inventoryWasOpen;
-        private PlayerMover playerMover;
-        private bool playerMovementStateCaptured;
-        private bool playerMovementInputWasEnabled;
+        private readonly PlayerMovementModalLock playerMovementLock = new PlayerMovementModalLock();
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -580,8 +577,6 @@ namespace BankSystem
             {
                 bankModalActive = false;
                 inventoryWasOpen = false;
-                playerMovementStateCaptured = false;
-                playerMovementInputWasEnabled = false;
                 return;
             }
 
@@ -589,8 +584,6 @@ namespace BankSystem
             {
                 bankModalActive = false;
                 inventoryWasOpen = false;
-                playerMovementStateCaptured = false;
-                playerMovementInputWasEnabled = false;
                 return;
             }
 
@@ -607,28 +600,7 @@ namespace BankSystem
             }
             // Freeze player movement while banking to mirror shop behaviour and
             // ensure the player cannot walk away with the window open.
-            playerMovementStateCaptured = false;
-            playerMovementInputWasEnabled = false;
-            if (playerMover == null)
-                playerMover = FindObjectOfType<PlayerMover>();
-            if (playerMover != null)
-            {
-                playerMover.StopMovement();
-
-                var movementInput = playerMover.MovementInput;
-                if (movementInput != null)
-                {
-                    playerMovementInputWasEnabled = movementInput.enabled;
-                    movementInput.enabled = false;
-                    playerMovementStateCaptured = true;
-                }
-                else
-                {
-                    playerMovementStateCaptured = false;
-                }
-
-                playerMover.CanDrop = false;
-            }
+            playerMovementLock.Acquire();
             // Ensure latest saved state is loaded whenever the bank opens
             Load();
             uiRoot.SetActive(true);
@@ -653,20 +625,7 @@ namespace BankSystem
                 else
                     playerInventory.CloseUI();
             }
-            if (playerMover != null)
-            {
-                if (playerMovementStateCaptured)
-                {
-                    // Release the bank's input suppression so overlapping systems such as freeze
-                    // spells maintain authority over the remaining frozen state.
-                    var movementInput = playerMover.MovementInput;
-                    if (movementInput != null)
-                        movementInput.enabled = playerMovementInputWasEnabled;
-                }
-                playerMover.CanDrop = true;
-            }
-            playerMovementStateCaptured = false;
-            playerMovementInputWasEnabled = false;
+            playerMovementLock.Release();
             bankModalActive = false;
             Save();
         }
