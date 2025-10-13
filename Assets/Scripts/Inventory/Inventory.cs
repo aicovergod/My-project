@@ -5,15 +5,11 @@ using Core.Save;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using ShopSystem;
-using BankSystem;
 using Player;
-using Skills;
 using Skills.Firemaking;
 using Pets;
 using Quests;
 using UI;
-using UI.Utilities;
-using Books;
 using Inventory.Core;
 using Inventory.UI;
 using Object = UnityEngine.Object;
@@ -115,16 +111,12 @@ namespace Inventory
         private InventoryModel model;
         public int selectedIndex = -1;
         private InventoryWindowController windowController;
-
-        // Active shop context when interacting with a shop
-        private Shop currentShop;
+        private InventoryInteractionHandler interactionHandler;
 
         private PlayerMover playerMover;
         private Equipment equipment;
         private FiremakingSkill firemakingSkill;
         private PetStorage petStorage;
-
-        // Cached quest UI reference to avoid per-frame lookups.
         private QuestUI questUi;
 
         // Cached default font to avoid repeated builtin lookups that may throw
@@ -143,13 +135,12 @@ namespace Inventory
                 bankOpen = value;
                 if (windowController != null)
                     windowController.IsBankOpen = value;
+                interactionHandler?.RefreshControllerState();
             }
         }
-        public bool InShop => currentShop != null;
+        public bool InShop => interactionHandler != null && interactionHandler.HasActiveShop;
 
-        private bool CanDropItems => playerMover == null || playerMover.CanDrop;
-
-        private InventoryModel Model
+        internal InventoryModel Model
         {
             get
             {
@@ -157,6 +148,8 @@ namespace Inventory
                 return model;
             }
         }
+
+        internal InventoryWindowController WindowController => windowController;
 
         /// <summary>
         /// Ensures the backing <see cref="InventoryModel"/> exists and matches the configured size.
@@ -229,16 +222,7 @@ namespace Inventory
 
         public void CloseUI()
         {
-            // Prevent the player inventory from closing while trading or banking to avoid inconsistent states.
-            if (BankOpen || InShop)
-                return;
-            windowController?.Hide();
-            if (playerMover != null)
-            {
-                var pet = PetDropSystem.ActivePetObject;
-                var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
-                storage?.Close();
-            }
+            interactionHandler?.RequestClose();
         }
 
         public void Close()
@@ -248,28 +232,7 @@ namespace Inventory
 
         public void OpenUI()
         {
-            if (!BankOpen && !InShop && useSharedUIRoot)
-            {
-                var uiManager = UIManager.Instance;
-                if (uiManager != null && !uiManager.TryOpenWindow(this))
-                    return;
-            }
-            InterfaceTabMutexUtility.CloseAllTabWindowsExcept(this);
-            windowController?.Show();
-            if (playerMover != null)
-            {
-                var pet = PetDropSystem.ActivePetObject;
-                var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
-                if (!BankOpen)
-                {
-                    if (PetDropSystem.PetInventoryVisible)
-                        storage?.Open();
-                    else
-                        storage?.Close();
-                }
-                else
-                    storage?.Close();
-            }
+            interactionHandler?.RequestOpen();
         }
 
         public InventoryEntry GetSlot(int index)
@@ -287,26 +250,7 @@ namespace Inventory
         /// </summary>
         public bool EquipItem(int index)
         {
-            if (equipment == null)
-                return false;
-            if (index < 0 || index >= Model.Size)
-                return false;
-            var entry = Model.GetEntry(index);
-            if (entry.item == null || entry.item.equipmentSlot == EquipmentSlot.None)
-                return false;
-
-            // Temporarily free the slot before attempting to equip.
-            Model.RemoveFromSlot(index, entry.count);
-
-            // Try to equip the item.
-            if (equipment.Equip(entry))
-            {
-                return true;
-            }
-
-            // Equipping failed. Restore the original item.
-            Model.ReplaceItem(index, null, entry.item, entry.count);
-            return false;
+            return interactionHandler != null && interactionHandler.EquipItem(index);
         }
 
         /// <summary>
@@ -315,55 +259,28 @@ namespace Inventory
         /// </summary>
         public bool UseItem(int index)
         {
-            if (index < 0 || index >= Model.Size)
-                return false;
+            return interactionHandler != null && interactionHandler.UseItem(index);
+        }
 
-            var entry = Model.GetEntry(index);
-            var item = entry.item;
-
-            if (item is BookItemData bookItem && bookItem.book != null)
-            {
-                BookUI.Instance.Open(bookItem.book);
-                return true;
-            }
-
-            var eater = GetComponent<PlayerEat>();
-            if (eater != null && item != null && item.healAmount > 0)
-            {
-                if (eater.Eat(item))
-                {
-                    if (!string.IsNullOrEmpty(item.replacementItemId))
-                    {
-                        var next = ItemDatabase.GetItem(item.replacementItemId);
-                        if (!Model.ReplaceItem(index, item, next, next != null ? 1 : 0))
-                            Model.RemoveFromSlot(index, entry.count);
-                    }
-                    else
-                    {
-                        Model.RemoveFromSlot(index, 1);
-                    }
-                    ItemUseResolver.NotifyItemUsed(gameObject, item, ItemUseType.Consumed);
-                    return true;
-                }
-            }
-
-            return false;
+        /// <summary>
+        /// Clears the current slot selection and hides the highlight.
+        /// </summary>
+        public void ClearSelection()
+        {
+            interactionHandler?.ClearSelection();
         }
 
         private void OnEnable()
         {
             EnsureInitialized();
             SaveManager.Register(this);
-            QuestUI.QuestUIOpened += OnQuestUiOpened;
-            QuestUI.QuestUIClosed += OnQuestUiClosed;
-            questUi = QuestUI.Instance;
+            interactionHandler?.OnEnable();
         }
 
         private void OnDisable()
         {
             SaveManager.Unregister(this);
-            QuestUI.QuestUIOpened -= OnQuestUiOpened;
-            QuestUI.QuestUIClosed -= OnQuestUiClosed;
+            interactionHandler?.OnDisable();
         }
 
         /// <summary>
@@ -391,28 +308,37 @@ namespace Inventory
             if (windowController == null)
             {
                 windowController = new InventoryWindowController(Model, BuildWindowConfig());
-                windowController.SlotClicked += OnSlotClicked;
-                windowController.DropRequested += OnDropRequested;
-                windowController.SplitRequested += OnSplitRequested;
-                windowController.DragDropRequested += OnDragDropRequested;
-                windowController.DragCancelled += OnDragCancelled;
                 windowController.CloseRequested += OnWindowCloseRequested;
             }
 
             windowController.Owner = this;
 
-            windowController.IsBankOpen = BankOpen;
-            windowController.InShop = InShop;
-            windowController.CanDropItems = CanDropItems;
-            windowController.CurrentShop = currentShop;
-            windowController.SetSelectedIndex(selectedIndex);
-            windowController.RefreshAllSlots();
-            windowController.Hide();
-
             if (playerMover == null)
                 playerMover = GetComponent<PlayerMover>();
             if (equipment == null)
                 equipment = GetComponent<Equipment>();
+            if (firemakingSkill == null)
+                firemakingSkill = GetComponent<FiremakingSkill>();
+            if (questUi == null)
+                questUi = QuestUI.Instance;
+            petStorage = GetPetStorage();
+
+            if (interactionHandler == null)
+                interactionHandler = new InventoryInteractionHandler(this, Model, windowController);
+
+            interactionHandler.UpdateServiceContext(new InventoryInteractionHandler.ServiceContext
+            {
+                Equipment = equipment,
+                PlayerMover = playerMover,
+                FiremakingSkill = firemakingSkill,
+                QuestUi = questUi,
+                PetStorage = petStorage
+            });
+
+            interactionHandler.RefreshControllerState();
+            windowController.SetSelectedIndex(selectedIndex);
+            windowController.RefreshAllSlots();
+            windowController.Hide();
         }
 
         /// <summary>
@@ -480,205 +406,6 @@ namespace Inventory
             CloseUI();
         }
 
-        private void OnSlotClicked(InventoryWindowController controller, InventoryWindowController.SlotClickEvent evt)
-        {
-            if (controller != windowController)
-                return;
-
-            int index = evt.SlotIndex;
-
-            if (BankOpen)
-            {
-                if (evt.Button == PointerEventData.InputButton.Left)
-                    BankSystem.BankUI.Instance?.DepositFromInventory(index);
-                else if (evt.Button == PointerEventData.InputButton.Right)
-                    BankSystem.BankUI.Instance?.ShowDepositMenu(index, evt.PointerPosition);
-                return;
-            }
-
-            if (InShop && evt.Button == PointerEventData.InputButton.Left)
-            {
-                SellItem(index, 1);
-                return;
-            }
-
-            if (evt.Button != PointerEventData.InputButton.Left)
-                return;
-
-            var entry = Model.GetEntry(index);
-
-            if (entry.item != null && entry.item.healAmount > 0)
-            {
-                UseItem(index);
-                return;
-            }
-
-            if (selectedIndex < 0)
-            {
-                if (entry.item != null)
-                {
-                    if (entry.item.equipmentSlot != EquipmentSlot.None)
-                    {
-                        if (EquipItem(index))
-                            return;
-                    }
-
-                    selectedIndex = index;
-                    windowController?.SetSelectedIndex(selectedIndex);
-                }
-            }
-            else if (selectedIndex == index)
-            {
-                ClearSelection();
-            }
-            else
-            {
-                int previouslySelected = selectedIndex;
-                bool keepSelection;
-                CombineItems(previouslySelected, index, out keepSelection);
-                int newSelection = selectedIndex;
-
-                if (!keepSelection)
-                {
-                    ClearSelection();
-                }
-                else
-                {
-                    selectedIndex = newSelection;
-                    windowController?.SetSelectedIndex(selectedIndex);
-                }
-
-                windowController?.RefreshSlot(previouslySelected);
-                windowController?.RefreshSlot(index);
-                if (keepSelection && newSelection != previouslySelected && newSelection != index)
-                    windowController?.RefreshSlot(newSelection);
-            }
-        }
-
-        private void OnDropRequested(InventoryWindowController controller, InventoryWindowController.DropRequestEvent evt)
-        {
-            if (controller != windowController)
-                return;
-
-            DropItem(evt.SlotIndex, evt.Quantity);
-        }
-
-        private void OnSplitRequested(InventoryWindowController controller, InventoryWindowController.StackSplitEvent evt)
-        {
-            if (controller != windowController)
-                return;
-
-            switch (evt.SplitType)
-            {
-                case StackSplitType.Drop:
-                    DropItem(evt.SlotIndex, evt.Quantity);
-                    break;
-                case StackSplitType.Sell:
-                    if (currentShop != null)
-                        SellItem(evt.SlotIndex, evt.Quantity);
-                    else
-                        SplitStack(evt.SlotIndex, evt.Quantity);
-                    break;
-                case StackSplitType.Split:
-                    SplitStack(evt.SlotIndex, evt.Quantity);
-                    break;
-            }
-        }
-
-        private void OnDragDropRequested(InventoryWindowController controller, InventoryWindowController.DragDropEvent evt)
-        {
-            if (evt.Target != windowController)
-                return;
-
-            var sourceController = evt.Source;
-            var sourceInventory = sourceController?.Owner;
-            int sourceIndex = evt.SourceIndex;
-            int targetIndex = evt.TargetIndex;
-
-            if (sourceController == null || sourceInventory == null)
-                return;
-
-            if (sourceInventory != this)
-                HandleExternalDrag(sourceInventory, sourceIndex, targetIndex);
-            else
-                HandleInternalDrag(sourceIndex, targetIndex);
-        }
-
-        private void OnDragCancelled(InventoryWindowController controller)
-        {
-            // Intentionally left empty. The callback remains for future analytics or feedback hooks.
-        }
-
-        private void HandleExternalDrag(Inventory sourceInventory, int sourceIndex, int targetIndex)
-        {
-            if (targetIndex < 0 || targetIndex >= Model.Size)
-                return;
-
-            var petStorage = GetComponent<PetStorage>();
-            if (petStorage != null &&
-                (petStorage.definition?.id == "Heron" ||
-                 petStorage.definition?.id == "Beaver" ||
-                 petStorage.definition?.id == "Rock Golem" ||
-                 petStorage.definition?.id == "Mr Frying Pan"))
-            {
-                var entry = sourceInventory.Model.GetEntry(sourceIndex);
-                if (!petStorage.StoreItem(entry.item, entry.count))
-                    return;
-
-                sourceInventory.Model.ClearSlot(sourceIndex);
-                sourceInventory.windowController?.RefreshSlot(sourceIndex);
-                return;
-            }
-
-            var destinationEntry = Model.GetEntry(targetIndex);
-            var movedEntry = sourceInventory.Model.TakeEntry(sourceIndex);
-
-            if (!Model.SetEntry(targetIndex, movedEntry))
-            {
-                sourceInventory.Model.SetEntry(sourceIndex, movedEntry);
-                return;
-            }
-
-            if (!sourceInventory.Model.SetEntry(sourceIndex, destinationEntry))
-            {
-                Model.SetEntry(targetIndex, destinationEntry);
-                sourceInventory.Model.SetEntry(sourceIndex, movedEntry);
-                return;
-            }
-
-            windowController?.RefreshSlot(targetIndex);
-            sourceInventory.windowController?.RefreshSlot(sourceIndex);
-        }
-
-        private void HandleInternalDrag(int sourceIndex, int targetIndex)
-        {
-            if (sourceIndex < 0 || sourceIndex >= Model.Size)
-                return;
-            if (targetIndex < 0 || targetIndex >= Model.Size)
-                return;
-
-            if (targetIndex != sourceIndex)
-            {
-                var destinationEntry = Model.GetEntry(targetIndex);
-                var draggedEntry = Model.GetEntry(sourceIndex);
-
-                if (!Model.SetEntry(targetIndex, draggedEntry))
-                    return;
-
-                if (!Model.SetEntry(sourceIndex, destinationEntry))
-                {
-                    Model.TakeEntry(targetIndex);
-                    Model.SetEntry(targetIndex, destinationEntry);
-                    Model.SetEntry(sourceIndex, draggedEntry);
-                    return;
-                }
-
-                windowController?.RefreshSlot(targetIndex);
-            }
-
-            windowController?.RefreshSlot(sourceIndex);
-        }
-
         private void Start()
         {
             EnsureInitialized();
@@ -691,27 +418,7 @@ namespace Inventory
         /// </summary>
         public void SellItem(int slotIndex, int quantity = 1)
         {
-            if (BankOpen || currentShop == null)
-                return;
-            if (slotIndex < 0 || slotIndex >= Model.Size)
-                return;
-            int sold = 0;
-            for (int i = 0; i < quantity; i++)
-            {
-                var item = Model.GetEntry(slotIndex).item;
-                if (item == null)
-                    break;
-
-                if (currentShop.Sell(item, this, slotIndex))
-                    sold++;
-                else
-                    break;
-            }
-
-            if (sold > 0)
-            {
-                windowController?.DismissTooltip();
-            }
+            interactionHandler?.SellItem(slotIndex, quantity);
         }
 
         /// <summary>
@@ -719,14 +426,7 @@ namespace Inventory
         /// </summary>
         public void SetShopContext(Shop shop)
         {
-            currentShop = shop;
-            if (windowController != null)
-            {
-                windowController.CurrentShop = shop;
-                windowController.InShop = shop != null;
-                if (shop != null)
-                    windowController.Show();
-            }
+            interactionHandler?.SetShopContext(shop);
         }
 
         public void Save()
@@ -748,68 +448,14 @@ namespace Inventory
             Save();
         }
 
+        private void OnDestroy()
+        {
+            interactionHandler?.Dispose();
+        }
+
         private void Update()
         {
-            if (playerMover == null)
-                return;
-
-            EnsureQuestUiReference();
-
-            if (windowController != null)
-                windowController.CanDropItems = CanDropItems;
-
-            if (questUi != null && questUi.IsOpen)
-            {
-                if (IsOpen)
-                    CloseUI();
-                return;
-            }
-            if (currentShop != null)
-            {
-                if (!IsOpen)
-                    OpenUI();
-                return;
-            }
-            if (BankOpen)
-            {
-                if (!IsOpen)
-                    OpenUI();
-                return;
-            }
-        }
-
-        /// <summary>
-        /// Ensures the cached quest UI reference stays valid without per-frame allocations.
-        /// </summary>
-        private void EnsureQuestUiReference()
-        {
-            if (questUi == null)
-                questUi = QuestUI.Instance;
-        }
-
-        /// <summary>
-        /// Handles quest UI open events so the inventory can immediately react.
-        /// </summary>
-        private void OnQuestUiOpened(QuestUI quest)
-        {
-            questUi = quest ?? QuestUI.Instance;
-
-            if (questUi != null && questUi.IsOpen && IsOpen)
-                CloseUI();
-        }
-
-        /// <summary>
-        /// Keeps the cached quest UI reference in sync when the quest window closes or is destroyed.
-        /// </summary>
-        private void OnQuestUiClosed(QuestUI quest)
-        {
-            if (quest == null)
-            {
-                questUi = null;
-                return;
-            }
-
-            questUi = quest;
+            interactionHandler?.Tick();
         }
 
         /// <summary>
