@@ -19,13 +19,11 @@ namespace Skills.Mining
     /// Handles XP, level, and mining tick logic.
     /// </summary>
     [DisallowMultipleComponent]
-    public class MiningSkill : TickedSkillBehaviour
+    public class MiningSkill : DebuggableTickedSkillBehaviour
     {
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
-        [SerializeField, Tooltip("Enables verbose debug logging for mining tick processing.")]
-        private bool enableDebugLogging;
         [SerializeField, Tooltip("ScriptableObject containing the Prospector outfit configuration.")]
         private SkillingOutfitDefinition miningOutfitDefinition;
 
@@ -63,15 +61,6 @@ namespace Skills.Mining
             }
         }
 
-        /// <summary>
-        ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
-        /// </summary>
-        public bool EnableDebugLogging
-        {
-            get => enableDebugLogging;
-            set => enableDebugLogging = value;
-        }
-
         private void Awake()
         {
             if (inventory == null)
@@ -98,11 +87,6 @@ namespace Skills.Mining
             SkillingOutfitProgress.Unregister(miningOutfit);
             miningOutfit = null;
         }
-
-        /// <summary>
-        ///     Enables ticker logging so we can trace subscription timing during debugging sessions.
-        /// </summary>
-        protected override bool LogTickerSubscription => enableDebugLogging;
 
         protected override void HandleTick()
         {

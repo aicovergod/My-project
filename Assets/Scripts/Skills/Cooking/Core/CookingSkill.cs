@@ -15,13 +15,11 @@ namespace Skills.Cooking
     /// simply removes the raw item.
     /// </summary>
     [DisallowMultipleComponent]
-    public class CookingSkill : TickedSkillBehaviour
+    public class CookingSkill : DebuggableTickedSkillBehaviour
     {
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
-        [SerializeField, Tooltip("Enables verbose debug logging for cooking actions.")]
-        private bool enableDebugLogging;
         [SerializeField, Tooltip("ScriptableObject containing the Chef outfit configuration.")]
         private SkillingOutfitDefinition cookingOutfitDefinition;
 
@@ -59,15 +57,6 @@ namespace Skills.Cooking
         ///     Number of OSRS-style ticks required to cook a single item.
         /// </summary>
         public int CookTicksPerItem => CookIntervalTicks;
-
-        /// <summary>
-        ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
-        /// </summary>
-        public bool EnableDebugLogging
-        {
-            get => enableDebugLogging;
-            set => enableDebugLogging = value;
-        }
 
         private void Awake()
         {
@@ -180,8 +169,6 @@ namespace Skills.Cooking
             LogDebug("Stopped cooking");
             OnStopCooking?.Invoke();
         }
-
-        protected override bool LogTickerSubscription => enableDebugLogging;
 
         protected override void HandleTick()
         {
