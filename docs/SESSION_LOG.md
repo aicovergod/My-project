@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ee0c793fc5f72e5887e3d7132aeed2bdfa1de561 -->
+## 2025-10-13T13:57:38+01:00 — Add cached resolver for gathering tool icons
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): AGENTS.md, Assets/Scripts/Skills/Common/UI/GatheringToolIconResolver.cs, Assets/Scripts/Skills/Fishing/UI/FishingHUD.cs, Assets/Scripts/Skills/Mining/UI/MiningUI.cs, Assets/Scripts/Skills/Woodcutting/UI/WoodcuttingHUD.cs
+- Diff: 50 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:9b1d2759c247285ad1580cc223cd7625216d8e59 -->
 ## 2025-10-13T11:26:07+01:00 — Merge pull request #1105 from aicovergod/codex/introduce-skillingoutfitinitializer-utility
 
