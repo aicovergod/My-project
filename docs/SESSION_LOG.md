@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:079c7d5e6c05ff10620e0b5397aae497c7e6d75d -->
+## 2025-10-13T19:47:40+01:00 — updates
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (10): Assets/Resources/Item/Adamant Dagger.asset, Assets/Resources/Item/Black Dagger.asset, Assets/Resources/Item/Rune Dagger.asset, Assets/Scripts/Combat/HitSplatLibraryResolver.cs.meta, Assets/Scripts/Skills/Common/DebuggableTickedSkillBehaviour.cs.meta, Assets/Scripts/Skills/Common/SkillingOutfitInitializer.cs.meta, Assets/Scripts/Skills/Common/UI/GatheringToolIconResolver.cs.meta, Assets/Scripts/UI/Utilities/PlayerMovementModalLock.cs.meta, Assets/Scripts/Util/LayerUtility.cs.meta, docs/bug-review-2024-06-08.md
+- Diff: 24 ++ / 23 --
+- Notes:
+  —
+---
 <!-- commit:a1698c1ba609783abb117d2d8bd48d9cd3c7a8aa -->
 ## 2025-10-13T18:58:46+01:00 — Merge pull request #1108 from aicovergod/codex/add-shared-utility-for-obstruction-layers
 
