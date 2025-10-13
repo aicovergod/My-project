@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:18ae0030c3e2eaffcc0f5b3a216940a6348b71fa -->
+## 2025-10-13T21:47:13+01:00 — Refactor inventory logic into shareable model
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Core/InventoryModel.cs, Assets/Scripts/Inventory/Inventory.cs
+- Diff: 721 ++ / 371 --
+- Notes:
+  —
+---
 <!-- commit:b0850fa9e1a1308e96b9ab43f9f04fec36974d3f -->
 ## 2025-10-13T20:29:44+01:00 — zz
 
