@@ -1,69 +1,46 @@
 using System.Collections.Generic;
-using System.Linq;
+using Skills.Common.ToolSelection;
 using UnityEngine;
-using Inventory;
 
 namespace Skills.Fishing
 {
     [DisallowMultipleComponent]
-    public class FishingToolToUse : MonoBehaviour
+    public class FishingToolToUse : GatheringToolSelectorBase<FishingToolDefinition, FishingSkill>
     {
         [SerializeField] private List<FishingToolDefinition> allTools = new List<FishingToolDefinition>();
-        [SerializeField] private Inventory.Inventory inventory;
-        [SerializeField] private Inventory.Equipment equipment;
-        [SerializeField] private FishingSkill skill;
 
-        public FishingToolDefinition Current { get; private set; }
+        public new FishingToolDefinition Current => base.Current;
 
-        private void Awake()
+        public new FishingToolDefinition GetBestTool(IEnumerable<FishingToolDefinition> allowed = null)
         {
-            if (inventory == null)
-                inventory = GetComponent<Inventory.Inventory>();
-            if (equipment == null)
-                equipment = GetComponent<Inventory.Equipment>();
-            if (skill == null)
-                skill = GetComponent<FishingSkill>();
+            return base.GetBestTool(allowed);
         }
 
-        public FishingToolDefinition GetBestTool(IEnumerable<FishingToolDefinition> allowed = null)
+        public new void Refresh(IEnumerable<FishingToolDefinition> allowed = null)
         {
-            Refresh(allowed);
-            return Current;
+            base.Refresh(allowed);
         }
 
-        public void Refresh(IEnumerable<FishingToolDefinition> allowed = null)
+        protected override IReadOnlyList<FishingToolDefinition> OrderedTools => allTools;
+
+        protected override string GetItemId(FishingToolDefinition definition)
         {
-            Current = null;
-            if (inventory == null || skill == null)
-                return;
+            return definition != null ? definition.Id : null;
+        }
 
-            IEnumerable<FishingToolDefinition> tools = allTools;
-            if (allowed != null)
-            {
-                var allowedSet = new HashSet<FishingToolDefinition>(allowed.Where(t => t != null));
-                tools = tools.Where(t => allowedSet.Contains(t));
-            }
+        protected override float GetSortKey(FishingToolDefinition definition)
+        {
+            return definition != null ? definition.CatchBonus : 0f;
+        }
 
-            foreach (var tool in tools.OrderByDescending(t => t.CatchBonus))
-            {
-                var item = Resources.Load<ItemData>("Item/" + tool.Id);
-                if (item == null)
-                    continue;
-                if (inventory.GetItemCount(item) > 0 && skill.Level >= tool.RequiredLevel)
-                {
-                    Current = tool;
-                    break;
-                }
-                else if (equipment != null)
-                {
-                    var entry = equipment.GetEquipped(EquipmentSlot.Weapon);
-                    if (entry.item == item && skill.Level >= tool.RequiredLevel)
-                    {
-                        Current = tool;
-                        break;
-                    }
-                }
-            }
+        protected override int GetRequiredLevel(FishingToolDefinition definition)
+        {
+            return definition != null ? definition.RequiredLevel : int.MaxValue;
+        }
+
+        protected override int GetCurrentSkillLevel()
+        {
+            return SkillComponent != null ? SkillComponent.Level : 0;
         }
     }
 }

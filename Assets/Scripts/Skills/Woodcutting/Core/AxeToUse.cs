@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
+using Skills.Common.ToolSelection;
 using UnityEngine;
-using Inventory;
 
 namespace Skills.Woodcutting
 {
@@ -9,32 +8,18 @@ namespace Skills.Woodcutting
     /// Chooses the best axe available in the inventory that the player can use.
     /// </summary>
     [DisallowMultipleComponent]
-    public class AxeToUse : MonoBehaviour
+    public class AxeToUse : GatheringToolSelectorBase<AxeDefinition, WoodcuttingSkill>
     {
         [SerializeField] private List<AxeDefinition> allAxes = new List<AxeDefinition>();
-        [SerializeField] private Inventory.Inventory inventory;
-        [SerializeField] private Inventory.Equipment equipment;
-        [SerializeField] private WoodcuttingSkill skill;
 
-        public AxeDefinition Current { get; private set; }
-
-        private void Awake()
-        {
-            if (inventory == null)
-                inventory = GetComponent<Inventory.Inventory>();
-            if (equipment == null)
-                equipment = GetComponent<Inventory.Equipment>();
-            if (skill == null)
-                skill = GetComponent<WoodcuttingSkill>();
-        }
+        public new AxeDefinition Current => base.Current;
 
         /// <summary>
         /// Returns the best usable axe. Refreshes the current axe cache.
         /// </summary>
         public AxeDefinition GetBestAxe()
         {
-            Refresh();
-            return Current;
+            return base.GetBestTool();
         }
 
         /// <summary>
@@ -42,30 +27,29 @@ namespace Skills.Woodcutting
         /// </summary>
         public void Refresh()
         {
-            Current = null;
-            if (inventory == null || skill == null)
-                return;
+            base.Refresh();
+        }
 
-            foreach (var axe in allAxes.OrderByDescending(a => a.Power))
-            {
-                var item = Resources.Load<ItemData>("Item/" + axe.Id);
-                if (item == null)
-                    continue;
-                if (inventory.GetItemCount(item) > 0 && skill.Level >= axe.RequiredWoodcuttingLevel)
-                {
-                    Current = axe;
-                    break;
-                }
-                else if (equipment != null)
-                {
-                    var entry = equipment.GetEquipped(EquipmentSlot.Weapon);
-                    if (entry.item == item && skill.Level >= axe.RequiredWoodcuttingLevel)
-                    {
-                        Current = axe;
-                        break;
-                    }
-                }
-            }
+        protected override IReadOnlyList<AxeDefinition> OrderedTools => allAxes;
+
+        protected override string GetItemId(AxeDefinition definition)
+        {
+            return definition != null ? definition.Id : null;
+        }
+
+        protected override float GetSortKey(AxeDefinition definition)
+        {
+            return definition != null ? definition.Power : 0f;
+        }
+
+        protected override int GetRequiredLevel(AxeDefinition definition)
+        {
+            return definition != null ? definition.RequiredWoodcuttingLevel : int.MaxValue;
+        }
+
+        protected override int GetCurrentSkillLevel()
+        {
+            return SkillComponent != null ? SkillComponent.Level : 0;
         }
     }
 }
