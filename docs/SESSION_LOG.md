@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c2ded995915f8982ce14805a54495dbda4de8d2a -->
+## 2025-10-13T09:29:43+01:00 — Refactor gathering tool selection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): AGENTS.md, Assets/Scripts/Skills/Common/ToolSelection.meta, Assets/Scripts/Skills/Common/ToolSelection/GatheringToolSelectorBase.cs, Assets/Scripts/Skills/Common/ToolSelection/GatheringToolSelectorBase.cs.meta, Assets/Scripts/Skills/Fishing/Core/FishingToolToUse.cs, Assets/Scripts/Skills/Mining/Core/PickaxeToUse.cs, Assets/Scripts/Skills/Woodcutting/Core/AxeToUse.cs
+- Diff: 258 ++ / 131 --
+- Notes:
+  —
+---
 <!-- commit:c8f35bd7f8f9fb923abb7426eab74f82dc32041d -->
 ## 2025-10-13T09:09:29+01:00 — Merge pull request #1101 from aicovergod/codex/add-player-movement-modal-lock-helper
 
