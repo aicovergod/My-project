@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:36cc86e29806b3e9a88943778d5014345b403b28 -->
+## 2025-10-13T14:16:53+01:00 — Merge pull request #1107 from aicovergod/codex/create-hitsplatlibraryhelper-and-refactor-usage
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 49 ++ / 44 --
+- Notes:
+  Refactor hitsplat library resolution
+---
+<!-- commit:2b633d3cd91eac34e072e9b34a43eaa97c82a171 -->
+## 2025-10-13T14:16:44+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:8e2dd0a6f7c6a91f8fbf2ba6f14df689e9528cb3 -->
 ## 2025-10-13T14:16:29+01:00 — Refactor hitsplat library resolution
 
