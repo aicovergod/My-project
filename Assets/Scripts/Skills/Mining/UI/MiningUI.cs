@@ -2,6 +2,7 @@ using Inventory;
 using Skills.Common.UI;
 using UnityEngine;
 using UnityEngine.UI;
+using Util;
 
 namespace Skills.Mining
 {
@@ -188,21 +189,7 @@ namespace Skills.Mining
             if (uiLayer < 0)
                 return;
 
-            SetLayerRecursively(target.transform, uiLayer);
-        }
-
-        private static void SetLayerRecursively(Transform root, int layer)
-        {
-            if (root == null)
-                return;
-
-            root.gameObject.layer = layer;
-            for (int i = 0; i < root.childCount; i++)
-            {
-                var child = root.GetChild(i);
-                if (child != null)
-                    SetLayerRecursively(child, layer);
-            }
+            LayerUtility.SetLayerRecursively(target.transform, uiLayer);
         }
     }
 }

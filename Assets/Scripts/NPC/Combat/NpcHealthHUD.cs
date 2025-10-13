@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UI;
+using Util;
 
 namespace NPC
 {
@@ -97,14 +98,7 @@ namespace NPC
             textRect.offsetMin = Vector2.zero;
             textRect.offsetMax = Vector2.zero;
 
-            SetLayerRecursively(go, LayerMask.NameToLayer("UI"));
-        }
-
-        private void SetLayerRecursively(GameObject obj, int layer)
-        {
-            obj.layer = layer;
-            foreach (Transform child in obj.transform)
-                SetLayerRecursively(child.gameObject, layer);
+            LayerUtility.SetLayerRecursively(go.transform, LayerMask.NameToLayer("UI"));
         }
 
         private void HandleHealthChanged(int current, int max)
