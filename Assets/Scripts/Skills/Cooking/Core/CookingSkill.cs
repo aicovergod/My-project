@@ -66,16 +66,11 @@ namespace Skills.Cooking
                 equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
             cookProgressTracker.TickAdvanced += HandleCookProgressAdvanced;
-            if (cookingOutfitDefinition == null)
-                cookingOutfitDefinition = Resources.Load<SkillingOutfitDefinition>(CookingOutfitResourcePath);
-            if (cookingOutfitDefinition != null)
-            {
-                cookingOutfit = new SkillingOutfitProgress(cookingOutfitDefinition);
-            }
-            else
-            {
-                Debug.LogWarning("CookingSkill is missing a SkillingOutfitDefinition reference; outfit rewards are disabled.");
-            }
+            cookingOutfit = SkillingOutfitInitializer.InitializeOutfitProgress(
+                ref cookingOutfitDefinition,
+                CookingOutfitResourcePath,
+                nameof(CookingSkill),
+                this);
         }
 
         private void OnDestroy()

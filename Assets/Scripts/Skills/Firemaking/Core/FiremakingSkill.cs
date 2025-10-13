@@ -224,17 +224,11 @@ namespace Skills.Firemaking
             bonfireProgressTracker.TickAdvanced += HandleBonfireProgressAdvanced;
 
             LoadLogDefinitions();
-
-            if (firemakingOutfitDefinition == null)
-                firemakingOutfitDefinition = Resources.Load<SkillingOutfitDefinition>(FiremakingOutfitResourcePath);
-            if (firemakingOutfitDefinition != null)
-            {
-                firemakingOutfit = new SkillingOutfitProgress(firemakingOutfitDefinition);
-            }
-            else
-            {
-                Debug.LogWarning("FiremakingSkill is missing a SkillingOutfitDefinition reference; outfit rewards are disabled.");
-            }
+            firemakingOutfit = SkillingOutfitInitializer.InitializeOutfitProgress(
+                ref firemakingOutfitDefinition,
+                FiremakingOutfitResourcePath,
+                nameof(FiremakingSkill),
+                this);
         }
 
         /// <summary>

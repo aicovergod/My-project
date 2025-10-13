@@ -73,16 +73,11 @@ namespace Skills.Fishing
             skills = GetComponent<SkillManager>();
             catchProgressTracker.TickAdvanced += HandleCatchProgressAdvanced;
             PreloadFishItems();
-            if (fishingOutfitDefinition == null)
-                fishingOutfitDefinition = Resources.Load<SkillingOutfitDefinition>(FishingOutfitResourcePath);
-            if (fishingOutfitDefinition != null)
-            {
-                fishingOutfit = new SkillingOutfitProgress(fishingOutfitDefinition);
-            }
-            else
-            {
-                Debug.LogWarning("FishingSkill is missing a SkillingOutfitDefinition reference; outfit rewards are disabled.");
-            }
+            fishingOutfit = SkillingOutfitInitializer.InitializeOutfitProgress(
+                ref fishingOutfitDefinition,
+                FishingOutfitResourcePath,
+                nameof(FishingSkill),
+                this);
             TryResolveBycatchManager();
             if (bycatchManager == null)
                 SubscribeToServicesReady();

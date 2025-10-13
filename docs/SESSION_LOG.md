@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8c5a6546459225d0d401906995395277e15cdc4f -->
+## 2025-10-13T11:25:28+01:00 — Refactor skilling outfit initialization
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Skills/Common/SkillingOutfitInitializer.cs, Assets/Scripts/Skills/Cooking/Core/CookingSkill.cs, Assets/Scripts/Skills/Firemaking/Core/FiremakingSkill.cs, Assets/Scripts/Skills/Fishing/Core/FishingSkill.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs, Assets/Scripts/Skills/Woodcutting/Core/WoodcuttingSkill.cs
+- Diff: 91 ++ / 51 --
+- Notes:
+  —
+---
 <!-- commit:2b929e0c966fc7fc7f3de68d2b0f4972cfa96990 -->
 ## 2025-10-13T11:16:39+01:00 — Merge pull request #1104 from aicovergod/codex/create-debuggabletickedskillbehaviour-class
 

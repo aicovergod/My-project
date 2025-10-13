@@ -70,16 +70,11 @@ namespace Skills.Woodcutting
             skills = GetComponent<SkillManager>();
             chopProgressTracker.TickAdvanced += HandleChopProgressAdvanced;
             PreloadLogItems();
-            if (woodcuttingOutfitDefinition == null)
-                woodcuttingOutfitDefinition = Resources.Load<SkillingOutfitDefinition>(WoodcuttingOutfitResourcePath);
-            if (woodcuttingOutfitDefinition != null)
-            {
-                woodcuttingOutfit = new SkillingOutfitProgress(woodcuttingOutfitDefinition);
-            }
-            else
-            {
-                Debug.LogWarning("WoodcuttingSkill is missing a SkillingOutfitDefinition reference; outfit rewards are disabled.");
-            }
+            woodcuttingOutfit = SkillingOutfitInitializer.InitializeOutfitProgress(
+                ref woodcuttingOutfitDefinition,
+                WoodcuttingOutfitResourcePath,
+                nameof(WoodcuttingSkill),
+                this);
         }
 
         private void OnDestroy()
