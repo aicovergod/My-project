@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d410e2a54830974fdf7c255614c21294dcc68199 -->
+## 2025-10-13T22:17:46+01:00 — Merge pull request #1110 from aicovergod/codex/add-inventorywindowcontroller-and-refactor-components
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1362 ++ / 1021 --
+- Notes:
+  Refactor inventory UI into window controller
+---
+<!-- commit:a90c8be7e629bd1c343d86d1b3c6ff9d6bbb207c -->
+## 2025-10-13T22:17:24+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b9043cf7b35cdab6b12beda6ce88b1f14a445061 -->
 ## 2025-10-13T22:17:07+01:00 — Refactor inventory UI into window controller
 
