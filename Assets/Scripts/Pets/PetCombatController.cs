@@ -31,11 +31,6 @@ namespace Pets
         [SerializeField, Tooltip("Controller that maintains the floating text anchor for this pet.")]
         private PetFloatingTextController floatingTextController;
 
-        /// <summary>
-        /// Shared cache so pets reuse a single hitsplat library loaded from the Resources
-        /// folder whenever no explicit reference has been assigned in the inspector.
-        /// </summary>
-        private static HitSplatLibrary sharedHitSplatLibrary;
 
         private PetFollower follower;
         private Animator animator;
@@ -106,7 +101,7 @@ namespace Pets
                 hasRigidbody2D = true;
             }
 
-            EnsureHitSplatLibrary();
+            hitSplatLibrary = HitSplatLibraryResolver.Resolve(hitSplatLibrary);
 
             if (hitSplatLibrary == null)
             {
@@ -484,22 +479,6 @@ namespace Pets
                 anchor = transform;
 
             GatheringFloatingTextService.TryShowAtAnchor(message, anchor);
-        }
-
-        /// <summary>
-        /// Ensures a shared hitsplat library is available, falling back to the
-        /// Resources asset when no explicit assignment exists in the inspector.
-        /// </summary>
-        private void EnsureHitSplatLibrary()
-        {
-            if (hitSplatLibrary != null)
-                return;
-
-            if (sharedHitSplatLibrary == null)
-                sharedHitSplatLibrary = Resources.Load<HitSplatLibrary>("HitSplatLibrary");
-
-            if (sharedHitSplatLibrary != null)
-                hitSplatLibrary = sharedHitSplatLibrary;
         }
 
         private void OnDisable()

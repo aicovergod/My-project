@@ -40,11 +40,6 @@ namespace NPC
         [SerializeField, Tooltip("Vertical offset applied when no floating text anchor is present.")]
         private float hitsplatFallbackOffset = 1f;
 
-        /// <summary>
-        /// Shared cached reference so NPCs can automatically use the global hitsplat
-        /// library without paying the cost of repeated Resources lookups.
-        /// </summary>
-        private static HitSplatLibrary sharedHitSplatLibrary;
         private int currentHp;
         private Collider2D collider2D;
         private SpriteRenderer spriteRenderer;
@@ -134,7 +129,7 @@ namespace NPC
             ClearDamageContributors("Awake initialisation");
             OnHealthChanged?.Invoke(currentHp, MaxHP);
 
-            EnsureHitSplatLibrary();
+            hitSplatLibrary = HitSplatLibraryResolver.Resolve(hitSplatLibrary);
 
             if (hitSplatLibrary == null)
             {
@@ -390,22 +385,6 @@ namespace NPC
         {
             playerDamage = 0;
             npcDamage = 0;
-        }
-
-        /// <summary>
-        /// Ensure the NPC has access to a hitsplat library, loading the shared asset from
-        /// the Resources folder when no explicit reference is configured in the inspector.
-        /// </summary>
-        private void EnsureHitSplatLibrary()
-        {
-            if (hitSplatLibrary != null)
-                return;
-
-            if (sharedHitSplatLibrary == null)
-                sharedHitSplatLibrary = Resources.Load<HitSplatLibrary>("HitSplatLibrary");
-
-            if (sharedHitSplatLibrary != null)
-                hitSplatLibrary = sharedHitSplatLibrary;
         }
 
         /// <summary>
