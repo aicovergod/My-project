@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9b1d2759c247285ad1580cc223cd7625216d8e59 -->
+## 2025-10-13T11:26:07+01:00 — Merge pull request #1105 from aicovergod/codex/introduce-skillingoutfitinitializer-utility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 100 ++ / 51 --
+- Notes:
+  Refactor skilling outfit initialization across gathering skills
+---
+<!-- commit:ee53815277c65f527f32846753411caedc4cbcfe -->
+## 2025-10-13T11:25:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:8c5a6546459225d0d401906995395277e15cdc4f -->
 ## 2025-10-13T11:25:28+01:00 — Refactor skilling outfit initialization
 
