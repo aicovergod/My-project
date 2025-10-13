@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9574a67f6c3e44255592c27f2a49877153a99c34 -->
+## 2025-10-13T09:09:06+01:00 — Add shared player movement modal lock for UI windows
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): AGENTS.md, Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Shop/ShopUI.cs, Assets/Scripts/UI/Utilities/PlayerMovementModalLock.cs
+- Diff: 110 ++ / 85 --
+- Notes:
+  —
+---
 <!-- commit:cf92fcfd16d3e7174bc9928b2d554bea2d079dab -->
 ## 2025-10-12T23:36:10+01:00 — Merge pull request #1100 from aicovergod/codex/update-agents.md-with-latest-changes-j8idid
 
