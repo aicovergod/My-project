@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:facf6aef73fd1ecc07c781bd0f70d9b97a1b144a -->
+## 2025-10-13T09:30:09+01:00 — Merge pull request #1102 from aicovergod/codex/create-generic-base-class-for-tool-selection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 267 ++ / 131 --
+- Notes:
+  Refactor gathering tool selectors into shared base
+---
+<!-- commit:e28eab088d0dc89cab982af1350876109a55ad9a -->
+## 2025-10-13T09:29:59+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c2ded995915f8982ce14805a54495dbda4de8d2a -->
 ## 2025-10-13T09:29:43+01:00 — Refactor gathering tool selection
 
