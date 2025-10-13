@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a1698c1ba609783abb117d2d8bd48d9cd3c7a8aa -->
+## 2025-10-13T18:58:46+01:00 — Merge pull request #1108 from aicovergod/codex/add-shared-utility-for-obstruction-layers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 116 ++ / 62 --
+- Notes:
+  Refactor obstruction mask handling for combat line of sight
+---
+<!-- commit:b392324f52d6569ca451d37f14689f15554e3bc0 -->
+## 2025-10-13T18:58:06+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:3b716267f40f7095d61224974f5921e3edd19e27 -->
 ## 2025-10-13T18:57:53+01:00 — Refactor combat obstruction masks
 
