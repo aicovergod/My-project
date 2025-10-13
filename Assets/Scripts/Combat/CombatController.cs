@@ -120,8 +120,6 @@ namespace Combat
         private float hitsplatFallbackOffset = 1.1f;
 
         [Header("Line of Sight")]
-        private static readonly string[] DefaultObstructionLayers = { "Obstacles", "Obstacle", "Physical Objects" };
-
         private static readonly string[] RangedWeaponNameKeywords =
         {
             "crossbow",
@@ -215,12 +213,7 @@ namespace Combat
         /// </summary>
         private void EnsureObstructionMaskConfigured()
         {
-            int defaultMask = LayerMask.GetMask(DefaultObstructionLayers);
-
-            // Always merge in the default layers so inspector overrides can't accidentally drop
-            // physical blockers like AntiMeleeObstacle colliders from the mask.
-            int combinedMask = obstructionMask.value | defaultMask;
-            obstructionMask = combinedMask;
+            obstructionMask = LineOfSightUtility.EnsureDefaultObstructionMask(obstructionMask);
         }
 
         /// <summary>
