@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:772f70bc446c448dabc52e7be4d4ae0adc41f7da -->
+## 2025-10-13T11:15:56+01:00 — Refactor gathering skill debug toggle into shared base
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Skills/Common/DebuggableTickedSkillBehaviour.cs, Assets/Scripts/Skills/Cooking/Core/CookingSkill.cs, Assets/Scripts/Skills/Firemaking/Core/FiremakingSkill.cs, Assets/Scripts/Skills/Fishing/Core/FishingSkill.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs, Assets/Scripts/Skills/Woodcutting/Core/WoodcuttingSkill.cs
+- Diff: 36 ++ / 79 --
+- Notes:
+  —
+---
 <!-- commit:1cccd6a1b2922f6919257f520678539aaef93344 -->
 ## 2025-10-13T11:00:27+01:00 — Merge pull request #1103 from aicovergod/codex/add-layerutility-helper-and-update-documentation
 

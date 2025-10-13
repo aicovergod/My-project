@@ -18,13 +18,11 @@ namespace Skills.Woodcutting
     /// Handles XP, level, and woodcutting tick logic.
     /// </summary>
     [DisallowMultipleComponent]
-    public class WoodcuttingSkill : TickedSkillBehaviour
+    public class WoodcuttingSkill : DebuggableTickedSkillBehaviour
     {
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
-        [SerializeField, Tooltip("Enables verbose debug logging for woodcutting actions.")]
-        private bool enableDebugLogging;
         [SerializeField, Tooltip("ScriptableObject containing the Lumberjack outfit configuration.")]
         private SkillingOutfitDefinition woodcuttingOutfitDefinition;
 
@@ -63,15 +61,6 @@ namespace Skills.Woodcutting
             }
         }
 
-        /// <summary>
-        ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
-        /// </summary>
-        public bool EnableDebugLogging
-        {
-            get => enableDebugLogging;
-            set => enableDebugLogging = value;
-        }
-
         private void Awake()
         {
             if (inventory == null)
@@ -98,11 +87,6 @@ namespace Skills.Woodcutting
             SkillingOutfitProgress.Unregister(woodcuttingOutfit);
             woodcuttingOutfit = null;
         }
-
-        /// <summary>
-        ///     Enables ticker logging so we can trace subscription timing during debugging sessions.
-        /// </summary>
-        protected override bool LogTickerSubscription => enableDebugLogging;
 
         protected override void HandleTick()
         {

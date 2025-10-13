@@ -14,7 +14,7 @@ using Skills.Common;
 namespace Skills.Fishing
 {
     [DisallowMultipleComponent]
-    public class FishingSkill : TickedSkillBehaviour
+    public class FishingSkill : DebuggableTickedSkillBehaviour
     {
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
@@ -25,8 +25,6 @@ namespace Skills.Fishing
         private BycatchManager bycatchManager;
         private bool waitingForServices;
 
-        [SerializeField, Tooltip("Enables verbose debug logging for fishing actions.")]
-        private bool enableDebugLogging;
         [SerializeField, Tooltip("ScriptableObject containing the Fisherman outfit configuration.")]
         private SkillingOutfitDefinition fishingOutfitDefinition;
 
@@ -64,15 +62,6 @@ namespace Skills.Fishing
         }
         public int CurrentCatchIntervalTicks => catchProgressTracker.RequiredTicks;
 
-        /// <summary>
-        ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
-        /// </summary>
-        public bool EnableDebugLogging
-        {
-            get => enableDebugLogging;
-            set => enableDebugLogging = value;
-        }
-
         private SkillManager skills;
 
         private void Awake()
@@ -109,8 +98,6 @@ namespace Skills.Fishing
             SkillingOutfitProgress.Unregister(fishingOutfit);
             fishingOutfit = null;
         }
-
-        protected override bool LogTickerSubscription => enableDebugLogging;
 
         /// <summary>
         /// Attempts to resolve the bycatch manager from the <see cref="GameManager"/> when available

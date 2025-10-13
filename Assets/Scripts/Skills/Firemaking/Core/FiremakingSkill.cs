@@ -19,7 +19,7 @@ namespace Skills.Firemaking
     ///     and awarding XP through the shared gathering reward processors.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class FiremakingSkill : TickedSkillBehaviour
+    public sealed class FiremakingSkill : DebuggableTickedSkillBehaviour
     {
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
@@ -31,8 +31,6 @@ namespace Skills.Firemaking
         [SerializeField] private GroundItemSpawner groundItemSpawner;
         [SerializeField] private string tinderboxItemId = "Tinderbox";
         [SerializeField] private float maxIgniteDistance = 1.6f;
-        [SerializeField, Tooltip("Enables verbose logging while diagnosing Firemaking behaviour.")]
-        private bool enableDebugLogging;
         [SerializeField, Tooltip("ScriptableObject containing the Pyromancer outfit configuration.")]
         private SkillingOutfitDefinition firemakingOutfitDefinition;
 
@@ -152,15 +150,6 @@ namespace Skills.Firemaking
         public string TinderboxItemId => tinderboxItemId;
 
         /// <summary>
-        ///     Runtime flag used by the admin menu to toggle verbose debug logging.
-        /// </summary>
-        public bool EnableDebugLogging
-        {
-            get => enableDebugLogging;
-            set => enableDebugLogging = value;
-        }
-
-        /// <summary>
         ///     Invoked when an ignition attempt starts so HUDs can attach to the action.
         /// </summary>
         public event Action<FiremakingLogDefinition, Vector3> IgnitionStarted;
@@ -257,11 +246,6 @@ namespace Skills.Firemaking
             firemakingOutfit = null;
             ClearActiveFires();
         }
-
-        /// <summary>
-        ///     Routes ticker subscription logging through the runtime toggle.
-        /// </summary>
-        protected override bool LogTickerSubscription => enableDebugLogging;
 
         /// <summary>
         ///     Cleans up attempts and listeners when the component is disabled (e.g. on scene changes).
