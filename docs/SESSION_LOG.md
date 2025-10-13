@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ac40953baed27931428a442e3d3e819f16f211ec -->
+## 2025-10-13T23:18:10+01:00 — Merge pull request #1112 from aicovergod/codex/refactor-inventory-for-new-architecture
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 181 ++ / 6 --
+- Notes:
+  Refine inventory lifecycle bindings
+---
+<!-- commit:4d1cd5fd56ac09b4096b309351447dd3a8353a08 -->
+## 2025-10-13T23:18:01+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c77011e5eddbcf0e360d6dafbc0aaf2a1090a7e8 -->
 ## 2025-10-13T23:17:50+01:00 — Refactor inventory bindings to model and controller
 
