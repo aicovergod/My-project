@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ec8ee7370b484b20a496a6c465962b19181b1e6c -->
+## 2025-10-13T11:00:02+01:00 — Add shared layer utility helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): AGENTS.md, Assets/Scripts/NPC/Combat/NpcHealthHUD.cs, Assets/Scripts/Skills/Mining/Core/PersonalOreNode.cs, Assets/Scripts/Skills/Mining/UI/MiningUI.cs, Assets/Scripts/Util/LayerUtility.cs
+- Diff: 38 ++ / 41 --
+- Notes:
+  —
+---
 <!-- commit:facf6aef73fd1ecc07c781bd0f70d9b97a1b144a -->
 ## 2025-10-13T09:30:09+01:00 — Merge pull request #1102 from aicovergod/codex/create-generic-base-class-for-tool-selection
 
