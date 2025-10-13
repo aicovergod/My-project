@@ -15,16 +15,11 @@ using Quests;
 using UI;
 using UI.Utilities;
 using Books;
+using Inventory.Core;
 using Object = UnityEngine.Object;
 
 namespace Inventory
 {
-    public struct InventoryEntry
-    {
-        public ItemData item;
-        public int count;
-    }
-
     /// <summary>
     /// Indicates how a stack split action should be handled.
     /// </summary>
@@ -119,7 +114,7 @@ namespace Inventory
 
         private Image[] slotImages;
         private Text[] slotCountTexts;
-        private InventoryEntry[] items;
+        private InventoryModel model;
         public int selectedIndex = -1;
         private Image[] slotHighlights;
         private Material highlightMaterial;
@@ -135,6 +130,7 @@ namespace Inventory
         private PlayerMover playerMover;
         private Equipment equipment;
         private FiremakingSkill firemakingSkill;
+        private PetStorage petStorage;
 
         // Cached quest UI reference to avoid per-frame lookups.
         private QuestUI questUi;
@@ -159,6 +155,72 @@ namespace Inventory
         public bool InShop => currentShop != null;
 
         private bool CanDropItems => playerMover == null || playerMover.CanDrop;
+
+        private InventoryModel Model
+        {
+            get
+            {
+                EnsureModelInitialized();
+                return model;
+            }
+        }
+
+        /// <summary>
+        /// Ensures the backing <see cref="InventoryModel"/> exists and matches the configured size.
+        /// </summary>
+        private void EnsureModelInitialized()
+        {
+            size = Mathf.Max(1, size);
+
+            if (model == null)
+                model = new InventoryModel(size, EvaluateCanStore, combinationDatabase);
+
+            model.CanStoreRule = EvaluateCanStore;
+            model.SetCombinationDatabase(combinationDatabase);
+            if (model.Size != size)
+                model.Resize(size);
+
+            model.InventoryChanged -= OnModelInventoryChanged;
+            model.InventoryChanged += OnModelInventoryChanged;
+            model.SlotChanged -= OnModelSlotChanged;
+            model.SlotChanged += OnModelSlotChanged;
+        }
+
+        /// <summary>
+        /// Propagates model-level inventory changes to persistence and observers.
+        /// </summary>
+        /// <param name="persist">True to write the inventory state before notifying listeners.</param>
+        private void OnModelInventoryChanged(bool persist)
+        {
+            NotifyInventoryChanged(persist);
+        }
+
+        /// <summary>
+        /// Refreshes UI when a slot changes within the backing model.
+        /// </summary>
+        private void OnModelSlotChanged(int index, InventoryEntry entry)
+        {
+            UpdateSlotVisual(index);
+        }
+
+        /// <summary>
+        /// Evaluates whether an item can be stored, deferring to the active pet storage component when present.
+        /// </summary>
+        private bool EvaluateCanStore(ItemData item)
+        {
+            var storage = GetPetStorage();
+            return storage == null || storage.CanStore(item);
+        }
+
+        /// <summary>
+        /// Returns and caches the PetStorage component when attached.
+        /// </summary>
+        private PetStorage GetPetStorage()
+        {
+            if (petStorage == null)
+                TryGetComponent(out petStorage);
+            return petStorage;
+        }
 
         /// <summary>
         /// Saves the inventory when requested and informs listeners that the
@@ -222,17 +284,12 @@ namespace Inventory
 
         public InventoryEntry GetSlot(int index)
         {
-            return index >= 0 && index < items.Length ? items[index] : default;
+            return Model.GetEntry(index);
         }
 
         public void ClearSlot(int index)
         {
-            if (index < 0 || index >= items.Length)
-                return;
-            items[index].item = null;
-            items[index].count = 0;
-            UpdateSlotVisual(index);
-            NotifyInventoryChanged();
+            Model.ClearSlot(index);
         }
 
         /// <summary>
@@ -242,27 +299,23 @@ namespace Inventory
         {
             if (equipment == null)
                 return false;
-            if (index < 0 || index >= items.Length)
+            if (index < 0 || index >= Model.Size)
                 return false;
-            var entry = items[index];
+            var entry = Model.GetEntry(index);
             if (entry.item == null || entry.item.equipmentSlot == EquipmentSlot.None)
                 return false;
 
             // Temporarily free the slot before attempting to equip.
-            items[index] = default;
-            UpdateSlotVisual(index);
+            Model.RemoveFromSlot(index, entry.count);
 
             // Try to equip the item.
             if (equipment.Equip(entry))
             {
-                NotifyInventoryChanged();
                 return true;
             }
 
             // Equipping failed. Restore the original item.
-            items[index] = entry;
-            UpdateSlotVisual(index);
-            NotifyInventoryChanged(false);
+            Model.ReplaceItem(index, null, entry.item, entry.count);
             return false;
         }
 
@@ -272,10 +325,10 @@ namespace Inventory
         /// </summary>
         public bool UseItem(int index)
         {
-            if (index < 0 || index >= items.Length)
+            if (index < 0 || index >= Model.Size)
                 return false;
 
-            var entry = items[index];
+            var entry = Model.GetEntry(index);
             var item = entry.item;
 
             if (item is BookItemData bookItem && bookItem.book != null)
@@ -292,17 +345,13 @@ namespace Inventory
                     if (!string.IsNullOrEmpty(item.replacementItemId))
                     {
                         var next = ItemDatabase.GetItem(item.replacementItemId);
-                        items[index].item = next;
-                        items[index].count = next != null ? 1 : 0;
+                        if (!Model.ReplaceItem(index, item, next, next != null ? 1 : 0))
+                            Model.RemoveFromSlot(index, entry.count);
                     }
                     else
                     {
-                        items[index].count--;
-                        if (items[index].count <= 0)
-                            items[index].item = null;
+                        Model.RemoveFromSlot(index, 1);
                     }
-                    UpdateSlotVisual(index);
-                    NotifyInventoryChanged();
                     ItemUseResolver.NotifyItemUsed(gameObject, item, ItemUseType.Consumed);
                     return true;
                 }
@@ -344,17 +393,7 @@ namespace Inventory
                                  defaultFont;
             }
 
-            if (items == null || items.Length != size)
-            {
-                var previous = items;
-                items = new InventoryEntry[size];
-                if (previous != null)
-                {
-                    int copyLength = Mathf.Min(previous.Length, items.Length);
-                    for (int i = 0; i < copyLength; i++)
-                        items[i] = previous[i];
-                }
-            }
+            EnsureModelInitialized();
 
             if (EventSystem.current == null)
                 EnsureEventSystem();
@@ -402,11 +441,8 @@ namespace Inventory
             if (!shouldRebuild)
             {
                 // We already own a dedicated canvas—just make sure slot visuals stay in sync.
-                if (items != null)
-                {
-                    for (int i = 0; i < items.Length; i++)
-                        UpdateSlotVisual(i);
-                }
+                for (int i = 0; i < Model.Size; i++)
+                    UpdateSlotVisual(i);
                 return;
             }
 
@@ -438,11 +474,8 @@ namespace Inventory
             }
 
             // Update every slot so the newly created UI matches the saved inventory contents.
-            if (items != null)
-            {
-                for (int i = 0; i < items.Length; i++)
-                    UpdateSlotVisual(i);
-            }
+            for (int i = 0; i < Model.Size; i++)
+                UpdateSlotVisual(i);
         }
 
         private void Start()
@@ -752,7 +785,7 @@ namespace Inventory
             if (slotImages == null || index < 0 || index >= slotImages.Length || slotImages[index] == null)
                 return;
 
-            var entry = items[index];
+            var entry = Model.GetEntry(index);
             var item = entry.item;
             if (item != null)
             {
@@ -820,47 +853,7 @@ namespace Inventory
         /// </summary>
         public bool AddItem(ItemData item, int quantity = 1)
         {
-            if (item == null || quantity <= 0)
-                return false;
-
-            var petStorage = GetComponent<PetStorage>();
-            if (petStorage != null && !petStorage.CanStore(item))
-                return false;
-
-            if (!CanAddItem(item, quantity))
-                return false;
-
-            int remaining = quantity;
-
-            if (item.stackable)
-            {
-                for (int i = 0; i < items.Length && remaining > 0; i++)
-                {
-                    if (items[i].item == item && items[i].count < item.MaxStack)
-                    {
-                        int add = Mathf.Min(item.MaxStack - items[i].count, remaining);
-                        items[i].count += add;
-                        remaining -= add;
-                        UpdateSlotVisual(i);
-                    }
-                }
-            }
-
-            for (int i = 0; i < items.Length && remaining > 0; i++)
-            {
-                if (items[i].item == null)
-                {
-                    items[i].item = item;
-                    items[i].count = item.stackable ? Mathf.Min(item.MaxStack, remaining) : 1;
-                    remaining -= items[i].count;
-                    UpdateSlotVisual(i);
-                }
-            }
-
-            bool success = remaining <= 0;
-            if (success)
-                NotifyInventoryChanged();
-            return success;
+            return Model.AddItem(item, quantity);
         }
 
         /// <summary>
@@ -868,14 +861,7 @@ namespace Inventory
         /// </summary>
         public int GetItemCount(ItemData item)
         {
-            int count = 0;
-            if (item == null) return count;
-            for (int i = 0; i < items.Length; i++)
-            {
-                if (items[i].item == item)
-                    count += items[i].count;
-            }
-            return count;
+            return Model.GetItemCount(item);
         }
 
         /// <summary>
@@ -884,40 +870,7 @@ namespace Inventory
         /// </summary>
         public bool CanAddItem(ItemData item, int quantity = 1)
         {
-            if (item == null || quantity <= 0)
-                return false;
-
-            var petStorage = GetComponent<PetStorage>();
-            if (petStorage != null && !petStorage.CanStore(item))
-                return false;
-
-            int space = 0;
-
-            if (item.stackable)
-            {
-                for (int i = 0; i < items.Length; i++)
-                {
-                    if (items[i].item == item)
-                        space += item.MaxStack - items[i].count;
-                    else if (items[i].item == null)
-                        space += item.MaxStack;
-
-                    if (space >= quantity)
-                        return true;
-                }
-            }
-            else
-            {
-                for (int i = 0; i < items.Length; i++)
-                {
-                    if (items[i].item == null)
-                        space++;
-                    if (space >= quantity)
-                        return true;
-                }
-            }
-
-            return space >= quantity;
+            return Model.CanAddItem(item, quantity);
         }
 
         /// <summary>
@@ -926,30 +879,7 @@ namespace Inventory
         /// </summary>
         public bool RemoveItem(ItemData item, int count)
         {
-            if (item == null || count <= 0)
-                return false;
-
-            // Ensure the inventory holds enough of the requested item before mutating any slots.
-            if (GetItemCount(item) < count)
-                return false;
-
-            for (int i = 0; i < items.Length && count > 0; i++)
-            {
-                if (items[i].item == item)
-                {
-                    int remove = Mathf.Min(count, items[i].count);
-                    items[i].count -= remove;
-                    count -= remove;
-                    if (items[i].count <= 0)
-                        items[i].item = null;
-                    UpdateSlotVisual(i);
-                }
-            }
-
-            bool success = count <= 0;
-            if (success)
-                NotifyInventoryChanged();
-            return success;
+            return Model.RemoveItem(item, count);
         }
 
         /// <summary>
@@ -957,12 +887,7 @@ namespace Inventory
         /// </summary>
         public bool HasItem(string id)
         {
-            foreach (var entry in items)
-            {
-                if (entry.item != null && entry.item.id == id)
-                    return true;
-            }
-            return false;
+            return Model.HasItem(id);
         }
 
         /// <summary>
@@ -971,75 +896,24 @@ namespace Inventory
         /// </summary>
         public bool RemoveItem(string id)
         {
-            for (int i = 0; i < items.Length; i++)
-            {
-                if (items[i].item != null && items[i].item.id == id)
-                {
-                    items[i].count--;
-                    if (items[i].count <= 0)
-                        items[i].item = null;
-                    UpdateSlotVisual(i);
-
-                    NotifyInventoryChanged();
-                    return true;
-                }
-            }
-
-            return false;
+            return Model.RemoveItem(id);
         }
 
         public bool CombineItems(int srcIndex, int dstIndex, out bool keepSelection)
         {
             keepSelection = false;
-            if (srcIndex < 0 || dstIndex < 0 || srcIndex >= items.Length || dstIndex >= items.Length)
+            if (srcIndex < 0 || dstIndex < 0 || srcIndex >= Model.Size || dstIndex >= Model.Size)
                 return false;
 
-            var srcItem = items[srcIndex].item;
-            var dstItem = items[dstIndex].item;
+            var srcItem = Model.GetEntry(srcIndex).item;
+            var dstItem = Model.GetEntry(dstIndex).item;
             if (srcItem == null || dstItem == null)
                 return false;
 
             if (TryHandleFiremakingCombination(srcIndex, dstIndex, srcItem, dstItem, out keepSelection))
                 return true;
 
-            if (combinationDatabase == null)
-                return false;
-
-            var result = combinationDatabase.GetResult(srcItem, dstItem);
-            if (result == null)
-                return false;
-
-            // Cache the original slot state so we can roll back if we fail to place the result.
-            // This avoids permanently consuming ingredients when the output item cannot fit.
-            InventoryEntry originalSrc = items[srcIndex];
-            InventoryEntry originalDst = items[dstIndex];
-
-            items[srcIndex].count--;
-            if (items[srcIndex].count <= 0)
-                items[srcIndex].item = null;
-            UpdateSlotVisual(srcIndex);
-
-            items[dstIndex].count--;
-            if (items[dstIndex].count <= 0)
-                items[dstIndex].item = null;
-            UpdateSlotVisual(dstIndex);
-
-            bool added = AddItem(result, 1);
-            if (added)
-            {
-                // AddItem already saved the inventory; we fire a non-persisting notification so listeners refresh visuals.
-                NotifyInventoryChanged(false);
-                return true;
-            }
-
-            // Failed to add the result, so restore the decremented ingredient stacks to keep the UI and data consistent.
-            items[srcIndex] = originalSrc;
-            UpdateSlotVisual(srcIndex);
-
-            items[dstIndex] = originalDst;
-            UpdateSlotVisual(dstIndex);
-
-            return false;
+            return Model.CombineItems(srcIndex, dstIndex, out keepSelection);
         }
 
         private FiremakingSkill GetFiremakingSkill()
@@ -1108,19 +982,7 @@ namespace Inventory
         /// </summary>
         public bool ReplaceItem(int slotIndex, ItemData oldItem, ItemData newItem, int newCount)
         {
-            if (slotIndex < 0 || slotIndex >= items.Length)
-                return false;
-
-            var entry = items[slotIndex];
-            if (entry.item != oldItem)
-                return false;
-
-            entry.item = newItem;
-            entry.count = newCount;
-            items[slotIndex] = entry;
-            UpdateSlotVisual(slotIndex);
-            NotifyInventoryChanged();
-            return true;
+            return Model.ReplaceItem(slotIndex, oldItem, newItem, newCount);
         }
 
         /// <summary>
@@ -1129,8 +991,8 @@ namespace Inventory
         public void DropItem(int slotIndex, int quantity = 1)
         {
             if (BankOpen || !CanDropItems) return;
-            if (slotIndex < 0 || slotIndex >= items.Length) return;
-            var entry = items[slotIndex];
+            if (slotIndex < 0 || slotIndex >= Model.Size) return;
+            var entry = Model.GetEntry(slotIndex);
             if (entry.item == null) return;
             if (entry.item.isUndroppable) return;
 
@@ -1145,11 +1007,7 @@ namespace Inventory
                 return;
 
             int remove = Mathf.Clamp(quantity, 1, entry.count);
-            entry.count -= remove;
-            if (entry.count <= 0)
-                entry.item = null;
-            items[slotIndex] = entry;
-            UpdateSlotVisual(slotIndex);
+            Model.RemoveFromSlot(slotIndex, remove);
             HideTooltip();
 
             // Attempt to spawn a pet for this item if one exists.
@@ -1164,9 +1022,8 @@ namespace Inventory
                     if (!restored)
                     {
                         // Fallback: restore the slot and explain why the swap was blocked so the player never loses their pet item.
-                        items[slotIndex] = originalEntry;
-                        UpdateSlotVisual(slotIndex);
-                        NotifyInventoryChanged();
+                        var currentEntry = Model.GetEntry(slotIndex);
+                        Model.ReplaceItem(slotIndex, currentEntry.item, originalEntry.item, originalEntry.count);
 
                         var message = "You need inventory space to store your active pet before summoning a new one.";
                         if (transform != null)
@@ -1182,8 +1039,6 @@ namespace Inventory
                 PetDropSystem.SpawnPet(pet, pos);
             }
             // If the dropped item has no associated pet we intentionally do not log to avoid console spam.
-
-            NotifyInventoryChanged();
         }
 
         /// <summary>
@@ -1191,18 +1046,8 @@ namespace Inventory
         /// </summary>
         public void RemoveFromSlot(int slotIndex, int quantity)
         {
-            if (slotIndex < 0 || slotIndex >= items.Length) return;
-            var entry = items[slotIndex];
-            if (entry.item == null) return;
-
-            int remove = Mathf.Clamp(quantity, 1, entry.count);
-            entry.count -= remove;
-            if (entry.count <= 0)
-                entry.item = null;
-            items[slotIndex] = entry;
-            UpdateSlotVisual(slotIndex);
+            Model.RemoveFromSlot(slotIndex, quantity);
             HideTooltip();
-            NotifyInventoryChanged();
         }
 
         /// <summary>
@@ -1211,33 +1056,7 @@ namespace Inventory
         /// </summary>
         public void SplitStack(int slotIndex, int quantity)
         {
-            if (slotIndex < 0 || slotIndex >= items.Length) return;
-            var entry = items[slotIndex];
-            if (entry.item == null || !entry.item.splittable) return;
-
-            int amount = Mathf.Clamp(quantity, 1, entry.count - 1);
-            if (amount <= 0) return;
-
-            int target = -1;
-            for (int i = 0; i < items.Length; i++)
-            {
-                if (items[i].item == null)
-                {
-                    target = i;
-                    break;
-                }
-            }
-
-            if (target == -1) return; // no space
-
-            entry.count -= amount;
-            items[slotIndex] = entry;
-            items[target].item = entry.item;
-            items[target].count = amount;
-
-            UpdateSlotVisual(slotIndex);
-            UpdateSlotVisual(target);
-            NotifyInventoryChanged();
+            Model.SplitStack(slotIndex, quantity);
         }
 
         /// <summary>
@@ -1246,8 +1065,8 @@ namespace Inventory
         /// </summary>
         public void PromptStackSplit(int slotIndex, StackSplitType type)
         {
-            if (BankOpen || slotIndex < 0 || slotIndex >= items.Length) return;
-            var entry = items[slotIndex];
+            if (BankOpen || slotIndex < 0 || slotIndex >= Model.Size) return;
+            var entry = Model.GetEntry(slotIndex);
             if (entry.item == null || entry.count <= 1) return;
             if (!entry.item.splittable) return;
             if (type == StackSplitType.Drop && !CanDropItems) return;
@@ -1274,8 +1093,8 @@ namespace Inventory
 
         public void ShowTooltip(int slotIndex, RectTransform slotRect)
         {
-            if (slotIndex < 0 || slotIndex >= items.Length) return;
-            var item = items[slotIndex].item;
+            if (slotIndex < 0 || slotIndex >= Model.Size) return;
+            var item = Model.GetEntry(slotIndex).item;
             if (item == null || tooltip == null || tooltipNameText == null || tooltipDescriptionText == null) return;
 
             if (currentShop != null && currentShop.TryGetSellPrice(item, out int sellPrice))
@@ -1397,12 +1216,12 @@ namespace Inventory
         {
             if (BankOpen || currentShop == null)
                 return;
-            if (slotIndex < 0 || slotIndex >= items.Length)
+            if (slotIndex < 0 || slotIndex >= Model.Size)
                 return;
             int sold = 0;
             for (int i = 0; i < quantity; i++)
             {
-                var item = items[slotIndex].item;
+                var item = Model.GetEntry(slotIndex).item;
                 if (item == null)
                     break;
 
@@ -1415,7 +1234,6 @@ namespace Inventory
             if (sold > 0)
             {
                 HideTooltip();
-                NotifyInventoryChanged();
             }
         }
 
@@ -1431,8 +1249,8 @@ namespace Inventory
 
         public void BeginDrag(int slotIndex)
         {
-            if (BankOpen || slotIndex < 0 || slotIndex >= items.Length) return;
-            var entry = items[slotIndex];
+            if (BankOpen || slotIndex < 0 || slotIndex >= Model.Size) return;
+            var entry = Model.GetEntry(slotIndex);
             var item = entry.item;
             if (item == null) return;
 
@@ -1486,7 +1304,7 @@ namespace Inventory
             {
                 var source = draggingInventory;
                 int sourceIndex = source.draggingIndex;
-                if (slotIndex >= 0 && slotIndex < items.Length)
+                if (slotIndex >= 0 && slotIndex < Model.Size)
                 {
                     var petStorage = GetComponent<PetStorage>();
                     if (petStorage != null &&
@@ -1497,25 +1315,36 @@ namespace Inventory
                     {
                         // Skilling pets (Heron, Beaver, Rock Golem, Mr Frying Pan) only accept auto-collected resources from
                         // their associated skills and cannot receive manual drops.
-                        var entry = source.items[sourceIndex];
+                        var entry = source.Model.GetEntry(sourceIndex);
                         if (!petStorage.StoreItem(entry.item, entry.count))
                         {
                             source.EndDrag();
                             return;
                         }
-                        source.ClearSlot(sourceIndex);
+                        source.Model.ClearSlot(sourceIndex);
                         source.EndDrag();
                         return;
                     }
 
-                    var temp = items[slotIndex];
-                    items[slotIndex] = source.items[sourceIndex];
-                    source.items[sourceIndex] = temp;
-                    UpdateSlotVisual(slotIndex);
-                    source.UpdateSlotVisual(sourceIndex);
+                    var destinationEntry = Model.GetEntry(slotIndex);
+                    var movedEntry = source.Model.TakeEntry(sourceIndex);
+                    if (!Model.SetEntry(slotIndex, movedEntry))
+                    {
+                        // Reinsert the entry into the source inventory if this bag rejects it.
+                        source.Model.SetEntry(sourceIndex, movedEntry);
+                        source.EndDrag();
+                        return;
+                    }
+
+                    if (!source.Model.SetEntry(sourceIndex, destinationEntry))
+                    {
+                        // Source inventory should always accept its original entry, but guard against failures by rolling back.
+                        Model.SetEntry(slotIndex, destinationEntry);
+                        source.Model.SetEntry(sourceIndex, movedEntry);
+                        source.EndDrag();
+                        return;
+                    }
                     source.EndDrag();
-                    NotifyInventoryChanged();
-                    source.NotifyInventoryChanged();
                 }
                 else
                 {
@@ -1530,21 +1359,32 @@ namespace Inventory
                 return;
             }
 
-            if (slotIndex >= 0 && slotIndex < items.Length)
+            if (slotIndex >= 0 && slotIndex < Model.Size)
             {
                 if (slotIndex != draggingIndex)
                 {
-                    var temp = items[slotIndex];
-                    items[slotIndex] = items[draggingIndex];
-                    items[draggingIndex] = temp;
-                    UpdateSlotVisual(slotIndex);
+                    var destinationEntry = Model.GetEntry(slotIndex);
+                    var draggedEntry = Model.GetEntry(draggingIndex);
+                    if (!Model.SetEntry(slotIndex, draggedEntry))
+                    {
+                        EndDrag();
+                        return;
+                    }
+
+                    if (!Model.SetEntry(draggingIndex, destinationEntry))
+                    {
+                        Model.TakeEntry(slotIndex);
+                        Model.SetEntry(slotIndex, destinationEntry);
+                        Model.SetEntry(draggingIndex, draggedEntry);
+                        EndDrag();
+                        return;
+                    }
                 }
 
                 UpdateSlotVisual(draggingIndex);
             }
 
             EndDrag();
-            NotifyInventoryChanged();
         }
 
         public void EndDrag()
@@ -1571,74 +1411,18 @@ namespace Inventory
                 draggingInventory = null;
         }
 
-        [Serializable]
-        private class InventorySaveData
-        {
-            public SlotData[] slots;
-        }
-
-        [Serializable]
-        private class SlotData
-        {
-            public string id;
-            public int count;
-        }
-
         public void Save()
         {
-            var data = new InventorySaveData
-            {
-                slots = new SlotData[size]
-            };
-
-            for (int i = 0; i < size; i++)
-            {
-                var entry = items[i];
-                data.slots[i] = new SlotData
-                {
-                    id = entry.item != null ? entry.item.id : string.Empty,
-                    count = entry.item != null ? entry.count : 0
-                };
-            }
-
+            EnsureModelInitialized();
+            var data = Model.CaptureState();
             SaveManager.Save(saveKey, data);
         }
 
         public void Load()
         {
-            var data = SaveManager.Load<InventorySaveData>(saveKey);
-            if (data?.slots == null)
-                return;
-
-            int len = Mathf.Min(size, data.slots.Length);
-            for (int i = 0; i < len; i++)
-            {
-                var slot = data.slots[i];
-                if (!string.IsNullOrEmpty(slot.id))
-                {
-                    var item = ItemDatabase.GetItem(slot.id);
-                    if (item == null)
-                    {
-                        // Log the corruption so we can investigate missing or invalid item ids in save data.
-                        Debug.LogWarning($"Inventory.Load: Failed to resolve item id '{slot.id}' for slot {i}. Resetting slot to empty.");
-                        items[i].item = null;
-                        items[i].count = 0;
-                    }
-                    else
-                    {
-                        items[i].item = item;
-                        items[i].count = slot.count;
-                    }
-                }
-                else
-                {
-                    items[i].item = null;
-                    items[i].count = 0;
-                }
-                UpdateSlotVisual(i);
-            }
-
-            NotifyInventoryChanged(false);
+            EnsureModelInitialized();
+            var data = SaveManager.Load<InventoryModel.InventorySaveData>(saveKey);
+            Model.RestoreState(data);
         }
 
         private void OnApplicationQuit()
