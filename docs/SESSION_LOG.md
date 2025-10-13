@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2b929e0c966fc7fc7f3de68d2b0f4972cfa96990 -->
+## 2025-10-13T11:16:39+01:00 — Merge pull request #1104 from aicovergod/codex/create-debuggabletickedskillbehaviour-class
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 45 ++ / 79 --
+- Notes:
+  Refactor gathering skill debug toggle into shared base
+---
+<!-- commit:67de35c6e633c489b6b1161f070604b81049dd65 -->
+## 2025-10-13T11:16:09+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:772f70bc446c448dabc52e7be4d4ae0adc41f7da -->
 ## 2025-10-13T11:15:56+01:00 — Refactor gathering skill debug toggle into shared base
 
