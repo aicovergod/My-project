@@ -1,6 +1,7 @@
+using Inventory.UI;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace Inventory
 {
@@ -14,7 +15,7 @@ namespace Inventory
         [Tooltip("Screen-space padding the cursor can move beyond the menu before the popup auto-closes.")]
         private float closePaddingPixels = 12f;
 
-        private Inventory inventory;
+        private InventoryWindowController controller;
         private int slotIndex;
         private Font font;
         private RectTransform rect;
@@ -113,9 +114,9 @@ namespace Inventory
             layout.spacing = 2f;
             layout.padding = new RectOffset(2, 2, 2, 2);
 
-            CreateButton("Drop 1", () => { inventory?.DropItem(slotIndex, 1); Hide(); });
-            CreateButton("Drop All", () => { if (inventory != null) inventory.DropItem(slotIndex, inventory.GetSlot(slotIndex).count); Hide(); });
-            CreateButton("Drop X", () => { inventory?.PromptStackSplit(slotIndex, StackSplitType.Drop); Hide(); });
+            CreateButton("Drop 1", () => OnSelection(DropMenuSelection.DropOne));
+            CreateButton("Drop All", () => OnSelection(DropMenuSelection.DropAll));
+            CreateButton("Drop X", () => OnSelection(DropMenuSelection.DropX));
         }
 
         private void CreateButton(string label, UnityAction onClick)
@@ -147,9 +148,9 @@ namespace Inventory
             txtRect.offsetMax = Vector2.zero;
         }
 
-        public void Show(Inventory inventory, int index, Vector2 position)
+        public void Show(InventoryWindowController controller, int index, Vector2 position)
         {
-            this.inventory = inventory;
+            this.controller = controller;
             slotIndex = index;
             transform.position = position;
             gameObject.SetActive(true);
@@ -159,7 +160,13 @@ namespace Inventory
         public void Hide()
         {
             gameObject.SetActive(false);
-            inventory = null;
+            controller = null;
+        }
+
+        private void OnSelection(DropMenuSelection selection)
+        {
+            controller?.HandleDropMenuSelection(slotIndex, selection);
+            Hide();
         }
     }
 }
