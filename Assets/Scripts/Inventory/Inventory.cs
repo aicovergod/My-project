@@ -2,11 +2,10 @@
 using System;
 using UnityEngine;
 using Core.Save;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using ShopSystem;
+using BankSystem;
 using Player;
 using Skills;
 using Skills.Firemaking;
@@ -16,6 +15,7 @@ using UI;
 using UI.Utilities;
 using Books;
 using Inventory.Core;
+using Inventory.UI;
 using Object = UnityEngine.Object;
 
 namespace Inventory
@@ -112,17 +112,9 @@ namespace Inventory
         [Tooltip("Database of valid item combinations.")]
         public ItemCombinationDatabase combinationDatabase;
 
-        private Image[] slotImages;
-        private Text[] slotCountTexts;
         private InventoryModel model;
         public int selectedIndex = -1;
-        private Image[] slotHighlights;
-        private Material highlightMaterial;
-
-        private GameObject tooltip;
-        private Text tooltipNameText;
-        private Text tooltipDescriptionText;
-        private InventoryDropMenu dropMenu;
+        private InventoryWindowController windowController;
 
         // Active shop context when interacting with a shop
         private Shop currentShop;
@@ -135,23 +127,24 @@ namespace Inventory
         // Cached quest UI reference to avoid per-frame lookups.
         private QuestUI questUi;
 
-        // UI
-        private GameObject uiRoot; // Canvas root
-        private static GameObject sharedUIRoot;
-
-        // Drag & drop
-        private int draggingIndex = -1;
-        private GameObject draggingIcon;
-        private static Inventory draggingInventory;
-
         // Cached default font to avoid repeated builtin lookups that may throw
         private Font defaultFont;
 
         public event Action OnInventoryChanged;
 
-        public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
+        public bool IsOpen => windowController != null && windowController.UiRoot != null && windowController.UiRoot.activeSelf;
 
-        public bool BankOpen { get; set; }
+        private bool bankOpen;
+        public bool BankOpen
+        {
+            get => bankOpen;
+            set
+            {
+                bankOpen = value;
+                if (windowController != null)
+                    windowController.IsBankOpen = value;
+            }
+        }
         public bool InShop => currentShop != null;
 
         private bool CanDropItems => playerMover == null || playerMover.CanDrop;
@@ -200,7 +193,7 @@ namespace Inventory
         /// </summary>
         private void OnModelSlotChanged(int index, InventoryEntry entry)
         {
-            UpdateSlotVisual(index);
+            windowController?.RefreshSlot(index);
         }
 
         /// <summary>
@@ -239,9 +232,7 @@ namespace Inventory
             // Prevent the player inventory from closing while trading or banking to avoid inconsistent states.
             if (BankOpen || InShop)
                 return;
-            if (uiRoot != null)
-                uiRoot.SetActive(false);
-            HideDropMenu();
+            windowController?.Hide();
             if (playerMover != null)
             {
                 var pet = PetDropSystem.ActivePetObject;
@@ -264,8 +255,7 @@ namespace Inventory
                     return;
             }
             InterfaceTabMutexUtility.CloseAllTabWindowsExcept(this);
-            if (uiRoot != null)
-                uiRoot.SetActive(true);
+            windowController?.Show();
             if (playerMover != null)
             {
                 var pet = PetDropSystem.ActivePetObject;
@@ -398,26 +388,26 @@ namespace Inventory
             if (EventSystem.current == null)
                 EnsureEventSystem();
 
-            if (uiRoot == null)
+            if (windowController == null)
             {
-                if (useSharedUIRoot && sharedUIRoot != null)
-                {
-                    uiRoot = sharedUIRoot;
-                }
-                else
-                {
-                    CreateUI();
-                    if (useSharedUIRoot)
-                        sharedUIRoot = uiRoot;
-                }
+                windowController = new InventoryWindowController(Model, BuildWindowConfig());
+                windowController.SlotClicked += OnSlotClicked;
+                windowController.DropRequested += OnDropRequested;
+                windowController.SplitRequested += OnSplitRequested;
+                windowController.DragDropRequested += OnDragDropRequested;
+                windowController.DragCancelled += OnDragCancelled;
+                windowController.CloseRequested += OnWindowCloseRequested;
             }
 
-            if (uiRoot != null)
-            {
-                uiRoot.SetActive(false);
-                if (dropMenu == null)
-                    dropMenu = uiRoot.GetComponentInChildren<InventoryDropMenu>(true);
-            }
+            windowController.Owner = this;
+
+            windowController.IsBankOpen = BankOpen;
+            windowController.InShop = InShop;
+            windowController.CanDropItems = CanDropItems;
+            windowController.CurrentShop = currentShop;
+            windowController.SetSelectedIndex(selectedIndex);
+            windowController.RefreshAllSlots();
+            windowController.Hide();
 
             if (playerMover == null)
                 playerMover = GetComponent<PlayerMover>();
@@ -437,775 +427,262 @@ namespace Inventory
             // Ensure backing arrays/fonts are prepared before we touch the UI.
             EnsureInitialized();
 
-            bool shouldRebuild = uiRoot == null || (sharedUIRoot != null && ReferenceEquals(uiRoot, sharedUIRoot));
-            if (!shouldRebuild)
+            bool wasOpen = IsOpen;
+
+            windowController?.ForceDedicatedCanvas();
+            windowController?.SetSelectedIndex(selectedIndex);
+            windowController?.RefreshAllSlots();
+
+            if (wasOpen)
+                windowController?.Show();
+            else
+                windowController?.Hide();
+        }
+
+        /// <summary>
+        /// Builds the configuration payload used when instantiating the window controller.
+        /// </summary>
+        private InventoryWindowController.WindowConfig BuildWindowConfig()
+        {
+            return new InventoryWindowController.WindowConfig(
+                slotSize,
+                slotSpacing,
+                windowPadding,
+                windowSize,
+                referenceResolution,
+                windowPosition,
+                windowColor,
+                emptySlotColor,
+                stackColorDefault,
+                stackColor10k,
+                stackColor100k,
+                stackColor10m,
+                stackColor100m,
+                tooltipNameColor,
+                tooltipDescriptionColor,
+                defaultFont,
+                stackCountFont,
+                tooltipNameFont,
+                tooltipDescriptionFont,
+                slotFrameSprite,
+                showCloseButton,
+                centerOnScreen,
+                useSharedUIRoot,
+                columns,
+                stackCountFontSize);
+        }
+
+        private void OnWindowCloseRequested(InventoryWindowController controller)
+        {
+            if (controller != windowController)
+                return;
+
+            CloseUI();
+        }
+
+        private void OnSlotClicked(InventoryWindowController controller, InventoryWindowController.SlotClickEvent evt)
+        {
+            if (controller != windowController)
+                return;
+
+            int index = evt.SlotIndex;
+
+            if (BankOpen)
             {
-                // We already own a dedicated canvas—just make sure slot visuals stay in sync.
-                for (int i = 0; i < Model.Size; i++)
-                    UpdateSlotVisual(i);
+                if (evt.Button == PointerEventData.InputButton.Left)
+                    BankSystem.BankUI.Instance?.DepositFromInventory(index);
+                else if (evt.Button == PointerEventData.InputButton.Right)
+                    BankSystem.BankUI.Instance?.ShowDepositMenu(index, evt.PointerPosition);
                 return;
             }
 
-            // Remember whether the UI was visible so we can restore the state after rebuilding.
-            bool wasOpen = uiRoot != null && uiRoot.activeSelf;
-
-            // Clean up any lingering UI state that pointed at the shared root.
-            HideDropMenu();
-            HideTooltip();
-
-            uiRoot = null;
-            dropMenu = null;
-            tooltip = null;
-            tooltipNameText = null;
-            tooltipDescriptionText = null;
-            slotImages = null;
-            slotCountTexts = null;
-            slotHighlights = null;
-
-            // Build a fresh dedicated canvas hierarchy for this inventory instance.
-            CreateUI();
-
-            if (uiRoot != null)
+            if (InShop && evt.Button == PointerEventData.InputButton.Left)
             {
-                // Restore the previous visibility state and make sure runtime helpers are rebound.
-                uiRoot.SetActive(wasOpen);
-                if (dropMenu == null)
-                    dropMenu = uiRoot.GetComponentInChildren<InventoryDropMenu>(true);
+                SellItem(index, 1);
+                return;
             }
 
-            // Update every slot so the newly created UI matches the saved inventory contents.
-            for (int i = 0; i < Model.Size; i++)
-                UpdateSlotVisual(i);
+            if (evt.Button != PointerEventData.InputButton.Left)
+                return;
+
+            var entry = Model.GetEntry(index);
+
+            if (entry.item != null && entry.item.healAmount > 0)
+            {
+                UseItem(index);
+                return;
+            }
+
+            if (selectedIndex < 0)
+            {
+                if (entry.item != null)
+                {
+                    if (entry.item.equipmentSlot != EquipmentSlot.None)
+                    {
+                        if (EquipItem(index))
+                            return;
+                    }
+
+                    selectedIndex = index;
+                    windowController?.SetSelectedIndex(selectedIndex);
+                }
+            }
+            else if (selectedIndex == index)
+            {
+                ClearSelection();
+            }
+            else
+            {
+                int previouslySelected = selectedIndex;
+                bool keepSelection;
+                CombineItems(previouslySelected, index, out keepSelection);
+                int newSelection = selectedIndex;
+
+                if (!keepSelection)
+                {
+                    ClearSelection();
+                }
+                else
+                {
+                    selectedIndex = newSelection;
+                    windowController?.SetSelectedIndex(selectedIndex);
+                }
+
+                windowController?.RefreshSlot(previouslySelected);
+                windowController?.RefreshSlot(index);
+                if (keepSelection && newSelection != previouslySelected && newSelection != index)
+                    windowController?.RefreshSlot(newSelection);
+            }
+        }
+
+        private void OnDropRequested(InventoryWindowController controller, InventoryWindowController.DropRequestEvent evt)
+        {
+            if (controller != windowController)
+                return;
+
+            DropItem(evt.SlotIndex, evt.Quantity);
+        }
+
+        private void OnSplitRequested(InventoryWindowController controller, InventoryWindowController.StackSplitEvent evt)
+        {
+            if (controller != windowController)
+                return;
+
+            switch (evt.SplitType)
+            {
+                case StackSplitType.Drop:
+                    DropItem(evt.SlotIndex, evt.Quantity);
+                    break;
+                case StackSplitType.Sell:
+                    if (currentShop != null)
+                        SellItem(evt.SlotIndex, evt.Quantity);
+                    else
+                        SplitStack(evt.SlotIndex, evt.Quantity);
+                    break;
+                case StackSplitType.Split:
+                    SplitStack(evt.SlotIndex, evt.Quantity);
+                    break;
+            }
+        }
+
+        private void OnDragDropRequested(InventoryWindowController controller, InventoryWindowController.DragDropEvent evt)
+        {
+            if (evt.Target != windowController)
+                return;
+
+            var sourceController = evt.Source;
+            var sourceInventory = sourceController?.Owner;
+            int sourceIndex = evt.SourceIndex;
+            int targetIndex = evt.TargetIndex;
+
+            if (sourceController == null || sourceInventory == null)
+                return;
+
+            if (sourceInventory != this)
+                HandleExternalDrag(sourceInventory, sourceIndex, targetIndex);
+            else
+                HandleInternalDrag(sourceIndex, targetIndex);
+        }
+
+        private void OnDragCancelled(InventoryWindowController controller)
+        {
+            // Intentionally left empty. The callback remains for future analytics or feedback hooks.
+        }
+
+        private void HandleExternalDrag(Inventory sourceInventory, int sourceIndex, int targetIndex)
+        {
+            if (targetIndex < 0 || targetIndex >= Model.Size)
+                return;
+
+            var petStorage = GetComponent<PetStorage>();
+            if (petStorage != null &&
+                (petStorage.definition?.id == "Heron" ||
+                 petStorage.definition?.id == "Beaver" ||
+                 petStorage.definition?.id == "Rock Golem" ||
+                 petStorage.definition?.id == "Mr Frying Pan"))
+            {
+                var entry = sourceInventory.Model.GetEntry(sourceIndex);
+                if (!petStorage.StoreItem(entry.item, entry.count))
+                    return;
+
+                sourceInventory.Model.ClearSlot(sourceIndex);
+                sourceInventory.windowController?.RefreshSlot(sourceIndex);
+                return;
+            }
+
+            var destinationEntry = Model.GetEntry(targetIndex);
+            var movedEntry = sourceInventory.Model.TakeEntry(sourceIndex);
+
+            if (!Model.SetEntry(targetIndex, movedEntry))
+            {
+                sourceInventory.Model.SetEntry(sourceIndex, movedEntry);
+                return;
+            }
+
+            if (!sourceInventory.Model.SetEntry(sourceIndex, destinationEntry))
+            {
+                Model.SetEntry(targetIndex, destinationEntry);
+                sourceInventory.Model.SetEntry(sourceIndex, movedEntry);
+                return;
+            }
+
+            windowController?.RefreshSlot(targetIndex);
+            sourceInventory.windowController?.RefreshSlot(sourceIndex);
+        }
+
+        private void HandleInternalDrag(int sourceIndex, int targetIndex)
+        {
+            if (sourceIndex < 0 || sourceIndex >= Model.Size)
+                return;
+            if (targetIndex < 0 || targetIndex >= Model.Size)
+                return;
+
+            if (targetIndex != sourceIndex)
+            {
+                var destinationEntry = Model.GetEntry(targetIndex);
+                var draggedEntry = Model.GetEntry(sourceIndex);
+
+                if (!Model.SetEntry(targetIndex, draggedEntry))
+                    return;
+
+                if (!Model.SetEntry(sourceIndex, destinationEntry))
+                {
+                    Model.TakeEntry(targetIndex);
+                    Model.SetEntry(targetIndex, destinationEntry);
+                    Model.SetEntry(sourceIndex, draggedEntry);
+                    return;
+                }
+
+                windowController?.RefreshSlot(targetIndex);
+            }
+
+            windowController?.RefreshSlot(sourceIndex);
         }
 
         private void Start()
         {
             EnsureInitialized();
             UIManager.Instance.RegisterWindow(this);
-        }
-
-        /// <summary>
-        /// Creates a Screen Space Overlay canvas and a simple grid of slots.
-        /// Slots sit inside a window with a colored background similar to the shop UI.
-        /// </summary>
-        private void CreateUI()
-        {
-            uiRoot = new GameObject("InventoryUI", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            // Put UI at the SCENE ROOT so it never behaves like a world object
-            uiRoot.transform.SetParent(null, false);
-            DontDestroyOnLoad(uiRoot);
-
-            // Optional: assign UI layer if it exists (no error if it doesn't)
-            int uiLayer = LayerMask.NameToLayer("UI");
-            if (uiLayer >= 0) uiRoot.layer = uiLayer;
-
-            var canvas = uiRoot.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.pixelPerfect = true;
-
-            var scaler = uiRoot.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = referenceResolution;
-            scaler.matchWidthOrHeight = 0f; // match width (nice for 64px tile games)
-
-            GameObject window = new GameObject("Window", typeof(RectTransform), typeof(Image));
-            window.transform.SetParent(uiRoot.transform, false);
-
-            var windowRect = window.GetComponent<RectTransform>();
-            if (centerOnScreen)
-            {
-                windowRect.anchorMin = new Vector2(0.5f, 0.5f);
-                windowRect.anchorMax = new Vector2(0.5f, 0.5f);
-                windowRect.pivot = new Vector2(0.5f, 0.5f);
-                windowRect.anchoredPosition = Vector2.zero;
-            }
-            else
-            {
-                windowRect.anchorMin = new Vector2(0f, 1f);
-                windowRect.anchorMax = new Vector2(0f, 1f);
-                windowRect.pivot = new Vector2(0f, 1f);
-                windowRect.anchoredPosition = windowPosition;
-            }
-
-            var windowImg = window.GetComponent<Image>();
-            windowImg.color = windowColor;
-
-            GameObject panel = new GameObject("Slots", typeof(RectTransform), typeof(GridLayoutGroup));
-            panel.transform.SetParent(window.transform, false);
-
-            var rect = panel.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0f, 1f);
-            rect.anchorMax = new Vector2(0f, 1f);
-            rect.pivot = new Vector2(0f, 1f);
-            rect.anchoredPosition = new Vector2(windowPadding.x, -windowPadding.y);
-
-            var grid = panel.GetComponent<GridLayoutGroup>();
-            grid.cellSize = slotSize;
-            grid.spacing = slotSpacing;
-            grid.childAlignment = TextAnchor.UpperLeft;
-            grid.startCorner = GridLayoutGroup.Corner.UpperLeft;
-            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            grid.constraintCount = Mathf.Max(1, columns);
-
-            // Generate visible slot images
-            slotImages = new Image[size];
-            slotCountTexts = new Text[size];
-            slotHighlights = new Image[size];
-
-            try
-            {
-                for (int i = 0; i < size; i++)
-                {
-                    GameObject slot = new GameObject($"Slot{i}", typeof(Image));
-                    slot.transform.SetParent(panel.transform, false);
-
-                    var img = slot.GetComponent<Image>();
-                    if (slotFrameSprite != null)
-                    {
-                        img.sprite = slotFrameSprite;
-                        img.type = Image.Type.Sliced; // use 9-slice if the sprite supports it
-                        img.color = emptySlotColor;    // tint
-                    }
-                    else
-                    {
-                        // No sprite? Show a simple tinted square.
-                        img.sprite = null;
-                        img.color = emptySlotColor;
-                        // Optional: give it a subtle outline by adding a child Image here if you want.
-                    }
-
-                    // IMPORTANT: keep enabled so you can see the empty slot
-                    img.enabled = true;
-
-                    // Add highlight image
-                    GameObject highlightGO = new GameObject("Highlight", typeof(Image));
-                    highlightGO.transform.SetParent(slot.transform, false);
-                    var highlightImg = highlightGO.GetComponent<Image>();
-                    highlightImg.sprite = null;
-                    // Use full alpha so the outline shader can render properly
-                    highlightImg.color = new Color(1f, 1f, 1f, 1f);
-                    highlightImg.type = Image.Type.Simple;
-                    highlightImg.raycastTarget = false;
-                    if (highlightMaterial == null)
-                    {
-                        var shader = Shader.Find("Custom/SpriteOutline");
-                        if (shader != null)
-                        {
-                            highlightMaterial = new Material(shader);
-                            highlightMaterial.SetColor("_OutlineColor", Color.yellow);
-                        }
-                    }
-                    highlightImg.material = highlightMaterial;
-                    var hlRect = highlightGO.GetComponent<RectTransform>();
-                    hlRect.anchorMin = Vector2.zero;
-                    hlRect.anchorMax = Vector2.one;
-                    hlRect.offsetMin = Vector2.zero;
-                    hlRect.offsetMax = Vector2.zero;
-                    highlightImg.enabled = false;
-                    slotHighlights[i] = highlightImg;
-
-                    // Add quantity text
-                    GameObject countGO = new GameObject("Count", typeof(Text));
-                    countGO.transform.SetParent(slot.transform, false);
-                    var countText = countGO.GetComponent<Text>();
-                    var outline = countGO.AddComponent<Outline>();
-                    outline.effectColor = Color.black;
-                    outline.effectDistance = new Vector2(1f, -1f);
-                    outline.useGraphicAlpha = false;
-                    countText.font = stackCountFont ?? defaultFont;
-                    countText.fontSize = stackCountFontSize;
-                    countText.alignment = TextAnchor.UpperLeft;
-                    countText.raycastTarget = false;
-                    countText.color = Color.white;
-                    countText.horizontalOverflow = HorizontalWrapMode.Overflow;
-                    countText.text = string.Empty;
-                    var countRect = countGO.GetComponent<RectTransform>();
-                    countRect.anchorMin = new Vector2(0f, 1f);
-                    countRect.anchorMax = new Vector2(0f, 1f);
-                    countRect.pivot = new Vector2(0f, 1f);
-                    countRect.offsetMin = new Vector2(2f, -16f);
-                    countRect.offsetMax = new Vector2(16f, -2f);
-
-                    // Add hover handler
-                    var slotComponent = slot.AddComponent<InventorySlot>();
-                    if (slotComponent != null)
-                    {
-                        slotComponent.inventory = this;
-                        slotComponent.index = i;
-                    }
-
-                    slotImages[i] = img;
-                    slotCountTexts[i] = countText;
-                }
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError($"Inventory UI generation failed: {ex}");
-            }
-
-            int rows = Mathf.CeilToInt((float)size / Mathf.Max(1, columns));
-            windowSize = new Vector2(columns * slotSize.x + (columns - 1) * slotSpacing.x + windowPadding.x * 2f,
-                rows * slotSize.y + (rows - 1) * slotSpacing.y + windowPadding.y * 2f);
-            rect.sizeDelta = new Vector2(windowSize.x - windowPadding.x * 2f, windowSize.y - windowPadding.y * 2f);
-
-            // Force a layout rebuild so slots are positioned before the UI is hidden
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-            windowRect.sizeDelta = windowSize;
-
-            if (showCloseButton)
-            {
-                GameObject closeBtn = new GameObject("CloseButton", typeof(RectTransform), typeof(Image), typeof(Button));
-                closeBtn.transform.SetParent(window.transform, false);
-                var cbRect = closeBtn.GetComponent<RectTransform>();
-                cbRect.anchorMin = cbRect.anchorMax = new Vector2(1f, 1f);
-                cbRect.pivot = new Vector2(1f, 1f);
-                cbRect.anchoredPosition = new Vector2(-4f, -4f);
-                cbRect.sizeDelta = new Vector2(16f, 16f);
-                var txtGO = new GameObject("X", typeof(Text));
-                txtGO.transform.SetParent(closeBtn.transform, false);
-                var txt = txtGO.GetComponent<Text>();
-                if (defaultFont != null) txt.font = defaultFont;
-                txt.text = "X";
-                txt.alignment = TextAnchor.MiddleCenter;
-                txt.color = Color.white;
-                txt.raycastTarget = false;
-                var txtRect = txtGO.GetComponent<RectTransform>();
-                txtRect.anchorMin = Vector2.zero;
-                txtRect.anchorMax = Vector2.one;
-                txtRect.offsetMin = Vector2.zero;
-                txtRect.offsetMax = Vector2.zero;
-                closeBtn.GetComponent<Button>().onClick.AddListener(CloseUI);
-            }
-
-            // Tooltip setup
-            tooltip = new GameObject("Tooltip", typeof(Image), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
-            tooltip.transform.SetParent(uiRoot.transform, false);
-
-            // Ensure the tooltip is rendered above other interfaces like the bank
-            var tooltipCanvas = tooltip.AddComponent<Canvas>();
-            tooltipCanvas.overrideSorting = true;
-            tooltipCanvas.sortingOrder = 1000;
-            tooltip.AddComponent<GraphicRaycaster>();
-
-            var bg = tooltip.GetComponent<Image>();
-            bg.color = new Color(0f, 0f, 0f, 0.75f);
-            bg.raycastTarget = false;
-
-            var layout = tooltip.GetComponent<VerticalLayoutGroup>();
-            layout.childAlignment = TextAnchor.UpperLeft;
-            layout.childControlWidth = false;
-            layout.childControlHeight = true;
-            layout.childForceExpandWidth = false;
-            layout.childForceExpandHeight = false;
-            layout.padding = new RectOffset(4, 4, 4, 4);
-            layout.spacing = 2f;
-
-            var fitter = tooltip.GetComponent<ContentSizeFitter>();
-            fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-            var nameGO = new GameObject("Name", typeof(Text));
-            nameGO.transform.SetParent(tooltip.transform, false);
-            tooltipNameText = nameGO.GetComponent<Text>();
-            tooltipNameText.font = tooltipNameFont != null
-                ? tooltipNameFont
-                : defaultFont;
-            tooltipNameText.alignment = TextAnchor.UpperLeft;
-            tooltipNameText.color = tooltipNameColor;
-            tooltipNameText.raycastTarget = false;
-            tooltipNameText.horizontalOverflow = HorizontalWrapMode.Wrap;
-            tooltipNameText.verticalOverflow = VerticalWrapMode.Overflow;
-
-            var descGO = new GameObject("Description", typeof(Text));
-            descGO.transform.SetParent(tooltip.transform, false);
-            tooltipDescriptionText = descGO.GetComponent<Text>();
-            tooltipDescriptionText.font = tooltipDescriptionFont != null
-                ? tooltipDescriptionFont
-                : defaultFont;
-            tooltipDescriptionText.alignment = TextAnchor.UpperLeft;
-            tooltipDescriptionText.color = tooltipDescriptionColor;
-            tooltipDescriptionText.supportRichText = true;
-            tooltipDescriptionText.raycastTarget = false;
-            tooltipDescriptionText.horizontalOverflow = HorizontalWrapMode.Wrap;
-            tooltipDescriptionText.verticalOverflow = VerticalWrapMode.Overflow;
-
-            var tooltipRect = tooltip.GetComponent<RectTransform>();
-            tooltipRect.pivot = new Vector2(0f, 1f);
-
-            tooltip.SetActive(false);
-
-            dropMenu = InventoryDropMenu.Create(uiRoot.transform, stackCountFont);
-        }
-
-        private string FormatStackCount(int count, out Color color)
-        {
-            if (count < 10000)
-            {
-                color = stackColorDefault;
-                return count.ToString();
-            }
-
-            if (count >= 1000000000)
-            {
-                color = stackColor100m;
-                return (count / 1000000000) + "b";
-            }
-
-            if (count >= 100000000)
-            {
-                color = stackColor100m;
-                return (count / 1000000) + "m";
-            }
-
-            if (count >= 10000000)
-            {
-                color = stackColor10m;
-                return (count / 1000000) + "m";
-            }
-
-            if (count >= 1000000)
-            {
-                color = stackColor100k;
-                return (count / 1000000) + "m";
-            }
-
-            if (count >= 100000)
-            {
-                color = stackColor100k;
-                return (count / 1000) + "k";
-            }
-
-            // count between 10,000 and 99,999
-            color = stackColor10k;
-            return (count / 1000) + "k";
-        }
-
-        public void UpdateSlotVisual(int index)
-        {
-            if (slotImages == null || index < 0 || index >= slotImages.Length || slotImages[index] == null)
-                return;
-
-            var entry = Model.GetEntry(index);
-            var item = entry.item;
-            if (item != null)
-            {
-                Sprite sprite = item.GetIconForCount(entry.count);
-                if (sprite == null)
-                    sprite = item.icon != null ? item.icon : slotFrameSprite;
-
-                if (sprite == null)
-                    sprite = slotFrameSprite;
-
-                slotImages[index].sprite = sprite;
-                slotImages[index].type = (slotImages[index].sprite == slotFrameSprite && slotFrameSprite != null)
-                    ? Image.Type.Sliced : Image.Type.Simple;
-                slotImages[index].color = Color.white;
-                slotImages[index].enabled = true;
-                if (slotCountTexts != null && slotCountTexts.Length > index && slotCountTexts[index] != null)
-                {
-                    if (entry.count > 1)
-                    {
-                        Color color;
-                        slotCountTexts[index].text = FormatStackCount(entry.count, out color);
-                        slotCountTexts[index].color = color;
-                        slotCountTexts[index].enabled = true;
-                    }
-                    else
-                    {
-                        slotCountTexts[index].text = string.Empty;
-                        slotCountTexts[index].enabled = false;
-                    }
-                }
-            }
-            else
-            {
-                slotImages[index].sprite = slotFrameSprite;
-                slotImages[index].type = (slotFrameSprite != null) ? Image.Type.Sliced : Image.Type.Simple;
-                slotImages[index].color = emptySlotColor;
-                slotImages[index].enabled = true;
-                if (slotCountTexts != null && slotCountTexts.Length > index && slotCountTexts[index] != null)
-                {
-                    slotCountTexts[index].text = string.Empty;
-                    slotCountTexts[index].enabled = false;
-                }
-            }
-
-            if (slotHighlights != null && slotHighlights.Length > index && slotHighlights[index] != null)
-            {
-                var highlight = slotHighlights[index];
-                highlight.sprite = slotImages[index].sprite;
-                highlight.type = Image.Type.Simple;
-                // Ensure the outline image has an opaque color; the outline shader
-                // will handle hiding the fill while keeping the border visible
-                highlight.color = new Color(1f, 1f, 1f, 1f);
-                if (highlightMaterial != null)
-                {
-                    highlight.material = highlightMaterial;
-                    highlightMaterial.SetColor("_OutlineColor", Color.yellow);
-                }
-                highlight.enabled = (selectedIndex == index);
-            }
-        }
-
-        /// <summary>
-        /// Adds an item, stacking when possible. Returns true if the entire
-        /// quantity could be added.
-        /// </summary>
-        public bool AddItem(ItemData item, int quantity = 1)
-        {
-            return Model.AddItem(item, quantity);
-        }
-
-        /// <summary>
-        /// Returns the total number of a given item currently in the inventory.
-        /// </summary>
-        public int GetItemCount(ItemData item)
-        {
-            return Model.GetItemCount(item);
-        }
-
-        /// <summary>
-        /// Returns true if there is room to add the specified quantity of the
-        /// given item.
-        /// </summary>
-        public bool CanAddItem(ItemData item, int quantity = 1)
-        {
-            return Model.CanAddItem(item, quantity);
-        }
-
-        /// <summary>
-        /// Removes up to 'count' of the specified item from the inventory.
-        /// Returns true if the requested amount was removed.
-        /// </summary>
-        public bool RemoveItem(ItemData item, int count)
-        {
-            return Model.RemoveItem(item, count);
-        }
-
-        /// <summary>
-        /// Checks whether the inventory contains an item by ID.
-        /// </summary>
-        public bool HasItem(string id)
-        {
-            return Model.HasItem(id);
-        }
-
-        /// <summary>
-        /// Removes the first occurrence of an item with the given ID.
-        /// Returns true if an item was removed.
-        /// </summary>
-        public bool RemoveItem(string id)
-        {
-            return Model.RemoveItem(id);
-        }
-
-        public bool CombineItems(int srcIndex, int dstIndex, out bool keepSelection)
-        {
-            keepSelection = false;
-            if (srcIndex < 0 || dstIndex < 0 || srcIndex >= Model.Size || dstIndex >= Model.Size)
-                return false;
-
-            var srcItem = Model.GetEntry(srcIndex).item;
-            var dstItem = Model.GetEntry(dstIndex).item;
-            if (srcItem == null || dstItem == null)
-                return false;
-
-            if (TryHandleFiremakingCombination(srcIndex, dstIndex, srcItem, dstItem, out keepSelection))
-                return true;
-
-            return Model.CombineItems(srcIndex, dstIndex, out keepSelection);
-        }
-
-        private FiremakingSkill GetFiremakingSkill()
-        {
-            if (firemakingSkill == null)
-                firemakingSkill = GetComponent<FiremakingSkill>();
-            return firemakingSkill;
-        }
-
-        private bool TryHandleFiremakingCombination(int srcIndex, int dstIndex, ItemData srcItem, ItemData dstItem, out bool keepSelection)
-        {
-            keepSelection = false;
-
-            var firemaking = GetFiremakingSkill();
-            if (firemaking == null)
-                return false;
-
-            string tinderboxId = firemaking.TinderboxItemId;
-            if (string.IsNullOrEmpty(tinderboxId))
-                return false;
-
-            bool srcIsTinderbox = string.Equals(srcItem.id, tinderboxId, StringComparison.Ordinal);
-            bool dstIsTinderbox = string.Equals(dstItem.id, tinderboxId, StringComparison.Ordinal);
-            if (!srcIsTinderbox && !dstIsTinderbox)
-                return false;
-
-            int logSlot = srcIsTinderbox ? dstIndex : srcIndex;
-            ItemData logItem = srcIsTinderbox ? dstItem : srcItem;
-            if (logItem == null)
-                return false;
-
-            if (firemaking.GetDefinitionForItem(logItem.id) == null)
-                return false;
-
-            keepSelection = true;
-            selectedIndex = logSlot;
-
-            if (!firemaking.BeginLightingFromInventory(logSlot, out var failureReason) && !string.IsNullOrEmpty(failureReason))
-            {
-                Vector3 feedbackPosition = transform != null ? transform.position : Vector3.zero;
-                feedbackPosition = firemaking.SnapToIgnitionPoint(feedbackPosition);
-                FloatingText.Show(failureReason, feedbackPosition);
-            }
-
-            return true;
-        }
-
-        public void ClearSelection()
-        {
-            selectedIndex = -1;
-            if (slotHighlights != null)
-            {
-                for (int i = 0; i < slotHighlights.Length; i++)
-                {
-                    if (slotHighlights[i] != null)
-                        slotHighlights[i].enabled = false;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Replaces the item at <paramref name="slotIndex"/> with
-        /// <paramref name="newItem"/> and sets its count. The slot must
-        /// currently contain <paramref name="oldItem"/>. Returns true on
-        /// success.
-        /// </summary>
-        public bool ReplaceItem(int slotIndex, ItemData oldItem, ItemData newItem, int newCount)
-        {
-            return Model.ReplaceItem(slotIndex, oldItem, newItem, newCount);
-        }
-
-        /// <summary>
-        /// Drops a quantity of the item from the specified slot.
-        /// </summary>
-        public void DropItem(int slotIndex, int quantity = 1)
-        {
-            if (BankOpen || !CanDropItems) return;
-            if (slotIndex < 0 || slotIndex >= Model.Size) return;
-            var entry = Model.GetEntry(slotIndex);
-            if (entry.item == null) return;
-            if (entry.item.isUndroppable) return;
-
-            // Cache the item before modifying the slot so we can check for pets.
-            var droppedItem = entry.item;
-            var originalEntry = entry;
-
-            // Prevent dropping or swapping pets while merged with a pet.
-            var pet = PetDropSystem.FindPetByItem(droppedItem);
-            if (pet != null && Beastmaster.PetMergeController.Instance != null &&
-                Beastmaster.PetMergeController.Instance.IsMerged)
-                return;
-
-            int remove = Mathf.Clamp(quantity, 1, entry.count);
-            Model.RemoveFromSlot(slotIndex, remove);
-            HideTooltip();
-
-            // Attempt to spawn a pet for this item if one exists.
-            if (pet != null)
-            {
-                // If a different pet is already active, return its pickup item to the inventory
-                // before spawning the new one so players don't lose their previous pet item.
-                var currentPet = PetDropSystem.ActivePet;
-                if (currentPet != null && currentPet != pet && currentPet.pickupItem != null)
-                {
-                    bool restored = AddItem(currentPet.pickupItem);
-                    if (!restored)
-                    {
-                        // Fallback: restore the slot and explain why the swap was blocked so the player never loses their pet item.
-                        var currentEntry = Model.GetEntry(slotIndex);
-                        Model.ReplaceItem(slotIndex, currentEntry.item, originalEntry.item, originalEntry.count);
-
-                        var message = "You need inventory space to store your active pet before summoning a new one.";
-                        if (transform != null)
-                            FloatingText.Show(message, transform.position);
-                        Debug.LogWarning($"Blocked pet swap for '{droppedItem.name}' because there was no room to return '{currentPet.pickupItem.name}'.");
-                        return;
-                    }
-                }
-
-                var player = GameObject.FindGameObjectWithTag("Player");
-                Vector3 pos = player != null ? player.transform.position : Vector3.zero;
-                Debug.Log($"Dropping pet item '{droppedItem.name}', spawning pet '{pet.displayName}'.");
-                PetDropSystem.SpawnPet(pet, pos);
-            }
-            // If the dropped item has no associated pet we intentionally do not log to avoid console spam.
-        }
-
-        /// <summary>
-        /// Removes a quantity from the specified slot without dropping it in the world.
-        /// </summary>
-        public void RemoveFromSlot(int slotIndex, int quantity)
-        {
-            Model.RemoveFromSlot(slotIndex, quantity);
-            HideTooltip();
-        }
-
-        /// <summary>
-        /// Splits a stack within the inventory, moving <paramref name="quantity"/>
-        /// items to a new slot if space is available.
-        /// </summary>
-        public void SplitStack(int slotIndex, int quantity)
-        {
-            Model.SplitStack(slotIndex, quantity);
-        }
-
-        /// <summary>
-        /// Opens the stack split dialog for the specified slot and performs the
-        /// desired action with the chosen amount.
-        /// </summary>
-        public void PromptStackSplit(int slotIndex, StackSplitType type)
-        {
-            if (BankOpen || slotIndex < 0 || slotIndex >= Model.Size) return;
-            var entry = Model.GetEntry(slotIndex);
-            if (entry.item == null || entry.count <= 1) return;
-            if (!entry.item.splittable) return;
-            if (type == StackSplitType.Drop && !CanDropItems) return;
-
-            StackSplitDialog.Show(uiRoot.transform, entry.count, amount =>
-            {
-                switch (type)
-                {
-                    case StackSplitType.Sell:
-                        if (currentShop != null)
-                            SellItem(slotIndex, amount);
-                        else
-                            SplitStack(slotIndex, amount);
-                        break;
-                    case StackSplitType.Drop:
-                        DropItem(slotIndex, amount);
-                        break;
-                    case StackSplitType.Split:
-                        SplitStack(slotIndex, amount);
-                        break;
-                }
-            });
-        }
-
-        public void ShowTooltip(int slotIndex, RectTransform slotRect)
-        {
-            if (slotIndex < 0 || slotIndex >= Model.Size) return;
-            var item = Model.GetEntry(slotIndex).item;
-            if (item == null || tooltip == null || tooltipNameText == null || tooltipDescriptionText == null) return;
-
-            if (currentShop != null && currentShop.TryGetSellPrice(item, out int sellPrice))
-            {
-                string currencyName = currentShop.currency != null ? currentShop.currency.itemName : "Coins";
-                tooltipNameText.text = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
-                tooltipDescriptionText.text = $"Sell for {sellPrice} {currencyName}";
-
-                var tooltipRectSell = tooltip.GetComponent<RectTransform>();
-                LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRectSell);
-
-                Vector3 sellPos = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
-                Vector3[] sellCorners = new Vector3[4];
-                tooltipRectSell.GetWorldCorners(sellCorners);
-                float sellWidth = sellCorners[2].x - sellCorners[0].x;
-                float sellHeight = sellCorners[2].y - sellCorners[0].y;
-                sellPos.x = Mathf.Min(sellPos.x, Screen.width - sellWidth);
-                sellPos.y = Mathf.Max(sellPos.y, sellHeight);
-                tooltipRectSell.position = sellPos;
-
-                tooltip.SetActive(true);
-                return;
-            }
-
-            string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
-            tooltipNameText.text = name;
-            tooltipDescriptionText.text = BuildTooltipDescription(item);
-
-            var tooltipRect = tooltip.GetComponent<RectTransform>();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
-
-            Vector3 pos = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
-            Vector3[] corners = new Vector3[4];
-            tooltipRect.GetWorldCorners(corners);
-            float width = corners[2].x - corners[0].x;
-            float height = corners[2].y - corners[0].y;
-            pos.x = Mathf.Min(pos.x, Screen.width - width);
-            pos.y = Mathf.Max(pos.y, height);
-            tooltipRect.position = pos;
-
-            tooltip.SetActive(true);
-        }
-
-        public void ShowTooltip(ItemData item, RectTransform slotRect)
-        {
-            if (item == null || tooltip == null || tooltipNameText == null || tooltipDescriptionText == null) return;
-
-            string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
-            tooltipNameText.text = name;
-            tooltipDescriptionText.text = BuildTooltipDescription(item);
-
-            var tooltipRect = tooltip.GetComponent<RectTransform>();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
-
-            Vector3 pos = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
-            Vector3[] corners = new Vector3[4];
-            tooltipRect.GetWorldCorners(corners);
-            float width = corners[2].x - corners[0].x;
-            float height = corners[2].y - corners[0].y;
-            pos.x = Mathf.Min(pos.x, Screen.width - width);
-            pos.y = Mathf.Max(pos.y, height);
-            tooltipRect.position = pos;
-
-            tooltip.SetActive(true);
-        }
-
-        public void HideTooltip()
-        {
-            if (tooltip != null)
-                tooltip.SetActive(false);
-        }
-
-        /// <summary>
-        /// Builds the tooltip body text for the provided item, overriding the default
-        /// description for consumables that restore hitpoints so players can see the
-        /// precise heal value at a glance.
-        /// </summary>
-        /// <param name="item">Item displayed in the tooltip.</param>
-        /// <returns>Formatted description string for the tooltip body.</returns>
-        private static string BuildTooltipDescription(ItemData item)
-        {
-            if (item == null)
-                return string.Empty;
-
-            // Cooked food and other consumables that heal the player expose their
-            // potency through ItemData.healAmount. Replace the flavour text with an
-            // OSRS-style heal summary so the tooltip communicates how much health is
-            // restored when consumed.
-            if (item.healAmount > 0)
-            {
-                // Unity's legacy Text component supports rich text colour tags. Highlight
-                // the heal amount in red so the restorative value stands out immediately
-                // when comparing food options inside the inventory tooltip.
-                return $"Heals <color=#FF0000>+{item.healAmount}</color> hp";
-            }
-
-            return item.description;
-        }
-
-        public void ShowDropMenu(int slotIndex, Vector2 position)
-        {
-            HideTooltip();
-            var entry = GetSlot(slotIndex);
-            if (entry.item != null && entry.item.isUndroppable)
-                return;
-            dropMenu?.Show(this, slotIndex, position);
-        }
-
-        public void HideDropMenu()
-        {
-            dropMenu?.Hide();
         }
 
         /// <summary>
@@ -1233,7 +710,7 @@ namespace Inventory
 
             if (sold > 0)
             {
-                HideTooltip();
+                windowController?.DismissTooltip();
             }
         }
 
@@ -1243,172 +720,13 @@ namespace Inventory
         public void SetShopContext(Shop shop)
         {
             currentShop = shop;
-            if (shop != null && uiRoot != null)
-                uiRoot.SetActive(true);
-        }
-
-        public void BeginDrag(int slotIndex)
-        {
-            if (BankOpen || slotIndex < 0 || slotIndex >= Model.Size) return;
-            var entry = Model.GetEntry(slotIndex);
-            var item = entry.item;
-            if (item == null) return;
-
-            HideTooltip();
-            draggingIndex = slotIndex;
-            draggingInventory = this;
-
-            draggingIcon = new GameObject("DraggingIcon", typeof(Image), typeof(Canvas));
-            var dragCanvas = draggingIcon.GetComponent<Canvas>();
-            dragCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            dragCanvas.overrideSorting = true;
-            dragCanvas.sortingOrder = short.MaxValue;
-            // Ensure the dragged icon renders above all inventory UIs by
-            // reparenting it to the shared root and placing it last.
-            Transform parent = sharedUIRoot != null ? sharedUIRoot.transform : uiRoot.transform;
-            draggingIcon.transform.SetParent(parent, false);
-            draggingIcon.transform.SetAsLastSibling();
-            var img = draggingIcon.GetComponent<Image>();
-            img.raycastTarget = false;
-            Sprite dragSprite = item.GetIconForCount(entry.count);
-            if (dragSprite == null)
-                dragSprite = item.icon != null ? item.icon : slotFrameSprite;
-            if (dragSprite == null)
-                dragSprite = slotFrameSprite;
-            img.sprite = dragSprite;
-            img.color = Color.white;
-            var rect = draggingIcon.GetComponent<RectTransform>();
-            rect.sizeDelta = slotSize;
-
-            if (slotImages != null && slotIndex < slotImages.Length && slotImages[slotIndex] != null)
-                slotImages[slotIndex].enabled = false;
-            if (slotCountTexts != null && slotIndex < slotCountTexts.Length && slotCountTexts[slotIndex] != null)
-                slotCountTexts[slotIndex].enabled = false;
-        }
-
-        public void Drag(PointerEventData eventData)
-        {
-            if (BankOpen) return;
-            if (draggingIcon != null)
-                draggingIcon.transform.position = eventData.position;
-        }
-
-        public void Drop(int slotIndex)
-        {
-            if (BankOpen)
+            if (windowController != null)
             {
-                EndDrag();
-                return;
+                windowController.CurrentShop = shop;
+                windowController.InShop = shop != null;
+                if (shop != null)
+                    windowController.Show();
             }
-            if (draggingInventory != null && draggingInventory != this && draggingInventory.draggingIndex != -1)
-            {
-                var source = draggingInventory;
-                int sourceIndex = source.draggingIndex;
-                if (slotIndex >= 0 && slotIndex < Model.Size)
-                {
-                    var petStorage = GetComponent<PetStorage>();
-                    if (petStorage != null &&
-                        (petStorage.definition?.id == "Heron" ||
-                         petStorage.definition?.id == "Beaver" ||
-                         petStorage.definition?.id == "Rock Golem" ||
-                         petStorage.definition?.id == "Mr Frying Pan"))
-                    {
-                        // Skilling pets (Heron, Beaver, Rock Golem, Mr Frying Pan) only accept auto-collected resources from
-                        // their associated skills and cannot receive manual drops.
-                        var entry = source.Model.GetEntry(sourceIndex);
-                        if (!petStorage.StoreItem(entry.item, entry.count))
-                        {
-                            source.EndDrag();
-                            return;
-                        }
-                        source.Model.ClearSlot(sourceIndex);
-                        source.EndDrag();
-                        return;
-                    }
-
-                    var destinationEntry = Model.GetEntry(slotIndex);
-                    var movedEntry = source.Model.TakeEntry(sourceIndex);
-                    if (!Model.SetEntry(slotIndex, movedEntry))
-                    {
-                        // Reinsert the entry into the source inventory if this bag rejects it.
-                        source.Model.SetEntry(sourceIndex, movedEntry);
-                        source.EndDrag();
-                        return;
-                    }
-
-                    if (!source.Model.SetEntry(sourceIndex, destinationEntry))
-                    {
-                        // Source inventory should always accept its original entry, but guard against failures by rolling back.
-                        Model.SetEntry(slotIndex, destinationEntry);
-                        source.Model.SetEntry(sourceIndex, movedEntry);
-                        source.EndDrag();
-                        return;
-                    }
-                    source.EndDrag();
-                }
-                else
-                {
-                    source.EndDrag();
-                }
-                return;
-            }
-
-            if (draggingIndex == -1)
-            {
-                EndDrag();
-                return;
-            }
-
-            if (slotIndex >= 0 && slotIndex < Model.Size)
-            {
-                if (slotIndex != draggingIndex)
-                {
-                    var destinationEntry = Model.GetEntry(slotIndex);
-                    var draggedEntry = Model.GetEntry(draggingIndex);
-                    if (!Model.SetEntry(slotIndex, draggedEntry))
-                    {
-                        EndDrag();
-                        return;
-                    }
-
-                    if (!Model.SetEntry(draggingIndex, destinationEntry))
-                    {
-                        Model.TakeEntry(slotIndex);
-                        Model.SetEntry(slotIndex, destinationEntry);
-                        Model.SetEntry(draggingIndex, draggedEntry);
-                        EndDrag();
-                        return;
-                    }
-                }
-
-                UpdateSlotVisual(draggingIndex);
-            }
-
-            EndDrag();
-        }
-
-        public void EndDrag()
-        {
-            if (BankOpen)
-            {
-                if (draggingIcon != null)
-                    Destroy(draggingIcon);
-                draggingIcon = null;
-                draggingIndex = -1;
-                if (draggingInventory == this)
-                    draggingInventory = null;
-                return;
-            }
-            if (draggingIndex != -1)
-                UpdateSlotVisual(draggingIndex);
-
-            if (draggingIcon != null)
-                Destroy(draggingIcon);
-
-            draggingIcon = null;
-            draggingIndex = -1;
-            if (draggingInventory == this)
-                draggingInventory = null;
         }
 
         public void Save()
@@ -1437,21 +755,24 @@ namespace Inventory
 
             EnsureQuestUiReference();
 
+            if (windowController != null)
+                windowController.CanDropItems = CanDropItems;
+
             if (questUi != null && questUi.IsOpen)
             {
-                if (uiRoot != null && uiRoot.activeSelf)
+                if (IsOpen)
                     CloseUI();
                 return;
             }
             if (currentShop != null)
             {
-                if (uiRoot != null && !uiRoot.activeSelf)
+                if (!IsOpen)
                     OpenUI();
                 return;
             }
             if (BankOpen)
             {
-                if (uiRoot != null && !uiRoot.activeSelf)
+                if (!IsOpen)
                     OpenUI();
                 return;
             }
@@ -1473,7 +794,7 @@ namespace Inventory
         {
             questUi = quest ?? QuestUI.Instance;
 
-            if (questUi != null && questUi.IsOpen && uiRoot != null && uiRoot.activeSelf)
+            if (questUi != null && questUi.IsOpen && IsOpen)
                 CloseUI();
         }
 

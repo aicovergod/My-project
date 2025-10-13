@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b9043cf7b35cdab6b12beda6ce88b1f14a445061 -->
+## 2025-10-13T22:17:07+01:00 — Refactor inventory UI into window controller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Inventory/InventoryDropMenu.cs, Assets/Scripts/Inventory/InventorySlot.cs, Assets/Scripts/Inventory/UI.meta, Assets/Scripts/Inventory/UI/InventoryWindowController.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs.meta
+- Diff: 1353 ++ / 1021 --
+- Notes:
+  —
+---
 <!-- commit:641b2df4e4b52a96f5dc767f823d1087ae972fc5 -->
 ## 2025-10-13T21:47:33+01:00 — Merge pull request #1109 from aicovergod/codex/implement-inventorymodel-and-integrate-with-inventory
 
