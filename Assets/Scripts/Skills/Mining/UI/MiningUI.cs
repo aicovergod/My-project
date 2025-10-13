@@ -45,8 +45,7 @@ namespace Skills.Mining
             if (pick == null)
                 return null;
 
-            var item = Resources.Load<ItemData>("Item/" + pick.Id);
-            return item != null ? item.icon : null;
+            return GatheringToolIconResolver.GetIcon(pick.Id);
         }
 
         protected override void OnProgressRootCreated(GameObject root, Canvas canvas, Image fillImage)
