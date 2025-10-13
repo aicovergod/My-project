@@ -38,8 +38,7 @@ namespace Skills.Fishing
             if (tool == null)
                 return null;
 
-            var item = Resources.Load<ItemData>("Item/" + tool.Id);
-            return item != null ? item.icon : null;
+            return GatheringToolIconResolver.GetIcon(tool.Id);
         }
 
         protected override void OnSkillLocated(FishingSkill located)

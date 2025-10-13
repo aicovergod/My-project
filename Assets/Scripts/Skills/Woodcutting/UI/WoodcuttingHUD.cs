@@ -38,8 +38,7 @@ namespace Skills.Woodcutting
             if (axe == null)
                 return null;
 
-            var item = Resources.Load<ItemData>("Item/" + axe.Id);
-            return item != null ? item.icon : null;
+            return GatheringToolIconResolver.GetIcon(axe.Id);
         }
 
         protected override void OnSkillLocated(WoodcuttingSkill located)
