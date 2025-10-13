@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c8f35bd7f8f9fb923abb7426eab74f82dc32041d -->
+## 2025-10-13T09:09:29+01:00 — Merge pull request #1101 from aicovergod/codex/add-player-movement-modal-lock-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 119 ++ / 85 --
+- Notes:
+  Refactor modal UI movement locks into shared helper
+---
+<!-- commit:1c5d2a2745d730f2acfd7f7d39c6e7e56f455b1e -->
+## 2025-10-13T09:09:17+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9574a67f6c3e44255592c27f2a49877153a99c34 -->
 ## 2025-10-13T09:09:06+01:00 — Add shared player movement modal lock for UI windows
 
