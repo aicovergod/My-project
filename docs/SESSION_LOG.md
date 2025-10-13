@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:632261022ed6a150c0ed044866635cf195b2af88 -->
+## 2025-10-13T22:57:45+01:00 — Improve quest UI resolution in inventory handler
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs
+- Diff: 850 ++ / 481 --
+- Notes:
+  —
+---
 <!-- commit:d410e2a54830974fdf7c255614c21294dcc68199 -->
 ## 2025-10-13T22:17:46+01:00 — Merge pull request #1110 from aicovergod/codex/add-inventorywindowcontroller-and-refactor-components
 
