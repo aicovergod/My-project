@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3b716267f40f7095d61224974f5921e3edd19e27 -->
+## 2025-10-13T18:57:53+01:00 — Refactor combat obstruction masks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Combat/LineOfSightUtility.cs, Assets/Scripts/NPC/Combat/BaseNpcCombat.cs
+- Diff: 107 ++ / 62 --
+- Notes:
+  —
+---
 <!-- commit:36cc86e29806b3e9a88943778d5014345b403b28 -->
 ## 2025-10-13T14:16:53+01:00 — Merge pull request #1107 from aicovergod/codex/create-hitsplatlibraryhelper-and-refactor-usage
 
