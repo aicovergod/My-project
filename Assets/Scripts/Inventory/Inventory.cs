@@ -113,6 +113,9 @@ namespace Inventory
         private InventoryWindowController windowController;
         private InventoryInteractionHandler interactionHandler;
 
+        private bool modelEventsSubscribed;
+        private bool controllerEventsSubscribed;
+
         private PlayerMover playerMover;
         private Equipment equipment;
         private FiremakingSkill firemakingSkill;
@@ -145,6 +148,7 @@ namespace Inventory
             get
             {
                 EnsureModelInitialized();
+                SubscribeModelEvents();
                 return model;
             }
         }
@@ -165,11 +169,6 @@ namespace Inventory
             model.SetCombinationDatabase(combinationDatabase);
             if (model.Size != size)
                 model.Resize(size);
-
-            model.InventoryChanged -= OnModelInventoryChanged;
-            model.InventoryChanged += OnModelInventoryChanged;
-            model.SlotChanged -= OnModelSlotChanged;
-            model.SlotChanged += OnModelSlotChanged;
         }
 
         /// <summary>
@@ -273,6 +272,8 @@ namespace Inventory
         private void OnEnable()
         {
             EnsureInitialized();
+            SubscribeModelEvents();
+            SubscribeControllerEvents();
             SaveManager.Register(this);
             interactionHandler?.OnEnable();
         }
@@ -281,6 +282,8 @@ namespace Inventory
         {
             SaveManager.Unregister(this);
             interactionHandler?.OnDisable();
+            UnsubscribeControllerEvents();
+            UnsubscribeModelEvents();
         }
 
         /// <summary>
@@ -308,7 +311,7 @@ namespace Inventory
             if (windowController == null)
             {
                 windowController = new InventoryWindowController(Model, BuildWindowConfig());
-                windowController.CloseRequested += OnWindowCloseRequested;
+                controllerEventsSubscribed = false;
             }
 
             windowController.Owner = this;
@@ -339,6 +342,8 @@ namespace Inventory
             windowController.SetSelectedIndex(selectedIndex);
             windowController.RefreshAllSlots();
             windowController.Hide();
+            SubscribeControllerEvents();
+            SubscribeModelEvents();
         }
 
         /// <summary>
@@ -439,6 +444,7 @@ namespace Inventory
         public void Load()
         {
             EnsureModelInitialized();
+            SubscribeModelEvents();
             var data = SaveManager.Load<InventoryModel.InventorySaveData>(saveKey);
             Model.RestoreState(data);
         }
@@ -450,6 +456,8 @@ namespace Inventory
 
         private void OnDestroy()
         {
+            UnsubscribeControllerEvents();
+            UnsubscribeModelEvents();
             interactionHandler?.Dispose();
         }
 
@@ -469,6 +477,164 @@ namespace Inventory
 
             var go = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
             go.transform.SetParent(null, false);
+        }
+
+        private void SubscribeModelEvents()
+        {
+            if (model == null || modelEventsSubscribed)
+                return;
+
+            model.InventoryChanged += OnModelInventoryChanged;
+            model.SlotChanged += OnModelSlotChanged;
+            modelEventsSubscribed = true;
+        }
+
+        private void UnsubscribeModelEvents()
+        {
+            if (model == null || !modelEventsSubscribed)
+                return;
+
+            model.InventoryChanged -= OnModelInventoryChanged;
+            model.SlotChanged -= OnModelSlotChanged;
+            modelEventsSubscribed = false;
+        }
+
+        private void SubscribeControllerEvents()
+        {
+            if (windowController == null || controllerEventsSubscribed)
+                return;
+
+            windowController.CloseRequested += OnWindowCloseRequested;
+            controllerEventsSubscribed = true;
+        }
+
+        private void UnsubscribeControllerEvents()
+        {
+            if (windowController == null || !controllerEventsSubscribed)
+                return;
+
+            windowController.CloseRequested -= OnWindowCloseRequested;
+            controllerEventsSubscribed = false;
+        }
+
+        /// <summary>
+        /// Determines whether the inventory can accommodate the specified item and quantity.
+        /// Delegates to the underlying <see cref="InventoryModel"/> so stacking rules remain centralised.
+        /// </summary>
+        public bool CanAddItem(ItemData item, int quantity = 1)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.CanAddItem(item, quantity);
+        }
+
+        /// <summary>
+        /// Attempts to add an item to the inventory, stacking where possible.
+        /// Returns true when the entire quantity was stored.
+        /// </summary>
+        public bool AddItem(ItemData item, int quantity = 1)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.AddItem(item, quantity);
+        }
+
+        /// <summary>
+        /// Removes up to <paramref name="count"/> of the requested item from the inventory.
+        /// </summary>
+        public bool RemoveItem(ItemData item, int count)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.RemoveItem(item, count);
+        }
+
+        /// <summary>
+        /// Removes a single instance of the item with the given identifier.
+        /// </summary>
+        public bool RemoveItem(string id)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.RemoveItem(id);
+        }
+
+        /// <summary>
+        /// Returns how many of the specified item are stored across all slots.
+        /// </summary>
+        public int GetItemCount(ItemData item)
+        {
+            EnsureModelInitialized();
+            return model.GetItemCount(item);
+        }
+
+        /// <summary>
+        /// Returns true when an item with the provided identifier exists in any slot.
+        /// </summary>
+        public bool HasItem(string id)
+        {
+            EnsureModelInitialized();
+            return model.HasItem(id);
+        }
+
+        /// <summary>
+        /// Removes a quantity directly from the slot without performing additional searches.
+        /// </summary>
+        public void RemoveFromSlot(int slotIndex, int quantity)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            model.RemoveFromSlot(slotIndex, quantity);
+        }
+
+        /// <summary>
+        /// Splits a stack, moving <paramref name="quantity"/> items to a new slot when space is available.
+        /// </summary>
+        public void SplitStack(int slotIndex, int quantity)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            model.SplitStack(slotIndex, quantity);
+        }
+
+        /// <summary>
+        /// Removes and returns the entry stored at the provided index.
+        /// </summary>
+        public InventoryEntry TakeEntry(int slotIndex)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.TakeEntry(slotIndex);
+        }
+
+        /// <summary>
+        /// Replaces the contents of a slot with the supplied entry when storage rules allow.
+        /// </summary>
+        public bool SetEntry(int slotIndex, InventoryEntry entry)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.SetEntry(slotIndex, entry);
+        }
+
+        /// <summary>
+        /// Swaps an item in place when the current slot matches <paramref name="oldItem"/>.
+        /// </summary>
+        public bool ReplaceItem(int slotIndex, ItemData oldItem, ItemData newItem, int newCount)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.ReplaceItem(slotIndex, oldItem, newItem, newCount);
+        }
+
+        /// <summary>
+        /// Attempts to combine two slots using the configured combination database.
+        /// </summary>
+        public bool CombineItems(int srcIndex, int dstIndex, out bool keepSelection)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.CombineItems(srcIndex, dstIndex, out keepSelection);
         }
     }
 }
