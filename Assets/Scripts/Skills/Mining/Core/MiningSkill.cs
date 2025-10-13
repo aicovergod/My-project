@@ -70,16 +70,11 @@ namespace Skills.Mining
             skills = GetComponent<SkillManager>();
             swingProgressTracker.TickAdvanced += HandleSwingProgressAdvanced;
             PreloadOreItems();
-            if (miningOutfitDefinition == null)
-                miningOutfitDefinition = Resources.Load<SkillingOutfitDefinition>(MiningOutfitResourcePath);
-            if (miningOutfitDefinition != null)
-            {
-                miningOutfit = new SkillingOutfitProgress(miningOutfitDefinition);
-            }
-            else
-            {
-                Debug.LogWarning("MiningSkill is missing a SkillingOutfitDefinition reference; outfit rewards are disabled.");
-            }
+            miningOutfit = SkillingOutfitInitializer.InitializeOutfitProgress(
+                ref miningOutfitDefinition,
+                MiningOutfitResourcePath,
+                nameof(MiningSkill),
+                this);
         }
 
         private void OnDestroy()
