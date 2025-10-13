@@ -6,6 +6,7 @@ using Skills;
 using UI;
 using UnityEngine;
 using UnityEngine.UI;
+using Util;
 
 namespace Skills.Mining
 {
@@ -550,7 +551,7 @@ namespace Skills.Mining
             if (overlayLayer < 0)
                 return;
 
-            SetLayerRecursively(target.transform, overlayLayer);
+            LayerUtility.SetLayerRecursively(target.transform, overlayLayer);
         }
 
         /// <summary>
@@ -585,23 +586,6 @@ namespace Skills.Mining
             }
 
             return false;
-        }
-
-        /// <summary>
-        ///     Recursively assigns the provided layer index to the transform and all of its children.
-        /// </summary>
-        private static void SetLayerRecursively(Transform target, int layer)
-        {
-            if (target == null)
-                return;
-
-            target.gameObject.layer = layer;
-            for (int i = 0; i < target.childCount; i++)
-            {
-                var child = target.GetChild(i);
-                if (child != null)
-                    SetLayerRecursively(child, layer);
-            }
         }
 
         /// <summary>

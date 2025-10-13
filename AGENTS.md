@@ -121,6 +121,7 @@
 - UI text defaults to `LegacyRuntime.ttf` via `Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf")` unless a serialized font override is provided.
 - Follow the existing commenting style (XML summaries and inline comments explaining intent) and keep logic modular for future skills/items.
 - For assets, maintain 64×64 resolution, transparent backgrounds, and URP-compatible import settings.
+- Reuse `Util.LayerUtility.SetLayerRecursively` when applying layers to UI or world-space hierarchies so overlays and interaction filters remain consistent.
 
 ## Working With Systems
 - **Input**: Prefer serialized `InputActionReference` fields. Resolve actions through `InputActionResolver.Resolve` so they auto-enable/disable. New interactables should plug into the shared Player action map (`Move`, `Interact`, `Prospect`, `Cancel`, `OpenMenu`).
