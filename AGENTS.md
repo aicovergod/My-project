@@ -53,6 +53,7 @@
   - Shop UIs share fonts/settings with inventory, reference `Shop`/`ShopUI` scripts, and rely on item databases. Bank UI reuses the same font default.
   - `BankUI`, `BankDepositMenu`, and `BankWithdrawMenu` process deposits/withdrawals with inventory hooks, while `BankOpener` gates world interactions.
   - `ShopUI` and `BankUI` now capture player input state and freeze locomotion while the modal remains open. They toggle the global modal flags consumed by `UIManager` and automatically restore inventory visibility and movement once closed—new modal windows should follow the same pattern so movement locks do not leak.
+  - Use `UI.Utilities.PlayerMovementModalLock` whenever a UI or modal flow must freeze the `PlayerMover`. The helper caches the mover, suspends `MovementInput`, forces `StopMovement()`, and restores the original drop/input state on release—do not duplicate this logic elsewhere.
 - **Dialogue & Quests** (`Assets/Scripts/Dialogue`, `Assets/Scripts/Quests`)
   - Dialogue data/manager/UI implement OSRS-style panels. Quests use `QuestManager` (saveable) with ScriptableObject quest definitions in `Resources/Quests`.
 - **NPCs & World** (`Assets/Scripts/NPC`, `Assets/Scripts/World`)

@@ -2,8 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Inventory;
-using Player;
-using Player.Input;
 using NPC;
 using UI;
 using UI.Utilities;
@@ -45,14 +43,12 @@ namespace ShopSystem
         private Text tooltipText;
         private Text shopNameText;
         private Shop currentShop;
-        private PlayerMover playerMover;
         private NpcWanderer npcMover;
         private bool hasLoggedMissingInventory;
         // Tracks the inventory visibility so we can restore the state when leaving the shop.
         private bool inventoryWasOpenBeforeShop;
         private bool inventoryStateCaptured;
-        private bool playerMovementStateCaptured;
-        private bool playerMovementInputWasEnabled;
+        private readonly PlayerMovementModalLock playerMovementLock = new PlayerMovementModalLock();
 
         private static ShopUI instance;
         public static ShopUI Instance => instance;
@@ -205,28 +201,7 @@ namespace ShopSystem
                 playerInventory.OnInventoryChanged += HandleInventoryChanged;
             }
 
-            playerMovementStateCaptured = false;
-            playerMovementInputWasEnabled = false;
-            if (playerMover == null)
-                playerMover = FindObjectOfType<PlayerMover>();
-            if (playerMover != null)
-            {
-                playerMover.StopMovement();
-
-                var movementInput = playerMover.MovementInput;
-                if (movementInput != null)
-                {
-                    playerMovementInputWasEnabled = movementInput.enabled;
-                    movementInput.enabled = false;
-                    playerMovementStateCaptured = true;
-                }
-                else
-                {
-                    playerMovementStateCaptured = false;
-                }
-
-                playerMover.CanDrop = false;
-            }
+            playerMovementLock.Acquire();
 
             if (npcMover != null)
                 npcMover.enabled = false;
@@ -273,17 +248,7 @@ namespace ShopSystem
                 }
             }
 
-            if (playerMover != null)
-            {
-                if (playerMovementStateCaptured)
-                {
-                    var movementInput = playerMover.MovementInput;
-                    if (movementInput != null)
-                        movementInput.enabled = playerMovementInputWasEnabled;
-                }
-
-                playerMover.CanDrop = true;
-            }
+            playerMovementLock.Release();
 
             if (npcMover != null)
             {
@@ -293,8 +258,6 @@ namespace ShopSystem
 
             inventoryStateCaptured = false;
             inventoryWasOpenBeforeShop = false;
-            playerMovementStateCaptured = false;
-            playerMovementInputWasEnabled = false;
             shopModalActive = false;
         }
 
