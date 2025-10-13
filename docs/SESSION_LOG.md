@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c77011e5eddbcf0e360d6dafbc0aaf2a1090a7e8 -->
+## 2025-10-13T23:17:50+01:00 — Refactor inventory bindings to model and controller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Inventory.cs
+- Diff: 172 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:f60446c597f8f1ba469e54e009dba89d1cb35243 -->
 ## 2025-10-13T22:58:13+01:00 — Merge pull request #1111 from aicovergod/codex/implement-inventoryinteractionhandler-and-refactor-inventory
 
