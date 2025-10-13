@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:eec97f41aecbb582dd74e8bcc1867bca9f432bd5 -->
+## 2025-10-13T13:58:04+01:00 — Merge pull request #1106 from aicovergod/codex/add-gatheringtooliconresolver-utility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 59 ++ / 6 --
+- Notes:
+  Add shared resolver for gathering tool HUD icons
+---
+<!-- commit:a8bdcd2a54c640f12888ab9de512ea71512cdd5d -->
+## 2025-10-13T13:57:51+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ee0c793fc5f72e5887e3d7132aeed2bdfa1de561 -->
 ## 2025-10-13T13:57:38+01:00 — Add cached resolver for gathering tool icons
 
