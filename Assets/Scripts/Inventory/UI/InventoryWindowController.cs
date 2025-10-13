@@ -197,23 +197,20 @@ namespace Inventory.UI
         }
 
         /// <summary>
-        /// Raised when the player finishes a stack split prompt. The inventory decides
-        /// whether the quantity is used for a drop, sell, or plain split.
+        /// Raised when the UI needs the gameplay layer to open a stack split dialog.
         /// </summary>
-        public readonly struct StackSplitEvent
+        public readonly struct StackSplitPromptEvent
         {
-            public StackSplitEvent(InventoryWindowController controller, int slotIndex, StackSplitType splitType, int quantity)
+            public StackSplitPromptEvent(InventoryWindowController controller, int slotIndex, StackSplitType splitType)
             {
                 Controller = controller;
                 SlotIndex = slotIndex;
                 SplitType = splitType;
-                Quantity = Mathf.Max(1, quantity);
             }
 
             public InventoryWindowController Controller { get; }
             public int SlotIndex { get; }
             public StackSplitType SplitType { get; }
-            public int Quantity { get; }
         }
 
         /// <summary>
@@ -237,7 +234,7 @@ namespace Inventory.UI
 
         public event Action<InventoryWindowController, SlotClickEvent> SlotClicked;
         public event Action<InventoryWindowController, DropRequestEvent> DropRequested;
-        public event Action<InventoryWindowController, StackSplitEvent> SplitRequested;
+        public event Action<InventoryWindowController, StackSplitPromptEvent> SplitPromptRequested;
         public event Action<InventoryWindowController, DragDropEvent> DragDropRequested;
         public event Action<InventoryWindowController> DragCancelled;
         public event Action<InventoryWindowController> CloseRequested;
@@ -527,59 +524,7 @@ namespace Inventory.UI
         public void HandlePointerClick(int slotIndex, PointerEventData eventData)
         {
             bool shiftHeld = IsShiftHeld();
-            var entry = model.GetEntry(slotIndex);
-
-            if (eventData.button == PointerEventData.InputButton.Left)
-            {
-                if (IsBankOpen)
-                {
-                    SlotClicked?.Invoke(this, new SlotClickEvent(this, slotIndex, eventData.button, shiftHeld, eventData.position));
-                    return;
-                }
-
-                if (InShop)
-                {
-                    if (shiftHeld)
-                    {
-                        RequestStackSplit(slotIndex, StackSplitType.Sell);
-                    }
-                    else
-                    {
-                        SlotClicked?.Invoke(this, new SlotClickEvent(this, slotIndex, eventData.button, shiftHeld, eventData.position));
-                    }
-                    return;
-                }
-
-                SlotClicked?.Invoke(this, new SlotClickEvent(this, slotIndex, eventData.button, shiftHeld, eventData.position));
-                return;
-            }
-
-            if (eventData.button == PointerEventData.InputButton.Right)
-            {
-                if (IsBankOpen)
-                {
-                    SlotClicked?.Invoke(this, new SlotClickEvent(this, slotIndex, eventData.button, shiftHeld, eventData.position));
-                    return;
-                }
-
-                if (shiftHeld)
-                {
-                    RequestStackSplit(slotIndex, StackSplitType.Drop);
-                    return;
-                }
-
-                if (!CanDropItems)
-                    return;
-
-                if (entry.item != null && entry.count > 1)
-                {
-                    ShowDropMenu(slotIndex, eventData.position);
-                }
-                else if (entry.item != null && !entry.item.isUndroppable)
-                {
-                    DropRequested?.Invoke(this, new DropRequestEvent(this, slotIndex, 1));
-                }
-            }
+            SlotClicked?.Invoke(this, new SlotClickEvent(this, slotIndex, eventData.button, shiftHeld, eventData.position));
         }
 
         internal void HandleDropMenuSelection(int slotIndex, DropMenuSelection selection)
@@ -594,7 +539,7 @@ namespace Inventory.UI
                     DropRequested?.Invoke(this, new DropRequestEvent(this, slotIndex, entry.count));
                     break;
                 case DropMenuSelection.DropX:
-                    RequestStackSplit(slotIndex, StackSplitType.Drop);
+                    SplitPromptRequested?.Invoke(this, new StackSplitPromptEvent(this, slotIndex, StackSplitType.Drop));
                     break;
             }
         }
@@ -608,24 +553,6 @@ namespace Inventory.UI
         public void DismissDropMenu()
         {
             HideDropMenu();
-        }
-
-        private void RequestStackSplit(int slotIndex, StackSplitType type)
-        {
-            if (slotIndex < 0 || slotIndex >= model.Size)
-                return;
-
-            var entry = model.GetEntry(slotIndex);
-            if (entry.item == null || entry.count <= 1)
-                return;
-
-            if (type == StackSplitType.Drop && entry.item.isUndroppable)
-                return;
-
-            StackSplitDialog.Show(uiRoot.transform, entry.count, amount =>
-            {
-                SplitRequested?.Invoke(this, new StackSplitEvent(this, slotIndex, type, amount));
-            });
         }
 
         private void ShowTooltip(int slotIndex, RectTransform slotRect)
@@ -686,7 +613,7 @@ namespace Inventory.UI
             HideTooltip();
         }
 
-        private void ShowDropMenu(int slotIndex, Vector2 position)
+        internal void ShowDropMenu(int slotIndex, Vector2 position)
         {
             if (dropMenu == null)
                 return;

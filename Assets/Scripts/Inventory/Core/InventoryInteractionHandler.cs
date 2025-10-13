@@ -1,0 +1,796 @@
+using System;
+using BankSystem;
+using Inventory.UI;
+using MyGame.Drops;
+using Pets;
+using Player;
+using Quests;
+using ShopSystem;
+using Skills.Common;
+using Skills.Firemaking;
+using UI;
+using UI.Utilities;
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+namespace Inventory.Core
+{
+    /// <summary>
+    ///     Mediates user intents coming from <see cref="InventoryWindowController"/> and
+    ///     coordinates gameplay side effects for the owning <see cref="Inventory.Inventory"/>.
+    ///     The handler keeps UI and gameplay concerns separate so inventory windows remain
+    ///     presentation-only while this class mutates the <see cref="InventoryModel"/> and
+    ///     talks to external systems such as equipment, shops, quests, and player movement.
+    /// </summary>
+    public sealed class InventoryInteractionHandler : IDisposable
+    {
+        /// <summary>
+        ///     Bundles optional service references that the handler relies on when
+        ///     resolving user actions (player movement, equipment, firemaking, etc.).
+        /// </summary>
+        public struct ServiceContext
+        {
+            public Equipment Equipment;
+            public PlayerMover PlayerMover;
+            public FiremakingSkill FiremakingSkill;
+            public QuestUI QuestUi;
+            public PetStorage PetStorage;
+            public GroundItemSpawner GroundItemSpawner;
+        }
+
+        private readonly Inventory.Inventory owner;
+        private readonly InventoryModel model;
+        private readonly InventoryWindowController controller;
+
+        private Equipment equipment;
+        private PlayerMover playerMover;
+        private FiremakingSkill firemakingSkill;
+        private QuestUI questUi;
+        private PetStorage petStorage;
+        private GroundItemSpawner groundItemSpawner;
+
+        private Shop currentShop;
+
+        private bool controllerEventsSubscribed;
+        private bool questEventsSubscribed;
+
+        /// <summary>
+        ///     Creates a new handler bound to the supplied inventory model and window controller.
+        /// </summary>
+        public InventoryInteractionHandler(Inventory.Inventory owner, InventoryModel model, InventoryWindowController controller)
+        {
+            this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
+            this.model = model ?? throw new ArgumentNullException(nameof(model));
+            this.controller = controller ?? throw new ArgumentNullException(nameof(controller));
+
+            SubscribeToController();
+        }
+
+        /// <summary>
+        ///     Current shop context. When non-null the handler routes clicks to the shop API.
+        /// </summary>
+        public Shop CurrentShop => currentShop;
+
+        /// <summary>
+        ///     True when the inventory is currently paired with an active shop window.
+        /// </summary>
+        public bool HasActiveShop => currentShop != null;
+
+        /// <summary>
+        ///     True when the player is allowed to drop items from the inventory.
+        /// </summary>
+        public bool CanDropItems => playerMover == null || playerMover.CanDrop;
+
+        /// <summary>
+        ///     Updates cached service references used when resolving user actions.
+        /// </summary>
+        public void UpdateServiceContext(ServiceContext context)
+        {
+            equipment = context.Equipment ?? equipment;
+            playerMover = context.PlayerMover ?? playerMover;
+            firemakingSkill = context.FiremakingSkill ?? firemakingSkill;
+            questUi = context.QuestUi ?? questUi;
+            petStorage = context.PetStorage ?? petStorage;
+            groundItemSpawner = context.GroundItemSpawner ?? groundItemSpawner;
+
+            RefreshControllerState();
+        }
+
+        /// <summary>
+        ///     Registers quest UI listeners so the inventory can react to quest window state changes.
+        /// </summary>
+        public void OnEnable()
+        {
+            EnsureQuestUiReference();
+            if (!questEventsSubscribed)
+            {
+                QuestUI.QuestUIOpened += HandleQuestUiOpened;
+                QuestUI.QuestUIClosed += HandleQuestUiClosed;
+                questEventsSubscribed = true;
+            }
+        }
+
+        /// <summary>
+        ///     Unregisters quest UI listeners when the owning inventory is disabled.
+        /// </summary>
+        public void OnDisable()
+        {
+            if (questEventsSubscribed)
+            {
+                QuestUI.QuestUIOpened -= HandleQuestUiOpened;
+                QuestUI.QuestUIClosed -= HandleQuestUiClosed;
+                questEventsSubscribed = false;
+            }
+        }
+
+        /// <summary>
+        ///     Unsubscribes controller listeners and quest hooks.
+        /// </summary>
+        public void Dispose()
+        {
+            UnsubscribeFromController();
+            OnDisable();
+        }
+
+        /// <summary>
+        ///     Pushes shop state and drop permissions to the window controller.
+        /// </summary>
+        public void RefreshControllerState()
+        {
+            if (controller == null)
+                return;
+
+            controller.IsBankOpen = owner.BankOpen;
+            controller.InShop = HasActiveShop;
+            controller.CanDropItems = CanDropItems;
+            controller.CurrentShop = currentShop;
+
+            if (owner.selectedIndex >= 0)
+                controller.SetSelectedIndex(owner.selectedIndex);
+            else
+                controller.ClearHighlight();
+        }
+
+        /// <summary>
+        ///     Synchronises the inventory window with current modal state (quests, shops, banks).
+        ///     Call this every frame from <see cref="Inventory.Inventory.Update"/>.
+        /// </summary>
+        public void Tick()
+        {
+            RefreshControllerState();
+
+            if (playerMover == null)
+                return;
+
+            EnsureQuestUiReference();
+
+            if (questUi != null && questUi.IsOpen)
+            {
+                if (owner.IsOpen)
+                    RequestClose();
+                return;
+            }
+
+            if (HasActiveShop)
+            {
+                if (!owner.IsOpen)
+                    RequestOpen();
+                return;
+            }
+
+            if (owner.BankOpen && !owner.IsOpen)
+                RequestOpen();
+        }
+
+        /// <summary>
+        ///     Requests that the inventory UI open, respecting modal locks and tab mutex rules.
+        /// </summary>
+        public void RequestOpen()
+        {
+            if (!owner.BankOpen && !HasActiveShop && owner.useSharedUIRoot)
+            {
+                var uiManager = UIManager.Instance;
+                if (uiManager != null && !uiManager.TryOpenWindow(owner))
+                    return;
+            }
+
+            InterfaceTabMutexUtility.CloseAllTabWindowsExcept(owner);
+            controller.Show();
+            UpdatePetStorageVisibility();
+        }
+
+        /// <summary>
+        ///     Attempts to close the inventory UI. Closing is skipped while trading or banking.
+        /// </summary>
+        public void RequestClose()
+        {
+            if (owner.BankOpen || HasActiveShop)
+                return;
+
+            controller.Hide();
+            controller.DismissTooltip();
+            controller.DismissDropMenu();
+            ClosePetStorage();
+        }
+
+        /// <summary>
+        ///     Clears the active slot selection and hides the highlight.
+        /// </summary>
+        public void ClearSelection()
+        {
+            owner.selectedIndex = -1;
+            controller.ClearHighlight();
+        }
+
+        /// <summary>
+        ///     Tries to equip the item located at <paramref name="index"/>.
+        /// </summary>
+        public bool EquipItem(int index)
+        {
+            if (equipment == null)
+                return false;
+            if (index < 0 || index >= model.Size)
+                return false;
+
+            var entry = model.GetEntry(index);
+            if (entry.item == null || entry.item.equipmentSlot == EquipmentSlot.None)
+                return false;
+
+            model.RemoveFromSlot(index, entry.count);
+            if (equipment.Equip(entry))
+            {
+                controller.RefreshSlot(index);
+                return true;
+            }
+
+            model.ReplaceItem(index, null, entry.item, entry.count);
+            controller.RefreshSlot(index);
+            return false;
+        }
+
+        /// <summary>
+        ///     Uses the item located at <paramref name="index"/> when possible.
+        /// </summary>
+        public bool UseItem(int index)
+        {
+            if (index < 0 || index >= model.Size)
+                return false;
+
+            var entry = model.GetEntry(index);
+            var item = entry.item;
+            if (item == null)
+                return false;
+
+            if (item is BookItemData bookItem && bookItem.book != null)
+            {
+                BookUI.Instance.Open(bookItem.book);
+                return true;
+            }
+
+            var eater = owner.GetComponent<PlayerEat>();
+            if (eater != null && item.healAmount > 0 && eater.Eat(item))
+            {
+                if (!string.IsNullOrEmpty(item.replacementItemId))
+                {
+                    var next = ItemDatabase.GetItem(item.replacementItemId);
+                    if (!model.ReplaceItem(index, item, next, next != null ? 1 : 0))
+                        model.RemoveFromSlot(index, entry.count);
+                }
+                else
+                {
+                    model.RemoveFromSlot(index, 1);
+                }
+
+                ItemUseResolver.NotifyItemUsed(owner.gameObject, item, ItemUseType.Consumed);
+                controller.RefreshSlot(index);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        ///     Sells up to <paramref name="quantity"/> items from <paramref name="slotIndex"/> to the active shop.
+        /// </summary>
+        public void SellItem(int slotIndex, int quantity)
+        {
+            if (owner.BankOpen || currentShop == null)
+                return;
+            if (slotIndex < 0 || slotIndex >= model.Size)
+                return;
+
+            int sold = 0;
+            quantity = Mathf.Max(1, quantity);
+            for (int i = 0; i < quantity; i++)
+            {
+                var item = model.GetEntry(slotIndex).item;
+                if (item == null)
+                    break;
+
+                if (currentShop.Sell(item, owner, slotIndex))
+                    sold++;
+                else
+                    break;
+            }
+
+            if (sold > 0)
+            {
+                controller.DismissTooltip();
+                controller.RefreshSlot(slotIndex);
+            }
+        }
+
+        /// <summary>
+        ///     Updates the active shop context so shift-click and tooltip flows behave correctly.
+        /// </summary>
+        public void SetShopContext(Shop shop)
+        {
+            currentShop = shop;
+            RefreshControllerState();
+
+            if (shop != null)
+                RequestOpen();
+        }
+
+        private void HandleDropRequested(InventoryWindowController _, InventoryWindowController.DropRequestEvent evt)
+        {
+            DropItem(evt.SlotIndex, evt.Quantity);
+        }
+
+        private void HandleSplitPromptRequested(InventoryWindowController _, InventoryWindowController.StackSplitPromptEvent evt)
+        {
+            ShowStackSplitPrompt(evt.SlotIndex, evt.SplitType);
+        }
+
+        private void HandleSlotClicked(InventoryWindowController _, InventoryWindowController.SlotClickEvent evt)
+        {
+            controller.DismissDropMenu();
+
+            int index = evt.SlotIndex;
+            if (index < 0 || index >= model.Size)
+                return;
+
+            if (owner.BankOpen)
+            {
+                if (evt.Button == PointerEventData.InputButton.Left)
+                    BankUI.Instance?.DepositFromInventory(index);
+                else if (evt.Button == PointerEventData.InputButton.Right)
+                    BankUI.Instance?.ShowDepositMenu(index, evt.PointerPosition);
+                return;
+            }
+
+            if (HasActiveShop && evt.Button == PointerEventData.InputButton.Left)
+            {
+                if (evt.ShiftHeld)
+                    ShowStackSplitPrompt(index, StackSplitType.Sell);
+                else
+                    SellItem(index, 1);
+                return;
+            }
+
+            if (evt.Button == PointerEventData.InputButton.Left)
+            {
+                HandlePrimaryClick(index);
+                return;
+            }
+
+            if (evt.Button == PointerEventData.InputButton.Right)
+                HandleSecondaryClick(index, evt);
+        }
+
+        private void HandleDragDropRequested(InventoryWindowController _, InventoryWindowController.DragDropEvent evt)
+        {
+            if (evt.Target != controller)
+                return;
+
+            var sourceController = evt.Source;
+            var sourceInventory = sourceController?.Owner;
+            if (sourceInventory == null)
+                return;
+
+            if (sourceInventory != owner)
+                HandleExternalDrag(sourceInventory, evt.SourceIndex, evt.TargetIndex);
+            else
+                HandleInternalDrag(evt.SourceIndex, evt.TargetIndex);
+        }
+
+        private void HandleDragCancelled(InventoryWindowController _)
+        {
+            // Reserved for future feedback hooks.
+        }
+
+        private void HandlePrimaryClick(int index)
+        {
+            var entry = model.GetEntry(index);
+            if (entry.item != null && entry.item.healAmount > 0)
+            {
+                UseItem(index);
+                return;
+            }
+
+            if (owner.selectedIndex < 0)
+            {
+                if (entry.item == null)
+                    return;
+
+                if (entry.item.equipmentSlot != EquipmentSlot.None && EquipItem(index))
+                    return;
+
+                owner.selectedIndex = index;
+                controller.SetSelectedIndex(index);
+                return;
+            }
+
+            if (owner.selectedIndex == index)
+            {
+                ClearSelection();
+                return;
+            }
+
+            CombineSlots(owner.selectedIndex, index);
+        }
+
+        private void HandleSecondaryClick(int index, InventoryWindowController.SlotClickEvent evt)
+        {
+            if (evt.ShiftHeld)
+            {
+                ShowStackSplitPrompt(index, StackSplitType.Drop);
+                return;
+            }
+
+            if (!CanDropItems)
+                return;
+
+            var entry = model.GetEntry(index);
+            if (entry.item == null)
+                return;
+
+            if (entry.count > 1)
+            {
+                controller.ShowDropMenu(index, evt.PointerPosition);
+                return;
+            }
+
+            if (!entry.item.isUndroppable)
+                DropItem(index, 1);
+        }
+
+        private void CombineSlots(int sourceIndex, int targetIndex)
+        {
+            bool performed = false;
+            bool keepSelection = false;
+            int selectionIndex = sourceIndex;
+
+            if (TryHandleFiremakingCombination(sourceIndex, targetIndex, out bool fireKeepSelection, out int fireSelection))
+            {
+                performed = true;
+                keepSelection = fireKeepSelection;
+                selectionIndex = fireSelection >= 0 ? fireSelection : sourceIndex;
+            }
+            else if (model.CombineItems(sourceIndex, targetIndex, out bool modelKeepSelection))
+            {
+                performed = true;
+                keepSelection = modelKeepSelection;
+                selectionIndex = sourceIndex;
+            }
+
+            if (!performed)
+            {
+                owner.selectedIndex = targetIndex;
+                controller.SetSelectedIndex(targetIndex);
+                return;
+            }
+
+            if (keepSelection)
+            {
+                owner.selectedIndex = selectionIndex;
+                controller.SetSelectedIndex(selectionIndex);
+            }
+            else
+            {
+                ClearSelection();
+            }
+
+            controller.RefreshSlot(sourceIndex);
+            controller.RefreshSlot(targetIndex);
+            if (keepSelection && selectionIndex != sourceIndex && selectionIndex != targetIndex)
+                controller.RefreshSlot(selectionIndex);
+        }
+
+        private bool TryHandleFiremakingCombination(int firstIndex, int secondIndex, out bool keepSelection, out int selectionIndex)
+        {
+            keepSelection = false;
+            selectionIndex = -1;
+
+            var skill = ResolveFiremakingSkill();
+            if (skill == null)
+                return false;
+
+            var first = model.GetEntry(firstIndex);
+            var second = model.GetEntry(secondIndex);
+            if (first.item == null || second.item == null)
+                return false;
+
+            bool firstIsTinder = string.Equals(first.item.id, skill.TinderboxItemId, StringComparison.OrdinalIgnoreCase);
+            bool secondIsTinder = string.Equals(second.item.id, skill.TinderboxItemId, StringComparison.OrdinalIgnoreCase);
+            if (!firstIsTinder && !secondIsTinder)
+                return false;
+
+            bool firstIsLog = skill.GetDefinitionForItem(first.item.id) != null;
+            bool secondIsLog = skill.GetDefinitionForItem(second.item.id) != null;
+            if (!firstIsLog && !secondIsLog)
+                return false;
+
+            int logSlot = firstIsLog ? firstIndex : secondIndex;
+            if (skill.BeginLightingFromInventory(logSlot, out string failure))
+            {
+                keepSelection = true;
+                selectionIndex = logSlot;
+                return true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(failure))
+                ShowFailureMessage(failure);
+            keepSelection = true;
+            selectionIndex = logSlot;
+            return true;
+        }
+
+        private void HandleExternalDrag(Inventory.Inventory sourceInventory, int sourceIndex, int targetIndex)
+        {
+            if (targetIndex < 0 || targetIndex >= model.Size)
+                return;
+
+            var storage = ResolvePetStorage();
+            if (storage != null &&
+                (storage.definition?.id == "Heron" ||
+                 storage.definition?.id == "Beaver" ||
+                 storage.definition?.id == "Rock Golem" ||
+                 storage.definition?.id == "Mr Frying Pan"))
+            {
+                var entry = sourceInventory.Model.GetEntry(sourceIndex);
+                if (!storage.StoreItem(entry.item, entry.count))
+                    return;
+
+                sourceInventory.Model.ClearSlot(sourceIndex);
+                sourceInventory.WindowController?.RefreshSlot(sourceIndex);
+                return;
+            }
+
+            var destinationEntry = model.GetEntry(targetIndex);
+            var movedEntry = sourceInventory.Model.TakeEntry(sourceIndex);
+
+            if (!model.SetEntry(targetIndex, movedEntry))
+            {
+                sourceInventory.Model.SetEntry(sourceIndex, movedEntry);
+                return;
+            }
+
+            if (!sourceInventory.Model.SetEntry(sourceIndex, destinationEntry))
+            {
+                model.SetEntry(targetIndex, destinationEntry);
+                sourceInventory.Model.SetEntry(sourceIndex, movedEntry);
+                return;
+            }
+
+            controller.RefreshSlot(targetIndex);
+            sourceInventory.WindowController?.RefreshSlot(sourceIndex);
+        }
+
+        private void HandleInternalDrag(int sourceIndex, int targetIndex)
+        {
+            if (sourceIndex < 0 || sourceIndex >= model.Size)
+                return;
+            if (targetIndex < 0 || targetIndex >= model.Size)
+                return;
+
+            if (targetIndex == sourceIndex)
+            {
+                controller.RefreshSlot(sourceIndex);
+                return;
+            }
+
+            var destinationEntry = model.GetEntry(targetIndex);
+            var draggedEntry = model.GetEntry(sourceIndex);
+
+            if (!model.SetEntry(targetIndex, draggedEntry))
+                return;
+
+            if (!model.SetEntry(sourceIndex, destinationEntry))
+            {
+                model.TakeEntry(targetIndex);
+                model.SetEntry(targetIndex, destinationEntry);
+                model.SetEntry(sourceIndex, draggedEntry);
+                return;
+            }
+
+            controller.RefreshSlot(targetIndex);
+            controller.RefreshSlot(sourceIndex);
+        }
+
+        private void DropItem(int slotIndex, int quantity)
+        {
+            if (!CanDropItems)
+                return;
+
+            if (slotIndex < 0 || slotIndex >= model.Size)
+                return;
+
+            var entry = model.GetEntry(slotIndex);
+            if (entry.item == null || entry.item.isUndroppable)
+                return;
+
+            int dropAmount = Mathf.Clamp(quantity, 1, entry.count);
+            model.RemoveFromSlot(slotIndex, dropAmount);
+            controller.RefreshSlot(slotIndex);
+
+            if (owner.selectedIndex == slotIndex && model.GetEntry(slotIndex).item == null)
+                ClearSelection();
+
+            SpawnGroundItem(entry.item, dropAmount);
+            controller.DismissTooltip();
+        }
+
+        private void ShowStackSplitPrompt(int slotIndex, StackSplitType type)
+        {
+            if (slotIndex < 0 || slotIndex >= model.Size)
+                return;
+
+            var entry = model.GetEntry(slotIndex);
+            if (entry.item == null || entry.count <= 1)
+                return;
+
+            if (type == StackSplitType.Drop && entry.item.isUndroppable)
+                return;
+
+            controller.DismissDropMenu();
+            StackSplitDialog.Show(controller.UiRoot.transform, entry.count, amount =>
+            {
+                amount = Mathf.Clamp(amount, 1, entry.count);
+                switch (type)
+                {
+                    case StackSplitType.Drop:
+                        DropItem(slotIndex, amount);
+                        break;
+                    case StackSplitType.Sell:
+                        SellItem(slotIndex, amount);
+                        break;
+                    case StackSplitType.Split:
+                        model.SplitStack(slotIndex, amount);
+                        break;
+                }
+            });
+        }
+
+        private void SpawnGroundItem(ItemData item, int amount)
+        {
+            if (item == null || amount <= 0)
+                return;
+
+            var spawner = ResolveGroundItemSpawner();
+            if (spawner == null)
+                return;
+
+            Vector3 origin = owner.transform != null ? owner.transform.position : Vector3.zero;
+            spawner.Spawn(item, amount, origin);
+        }
+
+        private GroundItemSpawner ResolveGroundItemSpawner()
+        {
+            if (groundItemSpawner == null)
+                groundItemSpawner = UnityEngine.Object.FindObjectOfType<GroundItemSpawner>(true);
+            return groundItemSpawner;
+        }
+
+        private FiremakingSkill ResolveFiremakingSkill()
+        {
+            if (firemakingSkill == null)
+                firemakingSkill = owner.GetComponent<FiremakingSkill>();
+            return firemakingSkill;
+        }
+
+        private PetStorage ResolvePetStorage()
+        {
+            if (petStorage == null)
+                owner.TryGetComponent(out petStorage);
+            return petStorage;
+        }
+
+        private void UpdatePetStorageVisibility()
+        {
+            if (playerMover == null)
+                return;
+
+            var pet = PetDropSystem.ActivePetObject;
+            var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
+            if (storage == null)
+                return;
+
+            if (!owner.BankOpen)
+            {
+                if (PetDropSystem.PetInventoryVisible)
+                    storage.Open();
+                else
+                    storage.Close();
+            }
+            else
+            {
+                storage.Close();
+            }
+        }
+
+        private void ClosePetStorage()
+        {
+            var pet = PetDropSystem.ActivePetObject;
+            var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
+            storage?.Close();
+        }
+
+        private void ShowFailureMessage(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            Transform anchor = firemakingSkill != null ? firemakingSkill.transform : owner.transform;
+            if (anchor == null)
+                return;
+
+            if (!GatheringFloatingTextService.TryShowAtAnchor(message, anchor))
+                FloatingText.Show(message, anchor.position);
+        }
+
+        private void HandleQuestUiOpened(QuestUI quest)
+        {
+            questUi = quest ?? QuestUI.Instance;
+            if (questUi != null && questUi.IsOpen && owner.IsOpen)
+                RequestClose();
+        }
+
+        private void HandleQuestUiClosed(QuestUI quest)
+        {
+            questUi = quest ?? QuestUI.Instance;
+        }
+
+        private void EnsureQuestUiReference()
+        {
+            if (questUi != null)
+                return;
+
+            questUi = QuestUI.Instance;
+            if (questUi == null)
+            {
+#if UNITY_2022_2_OR_NEWER
+                questUi = UnityEngine.Object.FindFirstObjectByType<QuestUI>(FindObjectsInactive.Include);
+#else
+                questUi = UnityEngine.Object.FindObjectOfType<QuestUI>(true);
+#endif
+            }
+        }
+
+        private void SubscribeToController()
+        {
+            if (controllerEventsSubscribed)
+                return;
+
+            controller.SlotClicked += HandleSlotClicked;
+            controller.DropRequested += HandleDropRequested;
+            controller.SplitPromptRequested += HandleSplitPromptRequested;
+            controller.DragDropRequested += HandleDragDropRequested;
+            controller.DragCancelled += HandleDragCancelled;
+            controllerEventsSubscribed = true;
+        }
+
+        private void UnsubscribeFromController()
+        {
+            if (!controllerEventsSubscribed)
+                return;
+
+            controller.SlotClicked -= HandleSlotClicked;
+            controller.DropRequested -= HandleDropRequested;
+            controller.SplitPromptRequested -= HandleSplitPromptRequested;
+            controller.DragDropRequested -= HandleDragDropRequested;
+            controller.DragCancelled -= HandleDragCancelled;
+            controllerEventsSubscribed = false;
+        }
+    }
+}
