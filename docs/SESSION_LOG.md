@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ef777837f870a9c3a200f8e2469359f2ab4b8cfa -->
+## 2025-10-14T21:47:57+01:00 — Merge pull request #1130 from aicovergod/codex/update-pickup-movement-to-item-position
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 29 ++ / 2 --
+- Notes:
+  Retarget ground item auto-walk to live pickup position
+---
+<!-- commit:cd9453493b5dfc51b3739d1b2d11b18f6adff111 -->
+## 2025-10-14T21:47:50+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9c01c61909e6d437a37e53418b1e17eb587e138d -->
 ## 2025-10-14T21:47:34+01:00 — Retarget ground item pickup movement
 
