@@ -75,6 +75,47 @@ namespace BankSystem
         private bool inventoryWasOpen;
         private readonly PlayerMovementModalLock playerMovementLock = new PlayerMovementModalLock();
 
+        /// <summary>
+        /// Resolves and caches the player's main inventory. This method prioritises the
+        /// inventory on the player object and gracefully ignores pet storage inventories
+        /// so the bank always manipulates the correct container.
+        /// </summary>
+        /// <returns>True if a valid player inventory was found; otherwise false.</returns>
+        private bool ResolvePlayerInventory()
+        {
+            // Unity overrides the == operator for destroyed objects, so this covers both
+            // cached references and cases where the underlying object has been unloaded.
+            if (playerInventory != null)
+                return true;
+
+            // Attempt to fetch the inventory directly from the player GameObject.
+            var playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject != null)
+            {
+                playerInventory = playerObject.GetComponent<Inventory.Inventory>() ??
+                                   playerObject.GetComponentInChildren<Inventory.Inventory>();
+                if (playerInventory != null)
+                    return true;
+            }
+
+            // As a safety net, fall back to scanning every inventory in the scene but skip
+            // any inventories that represent pet storage so we never bind to pet bags.
+            var inventories = FindObjectsOfType<Inventory.Inventory>(true);
+            foreach (var inventory in inventories)
+            {
+                if (inventory == null)
+                    continue;
+
+                if (inventory.GetComponent<PetStorage>() != null)
+                    continue;
+
+                playerInventory = inventory;
+                return true;
+            }
+
+            return false;
+        }
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
         {
@@ -441,9 +482,7 @@ namespace BankSystem
 
         public void ShowTooltip(int bankIndex, RectTransform slotRect)
         {
-            if (playerInventory == null)
-                playerInventory = FindObjectOfType<Inventory.Inventory>();
-            if (playerInventory == null)
+            if (!ResolvePlayerInventory())
                 return;
             if (bankIndex < 0 || bankIndex >= items.Length)
                 return;
@@ -457,9 +496,10 @@ namespace BankSystem
 
         public void HideTooltip()
         {
-            if (playerInventory == null)
-                playerInventory = FindObjectOfType<Inventory.Inventory>();
-            playerInventory?.HideTooltip();
+            if (!ResolvePlayerInventory())
+                return;
+
+            playerInventory.HideTooltip();
         }
 
         public void ShowWithdrawMenu(int bankIndex, Vector2 position)
@@ -587,9 +627,7 @@ namespace BankSystem
                 return;
             }
 
-            if (playerInventory == null)
-                playerInventory = FindObjectOfType<Inventory.Inventory>();
-            if (playerInventory != null)
+            if (ResolvePlayerInventory())
             {
                 inventoryWasOpen = playerInventory.IsOpen;
                 playerInventory.BankOpen = true;
@@ -597,6 +635,10 @@ namespace BankSystem
                 var pet = PetDropSystem.ActivePetObject;
                 var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
                 storage?.Close();
+            }
+            else
+            {
+                inventoryWasOpen = false;
             }
             // Freeze player movement while banking to mirror shop behaviour and
             // ensure the player cannot walk away with the window open.
@@ -732,9 +774,7 @@ namespace BankSystem
 
         public bool Withdraw(int bankIndex, int amount)
         {
-            if (playerInventory == null)
-                playerInventory = FindObjectOfType<Inventory.Inventory>();
-            if (playerInventory == null)
+            if (!ResolvePlayerInventory())
                 return false;
             if (bankIndex < 0 || bankIndex >= items.Length)
                 return false;
