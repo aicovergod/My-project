@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2040833f8591dfedf26ebeeb041a64830b11d717 -->
+## 2025-10-14T11:04:16+01:00 — Fix drag icon parenting on inactive shared canvas
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/UI/InventoryWindowController.cs
+- Diff: 13 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:4196ce4e84d422da8e993a365d810858d56c0b96 -->
 ## 2025-10-14T10:44:48+01:00 — just some stufff
 
