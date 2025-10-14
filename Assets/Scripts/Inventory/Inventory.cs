@@ -113,6 +113,11 @@ namespace Inventory
         private InventoryWindowController windowController;
         private InventoryInteractionHandler interactionHandler;
 
+        // Tracks the configuration currently bound to the runtime window so hot reloads
+        // can refresh layout without instantiating a new controller.
+        private InventoryWindowController.WindowConfig? lastAppliedConfig;
+        private int lastAppliedModelSize = -1;
+
         private bool modelEventsSubscribed;
         private bool controllerEventsSubscribed;
 
@@ -319,6 +324,8 @@ namespace Inventory
         {
             size = Mathf.Max(1, size);
 
+            bool wasOpen = IsOpen;
+
             if (defaultFont == null)
                 defaultFont = LegacyFontProvider.GetLegacyFont();
 
@@ -334,10 +341,18 @@ namespace Inventory
             if (EventSystem.current == null)
                 EnsureEventSystem();
 
+            var config = BuildWindowConfig();
+
             if (windowController == null)
             {
-                windowController = new InventoryWindowController(Model, BuildWindowConfig());
+                windowController = new InventoryWindowController(Model, config);
                 controllerEventsSubscribed = false;
+                lastAppliedConfig = config;
+                lastAppliedModelSize = model != null ? model.Size : size;
+            }
+            else
+            {
+                ApplyWindowConfigIfNeeded(config);
             }
 
             windowController.Owner = this;
@@ -367,7 +382,10 @@ namespace Inventory
             interactionHandler.RefreshControllerState();
             windowController.SetSelectedIndex(selectedIndex);
             windowController.RefreshAllSlots();
-            windowController.Hide();
+            if (wasOpen)
+                interactionHandler?.RequestOpen();
+            else
+                windowController.Hide();
             SubscribeControllerEvents();
             SubscribeModelEvents();
         }
@@ -381,19 +399,29 @@ namespace Inventory
             if (useSharedUIRoot)
                 return;
 
+            bool wasOpen = IsOpen;
+
             // Ensure backing arrays/fonts are prepared before we touch the UI.
             EnsureInitialized();
 
-            bool wasOpen = IsOpen;
+            ApplyWindowConfigIfNeeded(BuildWindowConfig());
 
             windowController?.ForceDedicatedCanvas();
             windowController?.SetSelectedIndex(selectedIndex);
             windowController?.RefreshAllSlots();
 
             if (wasOpen)
-                windowController?.Show();
+                interactionHandler?.RequestOpen();
             else
                 windowController?.Hide();
+        }
+
+        /// <summary>
+        /// Reapplies layout configuration so runtime property edits immediately rebuild the UI.
+        /// </summary>
+        public void RefreshWindowLayout()
+        {
+            EnsureInitialized();
         }
 
         /// <summary>
@@ -427,6 +455,34 @@ namespace Inventory
                 useSharedUIRoot,
                 columns,
                 stackCountFontSize);
+        }
+
+        /// <summary>
+        /// Applies the supplied configuration when the cached layout no longer matches runtime settings.
+        /// </summary>
+        private void ApplyWindowConfigIfNeeded(InventoryWindowController.WindowConfig config, bool force = false)
+        {
+            if (windowController == null)
+                return;
+
+            bool configChanged = !lastAppliedConfig.HasValue || !lastAppliedConfig.Value.Equals(config);
+            bool sizeChanged = model != null && model.Size != lastAppliedModelSize;
+            bool uiRootMissing = windowController.UiRoot == null;
+
+            if (force || configChanged || sizeChanged || uiRootMissing)
+            {
+                bool reopen = IsOpen;
+                windowController.ApplyConfig(config);
+                lastAppliedConfig = config;
+                lastAppliedModelSize = model != null ? model.Size : size;
+
+                if (reopen)
+                    interactionHandler?.RequestOpen();
+            }
+            else if (!force)
+            {
+                lastAppliedModelSize = model != null ? model.Size : size;
+            }
         }
 
         private void OnWindowCloseRequested(InventoryWindowController controller)
