@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:dede02659799313805a6ccf1ddf0c347b638eb7f -->
+## 2025-10-14T17:28:10+01:00 — Merge pull request #1124 from aicovergod/codex/add-resolveplayerinventory-helper-in-bankui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 61 ++ / 12 --
+- Notes:
+  Improve bank inventory resolution for BankUI
+---
+<!-- commit:850c770df4d6014fb024b000be2914fd554e3a74 -->
+## 2025-10-14T17:28:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:515e286efc9f60e431f226842b584efdaed8d15a -->
 ## 2025-10-14T17:27:50+01:00 — Improve bank inventory resolution
 
