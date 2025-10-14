@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:40ac0981f9e6735b8c9d2b0281acdecfafcf8786 -->
+## 2025-10-14T09:53:00+01:00 — Merge pull request #1114 from aicovergod/codex/fix-inventory-type-errors-after-refactor
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 21 ++ / 10 --
+- Notes:
+  Fix inventory type alias references
+---
+<!-- commit:256f899c0c28ab549562ad4fd3d3206220c7f43c -->
+## 2025-10-14T09:52:52+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ad08b91d5808c051964b5e96e4413a8694355108 -->
 ## 2025-10-14T09:52:40+01:00 — Fix inventory handler type references
 
