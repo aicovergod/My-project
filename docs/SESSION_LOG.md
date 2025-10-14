@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b9f43d24c8edb876baff09c92879b5e64915ac32 -->
+## 2025-10-14T10:07:52+01:00 — Restore inventory tooltip access for bank UI
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs
+- Diff: 55 ++ / 7 --
+- Notes:
+  —
+---
 <!-- commit:40ac0981f9e6735b8c9d2b0281acdecfafcf8786 -->
 ## 2025-10-14T09:53:00+01:00 — Merge pull request #1114 from aicovergod/codex/fix-inventory-type-errors-after-refactor
 
