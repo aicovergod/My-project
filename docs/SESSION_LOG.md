@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:515e286efc9f60e431f226842b584efdaed8d15a -->
+## 2025-10-14T17:27:50+01:00 — Improve bank inventory resolution
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Bank/BankUI.cs
+- Diff: 52 ++ / 12 --
+- Notes:
+  —
+---
 <!-- commit:c1cb43f34851ac7f9a786974b9df66702f4bc90e -->
 ## 2025-10-14T16:44:36+01:00 — Merge pull request #1123 from aicovergod/codex/fix-bug-reported-by-codex-2r4bj7
 
