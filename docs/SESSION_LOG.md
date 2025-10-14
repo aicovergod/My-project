@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:303deae830b63d5d5148cd2ef76cfa1d75269bac -->
+## 2025-10-14T12:40:14+01:00 — Merge pull request #1120 from aicovergod/codex/guard-shared-ui-access-in-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 23 ++ / 1 --
+- Notes:
+  Allow dedicated inventories to bypass tab mutex
+---
+<!-- commit:074c8d9c41a38a5461b42c9d1c7bc289f1e289e1 -->
+## 2025-10-14T12:40:05+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:298173382a080ed8b0d487140199bec291962f1e -->
 ## 2025-10-14T12:39:53+01:00 — Allow dedicated inventories to bypass tab mutex
 
