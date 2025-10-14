@@ -2,6 +2,7 @@ using System;
 using BankSystem;
 using Books;
 using Inventory.UI;
+using InventoryComponent = global::Inventory.Inventory;
 using MyGame.Drops;
 using Pets;
 using Player;
@@ -18,7 +19,7 @@ namespace Inventory.Core
 {
     /// <summary>
     ///     Mediates user intents coming from <see cref="InventoryWindowController"/> and
-    ///     coordinates gameplay side effects for the owning <see cref="Inventory.Inventory"/>.
+    ///     coordinates gameplay side effects for the owning <see cref="InventoryComponent"/>.
     ///     The handler keeps UI and gameplay concerns separate so inventory windows remain
     ///     presentation-only while this class mutates the <see cref="InventoryModel"/> and
     ///     talks to external systems such as equipment, shops, quests, and player movement.
@@ -39,7 +40,7 @@ namespace Inventory.Core
             public GroundItemSpawner GroundItemSpawner;
         }
 
-        private readonly Inventory.Inventory owner;
+        private readonly InventoryComponent owner;
         private readonly InventoryModel model;
         private readonly InventoryWindowController controller;
 
@@ -58,7 +59,7 @@ namespace Inventory.Core
         /// <summary>
         ///     Creates a new handler bound to the supplied inventory model and window controller.
         /// </summary>
-        public InventoryInteractionHandler(Inventory.Inventory owner, InventoryModel model, InventoryWindowController controller)
+        public InventoryInteractionHandler(InventoryComponent owner, InventoryModel model, InventoryWindowController controller)
         {
             this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
             this.model = model ?? throw new ArgumentNullException(nameof(model));
@@ -154,7 +155,7 @@ namespace Inventory.Core
 
         /// <summary>
         ///     Synchronises the inventory window with current modal state (quests, shops, banks).
-        ///     Call this every frame from <see cref="Inventory.Inventory.Update"/>.
+        ///     Call this every frame from <see cref="InventoryComponent.Update"/>.
         /// </summary>
         public void Tick()
         {
@@ -537,7 +538,7 @@ namespace Inventory.Core
             return true;
         }
 
-        private void HandleExternalDrag(Inventory.Inventory sourceInventory, int sourceIndex, int targetIndex)
+        private void HandleExternalDrag(InventoryComponent sourceInventory, int sourceIndex, int targetIndex)
         {
             if (targetIndex < 0 || targetIndex >= model.Size)
                 return;

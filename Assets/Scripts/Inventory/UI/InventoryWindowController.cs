@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Inventory.Core;
+using InventoryComponent = global::Inventory.Inventory;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -13,7 +14,7 @@ namespace Inventory.UI
 {
     /// <summary>
     /// Defines the pointer callbacks that inventory slot presenters forward to the
-    /// window controller. Slots no longer talk directly to <see cref="Inventory.Inventory"/>
+    /// window controller. Slots no longer talk directly to <see cref="InventoryComponent"/>
     /// so presentation and gameplay logic remain isolated.
     /// </summary>
     public interface IInventoryUIActions
@@ -64,13 +65,13 @@ namespace Inventory.UI
     /// <summary>
     /// Manages the runtime inventory window hierarchy. The controller is responsible
     /// for generating the canvas, binding slots, and exposing input intent events to
-    /// the owning <see cref="Inventory.Inventory"/> instance.
+    /// the owning <see cref="InventoryComponent"/> instance.
     /// </summary>
     public sealed class InventoryWindowController : IInventoryUIActions
     {
         /// <summary>
         /// Configuration payload describing how the inventory window should be built.
-        /// Values are copied from the <see cref="Inventory.Inventory"/> MonoBehaviour
+        /// Values are copied from the <see cref="InventoryComponent"/> MonoBehaviour
         /// so UI generation stays completely data driven.
         /// </summary>
         public readonly struct WindowConfig
@@ -271,10 +272,10 @@ namespace Inventory.UI
         public ShopSystem.Shop CurrentShop { get; set; }
 
         /// <summary>
-        /// Owning inventory component. Set by <see cref="Inventory.Inventory"/> after
+        /// Owning inventory component. Set by <see cref="InventoryComponent"/> after
         /// construction so drag events can be resolved across windows.
         /// </summary>
-        public Inventory.Inventory Owner { get; internal set; }
+        public InventoryComponent Owner { get; internal set; }
 
         public GameObject UiRoot => uiRoot;
 
