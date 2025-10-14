@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8cafd84d7e571ce525cb7a92e11f16f50875469e -->
+## 2025-10-14T10:44:16+01:00 — Merge pull request #1117 from aicovergod/codex/extend-inventorywindowcontroller-with-applyconfig-method
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 165 ++ / 6 --
+- Notes:
+  Ensure inventory UI rebuilds on runtime config changes
+---
+<!-- commit:faca282fa5e6b8d8d4d80bc77d0789b1684b32f4 -->
+## 2025-10-14T10:44:09+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d28475e7a427d039773914f28e55acc7b34da14b -->
 ## 2025-10-14T10:43:56+01:00 — Ensure inventory UI rebuilds on runtime config changes
 
