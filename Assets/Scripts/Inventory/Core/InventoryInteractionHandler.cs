@@ -645,8 +645,28 @@ namespace Inventory.Core
                 return;
 
             int dropAmount = Mathf.Clamp(quantity, 1, entry.count);
+
+            // Cache the item before removal so we can decide whether to spawn a pet or ground loot afterwards.
+            var droppedItem = entry.item;
+            bool shouldSummonPet = dropAmount == 1 && PetDropSystem.FindPetByItem(droppedItem) != null;
+
             model.RemoveFromSlot(slotIndex, dropAmount);
             controller.RefreshSlot(slotIndex);
+
+            bool petSummoned = false;
+            if (shouldSummonPet)
+            {
+                // Invoke the central pet use flow so existing pets are returned to the inventory and the
+                // newly dropped pet materialises next to the player.
+                petSummoned = PetUseHandler.TryUse(droppedItem);
+            }
+
+            if (!petSummoned)
+            {
+                // Fall back to spawning the item on the ground when the drop was not a pet summon or the
+                // summon failed (for example while merged into another pet).
+                SpawnGroundItem(droppedItem, dropAmount);
+            }
 
             if (owner.selectedIndex == slotIndex && model.GetEntry(slotIndex).item == null)
                 ClearSelection();

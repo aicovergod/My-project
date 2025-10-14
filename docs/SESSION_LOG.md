@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5d2b3eaee0e5242f1c4557d5adfb4eb133ea79d3 -->
+## 2025-10-14T12:52:19+01:00 — Fix pet summon when dropping pet items
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 20 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:303deae830b63d5d5148cd2ef76cfa1d75269bac -->
 ## 2025-10-14T12:40:14+01:00 — Merge pull request #1120 from aicovergod/codex/guard-shared-ui-access-in-inventory
 
