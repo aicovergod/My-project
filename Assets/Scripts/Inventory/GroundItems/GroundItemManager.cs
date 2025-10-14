@@ -363,8 +363,8 @@ namespace Inventory.GroundItems
 
         private IEnumerator ExecutePickupRoutine(ItemPickup pickup)
         {
-            Vector2 targetTileCenter = new Vector2(activePickupTile.x, activePickupTile.y);
             bool arrivalCallbackTriggered = false;
+            Vector3 lastIssuedDestination = pickup != null ? pickup.transform.position : Vector3.zero;
 
             void OnArrived()
             {
@@ -377,7 +377,7 @@ namespace Inventory.GroundItems
                 yield break;
             }
 
-            playerMover.MoveTo(targetTileCenter, pickupStopDistance, OnArrived);
+            IssueMoveCommand(lastIssuedDestination, OnArrived);
 
             while (pickup != null)
             {
@@ -391,6 +391,19 @@ namespace Inventory.GroundItems
                 }
 
                 activePickupLastKnownPosition = pickup.transform.position;
+
+                // If the pickup is pushed or otherwise displaced while we are moving towards it,
+                // retarget the PlayerMover so we walk directly to the live world position instead
+                // of the tile center that was originally clicked.
+                if (!arrivalCallbackTriggered)
+                {
+                    Vector3 currentDestination = pickup.transform.position;
+                    if ((currentDestination - lastIssuedDestination).sqrMagnitude > 0.0001f)
+                    {
+                        lastIssuedDestination = currentDestination;
+                        IssueMoveCommand(currentDestination, OnArrived);
+                    }
+                }
 
                 float distance = Vector2.Distance(playerMover.transform.position, pickup.transform.position);
                 if (distance <= pickup.PickupRadius + pickupStopDistance)
@@ -411,6 +424,11 @@ namespace Inventory.GroundItems
             }
 
             CancelActivePickupRoutine();
+
+            void IssueMoveCommand(Vector3 destination, System.Action arrivedCallback)
+            {
+                playerMover.MoveTo((Vector2)destination, pickupStopDistance, arrivedCallback);
+            }
         }
 
         private void AttemptCollection(ItemPickup pickup)

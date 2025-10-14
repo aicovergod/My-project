@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9c01c61909e6d437a37e53418b1e17eb587e138d -->
+## 2025-10-14T21:47:34+01:00 — Retarget ground item pickup movement
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 20 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:8e0f0a752e454a5549fbba5014d454f03324b97f -->
 ## 2025-10-14T21:35:30+01:00 — Merge pull request #1129 from aicovergod/codex/update-grounditemmanager-for-inactive-player-mover
 
