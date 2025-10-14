@@ -99,6 +99,8 @@ namespace Pets
             }
 
             inventory.useSharedUIRoot = false;
+            // Rebuild the window immediately so pet inventories reflect the latest slot count.
+            inventory.RefreshWindowLayout();
             inventory.ForceDedicatedUiRoot();
             inventory.OnInventoryChanged += inventory.Save;
         }

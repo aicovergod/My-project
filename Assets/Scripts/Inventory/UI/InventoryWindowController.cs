@@ -74,7 +74,7 @@ namespace Inventory.UI
         /// Values are copied from the <see cref="InventoryComponent"/> MonoBehaviour
         /// so UI generation stays completely data driven.
         /// </summary>
-        public readonly struct WindowConfig
+        public readonly struct WindowConfig : IEquatable<WindowConfig>
         {
             public WindowConfig(
                 Vector2 slotSize,
@@ -155,6 +155,84 @@ namespace Inventory.UI
             public bool UseSharedRoot { get; }
             public int Columns { get; }
             public int StackCountFontSize { get; }
+
+            /// <summary>
+            /// Determines whether two configuration payloads are equivalent.
+            /// </summary>
+            public bool Equals(WindowConfig other)
+            {
+                return SlotSize == other.SlotSize &&
+                       SlotSpacing == other.SlotSpacing &&
+                       WindowPadding == other.WindowPadding &&
+                       WindowSize == other.WindowSize &&
+                       ReferenceResolution == other.ReferenceResolution &&
+                       WindowPosition == other.WindowPosition &&
+                       WindowColor.Equals(other.WindowColor) &&
+                       EmptySlotColor.Equals(other.EmptySlotColor) &&
+                       StackColorDefault.Equals(other.StackColorDefault) &&
+                       StackColor10k.Equals(other.StackColor10k) &&
+                       StackColor100k.Equals(other.StackColor100k) &&
+                       StackColor10m.Equals(other.StackColor10m) &&
+                       StackColor100m.Equals(other.StackColor100m) &&
+                       TooltipNameColor.Equals(other.TooltipNameColor) &&
+                       TooltipDescriptionColor.Equals(other.TooltipDescriptionColor) &&
+                       DefaultFont == other.DefaultFont &&
+                       StackCountFont == other.StackCountFont &&
+                       TooltipNameFont == other.TooltipNameFont &&
+                       TooltipDescriptionFont == other.TooltipDescriptionFont &&
+                       SlotFrameSprite == other.SlotFrameSprite &&
+                       ShowCloseButton == other.ShowCloseButton &&
+                       CenterOnScreen == other.CenterOnScreen &&
+                       UseSharedRoot == other.UseSharedRoot &&
+                       Columns == other.Columns &&
+                       StackCountFontSize == other.StackCountFontSize;
+            }
+
+            /// <summary>
+            /// Determines whether the supplied object matches this configuration.
+            /// </summary>
+            public override bool Equals(object obj)
+            {
+                return obj is WindowConfig other && Equals(other);
+            }
+
+            /// <summary>
+            /// Generates a hash code so payloads can be cached or compared in sets.
+            /// </summary>
+            public override int GetHashCode()
+            {
+                var hash = new HashCode();
+                hash.Add(SlotSize);
+                hash.Add(SlotSpacing);
+                hash.Add(WindowPadding);
+                hash.Add(WindowSize);
+                hash.Add(ReferenceResolution);
+                hash.Add(WindowPosition);
+                hash.Add(WindowColor);
+                hash.Add(EmptySlotColor);
+                hash.Add(StackColorDefault);
+                hash.Add(StackColor10k);
+                hash.Add(StackColor100k);
+                hash.Add(StackColor10m);
+                hash.Add(StackColor100m);
+                hash.Add(TooltipNameColor);
+                hash.Add(TooltipDescriptionColor);
+                hash.Add(DefaultFont);
+                hash.Add(StackCountFont);
+                hash.Add(TooltipNameFont);
+                hash.Add(TooltipDescriptionFont);
+                hash.Add(SlotFrameSprite);
+                hash.Add(ShowCloseButton);
+                hash.Add(CenterOnScreen);
+                hash.Add(UseSharedRoot);
+                hash.Add(Columns);
+                hash.Add(StackCountFontSize);
+                return hash.ToHashCode();
+            }
+
+            public static bool operator ==(WindowConfig left, WindowConfig right) => left.Equals(right);
+
+            public static bool operator !=(WindowConfig left, WindowConfig right) => !left.Equals(right);
         }
 
         /// <summary>
@@ -241,7 +319,7 @@ namespace Inventory.UI
         public event Action<InventoryWindowController> CloseRequested;
 
         private readonly InventoryModel model;
-        private readonly WindowConfig config;
+        private WindowConfig config;
 
         private GameObject uiRoot;
         private Image[] slotImages;
@@ -286,6 +364,20 @@ namespace Inventory.UI
             this.model = model ?? throw new ArgumentNullException(nameof(model));
             this.config = config;
 
+            BuildUserInterface();
+            RefreshAllSlots();
+        }
+
+        /// <summary>
+        /// Replaces the active configuration and rebuilds the UI hierarchy so the
+        /// slot grid reflects the latest runtime sizing and styling rules.
+        /// </summary>
+        /// <param name="newConfig">Payload describing the desired UI layout.</param>
+        public void ApplyConfig(WindowConfig newConfig)
+        {
+            config = newConfig;
+
+            DestroyUi();
             BuildUserInterface();
             RefreshAllSlots();
         }
