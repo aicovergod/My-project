@@ -390,6 +390,11 @@ namespace Inventory.UI
             if (uiRoot != null)
             {
                 uiRoot.SetActive(true);
+
+                // Ensure the shared canvas root always references the active canvas
+                // so drag icons parent themselves under a live hierarchy.
+                if (config.UseSharedRoot)
+                    SharedCanvasRoot = uiRoot.transform;
             }
         }
 
@@ -401,6 +406,11 @@ namespace Inventory.UI
             if (uiRoot != null)
             {
                 uiRoot.SetActive(false);
+
+                // Clear the shared canvas root when this window hides to prevent
+                // future drag icons from binding to an inactive hierarchy.
+                if (config.UseSharedRoot && SharedCanvasRoot == uiRoot.transform)
+                    SharedCanvasRoot = null;
             }
 
             HideTooltip();
@@ -997,7 +1007,9 @@ namespace Inventory.UI
             dragCanvas.overrideSorting = true;
             dragCanvas.sortingOrder = short.MaxValue;
 
-            Transform parent = SharedCanvasRoot != null ? SharedCanvasRoot : uiRoot.transform;
+            Transform parent = SharedCanvasRoot != null && SharedCanvasRoot.gameObject.activeInHierarchy
+                ? SharedCanvasRoot
+                : uiRoot.transform;
             activeDragIcon.transform.SetParent(parent, false);
             activeDragIcon.transform.SetAsLastSibling();
 
