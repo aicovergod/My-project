@@ -51,6 +51,13 @@ namespace UI.Utilities
             if (window == null || ReferenceEquals(window, keepOpen))
                 return;
 
+            if (window is Inventory.Inventory inventoryWindow && !inventoryWindow.useSharedUIRoot)
+            {
+                // Dedicated inventories (pet storage, contextual bags, etc.) do not participate in the
+                // shared tab root and should never be forced closed by the mutex logic.
+                return;
+            }
+
             if (!window.IsOpen)
                 return;
 

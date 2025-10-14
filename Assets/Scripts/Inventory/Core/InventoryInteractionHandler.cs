@@ -200,7 +200,13 @@ namespace Inventory.Core
                     return;
             }
 
-            InterfaceTabMutexUtility.CloseAllTabWindowsExcept(owner);
+            if (owner.useSharedUIRoot)
+            {
+                // Only enforce the shared tab mutex when this inventory participates in the
+                // shared UI root. Dedicated inventories such as pet storage maintain their own
+                // window lifecycle and should remain unaffected by tab exclusivity.
+                InterfaceTabMutexUtility.CloseAllTabWindowsExcept(owner);
+            }
             controller.Show();
             UpdatePetStorageVisibility();
         }
