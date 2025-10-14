@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4196ce4e84d422da8e993a365d810858d56c0b96 -->
+## 2025-10-14T10:44:48+01:00 — just some stufff
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (23): Assets/Game/Sprites/Pets/Gorilla/Attack_Down_64x64.png, Assets/Game/Sprites/Pets/Gorilla/Attack_Right_64x64.png, Assets/Game/Sprites/Pets/Gorilla/Attack_Up_64x64.png, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_30_27 PM.png, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_30_27 PM.png.meta, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_31_05 PM.png, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_31_05 PM.png.meta, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_34_10 PM.png, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_34_10 PM.png.meta, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_40_39 PM.png, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_40_39 PM.png.meta, Assets/Game/Sprites/Pets/Gorilla/Gorilla_0001.png.meta, Assets/Game/Sprites/Pets/Gorilla/Gorilla_0002.png.meta, Assets/Game/Sprites/Pets/Gorilla/Gorilla_0003.png.meta, Assets/Game/Sprites/Pets/Gorilla/Gorilla_0004.png.meta, Assets/Game/Sprites/Pets/Gorilla/Gorilla_0005.png.meta, Assets/Game/Sprites/Pets/Gorilla/Idle_Down_64x64.png, Assets/Game/Sprites/Pets/Gorilla/Idle_Right_64x64.png, Assets/Game/Sprites/Pets/Gorilla/Idle_Up_64x64.png, Assets/Scripts/Inventory/Core.meta, Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs.meta, Assets/Scripts/Inventory/Core/InventoryModel.cs.meta, docs/bug-review-2024-06-08.md
+- Diff: 851 ++ / 70 --
+- Notes:
+  —
+---
 <!-- commit:8cafd84d7e571ce525cb7a92e11f16f50875469e -->
 ## 2025-10-14T10:44:16+01:00 — Merge pull request #1117 from aicovergod/codex/extend-inventorywindowcontroller-with-applyconfig-method
 
