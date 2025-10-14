@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f240c52b2d783579234e50a59c6c84eafac854b3 -->
+## 2025-10-14T10:19:52+01:00 — Merge pull request #1116 from aicovergod/codex/fix-stack-overflow-on-inventory-close
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 52 ++ / 5 --
+- Notes:
+  Prevent recursive pet storage closes from overflowing stack
+---
+<!-- commit:c3cad8f98dc1a49b2efb36a8eaf062e40baa544b -->
+## 2025-10-14T10:19:44+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b56248a420dc70130d9eeb9592686c6d5981505e -->
 ## 2025-10-14T10:19:29+01:00 — Prevent pet storage close recursion
 
