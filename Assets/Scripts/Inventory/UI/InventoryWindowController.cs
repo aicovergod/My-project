@@ -558,20 +558,42 @@ namespace Inventory.UI
 
         private void ShowTooltip(int slotIndex, RectTransform slotRect)
         {
-            if (tooltip == null || tooltipNameText == null || tooltipDescriptionText == null)
-                return;
-
             if (slotIndex < 0 || slotIndex >= model.Size)
                 return;
 
             var entry = model.GetEntry(slotIndex);
-            var item = entry.item;
-            if (item == null)
+            if (entry.item == null)
                 return;
 
-            if (CurrentShop != null && CurrentShop.TryGetSellPrice(item, out int sellPrice))
+            ShowTooltipForItem(entry.item, slotRect, CurrentShop);
+        }
+
+        /// <summary>
+        /// Displays the inventory tooltip for an arbitrary item, allowing external systems
+        /// such as the bank UI to reuse the unified hover presentation.
+        /// </summary>
+        /// <param name="item">Item definition that should populate the tooltip.</param>
+        /// <param name="slotRect">World-space rectangle used to anchor the tooltip.</param>
+        /// <param name="shopOverride">
+        /// Optional shop context that forces sell price information even when this window
+        /// is not currently bound to an active shop.
+        /// </param>
+        public void ShowTooltipForItem(global::Inventory.ItemData item, RectTransform slotRect, ShopSystem.Shop shopOverride = null)
+        {
+            if (tooltip == null || tooltipNameText == null || tooltipDescriptionText == null)
+                return;
+            if (item == null || slotRect == null)
+                return;
+
+            var activeShop = shopOverride ?? CurrentShop;
+            if (activeShop != null && activeShop.TryGetSellPrice(item, out int sellPrice))
             {
-                string currencyName = CurrentShop.currency != null ? CurrentShop.currency.itemName : "Coins";
+                string currencyName;
+                if (activeShop.currency != null)
+                    currencyName = !string.IsNullOrEmpty(activeShop.currency.itemName) ? activeShop.currency.itemName : activeShop.currency.name;
+                else
+                    currencyName = "Coins";
+
                 tooltipNameText.text = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
                 tooltipDescriptionText.text = $"Sell for {sellPrice} {currencyName}";
 

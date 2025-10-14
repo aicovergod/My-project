@@ -269,6 +269,32 @@ namespace Inventory
             interactionHandler?.ClearSelection();
         }
 
+        /// <summary>
+        /// Displays the shared inventory tooltip for the supplied item at the provided anchor.
+        /// Used by external systems such as the bank so all UI surfaces share presentation.
+        /// </summary>
+        /// <param name="item">Item to display within the tooltip.</param>
+        /// <param name="slotRect">RectTransform used to anchor the tooltip next to the hovered slot.</param>
+        public void ShowTooltip(ItemData item, RectTransform slotRect)
+        {
+            if (item == null || slotRect == null)
+                return;
+
+            EnsureInitialized();
+            windowController?.ShowTooltipForItem(item, slotRect);
+        }
+
+        /// <summary>
+        /// Hides the currently visible tooltip if one is active.
+        /// </summary>
+        public void HideTooltip()
+        {
+            if (windowController == null)
+                return;
+
+            windowController.DismissTooltip();
+        }
+
         private void OnEnable()
         {
             EnsureInitialized();
