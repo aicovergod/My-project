@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 5a954638b7b42cb40a41263144629a8e
+guid: 28cafec380957354593fa43fd63ba4e7
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1342613977285651339
-    second: Attack_Right_64x64_0
+      213: -696060785079855941
+    second: ChatGPT Image Oct 13, 2025, 08_34_10 PM_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 64
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -96,17 +96,30 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Attack_Right_64x64_0
+      name: ChatGPT Image Oct 13, 2025, 08_34_10 PM_0
       rect:
         serializedVersion: 2
-        x: 6
-        y: 6
-        width: 52
-        height: 52
+        x: 0
+        y: 16
+        width: 930
+        height: 963
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b8be5928c4ce1a210800000000000000
-      internalID: 1342613977285651339
+      spriteID: bb45c3367681756f0800000000000000
+      internalID: -696060785079855941
       vertices: []
       indices: 
       edges: []
@@ -125,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Attack_Right_64x64_0: 1342613977285651339
+      ChatGPT Image Oct 13, 2025, 08_34_10 PM_0: -696060785079855941
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

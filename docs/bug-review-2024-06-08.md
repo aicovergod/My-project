@@ -1,0 +1,15 @@
+# Bug Audit 2024-06-08
+
+The following issues were identified while reviewing the project. Each entry lists the impacted assets and a recommended fix.
+
+
+2. **Direct-open shops fail on non-mouse inputs** – `NpcShopOpener` relies on `OnMouseEnter/Exit` to track hover before allowing the Open Menu action, so controllers and touch can’t open shops that skip the context menu. Switch to pointer interfaces (e.g., `IPointerEnterHandler`) or action-based proximity checks. (File: `Assets/Scripts/NPC/Interaction/NpcShopOpener.cs`).
+3. **NPC context menu is locked behind mouse hover** – `NpcInteractable` uses the same `OnMouseEnter` gate, preventing the Open Menu action from firing on touch/gamepad and forcing the menu to appear at a screen-center fallback position. Use pointer events or proximity checks so the action works across input devices. (File: `Assets/Scripts/NPC/Interaction/NpcInteractable.cs`).
+
+6. **`GameManager.Instance` is never cleared** – `GameManager.OnDestroy` stops autosaves but leaves the static `Instance` pointing at a destroyed object, breaking later service lookups after scene reloads or domain restarts. Reset `Instance` (and optionally `ServicesReady`) during teardown. (File: `Assets/Scripts/Core/GameManager.cs`).
+7. **`QuestManager.Instance` also lingers after destruction** – the quest manager unregisters from `SaveManager` but does not clear the singleton reference, so callers can hit a dead instance and throw. Clear `Instance` inside `OnDestroy`. (File: `Assets/Scripts/Quests/QuestManager.cs`).
+8. **`QuestUI` never unsubscribes from `QuestsUpdated`** – the UI registers its refresh listener in `Start` but never removes it, so destroyed canvases stay in the event list and keep quest managers alive. Unsubscribe in `OnDestroy` (and guard against a missing manager). (File: `Assets/Scripts/Quests/QuestUI.cs`).
+9. **Reapplying consumable buffs raises the wrong event** – `ItemUseResolver` calls `BuffEvents.RaiseBuffApplied` when `refreshOnReapply` is true, swapping the intended refresh/apply semantics. Flip the branch so “refresh” actually refreshes. (File: `Assets/Scripts/Inventory/ItemUseResolver.cs`).
+10. **Quest UI refresh assumes the manager always exists** – `QuestUI.Refresh` immediately dereferences `QuestManager.Instance`, so opening the journal in scenes without the quest system throws. Add a null guard (and optionally hide the panel) when the manager is absent. (File: `Assets/Scripts/Quests/QuestUI.cs`).
+
+Each task should be verified in Play Mode after implementation to confirm the UI and economy flows operate correctly across mouse, keyboard, controller, and touch input.
