@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:214f419d00df277a99bab71c5e5685746ca9071a -->
+## 2025-10-14T16:38:24+01:00 — Prevent bank tooltip from collapsing inventory helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Inventory.cs
+- Diff: 12 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:bc4cc583603cf2e57b6a7b1946c9fe86499c5f7c -->
 ## 2025-10-14T12:52:39+01:00 — Merge pull request #1121 from aicovergod/codex/fix-pet-drop-functionality
 
