@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:427b22ab90433341387cf9de2afd9c2e590d1464 -->
+## 2025-10-14T12:28:03+01:00 — Merge pull request #1119 from aicovergod/codex/remove-spawngrounditem-invocation-from-dropitem
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 9 ++ / 1 --
+- Notes:
+  Stop spawning ground item pickups when dropping inventory items
+---
+<!-- commit:ba57b4514eab02b577ab69c12dc233666b97100a -->
+## 2025-10-14T12:27:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ac4054ef01910405df31583489609c43229d7f48 -->
 ## 2025-10-14T12:27:42+01:00 — Remove ground item spawn during inventory drop
 
