@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7d29ef8381fc83e760a40f910ed51f9088841018 -->
+## 2025-10-14T21:25:59+01:00 — Ensure ground item pickups rebind PlayerMover
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 25 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:29b61d11b9f9b31e819e640dc542637dd93a1e62 -->
 ## 2025-10-14T21:06:12+01:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
 
