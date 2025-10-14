@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f1ddfabc68ba55dbde579616434d3e86185c5632 -->
+## 2025-10-14T10:08:20+01:00 — Merge pull request #1115 from aicovergod/codex/fix-missing-showtooltip-and-hidetooltip-methods
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 64 ++ / 7 --
+- Notes:
+  Restore inventory tooltip access for bank UI
+---
+<!-- commit:9ae0a596ce1d8b7ce8dd905e0c1afaeb4005a94d -->
+## 2025-10-14T10:08:06+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b9f43d24c8edb876baff09c92879b5e64915ac32 -->
 ## 2025-10-14T10:07:52+01:00 — Restore inventory tooltip access for bank UI
 
