@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using Inventory;
 using Player;
 using UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using InventoryComponent = global::Inventory.Inventory;
 
 namespace Inventory.GroundItems
 {
@@ -27,7 +27,7 @@ namespace Inventory.GroundItems
         [Header("References")]
         [SerializeField]
         [Tooltip("Primary player inventory. Auto-assigned if left null.")]
-        private Inventory.Inventory playerInventory;
+        private InventoryComponent playerInventory;
 
         [SerializeField]
         [Tooltip("Player auto-movement service responsible for pathing to ground items.")]
@@ -100,7 +100,7 @@ namespace Inventory.GroundItems
 
             instance = this;
 
-            playerInventory ??= FindObjectOfType<Inventory.Inventory>(true);
+            playerInventory ??= FindObjectOfType<InventoryComponent>(true);
             playerMover ??= FindObjectOfType<PlayerMover>(true);
             worldCamera ??= Camera.main;
 
@@ -374,7 +374,7 @@ namespace Inventory.GroundItems
         private void AttemptCollection(ItemPickup pickup)
         {
             if (playerInventory == null)
-                playerInventory = FindObjectOfType<Inventory.Inventory>(true);
+                playerInventory = FindObjectOfType<InventoryComponent>(true);
 
             if (playerInventory == null)
             {
