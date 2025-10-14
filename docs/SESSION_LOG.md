@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:01b5e92804a5b12d738745fb3c83e8f861f214ed -->
+## 2025-10-14T17:39:02+01:00 — Merge pull request #1125 from aicovergod/codex/adjust-tryopenwindow-for-inventory-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 18 ++ / 0 --
+- Notes:
+  Allow dedicated inventories to coexist with shared inventory
+---
+<!-- commit:8febaeb2f1586c58218f0aca861e16b852512d28 -->
+## 2025-10-14T17:38:53+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f1feb1d312ab3f3aa12bf70904c2953a5dac1fb3 -->
 ## 2025-10-14T17:38:38+01:00 — Allow dedicated inventories to coexist
 
