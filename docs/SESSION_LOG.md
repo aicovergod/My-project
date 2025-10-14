@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:298173382a080ed8b0d487140199bec291962f1e -->
+## 2025-10-14T12:39:53+01:00 — Allow dedicated inventories to bypass tab mutex
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/UI/Utilities/InterfaceTabMutexUtility.cs
+- Diff: 14 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:427b22ab90433341387cf9de2afd9c2e590d1464 -->
 ## 2025-10-14T12:28:03+01:00 — Merge pull request #1119 from aicovergod/codex/remove-spawngrounditem-invocation-from-dropitem
 
