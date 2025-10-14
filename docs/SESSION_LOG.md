@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:bc4cc583603cf2e57b6a7b1946c9fe86499c5f7c -->
+## 2025-10-14T12:52:39+01:00 — Merge pull request #1121 from aicovergod/codex/fix-pet-drop-functionality
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 29 ++ / 0 --
+- Notes:
+  Fix pet drops spawning pets
+---
+<!-- commit:5dbd3160154cc87ce21a623c67ccae33004260df -->
+## 2025-10-14T12:52:32+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:5d2b3eaee0e5242f1c4557d5adfb4eb133ea79d3 -->
 ## 2025-10-14T12:52:19+01:00 — Fix pet summon when dropping pet items
 
