@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ac4054ef01910405df31583489609c43229d7f48 -->
+## 2025-10-14T12:27:42+01:00 — Remove ground item spawn during inventory drop
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 0 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:8ce45fc8e94cd3cd68c1bbcac049ae1d5721a19e -->
 ## 2025-10-14T11:04:39+01:00 — Merge pull request #1118 from aicovergod/codex/update-drag-icon-logic-in-inventory
 
