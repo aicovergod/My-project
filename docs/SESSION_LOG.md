@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8ce45fc8e94cd3cd68c1bbcac049ae1d5721a19e -->
+## 2025-10-14T11:04:39+01:00 — Merge pull request #1118 from aicovergod/codex/update-drag-icon-logic-in-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 22 ++ / 1 --
+- Notes:
+  Fix drag icon parenting on inactive shared canvas
+---
+<!-- commit:b0c76c540edb9a73dd0f65a32b686871f215baea -->
+## 2025-10-14T11:04:33+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2040833f8591dfedf26ebeeb041a64830b11d717 -->
 ## 2025-10-14T11:04:16+01:00 — Fix drag icon parenting on inactive shared canvas
 
