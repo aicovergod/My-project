@@ -53,6 +53,10 @@ namespace Inventory.Core
 
         private Shop currentShop;
 
+        // Tracks whether a close operation is already in progress so nested
+        // calls originating from pet storage do not recurse indefinitely.
+        private bool isClosing;
+
         private bool controllerEventsSubscribed;
         private bool questEventsSubscribed;
 
@@ -209,10 +213,22 @@ namespace Inventory.Core
             if (owner.BankOpen || HasActiveShop)
                 return;
 
-            controller.Hide();
-            controller.DismissTooltip();
-            controller.DismissDropMenu();
-            ClosePetStorage();
+            if (isClosing)
+                return;
+
+            isClosing = true;
+
+            try
+            {
+                controller.Hide();
+                controller.DismissTooltip();
+                controller.DismissDropMenu();
+                ClosePetStorage();
+            }
+            finally
+            {
+                isClosing = false;
+            }
         }
 
         /// <summary>
@@ -708,6 +724,9 @@ namespace Inventory.Core
             if (storage == null)
                 return;
 
+            if (IsLocalPetStorage(storage))
+                return;
+
             if (!owner.BankOpen)
             {
                 if (PetDropSystem.PetInventoryVisible)
@@ -725,7 +744,26 @@ namespace Inventory.Core
         {
             var pet = PetDropSystem.ActivePetObject;
             var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
-            storage?.Close();
+            if (storage == null)
+                return;
+
+            if (IsLocalPetStorage(storage))
+                return;
+
+            storage.Close();
+        }
+
+        /// <summary>
+        ///     Determines whether the supplied pet storage component belongs to this inventory instance.
+        ///     Pet storage inventories should not try to close themselves when propagating visibility changes,
+        ///     otherwise recursive close calls will overflow the stack.
+        /// </summary>
+        private bool IsLocalPetStorage(PetStorage storage)
+        {
+            if (storage == null)
+                return false;
+
+            return owner != null && owner.TryGetComponent(out PetStorage localStorage) && ReferenceEquals(storage, localStorage);
         }
 
         private void ShowFailureMessage(string message)
