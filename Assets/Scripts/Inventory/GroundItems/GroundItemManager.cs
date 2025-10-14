@@ -217,6 +217,23 @@ namespace Inventory.GroundItems
             raycaster.eventMask = itemRaycastMask;
         }
 
+        private bool EnsurePlayerMover()
+        {
+            if (playerMover != null)
+                return true;
+
+            playerMover = FindObjectOfType<PlayerMover>(true);
+            if (playerMover != null)
+            {
+                if (enableDebugLogging)
+                    Debug.Log("[GroundItemManager] Resolved PlayerMover reference at runtime.");
+                return true;
+            }
+
+            Debug.LogWarning("[GroundItemManager] PlayerMover reference missing; cannot auto-pickup.");
+            return false;
+        }
+
         private List<ItemPickup> GetPickupsOnTile(Vector2Int tile)
         {
             if (!pickupsByTile.TryGetValue(tile, out var list))
@@ -309,6 +326,8 @@ namespace Inventory.GroundItems
             if (pickup == null)
                 return;
 
+            EnsurePlayerMover();
+
             if (playerMover == null)
             {
                 if (enableDebugLogging)
@@ -333,6 +352,12 @@ namespace Inventory.GroundItems
             void OnArrived()
             {
                 arrivalCallbackTriggered = true;
+            }
+
+            if (!EnsurePlayerMover())
+            {
+                AbortActivePickup("Cannot auto-pickup because the PlayerMover could not be located.");
+                yield break;
             }
 
             playerMover.MoveTo(targetTileCenter, pickupStopDistance, OnArrived);
