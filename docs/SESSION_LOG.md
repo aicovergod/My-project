@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:de1e5bb10d9232054f195c01745056691ed510d1 -->
+## 2025-10-14T21:35:07+01:00 — Handle inactive player mover during ground item pickups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 28 ++ / 11 --
+- Notes:
+  —
+---
 <!-- commit:4090a2e620df0947b3c3a7d4ea046ffff2ecc5e4 -->
 ## 2025-10-14T21:26:19+01:00 — Merge pull request #1128 from aicovergod/codex/add-player-mover-resolution-helper
 

@@ -219,18 +219,37 @@ namespace Inventory.GroundItems
 
         private bool EnsurePlayerMover()
         {
-            if (playerMover != null)
-                return true;
-
-            playerMover = FindObjectOfType<PlayerMover>(true);
+            // When the cached mover reference exists but is currently inactive we should
+            // treat it as unresolved so we can search for an active instance instead of
+            // trying to issue movement commands against a disabled component.
             if (playerMover != null)
             {
+                bool moverActive = playerMover.isActiveAndEnabled && playerMover.gameObject.activeInHierarchy;
+                if (moverActive)
+                    return true;
+
                 if (enableDebugLogging)
-                    Debug.Log("[GroundItemManager] Resolved PlayerMover reference at runtime.");
-                return true;
+                    Debug.Log("[GroundItemManager] Cached PlayerMover was inactive; attempting to reacquire an active instance.");
+
+                playerMover = null;
             }
 
-            Debug.LogWarning("[GroundItemManager] PlayerMover reference missing; cannot auto-pickup.");
+            // Search the scene for an active mover. We include inactive objects in the
+            // search so we can verify their state before use and pick the first active
+            // candidate that is ready to accept movement requests.
+            var movers = FindObjectsOfType<PlayerMover>(true);
+            foreach (var mover in movers)
+            {
+                if (mover != null && mover.isActiveAndEnabled && mover.gameObject.activeInHierarchy)
+                {
+                    playerMover = mover;
+                    if (enableDebugLogging)
+                        Debug.Log("[GroundItemManager] Resolved active PlayerMover reference at runtime.");
+                    return true;
+                }
+            }
+
+            Debug.LogWarning("[GroundItemManager] PlayerMover reference missing or inactive; cannot auto-pickup.");
             return false;
         }
 
@@ -326,12 +345,10 @@ namespace Inventory.GroundItems
             if (pickup == null)
                 return;
 
-            EnsurePlayerMover();
-
-            if (playerMover == null)
+            if (!EnsurePlayerMover())
             {
                 if (enableDebugLogging)
-                    Debug.LogWarning("[GroundItemManager] Cannot auto-pickup without a PlayerMover reference.");
+                    Debug.LogWarning("[GroundItemManager] Cannot auto-pickup without an active PlayerMover reference.");
                 return;
             }
 
