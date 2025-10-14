@@ -1,20 +1,10 @@
 // Assets/Scripts/Inventory/Core/InventoryModel.cs
 using System;
 using UnityEngine;
+using Inventory;
 
 namespace Inventory.Core
 {
-    /// <summary>
-    /// Represents a single inventory slot entry consisting of the stored item
-    /// reference and the current stack count.
-    /// </summary>
-    [Serializable]
-    public struct InventoryEntry
-    {
-        public ItemData item;
-        public int count;
-    }
-
     /// <summary>
     /// Data-oriented model that owns the inventory slot array and exposes the
     /// mutation APIs used by <see cref="Inventory.Inventory"/>. The model raises
