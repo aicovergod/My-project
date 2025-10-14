@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b56248a420dc70130d9eeb9592686c6d5981505e -->
+## 2025-10-14T10:19:29+01:00 — Prevent pet storage close recursion
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 43 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:f1ddfabc68ba55dbde579616434d3e86185c5632 -->
 ## 2025-10-14T10:08:20+01:00 — Merge pull request #1115 from aicovergod/codex/fix-missing-showtooltip-and-hidetooltip-methods
 
