@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a1c873b1916def4632d093e518e7f41ed518aa9a -->
+## 2025-10-14T20:25:23+01:00 — Merge pull request #1126 from aicovergod/codex/implement-osrs-style-item-pickup-behavior
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 925 ++ / 18 --
+- Notes:
+  Add OSRS-style ground item pickup flow
+---
+<!-- commit:08c74b41e5491a51aa3bc0cbc15c05fe0f171377 -->
+## 2025-10-14T20:24:45+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2d3cad2828ac42690672ff4d45efb93e6b55aecf -->
 ## 2025-10-14T20:24:32+01:00 — Add ground item pickup manager and menu
 
