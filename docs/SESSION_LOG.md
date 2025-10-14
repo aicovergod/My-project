@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f1feb1d312ab3f3aa12bf70904c2953a5dac1fb3 -->
+## 2025-10-14T17:38:38+01:00 — Allow dedicated inventories to coexist
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/UIManager.cs
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:dede02659799313805a6ccf1ddf0c347b638eb7f -->
 ## 2025-10-14T17:28:10+01:00 — Merge pull request #1124 from aicovergod/codex/add-resolveplayerinventory-helper-in-bankui
 
