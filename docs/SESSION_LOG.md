@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8e0f0a752e454a5549fbba5014d454f03324b97f -->
+## 2025-10-14T21:35:30+01:00 — Merge pull request #1129 from aicovergod/codex/update-grounditemmanager-for-inactive-player-mover
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 37 ++ / 11 --
+- Notes:
+  Handle inactive player mover during ground item pickups
+---
+<!-- commit:7ac68d8a006394907407e2871462e0fc270c1080 -->
+## 2025-10-14T21:35:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:de1e5bb10d9232054f195c01745056691ed510d1 -->
 ## 2025-10-14T21:35:07+01:00 — Handle inactive player mover during ground item pickups
 
