@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e9973ab5ba815ec27d8267903760da51e06bcd37 -->
+## 2025-10-14T09:41:55+01:00 — Restore inventory entry struct and fix handler dependencies
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Inventory/Core/InventoryModel.cs, Assets/Scripts/Inventory/InventoryEntry.cs, Assets/Scripts/Inventory/InventoryEntry.cs.meta
+- Diff: 38 ++ / 11 --
+- Notes:
+  —
+---
 <!-- commit:ac40953baed27931428a442e3d3e819f16f211ec -->
 ## 2025-10-13T23:18:10+01:00 — Merge pull request #1112 from aicovergod/codex/refactor-inventory-for-new-architecture
 
