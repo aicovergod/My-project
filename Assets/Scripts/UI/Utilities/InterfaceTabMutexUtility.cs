@@ -54,7 +54,17 @@ namespace UI.Utilities
             if (window is Inventory.Inventory inventoryWindow && !inventoryWindow.useSharedUIRoot)
             {
                 // Dedicated inventories (pet storage, contextual bags, etc.) do not participate in the
-                // shared tab root and should never be forced closed by the mutex logic.
+                // shared tab root and should never be forced closed by the mutex logic. However, the
+                // FindObjectOfType lookup above can return one of these dedicated windows which means
+                // we still need to close the shared inventory window if it is currently visible.
+                Inventory.Inventory sharedInventoryWindow = FindSharedInventoryWindow(inventoryWindow, keepOpen);
+                if (sharedInventoryWindow == null)
+                    return;
+
+                if (!sharedInventoryWindow.IsOpen)
+                    return;
+
+                sharedInventoryWindow.Close();
                 return;
             }
 
@@ -62,6 +72,31 @@ namespace UI.Utilities
                 return;
 
             window.Close();
+        }
+
+        /// <summary>
+        /// Attempts to locate the shared inventory window when the provided inventory is a dedicated
+        /// instance (pet storage, contextual inventory, etc.).
+        /// </summary>
+        /// <param name="originalInventory">The inventory instance originally resolved by the mutex.</param>
+        /// <param name="keepOpen">Optional window that should remain open.</param>
+        /// <returns>The shared inventory window if one exists and should be closed.</returns>
+        private static Inventory.Inventory FindSharedInventoryWindow(Inventory.Inventory originalInventory, UI.IUIWindow keepOpen)
+        {
+            Inventory.Inventory[] allInventories = UnityEngine.Object.FindObjectsOfType<Inventory.Inventory>(true);
+            for (int i = 0; i < allInventories.Length; i++)
+            {
+                Inventory.Inventory candidate = allInventories[i];
+                if (!candidate.useSharedUIRoot)
+                    continue;
+
+                if (ReferenceEquals(candidate, keepOpen) || ReferenceEquals(candidate, originalInventory))
+                    continue;
+
+                return candidate;
+            }
+
+            return null;
         }
     }
 }
