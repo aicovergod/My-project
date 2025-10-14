@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2d3cad2828ac42690672ff4d45efb93e6b55aecf -->
+## 2025-10-14T20:24:32+01:00 — Add ground item pickup manager and menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs, Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs, Assets/Scripts/Inventory/ItemPickup.cs
+- Diff: 916 ++ / 18 --
+- Notes:
+  —
+---
 <!-- commit:01b5e92804a5b12d738745fb3c83e8f861f214ed -->
 ## 2025-10-14T17:39:02+01:00 — Merge pull request #1125 from aicovergod/codex/adjust-tryopenwindow-for-inventory-logic
 
