@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:17db658e614927d56c819e1cb3b6575b5df2e26a -->
+## 2025-10-14T16:39:04+01:00 — Merge pull request #1122 from aicovergod/codex/fix-bug-reported-by-codex
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 21 ++ / 3 --
+- Notes:
+  Fix bank tooltip collapsing inventory UI
+---
+<!-- commit:273cd7a27d2f8f38f59c082897069474da59c6d5 -->
+## 2025-10-14T16:38:46+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:214f419d00df277a99bab71c5e5685746ca9071a -->
 ## 2025-10-14T16:38:24+01:00 — Prevent bank tooltip from collapsing inventory helper
 
