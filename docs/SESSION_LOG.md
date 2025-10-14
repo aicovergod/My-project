@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c1cb43f34851ac7f9a786974b9df66702f4bc90e -->
+## 2025-10-14T16:44:36+01:00 — Merge pull request #1123 from aicovergod/codex/fix-bug-reported-by-codex-2r4bj7
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 45 ++ / 1 --
+- Notes:
+  Fix tab mutex handling with dedicated inventories
+---
+<!-- commit:515f836a6abd7ff2da744d09bee8bf51187eff3e -->
+## 2025-10-14T16:44:26+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:348323e49d03409d8bfef33f8295961e0e00a4ed -->
 ## 2025-10-14T16:44:10+01:00 — Fix tab mutex handling with dedicated inventories
 
