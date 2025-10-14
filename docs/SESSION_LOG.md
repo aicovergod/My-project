@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4090a2e620df0947b3c3a7d4ea046ffff2ecc5e4 -->
+## 2025-10-14T21:26:19+01:00 — Merge pull request #1128 from aicovergod/codex/add-player-mover-resolution-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 34 ++ / 0 --
+- Notes:
+  Ensure GroundItemManager rebinds PlayerMover before pickups
+---
+<!-- commit:f095e49b72834e74fd2d2c4c12ed2c4067771c0f -->
+## 2025-10-14T21:26:12+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7d29ef8381fc83e760a40f910ed51f9088841018 -->
 ## 2025-10-14T21:25:59+01:00 — Ensure ground item pickups rebind PlayerMover
 
