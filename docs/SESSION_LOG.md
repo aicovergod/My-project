@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:348323e49d03409d8bfef33f8295961e0e00a4ed -->
+## 2025-10-14T16:44:10+01:00 — Fix tab mutex handling with dedicated inventories
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Utilities/InterfaceTabMutexUtility.cs
+- Diff: 36 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:17db658e614927d56c819e1cb3b6575b5df2e26a -->
 ## 2025-10-14T16:39:04+01:00 — Merge pull request #1122 from aicovergod/codex/fix-bug-reported-by-codex
 
