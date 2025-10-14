@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ad08b91d5808c051964b5e96e4413a8694355108 -->
+## 2025-10-14T09:52:40+01:00 — Fix inventory handler type references
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs
+- Diff: 12 ++ / 10 --
+- Notes:
+  —
+---
 <!-- commit:173fad1ce73161c1cf6c6bfec9fc5dd4e81cda90 -->
 ## 2025-10-14T09:42:30+01:00 — Merge pull request #1113 from aicovergod/codex/fix-bugs-in-codex-connector
 
