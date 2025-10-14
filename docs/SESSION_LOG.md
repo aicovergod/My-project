@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:173fad1ce73161c1cf6c6bfec9fc5dd4e81cda90 -->
+## 2025-10-14T09:42:30+01:00 — Merge pull request #1113 from aicovergod/codex/fix-bugs-in-codex-connector
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 47 ++ / 11 --
+- Notes:
+  Restore InventoryEntry struct and fix missing Books namespace
+---
+<!-- commit:3b31da4fbb92651a0e0884b3c8d3540905f1db7e -->
+## 2025-10-14T09:42:09+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:e9973ab5ba815ec27d8267903760da51e06bcd37 -->
 ## 2025-10-14T09:41:55+01:00 — Restore inventory entry struct and fix handler dependencies
 
