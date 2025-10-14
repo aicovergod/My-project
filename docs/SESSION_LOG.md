@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c7b7163dca95a37d36048e25d0eb13e10a9afcf6 -->
+## 2025-10-14T20:40:10+01:00 — Fix ground item manager inventory reference
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 4 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:a1c873b1916def4632d093e518e7f41ed518aa9a -->
 ## 2025-10-14T20:25:23+01:00 — Merge pull request #1126 from aicovergod/codex/implement-osrs-style-item-pickup-behavior
 
