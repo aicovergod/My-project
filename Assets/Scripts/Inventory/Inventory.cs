@@ -285,7 +285,9 @@ namespace Inventory
             if (item == null || slotRect == null)
                 return;
 
-            EnsureInitialized();
+            // Ensure the controller exists and immediately reopen modal windows so bank/shop
+            // hover requests can surface tooltip data without collapsing the helper canvas.
+            EnsureInitialized(allowModalReopen: true);
             windowController?.ShowTooltipForItem(item, slotRect);
         }
 
@@ -320,7 +322,11 @@ namespace Inventory
         /// <summary>
         /// Ensures runtime data structures exist before the inventory participates in save/load.
         /// </summary>
-        private void EnsureInitialized()
+        /// <param name="allowModalReopen">
+        /// True to reopen the inventory window immediately when modal flows such as the bank or
+        /// shop are active so tooltip-only callers do not collapse the hover helper.
+        /// </param>
+        private void EnsureInitialized(bool allowModalReopen = false)
         {
             size = Mathf.Max(1, size);
 
@@ -382,7 +388,10 @@ namespace Inventory
             interactionHandler.RefreshControllerState();
             windowController.SetSelectedIndex(selectedIndex);
             windowController.RefreshAllSlots();
-            if (wasOpen)
+            bool shouldReopenForModal = allowModalReopen &&
+                                        (BankOpen || (interactionHandler != null && interactionHandler.HasActiveShop));
+
+            if (wasOpen || shouldReopenForModal)
                 interactionHandler?.RequestOpen();
             else
                 windowController.Hide();
