@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d28475e7a427d039773914f28e55acc7b34da14b -->
+## 2025-10-14T10:43:56+01:00 — Ensure inventory UI rebuilds on runtime config changes
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs, Assets/Scripts/Pets/PetStorage.cs
+- Diff: 156 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:f240c52b2d783579234e50a59c6c84eafac854b3 -->
 ## 2025-10-14T10:19:52+01:00 — Merge pull request #1116 from aicovergod/codex/fix-stack-overflow-on-inventory-close
 
