@@ -645,7 +645,6 @@ namespace Inventory.Core
             if (owner.selectedIndex == slotIndex && model.GetEntry(slotIndex).item == null)
                 ClearSelection();
 
-            SpawnGroundItem(entry.item, dropAmount);
             controller.DismissTooltip();
         }
 
