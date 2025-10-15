@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:67d5049a72c48351c2e78007513a4b5911f7ab5f -->
+## 2025-10-15T20:35:41+01:00 — Merge pull request #1140 from aicovergod/codex/update-grounditemmanager-to-sort-pickups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 1 --
+- Notes:
+  Ensure ground item pickups prioritize newest spawns
+---
+<!-- commit:1e5bf0e3b0935043847ba6341adfa45e466caf7f -->
+## 2025-10-15T20:35:27+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:e693a6f09d0c9db7815bcd986dbc0bd6be2d2a9e -->
 ## 2025-10-15T20:35:11+01:00 — Sort ground item pickups by newest spawn order
 
