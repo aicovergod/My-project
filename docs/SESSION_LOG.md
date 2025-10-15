@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9e37ea5b0482b08ba149599d3cb895faad7de133 -->
+## 2025-10-15T20:15:17+01:00 — Refactor context menus to shared base helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Bank/BankDepositMenu.cs, Assets/Scripts/Bank/BankWithdrawMenu.cs, Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs, Assets/Scripts/Inventory/InventoryDropMenu.cs, Assets/Scripts/UI/ContextMenus.meta, Assets/Scripts/UI/ContextMenus/ContextMenuBase.cs, Assets/Scripts/UI/ContextMenus/ContextMenuBase.cs.meta
+- Diff: 284 ++ / 155 --
+- Notes:
+  —
+---
 <!-- commit:4042b82b09305f135da21d19c1062cca70b706e4 -->
 ## 2025-10-15T19:59:52+01:00 — Merge pull request #1138 from aicovergod/codex/add-camera-refresh-helper-to-grounditemmanager
 
