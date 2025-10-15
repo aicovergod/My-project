@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:77bb5dc88f8ae208722ade3e7ee8abb364b966de -->
+## 2025-10-15T14:18:06+01:00 — Prevent ground item menu from closing before layout
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs
+- Diff: 13 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:df473fff1b55cc320e04e06685dc4212bed2aa6f -->
 ## 2025-10-15T12:13:47+01:00 — Merge pull request #1132 from aicovergod/codex/reduce-size-of-right-click-menu
 

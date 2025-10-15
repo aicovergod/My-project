@@ -56,6 +56,7 @@ namespace Inventory.GroundItems
 
         private Action<ItemPickup> onOptionSelected;
         private Vector2 lastRequestedScreenPosition;
+        private bool deferSafeZoneEvaluation;
 
         /// <summary>Pixels of cursor leeway before the menu auto-closes.</summary>
         public float SafePadding { get; set; } = 12f;
@@ -104,6 +105,16 @@ namespace Inventory.GroundItems
             if (!gameObject.activeSelf)
                 return;
 
+            if (deferSafeZoneEvaluation)
+            {
+                // Allow one frame for Show() to rebuild and reposition before we begin
+                // evaluating cursor bounds. Without this guard the first Update executes
+                // while the menu is still at its hidden origin which makes the cursor
+                // appear outside the safe zone and immediately closes the popup.
+                deferSafeZoneEvaluation = false;
+                return;
+            }
+
             bool isCursorInSafeZone = IsCursorWithinSafeZone(out bool isCursorInsideMenu);
             if (!isCursorInSafeZone)
             {
@@ -133,6 +144,7 @@ namespace Inventory.GroundItems
             currentPickups.Clear();
             currentPickups.AddRange(pickups);
             lastRequestedScreenPosition = screenPosition;
+            deferSafeZoneEvaluation = true;
 
             gameObject.SetActive(true);
             RebuildOptions();
@@ -169,6 +181,7 @@ namespace Inventory.GroundItems
             gameObject.SetActive(false);
             currentPickups.Clear();
             onOptionSelected = null;
+            deferSafeZoneEvaluation = false;
 
             foreach (var entry in optionEntries)
             {
