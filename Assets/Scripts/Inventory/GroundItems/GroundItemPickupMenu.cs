@@ -31,6 +31,10 @@ namespace Inventory.GroundItems
         private float minimumWidth = 180f;
 
         [SerializeField]
+        [Tooltip("Uniform scale applied to the entire menu. Use values below 1 to shrink the window.")]
+        private float menuScale = 0.5f;
+
+        [SerializeField]
         [Tooltip("Vertical spacing between options.")]
         private float optionSpacing = 2f;
 
@@ -85,6 +89,14 @@ namespace Inventory.GroundItems
 
             BuildMenuRoot();
             gameObject.SetActive(false);
+        }
+
+        private void OnValidate()
+        {
+            if (menuRect == null)
+                return;
+
+            ApplyMenuScale();
         }
 
         private void Update()
@@ -176,6 +188,8 @@ namespace Inventory.GroundItems
             menuRect.anchorMax = new Vector2(0f, 1f);
             menuRect.pivot = new Vector2(0f, 1f);
             menuRect.sizeDelta = new Vector2(minimumWidth, 0f);
+
+            ApplyMenuScale();
 
             var image = menuGO.GetComponent<Image>();
             image.color = backgroundColor;
@@ -304,10 +318,12 @@ namespace Inventory.GroundItems
 
             Vector2 size = menuRect.rect.size;
             size.x = Mathf.Max(size.x, minimumWidth);
+            Vector3 lossyScale = menuRect.lossyScale;
+            Vector2 scaledSize = new Vector2(size.x * lossyScale.x, size.y * lossyScale.y);
 
             float minX = 0f;
-            float maxX = Screen.width - size.x;
-            float minY = size.y;
+            float maxX = Mathf.Max(minX, Screen.width - scaledSize.x);
+            float minY = Mathf.Min(Screen.height, scaledSize.y);
             float maxY = Screen.height;
 
             Vector2 clamped = new Vector2(
@@ -334,6 +350,13 @@ namespace Inventory.GroundItems
             paddedRect.yMax += SafePadding;
 
             return paddedRect.Contains(local);
+        }
+
+        /// <summary>Applies the serialized scale to the menu root so designers can resize it.</summary>
+        private void ApplyMenuScale()
+        {
+            float clampedScale = Mathf.Max(0.01f, menuScale);
+            menuRect.localScale = new Vector3(clampedScale, clampedScale, 1f);
         }
     }
 }
