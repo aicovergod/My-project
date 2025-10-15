@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7de30d4ef191040750bb9a3742890f9e366a9a34 -->
+## 2025-10-15T09:34:26+01:00 — Merge pull request #1131 from aicovergod/codex/fix-bug-found-in-codex-review
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 25 ++ / 13 --
+- Notes:
+  Respect manual movement when auto-picking ground items
+---
+<!-- commit:d5850b88f1cdde7c03a9297cbde68d0e48ba7df0 -->
+## 2025-10-15T09:34:08+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:93bb9dcab4e69c50cf539c4070e6be5ac53a1d64 -->
 ## 2025-10-15T09:33:55+01:00 — Respect manual movement when auto-picking ground items
 
