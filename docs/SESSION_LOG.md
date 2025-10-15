@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4042b82b09305f135da21d19c1062cca70b706e4 -->
+## 2025-10-15T19:59:52+01:00 — Merge pull request #1138 from aicovergod/codex/add-camera-refresh-helper-to-grounditemmanager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 78 ++ / 3 --
+- Notes:
+  Recover ground item manager world camera after scene changes
+---
+<!-- commit:c84ff8c00444fb1ad40fc0aa17457ba87e4c25a9 -->
+## 2025-10-15T19:59:17+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:66f16231c64e39c108a4ae57aaf564ecdc6f2459 -->
 ## 2025-10-15T19:59:04+01:00 — Ensure ground item manager refreshes world camera
 
