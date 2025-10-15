@@ -256,8 +256,14 @@ namespace Inventory.GroundItems
             }
         }
 
-        /// <summary>Processes a left-click on a ground item and opens the selection menu if necessary.</summary>
-        public void HandlePickupClick(ItemPickup pickup, Vector3 clickScreenPosition)
+        /// <summary>
+        /// Processes a pointer click on a ground item, dispatching between left/right behaviour to
+        /// mirror OSRS interactions (left: quick-take, right: show context menu).
+        /// </summary>
+        /// <param name="pickup">Pickup that received the pointer event.</param>
+        /// <param name="clickScreenPosition">Screen position of the pointer event.</param>
+        /// <param name="button">Button that triggered the pointer event.</param>
+        public void HandlePickupClick(ItemPickup pickup, Vector3 clickScreenPosition, PointerEventData.InputButton button)
         {
             if (pickup == null)
                 return;
@@ -276,14 +282,26 @@ namespace Inventory.GroundItems
                 return;
             }
 
-            if (pickups.Count == 1)
+            switch (button)
             {
-                HideMenu();
-                BeginPickupRoutine(pickups[0]);
-                return;
-            }
+                case PointerEventData.InputButton.Left:
+                    if (pickups.Count == 1)
+                    {
+                        HideMenu();
+                        BeginPickupRoutine(pickups[0]);
+                        return;
+                    }
 
-            ShowMenu(tile, pickups, clickScreenPosition);
+                    ShowMenu(tile, pickups, clickScreenPosition);
+                    break;
+                case PointerEventData.InputButton.Right:
+                    ShowMenu(tile, pickups, clickScreenPosition);
+                    break;
+                default:
+                    if (enableDebugLogging)
+                        Debug.Log($"[GroundItemManager] Ignored unsupported pointer button {button} for pickup {pickup.name}.");
+                    break;
+            }
         }
 
         private void EnsurePhysicsRaycaster()
