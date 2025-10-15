@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:df473fff1b55cc320e04e06685dc4212bed2aa6f -->
+## 2025-10-15T12:13:47+01:00 — Merge pull request #1132 from aicovergod/codex/reduce-size-of-right-click-menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 34 ++ / 2 --
+- Notes:
+  Scale ground item context menu to half size
+---
+<!-- commit:b11564d2cc49aceceb9b6e3850718fa6d14ff802 -->
+## 2025-10-15T12:13:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:05f23376526dd9a6e1e3081e658f33ed32ecce53 -->
 ## 2025-10-15T12:13:23+01:00 — Scale ground item context menu to half size
 
