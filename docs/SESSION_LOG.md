@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e693a6f09d0c9db7815bcd986dbc0bd6be2d2a9e -->
+## 2025-10-15T20:35:11+01:00 — Sort ground item pickups by newest spawn order
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 15 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:ad9f6f23f3e512bfe87e4f707cbb9d5884e450c8 -->
 ## 2025-10-15T20:17:00+01:00 — Merge pull request #1139 from aicovergod/codex/create-shared-base-class-for-context-menus
 
