@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3de5a831d54d8712999293c7cfc9b2bc5fe71440 -->
+## 2025-10-15T21:49:56+01:00 — Support right-click menus on ground items
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs, Assets/Scripts/Inventory/ItemPickup.cs
+- Diff: 28 ++ / 10 --
+- Notes:
+  —
+---
 <!-- commit:67d5049a72c48351c2e78007513a4b5911f7ab5f -->
 ## 2025-10-15T20:35:41+01:00 — Merge pull request #1140 from aicovergod/codex/update-grounditemmanager-to-sort-pickups
 
