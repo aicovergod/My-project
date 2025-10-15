@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4fd0dfe1c55c749c77ad1a27e3fec401f0c89ec3 -->
+## 2025-10-16T00:19:23+01:00 — Merge pull request #1142 from aicovergod/codex/add-shared-helper-for-weapon-classification
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 139 ++ / 107 --
+- Notes:
+  Refine weapon classification keyword logic
+---
+<!-- commit:b517775de3d01d9b47e4a42187e244f3468d43a6 -->
+## 2025-10-16T00:19:00+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9bf4618ff3289a1078aefde280bea56cefabd8c9 -->
 ## 2025-10-16T00:18:49+01:00 — Refine weapon classification keyword logic
 
