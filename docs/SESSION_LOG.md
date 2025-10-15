@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:05f23376526dd9a6e1e3081e658f33ed32ecce53 -->
+## 2025-10-15T12:13:23+01:00 — Scale ground item context menu to half size
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs
+- Diff: 25 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:7de30d4ef191040750bb9a3742890f9e366a9a34 -->
 ## 2025-10-15T09:34:26+01:00 — Merge pull request #1131 from aicovergod/codex/fix-bug-found-in-codex-review
 
