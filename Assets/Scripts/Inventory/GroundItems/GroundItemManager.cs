@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Core;
@@ -314,10 +315,10 @@ namespace Inventory.GroundItems
             return false;
         }
 
-        private List<ItemPickup> GetPickupsOnTile(Vector2Int tile)
+        private IReadOnlyList<ItemPickup> GetPickupsOnTile(Vector2Int tile)
         {
             if (!pickupsByTile.TryGetValue(tile, out var list))
-                return new List<ItemPickup>();
+                return Array.Empty<ItemPickup>();
 
             // Remove any stale references before building the outgoing list.
             for (int i = list.Count - 1; i >= 0; i--)
@@ -329,12 +330,12 @@ namespace Inventory.GroundItems
             if (list.Count == 0)
             {
                 pickupsByTile.Remove(tile);
-                return new List<ItemPickup>();
+                return Array.Empty<ItemPickup>();
             }
 
             SortBySpawnOrder(list);
 
-            return new List<ItemPickup>(list);
+            return list;
         }
 
         private void SortBySpawnOrder(List<ItemPickup> pickups)
@@ -342,7 +343,7 @@ namespace Inventory.GroundItems
             pickups.Sort((a, b) => a.SpawnOrder.CompareTo(b.SpawnOrder));
         }
 
-        private void ShowMenu(Vector2Int tile, List<ItemPickup> pickups, Vector2 screenPosition)
+        private void ShowMenu(Vector2Int tile, IReadOnlyList<ItemPickup> pickups, Vector2 screenPosition)
         {
             EnsureMenuInstance();
             pickupMenu.SafePadding = menuSafePadding;

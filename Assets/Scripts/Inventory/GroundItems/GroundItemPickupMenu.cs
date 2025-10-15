@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -132,7 +133,7 @@ namespace Inventory.GroundItems
         }
 
         /// <summary>Displays the menu using the supplied pickup list.</summary>
-        public void Show(List<ItemPickup> pickups, Vector2 screenPosition, Action<ItemPickup> onOptionSelected)
+        public void Show(IReadOnlyList<ItemPickup> pickups, Vector2 screenPosition, Action<ItemPickup> onOptionSelected)
         {
             if (pickups == null || pickups.Count == 0)
             {
@@ -142,7 +143,7 @@ namespace Inventory.GroundItems
 
             this.onOptionSelected = onOptionSelected;
             currentPickups.Clear();
-            currentPickups.AddRange(pickups);
+            CopyIntoCurrentPickups(pickups);
             lastRequestedScreenPosition = screenPosition;
             deferSafeZoneEvaluation = true;
 
@@ -153,14 +154,14 @@ namespace Inventory.GroundItems
         }
 
         /// <summary>Updates the menu to reflect a new list of pickups while open.</summary>
-        public void RefreshFrom(List<ItemPickup> pickups)
+        public void RefreshFrom(IReadOnlyList<ItemPickup> pickups)
         {
             if (!gameObject.activeSelf)
                 return;
 
             currentPickups.Clear();
             if (pickups != null)
-                currentPickups.AddRange(pickups);
+                CopyIntoCurrentPickups(pickups);
 
             if (currentPickups.Count == 0)
             {
@@ -370,6 +371,31 @@ namespace Inventory.GroundItems
         {
             float clampedScale = Mathf.Max(0.01f, menuScale);
             menuRect.localScale = new Vector3(clampedScale, clampedScale, 1f);
+        }
+
+        /// <summary>
+        /// Copies the provided read-only pickup sequence into the reusable working list.
+        /// Utilises span-backed iteration when possible to avoid enumerator allocations.
+        /// </summary>
+        private void CopyIntoCurrentPickups(IReadOnlyList<ItemPickup> pickups)
+        {
+            if (pickups == null || pickups.Count == 0)
+                return;
+
+            if (pickups is List<ItemPickup> pickupList)
+            {
+                var span = CollectionsMarshal.AsSpan(pickupList);
+                for (int i = 0; i < span.Length; i++)
+                {
+                    currentPickups.Add(span[i]);
+                }
+                return;
+            }
+
+            for (int i = 0; i < pickups.Count; i++)
+            {
+                currentPickups.Add(pickups[i]);
+            }
         }
     }
 }
