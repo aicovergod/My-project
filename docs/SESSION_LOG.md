@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:93bb9dcab4e69c50cf539c4070e6be5ac53a1d64 -->
+## 2025-10-15T09:33:55+01:00 — Respect manual movement when auto-picking ground items
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 16 ++ / 13 --
+- Notes:
+  —
+---
 <!-- commit:ef777837f870a9c3a200f8e2469359f2ab4b8cfa -->
 ## 2025-10-14T21:47:57+01:00 — Merge pull request #1130 from aicovergod/codex/update-pickup-movement-to-item-position
 

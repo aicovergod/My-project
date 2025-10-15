@@ -392,6 +392,24 @@ namespace Inventory.GroundItems
 
                 activePickupLastKnownPosition = pickup.transform.position;
 
+                float distance = Vector2.Distance(playerMover.transform.position, pickup.transform.position);
+                if (distance <= pickup.PickupRadius + pickupStopDistance)
+                {
+                    AttemptCollection(pickup);
+                    yield break;
+                }
+
+                // Respect manual movement cancellation before we consider retargeting. If the
+                // player has issued their own movement command we should immediately abandon
+                // the auto pickup so the new command is honoured.
+                if (!playerMover.IsAutoMoving && !arrivalCallbackTriggered)
+                {
+                    if (enableDebugLogging)
+                        Debug.Log("[GroundItemManager] Auto pickup cancelled because the player interrupted movement.");
+                    CancelActivePickupRoutine();
+                    yield break;
+                }
+
                 // If the pickup is pushed or otherwise displaced while we are moving towards it,
                 // retarget the PlayerMover so we walk directly to the live world position instead
                 // of the tile center that was originally clicked.
@@ -403,21 +421,6 @@ namespace Inventory.GroundItems
                         lastIssuedDestination = currentDestination;
                         IssueMoveCommand(currentDestination, OnArrived);
                     }
-                }
-
-                float distance = Vector2.Distance(playerMover.transform.position, pickup.transform.position);
-                if (distance <= pickup.PickupRadius + pickupStopDistance)
-                {
-                    AttemptCollection(pickup);
-                    yield break;
-                }
-
-                if (!playerMover.IsAutoMoving && !arrivalCallbackTriggered)
-                {
-                    if (enableDebugLogging)
-                        Debug.Log("[GroundItemManager] Auto pickup cancelled because the player interrupted movement.");
-                    CancelActivePickupRoutine();
-                    yield break;
                 }
 
                 yield return null;
