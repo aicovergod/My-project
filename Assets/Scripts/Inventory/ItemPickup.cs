@@ -148,14 +148,14 @@ namespace Inventory
         /// <summary>Handles pointer clicks routed by the Physics2DRaycaster.</summary>
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (eventData == null || eventData.button != PointerEventData.InputButton.Left)
+            if (eventData == null)
                 return;
 
             manager ??= GroundItemManager.Instance;
             if (manager == null)
                 manager = FindObjectOfType<GroundItemManager>();
 
-            manager?.HandlePickupClick(this, eventData.position);
+            manager?.HandlePickupClick(this, eventData.position, eventData.button);
         }
 
         private void RegisterWithManager()
