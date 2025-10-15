@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0a12e41b519f16985a4c2ebf68e64f836ab8f7f8 -->
+## 2025-10-15T14:43:13+01:00 — Optimize ground item menu allocations
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs, Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs
+- Diff: 36 ++ / 9 --
+- Notes:
+  —
+---
 <!-- commit:144d81d08b8ec29658e6d9e2a0939321c3a29338 -->
 ## 2025-10-15T14:26:28+01:00 — Merge pull request #1135 from aicovergod/codex/add-rebinddependencies-method-in-grounditemmanager
 
