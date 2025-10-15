@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -384,10 +383,9 @@ namespace Inventory.GroundItems
 
             if (pickups is List<ItemPickup> pickupList)
             {
-                var span = CollectionsMarshal.AsSpan(pickupList);
-                for (int i = 0; i < span.Length; i++)
+                for (int i = 0; i < pickupList.Count; i++)
                 {
-                    currentPickups.Add(span[i]);
+                    currentPickups.Add(pickupList[i]);
                 }
                 return;
             }

@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1f4dcd394c692af6a84b06218408fe0607a12915 -->
+## 2025-10-15T19:23:55+01:00 — Remove CollectionsMarshal usage in ground item menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs
+- Diff: 2 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:bcea782be1e1845b8f25fc4a9087cf43e8f77678 -->
 ## 2025-10-15T14:43:40+01:00 — Merge pull request #1136 from aicovergod/codex/optimize-grounditemmanager-and-menu-methods
 
