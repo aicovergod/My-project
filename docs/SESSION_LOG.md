@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ad9f6f23f3e512bfe87e4f707cbb9d5884e450c8 -->
+## 2025-10-15T20:17:00+01:00 — Merge pull request #1139 from aicovergod/codex/create-shared-base-class-for-context-menus
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 293 ++ / 155 --
+- Notes:
+  Create shared context menu base for inventory and bank menus
+---
+<!-- commit:892a2bb72256db8e8eb93071adb1652f17df1fbd -->
+## 2025-10-15T20:16:38+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9e37ea5b0482b08ba149599d3cb895faad7de133 -->
 ## 2025-10-15T20:15:17+01:00 — Refactor context menus to shared base helper
 
