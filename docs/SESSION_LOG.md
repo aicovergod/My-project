@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e68f9c2f68847a76d4011038695142f9bbdd4471 -->
+## 2025-10-16T00:40:00+01:00 — Merge pull request #1143 from aicovergod/codex/fix-bug-identified-by-github-codex
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 59 ++ / 7 --
+- Notes:
+  Ensure magic damage type updates with spell selection
+---
+<!-- commit:83ffb30c393a017f1a393a71d21ece052c14e9da -->
+## 2025-10-16T00:39:47+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a455dc0b484db3580cf38df1fb325e05f6a8c15b -->
 ## 2025-10-16T00:39:35+01:00 — Fix magic damage type updates when swapping spells
 
