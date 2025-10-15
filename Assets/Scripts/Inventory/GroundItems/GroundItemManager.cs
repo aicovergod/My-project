@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using Core;
 using Player;
 using UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using World;
 using InventoryComponent = global::Inventory.Inventory;
 
 namespace Inventory.GroundItems
@@ -99,18 +101,96 @@ namespace Inventory.GroundItems
             }
 
             instance = this;
-
-            playerInventory ??= FindObjectOfType<InventoryComponent>(true);
-            playerMover ??= FindObjectOfType<PlayerMover>(true);
             worldCamera ??= Camera.main;
 
+            RebindDependencies();
+
             EnsurePhysicsRaycaster();
+        }
+
+        private void OnEnable()
+        {
+            GameManager.ServicesReady += OnPersistentServicesReady;
+            SceneTransitionManager.TransitionCompleted += OnSceneTransitionCompleted;
+        }
+
+        private void OnDisable()
+        {
+            GameManager.ServicesReady -= OnPersistentServicesReady;
+            SceneTransitionManager.TransitionCompleted -= OnSceneTransitionCompleted;
         }
 
         private void OnDestroy()
         {
             if (instance == this)
                 instance = null;
+        }
+
+        /// <summary>Rebinds cached references to the player mover and inventory without scanning the entire scene.</summary>
+        public void RebindDependencies()
+        {
+            bool moverInvalid = playerMover == null || !playerMover.gameObject.activeInHierarchy || !playerMover.isActiveAndEnabled;
+            bool inventoryMissing = playerInventory == null;
+
+            if (!moverInvalid && !inventoryMissing)
+                return;
+
+            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject == null)
+            {
+                if (enableDebugLogging)
+                    Debug.LogWarning("[GroundItemManager] Unable to locate the player object while rebinding dependencies.");
+
+                if (moverInvalid)
+                    playerMover = null;
+
+                if (inventoryMissing)
+                    playerInventory = null;
+
+                return;
+            }
+
+            if (moverInvalid)
+            {
+                var resolvedMover = playerObject.GetComponent<PlayerMover>();
+                if (resolvedMover != null && resolvedMover.isActiveAndEnabled && resolvedMover.gameObject.activeInHierarchy)
+                {
+                    playerMover = resolvedMover;
+                    if (enableDebugLogging)
+                        Debug.Log("[GroundItemManager] Rebound PlayerMover reference from player object.");
+                }
+                else
+                {
+                    playerMover = resolvedMover;
+                    if (enableDebugLogging)
+                        Debug.LogWarning("[GroundItemManager] PlayerMover component was not available or active during rebind.");
+                }
+            }
+
+            if (inventoryMissing)
+            {
+                var resolvedInventory = playerObject.GetComponent<InventoryComponent>();
+                if (resolvedInventory != null)
+                {
+                    playerInventory = resolvedInventory;
+                    if (enableDebugLogging)
+                        Debug.Log("[GroundItemManager] Rebound Inventory reference from player object.");
+                }
+                else if (enableDebugLogging)
+                {
+                    Debug.LogWarning("[GroundItemManager] Inventory component was not found on the player during rebind.");
+                }
+            }
+        }
+
+        private void OnPersistentServicesReady()
+        {
+            RebindDependencies();
+        }
+
+        private void OnSceneTransitionCompleted()
+        {
+            RebindDependencies();
         }
 
         /// <summary>Registers a new ground item pickup into the tile registry.</summary>
@@ -219,35 +299,16 @@ namespace Inventory.GroundItems
 
         private bool EnsurePlayerMover()
         {
-            // When the cached mover reference exists but is currently inactive we should
-            // treat it as unresolved so we can search for an active instance instead of
-            // trying to issue movement commands against a disabled component.
-            if (playerMover != null)
-            {
-                bool moverActive = playerMover.isActiveAndEnabled && playerMover.gameObject.activeInHierarchy;
-                if (moverActive)
-                    return true;
+            if (playerMover != null && playerMover.isActiveAndEnabled && playerMover.gameObject.activeInHierarchy)
+                return true;
 
-                if (enableDebugLogging)
-                    Debug.Log("[GroundItemManager] Cached PlayerMover was inactive; attempting to reacquire an active instance.");
+            if (enableDebugLogging)
+                Debug.LogWarning("[GroundItemManager] PlayerMover reference missing or inactive; attempting to rebind.");
 
-                playerMover = null;
-            }
+            RebindDependencies();
 
-            // Search the scene for an active mover. We include inactive objects in the
-            // search so we can verify their state before use and pick the first active
-            // candidate that is ready to accept movement requests.
-            var movers = FindObjectsOfType<PlayerMover>(true);
-            foreach (var mover in movers)
-            {
-                if (mover != null && mover.isActiveAndEnabled && mover.gameObject.activeInHierarchy)
-                {
-                    playerMover = mover;
-                    if (enableDebugLogging)
-                        Debug.Log("[GroundItemManager] Resolved active PlayerMover reference at runtime.");
-                    return true;
-                }
-            }
+            if (playerMover != null && playerMover.isActiveAndEnabled && playerMover.gameObject.activeInHierarchy)
+                return true;
 
             Debug.LogWarning("[GroundItemManager] PlayerMover reference missing or inactive; cannot auto-pickup.");
             return false;
@@ -437,14 +498,19 @@ namespace Inventory.GroundItems
         private void AttemptCollection(ItemPickup pickup)
         {
             if (playerInventory == null)
-                playerInventory = FindObjectOfType<InventoryComponent>(true);
-
-            if (playerInventory == null)
             {
                 if (enableDebugLogging)
-                    Debug.LogWarning("[GroundItemManager] Pickup failed because no Inventory component was located.");
-                CancelActivePickupRoutine();
-                return;
+                    Debug.LogWarning("[GroundItemManager] Player inventory reference missing; attempting to rebind before pickup.");
+
+                RebindDependencies();
+
+                if (playerInventory == null)
+                {
+                    if (enableDebugLogging)
+                        Debug.LogWarning("[GroundItemManager] Pickup failed because no Inventory component was located after rebinding.");
+                    CancelActivePickupRoutine();
+                    return;
+                }
             }
 
             bool success = pickup.TryCollect(playerInventory);
