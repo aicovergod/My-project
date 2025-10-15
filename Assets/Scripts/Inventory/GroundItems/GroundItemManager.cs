@@ -344,7 +344,21 @@ namespace Inventory.GroundItems
 
         private void SortBySpawnOrder(List<ItemPickup> pickups)
         {
-            pickups.Sort((a, b) => a.SpawnOrder.CompareTo(b.SpawnOrder));
+            // Sort newest-first so index zero always represents the most recent spawn. Null entries
+            // are pushed to the back so any lingering stale references never surface in the UI.
+            pickups.Sort((a, b) =>
+            {
+                if (ReferenceEquals(a, b))
+                    return 0;
+
+                if (a == null)
+                    return 1;
+
+                if (b == null)
+                    return -1;
+
+                return b.SpawnOrder.CompareTo(a.SpawnOrder);
+            });
         }
 
         private void ShowMenu(Vector2Int tile, IReadOnlyList<ItemPickup> pickups, Vector2 screenPosition)
