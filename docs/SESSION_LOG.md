@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f123d7108584492f85cc5371ecaf8001b77ca02f -->
+## 2025-10-15T14:18:44+01:00 — Merge pull request #1134 from aicovergod/codex/fix-codex-bug-found-in-github
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 22 ++ / 0 --
+- Notes:
+  Defer ground item pickup menu safe-zone check until after layout
+---
+<!-- commit:8e016afbde03f1dbf2bc43e8f9f1e16979f2f663 -->
+## 2025-10-15T14:18:19+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:77bb5dc88f8ae208722ade3e7ee8abb364b966de -->
 ## 2025-10-15T14:18:06+01:00 — Prevent ground item menu from closing before layout
 
