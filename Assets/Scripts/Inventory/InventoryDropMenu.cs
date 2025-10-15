@@ -1,4 +1,5 @@
 using Inventory.UI;
+using UI.ContextMenus;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -9,18 +10,12 @@ namespace Inventory
     /// Simple right-click context menu for inventory drop options.
     /// Built entirely in code so no prefab is needed.
     /// </summary>
-    public class InventoryDropMenu : MonoBehaviour
+    public class InventoryDropMenu : ContextMenuBase
     {
-        [SerializeField]
-        [Tooltip("Screen-space padding the cursor can move beyond the menu before the popup auto-closes.")]
-        private float closePaddingPixels = 12f;
-
         private InventoryWindowController controller;
         private int slotIndex;
         private Font font;
         private RectTransform rect;
-        private Canvas menuCanvas;
-        private Camera canvasCamera;
 
         public static InventoryDropMenu Create(Transform parent, Font font)
         {
@@ -34,69 +29,12 @@ namespace Inventory
             return menu;
         }
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             rect ??= GetComponent<RectTransform>();
-            menuCanvas = GetComponentInParent<Canvas>();
-
-            // Cache the correct camera reference so hover checks work with any canvas render mode.
-            if (menuCanvas != null && menuCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
-            {
-                canvasCamera = menuCanvas.worldCamera;
-            }
-            else
-            {
-                canvasCamera = null;
-            }
-        }
-
-        private void Update()
-        {
-            if (!gameObject.activeSelf)
-                return;
-
-            var isCursorWithinSafeZone = IsCursorWithinSafeZone(out var isCursorOverMenu);
-
-            // Immediately hide the menu when the cursor leaves the padded safe zone to keep the OSRS-style feel.
-            if (!isCursorWithinSafeZone)
-            {
-                Hide();
-                return;
-            }
-
-            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
-            {
-                // Only close on clicks that land outside the strict menu rectangle.
-                if (!isCursorOverMenu)
-                    Hide();
-            }
-        }
-
-        /// <summary>
-        /// Determines if the cursor remains within the menu rectangle plus a tolerance band to prevent accidental closures.
-        /// </summary>
-        private bool IsCursorWithinSafeZone(out bool insideMenu)
-        {
-            insideMenu = RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition, canvasCamera);
-
-            if (closePaddingPixels <= 0f)
-            {
-                return insideMenu;
-            }
-
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, Input.mousePosition, canvasCamera, out var localPoint))
-            {
-                // If the conversion fails, fall back to the strict rectangle check to preserve existing behaviour.
-                return insideMenu;
-            }
-
-            var paddedRect = rect.rect;
-            paddedRect.xMin -= closePaddingPixels;
-            paddedRect.xMax += closePaddingPixels;
-            paddedRect.yMin -= closePaddingPixels;
-            paddedRect.yMax += closePaddingPixels;
-
-            return paddedRect.Contains(localPoint);
+            AssignCanvas(GetComponentInParent<Canvas>());
+            SetMenuRectTransform(rect);
         }
 
         private void BuildUI()
@@ -154,6 +92,7 @@ namespace Inventory
             slotIndex = index;
             transform.position = position;
             gameObject.SetActive(true);
+            DeferSafeZoneCheck();
             transform.SetAsLastSibling();
         }
 
@@ -161,6 +100,12 @@ namespace Inventory
         {
             gameObject.SetActive(false);
             controller = null;
+        }
+
+        /// <inheritdoc />
+        protected override void OnCloseRequested()
+        {
+            Hide();
         }
 
         private void OnSelection(DropMenuSelection selection)

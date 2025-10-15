@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UI;
+using UI.ContextMenus;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +13,7 @@ namespace Inventory.GroundItems
     /// player clicks elsewhere or the manager hides it.
     /// </summary>
     [DisallowMultipleComponent]
-    public class GroundItemPickupMenu : MonoBehaviour
+    public class GroundItemPickupMenu : ContextMenuBase
     {
         private class OptionEntry
         {
@@ -56,18 +57,20 @@ namespace Inventory.GroundItems
 
         private Action<ItemPickup> onOptionSelected;
         private Vector2 lastRequestedScreenPosition;
-        private bool deferSafeZoneEvaluation;
-
+        
         /// <summary>Pixels of cursor leeway before the menu auto-closes.</summary>
-        public float SafePadding { get; set; } = 12f;
+        public float SafePadding
+        {
+            get => SafePaddingPixels;
+            set => SafePaddingPixels = value;
+        }
 
         /// <summary>Invoked whenever the menu hides itself for any reason.</summary>
         public event Action MenuHidden;
 
-        private Camera CanvasCamera => canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
-
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             canvas = GetComponent<Canvas>();
             if (canvas == null)
                 canvas = gameObject.AddComponent<Canvas>();
@@ -89,6 +92,8 @@ namespace Inventory.GroundItems
             rootRect.pivot = new Vector2(0f, 1f);
 
             BuildMenuRoot();
+            AssignCanvas(canvas);
+            SetMenuRectTransform(menuRect);
             gameObject.SetActive(false);
         }
 
@@ -98,37 +103,6 @@ namespace Inventory.GroundItems
                 return;
 
             ApplyMenuScale();
-        }
-
-        private void Update()
-        {
-            if (!gameObject.activeSelf)
-                return;
-
-            if (deferSafeZoneEvaluation)
-            {
-                // Allow one frame for Show() to rebuild and reposition before we begin
-                // evaluating cursor bounds. Without this guard the first Update executes
-                // while the menu is still at its hidden origin which makes the cursor
-                // appear outside the safe zone and immediately closes the popup.
-                deferSafeZoneEvaluation = false;
-                return;
-            }
-
-            bool isCursorInSafeZone = IsCursorWithinSafeZone(out bool isCursorInsideMenu);
-            if (!isCursorInSafeZone)
-            {
-                Hide();
-                return;
-            }
-
-            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
-            {
-                if (!isCursorInsideMenu)
-                {
-                    Hide();
-                }
-            }
         }
 
         /// <summary>Displays the menu using the supplied pickup list.</summary>
@@ -144,9 +118,9 @@ namespace Inventory.GroundItems
             currentPickups.Clear();
             CopyIntoCurrentPickups(pickups);
             lastRequestedScreenPosition = screenPosition;
-            deferSafeZoneEvaluation = true;
 
             gameObject.SetActive(true);
+            DeferSafeZoneCheck();
             RebuildOptions();
             PositionMenu(lastRequestedScreenPosition);
             transform.SetAsLastSibling();
@@ -181,7 +155,6 @@ namespace Inventory.GroundItems
             gameObject.SetActive(false);
             currentPickups.Clear();
             onOptionSelected = null;
-            deferSafeZoneEvaluation = false;
 
             foreach (var entry in optionEntries)
             {
@@ -190,6 +163,12 @@ namespace Inventory.GroundItems
             }
 
             MenuHidden?.Invoke();
+        }
+
+        /// <inheritdoc />
+        protected override void OnCloseRequested()
+        {
+            Hide();
         }
 
         private void BuildMenuRoot()
@@ -344,25 +323,6 @@ namespace Inventory.GroundItems
                 Mathf.Clamp(requestedPosition.y, minY, maxY));
 
             menuRect.position = clamped;
-        }
-
-        private bool IsCursorWithinSafeZone(out bool insideMenu)
-        {
-            insideMenu = RectTransformUtility.RectangleContainsScreenPoint(menuRect, Input.mousePosition, CanvasCamera);
-
-            if (SafePadding <= 0f)
-                return insideMenu;
-
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(menuRect, Input.mousePosition, CanvasCamera, out var local))
-                return insideMenu;
-
-            Rect paddedRect = menuRect.rect;
-            paddedRect.xMin -= SafePadding;
-            paddedRect.xMax += SafePadding;
-            paddedRect.yMin -= SafePadding;
-            paddedRect.yMax += SafePadding;
-
-            return paddedRect.Contains(local);
         }
 
         /// <summary>Applies the serialized scale to the menu root so designers can resize it.</summary>
