@@ -182,46 +182,6 @@ namespace Player
             var entry = equipment != null ? equipment.GetEquipped(EquipmentSlot.Weapon) : default;
             var weapon = entry.item;
 
-            // Local helper resolves the equipped weapon's display name and checks for magic keywords.
-            bool WeaponNameIndicatesMagic()
-            {
-                if (weapon == null)
-                    return false;
-
-                // Prefer the designer facing itemName but fall back to the asset name when absent.
-                string displayName = !string.IsNullOrEmpty(weapon.itemName) ? weapon.itemName : weapon.name;
-                if (string.IsNullOrEmpty(displayName))
-                    return false;
-
-                return displayName.IndexOf("Wand", StringComparison.OrdinalIgnoreCase) >= 0
-                    || displayName.IndexOf("Staff", StringComparison.OrdinalIgnoreCase) >= 0
-                    || displayName.IndexOf("Trident", StringComparison.OrdinalIgnoreCase) >= 0
-                    || displayName.IndexOf("Sceptre", StringComparison.OrdinalIgnoreCase) >= 0;
-            }
-
-            // Local helper mirrors the magic keyword logic for ranged identifiers.
-            bool WeaponNameIndicatesRanged()
-            {
-                if (weapon == null)
-                    return false;
-
-                string displayName = !string.IsNullOrEmpty(weapon.itemName) ? weapon.itemName : weapon.name;
-                if (string.IsNullOrEmpty(displayName))
-                    return false;
-
-                return displayName.IndexOf("Bow", StringComparison.OrdinalIgnoreCase) >= 0
-                    || displayName.IndexOf("Shortbow", StringComparison.OrdinalIgnoreCase) >= 0
-                    || displayName.IndexOf("Longbow", StringComparison.OrdinalIgnoreCase) >= 0
-                    || displayName.IndexOf("Handcannon", StringComparison.OrdinalIgnoreCase) >= 0
-                    || displayName.IndexOf("Blowpipe", StringComparison.OrdinalIgnoreCase) >= 0
-                    || displayName.IndexOf("Crossbow", StringComparison.OrdinalIgnoreCase) >= 0
-                    || displayName.IndexOf("Chinchompa", StringComparison.OrdinalIgnoreCase) >= 0
-                    || displayName.IndexOf("Dart", StringComparison.OrdinalIgnoreCase) >= 0
-                    || displayName.IndexOf("Thrownaxe", StringComparison.OrdinalIgnoreCase) >= 0
-                    || displayName.IndexOf("Knife", StringComparison.OrdinalIgnoreCase) >= 0
-                    || displayName.IndexOf("Javelin", StringComparison.OrdinalIgnoreCase) >= 0;
-            }
-
             var poisonApplier = GetComponent<OnHitPoisonApplier>();
             if (weapon != null && weapon.onHitPoison != null)
             {
@@ -236,27 +196,21 @@ namespace Player
                 Destroy(poisonApplier);
             }
 
-            DamageType newType = DamageType.Melee;
-            if (weapon != null)
-            {
-                if (WeaponNameIndicatesMagic())
-                    newType = DamageType.Magic;
-                else if (WeaponNameIndicatesRanged())
-                    newType = DamageType.Ranged;
-            }
+            DamageType resolvedType = WeaponClassificationUtility.ResolveDamageType(weapon);
+            bool spellSelected = MagicUI.ActiveSpell != null;
+            DamageType newType = spellSelected ? DamageType.Magic : resolvedType;
 
-            if (newType == DamageType.Magic)
+            if (!spellSelected)
             {
-                if (MagicUI.ActiveSpell == null)
-                    MagicUI.RestoreLastSpell();
-            }
-            else if (newType == DamageType.Melee)
-            {
-                MagicUI.ClearActiveSpell();
-            }
-            else if (newType == DamageType.Ranged)
-            {
-                MagicUI.ClearActiveSpell();
+                if (newType == DamageType.Magic)
+                {
+                    if (MagicUI.ActiveSpell == null)
+                        MagicUI.RestoreLastSpell();
+                }
+                else
+                {
+                    MagicUI.ClearActiveSpell();
+                }
             }
 
             UpdateDamageType(newType);

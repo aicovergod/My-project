@@ -120,16 +120,6 @@ namespace Combat
         private float hitsplatFallbackOffset = 1.1f;
 
         [Header("Line of Sight")]
-        private static readonly string[] RangedWeaponNameKeywords =
-        {
-            "crossbow",
-            "dart",
-            "javelin",
-            "throwing knife",
-            "shortbow",
-            "longbow"
-        };
-
         [SerializeField, Tooltip("Layers considered solid when checking whether swings or spells have a clear path to the target.")]
         private LayerMask obstructionMask;
 
@@ -337,6 +327,10 @@ namespace Combat
         /// </summary>
         private DamageType DetermineActiveDamageType()
         {
+            var activeSpell = MagicUI.ActiveSpell;
+            if (activeSpell != null)
+                return DamageType.Magic;
+
             CombatantStats stats = null;
             if (combatBinder != null)
                 stats = combatBinder.GetCombatantStats();
@@ -359,14 +353,9 @@ namespace Combat
                     // loadouts). In those cases we trust the weapon's combat stats over
                     // the profile so movement and range checks line up with the equipped
                     // item.
-                    if (weapon.combat.Magic > 0)
-                        return DamageType.Magic;
-
-                    if (WeaponNameIndicatesRanged(weapon))
-                        return DamageType.Ranged;
-
-                    if (weapon.combat.Range > 0 || weapon.combat.RangeStrength > 0)
-                        return DamageType.Ranged;
+                    var resolvedType = WeaponClassificationUtility.ResolveDamageType(weapon);
+                    if (resolvedType != DamageType.Melee)
+                        return resolvedType;
                 }
 
                 // Pet merge profiles that explicitly flag ranged or magic combat types
@@ -375,41 +364,14 @@ namespace Combat
                 return reportedType;
             }
 
-            var activeSpell = MagicUI.ActiveSpell;
-            if (activeSpell != null)
-                return DamageType.Magic;
-
             if (weapon != null)
             {
-                if (weapon.combat.Magic > 0)
-                    return DamageType.Magic;
-
-                if (WeaponNameIndicatesRanged(weapon))
-                    return DamageType.Ranged;
-                if (weapon.combat.Range > 0 || weapon.combat.RangeStrength > 0)
-                    return DamageType.Ranged;
+                var resolvedType = WeaponClassificationUtility.ResolveDamageType(weapon);
+                if (resolvedType != DamageType.Melee)
+                    return resolvedType;
             }
 
             return DamageType.Melee;
-        }
-
-        /// <summary>
-        /// Inspect the equipped weapon's display name to catch ranged weapons that lack
-        /// explicit ranged stat blocks. The lookup is case-insensitive so variations in
-        /// item naming (Longbow vs. longbow) still flag the weapon as ranged.
-        /// </summary>
-        private bool WeaponNameIndicatesRanged(Inventory.ItemData weapon)
-        {
-            if (weapon == null || string.IsNullOrWhiteSpace(weapon.itemName))
-                return false;
-
-            foreach (string keyword in RangedWeaponNameKeywords)
-            {
-                if (weapon.itemName.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
-                    return true;
-            }
-
-            return false;
         }
 
         /// <summary>
