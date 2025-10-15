@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9bf4618ff3289a1078aefde280bea56cefabd8c9 -->
+## 2025-10-16T00:18:49+01:00 — Refine weapon classification keyword logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Combat/WeaponClassificationUtility.cs, Assets/Scripts/Player/PlayerCombatLoadout.cs
+- Diff: 130 ++ / 107 --
+- Notes:
+  —
+---
 <!-- commit:2172021092e5848585bc79eaf24a4db6808f490f -->
 ## 2025-10-15T21:50:18+01:00 — Merge pull request #1141 from aicovergod/codex/update-input-handling-for-item-pickup
 
