@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a455dc0b484db3580cf38df1fb325e05f6a8c15b -->
+## 2025-10-16T00:39:35+01:00 — Fix magic damage type updates when swapping spells
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/PlayerCombatLoadout.cs, Assets/Scripts/UI/MagicUI.cs
+- Diff: 50 ++ / 7 --
+- Notes:
+  —
+---
 <!-- commit:4fd0dfe1c55c749c77ad1a27e3fec401f0c89ec3 -->
 ## 2025-10-16T00:19:23+01:00 — Merge pull request #1142 from aicovergod/codex/add-shared-helper-for-weapon-classification
 
