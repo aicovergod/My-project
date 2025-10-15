@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2172021092e5848585bc79eaf24a4db6808f490f -->
+## 2025-10-15T21:50:18+01:00 — Merge pull request #1141 from aicovergod/codex/update-input-handling-for-item-pickup
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 37 ++ / 10 --
+- Notes:
+  Support right-click menus on ground items
+---
+<!-- commit:1514ff7ebadd5877e9bbf1b68015e67f7239148a -->
+## 2025-10-15T21:50:09+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:3de5a831d54d8712999293c7cfc9b2bc5fe71440 -->
 ## 2025-10-15T21:49:56+01:00 — Support right-click menus on ground items
 
