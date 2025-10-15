@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f7ffafa349e17c0c47d90626ddc9aa6bba51d693 -->
+## 2025-10-15T14:02:54+01:00 — Refactor context menus to use input actions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs, Assets/Scripts/Inventory/InventoryDropMenu.cs, Assets/Scripts/UI/UiInputActionSubscription.cs
+- Diff: 303 ++ / 37 --
+- Notes:
+  —
+---
 <!-- commit:df473fff1b55cc320e04e06685dc4212bed2aa6f -->
 ## 2025-10-15T12:13:47+01:00 — Merge pull request #1132 from aicovergod/codex/reduce-size-of-right-click-menu
 
