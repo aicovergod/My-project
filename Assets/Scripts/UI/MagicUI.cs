@@ -31,6 +31,9 @@ namespace UI
         // Runtime map storing the boosted max hit values currently applied to each strike spell.
         private readonly Dictionary<SpellDefinition, int> strikeRuntimeMaxHits = new();
 
+        /// <summary>Raised whenever the active spell selection changes.</summary>
+        public static event Action<SpellDefinition> ActiveSpellChanged;
+
         /// <summary>Currently selected spell.</summary>
         public static SpellDefinition ActiveSpell { get; private set; }
             = null;
@@ -55,7 +58,12 @@ namespace UI
 
         public static void ClearActiveSpell()
         {
+            if (ActiveSpell == null)
+                return;
+
             ActiveSpell = null;
+            NotifyActiveSpellChanged(null);
+
             var ui = Instance ?? FindObjectOfType<MagicUI>();
             ui?.UpdateSelection();
         }
@@ -296,14 +304,12 @@ namespace UI
             if (ActiveSpell == spell)
             {
                 ClearActiveSpell();
-                loadout?.SetDamageType(DamageType.Melee);
+                return;
             }
-            else
-            {
-                ActiveSpell = spell;
-                LastSelectedSpell = spell;
-                loadout?.SetDamageType(DamageType.Magic);
-            }
+
+            ActiveSpell = spell;
+            LastSelectedSpell = spell;
+            NotifyActiveSpellChanged(ActiveSpell);
 
             UpdateSelection();
         }
@@ -345,7 +351,18 @@ namespace UI
             // previous behaviour by restoring the cached spell reference and refreshing any
             // lingering UI objects if they are still present in the scene hierarchy.
             ActiveSpell = LastSelectedSpell;
+            NotifyActiveSpellChanged(ActiveSpell);
             discoveredInstance?.UpdateSelection();
+        }
+
+        /// <summary>
+        /// Notify listeners that the active spell selection has changed so they can react
+        /// (for example updating combat damage types) even when weapon changes do not occur.
+        /// </summary>
+        /// <param name="spell">The newly active spell, or <c>null</c> if none is selected.</param>
+        private static void NotifyActiveSpellChanged(SpellDefinition spell)
+        {
+            ActiveSpellChanged?.Invoke(spell);
         }
     }
 }
