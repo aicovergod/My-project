@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8e7e7489de0c5846d1998075cb73b8e4955b35f6 -->
+## 2025-10-15T19:24:21+01:00 — Merge pull request #1137 from aicovergod/codex/fix-image-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 4 --
+- Notes:
+  Fix ground pickup menu compatibility
+---
+<!-- commit:1012deff43c2f6b7cb287378a492aef2c0712d1c -->
+## 2025-10-15T19:24:08+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:1f4dcd394c692af6a84b06218408fe0607a12915 -->
 ## 2025-10-15T19:23:55+01:00 — Remove CollectionsMarshal usage in ground item menu
 
