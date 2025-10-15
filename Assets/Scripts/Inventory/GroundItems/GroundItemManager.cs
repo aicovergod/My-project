@@ -102,11 +102,10 @@ namespace Inventory.GroundItems
             }
 
             instance = this;
-            worldCamera ??= Camera.main;
+
+            RefreshWorldCamera(worldCamera);
 
             RebindDependencies();
-
-            EnsurePhysicsRaycaster();
         }
 
         private void OnEnable()
@@ -187,11 +186,13 @@ namespace Inventory.GroundItems
         private void OnPersistentServicesReady()
         {
             RebindDependencies();
+            RefreshWorldCamera();
         }
 
         private void OnSceneTransitionCompleted()
         {
             RebindDependencies();
+            RefreshWorldCamera();
         }
 
         /// <summary>Registers a new ground item pickup into the tile registry.</summary>
@@ -260,6 +261,9 @@ namespace Inventory.GroundItems
         {
             if (pickup == null)
                 return;
+
+            if (worldCamera == null || !worldCamera.isActiveAndEnabled)
+                RefreshWorldCamera();
 
             Vector2Int tile = pickup.TileCoordinate;
             var pickups = GetPickupsOnTile(tile);
@@ -345,6 +349,9 @@ namespace Inventory.GroundItems
 
         private void ShowMenu(Vector2Int tile, IReadOnlyList<ItemPickup> pickups, Vector2 screenPosition)
         {
+            if (worldCamera == null || !worldCamera.isActiveAndEnabled)
+                RefreshWorldCamera();
+
             EnsureMenuInstance();
             pickupMenu.SafePadding = menuSafePadding;
             openMenuTile = tile;
@@ -372,6 +379,65 @@ namespace Inventory.GroundItems
             pickupMenu = go.AddComponent<GroundItemPickupMenu>();
             pickupMenu.SafePadding = menuSafePadding;
             pickupMenu.MenuHidden += OnMenuHidden;
+        }
+
+        /// <summary>
+        /// Resolves the active world camera, ensuring a Physics2DRaycaster is present so ground item clicks succeed.
+        /// </summary>
+        /// <param name="candidate">Optional camera hint supplied by callers that may already be valid.</param>
+        private void RefreshWorldCamera(Camera candidate = null)
+        {
+            Camera resolvedCamera = null;
+
+            if (candidate != null && candidate.isActiveAndEnabled)
+            {
+                resolvedCamera = candidate;
+            }
+            else if (worldCamera != null && worldCamera.isActiveAndEnabled)
+            {
+                resolvedCamera = worldCamera;
+            }
+            else
+            {
+                Camera mainCamera = Camera.main;
+                if (mainCamera != null && mainCamera.isActiveAndEnabled)
+                {
+                    resolvedCamera = mainCamera;
+                }
+                else
+                {
+                    var allCameras = Camera.allCameras;
+                    for (int i = 0; i < allCameras.Length; i++)
+                    {
+                        Camera camera = allCameras[i];
+                        if (camera != null && camera.isActiveAndEnabled)
+                        {
+                            resolvedCamera = camera;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            bool cameraChanged = worldCamera != resolvedCamera;
+            worldCamera = resolvedCamera;
+
+            if (cameraChanged)
+            {
+                if (enableDebugLogging)
+                {
+                    if (worldCamera != null)
+                    {
+                        Debug.Log($"[GroundItemManager] Bound world camera to {worldCamera.name}.");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[GroundItemManager] World camera reference cleared; no active cameras detected.");
+                    }
+                }
+            }
+
+            EnsurePhysicsRaycaster();
         }
 
         private void OnMenuSelection(ItemPickup pickup)
