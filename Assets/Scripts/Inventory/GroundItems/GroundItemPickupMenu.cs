@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Core.Input;
 using UI;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace Inventory.GroundItems
@@ -46,6 +48,19 @@ namespace Inventory.GroundItems
         [Tooltip("Height of each selectable option in pixels.")]
         private float optionHeight = 24f;
 
+        [Header("Input")]
+        [SerializeField]
+        [Tooltip("Input action triggered for primary clicks when the menu should evaluate closing.")]
+        private InputActionReference leftClickActionReference;
+
+        [SerializeField]
+        [Tooltip("Input action triggered for secondary clicks when the menu should evaluate closing.")]
+        private InputActionReference rightClickActionReference;
+
+        [SerializeField]
+        [Tooltip("Pointer position action used to track the current cursor location in screen space.")]
+        private InputActionReference pointerPositionActionReference;
+
         private readonly List<OptionEntry> optionEntries = new List<OptionEntry>();
         private readonly List<ItemPickup> currentPickups = new List<ItemPickup>();
 
@@ -56,6 +71,11 @@ namespace Inventory.GroundItems
 
         private Action<ItemPickup> onOptionSelected;
         private Vector2 lastRequestedScreenPosition;
+
+        private PlayerInput playerInput;
+        private readonly UiInputActionSubscription leftClickSubscription = new UiInputActionSubscription();
+        private readonly UiInputActionSubscription rightClickSubscription = new UiInputActionSubscription();
+        private readonly UiInputActionSubscription pointerPositionSubscription = new UiInputActionSubscription();
 
         /// <summary>Pixels of cursor leeway before the menu auto-closes.</summary>
         public float SafePadding { get; set; } = 12f;
@@ -88,6 +108,7 @@ namespace Inventory.GroundItems
             rootRect.pivot = new Vector2(0f, 1f);
 
             BuildMenuRoot();
+            ResolveInputActions();
             gameObject.SetActive(false);
         }
 
@@ -99,25 +120,29 @@ namespace Inventory.GroundItems
             ApplyMenuScale();
         }
 
-        private void Update()
+        private void OnEnable()
         {
-            if (!gameObject.activeSelf)
-                return;
-
-            bool isCursorInSafeZone = IsCursorWithinSafeZone(out bool isCursorInsideMenu);
-            if (!isCursorInSafeZone)
+            if (leftClickSubscription.Action == null || rightClickSubscription.Action == null ||
+                pointerPositionSubscription.Action == null)
             {
-                Hide();
-                return;
+                ResolveInputActions();
             }
 
-            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
-            {
-                if (!isCursorInsideMenu)
-                {
-                    Hide();
-                }
-            }
+            SubscribeInput();
+            if (gameObject.activeSelf)
+                EvaluatePointerPosition(GetCurrentPointerPosition(), false);
+        }
+
+        private void OnDisable()
+        {
+            UnsubscribeInput();
+        }
+
+        private void OnDestroy()
+        {
+            leftClickSubscription.Release();
+            rightClickSubscription.Release();
+            pointerPositionSubscription.Release();
         }
 
         /// <summary>Displays the menu using the supplied pickup list.</summary>
@@ -177,6 +202,80 @@ namespace Inventory.GroundItems
             }
 
             MenuHidden?.Invoke();
+        }
+
+        private void ResolveInputActions()
+        {
+            if (playerInput == null)
+                playerInput = GetComponentInParent<PlayerInput>();
+
+            if (playerInput == null)
+                playerInput = FindObjectOfType<PlayerInput>();
+
+            leftClickSubscription.Resolve(playerInput, leftClickActionReference, "UI/Click");
+            rightClickSubscription.Resolve(playerInput, rightClickActionReference, "UI/RightClick");
+            pointerPositionSubscription.Resolve(playerInput, pointerPositionActionReference, "UI/Point");
+        }
+
+        private void SubscribeInput()
+        {
+            leftClickSubscription.Subscribe(HandleLeftClickPerformed);
+            rightClickSubscription.Subscribe(HandleRightClickPerformed);
+            pointerPositionSubscription.Subscribe(HandlePointerMoved);
+        }
+
+        private void UnsubscribeInput()
+        {
+            leftClickSubscription.Unsubscribe(HandleLeftClickPerformed);
+            rightClickSubscription.Unsubscribe(HandleRightClickPerformed);
+            pointerPositionSubscription.Unsubscribe(HandlePointerMoved);
+        }
+
+        private void HandleLeftClickPerformed(InputAction.CallbackContext context)
+        {
+            if (!context.performed || !gameObject.activeSelf)
+                return;
+
+            EvaluatePointerPosition(GetCurrentPointerPosition(), true);
+        }
+
+        private void HandleRightClickPerformed(InputAction.CallbackContext context)
+        {
+            if (!context.performed || !gameObject.activeSelf)
+                return;
+
+            EvaluatePointerPosition(GetCurrentPointerPosition(), true);
+        }
+
+        private void HandlePointerMoved(InputAction.CallbackContext context)
+        {
+            if (!gameObject.activeSelf)
+                return;
+
+            Vector2 pointerPosition = context.ReadValue<Vector2>();
+            EvaluatePointerPosition(pointerPosition, false);
+        }
+
+        private void EvaluatePointerPosition(Vector2 pointerPosition, bool triggeredByClick)
+        {
+            bool insideMenu;
+            bool withinSafeZone = IsCursorWithinSafeZone(pointerPosition, out insideMenu);
+            if (!withinSafeZone)
+            {
+                Hide();
+                return;
+            }
+
+            if (triggeredByClick && !insideMenu)
+                Hide();
+        }
+
+        private Vector2 GetCurrentPointerPosition()
+        {
+            if (pointerPositionSubscription.Action != null)
+                return pointerPositionSubscription.Action.ReadValue<Vector2>();
+
+            return InputActionResolver.GetPointerScreenPosition(lastRequestedScreenPosition);
         }
 
         private void BuildMenuRoot()
@@ -333,14 +432,14 @@ namespace Inventory.GroundItems
             menuRect.position = clamped;
         }
 
-        private bool IsCursorWithinSafeZone(out bool insideMenu)
+        private bool IsCursorWithinSafeZone(Vector2 pointerPosition, out bool insideMenu)
         {
-            insideMenu = RectTransformUtility.RectangleContainsScreenPoint(menuRect, Input.mousePosition, CanvasCamera);
+            insideMenu = RectTransformUtility.RectangleContainsScreenPoint(menuRect, pointerPosition, CanvasCamera);
 
             if (SafePadding <= 0f)
                 return insideMenu;
 
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(menuRect, Input.mousePosition, CanvasCamera, out var local))
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(menuRect, pointerPosition, CanvasCamera, out var local))
                 return insideMenu;
 
             Rect paddedRect = menuRect.rect;
