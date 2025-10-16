@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:38716fd8e8e20a98ec31ce64416f3aea448c011e -->
+## 2025-10-16T21:00:19+01:00 — Filter NPC shop UI raycasts
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Interaction/NpcShopOpener.cs
+- Diff: 49 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:8e58fdeeda7fd10bf2120191f3a57b6eaaac740b -->
 ## 2025-10-16T20:53:56+01:00 — Merge pull request #1160 from aicovergod/codex/refactor-pointer-blocking-logic-in-scenetransitioninteractab
 
