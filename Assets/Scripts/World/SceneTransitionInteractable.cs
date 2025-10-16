@@ -99,12 +99,7 @@ namespace World
                 return;
             }
 
-            bool pointerBlocked = false;
-            if (EventSystem.current != null)
-                pointerBlocked = EventSystem.current.IsPointerOverGameObject();
-
-            if (!pointerBlocked)
-                pointerBlocked = IsPointerOverUI(_pendingScreenPosition);
+            bool pointerBlocked = IsPointerOverUI(_pendingScreenPosition);
 
             if (!pointerBlocked)
                 TryResolveInteractRequest(_pendingScreenPosition);
@@ -180,13 +175,24 @@ namespace World
         /// </summary>
         private static bool IsPointerOverUI(Vector2 screenPosition)
         {
-            return RaycastUI(screenPosition);
+            return TryGetFilteredUiRaycasts(screenPosition, null);
         }
 
-        private static bool RaycastUI(Vector2 screenPosition)
+        /// <summary>
+        ///     Raycasts the UI system and filters out hits coming from world physics raycasters so only genuine UI
+        ///     elements block pointer-based interaction checks.
+        /// </summary>
+        /// <param name="filteredResults">
+        ///     Optional list that will be populated with the filtered UI hits. Provide a buffer when diagnostics
+        ///     or tooling need to inspect which UI elements are blocking the interaction.
+        /// </param>
+        private static bool TryGetFilteredUiRaycasts(Vector2 screenPosition, List<RaycastResult> filteredResults)
         {
             if (EventSystem.current == null)
+            {
+                filteredResults?.Clear();
                 return false;
+            }
 
             var pointerEventData = new PointerEventData(EventSystem.current)
             {
@@ -195,9 +201,24 @@ namespace World
 
             RaycastResults.Clear();
             EventSystem.current.RaycastAll(pointerEventData, RaycastResults);
-            bool hit = RaycastResults.Count > 0;
+
+            filteredResults?.Clear();
+
+            bool hasUiHit = false;
+
+            for (int i = 0; i < RaycastResults.Count; i++)
+            {
+                RaycastResult result = RaycastResults[i];
+                if (result.module is PhysicsRaycaster || result.module is Physics2DRaycaster)
+                    continue;
+
+                hasUiHit = true;
+                filteredResults?.Add(result);
+            }
+
             RaycastResults.Clear();
-            return hit;
+
+            return hasUiHit;
         }
 
         /// <summary>
