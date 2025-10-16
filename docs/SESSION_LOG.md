@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:40dd2e276ef364c79cd461dbfcf098afb067ad12 -->
+## 2025-10-16T15:58:44+01:00 — Simplify gathering and scene interaction input to mouse
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 37 ++ / 334 --
+- Notes:
+  —
+---
 <!-- commit:7773e56040e7cd5e6b134144ab4b876372c051c7 -->
 ## 2025-10-16T15:41:17+01:00 — Merge pull request #1155 from aicovergod/codex/fix-pointerid-penpointerid-error
 
