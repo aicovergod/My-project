@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ac9d2caddd2d5ec93081fa8883d72ff37ac8fb0c -->
+## 2025-10-16T10:43:44+01:00 — Merge pull request #1147 from aicovergod/codex/fix-input-field-click-issue-in-bank-tab
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 79 ++ / 15 --
+- Notes:
+  Fix stack split dialog pointer handling
+---
+<!-- commit:2c350f6e9e85c899bdd543c78e947ac4c10bf45c -->
+## 2025-10-16T10:43:37+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f0f7061b196c7bf7d0b4ce17e087bd63e9c9828e -->
 ## 2025-10-16T10:43:22+01:00 — Fix stack split dialog input focus
 
