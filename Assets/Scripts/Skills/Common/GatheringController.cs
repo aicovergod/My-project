@@ -106,10 +106,14 @@ namespace Skills.Common
         // Flags queued by input callbacks so pointer interactions are processed from Update.
         private bool pendingInteract;
         private Vector2 pendingInteractScreenPosition;
-        private int pendingInteractTouchId = -1;
+        private int pendingInteractPointerId = PointerId.invalidPointerId;
+        private bool pendingInteractSkipUiBlock;
+        private bool pendingInteractHasDirectNode;
+        private TNode pendingInteractDirectNode;
         private bool pendingProspect;
         private Vector2 pendingProspectScreenPosition;
-        private int pendingProspectTouchId = -1;
+        private int pendingProspectPointerId = PointerId.invalidPointerId;
+        private bool pendingProspectSkipUiBlock;
 
         // Automatic movement state used when the player clicks a node from outside the interaction range.
         private bool isApproachingNode;
@@ -283,17 +287,27 @@ namespace Skills.Common
             if (pendingInteract)
             {
                 pendingInteract = false;
-                bool pointerBlocked = false;
-                if (BlockMouseWhilePointerOverUI && EventSystem.current != null && pendingInteractTouchId >= 0)
-                    pointerBlocked = EventSystem.current.IsPointerOverGameObject(pendingInteractTouchId);
 
+                bool pointerBlocked = false;
+                int pointerId = pendingInteractPointerId;
+                bool skipUiBlock = pendingInteractSkipUiBlock;
+                bool hasDirectNode = pendingInteractHasDirectNode;
+                TNode directNode = pendingInteractDirectNode;
                 Vector2 screenPosition = pendingInteractScreenPosition;
-                pendingInteractTouchId = -1;
+
+                pendingInteractPointerId = PointerId.invalidPointerId;
+                pendingInteractSkipUiBlock = false;
+                pendingInteractHasDirectNode = false;
+                pendingInteractDirectNode = null;
                 pendingInteractScreenPosition = default;
+
+                if (!skipUiBlock && BlockMouseWhilePointerOverUI && EventSystem.current != null &&
+                    pointerId != PointerId.invalidPointerId)
+                    pointerBlocked = EventSystem.current.IsPointerOverGameObject(pointerId);
 
                 if (!pointerBlocked)
                 {
-                    var node = FindNodeAtScreenPosition(screenPosition);
+                    var node = hasDirectNode ? directNode : FindNodeAtScreenPosition(screenPosition);
                     if (node != null && IsInteractionReady())
                         AttemptStart(node);
                 }
@@ -302,13 +316,19 @@ namespace Skills.Common
             if (pendingProspect)
             {
                 pendingProspect = false;
-                bool pointerBlocked = false;
-                if (BlockMouseWhilePointerOverUI && EventSystem.current != null && pendingProspectTouchId >= 0)
-                    pointerBlocked = EventSystem.current.IsPointerOverGameObject(pendingProspectTouchId);
 
+                bool pointerBlocked = false;
+                int pointerId = pendingProspectPointerId;
+                bool skipUiBlock = pendingProspectSkipUiBlock;
                 Vector2 screenPosition = pendingProspectScreenPosition;
-                pendingProspectTouchId = -1;
+
+                pendingProspectPointerId = PointerId.invalidPointerId;
+                pendingProspectSkipUiBlock = false;
                 pendingProspectScreenPosition = default;
+
+                if (!skipUiBlock && BlockMouseWhilePointerOverUI && EventSystem.current != null &&
+                    pointerId != PointerId.invalidPointerId)
+                    pointerBlocked = EventSystem.current.IsPointerOverGameObject(pointerId);
 
                 if (!pointerBlocked)
                 {
@@ -330,7 +350,8 @@ namespace Skills.Common
             if (!context.performed)
                 return;
 
-            // Pointer devices (mouse, pen, touch) behave like the legacy left click handling.
+            bool handled = false;
+
             if (context.control != null)
             {
                 if (context.control.parent is TouchControl touchControl)
@@ -338,31 +359,31 @@ namespace Skills.Common
                     if (!IsInteractionReady())
                         return;
 
-                    pendingInteract = true;
-                    pendingInteractTouchId = touchControl.touchId.ReadValue();
-                    pendingInteractScreenPosition = touchControl.position.ReadValue();
-                    return;
+                    QueuePendingInteractFromPointer(touchControl.position.ReadValue(), touchControl.touchId.ReadValue());
+                    handled = true;
                 }
-
-                if (context.control.device is Pointer pointer && !(pointer is Touchscreen))
+                else if (context.control.device is Pen)
                 {
                     if (!IsInteractionReady())
                         return;
 
-                    if (BlockMouseWhilePointerOverUI && EventSystem.current != null &&
-                        EventSystem.current.IsPointerOverGameObject(MousePointerEventSystemId))
+                    Vector2 screenPosition = ResolvePointerScreenPosition(context.control.device);
+                    QueuePendingInteractFromPointer(screenPosition, PointerId.penPointerId);
+                    handled = true;
+                }
+                else if (context.control.device is Pointer pointer && !(pointer is Touchscreen))
+                {
+                    if (!IsInteractionReady())
                         return;
 
-                    Vector2 screenPosition = Mouse.current != null
-                        ? Mouse.current.position.ReadValue()
-                        : pointer.position.ReadValue();
-
-                    var node = FindNodeAtScreenPosition(screenPosition);
-                    if (node != null)
-                        AttemptStart(node);
-                    return;
+                    Vector2 screenPosition = ResolvePointerScreenPosition(pointer);
+                    QueuePendingInteractFromPointer(screenPosition, MousePointerEventSystemId);
+                    handled = true;
                 }
             }
+
+            if (handled)
+                return;
 
             if (!AllowQuickActionKey)
                 return;
@@ -371,7 +392,7 @@ namespace Skills.Common
                 return;
 
             if (nearbyNode != null)
-                AttemptStart(nearbyNode);
+                QueuePendingInteractFromQuickAction(nearbyNode);
         }
 
         /// <summary>
@@ -394,28 +415,76 @@ namespace Skills.Common
             if (context.control.parent is TouchControl touchControl)
             {
                 pendingProspect = true;
-                pendingProspectTouchId = touchControl.touchId.ReadValue();
+                pendingProspectPointerId = touchControl.touchId.ReadValue();
                 pendingProspectScreenPosition = touchControl.position.ReadValue();
+                pendingProspectSkipUiBlock = false;
+                return;
+            }
+
+            if (context.control.device is Pen)
+            {
+                pendingProspect = true;
+                pendingProspectPointerId = PointerId.penPointerId;
+                pendingProspectScreenPosition = ResolvePointerScreenPosition(context.control.device);
+                pendingProspectSkipUiBlock = false;
                 return;
             }
 
             if (!(context.control.device is Pointer pointer) || pointer is Touchscreen)
                 return;
 
-            if (BlockMouseWhilePointerOverUI && EventSystem.current != null &&
-                EventSystem.current.IsPointerOverGameObject(MousePointerEventSystemId))
-                return;
+            pendingProspect = true;
+            pendingProspectPointerId = MousePointerEventSystemId;
+            pendingProspectScreenPosition = ResolvePointerScreenPosition(pointer);
+            pendingProspectSkipUiBlock = false;
+        }
 
-            Vector2 screenPosition = Mouse.current != null
-                ? Mouse.current.position.ReadValue()
-                : pointer.position.ReadValue();
+        /// <summary>
+        ///     Queues pointer-driven interaction presses so they can be resolved from Update once UI checks pass.
+        /// </summary>
+        private void QueuePendingInteractFromPointer(Vector2 screenPosition, int pointerId)
+        {
+            pendingInteract = true;
+            pendingInteractScreenPosition = screenPosition;
+            pendingInteractPointerId = pointerId;
+            pendingInteractSkipUiBlock = false;
+            pendingInteractHasDirectNode = false;
+            pendingInteractDirectNode = null;
+        }
 
-            var node = FindNodeAtScreenPosition(screenPosition);
-            if (node != null)
-            {
-                Prospect(node);
-                nextProspectAllowedTime = Time.time + prospectCooldownSeconds;
-            }
+        /// <summary>
+        ///     Queues quick-action requests triggered by keyboard/gamepad confirms so they bypass UI filtering.
+        /// </summary>
+        private void QueuePendingInteractFromQuickAction(TNode node)
+        {
+            pendingInteract = true;
+            pendingInteractScreenPosition = default;
+            pendingInteractPointerId = PointerId.invalidPointerId;
+            pendingInteractSkipUiBlock = true;
+            pendingInteractHasDirectNode = true;
+            pendingInteractDirectNode = node;
+        }
+
+        /// <summary>
+        ///     Resolves the screen position from a pointer device, falling back to the active mouse when needed.
+        /// </summary>
+        private static Vector2 ResolvePointerScreenPosition(InputDevice device)
+        {
+            if (device is Mouse mouse)
+                return mouse.position.ReadValue();
+
+            if (device is Pointer pointerDevice)
+                return pointerDevice.position.ReadValue();
+
+            Mouse currentMouse = Mouse.current;
+            if (currentMouse != null)
+                return currentMouse.position.ReadValue();
+
+            Pointer currentPointer = Pointer.current;
+            if (currentPointer != null)
+                return currentPointer.position.ReadValue();
+
+            return new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
         }
 
         /// <summary>

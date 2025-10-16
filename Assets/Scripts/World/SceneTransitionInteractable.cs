@@ -67,8 +67,9 @@ namespace World
         private bool interactActionOwned;
         private bool _hasPendingInteractRequest;
         private Vector2 _pendingScreenPosition;
-        private bool _pendingFromTouch;
-        private int _pendingTouchId = -1;
+        private bool _pendingHasPointerId;
+        private int _pendingPointerId = PointerId.invalidPointerId;
+        private bool _pendingRequiresFallbackUiCheck;
 
         private void OnEnable()
         {
@@ -93,14 +94,39 @@ namespace World
             if (_transitioning)
                 return;
 
-            if (TryQueueTouchRequest(context))
-                return;
-
-            if (IsPointerBlockedByUI(context))
-                return;
-
             Vector2 screenPosition = ResolveScreenPosition(context);
-            TryResolveInteractRequest(screenPosition);
+            bool hasPointerId = false;
+            int pointerId = PointerId.invalidPointerId;
+            bool requiresFallbackUiCheck = false;
+
+            if (context.control != null)
+            {
+                if (context.control.parent is TouchControl touchControl)
+                {
+                    hasPointerId = true;
+                    pointerId = touchControl.touchId.ReadValue();
+                }
+                else if (context.control.device is Pen)
+                {
+                    hasPointerId = true;
+                    pointerId = PointerId.penPointerId;
+                }
+                else if (context.control.device is Pointer pointer && !(pointer is Touchscreen))
+                {
+                    hasPointerId = true;
+                    pointerId = MousePointerEventSystemId;
+                }
+                else
+                {
+                    requiresFallbackUiCheck = true;
+                }
+            }
+            else
+            {
+                requiresFallbackUiCheck = true;
+            }
+
+            QueuePendingInteractRequest(screenPosition, hasPointerId, pointerId, requiresFallbackUiCheck);
         }
 
         private void Update()
@@ -115,16 +141,17 @@ namespace World
             }
 
             bool pointerBlocked = false;
-            if (EventSystem.current != null && _pendingFromTouch && _pendingTouchId >= 0)
-                pointerBlocked = EventSystem.current.IsPointerOverGameObject(_pendingTouchId);
-
-            if (pointerBlocked)
+            if (EventSystem.current != null)
             {
-                ClearPendingInteractRequest();
-                return;
+                if (_pendingHasPointerId && _pendingPointerId != PointerId.invalidPointerId)
+                    pointerBlocked = EventSystem.current.IsPointerOverGameObject(_pendingPointerId);
+                else if (_pendingRequiresFallbackUiCheck)
+                    pointerBlocked = IsPointerOverUI();
             }
 
-            TryResolveInteractRequest(_pendingScreenPosition);
+            if (!pointerBlocked)
+                TryResolveInteractRequest(_pendingScreenPosition);
+
             ClearPendingInteractRequest();
         }
 
@@ -224,33 +251,6 @@ namespace World
         }
 
         /// <summary>
-        ///     Determines whether the current interaction press should be blocked because the pointer is over a UI element.
-        ///     Uses touch specific pointer IDs when available so mobile presses continue to honour EventSystem filtering.
-        /// </summary>
-        private static bool IsPointerBlockedByUI(InputAction.CallbackContext context)
-        {
-            if (EventSystem.current == null)
-                return false;
-
-            if (context.control != null)
-            {
-                if (context.control.parent is TouchControl touchControl)
-                {
-                    int touchId = touchControl.touchId.ReadValue();
-                    if (EventSystem.current.IsPointerOverGameObject(touchId))
-                        return true;
-                }
-                else if (context.control.device is Pointer pointer && !(pointer is Touchscreen))
-                {
-                    if (EventSystem.current.IsPointerOverGameObject(MousePointerEventSystemId))
-                        return true;
-                }
-            }
-
-            return IsPointerOverUI();
-        }
-
-        /// <summary>
         ///     Resolves the screen position associated with the current input context, falling back to the active pointer device
         ///     when the action originates from a non-pointer binding (e.g. controller confirm).
         /// </summary>
@@ -280,25 +280,6 @@ namespace World
         }
 
         /// <summary>
-        ///     Attempts to queue a pointer-driven interaction so UI checks can be evaluated safely during Update.
-        /// </summary>
-        private bool TryQueueTouchRequest(InputAction.CallbackContext context)
-        {
-            if (context.control == null)
-                return false;
-
-            if (context.control.parent is TouchControl touchControl)
-            {
-                QueuePendingInteractRequest(
-                    touchControl.position.ReadValue(),
-                    touchControl.touchId.ReadValue());
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
         ///     Executes the collider hit test using a cached screen position and begins the transition coroutine when valid.
         /// </summary>
         private void TryResolveInteractRequest(Vector2 screenPosition)
@@ -322,11 +303,16 @@ namespace World
         /// <summary>
         ///     Stores the pending interaction data until it can be processed during Update.
         /// </summary>
-        private void QueuePendingInteractRequest(Vector2 screenPosition, int touchId)
+        private void QueuePendingInteractRequest(
+            Vector2 screenPosition,
+            bool hasPointerId,
+            int pointerId,
+            bool requiresFallbackUiCheck)
         {
             _pendingScreenPosition = screenPosition;
-            _pendingFromTouch = true;
-            _pendingTouchId = touchId;
+            _pendingHasPointerId = hasPointerId && pointerId != PointerId.invalidPointerId;
+            _pendingPointerId = hasPointerId ? pointerId : PointerId.invalidPointerId;
+            _pendingRequiresFallbackUiCheck = requiresFallbackUiCheck;
             _hasPendingInteractRequest = true;
         }
 
@@ -337,8 +323,9 @@ namespace World
         {
             _hasPendingInteractRequest = false;
             _pendingScreenPosition = default;
-            _pendingFromTouch = false;
-            _pendingTouchId = -1;
+            _pendingHasPointerId = false;
+            _pendingPointerId = PointerId.invalidPointerId;
+            _pendingRequiresFallbackUiCheck = false;
         }
 
         /// <summary>
