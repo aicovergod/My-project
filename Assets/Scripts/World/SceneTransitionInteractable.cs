@@ -1,10 +1,11 @@
 using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.UI;
-using UnityEngine.UIElements;
 using Core.Input;
 using Skills;
 
@@ -61,6 +62,15 @@ namespace World
         ///     to ensure UI hover checks track the active input system package.
         /// </summary>
         private static readonly int MousePointerEventSystemId = PointerId.mousePointerId;
+        private static readonly int PenPointerEventSystemId;
+        private static readonly bool SupportsPenPointerId;
+
+        private static readonly List<RaycastResult> RaycastResults = new List<RaycastResult>(8);
+
+        static SceneTransitionInteractable()
+        {
+            SupportsPenPointerId = TryResolvePenPointerEventSystemId(out PenPointerEventSystemId);
+        }
 
         private bool _transitioning;
         private InputAction interactAction;
@@ -108,8 +118,15 @@ namespace World
                 }
                 else if (context.control.device is Pen)
                 {
-                    hasPointerId = true;
-                    pointerId = PointerId.penPointerId;
+                    if (SupportsPenPointerId)
+                    {
+                        hasPointerId = true;
+                        pointerId = PenPointerEventSystemId;
+                    }
+                    else
+                    {
+                        requiresFallbackUiCheck = true;
+                    }
                 }
                 else if (context.control.device is Pointer pointer && !(pointer is Touchscreen))
                 {
@@ -146,7 +163,7 @@ namespace World
                 if (_pendingHasPointerId && _pendingPointerId != PointerId.invalidPointerId)
                     pointerBlocked = EventSystem.current.IsPointerOverGameObject(_pendingPointerId);
                 else if (_pendingRequiresFallbackUiCheck)
-                    pointerBlocked = IsPointerOverUI();
+                    pointerBlocked = IsPointerOverUI(_pendingScreenPosition);
             }
 
             if (!pointerBlocked)
@@ -221,7 +238,7 @@ namespace World
         /// <summary>
         ///     Checks whether the pointer is hovering a UI element registered with the active <see cref="EventSystem"/>.
         /// </summary>
-        private static bool IsPointerOverUI()
+        private static bool IsPointerOverUI(Vector2 fallbackScreenPosition)
         {
             if (EventSystem.current == null)
                 return false;
@@ -242,11 +259,62 @@ namespace World
                 }
             }
 
-            // If a mouse or pen pointer is available, rely on the default EventSystem behaviour.
+            // If a pointer is available, try to use the EventSystem pointer ID when supported.
             Pointer pointer = Pointer.current;
             if (pointer != null && !(pointer is Touchscreen))
-                return EventSystem.current.IsPointerOverGameObject(MousePointerEventSystemId);
+            {
+                if (!(pointer is Pen) || SupportsPenPointerId)
+                    return EventSystem.current.IsPointerOverGameObject(MousePointerEventSystemId);
 
+                Vector2 screenPosition = fallbackScreenPosition;
+                if (screenPosition == default)
+                    screenPosition = pointer.position.ReadValue();
+
+                return RaycastUI(screenPosition);
+            }
+
+            if (fallbackScreenPosition != default)
+                return RaycastUI(fallbackScreenPosition);
+
+            return false;
+        }
+
+        private static bool RaycastUI(Vector2 screenPosition)
+        {
+            if (EventSystem.current == null)
+                return false;
+
+            var pointerEventData = new PointerEventData(EventSystem.current)
+            {
+                position = screenPosition
+            };
+
+            RaycastResults.Clear();
+            EventSystem.current.RaycastAll(pointerEventData, RaycastResults);
+            bool hit = RaycastResults.Count > 0;
+            RaycastResults.Clear();
+            return hit;
+        }
+
+        private static bool TryResolvePenPointerEventSystemId(out int pointerId)
+        {
+            const BindingFlags lookupFlags = BindingFlags.Public | BindingFlags.Static;
+
+            FieldInfo field = typeof(PointerId).GetField("penPointerId", lookupFlags);
+            if (field != null)
+            {
+                pointerId = (int)field.GetValue(null);
+                return true;
+            }
+
+            PropertyInfo property = typeof(PointerId).GetProperty("penPointerId", lookupFlags);
+            if (property != null)
+            {
+                pointerId = (int)property.GetValue(null);
+                return true;
+            }
+
+            pointerId = PointerId.invalidPointerId;
             return false;
         }
 
