@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:503e2dd0b3f843c5866f576380faecbacbb6c5fa -->
+## 2025-10-16T11:27:35+01:00 — Adjust pointer id usage for UI blocking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 59 ++ / 15 --
+- Notes:
+  —
+---
 <!-- commit:bc56ac149ba17455f27aad0665b7d7b1637a0b8c -->
 ## 2025-10-16T11:13:12+01:00 — Merge pull request #1149 from aicovergod/codex/extend-npcinteractable-with-pending-pointer-request
 
