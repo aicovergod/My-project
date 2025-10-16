@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a2a6507dcb9cef3eeb46672266a1a4927d161341 -->
+## 2025-10-16T11:47:04+01:00 — Simplify mouse pointer handling for interactions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): AGENTS.md, Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 112 ++ / 83 --
+- Notes:
+  —
+---
 <!-- commit:60b402deb7b76b0b3badcb852a36e7d0fd70a4ef -->
 ## 2025-10-16T11:27:57+01:00 — Merge pull request #1150 from aicovergod/codex/adjust-pointer-id-handling-in-interactions
 

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.UI;
 using Player;
 using Player.Movement;
 using Core.Input;
@@ -96,9 +97,11 @@ namespace Skills.Common
 
         // Flags queued by input callbacks so pointer interactions are processed from Update.
         private bool pendingInteract;
-        private int pendingPointerId = -1;
-        private bool pendingHasPointerId;
+        private Vector2 pendingInteractScreenPosition;
+        private int pendingInteractTouchId = -1;
         private bool pendingProspect;
+        private Vector2 pendingProspectScreenPosition;
+        private int pendingProspectTouchId = -1;
 
         // Automatic movement state used when the player clicks a node from outside the interaction range.
         private bool isApproachingNode;
@@ -273,19 +276,16 @@ namespace Skills.Common
             {
                 pendingInteract = false;
                 bool pointerBlocked = false;
-                if (BlockMouseWhilePointerOverUI && EventSystem.current != null)
-                {
-                    pointerBlocked = pendingHasPointerId
-                        ? EventSystem.current.IsPointerOverGameObject(pendingPointerId)
-                        : EventSystem.current.IsPointerOverGameObject();
-                }
+                if (BlockMouseWhilePointerOverUI && EventSystem.current != null && pendingInteractTouchId >= 0)
+                    pointerBlocked = EventSystem.current.IsPointerOverGameObject(pendingInteractTouchId);
 
-                pendingPointerId = -1;
-                pendingHasPointerId = false;
+                Vector2 screenPosition = pendingInteractScreenPosition;
+                pendingInteractTouchId = -1;
+                pendingInteractScreenPosition = default;
 
                 if (!pointerBlocked)
                 {
-                    var node = FindNodeUnderCursor();
+                    var node = FindNodeAtScreenPosition(screenPosition);
                     if (node != null && IsInteractionReady())
                         AttemptStart(node);
                 }
@@ -295,19 +295,16 @@ namespace Skills.Common
             {
                 pendingProspect = false;
                 bool pointerBlocked = false;
-                if (BlockMouseWhilePointerOverUI && EventSystem.current != null)
-                {
-                    pointerBlocked = pendingHasPointerId
-                        ? EventSystem.current.IsPointerOverGameObject(pendingPointerId)
-                        : EventSystem.current.IsPointerOverGameObject();
-                }
+                if (BlockMouseWhilePointerOverUI && EventSystem.current != null && pendingProspectTouchId >= 0)
+                    pointerBlocked = EventSystem.current.IsPointerOverGameObject(pendingProspectTouchId);
 
-                pendingPointerId = -1;
-                pendingHasPointerId = false;
+                Vector2 screenPosition = pendingProspectScreenPosition;
+                pendingProspectTouchId = -1;
+                pendingProspectScreenPosition = default;
 
                 if (!pointerBlocked)
                 {
-                    var node = FindNodeUnderCursor();
+                    var node = FindNodeAtScreenPosition(screenPosition);
                     if (node != null)
                     {
                         Prospect(node);
@@ -334,19 +331,27 @@ namespace Skills.Common
                         return;
 
                     pendingInteract = true;
-                    pendingPointerId = touchControl.touchId.ReadValue();
-                    pendingHasPointerId = true;
+                    pendingInteractTouchId = touchControl.touchId.ReadValue();
+                    pendingInteractScreenPosition = touchControl.position.ReadValue();
                     return;
                 }
 
-                if (context.control.device is Pointer)
+                if (context.control.device is Pointer pointer && !(pointer is Touchscreen))
                 {
                     if (!IsInteractionReady())
                         return;
 
-                    pendingInteract = true;
-                    pendingPointerId = -1;
-                    pendingHasPointerId = false;
+                    if (BlockMouseWhilePointerOverUI && EventSystem.current != null &&
+                        EventSystem.current.IsPointerOverGameObject(PointerId.mousePointerId))
+                        return;
+
+                    Vector2 screenPosition = Mouse.current != null
+                        ? Mouse.current.position.ReadValue()
+                        : pointer.position.ReadValue();
+
+                    var node = FindNodeAtScreenPosition(screenPosition);
+                    if (node != null)
+                        AttemptStart(node);
                     return;
                 }
             }
@@ -372,22 +377,36 @@ namespace Skills.Common
             if (!SupportsProspecting)
                 return;
 
-            if (context.control == null || !(context.control.device is Pointer))
+            if (context.control == null)
                 return;
 
             if (Time.time < nextProspectAllowedTime)
                 return;
 
-            pendingProspect = true;
             if (context.control.parent is TouchControl touchControl)
             {
-                pendingPointerId = touchControl.touchId.ReadValue();
-                pendingHasPointerId = true;
+                pendingProspect = true;
+                pendingProspectTouchId = touchControl.touchId.ReadValue();
+                pendingProspectScreenPosition = touchControl.position.ReadValue();
+                return;
             }
-            else
+
+            if (!(context.control.device is Pointer pointer) || pointer is Touchscreen)
+                return;
+
+            if (BlockMouseWhilePointerOverUI && EventSystem.current != null &&
+                EventSystem.current.IsPointerOverGameObject(PointerId.mousePointerId))
+                return;
+
+            Vector2 screenPosition = Mouse.current != null
+                ? Mouse.current.position.ReadValue()
+                : pointer.position.ReadValue();
+
+            var node = FindNodeAtScreenPosition(screenPosition);
+            if (node != null)
             {
-                pendingPointerId = -1;
-                pendingHasPointerId = false;
+                Prospect(node);
+                nextProspectAllowedTime = Time.time + prospectCooldownSeconds;
             }
         }
 
@@ -452,6 +471,17 @@ namespace Skills.Common
 
             Vector2 fallback = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
             Vector2 screenPoint = InputActionResolver.GetPointerScreenPosition(fallback);
+            return FindNodeAtScreenPosition(screenPoint);
+        }
+
+        /// <summary>
+        ///     Converts a screen position into a node reference.
+        /// </summary>
+        private TNode FindNodeAtScreenPosition(Vector2 screenPoint)
+        {
+            if (worldCamera == null)
+                return null;
+
             Vector2 worldPoint = worldCamera.ScreenToWorldPoint(screenPoint);
             return FindNodeAtWorldPosition(worldPoint);
         }
