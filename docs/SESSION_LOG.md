@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8dab5f9a84b9c35b774fdd66943b4f208b284f38 -->
+## 2025-10-16T21:06:53+01:00 — Merge pull request #1162 from aicovergod/codex/add-ui-check-in-onmousedown
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 91 ++ / 56 --
+- Notes:
+  Block NPC attacks when pointer over UI
+---
+<!-- commit:ec7eeacb1fd2de9fd7bd9a7f52174bf55b2e38e8 -->
+## 2025-10-16T21:06:42+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:39c77e5f21eaa4ec73904f26cbaf06dcd0cdce1a -->
 ## 2025-10-16T21:06:24+01:00 — Block NPC attacks when pointer over UI
 
