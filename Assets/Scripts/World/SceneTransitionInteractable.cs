@@ -292,7 +292,7 @@ namespace World
                     pointer.position.ReadValue(),
                     pointer.deviceId,
                     cameFromPointerDevice: true,
-                    hasPointerId: true);
+                    hasPointerId: false);
                 return true;
             }
 
