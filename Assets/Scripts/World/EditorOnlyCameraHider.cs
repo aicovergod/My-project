@@ -154,18 +154,19 @@ namespace World
 
             gameObject.hideFlags = HideFlags.None;
 
-            if (previewCamera != null && !previewCamera.enabled)
+            if (previewCamera != null)
             {
-                previewCamera.enabled = cameraEnabledBeforeRuntime;
+                previewCamera.enabled = true;
             }
 
-            if (previewAudioListener != null && !previewAudioListener.enabled)
+            cameraEnabledBeforeRuntime = true;
+
+            if (previewAudioListener != null)
             {
-                previewAudioListener.enabled = audioListenerEnabledBeforeRuntime;
+                previewAudioListener.enabled = true;
             }
 
-            cameraEnabledBeforeRuntime = previewCamera != null ? previewCamera.enabled : cameraEnabledBeforeRuntime;
-            audioListenerEnabledBeforeRuntime = previewAudioListener != null ? previewAudioListener.enabled : audioListenerEnabledBeforeRuntime;
+            audioListenerEnabledBeforeRuntime = true;
 
             hasRuntimeSuppressionBeenApplied = false;
         }

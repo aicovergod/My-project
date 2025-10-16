@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c99777641b3b9b1105b80ef905671ad9b14e23b5 -->
+## 2025-10-16T10:21:50+01:00 — Ensure preview camera restores after play mode
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/World/EditorOnlyCameraHider.cs
+- Diff: 7 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:d69598f5930831c8cdc72f4e1728ec65a63fca7e -->
 ## 2025-10-16T10:05:58+01:00 — Merge pull request #1144 from aicovergod/codex/refactor-editoronlycamerahider-for-performance
 
