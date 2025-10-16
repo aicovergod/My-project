@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4cb01e525ca5904d4c2d84fa04a86a0cfd7fab44 -->
+## 2025-10-16T20:48:37+01:00 — Restore UI blocking for gathering controllers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Skills/Cooking/Core/CookingController.cs, Assets/Scripts/Skills/Firemaking/Core/FiremakingBonfireController.cs, Assets/Scripts/Skills/Fishing/Core/FisherController.cs
+- Diff: 0 ++ / 14 --
+- Notes:
+  —
+---
 <!-- commit:3599871b1ee31802aec890228e0f113481917ca2 -->
 ## 2025-10-16T20:19:52+01:00 — Merge pull request #1158 from aicovergod/codex/update-raycast-filtering-for-ui-interactions
 
