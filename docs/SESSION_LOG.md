@@ -1,84 +1,12 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:8dab5f9a84b9c35b774fdd66943b4f208b284f38 -->
-## 2025-10-16T21:06:53+01:00 — Merge pull request #1162 from aicovergod/codex/add-ui-check-in-onmousedown
+<!-- commit:4cb01e525ca5904d4c2d84fa04a86a0cfd7fab44 -->
+## 2025-10-16T20:48:37+01:00 — Restore UI blocking for gathering controllers
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 91 ++ / 56 --
-- Notes:
-  Block NPC attacks when pointer over UI
----
-<!-- commit:ec7eeacb1fd2de9fd7bd9a7f52174bf55b2e38e8 -->
-## 2025-10-16T21:06:42+01:00 — Update SESSION_LOG [ci]
-
-- Author: session-log-bot <actions@github.com>
-- Changed files (1): docs/SESSION_LOG.md
-- Diff: 9 ++ / 0 --
-- Notes:
-  —
----
-<!-- commit:39c77e5f21eaa4ec73904f26cbaf06dcd0cdce1a -->
-## 2025-10-16T21:06:24+01:00 — Block NPC attacks when pointer over UI
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (3): Assets/Scripts/NPC/Combat/NpcAttackOnClick.cs, Assets/Scripts/UI/Utilities/PointerRaycastUtility.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
-- Diff: 82 ++ / 56 --
-- Notes:
-  —
----
-<!-- commit:f3347fbc358c0eafef359546785539f55dea4028 -->
-## 2025-10-16T21:00:57+01:00 — Merge pull request #1161 from aicovergod/codex/update-npcshopopener-to-filter-ui-hits
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 58 ++ / 3 --
-- Notes:
-  Filter NPC shop UI raycasts
----
-<!-- commit:9deb90cf0fc33206ef997bb84c77ba2a981c5592 -->
-## 2025-10-16T21:00:37+01:00 — Update SESSION_LOG [ci]
-
-- Author: session-log-bot <actions@github.com>
-- Changed files (1): docs/SESSION_LOG.md
-- Diff: 9 ++ / 0 --
-- Notes:
-  —
----
-<!-- commit:38716fd8e8e20a98ec31ce64416f3aea448c011e -->
-## 2025-10-16T21:00:19+01:00 — Filter NPC shop UI raycasts
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (1): Assets/Scripts/NPC/Interaction/NpcShopOpener.cs
-- Diff: 49 ++ / 3 --
-- Notes:
-  —
----
-<!-- commit:8e58fdeeda7fd10bf2120191f3a57b6eaaac740b -->
-## 2025-10-16T20:53:56+01:00 — Merge pull request #1160 from aicovergod/codex/refactor-pointer-blocking-logic-in-scenetransitioninteractab
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 40 ++ / 10 --
-- Notes:
-  Filter scene transition UI raycasts
----
-<!-- commit:4e587b6bf6c592d492ed17e19b01dc272e383490 -->
-## 2025-10-16T20:53:30+01:00 — Update SESSION_LOG [ci]
-
-- Author: session-log-bot <actions@github.com>
-- Changed files (1): docs/SESSION_LOG.md
-- Diff: 9 ++ / 0 --
-- Notes:
-  —
----
-<!-- commit:9d229e1fbd6f9ca03c9b108cc88c9964ad82d98f -->
-## 2025-10-16T20:52:55+01:00 — Filter UI raycasts for scene transitions
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (1): Assets/Scripts/World/SceneTransitionInteractable.cs
-- Diff: 31 ++ / 10 --
+- Changed files (3): Assets/Scripts/Skills/Cooking/Core/CookingController.cs, Assets/Scripts/Skills/Firemaking/Core/FiremakingBonfireController.cs, Assets/Scripts/Skills/Fishing/Core/FisherController.cs
+- Diff: 0 ++ / 14 --
 - Notes:
   —
 ---

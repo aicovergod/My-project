@@ -91,12 +91,6 @@ namespace Skills.Firemaking
         }
 #endif
 
-        /// <summary>
-        ///     Bonfires should continue to accept clicks even if the pointer is hovering UI, matching
-        ///     the fishing controller behaviour so banking or chat overlays do not block fueling.
-        /// </summary>
-        protected override bool BlockMouseWhilePointerOverUI => false;
-
         /// <inheritdoc />
         protected override bool IsPerformingAction => Skill != null && Skill.IsFeedingBonfire;
 

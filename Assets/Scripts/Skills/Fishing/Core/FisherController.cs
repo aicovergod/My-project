@@ -65,11 +65,6 @@ namespace Skills.Fishing
         /// </summary>
         protected override bool SupportsProspecting => true;
 
-        /// <summary>
-        /// Fishing should still respond to clicks when the pointer is over UI elements.
-        /// </summary>
-        protected override bool BlockMouseWhilePointerOverUI => false;
-
         /// <inheritdoc />
         protected override bool IsPerformingAction => FishingSkill != null && FishingSkill.IsFishing;
 
