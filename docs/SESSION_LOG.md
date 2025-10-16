@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:39c77e5f21eaa4ec73904f26cbaf06dcd0cdce1a -->
+## 2025-10-16T21:06:24+01:00 — Block NPC attacks when pointer over UI
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/NPC/Combat/NpcAttackOnClick.cs, Assets/Scripts/UI/Utilities/PointerRaycastUtility.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 82 ++ / 56 --
+- Notes:
+  —
+---
 <!-- commit:f3347fbc358c0eafef359546785539f55dea4028 -->
 ## 2025-10-16T21:00:57+01:00 — Merge pull request #1161 from aicovergod/codex/update-npcshopopener-to-filter-ui-hits
 
