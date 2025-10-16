@@ -74,9 +74,6 @@ namespace Skills.Cooking
         }
 
         /// <inheritdoc />
-        protected override bool BlockMouseWhilePointerOverUI => false;
-
-        /// <inheritdoc />
         protected override bool IsPerformingAction => CookingSkill != null && CookingSkill.IsCooking;
 
         /// <inheritdoc />
