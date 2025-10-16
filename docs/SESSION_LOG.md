@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0ad027783748e3fbe73575717d651ca9b32ef3cc -->
+## 2025-10-16T11:02:03+01:00 — Fix ground item collection abort handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs, Assets/Scripts/Inventory/ItemPickup.cs
+- Diff: 21 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:ac9d2caddd2d5ec93081fa8883d72ff37ac8fb0c -->
 ## 2025-10-16T10:43:44+01:00 — Merge pull request #1147 from aicovergod/codex/fix-input-field-click-issue-in-bank-tab
 
