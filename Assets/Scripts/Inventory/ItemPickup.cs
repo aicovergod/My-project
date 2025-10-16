@@ -43,6 +43,9 @@ namespace Inventory
         private GroundItemManager manager;
         private Vector2Int cachedTile;
         private bool registeredWithManager;
+        // Tracks whether the pickup is currently being added to an inventory so the
+        // manager can avoid treating the Destroy call as an unexpected despawn.
+        private bool isBeingCollected;
 
         /// <summary>Spawn order assigned by <see cref="GroundItemManager"/> for deterministic menus.</summary>
         internal long SpawnOrder { get; set; }
@@ -58,6 +61,9 @@ namespace Inventory
 
         /// <summary>Tile coordinate cached for this pickup.</summary>
         public Vector2Int TileCoordinate => cachedTile;
+
+        /// <summary>True while the pickup is in the process of being collected.</summary>
+        internal bool IsBeingCollected => isBeingCollected;
 
         private void Reset()
         {
@@ -75,6 +81,7 @@ namespace Inventory
 
         private void OnEnable()
         {
+            isBeingCollected = false;
             RegisterWithManager();
         }
 
@@ -93,6 +100,7 @@ namespace Inventory
         private void OnDisable()
         {
             UnregisterFromManager();
+            isBeingCollected = false;
         }
 
         /// <summary>Updates icon visuals and cached data for the pickup.</summary>
@@ -118,12 +126,16 @@ namespace Inventory
             if (inventory == null || item == null || amount <= 0)
                 return false;
 
+            // Flag collection so GroundItemManager knows the upcoming Destroy call is expected.
+            isBeingCollected = true;
+
             if (inventory.AddItem(item, amount))
             {
                 Destroy(gameObject);
                 return true;
             }
 
+            isBeingCollected = false;
             return false;
         }
 
