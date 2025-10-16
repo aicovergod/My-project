@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:78db75b2b6bc3bf39dc8feca0e4aa4ea256b82e5 -->
+## 2025-10-16T10:35:35+01:00 — Merge pull request #1146 from aicovergod/codex/fix-collision-for-depleted-ore
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 34 ++ / 4 --
+- Notes:
+  Fix depleted mining rock collision
+---
+<!-- commit:2710c9bbe881ccbfe03d6a70bd2aa53536b1593b -->
+## 2025-10-16T10:35:26+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:013b2290228716fbadd85fb8a65a9287fa5cab6d -->
 ## 2025-10-16T10:35:11+01:00 — Fix depleted mining rock collider
 
