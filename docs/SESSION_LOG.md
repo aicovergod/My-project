@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4fa338e7dddc398755809ce717a0d682ae89b734 -->
+## 2025-10-16T15:30:27+01:00 — Defer UI pointer checks for gathering and transitions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 164 ++ / 108 --
+- Notes:
+  —
+---
 <!-- commit:801600a000907c703f17c33975c3a0695e7cb1e3 -->
 ## 2025-10-16T14:06:27+01:00 — Merge pull request #1153 from aicovergod/codex/replace-mousepointereventsystemid-with-pointerid
 
