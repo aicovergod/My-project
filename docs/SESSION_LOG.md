@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f0f7061b196c7bf7d0b4ce17e087bd63e9c9828e -->
+## 2025-10-16T10:43:22+01:00 — Fix stack split dialog input focus
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/StackSplitDialog.cs
+- Diff: 70 ++ / 15 --
+- Notes:
+  —
+---
 <!-- commit:78db75b2b6bc3bf39dc8feca0e4aa4ea256b82e5 -->
 ## 2025-10-16T10:35:35+01:00 — Merge pull request #1146 from aicovergod/codex/fix-collision-for-depleted-ore
 
