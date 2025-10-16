@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9d229e1fbd6f9ca03c9b108cc88c9964ad82d98f -->
+## 2025-10-16T20:52:55+01:00 — Filter UI raycasts for scene transitions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 31 ++ / 10 --
+- Notes:
+  —
+---
 <!-- commit:3599871b1ee31802aec890228e0f113481917ca2 -->
 ## 2025-10-16T20:19:52+01:00 — Merge pull request #1158 from aicovergod/codex/update-raycast-filtering-for-ui-interactions
 
