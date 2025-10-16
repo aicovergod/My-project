@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.UIElements;
 using ShopSystem;
 using Pets;
 using Combat;
@@ -38,11 +39,11 @@ namespace NPC
         private static Canvas menuCanvas;
 
         /// <summary>
-        ///     Pointer identifier used by the EventSystem for mouse hover checks. Unity removed the
-        ///     <c>PointerId</c> helper when consolidating the new input module, but the EventSystem still
-        ///     expects <c>-1</c> for the active mouse pointer so we cache the constant locally.
+        ///     Pointer identifier used by the EventSystem for mouse hover checks. Unity exposes the
+        ///     active mouse pointer value via <see cref="PointerId.mousePointerId"/> so the cache stays in
+        ///     sync with the current input system configuration.
         /// </summary>
-        private const int MousePointerEventSystemId = -1;
+        private static readonly int MousePointerEventSystemId = PointerId.mousePointerId;
 
         private InputAction openMenuAction;
         private bool openMenuActionOwned;

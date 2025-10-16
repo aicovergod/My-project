@@ -3,6 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.UIElements;
 using Player;
 using Player.Movement;
 using Core.Input;
@@ -89,11 +90,11 @@ namespace Skills.Common
 
         // Cached input actions resolved from the PlayerInput/asset.
         /// <summary>
-        ///     Pointer identifier recognised by the EventSystem for the active mouse cursor. Unity's newer
-        ///     input system packages no longer expose <c>PointerId.mousePointerId</c>, so keep the value cached
-        ///     locally to avoid depending on package internals.
+        ///     Pointer identifier recognised by the EventSystem for the active mouse cursor. Unity exposes
+        ///     the canonical value via <see cref="PointerId.mousePointerId"/>, so cache it locally to keep the
+        ///     EventSystem queries aligned with whichever input system package is active.
         /// </summary>
-        private const int MousePointerEventSystemId = -1;
+        private static readonly int MousePointerEventSystemId = PointerId.mousePointerId;
 
         private InputAction interactAction;
         private InputAction prospectAction;
