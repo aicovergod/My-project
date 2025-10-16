@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2b2b0623c83c159d09d951ac2224d2af9d62159d -->
+## 2025-10-16T15:31:19+01:00 — Merge pull request #1154 from aicovergod/codex/refactor-interaction-handling-in-gatheringcontroller-and-sce
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 173 ++ / 108 --
+- Notes:
+  Defer UI pointer filtering for gathering and scene transitions
+---
+<!-- commit:52add921b28d64904eefbd2692adad027b04175d -->
+## 2025-10-16T15:30:41+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:4fa338e7dddc398755809ce717a0d682ae89b734 -->
 ## 2025-10-16T15:30:27+01:00 — Defer UI pointer checks for gathering and transitions
 
