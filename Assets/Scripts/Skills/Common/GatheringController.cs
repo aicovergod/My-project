@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -103,6 +105,9 @@ namespace Skills.Common
         private Vector2 pendingProspectScreenPosition;
         private bool pendingProspectSkipUiBlock;
 
+        // Cached buffer used when raycasting against the UI EventSystem so we avoid per-frame allocations.
+        private readonly List<RaycastResult> pointerRaycastResults = new();
+
         // Automatic movement state used when the player clicks a node from outside the interaction range.
         private bool isApproachingNode;
         private TNode approachingNode;
@@ -114,6 +119,12 @@ namespace Skills.Common
         ///     Cached reference to the skill component so derived classes can access it safely.
         /// </summary>
         protected TSkill Skill => skill;
+
+        /// <summary>
+        ///     Determines whether verbose pointer blocking diagnostics should be emitted.
+        /// </summary>
+        private bool ShouldLogUiDiagnostics =>
+            skill is DebuggableTickedSkillBehaviour debuggable && debuggable.EnableDebugLogging;
 
         /// <summary>
         ///     Cached reference to the movement controller used for cancellation checks.
@@ -286,8 +297,13 @@ namespace Skills.Common
                 pendingInteractDirectNode = null;
                 pendingInteractScreenPosition = default;
 
-                bool pointerBlocked = !skipUiBlock && BlockMouseWhilePointerOverUI && EventSystem.current != null &&
-                                       EventSystem.current.IsPointerOverGameObject();
+                bool pointerBlocked = false;
+                if (!skipUiBlock && BlockMouseWhilePointerOverUI)
+                {
+                    pointerBlocked = TryRaycastPointerUI(screenPosition, out var uiHits);
+                    if (pointerBlocked)
+                        LogPointerBlocked("Interact", screenPosition, uiHits);
+                }
 
                 if (!pointerBlocked)
                 {
@@ -307,8 +323,13 @@ namespace Skills.Common
                 pendingProspectSkipUiBlock = false;
                 pendingProspectScreenPosition = default;
 
-                bool pointerBlocked = !skipUiBlock && BlockMouseWhilePointerOverUI && EventSystem.current != null &&
-                                       EventSystem.current.IsPointerOverGameObject();
+                bool pointerBlocked = false;
+                if (!skipUiBlock && BlockMouseWhilePointerOverUI)
+                {
+                    pointerBlocked = TryRaycastPointerUI(screenPosition, out var uiHits);
+                    if (pointerBlocked)
+                        LogPointerBlocked("Prospect", screenPosition, uiHits);
+                }
 
                 if (!pointerBlocked)
                 {
@@ -415,6 +436,27 @@ namespace Skills.Common
         }
 
         /// <summary>
+        ///     Performs a UI raycast at the specified screen position and returns the cached hit list.
+        /// </summary>
+        private bool TryRaycastPointerUI(Vector2 screenPosition, out List<RaycastResult> hits)
+        {
+            hits = pointerRaycastResults;
+            hits.Clear();
+
+            EventSystem eventSystem = EventSystem.current;
+            if (eventSystem == null)
+                return false;
+
+            var pointerEventData = new PointerEventData(eventSystem)
+            {
+                position = screenPosition
+            };
+
+            eventSystem.RaycastAll(pointerEventData, hits);
+            return hits.Count > 0;
+        }
+
+        /// <summary>
         ///     Cancels the current action when the cancel input is pressed.
         /// </summary>
         private void HandleCancelAction(InputAction.CallbackContext context)
@@ -427,6 +469,84 @@ namespace Skills.Common
 
             CancelAutoApproach(true);
             RequestStopAction();
+        }
+
+        /// <summary>
+        ///     Emits detailed diagnostics for pointer blocks so gathering UI conflicts are easier to troubleshoot.
+        /// </summary>
+        private void LogPointerBlocked(string context, Vector2 screenPosition, List<RaycastResult> uiHits)
+        {
+            if (!ShouldLogUiDiagnostics)
+                return;
+
+            var sb = new StringBuilder();
+            sb.Append('[').Append(GetType().Name).Append("] Pointer blocked during ").Append(context)
+              .Append(" at screen position ").Append(screenPosition).AppendLine(".");
+
+            sb.Append("UI Raycast Hits (").Append(uiHits.Count).AppendLine("):");
+            for (int i = 0; i < uiHits.Count; i++)
+            {
+                RaycastResult hit = uiHits[i];
+                if (hit.gameObject == null)
+                    continue;
+
+                string layerName = FormatLayerName(hit.gameObject.layer);
+                string moduleName = hit.module != null ? hit.module.GetType().Name : "UnknownModule";
+                sb.Append("  ").Append(i + 1).Append(": ")
+                  .Append(hit.gameObject.name)
+                  .Append(" [Layer: ").Append(layerName).Append("] via ")
+                  .Append(moduleName);
+
+                if (hit.module != null && hit.module.eventCamera != null)
+                    sb.Append(" (Camera: ").Append(hit.module.eventCamera.name).Append(')');
+
+                sb.AppendLine();
+            }
+
+            Camera activeCamera = worldCamera != null ? worldCamera : Camera.main;
+            if (activeCamera != null)
+            {
+                Vector3 worldPoint3 = activeCamera.ScreenToWorldPoint(screenPosition);
+                Vector2 worldPoint = new Vector2(worldPoint3.x, worldPoint3.y);
+                sb.Append("Physics2D.OverlapPointAll at world ").Append(worldPoint).AppendLine(":");
+
+                var colliders = Physics2D.OverlapPointAll(worldPoint);
+                if (colliders.Length == 0)
+                {
+                    sb.AppendLine("  (none)");
+                }
+                else
+                {
+                    for (int i = 0; i < colliders.Length; i++)
+                    {
+                        var collider = colliders[i];
+                        if (collider == null)
+                            continue;
+
+                        string layerName = FormatLayerName(collider.gameObject.layer);
+                        sb.Append("  ").Append(i + 1).Append(": ")
+                          .Append(collider.name)
+                          .Append(" [Layer: ").Append(layerName).Append("] ")
+                          .Append(collider.GetType().Name)
+                          .AppendLine();
+                    }
+                }
+            }
+            else
+            {
+                sb.AppendLine("No active world camera available; skipped Physics2D.OverlapPointAll diagnostics.");
+            }
+
+            Debug.Log(sb.ToString(), this);
+        }
+
+        /// <summary>
+        ///     Formats a layer identifier so diagnostics surface both the name and the numeric value when available.
+        /// </summary>
+        private static string FormatLayerName(int layer)
+        {
+            string layerName = LayerMask.LayerToName(layer);
+            return string.IsNullOrEmpty(layerName) ? layer.ToString() : $"{layerName} ({layer})";
         }
 
         /// <summary>
