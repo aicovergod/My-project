@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:752c38e245858905bddde1ad43051c30801d9c2c -->
+## 2025-10-16T14:05:44+01:00 — Align mouse pointer ID with UIElements constant
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 14 ++ / 12 --
+- Notes:
+  —
+---
 <!-- commit:13ea0c2bc26616369b4376bcd09ab96fa3af5d0b -->
 ## 2025-10-16T11:52:32+01:00 — Merge pull request #1152 from aicovergod/codex/fix-console-errors-related-to-pointerid
 
