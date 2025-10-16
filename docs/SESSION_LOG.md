@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:13ea0c2bc26616369b4376bcd09ab96fa3af5d0b -->
+## 2025-10-16T11:52:32+01:00 — Merge pull request #1152 from aicovergod/codex/fix-console-errors-related-to-pointerid
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 37 ++ / 6 --
+- Notes:
+  Restore mouse pointer ID constants for EventSystem UI checks
+---
+<!-- commit:1e9759b021b47e13acb4aaed414cd25ee43451fc -->
+## 2025-10-16T11:52:20+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:eb85ffc9ce89eae5b7df1ba772626dee6ced7453 -->
 ## 2025-10-16T11:52:09+01:00 — Restore mouse pointer ID constants for EventSystem UI checks
 
