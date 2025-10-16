@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:801600a000907c703f17c33975c3a0695e7cb1e3 -->
+## 2025-10-16T14:06:27+01:00 — Merge pull request #1153 from aicovergod/codex/replace-mousepointereventsystemid-with-pointerid
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 23 ++ / 12 --
+- Notes:
+  Align pointer hover checks with UIElements pointer ID
+---
+<!-- commit:d5f48c6a9a652dfe8963f3dc3ebfd28a00ee0888 -->
+## 2025-10-16T14:05:57+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:752c38e245858905bddde1ad43051c30801d9c2c -->
 ## 2025-10-16T14:05:44+01:00 — Align mouse pointer ID with UIElements constant
 
