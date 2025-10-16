@@ -273,6 +273,15 @@ namespace NPC
             };
 
             eventSystem.RaycastAll(pointerEventData, hits);
+
+            // Remove world collider hits so only genuine UI blocks the interaction.
+            for (int i = hits.Count - 1; i >= 0; i--)
+            {
+                BaseRaycaster module = hits[i].module;
+                if (module is PhysicsRaycaster || module is Physics2DRaycaster)
+                    hits.RemoveAt(i);
+            }
+
             return hits.Count > 0;
         }
 
