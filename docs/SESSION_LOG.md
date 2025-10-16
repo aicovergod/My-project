@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:27fa375f1416e325d9a2349fc929c78020c3bbfc -->
+## 2025-10-16T15:59:34+01:00 — Merge pull request #1156 from aicovergod/codex/refactor-input-handling-for-mouse-only-support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 46 ++ / 334 --
+- Notes:
+  Simplify mouse-only interaction handling
+---
+<!-- commit:d96ef6c184ad0aa48e58641a1680b17a64827215 -->
+## 2025-10-16T15:58:58+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:40dd2e276ef364c79cd461dbfcf098afb067ad12 -->
 ## 2025-10-16T15:58:44+01:00 — Simplify gathering and scene interaction input to mouse
 
