@@ -1,10 +1,10 @@
+using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
-using UnityEngine.InputSystem.UI;
-using UnityEngine.UIElements;
 using ShopSystem;
 using Pets;
 using Combat;
@@ -38,13 +38,6 @@ namespace NPC
         private static RightClickMenu menuInstance;
         private static Canvas menuCanvas;
 
-        /// <summary>
-        ///     Pointer identifier used by the EventSystem for mouse hover checks. Unity exposes the
-        ///     active mouse pointer value via <see cref="PointerId.mousePointerId"/> so the cache stays in
-        ///     sync with the current input system configuration.
-        /// </summary>
-        private static readonly int MousePointerEventSystemId = PointerId.mousePointerId;
-
         private InputAction openMenuAction;
         private bool openMenuActionOwned;
         private bool pointerHovering;
@@ -53,6 +46,9 @@ namespace NPC
         private bool pendingCameFromPointerDevice;
         private bool pendingCameFromTouch;
         private int pendingTouchId = -1;
+
+        // Cached list used to capture UI raycast hits without allocating every frame.
+        private readonly List<RaycastResult> pointerRaycastResults = new();
 
         private void Awake()
         {
@@ -116,29 +112,15 @@ namespace NPC
                 return;
             }
 
-            bool pointerBlocked = false;
-            if (EventSystem.current != null)
-            {
-                if (pendingCameFromTouch)
-                {
-                    pointerBlocked = EventSystem.current.IsPointerOverGameObject(pendingTouchId);
-                }
-                else if (pendingCameFromPointerDevice)
-                {
-                    pointerBlocked = EventSystem.current.IsPointerOverGameObject(MousePointerEventSystemId);
-                }
-                else if (IsPointerOverUI())
-                {
-                    pointerBlocked = true;
-                }
-            }
-            else if (IsPointerOverUI())
-            {
-                pointerBlocked = true;
-            }
+            string context = pendingCameFromTouch
+                ? $"TouchOpenMenu(id:{pendingTouchId})"
+                : pendingCameFromPointerDevice
+                    ? "PointerOpenMenu"
+                    : "OpenMenu";
 
-            if (pointerBlocked)
+            if (TryRaycastPointerUI(pendingScreenPosition, out var uiHits))
             {
+                LogPointerBlocked(context, pendingScreenPosition, uiHits);
                 ClearPendingOpenMenuRequest();
                 return;
             }
@@ -274,14 +256,112 @@ namespace NPC
         }
 
         /// <summary>
+        ///     Performs a UI raycast at the supplied screen position using the cached buffer.
+        /// </summary>
+        private bool TryRaycastPointerUI(Vector2 screenPosition, out List<RaycastResult> hits)
+        {
+            hits = pointerRaycastResults;
+            hits.Clear();
+
+            EventSystem eventSystem = EventSystem.current;
+            if (eventSystem == null)
+                return false;
+
+            var pointerEventData = new PointerEventData(eventSystem)
+            {
+                position = screenPosition
+            };
+
+            eventSystem.RaycastAll(pointerEventData, hits);
+            return hits.Count > 0;
+        }
+
+        /// <summary>
+        ///     Logs detailed diagnostics for pointer interactions that are blocked by UI elements.
+        /// </summary>
+        private void LogPointerBlocked(string context, Vector2 screenPosition, List<RaycastResult> uiHits)
+        {
+            if (uiHits == null || uiHits.Count == 0)
+                return;
+
+            var sb = new StringBuilder();
+            sb.Append('[').Append(GetType().Name).Append("] Pointer blocked (").Append(context)
+              .Append(") at screen position ").Append(screenPosition).AppendLine(".");
+
+            sb.Append("UI Raycast Hits (").Append(uiHits.Count).AppendLine("):");
+            for (int i = 0; i < uiHits.Count; i++)
+            {
+                RaycastResult hit = uiHits[i];
+                if (hit.gameObject == null)
+                    continue;
+
+                string layerName = FormatLayerName(hit.gameObject.layer);
+                string moduleName = hit.module != null ? hit.module.GetType().Name : "UnknownModule";
+                sb.Append("  ").Append(i + 1).Append(": ")
+                  .Append(hit.gameObject.name)
+                  .Append(" [Layer: ").Append(layerName).Append("] via ")
+                  .Append(moduleName);
+
+                if (hit.module != null && hit.module.eventCamera != null)
+                    sb.Append(" (Camera: ").Append(hit.module.eventCamera.name).Append(')');
+
+                sb.AppendLine();
+            }
+
+            Camera activeCamera = Camera.main;
+            if (activeCamera != null)
+            {
+                Vector3 worldPoint3 = activeCamera.ScreenToWorldPoint(screenPosition);
+                Vector2 worldPoint = new Vector2(worldPoint3.x, worldPoint3.y);
+                sb.Append("Physics2D.OverlapPointAll at world ").Append(worldPoint).AppendLine(":");
+
+                var colliders = Physics2D.OverlapPointAll(worldPoint);
+                if (colliders.Length == 0)
+                {
+                    sb.AppendLine("  (none)");
+                }
+                else
+                {
+                    for (int i = 0; i < colliders.Length; i++)
+                    {
+                        var collider = colliders[i];
+                        if (collider == null)
+                            continue;
+
+                        string layerName = FormatLayerName(collider.gameObject.layer);
+                        sb.Append("  ").Append(i + 1).Append(": ")
+                          .Append(collider.name)
+                          .Append(" [Layer: ").Append(layerName).Append("] ")
+                          .Append(collider.GetType().Name)
+                          .AppendLine();
+                    }
+                }
+            }
+            else
+            {
+                sb.AppendLine("No main camera available; skipped Physics2D.OverlapPointAll diagnostics.");
+            }
+
+            Debug.Log(sb.ToString(), this);
+        }
+
+        /// <summary>
+        ///     Formats layer information to include both the human-readable name and numeric identifier when available.
+        /// </summary>
+        private static string FormatLayerName(int layer)
+        {
+            string layerName = LayerMask.LayerToName(layer);
+            return string.IsNullOrEmpty(layerName) ? layer.ToString() : $"{layerName} ({layer})";
+        }
+
+        /// <summary>
         ///     Determines whether the current pointer is hovering UI that should prevent NPC interactions.
         /// </summary>
-        private static bool IsPointerOverUI()
+        private bool IsPointerOverUI()
         {
             if (EventSystem.current == null)
                 return false;
 
-            // Evaluate active touches first so mobile presses correctly block world interactions.
             Touchscreen touchscreen = Touchscreen.current;
             if (touchscreen != null)
             {
@@ -292,15 +372,25 @@ namespace NPC
                     if (!touchControl.press.isPressed)
                         continue;
 
-                    if (EventSystem.current.IsPointerOverGameObject(touchControl.touchId.ReadValue()))
+                    Vector2 touchPosition = touchControl.position.ReadValue();
+                    if (TryRaycastPointerUI(touchPosition, out var uiHits))
+                    {
+                        LogPointerBlocked("TouchCheck", touchPosition, uiHits);
                         return true;
+                    }
                 }
             }
 
-            // If a mouse or pen pointer is available, rely on the default EventSystem behaviour.
             Pointer pointer = Pointer.current;
             if (pointer != null && !(pointer is Touchscreen))
-                return EventSystem.current.IsPointerOverGameObject(MousePointerEventSystemId);
+            {
+                Vector2 pointerPosition = pointer.position.ReadValue();
+                if (TryRaycastPointerUI(pointerPosition, out var uiHits))
+                {
+                    LogPointerBlocked("PointerCheck", pointerPosition, uiHits);
+                    return true;
+                }
+            }
 
             return false;
         }
