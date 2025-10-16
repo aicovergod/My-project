@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2c3419987edf1396e61c3226f66f1f7152700d32 -->
+## 2025-10-16T21:12:03+01:00 — Document raycaster filtering requirement for gathering UI
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): AGENTS.md
+- Diff: 1 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:8c4a99ab9cdd2d8f8c88d6e0e6bfded7134960ef -->
 ## 2025-10-16T21:09:04+01:00 — Merge pull request #1159 from aicovergod/codex/update-ui-blocking-behavior-in-controllers
 
