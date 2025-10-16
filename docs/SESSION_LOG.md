@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d69598f5930831c8cdc72f4e1728ec65a63fca7e -->
+## 2025-10-16T10:05:58+01:00 — Merge pull request #1144 from aicovergod/codex/refactor-editoronlycamerahider-for-performance
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 96 ++ / 10 --
+- Notes:
+  Refine editor-only camera hider runtime toggling
+---
+<!-- commit:643e3bd142e5b3711fa62a5784d5bef1040036b7 -->
+## 2025-10-16T10:05:52+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f60d9a811d1ed237d7eda69bcceb47d792191d96 -->
 ## 2025-10-16T10:05:36+01:00 — Refine editor preview camera toggling
 
