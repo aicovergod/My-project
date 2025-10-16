@@ -25,7 +25,18 @@ namespace World
             Destroy(gameObject);
         }
 #else
+        [SerializeField]
+        [Tooltip("Optional explicit reference to the preview camera that should be hidden while the game runs.")]
+        private Camera previewCamera;
+
+        [SerializeField]
+        [Tooltip("Optional explicit reference to the preview audio listener that should be hidden while the game runs.")]
+        private AudioListener previewAudioListener;
+
         private bool isSubscribedToEditorEvents;
+        private bool hasRuntimeSuppressionBeenApplied;
+        private bool cameraEnabledBeforeRuntime = true;
+        private bool audioListenerEnabledBeforeRuntime = true;
 
         /// <summary>
         /// Subscribe to play-mode events and make sure the preview camera is
@@ -33,10 +44,17 @@ namespace World
         /// </summary>
         private void OnEnable()
         {
+            CachePreviewComponents();
+
             if (!isSubscribedToEditorEvents)
             {
                 EditorApplication.playModeStateChanged += HandlePlayModeStateChanged;
                 isSubscribedToEditorEvents = true;
+            }
+
+            if (!Application.isPlaying && !EditorApplication.isPlaying)
+            {
+                RestoreForEditMode();
             }
 
             ApplyDesiredState();
@@ -84,11 +102,17 @@ namespace World
         {
             if (Application.isPlaying || EditorApplication.isPlaying)
             {
-                DisableForRuntime();
+                if (!hasRuntimeSuppressionBeenApplied)
+                {
+                    DisableForRuntime();
+                }
             }
             else
             {
-                RestoreForEditMode();
+                if (hasRuntimeSuppressionBeenApplied)
+                {
+                    RestoreForEditMode();
+                }
             }
         }
 
@@ -111,8 +135,8 @@ namespace World
         }
 
         /// <summary>
-        /// Makes sure the preview camera object is active while editing so
-        /// designers can frame the scene.
+        /// Restores the preview camera (and matching audio listener) for edit mode
+        /// while keeping the helper object active and visible in the hierarchy.
         /// </summary>
         private void RestoreForEditMode()
         {
@@ -121,21 +145,34 @@ namespace World
                 return;
             }
 
+            CachePreviewComponents();
+
             if (!gameObject.activeSelf)
             {
                 gameObject.SetActive(true);
             }
 
-            var previewCamera = GetComponent<Camera>();
+            gameObject.hideFlags = HideFlags.None;
+
             if (previewCamera != null && !previewCamera.enabled)
             {
-                previewCamera.enabled = true;
+                previewCamera.enabled = cameraEnabledBeforeRuntime;
             }
+
+            if (previewAudioListener != null && !previewAudioListener.enabled)
+            {
+                previewAudioListener.enabled = audioListenerEnabledBeforeRuntime;
+            }
+
+            cameraEnabledBeforeRuntime = previewCamera != null ? previewCamera.enabled : cameraEnabledBeforeRuntime;
+            audioListenerEnabledBeforeRuntime = previewAudioListener != null ? previewAudioListener.enabled : audioListenerEnabledBeforeRuntime;
+
+            hasRuntimeSuppressionBeenApplied = false;
         }
 
         /// <summary>
-        /// Deactivates the preview camera as soon as play mode begins so the
-        /// persistent runtime camera owns the scene without competition.
+        /// Disables the preview camera and audio listener during play mode so the
+        /// runtime camera/audio stack can drive the scene without interference.
         /// </summary>
         private void DisableForRuntime()
         {
@@ -144,10 +181,33 @@ namespace World
                 return;
             }
 
-            if (gameObject.activeSelf)
+            if (hasRuntimeSuppressionBeenApplied)
             {
-                gameObject.SetActive(false);
+                return;
             }
+
+            CachePreviewComponents();
+
+            if (previewCamera != null)
+            {
+                cameraEnabledBeforeRuntime = previewCamera.enabled;
+                if (previewCamera.enabled)
+                {
+                    previewCamera.enabled = false;
+                }
+            }
+
+            if (previewAudioListener != null)
+            {
+                audioListenerEnabledBeforeRuntime = previewAudioListener.enabled;
+                if (previewAudioListener.enabled)
+                {
+                    previewAudioListener.enabled = false;
+                }
+            }
+
+            gameObject.hideFlags |= HideFlags.HideInHierarchy;
+            hasRuntimeSuppressionBeenApplied = true;
         }
 
         /// <summary>
@@ -162,6 +222,23 @@ namespace World
 
             EditorApplication.playModeStateChanged -= HandlePlayModeStateChanged;
             isSubscribedToEditorEvents = false;
+        }
+
+        /// <summary>
+        /// Lazily resolves the preview camera and audio listener references so the
+        /// helper does not call <see cref="GetComponent{T}()"/> every frame.
+        /// </summary>
+        private void CachePreviewComponents()
+        {
+            if (previewCamera == null)
+            {
+                TryGetComponent(out previewCamera);
+            }
+
+            if (previewAudioListener == null)
+            {
+                TryGetComponent(out previewAudioListener);
+            }
         }
 #endif
     }
