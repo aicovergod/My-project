@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e81039c6354a05d38b706b12d654686d8e589bef -->
+## 2025-10-16T11:02:24+01:00 — Merge pull request #1148 from aicovergod/codex/fix-item-pickup-not-adding-to-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 30 ++ / 1 --
+- Notes:
+  Fix ground item collection abort handling
+---
+<!-- commit:904e56c536c9cc20ebcfbc4f08be7a6984626fed -->
+## 2025-10-16T11:02:16+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0ad027783748e3fbe73575717d651ca9b32ef3cc -->
 ## 2025-10-16T11:02:03+01:00 — Fix ground item collection abort handling
 
