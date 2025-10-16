@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:800c8663af9cd0049c1620cec46e9ba190185b21 -->
+## 2025-10-16T15:40:53+01:00 — Fix pen pointer handling in UI gating
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 165 ++ / 19 --
+- Notes:
+  —
+---
 <!-- commit:2b2b0623c83c159d09d951ac2224d2af9d62159d -->
 ## 2025-10-16T15:31:19+01:00 — Merge pull request #1154 from aicovergod/codex/refactor-interaction-handling-in-gatheringcontroller-and-sce
 
