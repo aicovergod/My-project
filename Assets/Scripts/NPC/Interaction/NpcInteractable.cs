@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using ShopSystem;
 using Pets;
 using Combat;
@@ -38,6 +39,11 @@ namespace NPC
         private InputAction openMenuAction;
         private bool openMenuActionOwned;
         private bool pointerHovering;
+        private bool hasPendingOpenMenuRequest;
+        private Vector2 pendingScreenPosition;
+        private int pendingPointerId = -1;
+        private bool pendingCameFromPointerDevice;
+        private bool pendingHasPointerId;
 
         private void Awake()
         {
@@ -55,6 +61,7 @@ namespace NPC
         {
             pointerHovering = false;
             UnsubscribeFromInput();
+            ClearPendingOpenMenuRequest();
         }
 
         private void OnMouseEnter()
@@ -78,22 +85,48 @@ namespace NPC
             if (!pointerHovering)
                 return;
 
+            if (TryQueuePointerOpenMenuRequest(context))
+                return;
+
             if (IsPointerOverUI())
-                return;
-
-            var combatTarget = GetComponent<CombatTarget>();
-            if (!PetDropSystem.GuardModeEnabled && PetDropSystem.ActivePetCombat != null && combatTarget != null)
-            {
-                PetDropSystem.ActivePetCombat.CommandAttack(combatTarget, true);
-                return;
-            }
-
-            if (!EnsureMenuInstance())
                 return;
 
             Vector2 pointer = InputActionResolver.GetPointerScreenPosition(
                 new Vector2(Screen.width * 0.5f, Screen.height * 0.5f));
-            menuInstance.Show(this, pointer);
+            ProcessOpenMenu(pointer);
+        }
+
+        private void Update()
+        {
+            if (!hasPendingOpenMenuRequest)
+                return;
+
+            if (!pointerHovering)
+            {
+                ClearPendingOpenMenuRequest();
+                return;
+            }
+
+            bool pointerBlocked = false;
+            if (pendingCameFromPointerDevice && EventSystem.current != null)
+            {
+                pointerBlocked = pendingHasPointerId
+                    ? EventSystem.current.IsPointerOverGameObject(pendingPointerId)
+                    : EventSystem.current.IsPointerOverGameObject();
+            }
+            else if (IsPointerOverUI())
+            {
+                pointerBlocked = true;
+            }
+
+            if (pointerBlocked)
+            {
+                ClearPendingOpenMenuRequest();
+                return;
+            }
+
+            ProcessOpenMenu(pendingScreenPosition);
+            ClearPendingOpenMenuRequest();
         }
 
         /// <summary>
@@ -146,6 +179,81 @@ namespace NPC
                 openMenuAction = null;
                 openMenuActionOwned = false;
             }
+        }
+
+        /// <summary>
+        ///     Attempts to queue a pointer-driven open menu request so UI blocking can be re-evaluated safely in Update.
+        /// </summary>
+        private bool TryQueuePointerOpenMenuRequest(InputAction.CallbackContext context)
+        {
+            if (context.control == null)
+                return false;
+
+            if (context.control.parent is TouchControl touchControl)
+            {
+                int touchId = touchControl.touchId.ReadValue();
+                QueuePendingOpenMenuRequest(
+                    touchControl.position.ReadValue(),
+                    touchId,
+                    cameFromPointerDevice: true,
+                    hasPointerId: touchId >= 0);
+                return true;
+            }
+
+            if (context.control.device is Pointer pointer && !(pointer is Touchscreen))
+            {
+                int pointerId = pointer.deviceId;
+                QueuePendingOpenMenuRequest(
+                    pointer.position.ReadValue(),
+                    pointerId,
+                    cameFromPointerDevice: true,
+                    hasPointerId: pointerId >= 0);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        ///     Stores the pending data associated with a pointer-triggered open menu request.
+        /// </summary>
+        private void QueuePendingOpenMenuRequest(Vector2 screenPosition, int pointerId, bool cameFromPointerDevice, bool hasPointerId)
+        {
+            pendingScreenPosition = screenPosition;
+            pendingPointerId = pointerId;
+            pendingCameFromPointerDevice = cameFromPointerDevice;
+            pendingHasPointerId = hasPointerId;
+            hasPendingOpenMenuRequest = true;
+        }
+
+        /// <summary>
+        ///     Clears any cached pointer interaction data to avoid leaking callbacks across disable/enable cycles.
+        /// </summary>
+        private void ClearPendingOpenMenuRequest()
+        {
+            hasPendingOpenMenuRequest = false;
+            pendingScreenPosition = default;
+            pendingPointerId = -1;
+            pendingCameFromPointerDevice = false;
+            pendingHasPointerId = false;
+        }
+
+        /// <summary>
+        ///     Executes the pet attack fallback or shows the NPC context menu at the specified screen position.
+        /// </summary>
+        private void ProcessOpenMenu(Vector2 screenPosition)
+        {
+            var combatTarget = GetComponent<CombatTarget>();
+            if (!PetDropSystem.GuardModeEnabled && PetDropSystem.ActivePetCombat != null && combatTarget != null)
+            {
+                PetDropSystem.ActivePetCombat.CommandAttack(combatTarget, true);
+                return;
+            }
+
+            if (!EnsureMenuInstance())
+                return;
+
+            menuInstance.Show(this, screenPosition);
         }
 
         /// <summary>

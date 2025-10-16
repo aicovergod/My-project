@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:44c4242d0ca7da3bc4355958ee992a5008d7a9e5 -->
+## 2025-10-16T11:12:52+01:00 — Handle pointer-driven NPC menu interactions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Interaction/NpcInteractable.cs
+- Diff: 115 ++ / 7 --
+- Notes:
+  —
+---
 <!-- commit:e81039c6354a05d38b706b12d654686d8e589bef -->
 ## 2025-10-16T11:02:24+01:00 — Merge pull request #1148 from aicovergod/codex/fix-item-pickup-not-adding-to-inventory
 
