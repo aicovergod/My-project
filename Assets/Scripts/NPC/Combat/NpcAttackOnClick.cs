@@ -4,6 +4,7 @@ using Combat;
 using Player;
 using Player.Movement;
 using Status.Freeze;
+using UI.Utilities;
 
 namespace NPC
 {
@@ -38,6 +39,11 @@ namespace NPC
 
         private void OnMouseDown()
         {
+            // Abort when the pointer is currently interacting with genuine UI so clicks on
+            // overlays (inventory, spellbook, etc.) do not also command NPC attacks.
+            if (PointerRaycastUtility.IsPointerOverBlockingUI(Input.mousePosition))
+                return;
+
             var playerController = FindObjectOfType<CombatController>();
             if (playerController == null)
                 return;

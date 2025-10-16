@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -138,6 +139,16 @@ namespace NPC
         }
 
         /// <summary>
+        ///     Shared buffer for UI raycasts so diagnostics can reuse the filtered hit list without allocations.
+        /// </summary>
+        private static readonly List<RaycastResult> pointerRaycastResults = new List<RaycastResult>(8);
+
+        /// <summary>
+        ///     Cached pointer event data instance aligned with the active event system for repeated raycasts.
+        /// </summary>
+        private static PointerEventData sharedPointerEventData;
+
+        /// <summary>
         ///     Evaluates whether the active pointer is currently hovering UI that should block world interactions.
         /// </summary>
         private static bool IsPointerOverUI()
@@ -156,17 +167,52 @@ namespace NPC
                     if (!touchControl.press.isPressed)
                         continue;
 
-                    if (EventSystem.current.IsPointerOverGameObject(touchControl.touchId.ReadValue()))
+                    Vector2 touchPosition = touchControl.position.ReadValue();
+                    if (TryRaycastPointerUI(touchPosition, out _))
                         return true;
                 }
             }
 
-            // If a mouse or pen pointer is available, rely on the default EventSystem behaviour.
+            // Evaluate mouse or pen pointers through the same filtered raycast path.
             Pointer pointer = Pointer.current;
             if (pointer != null && !(pointer is Touchscreen))
-                return EventSystem.current.IsPointerOverGameObject();
+            {
+                Vector2 pointerPosition = pointer.position.ReadValue();
+                if (TryRaycastPointerUI(pointerPosition, out _))
+                    return true;
+            }
 
             return false;
+        }
+
+        /// <summary>
+        ///     Performs a UI raycast using the shared buffer and strips physics raycaster hits so only UI blocks interactions.
+        /// </summary>
+        private static bool TryRaycastPointerUI(Vector2 screenPosition, out List<RaycastResult> hits)
+        {
+            hits = pointerRaycastResults;
+            hits.Clear();
+
+            EventSystem eventSystem = EventSystem.current;
+            if (eventSystem == null)
+                return false;
+
+            if (sharedPointerEventData == null || sharedPointerEventData.eventSystem != eventSystem)
+                sharedPointerEventData = new PointerEventData(eventSystem);
+            else
+                sharedPointerEventData.Reset();
+
+            sharedPointerEventData.position = screenPosition;
+            eventSystem.RaycastAll(sharedPointerEventData, hits);
+
+            for (int i = hits.Count - 1; i >= 0; i--)
+            {
+                BaseRaycaster module = hits[i].module;
+                if (module is PhysicsRaycaster || module is Physics2DRaycaster)
+                    hits.RemoveAt(i);
+            }
+
+            return hits.Count > 0;
         }
     }
 }
