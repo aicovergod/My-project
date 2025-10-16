@@ -252,7 +252,15 @@ namespace Inventory.GroundItems
 
             if (activePickup == pickup)
             {
-                AbortActivePickup("Pickup was removed before collection could complete.");
+                if (pickup.IsBeingCollected)
+                {
+                    if (enableDebugLogging)
+                        Debug.Log("[GroundItemManager] Pickup removed as part of a successful collection. Skipping abort.");
+                }
+                else
+                {
+                    AbortActivePickup("Pickup was removed before collection could complete.");
+                }
             }
         }
 
