@@ -453,6 +453,15 @@ namespace Skills.Common
             };
 
             eventSystem.RaycastAll(pointerEventData, hits);
+
+            // Ignore physics raycasters because they correspond to world colliders rather than UI elements.
+            for (int i = hits.Count - 1; i >= 0; i--)
+            {
+                BaseRaycaster module = hits[i].module;
+                if (module is PhysicsRaycaster || module is Physics2DRaycaster)
+                    hits.RemoveAt(i);
+            }
+
             return hits.Count > 0;
         }
 
