@@ -54,6 +54,14 @@ namespace World
         [Tooltip("Optional override for the interact/confirm action used to trigger the transition.")]
         private InputActionReference interactActionReference;
 
+        /// <summary>
+        ///     Pointer identifier used by the EventSystem to represent the active mouse pointer.
+        ///     The Input System previously exposed this via <c>PointerId.mousePointerId</c> but the
+        ///     constant was removed when Unity dropped the legacy UI module. We still need the value
+        ///     when checking whether the mouse is hovering UI, so cache it locally.
+        /// </summary>
+        private const int MousePointerEventSystemId = -1;
+
         private bool _transitioning;
         private InputAction interactAction;
         private bool interactActionOwned;
@@ -210,7 +218,7 @@ namespace World
             // If a mouse or pen pointer is available, rely on the default EventSystem behaviour.
             Pointer pointer = Pointer.current;
             if (pointer != null && !(pointer is Touchscreen))
-                return EventSystem.current.IsPointerOverGameObject(PointerId.mousePointerId);
+                return EventSystem.current.IsPointerOverGameObject(MousePointerEventSystemId);
 
             return false;
         }
@@ -234,7 +242,7 @@ namespace World
                 }
                 else if (context.control.device is Pointer pointer && !(pointer is Touchscreen))
                 {
-                    if (EventSystem.current.IsPointerOverGameObject(PointerId.mousePointerId))
+                    if (EventSystem.current.IsPointerOverGameObject(MousePointerEventSystemId))
                         return true;
                 }
             }

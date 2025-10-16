@@ -37,6 +37,13 @@ namespace NPC
         private static RightClickMenu menuInstance;
         private static Canvas menuCanvas;
 
+        /// <summary>
+        ///     Pointer identifier used by the EventSystem for mouse hover checks. Unity removed the
+        ///     <c>PointerId</c> helper when consolidating the new input module, but the EventSystem still
+        ///     expects <c>-1</c> for the active mouse pointer so we cache the constant locally.
+        /// </summary>
+        private const int MousePointerEventSystemId = -1;
+
         private InputAction openMenuAction;
         private bool openMenuActionOwned;
         private bool pointerHovering;
@@ -117,7 +124,7 @@ namespace NPC
                 }
                 else if (pendingCameFromPointerDevice)
                 {
-                    pointerBlocked = EventSystem.current.IsPointerOverGameObject(PointerId.mousePointerId);
+                    pointerBlocked = EventSystem.current.IsPointerOverGameObject(MousePointerEventSystemId);
                 }
                 else if (IsPointerOverUI())
                 {
@@ -292,7 +299,7 @@ namespace NPC
             // If a mouse or pen pointer is available, rely on the default EventSystem behaviour.
             Pointer pointer = Pointer.current;
             if (pointer != null && !(pointer is Touchscreen))
-                return EventSystem.current.IsPointerOverGameObject(PointerId.mousePointerId);
+                return EventSystem.current.IsPointerOverGameObject(MousePointerEventSystemId);
 
             return false;
         }
