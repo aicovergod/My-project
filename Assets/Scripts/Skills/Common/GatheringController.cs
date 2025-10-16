@@ -88,6 +88,13 @@ namespace Skills.Common
         private float nextProspectAllowedTime;
 
         // Cached input actions resolved from the PlayerInput/asset.
+        /// <summary>
+        ///     Pointer identifier recognised by the EventSystem for the active mouse cursor. Unity's newer
+        ///     input system packages no longer expose <c>PointerId.mousePointerId</c>, so keep the value cached
+        ///     locally to avoid depending on package internals.
+        /// </summary>
+        private const int MousePointerEventSystemId = -1;
+
         private InputAction interactAction;
         private InputAction prospectAction;
         private InputAction cancelAction;
@@ -342,7 +349,7 @@ namespace Skills.Common
                         return;
 
                     if (BlockMouseWhilePointerOverUI && EventSystem.current != null &&
-                        EventSystem.current.IsPointerOverGameObject(PointerId.mousePointerId))
+                        EventSystem.current.IsPointerOverGameObject(MousePointerEventSystemId))
                         return;
 
                     Vector2 screenPosition = Mouse.current != null
@@ -395,7 +402,7 @@ namespace Skills.Common
                 return;
 
             if (BlockMouseWhilePointerOverUI && EventSystem.current != null &&
-                EventSystem.current.IsPointerOverGameObject(PointerId.mousePointerId))
+                EventSystem.current.IsPointerOverGameObject(MousePointerEventSystemId))
                 return;
 
             Vector2 screenPosition = Mouse.current != null

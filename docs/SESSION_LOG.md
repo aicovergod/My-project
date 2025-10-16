@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:eb85ffc9ce89eae5b7df1ba772626dee6ced7453 -->
+## 2025-10-16T11:52:09+01:00 — Restore mouse pointer ID constants for EventSystem UI checks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 28 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:36bec526101971ab3ddc1e32e6b27a274738de46 -->
 ## 2025-10-16T11:47:32+01:00 — Merge pull request #1151 from aicovergod/codex/refactor-input-handling-for-mouse-clicks-t8xhrz
 
