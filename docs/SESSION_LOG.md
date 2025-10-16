@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:233148d53d227ff97404568dca20f90574c93ab0 -->
+## 2025-10-16T17:29:36+01:00 — Improve UI raycast diagnostics for interactions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/Skills/Common/GatheringController.cs
+- Diff: 249 ++ / 39 --
+- Notes:
+  —
+---
 <!-- commit:27fa375f1416e325d9a2349fc929c78020c3bbfc -->
 ## 2025-10-16T15:59:34+01:00 — Merge pull request #1156 from aicovergod/codex/refactor-input-handling-for-mouse-only-support
 
