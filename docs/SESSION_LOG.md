@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6af0e90df96f0775d80b257db3c9e0aa57fb007b -->
+## 2025-10-16T10:22:10+01:00 — Merge pull request #1145 from aicovergod/codex/update-restoreforeditmode-method
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 16 ++ / 6 --
+- Notes:
+  Ensure preview camera restores after play mode
+---
+<!-- commit:e8c3a2a326da676b840d7f77bf0ad57f53540af2 -->
+## 2025-10-16T10:22:02+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c99777641b3b9b1105b80ef905671ad9b14e23b5 -->
 ## 2025-10-16T10:21:50+01:00 — Ensure preview camera restores after play mode
 
