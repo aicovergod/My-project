@@ -1,10 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using Core.Input;
 using Skills;
+using UI.Utilities;
 
 namespace World
 {
@@ -53,8 +52,6 @@ namespace World
         [Tooltip("Optional override for the interact/confirm action used to trigger the transition.")]
         private InputActionReference interactActionReference;
 
-        private static readonly List<RaycastResult> RaycastResults = new List<RaycastResult>(8);
-
         private bool _transitioning;
         private InputAction interactAction;
         private bool interactActionOwned;
@@ -99,7 +96,7 @@ namespace World
                 return;
             }
 
-            bool pointerBlocked = IsPointerOverUI(_pendingScreenPosition);
+            bool pointerBlocked = PointerRaycastUtility.IsPointerOverBlockingUI(_pendingScreenPosition);
 
             if (!pointerBlocked)
                 TryResolveInteractRequest(_pendingScreenPosition);
@@ -169,57 +166,6 @@ namespace World
         private void OnTransitionStarted() => _transitioning = true;
 
         private void OnTransitionCompleted() => _transitioning = false;
-
-        /// <summary>
-        ///     Checks whether the pointer is hovering a UI element registered with the active <see cref="EventSystem"/>.
-        /// </summary>
-        private static bool IsPointerOverUI(Vector2 screenPosition)
-        {
-            return TryGetFilteredUiRaycasts(screenPosition, null);
-        }
-
-        /// <summary>
-        ///     Raycasts the UI system and filters out hits coming from world physics raycasters so only genuine UI
-        ///     elements block pointer-based interaction checks.
-        /// </summary>
-        /// <param name="filteredResults">
-        ///     Optional list that will be populated with the filtered UI hits. Provide a buffer when diagnostics
-        ///     or tooling need to inspect which UI elements are blocking the interaction.
-        /// </param>
-        private static bool TryGetFilteredUiRaycasts(Vector2 screenPosition, List<RaycastResult> filteredResults)
-        {
-            if (EventSystem.current == null)
-            {
-                filteredResults?.Clear();
-                return false;
-            }
-
-            var pointerEventData = new PointerEventData(EventSystem.current)
-            {
-                position = screenPosition
-            };
-
-            RaycastResults.Clear();
-            EventSystem.current.RaycastAll(pointerEventData, RaycastResults);
-
-            filteredResults?.Clear();
-
-            bool hasUiHit = false;
-
-            for (int i = 0; i < RaycastResults.Count; i++)
-            {
-                RaycastResult result = RaycastResults[i];
-                if (result.module is PhysicsRaycaster || result.module is Physics2DRaycaster)
-                    continue;
-
-                hasUiHit = true;
-                filteredResults?.Add(result);
-            }
-
-            RaycastResults.Clear();
-
-            return hasUiHit;
-        }
 
         /// <summary>
         ///     Resolves the current mouse screen position, falling back to the screen centre when unavailable.
