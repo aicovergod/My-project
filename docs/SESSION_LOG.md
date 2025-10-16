@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:013b2290228716fbadd85fb8a65a9287fa5cab6d -->
+## 2025-10-16T10:35:11+01:00 — Fix depleted mining rock collider
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Mining/Core/MineableRock.cs
+- Diff: 25 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:6af0e90df96f0775d80b257db3c9e0aa57fb007b -->
 ## 2025-10-16T10:22:10+01:00 — Merge pull request #1145 from aicovergod/codex/update-restoreforeditmode-method
 
