@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f60d9a811d1ed237d7eda69bcceb47d792191d96 -->
+## 2025-10-16T10:05:36+01:00 — Refine editor preview camera toggling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/World/EditorOnlyCameraHider.cs
+- Diff: 87 ++ / 10 --
+- Notes:
+  —
+---
 <!-- commit:e68f9c2f68847a76d4011038695142f9bbdd4471 -->
 ## 2025-10-16T00:40:00+01:00 — Merge pull request #1143 from aicovergod/codex/fix-bug-identified-by-github-codex
 
