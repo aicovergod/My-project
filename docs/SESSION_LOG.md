@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3599871b1ee31802aec890228e0f113481917ca2 -->
+## 2025-10-16T20:19:52+01:00 — Merge pull request #1158 from aicovergod/codex/update-raycast-filtering-for-ui-interactions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 27 ++ / 0 --
+- Notes:
+  Filter physics raycasters out of UI pointer checks
+---
+<!-- commit:8d0cc91efd250977081f477463f98bb6a5f15883 -->
+## 2025-10-16T20:18:57+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:3abfa68f8688736a7c6084909ced4f75ee0ffae6 -->
 ## 2025-10-16T20:18:34+01:00 — Filter physics raycasts from UI blocking checks
 
