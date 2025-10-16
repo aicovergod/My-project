@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using Player;
 using Player.Movement;
 using Core.Input;
@@ -95,7 +96,8 @@ namespace Skills.Common
 
         // Flags queued by input callbacks so pointer interactions are processed from Update.
         private bool pendingInteract;
-        private int pendingPointerId;
+        private int pendingPointerId = -1;
+        private bool pendingHasPointerId;
         private bool pendingProspect;
 
         // Automatic movement state used when the player clicks a node from outside the interaction range.
@@ -270,9 +272,18 @@ namespace Skills.Common
             if (pendingInteract)
             {
                 pendingInteract = false;
-                if (!(BlockMouseWhilePointerOverUI &&
-                      EventSystem.current != null &&
-                      EventSystem.current.IsPointerOverGameObject(pendingPointerId)))
+                bool pointerBlocked = false;
+                if (BlockMouseWhilePointerOverUI && EventSystem.current != null)
+                {
+                    pointerBlocked = pendingHasPointerId
+                        ? EventSystem.current.IsPointerOverGameObject(pendingPointerId)
+                        : EventSystem.current.IsPointerOverGameObject();
+                }
+
+                pendingPointerId = -1;
+                pendingHasPointerId = false;
+
+                if (!pointerBlocked)
                 {
                     var node = FindNodeUnderCursor();
                     if (node != null && IsInteractionReady())
@@ -283,9 +294,18 @@ namespace Skills.Common
             if (pendingProspect)
             {
                 pendingProspect = false;
-                if (!(BlockMouseWhilePointerOverUI &&
-                      EventSystem.current != null &&
-                      EventSystem.current.IsPointerOverGameObject(pendingPointerId)))
+                bool pointerBlocked = false;
+                if (BlockMouseWhilePointerOverUI && EventSystem.current != null)
+                {
+                    pointerBlocked = pendingHasPointerId
+                        ? EventSystem.current.IsPointerOverGameObject(pendingPointerId)
+                        : EventSystem.current.IsPointerOverGameObject();
+                }
+
+                pendingPointerId = -1;
+                pendingHasPointerId = false;
+
+                if (!pointerBlocked)
                 {
                     var node = FindNodeUnderCursor();
                     if (node != null)
@@ -306,14 +326,29 @@ namespace Skills.Common
                 return;
 
             // Pointer devices (mouse, pen, touch) behave like the legacy left click handling.
-            if (context.control != null && context.control.device is Pointer pointer)
+            if (context.control != null)
             {
-                if (!IsInteractionReady())
-                    return;
+                if (context.control.parent is TouchControl touchControl)
+                {
+                    if (!IsInteractionReady())
+                        return;
 
-                pendingInteract = true;
-                pendingPointerId = pointer.deviceId;
-                return;
+                    pendingInteract = true;
+                    pendingPointerId = touchControl.touchId.ReadValue();
+                    pendingHasPointerId = true;
+                    return;
+                }
+
+                if (context.control.device is Pointer)
+                {
+                    if (!IsInteractionReady())
+                        return;
+
+                    pendingInteract = true;
+                    pendingPointerId = -1;
+                    pendingHasPointerId = false;
+                    return;
+                }
             }
 
             if (!AllowQuickActionKey)
@@ -337,14 +372,23 @@ namespace Skills.Common
             if (!SupportsProspecting)
                 return;
 
-            if (context.control == null || !(context.control.device is Pointer pointer))
+            if (context.control == null || !(context.control.device is Pointer))
                 return;
 
             if (Time.time < nextProspectAllowedTime)
                 return;
 
             pendingProspect = true;
-            pendingPointerId = pointer.deviceId;
+            if (context.control.parent is TouchControl touchControl)
+            {
+                pendingPointerId = touchControl.touchId.ReadValue();
+                pendingHasPointerId = true;
+            }
+            else
+            {
+                pendingPointerId = -1;
+                pendingHasPointerId = false;
+            }
         }
 
         /// <summary>
