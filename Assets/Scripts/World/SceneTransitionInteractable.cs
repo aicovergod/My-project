@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.UIElements;
 using Core.Input;
 using Skills;
 
@@ -56,11 +57,10 @@ namespace World
 
         /// <summary>
         ///     Pointer identifier used by the EventSystem to represent the active mouse pointer.
-        ///     The Input System previously exposed this via <c>PointerId.mousePointerId</c> but the
-        ///     constant was removed when Unity dropped the legacy UI module. We still need the value
-        ///     when checking whether the mouse is hovering UI, so cache it locally.
+        ///     Unity exposes the value through <see cref="PointerId.mousePointerId"/>, so mirror it here
+        ///     to ensure UI hover checks track the active input system package.
         /// </summary>
-        private const int MousePointerEventSystemId = -1;
+        private static readonly int MousePointerEventSystemId = PointerId.mousePointerId;
 
         private bool _transitioning;
         private InputAction interactAction;
