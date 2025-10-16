@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8e58fdeeda7fd10bf2120191f3a57b6eaaac740b -->
+## 2025-10-16T20:53:56+01:00 — Merge pull request #1160 from aicovergod/codex/refactor-pointer-blocking-logic-in-scenetransitioninteractab
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 40 ++ / 10 --
+- Notes:
+  Filter scene transition UI raycasts
+---
+<!-- commit:4e587b6bf6c592d492ed17e19b01dc272e383490 -->
+## 2025-10-16T20:53:30+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9d229e1fbd6f9ca03c9b108cc88c9964ad82d98f -->
 ## 2025-10-16T20:52:55+01:00 — Filter UI raycasts for scene transitions
 
