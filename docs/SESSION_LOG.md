@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:60b402deb7b76b0b3badcb852a36e7d0fd70a4ef -->
+## 2025-10-16T11:27:57+01:00 — Merge pull request #1150 from aicovergod/codex/adjust-pointer-id-handling-in-interactions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 68 ++ / 15 --
+- Notes:
+  Fix pointer UI gating for scene transitions and gathering
+---
+<!-- commit:336a3c5c3cc812551c99fd4536da11a97b675ce8 -->
+## 2025-10-16T11:27:49+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:503e2dd0b3f843c5866f576380faecbacbb6c5fa -->
 ## 2025-10-16T11:27:35+01:00 — Adjust pointer id usage for UI blocking
 
