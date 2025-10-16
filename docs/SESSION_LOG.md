@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3abfa68f8688736a7c6084909ced4f75ee0ffae6 -->
+## 2025-10-16T20:18:34+01:00 — Filter physics raycasts from UI blocking checks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/Skills/Common/GatheringController.cs
+- Diff: 18 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:dcd9cff467e42bec2ebd8c598177ce76b982d904 -->
 ## 2025-10-16T17:29:56+01:00 — Merge pull request #1157 from aicovergod/codex/add-raycast-helper-and-logging-for-ui-hits
 
