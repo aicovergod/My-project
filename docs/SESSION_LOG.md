@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:bc56ac149ba17455f27aad0665b7d7b1637a0b8c -->
+## 2025-10-16T11:13:12+01:00 — Merge pull request #1149 from aicovergod/codex/extend-npcinteractable-with-pending-pointer-request
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 124 ++ / 7 --
+- Notes:
+  Handle pointer-driven NPC menu interactions
+---
+<!-- commit:90156ffbc71ac152e7a655af59c3fd15f11705f6 -->
+## 2025-10-16T11:13:04+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:44c4242d0ca7da3bc4355958ee992a5008d7a9e5 -->
 ## 2025-10-16T11:12:52+01:00 — Handle pointer-driven NPC menu interactions
 
