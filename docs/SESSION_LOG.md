@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8c4a99ab9cdd2d8f8c88d6e0e6bfded7134960ef -->
+## 2025-10-16T21:09:04+01:00 — Merge pull request #1159 from aicovergod/codex/update-ui-blocking-behavior-in-controllers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 4 ++ / 90 --
+- Notes:
+  Restore UI blocking for gathering controllers
+---
+<!-- commit:c76da971c454964537a441dbf688427c64af9acc -->
+## 2025-10-16T21:08:48+01:00 — Merge branch 'main' into codex/update-ui-blocking-behavior-in-controllers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 131 ++ / 38 --
+- Notes:
+  —
+---
 <!-- commit:4cb01e525ca5904d4c2d84fa04a86a0cfd7fab44 -->
 ## 2025-10-16T20:48:37+01:00 — Restore UI blocking for gathering controllers
 
