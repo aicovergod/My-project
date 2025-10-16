@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7773e56040e7cd5e6b134144ab4b876372c051c7 -->
+## 2025-10-16T15:41:17+01:00 — Merge pull request #1155 from aicovergod/codex/fix-pointerid-penpointerid-error
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 174 ++ / 19 --
+- Notes:
+  Handle pen pointer detection without deprecated constant
+---
+<!-- commit:c1bb8c17a666beca54e73a5ac70246b657080b96 -->
+## 2025-10-16T15:41:06+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:800c8663af9cd0049c1620cec46e9ba190185b21 -->
 ## 2025-10-16T15:40:53+01:00 — Fix pen pointer handling in UI gating
 
