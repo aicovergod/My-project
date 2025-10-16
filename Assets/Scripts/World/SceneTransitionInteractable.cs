@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.UI;
 using Core.Input;
 using Skills;
 
@@ -58,9 +59,8 @@ namespace World
         private bool interactActionOwned;
         private bool _hasPendingInteractRequest;
         private Vector2 _pendingScreenPosition;
-        private int _pendingPointerId = -1;
-        private bool _pendingCameFromPointerDevice;
-        private bool _pendingHasPointerId;
+        private bool _pendingFromTouch;
+        private int _pendingTouchId = -1;
 
         private void OnEnable()
         {
@@ -85,7 +85,7 @@ namespace World
             if (_transitioning)
                 return;
 
-            if (TryQueuePointerRequest(context))
+            if (TryQueueTouchRequest(context))
                 return;
 
             if (IsPointerBlockedByUI(context))
@@ -107,12 +107,8 @@ namespace World
             }
 
             bool pointerBlocked = false;
-            if (_pendingCameFromPointerDevice && EventSystem.current != null)
-            {
-                pointerBlocked = _pendingHasPointerId
-                    ? EventSystem.current.IsPointerOverGameObject(_pendingPointerId)
-                    : EventSystem.current.IsPointerOverGameObject();
-            }
+            if (EventSystem.current != null && _pendingFromTouch && _pendingTouchId >= 0)
+                pointerBlocked = EventSystem.current.IsPointerOverGameObject(_pendingTouchId);
 
             if (pointerBlocked)
             {
@@ -214,7 +210,7 @@ namespace World
             // If a mouse or pen pointer is available, rely on the default EventSystem behaviour.
             Pointer pointer = Pointer.current;
             if (pointer != null && !(pointer is Touchscreen))
-                return EventSystem.current.IsPointerOverGameObject();
+                return EventSystem.current.IsPointerOverGameObject(PointerId.mousePointerId);
 
             return false;
         }
@@ -238,7 +234,7 @@ namespace World
                 }
                 else if (context.control.device is Pointer pointer && !(pointer is Touchscreen))
                 {
-                    if (EventSystem.current.IsPointerOverGameObject())
+                    if (EventSystem.current.IsPointerOverGameObject(PointerId.mousePointerId))
                         return true;
                 }
             }
@@ -256,7 +252,14 @@ namespace World
             {
                 if (context.control.parent is TouchControl touchControl)
                     return touchControl.position.ReadValue();
+            }
 
+            Mouse mouse = Mouse.current;
+            if (mouse != null)
+                return mouse.position.ReadValue();
+
+            if (context.control != null)
+            {
                 if (context.control.device is Pointer pointerDevice)
                     return pointerDevice.position.ReadValue();
             }
@@ -271,7 +274,7 @@ namespace World
         /// <summary>
         ///     Attempts to queue a pointer-driven interaction so UI checks can be evaluated safely during Update.
         /// </summary>
-        private bool TryQueuePointerRequest(InputAction.CallbackContext context)
+        private bool TryQueueTouchRequest(InputAction.CallbackContext context)
         {
             if (context.control == null)
                 return false;
@@ -280,19 +283,7 @@ namespace World
             {
                 QueuePendingInteractRequest(
                     touchControl.position.ReadValue(),
-                    touchControl.touchId.ReadValue(),
-                    cameFromPointerDevice: true,
-                    hasPointerId: true);
-                return true;
-            }
-
-            if (context.control.device is Pointer pointer && !(pointer is Touchscreen))
-            {
-                QueuePendingInteractRequest(
-                    pointer.position.ReadValue(),
-                    pointer.deviceId,
-                    cameFromPointerDevice: true,
-                    hasPointerId: false);
+                    touchControl.touchId.ReadValue());
                 return true;
             }
 
@@ -323,12 +314,11 @@ namespace World
         /// <summary>
         ///     Stores the pending interaction data until it can be processed during Update.
         /// </summary>
-        private void QueuePendingInteractRequest(Vector2 screenPosition, int pointerId, bool cameFromPointerDevice, bool hasPointerId)
+        private void QueuePendingInteractRequest(Vector2 screenPosition, int touchId)
         {
             _pendingScreenPosition = screenPosition;
-            _pendingPointerId = pointerId;
-            _pendingCameFromPointerDevice = cameFromPointerDevice;
-            _pendingHasPointerId = hasPointerId;
+            _pendingFromTouch = true;
+            _pendingTouchId = touchId;
             _hasPendingInteractRequest = true;
         }
 
@@ -339,9 +329,8 @@ namespace World
         {
             _hasPendingInteractRequest = false;
             _pendingScreenPosition = default;
-            _pendingPointerId = -1;
-            _pendingCameFromPointerDevice = false;
-            _pendingHasPointerId = false;
+            _pendingFromTouch = false;
+            _pendingTouchId = -1;
         }
 
         /// <summary>

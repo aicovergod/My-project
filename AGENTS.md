@@ -107,6 +107,7 @@
 ## Input & Rebinding
 - The project relies on the Unity Input System asset `Assets/InputSystem_Actions.inputactions`.
 - The **Player** action map exposes `Move`, `Interact`, `Prospect`, `Cancel`, and `OpenMenu`. Share these bindings across gameplay, NPC interaction, and UI to keep inputs consistent.
+- The game only targets mouse and keyboard on desktop—design interactions and checks with those devices as the baseline and treat touch/gamepad paths as optional extensions.
 - When introducing new bindings:
   1. Update the action asset via the Input Actions editor and apply changes.
   2. Ensure any `PlayerInput` components reference the updated asset.

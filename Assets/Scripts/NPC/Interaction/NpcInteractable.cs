@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.UI;
 using ShopSystem;
 using Pets;
 using Combat;
@@ -41,9 +42,9 @@ namespace NPC
         private bool pointerHovering;
         private bool hasPendingOpenMenuRequest;
         private Vector2 pendingScreenPosition;
-        private int pendingPointerId = -1;
         private bool pendingCameFromPointerDevice;
-        private bool pendingHasPointerId;
+        private bool pendingCameFromTouch;
+        private int pendingTouchId = -1;
 
         private void Awake()
         {
@@ -108,11 +109,20 @@ namespace NPC
             }
 
             bool pointerBlocked = false;
-            if (pendingCameFromPointerDevice && EventSystem.current != null)
+            if (EventSystem.current != null)
             {
-                pointerBlocked = pendingHasPointerId
-                    ? EventSystem.current.IsPointerOverGameObject(pendingPointerId)
-                    : EventSystem.current.IsPointerOverGameObject();
+                if (pendingCameFromTouch)
+                {
+                    pointerBlocked = EventSystem.current.IsPointerOverGameObject(pendingTouchId);
+                }
+                else if (pendingCameFromPointerDevice)
+                {
+                    pointerBlocked = EventSystem.current.IsPointerOverGameObject(PointerId.mousePointerId);
+                }
+                else if (IsPointerOverUI())
+                {
+                    pointerBlocked = true;
+                }
             }
             else if (IsPointerOverUI())
             {
@@ -194,20 +204,19 @@ namespace NPC
                 int touchId = touchControl.touchId.ReadValue();
                 QueuePendingOpenMenuRequest(
                     touchControl.position.ReadValue(),
-                    touchId,
                     cameFromPointerDevice: true,
-                    hasPointerId: touchId >= 0);
+                    cameFromTouch: true,
+                    touchId: touchId);
                 return true;
             }
 
             if (context.control.device is Pointer pointer && !(pointer is Touchscreen))
             {
-                int pointerId = pointer.deviceId;
                 QueuePendingOpenMenuRequest(
                     pointer.position.ReadValue(),
-                    pointerId,
                     cameFromPointerDevice: true,
-                    hasPointerId: pointerId >= 0);
+                    cameFromTouch: false,
+                    touchId: -1);
                 return true;
             }
 
@@ -217,12 +226,12 @@ namespace NPC
         /// <summary>
         ///     Stores the pending data associated with a pointer-triggered open menu request.
         /// </summary>
-        private void QueuePendingOpenMenuRequest(Vector2 screenPosition, int pointerId, bool cameFromPointerDevice, bool hasPointerId)
+        private void QueuePendingOpenMenuRequest(Vector2 screenPosition, bool cameFromPointerDevice, bool cameFromTouch, int touchId)
         {
             pendingScreenPosition = screenPosition;
-            pendingPointerId = pointerId;
             pendingCameFromPointerDevice = cameFromPointerDevice;
-            pendingHasPointerId = hasPointerId;
+            pendingCameFromTouch = cameFromTouch;
+            pendingTouchId = touchId;
             hasPendingOpenMenuRequest = true;
         }
 
@@ -233,9 +242,9 @@ namespace NPC
         {
             hasPendingOpenMenuRequest = false;
             pendingScreenPosition = default;
-            pendingPointerId = -1;
             pendingCameFromPointerDevice = false;
-            pendingHasPointerId = false;
+            pendingCameFromTouch = false;
+            pendingTouchId = -1;
         }
 
         /// <summary>
@@ -283,7 +292,7 @@ namespace NPC
             // If a mouse or pen pointer is available, rely on the default EventSystem behaviour.
             Pointer pointer = Pointer.current;
             if (pointer != null && !(pointer is Touchscreen))
-                return EventSystem.current.IsPointerOverGameObject();
+                return EventSystem.current.IsPointerOverGameObject(PointerId.mousePointerId);
 
             return false;
         }
