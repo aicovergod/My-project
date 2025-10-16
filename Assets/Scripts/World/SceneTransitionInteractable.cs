@@ -1,11 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
-using UnityEngine.InputSystem.UI;
 using Core.Input;
 using Skills;
 
@@ -56,30 +53,13 @@ namespace World
         [Tooltip("Optional override for the interact/confirm action used to trigger the transition.")]
         private InputActionReference interactActionReference;
 
-        /// <summary>
-        ///     Pointer identifier used by the EventSystem to represent the active mouse pointer.
-        ///     Unity exposes the value through <see cref="PointerId.mousePointerId"/>, so mirror it here
-        ///     to ensure UI hover checks track the active input system package.
-        /// </summary>
-        private static readonly int MousePointerEventSystemId = PointerId.mousePointerId;
-        private static readonly int PenPointerEventSystemId;
-        private static readonly bool SupportsPenPointerId;
-
         private static readonly List<RaycastResult> RaycastResults = new List<RaycastResult>(8);
-
-        static SceneTransitionInteractable()
-        {
-            SupportsPenPointerId = TryResolvePenPointerEventSystemId(out PenPointerEventSystemId);
-        }
 
         private bool _transitioning;
         private InputAction interactAction;
         private bool interactActionOwned;
         private bool _hasPendingInteractRequest;
         private Vector2 _pendingScreenPosition;
-        private bool _pendingHasPointerId;
-        private int _pendingPointerId = PointerId.invalidPointerId;
-        private bool _pendingRequiresFallbackUiCheck;
 
         private void OnEnable()
         {
@@ -104,46 +84,8 @@ namespace World
             if (_transitioning)
                 return;
 
-            Vector2 screenPosition = ResolveScreenPosition(context);
-            bool hasPointerId = false;
-            int pointerId = PointerId.invalidPointerId;
-            bool requiresFallbackUiCheck = false;
-
-            if (context.control != null)
-            {
-                if (context.control.parent is TouchControl touchControl)
-                {
-                    hasPointerId = true;
-                    pointerId = touchControl.touchId.ReadValue();
-                }
-                else if (context.control.device is Pen)
-                {
-                    if (SupportsPenPointerId)
-                    {
-                        hasPointerId = true;
-                        pointerId = PenPointerEventSystemId;
-                    }
-                    else
-                    {
-                        requiresFallbackUiCheck = true;
-                    }
-                }
-                else if (context.control.device is Pointer pointer && !(pointer is Touchscreen))
-                {
-                    hasPointerId = true;
-                    pointerId = MousePointerEventSystemId;
-                }
-                else
-                {
-                    requiresFallbackUiCheck = true;
-                }
-            }
-            else
-            {
-                requiresFallbackUiCheck = true;
-            }
-
-            QueuePendingInteractRequest(screenPosition, hasPointerId, pointerId, requiresFallbackUiCheck);
+            Vector2 screenPosition = ResolveMouseScreenPosition();
+            QueuePendingInteractRequest(screenPosition);
         }
 
         private void Update()
@@ -159,12 +101,10 @@ namespace World
 
             bool pointerBlocked = false;
             if (EventSystem.current != null)
-            {
-                if (_pendingHasPointerId && _pendingPointerId != PointerId.invalidPointerId)
-                    pointerBlocked = EventSystem.current.IsPointerOverGameObject(_pendingPointerId);
-                else if (_pendingRequiresFallbackUiCheck)
-                    pointerBlocked = IsPointerOverUI(_pendingScreenPosition);
-            }
+                pointerBlocked = EventSystem.current.IsPointerOverGameObject();
+
+            if (!pointerBlocked)
+                pointerBlocked = IsPointerOverUI(_pendingScreenPosition);
 
             if (!pointerBlocked)
                 TryResolveInteractRequest(_pendingScreenPosition);
@@ -238,45 +178,9 @@ namespace World
         /// <summary>
         ///     Checks whether the pointer is hovering a UI element registered with the active <see cref="EventSystem"/>.
         /// </summary>
-        private static bool IsPointerOverUI(Vector2 fallbackScreenPosition)
+        private static bool IsPointerOverUI(Vector2 screenPosition)
         {
-            if (EventSystem.current == null)
-                return false;
-
-            // Evaluate active touches first so mobile presses correctly block interactable usage.
-            Touchscreen touchscreen = Touchscreen.current;
-            if (touchscreen != null)
-            {
-                var touches = touchscreen.touches;
-                for (int i = 0; i < touches.Count; i++)
-                {
-                    var touchControl = touches[i];
-                    if (!touchControl.press.isPressed)
-                        continue;
-
-                    if (EventSystem.current.IsPointerOverGameObject(touchControl.touchId.ReadValue()))
-                        return true;
-                }
-            }
-
-            // If a pointer is available, try to use the EventSystem pointer ID when supported.
-            Pointer pointer = Pointer.current;
-            if (pointer != null && !(pointer is Touchscreen))
-            {
-                if (!(pointer is Pen) || SupportsPenPointerId)
-                    return EventSystem.current.IsPointerOverGameObject(MousePointerEventSystemId);
-
-                Vector2 screenPosition = fallbackScreenPosition;
-                if (screenPosition == default)
-                    screenPosition = pointer.position.ReadValue();
-
-                return RaycastUI(screenPosition);
-            }
-
-            if (fallbackScreenPosition != default)
-                return RaycastUI(fallbackScreenPosition);
-
-            return false;
+            return RaycastUI(screenPosition);
         }
 
         private static bool RaycastUI(Vector2 screenPosition)
@@ -296,53 +200,14 @@ namespace World
             return hit;
         }
 
-        private static bool TryResolvePenPointerEventSystemId(out int pointerId)
-        {
-            const BindingFlags lookupFlags = BindingFlags.Public | BindingFlags.Static;
-
-            FieldInfo field = typeof(PointerId).GetField("penPointerId", lookupFlags);
-            if (field != null)
-            {
-                pointerId = (int)field.GetValue(null);
-                return true;
-            }
-
-            PropertyInfo property = typeof(PointerId).GetProperty("penPointerId", lookupFlags);
-            if (property != null)
-            {
-                pointerId = (int)property.GetValue(null);
-                return true;
-            }
-
-            pointerId = PointerId.invalidPointerId;
-            return false;
-        }
-
         /// <summary>
-        ///     Resolves the screen position associated with the current input context, falling back to the active pointer device
-        ///     when the action originates from a non-pointer binding (e.g. controller confirm).
+        ///     Resolves the current mouse screen position, falling back to the screen centre when unavailable.
         /// </summary>
-        private static Vector2 ResolveScreenPosition(InputAction.CallbackContext context)
+        private static Vector2 ResolveMouseScreenPosition()
         {
-            if (context.control != null)
-            {
-                if (context.control.parent is TouchControl touchControl)
-                    return touchControl.position.ReadValue();
-            }
-
             Mouse mouse = Mouse.current;
             if (mouse != null)
                 return mouse.position.ReadValue();
-
-            if (context.control != null)
-            {
-                if (context.control.device is Pointer pointerDevice)
-                    return pointerDevice.position.ReadValue();
-            }
-
-            Pointer pointer = Pointer.current;
-            if (pointer != null)
-                return pointer.position.ReadValue();
 
             return new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
         }
@@ -371,16 +236,9 @@ namespace World
         /// <summary>
         ///     Stores the pending interaction data until it can be processed during Update.
         /// </summary>
-        private void QueuePendingInteractRequest(
-            Vector2 screenPosition,
-            bool hasPointerId,
-            int pointerId,
-            bool requiresFallbackUiCheck)
+        private void QueuePendingInteractRequest(Vector2 screenPosition)
         {
             _pendingScreenPosition = screenPosition;
-            _pendingHasPointerId = hasPointerId && pointerId != PointerId.invalidPointerId;
-            _pendingPointerId = hasPointerId ? pointerId : PointerId.invalidPointerId;
-            _pendingRequiresFallbackUiCheck = requiresFallbackUiCheck;
             _hasPendingInteractRequest = true;
         }
 
@@ -391,9 +249,6 @@ namespace World
         {
             _hasPendingInteractRequest = false;
             _pendingScreenPosition = default;
-            _pendingHasPointerId = false;
-            _pendingPointerId = PointerId.invalidPointerId;
-            _pendingRequiresFallbackUiCheck = false;
         }
 
         /// <summary>
