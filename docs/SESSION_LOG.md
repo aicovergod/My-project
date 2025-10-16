@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f3347fbc358c0eafef359546785539f55dea4028 -->
+## 2025-10-16T21:00:57+01:00 — Merge pull request #1161 from aicovergod/codex/update-npcshopopener-to-filter-ui-hits
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 58 ++ / 3 --
+- Notes:
+  Filter NPC shop UI raycasts
+---
+<!-- commit:9deb90cf0fc33206ef997bb84c77ba2a981c5592 -->
+## 2025-10-16T21:00:37+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:38716fd8e8e20a98ec31ce64416f3aea448c011e -->
 ## 2025-10-16T21:00:19+01:00 — Filter NPC shop UI raycasts
 
