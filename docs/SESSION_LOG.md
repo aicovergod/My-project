@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d85d2fc8691f9803253f88eac12c94882c94916a -->
+## 2025-10-17T15:35:49+01:00 — Merge pull request #1166 from aicovergod/codex/add-closebuttonbuilder-utility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 201 ++ / 70 --
+- Notes:
+  Add reusable close button builder for UI windows
+---
+<!-- commit:b1be73761218a3841c16fa29a3256ad8ef0f6754 -->
+## 2025-10-17T15:35:30+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:42988da5d35a61bbda6142492573eac6ed914026 -->
 ## 2025-10-17T15:35:14+01:00 — Refactor close button creation into reusable builder
 
