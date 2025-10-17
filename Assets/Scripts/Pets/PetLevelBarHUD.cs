@@ -85,6 +85,11 @@ namespace Pets
             instance.text.alignment = TextAnchor.MiddleCenter;
             instance.text.color = Color.white;
             instance.text.fontSize = 24;
+            // Add an outline so the pet level text remains readable against varying backgrounds.
+            var outline = textGO.AddComponent<Outline>();
+            outline.effectColor = Color.black;
+            outline.effectDistance = new Vector2(1f, -1f);
+            outline.useGraphicAlpha = false;
             var textRect = instance.text.rectTransform;
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
