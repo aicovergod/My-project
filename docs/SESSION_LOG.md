@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:bace9866dd6345932647dbd2785007e2514c6f7a -->
+## 2025-10-17T22:57:35+01:00 — Enhance pet and health HUD text legibility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Pets/PetLevelBarHUD.cs, Assets/Scripts/Player/HealthHUD.cs
+- Diff: 11 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:80c1e4b24a7d8ee7d00a5ea8b437175a350fcb4b -->
 ## 2025-10-17T22:50:47+01:00 — Merge pull request #1171 from aicovergod/codex/update-pet-and-health-hud-layouts
 
