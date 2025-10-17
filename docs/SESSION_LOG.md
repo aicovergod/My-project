@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0973da9a3e3e120d50026ae213065e75d03a4817 -->
+## 2025-10-17T21:43:34+01:00 — Fix shop UI layout references and pointer raycast caching
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Interaction/NpcShopOpener.cs, Assets/Scripts/Shop/ShopUI.cs
+- Diff: 15 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:c521bc90b7d65e408f6658cd5ce01c722598680f -->
 ## 2025-10-17T19:49:11+01:00 — Merge pull request #1168 from aicovergod/codex/extend-overlaycanvasfactory-and-update-references
 
