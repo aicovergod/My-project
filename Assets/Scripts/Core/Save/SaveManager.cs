@@ -22,6 +22,22 @@ namespace Core.Save
 
         public static string ActiveProfileId { get; private set; } = string.Empty;
 
+        /// <summary>
+        /// Exposes the username of the currently bound account or an empty string when unauthenticated.
+        /// </summary>
+        public static string ActiveAccountUsername
+        {
+            get
+            {
+                var account = boundAccount;
+                if (account == null)
+                    return string.Empty;
+
+                string username = account.username;
+                return string.IsNullOrWhiteSpace(username) ? string.Empty : username.Trim();
+            }
+        }
+
         private static AccountSave boundAccount;
         private static AccountSave.AccountData cache;
         private static bool cacheDirty;

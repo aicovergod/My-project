@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:119c4666957bb217db79830d09975b37e1d15336 -->
+## 2025-10-17T23:45:11+01:00 — Add runtime chat HUD and player chat integration
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (18): Assets/InputSystem_Actions.inputactions, Assets/Prefabs/MainScriptObjects/Player.prefab, Assets/Scripts/Core/Save/SaveManager.cs, Assets/Scripts/Player/Chat.meta, Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/Player/Chat/PlayerChatController.cs.meta, Assets/Scripts/Skills/Common/GatheringRewardProcessor.cs, Assets/Scripts/UI/Chat.meta, Assets/Scripts/UI/Chat/ChatChannel.cs, Assets/Scripts/UI/Chat/ChatChannel.cs.meta, Assets/Scripts/UI/Chat/ChatHudBootstrap.cs, Assets/Scripts/UI/Chat/ChatHudBootstrap.cs.meta, Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/UI/Chat/ChatHudController.cs.meta, Assets/Scripts/UI/Chat/ChatMessage.cs, Assets/Scripts/UI/Chat/ChatMessage.cs.meta, Assets/Scripts/UI/Chat/ChatService.cs, Assets/Scripts/UI/Chat/ChatService.cs.meta
+- Diff: 1482 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d9e0e8b4f40f0ac969b715f1d484d8755878d348 -->
 ## 2025-10-17T23:02:46+01:00 — Merge pull request #1173 from aicovergod/codex/increase-buff-icon-size-by-2.5x
 

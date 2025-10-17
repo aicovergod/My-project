@@ -3,6 +3,7 @@ using Inventory;
 using Pets;
 using Skills;
 using UnityEngine;
+using UI.Chat;
 
 namespace Skills.Common
 {
@@ -117,6 +118,8 @@ namespace Skills.Common
                     if (!displayed && !resourcePosition.HasValue)
                         GatheringFloatingTextService.TryShowAtAnchor(fullMessage, anchor);
                 }
+
+                PublishGameChat(fullMessage);
                 result.InventoryFull = true;
                 result.NewLevel = result.PreviousLevel;
                 context.onFailure?.Invoke(result);
@@ -142,6 +145,8 @@ namespace Skills.Common
 
                     if (!displayed && !resourcePosition.HasValue)
                         GatheringFloatingTextService.TryShowAtAnchor(rewardMessage, anchor);
+
+                    PublishGameChat(rewardMessage);
                 }
             }
 
@@ -201,6 +206,18 @@ namespace Skills.Common
             }
 
             return true;
+        }
+
+        private static void PublishGameChat(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            var chatService = ChatService.Instance;
+            if (chatService == null)
+                return;
+
+            chatService.PublishGameMessage(message);
         }
 
         private static float CalculateXpBonus(in GatheringRewardContext context)
