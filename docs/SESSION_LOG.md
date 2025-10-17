@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8e8a702df52074df5a2e4932824f7dfb734f9033 -->
+## 2025-10-17T16:27:35+01:00 — Document canvas factory and close button guidance
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): AGENTS.md
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:d85d2fc8691f9803253f88eac12c94882c94916a -->
 ## 2025-10-17T15:35:49+01:00 — Merge pull request #1166 from aicovergod/codex/add-closebuttonbuilder-utility
 
