@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using World;
+using UI.Utilities;
 
 namespace UI
 {
@@ -26,28 +27,36 @@ namespace UI
 
             base.Awake();
 
-            var canvas = GetComponentInChildren<Canvas>();
+            Canvas canvas = GetComponentInChildren<Canvas>();
+            Transform targetParent = null;
             if (canvas == null)
             {
                 var existing = GameObject.Find("MergeHudCanvas");
-                if (existing != null)
+                if (existing != null && existing.TryGetComponent(out Canvas existingCanvas))
                 {
-                    canvas = existing.GetComponent<Canvas>();
-                    transform.SetParent(existing.transform, false);
+                    canvas = existingCanvas;
+                    DontDestroyOnLoad(existing);
+                    targetParent = existing.transform;
                 }
                 else
                 {
-                    var canvasGO = new GameObject("MergeHudCanvas", typeof(Canvas));
-                    canvas = canvasGO.GetComponent<Canvas>();
-                    canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                    DontDestroyOnLoad(canvasGO);
-                    transform.SetParent(canvasGO.transform, false);
+                    var overlay = OverlayCanvasFactory.CreateOverlayCanvas(
+                        "MergeHudCanvas",
+                        new Vector2(1920f, 1080f),
+                        dontDestroyOnLoad: true,
+                        assignToUiLayer: true);
+                    canvas = overlay.Canvas;
+                    targetParent = overlay.Root.transform;
                 }
             }
             else
             {
                 DontDestroyOnLoad(canvas.gameObject);
+                targetParent = canvas.transform != transform ? canvas.transform : null;
             }
+
+            if (targetParent != null && transform.parent != targetParent)
+                transform.SetParent(targetParent, false);
             var rectTransform = GetComponent<RectTransform>();
             if (rectTransform == null)
                 rectTransform = gameObject.AddComponent<RectTransform>();

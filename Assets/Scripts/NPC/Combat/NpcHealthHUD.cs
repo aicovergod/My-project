@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UI;
+using UI.Utilities;
 using Util;
 
 namespace NPC
@@ -42,17 +43,20 @@ namespace NPC
 
         private void CreateHud()
         {
-            var go = new GameObject("NpcHealthHUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            canvas = go.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.WorldSpace;
-            canvas.overrideSorting = true; // Force the HUD to obey the explicit sorting order so it can render above world geometry.
-            canvas.sortingLayerID = SortingLayer.NameToID("Default");
-            canvas.sortingOrder = sortingOrder;
-            canvas.transform.SetParent(transform, false);
+            var overlay = OverlayCanvasFactory.CreateWorldSpaceCanvas(
+                "NpcHealthHUD",
+                new Vector2(1920f, 1080f),
+                new Vector2(1f, 0.15f),
+                parent: transform,
+                assignToUiLayer: true,
+                sortingLayerId: SortingLayer.NameToID("Default"),
+                sortingOrder: sortingOrder,
+                overrideSorting: true);
+
+            canvas = overlay.Canvas;
             canvas.transform.localPosition = new Vector3(0f, heightOffset, 0f);
             canvas.transform.localRotation = Quaternion.identity;
-            canvas.GetComponent<RectTransform>().sizeDelta = new Vector2(1f, 0.15f);
-            canvasGroup = go.AddComponent<CanvasGroup>();
+            canvasGroup = overlay.Root.AddComponent<CanvasGroup>();
             canvasGroup.alpha = 0f;
 
             var sprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0f,0f,1f,1f), new Vector2(0.5f,0.5f));
@@ -98,7 +102,7 @@ namespace NPC
             textRect.offsetMin = Vector2.zero;
             textRect.offsetMax = Vector2.zero;
 
-            LayerUtility.SetLayerRecursively(go.transform, LayerMask.NameToLayer("UI"));
+            LayerUtility.SetLayerRecursively(overlay.Root.transform, LayerMask.NameToLayer("UI"));
         }
 
         private void HandleHealthChanged(int current, int max)

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UI;
+using UI.Utilities;
 
 namespace Pets
 {
@@ -39,16 +40,23 @@ namespace Pets
 
         private static void CreateInstance()
         {
-            var canvasGO = new GameObject("PetBarMenuCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            menuCanvas = canvasGO.GetComponent<Canvas>();
-            menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            // Ensure the context menu canvas renders above other UI elements
-            menuCanvas.overrideSorting = true;
-            menuCanvas.sortingOrder = short.MaxValue;
-            Object.DontDestroyOnLoad(canvasGO);
+            var overlay = OverlayCanvasFactory.CreateOverlayCanvas(
+                "PetBarMenuCanvas",
+                new Vector2(1920f, 1080f),
+                dontDestroyOnLoad: true,
+                assignToUiLayer: true,
+                overrideSorting: true,
+                sortingOrder: short.MaxValue);
 
-            var menuGO = new GameObject("PetLevelBarMenu", typeof(Image), typeof(PetLevelBarMenu), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
-            menuGO.transform.SetParent(canvasGO.transform, false);
+            menuCanvas = overlay.Canvas;
+
+            var menuGO = new GameObject(
+                "PetLevelBarMenu",
+                typeof(Image),
+                typeof(PetLevelBarMenu),
+                typeof(VerticalLayoutGroup),
+                typeof(ContentSizeFitter));
+            menuGO.transform.SetParent(overlay.Root.transform, false);
             var img = menuGO.GetComponent<Image>();
             img.color = new Color(0f, 0f, 0f, 0.8f);
 

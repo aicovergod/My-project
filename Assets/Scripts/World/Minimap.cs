@@ -8,6 +8,7 @@ using ShopSystem;
 using Player;
 using UnityEngine.EventSystems;
 using Pets;
+using UI.Utilities;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -136,13 +137,13 @@ namespace World
             if (minimapCanvas != null)
                 return;
 
-            var canvasGO = new GameObject("MinimapCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            canvasGO.transform.SetParent(transform, false);
-            var canvas = canvasGO.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            minimapCanvas = canvas;
-            var scaler = canvasGO.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            var overlay = OverlayCanvasFactory.CreateOverlayCanvas(
+                "MinimapCanvas",
+                new Vector2(1920f, 1080f),
+                parent: transform,
+                assignToUiLayer: true);
+            var canvasGO = overlay.Root;
+            minimapCanvas = overlay.Canvas;
 
             const int size = 128;
             const int border = 4;
