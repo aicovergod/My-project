@@ -67,7 +67,12 @@ namespace Player
             LegacyFontProvider.ApplyTo(hud.text);
             hud.text.alignment = TextAnchor.MiddleCenter;
             hud.text.color = Color.white;
-            hud.text.fontSize = 30;
+            hud.text.fontSize = 28;
+            // Add an outline to give the health text a crisp black border similar to OSRS UI treatment.
+            var outline = textGO.AddComponent<Outline>();
+            outline.effectColor = Color.black;
+            outline.effectDistance = new Vector2(1f, -1f);
+            outline.useGraphicAlpha = false;
             var textRect = hud.text.rectTransform;
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
