@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c521bc90b7d65e408f6658cd5ce01c722598680f -->
+## 2025-10-17T19:49:11+01:00 — Merge pull request #1168 from aicovergod/codex/extend-overlaycanvasfactory-and-update-references
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 139 ++ / 43 --
+- Notes:
+  Refactor UI canvases to use shared factory
+---
+<!-- commit:4c30cc7b7d69f8497b1a8048ad6757d326a79393 -->
+## 2025-10-17T19:28:14+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6ed546b1bc1f98ec61c8c878d70379bbb83e7ec4 -->
 ## 2025-10-17T19:27:54+01:00 — Refactor UI canvases to use shared factory
 
