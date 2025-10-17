@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Core;
 using Player;
+using Pets;
 using UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -130,12 +131,15 @@ namespace Inventory.GroundItems
         public void RebindDependencies()
         {
             bool moverInvalid = playerMover == null || !playerMover.gameObject.activeInHierarchy || !playerMover.isActiveAndEnabled;
-            bool inventoryMissing = playerInventory == null;
-
-            if (!moverInvalid && !inventoryMissing)
-                return;
 
             GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+            Transform playerTransform = playerObject != null ? playerObject.transform : null;
+
+            bool inventoryInvalid = !IsPlayerInventoryCandidate(playerInventory, playerTransform);
+
+            if (!moverInvalid && !inventoryInvalid)
+                return;
+
             if (playerObject == null)
             {
                 if (enableDebugLogging)
@@ -144,7 +148,7 @@ namespace Inventory.GroundItems
                 if (moverInvalid)
                     playerMover = null;
 
-                if (inventoryMissing)
+                if (inventoryInvalid)
                     playerInventory = null;
 
                 return;
@@ -167,20 +171,65 @@ namespace Inventory.GroundItems
                 }
             }
 
-            if (inventoryMissing)
+            if (inventoryInvalid)
             {
-                var resolvedInventory = playerObject.GetComponent<InventoryComponent>();
+                InventoryComponent resolvedInventory = playerObject.GetComponent<InventoryComponent>();
+                if (!IsPlayerInventoryCandidate(resolvedInventory, playerTransform))
+                {
+                    resolvedInventory = null;
+                }
+
+                if (resolvedInventory == null)
+                {
+                    resolvedInventory = playerObject.GetComponentInChildren<InventoryComponent>(true);
+                    if (!IsPlayerInventoryCandidate(resolvedInventory, playerTransform))
+                        resolvedInventory = null;
+                }
+
+                if (resolvedInventory == null)
+                {
+                    var allInventories = FindObjectsOfType<InventoryComponent>(true);
+                    foreach (var candidate in allInventories)
+                    {
+                        if (candidate == null)
+                            continue;
+
+                        if (candidate.GetComponent<PetStorage>() != null)
+                            continue;
+
+                        if (!IsPlayerInventoryCandidate(candidate, playerTransform))
+                            continue;
+
+                        resolvedInventory = candidate;
+                        break;
+                    }
+                }
+
                 if (resolvedInventory != null)
                 {
                     playerInventory = resolvedInventory;
                     if (enableDebugLogging)
-                        Debug.Log("[GroundItemManager] Rebound Inventory reference from player object.");
+                        Debug.Log($"[GroundItemManager] Rebound Inventory reference from '{playerInventory.gameObject.name}'.");
                 }
-                else if (enableDebugLogging)
+                else
                 {
-                    Debug.LogWarning("[GroundItemManager] Inventory component was not found on the player during rebind.");
+                    playerInventory = null;
+                    if (enableDebugLogging)
+                        Debug.LogWarning("[GroundItemManager] Inventory component was not found on the player during rebind.");
                 }
             }
+        }
+
+        private static bool IsPlayerInventoryCandidate(InventoryComponent inventory, Transform playerTransform)
+        {
+            if (inventory == null || playerTransform == null)
+                return false;
+
+            if (!inventory.isActiveAndEnabled || !inventory.gameObject.activeInHierarchy)
+                return false;
+
+            Transform inventoryTransform = inventory.transform;
+            return inventoryTransform == playerTransform || inventoryTransform.IsChildOf(playerTransform);
         }
 
         private void OnPersistentServicesReady()
