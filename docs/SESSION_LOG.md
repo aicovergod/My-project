@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c0676f812f9d32816befb44b977076cd6ce33afa -->
+## 2025-10-17T22:35:35+01:00 — Merge pull request #1170 from aicovergod/codex/update-minimap-size-and-border-constants
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 5 --
+- Notes:
+  Adjust minimap border dimensions
+---
+<!-- commit:7b121c77472641d74a14d064d3b16bacde7158e8 -->
+## 2025-10-17T22:35:17+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b2c5e80cd100d72fa51430c1ffaa0a775e927f6d -->
 ## 2025-10-17T22:35:00+01:00 — Expand minimap border to 300
 
