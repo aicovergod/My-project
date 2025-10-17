@@ -292,7 +292,7 @@ namespace ShopSystem
             var windowImg = window.GetComponent<Image>();
             windowImg.color = windowColor;
 
-            CloseButtonBuilder.Build(
+            var closeButton = CloseButtonBuilder.Build(
                 window.transform,
                 Close,
                 new CloseButtonBuilder.Options
@@ -301,6 +301,11 @@ namespace ShopSystem
                     AnchoredPosition = new Vector2(-4f, -4f),
                     Size = new Vector2(16f, 16f)
                 });
+
+            // Cache the close button rect so we can reserve horizontal space for it
+            // when laying out the shop name label below. Without this, the label would
+            // overlap the close button when the window resizes for larger inventories.
+            var closeRect = closeButton.GetComponent<RectTransform>();
 
             GameObject panel = new GameObject("Slots", typeof(RectTransform), typeof(GridLayoutGroup));
             panel.transform.SetParent(window.transform, false);
