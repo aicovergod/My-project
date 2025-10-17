@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ae22dbd810f2fade4d6eb18e79b893a893f3b1a6 -->
+## 2025-10-17T18:47:43+01:00 — Merge pull request #1167 from aicovergod/codex/update-agents.md-for-canvas-factory-and-close-button
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 10 ++ / 1 --
+- Notes:
+  Update agent UI guidelines for canvas factory and close buttons
+---
+<!-- commit:4f1cb7d11dd4a7cd32963e5cc51ede0584c7788d -->
+## 2025-10-17T16:28:46+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:8e8a702df52074df5a2e4932824f7dfb734f9033 -->
 ## 2025-10-17T16:27:35+01:00 — Document canvas factory and close button guidance
 
