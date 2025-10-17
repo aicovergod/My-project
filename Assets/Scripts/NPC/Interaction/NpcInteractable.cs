@@ -9,6 +9,7 @@ using ShopSystem;
 using Pets;
 using Combat;
 using UI;
+using UI.Utilities;
 using Core.Input;
 
 namespace NPC
@@ -146,13 +147,14 @@ namespace NPC
                 return false;
             }
 
-            var canvasGO = new GameObject("ContextMenuCanvas", typeof(Canvas), typeof(CanvasScaler),
-                typeof(GraphicRaycaster));
-            menuCanvas = canvasGO.GetComponent<Canvas>();
-            menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            DontDestroyOnLoad(canvasGO);
+            var overlay = OverlayCanvasFactory.CreateOverlayCanvas(
+                "ContextMenuCanvas",
+                new Vector2(1920f, 1080f),
+                dontDestroyOnLoad: true,
+                assignToUiLayer: true);
+            menuCanvas = overlay.Canvas;
 
-            menuInstance = Instantiate(menuPrefab, menuCanvas.transform);
+            menuInstance = Instantiate(menuPrefab, overlay.Root.transform);
             return true;
         }
 

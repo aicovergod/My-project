@@ -63,6 +63,9 @@ namespace UI.Utilities
         /// <param name="assignToUiLayer">When true, automatically assigns the "UI" layer.</param>
         /// <param name="explicitLayer">Optional explicit layer index to apply instead of resolving the "UI" layer.</param>
         /// <param name="renderMode">Render mode for the canvas. Defaults to <see cref="RenderMode.ScreenSpaceOverlay"/>.</param>
+        /// <param name="overrideSorting">When true, forces the canvas to respect the explicit sorting order.</param>
+        /// <param name="sortingOrder">Sorting order applied when <paramref name="overrideSorting"/> is true.</param>
+        /// <param name="sortingLayerId">Optional sorting layer identifier applied to the canvas.</param>
         /// <returns>A container describing the created root, canvas, and scaler components.</returns>
         public static OverlayCanvasComponents CreateOverlayCanvas(
             string canvasName,
@@ -73,7 +76,10 @@ namespace UI.Utilities
             float matchWidthOrHeight = 0f,
             bool assignToUiLayer = false,
             int? explicitLayer = null,
-            RenderMode renderMode = RenderMode.ScreenSpaceOverlay)
+            RenderMode renderMode = RenderMode.ScreenSpaceOverlay,
+            bool overrideSorting = false,
+            int sortingOrder = 0,
+            int? sortingLayerId = null)
         {
             if (string.IsNullOrWhiteSpace(canvasName))
                 throw new ArgumentException("Canvas name must be supplied when creating an overlay canvas.", nameof(canvasName));
@@ -89,6 +95,11 @@ namespace UI.Utilities
             var canvas = root.GetComponent<Canvas>();
             canvas.renderMode = renderMode;
             canvas.pixelPerfect = pixelPerfect;
+            canvas.overrideSorting = overrideSorting;
+            if (overrideSorting)
+                canvas.sortingOrder = sortingOrder;
+            if (sortingLayerId.HasValue)
+                canvas.sortingLayerID = sortingLayerId.Value;
 
             var scaler = root.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -109,6 +120,58 @@ namespace UI.Utilities
                 root.layer = layerToApply;
 
             return new OverlayCanvasComponents(root, canvas, scaler);
+        }
+
+        /// <summary>
+        /// Generates a configured world-space canvas that respects the shared defaults while
+        /// also wiring the requested sorting layer/order and rect transform size.
+        /// </summary>
+        /// <param name="canvasName">Name assigned to the generated GameObject.</param>
+        /// <param name="referenceResolution">Reference resolution applied to the scaler.</param>
+        /// <param name="size">Local size applied to the canvas rect transform.</param>
+        /// <param name="parent">Optional parent transform for the created root.</param>
+        /// <param name="dontDestroyOnLoad">When true, marks the root as persistent across scenes.</param>
+        /// <param name="assignToUiLayer">When true, automatically assigns the "UI" layer.</param>
+        /// <param name="explicitLayer">Optional explicit layer index to apply instead of resolving the "UI" layer.</param>
+        /// <param name="sortingLayerId">Optional sorting layer identifier applied to the canvas.</param>
+        /// <param name="sortingOrder">Sorting order applied to the world-space canvas.</param>
+        /// <param name="overrideSorting">When true, forces the canvas to respect the explicit sorting order.</param>
+        /// <param name="worldCamera">Optional camera reference for world-space canvases.</param>
+        /// <returns>A container describing the created root, canvas, and scaler components.</returns>
+        public static OverlayCanvasComponents CreateWorldSpaceCanvas(
+            string canvasName,
+            Vector2 referenceResolution,
+            Vector2 size,
+            Transform parent = null,
+            bool dontDestroyOnLoad = false,
+            bool assignToUiLayer = false,
+            int? explicitLayer = null,
+            int? sortingLayerId = null,
+            int sortingOrder = 0,
+            bool overrideSorting = false,
+            Camera worldCamera = null)
+        {
+            var components = CreateOverlayCanvas(
+                canvasName,
+                referenceResolution,
+                parent,
+                dontDestroyOnLoad,
+                pixelPerfect: false,
+                matchWidthOrHeight: 0f,
+                assignToUiLayer: assignToUiLayer,
+                explicitLayer: explicitLayer,
+                renderMode: RenderMode.WorldSpace,
+                overrideSorting: overrideSorting,
+                sortingOrder: sortingOrder,
+                sortingLayerId: sortingLayerId);
+
+            var rectTransform = components.Canvas.GetComponent<RectTransform>();
+            rectTransform.sizeDelta = size;
+
+            if (worldCamera != null)
+                components.Canvas.worldCamera = worldCamera;
+
+            return components;
         }
     }
 }

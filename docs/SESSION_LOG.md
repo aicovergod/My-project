@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6ed546b1bc1f98ec61c8c878d70379bbb83e7ec4 -->
+## 2025-10-17T19:27:54+01:00 — Refactor UI canvases to use shared factory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/NPC/Combat/NpcHealthHUD.cs, Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/Pets/PetLevelBarMenu.cs, Assets/Scripts/UI/MergeHudTimer.cs, Assets/Scripts/UI/Utilities/OverlayCanvasFactory.cs, Assets/Scripts/World/Minimap.cs
+- Diff: 130 ++ / 43 --
+- Notes:
+  —
+---
 <!-- commit:a73c4865282f05a4127f408495511a11bf69ac04 -->
 ## 2025-10-17T19:11:17+01:00 — Merge pull request #1165 from aicovergod/codex/create-overlay-canvas-factory-and-refactor-ui
 
