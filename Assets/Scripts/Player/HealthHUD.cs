@@ -28,15 +28,12 @@ namespace Player
                 new Rect(0f, 0f, 1f, 1f),
                 new Vector2(0.5f, 0.5f));
 
-            const float height = 12f;
-            const float margin = 4f;
-
             var rect = go.GetComponent<RectTransform>();
             rect.anchorMin = new Vector2(1f, 1f);
             rect.anchorMax = new Vector2(1f, 1f);
             rect.pivot = new Vector2(1f, 1f);
-            rect.sizeDelta = new Vector2(minimapRoot.sizeDelta.x, height);
-            rect.anchoredPosition = minimapRoot.anchoredPosition + new Vector2(0f, -(minimapRoot.sizeDelta.y + margin));
+            rect.sizeDelta = new Vector2(300f, 30f);
+            rect.anchoredPosition = new Vector2(-10f, -314f);
 
             var bgGO = new GameObject("Background", typeof(Image));
             bgGO.transform.SetParent(go.transform, false);
@@ -70,7 +67,7 @@ namespace Player
             LegacyFontProvider.ApplyTo(hud.text);
             hud.text.alignment = TextAnchor.MiddleCenter;
             hud.text.color = Color.white;
-            hud.text.fontSize = 11;
+            hud.text.fontSize = 30;
             var textRect = hud.text.rectTransform;
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
