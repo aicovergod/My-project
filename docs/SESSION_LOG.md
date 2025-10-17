@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4a0ab763253d3b6e2ebdf737aec8e1b6a9d63d69 -->
+## 2025-10-17T22:50:20+01:00 — Adjust player and pet HUD layout
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Pets/PetLevelBarHUD.cs, Assets/Scripts/Player/HealthHUD.cs
+- Diff: 6 ++ / 11 --
+- Notes:
+  —
+---
 <!-- commit:c0676f812f9d32816befb44b977076cd6ce33afa -->
 ## 2025-10-17T22:35:35+01:00 — Merge pull request #1170 from aicovergod/codex/update-minimap-size-and-border-constants
 

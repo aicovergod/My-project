@@ -45,14 +45,12 @@ namespace Pets
                 new Rect(0f, 0f, 1f, 1f),
                 new Vector2(0.5f, 0.5f));
 
-            const float margin = 2f;
-
             var rect = go.GetComponent<RectTransform>();
             rect.anchorMin = healthRect.anchorMin;
             rect.anchorMax = healthRect.anchorMax;
             rect.pivot = healthRect.pivot;
-            rect.sizeDelta = healthRect.sizeDelta;
-            rect.anchoredPosition = healthRect.anchoredPosition + new Vector2(0f, -(healthRect.sizeDelta.y + margin));
+            rect.sizeDelta = new Vector2(300f, 30f);
+            rect.anchoredPosition = new Vector2(-10f, -348f);
 
             var bgGO = new GameObject("Background", typeof(Image));
             bgGO.transform.SetParent(go.transform, false);
@@ -86,7 +84,7 @@ namespace Pets
             LegacyFontProvider.ApplyTo(instance.text);
             instance.text.alignment = TextAnchor.MiddleCenter;
             instance.text.color = Color.white;
-            instance.text.fontSize = 11;
+            instance.text.fontSize = 24;
             var textRect = instance.text.rectTransform;
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
