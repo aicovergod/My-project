@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fe96ceeb773a9c0f3c5b71454572755b17b84d18 -->
+## 2025-10-17T21:44:26+01:00 — Merge pull request #1169 from aicovergod/codex/fix-cs0103-and-cs1061-errors
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 2 --
+- Notes:
+  Fix shop UI close button spacing and pointer event caching
+---
+<!-- commit:cc34b8ba7d718d9fed211fa39039d93acb82168f -->
+## 2025-10-17T21:44:21+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0973da9a3e3e120d50026ae213065e75d03a4817 -->
 ## 2025-10-17T21:43:34+01:00 — Fix shop UI layout references and pointer raycast caching
 
