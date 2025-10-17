@@ -270,20 +270,15 @@ namespace ShopSystem
 
         private void CreateUI()
         {
-            uiRoot = new GameObject("ShopUI", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            uiRoot.transform.SetParent(null, false);
-            DontDestroyOnLoad(uiRoot);
+            var overlay = OverlayCanvasFactory.CreateOverlayCanvas(
+                "ShopUI",
+                referenceResolution,
+                dontDestroyOnLoad: true,
+                matchWidthOrHeight: 0f);
+
+            uiRoot = overlay.Root;
 
             Font runtimeFont = priceFont != null ? priceFont : LegacyFontProvider.GetLegacyFont();
-
-            var canvas = uiRoot.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.pixelPerfect = true;
-
-            var scaler = uiRoot.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = referenceResolution;
-            scaler.matchWidthOrHeight = 0f;
 
             GameObject window = new GameObject("Window", typeof(RectTransform), typeof(Image));
             window.transform.SetParent(uiRoot.transform, false);

@@ -1,57 +1,21 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:ae22dbd810f2fade4d6eb18e79b893a893f3b1a6 -->
-## 2025-10-17T18:47:43+01:00 — Merge pull request #1167 from aicovergod/codex/update-agents.md-for-canvas-factory-and-close-button
+<!-- commit:894f7611956d4591f2b99b7a2f84b973be4f1c3a -->
+## 2025-10-17T18:46:38+01:00 — Merge branch 'main' into codex/create-overlay-canvas-factory-and-refactor-ui
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 10 ++ / 1 --
-- Notes:
-  Update agent UI guidelines for canvas factory and close buttons
----
-<!-- commit:4f1cb7d11dd4a7cd32963e5cc51ede0584c7788d -->
-## 2025-10-17T16:28:46+01:00 — Update SESSION_LOG [ci]
-
-- Author: session-log-bot <actions@github.com>
-- Changed files (1): docs/SESSION_LOG.md
-- Diff: 9 ++ / 0 --
-- Notes:
-  —
----
-<!-- commit:8e8a702df52074df5a2e4932824f7dfb734f9033 -->
-## 2025-10-17T16:27:35+01:00 — Document canvas factory and close button guidance
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (1): AGENTS.md
-- Diff: 1 ++ / 1 --
-- Notes:
-  —
----
-<!-- commit:d85d2fc8691f9803253f88eac12c94882c94916a -->
-## 2025-10-17T15:35:49+01:00 — Merge pull request #1166 from aicovergod/codex/add-closebuttonbuilder-utility
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 201 ++ / 70 --
-- Notes:
-  Add reusable close button builder for UI windows
----
-<!-- commit:b1be73761218a3841c16fa29a3256ad8ef0f6754 -->
-## 2025-10-17T15:35:30+01:00 — Update SESSION_LOG [ci]
-
-- Author: session-log-bot <actions@github.com>
-- Changed files (1): docs/SESSION_LOG.md
-- Diff: 9 ++ / 0 --
-- Notes:
-  —
----
-<!-- commit:42988da5d35a61bbda6142492573eac6ed914026 -->
-## 2025-10-17T15:35:14+01:00 — Refactor close button creation into reusable builder
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (4): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs, Assets/Scripts/Shop/ShopUI.cs, Assets/Scripts/UI/Utilities/CloseButtonBuilder.cs
+- Changed files (3): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs, Assets/Scripts/Shop/ShopUI.cs
 - Diff: 192 ++ / 70 --
+- Notes:
+  —
+---
+<!-- commit:6058d053613f7112acb229a613f55cc9e514189c -->
+## 2025-10-17T15:25:10+01:00 — Refactor overlay canvas generation into factory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Inventory/Equipment.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs, Assets/Scripts/Shop/ShopUI.cs, Assets/Scripts/UI/Utilities/OverlayCanvasFactory.cs
+- Diff: 147 ++ / 53 --
 - Notes:
   —
 ---
