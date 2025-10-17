@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:42988da5d35a61bbda6142492573eac6ed914026 -->
+## 2025-10-17T15:35:14+01:00 — Refactor close button creation into reusable builder
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs, Assets/Scripts/Shop/ShopUI.cs, Assets/Scripts/UI/Utilities/CloseButtonBuilder.cs
+- Diff: 192 ++ / 70 --
+- Notes:
+  —
+---
 <!-- commit:f39026f102cbc95f2073d0334e0c84159b247e93 -->
 ## 2025-10-17T12:39:14+01:00 — Merge pull request #1164 from aicovergod/codex/update-grounditemmanager-to-validate-player-inventory
 
