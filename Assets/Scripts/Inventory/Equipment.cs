@@ -889,21 +889,16 @@ namespace Inventory
             if (existing != null)
                 Destroy(existing);
 
-            uiRoot = new GameObject("EquipmentUI", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            uiRoot.transform.SetParent(null, false);
-            DontDestroyOnLoad(uiRoot);
-
             int uiLayer = LayerMask.NameToLayer("UI");
-            if (uiLayer >= 0) uiRoot.layer = uiLayer;
+            var overlay = OverlayCanvasFactory.CreateOverlayCanvas(
+                "EquipmentUI",
+                referenceResolution,
+                dontDestroyOnLoad: true,
+                matchWidthOrHeight: 0f,
+                explicitLayer: uiLayer >= 0 ? uiLayer : (int?)null,
+                assignToUiLayer: uiLayer < 0);
 
-            var canvas = uiRoot.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.pixelPerfect = true;
-
-            var scaler = uiRoot.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = referenceResolution;
-            scaler.matchWidthOrHeight = 0f;
+            uiRoot = overlay.Root;
 
             GameObject window = new GameObject("Window", typeof(RectTransform), typeof(Image));
             window.transform.SetParent(uiRoot.transform, false);

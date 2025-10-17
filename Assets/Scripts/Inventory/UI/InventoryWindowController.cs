@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Inventory.Core;
+using UI.Utilities;
 using InventoryComponent = global::Inventory.Inventory;
 
 #if ENABLE_INPUT_SYSTEM
@@ -749,22 +750,16 @@ namespace Inventory.UI
 
         private void BuildUserInterface()
         {
-            uiRoot = new GameObject("InventoryUI", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            uiRoot.transform.SetParent(null, false);
-            UnityEngine.Object.DontDestroyOnLoad(uiRoot);
-
             int uiLayer = LayerMask.NameToLayer("UI");
-            if (uiLayer >= 0)
-                uiRoot.layer = uiLayer;
+            var overlay = OverlayCanvasFactory.CreateOverlayCanvas(
+                "InventoryUI",
+                config.ReferenceResolution,
+                dontDestroyOnLoad: true,
+                matchWidthOrHeight: 0f,
+                explicitLayer: uiLayer >= 0 ? uiLayer : (int?)null,
+                assignToUiLayer: uiLayer < 0);
 
-            var canvas = uiRoot.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.pixelPerfect = true;
-
-            var scaler = uiRoot.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = config.ReferenceResolution;
-            scaler.matchWidthOrHeight = 0f;
+            uiRoot = overlay.Root;
 
             var window = new GameObject("Window", typeof(RectTransform), typeof(Image));
             window.transform.SetParent(uiRoot.transform, false);
