@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e77c28263174688cc9a09872eff1cfd7f3909e0a -->
+## 2025-10-17T12:38:42+01:00 — Fix ground item inventory rebinding
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 58 ++ / 9 --
+- Notes:
+  —
+---
 <!-- commit:07671796fa82a3f4715f9e6c86d4d93aca841189 -->
 ## 2025-10-16T21:12:32+01:00 — Merge pull request #1163 from aicovergod/codex/update-agents.md-with-ui-pointer-checks-guideline
 
