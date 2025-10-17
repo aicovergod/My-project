@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 7826943123202149709}
   - component: {fileID: 5214551407693897022}
   - component: {fileID: 2069911887794511935}
+  - component: {fileID: 1564341770880048146}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -1327,3 +1328,21 @@ MonoBehaviour:
   ammoUiRefreshInterval: 0.25
   ammoDepletedSoundId: 
   enableDebugLogging: 0
+
+--- !u!114 &1564341770880048146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3da531c713324a98aa343b54832ec06b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  playerInput: {fileID: 7000745351061079601}
+  openChatAction: {fileID: 0}
+  submitChatAction: {fileID: 0}
+  cancelChatAction: {fileID: 0}
+  chatHud: {fileID: 0}
