@@ -22,6 +22,18 @@ namespace UI.HUD
         [SerializeField] private Color warningTimerColor = new Color32(255, 196, 0, 255);
         [SerializeField] private CanvasGroup canvasGroup;
 
+        // Base layout constants used to construct the OSRS-style buff slot.
+        private const float BaseSlotSize = 32f;
+        private const float BaseIconSize = 28f;
+        private const float BaseTextPadding = 1f;
+        private const float BaseLabelHeight = 9f;
+        private const int BaseNameFontSize = 7;
+        private const int BaseTimerFontSize = 6;
+
+        // Scale factor requested for larger buff icons.  This is applied uniformly to
+        // every dimension so the infobox keeps the correct proportions when resized.
+        private const float SizeScale = 2.5f;
+
         private Sprite loadedIcon;
 
         // Cached references used for tooltip positioning and contextual data.
@@ -57,9 +69,12 @@ namespace UI.HUD
             if (parent == null)
                 throw new System.ArgumentNullException(nameof(parent));
 
-            const float slotSize = 32f;
-            const float iconSize = 28f;
-            const float textPadding = 1f;
+            float slotSize = ScaleValue(BaseSlotSize);
+            float iconSize = ScaleValue(BaseIconSize);
+            float textPadding = ScaleValue(BaseTextPadding);
+            float labelHeight = ScaleValue(BaseLabelHeight);
+            int nameFontSize = ScaleFont(BaseNameFontSize);
+            int timerFontSize = ScaleFont(BaseTimerFontSize);
 
             // Root object that mimics the prefab layout.  The anchors/pivot align
             // with the HUD expectation of stacking boxes downward from the
@@ -74,8 +89,9 @@ namespace UI.HUD
             rootRect.anchorMax = new Vector2(1f, 1f);
             rootRect.pivot = new Vector2(1f, 1f);
             rootRect.sizeDelta = new Vector2(slotSize, slotSize);
-
+            
             var component = rootGO.AddComponent<BuffInfoBox>();
+            component.rectTransform = rootRect;
 
             var canvasGroup = rootGO.GetComponent<CanvasGroup>();
             canvasGroup.alpha = 0.92f;
@@ -121,7 +137,7 @@ namespace UI.HUD
             nameGO.transform.SetParent(frameGO.transform, false);
             var nameText = nameGO.GetComponent<Text>();
             nameText.font = legacyFont;
-            nameText.fontSize = 7;
+            nameText.fontSize = nameFontSize;
             nameText.alignment = TextAnchor.UpperCenter;
             nameText.color = new Color32(255, 240, 187, 255);
             nameText.raycastTarget = false;
@@ -133,7 +149,7 @@ namespace UI.HUD
             nameRect.anchorMax = new Vector2(0.5f, 1f);
             nameRect.pivot = new Vector2(0.5f, 1f);
             nameRect.anchoredPosition = new Vector2(0f, -textPadding);
-            nameRect.sizeDelta = new Vector2(slotSize - (textPadding * 2f), 9f);
+            nameRect.sizeDelta = new Vector2(slotSize - (textPadding * 2f), labelHeight);
             component.nameText = nameText;
 
             nameText.text = string.Empty;
@@ -144,7 +160,7 @@ namespace UI.HUD
 
             var timerText = timerGO.GetComponent<Text>();
             timerText.font = legacyFont;
-            timerText.fontSize = 6;
+            timerText.fontSize = timerFontSize;
             timerText.alignment = TextAnchor.LowerCenter;
             timerText.color = new Color32(212, 212, 212, 255);
             timerText.raycastTarget = false;
@@ -157,11 +173,12 @@ namespace UI.HUD
             timerRect.anchorMax = new Vector2(0.5f, 0f);
             timerRect.pivot = new Vector2(0.5f, 0f);
             timerRect.anchoredPosition = new Vector2(0f, textPadding);
-            timerRect.sizeDelta = new Vector2(slotSize - (textPadding * 2f), 9f);
+            timerRect.sizeDelta = new Vector2(slotSize - (textPadding * 2f), labelHeight);
             component.timerText = timerText;
 
             component.normalTimerColor = timerText.color;
 
+            component.ApplyScaledLayout();
             component.ResetVisuals();
 
             return component;
@@ -186,6 +203,9 @@ namespace UI.HUD
             if (rectTransform == null)
                 rectTransform = GetComponent<RectTransform>();
 
+            // Ensure prefab instances created in the editor also receive the scaled layout.
+            ApplyScaledLayout();
+
             if (cachedCanvasRect == null)
             {
                 var canvas = GetComponentInParent<Canvas>();
@@ -193,6 +213,66 @@ namespace UI.HUD
                     cachedCanvasRect = canvas.transform as RectTransform;
             }
         }
+
+        /// <summary>
+        /// Applies the configured scale factor to every tracked UI element so the buff slot
+        /// remains proportionally accurate regardless of whether it was spawned from code or
+        /// built as a prefab.
+        /// </summary>
+        private void ApplyScaledLayout()
+        {
+            float slotSize = ScaleValue(BaseSlotSize);
+            float iconSize = ScaleValue(BaseIconSize);
+            float textPadding = ScaleValue(BaseTextPadding);
+            float labelHeight = ScaleValue(BaseLabelHeight);
+
+            if (rectTransform == null)
+                rectTransform = GetComponent<RectTransform>();
+
+            if (rectTransform != null)
+                rectTransform.sizeDelta = new Vector2(slotSize, slotSize);
+
+            if (frameImage != null)
+            {
+                var frameRect = frameImage.rectTransform;
+                frameRect.offsetMin = Vector2.zero;
+                frameRect.offsetMax = Vector2.zero;
+            }
+
+            if (iconImage != null)
+            {
+                var iconRect = iconImage.rectTransform;
+                iconRect.sizeDelta = new Vector2(iconSize, iconSize);
+                iconRect.anchoredPosition = Vector2.zero;
+            }
+
+            if (nameText != null)
+            {
+                nameText.fontSize = ScaleFont(BaseNameFontSize);
+                var nameRect = nameText.rectTransform;
+                nameRect.sizeDelta = new Vector2(slotSize - (textPadding * 2f), labelHeight);
+                nameRect.anchoredPosition = new Vector2(0f, -textPadding);
+            }
+
+            if (timerText != null)
+            {
+                timerText.fontSize = ScaleFont(BaseTimerFontSize);
+                var timerRect = timerText.rectTransform;
+                timerRect.sizeDelta = new Vector2(slotSize - (textPadding * 2f), labelHeight);
+                timerRect.anchoredPosition = new Vector2(0f, textPadding);
+            }
+        }
+
+        /// <summary>
+        /// Helper used to scale layout values consistently for the buff slot.
+        /// </summary>
+        private static float ScaleValue(float baseValue) => baseValue * SizeScale;
+
+        /// <summary>
+        /// Helper used to scale font sizes while ensuring a minimum value of 1 so Unity's
+        /// text renderer stays valid.
+        /// </summary>
+        private static int ScaleFont(int baseValue) => Mathf.Max(1, Mathf.RoundToInt(baseValue * SizeScale));
 
         /// <summary>
         /// Initialise the infobox with the provided buff instance.
