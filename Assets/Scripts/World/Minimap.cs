@@ -145,8 +145,8 @@ namespace World
             var canvasGO = overlay.Root;
             minimapCanvas = overlay.Canvas;
 
-            const int size = 128;
-            const int border = 4;
+            const float smallMapOuterSize = 300f;
+            const float borderThickness = 4f;
 
             smallRoot = new GameObject("Small", typeof(RectTransform));
             smallRoot.transform.SetParent(canvasGO.transform, false);
@@ -165,7 +165,7 @@ namespace World
             borderRect.anchorMin = new Vector2(1f, 1f);
             borderRect.anchorMax = new Vector2(1f, 1f);
             borderRect.pivot = new Vector2(1f, 1f);
-            borderRect.sizeDelta = new Vector2(size + border * 2, size + border * 2);
+            borderRect.sizeDelta = new Vector2(smallMapOuterSize, smallMapOuterSize);
             borderRect.anchoredPosition = new Vector2(-10f, -10f);
 
             var rawGO = new GameObject("Image", typeof(RawImage));
@@ -175,8 +175,8 @@ namespace World
             var rawRect = rawImg.rectTransform;
             rawRect.anchorMin = Vector2.zero;
             rawRect.anchorMax = Vector2.one;
-            rawRect.offsetMin = new Vector2(border, border);
-            rawRect.offsetMax = new Vector2(-border, -border);
+            rawRect.offsetMin = new Vector2(borderThickness, borderThickness);
+            rawRect.offsetMax = new Vector2(-borderThickness, -borderThickness);
             smallMapRect = rawRect;
             const int btnSize = 24;
             const int btnSpacing = 4;
