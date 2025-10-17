@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:80c1e4b24a7d8ee7d00a5ea8b437175a350fcb4b -->
+## 2025-10-17T22:50:47+01:00 — Merge pull request #1171 from aicovergod/codex/update-pet-and-health-hud-layouts
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 15 ++ / 11 --
+- Notes:
+  Adjust HUD layout constants for health and pet bars
+---
+<!-- commit:628e6230a84f5a5d492f4a255811b0f98092a41c -->
+## 2025-10-17T22:50:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:4a0ab763253d3b6e2ebdf737aec8e1b6a9d63d69 -->
 ## 2025-10-17T22:50:20+01:00 — Adjust player and pet HUD layout
 
