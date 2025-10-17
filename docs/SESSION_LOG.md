@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b2c5e80cd100d72fa51430c1ffaa0a775e927f6d -->
+## 2025-10-17T22:35:00+01:00 — Expand minimap border to 300
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/World/Minimap.cs
+- Diff: 5 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:fe96ceeb773a9c0f3c5b71454572755b17b84d18 -->
 ## 2025-10-17T21:44:26+01:00 — Merge pull request #1169 from aicovergod/codex/fix-cs0103-and-cs1061-errors
 
