@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d9e0e8b4f40f0ac969b715f1d484d8755878d348 -->
+## 2025-10-17T23:02:46+01:00 — Merge pull request #1173 from aicovergod/codex/increase-buff-icon-size-by-2.5x
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 97 ++ / 8 --
+- Notes:
+  Enlarge buff HUD icons for readability
+---
+<!-- commit:28a28d270ba3c1e743161774ccc48622a9ba3764 -->
+## 2025-10-17T23:02:37+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:3780a69a1ee5b9a0726ec3eae19ba061a10f33fd -->
 ## 2025-10-17T23:02:15+01:00 — Scale buff info boxes for readability
 
