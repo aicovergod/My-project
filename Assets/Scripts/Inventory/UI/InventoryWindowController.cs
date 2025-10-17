@@ -3,6 +3,7 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UI.Utilities;
 using Inventory.Core;
 using UI.Utilities;
 using InventoryComponent = global::Inventory.Inventory;
@@ -896,27 +897,16 @@ namespace Inventory.UI
 
             if (config.ShowCloseButton)
             {
-                GameObject closeBtn = new GameObject("CloseButton", typeof(RectTransform), typeof(Image), typeof(Button));
-                closeBtn.transform.SetParent(window.transform, false);
-                var cbRect = closeBtn.GetComponent<RectTransform>();
-                cbRect.anchorMin = cbRect.anchorMax = new Vector2(1f, 1f);
-                cbRect.pivot = new Vector2(1f, 1f);
-                cbRect.anchoredPosition = new Vector2(-4f, -4f);
-                cbRect.sizeDelta = new Vector2(16f, 16f);
-                var txtGO = new GameObject("X", typeof(Text));
-                txtGO.transform.SetParent(closeBtn.transform, false);
-                var txt = txtGO.GetComponent<Text>();
-                if (config.DefaultFont != null) txt.font = config.DefaultFont;
-                txt.text = "X";
-                txt.alignment = TextAnchor.MiddleCenter;
-                txt.color = Color.white;
-                txt.raycastTarget = false;
-                var txtRect = txtGO.GetComponent<RectTransform>();
-                txtRect.anchorMin = Vector2.zero;
-                txtRect.anchorMax = Vector2.one;
-                txtRect.offsetMin = Vector2.zero;
-                txtRect.offsetMax = Vector2.zero;
-                closeBtn.GetComponent<Button>().onClick.AddListener(() => CloseRequested?.Invoke(this));
+                CloseButtonBuilder.Build(
+                    window.transform,
+                    () => CloseRequested?.Invoke(this),
+                    new CloseButtonBuilder.Options
+                    {
+                        Font = config.DefaultFont,
+                        TextRaycastTarget = false,
+                        AnchoredPosition = new Vector2(-4f, -4f),
+                        Size = new Vector2(16f, 16f)
+                    });
             }
 
             tooltip = new GameObject("Tooltip", typeof(Image), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
