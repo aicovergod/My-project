@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a73c4865282f05a4127f408495511a11bf69ac04 -->
+## 2025-10-17T19:11:17+01:00 — Merge pull request #1165 from aicovergod/codex/create-overlay-canvas-factory-and-refactor-ui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 155 ++ / 97 --
+- Notes:
+  Refactor overlay canvas creation into factory
+---
+<!-- commit:b03c17da4b13b99015339c875393f4f3b73d6927 -->
+## 2025-10-17T19:11:06+01:00 — Merge branch 'main' into codex/create-overlay-canvas-factory-and-refactor-ui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:894f7611956d4591f2b99b7a2f84b973be4f1c3a -->
 ## 2025-10-17T18:46:38+01:00 — Merge branch 'main' into codex/create-overlay-canvas-factory-and-refactor-ui
 
