@@ -149,6 +149,11 @@ namespace NPC
         private static PointerEventData sharedPointerEventData;
 
         /// <summary>
+        ///     Tracks which event system owns <see cref="sharedPointerEventData"/> so we can rebuild it when scenes swap.
+        /// </summary>
+        private static EventSystem sharedPointerEventSystem;
+
+        /// <summary>
         ///     Evaluates whether the active pointer is currently hovering UI that should block world interactions.
         /// </summary>
         private static bool IsPointerOverUI()
@@ -197,8 +202,11 @@ namespace NPC
             if (eventSystem == null)
                 return false;
 
-            if (sharedPointerEventData == null || sharedPointerEventData.eventSystem != eventSystem)
+            if (sharedPointerEventData == null || sharedPointerEventSystem != eventSystem)
+            {
                 sharedPointerEventData = new PointerEventData(eventSystem);
+                sharedPointerEventSystem = eventSystem;
+            }
             else
                 sharedPointerEventData.Reset();
 
