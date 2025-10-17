@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:894f7611956d4591f2b99b7a2f84b973be4f1c3a -->
+## 2025-10-17T18:46:38+01:00 — Merge branch 'main' into codex/create-overlay-canvas-factory-and-refactor-ui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs, Assets/Scripts/Shop/ShopUI.cs
+- Diff: 192 ++ / 70 --
+- Notes:
+  —
+---
 <!-- commit:6058d053613f7112acb229a613f55cc9e514189c -->
 ## 2025-10-17T15:25:10+01:00 — Refactor overlay canvas generation into factory
 
