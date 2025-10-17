@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3780a69a1ee5b9a0726ec3eae19ba061a10f33fd -->
+## 2025-10-17T23:02:15+01:00 — Scale buff info boxes for readability
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/HUD/BuffInfoBox.cs
+- Diff: 88 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:205c6fb86f65d97085b1c837252032cd329e56ed -->
 ## 2025-10-17T22:57:50+01:00 — Merge pull request #1172 from aicovergod/codex/add-outline-to-petlevelbarhud-and-healthhud
 
