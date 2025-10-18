@@ -221,8 +221,11 @@ namespace Player.Chat
                 return;
 
             var position = FloatingTextAnchorUtility.ResolveAnchorPosition(transform, FloatingTextFallbackHeight, ref floatingTextAnchorCache);
+            var anchorTransform = floatingTextAnchorCache.anchor != null ? floatingTextAnchorCache.anchor : transform;
+            // Preserve the resolved spawn location while ensuring the popup tracks the anchor each frame.
+            Vector3 followOffset = position - anchorTransform.position;
             var tokens = EmojiMarkupParser.Parse(message ?? string.Empty);
-            FloatingText.Show(tokens, position, Color.white);
+            FloatingText.ShowAnchored(tokens, anchorTransform, followOffset, Color.white);
         }
 
         private void ReleaseModalLock()

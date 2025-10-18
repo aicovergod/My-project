@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7e8b5c9b56bfc6f8e48e5073ac551f3547cc5ee6 -->
+## 2025-10-18T20:27:40+01:00 — Add anchored floating text support for player chat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/UI/FloatingText.cs
+- Diff: 72 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:3df165681a6bf593baa5c47328e3687158f73431 -->
 ## 2025-10-18T20:13:56+01:00 — Merge pull request #1211 from aicovergod/codex/remove-press-enter-to-chat-notification
 
