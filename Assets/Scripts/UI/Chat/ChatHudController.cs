@@ -235,8 +235,8 @@ namespace UI.Chat
             layout.childAlignment = TextAnchor.LowerLeft;
 
             var scrollElement = CreateMessageScroll(background.transform);
-            var channelRow = CreateChannelRow(background.transform);
             var inputRow = CreateInputRow(background.transform);
+            var channelRow = CreateChannelRow(background.transform);
 
             scrollElement.flexibleHeight = 1f;
             channelRow.preferredHeight = 40f;
