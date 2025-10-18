@@ -290,7 +290,7 @@ namespace UI.Chat
                 var iconRect = iconObject.GetComponent<RectTransform>();
                 iconRect.SetParent(cellObject.transform, false);
                 var iconImage = iconObject.GetComponent<Image>();
-                definition.ApplyTo(iconImage);
+                definition.ApplyTo(iconImage, 32f);
 
                 var labelObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
                 var labelRect = labelObject.GetComponent<RectTransform>();

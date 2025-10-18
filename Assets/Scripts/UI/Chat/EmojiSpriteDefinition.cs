@@ -19,11 +19,17 @@ namespace UI.Chat
         /// <summary>Sprite instance representing the emoji graphic.</summary>
         public Sprite Sprite { get; }
 
+        private const float DefaultTargetSize = 16f;
+
         /// <summary>
-        /// Applies the sprite to the provided image while enforcing a 16×16 rect transform and pixel density.
+        /// Applies the sprite to the provided image while enforcing a square rect transform and pixel density.
         /// </summary>
         /// <param name="image">Image that should render the emoji.</param>
-        public void ApplyTo(UnityEngine.UI.Image image)
+        /// <param name="targetSize">
+        /// Desired rendered size (in pixels) for the emoji. Defaults to <see cref="DefaultTargetSize"/> so chat output
+        /// stays aligned with the 16px font baseline.
+        /// </param>
+        public void ApplyTo(UnityEngine.UI.Image image, float targetSize = DefaultTargetSize)
         {
             if (image == null || Sprite == null)
                 return;
@@ -35,14 +41,13 @@ namespace UI.Chat
             var rect = image.rectTransform;
             if (rect != null)
             {
-                const float targetSize = 16f;
                 rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, targetSize);
                 rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, targetSize);
             }
 
-            // Ensure the rendered size matches the OSRS-inspired 16px target regardless of the sprite's native pixels-per-unit.
+            // Ensure the rendered size matches the requested target regardless of the sprite's native pixels-per-unit.
             if (Sprite.pixelsPerUnit > 0f)
-                image.pixelsPerUnitMultiplier = 16f / Sprite.pixelsPerUnit;
+                image.pixelsPerUnitMultiplier = targetSize / Sprite.pixelsPerUnit;
             else
                 image.pixelsPerUnitMultiplier = 1f;
         }
