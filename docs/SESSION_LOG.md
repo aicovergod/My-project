@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8ac1ab1e9a5359caee63c375187ec712d0a7de61 -->
+## 2025-10-18T12:04:04+01:00 — Shrink chat channel toggles
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 10 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:0a83b506c81d430215c4d0726a93dd5763046e23 -->
 ## 2025-10-18T12:00:12+01:00 — Merge pull request #1177 from aicovergod/codex/reorder-ui-elements-in-chathudcontroller
 
