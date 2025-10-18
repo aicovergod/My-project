@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:95c134ae233566623e3afe952bb90b28f257568e -->
+## 2025-10-18T18:37:27+01:00 — Ensure emoji text spans align left
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 30 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:dfae0858b6d7b71da06a6e03dd601a855f414bc3 -->
 ## 2025-10-18T18:18:08+01:00 — Merge pull request #1202 from aicovergod/codex/adjust-emoji-token-layout-alignment
 
