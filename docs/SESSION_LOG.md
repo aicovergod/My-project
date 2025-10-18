@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0a76fa9173122f0b8081ef341e5f0df9c5b8fd49 -->
+## 2025-10-18T14:37:35+01:00 — Prevent minimap toggle during chat and freeze movement
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/World/Minimap.cs
+- Diff: 82 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:4a673fac020802a4e889d80ea921e1af23c16d71 -->
 ## 2025-10-18T14:27:35+01:00 — Merge pull request #1186 from aicovergod/codex/update-chathudcontroller-layout-properties
 
