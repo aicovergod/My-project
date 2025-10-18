@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
@@ -56,6 +57,7 @@ namespace UI.Chat
         private bool autoScrollToBottom = true;
         private bool inputFocused;
         private ChatService chatService;
+        private Coroutine bindRetryCoroutine;
 
         /// <summary>
         /// Provides runtime access to the active HUD instance.
@@ -92,26 +94,19 @@ namespace UI.Chat
 
         private void OnEnable()
         {
-            chatService = ChatService.Instance;
             InitialiseChannelState();
 
-            if (chatService != null)
-            {
-                chatService.MessageReceived += HandleMessageReceived;
-                chatService.HistoryRefreshed += HandleHistoryRefreshed;
-                chatService.ActiveUsernameChanged += HandleActiveUsernameChanged;
-
-                UpdateActiveUsername(chatService.ActiveUsername);
-                chatService.RequestFullRefresh();
-            }
-            else
+            if (!TryBindChatService())
             {
                 Debug.LogWarning("ChatHudController: ChatService unavailable; HUD will wait for service bootstrap.");
+                StartChatServiceRetry();
             }
         }
 
         private void OnDisable()
         {
+            StopChatServiceRetry();
+
             if (chatService != null)
             {
                 chatService.MessageReceived -= HandleMessageReceived;
@@ -119,6 +114,63 @@ namespace UI.Chat
                 chatService.ActiveUsernameChanged -= HandleActiveUsernameChanged;
                 chatService = null;
             }
+        }
+
+        /// <summary>
+        /// Attempts to bind to the <see cref="ChatService"/> singleton and wire runtime callbacks.
+        /// </summary>
+        /// <returns><c>true</c> when the service is available and successfully bound, otherwise <c>false</c>.</returns>
+        private bool TryBindChatService()
+        {
+            if (chatService != null)
+                return true;
+
+            var instance = ChatService.Instance;
+            if (instance == null)
+                return false;
+
+            chatService = instance;
+            chatService.MessageReceived += HandleMessageReceived;
+            chatService.HistoryRefreshed += HandleHistoryRefreshed;
+            chatService.ActiveUsernameChanged += HandleActiveUsernameChanged;
+
+            UpdateActiveUsername(chatService.ActiveUsername);
+            chatService.RequestFullRefresh();
+            return true;
+        }
+
+        /// <summary>
+        /// Starts a lightweight retry coroutine that polls for the chat service becoming available.
+        /// </summary>
+        private void StartChatServiceRetry()
+        {
+            if (bindRetryCoroutine != null)
+                return;
+
+            bindRetryCoroutine = StartCoroutine(BindChatServiceWhenAvailable());
+        }
+
+        /// <summary>
+        /// Stops the retry coroutine if it is running.
+        /// </summary>
+        private void StopChatServiceRetry()
+        {
+            if (bindRetryCoroutine == null)
+                return;
+
+            StopCoroutine(bindRetryCoroutine);
+            bindRetryCoroutine = null;
+        }
+
+        /// <summary>
+        /// Coroutine that waits until the chat service singleton is initialised before binding callbacks.
+        /// </summary>
+        private IEnumerator BindChatServiceWhenAvailable()
+        {
+            while (!TryBindChatService())
+                yield return null;
+
+            bindRetryCoroutine = null;
         }
 
         /// <summary>
