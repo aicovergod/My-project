@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UI.Utilities;
+using UI;
 
 namespace UI.Chat
 {
@@ -975,9 +976,9 @@ namespace UI.Chat
             {
                 var row = GetRow(i);
                 var message = mergedMessages[i];
-                string formatted = BuildFormattedMessage(message);
-                var tokens = EmojiMarkupParser.Parse(formatted);
-                row.SetTokens(tokens, ResolveMessageColor(message));
+                string prefix = BuildMessagePrefix(message);
+                var tokens = EmojiMarkupParser.Parse(message.Text ?? string.Empty);
+                row.SetTokens(prefix, tokens, ResolveMessageColor(message));
             }
 
             for (int i = mergedMessages.Count; i < activeRows.Count; i++)
@@ -1033,12 +1034,12 @@ namespace UI.Chat
             autoScrollToBottom = position.y <= 0.001f;
         }
 
-        private string BuildFormattedMessage(ChatMessage message)
+        private string BuildMessagePrefix(ChatMessage message)
         {
             DateTime localTime = message.TimestampUtc.ToLocalTime();
             string timestamp = localTime.ToString("HH:mm", CultureInfo.InvariantCulture);
             string prefix = message.Channel == ChatChannel.Game ? "Game" : (!string.IsNullOrEmpty(message.Sender) ? message.Sender : "Player");
-            return $"[{timestamp}] {prefix}: {message.Text}";
+            return $"[{timestamp}] {prefix}: ";
         }
 
         private Color ResolveMessageColor(ChatMessage message)
@@ -1066,7 +1067,39 @@ namespace UI.Chat
                 layout.minHeight = 20f;
                 layout.flexibleHeight = 0f;
 
-                var contentObject = new GameObject("Content", typeof(RectTransform), typeof(EmojiTokenLayout));
+                var horizontalGroup = Root.AddComponent<HorizontalLayoutGroup>();
+                horizontalGroup.childControlWidth = true;
+                horizontalGroup.childControlHeight = true;
+                horizontalGroup.childForceExpandWidth = true;
+                horizontalGroup.childForceExpandHeight = false;
+                horizontalGroup.childAlignment = TextAnchor.UpperLeft;
+                horizontalGroup.spacing = 0f;
+
+                var prefixObject = new GameObject("Prefix", typeof(RectTransform), typeof(Text), typeof(LayoutElement));
+                var prefixRect = prefixObject.GetComponent<RectTransform>();
+                prefixRect.SetParent(Root.transform, false);
+                prefixRect.anchorMin = new Vector2(0f, 0f);
+                prefixRect.anchorMax = new Vector2(0f, 1f);
+                prefixRect.pivot = new Vector2(0f, 0.5f);
+                prefixRect.offsetMin = Vector2.zero;
+                prefixRect.offsetMax = Vector2.zero;
+
+                prefixLabel = prefixObject.GetComponent<Text>();
+                prefixLabel.text = string.Empty;
+                prefixLabel.alignment = TextAnchor.MiddleLeft;
+                prefixLabel.supportRichText = false;
+                prefixLabel.horizontalOverflow = HorizontalWrapMode.Overflow;
+                prefixLabel.verticalOverflow = VerticalWrapMode.Truncate;
+                prefixLabel.raycastTarget = false;
+                prefixLabel.fontSize = FontSize;
+                LegacyFontProvider.ApplyTo(prefixLabel);
+
+                var prefixLayout = prefixObject.GetComponent<LayoutElement>();
+                prefixLayout.flexibleWidth = 0f;
+                prefixLayout.minWidth = 0f;
+                prefixLayout.preferredWidth = -1f;
+
+                var contentObject = new GameObject("Content", typeof(RectTransform), typeof(EmojiTokenLayout), typeof(LayoutElement));
                 var contentRect = contentObject.GetComponent<RectTransform>();
                 contentRect.SetParent(Root.transform, false);
                 contentRect.anchorMin = new Vector2(0f, 0f);
@@ -1074,15 +1107,27 @@ namespace UI.Chat
                 contentRect.offsetMin = Vector2.zero;
                 contentRect.offsetMax = Vector2.zero;
 
+                var contentLayout = contentObject.GetComponent<LayoutElement>();
+                contentLayout.flexibleWidth = 1f;
+                contentLayout.minWidth = 0f;
+                contentLayout.preferredWidth = -1f;
+
                 TokenLayout = contentObject.GetComponent<EmojiTokenLayout>();
             }
 
             public GameObject Root { get; }
             public RectTransform RectTransform { get; }
+            private Text prefixLabel;
             private EmojiTokenLayout TokenLayout { get; }
 
-            public void SetTokens(IReadOnlyList<EmojiMarkupToken> tokens, Color color)
+            public void SetTokens(string prefix, IReadOnlyList<EmojiMarkupToken> tokens, Color color)
             {
+                if (prefixLabel != null)
+                {
+                    prefixLabel.text = prefix ?? string.Empty;
+                    prefixLabel.color = color;
+                }
+
                 TokenLayout?.RenderTokens(tokens, color, FontSize, TextAnchor.MiddleLeft);
             }
 
