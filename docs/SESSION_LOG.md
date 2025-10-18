@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:185c753d871d7b893d340eaa168749436cdaae53 -->
+## 2025-10-18T10:55:04+01:00 — Merge pull request #1175 from aicovergod/codex/fix-console-errors-in-chathudcontroller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 67 ++ / 2 --
+- Notes:
+  Fix chat HUD focus tracking without deprecated InputField events
+---
+<!-- commit:72d687b10332e366ec48ab0c66dc0c6d1bda227b -->
+## 2025-10-18T10:54:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:8d3fa2fd2cb85331b74e29d8f3ad2aed1ab4a122 -->
 ## 2025-10-18T10:54:38+01:00 — Fix chat HUD input focus tracking
 
