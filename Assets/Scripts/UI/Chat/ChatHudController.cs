@@ -239,7 +239,7 @@ namespace UI.Chat
             var channelRow = CreateChannelRow(background.transform);
 
             scrollElement.flexibleHeight = 1f;
-            channelRow.preferredHeight = 40f;
+            channelRow.preferredHeight = 12f;
             inputRow.preferredHeight = 48f;
         }
 
@@ -332,7 +332,7 @@ namespace UI.Chat
             var toggleRoot = new GameObject($"{channel}Toggle", typeof(RectTransform), typeof(Image), typeof(Button));
             var rect = toggleRoot.GetComponent<RectTransform>();
             rect.SetParent(parent, false);
-            rect.sizeDelta = new Vector2(100f, 40f);
+            rect.sizeDelta = new Vector2(20f, 8f);
 
             var image = toggleRoot.GetComponent<Image>();
             image.color = ChannelToggleEnabledColor;
@@ -350,7 +350,10 @@ namespace UI.Chat
             labelObject.transform.SetParent(toggleRoot.transform, false);
             labelText.text = channel.ToString();
             labelText.alignment = TextAnchor.MiddleCenter;
-            labelText.fontSize = 16;
+            labelText.fontSize = 8;
+            labelText.resizeTextForBestFit = true;
+            labelText.resizeTextMinSize = 4;
+            labelText.resizeTextMaxSize = 10;
             labelText.color = ChannelToggleEnabledTextColor;
             LegacyFontProvider.ApplyTo(labelText);
 
@@ -359,7 +362,10 @@ namespace UI.Chat
             stateObject.transform.SetParent(toggleRoot.transform, false);
             stateText.text = "On";
             stateText.alignment = TextAnchor.MiddleCenter;
-            stateText.fontSize = 14;
+            stateText.fontSize = 7;
+            stateText.resizeTextForBestFit = true;
+            stateText.resizeTextMinSize = 4;
+            stateText.resizeTextMaxSize = 9;
             stateText.color = ChannelToggleEnabledTextColor;
             LegacyFontProvider.ApplyTo(stateText);
 
