@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7da28796d58d60ed6d7401cd131b61ad5e0fcbcf -->
+## 2025-10-18T18:03:42+01:00 — Merge pull request #1201 from aicovergod/codex/fix-chatbox-message-text-wrapping
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 13 ++ / 1 --
+- Notes:
+  Fix floating chat bubbles wrapping across lines
+---
+<!-- commit:b3673510f962da741a9df4d444e574199c8183e2 -->
+## 2025-10-18T18:03:34+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f2400cd4b1168efb233b76e66a5eb8b958b84f18 -->
 ## 2025-10-18T18:03:17+01:00 — Keep floating chat speech on a single line
 
