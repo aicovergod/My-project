@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fa3cd28ab1e282be0271f70cb7efba6c4754ef82 -->
+## 2025-10-18T21:28:20+01:00 — Align ground item spawns to tile centres
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Drops/GroundItemSpawner.cs, Assets/Scripts/Drops/NpcDropper.cs
+- Diff: 51 ++ / 7 --
+- Notes:
+  —
+---
 <!-- commit:c77f9810831dda445f76bc106e43a8d427d2756d -->
 ## 2025-10-18T21:10:30+01:00 — Merge pull request #1216 from aicovergod/codex/fix-scroller-issue-in-emoji-window
 
