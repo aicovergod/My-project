@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1f52a75fc66d187f276340a3ea970b9aa4030d18 -->
+## 2025-10-18T21:02:08+01:00 — Enforce username length and case-insensitive credentials
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Core/Save/AccountProfileService.cs, Assets/Scripts/UI/Login/LoginScreenController.cs
+- Diff: 78 ++ / 14 --
+- Notes:
+  —
+---
 <!-- commit:2402c9fa3e03b61fd094490f5729b1b50bdb4dd0 -->
 ## 2025-10-18T20:55:57+01:00 — Merge pull request #1214 from aicovergod/codex/add-scroller-to-emoji-window
 
