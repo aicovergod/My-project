@@ -682,6 +682,8 @@ namespace UI.Chat
             var emojiButtonLayout = emojiButtonObject.GetComponent<LayoutElement>();
             emojiButtonLayout.preferredWidth = 32f;
             emojiButtonLayout.preferredHeight = 32f;
+            emojiButtonLayout.minWidth = 32f;
+            emojiButtonLayout.minHeight = 32f;
             emojiButtonLayout.flexibleWidth = 0f;
             emojiButtonLayout.flexibleHeight = 0f;
 
