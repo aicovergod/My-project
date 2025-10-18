@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fbf07e36abb345aa4aadab7788781e7eba865286 -->
+## 2025-10-18T17:54:44+01:00 — Adjust emoji token text layout width
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:edce82222a2fe404c3211e7fefa7e06adbb339f8 -->
 ## 2025-10-18T17:45:07+01:00 — Merge pull request #1199 from aicovergod/codex/fix-emoji-insertion-position
 

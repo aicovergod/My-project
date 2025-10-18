@@ -193,7 +193,7 @@ namespace UI.Chat
             if (layout == null)
                 return;
 
-            layout.flexibleWidth = 1f;
+            layout.flexibleWidth = 0f;
             layout.minWidth = 0f;
             layout.preferredWidth = -1f;
         }
