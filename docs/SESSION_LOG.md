@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:bd4ecf4b02cd129bfd3c0e3d655e0469c69e74b5 -->
+## 2025-10-18T17:30:58+01:00 — Merge pull request #1197 from aicovergod/codex/add-helper-to-manage-input-field-caret
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 30 ++ / 3 --
+- Notes:
+  Fix chat HUD caret collapse after focus changes
+---
+<!-- commit:55c7c6b926107c2ace644bf2fb9a8b14b7686d46 -->
+## 2025-10-18T17:30:50+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f273999218bedf3e0a017716553855a0cc75307c -->
 ## 2025-10-18T17:30:31+01:00 — Adjust chat input caret handling
 
