@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8e61ccd16373f56b1accd77fe8f91f7c9d6f5364 -->
+## 2025-10-18T18:17:44+01:00 — Align emoji layout child alignment with caller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 7 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7da28796d58d60ed6d7401cd131b61ad5e0fcbcf -->
 ## 2025-10-18T18:03:42+01:00 — Merge pull request #1201 from aicovergod/codex/fix-chatbox-message-text-wrapping
 
