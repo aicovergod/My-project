@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c77f9810831dda445f76bc106e43a8d427d2756d -->
+## 2025-10-18T21:10:30+01:00 — Merge pull request #1216 from aicovergod/codex/fix-scroller-issue-in-emoji-window
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 18 ++ / 17 --
+- Notes:
+  Fix emoji picker scroll view content sizing
+---
+<!-- commit:1c44cc45b54ce08c08df224846d6f7a93fdbea53 -->
+## 2025-10-18T21:10:14+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:37846cb9524061c44b8b2a6cf836017afbacf81b -->
 ## 2025-10-18T21:09:56+01:00 — Merge branch 'main' into codex/fix-scroller-issue-in-emoji-window
 
