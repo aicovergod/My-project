@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b864c1a4a8383557d95d08d795cf9d94efeb13d0 -->
+## 2025-10-18T20:45:51+01:00 — Limit chat input to 64 emoji-aware characters
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 131 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:4c79a9bdf1377f1ebf9cb51057aab6264e12c491 -->
 ## 2025-10-18T20:28:07+01:00 — Merge pull request #1212 from aicovergod/codex/add-anchored-floating-text-behavior
 
