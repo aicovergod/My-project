@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:39107208aaecadfab10f6146422cf343a5bc6c72 -->
+## 2025-10-18T19:01:17+01:00 — Merge pull request #1205 from aicovergod/codex/fix-emoji-popup-rendering-order
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 49 ++ / 1 --
+- Notes:
+  Fix emoji picker layering above chat window
+---
+<!-- commit:89bc2ad95fc17b6e47a81d8e111c43c9ca55e194 -->
+## 2025-10-18T19:00:59+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b0cba2c33eda9a664d562372c8f18564e43d087a -->
 ## 2025-10-18T19:00:42+01:00 — Fix emoji picker panel layering
 
