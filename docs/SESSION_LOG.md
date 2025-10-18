@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e02323e230ca0246005a8e8805e84187ca3d9535 -->
+## 2025-10-18T17:24:04+01:00 — Merge pull request #1196 from aicovergod/codex/fix-chatbox-interaction-with-expanded-minimap
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 54 ++ / 0 --
+- Notes:
+  Block chat input when minimap is expanded
+---
+<!-- commit:b0a671410a187100ddf68c793d8c108fe774be14 -->
+## 2025-10-18T17:22:45+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:13e3f84cd8e8aaf0f9b6dd5eb035445c234e9d06 -->
 ## 2025-10-18T17:22:27+01:00 — Block chat input when minimap is expanded
 
