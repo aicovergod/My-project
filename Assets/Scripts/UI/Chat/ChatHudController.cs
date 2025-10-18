@@ -30,6 +30,12 @@ namespace UI.Chat
 
         private static readonly ChatChannel[] ChannelValues = (ChatChannel[])Enum.GetValues(typeof(ChatChannel));
 
+        private const float WindowWidth = 520f;
+        private const float WindowHeight = 220f;
+        private const float ChannelPanelHeight = 44f;
+        private const float WindowMargin = 18f;
+        private const float WindowSpacing = 6f;
+
         private readonly Dictionary<ChatChannel, bool> channelFilters = new Dictionary<ChatChannel, bool>();
         private readonly Dictionary<ChatChannel, List<ChatMessage>> channelHistory = new Dictionary<ChatChannel, List<ChatMessage>>();
         private readonly Dictionary<ChatChannel, ChannelToggleState> channelToggleLookup = new Dictionary<ChatChannel, ChannelToggleState>();
@@ -39,6 +45,7 @@ namespace UI.Chat
 
         private Canvas canvas;
         private ScrollRect scrollRect;
+        private RectTransform channelWindowRoot;
         private RectTransform windowRoot;
         private RectTransform contentRect;
         private InputField inputField;
@@ -191,28 +198,74 @@ namespace UI.Chat
 
         private void ConfigureRoot()
         {
+            if (channelWindowRoot == null)
+            {
+                var channelRootObject = new GameObject("ChannelWindowRoot", typeof(RectTransform));
+                channelWindowRoot = channelRootObject.GetComponent<RectTransform>();
+            }
+
             if (windowRoot == null)
             {
                 var windowRootObject = new GameObject("WindowRoot", typeof(RectTransform));
                 windowRoot = windowRootObject.GetComponent<RectTransform>();
             }
 
+            channelWindowRoot.SetParent(transform, false);
+            channelWindowRoot.localScale = Vector3.one;
+            channelWindowRoot.anchorMin = new Vector2(0f, 0f);
+            channelWindowRoot.anchorMax = new Vector2(0f, 0f);
+            channelWindowRoot.pivot = new Vector2(0f, 0f);
+            channelWindowRoot.sizeDelta = new Vector2(WindowWidth, ChannelPanelHeight);
+            channelWindowRoot.anchoredPosition = new Vector2(WindowMargin, WindowMargin);
+
             windowRoot.SetParent(transform, false);
             windowRoot.localScale = Vector3.one;
             windowRoot.anchorMin = new Vector2(0f, 0f);
             windowRoot.anchorMax = new Vector2(0f, 0f);
             windowRoot.pivot = new Vector2(0f, 0f);
-            windowRoot.sizeDelta = new Vector2(520f, 220f);
-            windowRoot.anchoredPosition = new Vector2(18f, 18f);
+            windowRoot.sizeDelta = new Vector2(WindowWidth, WindowHeight);
+            windowRoot.anchoredPosition = new Vector2(WindowMargin, WindowMargin + ChannelPanelHeight + WindowSpacing);
         }
 
         private void BuildUi()
         {
+            if (channelWindowRoot == null)
+            {
+                Debug.LogError("ChatHudController: Channel window root missing during UI build.");
+                return;
+            }
+
             if (windowRoot == null)
             {
                 Debug.LogError("ChatHudController: Window root missing during UI build.");
                 return;
             }
+
+            var channelBackground = new GameObject("ChannelBackground", typeof(RectTransform), typeof(Image));
+            var channelBackgroundRect = channelBackground.GetComponent<RectTransform>();
+            channelBackgroundRect.SetParent(channelWindowRoot, false);
+            channelBackgroundRect.anchorMin = new Vector2(0f, 0f);
+            channelBackgroundRect.anchorMax = new Vector2(1f, 1f);
+            channelBackgroundRect.offsetMin = Vector2.zero;
+            channelBackgroundRect.offsetMax = Vector2.zero;
+
+            var channelBackgroundImage = channelBackground.GetComponent<Image>();
+            channelBackgroundImage.color = PanelColor;
+
+            var channelLayout = channelBackground.AddComponent<VerticalLayoutGroup>();
+            channelLayout.padding = new RectOffset(8, 8, 6, 6);
+            channelLayout.spacing = 4f;
+            channelLayout.childAlignment = TextAnchor.MiddleLeft;
+            channelLayout.childControlWidth = true;
+            channelLayout.childControlHeight = true;
+            channelLayout.childForceExpandWidth = false;
+            channelLayout.childForceExpandHeight = false;
+
+            var channelRow = CreateChannelRow(channelBackground.transform);
+            float availableChannelHeight = Mathf.Max(0f, ChannelPanelHeight - channelLayout.padding.vertical);
+            channelRow.preferredHeight = availableChannelHeight;
+            channelRow.minHeight = availableChannelHeight;
+            channelRow.flexibleWidth = 1f;
 
             var background = new GameObject("Background", typeof(RectTransform), typeof(Image));
             var backgroundRect = background.GetComponent<RectTransform>();
@@ -236,10 +289,8 @@ namespace UI.Chat
 
             var scrollElement = CreateMessageScroll(background.transform);
             var inputRow = CreateInputRow(background.transform);
-            var channelRow = CreateChannelRow(background.transform);
 
             scrollElement.flexibleHeight = 1f;
-            channelRow.preferredHeight = 12f;
             inputRow.preferredHeight = 48f;
         }
 
