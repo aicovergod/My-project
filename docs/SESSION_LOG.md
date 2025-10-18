@@ -1,30 +1,21 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:d2209dcd276308a2c7ac065b36eb234e37c35103 -->
-## 2025-10-18T21:02:42+01:00 — Merge pull request #1215 from aicovergod/codex/restrict-account-name-to-12-characters
+<!-- commit:37846cb9524061c44b8b2a6cf836017afbacf81b -->
+## 2025-10-18T21:09:56+01:00 — Merge branch 'main' into codex/fix-scroller-issue-in-emoji-window
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
 - Changed files (0): —
-- Diff: 87 ++ / 14 --
-- Notes:
-  Enforce username length and case-insensitive credentials
----
-<!-- commit:c4cc67046ae05b9a9f826403a55ae913eb98e9bc -->
-## 2025-10-18T21:02:30+01:00 — Update SESSION_LOG [ci]
-
-- Author: session-log-bot <actions@github.com>
-- Changed files (1): docs/SESSION_LOG.md
-- Diff: 9 ++ / 0 --
+- Diff: 78 ++ / 14 --
 - Notes:
   —
 ---
-<!-- commit:1f52a75fc66d187f276340a3ea970b9aa4030d18 -->
-## 2025-10-18T21:02:08+01:00 — Enforce username length and case-insensitive credentials
+<!-- commit:b582c36cb675febece648c6ed430a5f5e683e8cf -->
+## 2025-10-18T21:09:21+01:00 — Fix emoji picker scroll content sizing
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (2): Assets/Scripts/Core/Save/AccountProfileService.cs, Assets/Scripts/UI/Login/LoginScreenController.cs
-- Diff: 78 ++ / 14 --
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiPickerPanel.cs
+- Diff: 11 ++ / 1 --
 - Notes:
   —
 ---

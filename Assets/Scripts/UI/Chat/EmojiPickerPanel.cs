@@ -291,7 +291,11 @@ namespace UI.Chat
             viewportGraphic.color = new Color(0f, 0f, 0f, 0.05f);
             viewportGraphic.raycastTarget = true;
 
-            var content = new GameObject("Content", typeof(RectTransform), typeof(GridLayoutGroup));
+            var content = new GameObject(
+                "Content",
+                typeof(RectTransform),
+                typeof(GridLayoutGroup),
+                typeof(ContentSizeFitter));
             gridContent = content.GetComponent<RectTransform>();
             gridContent.SetParent(viewportRect, false);
             // Anchor the grid content to the top of the viewport so the first emoji aligns with the
@@ -311,6 +315,12 @@ namespace UI.Chat
             // expected origin when the picker opens.
             grid.childAlignment = TextAnchor.UpperLeft;
             grid.startCorner = GridLayoutGroup.Corner.UpperLeft;
+
+            var contentFitter = content.GetComponent<ContentSizeFitter>();
+            contentFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+            // Use the preferred size for the vertical axis so the ScrollRect receives the correct
+            // content height and allows dragging/mouse-wheel scrolling across the full emoji list.
+            contentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             scrollRect.viewport = viewportRect;
             scrollRect.content = gridContent;
