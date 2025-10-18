@@ -238,10 +238,10 @@ namespace UI.Chat
             gridContent = content.GetComponent<RectTransform>();
             gridContent.SetParent(viewportRect, false);
             var grid = content.GetComponent<GridLayoutGroup>();
-            grid.cellSize = new Vector2(48f, 48f);
-            grid.spacing = new Vector2(6f, 6f);
+            grid.cellSize = new Vector2(34f, 34f);
+            grid.spacing = new Vector2(3f, 3f);
             grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            grid.constraintCount = 5;
+            grid.constraintCount = 6;
 
             scrollRect.viewport = viewportRect;
             scrollRect.content = gridContent;
