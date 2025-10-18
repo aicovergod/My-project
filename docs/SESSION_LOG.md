@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5bf6b95280e126dd38b7c23bb86c7e998d414345 -->
+## 2025-10-18T12:04:47+01:00 — Merge pull request #1178 from aicovergod/codex/update-chathudcontroller-ui-sizing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 4 --
+- Notes:
+  Adjust chat channel toggle sizing
+---
+<!-- commit:9ee60e4c77b815640ad5a0d6def9e93a6d269e01 -->
+## 2025-10-18T12:04:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:8ac1ab1e9a5359caee63c375187ec712d0a7de61 -->
 ## 2025-10-18T12:04:04+01:00 — Shrink chat channel toggles
 
