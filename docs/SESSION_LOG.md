@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:13e3f84cd8e8aaf0f9b6dd5eb035445c234e9d06 -->
+## 2025-10-18T17:22:27+01:00 — Block chat input when minimap is expanded
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/World/Minimap.cs
+- Diff: 45 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d41dd0e303b483d09fdba51e8487a4184adade6a -->
 ## 2025-10-18T17:14:51+01:00 — Merge pull request #1195 from aicovergod/codex/update-chatmessagerow-constructor
 

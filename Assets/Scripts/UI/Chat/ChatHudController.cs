@@ -60,6 +60,7 @@ namespace UI.Chat
         private EmojiPickerPanel emojiPickerPanel;
         private bool autoScrollToBottom = true;
         private bool inputFocused;
+        private bool inputFocusBlocked;
 
         /// <summary>
         /// Raised whenever the chat input focus state changes. The boolean argument is <c>true</c>
@@ -193,6 +194,9 @@ namespace UI.Chat
             if (inputField == null)
                 return;
 
+            if (inputFocusBlocked)
+                return;
+
             EventSystem eventSystem = EventSystem.current;
             if (eventSystem != null)
                 eventSystem.SetSelectedGameObject(inputField.gameObject);
@@ -269,6 +273,34 @@ namespace UI.Chat
         /// Determines whether the chat input currently holds focus.
         /// </summary>
         public bool IsInputFocused => inputFocused;
+
+        /// <summary>
+        /// Indicates whether an external system (such as the expanded minimap)
+        /// is currently preventing the chat input from receiving focus.
+        /// </summary>
+        public bool IsInputFocusBlocked => inputFocusBlocked;
+
+        /// <summary>
+        /// Enables or disables an external focus block for the chat input. When blocked,
+        /// the input field is made non-interactable and any active focus is cancelled.
+        /// </summary>
+        /// <param name="blocked">True to prevent the chat input from accepting focus.</param>
+        public void SetInputFocusBlocked(bool blocked)
+        {
+            if (inputFocusBlocked == blocked)
+                return;
+
+            inputFocusBlocked = blocked;
+
+            if (blocked)
+                CancelInput();
+
+            if (inputField != null)
+                inputField.interactable = !blocked;
+
+            UpdateInputNameVisibility();
+            RefreshInputPreview();
+        }
 
         /// <summary>
         /// Applies the supplied focus state and notifies any subscribers if the state changed.
@@ -751,6 +783,12 @@ namespace UI.Chat
         /// <param name="_">Unused event payload.</param>
         private void HandleInputSelected(BaseEventData _)
         {
+            if (inputFocusBlocked)
+            {
+                CancelInput();
+                return;
+            }
+
             ApplyInputFocusState(true);
             UpdateInputNameVisibility();
         }
