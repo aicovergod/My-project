@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c310773613ca5adaa5024f3d1e303ef0d3f1a699 -->
+## 2025-10-18T17:44:36+01:00 — Fix chat emoji insertion and deletion behavior
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 87 ++ / 17 --
+- Notes:
+  —
+---
 <!-- commit:78eb296e0b0223b7b53a5159a889bea136393279 -->
 ## 2025-10-18T17:34:55+01:00 — Merge pull request #1198 from aicovergod/codex/fix-inputfield-stringposition-error
 
