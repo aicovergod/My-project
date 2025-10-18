@@ -54,7 +54,6 @@ namespace UI.Chat
         private RectTransform contentRect;
         private InputField inputField;
         private Text inputNameLabel;
-        private Text reminderLabel;
         private Text placeholderLabel;
         private EmojiTokenLayout inputPreviewRenderer;
         private Button emojiButton;
@@ -728,8 +727,6 @@ namespace UI.Chat
             previewRect.SetSiblingIndex(placeholderRect.GetSiblingIndex());
 
             UpdateInputNameVisibility();
-
-            reminderLabel = CreateTextLabel(row.transform, "Press Enter to chat", 14, ChannelToggleEnabledTextColor);
 
             var emojiButtonObject = new GameObject("EmojiButton", typeof(RectTransform), typeof(Image), typeof(Button), typeof(LayoutElement));
             var emojiButtonRect = emojiButtonObject.GetComponent<RectTransform>();
