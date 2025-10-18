@@ -394,8 +394,7 @@ namespace UI.Chat
             inputField.lineType = InputField.LineType.SingleLine;
             inputField.characterLimit = 200;
             inputField.transition = Selectable.Transition.ColorTint;
-            inputField.onSelect.AddListener(_ => inputFocused = true);
-            inputField.onDeselect.AddListener(_ => inputFocused = false);
+            RegisterInputFocusCallbacks(inputField);
 
             var textObject = new GameObject("Text", typeof(RectTransform), typeof(Text));
             var textRect = textObject.GetComponent<RectTransform>();
@@ -435,6 +434,63 @@ namespace UI.Chat
             reminderLabel = CreateTextLabel(row.transform, "Press Enter to chat", 14, ChannelToggleEnabledTextColor);
 
             return row.GetComponent<LayoutElement>();
+        }
+
+        /// <summary>
+        /// Wires select and deselect triggers so the HUD can mirror the current focus state
+        /// without relying on deprecated <see cref="InputField.onSelect"/> events.
+        /// </summary>
+        /// <param name="field">The input field that should report focus changes.</param>
+        private void RegisterInputFocusCallbacks(InputField field)
+        {
+            if (field == null)
+                return;
+
+            var trigger = field.GetComponent<EventTrigger>();
+            if (trigger == null)
+                trigger = field.gameObject.AddComponent<EventTrigger>();
+
+            trigger.triggers ??= new List<EventTrigger.Entry>();
+
+            AppendEventTrigger(trigger, EventTriggerType.Select, HandleInputSelected);
+            AppendEventTrigger(trigger, EventTriggerType.Deselect, HandleInputDeselected);
+        }
+
+        /// <summary>
+        /// Adds an <see cref="EventTrigger"/> entry that forwards to the provided handler.
+        /// </summary>
+        /// <param name="trigger">Trigger instance to append the entry to.</param>
+        /// <param name="eventType">The UI event that should invoke the callback.</param>
+        /// <param name="handler">Callback invoked when the event fires.</param>
+        private static void AppendEventTrigger(EventTrigger trigger, EventTriggerType eventType, Action<BaseEventData> handler)
+        {
+            if (trigger == null || handler == null)
+                return;
+
+            var entry = new EventTrigger.Entry
+            {
+                eventID = eventType
+            };
+            entry.callback.AddListener(evt => handler(evt));
+            trigger.triggers.Add(entry);
+        }
+
+        /// <summary>
+        /// Marks the chat input as focused when the EventSystem selects the input field.
+        /// </summary>
+        /// <param name="_">Unused event payload.</param>
+        private void HandleInputSelected(BaseEventData _)
+        {
+            inputFocused = true;
+        }
+
+        /// <summary>
+        /// Marks the chat input as unfocused when the EventSystem deselects the input field.
+        /// </summary>
+        /// <param name="_">Unused event payload.</param>
+        private void HandleInputDeselected(BaseEventData _)
+        {
+            inputFocused = false;
         }
 
         private Text CreateTextLabel(Transform parent, string text, int fontSize, Color color)
