@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4c79a9bdf1377f1ebf9cb51057aab6264e12c491 -->
+## 2025-10-18T20:28:07+01:00 — Merge pull request #1212 from aicovergod/codex/add-anchored-floating-text-behavior
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 81 ++ / 4 --
+- Notes:
+  Add anchored floating text support for player chat
+---
+<!-- commit:a1928c60d9dc46d2d10a6c2747c60dc06bfdf8eb -->
+## 2025-10-18T20:27:59+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7e8b5c9b56bfc6f8e48e5073ac551f3547cc5ee6 -->
 ## 2025-10-18T20:27:40+01:00 — Add anchored floating text support for player chat
 
