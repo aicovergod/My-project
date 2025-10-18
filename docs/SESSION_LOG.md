@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:247a3dbc4b676ea46c196a969ec6197ce7b309ff -->
+## 2025-10-18T16:23:49+01:00 — Merge pull request #1192 from aicovergod/codex/fix-emojitokenlayout-pooled-children-leak
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 37 ++ / 2 --
+- Notes:
+  Fix EmojiTokenLayout pooling reuse
+---
+<!-- commit:14eefc89dfdf92e1c7e448947a148453a4ff0077 -->
+## 2025-10-18T16:23:12+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:186749e9a6e422dc397b3679ca6ab9f224717b24 -->
 ## 2025-10-18T16:22:53+01:00 — Fix EmojiTokenLayout reuse logic
 
