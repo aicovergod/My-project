@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f2400cd4b1168efb233b76e66a5eb8b958b84f18 -->
+## 2025-10-18T18:03:17+01:00 — Keep floating chat speech on a single line
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 4 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:9a11d2ad20c7a6810f8516a0970156455f14c3f4 -->
 ## 2025-10-18T17:55:10+01:00 — Merge pull request #1200 from aicovergod/codex/update-emojitokenlayout-for-correct-sizing
 
