@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b8d67de85ffaa1691e2b7b86bc01a5887906dea1 -->
+## 2025-10-18T13:01:57+01:00 — Merge pull request #1181 from aicovergod/codex/add-chat-service-binding-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 72 ++ / 11 --
+- Notes:
+  Add retry binding for chat HUD
+---
+<!-- commit:17f0b9c8fdbc87984c4688517c3471e7ac7a1335 -->
+## 2025-10-18T13:01:48+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b010c93762ab3173c063700229cfffc4893f1145 -->
 ## 2025-10-18T13:01:30+01:00 — Add retry binding for chat HUD
 
