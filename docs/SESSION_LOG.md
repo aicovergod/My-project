@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4531a4a0882a455a595f4714168d403666eb1699 -->
+## 2025-10-18T21:28:47+01:00 — Merge pull request #1217 from aicovergod/codex/update-ground-item-spawning-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 60 ++ / 7 --
+- Notes:
+  Snap ground drops to tile centres
+---
+<!-- commit:c796e0123048bcb8fd633ab0d21b00338d3fed54 -->
+## 2025-10-18T21:28:38+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:fa3cd28ab1e282be0271f70cb7efba6c4754ef82 -->
 ## 2025-10-18T21:28:20+01:00 — Align ground item spawns to tile centres
 
