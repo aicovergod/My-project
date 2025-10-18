@@ -236,16 +236,32 @@ namespace UI.Chat
             var content = new GameObject("Content", typeof(RectTransform), typeof(GridLayoutGroup));
             gridContent = content.GetComponent<RectTransform>();
             gridContent.SetParent(viewportRect, false);
+            // Anchor the grid content to the top of the viewport so the first emoji aligns with the
+            // top-left corner of the picker rather than being centred within the ScrollRect.
+            gridContent.anchorMin = new Vector2(0f, 1f);
+            gridContent.anchorMax = new Vector2(1f, 1f);
+            gridContent.pivot = new Vector2(0.5f, 1f);
+            gridContent.anchoredPosition = Vector2.zero;
+            gridContent.offsetMin = Vector2.zero;
+            gridContent.offsetMax = Vector2.zero;
             var grid = content.GetComponent<GridLayoutGroup>();
             grid.cellSize = new Vector2(34f, 34f);
             grid.spacing = new Vector2(3f, 3f);
             grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             grid.constraintCount = 6;
+            // Force the grid layout to begin in the upper-left corner so emoji buttons pack from the
+            // expected origin when the picker opens.
+            grid.childAlignment = TextAnchor.UpperLeft;
+            grid.startCorner = GridLayoutGroup.Corner.UpperLeft;
 
             scrollRect.viewport = viewportRect;
             scrollRect.content = gridContent;
 
             PopulateEmojiButtons();
+            // Ensure the layout updates immediately with the new anchoring and snap the scroll
+            // position so the first emoji sits flush with the picker top edge.
+            LayoutRebuilder.ForceRebuildLayoutImmediate(gridContent);
+            scrollRect.verticalNormalizedPosition = 1f;
         }
 
         private void PopulateEmojiButtons()
