@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6672104815d7bb3fe001ff5d9ed95f56cc1ccccf -->
+## 2025-10-18T16:35:33+01:00 — Ensure chat emoji button keeps minimum size
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 2 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:247a3dbc4b676ea46c196a969ec6197ce7b309ff -->
 ## 2025-10-18T16:23:49+01:00 — Merge pull request #1192 from aicovergod/codex/fix-emojitokenlayout-pooled-children-leak
 
