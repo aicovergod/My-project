@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a943344bb83665a9e3a934b48c6b58cb47669867 -->
+## 2025-10-18T20:13:26+01:00 — Remove chat HUD enter reminder
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 0 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:67d81d83b47f995f490898f2f47d60402412eef4 -->
 ## 2025-10-18T20:07:25+01:00 — Merge pull request #1210 from aicovergod/codex/fix-emoji-picker-grid-alignment-issue
 
