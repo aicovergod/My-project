@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:78eb296e0b0223b7b53a5159a889bea136393279 -->
+## 2025-10-18T17:34:55+01:00 — Merge pull request #1198 from aicovergod/codex/fix-inputfield-stringposition-error
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 12 ++ / 1 --
+- Notes:
+  Fix chat HUD selection collapse for legacy InputField
+---
+<!-- commit:a557c4398268b7a9099a96149834b14f360bbfcf -->
+## 2025-10-18T17:34:47+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:96ad2f548586f2f4c9b3b4c2a0b83404a9934ea2 -->
 ## 2025-10-18T17:34:30+01:00 — Fix chat HUD InputField selection collapse
 
