@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a7d7c1ad6cf7a0408cd9a1b8839a97d15385b2d5 -->
+## 2025-10-18T14:10:52+01:00 — Adjust chat input stack to respect child height
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:111d5d64559e4d005ed424b85aec3b2b372af271 -->
 ## 2025-10-18T14:03:08+01:00 — uwu
 
