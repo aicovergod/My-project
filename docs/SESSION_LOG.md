@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b010c93762ab3173c063700229cfffc4893f1145 -->
+## 2025-10-18T13:01:30+01:00 — Add retry binding for chat HUD
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 63 ++ / 11 --
+- Notes:
+  —
+---
 <!-- commit:efab5d2c5d40068448186f450286a0b8d4f7c7e4 -->
 ## 2025-10-18T12:45:14+01:00 — Merge pull request #1180 from aicovergod/codex/refactor-chathudcontroller-layout-and-events
 
