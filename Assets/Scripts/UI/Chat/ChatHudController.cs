@@ -769,6 +769,7 @@ namespace UI.Chat
         private void HandleInputValueChanged(string _)
         {
             UpdateInputNameVisibility();
+            RefreshInputPreview();
         }
 
         /// <summary>
