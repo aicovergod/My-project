@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f273999218bedf3e0a017716553855a0cc75307c -->
+## 2025-10-18T17:30:31+01:00 — Adjust chat input caret handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 21 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:e02323e230ca0246005a8e8805e84187ca3d9535 -->
 ## 2025-10-18T17:24:04+01:00 — Merge pull request #1196 from aicovergod/codex/fix-chatbox-interaction-with-expanded-minimap
 
