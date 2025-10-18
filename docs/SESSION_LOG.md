@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8cdc6dcee1802ccaf8af75588df93de5a58a5209 -->
+## 2025-10-18T12:15:04+01:00 — Merge pull request #1179 from aicovergod/codex/refactor-chathudcontroller-for-channel-buttons
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 64 ++ / 4 --
+- Notes:
+  Refactor chat HUD layout to separate channel toggles
+---
+<!-- commit:7388a07ce801bb2348e496ef4f200533fd7cd232 -->
+## 2025-10-18T12:14:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f019d4c8b1ff1ed7587b21559623535d20e1f489 -->
 ## 2025-10-18T12:14:35+01:00 — Refactor chat HUD channel panel layout
 
