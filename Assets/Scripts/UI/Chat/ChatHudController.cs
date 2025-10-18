@@ -198,6 +198,7 @@ namespace UI.Chat
                 return;
 
             inputField.text = string.Empty;
+            UpdateInputNameVisibility();
         }
 
         /// <summary>
@@ -216,6 +217,7 @@ namespace UI.Chat
 
             message = trimmed;
             inputField.text = string.Empty;
+            UpdateInputNameVisibility();
             return true;
         }
 
@@ -231,7 +233,9 @@ namespace UI.Chat
             if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject == inputField.gameObject)
                 EventSystem.current.SetSelectedGameObject(null);
 
+            inputField.text = string.Empty;
             inputFocused = false;
+            UpdateInputNameVisibility();
         }
 
         /// <summary>
@@ -543,12 +547,39 @@ namespace UI.Chat
             layout.childForceExpandHeight = false;
             layout.childForceExpandWidth = false;
 
-            inputNameLabel = CreateTextLabel(row.transform, string.Empty, 16, PublicMessageColor);
+            var inputStack = new GameObject("InputStack", typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(LayoutElement));
+            var inputStackRect = inputStack.GetComponent<RectTransform>();
+            inputStackRect.SetParent(row.transform, false);
 
-            var inputContainer = new GameObject("InputContainer", typeof(RectTransform), typeof(Image));
+            var stackLayout = inputStack.GetComponent<VerticalLayoutGroup>();
+            stackLayout.spacing = 2f;
+            stackLayout.padding = new RectOffset(0, 0, 0, 0);
+            stackLayout.childAlignment = TextAnchor.UpperLeft;
+            stackLayout.childControlWidth = true;
+            stackLayout.childControlHeight = false;
+            stackLayout.childForceExpandWidth = true;
+            stackLayout.childForceExpandHeight = false;
+
+            var stackLayoutElement = inputStack.GetComponent<LayoutElement>();
+            stackLayoutElement.preferredWidth = 260f;
+            stackLayoutElement.minWidth = 260f;
+            stackLayoutElement.flexibleWidth = 0f;
+
+            inputNameLabel = CreateTextLabel(inputStack.transform, string.Empty, 16, PublicMessageColor);
+
+            var inputContainer = new GameObject("InputContainer", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
             var inputContainerRect = inputContainer.GetComponent<RectTransform>();
-            inputContainerRect.SetParent(row.transform, false);
-            inputContainerRect.sizeDelta = new Vector2(260f, 32f);
+            inputContainerRect.SetParent(inputStack.transform, false);
+            inputContainerRect.anchorMin = new Vector2(0f, 0f);
+            inputContainerRect.anchorMax = new Vector2(1f, 0f);
+            inputContainerRect.offsetMin = Vector2.zero;
+            inputContainerRect.offsetMax = Vector2.zero;
+
+            var inputContainerLayout = inputContainer.GetComponent<LayoutElement>();
+            inputContainerLayout.preferredHeight = 32f;
+            inputContainerLayout.minHeight = 32f;
+            inputContainerLayout.flexibleHeight = 0f;
+            inputContainerLayout.flexibleWidth = 0f;
 
             var inputBackground = inputContainer.GetComponent<Image>();
             inputBackground.color = InputBackgroundColor;
@@ -558,6 +589,7 @@ namespace UI.Chat
             inputField.characterLimit = 200;
             inputField.transition = Selectable.Transition.ColorTint;
             RegisterInputFocusCallbacks(inputField);
+            inputField.onValueChanged.AddListener(HandleInputValueChanged);
 
             var textObject = new GameObject("Text", typeof(RectTransform), typeof(Text));
             var textRect = textObject.GetComponent<RectTransform>();
@@ -593,6 +625,8 @@ namespace UI.Chat
 
             inputField.textComponent = inputText;
             inputField.placeholder = placeholderLabel;
+
+            UpdateInputNameVisibility();
 
             reminderLabel = CreateTextLabel(row.transform, "Press Enter to chat", 14, ChannelToggleEnabledTextColor);
 
@@ -645,6 +679,7 @@ namespace UI.Chat
         private void HandleInputSelected(BaseEventData _)
         {
             inputFocused = true;
+            UpdateInputNameVisibility();
         }
 
         /// <summary>
@@ -654,6 +689,29 @@ namespace UI.Chat
         private void HandleInputDeselected(BaseEventData _)
         {
             inputFocused = false;
+            UpdateInputNameVisibility();
+        }
+
+        /// <summary>
+        /// Reacts to runtime text changes so the input name label can mirror the current state.
+        /// </summary>
+        /// <param name="_">Unused text payload.</param>
+        private void HandleInputValueChanged(string _)
+        {
+            UpdateInputNameVisibility();
+        }
+
+        /// <summary>
+        /// Ensures the input name label is only visible when the input is not actively being edited.
+        /// </summary>
+        private void UpdateInputNameVisibility()
+        {
+            if (inputNameLabel == null)
+                return;
+
+            bool hasInputField = inputField != null;
+            bool hasText = hasInputField && !string.IsNullOrEmpty(inputField.text);
+            inputNameLabel.enabled = !inputFocused || !hasText;
         }
 
         private Text CreateTextLabel(Transform parent, string text, int fontSize, Color color)
