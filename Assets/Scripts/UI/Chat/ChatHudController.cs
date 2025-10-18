@@ -543,7 +543,7 @@ namespace UI.Chat
             layout.childForceExpandHeight = false;
             layout.childForceExpandWidth = false;
 
-            inputNameLabel = CreateTextLabel(row.transform, "Player name: ", 16, PublicMessageColor);
+            inputNameLabel = CreateTextLabel(row.transform, string.Empty, 16, PublicMessageColor);
 
             var inputContainer = new GameObject("InputContainer", typeof(RectTransform), typeof(Image));
             var inputContainerRect = inputContainer.GetComponent<RectTransform>();
@@ -762,10 +762,7 @@ namespace UI.Chat
             if (inputNameLabel == null)
                 return;
 
-            if (string.IsNullOrEmpty(username))
-                inputNameLabel.text = "Player name: Adventurer";
-            else
-                inputNameLabel.text = $"Player name: {username}";
+            inputNameLabel.text = string.IsNullOrEmpty(username) ? "Adventurer:" : $"{username}:";
         }
 
         private void RebuildVisibleMessages()
