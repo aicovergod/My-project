@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a4d15311bde1d0c59a4051f1ec14fbb4e7b8bc85 -->
+## 2025-10-18T16:35:59+01:00 — Merge pull request #1193 from aicovergod/codex/set-min-size-for-emoji-button
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 0 --
+- Notes:
+  Prevent Chat HUD emoji button from shrinking below intended size
+---
+<!-- commit:647de7f459f753552378713c2c32ca9ccad6c9cb -->
+## 2025-10-18T16:35:51+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6672104815d7bb3fe001ff5d9ed95f56cc1ccccf -->
 ## 2025-10-18T16:35:33+01:00 — Ensure chat emoji button keeps minimum size
 
