@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4a673fac020802a4e889d80ea921e1af23c16d71 -->
+## 2025-10-18T14:27:35+01:00 — Merge pull request #1186 from aicovergod/codex/update-chathudcontroller-layout-properties
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 13 ++ / 3 --
+- Notes:
+  Adjust chat HUD input row sizing
+---
+<!-- commit:1b47d54b7160ee413992efdc9f237691fbcec3c6 -->
+## 2025-10-18T14:27:27+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b95c323aa63d00cc3c2e86367613a04f5f20c8ad -->
 ## 2025-10-18T14:27:06+01:00 — Adjust chat input row sizing
 
