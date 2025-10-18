@@ -99,7 +99,7 @@ namespace UI.Chat
                     text.text = token.Text ?? string.Empty;
                     text.color = textColor;
                     text.fontSize = fontSize;
-                    text.alignment = alignment;
+                    text.alignment = ResolveTextAlignment(alignment);
                     // Force long chat strings to remain on a single line even when
                     // players enter lengthy messages. Wrapping caused floating chat
                     // bubbles to stack vertically and break the OSRS-style speech look.
@@ -183,6 +183,35 @@ namespace UI.Chat
 
             text.gameObject.SetActive(true);
             return text;
+        }
+
+        /// <summary>
+        /// Resolves the alignment that should be applied to individual text spans.
+        /// </summary>
+        /// <param name="alignment">Caller-provided anchor describing the overall layout.</param>
+        /// <returns>Alignment that preserves the vertical anchor while forcing the text to be left aligned.</returns>
+        private static TextAnchor ResolveTextAlignment(TextAnchor alignment)
+        {
+            // The floating chat rows can request centred alignment so the overall
+            // bubble anchors correctly, but individual text spans must remain
+            // left aligned so emoji sprites do not overlap the neighbouring text.
+            switch (alignment)
+            {
+                case TextAnchor.UpperLeft:
+                case TextAnchor.UpperCenter:
+                case TextAnchor.UpperRight:
+                    return TextAnchor.UpperLeft;
+                case TextAnchor.MiddleLeft:
+                case TextAnchor.MiddleCenter:
+                case TextAnchor.MiddleRight:
+                    return TextAnchor.MiddleLeft;
+                case TextAnchor.LowerLeft:
+                case TextAnchor.LowerCenter:
+                case TextAnchor.LowerRight:
+                    return TextAnchor.LowerLeft;
+                default:
+                    return TextAnchor.UpperLeft;
+            }
         }
 
         private static void ConfigureTextComponent(Text text)
