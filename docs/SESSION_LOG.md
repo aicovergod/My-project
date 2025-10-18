@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8d3fa2fd2cb85331b74e29d8f3ad2aed1ab4a122 -->
+## 2025-10-18T10:54:38+01:00 — Fix chat HUD input focus tracking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 58 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:b3b6cd79dfa54a715d938a5771206845b1608820 -->
 ## 2025-10-18T10:47:59+01:00 — meta
 
