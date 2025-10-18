@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:51fdf454f2fe37bef05a1913a3a4815d926cfeab -->
+## 2025-10-18T20:06:51+01:00 — Anchor emoji grid to top-left in picker
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiPickerPanel.cs
+- Diff: 16 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d82cdd71df7bdaabc16bb256a235040f9e4f437d -->
 ## 2025-10-18T19:37:10+01:00 — Merge pull request #1209 from aicovergod/codex/update-emojipickerpanel-masking-and-layout
 
