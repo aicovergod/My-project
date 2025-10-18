@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Text;
+using UI.Chat;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +15,7 @@ namespace UI
         [SerializeField] private Vector3 floatSpeed = new Vector3(0f, 1f, 0f);
         [SerializeField] private float textSize = 0.2f;
 
-        private Text uiText;
+        private EmojiTokenLayout tokenLayout;
         private RectTransform rectTransform;
         private Vector3 worldPosition;
         private Camera mainCamera;
@@ -35,6 +38,15 @@ namespace UI
 
         public static void Show(string message, Vector3 position, Color? color = null, float? size = null, Sprite background = null)
         {
+            var tokens = EmojiMarkupParser.Parse(message ?? string.Empty);
+            Show(tokens, position, color, size, background);
+        }
+
+        /// <summary>
+        /// Displays floating text by rendering a pre-parsed token list.
+        /// </summary>
+        public static void Show(IReadOnlyList<EmojiMarkupToken> tokens, Vector3 position, Color? color = null, float? size = null, Sprite background = null)
+        {
             GameObject go = new GameObject("FloatingText", typeof(Canvas));
             var instance = go.AddComponent<FloatingText>();
             var canvas = go.GetComponent<Canvas>();
@@ -43,6 +55,7 @@ namespace UI
             go.AddComponent<GraphicRaycaster>();
 
             GameObject parentGO = go;
+            RectTransform parentRect = go.GetComponent<RectTransform>();
 
             if (background != null)
             {
@@ -52,33 +65,36 @@ namespace UI
                 image.sprite = background;
                 image.SetNativeSize();
                 parentGO = imageGO;
+                parentRect = imageGO.GetComponent<RectTransform>();
             }
 
-            var textGO = new GameObject("Text", typeof(Text));
-            textGO.transform.SetParent(parentGO.transform, false);
-            instance.uiText = textGO.GetComponent<Text>();
-            instance.uiText.alignment = TextAnchor.MiddleCenter;
-            instance.uiText.horizontalOverflow = HorizontalWrapMode.Overflow;
-            instance.uiText.verticalOverflow = VerticalWrapMode.Overflow;
-            LegacyFontProvider.ApplyTo(instance.uiText);
-            instance.rectTransform = background != null ? parentGO.GetComponent<RectTransform>() : textGO.GetComponent<RectTransform>();
+            var contentGO = new GameObject("Content", typeof(RectTransform), typeof(EmojiTokenLayout));
+            var contentRect = contentGO.GetComponent<RectTransform>();
+            contentRect.SetParent(parentGO.transform, false);
+            contentRect.anchorMin = new Vector2(0.5f, 0.5f);
+            contentRect.anchorMax = new Vector2(0.5f, 0.5f);
+            contentRect.pivot = new Vector2(0.5f, 0.5f);
+            contentRect.anchoredPosition = Vector2.zero;
+
+            instance.tokenLayout = contentGO.GetComponent<EmojiTokenLayout>();
+            var targetRect = background != null ? parentRect : contentRect;
+            instance.rectTransform = targetRect;
             instance.mainCamera = Camera.main;
 
             instance.worldPosition = position;
             if (instance.mainCamera == null)
                 instance.mainCamera = Camera.main;
             instance.rectTransform.position = instance.mainCamera.WorldToScreenPoint(position);
-            instance.uiText.text = message;
-            instance.uiText.color = color ?? Color.white;
             float finalSize = size ?? instance.textSize;
-            instance.uiText.fontSize = Mathf.RoundToInt(64 * finalSize);
+            int fontSize = Mathf.RoundToInt(64 * finalSize);
+            Color resolvedColor = color ?? Color.white;
+            instance.RenderTokens(tokens, resolvedColor, fontSize);
             instance.remainingLifetime = instance.lifetime;
             instance.needsInitialSnap = true;
 
             if (debugLogMessages)
             {
-                // Mirror the popup in the console so QA can diagnose why the message appeared.
-                Debug.Log($"[FloatingText] {message}");
+                Debug.Log($"[FloatingText] {BuildDebugMessage(tokens)}");
             }
         }
 
@@ -112,5 +128,31 @@ namespace UI
                 Destroy(gameObject);
         }
 
+        private void RenderTokens(IReadOnlyList<EmojiMarkupToken> tokens, Color color, int fontSize)
+        {
+            if (tokenLayout == null)
+                return;
+
+            var payload = tokens ?? EmojiMarkupParser.Parse(string.Empty);
+            tokenLayout.RenderTokens(payload, color, fontSize, TextAnchor.MiddleCenter);
+        }
+
+        private static string BuildDebugMessage(IReadOnlyList<EmojiMarkupToken> tokens)
+        {
+            if (tokens == null || tokens.Count == 0)
+                return string.Empty;
+
+            var builder = new StringBuilder();
+            for (int i = 0; i < tokens.Count; i++)
+            {
+                var token = tokens[i];
+                if (token.IsEmoji)
+                    builder.Append($"<emoji={token.Emoji.Key}>");
+                else
+                    builder.Append(token.Text);
+            }
+
+            return builder.ToString();
+        }
     }
 }
