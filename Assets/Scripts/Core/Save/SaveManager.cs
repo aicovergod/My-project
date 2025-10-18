@@ -23,6 +23,11 @@ namespace Core.Save
         public static string ActiveProfileId { get; private set; } = string.Empty;
 
         /// <summary>
+        /// Raised whenever the bound account username changes.
+        /// </summary>
+        public static event Action<string> ActiveAccountUsernameChanged;
+
+        /// <summary>
         /// Exposes the username of the currently bound account or an empty string when unauthenticated.
         /// </summary>
         public static string ActiveAccountUsername
@@ -148,6 +153,8 @@ namespace Core.Save
 
             if (reload)
                 LoadAll();
+
+            ActiveAccountUsernameChanged?.Invoke(ActiveAccountUsername);
         }
 
         /// <summary>

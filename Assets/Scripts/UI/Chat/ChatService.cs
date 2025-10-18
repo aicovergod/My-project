@@ -86,12 +86,14 @@ namespace UI.Chat
                     histories[ChannelValues[i]] = new List<ChatMessage>(DefaultHistoryLimit);
             }
 
+            SaveManager.ActiveAccountUsernameChanged += HandleActiveAccountUsernameChanged;
             RefreshCachedUsername(true);
         }
 
         /// <inheritdoc />
         protected override void OnSingletonDestroyed()
         {
+            SaveManager.ActiveAccountUsernameChanged -= HandleActiveAccountUsernameChanged;
             base.OnSingletonDestroyed();
 
             lock (syncRoot)
@@ -199,6 +201,11 @@ namespace UI.Chat
 
             cachedActiveUsername = latest;
             ActiveUsernameChanged?.Invoke(cachedActiveUsername);
+        }
+
+        private void HandleActiveAccountUsernameChanged(string _)
+        {
+            RefreshCachedUsername(true);
         }
 
         private static string NormaliseMessage(string text)

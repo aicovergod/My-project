@@ -45,6 +45,7 @@ namespace UI.Chat
 
         private Canvas canvas;
         private ScrollRect scrollRect;
+        private RectTransform chatRoot;
         private RectTransform channelWindowRoot;
         private RectTransform windowRoot;
         private RectTransform contentRect;
@@ -198,6 +199,12 @@ namespace UI.Chat
 
         private void ConfigureRoot()
         {
+            if (chatRoot == null)
+            {
+                var chatRootObject = new GameObject("ChatRoot", typeof(RectTransform), typeof(VerticalLayoutGroup));
+                chatRoot = chatRootObject.GetComponent<RectTransform>();
+            }
+
             if (channelWindowRoot == null)
             {
                 var channelRootObject = new GameObject("ChannelWindowRoot", typeof(RectTransform));
@@ -210,21 +217,54 @@ namespace UI.Chat
                 windowRoot = windowRootObject.GetComponent<RectTransform>();
             }
 
-            channelWindowRoot.SetParent(transform, false);
-            channelWindowRoot.localScale = Vector3.one;
-            channelWindowRoot.anchorMin = new Vector2(0f, 0f);
-            channelWindowRoot.anchorMax = new Vector2(0f, 0f);
-            channelWindowRoot.pivot = new Vector2(0f, 0f);
-            channelWindowRoot.sizeDelta = new Vector2(WindowWidth, ChannelPanelHeight);
-            channelWindowRoot.anchoredPosition = new Vector2(WindowMargin, WindowMargin);
+            chatRoot.SetParent(transform, false);
+            chatRoot.localScale = Vector3.one;
+            chatRoot.anchorMin = new Vector2(0f, 0f);
+            chatRoot.anchorMax = new Vector2(0f, 0f);
+            chatRoot.pivot = new Vector2(0f, 0f);
+            chatRoot.sizeDelta = new Vector2(WindowWidth, WindowHeight + ChannelPanelHeight + WindowSpacing);
+            chatRoot.anchoredPosition = new Vector2(WindowMargin, WindowMargin);
 
-            windowRoot.SetParent(transform, false);
+            var layoutGroup = chatRoot.GetComponent<VerticalLayoutGroup>();
+            layoutGroup.padding = new RectOffset(0, 0, 0, 0);
+            layoutGroup.spacing = WindowSpacing;
+            layoutGroup.childAlignment = TextAnchor.LowerLeft;
+            layoutGroup.childControlWidth = true;
+            layoutGroup.childControlHeight = false;
+            layoutGroup.childForceExpandWidth = true;
+            layoutGroup.childForceExpandHeight = false;
+
+            windowRoot.SetParent(chatRoot, false);
             windowRoot.localScale = Vector3.one;
             windowRoot.anchorMin = new Vector2(0f, 0f);
-            windowRoot.anchorMax = new Vector2(0f, 0f);
+            windowRoot.anchorMax = new Vector2(1f, 0f);
             windowRoot.pivot = new Vector2(0f, 0f);
-            windowRoot.sizeDelta = new Vector2(WindowWidth, WindowHeight);
-            windowRoot.anchoredPosition = new Vector2(WindowMargin, WindowMargin + ChannelPanelHeight + WindowSpacing);
+            windowRoot.sizeDelta = new Vector2(0f, WindowHeight);
+            windowRoot.SetAsFirstSibling();
+
+            channelWindowRoot.SetParent(chatRoot, false);
+            channelWindowRoot.localScale = Vector3.one;
+            channelWindowRoot.anchorMin = new Vector2(0f, 0f);
+            channelWindowRoot.anchorMax = new Vector2(1f, 0f);
+            channelWindowRoot.pivot = new Vector2(0f, 0f);
+            channelWindowRoot.sizeDelta = new Vector2(0f, ChannelPanelHeight);
+            channelWindowRoot.SetAsLastSibling();
+
+            var windowLayout = windowRoot.GetComponent<LayoutElement>();
+            if (windowLayout == null)
+                windowLayout = windowRoot.gameObject.AddComponent<LayoutElement>();
+            windowLayout.preferredHeight = WindowHeight;
+            windowLayout.minHeight = WindowHeight;
+            windowLayout.flexibleHeight = 0f;
+            windowLayout.flexibleWidth = 0f;
+
+            var channelLayout = channelWindowRoot.GetComponent<LayoutElement>();
+            if (channelLayout == null)
+                channelLayout = channelWindowRoot.gameObject.AddComponent<LayoutElement>();
+            channelLayout.preferredHeight = ChannelPanelHeight;
+            channelLayout.minHeight = ChannelPanelHeight;
+            channelLayout.flexibleHeight = 0f;
+            channelLayout.flexibleWidth = 0f;
         }
 
         private void BuildUi()
