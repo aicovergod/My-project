@@ -21,6 +21,7 @@ namespace Core.Save
         /// persistent data path so the saves land in a writable location on every platform.
         /// </summary>
         private static readonly string BaseSavePath = Path.Combine(Application.persistentDataPath, "PlayerSave");
+        public const int MaxUsernameLength = 12;
         private const int SaltSizeBytes = 16;
         private const int Pbkdf2Iterations = 100_000;
         private const int Pbkdf2KeySizeBytes = 32;
@@ -33,7 +34,8 @@ namespace Core.Save
 
         /// <summary>
         /// Sanitises the supplied username into a slug suitable for filenames and profile IDs.
-        /// Characters outside the [a-z0-9_-] range are discarded and whitespace becomes underscores.
+        /// Characters outside the [a-z0-9_-] range are discarded, whitespace becomes underscores,
+        /// and the result is capped at <see cref="MaxUsernameLength"/> characters.
         /// </summary>
         /// <param name="input">Raw username supplied by the player.</param>
         /// <returns>Lowercase slug that can be used safely for filenames.</returns>
@@ -42,12 +44,13 @@ namespace Core.Save
             if (string.IsNullOrWhiteSpace(input))
                 return string.Empty;
 
-            var builder = new StringBuilder(input.Length);
+            string trimmed = input.Trim();
+            var builder = new StringBuilder(Math.Min(trimmed.Length, MaxUsernameLength));
             bool previousUnderscore = false;
 
-            for (int i = 0; i < input.Length; i++)
+            for (int i = 0; i < trimmed.Length && builder.Length < MaxUsernameLength; i++)
             {
-                char c = char.ToLowerInvariant(input[i]);
+                char c = char.ToLowerInvariant(trimmed[i]);
 
                 if (char.IsWhiteSpace(c))
                 {
@@ -112,7 +115,11 @@ namespace Core.Save
         {
             save = null;
 
-            string slug = SanitizeUsername(username);
+            string trimmed = username?.Trim() ?? string.Empty;
+            if (trimmed.Length > MaxUsernameLength)
+                return AccountLoadStatus.NotFound;
+
+            string slug = SanitizeUsername(trimmed);
             if (string.IsNullOrEmpty(slug))
                 return AccountLoadStatus.NotFound;
 
@@ -160,20 +167,28 @@ namespace Core.Save
             if (string.IsNullOrEmpty(rawPassword))
                 throw new ArgumentException("Password is required.", nameof(rawPassword));
 
-            string slug = SanitizeUsername(username);
+            string trimmedUsername = username.Trim();
+            if (trimmedUsername.Length > MaxUsernameLength)
+                throw new ArgumentException($"Username cannot exceed {MaxUsernameLength} characters.", nameof(username));
+
+            string slug = SanitizeUsername(trimmedUsername);
             if (string.IsNullOrEmpty(slug))
                 throw new ArgumentException("Username must include at least one valid character.", nameof(username));
 
+            string normalizedPassword = NormalizePassword(rawPassword);
+            if (string.IsNullOrEmpty(normalizedPassword))
+                throw new ArgumentException("Password must include at least one non-whitespace character.", nameof(rawPassword));
+
             var salt = new byte[SaltSizeBytes];
             RandomNumberGenerator.Fill(salt);
-            byte[] hash = HashPassword(rawPassword, salt);
+            byte[] hash = HashPassword(normalizedPassword, salt);
 
             string now = DateTime.UtcNow.ToString("O");
 
             var save = new AccountSave
             {
                 schemaVersion = 1,
-                username = username.Trim(),
+                username = trimmedUsername,
                 usernameSlug = slug,
                 passwordHash = Convert.ToBase64String(hash),
                 passwordSalt = Convert.ToBase64String(salt),
@@ -212,7 +227,11 @@ namespace Core.Save
             {
                 byte[] salt = Convert.FromBase64String(save.passwordSalt);
                 byte[] storedHash = Convert.FromBase64String(save.passwordHash);
-                byte[] computed = HashPassword(rawPassword, salt);
+                string normalizedPassword = NormalizePassword(rawPassword);
+                if (string.IsNullOrEmpty(normalizedPassword))
+                    return false;
+
+                byte[] computed = HashPassword(normalizedPassword, salt);
                 return ConstantTimeEquals(storedHash, computed);
             }
             catch (FormatException)
@@ -220,6 +239,20 @@ namespace Core.Save
                 Debug.LogError($"AccountManager: Stored credentials for '{save.usernameSlug}' are corrupted.");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Normalises passwords so logins ignore casing and surrounding whitespace.
+        /// </summary>
+        /// <param name="rawPassword">Password entered by the player.</param>
+        /// <returns>Trimmed, lowercase password suitable for hashing.</returns>
+        private static string NormalizePassword(string rawPassword)
+        {
+            if (rawPassword == null)
+                return string.Empty;
+
+            string trimmed = rawPassword.Trim();
+            return trimmed.ToLowerInvariant();
         }
 
         /// <summary>
