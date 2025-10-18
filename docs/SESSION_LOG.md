@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f019d4c8b1ff1ed7587b21559623535d20e1f489 -->
+## 2025-10-18T12:14:35+01:00 — Refactor chat HUD channel panel layout
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 55 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:5bf6b95280e126dd38b7c23bb86c7e998d414345 -->
 ## 2025-10-18T12:04:47+01:00 — Merge pull request #1178 from aicovergod/codex/update-chathudcontroller-ui-sizing
 
