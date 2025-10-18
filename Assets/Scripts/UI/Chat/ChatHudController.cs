@@ -475,7 +475,7 @@ namespace UI.Chat
             var toggleRoot = new GameObject($"{channel}Toggle", typeof(RectTransform), typeof(Image), typeof(Button));
             var rect = toggleRoot.GetComponent<RectTransform>();
             rect.SetParent(parent, false);
-            rect.sizeDelta = new Vector2(20f, 8f);
+            rect.sizeDelta = new Vector2(32f, 32f);
 
             var image = toggleRoot.GetComponent<Image>();
             image.color = ChannelToggleEnabledColor;
