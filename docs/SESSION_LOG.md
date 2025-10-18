@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8bbb4e3479dacac27b22056c68c8bed2fb6400eb -->
+## 2025-10-18T19:11:27+01:00 — Fix emoji key extraction for underscore sprite names
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiAtlas.cs
+- Diff: 28 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:39107208aaecadfab10f6146422cf343a5bc6c72 -->
 ## 2025-10-18T19:01:17+01:00 — Merge pull request #1205 from aicovergod/codex/fix-emoji-popup-rendering-order
 
