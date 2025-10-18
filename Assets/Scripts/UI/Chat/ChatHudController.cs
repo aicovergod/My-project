@@ -54,6 +54,9 @@ namespace UI.Chat
         private Text inputNameLabel;
         private Text reminderLabel;
         private Text placeholderLabel;
+        private EmojiTokenLayout inputPreviewRenderer;
+        private Button emojiButton;
+        private EmojiPickerPanel emojiPickerPanel;
         private bool autoScrollToBottom = true;
         private bool inputFocused;
 
@@ -120,6 +123,8 @@ namespace UI.Chat
                 chatService.ActiveUsernameChanged -= HandleActiveUsernameChanged;
                 chatService = null;
             }
+
+            emojiPickerPanel?.Close();
         }
 
         /// <summary>
@@ -194,6 +199,7 @@ namespace UI.Chat
             inputField.ActivateInputField();
             ApplyInputFocusState(true);
             UpdateInputNameVisibility();
+            RefreshInputPreview();
         }
 
         /// <summary>
@@ -206,6 +212,7 @@ namespace UI.Chat
 
             inputField.text = string.Empty;
             UpdateInputNameVisibility();
+            RefreshInputPreview();
         }
 
         /// <summary>
@@ -225,6 +232,7 @@ namespace UI.Chat
             message = trimmed;
             inputField.text = string.Empty;
             UpdateInputNameVisibility();
+            RefreshInputPreview();
             return true;
         }
 
@@ -243,6 +251,7 @@ namespace UI.Chat
             inputField.text = string.Empty;
             ApplyInputFocusState(false);
             UpdateInputNameVisibility();
+            RefreshInputPreview();
         }
 
         /// <summary>
@@ -271,6 +280,9 @@ namespace UI.Chat
 
             inputFocused = focused;
             InputFocusChanged?.Invoke(focused);
+
+            if (!focused && emojiPickerPanel != null)
+                emojiPickerPanel.Close();
         }
 
         private void ConfigureRoot()
@@ -628,6 +640,7 @@ namespace UI.Chat
             inputText.verticalOverflow = VerticalWrapMode.Overflow;
             inputText.color = LocalPlayerMessageColor;
             LegacyFontProvider.ApplyTo(inputText);
+            inputText.color = new Color(inputText.color.r, inputText.color.g, inputText.color.b, 0f);
 
             var placeholderObject = new GameObject("Placeholder", typeof(RectTransform), typeof(Text));
             var placeholderRect = placeholderObject.GetComponent<RectTransform>();
@@ -647,9 +660,45 @@ namespace UI.Chat
             inputField.textComponent = inputText;
             inputField.placeholder = placeholderLabel;
 
+            var previewObject = new GameObject("Preview", typeof(RectTransform), typeof(EmojiTokenLayout));
+            var previewRect = previewObject.GetComponent<RectTransform>();
+            previewRect.SetParent(inputContainer.transform, false);
+            previewRect.anchorMin = new Vector2(0f, 0f);
+            previewRect.anchorMax = new Vector2(1f, 1f);
+            previewRect.offsetMin = new Vector2(6f, 4f);
+            previewRect.offsetMax = new Vector2(-6f, -4f);
+            inputPreviewRenderer = previewObject.GetComponent<EmojiTokenLayout>();
+            previewRect.SetSiblingIndex(placeholderRect.GetSiblingIndex());
+
             UpdateInputNameVisibility();
 
             reminderLabel = CreateTextLabel(row.transform, "Press Enter to chat", 14, ChannelToggleEnabledTextColor);
+
+            var emojiButtonObject = new GameObject("EmojiButton", typeof(RectTransform), typeof(Image), typeof(Button), typeof(LayoutElement));
+            var emojiButtonRect = emojiButtonObject.GetComponent<RectTransform>();
+            emojiButtonRect.SetParent(row.transform, false);
+            emojiButtonRect.sizeDelta = new Vector2(32f, 32f);
+
+            var emojiButtonLayout = emojiButtonObject.GetComponent<LayoutElement>();
+            emojiButtonLayout.preferredWidth = 32f;
+            emojiButtonLayout.preferredHeight = 32f;
+            emojiButtonLayout.flexibleWidth = 0f;
+            emojiButtonLayout.flexibleHeight = 0f;
+
+            var emojiButtonImage = emojiButtonObject.GetComponent<Image>();
+            emojiButtonImage.color = ChannelToggleEnabledColor;
+            var emojiSprite = Resources.Load<Sprite>("Sprites/Chatbox/Button");
+            if (emojiSprite != null)
+            {
+                emojiButtonImage.sprite = emojiSprite;
+                emojiButtonImage.type = Image.Type.Sliced;
+            }
+
+            emojiButton = emojiButtonObject.GetComponent<Button>();
+            emojiButton.onClick.AddListener(HandleEmojiButtonClicked);
+
+            EnsureEmojiPicker();
+            RefreshInputPreview();
 
             return row.GetComponent<LayoutElement>();
         }
@@ -733,6 +782,64 @@ namespace UI.Chat
             bool hasInputField = inputField != null;
             bool hasText = hasInputField && !string.IsNullOrEmpty(inputField.text);
             inputNameLabel.enabled = !inputFocused || !hasText;
+        }
+
+        private void RefreshInputPreview()
+        {
+            if (inputPreviewRenderer == null)
+                return;
+
+            string text = inputField != null ? inputField.text ?? string.Empty : string.Empty;
+            var tokens = EmojiMarkupParser.Parse(text);
+            inputPreviewRenderer.RenderTokens(tokens, LocalPlayerMessageColor, 16, TextAnchor.MiddleLeft);
+        }
+
+        private void HandleEmojiButtonClicked()
+        {
+            if (emojiPickerPanel == null)
+                return;
+
+            if (emojiPickerPanel.IsOpen)
+                emojiPickerPanel.Close();
+            else
+                emojiPickerPanel.Open(emojiButton?.GetComponent<RectTransform>(), HandleEmojiSelected);
+        }
+
+        private void HandleEmojiSelected(string key)
+        {
+            if (string.IsNullOrEmpty(key) || inputField == null)
+                return;
+
+            string markup = $"<emoji={key}>";
+            string current = inputField.text ?? string.Empty;
+            int anchor = Mathf.Min(inputField.selectionAnchorPosition, inputField.selectionFocusPosition);
+            int focus = Mathf.Max(inputField.selectionAnchorPosition, inputField.selectionFocusPosition);
+            if (anchor < 0 || focus < 0)
+            {
+                anchor = inputField.caretPosition;
+                focus = anchor;
+            }
+
+            anchor = Mathf.Clamp(anchor, 0, current.Length);
+            focus = Mathf.Clamp(focus, 0, current.Length);
+
+            string updated = current.Substring(0, anchor) + markup + current.Substring(focus);
+            inputField.text = updated;
+            int caret = anchor + markup.Length;
+            inputField.caretPosition = caret;
+            inputField.selectionAnchorPosition = caret;
+            inputField.selectionFocusPosition = caret;
+            RefreshInputPreview();
+            UpdateInputNameVisibility();
+            inputField.ActivateInputField();
+        }
+
+        private void EnsureEmojiPicker()
+        {
+            if (emojiPickerPanel != null)
+                return;
+
+            emojiPickerPanel = EmojiPickerPanel.Create(chatRoot);
         }
 
         private Text CreateTextLabel(Transform parent, string text, int fontSize, Color color)
@@ -865,7 +972,9 @@ namespace UI.Chat
             {
                 var row = GetRow(i);
                 var message = mergedMessages[i];
-                row.SetText(FormatMessage(message), ResolveMessageColor(message));
+                string formatted = BuildFormattedMessage(message);
+                var tokens = EmojiMarkupParser.Parse(formatted);
+                row.SetTokens(tokens, ResolveMessageColor(message));
             }
 
             for (int i = mergedMessages.Count; i < activeRows.Count; i++)
@@ -921,7 +1030,7 @@ namespace UI.Chat
             autoScrollToBottom = position.y <= 0.001f;
         }
 
-        private string FormatMessage(ChatMessage message)
+        private string BuildFormattedMessage(ChatMessage message)
         {
             DateTime localTime = message.TimestampUtc.ToLocalTime();
             string timestamp = localTime.ToString("HH:mm", CultureInfo.InvariantCulture);
@@ -938,6 +1047,8 @@ namespace UI.Chat
 
         private sealed class ChatMessageRow
         {
+            private const int FontSize = 16;
+
             public ChatMessageRow(Transform parent)
             {
                 Root = new GameObject("MessageRow", typeof(RectTransform));
@@ -952,30 +1063,24 @@ namespace UI.Chat
                 layout.minHeight = 20f;
                 layout.flexibleHeight = 0f;
 
-                var textObject = new GameObject("Text", typeof(RectTransform), typeof(Text));
-                var textRect = textObject.GetComponent<RectTransform>();
-                textRect.SetParent(Root.transform, false);
-                textRect.anchorMin = new Vector2(0f, 0f);
-                textRect.anchorMax = new Vector2(1f, 1f);
-                textRect.offsetMin = Vector2.zero;
-                textRect.offsetMax = Vector2.zero;
+                var contentObject = new GameObject("Content", typeof(RectTransform), typeof(EmojiTokenLayout));
+                var contentRect = contentObject.GetComponent<RectTransform>();
+                contentRect.SetParent(Root.transform, false);
+                contentRect.anchorMin = new Vector2(0f, 0f);
+                contentRect.anchorMax = new Vector2(1f, 1f);
+                contentRect.offsetMin = Vector2.zero;
+                contentRect.offsetMax = Vector2.zero;
 
-                Text = textObject.GetComponent<Text>();
-                Text.fontSize = 16;
-                Text.alignment = TextAnchor.MiddleLeft;
-                Text.horizontalOverflow = HorizontalWrapMode.Wrap;
-                Text.verticalOverflow = VerticalWrapMode.Overflow;
-                LegacyFontProvider.ApplyTo(Text);
+                TokenLayout = contentObject.GetComponent<EmojiTokenLayout>();
             }
 
             public GameObject Root { get; }
             public RectTransform RectTransform { get; }
-            public Text Text { get; }
+            private EmojiTokenLayout TokenLayout { get; }
 
-            public void SetText(string text, Color color)
+            public void SetTokens(IReadOnlyList<EmojiMarkupToken> tokens, Color color)
             {
-                Text.text = text;
-                Text.color = color;
+                TokenLayout?.RenderTokens(tokens, color, FontSize, TextAnchor.MiddleLeft);
             }
 
             public void SetActive(bool active)

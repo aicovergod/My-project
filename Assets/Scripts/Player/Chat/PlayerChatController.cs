@@ -218,7 +218,8 @@ namespace Player.Chat
                 return;
 
             var position = FloatingTextAnchorUtility.ResolveAnchorPosition(transform, FloatingTextFallbackHeight, ref floatingTextAnchorCache);
-            FloatingText.Show(message, position, Color.white);
+            var tokens = EmojiMarkupParser.Parse(message ?? string.Empty);
+            FloatingText.Show(tokens, position, Color.white);
         }
 
         private void ReleaseModalLock()
