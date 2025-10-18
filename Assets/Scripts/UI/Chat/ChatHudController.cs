@@ -556,7 +556,7 @@ namespace UI.Chat
             stackLayout.padding = new RectOffset(0, 0, 0, 0);
             stackLayout.childAlignment = TextAnchor.UpperLeft;
             stackLayout.childControlWidth = true;
-            stackLayout.childControlHeight = false;
+            stackLayout.childControlHeight = true;
             stackLayout.childForceExpandWidth = true;
             stackLayout.childForceExpandHeight = false;
 
