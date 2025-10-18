@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d41dd0e303b483d09fdba51e8487a4184adade6a -->
+## 2025-10-18T17:14:51+01:00 — Merge pull request #1195 from aicovergod/codex/update-chatmessagerow-constructor
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 10 ++ / 1 --
+- Notes:
+  Adjust chat message row layout to limit prefix width
+---
+<!-- commit:380661047c838290eeee5461316c8fab5d092518 -->
+## 2025-10-18T17:14:40+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:5128e31baaf3542d2f88418786a4d328f94f60cb -->
 ## 2025-10-18T17:14:21+01:00 — Stop expanding chat prefix width
 
