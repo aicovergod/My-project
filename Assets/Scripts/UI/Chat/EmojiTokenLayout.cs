@@ -63,15 +63,32 @@ namespace UI.Chat
             for (int i = 0; i < tokens.Count; i++)
             {
                 var token = tokens[i];
+                var existing = activeIndex < activeComponents.Count ? activeComponents[activeIndex] : null;
                 if (token.IsEmoji)
                 {
-                    var image = AcquireImage();
+                    if (existing != null && !(existing is Image))
+                    {
+                        ReturnToPool(existing);
+                        activeComponents[activeIndex] = null;
+                        existing = null;
+                    }
+
+                    var image = existing as Image ?? AcquireImage();
+                    PrepareImage(image);
                     token.Emoji.ApplyTo(image);
                     Activate(image, ref activeIndex);
                 }
                 else
                 {
-                    var text = AcquireText();
+                    if (existing != null && !(existing is Text))
+                    {
+                        ReturnToPool(existing);
+                        activeComponents[activeIndex] = null;
+                        existing = null;
+                    }
+
+                    var text = existing as Text ?? AcquireText();
+                    PrepareText(text);
                     text.text = token.Text ?? string.Empty;
                     text.color = textColor;
                     text.fontSize = fontSize;
@@ -99,6 +116,15 @@ namespace UI.Chat
         {
             if (component == null)
                 return;
+
+            if (index < activeComponents.Count)
+            {
+                var existing = activeComponents[index];
+                if (existing != null && existing != component)
+                {
+                    ReturnToPool(existing);
+                }
+            }
 
             var transformComponent = component.transform;
             transformComponent.SetParent(transform, false);
