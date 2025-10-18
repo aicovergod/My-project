@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:461a068a8bf2419636f605e86169f71da0778891 -->
+## 2025-10-18T15:56:02+01:00 — Fix pooled chat text layout widths
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 30 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:c4f17587c7e1b43cb1732715ed6d0260bde2e408 -->
 ## 2025-10-18T15:52:56+01:00 — Merge pull request #1189 from aicovergod/codex/update-emoji-preview-on-input-change
 
