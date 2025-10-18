@@ -7,7 +7,10 @@ using UnityEngine.UI;
 namespace UI
 {
     /// <summary>
-    /// Simple floating text utility for feedback messages.
+    /// Simple floating text utility for feedback messages. Call <see cref="Show"/> for the
+    /// classic drifting popups used by hitsplats and gathering feedback, or
+    /// <see cref="ShowAnchored"/> when the popup must stay attached to a moving entity (for
+    /// example, player speech bubbles).
     /// </summary>
     public class FloatingText : MonoBehaviour
     {
@@ -21,6 +24,11 @@ namespace UI
         private Camera mainCamera;
         private float remainingLifetime;
         private bool needsInitialSnap = true;
+
+        // Anchoring state allows the popup to follow a transform instead of drifting upward.
+        private Transform followTarget;
+        private Vector3 followOffset;
+        private bool isAnchored;
 
         /// <summary>
         ///     Backing field for <see cref="DebugLogMessages"/> so the toggle persists between spawn calls.
@@ -43,9 +51,41 @@ namespace UI
         }
 
         /// <summary>
-        /// Displays floating text by rendering a pre-parsed token list.
+        /// Displays floating text by rendering a pre-parsed token list. The popup drifts upward
+        /// over its lifetime. Use <see cref="ShowAnchored"/> when the popup should remain tied to
+        /// a moving transform.
         /// </summary>
         public static void Show(IReadOnlyList<EmojiMarkupToken> tokens, Vector3 position, Color? color = null, float? size = null, Sprite background = null)
+        {
+            CreateInstance(tokens, position, color, size, background);
+        }
+
+        /// <summary>
+        /// Displays floating text anchored to a transform so the popup follows the target.
+        /// </summary>
+        /// <param name="tokens">Pre-parsed emoji tokens to render.</param>
+        /// <param name="target">Transform the popup should follow.</param>
+        /// <param name="offset">World-space offset applied relative to the target each frame.</param>
+        /// <param name="color">Optional override for the rendered text colour.</param>
+        /// <param name="size">Optional override for the base text scale.</param>
+        /// <param name="background">Optional sprite rendered behind the floating text.</param>
+        public static void ShowAnchored(IReadOnlyList<EmojiMarkupToken> tokens, Transform target, Vector3 offset, Color? color = null, float? size = null, Sprite background = null)
+        {
+            Vector3 initialPosition = target != null ? target.position + offset : offset;
+            var instance = CreateInstance(tokens, initialPosition, color, size, background);
+            instance.ConfigureAnchor(target, offset);
+        }
+
+        /// <summary>
+        /// Convenience overload that parses the message before displaying anchored floating text.
+        /// </summary>
+        public static void ShowAnchored(string message, Transform target, Vector3 offset, Color? color = null, float? size = null, Sprite background = null)
+        {
+            var tokens = EmojiMarkupParser.Parse(message ?? string.Empty);
+            ShowAnchored(tokens, target, offset, color, size, background);
+        }
+
+        private static FloatingText CreateInstance(IReadOnlyList<EmojiMarkupToken> tokens, Vector3 position, Color? color, float? size, Sprite background)
         {
             GameObject go = new GameObject("FloatingText", typeof(Canvas));
             var instance = go.AddComponent<FloatingText>();
@@ -91,11 +131,21 @@ namespace UI
             instance.RenderTokens(tokens, resolvedColor, fontSize);
             instance.remainingLifetime = instance.lifetime;
             instance.needsInitialSnap = true;
+            instance.ConfigureAnchor(null, Vector3.zero);
 
             if (debugLogMessages)
             {
                 Debug.Log($"[FloatingText] {BuildDebugMessage(tokens)}");
             }
+
+            return instance;
+        }
+
+        private void ConfigureAnchor(Transform target, Vector3 offset)
+        {
+            followTarget = target;
+            followOffset = offset;
+            isAnchored = target != null;
         }
 
         private void Awake()
@@ -114,13 +164,28 @@ namespace UI
 
             // Reapply the first projection in LateUpdate so the spawn frame respects any camera movement that
             // occurred after the popup was created earlier in the frame.
+            if (isAnchored)
+            {
+                if (followTarget != null)
+                {
+                    worldPosition = followTarget.position + followOffset;
+                }
+                else
+                {
+                    // The anchor has been destroyed, so gracefully fall back to floating behaviour.
+                    isAnchored = false;
+                }
+            }
+
             if (needsInitialSnap)
             {
                 rectTransform.position = mainCamera.WorldToScreenPoint(worldPosition);
                 needsInitialSnap = false;
             }
 
-            worldPosition += floatSpeed * Time.deltaTime;
+            if (!isAnchored)
+                worldPosition += floatSpeed * Time.deltaTime;
+
             rectTransform.position = mainCamera.WorldToScreenPoint(worldPosition);
 
             remainingLifetime -= Time.deltaTime;
