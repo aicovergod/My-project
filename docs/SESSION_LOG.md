@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3a3ac1e7eaa3d981300472a14f675623352d4ae8 -->
+## 2025-10-18T16:05:59+01:00 — Allow emoji tokens to size to preferred width
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:46cc73f9b4fd4dcc5911f5f355228bb6f05ce4cf -->
 ## 2025-10-18T15:56:28+01:00 — Merge pull request #1190 from aicovergod/codex/update-emojitokenlayout-for-text-elements
 

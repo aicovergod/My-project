@@ -24,7 +24,7 @@ namespace UI.Chat
             if (layoutGroup == null)
             {
                 layoutGroup = gameObject.AddComponent<HorizontalLayoutGroup>();
-                layoutGroup.childControlWidth = false;
+                layoutGroup.childControlWidth = true;
                 layoutGroup.childControlHeight = true;
                 layoutGroup.childForceExpandWidth = false;
                 layoutGroup.childForceExpandHeight = false;
