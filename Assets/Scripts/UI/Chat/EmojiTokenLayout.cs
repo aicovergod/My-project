@@ -117,7 +117,11 @@ namespace UI.Chat
         private Text AcquireText()
         {
             if (textPool.Count > 0)
-                return PrepareText(textPool.Dequeue());
+            {
+                var pooledText = textPool.Dequeue();
+                ConfigureTextComponent(pooledText);
+                return PrepareText(pooledText);
+            }
 
             var go = new GameObject("TextToken", typeof(RectTransform), typeof(Text), typeof(LayoutElement));
             var rect = go.GetComponent<RectTransform>();
@@ -128,15 +132,10 @@ namespace UI.Chat
             rect.offsetMax = Vector2.zero;
 
             var layout = go.GetComponent<LayoutElement>();
-            layout.flexibleWidth = 1f;
-            layout.minWidth = 0f;
-            layout.preferredWidth = 0f;
+            ConfigureLayoutElement(layout);
 
             var text = go.GetComponent<Text>();
-            text.text = string.Empty;
-            text.supportRichText = false;
-            LegacyFontProvider.ApplyTo(text);
-            text.raycastTarget = false;
+            ConfigureTextComponent(text);
 
             return PrepareText(text);
         }
@@ -148,6 +147,29 @@ namespace UI.Chat
 
             text.gameObject.SetActive(true);
             return text;
+        }
+
+        private static void ConfigureTextComponent(Text text)
+        {
+            if (text == null)
+                return;
+
+            text.text = string.Empty;
+            text.supportRichText = false;
+            LegacyFontProvider.ApplyTo(text);
+            text.raycastTarget = false;
+
+            ConfigureLayoutElement(text.GetComponent<LayoutElement>());
+        }
+
+        private static void ConfigureLayoutElement(LayoutElement layout)
+        {
+            if (layout == null)
+                return;
+
+            layout.flexibleWidth = 1f;
+            layout.minWidth = 0f;
+            layout.preferredWidth = -1f;
         }
 
         private Image AcquireImage()
