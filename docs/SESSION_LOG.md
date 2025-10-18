@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b582c36cb675febece648c6ed430a5f5e683e8cf -->
+## 2025-10-18T21:09:21+01:00 — Fix emoji picker scroll content sizing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiPickerPanel.cs
+- Diff: 11 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:2402c9fa3e03b61fd094490f5729b1b50bdb4dd0 -->
 ## 2025-10-18T20:55:57+01:00 — Merge pull request #1214 from aicovergod/codex/add-scroller-to-emoji-window
 
