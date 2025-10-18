@@ -93,7 +93,10 @@ namespace UI.Chat
                     text.color = textColor;
                     text.fontSize = fontSize;
                     text.alignment = alignment;
-                    text.horizontalOverflow = HorizontalWrapMode.Wrap;
+                    // Force long chat strings to remain on a single line even when
+                    // players enter lengthy messages. Wrapping caused floating chat
+                    // bubbles to stack vertically and break the OSRS-style speech look.
+                    text.horizontalOverflow = HorizontalWrapMode.Overflow;
                     text.verticalOverflow = VerticalWrapMode.Overflow;
                     text.raycastTarget = false;
                     Activate(text, ref activeIndex);
