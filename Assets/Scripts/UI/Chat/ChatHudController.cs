@@ -39,6 +39,7 @@ namespace UI.Chat
 
         private Canvas canvas;
         private ScrollRect scrollRect;
+        private RectTransform windowRoot;
         private RectTransform contentRect;
         private InputField inputField;
         private Text inputNameLabel;
@@ -190,19 +191,32 @@ namespace UI.Chat
 
         private void ConfigureRoot()
         {
-            var rect = GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0f, 0f);
-            rect.anchorMax = new Vector2(0f, 0f);
-            rect.pivot = new Vector2(0f, 0f);
-            rect.sizeDelta = new Vector2(520f, 220f);
-            rect.anchoredPosition = new Vector2(18f, 18f);
+            if (windowRoot == null)
+            {
+                var windowRootObject = new GameObject("WindowRoot", typeof(RectTransform));
+                windowRoot = windowRootObject.GetComponent<RectTransform>();
+            }
+
+            windowRoot.SetParent(transform, false);
+            windowRoot.localScale = Vector3.one;
+            windowRoot.anchorMin = new Vector2(0f, 0f);
+            windowRoot.anchorMax = new Vector2(0f, 0f);
+            windowRoot.pivot = new Vector2(0f, 0f);
+            windowRoot.sizeDelta = new Vector2(520f, 220f);
+            windowRoot.anchoredPosition = new Vector2(18f, 18f);
         }
 
         private void BuildUi()
         {
+            if (windowRoot == null)
+            {
+                Debug.LogError("ChatHudController: Window root missing during UI build.");
+                return;
+            }
+
             var background = new GameObject("Background", typeof(RectTransform), typeof(Image));
             var backgroundRect = background.GetComponent<RectTransform>();
-            backgroundRect.SetParent(transform, false);
+            backgroundRect.SetParent(windowRoot, false);
             backgroundRect.anchorMin = new Vector2(0f, 0f);
             backgroundRect.anchorMax = new Vector2(1f, 1f);
             backgroundRect.offsetMin = Vector2.zero;
