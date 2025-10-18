@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:790c3ea7af405cde412eae7504ff9717e6bcc272 -->
+## 2025-10-18T15:52:44+01:00 — Refresh chat input preview on typing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 1 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a46c8610eae080a7fcd742b32f9d64ab3bea6536 -->
 ## 2025-10-18T15:43:16+01:00 — Merge pull request #1188 from aicovergod/codex/add-emoji-support-to-chat-ui
 
