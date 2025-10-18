@@ -32,6 +32,7 @@ namespace UI.Chat
 
         private static readonly ChatChannel[] ChannelValues = (ChatChannel[])Enum.GetValues(typeof(ChatChannel));
         private const string EmojiMarkupPrefix = "<emoji=";
+        private const int InputCharacterLimit = 64;
 
         private const float WindowWidth = 520f;
         private const float WindowHeight = 220f;
@@ -675,7 +676,7 @@ namespace UI.Chat
 
             inputField = inputContainer.AddComponent<InputField>();
             inputField.lineType = InputField.LineType.SingleLine;
-            inputField.characterLimit = 200;
+            inputField.characterLimit = 0;
             inputField.transition = Selectable.Transition.ColorTint;
             RegisterInputFocusCallbacks(inputField);
             inputField.onValueChanged.AddListener(HandleInputValueChanged);
@@ -836,6 +837,7 @@ namespace UI.Chat
                 return;
 
             TryCollapseEmojiBackspace();
+            EnforceInputCharacterLimit();
             UpdateInputNameVisibility();
             RefreshInputPreview();
             previousInputText = inputField != null ? inputField.text ?? string.Empty : string.Empty;
@@ -885,10 +887,12 @@ namespace UI.Chat
             string updated = current + markup;
             int caret = updated.Length;
             SetInputFieldText(updated, caret);
+            EnforceInputCharacterLimit();
             RefreshInputPreview();
             UpdateInputNameVisibility();
             inputField.ActivateInputField();
-            CollapseInputSelection(caret);
+            int enforcedCaret = inputField != null ? inputField.caretPosition : caret;
+            CollapseInputSelection(enforcedCaret);
         }
 
         /// <summary>
@@ -961,6 +965,131 @@ namespace UI.Chat
 
             string updated = previous.Remove(startIndex, closingIndex - startIndex + 1);
             SetInputFieldText(updated, startIndex);
+        }
+
+        /// <summary>
+        /// Ensures the chat input text and caret respect the configured logical character limit.
+        /// </summary>
+        private void EnforceInputCharacterLimit()
+        {
+            if (inputField == null)
+                return;
+
+            string text = inputField.text ?? string.Empty;
+            int caret = Mathf.Clamp(inputField.caretPosition, 0, text.Length);
+
+            if (!TryTruncateEmojiAware(text, caret, out string truncatedText, out int truncatedCaret))
+                return;
+
+            if (!string.Equals(truncatedText, text, StringComparison.Ordinal))
+            {
+                SetInputFieldText(truncatedText, truncatedCaret);
+            }
+            else if (caret != truncatedCaret)
+            {
+                CollapseInputSelection(truncatedCaret);
+                previousInputText = truncatedText;
+            }
+        }
+
+        /// <summary>
+        /// Truncates the supplied text so that no more than the logical character limit is represented.
+        /// </summary>
+        /// <param name="text">Raw chat input text.</param>
+        /// <param name="caretPosition">Current caret index within the raw text.</param>
+        /// <param name="truncatedText">Resulting truncated text if trimming was required.</param>
+        /// <param name="truncatedCaret">Caret index aligned to the truncated text.</param>
+        /// <returns>True if the caret or text were modified, otherwise false.</returns>
+        private bool TryTruncateEmojiAware(string text, int caretPosition, out string truncatedText, out int truncatedCaret)
+        {
+            truncatedText = text ?? string.Empty;
+            truncatedCaret = Mathf.Clamp(caretPosition, 0, truncatedText.Length);
+
+            if (string.IsNullOrEmpty(truncatedText))
+                return false;
+
+            int logicalCount = 0;
+            int index = 0;
+            int allowedIndex = 0;
+            bool caretAdjusted = false;
+
+            while (index < truncatedText.Length)
+            {
+                if (logicalCount >= InputCharacterLimit)
+                    break;
+
+                int tokenLength = 1;
+                if (TryReadEmojiMarkup(truncatedText, index, out int emojiLength))
+                    tokenLength = emojiLength;
+
+                int nextIndex = index + tokenLength;
+                logicalCount++;
+                allowedIndex = nextIndex;
+
+                if (truncatedCaret > index && truncatedCaret < nextIndex)
+                {
+                    truncatedCaret = nextIndex;
+                    caretAdjusted = true;
+                }
+
+                index = nextIndex;
+            }
+
+            bool truncated = allowedIndex < truncatedText.Length;
+            if (truncated)
+            {
+                truncatedText = truncatedText.Substring(0, allowedIndex);
+                if (truncatedCaret > allowedIndex)
+                {
+                    truncatedCaret = allowedIndex;
+                    caretAdjusted = true;
+                }
+            }
+
+            truncatedCaret = Mathf.Clamp(truncatedCaret, 0, truncatedText.Length);
+            return truncated || caretAdjusted;
+        }
+
+        /// <summary>
+        /// Attempts to read a complete emoji markup sequence beginning at the supplied index.
+        /// </summary>
+        /// <param name="text">Source text to inspect.</param>
+        /// <param name="startIndex">Potential starting index of the markup sequence.</param>
+        /// <param name="length">Length of the markup token if a valid sequence was discovered.</param>
+        /// <returns>True when the substring matches <c>&lt;emoji=KEY&gt;</c> format, otherwise false.</returns>
+        private bool TryReadEmojiMarkup(string text, int startIndex, out int length)
+        {
+            length = 0;
+
+            if (string.IsNullOrEmpty(text))
+                return false;
+
+            if (startIndex < 0 || startIndex >= text.Length)
+                return false;
+
+            if (text.IndexOf(EmojiMarkupPrefix, startIndex, StringComparison.Ordinal) != startIndex)
+                return false;
+
+            int keyStart = startIndex + EmojiMarkupPrefix.Length;
+            if (keyStart >= text.Length)
+                return false;
+
+            int closingIndex = text.IndexOf('>', keyStart);
+            if (closingIndex < 0)
+                return false;
+
+            if (closingIndex == keyStart)
+                return false;
+
+            for (int i = keyStart; i < closingIndex; i++)
+            {
+                char c = text[i];
+                if (char.IsWhiteSpace(c) || c == '<' || c == '>')
+                    return false;
+            }
+
+            length = closingIndex - startIndex + 1;
+            return length > 0;
         }
 
         private void EnsureEmojiPicker()
