@@ -64,5 +64,5 @@ MonoBehaviour:
   menuSafePadding: 12
   itemRaycastMask:
     serializedVersion: 2
-    m_Bits: 4
+    m_Bits: 4091
   enableDebugLogging: 1
