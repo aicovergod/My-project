@@ -205,6 +205,25 @@ namespace UI.Chat
             ApplyInputFocusState(true);
             UpdateInputNameVisibility();
             RefreshInputPreview();
+            CollapseInputSelection(inputField.text != null ? inputField.text.Length : 0);
+        }
+
+        /// <summary>
+        /// Collapses the chat input selection to a single caret position, ensuring the
+        /// text is not highlighted after programmatic focus changes.
+        /// </summary>
+        /// <param name="caretIndex">Requested caret index before clamping.</param>
+        private void CollapseInputSelection(int caretIndex)
+        {
+            if (inputField == null)
+                return;
+
+            string text = inputField.text ?? string.Empty;
+            int clamped = Mathf.Clamp(caretIndex, 0, text.Length);
+            inputField.caretPosition = clamped;
+            inputField.stringPosition = clamped;
+            inputField.selectionAnchorPosition = clamped;
+            inputField.selectionFocusPosition = clamped;
         }
 
         /// <summary>
@@ -791,6 +810,7 @@ namespace UI.Chat
 
             ApplyInputFocusState(true);
             UpdateInputNameVisibility();
+            CollapseInputSelection(inputField != null && inputField.text != null ? inputField.text.Length : 0);
         }
 
         /// <summary>
@@ -868,12 +888,10 @@ namespace UI.Chat
             string updated = current.Substring(0, anchor) + markup + current.Substring(focus);
             inputField.text = updated;
             int caret = anchor + markup.Length;
-            inputField.caretPosition = caret;
-            inputField.selectionAnchorPosition = caret;
-            inputField.selectionFocusPosition = caret;
             RefreshInputPreview();
             UpdateInputNameVisibility();
             inputField.ActivateInputField();
+            CollapseInputSelection(caret);
         }
 
         private void EnsureEmojiPicker()
