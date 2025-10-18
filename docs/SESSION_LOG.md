@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:90b9eac9325d798fbb36581a7b8196026ed7c05d -->
+## 2025-10-18T16:06:26+01:00 — Merge pull request #1191 from aicovergod/codex/update-emojitokenlayout-for-width-calculation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 10 ++ / 1 --
+- Notes:
+  Adjust emoji token layout width handling
+---
+<!-- commit:714c36dfd5deb75ae680a388b449ba605bb0077c -->
+## 2025-10-18T16:06:17+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:3a3ac1e7eaa3d981300472a14f675623352d4ae8 -->
 ## 2025-10-18T16:05:59+01:00 — Allow emoji tokens to size to preferred width
 
