@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b95c323aa63d00cc3c2e86367613a04f5f20c8ad -->
+## 2025-10-18T14:27:06+01:00 — Adjust chat input row sizing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 4 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:0f93de2ecb060ca4d33e854ab32831442492e003 -->
 ## 2025-10-18T14:11:03+01:00 — Merge pull request #1185 from aicovergod/codex/update-child-control-height-settings
 
