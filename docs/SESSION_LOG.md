@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b35a34f6913ef1b8513b7cb089841efcfad2f3b7 -->
+## 2025-10-18T14:02:12+01:00 — Refine chat input layout and label visibility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 62 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:80171b5e55ce3236cbb9c7a1562d77d1c627d355 -->
 ## 2025-10-18T13:44:48+01:00 — Merge pull request #1183 from aicovergod/codex/update-game-and-public-button-size
 
