@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:186749e9a6e422dc397b3679ca6ab9f224717b24 -->
+## 2025-10-18T16:22:53+01:00 — Fix EmojiTokenLayout reuse logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 28 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:90b9eac9325d798fbb36581a7b8196026ed7c05d -->
 ## 2025-10-18T16:06:26+01:00 — Merge pull request #1191 from aicovergod/codex/update-emojitokenlayout-for-width-calculation
 
