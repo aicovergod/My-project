@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0ad1b3bb441902fc20ae2e8c45a28f998c78bea5 -->
+## 2025-10-18T11:59:42+01:00 — Adjust chat HUD layout ordering
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:3c1d3637b74bd8c03af9ef1e9c54c66b60ed0884 -->
 ## 2025-10-18T11:09:37+01:00 — Merge pull request #1176 from aicovergod/codex/refactor-chat-ui-layout-to-windowroot
 
