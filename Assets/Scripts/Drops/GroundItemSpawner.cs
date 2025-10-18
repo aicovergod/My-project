@@ -15,6 +15,30 @@ namespace MyGame.Drops
         /// <summary>When true, attempts to route spawning to Inventory.ItemPickup.Spawn.</summary>
         public bool useInventorySpawner = true;
 
+        [SerializeField]
+        [Tooltip("World-space size of a single tile. Positions are snapped to the tile centre before spawning.")]
+        private float tileSize = 1f;
+
+        /// <summary>
+        /// Snaps an arbitrary world position to the centre of its tile while preserving the original Z axis.
+        /// </summary>
+        /// <param name="worldPosition">Incoming world position.</param>
+        /// <returns>World position aligned to the tile centre.</returns>
+        public Vector3 SnapPositionToTileCenter(Vector3 worldPosition)
+        {
+            float size = tileSize;
+            if (size <= 0f)
+            {
+                size = 1f;
+            }
+
+            float halfSize = size * 0.5f;
+            float snappedX = Mathf.Floor(worldPosition.x / size) * size + halfSize;
+            float snappedY = Mathf.Floor(worldPosition.y / size) * size + halfSize;
+
+            return new Vector3(snappedX, snappedY, worldPosition.z);
+        }
+
         /// <summary>
         /// Spawns an item pickup in the world.
         /// </summary>
@@ -28,7 +52,7 @@ namespace MyGame.Drops
                 return;
             }
 
-            Vector3 spawnPos = pos + (Vector3)(UnityEngine.Random.insideUnitCircle * 0.1f);
+            Vector3 spawnPos = SnapPositionToTileCenter(pos);
 
             if (useInventorySpawner)
             {
