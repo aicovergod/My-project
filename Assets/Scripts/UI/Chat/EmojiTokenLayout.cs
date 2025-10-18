@@ -17,9 +17,12 @@ namespace UI.Chat
         private readonly Queue<Image> imagePool = new Queue<Image>();
 
         private HorizontalLayoutGroup layoutGroup;
+        private RectTransform rectTransform;
 
         private void Awake()
         {
+            rectTransform = transform as RectTransform;
+
             layoutGroup = GetComponent<HorizontalLayoutGroup>();
             if (layoutGroup == null)
             {
@@ -111,7 +114,7 @@ namespace UI.Chat
             }
 
             TrimExcess(activeIndex);
-            LayoutRebuilder.MarkLayoutForRebuild(transform as RectTransform);
+            RefreshLayoutSize();
         }
 
         private void EnsureLayout()
@@ -120,6 +123,39 @@ namespace UI.Chat
                 return;
 
             Awake();
+        }
+
+        /// <summary>
+        /// Forces the layout to update immediately and adjusts the rect transform size when appropriate.
+        /// </summary>
+        private void RefreshLayoutSize()
+        {
+            if (rectTransform == null)
+                rectTransform = transform as RectTransform;
+
+            if (rectTransform == null)
+                return;
+
+            // Unity does not update the preferred dimensions until a layout rebuild occurs. Forcing
+            // the rebuild ensures the preferred size accounts for the latest token content before we
+            // query LayoutUtility.
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
+
+            float preferredWidth = LayoutUtility.GetPreferredWidth(rectTransform);
+            float preferredHeight = LayoutUtility.GetPreferredHeight(rectTransform);
+
+            // Only adjust the axis when the rect is not stretched by its parent. This keeps HUD/chat
+            // rows that fill their parent unaffected while standalone floating text objects can expand
+            // to fit long messages with trailing emoji.
+            if (Mathf.Approximately(rectTransform.anchorMin.x, rectTransform.anchorMax.x))
+            {
+                rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, preferredWidth);
+            }
+
+            if (Mathf.Approximately(rectTransform.anchorMin.y, rectTransform.anchorMax.y))
+            {
+                rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, preferredHeight);
+            }
         }
 
         private void Activate(Component component, ref int index)
