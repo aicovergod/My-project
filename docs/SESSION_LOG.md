@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2402c9fa3e03b61fd094490f5729b1b50bdb4dd0 -->
+## 2025-10-18T20:55:57+01:00 — Merge pull request #1214 from aicovergod/codex/add-scroller-to-emoji-window
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 74 ++ / 2 --
+- Notes:
+  Add scroll bar to emoji picker for expanded emoji set
+---
+<!-- commit:ac836fd8231b9732891f2d50dca6b8ef43fece16 -->
+## 2025-10-18T20:55:46+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0cec500c8317575fb0d1ac03145a5391024127ba -->
 ## 2025-10-18T20:55:23+01:00 — Add scrollbar to emoji picker
 
