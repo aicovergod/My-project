@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8f00eb7550960344c2156daa12ad8883537d0761 -->
+## 2025-10-18T15:42:25+01:00 — Add emoji support to chat and floating text rendering
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (20): Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/UI/Chat/EmojiAtlas.cs, Assets/Scripts/UI/Chat/EmojiAtlas.cs.meta, Assets/Scripts/UI/Chat/EmojiMarkupParser.cs, Assets/Scripts/UI/Chat/EmojiMarkupParser.cs.meta, Assets/Scripts/UI/Chat/EmojiMarkupToken.cs, Assets/Scripts/UI/Chat/EmojiMarkupToken.cs.meta, Assets/Scripts/UI/Chat/EmojiPickerPanel.cs, Assets/Scripts/UI/Chat/EmojiPickerPanel.cs.meta, Assets/Scripts/UI/Chat/EmojiSpriteDefinition.cs, Assets/Scripts/UI/Chat/EmojiSpriteDefinition.cs.meta, Assets/Scripts/UI/Chat/EmojiTokenLayout.cs, Assets/Scripts/UI/Chat/EmojiTokenLayout.cs.meta, Assets/Scripts/UI/Chat/IEmojiAtlas.cs, Assets/Scripts/UI/Chat/IEmojiAtlas.cs.meta, Assets/Scripts/UI/FloatingText.cs, Assets/Tests/UI.meta, Assets/Tests/UI/EmojiMarkupParserTests.cs, Assets/Tests/UI/EmojiMarkupParserTests.cs.meta
+- Diff: 1218 ++ / 35 --
+- Notes:
+  —
+---
 <!-- commit:286b6c07a92b5714f1537fab555a259543765f03 -->
 ## 2025-10-18T15:07:44+01:00 — emojis
 
