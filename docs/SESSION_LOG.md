@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5128e31baaf3542d2f88418786a4d328f94f60cb -->
+## 2025-10-18T17:14:21+01:00 — Stop expanding chat prefix width
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:de43762c67f71164f24a788b122a76981c360f70 -->
 ## 2025-10-18T16:59:05+01:00 — Merge pull request #1194 from aicovergod/codex/update-chat-message-formatting-and-layout
 
