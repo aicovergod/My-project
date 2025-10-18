@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a574be8556c1173da0614c343a37f185bc4bd216 -->
+## 2025-10-18T11:09:13+01:00 — Adjust chat HUD hierarchy
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 21 ++ / 7 --
+- Notes:
+  —
+---
 <!-- commit:185c753d871d7b893d340eaa168749436cdaae53 -->
 ## 2025-10-18T10:55:04+01:00 — Merge pull request #1175 from aicovergod/codex/fix-console-errors-in-chathudcontroller
 
