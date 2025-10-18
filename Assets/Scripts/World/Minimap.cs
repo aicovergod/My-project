@@ -9,6 +9,7 @@ using Player;
 using UnityEngine.EventSystems;
 using Pets;
 using UI.Utilities;
+using UI.Chat;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -356,6 +357,10 @@ namespace World
             if (keyboard != null)
                 toggleRequested = keyboard.mKey.wasPressedThisFrame;
 #endif
+
+            var chatHud = ChatHudController.Instance;
+            if (toggleRequested && chatHud != null && chatHud.IsInputFocused)
+                toggleRequested = false;
 
             if (mapCamera != null)
             {

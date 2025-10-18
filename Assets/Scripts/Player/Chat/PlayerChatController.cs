@@ -34,6 +34,7 @@ namespace Player.Chat
         private bool cancelActionEnabledByResolver;
 
         private readonly PlayerMovementModalLock modalLock = new PlayerMovementModalLock();
+        private PlayerMover cachedPlayerMover;
         private FloatingTextAnchorUtility.AnchorCache floatingTextAnchorCache;
 
         /// <summary>
@@ -46,7 +47,16 @@ namespace Player.Chat
         /// </summary>
         public void SetHud(ChatHudController hud)
         {
+            if (chatHud == hud)
+                return;
+
+            UnsubscribeHudFocus();
             chatHud = hud;
+            ReleaseModalLock();
+            if (chatHud == null)
+                return;
+
+            SubscribeHudFocus();
         }
 
         private void Reset()
@@ -58,18 +68,49 @@ namespace Player.Chat
         {
             ResolveActions();
             SubscribeActions();
+            SubscribeHudFocus();
         }
 
         private void OnDisable()
         {
             UnsubscribeActions();
+            UnsubscribeHudFocus();
             ReleaseModalLock();
             DisableResolvedActions();
         }
 
         private void OnDestroy()
         {
+            UnsubscribeHudFocus();
             ReleaseModalLock();
+        }
+
+        private PlayerMover ResolvePlayerMover()
+        {
+            if (cachedPlayerMover == null)
+                cachedPlayerMover = GetComponent<PlayerMover>();
+
+            return cachedPlayerMover;
+        }
+
+        private void SubscribeHudFocus()
+        {
+            if (chatHud == null)
+                return;
+
+            chatHud.InputFocusChanged -= HandleHudInputFocusChanged;
+            chatHud.InputFocusChanged += HandleHudInputFocusChanged;
+
+            if (isActiveAndEnabled && chatHud.IsInputFocused)
+                modalLock.Acquire(ResolvePlayerMover());
+        }
+
+        private void UnsubscribeHudFocus()
+        {
+            if (chatHud == null)
+                return;
+
+            chatHud.InputFocusChanged -= HandleHudInputFocusChanged;
         }
 
         private void ResolveActions()
@@ -125,7 +166,7 @@ namespace Player.Chat
             }
 
             chatHud.FocusInput();
-            modalLock.Acquire(GetComponent<PlayerMover>());
+            modalLock.Acquire(ResolvePlayerMover());
         }
 
         private void HandleSubmitChatPerformed(InputAction.CallbackContext context)
@@ -158,6 +199,17 @@ namespace Player.Chat
             if (chatHud != null)
                 chatHud.CancelInput();
             ReleaseModalLock();
+        }
+
+        private void HandleHudInputFocusChanged(bool focused)
+        {
+            if (!isActiveAndEnabled)
+                return;
+
+            if (focused)
+                modalLock.Acquire(ResolvePlayerMover());
+            else
+                ReleaseModalLock();
         }
 
         private void SpawnFloatingSpeech(string message)

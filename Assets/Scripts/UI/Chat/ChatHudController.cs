@@ -56,6 +56,12 @@ namespace UI.Chat
         private Text placeholderLabel;
         private bool autoScrollToBottom = true;
         private bool inputFocused;
+
+        /// <summary>
+        /// Raised whenever the chat input focus state changes. The boolean argument is <c>true</c>
+        /// when the input gains focus and <c>false</c> when focus is lost.
+        /// </summary>
+        public event Action<bool> InputFocusChanged;
         private ChatService chatService;
         private Coroutine bindRetryCoroutine;
 
@@ -186,7 +192,8 @@ namespace UI.Chat
                 eventSystem.SetSelectedGameObject(inputField.gameObject);
 
             inputField.ActivateInputField();
-            inputFocused = true;
+            ApplyInputFocusState(true);
+            UpdateInputNameVisibility();
         }
 
         /// <summary>
@@ -234,7 +241,7 @@ namespace UI.Chat
                 EventSystem.current.SetSelectedGameObject(null);
 
             inputField.text = string.Empty;
-            inputFocused = false;
+            ApplyInputFocusState(false);
             UpdateInputNameVisibility();
         }
 
@@ -252,6 +259,19 @@ namespace UI.Chat
         /// Determines whether the chat input currently holds focus.
         /// </summary>
         public bool IsInputFocused => inputFocused;
+
+        /// <summary>
+        /// Applies the supplied focus state and notifies any subscribers if the state changed.
+        /// </summary>
+        /// <param name="focused">Whether the input should be considered focused.</param>
+        private void ApplyInputFocusState(bool focused)
+        {
+            if (inputFocused == focused)
+                return;
+
+            inputFocused = focused;
+            InputFocusChanged?.Invoke(focused);
+        }
 
         private void ConfigureRoot()
         {
@@ -679,7 +699,7 @@ namespace UI.Chat
         /// <param name="_">Unused event payload.</param>
         private void HandleInputSelected(BaseEventData _)
         {
-            inputFocused = true;
+            ApplyInputFocusState(true);
             UpdateInputNameVisibility();
         }
 
@@ -689,7 +709,7 @@ namespace UI.Chat
         /// <param name="_">Unused event payload.</param>
         private void HandleInputDeselected(BaseEventData _)
         {
-            inputFocused = false;
+            ApplyInputFocusState(false);
             UpdateInputNameVisibility();
         }
 
