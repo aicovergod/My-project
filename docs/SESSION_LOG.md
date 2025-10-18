@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b0cba2c33eda9a664d562372c8f18564e43d087a -->
+## 2025-10-18T19:00:42+01:00 — Fix emoji picker panel layering
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiPickerPanel.cs
+- Diff: 40 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:1a226e3777b8b9983be1faf49f58916a3cebab83 -->
 ## 2025-10-18T18:55:08+01:00 — Merge pull request #1204 from aicovergod/codex/update-emojitokenlayout-for-layout-rebuilds
 
