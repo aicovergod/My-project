@@ -1070,7 +1070,7 @@ namespace UI.Chat
                 var horizontalGroup = Root.AddComponent<HorizontalLayoutGroup>();
                 horizontalGroup.childControlWidth = true;
                 horizontalGroup.childControlHeight = true;
-                horizontalGroup.childForceExpandWidth = true;
+                horizontalGroup.childForceExpandWidth = false;
                 horizontalGroup.childForceExpandHeight = false;
                 horizontalGroup.childAlignment = TextAnchor.UpperLeft;
                 horizontalGroup.spacing = 0f;
