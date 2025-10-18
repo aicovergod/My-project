@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1a226e3777b8b9983be1faf49f58916a3cebab83 -->
+## 2025-10-18T18:55:08+01:00 — Merge pull request #1204 from aicovergod/codex/update-emojitokenlayout-for-layout-rebuilds
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 46 ++ / 1 --
+- Notes:
+  Force EmojiTokenLayout to rebuild layout size
+---
+<!-- commit:ed2a7645c969a420323ff18bdb77eb5025f4bee2 -->
+## 2025-10-18T18:54:57+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c47ceb34df20f6e71acfe4cfeb26d3ff6323c976 -->
 ## 2025-10-18T18:54:38+01:00 — Adjust EmojiTokenLayout sizing after rebuild
 
