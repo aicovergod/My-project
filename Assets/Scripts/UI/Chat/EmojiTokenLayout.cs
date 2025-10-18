@@ -59,6 +59,13 @@ namespace UI.Chat
 
             EnsureLayout();
 
+            if (layoutGroup != null)
+            {
+                // Keep the layout alignment in sync with the caller so floating chat
+                // bubbles can request centred emoji while log rows remain left aligned.
+                layoutGroup.childAlignment = alignment;
+            }
+
             int activeIndex = 0;
             for (int i = 0; i < tokens.Count; i++)
             {
