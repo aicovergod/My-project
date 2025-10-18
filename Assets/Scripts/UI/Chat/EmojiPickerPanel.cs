@@ -18,7 +18,7 @@ namespace UI.Chat
         private static readonly Color32 LabelColor = new Color32(255, 238, 170, 255);
 
         private const float PanelWidth = 240f;
-        private const float PanelHeight = 220f;
+        private const float PanelHeight = 238f;
 
         private CanvasGroup canvasGroup;
         private RectTransform panelRect;
@@ -221,7 +221,7 @@ namespace UI.Chat
             scrollRect.horizontal = false;
             scrollRect.movementType = ScrollRect.MovementType.Clamped;
 
-            var viewport = new GameObject("Viewport", typeof(RectTransform), typeof(Image), typeof(Mask));
+            var viewport = new GameObject("Viewport", typeof(RectTransform), typeof(RectMask2D));
             var viewportRect = viewport.GetComponent<RectTransform>();
             viewportRect.SetParent(scrollRectTransform, false);
             viewportRect.anchorMin = Vector2.zero;
@@ -229,10 +229,9 @@ namespace UI.Chat
             viewportRect.offsetMin = Vector2.zero;
             viewportRect.offsetMax = Vector2.zero;
 
-            var viewportImage = viewport.GetComponent<Image>();
-            viewportImage.color = new Color(0f, 0f, 0f, 0f);
-            viewportImage.raycastTarget = true;
-            viewport.GetComponent<Mask>().showMaskGraphic = false;
+            var viewportGraphic = viewport.AddComponent<Image>();
+            viewportGraphic.color = new Color(0f, 0f, 0f, 0.05f);
+            viewportGraphic.raycastTarget = true;
 
             var content = new GameObject("Content", typeof(RectTransform), typeof(GridLayoutGroup));
             gridContent = content.GetComponent<RectTransform>();
