@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d9f8182907b167f33836ee5aa4d8fd8c1f8783e9 -->
+## 2025-10-18T13:10:25+01:00 — Adjust chat input name label formatting
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 2 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:b8d67de85ffaa1691e2b7b86bc01a5887906dea1 -->
 ## 2025-10-18T13:01:57+01:00 — Merge pull request #1181 from aicovergod/codex/add-chat-service-binding-helper
 
