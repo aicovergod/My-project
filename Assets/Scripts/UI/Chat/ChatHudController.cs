@@ -540,16 +540,17 @@ namespace UI.Chat
             rect.offsetMax = Vector2.zero;
 
             var layout = row.GetComponent<HorizontalLayoutGroup>();
+            layout.childControlWidth = true;
             layout.spacing = 8f;
             layout.padding = new RectOffset(0, 0, 0, 0);
             layout.childAlignment = TextAnchor.MiddleLeft;
-            layout.childControlWidth = false;
             layout.childForceExpandHeight = false;
             layout.childForceExpandWidth = false;
 
             var inputStack = new GameObject("InputStack", typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(LayoutElement));
             var inputStackRect = inputStack.GetComponent<RectTransform>();
             inputStackRect.SetParent(row.transform, false);
+            inputStackRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 460f);
 
             var stackLayout = inputStack.GetComponent<VerticalLayoutGroup>();
             stackLayout.spacing = 2f;
@@ -561,8 +562,8 @@ namespace UI.Chat
             stackLayout.childForceExpandHeight = false;
 
             var stackLayoutElement = inputStack.GetComponent<LayoutElement>();
-            stackLayoutElement.preferredWidth = 260f;
-            stackLayoutElement.minWidth = 260f;
+            stackLayoutElement.preferredWidth = 460f;
+            stackLayoutElement.minWidth = 460f;
             stackLayoutElement.flexibleWidth = 0f;
 
             inputNameLabel = CreateTextLabel(inputStack.transform, string.Empty, 16, PublicMessageColor);
