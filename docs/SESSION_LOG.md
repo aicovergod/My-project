@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3c1d3637b74bd8c03af9ef1e9c54c66b60ed0884 -->
+## 2025-10-18T11:09:37+01:00 — Merge pull request #1176 from aicovergod/codex/refactor-chat-ui-layout-to-windowroot
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 30 ++ / 7 --
+- Notes:
+  Refine chat HUD anchoring
+---
+<!-- commit:4921ddb68040acb1c59a87e30bac13ce2f159b3b -->
+## 2025-10-18T11:09:31+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a574be8556c1173da0614c343a37f185bc4bd216 -->
 ## 2025-10-18T11:09:13+01:00 — Adjust chat HUD hierarchy
 
