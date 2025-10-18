@@ -81,6 +81,23 @@ namespace UI.Chat
                 return string.Empty;
 
             string trimmed = spriteName.Trim();
+            string[] segments = trimmed.Split('_');
+            if (segments.Length >= 2)
+            {
+                for (int i = 1; i < segments.Length; i++)
+                {
+                    string segment = segments[i];
+                    if (string.IsNullOrWhiteSpace(segment))
+                        continue;
+
+                    // Prefer the first non-empty segment after the prefix, which holds the emoji index
+                    // for names like "Emoji_01_0". Keeping this logic ensures atlas ordering remains
+                    // consistent regardless of variant suffixes.
+                    if (segments.Length == 2 || ContainsDigit(segment))
+                        return segment;
+                }
+            }
+
             int underscore = trimmed.LastIndexOf('_');
             if (underscore >= 0 && underscore < trimmed.Length - 1)
                 trimmed = trimmed.Substring(underscore + 1);
@@ -89,6 +106,17 @@ namespace UI.Chat
                 trimmed = trimmed.Substring(5);
 
             return trimmed;
+        }
+
+        private static bool ContainsDigit(string value)
+        {
+            foreach (char character in value)
+            {
+                if (char.IsDigit(character))
+                    return true;
+            }
+
+            return false;
         }
 
         private static string NormalizeKey(string key)
