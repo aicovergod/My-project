@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:91b7bb395b06b825f4a03e4869bf5e708fce5340 -->
+## 2025-10-18T19:36:43+01:00 — Adjust emoji picker masking and height
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiPickerPanel.cs
+- Diff: 5 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:8a7e19c25a68b68c0e1993bc18ff0a1009b986e1 -->
 ## 2025-10-18T19:21:47+01:00 — Merge pull request #1208 from aicovergod/codex/update-emojipickerpanel-layout-settings
 
