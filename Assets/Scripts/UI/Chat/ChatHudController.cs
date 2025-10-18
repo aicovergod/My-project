@@ -220,8 +220,10 @@ namespace UI.Chat
 
             string text = inputField.text ?? string.Empty;
             int clamped = Mathf.Clamp(caretIndex, 0, text.Length);
+            // UnityEngine.UI.InputField exposes caret/selection positions but lacks
+            // the TMP-specific stringPosition property, so we only touch the fields
+            // that exist on the legacy input component to keep compatibility.
             inputField.caretPosition = clamped;
-            inputField.stringPosition = clamped;
             inputField.selectionAnchorPosition = clamped;
             inputField.selectionFocusPosition = clamped;
         }
