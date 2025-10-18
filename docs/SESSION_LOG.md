@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1942f70bdec65769340cf29571882f0702373cb6 -->
+## 2025-10-18T14:38:03+01:00 — Merge pull request #1187 from aicovergod/codex/fix-chatbox-m-key-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 91 ++ / 5 --
+- Notes:
+  Fix chat focus movement lock and minimap input guard
+---
+<!-- commit:8e3bf4b90258fd1a56d62cccb8577a97360ae641 -->
+## 2025-10-18T14:37:52+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0a76fa9173122f0b8081ef341e5f0df9c5b8fd49 -->
 ## 2025-10-18T14:37:35+01:00 — Prevent minimap toggle during chat and freeze movement
 
