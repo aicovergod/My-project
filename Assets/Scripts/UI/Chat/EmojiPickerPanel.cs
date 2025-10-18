@@ -46,7 +46,13 @@ namespace UI.Chat
             if (parent == null)
                 return null;
 
-            var root = new GameObject("EmojiPickerPanel", typeof(RectTransform), typeof(CanvasGroup));
+            var root = new GameObject(
+                "EmojiPickerPanel",
+                typeof(RectTransform),
+                typeof(CanvasGroup),
+                typeof(Canvas),
+                typeof(GraphicRaycaster),
+                typeof(LayoutElement));
             var rect = root.GetComponent<RectTransform>();
             rect.SetParent(parent, false);
             rect.anchorMin = Vector2.zero;
@@ -56,9 +62,38 @@ namespace UI.Chat
 
             var panel = root.AddComponent<EmojiPickerPanel>();
             panel.canvasGroup = root.GetComponent<CanvasGroup>();
+            panel.ConfigureCanvas(parent);
             panel.BuildUi();
             panel.HideImmediate();
             return panel;
+        }
+
+        /// <summary>
+        /// Ensures the picker renders above chat UI by configuring a local canvas.
+        /// </summary>
+        /// <param name="parent">Transform the picker was anchored to.</param>
+        private void ConfigureCanvas(Transform parent)
+        {
+            var canvas = GetComponent<Canvas>();
+            if (canvas == null)
+                return;
+
+            canvas.overrideSorting = true;
+
+            var parentCanvas = parent != null ? parent.GetComponentInParent<Canvas>() : null;
+            if (parentCanvas != null)
+            {
+                canvas.renderMode = parentCanvas.renderMode;
+                canvas.sortingLayerID = parentCanvas.sortingLayerID;
+                canvas.sortingOrder = parentCanvas.sortingOrder + 10;
+                canvas.worldCamera = parentCanvas.worldCamera;
+                canvas.planeDistance = parentCanvas.planeDistance;
+                canvas.additionalShaderChannels = parentCanvas.additionalShaderChannels;
+            }
+            else
+            {
+                canvas.sortingOrder = 1000;
+            }
         }
 
         /// <summary>
@@ -115,6 +150,10 @@ namespace UI.Chat
             canvasGroup.alpha = 1f;
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
+
+            var layoutElement = GetComponent<LayoutElement>();
+            if (layoutElement != null)
+                layoutElement.ignoreLayout = true;
 
             var overlay = new GameObject("Overlay", typeof(RectTransform), typeof(Image), typeof(Button));
             var overlayRect = overlay.GetComponent<RectTransform>();
