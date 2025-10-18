@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0cec500c8317575fb0d1ac03145a5391024127ba -->
+## 2025-10-18T20:55:23+01:00 — Add scrollbar to emoji picker
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiPickerPanel.cs
+- Diff: 65 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:e8be851e5ae968ec1395c9c11a6ca8ee2fd4acb5 -->
 ## 2025-10-18T20:46:57+01:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
 
