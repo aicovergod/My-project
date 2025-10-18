@@ -16,9 +16,14 @@ namespace UI.Chat
         private static readonly Color32 ScrollColor = new Color32(22, 18, 14, 140);
         private static readonly Color32 ButtonColor = new Color32(48, 38, 28, 200);
         private static readonly Color32 LabelColor = new Color32(255, 238, 170, 255);
+        private static readonly Color32 ScrollbarTrackColor = new Color32(33, 27, 21, 220);
+        private static readonly Color32 ScrollbarHandleColor = new Color32(206, 180, 108, 255);
 
-        private const float PanelWidth = 240f;
+        private const float PanelWidth = 256f;
         private const float PanelHeight = 238f;
+        private const float ScrollbarWidth = 14f;
+        private const float ScrollbarViewportPadding = 4f;
+        private const float ScrollbarHandlePadding = 3f;
 
         private CanvasGroup canvasGroup;
         private RectTransform panelRect;
@@ -113,6 +118,15 @@ namespace UI.Chat
             transform.SetAsLastSibling();
 
             PositionPanel(anchor);
+            if (scrollRect != null)
+            {
+                // Always reopen with the picker scrolled to the top so the newest emojis stay visible
+                // near the anchor button and keyboard/gamepad navigation begins on the first entry.
+                scrollRect.StopMovement();
+                scrollRect.verticalNormalizedPosition = 1f;
+                var bar = scrollRect.verticalScrollbar;
+                bar?.SetValueWithoutNotify(1f);
+            }
             FocusFirstEmoji();
         }
 
@@ -219,7 +233,49 @@ namespace UI.Chat
 
             scrollRect = scrollObject.GetComponent<ScrollRect>();
             scrollRect.horizontal = false;
+            scrollRect.vertical = true;
             scrollRect.movementType = ScrollRect.MovementType.Clamped;
+
+            // Build a dedicated vertical scrollbar anchored to the right edge so the picker can
+            // surface additional emoji rows without expanding the modal footprint.
+            var scrollbarObject = new GameObject("Scrollbar", typeof(RectTransform), typeof(Image), typeof(Scrollbar));
+            var scrollbarRect = scrollbarObject.GetComponent<RectTransform>();
+            scrollbarRect.SetParent(scrollRectTransform, false);
+            scrollbarRect.anchorMin = new Vector2(1f, 0f);
+            scrollbarRect.anchorMax = new Vector2(1f, 1f);
+            scrollbarRect.pivot = new Vector2(1f, 1f);
+            scrollbarRect.sizeDelta = new Vector2(ScrollbarWidth, 0f);
+            scrollbarRect.anchoredPosition = Vector2.zero;
+
+            var scrollbarImage = scrollbarObject.GetComponent<Image>();
+            scrollbarImage.color = ScrollbarTrackColor;
+            scrollbarImage.raycastTarget = true;
+
+            var slidingArea = new GameObject("SlidingArea", typeof(RectTransform));
+            var slidingRect = slidingArea.GetComponent<RectTransform>();
+            slidingRect.SetParent(scrollbarRect, false);
+            slidingRect.anchorMin = new Vector2(0f, 0f);
+            slidingRect.anchorMax = new Vector2(1f, 1f);
+            slidingRect.offsetMin = new Vector2(ScrollbarHandlePadding, ScrollbarHandlePadding);
+            slidingRect.offsetMax = new Vector2(-ScrollbarHandlePadding, -ScrollbarHandlePadding);
+
+            var handleObject = new GameObject("Handle", typeof(RectTransform), typeof(Image));
+            var handleRect = handleObject.GetComponent<RectTransform>();
+            handleRect.SetParent(slidingRect, false);
+            handleRect.anchorMin = Vector2.zero;
+            handleRect.anchorMax = Vector2.one;
+            handleRect.offsetMin = Vector2.zero;
+            handleRect.offsetMax = Vector2.zero;
+
+            var handleImage = handleObject.GetComponent<Image>();
+            handleImage.color = ScrollbarHandleColor;
+            handleImage.raycastTarget = true;
+
+            var scrollbar = scrollbarObject.GetComponent<Scrollbar>();
+            scrollbar.direction = Scrollbar.Direction.BottomToTop;
+            scrollbar.handleRect = handleRect;
+            scrollbar.targetGraphic = handleImage;
+            scrollbar.value = 1f;
 
             var viewport = new GameObject("Viewport", typeof(RectTransform), typeof(RectMask2D));
             var viewportRect = viewport.GetComponent<RectTransform>();
@@ -227,7 +283,9 @@ namespace UI.Chat
             viewportRect.anchorMin = Vector2.zero;
             viewportRect.anchorMax = Vector2.one;
             viewportRect.offsetMin = Vector2.zero;
-            viewportRect.offsetMax = Vector2.zero;
+            // Reserve horizontal space for the scrollbar so the grid keeps its six-column layout
+            // while still leaving a small visual gutter between the track and emoji buttons.
+            viewportRect.offsetMax = new Vector2(-(ScrollbarWidth + ScrollbarViewportPadding), 0f);
 
             var viewportGraphic = viewport.AddComponent<Image>();
             viewportGraphic.color = new Color(0f, 0f, 0f, 0.05f);
@@ -256,12 +314,17 @@ namespace UI.Chat
 
             scrollRect.viewport = viewportRect;
             scrollRect.content = gridContent;
+            // Link the ScrollRect to the new scrollbar so both mouse wheel and direct drag inputs
+            // keep the content, handle, and scroll position in sync.
+            scrollRect.verticalScrollbar = scrollbar;
+            scrollRect.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
 
             PopulateEmojiButtons();
             // Ensure the layout updates immediately with the new anchoring and snap the scroll
             // position so the first emoji sits flush with the picker top edge.
             LayoutRebuilder.ForceRebuildLayoutImmediate(gridContent);
             scrollRect.verticalNormalizedPosition = 1f;
+            scrollbar.SetValueWithoutNotify(1f);
         }
 
         private void PopulateEmojiButtons()
