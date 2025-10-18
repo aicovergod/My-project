@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:efab5d2c5d40068448186f450286a0b8d4f7c7e4 -->
+## 2025-10-18T12:45:14+01:00 — Merge pull request #1180 from aicovergod/codex/refactor-chathudcontroller-layout-and-events
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 75 ++ / 12 --
+- Notes:
+  Fix chat HUD layout stacking and refresh chat username cache
+---
+<!-- commit:5e46a84ce237c922d5446cfcef42c775de4b52e7 -->
+## 2025-10-18T12:38:13+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:766928a908278d24727c2a223936ba9dbdf92b30 -->
 ## 2025-10-18T12:37:57+01:00 — Adjust chat HUD layout and username refresh
 
