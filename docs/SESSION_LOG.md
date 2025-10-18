@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:316cd0c91297e79b64df9880e43e49e001ed9754 -->
+## 2025-10-18T13:10:50+01:00 — Merge pull request #1182 from aicovergod/codex/update-chat-username-display-format
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 5 --
+- Notes:
+  Update chat HUD username label formatting
+---
+<!-- commit:d2c4ab66e7fc677cb9317bbb14925631e49827b6 -->
+## 2025-10-18T13:10:43+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d9f8182907b167f33836ee5aa4d8fd8c1f8783e9 -->
 ## 2025-10-18T13:10:25+01:00 — Adjust chat input name label formatting
 
