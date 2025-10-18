@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2d9ff4fd6fabab8181653712468a63e3d837979d -->
+## 2025-10-18T19:18:41+01:00 — Adjust emoji sprite sizing targets
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/UI/Chat/EmojiPickerPanel.cs, Assets/Scripts/UI/Chat/EmojiSpriteDefinition.cs
+- Diff: 11 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:f7b9f4157b6ee1ea95de9522742ff35cfd823f17 -->
 ## 2025-10-18T19:11:56+01:00 — Merge pull request #1206 from aicovergod/codex/update-extractkey-to-handle-emoji-names
 
