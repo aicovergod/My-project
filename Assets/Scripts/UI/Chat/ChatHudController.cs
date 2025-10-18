@@ -31,6 +31,7 @@ namespace UI.Chat
         private static readonly Color32 PlaceholderColor = new Color32(210, 210, 210, 140);
 
         private static readonly ChatChannel[] ChannelValues = (ChatChannel[])Enum.GetValues(typeof(ChatChannel));
+        private const string EmojiMarkupPrefix = "<emoji=";
 
         private const float WindowWidth = 520f;
         private const float WindowHeight = 220f;
@@ -61,6 +62,8 @@ namespace UI.Chat
         private bool autoScrollToBottom = true;
         private bool inputFocused;
         private bool inputFocusBlocked;
+        private bool suppressInputValueChanged; // Prevents recursive onValueChanged handling while mutating text.
+        private string previousInputText = string.Empty; // Snapshot of the previous input text for emoji deletion heuristics.
 
         /// <summary>
         /// Raised whenever the chat input focus state changes. The boolean argument is <c>true</c>
@@ -236,7 +239,7 @@ namespace UI.Chat
             if (inputField == null)
                 return;
 
-            inputField.text = string.Empty;
+            SetInputFieldText(string.Empty);
             UpdateInputNameVisibility();
             RefreshInputPreview();
         }
@@ -256,7 +259,7 @@ namespace UI.Chat
                 return false;
 
             message = trimmed;
-            inputField.text = string.Empty;
+            SetInputFieldText(string.Empty);
             UpdateInputNameVisibility();
             RefreshInputPreview();
             return true;
@@ -274,7 +277,7 @@ namespace UI.Chat
             if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject == inputField.gameObject)
                 EventSystem.current.SetSelectedGameObject(null);
 
-            inputField.text = string.Empty;
+            SetInputFieldText(string.Empty);
             ApplyInputFocusState(false);
             UpdateInputNameVisibility();
             RefreshInputPreview();
@@ -755,6 +758,7 @@ namespace UI.Chat
 
             EnsureEmojiPicker();
             RefreshInputPreview();
+            previousInputText = inputField.text ?? string.Empty;
 
             return row.GetComponent<LayoutElement>();
         }
@@ -831,8 +835,13 @@ namespace UI.Chat
         /// <param name="_">Unused text payload.</param>
         private void HandleInputValueChanged(string _)
         {
+            if (suppressInputValueChanged)
+                return;
+
+            TryCollapseEmojiBackspace();
             UpdateInputNameVisibility();
             RefreshInputPreview();
+            previousInputText = inputField != null ? inputField.text ?? string.Empty : string.Empty;
         }
 
         /// <summary>
@@ -876,24 +885,85 @@ namespace UI.Chat
 
             string markup = $"<emoji={key}>";
             string current = inputField.text ?? string.Empty;
-            int anchor = Mathf.Min(inputField.selectionAnchorPosition, inputField.selectionFocusPosition);
-            int focus = Mathf.Max(inputField.selectionAnchorPosition, inputField.selectionFocusPosition);
-            if (anchor < 0 || focus < 0)
-            {
-                anchor = inputField.caretPosition;
-                focus = anchor;
-            }
-
-            anchor = Mathf.Clamp(anchor, 0, current.Length);
-            focus = Mathf.Clamp(focus, 0, current.Length);
-
-            string updated = current.Substring(0, anchor) + markup + current.Substring(focus);
-            inputField.text = updated;
-            int caret = anchor + markup.Length;
+            string updated = current + markup;
+            int caret = updated.Length;
+            SetInputFieldText(updated, caret);
             RefreshInputPreview();
             UpdateInputNameVisibility();
             inputField.ActivateInputField();
             CollapseInputSelection(caret);
+        }
+
+        /// <summary>
+        /// Applies a new value to the chat input while suppressing recursive
+        /// <see cref="InputField.onValueChanged"/> callbacks so helper logic can
+        /// safely mutate the text.
+        /// </summary>
+        /// <param name="text">The string that should be assigned to the input field.</param>
+        /// <param name="caretPosition">Optional caret index to apply after setting the text.</param>
+        private void SetInputFieldText(string text, int? caretPosition = null)
+        {
+            if (inputField == null)
+                return;
+
+            suppressInputValueChanged = true;
+            inputField.text = text ?? string.Empty;
+            suppressInputValueChanged = false;
+            previousInputText = inputField.text ?? string.Empty;
+
+            if (caretPosition.HasValue)
+                CollapseInputSelection(caretPosition.Value);
+        }
+
+        /// <summary>
+        /// Detects when the player attempts to backspace through an emoji tag and
+        /// removes the full markup sequence so the emoji behaves like a single unit.
+        /// </summary>
+        private void TryCollapseEmojiBackspace()
+        {
+            if (inputField == null)
+                return;
+
+            string current = inputField.text ?? string.Empty;
+            string previous = previousInputText ?? string.Empty;
+            if (previous.Length <= current.Length)
+                return;
+
+            int removedCount = previous.Length - current.Length;
+            if (removedCount != 1)
+                return;
+
+            int caret = inputField.caretPosition;
+            int anchor = inputField.selectionAnchorPosition;
+            int focus = inputField.selectionFocusPosition;
+            if (caret != anchor || caret != focus)
+                return;
+
+            if (caret < 0 || caret > previous.Length)
+                return;
+
+            int searchStart = Mathf.Clamp(caret - 1, 0, Math.Max(previous.Length - 1, 0));
+            int startIndex = previous.LastIndexOf(EmojiMarkupPrefix, searchStart, StringComparison.Ordinal);
+            if (startIndex < 0)
+                return;
+
+            int closingIndex = previous.IndexOf('>', startIndex);
+            if (closingIndex != caret)
+                return;
+
+            int keyStart = startIndex + EmojiMarkupPrefix.Length;
+            if (keyStart >= closingIndex)
+                return;
+
+            for (int i = keyStart; i < closingIndex; i++)
+            {
+                char keyChar = previous[i];
+                if (char.IsWhiteSpace(keyChar) || keyChar == '<' || keyChar == '>')
+                    return;
+            }
+
+            string updated = previous.Remove(startIndex, closingIndex - startIndex + 1);
+            SetInputFieldText(updated, startIndex);
         }
 
         private void EnsureEmojiPicker()
