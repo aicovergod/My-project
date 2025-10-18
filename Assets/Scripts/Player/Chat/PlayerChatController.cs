@@ -165,6 +165,9 @@ namespace Player.Chat
                 return;
             }
 
+            if (chatHud.IsInputFocusBlocked)
+                return;
+
             chatHud.FocusInput();
             modalLock.Acquire(ResolvePlayerMover());
         }

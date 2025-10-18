@@ -639,6 +639,10 @@ namespace World
             if (smallRoot != null)
                 smallRoot.SetActive(!opening);
 
+            var chatHud = ChatHudController.Instance;
+            if (chatHud != null)
+                chatHud.SetInputFocusBlocked(opening);
+
             if (!opening)
             {
                 ResetSmallMapZoom();
