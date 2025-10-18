@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f7b9f4157b6ee1ea95de9522742ff35cfd823f17 -->
+## 2025-10-18T19:11:56+01:00 — Merge pull request #1206 from aicovergod/codex/update-extractkey-to-handle-emoji-names
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 37 ++ / 0 --
+- Notes:
+  Fix emoji atlas key extraction for underscore sprite names
+---
+<!-- commit:72be34643f568ab9acb16efb2e8973c1e5433df6 -->
+## 2025-10-18T19:11:47+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:8bbb4e3479dacac27b22056c68c8bed2fb6400eb -->
 ## 2025-10-18T19:11:27+01:00 — Fix emoji key extraction for underscore sprite names
 
