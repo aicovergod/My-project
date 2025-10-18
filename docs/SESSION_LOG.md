@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c47ceb34df20f6e71acfe4cfeb26d3ff6323c976 -->
+## 2025-10-18T18:54:38+01:00 — Adjust EmojiTokenLayout sizing after rebuild
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 37 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:00124a098e9b0b2849e1a0a4d29d3023a2a7e813 -->
 ## 2025-10-18T18:39:35+01:00 — Merge pull request #1203 from aicovergod/codex/add-helper-for-textanchor-alignment
 
