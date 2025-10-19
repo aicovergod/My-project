@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1f1fd19142e249102f33021afabafb404c39b2cc -->
+## 2025-10-19T16:04:06+01:00 — Fix mod icon parsing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/UI/Chat/ModIconAtlas.cs, Assets/Tests/UI/ModIconAtlasTests.cs
+- Diff: 43 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a49ddfc6b311c5be3cd253436bda0eb21083f682 -->
 ## 2025-10-19T15:57:49+01:00 — emojis and icons
 
