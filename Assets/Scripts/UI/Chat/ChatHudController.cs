@@ -56,6 +56,8 @@ namespace UI.Chat
         private RectTransform windowRoot;
         private RectTransform contentRect;
         private InputField inputField;
+        private RectTransform inputNameContainer;
+        private Image inputNameModIcon;
         private Text inputNameLabel;
         private Text placeholderLabel;
         private EmojiTokenLayout inputPreviewRenderer;
@@ -657,7 +659,7 @@ namespace UI.Chat
             stackLayoutElement.minWidth = 460f;
             stackLayoutElement.flexibleWidth = 0f;
 
-            inputNameLabel = CreateTextLabel(inputStack.transform, string.Empty, 16, PublicMessageColor);
+            BuildInputNameRow(inputStack.transform);
 
             var inputContainer = new GameObject("InputContainer", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
             var inputContainerRect = inputContainer.GetComponent<RectTransform>();
@@ -850,12 +852,13 @@ namespace UI.Chat
         /// </summary>
         private void UpdateInputNameVisibility()
         {
-            if (inputNameLabel == null)
+            if (inputNameContainer == null)
                 return;
 
             bool hasInputField = inputField != null;
             bool hasText = hasInputField && !string.IsNullOrEmpty(inputField.text);
-            inputNameLabel.enabled = !inputFocused || !hasText;
+            bool visible = !inputFocused || !hasText;
+            inputNameContainer.gameObject.SetActive(visible);
         }
 
         private void RefreshInputPreview()
@@ -1102,6 +1105,47 @@ namespace UI.Chat
             emojiPickerPanel = EmojiPickerPanel.Create(chatRoot);
         }
 
+        private void BuildInputNameRow(Transform parent)
+        {
+            var nameRow = new GameObject("InputNameRow", typeof(RectTransform), typeof(HorizontalLayoutGroup));
+            inputNameContainer = nameRow.GetComponent<RectTransform>();
+            inputNameContainer.SetParent(parent, false);
+            inputNameContainer.anchorMin = new Vector2(0f, 0f);
+            inputNameContainer.anchorMax = new Vector2(1f, 0f);
+            inputNameContainer.offsetMin = Vector2.zero;
+            inputNameContainer.offsetMax = Vector2.zero;
+
+            var layout = nameRow.GetComponent<HorizontalLayoutGroup>();
+            layout.spacing = 4f;
+            layout.padding = new RectOffset(6, 0, 0, 0);
+            layout.childAlignment = TextAnchor.MiddleLeft;
+            layout.childControlWidth = true;
+            layout.childControlHeight = false;
+            layout.childForceExpandWidth = false;
+            layout.childForceExpandHeight = false;
+
+            var iconObject = new GameObject("ModIcon", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
+            var iconRect = iconObject.GetComponent<RectTransform>();
+            iconRect.SetParent(inputNameContainer, false);
+            iconRect.anchorMin = new Vector2(0f, 0.5f);
+            iconRect.anchorMax = new Vector2(0f, 0.5f);
+            iconRect.pivot = new Vector2(0.5f, 0.5f);
+
+            inputNameModIcon = iconObject.GetComponent<Image>();
+            inputNameModIcon.raycastTarget = false;
+            inputNameModIcon.gameObject.SetActive(false);
+
+            var iconLayout = iconObject.GetComponent<LayoutElement>();
+            iconLayout.preferredWidth = 16f;
+            iconLayout.preferredHeight = 16f;
+            iconLayout.minWidth = 16f;
+            iconLayout.minHeight = 16f;
+            iconLayout.flexibleWidth = 0f;
+            iconLayout.flexibleHeight = 0f;
+
+            inputNameLabel = CreateTextLabel(inputNameContainer, string.Empty, 16, PublicMessageColor);
+        }
+
         private Text CreateTextLabel(Transform parent, string text, int fontSize, Color color)
         {
             var go = new GameObject("Label", typeof(RectTransform), typeof(Text));
@@ -1208,7 +1252,41 @@ namespace UI.Chat
             if (inputNameLabel == null)
                 return;
 
-            inputNameLabel.text = string.IsNullOrEmpty(username) ? "Adventurer:" : $"{username}:";
+            string displayName = string.IsNullOrEmpty(username) ? "Adventurer" : username;
+            inputNameLabel.text = $"{displayName}:";
+            UpdateInputNameModIcon(username);
+        }
+
+        private void UpdateInputNameModIcon(string username)
+        {
+            if (inputNameModIcon == null)
+                return;
+
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                inputNameModIcon.gameObject.SetActive(false);
+                inputNameModIcon.sprite = null;
+                return;
+            }
+
+            var rankService = PlayerRankService.Instance;
+            PlayerRank? rank = rankService?.GetRankForUsername(username);
+            if (!rank.HasValue || !TryGetRankIconKey(rank.Value, out string iconKey))
+            {
+                inputNameModIcon.gameObject.SetActive(false);
+                inputNameModIcon.sprite = null;
+                return;
+            }
+
+            if (!ModIconAtlas.Instance.TryGetEmoji(iconKey, out var definition))
+            {
+                inputNameModIcon.gameObject.SetActive(false);
+                inputNameModIcon.sprite = null;
+                return;
+            }
+
+            definition.ApplyTo(inputNameModIcon);
+            inputNameModIcon.gameObject.SetActive(true);
         }
 
         private void RebuildVisibleMessages()
