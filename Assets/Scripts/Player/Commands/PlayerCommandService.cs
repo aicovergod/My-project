@@ -170,7 +170,10 @@ namespace Player.Commands
             RegisterCommand(new BankCommand());
             RegisterCommand(new ClearBankCommand());
             RegisterCommand(new ClearInventoryCommand());
+            RegisterCommand(new GiveItemCommand());
+            RegisterCommand(new GiveXpCommand());
             RegisterCommand(new MaxStatsCommand());
+            RegisterCommand(new SetSkillLevelCommand());
             RegisterCommand(new TeleportCommand());
         }
 
