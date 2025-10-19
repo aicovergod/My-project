@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:88ece5ba431ecf03342de6a4d7b89b8e6651fe3b -->
+## 2025-10-19T15:56:26+01:00 — Add moderator icons to chat prefix
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/UI/Chat/EmojiMarkupParser.cs, Assets/Scripts/UI/Chat/ModIconAtlas.cs, Assets/Tests/UI/EmojiMarkupParserTests.cs
+- Diff: 286 ++ / 36 --
+- Notes:
+  —
+---
 <!-- commit:9e5ec16bd2783d5051fb14bd38d79a07d7f13bce -->
 ## 2025-10-19T15:37:10+01:00 — Merge pull request #1226 from aicovergod/codex/fix-cs0102-error-in-playercommandresult
 

@@ -2,11 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UI.Utilities;
 using UI;
+using Player.Ranks;
 
 namespace UI.Chat
 {
@@ -1230,9 +1232,9 @@ namespace UI.Chat
             {
                 var row = GetRow(i);
                 var message = mergedMessages[i];
-                string prefix = BuildMessagePrefix(message);
-                var tokens = EmojiMarkupParser.Parse(message.Text ?? string.Empty);
-                row.SetTokens(prefix, tokens, ResolveMessageColor(message));
+                var prefixTokens = BuildMessagePrefixTokens(message);
+                var messageTokens = EmojiMarkupParser.Parse(message.Text ?? string.Empty, EmojiAtlas.Instance, ModIconAtlas.Instance);
+                row.SetTokens(prefixTokens, messageTokens, ResolveMessageColor(message));
             }
 
             for (int i = mergedMessages.Count; i < activeRows.Count; i++)
@@ -1288,12 +1290,101 @@ namespace UI.Chat
             autoScrollToBottom = position.y <= 0.001f;
         }
 
-        private string BuildMessagePrefix(ChatMessage message)
+        /// <summary>
+        /// Generates the tokenised prefix for a chat line, including timestamps and optional moderator icons.
+        /// </summary>
+        /// <param name="message">Chat message currently being rendered.</param>
+        /// <returns>List of tokens representing the formatted prefix.</returns>
+        private List<EmojiMarkupToken> BuildMessagePrefixTokens(ChatMessage message)
         {
+            string markup = ComposeMessagePrefixMarkup(message);
+            return EmojiMarkupParser.Parse(markup, EmojiAtlas.Instance, ModIconAtlas.Instance);
+        }
+
+        /// <summary>
+        /// Builds the markup string that precedes the chat message payload.
+        /// </summary>
+        /// <param name="message">Chat message currently being rendered.</param>
+        /// <returns>Markup string containing the timestamp, moderator icon (when available), and display name.</returns>
+        private string ComposeMessagePrefixMarkup(ChatMessage message)
+        {
+            var builder = new StringBuilder(64);
+
             DateTime localTime = message.TimestampUtc.ToLocalTime();
             string timestamp = localTime.ToString("HH:mm", CultureInfo.InvariantCulture);
-            string prefix = message.Channel == ChatChannel.Game ? "Game" : (!string.IsNullOrEmpty(message.Sender) ? message.Sender : "Player");
-            return $"[{timestamp}] {prefix}: ";
+            builder.Append('[').Append(timestamp).Append("] ");
+
+            if (TryResolveModIconKey(message, out string iconKey))
+            {
+                builder.Append("<ModIcon=").Append(iconKey).Append("> ");
+            }
+
+            builder.Append(ResolvePrefixDisplayName(message)).Append(": ");
+            return builder.ToString();
+        }
+
+        /// <summary>
+        /// Resolves the display name that should appear before the chat message body.
+        /// </summary>
+        /// <param name="message">Chat message being rendered.</param>
+        /// <returns>Display name selected for the prefix.</returns>
+        private static string ResolvePrefixDisplayName(ChatMessage message)
+        {
+            if (message.Channel == ChatChannel.Game)
+                return "Game";
+
+            return !string.IsNullOrEmpty(message.Sender) ? message.Sender : "Player";
+        }
+
+        /// <summary>
+        /// Attempts to map the message author to a moderator icon key using <see cref="PlayerRankService"/>.
+        /// </summary>
+        /// <param name="message">Chat message being rendered.</param>
+        /// <param name="iconKey">Resolved icon key when the sender qualifies for an icon.</param>
+        /// <returns><c>true</c> when an icon should be rendered; otherwise <c>false</c>.</returns>
+        private bool TryResolveModIconKey(ChatMessage message, out string iconKey)
+        {
+            iconKey = string.Empty;
+
+            if (message.Channel == ChatChannel.Game)
+                return false;
+
+            if (string.IsNullOrWhiteSpace(message.Sender))
+                return false;
+
+            PlayerRank? rank = PlayerRankService.Instance?.GetRankForUsername(message.Sender);
+            if (!rank.HasValue)
+                return false;
+
+            return TryGetRankIconKey(rank.Value, out iconKey);
+        }
+
+        /// <summary>
+        /// Maps a resolved <see cref="PlayerRank"/> to the corresponding moderator icon key.
+        /// </summary>
+        /// <param name="rank">Rank associated with the message author.</param>
+        /// <param name="iconKey">Icon key that should be injected into the chat prefix.</param>
+        /// <returns><c>true</c> when the rank has an associated icon.</returns>
+        private static bool TryGetRankIconKey(PlayerRank rank, out string iconKey)
+        {
+            switch (rank)
+            {
+                case PlayerRank.Support:
+                    iconKey = "01";
+                    return true;
+                case PlayerRank.Moderator:
+                    iconKey = "02";
+                    return true;
+                case PlayerRank.Admin:
+                    iconKey = "03";
+                    return true;
+                case PlayerRank.Developer:
+                    iconKey = "04";
+                    return true;
+                default:
+                    iconKey = string.Empty;
+                    return false;
+            }
         }
 
         private Color ResolveMessageColor(ChatMessage message)
@@ -1329,7 +1420,7 @@ namespace UI.Chat
                 horizontalGroup.childAlignment = TextAnchor.UpperLeft;
                 horizontalGroup.spacing = 0f;
 
-                var prefixObject = new GameObject("Prefix", typeof(RectTransform), typeof(Text), typeof(LayoutElement));
+                var prefixObject = new GameObject("Prefix", typeof(RectTransform), typeof(EmojiTokenLayout), typeof(LayoutElement));
                 var prefixRect = prefixObject.GetComponent<RectTransform>();
                 prefixRect.SetParent(Root.transform, false);
                 prefixRect.anchorMin = new Vector2(0f, 0f);
@@ -1338,20 +1429,12 @@ namespace UI.Chat
                 prefixRect.offsetMin = Vector2.zero;
                 prefixRect.offsetMax = Vector2.zero;
 
-                prefixLabel = prefixObject.GetComponent<Text>();
-                prefixLabel.text = string.Empty;
-                prefixLabel.alignment = TextAnchor.MiddleLeft;
-                prefixLabel.supportRichText = false;
-                prefixLabel.horizontalOverflow = HorizontalWrapMode.Overflow;
-                prefixLabel.verticalOverflow = VerticalWrapMode.Truncate;
-                prefixLabel.raycastTarget = false;
-                prefixLabel.fontSize = FontSize;
-                LegacyFontProvider.ApplyTo(prefixLabel);
-
                 var prefixLayout = prefixObject.GetComponent<LayoutElement>();
                 prefixLayout.flexibleWidth = 0f;
                 prefixLayout.minWidth = 0f;
                 prefixLayout.preferredWidth = -1f;
+
+                prefixTokenLayout = prefixObject.GetComponent<EmojiTokenLayout>();
 
                 var contentObject = new GameObject("Content", typeof(RectTransform), typeof(EmojiTokenLayout), typeof(LayoutElement));
                 var contentRect = contentObject.GetComponent<RectTransform>();
@@ -1371,18 +1454,13 @@ namespace UI.Chat
 
             public GameObject Root { get; }
             public RectTransform RectTransform { get; }
-            private Text prefixLabel;
+            private readonly EmojiTokenLayout prefixTokenLayout;
             private EmojiTokenLayout TokenLayout { get; }
 
-            public void SetTokens(string prefix, IReadOnlyList<EmojiMarkupToken> tokens, Color color)
+            public void SetTokens(IReadOnlyList<EmojiMarkupToken> prefixTokens, IReadOnlyList<EmojiMarkupToken> messageTokens, Color color)
             {
-                if (prefixLabel != null)
-                {
-                    prefixLabel.text = prefix ?? string.Empty;
-                    prefixLabel.color = color;
-                }
-
-                TokenLayout?.RenderTokens(tokens, color, FontSize, TextAnchor.MiddleLeft);
+                prefixTokenLayout?.RenderTokens(prefixTokens, color, FontSize, TextAnchor.MiddleLeft);
+                TokenLayout?.RenderTokens(messageTokens, color, FontSize, TextAnchor.MiddleLeft);
             }
 
             public void SetActive(bool active)
