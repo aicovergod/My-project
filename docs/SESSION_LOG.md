@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:eb2ec13adcd8304e2f1935f74c46818b6999ef27 -->
+## 2025-10-19T10:40:53+01:00 — Add player command and rank infrastructure
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (27): Assets/Resources/PlayerRanks.meta, Assets/Resources/PlayerRanks/DefaultPlayerRankDatabase.asset, Assets/Resources/PlayerRanks/DefaultPlayerRankDatabase.asset.meta, Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/Player/Commands.meta, Assets/Scripts/Player/Commands/IPlayerCommand.cs, Assets/Scripts/Player/Commands/IPlayerCommand.cs.meta, Assets/Scripts/Player/Commands/PlayerCommandContext.cs, Assets/Scripts/Player/Commands/PlayerCommandContext.cs.meta, Assets/Scripts/Player/Commands/PlayerCommandHandleResult.cs, Assets/Scripts/Player/Commands/PlayerCommandHandleResult.cs.meta, Assets/Scripts/Player/Commands/PlayerCommandResult.cs, Assets/Scripts/Player/Commands/PlayerCommandResult.cs.meta, Assets/Scripts/Player/Commands/PlayerCommandService.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs.meta, Assets/Scripts/Player/Commands/TeleportCommand.cs, Assets/Scripts/Player/Commands/TeleportCommand.cs.meta, Assets/Scripts/Player/Movement/PlayerTeleportUtility.cs, Assets/Scripts/Player/Movement/PlayerTeleportUtility.cs.meta, Assets/Scripts/Player/Ranks.meta, Assets/Scripts/Player/Ranks/PlayerRank.cs, Assets/Scripts/Player/Ranks/PlayerRank.cs.meta, Assets/Scripts/Player/Ranks/PlayerRankDatabase.cs, Assets/Scripts/Player/Ranks/PlayerRankDatabase.cs.meta, Assets/Scripts/Player/Ranks/PlayerRankService.cs, Assets/Scripts/Player/Ranks/PlayerRankService.cs.meta, Assets/Scripts/World/Minimap.cs
+- Diff: 1108 ++ / 38 --
+- Notes:
+  —
+---
 <!-- commit:4531a4a0882a455a595f4714168d403666eb1699 -->
 ## 2025-10-18T21:28:47+01:00 — Merge pull request #1217 from aicovergod/codex/update-ground-item-spawning-logic
 
