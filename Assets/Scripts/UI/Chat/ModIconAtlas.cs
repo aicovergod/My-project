@@ -89,6 +89,20 @@ namespace UI.Chat
                 return string.Empty;
 
             string trimmed = spriteName.Trim();
+
+            // Unity appends an extra numeric suffix (e.g. "_0") when sprites are sliced from a
+            // texture. Our moderator icons are stored as sliced sprites, so strip a trailing index
+            // whenever there is at least one additional underscore present. This leaves the actual
+            // icon identifier intact ("ModIcon_04_0" => "ModIcon_04").
+            int lastUnderscore = trimmed.LastIndexOf('_');
+            if (lastUnderscore > 0)
+            {
+                string suffix = trimmed.Substring(lastUnderscore + 1);
+                bool hasAnotherUnderscore = trimmed.IndexOf('_') != lastUnderscore;
+                if (hasAnotherUnderscore && int.TryParse(suffix, out _))
+                    trimmed = trimmed.Substring(0, lastUnderscore);
+            }
+
             int underscore = trimmed.LastIndexOf('_');
             if (underscore >= 0 && underscore < trimmed.Length - 1)
                 return trimmed.Substring(underscore + 1);
