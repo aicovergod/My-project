@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:68a99cd58b01173a873032042f87ead76feca668 -->
+## 2025-10-19T16:06:04+01:00 — Merge pull request #1228 from aicovergod/codex/fix-modicon-display-in-chatbox
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 52 ++ / 0 --
+- Notes:
+  Fix mod icon parsing
+---
+<!-- commit:e04c60b4ac062d7597589e725722bfc1d6198e6e -->
+## 2025-10-19T16:04:25+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:1f1fd19142e249102f33021afabafb404c39b2cc -->
 ## 2025-10-19T16:04:06+01:00 — Fix mod icon parsing
 
