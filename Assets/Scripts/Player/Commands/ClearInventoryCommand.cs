@@ -233,6 +233,20 @@ namespace Player.Commands
                 slots = new InventoryModel.SlotData[slotCount]
             };
 
+            // JsonUtility serialises null array elements as "null", which then restores as literal
+            // null slot references. InventoryModel expects each slot element to be a fully-instantiated
+            // object (matching CaptureState output) so downstream logic can safely dereference it
+            // without additional null guards. Populate each slot with an empty instance so offline
+            // wipes mirror the runtime capture format and avoid NullReferenceException when loading.
+            for (int i = 0; i < clearedData.slots.Length; i++)
+            {
+                clearedData.slots[i] = new InventoryModel.SlotData
+                {
+                    id = string.Empty,
+                    count = 0
+                };
+            }
+
             entry.value = JsonUtility.ToJson(clearedData);
             changed = true;
             return true;
