@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4ddc654f43de45d302bd3eeb949652f66a6d5e1d -->
+## 2025-10-19T11:12:22+01:00 — Merge pull request #1221 from aicovergod/codex/add-clearinv-command-for-inventory-clear
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 332 ++ / 0 --
+- Notes:
+  Add ::clearinv admin command
+---
+<!-- commit:d51ad8f1ae2879a93a8e174e4de12e4c3b2051b7 -->
+## 2025-10-19T11:12:14+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:34aba6e08faad1f23154b7e740e26a0a68b12042 -->
 ## 2025-10-19T11:11:58+01:00 — Add admin clear inventory command
 
