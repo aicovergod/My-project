@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:494cd89b81e9250f18c4e1fd0530cf3a6a07ae02 -->
+## 2025-10-19T11:00:35+01:00 — Merge pull request #1220 from aicovergod/codex/update-agents.md-with-system-information
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 0 --
+- Notes:
+  Document social systems in AGENTS
+---
+<!-- commit:3b739dc1e3ac576df473581b647695b01becf2dc -->
+## 2025-10-19T10:59:38+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b131acdc031a1ca03c285fc11cbc43cecb727fbe -->
 ## 2025-10-19T10:59:21+01:00 — Document social systems in AGENTS
 
