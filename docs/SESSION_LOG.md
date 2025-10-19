@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4d00a8d4e0cec65313369afbbcba73ce7dc8a5e0 -->
+## 2025-10-19T16:18:02+01:00 — Merge pull request #1229 from aicovergod/codex/add-modicons-before-character-name
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 91 ++ / 4 --
+- Notes:
+  Show mod icon beside chat input name
+---
+<!-- commit:399c79a9cd510c3626e74301656518a068906da1 -->
+## 2025-10-19T16:17:53+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:e84bd5f350d6f96e1a49045bc2a77f4a98bc1781 -->
 ## 2025-10-19T16:17:36+01:00 — Show mod icon beside chat input name
 
