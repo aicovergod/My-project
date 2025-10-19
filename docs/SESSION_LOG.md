@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f5e69bbdc4f90f33f19158bbddad5d330aa7f82d -->
+## 2025-10-19T16:25:11+01:00 — Merge pull request #1230 from aicovergod/codex/fix-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 39 ++ / 5 --
+- Notes:
+  Prevent moderator icon markup spoofing in chat messages
+---
+<!-- commit:3cef08d7d6b0090db76fc14f669df56549059b34 -->
+## 2025-10-19T16:24:32+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:969380622ff3354d197c4dc131da83e8ebb34d12 -->
 ## 2025-10-19T16:24:15+01:00 — Prevent chat messages from rendering mod icon markup
 
