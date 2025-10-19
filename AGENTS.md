@@ -61,6 +61,11 @@
   - `World/SceneTransitionManager` now owns additive scene swaps, persistent-object callbacks, spawn point routing, and fade timing. Use `SceneTransitionInteractable` to trigger transitions, populate `SceneTransitionManager.NextSpawnPoint`, and keep persistent services registered via `IScenePersistent` so they receive unload/load callbacks.
   - `World/Minimap` & `MinimapMarker` render the overworld HUD, `PopupText`/`PopupTextPool` feed floating world text, and `Environment/FenceColliderFoot` supplies nav blockers for fence kits.
   - Lighter NPC prefabs should include `NpcKnockbackReceiver` alongside `NpcWanderer` so damage-driven knockback eases displacement without breaking wander bounds. Heavy or boss NPCs can disable or omit the receiver to stay rooted.
+- **Social & Communication** (`Assets/Scripts/Social`, `Assets/Scripts/UI/Chat`, `Assets/Scripts/Systems/Commands`)
+  - A player ranking system tracks standings and should be extended by integrating with existing player progression hooks rather than duplicating XP/level queries.
+  - The in-game command system already resolves slash commands through the shared dispatcher—extend it by registering new command handlers under the established command catalog.
+  - A chat box system powers player communication UI, complete with emoji rendering; use its existing channels and filtering logic when wiring new social features.
+  - Emoji definitions are centralised for reuse across chat, commands, and rankings. Reference the emoji service instead of embedding sprite assets directly so updates propagate globally.
 - **UI Layer** (`Assets/Scripts/UI`, `Assets/Scripts/Player`, `Assets/Scripts/Status`)
   - HUDs such as `HealthHUD`, merge timers, tab buttons, and combat/skill overlays expect LegacyRuntime fonts and OSRS layout cues. `UI/PersistentEventSystem` maintains input modules across scenes.
   - `UI/MagicUI` is a `PersistentSceneSingleton` that builds the spellbook grid from `Resources/Spells`, caches strike spells for max-hit syncing, and drives the active spell/last selected spell state consumed by `CombatController` and `PlayerCombatLoadout`.
