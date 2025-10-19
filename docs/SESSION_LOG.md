@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:969380622ff3354d197c4dc131da83e8ebb34d12 -->
+## 2025-10-19T16:24:15+01:00 — Prevent chat messages from rendering mod icon markup
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/UI/Chat/EmojiMarkupParser.cs, Assets/Tests/UI/EmojiMarkupParserTests.cs
+- Diff: 30 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:4d00a8d4e0cec65313369afbbcba73ce7dc8a5e0 -->
 ## 2025-10-19T16:18:02+01:00 — Merge pull request #1229 from aicovergod/codex/add-modicons-before-character-name
 
