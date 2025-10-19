@@ -243,7 +243,8 @@ namespace Player.Chat
             var anchorTransform = floatingTextAnchorCache.anchor != null ? floatingTextAnchorCache.anchor : transform;
             // Preserve the resolved spawn location while ensuring the popup tracks the anchor each frame.
             Vector3 followOffset = position - anchorTransform.position;
-            var tokens = EmojiMarkupParser.Parse(message ?? string.Empty);
+            // Chat prefixes control moderator icon rendering, so keep speech bubbles free of badge markup to prevent spoofing.
+            var tokens = EmojiMarkupParser.Parse(message ?? string.Empty, allowModeratorIcons: false);
             FloatingText.ShowAnchored(tokens, anchorTransform, followOffset, Color.white);
         }
 

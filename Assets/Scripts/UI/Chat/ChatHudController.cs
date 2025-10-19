@@ -867,7 +867,8 @@ namespace UI.Chat
                 return;
 
             string text = inputField != null ? inputField.text ?? string.Empty : string.Empty;
-            var tokens = EmojiMarkupParser.Parse(text);
+            // Prevent moderator badge markup from rendering in the live preview so non-moderators cannot spoof icons while typing.
+            var tokens = EmojiMarkupParser.Parse(text, allowModeratorIcons: false);
             inputPreviewRenderer.RenderTokens(tokens, LocalPlayerMessageColor, 16, TextAnchor.MiddleLeft);
         }
 
@@ -1311,7 +1312,9 @@ namespace UI.Chat
                 var row = GetRow(i);
                 var message = mergedMessages[i];
                 var prefixTokens = BuildMessagePrefixTokens(message);
-                var messageTokens = EmojiMarkupParser.Parse(message.Text ?? string.Empty, EmojiAtlas.Instance, ModIconAtlas.Instance);
+                // Moderator icons are injected via the prefix when authorised. Disable them in the body so arbitrary markup
+                // cannot create fake badges.
+                var messageTokens = EmojiMarkupParser.Parse(message.Text ?? string.Empty, EmojiAtlas.Instance, allowModeratorIcons: false);
                 row.SetTokens(prefixTokens, messageTokens, ResolveMessageColor(message));
             }
 

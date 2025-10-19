@@ -18,8 +18,12 @@ namespace UI.Chat
         /// <param name="text">Raw chat text potentially containing emoji markup.</param>
         /// <param name="emojiAtlas">Emoji atlas used for <c>&lt;emoji=...&gt;</c> sprite lookups. Defaults to <see cref="EmojiAtlas.Instance"/>.</param>
         /// <param name="modIconAtlas">Moderator icon atlas used for <c>&lt;ModIcon=...&gt;</c> sprite lookups. Defaults to <see cref="ModIconAtlas.Instance"/>.</param>
+        /// <param name="allowModeratorIcons">
+        /// When <c>true</c>, <c>&lt;ModIcon=...&gt;</c> markup will resolve into sprite tokens; otherwise the markup remains literal
+        /// text so players cannot spoof moderator badges within unrestricted message fields.
+        /// </param>
         /// <returns>List of tokens describing the message content.</returns>
-        public static List<EmojiMarkupToken> Parse(string text, IEmojiAtlas emojiAtlas = null, IEmojiAtlas modIconAtlas = null)
+        public static List<EmojiMarkupToken> Parse(string text, IEmojiAtlas emojiAtlas = null, IEmojiAtlas modIconAtlas = null, bool allowModeratorIcons = true)
         {
             var result = new List<EmojiMarkupToken>();
 
@@ -27,7 +31,10 @@ namespace UI.Chat
                 return result;
 
             emojiAtlas ??= EmojiAtlas.Instance;
-            modIconAtlas ??= ModIconAtlas.Instance;
+            if (allowModeratorIcons)
+                modIconAtlas ??= ModIconAtlas.Instance;
+            else
+                modIconAtlas = null;
             var builder = new StringBuilder();
 
             for (int i = 0; i < text.Length; i++)
