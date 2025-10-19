@@ -17,7 +17,7 @@ namespace Player.Commands
 
         private PlayerCommandResult(bool success, PlayerCommandFailureReason reason, string message)
         {
-            Success = success;
+            IsSuccessful = success;
             FailureReason = reason;
             Message = message;
         }
@@ -25,7 +25,7 @@ namespace Player.Commands
         /// <summary>
         /// Indicates whether the command executed successfully.
         /// </summary>
-        public bool Success { get; }
+        public bool IsSuccessful { get; }
 
         /// <summary>
         /// Categorises why a command failed. <see cref="PlayerCommandFailureReason.None"/> when successful.
