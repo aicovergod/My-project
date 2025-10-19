@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c2216fc7d9680ea1386800128f05a49b50fc2fac -->
+## 2025-10-19T12:06:44+01:00 — Add developer commands for item, level, and XP overrides
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Player/Commands/GiveItemCommand.cs, Assets/Scripts/Player/Commands/GiveXpCommand.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs, Assets/Scripts/Player/Commands/SetSkillLevelCommand.cs
+- Diff: 246 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:bd78ae7d4d6d7eedf6adf5d4d91463363fe0da26 -->
 ## 2025-10-19T11:40:28+01:00 — Merge pull request #1224 from aicovergod/codex/add-maxstats-command-for-developers
 
