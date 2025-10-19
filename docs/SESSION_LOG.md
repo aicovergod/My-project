@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d3893b932e1d99d386d3f0b0a8cf0c12a240beb4 -->
+## 2025-10-20T00:34:06+01:00 — Add developer save profile command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Commands/PlayerCommandService.cs, Assets/Scripts/Player/Commands/SaveProfileCommand.cs
+- Diff: 43 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a0223304b692934f9d708547484cc15bdd11827c -->
 ## 2025-10-19T23:15:32+01:00 — Merge pull request #1231 from aicovergod/codex/add-commandslistcommand-and-expose-command-list
 
