@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a0223304b692934f9d708547484cc15bdd11827c -->
+## 2025-10-19T23:15:32+01:00 — Merge pull request #1231 from aicovergod/codex/add-commandslistcommand-and-expose-command-list
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 115 ++ / 0 --
+- Notes:
+  Add support command to list available player commands
+---
+<!-- commit:6de19ca3d0a18cfc6e301817cb2dff29538b86c4 -->
+## 2025-10-19T23:15:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f828bb9922992744c49833d9f1821898332a697f -->
 ## 2025-10-19T23:15:03+01:00 — Add commands list player chat command
 
