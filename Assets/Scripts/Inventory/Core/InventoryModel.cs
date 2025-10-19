@@ -374,6 +374,35 @@ namespace Inventory.Core
         }
 
         /// <summary>
+        /// Clears every slot in the inventory and raises change notifications when any
+        /// entries were removed.
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> when at least one slot transitioned from occupied to empty;
+        /// otherwise, <c>false</c> to indicate the inventory was already empty.
+        /// </returns>
+        public bool ClearAllSlots()
+        {
+            bool clearedAny = false;
+
+            for (int i = 0; i < slots.Length; i++)
+            {
+                var entry = slots[i];
+                if (entry.item == null && entry.count <= 0)
+                    continue;
+
+                slots[i] = default;
+                SlotChanged?.Invoke(i, slots[i]);
+                clearedAny = true;
+            }
+
+            if (clearedAny)
+                RaiseInventoryChanged(true);
+
+            return clearedAny;
+        }
+
+        /// <summary>
         /// Removes a quantity from the specified slot without dropping it in the
         /// world.
         /// </summary>

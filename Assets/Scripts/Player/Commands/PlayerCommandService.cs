@@ -168,6 +168,7 @@ namespace Player.Commands
         private void RegisterBuiltInCommands()
         {
             RegisterCommand(new BankCommand());
+            RegisterCommand(new ClearInventoryCommand());
             RegisterCommand(new TeleportCommand());
         }
 

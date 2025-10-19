@@ -250,6 +250,17 @@ namespace Inventory
         }
 
         /// <summary>
+        /// Removes all items from the inventory, persisting the change when any slots
+        /// transition from occupied to empty.
+        /// </summary>
+        /// <returns><c>true</c> when one or more slots were cleared; otherwise <c>false</c>.</returns>
+        public bool ClearAllSlots()
+        {
+            EnsureModelInitialized();
+            return Model.ClearAllSlots();
+        }
+
+        /// <summary>
         /// Equip the item in the given inventory slot if possible.
         /// </summary>
         public bool EquipItem(int index)
