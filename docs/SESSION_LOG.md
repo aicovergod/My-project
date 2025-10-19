@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e84bd5f350d6f96e1a49045bc2a77f4a98bc1781 -->
+## 2025-10-19T16:17:36+01:00 — Show mod icon beside chat input name
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 82 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:68a99cd58b01173a873032042f87ead76feca668 -->
 ## 2025-10-19T16:06:04+01:00 — Merge pull request #1228 from aicovergod/codex/fix-modicon-display-in-chatbox
 
