@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f828bb9922992744c49833d9f1821898332a697f -->
+## 2025-10-19T23:15:03+01:00 — Add commands list player chat command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Commands/CommandsListCommand.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs
+- Diff: 106 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f5e69bbdc4f90f33f19158bbddad5d330aa7f82d -->
 ## 2025-10-19T16:25:11+01:00 — Merge pull request #1230 from aicovergod/codex/fix-bug
 
