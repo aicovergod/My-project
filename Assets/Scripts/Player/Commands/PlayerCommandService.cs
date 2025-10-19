@@ -149,7 +149,7 @@ namespace Player.Commands
                 ? $"::{command.Name} completed."
                 : commandResult.Message;
 
-            if (commandResult.Success)
+            if (commandResult.IsSuccessful)
             {
                 PublishGameMessage(response);
                 return new PlayerCommandHandleResult(true, true, PlayerCommandServiceError.None, response);

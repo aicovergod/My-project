@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c6593d786a4a4ca06618ea4a9653b97e38169b31 -->
+## 2025-10-19T15:36:19+01:00 — Fix PlayerCommandResult success naming conflict
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Commands/PlayerCommandResult.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs
+- Diff: 3 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:8a4e7037369d599ab25df049ca76d168abd996ab -->
 ## 2025-10-19T12:07:16+01:00 — Merge pull request #1225 from aicovergod/codex/add-developer-commands-for-player-actions
 
