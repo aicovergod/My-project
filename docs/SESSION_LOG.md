@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b131acdc031a1ca03c285fc11cbc43cecb727fbe -->
+## 2025-10-19T10:59:21+01:00 — Document social systems in AGENTS
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): AGENTS.md
+- Diff: 5 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:77abb2d9e27f91dfd503e9e00e95de52b1cda4cd -->
 ## 2025-10-19T10:55:32+01:00 — Merge pull request #1219 from aicovergod/codex/add-bank-command-for-admins
 
