@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:bf05a8cc0bf4749461cf95706f2bba3c5d5f5c1d -->
+## 2025-10-19T11:20:29+01:00 — Add admin command to clear banks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Commands/ClearBankCommand.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs
+- Diff: 296 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:4ddc654f43de45d302bd3eeb949652f66a6d5e1d -->
 ## 2025-10-19T11:12:22+01:00 — Merge pull request #1221 from aicovergod/codex/add-clearinv-command-for-inventory-clear
 
