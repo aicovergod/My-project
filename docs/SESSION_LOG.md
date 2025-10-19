@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ef9250dbb0265d28dafc60b1f75e32ed2d0a1cbd -->
+## 2025-10-19T11:34:25+01:00 — Add developer max stats command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Commands/MaxStatsCommand.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs
+- Diff: 111 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:34ceb954f430372ad87c5ceed0be52aa097d468e -->
 ## 2025-10-19T11:26:09+01:00 — Merge pull request #1223 from aicovergod/codex/fix-this-error-gs9rif
 
