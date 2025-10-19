@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9b0e41ad057a3ecb24912709bcfa4f38487a8e78 -->
+## 2025-10-19T11:25:42+01:00 — Fix offline inventory clearing slot initialisation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Player/Commands/ClearInventoryCommand.cs
+- Diff: 14 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:530533dfacc7e59c53d53a7ace9726235011ac35 -->
 ## 2025-10-19T11:20:58+01:00 — Merge pull request #1222 from aicovergod/codex/add-clearbank-command-functionality
 
