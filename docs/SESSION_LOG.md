@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:973adc37d38e8eeaab66d1b5eee9a441d4d74393 -->
+## 2025-10-19T15:56:49+01:00 — Merge pull request #1227 from aicovergod/codex/add-moderator-icons-to-chat-messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 295 ++ / 36 --
+- Notes:
+  Add moderator icons to chat HUD prefixes
+---
+<!-- commit:568e5d2fb0903a6de46f8f0b65d0e9c3f8b7424c -->
+## 2025-10-19T15:56:43+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:88ece5ba431ecf03342de6a4d7b89b8e6651fe3b -->
 ## 2025-10-19T15:56:26+01:00 — Add moderator icons to chat prefix
 
