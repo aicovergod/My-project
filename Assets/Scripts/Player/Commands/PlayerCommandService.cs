@@ -170,6 +170,7 @@ namespace Player.Commands
             RegisterCommand(new BankCommand());
             RegisterCommand(new ClearBankCommand());
             RegisterCommand(new ClearInventoryCommand());
+            RegisterCommand(new MaxStatsCommand());
             RegisterCommand(new TeleportCommand());
         }
 
