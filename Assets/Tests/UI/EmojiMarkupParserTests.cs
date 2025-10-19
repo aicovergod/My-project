@@ -51,6 +51,20 @@ namespace Tests.UI
             Assert.That(tokens[2].Text, Is.EqualTo(" check"));
         }
 
+        [Test]
+        public void Parse_ModIconMarkupDisabledTreatsTagAsLiteral()
+        {
+            const string message = "Rank <ModIcon=02> check";
+            var emojiAtlas = new StubAtlas();
+            var modIconAtlas = new StubAtlas("02");
+            var tokens = EmojiMarkupParser.Parse(message, emojiAtlas, modIconAtlas, allowModeratorIcons: false);
+
+            Assert.That(tokens, Is.Not.Null);
+            Assert.That(tokens.Count, Is.EqualTo(1));
+            Assert.That(tokens[0].IsText, Is.True);
+            Assert.That(tokens[0].Text, Is.EqualTo(message));
+        }
+
         private sealed class StubAtlas : IEmojiAtlas
         {
             private readonly Dictionary<string, EmojiSpriteDefinition> entries = new Dictionary<string, EmojiSpriteDefinition>();
