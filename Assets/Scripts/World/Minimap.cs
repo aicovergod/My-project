@@ -7,7 +7,7 @@ using BankSystem;
 using ShopSystem;
 using Player;
 using UnityEngine.EventSystems;
-using Pets;
+using Player.Movement;
 using UI.Utilities;
 using UI.Chat;
 #if ENABLE_INPUT_SYSTEM
@@ -547,48 +547,18 @@ namespace World
         private void TeleportPlayerTo(Vector3 worldPosition)
         {
             var mover = cachedPlayerMover;
-            if (mover == null)
-            {
-                GameObject playerObj = target != null ? target.gameObject : GameObject.FindGameObjectWithTag("Player");
-                if (playerObj != null)
-                {
-                    // Cache the mover so future teleports do not have to repeat the lookup.
-                    mover = playerObj.GetComponent<PlayerMover>();
-                    target = playerObj.transform;
-                    cachedPlayerMover = mover;
-                }
-            }
+            var playerTransform = target;
 
-            if (mover == null)
+            if (!PlayerTeleportUtility.TryTeleportPlayer(worldPosition, ref mover, ref playerTransform, out string errorMessage))
             {
-                Debug.LogWarning("Minimap debug teleport requested but no PlayerMover could be found.");
+                Debug.LogWarning(string.IsNullOrEmpty(errorMessage)
+                    ? "Minimap debug teleport failed because no PlayerMover could be located."
+                    : $"Minimap debug teleport failed: {errorMessage}");
                 return;
             }
 
-            // Halt any ongoing locomotion so we do not carry momentum into the new position.
-            mover.StopMovement();
-
-            Transform playerTransform = mover.transform;
-            Vector3 currentPosition = playerTransform.position;
-            // Preserve the existing Z value so sprite sorting layers remain correct.
-            Vector3 newPosition = new Vector3(worldPosition.x, worldPosition.y, currentPosition.z);
-            playerTransform.position = newPosition;
-
-            GameObject pet = PetDropSystem.ActivePetObject;
-            if (pet != null)
-            {
-                // Drop the pet alongside the player so it resumes following without a sudden snap.
-                Vector3 petPosition = newPosition + Vector3.right * 0.5f;
-                petPosition.z = pet.transform.position.z;
-                pet.transform.position = petPosition;
-
-                var follower = pet.GetComponent<PetFollower>();
-                if (follower != null)
-                    follower.SetPlayer(playerTransform);
-            }
-
-            // Persist the new location to keep autosaves and relogging in sync with the teleport.
-            mover.SavePosition();
+            cachedPlayerMover = mover;
+            target = playerTransform;
         }
 
         private void ZoomIn()

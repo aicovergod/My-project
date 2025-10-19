@@ -1,5 +1,6 @@
 using Core.Input;
 using Player;
+using Player.Commands;
 using UI;
 using UI.Chat;
 using UI.Utilities;
@@ -190,6 +191,24 @@ namespace Player.Chat
             }
 
             string sender = chatService.ActiveUsername;
+
+            var commandService = PlayerCommandService.Instance;
+            PlayerCommandHandleResult commandResult = commandService != null
+                ? commandService.ProcessChatMessage(sender, message)
+                : (IsPotentialCommand(message)
+                    ? new PlayerCommandHandleResult(true, false, PlayerCommandServiceError.ServiceUnavailable, "Command service is unavailable.")
+                    : PlayerCommandHandleResult.NotACommand());
+
+            if (commandResult.IsCommand)
+            {
+                if (commandResult.Error == PlayerCommandServiceError.ServiceUnavailable && !string.IsNullOrEmpty(commandResult.FeedbackMessage))
+                    chatService.PublishGameMessage(commandResult.FeedbackMessage);
+
+                chatHud.CancelInput();
+                ReleaseModalLock();
+                return;
+            }
+
             chatService.PublishPublicMessage(sender, message);
             SpawnFloatingSpeech(message);
 
@@ -232,6 +251,14 @@ namespace Player.Chat
         {
             if (modalLock.IsLocked)
                 modalLock.Release();
+        }
+
+        private static bool IsPotentialCommand(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                return false;
+
+            return message.TrimStart().StartsWith("::", System.StringComparison.Ordinal);
         }
     }
 }
