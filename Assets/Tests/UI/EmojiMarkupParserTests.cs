@@ -35,6 +35,22 @@ namespace Tests.UI
             Assert.That(tokens[0].Text, Is.EqualTo(message));
         }
 
+        [Test]
+        public void Parse_ModIconMarkupProducesSpriteToken()
+        {
+            var emojiAtlas = new StubAtlas();
+            var modIconAtlas = new StubAtlas("02");
+            var tokens = EmojiMarkupParser.Parse("Rank <ModIcon=02> check", emojiAtlas, modIconAtlas);
+
+            Assert.That(tokens, Is.Not.Null);
+            Assert.That(tokens.Count, Is.EqualTo(3));
+            Assert.That(tokens[0].IsText, Is.True);
+            Assert.That(tokens[1].IsEmoji, Is.True);
+            Assert.That(tokens[1].Emoji.Key, Is.EqualTo("02"));
+            Assert.That(tokens[2].IsText, Is.True);
+            Assert.That(tokens[2].Text, Is.EqualTo(" check"));
+        }
+
         private sealed class StubAtlas : IEmojiAtlas
         {
             private readonly Dictionary<string, EmojiSpriteDefinition> entries = new Dictionary<string, EmojiSpriteDefinition>();
