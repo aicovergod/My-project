@@ -64,6 +64,21 @@ namespace Player.Commands
         }
 
         /// <summary>
+        /// Provides an alphabetically sorted snapshot of the currently registered commands.
+        /// </summary>
+        /// <returns>
+        /// A new <see cref="IReadOnlyList{T}"/> containing the registered commands sorted by their
+        /// <see cref="IPlayerCommand.Name"/> token so callers can safely iterate without mutating the
+        /// internal lookup.
+        /// </returns>
+        public IReadOnlyList<IPlayerCommand> GetRegisteredCommands()
+        {
+            var snapshot = new List<IPlayerCommand>(commandLookup.Values);
+            snapshot.Sort((left, right) => string.Compare(left.Name, right.Name, StringComparison.OrdinalIgnoreCase));
+            return snapshot;
+        }
+
+        /// <summary>
         /// Inspects the supplied chat message and executes it as a command when appropriate.
         /// </summary>
         public PlayerCommandHandleResult ProcessChatMessage(string sender, string message)
@@ -167,6 +182,7 @@ namespace Player.Commands
 
         private void RegisterBuiltInCommands()
         {
+            RegisterCommand(new CommandsListCommand(PlayerCommandService.Instance, PlayerRankService.Instance));
             RegisterCommand(new BankCommand());
             RegisterCommand(new ClearBankCommand());
             RegisterCommand(new ClearInventoryCommand());
