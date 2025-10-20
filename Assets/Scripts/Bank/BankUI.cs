@@ -489,6 +489,12 @@ namespace BankSystem
 
         public void ShowDepositMenu(int invIndex, Vector2 position)
         {
+            if (!ResolvePlayerInventory())
+            {
+                depositMenu?.Hide();
+                return;
+            }
+
             depositMenu?.Show(this, invIndex, position);
         }
 
@@ -504,7 +510,7 @@ namespace BankSystem
 
         public void PromptDepositAmount(int invIndex)
         {
-            if (playerInventory == null)
+            if (!ResolvePlayerInventory())
                 return;
             var entry = playerInventory.GetSlot(invIndex);
             if (entry.item == null)
@@ -654,7 +660,7 @@ namespace BankSystem
 
         public bool DepositFromInventory(int invIndex)
         {
-            if (playerInventory == null)
+            if (!ResolvePlayerInventory())
                 return false;
             var entry = playerInventory.GetSlot(invIndex);
             return DepositFromInventory(invIndex, entry.count);
@@ -662,7 +668,7 @@ namespace BankSystem
 
         public bool DepositAllFromInventory(int invIndex)
         {
-            if (playerInventory == null)
+            if (!ResolvePlayerInventory())
                 return false;
             var entry = playerInventory.GetSlot(invIndex);
             if (entry.item == null)
@@ -673,7 +679,7 @@ namespace BankSystem
 
         public bool DepositFromInventory(int invIndex, int amount)
         {
-            if (playerInventory == null)
+            if (!ResolvePlayerInventory())
                 return false;
 
             var entry = playerInventory.GetSlot(invIndex);
