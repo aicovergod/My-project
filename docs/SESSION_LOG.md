@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a433c5b53909f994db9ef803da9b3d2266188fb4 -->
+## 2025-10-20T15:39:42+01:00 — Merge pull request #1234 from aicovergod/codex/update-depositfrominventory-for-batching-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 13 ++ / 3 --
+- Notes:
+  Batch bank deposit saves
+---
+<!-- commit:b6fbe5565feadaa52b39ea3b82f6148ac9e08773 -->
+## 2025-10-20T15:39:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d50cc7cc997ffdfd1c3b9f67e489e79d077aa315 -->
 ## 2025-10-20T15:39:07+01:00 — Adjust bank deposit batching save
 
