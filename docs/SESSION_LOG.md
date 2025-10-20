@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d50cc7cc997ffdfd1c3b9f67e489e79d077aa315 -->
+## 2025-10-20T15:39:07+01:00 — Adjust bank deposit batching save
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Bank/BankUI.cs
+- Diff: 4 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:28f2a62d1384ad0b4f8ab7c55d88b15675fcf9df -->
 ## 2025-10-20T11:27:33+01:00 — Merge pull request #1233 from aicovergod/codex/fix-this
 
