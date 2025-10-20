@@ -686,6 +686,7 @@ namespace BankSystem
             int available = playerInventory.GetItemCount(entry.item);
             int totalRequested = Mathf.Min(amount, available);
             int deposited = 0;
+            bool depositedAny = false;
 
             // Deposit from the originally selected slot first so the item the
             // player clicked is removed before searching other slots.
@@ -697,8 +698,8 @@ namespace BankSystem
                     goto FinishDeposit; // bank can no longer accept items
 
                 playerInventory.RemoveFromSlot(invIndex, added);
-                SaveState();
                 deposited += added;
+                depositedAny = true;
                 toDeposit = Mathf.Min(playerInventory.GetSlot(invIndex).count,
                                       totalRequested - deposited);
             }
@@ -721,8 +722,8 @@ namespace BankSystem
                         goto FinishDeposit;
 
                     playerInventory.RemoveFromSlot(i, added);
-                    SaveState();
                     deposited += added;
+                    depositedAny = true;
                     slot = playerInventory.GetSlot(i);
                     toDeposit = Mathf.Min(slot.item == entry.item ? slot.count : 0,
                                            totalRequested - deposited);
@@ -730,7 +731,7 @@ namespace BankSystem
             }
 
         FinishDeposit:
-            if (deposited > 0)
+            if (depositedAny)
                 SaveState();
 
             // Return true only if the full requested amount was deposited.
