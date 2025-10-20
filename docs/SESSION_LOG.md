@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2ba7eb091ee5e8dc5ace9afc578c1b7e52b413da -->
+## 2025-10-20T15:59:14+01:00 — Merge pull request #1235 from aicovergod/codex/update-bank-deposit-methods-for-inventory-resolution
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 4 --
+- Notes:
+  Ensure bank deposit flows re-resolve player inventory
+---
+<!-- commit:14540276dbf3fe2fbd3fba3039cfec0d8ddc58f8 -->
+## 2025-10-20T15:59:06+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ae0e1c146ce70993c1ea7dcf77c2f15ef69160d7 -->
 ## 2025-10-20T15:58:51+01:00 — Ensure bank deposits re-resolve player inventory
 
