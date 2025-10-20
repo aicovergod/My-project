@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ae0e1c146ce70993c1ea7dcf77c2f15ef69160d7 -->
+## 2025-10-20T15:58:51+01:00 — Ensure bank deposits re-resolve player inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Bank/BankUI.cs
+- Diff: 10 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:a433c5b53909f994db9ef803da9b3d2266188fb4 -->
 ## 2025-10-20T15:39:42+01:00 — Merge pull request #1234 from aicovergod/codex/update-depositfrominventory-for-batching-logic
 
