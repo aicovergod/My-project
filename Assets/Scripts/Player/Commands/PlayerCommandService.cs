@@ -22,6 +22,7 @@ namespace Player.Commands
 
         private PlayerRankService rankService;
         private ChatService chatService;
+        private bool commandsListRegistered;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -49,6 +50,7 @@ namespace Player.Commands
         {
             commandLookup.Clear();
             tokenBuffer.Clear();
+            commandsListRegistered = false;
             base.OnSingletonDestroyed();
         }
 
@@ -182,7 +184,7 @@ namespace Player.Commands
 
         private void RegisterBuiltInCommands()
         {
-            RegisterCommand(new CommandsListCommand(PlayerCommandService.Instance, PlayerRankService.Instance));
+            // Commands that do not depend on other services can be created immediately.
             RegisterCommand(new BankCommand());
             RegisterCommand(new ClearBankCommand());
             RegisterCommand(new ClearInventoryCommand());
@@ -192,14 +194,38 @@ namespace Player.Commands
             RegisterCommand(new SaveProfileCommand());
             RegisterCommand(new SetSkillLevelCommand());
             RegisterCommand(new TeleportCommand());
+
+            // The ::commands helper requires a populated PlayerRankService instance. Delay its
+            // registration until the rank service is available so we do not trigger an
+            // ArgumentNullException while the bootstrap sequence is still resolving services.
+            TryRegisterCommandsListCommand();
+        }
+
+        /// <summary>
+        /// Ensures the <c>::commands</c> helper is only registered once the rank service is ready.
+        /// </summary>
+        private void TryRegisterCommandsListCommand()
+        {
+            if (commandsListRegistered)
+                return;
+
+            if (rankService == null)
+                return;
+
+            RegisterCommand(new CommandsListCommand(this, rankService));
+            commandsListRegistered = true;
         }
 
         private void EnsureServices()
         {
+            bool hadRankService = rankService != null;
             if (rankService == null)
                 rankService = PlayerRankService.Instance;
             if (chatService == null)
                 chatService = ChatService.Instance;
+
+            if (!hadRankService && rankService != null)
+                TryRegisterCommandsListCommand();
         }
 
         private void PublishGameMessage(string message)
