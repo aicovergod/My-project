@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7dfa1afa3df87abae7b03e41022119973604f533 -->
+## 2025-10-21T22:33:02+01:00 — Refactor mining HUD and add companion overlay
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Skills/Mining/UI/CompanionMiningHUD.cs, Assets/Scripts/Skills/Mining/UI/CompanionMiningHUD.cs.meta, Assets/Scripts/Skills/Mining/UI/MiningHudBase.cs, Assets/Scripts/Skills/Mining/UI/MiningHudBase.cs.meta, Assets/Scripts/Skills/Mining/UI/MiningUI.cs
+- Diff: 423 ++ / 147 --
+- Notes:
+  —
+---
 <!-- commit:da3d4a9c5d312287b92eca4c2a4e5b3a6b7eed77 -->
 ## 2025-10-21T22:20:40+01:00 — Merge pull request #1260 from aicovergod/codex/fix-pet-inventory-full-message
 
