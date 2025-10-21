@@ -25,6 +25,7 @@ namespace Companions
             cachedDefinition.hideFlags = HideFlags.HideAndDontSave;
             cachedDefinition.id = "Companion";
             cachedDefinition.displayName = "Companion";
+            cachedDefinition.possessivePronoun = "their";
             cachedDefinition.hasInventory = false;
             cachedDefinition.canFight = true;
             cachedDefinition.petAttackLevel = 1;

@@ -2,6 +2,7 @@ using System;
 using Combat;
 using Pets;
 using Skills;
+using UI.Chat;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -535,6 +536,50 @@ namespace Companions
         private static void HandleSkillLevelChanged(SkillType skill, int level)
         {
             UpdateCombatLevel();
+            PublishCompanionLevelUpMessage(skill, level);
+        }
+
+        /// <summary>
+        /// Broadcasts a companion-channel chat message whenever the active companion levels a skill.
+        /// </summary>
+        /// <param name="skill">Skill that gained a level.</param>
+        /// <param name="level">Resulting companion level.</param>
+        private static void PublishCompanionLevelUpMessage(SkillType skill, int level)
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string companionName = ResolveCompanionName();
+            string pronoun = ResolveCompanionPronoun();
+            string skillName = SkillNameUtility.GetSentenceName(skill);
+            string message = $"Just levelled up {pronoun} {skillName} to level {level}!";
+            chat.PublishCompanionMessage(companionName, message);
+        }
+
+        /// <summary>
+        /// Resolves the companion name used for chat output, falling back to a generic label when
+        /// no runtime definition is available.
+        /// </summary>
+        private static string ResolveCompanionName()
+        {
+            if (activeDefinition != null && !string.IsNullOrWhiteSpace(activeDefinition.displayName))
+                return activeDefinition.displayName;
+
+            return "Companion";
+        }
+
+        /// <summary>
+        /// Determines which possessive pronoun the current companion prefers for chat messaging.
+        /// Defaults to a neutral pronoun so messages remain grammatically correct when definitions
+        /// do not provide explicit data.
+        /// </summary>
+        private static string ResolveCompanionPronoun()
+        {
+            if (activeDefinition != null && !string.IsNullOrWhiteSpace(activeDefinition.possessivePronoun))
+                return activeDefinition.possessivePronoun.ToLowerInvariant();
+
+            return "their";
         }
 
         /// <summary>
