@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:81a1816b742b8135c845b09276cf29cc65a10a60 -->
+## 2025-10-21T11:54:22+01:00 — Merge pull request #1237 from aicovergod/codex/add-companion-system-to-pet-architecture
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1478 ++ / 76 --
+- Notes:
+  Add companion system alongside existing pets
+---
+<!-- commit:59b1d2a5bcb56f02be3923c11225646c07f2c239 -->
+## 2025-10-21T11:53:59+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:4753e1154f4c65a9938caa48724b69813c072868 -->
 ## 2025-10-21T11:53:17+01:00 — Add companion system alongside existing pets
 
