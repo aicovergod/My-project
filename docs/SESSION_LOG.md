@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:27b684470fdaea136807e0e3b4e50a59b65002d6 -->
+## 2025-10-21T17:15:39+01:00 — Implement companion melee XP randomization and logging toggle
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 70 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:52e43693a6c89c678fd03bfbddaa1dc5277ac9a1 -->
 ## 2025-10-21T16:51:12+01:00 — Merge pull request #1247 from aicovergod/codex/extend-pet-spawn-with-auto-return-option
 

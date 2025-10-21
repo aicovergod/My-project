@@ -46,6 +46,14 @@ namespace Companions
         /// <summary>Provides access to the configured inventory wrapper.</summary>
         public CompanionInventory Inventory => companionInventory;
 
+        /// <summary>Pool of combat skills eligible for melee XP rolls.</summary>
+        private static readonly SkillType[] MeleeXpSkills =
+        {
+            SkillType.Attack,
+            SkillType.Strength,
+            SkillType.Defence
+        };
+
         /// <summary>
         /// Configures the companion by wiring the follower, skill manager, combat overrides, and inventory.
         /// </summary>
@@ -119,11 +127,17 @@ namespace Companions
             if (damage <= 0 || skillManager == null)
                 return;
 
-            skillManager.AddXP(SkillType.Hitpoints, damage * 1.33f);
+            float hitpointsXp = damage * 1.33f;
+            skillManager.AddXP(SkillType.Hitpoints, hitpointsXp);
+            if (CompanionManager.EnableDebugLogging)
+                Debug.Log($"[Companion XP] Awarded {hitpointsXp:0.##} Hitpoints XP from {damage} damage ({type}).");
 
             if (type == DamageType.Magic)
             {
-                skillManager.AddXP(SkillType.Magic, 4 * damage);
+                float magicXp = 4f * damage;
+                skillManager.AddXP(SkillType.Magic, magicXp);
+                if (CompanionManager.EnableDebugLogging)
+                    Debug.Log($"[Companion XP] Awarded {magicXp:0.##} Magic XP from {damage} magic damage.");
                 return;
             }
 
@@ -138,25 +152,49 @@ namespace Companions
                         float split = total * 0.5f;
                         skillManager.AddXP(SkillType.Ranged, split);
                         skillManager.AddXP(SkillType.Defence, split);
+                        if (CompanionManager.EnableDebugLogging)
+                            Debug.Log($"[Companion XP] Split ranged XP ({style}) -> {split:0.##} Ranged / {split:0.##} Defence from {damage} damage.");
                         break;
                     default:
                         skillManager.AddXP(SkillType.Ranged, total);
+                        if (CompanionManager.EnableDebugLogging)
+                            Debug.Log($"[Companion XP] Awarded {total:0.##} Ranged XP from {damage} ranged damage using {style} style.");
                         break;
                 }
 
                 return;
             }
 
+            if (type == DamageType.Melee)
+            {
+                float combatXp = 4f * damage;
+                int selectedIndex = UnityEngine.Random.Range(0, MeleeXpSkills.Length);
+                SkillType awardedSkill = MeleeXpSkills[selectedIndex];
+                skillManager.AddXP(awardedSkill, combatXp);
+                if (CompanionManager.EnableDebugLogging)
+                    Debug.Log($"[Companion XP] Random melee roll awarded {combatXp:0.##} XP to {awardedSkill} from {damage} damage (style {style}).");
+                return;
+            }
+
             switch (style)
             {
                 case CombatStyle.Accurate:
-                    skillManager.AddXP(SkillType.Attack, 4 * damage);
+                    float accurateXp = 4f * damage;
+                    skillManager.AddXP(SkillType.Attack, accurateXp);
+                    if (CompanionManager.EnableDebugLogging)
+                        Debug.Log($"[Companion XP] Awarded {accurateXp:0.##} Attack XP from {damage} damage via Accurate style.");
                     break;
                 case CombatStyle.Aggressive:
-                    skillManager.AddXP(SkillType.Strength, 4 * damage);
+                    float aggressiveXp = 4f * damage;
+                    skillManager.AddXP(SkillType.Strength, aggressiveXp);
+                    if (CompanionManager.EnableDebugLogging)
+                        Debug.Log($"[Companion XP] Awarded {aggressiveXp:0.##} Strength XP from {damage} damage via Aggressive style.");
                     break;
                 case CombatStyle.Defensive:
-                    skillManager.AddXP(SkillType.Defence, 4 * damage);
+                    float defensiveXp = 4f * damage;
+                    skillManager.AddXP(SkillType.Defence, defensiveXp);
+                    if (CompanionManager.EnableDebugLogging)
+                        Debug.Log($"[Companion XP] Awarded {defensiveXp:0.##} Defence XP from {damage} damage via Defensive style.");
                     break;
                 case CombatStyle.Controlled:
                     float total = 4f * damage;
@@ -165,6 +203,8 @@ namespace Companions
                     skillManager.AddXP(SkillType.Attack, share);
                     skillManager.AddXP(SkillType.Strength, share);
                     skillManager.AddXP(SkillType.Defence, share + remainder);
+                    if (CompanionManager.EnableDebugLogging)
+                        Debug.Log($"[Companion XP] Controlled style awarded {share} Attack, {share} Strength, {share + remainder} Defence XP from {damage} damage.");
                     break;
             }
         }
