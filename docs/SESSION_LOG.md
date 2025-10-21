@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:35da0a989532489a8029518c6caac6117885fab3 -->
+## 2025-10-21T20:16:43+01:00 — Handle null slots when restoring inventory state
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Core/InventoryModel.cs
+- Diff: 6 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2de7b8268ad1369716262e83b8bc15689c195e38 -->
 ## 2025-10-21T20:04:27+01:00 — Merge pull request #1256 from aicovergod/codex/add-save-manager-integration-for-companions
 

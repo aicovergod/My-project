@@ -552,6 +552,12 @@ namespace Inventory.Core
             for (int i = 0; i < len; i++)
             {
                 var slot = data.slots[i];
+                if (slot == null)
+                {
+                    slots[i] = default;
+                    SlotChanged?.Invoke(i, slots[i]);
+                    continue;
+                }
                 if (!string.IsNullOrEmpty(slot.id))
                 {
                     var item = ItemDatabase.GetItem(slot.id);
