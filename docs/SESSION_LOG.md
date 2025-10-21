@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:cd3de81f7f846f4af1f326bcfce867d9cd77e5e3 -->
+## 2025-10-21T18:04:00+01:00 — Separate AdminF2 skill overrides for player and companion
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 114 ++ / 50 --
+- Notes:
+  —
+---
 <!-- commit:b2c1e348a9555f4422554b505baec3bb94c611bd -->
 ## 2025-10-21T17:46:33+01:00 — Merge pull request #1250 from aicovergod/codex/add-skill-level-up-messages-in-chatbox
 
