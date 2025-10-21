@@ -303,6 +303,12 @@ namespace Companions
             }
             if (storedByPet)
                 SetStored(false);
+
+            // If the companion remained active (for example, it was manually re-summoned while the pet
+            // was still present) the HUD still needs to be rebuilt so the level bar stays visible once the
+            // pet leaves the scene.
+            if (HasActiveCompanion)
+                EnsureHud();
         }
 
         /// <summary>

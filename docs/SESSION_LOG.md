@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:96a3171f55168213c988ab44b127bab0bae18806 -->
+## 2025-10-21T14:31:16+01:00 — Ensure companion HUD restores after pet despawn
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 6 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d343c8028d6c917165b42ee5d6334f9e11da598f -->
 ## 2025-10-21T14:04:31+01:00 — Merge pull request #1241 from aicovergod/codex/fix-console-errors-in-scripts
 
