@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7e662e2b3a226fed59bf6ab22b0ad3df55b0cbaf -->
+## 2025-10-21T15:04:54+01:00 — Refine companion despawn flow
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 113 ++ / 38 --
+- Notes:
+  —
+---
 <!-- commit:37284799fa0f048d3824b0a57910f98cac18e348 -->
 ## 2025-10-21T14:32:09+01:00 — Merge pull request #1242 from aicovergod/codex/update-handlepetdespawned-to-invoke-ensurehud
 
