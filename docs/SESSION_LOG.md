@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:da3d4a9c5d312287b92eca4c2a4e5b3a6b7eed77 -->
+## 2025-10-21T22:20:40+01:00 — Merge pull request #1260 from aicovergod/codex/fix-pet-inventory-full-message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 44 ++ / 0 --
+- Notes:
+  Prevent companion mining when inventory is full
+---
+<!-- commit:739422ac04d836c211f60eca061ddcf01b062627 -->
+## 2025-10-21T22:19:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:679b67d2056d228af68207b651e97007788a2e28 -->
 ## 2025-10-21T22:18:39+01:00 — Prevent companion mining with full inventory
 
