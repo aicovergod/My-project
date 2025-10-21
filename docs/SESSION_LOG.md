@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c8a7344c698ce319798cd7403beb881a890a6a17 -->
+## 2025-10-21T19:08:01+01:00 — Merge pull request #1253 from aicovergod/codex/implement-companion-mining-command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 609 ++ / 2 --
+- Notes:
+  Add companion mining command and pickaxe registry
+---
+<!-- commit:02dcaccf4051833ed253a00c8803bc83b82c2653 -->
+## 2025-10-21T19:07:29+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:1b89a461f537ebcf360ad1b5d469dba74c103a47 -->
 ## 2025-10-21T19:07:07+01:00 — Add companion mining command and tool registry
 
