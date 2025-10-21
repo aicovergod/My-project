@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d7ee45a5b2f393da71baac86bbc1088058ab1052 -->
+## 2025-10-21T22:54:41+01:00 — Merge pull request #1263 from aicovergod/codex/add-pet-definition-helper-and-update-drop-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 53 ++ / 5 --
+- Notes:
+  Prevent dropping active pets from inventory
+---
+<!-- commit:4ca70dd7e5b45ab28db38c3f080d47b6e8af1e4d -->
+## 2025-10-21T22:54:34+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:74f78b94400ec87aa9f7e1f8a94969e89c8dc2bd -->
 ## 2025-10-21T22:54:14+01:00 — Prevent dropping active pets from inventory
 
