@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:679b67d2056d228af68207b651e97007788a2e28 -->
+## 2025-10-21T22:18:39+01:00 — Prevent companion mining with full inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs
+- Diff: 35 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:cefcec98a4455c88bf10f6bec925fa9e257878ad -->
 ## 2025-10-21T21:53:31+01:00 — Merge pull request #1259 from aicovergod/codex/update-handle-active-account-username-change
 

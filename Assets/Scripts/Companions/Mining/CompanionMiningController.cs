@@ -198,6 +198,9 @@ namespace Companions
                 return false;
             }
 
+            if (!HasInventoryCapacityForOre(oreDef))
+                return false;
+
             CancelMining(true);
 
             currentRock = rock;
@@ -359,6 +362,33 @@ namespace Companions
             {
                 transform.position = nextPosition;
             }
+        }
+
+        private bool HasInventoryCapacityForOre(OreDefinition ore)
+        {
+            if (ore == null || miningSkill == null)
+                return true;
+
+            if (miningSkill.CanAddOre(ore))
+                return true;
+
+            PublishInventoryFullMessage();
+
+            if (CompanionManager.EnableDebugLogging)
+                Debug.Log("[Companion Mining] Command rejected because the companion inventory is full.", this);
+
+            return false;
+        }
+
+        private void PublishInventoryFullMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            chat.PublishCompanionMessage(
+                CompanionManager.GetCompanionDisplayName(),
+                CompanionManager.InventoryFullChatLine);
         }
 
         private float ResolveMoveSpeed()
