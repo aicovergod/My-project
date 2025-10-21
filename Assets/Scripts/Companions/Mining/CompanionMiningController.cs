@@ -24,7 +24,7 @@ namespace Companions
 
         private SkillManager skillManager;
         private Inventory.Inventory inventory;
-        private Equipment equipment;
+        private CompanionEquipment companionEquipment;
         private MiningSkill miningSkill;
         private PetFollower petFollower;
         private PetPathMover pathMover;
@@ -58,9 +58,7 @@ namespace Companions
                 Debug.LogWarning("[Companion Mining] No inventory available for tool checks.", this);
             }
 
-            equipment = GetComponent<Equipment>();
-            if (equipment == null && inventory != null)
-                equipment = inventory.GetComponent<Equipment>();
+            companionEquipment = ownerController != null ? ownerController.Equipment : null;
 
             miningSkill = GetComponent<MiningSkill>();
             if (miningSkill == null)
@@ -178,9 +176,9 @@ namespace Companions
                 var item = GatheringInventoryHelper.GetItemData(definition.Id, ref itemCache);
                 bool ownsInInventory = inventory != null && item != null && inventory.GetItemCount(item) > 0;
                 bool equippedTool = false;
-                if (equipment != null && item != null)
+                if (companionEquipment != null && item != null)
                 {
-                    var entry = equipment.GetEquipped(EquipmentSlot.Weapon);
+                    var entry = companionEquipment.GetEquipped(EquipmentSlot.Weapon);
                     equippedTool = entry.item == item;
                 }
 

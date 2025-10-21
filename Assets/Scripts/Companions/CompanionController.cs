@@ -1,5 +1,6 @@
 using System;
 using Combat;
+using Inventory;
 using Pets;
 using Skills;
 using UnityEngine;
@@ -25,6 +26,9 @@ namespace Companions
         /// <summary>Controller that manages mining-specific behaviour for the companion.</summary>
         private CompanionMiningController miningController;
 
+        /// <summary>Equipment component responsible for the companion gear window and state.</summary>
+        private CompanionEquipment companionEquipment;
+
         /// <summary>Bridges pet combat calculations so the companion uses its own stats.</summary>
         private CompanionCombatBridge combatBridge;
 
@@ -43,6 +47,9 @@ namespace Companions
         /// <summary>Raised when the controller is destroyed so the manager can clear cached state.</summary>
         public event Action<CompanionController> Despawned;
 
+        /// <summary>Raised whenever the companion equipment window opens or closes.</summary>
+        public event Action<bool> EquipmentVisibilityChanged;
+
         /// <summary>Exposes the runtime skill manager used for stats and combat calculations.</summary>
         public SkillManager SkillManager => skillManager;
 
@@ -51,6 +58,9 @@ namespace Companions
 
         /// <summary>Exposes the mining controller responsible for companion gathering commands.</summary>
         public CompanionMiningController MiningController => miningController;
+
+        /// <summary>Provides access to the equipment component configured for the companion.</summary>
+        public CompanionEquipment Equipment => companionEquipment;
 
         /// <summary>
         /// Indicates whether the companion has an active combat controller capable of fighting.
@@ -76,6 +86,7 @@ namespace Companions
 
             ConfigureSkills(player);
             ConfigureInventory(player);
+            ConfigureEquipment();
             ConfigureMining();
             ConfigureCombat();
             RebindPlayer(player);
@@ -107,6 +118,7 @@ namespace Companions
         public void HandleStoreRequest()
         {
             companionInventory?.ForceClosed();
+            companionEquipment?.ForceClosed();
             if (gameObject.activeSelf)
                 gameObject.SetActive(false);
         }
@@ -129,6 +141,29 @@ namespace Companions
             bool opened = companionInventory != null && companionInventory.ToggleInventory();
             InventoryVisibilityChanged?.Invoke(opened);
             return opened;
+        }
+
+        /// <summary>
+        /// Toggles the companion equipment UI and reports the resulting visibility.
+        /// </summary>
+        public bool ToggleEquipment()
+        {
+            bool opened = companionEquipment != null && companionEquipment.ToggleEquipment();
+            return opened;
+        }
+
+        /// <summary>Indicates whether the equipment window is currently visible.</summary>
+        public bool IsEquipmentVisible => companionEquipment != null && companionEquipment.IsOpen;
+
+        /// <summary>
+        /// Attempts to equip an entry removed from the player inventory into the companion gear slots.
+        /// </summary>
+        public bool TryEquipFromPlayerInventory(InventoryEntry entry, Inventory.Inventory playerInventory)
+        {
+            if (companionEquipment == null)
+                return false;
+
+            return companionEquipment.TryEquipFromPlayerInventory(entry, playerInventory);
         }
 
         /// <summary>
@@ -244,6 +279,19 @@ namespace Companions
             companionInventory.VisibilityChanged += OnInventoryVisibilityChanged;
         }
 
+        /// <summary>
+        /// Configures the equipment component so the companion can manage its own gear window.
+        /// </summary>
+        private void ConfigureEquipment()
+        {
+            companionEquipment = GetComponent<CompanionEquipment>();
+            if (companionEquipment == null)
+                companionEquipment = gameObject.AddComponent<CompanionEquipment>();
+            companionEquipment.Initialise(companionInventory, skillManager);
+            companionEquipment.VisibilityChanged += OnEquipmentVisibilityChanged;
+            companionEquipment.ForceClosed();
+        }
+
         private void ConfigureMining()
         {
             miningController = gameObject.AddComponent<CompanionMiningController>();
@@ -266,6 +314,14 @@ namespace Companions
             InventoryVisibilityChanged?.Invoke(visible);
         }
 
+        /// <summary>
+        /// Relays equipment window visibility so the manager can keep HUD labels in sync.
+        /// </summary>
+        private void OnEquipmentVisibilityChanged(bool visible)
+        {
+            EquipmentVisibilityChanged?.Invoke(visible);
+        }
+
         private void OnDestroy()
         {
             miningController?.CancelMining(true);
@@ -276,7 +332,14 @@ namespace Companions
             if (companionInventory != null)
                 companionInventory.VisibilityChanged -= OnInventoryVisibilityChanged;
 
+            if (companionEquipment != null)
+            {
+                companionEquipment.VisibilityChanged -= OnEquipmentVisibilityChanged;
+                companionEquipment.ForceClosed();
+            }
+
             miningController = null;
+            companionEquipment = null;
             Despawned?.Invoke(this);
         }
     }

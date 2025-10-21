@@ -22,6 +22,12 @@ namespace Pets
         /// <summary>Label reflecting the current inventory visibility state.</summary>
         private Text inventoryText;
 
+        /// <summary>Button that toggles the companion equipment window.</summary>
+        private Button equipmentButton;
+
+        /// <summary>Label reflecting the current equipment visibility state.</summary>
+        private Text equipmentText;
+
         /// <summary>Button that opens the companion stats window.</summary>
         private Button statsButton;
 
@@ -47,6 +53,8 @@ namespace Pets
                 instance.guardText.text = CompanionManager.GuardModeEnabled ? "Guard Mode: On" : "Guard Mode: Off";
                 instance.inventoryButton.gameObject.SetActive(true);
                 instance.inventoryText.text = CompanionManager.IsInventoryVisible() ? "Inventory: On" : "Inventory: Off";
+                instance.equipmentButton.gameObject.SetActive(true);
+                instance.equipmentText.text = CompanionManager.IsEquipmentVisible() ? "Equipment: On" : "Equipment: Off";
             }
             else
             {
@@ -58,6 +66,7 @@ namespace Pets
                 instance.inventoryButton.gameObject.SetActive(hasInventory);
                 if (hasInventory)
                     instance.inventoryText.text = PetDropSystem.PetInventoryVisible ? "Inventory: On" : "Inventory: Off";
+                instance.equipmentButton.gameObject.SetActive(false);
             }
             instance.transform.position = position;
             instance.gameObject.SetActive(true);
@@ -121,6 +130,14 @@ namespace Pets
             instance.inventoryButton.onClick.AddListener(() =>
             {
                 instance.current?.ToggleInventory();
+                instance.Hide();
+            });
+
+            instance.equipmentButton = CreateButton(menuGO.transform, "Equipment");
+            instance.equipmentText = instance.equipmentButton.GetComponentInChildren<Text>();
+            instance.equipmentButton.onClick.AddListener(() =>
+            {
+                instance.current?.ToggleEquipment();
                 instance.Hide();
             });
 
