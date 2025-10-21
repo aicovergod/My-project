@@ -337,6 +337,11 @@ namespace Pets
             var companionBridge = GetComponent<Companions.CompanionCombatBridge>();
             bool statsOverridden = companionBridge != null && companionBridge.TryOverrideStats(ref attacker);
 
+            // Cache the owner reference and Beastmaster level so both the stat scaling logic and damage
+            // resolution later in the method can consume the same readings.
+            Transform ownerTransform = follower != null ? follower.Player : null;
+            int beastmasterLevel = ResolveBeastmasterLevel(ownerTransform);
+
             if (!statsOverridden)
             {
                 var exp = GetComponent<PetExperience>();
@@ -346,12 +351,6 @@ namespace Pets
                 attacker.Equip.attack = Mathf.RoundToInt(attacker.Equip.attack * statMult);
                 attacker.Equip.strength = Mathf.RoundToInt(attacker.Equip.strength * statMult);
                 attacker.Equip.rangeStrength = Mathf.RoundToInt(attacker.Equip.rangeStrength * statMult);
-
-                // scale stats based on the owner's Beastmaster level
-                var owner = follower != null ? follower.Player : null;
-                int beastmasterLevel = 1;
-                if (owner != null && owner.TryGetComponent<SkillManager>(out var skills))
-                    beastmasterLevel = skills.GetLevel(SkillType.Beastmaster);
 
                 if (definition != null)
                 {
@@ -422,7 +421,7 @@ namespace Pets
                     maxHit = Mathf.RoundToInt(maxHit * (1f + definition.maxHitPerBeastmasterLevel * beastmasterLevel));
                 int dmg = CombatMath.RollDamage(maxHit);
                 object source = this;
-                if (owner != null && owner.TryGetComponent<PlayerCombatTarget>(out var ownerTarget))
+                if (ownerTransform != null && ownerTransform.TryGetComponent<PlayerCombatTarget>(out var ownerTarget))
                     source = ownerTarget;
                 int finalDamage = target.ApplyDamage(dmg, attacker.DamageType, SpellElement.None, source);
 
@@ -452,7 +451,7 @@ namespace Pets
                     var npcAttack = npc.GetComponent<NpcAttackController>();
                     npcAttack?.BeginAttacking(this);
                 }
-                BeastmasterXp.TryGrantFromPetDamage(owner != null ? owner.gameObject : null, finalDamage);
+                BeastmasterXp.TryGrantFromPetDamage(ownerTransform != null ? ownerTransform.gameObject : null, finalDamage);
                 companionBridge?.NotifyDamageDealt(finalDamage, attacker.Style, attacker.DamageType);
             }
             else
@@ -500,6 +499,18 @@ namespace Pets
             yield return new WaitForSeconds(0.2f);
             spriteRenderer.sprite = defaultSprite;
             spriteSwapRoutine = null;
+        }
+
+        /// <summary>
+        /// Resolves the owner's Beastmaster level, defaulting to one when the skill data is unavailable.
+        /// </summary>
+        /// <param name="ownerTransform">Transform of the owning player.</param>
+        private static int ResolveBeastmasterLevel(Transform ownerTransform)
+        {
+            if (ownerTransform != null && ownerTransform.TryGetComponent<SkillManager>(out var skills))
+                return Mathf.Max(1, skills.GetLevel(SkillType.Beastmaster));
+
+            return 1;
         }
 
         /// <summary>
