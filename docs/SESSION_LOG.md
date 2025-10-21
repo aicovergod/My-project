@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4753e1154f4c65a9938caa48724b69813c072868 -->
+## 2025-10-21T11:53:17+01:00 — Add companion system alongside existing pets
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (15): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Companions/CompanionClickable.cs, Assets/Scripts/Companions/CompanionCombatBridge.cs, Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionInventory.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionRuntimeAssets.cs, Assets/Scripts/Companions/CompanionSkillMemorySave.cs, Assets/Scripts/Companions/CompanionStatsWindow.cs, Assets/Scripts/Pets/PetCombatController.cs, Assets/Scripts/Pets/PetDropSystem.cs, Assets/Scripts/Pets/PetLevelBarHUD.cs, Assets/Scripts/Pets/PetLevelBarMenu.cs, Assets/Scripts/Skills/SkillManager.cs, Assets/Scripts/UI/PetLevelBarContextMenuExtender.cs
+- Diff: 1469 ++ / 76 --
+- Notes:
+  —
+---
 <!-- commit:4a90fbd49c93780630ef13b0e210ff02be731f14 -->
 ## 2025-10-21T10:48:14+01:00 — Merge pull request #1236 from aicovergod/codex/fix-operator-error-in-commandslistcommand
 

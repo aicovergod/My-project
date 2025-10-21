@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UI;
 using UI.Utilities;
+using Companions;
 
 namespace Pets
 {
@@ -12,12 +13,24 @@ namespace Pets
     {
         private Button xpButton;
         private Button guardButton;
+
+        /// <summary>Label reflecting the current guard mode state.</summary>
         private Text guardText;
+
         private Button inventoryButton;
+
+        /// <summary>Label reflecting the current inventory visibility state.</summary>
         private Text inventoryText;
+
+        /// <summary>Button that opens the companion stats window.</summary>
+        private Button statsButton;
+
+        /// <summary>HUD currently owning the menu so callbacks can target the right entity.</summary>
         private PetLevelBarHUD current;
 
         private static PetLevelBarMenu instance;
+
+        /// <summary>Canvas hosting the floating menu so click detection can reference it.</summary>
         private static Canvas menuCanvas;
 
         public static void Show(PetLevelBarHUD hud, Vector2 position)
@@ -25,14 +38,27 @@ namespace Pets
             if (instance == null)
                 CreateInstance();
             instance.current = hud;
-            instance.guardText.text = PetDropSystem.GuardModeEnabled ? "Guard Mode: On" : "Guard Mode: Off";
-            var pet = PetDropSystem.ActivePetObject;
-            var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
-            var inv = pet != null ? pet.GetComponent<Inventory.Inventory>() : null;
-            bool hasInventory = storage != null && inv != null;
-            instance.inventoryButton.gameObject.SetActive(hasInventory);
-            if (hasInventory)
-                instance.inventoryText.text = PetDropSystem.PetInventoryVisible ? "Inventory: On" : "Inventory: Off";
+            bool isCompanion = hud != null && hud.IsCompanionHud;
+            instance.statsButton.gameObject.SetActive(isCompanion);
+            instance.xpButton.gameObject.SetActive(!isCompanion);
+
+            if (isCompanion)
+            {
+                instance.guardText.text = CompanionManager.GuardModeEnabled ? "Guard Mode: On" : "Guard Mode: Off";
+                instance.inventoryButton.gameObject.SetActive(true);
+                instance.inventoryText.text = CompanionManager.IsInventoryVisible() ? "Inventory: On" : "Inventory: Off";
+            }
+            else
+            {
+                instance.guardText.text = PetDropSystem.GuardModeEnabled ? "Guard Mode: On" : "Guard Mode: Off";
+                var pet = PetDropSystem.ActivePetObject;
+                var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
+                var inv = pet != null ? pet.GetComponent<Inventory.Inventory>() : null;
+                bool hasInventory = storage != null && inv != null;
+                instance.inventoryButton.gameObject.SetActive(hasInventory);
+                if (hasInventory)
+                    instance.inventoryText.text = PetDropSystem.PetInventoryVisible ? "Inventory: On" : "Inventory: Off";
+            }
             instance.transform.position = position;
             instance.gameObject.SetActive(true);
             instance.OnMenuShown();
@@ -72,6 +98,13 @@ namespace Pets
             instance.xpButton.onClick.AddListener(() =>
             {
                 instance.current?.ShowXpToNextLevel();
+                instance.Hide();
+            });
+
+            instance.statsButton = CreateButton(menuGO.transform, "Stats");
+            instance.statsButton.onClick.AddListener(() =>
+            {
+                CompanionManager.OpenStats();
                 instance.Hide();
             });
 

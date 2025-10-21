@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using System.Collections;
 using Player;
 using UI;
+using Companions;
 
 namespace Pets
 {
@@ -18,6 +19,12 @@ namespace Pets
         private Text text;
         private Coroutine xpRoutine;
 
+        /// <summary>True when the HUD currently represents the companion.</summary>
+        private bool isCompanion;
+
+        /// <summary>Tracks whether companion event subscriptions have been established.</summary>
+        private bool companionEventsBound;
+
         /// <summary>
         /// Create the pet level bar under the existing health bar.
         /// If a bar already exists it will be replaced.
@@ -27,18 +34,79 @@ namespace Pets
             if (exp == null)
                 return;
 
+            var hud = BuildHudSkeleton();
+            if (hud == null)
+                return;
+
+            hud.experience = exp;
+            hud.isCompanion = false;
+            exp.OnLevelChanged += hud.HandleLevelChanged;
+            hud.HandleLevelChanged(exp.Level);
+        }
+
+        /// <summary>
+        /// Creates the level bar for the companion. Returns the created HUD so the manager can wire events.
+        /// </summary>
+        public static PetLevelBarHUD CreateForCompanion()
+        {
+            var hud = BuildHudSkeleton();
+            if (hud == null)
+                return null;
+
+            hud.experience = null;
+            hud.isCompanion = true;
+            hud.UpdateLevelText();
+            hud.BindToCompanion();
+            return hud;
+        }
+
+        /// <summary>
+        /// Destroy the current pet level bar, if any.
+        /// </summary>
+        public static void DestroyInstance()
+        {
+            if (instance != null)
+                Destroy(instance.gameObject);
+        }
+
+        /// <summary>
+        /// Indicates whether this HUD currently represents the companion instead of a standard pet.
+        /// </summary>
+        public bool IsCompanionHud => isCompanion;
+
+        /// <summary>
+        /// Ensures the HUD is bound to the companion event stream so combat levels stay in sync.
+        /// </summary>
+        internal void BindToCompanion()
+        {
+            if (!isCompanion || companionEventsBound)
+                return;
+
+            isCompanion = true;
+            companionEventsBound = true;
+            CompanionManager.RegisterHud(this);
+            CompanionManager.CombatLevelChanged += HandleCompanionCombatLevelChanged;
+            UpdateLevelText();
+        }
+
+        private static PetLevelBarHUD BuildHudSkeleton()
+        {
             if (instance != null)
                 Destroy(instance.gameObject);
 
             var healthHud = Object.FindObjectOfType<HealthHUD>();
             if (healthHud == null)
-                return;
+                return null;
 
             var healthRect = healthHud.GetComponent<RectTransform>();
             var parent = healthRect.parent as RectTransform;
             var go = new GameObject("PetLevelHUD", typeof(RectTransform), typeof(PetLevelBarHUD));
-            instance = go.GetComponent<PetLevelBarHUD>();
-            instance.experience = exp;
+            var hud = go.GetComponent<PetLevelBarHUD>();
+            instance = hud;
+            hud.experience = null;
+            hud.isCompanion = false;
+            hud.companionEventsBound = false;
+            hud.xpRoutine = null;
             go.transform.SetParent(parent, false);
 
             var sprite = Sprite.Create(Texture2D.whiteTexture,
@@ -66,7 +134,7 @@ namespace Pets
             var fillGO = new GameObject("Fill", typeof(Image));
             fillGO.transform.SetParent(bgGO.transform, false);
             var fillImg = fillGO.GetComponent<Image>();
-            fillImg.color = new Color(1f, 0.84f, 0f); // gold
+            fillImg.color = new Color(1f, 0.84f, 0f);
             fillImg.type = Image.Type.Filled;
             fillImg.sprite = sprite;
             fillImg.fillMethod = Image.FillMethod.Horizontal;
@@ -80,33 +148,22 @@ namespace Pets
 
             var textGO = new GameObject("Text", typeof(Text));
             textGO.transform.SetParent(bgGO.transform, false);
-            instance.text = textGO.GetComponent<Text>();
-            LegacyFontProvider.ApplyTo(instance.text);
-            instance.text.alignment = TextAnchor.MiddleCenter;
-            instance.text.color = Color.white;
-            instance.text.fontSize = 24;
-            // Add an outline so the pet level text remains readable against varying backgrounds.
+            hud.text = textGO.GetComponent<Text>();
+            LegacyFontProvider.ApplyTo(hud.text);
+            hud.text.alignment = TextAnchor.MiddleCenter;
+            hud.text.color = Color.white;
+            hud.text.fontSize = 24;
             var outline = textGO.AddComponent<Outline>();
             outline.effectColor = Color.black;
             outline.effectDistance = new Vector2(1f, -1f);
             outline.useGraphicAlpha = false;
-            var textRect = instance.text.rectTransform;
+            var textRect = hud.text.rectTransform;
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
             textRect.offsetMin = Vector2.zero;
             textRect.offsetMax = Vector2.zero;
 
-            exp.OnLevelChanged += instance.HandleLevelChanged;
-            instance.HandleLevelChanged(exp.Level);
-        }
-
-        /// <summary>
-        /// Destroy the current pet level bar, if any.
-        /// </summary>
-        public static void DestroyInstance()
-        {
-            if (instance != null)
-                Destroy(instance.gameObject);
+            return hud;
         }
 
         private void HandleLevelChanged(int lvl)
@@ -114,10 +171,25 @@ namespace Pets
             UpdateLevelText();
         }
 
+        private void HandleCompanionCombatLevelChanged(int level)
+        {
+            UpdateLevelText();
+        }
+
         private void UpdateLevelText()
         {
-            if (text == null || experience == null)
+            if (text == null)
                 return;
+
+            if (isCompanion)
+            {
+                text.text = $"Combat lvl {CompanionManager.CombatLevel}";
+                return;
+            }
+
+            if (experience == null)
+                return;
+
             string tier = experience.TierName;
             if (string.IsNullOrEmpty(tier))
                 text.text = $"Lv {experience.Level}";
@@ -127,6 +199,12 @@ namespace Pets
 
         public void ShowXpToNextLevel()
         {
+            if (isCompanion)
+            {
+                CompanionManager.OpenStats();
+                return;
+            }
+
             if (xpRoutine != null)
                 StopCoroutine(xpRoutine);
             xpRoutine = StartCoroutine(ShowXpRoutine());
@@ -145,11 +223,23 @@ namespace Pets
 
         public void ToggleGuardMode()
         {
+            if (isCompanion)
+            {
+                CompanionManager.ToggleGuardMode();
+                return;
+            }
+
             PetDropSystem.GuardModeEnabled = !PetDropSystem.GuardModeEnabled;
         }
 
         public void ToggleInventory()
         {
+            if (isCompanion)
+            {
+                CompanionManager.ToggleInventory();
+                return;
+            }
+
             var pet = PetDropSystem.ActivePetObject;
             if (pet == null)
                 return;
@@ -178,6 +268,14 @@ namespace Pets
         {
             if (experience != null)
                 experience.OnLevelChanged -= HandleLevelChanged;
+            if (companionEventsBound)
+            {
+                CompanionManager.CombatLevelChanged -= HandleCompanionCombatLevelChanged;
+                CompanionManager.UnbindHud(this);
+                companionEventsBound = false;
+            }
+            if (xpRoutine != null)
+                StopCoroutine(xpRoutine);
             if (instance == this)
                 instance = null;
         }
