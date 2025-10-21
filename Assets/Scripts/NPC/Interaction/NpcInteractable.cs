@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using ShopSystem;
 using Pets;
+using Companions;
 using Combat;
 using UI;
 using UI.Utilities;
@@ -250,6 +251,9 @@ namespace NPC
                 PetDropSystem.ActivePetCombat.CommandAttack(combatTarget, true);
                 return;
             }
+
+            if (combatTarget != null && CompanionManager.TryCommandAttack(combatTarget))
+                return;
 
             if (!EnsureMenuInstance())
                 return;
