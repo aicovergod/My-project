@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3833fbf882cacc5d9f936b54603b74838164ac84 -->
+## 2025-10-21T18:04:28+01:00 — Merge pull request #1251 from aicovergod/codex/separate-skill-level-application-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 123 ++ / 50 --
+- Notes:
+  Separate AdminF2 skill overrides for player and companion
+---
+<!-- commit:afb9ffd89f7c217c32474fc2dc8d99c54884a090 -->
+## 2025-10-21T18:04:18+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:cd3de81f7f846f4af1f326bcfce867d9cd77e5e3 -->
 ## 2025-10-21T18:04:00+01:00 — Separate AdminF2 skill overrides for player and companion
 
