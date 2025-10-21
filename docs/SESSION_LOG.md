@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e958b61ca079bec58337abdbe75b600eb4c59db9 -->
+## 2025-10-21T18:21:20+01:00 — Add stat reset controls to Admin F2 menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 54 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:3833fbf882cacc5d9f936b54603b74838164ac84 -->
 ## 2025-10-21T18:04:28+01:00 — Merge pull request #1251 from aicovergod/codex/separate-skill-level-application-logic
 
