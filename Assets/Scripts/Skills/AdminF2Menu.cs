@@ -300,6 +300,11 @@ namespace Skills
                 ApplySkillOverrides(playerSkillManager, hitpoints, beastmasterService);
                 RefreshFields();
             }
+            if (GUILayout.Button("Reset Stats For Player"))
+            {
+                ResetStatsToBaseline(playerSkillManager, hitpoints, beastmasterService);
+                RefreshFields();
+            }
             GUI.enabled = previousGuiEnabled;
 
             previousGuiEnabled = GUI.enabled;
@@ -307,6 +312,11 @@ namespace Skills
             if (GUILayout.Button("Apply To Companion"))
             {
                 ApplySkillOverrides(companionSkillManager, null, null);
+                RefreshFields();
+            }
+            if (GUILayout.Button("Reset Stats For Companion"))
+            {
+                ResetStatsToBaseline(companionSkillManager, null, null);
                 RefreshFields();
             }
             GUI.enabled = previousGuiEnabled;
@@ -670,6 +680,50 @@ namespace Skills
             {
                 targetSkillManager.DebugSetLevel(SkillType.Beastmaster, bm);
                 targetBeastmasterService?.SetLevel(Mathf.Clamp(bm, 1, 99));
+            }
+        }
+
+        /// <summary>
+        /// Resets the supplied skill manager to the standard baseline levels used for new characters.
+        /// Hitpoints returns to 10 while all other skills revert to level 1.
+        /// </summary>
+        /// <param name="targetSkillManager">Skill manager to reset.</param>
+        /// <param name="targetHitpoints">Optional hitpoints component so current HP can be clamped to the new maximum.</param>
+        /// <param name="targetBeastmasterService">Optional Beastmaster bridge to keep the Beastmaster service in sync.</param>
+        private void ResetStatsToBaseline(
+            SkillManager targetSkillManager,
+            PlayerHitpoints targetHitpoints,
+            IBeastmasterService targetBeastmasterService)
+        {
+            if (targetSkillManager == null)
+                return;
+
+            foreach (SkillType skill in Enum.GetValues(typeof(SkillType)))
+            {
+                int baselineLevel = GetBaselineLevel(skill);
+                targetSkillManager.DebugSetLevel(skill, baselineLevel);
+
+                if (skill == SkillType.Beastmaster)
+                    targetBeastmasterService?.SetLevel(Mathf.Clamp(baselineLevel, 1, 99));
+            }
+
+            if (targetHitpoints != null)
+                targetHitpoints.DebugSetCurrentHp(targetHitpoints.MaxHp);
+        }
+
+        /// <summary>
+        /// Provides the baseline level that new characters should use for a given skill.
+        /// </summary>
+        /// <param name="skill">Skill type being queried.</param>
+        /// <returns>Level that represents the baseline for the supplied skill.</returns>
+        private static int GetBaselineLevel(SkillType skill)
+        {
+            switch (skill)
+            {
+                case SkillType.Hitpoints:
+                    return 10;
+                default:
+                    return 1;
             }
         }
 
