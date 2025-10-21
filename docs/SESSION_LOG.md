@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5aeb6bc0318ffb95df31aa5dc666f80677638590 -->
+## 2025-10-21T23:43:20+01:00 — Merge pull request #1265 from aicovergod/codex/add-companion-equipment-system
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1258 ++ / 6 --
+- Notes:
+  Add companion equipment window and integrate UI toggles
+---
+<!-- commit:9d70ac43d8f039c5af746022691b38578292db67 -->
+## 2025-10-21T23:42:48+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:142aa8daa9896d213479af331e8c01b6a411f029 -->
 ## 2025-10-21T23:42:30+01:00 — Add companion equipment system and integrate UI
 
