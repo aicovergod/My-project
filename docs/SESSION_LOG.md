@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c37281aa6b11cebcb0121302cead1154480e0d17 -->
+## 2025-10-21T23:00:01+01:00 — Merge pull request #1264 from aicovergod/codex/fix-prospecting-when-companion-inventory-is-full
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 1 --
+- Notes:
+  Prevent companion mining failures from triggering player prospecting
+---
+<!-- commit:7909856d6c3f31fe23b0a0d36c05ae387d6ad9fc -->
+## 2025-10-21T22:59:52+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:3cb42f7cc9b8a283f8b727eaa13fcbabd3fc7b6e -->
 ## 2025-10-21T22:59:31+01:00 — Prevent companion mining failures from triggering player prospect
 
