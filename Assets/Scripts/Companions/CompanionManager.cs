@@ -83,8 +83,13 @@ namespace Companions
 
         private static void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            if (controller != null)
-                controller.RebindPlayer();
+            if (controller == null)
+                return;
+
+            // Locate the current player transform so the companion follower can resume tracking after
+            // additive scene loads or respawns that destroy the original player instance.
+            var player = GameObject.FindGameObjectWithTag("Player");
+            controller.RebindPlayer(player != null ? player.transform : null);
         }
 
         /// <summary>
