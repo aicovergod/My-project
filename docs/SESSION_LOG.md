@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:142aa8daa9896d213479af331e8c01b6a411f029 -->
+## 2025-10-21T23:42:30+01:00 — Add companion equipment system and integrate UI
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (8): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionEquipment.cs, Assets/Scripts/Companions/CompanionEquipment.cs.meta, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Pets/PetLevelBarHUD.cs, Assets/Scripts/Pets/PetLevelBarMenu.cs
+- Diff: 1249 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:c37281aa6b11cebcb0121302cead1154480e0d17 -->
 ## 2025-10-21T23:00:01+01:00 — Merge pull request #1264 from aicovergod/codex/fix-prospecting-when-companion-inventory-is-full
 
