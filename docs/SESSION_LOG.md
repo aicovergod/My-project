@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5f970dfe4bd7e60a1f00b763444f16f4087e84e8 -->
+## 2025-10-21T18:35:57+01:00 — Merge pull request #1252 from aicovergod/codex/add-reset-stats-buttons-in-admin-menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 63 ++ / 0 --
+- Notes:
+  Add stat reset controls to Admin F2 menu
+---
+<!-- commit:631546443e3e0f0f954281dd2e0d2e673bfeb958 -->
+## 2025-10-21T18:21:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:e958b61ca079bec58337abdbe75b600eb4c59db9 -->
 ## 2025-10-21T18:21:20+01:00 — Add stat reset controls to Admin F2 menu
 
