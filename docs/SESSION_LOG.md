@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:da762e1cd5f1d73872314ebbee3b2b61e844dd41 -->
+## 2025-10-21T20:59:15+01:00 — Merge pull request #1258 from aicovergod/codex/refactor-companion-inventory-loading-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 62 ++ / 1 --
+- Notes:
+  Defer companion inventory load until profile active
+---
+<!-- commit:0b1fa8bac7bbeb30b4463f72e633ae6b10a98522 -->
+## 2025-10-21T20:59:05+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:af4aecdfc5da0ec9fb6d9d16a34f0dcb8329d661 -->
 ## 2025-10-21T20:58:43+01:00 — Defer companion inventory load until profile active
 
