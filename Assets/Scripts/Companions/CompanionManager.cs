@@ -42,6 +42,9 @@ namespace Companions
         /// <summary>Tracks whether the companion was active when the pet pipeline requested a hide.</summary>
         private static bool companionWasActiveBeforePetSpawn;
 
+        /// <summary>Chat line used when the companion cannot store additional resources.</summary>
+        internal const string InventoryFullChatLine = "My inventory is full up.";
+
         /// <summary>Latest combat level computed from the companion's skills.</summary>
         private static int combatLevel = 1;
 
