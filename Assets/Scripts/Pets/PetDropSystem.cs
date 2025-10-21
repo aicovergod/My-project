@@ -72,7 +72,10 @@ namespace Pets
             else if (activePetDef != null)
             {
                 Vector3 pos = player != null ? player.transform.position : Vector3.zero;
-                SpawnPetInternal(activePetDef, pos, true);
+                if (activePetDef.spawnAsCompanion)
+                    CompanionManager.TrySpawnCompanion(activePetDef);
+                else
+                    SpawnPetInternal(activePetDef, pos, true);
             }
         }
 
@@ -211,7 +214,7 @@ namespace Pets
                         pet = entry.pet;
                         if (activePetGO == null)
                         {
-                            SpawnPetInternal(entry.pet, worldPosition);
+                            SpawnPet(entry.pet, worldPosition);
                         }
                         else
                         {
@@ -281,6 +284,16 @@ namespace Pets
         public static GameObject SpawnPet(PetDefinition pet, Vector3 position)
         {
             Initialize();
+
+            if (pet != null && pet.spawnAsCompanion)
+            {
+                if (activePetGO != null)
+                    DespawnActive();
+
+                CompanionManager.TrySpawnCompanion(pet);
+                return CompanionManager.CompanionObject;
+            }
+
             if (Beastmaster.PetMergeController.Instance != null && Beastmaster.PetMergeController.Instance.IsMerged)
                 return null;
             CompanionManager.HandlePrePetSpawn();

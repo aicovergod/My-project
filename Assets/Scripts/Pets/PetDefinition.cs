@@ -22,6 +22,10 @@ namespace Pets
         [Tooltip("Item awarded when picking up the pet.")]
         public ItemData pickupItem;
 
+        [Header("Companion Integration")]
+        [Tooltip("If true, this pet definition should use the companion pipeline instead of the standard pet stack.")]
+        public bool spawnAsCompanion;
+
         [Header("Storage")]
         [Tooltip("If true, this pet has its own inventory.")]
         public bool hasInventory;
