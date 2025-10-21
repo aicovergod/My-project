@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:649f4c08a040431d4832cab2ea6382021b8970be -->
+## 2025-10-21T15:56:22+01:00 — Merge pull request #1245 from aicovergod/codex/fix-companion-respawn-petlevelbar-hud
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 12 --
+- Notes:
+  Fix companion HUD teardown handling
+---
+<!-- commit:7e82838462a745de19e10f00c9bed1dc4aaf083d -->
+## 2025-10-21T15:54:43+01:00 — Fix companion HUD teardown handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetLevelBarHUD.cs
+- Diff: 19 ++ / 12 --
+- Notes:
+  —
+---
 <!-- commit:ab23e171f5e99f773ac46483fe3bda3b8c3e51e3 -->
 ## 2025-10-21T15:16:31+01:00 — Merge pull request #1244 from aicovergod/codex/fix-pet-level-bar-visibility-on-spawn
 
