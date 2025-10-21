@@ -24,7 +24,21 @@ namespace Companions
         /// <summary>Initialises the underlying inventory component using the player's styling as a template.</summary>
         public void Initialise()
         {
-            inventory = gameObject.AddComponent<Inventory.Inventory>();
+            // Try to reuse an existing inventory component so pet storage leftovers are retained.
+            inventory = GetComponent<Inventory.Inventory>();
+
+            if (inventory == null)
+            {
+                inventory = gameObject.AddComponent<Inventory.Inventory>();
+            }
+
+            // If we still failed to acquire an inventory component something is misconfigured, so abort.
+            if (inventory == null)
+            {
+                Debug.LogError("CompanionInventory.Initialise failed because no Inventory component could be resolved.");
+                return;
+            }
+
             inventory.columns = 4;
             inventory.size = 28;
             inventory.useSharedUIRoot = false;
