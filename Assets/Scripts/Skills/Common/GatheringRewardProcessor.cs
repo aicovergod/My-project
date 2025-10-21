@@ -36,6 +36,8 @@ namespace Skills.Common
         public bool showItemFloatingText;
         public bool showXpPopup;
         public float xpPopupDelayTicks;
+        public bool useCompanionChatFormatting;
+        public Func<string> companionChatSenderResolver;
         public Action<GatheringRewardResult> onItemsGranted;
         public Action<GatheringRewardResult> onXpApplied;
         public Action<GatheringRewardResult> onSuccess;
@@ -119,7 +121,7 @@ namespace Skills.Common
                         GatheringFloatingTextService.TryShowAtAnchor(fullMessage, anchor);
                 }
 
-                PublishGameChat(fullMessage);
+                PublishChatMessage(fullMessage, context);
                 result.InventoryFull = true;
                 result.NewLevel = result.PreviousLevel;
                 context.onFailure?.Invoke(result);
@@ -146,7 +148,7 @@ namespace Skills.Common
                     if (!displayed && !resourcePosition.HasValue)
                         GatheringFloatingTextService.TryShowAtAnchor(rewardMessage, anchor);
 
-                    PublishGameChat(rewardMessage);
+                    PublishChatMessage(rewardMessage, context);
                 }
             }
 
@@ -208,7 +210,7 @@ namespace Skills.Common
             return true;
         }
 
-        private static void PublishGameChat(string message)
+        private static void PublishChatMessage(string message, in GatheringRewardContext context)
         {
             if (string.IsNullOrWhiteSpace(message))
                 return;
@@ -217,7 +219,20 @@ namespace Skills.Common
             if (chatService == null)
                 return;
 
-            chatService.PublishGameMessage(message);
+            if (context.useCompanionChatFormatting)
+            {
+                string sender = context.companionChatSenderResolver != null
+                    ? context.companionChatSenderResolver.Invoke()
+                    : null;
+                if (string.IsNullOrWhiteSpace(sender))
+                    sender = "Companion";
+
+                chatService.PublishCompanionMessage(sender, message);
+            }
+            else
+            {
+                chatService.PublishGameMessage(message);
+            }
         }
 
         private static float CalculateXpBonus(in GatheringRewardContext context)

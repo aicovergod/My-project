@@ -70,6 +70,8 @@ namespace Companions
             {
                 miningSkill.OnStopMining -= HandleMiningStopped;
                 miningSkill.OnStopMining += HandleMiningStopped;
+                // Ensure gathering rewards emit companion-formatted chat messages instead of Game channel output.
+                miningSkill.ConfigureCompanionChat(CompanionManager.GetCompanionDisplayName);
             }
             else if (CompanionManager.EnableDebugLogging)
             {
