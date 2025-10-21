@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:674387feff925eb001b92a41c6a31218bb8c258c -->
+## 2025-10-21T16:29:54+01:00 — Merge pull request #1246 from aicovergod/codex/update-initialise-method-for-inventory-component
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 1 --
+- Notes:
+  Fix companion inventory initialization reuse when available
+---
+<!-- commit:315f856c1f3f08be6d41c75bce7cfdc5825784bc -->
+## 2025-10-21T16:29:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a871d5391948fa7fce80505e9f3929a61e8caf7b -->
 ## 2025-10-21T16:29:18+01:00 — Reuse companion inventory component when available
 
