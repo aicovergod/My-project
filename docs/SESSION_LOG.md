@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:16c9198fe27a9f6adf8a47125d632f1f6595cf9d -->
+## 2025-10-22T00:12:19+01:00 — Ensure companion equipment opens player inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 57 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:43adbdd2e82cfb83aa0bc05a4710e8b7b4ad11d6 -->
 ## 2025-10-22T00:04:30+01:00 — Merge pull request #1266 from aicovergod/codex/fix-companion-equipment-tab-behavior
 
