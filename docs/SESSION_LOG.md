@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7432072b60ae37eda4eed165979fe6a2234738a3 -->
+## 2025-10-21T21:52:53+01:00 — Fix companion inventory load when profile pending
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionInventory.cs
+- Diff: 5 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:fb0f07a4ef65a84379f95fad92c3e2f096a4e5f2 -->
 ## 2025-10-21T21:30:43+01:00 — uwu
 
