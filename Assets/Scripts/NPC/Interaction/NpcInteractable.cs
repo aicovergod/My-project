@@ -11,6 +11,7 @@ using Companions;
 using Combat;
 using UI;
 using UI.Utilities;
+using Util;
 using Core.Input;
 
 namespace NPC
@@ -39,6 +40,7 @@ namespace NPC
         // Shared instance so the menu persists across scene loads
         private static RightClickMenu menuInstance;
         private static Canvas menuCanvas;
+        private static bool menuPrefabMissingLogged;
 
         private InputAction openMenuAction;
         private bool openMenuActionOwned;
@@ -142,10 +144,24 @@ namespace NPC
             if (menuPrefab == null)
                 menuPrefab = Resources.Load<RightClickMenu>("Interfaces/RightClickMenu");
 
-            if (menuPrefab == null)
+            if (menuPrefab != null)
             {
-                Debug.LogError("RightClickMenu prefab not assigned and could not be loaded.");
-                return false;
+                var prefabOverlay = OverlayCanvasFactory.CreateOverlayCanvas(
+                    "ContextMenuCanvas",
+                    new Vector2(1920f, 1080f),
+                    dontDestroyOnLoad: true,
+                    assignToUiLayer: true);
+                menuCanvas = prefabOverlay.Canvas;
+                menuInstance = Instantiate(menuPrefab, prefabOverlay.Root.transform);
+                return true;
+            }
+
+            if (!menuPrefabMissingLogged)
+            {
+                Debug.LogWarning(
+                    "RightClickMenu prefab was not assigned on any NPC and the fallback UI will be generated at runtime. " +
+                    "Assign Assets/Prefabs/RightClickMenu.prefab to avoid this automatic construction cost.");
+                menuPrefabMissingLogged = true;
             }
 
             var overlay = OverlayCanvasFactory.CreateOverlayCanvas(
@@ -155,8 +171,120 @@ namespace NPC
                 assignToUiLayer: true);
             menuCanvas = overlay.Canvas;
 
-            menuInstance = Instantiate(menuPrefab, overlay.Root.transform);
-            return true;
+            menuInstance = BuildFallbackMenu(overlay.Root.transform);
+            return menuInstance != null;
+        }
+
+        /// <summary>
+        ///     Generates a minimal OSRS-style context menu at runtime when the prefab is unavailable.
+        /// </summary>
+        private static RightClickMenu BuildFallbackMenu(Transform parent)
+        {
+            if (parent == null)
+                return null;
+
+            var menuRoot = new GameObject(
+                "RightClickMenu",
+                typeof(RectTransform),
+                typeof(CanvasGroup),
+                typeof(Image),
+                typeof(VerticalLayoutGroup),
+                typeof(ContentSizeFitter));
+
+            var rectTransform = menuRoot.GetComponent<RectTransform>();
+            rectTransform.SetParent(parent, false);
+            rectTransform.anchorMin = new Vector2(0f, 1f);
+            rectTransform.anchorMax = new Vector2(0f, 1f);
+            rectTransform.pivot = new Vector2(0f, 1f);
+            rectTransform.anchoredPosition = Vector2.zero;
+
+            var canvasGroup = menuRoot.GetComponent<CanvasGroup>();
+            canvasGroup.alpha = 1f;
+            canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = true;
+
+            var background = menuRoot.GetComponent<Image>();
+            background.color = new Color32(28, 28, 28, 255);
+
+            var layout = menuRoot.GetComponent<VerticalLayoutGroup>();
+            layout.childAlignment = TextAnchor.UpperLeft;
+            layout.childForceExpandHeight = false;
+            layout.childForceExpandWidth = true;
+            layout.spacing = 4f;
+            layout.padding = new RectOffset(10, 10, 10, 10);
+
+            var fitter = menuRoot.GetComponent<ContentSizeFitter>();
+            fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            if (font == null)
+                font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+
+            Button talkButton = CreateMenuButton(menuRoot.transform, "TalkButton", "Talk-to", font);
+            Button shopButton = CreateMenuButton(menuRoot.transform, "ShopButton", "Trade", font);
+            Button examineButton = CreateMenuButton(menuRoot.transform, "ExamineButton", "Examine", font);
+
+            LayerUtility.SetLayerRecursively(menuRoot.transform, LayerMask.NameToLayer("UI"));
+
+            var menu = menuRoot.AddComponent<RightClickMenu>();
+            menu.ConfigureButtons(talkButton, shopButton, examineButton);
+
+            return menu;
+        }
+
+        /// <summary>
+        ///     Creates a styled button for the fallback menu, wiring the shared font and OSRS colours.
+        /// </summary>
+        private static Button CreateMenuButton(Transform parent, string objectName, string label, Font font)
+        {
+            var buttonRoot = new GameObject(objectName, typeof(RectTransform), typeof(Image), typeof(Button), typeof(LayoutElement));
+            buttonRoot.transform.SetParent(parent, false);
+
+            var rect = buttonRoot.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0f, 0f);
+            rect.anchorMax = new Vector2(1f, 1f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+
+            var background = buttonRoot.GetComponent<Image>();
+            background.color = new Color32(48, 48, 48, 255);
+
+            var layoutElement = buttonRoot.GetComponent<LayoutElement>();
+            layoutElement.minWidth = 200f;
+            layoutElement.minHeight = 44f;
+            layoutElement.flexibleWidth = 0f;
+            layoutElement.flexibleHeight = 0f;
+
+            var button = buttonRoot.GetComponent<Button>();
+            button.transition = Selectable.Transition.ColorTint;
+            button.targetGraphic = background;
+            var colors = button.colors;
+            colors.normalColor = new Color32(48, 48, 48, 255);
+            colors.highlightedColor = new Color32(68, 68, 68, 255);
+            colors.pressedColor = new Color32(32, 32, 32, 255);
+            colors.selectedColor = colors.highlightedColor;
+            colors.disabledColor = new Color32(30, 30, 30, 255);
+            colors.fadeDuration = 0.08f;
+            button.colors = colors;
+
+            var textRoot = new GameObject("Label", typeof(RectTransform), typeof(Text));
+            textRoot.transform.SetParent(buttonRoot.transform, false);
+
+            var textRect = textRoot.GetComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
+
+            var text = textRoot.GetComponent<Text>();
+            text.text = label;
+            text.font = font;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.color = new Color32(222, 211, 172, 255);
+            text.fontSize = 22;
+            text.resizeTextForBestFit = false;
+
+            return button;
         }
 
         private void SubscribeToInput()
