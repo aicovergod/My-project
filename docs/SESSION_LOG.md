@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d343c8028d6c917165b42ee5d6334f9e11da598f -->
+## 2025-10-21T14:04:31+01:00 — Merge pull request #1241 from aicovergod/codex/fix-console-errors-in-scripts
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 35 ++ / 10 --
+- Notes:
+  Fix companion player rebinding and pet beastmaster references
+---
+<!-- commit:70397ec86b44726182fb62fecf59fbf5e2575612 -->
+## 2025-10-21T14:04:20+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9c91c35375ac9b558a165f8a74b26f6d673d43bd -->
 ## 2025-10-21T14:04:00+01:00 — Fix companion and pet combat owner bindings
 
