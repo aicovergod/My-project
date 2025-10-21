@@ -513,6 +513,12 @@ namespace Companions
         {
             if (controller == null)
                 return;
+
+            if (controller.IsEquipmentVisible)
+            {
+                controller.Equipment?.ForceClosed();
+            }
+
             controller.ToggleInventory();
         }
 
@@ -523,6 +529,13 @@ namespace Companions
         {
             if (controller == null)
                 return false;
+
+            bool wasOpen = controller.IsEquipmentVisible;
+
+            if (!wasOpen && inventoryVisible)
+            {
+                controller.Inventory?.ForceClosed();
+            }
 
             bool opened = controller.ToggleEquipment();
             UpdateEquipmentVisibility(opened);

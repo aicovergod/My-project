@@ -490,6 +490,8 @@ namespace Companions
             var windowImg = window.GetComponent<Image>();
             windowImg.color = windowColor;
 
+            BuildCloseButton(window.transform);
+
             GameObject panel = new("Slots", typeof(RectTransform), typeof(GridLayoutGroup));
             panel.transform.SetParent(window.transform, false);
 
@@ -665,6 +667,33 @@ namespace Companions
             tooltipBonusText.verticalOverflow = VerticalWrapMode.Overflow;
 
             tooltip.SetActive(false);
+        }
+
+        /// <summary>
+        /// Adds an OSRS-style close button to the equipment window so players can dismiss it without
+        /// relying on context menus.
+        /// </summary>
+        /// <param name="windowTransform">Transform that should host the close button.</param>
+        private void BuildCloseButton(Transform windowTransform)
+        {
+            if (windowTransform == null)
+                return;
+
+            var options = new CloseButtonBuilder.Options
+            {
+                Size = new Vector2(16f * UiScale, 16f * UiScale),
+                AnchoredPosition = new Vector2(-4f * UiScale, -4f * UiScale)
+            };
+
+            CloseButtonBuilder.Build(windowTransform, HandleCloseButtonClicked, options);
+        }
+
+        /// <summary>
+        /// Handles close button clicks by hiding the equipment window and broadcasting the visibility change.
+        /// </summary>
+        private void HandleCloseButtonClicked()
+        {
+            ForceClosed();
         }
 
         private void RegisterSlotEvents(GameObject cell, EquipmentSlot slot, RectTransform rect)
