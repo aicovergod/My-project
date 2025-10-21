@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ab23e171f5e99f773ac46483fe3bda3b8c3e51e3 -->
+## 2025-10-21T15:16:31+01:00 — Merge pull request #1244 from aicovergod/codex/fix-pet-level-bar-visibility-on-spawn
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 116 ++ / 1 --
+- Notes:
+  Ensure pet HUD waits for health bar before spawning
+---
+<!-- commit:49fad6ea7a0aeecd4ff79f2276222baab218d235 -->
+## 2025-10-21T15:15:47+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b2cd9074caba5998e8b8f161b6ebb5c98362232f -->
 ## 2025-10-21T15:15:29+01:00 — Ensure pet HUD waits for health bar before spawning
 
