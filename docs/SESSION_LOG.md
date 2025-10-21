@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6fa77de1cefbb4a740204edb3a73fa92aead327f -->
+## 2025-10-21T22:33:30+01:00 — Merge pull request #1261 from aicovergod/codex/refactor-hud-logic-into-mininghudbase
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 432 ++ / 147 --
+- Notes:
+  Refactor mining HUD and add companion overlay
+---
+<!-- commit:1515058ef740458b0d15e629141d3eaa38eee1bd -->
+## 2025-10-21T22:33:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7dfa1afa3df87abae7b03e41022119973604f533 -->
 ## 2025-10-21T22:33:02+01:00 — Refactor mining HUD and add companion overlay
 
