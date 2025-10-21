@@ -37,6 +37,9 @@ namespace Companions
         /// <summary>True when the player explicitly issued a Pick Up command.</summary>
         private static bool storedManually;
 
+        /// <summary>Tracks whether the companion was active when the pet pipeline requested a hide.</summary>
+        private static bool companionWasActiveBeforePetSpawn;
+
         /// <summary>Latest combat level computed from the companion's skills.</summary>
         private static int combatLevel = 1;
 
@@ -53,10 +56,10 @@ namespace Companions
         public static event Action<bool> InventoryVisibilityChanged;
 
         /// <summary>True when the companion exists and is currently visible in the world.</summary>
-        public static bool HasActiveCompanion => controller != null && !IsStored;
+        public static bool HasActiveCompanion => controller != null && controller.gameObject != null && controller.gameObject.activeSelf;
 
         /// <summary>True when the companion has been stored (picked up) but remains available to resummon.</summary>
-        public static bool IsStored => controller != null && !controller.gameObject.activeSelf;
+        public static bool IsStored => storedByPet || storedManually || (controller != null && controller.gameObject != null && !controller.gameObject.activeSelf);
 
         /// <summary>Latest combat level calculated from the companion skill manager.</summary>
         public static int CombatLevel => combatLevel;
@@ -153,6 +156,7 @@ namespace Companions
             inventoryVisible = false;
             storedByPet = false;
             storedManually = false;
+            companionWasActiveBeforePetSpawn = false;
             suppressRestoreAfterPet = false;
 
             UpdateCombatLevel();
@@ -178,27 +182,61 @@ namespace Companions
         /// </summary>
         private static void TearDownExistingCompanion()
         {
-            if (controller == null)
-                return;
+            DespawnCompanion(true);
+        }
 
-            controller.SkillLevelChanged -= HandleSkillLevelChanged;
-            controller.InventoryVisibilityChanged -= HandleInventoryVisibilityChanged;
-            controller.Despawned -= HandleControllerDespawned;
+        /// <summary>
+        /// Destroys the active companion instance, optionally clearing the tracked definition.
+        /// </summary>
+        /// <param name="clearDefinition">True when switching companions, false when temporarily hiding the current one.</param>
+        private static void DespawnCompanion(bool clearDefinition)
+        {
+            if (controller == null && companionObject == null)
+            {
+                if (clearDefinition)
+                {
+                    activeDefinition = null;
+                    storedByPet = false;
+                    storedManually = false;
+                    companionWasActiveBeforePetSpawn = false;
+                    combatLevel = 1;
+                }
+
+                PetLevelBarHUD.DestroyInstance();
+                boundHud = null;
+                return;
+            }
 
             var objectToDestroy = companionObject;
 
+            if (controller != null)
+            {
+                controller.SkillLevelChanged -= HandleSkillLevelChanged;
+                controller.InventoryVisibilityChanged -= HandleInventoryVisibilityChanged;
+                controller.Despawned -= HandleControllerDespawned;
+                controller.HandleStoreRequest();
+            }
+
             controller = null;
             companionObject = null;
-            activeDefinition = null;
-            guardModeEnabled = false;
-            inventoryVisible = false;
-            storedByPet = false;
-            storedManually = false;
-            suppressRestoreAfterPet = false;
-            combatLevel = 1;
 
-            InventoryVisibilityChanged?.Invoke(false);
+            guardModeEnabled = false;
             GuardModeChanged?.Invoke(false);
+
+            inventoryVisible = false;
+            InventoryVisibilityChanged?.Invoke(false);
+
+            if (clearDefinition)
+            {
+                activeDefinition = null;
+                storedByPet = false;
+                storedManually = false;
+                companionWasActiveBeforePetSpawn = false;
+                combatLevel = 1;
+            }
+
+            PetLevelBarHUD.DestroyInstance();
+            boundHud = null;
 
             if (objectToDestroy != null)
                 UnityEngine.Object.Destroy(objectToDestroy);
@@ -231,6 +269,9 @@ namespace Companions
         /// </summary>
         private static void EnsureHud()
         {
+            if (controller == null)
+                return;
+
             if (boundHud != null)
             {
                 boundHud.BindToCompanion();
@@ -256,38 +297,62 @@ namespace Companions
         /// </summary>
         public static void SetStored(bool stored, bool triggeredByPet = false)
         {
-            if (controller == null)
-                return;
-
-            bool alreadyStored = IsStored;
+            bool hadActiveCompanion = HasActiveCompanion;
 
             if (stored)
             {
-                if (!triggeredByPet && !alreadyStored && activeDefinition != null && activeDefinition.pickupItem != null)
+                if (!hadActiveCompanion)
+                {
+                    if (!triggeredByPet)
+                    {
+                        storedByPet = false;
+                        companionWasActiveBeforePetSpawn = false;
+                    }
+                    return;
+                }
+
+                if (!triggeredByPet && activeDefinition != null && activeDefinition.pickupItem != null)
                 {
                     if (!InventoryBridge.AddItem(activeDefinition.pickupItem, 1))
                         return;
                 }
 
-                controller.HandleStoreRequest();
-                storedByPet |= triggeredByPet;
-                storedManually |= !triggeredByPet;
-                if (guardModeEnabled)
+                DespawnCompanion(false);
+
+                storedByPet = triggeredByPet && hadActiveCompanion;
+                storedManually = !triggeredByPet && hadActiveCompanion;
+                if (!triggeredByPet)
                 {
-                    guardModeEnabled = false;
-                    GuardModeChanged?.Invoke(false);
+                    companionWasActiveBeforePetSpawn = false;
+                    suppressRestoreAfterPet = false;
+                }
+                else
+                {
+                    companionWasActiveBeforePetSpawn = storedByPet;
                 }
             }
             else
             {
-                controller.HandleSummonRequest();
+                if (!IsStored)
+                {
+                    if (hadActiveCompanion)
+                        EnsureHud();
+                    return;
+                }
+
                 storedByPet = false;
                 storedManually = false;
+                companionWasActiveBeforePetSpawn = false;
+                suppressRestoreAfterPet = false;
+
+                TrySpawnCompanion(activeDefinition);
             }
 
-            inventoryVisible = false;
-            InventoryVisibilityChanged?.Invoke(false);
-            EnsureHud();
+            if (inventoryVisible)
+            {
+                inventoryVisible = false;
+                InventoryVisibilityChanged?.Invoke(false);
+            }
         }
 
         /// <summary>
@@ -302,11 +367,15 @@ namespace Companions
                 return;
             }
             if (storedByPet)
-                SetStored(false);
+            {
+                storedByPet = false;
+                companionWasActiveBeforePetSpawn = false;
+                TrySpawnCompanion(activeDefinition);
+                return;
+            }
 
-            // If the companion remained active (for example, it was manually re-summoned while the pet
-            // was still present) the HUD still needs to be rebuilt so the level bar stays visible once the
-            // pet leaves the scene.
+            companionWasActiveBeforePetSpawn = false;
+
             if (HasActiveCompanion)
                 EnsureHud();
         }
@@ -316,11 +385,14 @@ namespace Companions
         /// </summary>
         public static void HandlePrePetSpawn()
         {
-            if (controller != null && controller.gameObject.activeSelf)
-            {
-                suppressRestoreAfterPet = true;
-                SetStored(true, triggeredByPet: true);
-            }
+            companionWasActiveBeforePetSpawn = HasActiveCompanion;
+            if (!companionWasActiveBeforePetSpawn)
+                return;
+
+            suppressRestoreAfterPet = true;
+            storedManually = false;
+            DespawnCompanion(false);
+            storedByPet = companionWasActiveBeforePetSpawn;
         }
 
         /// <summary>
@@ -445,10 +517,13 @@ namespace Companions
             inventoryVisible = false;
             storedByPet = false;
             storedManually = false;
+            companionWasActiveBeforePetSpawn = false;
             guardModeEnabled = false;
             combatLevel = 1;
             InventoryVisibilityChanged?.Invoke(false);
             GuardModeChanged?.Invoke(false);
+            PetLevelBarHUD.DestroyInstance();
+            boundHud = null;
         }
 
         /// <summary>
