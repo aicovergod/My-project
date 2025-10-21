@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:aad4e89d8caa97b597f3903b8e7f6f68d4b10989 -->
+## 2025-10-21T19:39:16+01:00 — Route companion gathering messages to companion chat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Skills/Common/GatheringRewardContextBuilder.cs, Assets/Scripts/Skills/Common/GatheringRewardProcessor.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs
+- Diff: 41 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:f101fc79d6beed4d2ca83b7e3120c38674b54a4d -->
 ## 2025-10-21T19:30:26+01:00 — Merge pull request #1254 from aicovergod/codex/fix-bug-kuy436
 
