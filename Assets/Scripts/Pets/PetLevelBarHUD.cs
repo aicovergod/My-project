@@ -345,6 +345,17 @@ namespace Pets
             }
         }
 
+        /// <summary>
+        /// Toggles the companion equipment window when this HUD represents the companion.
+        /// </summary>
+        public void ToggleEquipment()
+        {
+            if (isCompanion)
+            {
+                CompanionManager.ToggleEquipment();
+            }
+        }
+
         public void OnPointerClick(PointerEventData eventData)
         {
             if (eventData.button == PointerEventData.InputButton.Right)

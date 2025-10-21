@@ -1,5 +1,6 @@
 using System;
 using Combat;
+using Inventory;
 using Pets;
 using Skills;
 using Skills.Mining;
@@ -42,6 +43,9 @@ namespace Companions
         /// <summary>Tracks whether the companion was active when the pet pipeline requested a hide.</summary>
         private static bool companionWasActiveBeforePetSpawn;
 
+        /// <summary>Tracks whether the companion equipment window is currently visible.</summary>
+        private static bool equipmentVisible;
+
         /// <summary>Chat line used when the companion cannot store additional resources.</summary>
         internal const string InventoryFullChatLine = "My inventory is full up.";
 
@@ -59,6 +63,9 @@ namespace Companions
 
         /// <summary>Raised whenever the companion inventory opens or closes.</summary>
         public static event Action<bool> InventoryVisibilityChanged;
+
+        /// <summary>Raised whenever the companion equipment window opens or closes.</summary>
+        public static event Action<bool> EquipmentVisibilityChanged;
 
         /// <summary>Tracks whether verbose companion debug logging is enabled.</summary>
         private static bool enableDebugLogging;
@@ -111,6 +118,9 @@ namespace Companions
 
         /// <summary>Provides access to the configured inventory wrapper.</summary>
         public static CompanionInventory CompanionInventory => controller != null ? controller.Inventory : null;
+
+        /// <summary>Provides access to the configured equipment wrapper.</summary>
+        public static CompanionEquipment CompanionEquipment => controller != null ? controller.Equipment : null;
 
         /// <summary>Exposes the spawned companion object for systems that need the instance handle.</summary>
         public static GameObject CompanionObject => companionObject;
@@ -186,6 +196,7 @@ namespace Companions
             controller.Initialise(player.transform);
             controller.SkillLevelChanged += HandleSkillLevelChanged;
             controller.InventoryVisibilityChanged += HandleInventoryVisibilityChanged;
+            controller.EquipmentVisibilityChanged += HandleEquipmentVisibilityChanged;
             controller.Despawned += HandleControllerDespawned;
             if (companionObject.GetComponent<CompanionClickable>() == null)
                 companionObject.AddComponent<CompanionClickable>();
@@ -193,6 +204,7 @@ namespace Companions
             activeDefinition = resolvedDefinition;
             guardModeEnabled = false;
             inventoryVisible = false;
+            equipmentVisible = false;
             storedByPet = false;
             storedManually = false;
             companionWasActiveBeforePetSpawn = false;
@@ -200,6 +212,7 @@ namespace Companions
 
             UpdateCombatLevel();
             EnsureHud();
+            UpdateEquipmentVisibility(false);
         }
 
         /// <summary>
@@ -388,6 +401,11 @@ namespace Companions
                 inventoryVisible = false;
                 InventoryVisibilityChanged?.Invoke(false);
             }
+
+            if (equipmentVisible)
+            {
+                UpdateEquipmentVisibility(false);
+            }
         }
 
         /// <summary>
@@ -499,6 +517,19 @@ namespace Companions
         }
 
         /// <summary>
+        /// Toggles the companion equipment window and reports the resulting state.
+        /// </summary>
+        public static bool ToggleEquipment()
+        {
+            if (controller == null)
+                return false;
+
+            bool opened = controller.ToggleEquipment();
+            UpdateEquipmentVisibility(opened);
+            return opened;
+        }
+
+        /// <summary>
         /// Opens the companion stats window using the shared UI manager lifecycle.
         /// </summary>
         public static void OpenStats()
@@ -516,6 +547,26 @@ namespace Companions
         public static bool IsInventoryVisible()
         {
             return inventoryVisible;
+        }
+
+        /// <summary>Returns whether the companion equipment UI is currently open.</summary>
+        public static bool IsEquipmentVisible()
+        {
+            return equipmentVisible;
+        }
+
+        /// <summary>
+        /// Attempts to equip an item into the companion equipment using the player's inventory entry.
+        /// </summary>
+        public static bool TryEquipItemFromPlayerInventory(Inventory.Inventory playerInventory, InventoryEntry entry)
+        {
+            if (controller == null || controller.Equipment == null)
+                return false;
+
+            if (!equipmentVisible)
+                return false;
+
+            return controller.TryEquipFromPlayerInventory(entry, playerInventory);
         }
 
         /// <summary>
@@ -647,6 +698,14 @@ namespace Companions
         }
 
         /// <summary>
+        /// Mirrors equipment visibility updates from the controller so menus stay in sync.
+        /// </summary>
+        private static void HandleEquipmentVisibilityChanged(bool visible)
+        {
+            UpdateEquipmentVisibility(visible);
+        }
+
+        /// <summary>
         /// Clears cached state when the controller is destroyed (e.g. on shutdown).
         /// </summary>
         private static void HandleControllerDespawned(CompanionController destroyed)
@@ -656,6 +715,7 @@ namespace Companions
 
             controller.SkillLevelChanged -= HandleSkillLevelChanged;
             controller.InventoryVisibilityChanged -= HandleInventoryVisibilityChanged;
+            controller.EquipmentVisibilityChanged -= HandleEquipmentVisibilityChanged;
             controller.Despawned -= HandleControllerDespawned;
             controller = null;
             companionObject = null;
@@ -667,6 +727,7 @@ namespace Companions
             guardModeEnabled = false;
             combatLevel = 1;
             InventoryVisibilityChanged?.Invoke(false);
+            UpdateEquipmentVisibility(false);
             GuardModeChanged?.Invoke(false);
             PetLevelBarHUD.DestroyInstance();
             boundHud = null;
@@ -684,6 +745,18 @@ namespace Companions
 
             if (combatLevel != previous)
                 CombatLevelChanged?.Invoke(combatLevel);
+        }
+
+        /// <summary>
+        /// Updates the cached equipment visibility flag and notifies listeners when the state changes.
+        /// </summary>
+        private static void UpdateEquipmentVisibility(bool visible)
+        {
+            if (equipmentVisible == visible)
+                return;
+
+            equipmentVisible = visible;
+            EquipmentVisibilityChanged?.Invoke(visible);
         }
     }
 }
