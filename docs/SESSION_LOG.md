@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:af4aecdfc5da0ec9fb6d9d16a34f0dcb8329d661 -->
+## 2025-10-21T20:58:43+01:00 — Defer companion inventory load until profile active
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionInventory.cs
+- Diff: 53 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:291dae7ce4214c063f404befdad4931d7f6a7bf0 -->
 ## 2025-10-21T20:17:10+01:00 — Merge pull request #1257 from aicovergod/codex/add-null-slot-guard-in-restorestate
 

@@ -20,6 +20,9 @@ namespace Companions
         /// <summary>Tracks whether the inventory UI is currently visible.</summary>
         private bool isOpen;
 
+        /// <summary>Indicates whether the inventory load must wait for an active profile.</summary>
+        private bool deferredLoadPending;
+
         /// <summary>Raised whenever the inventory window opens or closes.</summary>
         public event Action<bool> VisibilityChanged;
 
@@ -87,7 +90,31 @@ namespace Companions
             inventory.RefreshWindowLayout();
             inventory.ForceDedicatedUiRoot();
 
-            // Reload using the companion key and re-register so subsequent saves persist under it.
+            // Defer loading if no account is active so we bind to the correct profile-scoped key.
+            if (string.IsNullOrEmpty(SaveManager.ActiveProfileId))
+            {
+                if (!deferredLoadPending)
+                {
+                    SaveManager.ActiveAccountUsernameChanged += HandleActiveAccountUsernameChanged;
+                }
+
+                deferredLoadPending = true;
+            }
+            else
+            {
+                LoadAndRegisterInventory();
+            }
+        }
+
+        /// <summary>
+        /// Performs the companion inventory load, re-registers it with the save system, and
+        /// ensures the UI reflects the refreshed contents.
+        /// </summary>
+        private void LoadAndRegisterInventory()
+        {
+            if (inventory == null)
+                return;
+
             inventory.Load();
             SaveManager.Register(inventory);
 
@@ -156,9 +183,34 @@ namespace Companions
 
         private void OnDestroy()
         {
+            if (deferredLoadPending)
+            {
+                SaveManager.ActiveAccountUsernameChanged -= HandleActiveAccountUsernameChanged;
+                deferredLoadPending = false;
+            }
+
             if (inventory != null)
                 inventory.CloseUI();
             VisibilityChanged = null;
+        }
+
+        /// <summary>
+        /// Handles the save manager activating a profile so the companion inventory can bind to it.
+        /// </summary>
+        /// <param name="_">Unused username argument supplied by the save manager.</param>
+        private void HandleActiveAccountUsernameChanged(string _)
+        {
+            if (!deferredLoadPending)
+                return;
+
+            SaveManager.ActiveAccountUsernameChanged -= HandleActiveAccountUsernameChanged;
+            deferredLoadPending = false;
+
+            // Guard against race conditions where the profile is still unavailable.
+            if (string.IsNullOrEmpty(SaveManager.ActiveProfileId))
+                return;
+
+            LoadAndRegisterInventory();
         }
     }
 }
