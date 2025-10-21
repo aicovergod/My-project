@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b2cd9074caba5998e8b8f161b6ebb5c98362232f -->
+## 2025-10-21T15:15:29+01:00 — Ensure pet HUD waits for health bar before spawning
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Pets/PetLevelBarHUD.cs, Assets/Scripts/Player/HealthHUD.cs
+- Diff: 107 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:b0ee488b83079882f467b670bdd012b0a30f3a2c -->
 ## 2025-10-21T15:05:23+01:00 — Merge pull request #1243 from aicovergod/codex/update-companionmanager-despawn-logic
 
