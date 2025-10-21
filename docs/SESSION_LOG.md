@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fb0f07a4ef65a84379f95fad92c3e2f096a4e5f2 -->
+## 2025-10-21T21:30:43+01:00 — uwu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (18): Assets/Scripts/Companions.meta, Assets/Scripts/Companions/CompanionClickable.cs.meta, Assets/Scripts/Companions/CompanionCombatBridge.cs.meta, Assets/Scripts/Companions/CompanionController.cs.meta, Assets/Scripts/Companions/CompanionInventory.cs.meta, Assets/Scripts/Companions/CompanionManager.cs.meta, Assets/Scripts/Companions/CompanionRuntimeAssets.cs.meta, Assets/Scripts/Companions/CompanionSkillMemorySave.cs.meta, Assets/Scripts/Companions/CompanionStatsWindow.cs.meta, Assets/Scripts/Companions/Mining.meta, Assets/Scripts/Companions/Mining/CompanionMiningController.cs.meta, Assets/Scripts/Player/Commands/CommandsListCommand.cs.meta, Assets/Scripts/Player/Commands/SaveProfileCommand.cs.meta, Assets/Scripts/Skills/Mining/Core/PickaxeDefinitionRegistry.cs.meta, Assets/Scripts/Skills/SkillNameUtility.cs.meta, Assets/Tests/UI/ModIconAtlasTests.cs.meta, Packages/manifest.json, Packages/packages-lock.json
+- Diff: 72 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:da762e1cd5f1d73872314ebbee3b2b61e844dd41 -->
 ## 2025-10-21T20:59:15+01:00 — Merge pull request #1258 from aicovergod/codex/refactor-companion-inventory-loading-logic
 
