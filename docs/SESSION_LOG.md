@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:eae34d0a0b6ff846a51579f8fe7cd9c30307e65d -->
+## 2025-10-22T00:12:49+01:00 — Merge pull request #1267 from aicovergod/codex/force-player-inventory-to-open-with-equipment-tab
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 66 ++ / 0 --
+- Notes:
+  Ensure companion equipment opens player inventory
+---
+<!-- commit:d485fb9a62eac7a369a130122abb0af2a3b3e8cb -->
+## 2025-10-22T00:12:38+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:16c9198fe27a9f6adf8a47125d632f1f6595cf9d -->
 ## 2025-10-22T00:12:19+01:00 — Ensure companion equipment opens player inventory
 
