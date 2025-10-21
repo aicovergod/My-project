@@ -24,6 +24,26 @@ namespace Pets
         public static PetCombatController ActivePetCombat => activePetGO != null ? activePetGO.GetComponent<PetCombatController>() : null;
 
         /// <summary>
+        ///     Determines whether the supplied definition matches the currently active pet instance.
+        ///     The comparison succeeds when the references are identical or when their IDs match.
+        /// </summary>
+        /// <param name="definition">Definition to evaluate against the active pet.</param>
+        /// <returns>True when <paramref name="definition"/> represents the active pet.</returns>
+        public static bool IsActivePetDefinition(PetDefinition definition)
+        {
+            if (definition == null || activePetDef == null)
+                return false;
+
+            if (ReferenceEquals(activePetDef, definition))
+                return true;
+
+            if (string.IsNullOrEmpty(definition.id) || string.IsNullOrEmpty(activePetDef.id))
+                return false;
+
+            return string.Equals(activePetDef.id, definition.id, StringComparison.Ordinal);
+        }
+
+        /// <summary>
         ///     Provides the floating-text controller for the active pet instance when available.
         /// </summary>
         public static PetFloatingTextController ActivePetFloatingText => activePetGO != null ? activePetGO.GetComponent<PetFloatingTextController>() : null;

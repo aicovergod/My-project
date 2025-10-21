@@ -653,10 +653,27 @@ namespace Inventory.Core
             var petDefinition = PetDropSystem.FindPetByItem(droppedItem);
             bool shouldSummonPet = dropAmount == 1 && petDefinition != null;
 
+            if (petDefinition != null && PetDropSystem.IsActivePetDefinition(petDefinition))
+            {
+                string activeDisplayName = PetDropSystem.ActivePet != null &&
+                    !string.IsNullOrEmpty(PetDropSystem.ActivePet.displayName)
+                    ? PetDropSystem.ActivePet.displayName
+                    : petDefinition.displayName;
+
+                PublishActivePetDropBlockedMessage(activeDisplayName);
+                controller.RefreshSlot(slotIndex);
+                controller.DismissDropMenu();
+                return;
+            }
+
             if (petDefinition != null && petDefinition.spawnAsCompanion &&
                 CompanionManager.IsActiveCompanionDefinition(petDefinition))
             {
-                PublishActiveCompanionDropBlockedMessage();
+                string companionDisplayName = CompanionManager.GetCompanionDisplayName();
+                string displayName = !string.IsNullOrEmpty(companionDisplayName)
+                    ? companionDisplayName
+                    : petDefinition.displayName;
+                PublishActivePetDropBlockedMessage(displayName);
                 controller.RefreshSlot(slotIndex);
                 controller.DismissDropMenu();
                 return;
@@ -731,16 +748,18 @@ namespace Inventory.Core
         }
 
         /// <summary>
-        /// Publishes a Game-channel chat message explaining why a companion item could not be dropped.
+        /// Publishes a Game-channel chat message explaining why a pet item could not be dropped.
         /// </summary>
-        private static void PublishActiveCompanionDropBlockedMessage()
+        private static void PublishActivePetDropBlockedMessage(string petDisplayName)
         {
             var chat = ChatService.Instance;
             if (chat == null)
                 return;
 
-            string companionName = CompanionManager.GetCompanionDisplayName();
-            chat.PublishGameMessage($"You already have a \"{companionName}\" spawned");
+            if (string.IsNullOrWhiteSpace(petDisplayName))
+                petDisplayName = "pet";
+
+            chat.PublishGameMessage($"You already have a \"{petDisplayName}\" spawned");
         }
 
         private GroundItemSpawner ResolveGroundItemSpawner()

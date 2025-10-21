@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:74f78b94400ec87aa9f7e1f8a94969e89c8dc2bd -->
+## 2025-10-21T22:54:14+01:00 — Prevent dropping active pets from inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Pets/PetDropSystem.cs
+- Diff: 44 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:1e19c5ad02412ecc9f4142784d8dd4791bfb4cd3 -->
 ## 2025-10-21T22:42:41+01:00 — Merge pull request #1262 from aicovergod/codex/fix-companion-drop-bug
 
