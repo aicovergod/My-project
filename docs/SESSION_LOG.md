@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:baa6063eae3f0466cbedca9fd785833f4bae4b5a -->
+## 2025-10-21T17:16:09+01:00 — Merge pull request #1248 from aicovergod/codex/add-random-skill-xp-gains-for-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 79 ++ / 5 --
+- Notes:
+  Implement companion melee XP randomization and logging toggle
+---
+<!-- commit:230b2567d5ece98b6d17aef80c5ab3431045b287 -->
+## 2025-10-21T17:15:57+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:27b684470fdaea136807e0e3b4e50a59b65002d6 -->
 ## 2025-10-21T17:15:39+01:00 — Implement companion melee XP randomization and logging toggle
 
