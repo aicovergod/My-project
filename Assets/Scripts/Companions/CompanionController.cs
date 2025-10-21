@@ -52,6 +52,11 @@ namespace Companions
         /// <summary>Exposes the mining controller responsible for companion gathering commands.</summary>
         public CompanionMiningController MiningController => miningController;
 
+        /// <summary>
+        /// Indicates whether the companion has an active combat controller capable of fighting.
+        /// </summary>
+        public bool CanFight => combatController != null && combatController.CanFight;
+
         /// <summary>Pool of combat skills eligible for melee XP rolls.</summary>
         private static readonly SkillType[] MeleeXpSkills =
         {

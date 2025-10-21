@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:01745b5e279e8239d5d9b24ffa9aaee36946cb7b -->
+## 2025-10-21T19:30:02+01:00 — Prevent non-combat companions from intercepting NPC menus
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 8 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c8a7344c698ce319798cd7403beb881a890a6a17 -->
 ## 2025-10-21T19:08:01+01:00 — Merge pull request #1253 from aicovergod/codex/implement-companion-mining-command
 
