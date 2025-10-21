@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9bf57eee13c25413934321c03a3f20d850cdab31 -->
+## 2025-10-21T19:40:57+01:00 — Merge pull request #1255 from aicovergod/codex/update-resource-gathering-messages-for-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 50 ++ / 4 --
+- Notes:
+  Route companion gathering messages to companion chat
+---
+<!-- commit:e8d58bd45ef81c2ca6512ea82e66608a753e9870 -->
+## 2025-10-21T19:39:34+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:aad4e89d8caa97b597f3903b8e7f6f68d4b10989 -->
 ## 2025-10-21T19:39:16+01:00 — Route companion gathering messages to companion chat
 
