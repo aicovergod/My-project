@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:71c96af69139bb41c5c1afb4ffc01998697f4381 -->
+## 2025-10-21T17:45:15+01:00 — feat: announce skill level ups in chat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionRuntimeAssets.cs, Assets/Scripts/Pets/PetDefinition.cs, Assets/Scripts/Skills/SkillNameUtility.cs
+- Diff: 129 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:815c7255c91e9a6f55a2a4e2a062b3014c7890d5 -->
 ## 2025-10-21T17:32:44+01:00 — Handle companion manual attack commands
 
