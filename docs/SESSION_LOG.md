@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b38438dc3609a598610073f6317a36bdb540e215 -->
+## 2025-10-21T12:46:58+01:00 — Add companion chat channel to chat HUD
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/UI/Chat/ChatChannel.cs, Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/UI/Chat/ChatService.cs
+- Diff: 86 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:58d0b9f20bd2a7cf8967ce2756c64d28817f964d -->
 ## 2025-10-21T12:36:08+01:00 — Merge pull request #1238 from aicovergod/codex/add-companion-spawning-functionality
 

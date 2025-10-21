@@ -28,11 +28,12 @@ namespace UI.Chat
         private static readonly Color32 ChannelToggleEnabledTextColor = new Color32(255, 238, 170, 255);
         private static readonly Color32 ChannelToggleDisabledTextColor = new Color32(180, 170, 140, 160);
         private static readonly Color32 GameMessageColor = new Color32(170, 255, 170, 255);
+        private static readonly Color32 CompanionMessageColor = new Color32(160, 215, 255, 255);
         private static readonly Color32 PublicMessageColor = new Color32(230, 230, 230, 255);
         private static readonly Color32 LocalPlayerMessageColor = new Color32(255, 255, 255, 255);
         private static readonly Color32 PlaceholderColor = new Color32(210, 210, 210, 140);
 
-        private static readonly ChatChannel[] ChannelValues = (ChatChannel[])Enum.GetValues(typeof(ChatChannel));
+        private static readonly ChatChannel[] ChannelValues = ChatChannelUtility.GetOrderedChannels();
         private const string EmojiMarkupPrefix = "<emoji=";
         private const int InputCharacterLimit = 64;
 
@@ -1414,6 +1415,9 @@ namespace UI.Chat
             if (message.Channel == ChatChannel.Game)
                 return "Game";
 
+            if (message.Channel == ChatChannel.Companion && string.IsNullOrEmpty(message.Sender))
+                return "Companion";
+
             return !string.IsNullOrEmpty(message.Sender) ? message.Sender : "Player";
         }
 
@@ -1472,6 +1476,10 @@ namespace UI.Chat
         {
             if (message.Channel == ChatChannel.Game)
                 return GameMessageColor;
+
+            if (message.Channel == ChatChannel.Companion)
+                return CompanionMessageColor;
+
             return message.IsLocalPlayerAuthor ? LocalPlayerMessageColor : PublicMessageColor;
         }
 

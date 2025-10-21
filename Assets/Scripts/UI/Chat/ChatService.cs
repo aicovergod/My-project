@@ -15,7 +15,7 @@ namespace UI.Chat
     public sealed class ChatService : SceneGatedSingletonBehaviour<ChatService>
     {
         private const int DefaultHistoryLimit = 200;
-        private static readonly ChatChannel[] ChannelValues = (ChatChannel[])Enum.GetValues(typeof(ChatChannel));
+        private static readonly ChatChannel[] ChannelValues = ChatChannelUtility.GetOrderedChannels();
         private static readonly Regex WhitespaceRegex = new Regex("\\s+", RegexOptions.Compiled);
 
         [SerializeField, Tooltip("Maximum number of messages cached per channel."), Min(1)]
@@ -131,6 +131,23 @@ namespace UI.Chat
                 return;
 
             var message = new ChatMessage(ChatChannel.Game, "Game", normalised, DateTime.UtcNow, false);
+            EnqueueMessage(message);
+        }
+
+        /// <summary>
+        /// Publishes a companion dialogue line to the Companion channel.
+        /// </summary>
+        /// <param name="sender">Display name of the speaker. Falls back to "Companion" when empty.</param>
+        /// <param name="text">Dialogue text that should be queued.</param>
+        /// <param name="isLocalPlayerAuthor">Whether the local player authored the line (used for colour selection).</param>
+        public void PublishCompanionMessage(string sender, string text, bool isLocalPlayerAuthor = false)
+        {
+            string normalised = NormaliseMessage(text);
+            if (string.IsNullOrEmpty(normalised))
+                return;
+
+            string resolvedSender = !string.IsNullOrWhiteSpace(sender) ? sender.Trim() : "Companion";
+            var message = new ChatMessage(ChatChannel.Companion, resolvedSender, normalised, DateTime.UtcNow, isLocalPlayerAuthor);
             EnqueueMessage(message);
         }
 
