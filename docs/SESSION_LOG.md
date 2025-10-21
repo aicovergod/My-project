@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:291dae7ce4214c063f404befdad4931d7f6a7bf0 -->
+## 2025-10-21T20:17:10+01:00 — Merge pull request #1257 from aicovergod/codex/add-null-slot-guard-in-restorestate
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 15 ++ / 0 --
+- Notes:
+  Handle null inventory slots during state restoration
+---
+<!-- commit:6c75953fac4724561c5bf25bb0cd3ff559a11871 -->
+## 2025-10-21T20:17:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:35da0a989532489a8029518c6caac6117885fab3 -->
 ## 2025-10-21T20:16:43+01:00 — Handle null slots when restoring inventory state
 
