@@ -46,6 +46,9 @@ namespace Companions
         /// <summary>Tracks whether the companion equipment window is currently visible.</summary>
         private static bool equipmentVisible;
 
+        /// <summary>Cached handle to the active player inventory so equipment toggles can drive it.</summary>
+        private static Inventory.Inventory cachedPlayerInventory;
+
         /// <summary>Chat line used when the companion cannot store additional resources.</summary>
         internal const string InventoryFullChatLine = "My inventory is full up.";
 
@@ -716,6 +719,9 @@ namespace Companions
         private static void HandleEquipmentVisibilityChanged(bool visible)
         {
             UpdateEquipmentVisibility(visible);
+
+            if (visible)
+                EnsurePlayerInventoryOpen();
         }
 
         /// <summary>
@@ -770,6 +776,57 @@ namespace Companions
 
             equipmentVisible = visible;
             EquipmentVisibilityChanged?.Invoke(visible);
+        }
+
+        /// <summary>
+        /// Ensures the player's own inventory window is visible whenever the companion equipment opens.
+        /// </summary>
+        private static void EnsurePlayerInventoryOpen()
+        {
+            var playerInventory = ResolvePlayerInventory();
+            if (playerInventory == null)
+                return;
+
+            if (!playerInventory.IsOpen)
+                playerInventory.OpenUI();
+        }
+
+        /// <summary>
+        /// Resolves the active player inventory, caching the result so repeated equipment toggles stay fast.
+        /// </summary>
+        private static Inventory.Inventory ResolvePlayerInventory()
+        {
+            if (cachedPlayerInventory != null)
+                return cachedPlayerInventory;
+
+            cachedPlayerInventory = null;
+
+            var playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject != null)
+            {
+                cachedPlayerInventory = playerObject.GetComponent<Inventory.Inventory>() ??
+                                        playerObject.GetComponentInChildren<Inventory.Inventory>();
+                if (cachedPlayerInventory != null)
+                    return cachedPlayerInventory;
+            }
+
+            var inventories = UnityEngine.Object.FindObjectsOfType<Inventory.Inventory>(true);
+            foreach (var inventory in inventories)
+            {
+                if (inventory == null)
+                    continue;
+
+                if (inventory.GetComponent<CompanionInventory>() != null)
+                    continue;
+
+                if (inventory.GetComponent<Pets.PetStorage>() != null)
+                    continue;
+
+                cachedPlayerInventory = inventory;
+                break;
+            }
+
+            return cachedPlayerInventory;
         }
     }
 }
