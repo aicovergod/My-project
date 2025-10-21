@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:aa9e092139ab06156729d7afa08c733db48e0cd2 -->
+## 2025-10-21T16:50:28+01:00 — Adjust pet spawning companion restore behaviour
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetDropSystem.cs, Assets/Scripts/Pets/PetUseHandler.cs
+- Diff: 26 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:674387feff925eb001b92a41c6a31218bb8c258c -->
 ## 2025-10-21T16:29:54+01:00 — Merge pull request #1246 from aicovergod/codex/update-initialise-method-for-inventory-component
 
