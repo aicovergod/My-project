@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b147704f21f8729f200feb4edd0f0dd835b85e16 -->
+## 2025-10-21T13:16:33+01:00 — Fix companion pet spawning and persistence
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetDropSystem.cs, Assets/Scripts/Pets/PetUseHandler.cs
+- Diff: 103 ++ / 18 --
+- Notes:
+  —
+---
 <!-- commit:2512ea9333679750a138e677d7b16fc2cf0236a4 -->
 ## 2025-10-21T12:48:41+01:00 — Merge pull request #1239 from aicovergod/codex/add-companion-button-to-chatbox
 
