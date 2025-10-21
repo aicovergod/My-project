@@ -1,6 +1,7 @@
 using System;
 using BankSystem;
 using Books;
+using Companions;
 using Inventory.UI;
 using InventoryComponent = global::Inventory.Inventory;
 using MyGame.Drops;
@@ -11,6 +12,7 @@ using ShopSystem;
 using Skills.Common;
 using Skills.Firemaking;
 using UI;
+using UI.Chat;
 using UI.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -648,7 +650,17 @@ namespace Inventory.Core
 
             // Cache the item before removal so we can decide whether to spawn a pet or ground loot afterwards.
             var droppedItem = entry.item;
-            bool shouldSummonPet = dropAmount == 1 && PetDropSystem.FindPetByItem(droppedItem) != null;
+            var petDefinition = PetDropSystem.FindPetByItem(droppedItem);
+            bool shouldSummonPet = dropAmount == 1 && petDefinition != null;
+
+            if (petDefinition != null && petDefinition.spawnAsCompanion &&
+                CompanionManager.IsActiveCompanionDefinition(petDefinition))
+            {
+                PublishActiveCompanionDropBlockedMessage();
+                controller.RefreshSlot(slotIndex);
+                controller.DismissDropMenu();
+                return;
+            }
 
             model.RemoveFromSlot(slotIndex, dropAmount);
             controller.RefreshSlot(slotIndex);
@@ -716,6 +728,19 @@ namespace Inventory.Core
 
             Vector3 origin = owner.transform != null ? owner.transform.position : Vector3.zero;
             spawner.Spawn(item, amount, origin);
+        }
+
+        /// <summary>
+        /// Publishes a Game-channel chat message explaining why a companion item could not be dropped.
+        /// </summary>
+        private static void PublishActiveCompanionDropBlockedMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string companionName = CompanionManager.GetCompanionDisplayName();
+            chat.PublishGameMessage($"You already have a \"{companionName}\" spawned");
         }
 
         private GroundItemSpawner ResolveGroundItemSpawner()
