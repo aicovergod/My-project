@@ -289,7 +289,14 @@ namespace Pets
         /// <summary>
         /// Spawns a pet directly at the given world position.
         /// </summary>
-        public static GameObject SpawnPet(PetDefinition pet, Vector3 position)
+        /// <param name="pet">Definition describing the pet that should manifest.</param>
+        /// <param name="position">World position where the follower should appear.</param>
+        /// <param name="allowAutoRestore">
+        ///     Controls whether a previously active companion should automatically return once the new
+        ///     pet despawns. Pass <c>false</c> when a manual pet summon intentionally replaces the
+        ///     companion so it remains stored until the player calls it back in.
+        /// </param>
+        public static GameObject SpawnPet(PetDefinition pet, Vector3 position, bool allowAutoRestore = true)
         {
             Initialize();
 
@@ -303,7 +310,7 @@ namespace Pets
 
             if (Beastmaster.PetMergeController.Instance != null && Beastmaster.PetMergeController.Instance.IsMerged)
                 return null;
-            CompanionManager.HandlePrePetSpawn();
+            CompanionManager.HandlePrePetSpawn(allowAutoRestore);
             return SpawnPetInternal(pet, position);
         }
 

@@ -379,7 +379,11 @@ namespace Companions
         /// <summary>
         /// Ensures the companion is hidden before a pet spawns, satisfying the single-entity rule.
         /// </summary>
-        public static void HandlePrePetSpawn()
+        /// <param name="allowAutoRestore">
+        ///     True when the companion should automatically return after the temporary pet despawns.
+        ///     Pass false to keep the companion stored until the player explicitly summons it again.
+        /// </param>
+        public static void HandlePrePetSpawn(bool allowAutoRestore)
         {
             companionWasActiveBeforePetSpawn = HasActiveCompanion;
             if (!companionWasActiveBeforePetSpawn)
@@ -388,7 +392,17 @@ namespace Companions
             suppressRestoreAfterPet = true;
             storedManually = false;
             DespawnCompanion(false);
-            storedByPet = companionWasActiveBeforePetSpawn;
+
+            if (allowAutoRestore)
+            {
+                storedByPet = companionWasActiveBeforePetSpawn;
+                storedManually = false;
+            }
+            else
+            {
+                storedByPet = false;
+                storedManually = companionWasActiveBeforePetSpawn;
+            }
         }
 
         /// <summary>
