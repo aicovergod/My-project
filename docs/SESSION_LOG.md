@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5a722be2306330b54becf24bf0a8503398e2da44 -->
+## 2025-10-22T00:43:47+01:00 — Merge pull request #1270 from aicovergod/codex/add-chatbox-message-for-companion-mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 0 --
+- Notes:
+  Add companion chat warning when companion lacks pickaxe
+---
+<!-- commit:9169ec7deebcd13cad2d2864e91038df5e975b68 -->
+## 2025-10-22T00:41:24+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:28302cc4dea33c4202bde0b6ef9be45f696de67d -->
 ## 2025-10-22T00:41:06+01:00 — Add companion chat warning when missing pickaxe
 
