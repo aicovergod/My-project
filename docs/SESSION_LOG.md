@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:39d1557aa6ebb1c678991e1515a3598380e87ecf -->
+## 2025-10-22T00:20:28+01:00 — Mirror player equipment text styling on companion UI
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionEquipment.cs
+- Diff: 112 ++ / 19 --
+- Notes:
+  —
+---
 <!-- commit:eae34d0a0b6ff846a51579f8fe7cd9c30307e65d -->
 ## 2025-10-22T00:12:49+01:00 — Merge pull request #1267 from aicovergod/codex/force-player-inventory-to-open-with-equipment-tab
 

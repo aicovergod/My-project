@@ -94,6 +94,33 @@ namespace Companions
         private Vector2 slotSpacing = new(4f, 4f);
         private Vector2 referenceResolution = new(1024f, 768f);
 
+        private Font combatHeaderFont;
+        private Color combatHeaderColor = Color.white;
+        private Font attackFont;
+        private Color attackColor = Color.white;
+        private Font strengthFont;
+        private Color strengthColor = Color.white;
+        private Font rangeFont;
+        private Color rangeColor = Color.white;
+        private Font magicFont;
+        private Color magicColor = Color.white;
+        private Font defenceHeaderFont;
+        private Color defenceHeaderColor = Color.white;
+        private Font meleeDefFont;
+        private Color meleeDefColor = Color.white;
+        private Font rangeDefFont;
+        private Color rangeDefColor = Color.white;
+        private Font magicDefFont;
+        private Color magicDefColor = Color.white;
+        private Font maxHitHeaderFont;
+        private Color maxHitHeaderColor = Color.white;
+        private Font maxHitFont;
+        private Color maxHitColor = Color.white;
+        private Font tooltipNameFont;
+        private Color tooltipNameColor = Color.white;
+        private Font tooltipBonusFont;
+        private Color tooltipBonusColor = Color.white;
+
         private bool registeredWithUiManager;
         private bool initialised;
         private bool isOpen;
@@ -416,6 +443,9 @@ namespace Companions
 
         private void CopyStylingFromPlayerEquipment()
         {
+            Font fallbackFont = LegacyFontProvider.GetLegacyFont();
+            ApplyDefaultTextStyling(fallbackFont);
+
             var playerEquipment = FindObjectOfType<Inventory.Equipment>();
             if (playerEquipment == null)
             {
@@ -453,7 +483,70 @@ namespace Companions
             shieldSlotSprite = playerEquipment.shieldSlotSprite;
             weaponSlotSprite = playerEquipment.weaponSlotSprite;
             charmSlotSprite = playerEquipment.charmSlotSprite;
+
+            combatHeaderFont = playerEquipment.combatHeaderFont != null ? playerEquipment.combatHeaderFont : fallbackFont;
+            combatHeaderColor = playerEquipment.combatHeaderColor;
+            attackFont = playerEquipment.attackFont != null ? playerEquipment.attackFont : fallbackFont;
+            attackColor = playerEquipment.attackColor;
+            strengthFont = playerEquipment.strengthFont != null ? playerEquipment.strengthFont : fallbackFont;
+            strengthColor = playerEquipment.strengthColor;
+            rangeFont = playerEquipment.rangeFont != null ? playerEquipment.rangeFont : fallbackFont;
+            rangeColor = playerEquipment.rangeColor;
+            magicFont = playerEquipment.magicFont != null ? playerEquipment.magicFont : fallbackFont;
+            magicColor = playerEquipment.magicColor;
+            defenceHeaderFont = playerEquipment.defenceHeaderFont != null ? playerEquipment.defenceHeaderFont : fallbackFont;
+            defenceHeaderColor = playerEquipment.defenceHeaderColor;
+            meleeDefFont = playerEquipment.meleeDefFont != null ? playerEquipment.meleeDefFont : fallbackFont;
+            meleeDefColor = playerEquipment.meleeDefColor;
+            rangeDefFont = playerEquipment.rangeDefFont != null ? playerEquipment.rangeDefFont : fallbackFont;
+            rangeDefColor = playerEquipment.rangeDefColor;
+            magicDefFont = playerEquipment.magicDefFont != null ? playerEquipment.magicDefFont : fallbackFont;
+            magicDefColor = playerEquipment.magicDefColor;
+            maxHitHeaderFont = playerEquipment.maxHitHeaderFont != null ? playerEquipment.maxHitHeaderFont : fallbackFont;
+            maxHitHeaderColor = playerEquipment.maxHitHeaderColor;
+            maxHitFont = playerEquipment.maxHitFont != null ? playerEquipment.maxHitFont : fallbackFont;
+            maxHitColor = playerEquipment.maxHitColor;
+            tooltipNameFont = playerEquipment.tooltipNameFont != null ? playerEquipment.tooltipNameFont : fallbackFont;
+            tooltipNameColor = playerEquipment.tooltipNameColor;
+            tooltipBonusFont = playerEquipment.tooltipBonusFont != null ? playerEquipment.tooltipBonusFont : fallbackFont;
+            tooltipBonusColor = playerEquipment.tooltipBonusColor;
+
             emptySlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Empty_Slot");
+        }
+
+        /// <summary>
+        /// Resets the cached text styling to the Legacy font and OSRS white palette so the companion window
+        /// renders correctly even when the player equipment component is unavailable.
+        /// </summary>
+        /// <param name="fallbackFont">Font fetched from <see cref="LegacyFontProvider"/> used as the baseline style.</param>
+        private void ApplyDefaultTextStyling(Font fallbackFont)
+        {
+            combatHeaderFont = fallbackFont;
+            combatHeaderColor = Color.white;
+            attackFont = fallbackFont;
+            attackColor = Color.white;
+            strengthFont = fallbackFont;
+            strengthColor = Color.white;
+            rangeFont = fallbackFont;
+            rangeColor = Color.white;
+            magicFont = fallbackFont;
+            magicColor = Color.white;
+            defenceHeaderFont = fallbackFont;
+            defenceHeaderColor = Color.white;
+            meleeDefFont = fallbackFont;
+            meleeDefColor = Color.white;
+            rangeDefFont = fallbackFont;
+            rangeDefColor = Color.white;
+            magicDefFont = fallbackFont;
+            magicDefColor = Color.white;
+            maxHitHeaderFont = fallbackFont;
+            maxHitHeaderColor = Color.white;
+            maxHitFont = fallbackFont;
+            maxHitColor = Color.white;
+            tooltipNameFont = fallbackFont;
+            tooltipNameColor = Color.white;
+            tooltipBonusFont = fallbackFont;
+            tooltipBonusColor = Color.white;
         }
 
         private void BuildInterface()
@@ -583,12 +676,12 @@ namespace Companions
             bonusRect.anchoredPosition = new Vector2(-scaledPanelOffset, 0f);
             bonusRect.sizeDelta = new Vector2(scaledBonusWidth, contentSize.y);
 
-            Text CreateText(Transform parent, string name, string txt, float y, Color color)
+            Text CreateText(Transform parent, string name, string txt, float y, Font font, Color color)
             {
                 GameObject go = new(name, typeof(Text));
                 go.transform.SetParent(parent, false);
                 var t = go.GetComponent<Text>();
-                t.font = defaultFont;
+                t.font = font != null ? font : defaultFont;
                 t.fontSize = scaledFontSize;
                 t.alignment = TextAnchor.UpperCenter;
                 t.raycastTarget = false;
@@ -604,19 +697,19 @@ namespace Companions
             }
 
             float line = 0f;
-            CreateText(bonusPanel.transform, "CombatHeader", "Combat:", line, Color.white);
-            attackBonusText = CreateText(bonusPanel.transform, "Attack", "Attack = 0", line -= scaledLineHeight, Color.white);
-            rangeAccuracyBonusText = CreateText(bonusPanel.transform, "RangeAccuracy", "Ranged = 0", line -= scaledLineHeight, Color.white);
-            magicBonusText = CreateText(bonusPanel.transform, "Magic", "Magic = 0", line -= scaledLineHeight, Color.white);
-            CreateText(bonusPanel.transform, "DefenceHeader", "Defence:", line -= scaledLineHeight, Color.white);
-            meleeDefenceBonusText = CreateText(bonusPanel.transform, "MeleeDef", "Melee = 0", line -= scaledLineHeight, Color.white);
-            rangedDefenceBonusText = CreateText(bonusPanel.transform, "RangeDef", "Range = 0", line -= scaledLineHeight, Color.white);
-            magicDefenceBonusText = CreateText(bonusPanel.transform, "MagicDef", "Magic = 0", line -= scaledLineHeight, Color.white);
-            CreateText(bonusPanel.transform, "BonusesHeader", "Bonuses:", line -= scaledLineHeight * 2f, Color.white);
-            meleeBonusText = CreateText(bonusPanel.transform, "Melee", "Melee = 0", line -= scaledLineHeight, Color.white);
-            rangeStrengthBonusText = CreateText(bonusPanel.transform, "RangeStrength", "Ranged = 0", line -= scaledLineHeight, Color.white);
-            CreateText(bonusPanel.transform, "MaxHitHeader", "Max Hit:", line -= scaledLineHeight * 2f, Color.white);
-            maxHitText = CreateText(bonusPanel.transform, "MaxHit", "Total = 0", line -= scaledLineHeight, Color.white);
+            CreateText(bonusPanel.transform, "CombatHeader", "Combat:", line, combatHeaderFont, combatHeaderColor);
+            attackBonusText = CreateText(bonusPanel.transform, "Attack", "Attack = 0", line -= scaledLineHeight, attackFont, attackColor);
+            rangeAccuracyBonusText = CreateText(bonusPanel.transform, "RangeAccuracy", "Ranged = 0", line -= scaledLineHeight, rangeFont, rangeColor);
+            magicBonusText = CreateText(bonusPanel.transform, "Magic", "Magic = 0", line -= scaledLineHeight, magicFont, magicColor);
+            CreateText(bonusPanel.transform, "DefenceHeader", "Defence:", line -= scaledLineHeight, defenceHeaderFont, defenceHeaderColor);
+            meleeDefenceBonusText = CreateText(bonusPanel.transform, "MeleeDef", "Melee = 0", line -= scaledLineHeight, meleeDefFont, meleeDefColor);
+            rangedDefenceBonusText = CreateText(bonusPanel.transform, "RangeDef", "Range = 0", line -= scaledLineHeight, rangeDefFont, rangeDefColor);
+            magicDefenceBonusText = CreateText(bonusPanel.transform, "MagicDef", "Magic = 0", line -= scaledLineHeight, magicDefFont, magicDefColor);
+            CreateText(bonusPanel.transform, "BonusesHeader", "Bonuses:", line -= scaledLineHeight * 2f, combatHeaderFont, combatHeaderColor);
+            meleeBonusText = CreateText(bonusPanel.transform, "Melee", "Melee = 0", line -= scaledLineHeight, strengthFont, strengthColor);
+            rangeStrengthBonusText = CreateText(bonusPanel.transform, "RangeStrength", "Ranged = 0", line -= scaledLineHeight, rangeFont, rangeColor);
+            CreateText(bonusPanel.transform, "MaxHitHeader", "Max Hit:", line -= scaledLineHeight * 2f, maxHitHeaderFont, maxHitHeaderColor);
+            maxHitText = CreateText(bonusPanel.transform, "MaxHit", "Total = 0", line -= scaledLineHeight, maxHitFont, maxHitColor);
 
             tooltip = new GameObject("Tooltip", typeof(Image), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
             tooltip.transform.SetParent(uiRoot.transform, false);
@@ -647,10 +740,10 @@ namespace Companions
             var nameGO = new GameObject("Name", typeof(Text));
             nameGO.transform.SetParent(tooltip.transform, false);
             tooltipNameText = nameGO.GetComponent<Text>();
-            tooltipNameText.font = defaultFont;
+            tooltipNameText.font = tooltipNameFont != null ? tooltipNameFont : defaultFont;
             tooltipNameText.fontSize = scaledFontSize;
             tooltipNameText.alignment = TextAnchor.UpperLeft;
-            tooltipNameText.color = Color.white;
+            tooltipNameText.color = tooltipNameColor;
             tooltipNameText.raycastTarget = false;
             tooltipNameText.horizontalOverflow = HorizontalWrapMode.Wrap;
             tooltipNameText.verticalOverflow = VerticalWrapMode.Overflow;
@@ -658,10 +751,10 @@ namespace Companions
             var bonusGO = new GameObject("Bonus", typeof(Text));
             bonusGO.transform.SetParent(tooltip.transform, false);
             tooltipBonusText = bonusGO.GetComponent<Text>();
-            tooltipBonusText.font = defaultFont;
+            tooltipBonusText.font = tooltipBonusFont != null ? tooltipBonusFont : defaultFont;
             tooltipBonusText.fontSize = scaledFontSize;
             tooltipBonusText.alignment = TextAnchor.UpperLeft;
-            tooltipBonusText.color = Color.white;
+            tooltipBonusText.color = tooltipBonusColor;
             tooltipBonusText.raycastTarget = false;
             tooltipBonusText.horizontalOverflow = HorizontalWrapMode.Wrap;
             tooltipBonusText.verticalOverflow = VerticalWrapMode.Overflow;
