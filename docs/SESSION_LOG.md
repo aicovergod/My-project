@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:28302cc4dea33c4202bde0b6ef9be45f696de67d -->
+## 2025-10-22T00:41:06+01:00 — Add companion chat warning when missing pickaxe
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 15 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:baf4ca5e0c551c54877a7116b5cda92c9869ce23 -->
 ## 2025-10-22T00:37:48+01:00 — Merge pull request #1269 from aicovergod/codex/fix-rightclickmenu-prefab-loading-error
 
