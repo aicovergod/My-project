@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:402b9c15256bca50071c7457ecdd1261ea1f3c58 -->
+## 2025-10-21T17:33:39+01:00 — Merge pull request #1249 from aicovergod/codex/ensure-companions-follow-right-click-attack-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 30 ++ / 0 --
+- Notes:
+  Handle companion manual attack commands
+---
+<!-- commit:17b1120da33f8e9ea9e02ae5ed3440dcd6c5ac53 -->
+## 2025-10-21T17:33:04+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:815c7255c91e9a6f55a2a4e2a062b3014c7890d5 -->
 ## 2025-10-21T17:32:44+01:00 — Handle companion manual attack commands
 
