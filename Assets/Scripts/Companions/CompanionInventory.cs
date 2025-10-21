@@ -1,5 +1,7 @@
 using System;
+using Core.Save;
 using Inventory;
+using Inventory.Core;
 using UI;
 using UnityEngine;
 
@@ -42,12 +44,16 @@ namespace Companions
                 return;
             }
 
+            // The inventory registers with the save manager during OnEnable. Remove it so we can
+            // normalise the save key and contents without writing to the player profile slot.
+            SaveManager.Unregister(inventory);
+
+            inventory.saveKey = "CompanionInventory";
             inventory.columns = 4;
             inventory.size = 28;
             inventory.useSharedUIRoot = false;
             inventory.centerOnScreen = true;
             inventory.showCloseButton = false;
-            inventory.saveKey = "CompanionInventory";
             inventory.slotSize = new Vector2(64f, 64f);
             inventory.slotSpacing = new Vector2(4f, 4f);
             inventory.windowPadding = new Vector2(6f, 6f);
@@ -74,10 +80,39 @@ namespace Companions
                 inventory.combinationDatabase = playerInventory.combinationDatabase;
             }
 
+            // Ensure any residual items from default registration are cleared before we reload with the
+            // companion-specific save key. This prevents wiping existing pet data with empty payloads.
+            ClearPreloadedContents();
+
             inventory.RefreshWindowLayout();
             inventory.ForceDedicatedUiRoot();
+
+            // Reload using the companion key and re-register so subsequent saves persist under it.
+            inventory.Load();
+            SaveManager.Register(inventory);
+
+            inventory.RefreshWindowLayout();
             inventory.CloseUI();
             isOpen = false;
+        }
+
+        /// <summary>
+        /// Clears any items that may have been loaded with the default inventory key so the companion
+        /// starts with a clean state before reloading the dedicated save slot.
+        /// </summary>
+        private void ClearPreloadedContents()
+        {
+            if (inventory == null)
+                return;
+
+            var model = inventory.Model;
+            int slotCount = Mathf.Max(0, model.Size);
+            var emptyData = new InventoryModel.InventorySaveData
+            {
+                slots = new InventoryModel.SlotData[slotCount]
+            };
+
+            model.RestoreState(emptyData);
         }
 
         /// <summary>

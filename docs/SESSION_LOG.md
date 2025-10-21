@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ec2eb5160cd036b381769fa676d042a7f6034047 -->
+## 2025-10-21T20:03:50+01:00 — Refine companion save handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionInventory.cs, Assets/Scripts/Companions/CompanionSkillMemorySave.cs
+- Diff: 155 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:9bf57eee13c25413934321c03a3f20d850cdab31 -->
 ## 2025-10-21T19:40:57+01:00 — Merge pull request #1255 from aicovergod/codex/update-resource-gathering-messages-for-companions
 
