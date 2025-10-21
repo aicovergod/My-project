@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:736c6835ae4650dd74cb3c4c397f678e19b78d7f -->
+## 2025-10-21T13:47:24+01:00 — Merge pull request #1240 from aicovergod/codex/fix-identified-bugs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 112 ++ / 18 --
+- Notes:
+  Fix companion pet spawning and persistence
+---
+<!-- commit:2c48fc1f411163e074932b4b199d956109fb5722 -->
+## 2025-10-21T13:16:51+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b147704f21f8729f200feb4edd0f0dd835b85e16 -->
 ## 2025-10-21T13:16:33+01:00 — Fix companion pet spawning and persistence
 
