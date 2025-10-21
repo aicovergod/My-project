@@ -1,5 +1,7 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Skills.Common;
+using Companions;
 
 namespace Skills.Mining
 {
@@ -137,7 +139,27 @@ namespace Skills.Mining
         /// <inheritdoc />
         protected override void Prospect(MineableRock node)
         {
-            node?.Prospect(transform);
+            if (node == null)
+                return;
+
+            bool shiftHeld = false;
+            var keyboard = Keyboard.current;
+            if (keyboard != null)
+            {
+                shiftHeld = (keyboard.leftShiftKey != null && keyboard.leftShiftKey.isPressed)
+                    || (keyboard.rightShiftKey != null && keyboard.rightShiftKey.isPressed);
+            }
+            else
+            {
+                shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            }
+
+            if (shiftHeld && CompanionManager.TryCommandMine(node))
+            {
+                return;
+            }
+
+            node.Prospect(transform);
         }
     }
 }

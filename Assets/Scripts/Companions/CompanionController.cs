@@ -22,6 +22,9 @@ namespace Companions
         /// <summary>Inventory wrapper that builds the companion backpack UI.</summary>
         private CompanionInventory companionInventory;
 
+        /// <summary>Controller that manages mining-specific behaviour for the companion.</summary>
+        private CompanionMiningController miningController;
+
         /// <summary>Bridges pet combat calculations so the companion uses its own stats.</summary>
         private CompanionCombatBridge combatBridge;
 
@@ -46,6 +49,9 @@ namespace Companions
         /// <summary>Provides access to the configured inventory wrapper.</summary>
         public CompanionInventory Inventory => companionInventory;
 
+        /// <summary>Exposes the mining controller responsible for companion gathering commands.</summary>
+        public CompanionMiningController MiningController => miningController;
+
         /// <summary>Pool of combat skills eligible for melee XP rolls.</summary>
         private static readonly SkillType[] MeleeXpSkills =
         {
@@ -65,6 +71,7 @@ namespace Companions
 
             ConfigureSkills(player);
             ConfigureInventory(player);
+            ConfigureMining();
             ConfigureCombat();
             RebindPlayer(player);
         }
@@ -232,6 +239,12 @@ namespace Companions
             companionInventory.VisibilityChanged += OnInventoryVisibilityChanged;
         }
 
+        private void ConfigureMining()
+        {
+            miningController = gameObject.AddComponent<CompanionMiningController>();
+            miningController.Initialise(this, skillManager, companionInventory);
+        }
+
         private void ConfigureCombat()
         {
             combatBridge = gameObject.AddComponent<CompanionCombatBridge>();
@@ -250,12 +263,15 @@ namespace Companions
 
         private void OnDestroy()
         {
+            miningController?.CancelMining(true);
+
             if (skillManager != null)
                 skillManager.LevelChanged -= OnSkillLevelChanged;
 
             if (companionInventory != null)
                 companionInventory.VisibilityChanged -= OnInventoryVisibilityChanged;
 
+            miningController = null;
             Despawned?.Invoke(this);
         }
     }

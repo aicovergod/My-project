@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1b89a461f537ebcf360ad1b5d469dba74c103a47 -->
+## 2025-10-21T19:07:07+01:00 — Add companion mining command and tool registry
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionInventory.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Skills/Mining/Core/MinerController.cs, Assets/Scripts/Skills/Mining/Core/PickaxeDefinitionRegistry.cs, Assets/Scripts/Skills/Mining/Core/PickaxeToUse.cs
+- Diff: 600 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:5f970dfe4bd7e60a1f00b763444f16f4087e84e8 -->
 ## 2025-10-21T18:35:57+01:00 — Merge pull request #1252 from aicovergod/codex/add-reset-stats-buttons-in-admin-menu
 

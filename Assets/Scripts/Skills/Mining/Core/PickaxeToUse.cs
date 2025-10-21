@@ -15,6 +15,18 @@ namespace Skills.Mining
         public new PickaxeDefinition Current => base.Current;
 
         /// <summary>
+        /// Provides read-only access to the serialized pickaxe definitions so registries can cache them.
+        /// </summary>
+        public IReadOnlyList<PickaxeDefinition> AllPickaxes => allPickaxes;
+
+        /// <inheritdoc />
+        protected override void Awake()
+        {
+            base.Awake();
+            PickaxeDefinitionRegistry.RegisterDefinitions(allPickaxes);
+        }
+
+        /// <summary>
         /// Returns the best usable pickaxe. Refreshes the current pickaxe cache.
         /// </summary>
         public PickaxeDefinition GetBestPickaxe()
