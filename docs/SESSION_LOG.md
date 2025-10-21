@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:58d0b9f20bd2a7cf8967ce2756c64d28817f964d -->
+## 2025-10-21T12:36:08+01:00 — Merge pull request #1238 from aicovergod/codex/add-companion-spawning-functionality
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 68 ++ / 8 --
+- Notes:
+  Route Isla pet assets through companion pipeline
+---
+<!-- commit:befe05ebee18a5ebf0be5ed6166942ebd311b848 -->
+## 2025-10-21T12:35:59+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:4271c82ee0d7ec4a764269568f85852ab8a3212d -->
 ## 2025-10-21T12:35:42+01:00 — Route Isla pet assets through companion pipeline
 
