@@ -37,8 +37,8 @@ namespace Player.Commands
         /// <inheritdoc />
         public PlayerCommandResult Execute(PlayerCommandContext context)
         {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
+            if (context.Equals(default(PlayerCommandContext)))
+                throw new ArgumentException("Command context must be initialized.", nameof(context));
 
             var commands = commandService.GetRegisteredCommands();
             if (commands.Count == 0)
