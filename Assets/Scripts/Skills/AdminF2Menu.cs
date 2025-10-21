@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Player;
+using Companions;
 using Beastmaster;
 using Pets;
 using NPC;
@@ -267,6 +268,11 @@ namespace Skills
                 () => firemakingSkillBehaviour != null,
                 () => firemakingSkillBehaviour.EnableDebugLogging,
                 value => firemakingSkillBehaviour.EnableDebugLogging = value);
+
+            bool companionDebugLogging = CompanionManager.EnableDebugLogging;
+            bool requestedCompanionDebugLogging = GUILayout.Toggle(companionDebugLogging, "Companion Debug Logging");
+            if (requestedCompanionDebugLogging != companionDebugLogging)
+                CompanionManager.EnableDebugLogging = requestedCompanionDebugLogging;
 
             DrawNpcDamageLoggingControls();
 

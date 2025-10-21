@@ -55,6 +55,25 @@ namespace Companions
         /// <summary>Raised whenever the companion inventory opens or closes.</summary>
         public static event Action<bool> InventoryVisibilityChanged;
 
+        /// <summary>Tracks whether verbose companion debug logging is enabled.</summary>
+        private static bool enableDebugLogging;
+
+        /// <summary>
+        /// Toggle that allows QA to enable or disable verbose companion debug logging from the AdminF2 menu.
+        /// </summary>
+        public static bool EnableDebugLogging
+        {
+            get => enableDebugLogging;
+            set
+            {
+                if (enableDebugLogging == value)
+                    return;
+
+                enableDebugLogging = value;
+                Debug.Log($"[Companion] Debug logging {(enableDebugLogging ? "enabled" : "disabled")}.");
+            }
+        }
+
         /// <summary>True when the companion exists and is currently visible in the world.</summary>
         public static bool HasActiveCompanion => controller != null && controller.gameObject != null && controller.gameObject.activeSelf;
 
