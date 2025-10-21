@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2512ea9333679750a138e677d7b16fc2cf0236a4 -->
+## 2025-10-21T12:48:41+01:00 — Merge pull request #1239 from aicovergod/codex/add-companion-button-to-chatbox
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 95 ++ / 2 --
+- Notes:
+  Add companion chat channel between game and public
+---
+<!-- commit:377c35a84f3825e0c3b3438c41e0c069c83bfd9d -->
+## 2025-10-21T12:47:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b38438dc3609a598610073f6317a36bdb540e215 -->
 ## 2025-10-21T12:46:58+01:00 — Add companion chat channel to chat HUD
 
