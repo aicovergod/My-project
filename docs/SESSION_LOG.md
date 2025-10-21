@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:43adbdd2e82cfb83aa0bc05a4710e8b7b4ad11d6 -->
+## 2025-10-22T00:04:30+01:00 — Merge pull request #1266 from aicovergod/codex/fix-companion-equipment-tab-behavior
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 76 ++ / 0 --
+- Notes:
+  Keep player inventory visible while companion equipment tab is open
+---
+<!-- commit:822a7c15a0cd718307bb4e4e7e273a5f7c6db4bb -->
+## 2025-10-22T00:04:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:118da0711266a315ab5da9d1e3c4cb43475a309f -->
 ## 2025-10-22T00:04:04+01:00 — Fix companion equipment tab inventory interactions
 
