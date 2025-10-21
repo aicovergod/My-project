@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:cefcec98a4455c88bf10f6bec925fa9e257878ad -->
+## 2025-10-21T21:53:31+01:00 — Merge pull request #1259 from aicovergod/codex/update-handle-active-account-username-change
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 4 --
+- Notes:
+  Fix companion inventory load when profile pending
+---
+<!-- commit:5b7ec23ee7dfc5944c6b2888b2a76edbbb168f81 -->
+## 2025-10-21T21:53:12+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7432072b60ae37eda4eed165979fe6a2234738a3 -->
 ## 2025-10-21T21:52:53+01:00 — Fix companion inventory load when profile pending
 
