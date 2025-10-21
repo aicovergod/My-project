@@ -12,6 +12,7 @@ using Player;
 using Player.Movement;
 using NPC;
 using Pets;
+using Companions;
 using UI;
 using Magic;
 using Status;
@@ -239,6 +240,8 @@ namespace Combat
                 var pet = PetDropSystem.ActivePetCombat;
                 pet?.CommandAttack(target, false);
             }
+            if (CompanionManager.GuardModeEnabled)
+                CompanionManager.CommandGuardAttack(target);
             return true;
         }
 

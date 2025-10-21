@@ -6,6 +6,7 @@ using Inventory;
 using Skills;
 using BankSystem;
 using Core.Save;
+using Companions;
 
 namespace Pets
 {
@@ -250,6 +251,8 @@ namespace Pets
                 activePetDef = null;
                 PetSaveBridge.Clear();
             }
+
+            CompanionManager.HandlePetDespawned();
         }
 
         /// <summary>
@@ -280,6 +283,7 @@ namespace Pets
             Initialize();
             if (Beastmaster.PetMergeController.Instance != null && Beastmaster.PetMergeController.Instance.IsMerged)
                 return null;
+            CompanionManager.HandlePrePetSpawn();
             return SpawnPetInternal(pet, position);
         }
 

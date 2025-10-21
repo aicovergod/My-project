@@ -7,6 +7,7 @@ using Inventory;
 using Skills;
 using Skills.Cooking;
 using UI;
+using Companions;
 using Object = UnityEngine.Object;
 
 namespace Pets
@@ -18,12 +19,19 @@ namespace Pets
     {
         private Button mergeButton;
         private Text mergeText;
+
+        /// <summary>Button backing the pick-up / summon action.</summary>
         private Button pickupButton;
+
         private PetMergeController mergeController;
 
         private Button cookAllButton;
         private Text cookAllText;
+
+        /// <summary>Stores the next time the cook-all option can be invoked.</summary>
         private static float cookAllCooldownEnd;
+
+        /// <summary>Recipe lookup cached to avoid repeated database scans.</summary>
         private static Dictionary<string, CookableRecipe> recipeLookup;
 
         partial void OnMenuCreated(Transform menuRoot)
@@ -44,41 +52,52 @@ namespace Pets
         {
             if (mergeButton == null || pickupButton == null || cookAllButton == null)
                 return;
-            if (mergeController == null)
-                mergeController = Object.FindObjectOfType<PetMergeController>();
-            pickupButton.gameObject.SetActive(PetDropSystem.ActivePetObject != null);
-
-            if (mergeController == null)
+            bool isCompanion = current != null && current.IsCompanionHud;
+            if (isCompanion)
             {
                 mergeButton.gameObject.SetActive(false);
+                cookAllButton.gameObject.SetActive(false);
+                pickupButton.gameObject.SetActive(true);
+                pickupButton.GetComponentInChildren<Text>().text = CompanionManager.HasActiveCompanion ? "Pick Up" : "Summon";
             }
             else
             {
-                mergeButton.gameObject.SetActive(true);
-                if (mergeController.IsMerged)
+                if (mergeController == null)
+                    mergeController = Object.FindObjectOfType<PetMergeController>();
+                pickupButton.gameObject.SetActive(PetDropSystem.ActivePetObject != null);
+
+                if (mergeController == null)
                 {
-                    mergeText.text = "Unmerge";
-                    mergeButton.interactable = true;
-                }
-                else if (mergeController.IsOnCooldown)
-                {
-                    TimeSpan cd = TimeSpan.FromSeconds(mergeController.CooldownRemaining);
-                    mergeText.text = $"Merge ({cd.Minutes:00}:{cd.Seconds:00})";
-                    mergeButton.interactable = false;
-                }
-                else if (!mergeController.CanMerge)
-                {
-                    mergeText.text = "Merge";
-                    mergeButton.interactable = false;
+                    mergeButton.gameObject.SetActive(false);
                 }
                 else
                 {
-                    mergeText.text = "Merge";
-                    mergeButton.interactable = true;
+                    mergeButton.gameObject.SetActive(true);
+                    if (mergeController.IsMerged)
+                    {
+                        mergeText.text = "Unmerge";
+                        mergeButton.interactable = true;
+                    }
+                    else if (mergeController.IsOnCooldown)
+                    {
+                        TimeSpan cd = TimeSpan.FromSeconds(mergeController.CooldownRemaining);
+                        mergeText.text = $"Merge ({cd.Minutes:00}:{cd.Seconds:00})";
+                        mergeButton.interactable = false;
+                    }
+                    else if (!mergeController.CanMerge)
+                    {
+                        mergeText.text = "Merge";
+                        mergeButton.interactable = false;
+                    }
+                    else
+                    {
+                        mergeText.text = "Merge";
+                        mergeButton.interactable = true;
+                    }
                 }
-            }
 
-            UpdateCookAllButton();
+                UpdateCookAllButton();
+            }
         }
 
         private void OnMergeClicked()
@@ -94,11 +113,21 @@ namespace Pets
 
         private void OnPickupClicked()
         {
-            var pet = PetDropSystem.ActivePetObject;
-            if (pet != null)
+            if (current != null && current.IsCompanionHud)
             {
-                var clickable = pet.GetComponent<PetClickable>();
-                clickable?.Pickup();
+                if (CompanionManager.HasActiveCompanion)
+                    CompanionManager.SetStored(true);
+                else
+                    CompanionManager.SetStored(false);
+            }
+            else
+            {
+                var pet = PetDropSystem.ActivePetObject;
+                if (pet != null)
+                {
+                    var clickable = pet.GetComponent<PetClickable>();
+                    clickable?.Pickup();
+                }
             }
             Hide();
         }

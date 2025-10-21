@@ -115,6 +115,34 @@ namespace Skills
                 LevelChanged?.Invoke(skill, level);
         }
 
+        /// <summary>
+        /// Provides read-only access to the XP table currently driving level calculations.
+        /// </summary>
+        public XpTable GetXpTable()
+        {
+            return xpTable;
+        }
+
+        /// <summary>
+        /// Allows runtime systems to inject a specific XP table or save provider after the
+        /// component has been instantiated. This keeps hot-spawned skill managers in sync
+        /// with the player configuration without relying on inspector wiring.
+        /// </summary>
+        /// <param name="table">XP table that should back future level lookups.</param>
+        /// <param name="overrideProvider">Optional save provider override used to persist XP.</param>
+        public void ConfigureRuntime(XpTable table, ICombatSkillSave overrideProvider)
+        {
+            if (table != null)
+                xpTable = table;
+
+            if (overrideProvider != null)
+            {
+                save = overrideProvider;
+                if (overrideProvider is MonoBehaviour behaviour)
+                    saveProvider = behaviour;
+            }
+        }
+
         public void Save()
         {
             foreach (var kvp in skills)

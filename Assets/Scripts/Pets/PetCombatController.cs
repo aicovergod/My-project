@@ -10,6 +10,7 @@ using Skills.Mining;
 using UI;
 using Player;
 using Util;
+using Companions;
 
 namespace Pets
 {
@@ -333,26 +334,32 @@ namespace Pets
                 Style = CombatStyle.Accurate,
                 DamageType = DamageType.Melee
             };
-            var exp = GetComponent<PetExperience>();
-            float statMult = exp != null ? PetExperience.GetStatMultiplier(exp.Level) : 1f;
-            attacker.AttackLevel = Mathf.RoundToInt(attacker.AttackLevel * statMult);
-            attacker.StrengthLevel = Mathf.RoundToInt(attacker.StrengthLevel * statMult);
-            attacker.Equip.attack = Mathf.RoundToInt(attacker.Equip.attack * statMult);
-            attacker.Equip.strength = Mathf.RoundToInt(attacker.Equip.strength * statMult);
-            attacker.Equip.rangeStrength = Mathf.RoundToInt(attacker.Equip.rangeStrength * statMult);
+            var companionBridge = GetComponent<Companions.CompanionCombatBridge>();
+            bool statsOverridden = companionBridge != null && companionBridge.TryOverrideStats(ref attacker);
 
-            // scale stats based on the owner's Beastmaster level
-            var owner = follower != null ? follower.Player : null;
-            int beastmasterLevel = 1;
-            if (owner != null && owner.TryGetComponent<SkillManager>(out var skills))
-                beastmasterLevel = skills.GetLevel(SkillType.Beastmaster);
-
-            if (definition != null)
+            if (!statsOverridden)
             {
-                if (definition.attackLevelPerBeastmasterLevel != 0f)
-                    attacker.AttackLevel = Mathf.RoundToInt(attacker.AttackLevel * (1f + definition.attackLevelPerBeastmasterLevel * beastmasterLevel));
-                if (definition.strengthLevelPerBeastmasterLevel != 0f)
-                    attacker.StrengthLevel = Mathf.RoundToInt(attacker.StrengthLevel * (1f + definition.strengthLevelPerBeastmasterLevel * beastmasterLevel));
+                var exp = GetComponent<PetExperience>();
+                float statMult = exp != null ? PetExperience.GetStatMultiplier(exp.Level) : 1f;
+                attacker.AttackLevel = Mathf.RoundToInt(attacker.AttackLevel * statMult);
+                attacker.StrengthLevel = Mathf.RoundToInt(attacker.StrengthLevel * statMult);
+                attacker.Equip.attack = Mathf.RoundToInt(attacker.Equip.attack * statMult);
+                attacker.Equip.strength = Mathf.RoundToInt(attacker.Equip.strength * statMult);
+                attacker.Equip.rangeStrength = Mathf.RoundToInt(attacker.Equip.rangeStrength * statMult);
+
+                // scale stats based on the owner's Beastmaster level
+                var owner = follower != null ? follower.Player : null;
+                int beastmasterLevel = 1;
+                if (owner != null && owner.TryGetComponent<SkillManager>(out var skills))
+                    beastmasterLevel = skills.GetLevel(SkillType.Beastmaster);
+
+                if (definition != null)
+                {
+                    if (definition.attackLevelPerBeastmasterLevel != 0f)
+                        attacker.AttackLevel = Mathf.RoundToInt(attacker.AttackLevel * (1f + definition.attackLevelPerBeastmasterLevel * beastmasterLevel));
+                    if (definition.strengthLevelPerBeastmasterLevel != 0f)
+                        attacker.StrengthLevel = Mathf.RoundToInt(attacker.StrengthLevel * (1f + definition.strengthLevelPerBeastmasterLevel * beastmasterLevel));
+                }
             }
 
             var npc = target as NpcCombatant;
@@ -446,6 +453,7 @@ namespace Pets
                     npcAttack?.BeginAttacking(this);
                 }
                 BeastmasterXp.TryGrantFromPetDamage(owner != null ? owner.gameObject : null, finalDamage);
+                companionBridge?.NotifyDamageDealt(finalDamage, attacker.Style, attacker.DamageType);
             }
             else
             {
