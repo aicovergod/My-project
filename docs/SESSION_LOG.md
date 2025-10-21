@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1e19c5ad02412ecc9f4142784d8dd4791bfb4cd3 -->
+## 2025-10-21T22:42:41+01:00 — Merge pull request #1262 from aicovergod/codex/fix-companion-drop-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 50 ++ / 1 --
+- Notes:
+  Prevent dropping active companion items
+---
+<!-- commit:2c85caaa3e144279e30aa9f9b347addb51748a65 -->
+## 2025-10-21T22:42:33+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0fdf8978501c511aa77525c30585aba41c25f02c -->
 ## 2025-10-21T22:42:14+01:00 — Prevent dropping active companion items
 
