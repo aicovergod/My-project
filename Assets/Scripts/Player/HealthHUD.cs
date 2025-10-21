@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UI;
@@ -12,6 +13,15 @@ namespace Player
         private PlayerHitpoints hitpoints;
         private Image fillImage;
         private Text text;
+
+        /// <summary>Raised whenever a health HUD instance finishes its awake cycle.</summary>
+        public static event Action<HealthHUD> HealthHudCreated;
+
+        /// <summary>Raised when the active health HUD is destroyed so dependants can rebuild.</summary>
+        public static event Action HealthHudDestroyed;
+
+        /// <summary>Provides global access to the active health HUD instance.</summary>
+        public static HealthHUD Instance { get; private set; }
 
         public static HealthHUD CreateUnderMinimap(RectTransform minimapRoot, PlayerHitpoints hp)
         {
@@ -86,6 +96,14 @@ namespace Player
             return hud;
         }
 
+        private void Awake()
+        {
+            // Publish the instance immediately so late subscribers (pet HUD, companion HUD, etc.)
+            // can anchor to the health bar as soon as it is created.
+            Instance = this;
+            HealthHudCreated?.Invoke(this);
+        }
+
         private void HandleHealthChanged(int current, int max)
         {
             if (fillImage != null)
@@ -105,6 +123,14 @@ namespace Player
             {
                 hitpoints.OnHealthChanged -= HandleHealthChanged;
                 hitpoints.OnHitpointsLevelChanged -= HandleLevelChanged;
+            }
+
+            // Clear the static instance and alert listeners so they can queue a rebuild once the
+            // minimap recreates the HUD in the new scene.
+            if (Instance == this)
+            {
+                Instance = null;
+                HealthHudDestroyed?.Invoke();
             }
         }
     }

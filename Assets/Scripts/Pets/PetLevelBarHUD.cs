@@ -15,6 +15,15 @@ namespace Pets
     {
         private static PetLevelBarHUD instance;
 
+        /// <summary>Stores a pending pet experience reference while the health HUD is unavailable.</summary>
+        private static PetExperience pendingExperience;
+
+        /// <summary>Tracks whether a companion HUD needs to be rebuilt once the health HUD appears.</summary>
+        private static bool pendingCompanionRequest;
+
+        /// <summary>Ensures we only subscribe to health HUD lifecycle events once.</summary>
+        private static bool subscribedToHealthHudEvents;
+
         private PetExperience experience;
         private Text text;
         private Coroutine xpRoutine;
@@ -34,6 +43,15 @@ namespace Pets
             if (exp == null)
                 return;
 
+            if (HealthHUD.Instance == null)
+            {
+                // Defer creation until the minimap spawns the health HUD so the pet bar can anchor
+                // beneath it cleanly.
+                pendingExperience = exp;
+                EnsureHealthHudEventSubscription();
+                return;
+            }
+
             var hud = BuildHudSkeleton();
             if (hud == null)
                 return;
@@ -42,6 +60,7 @@ namespace Pets
             hud.isCompanion = false;
             exp.OnLevelChanged += hud.HandleLevelChanged;
             hud.HandleLevelChanged(exp.Level);
+            pendingExperience = null;
         }
 
         /// <summary>
@@ -49,6 +68,14 @@ namespace Pets
         /// </summary>
         public static PetLevelBarHUD CreateForCompanion()
         {
+            if (HealthHUD.Instance == null)
+            {
+                // Queue the request so the HUD materialises once the health bar is ready.
+                pendingCompanionRequest = true;
+                EnsureHealthHudEventSubscription();
+                return null;
+            }
+
             var hud = BuildHudSkeleton();
             if (hud == null)
                 return null;
@@ -57,6 +84,7 @@ namespace Pets
             hud.isCompanion = true;
             hud.UpdateLevelText();
             hud.BindToCompanion();
+            pendingCompanionRequest = false;
             return hud;
         }
 
@@ -94,7 +122,9 @@ namespace Pets
             if (instance != null)
                 Destroy(instance.gameObject);
 
-            var healthHud = Object.FindObjectOfType<HealthHUD>();
+            var healthHud = HealthHUD.Instance != null
+                ? HealthHUD.Instance
+                : Object.FindObjectOfType<HealthHUD>();
             if (healthHud == null)
                 return null;
 
@@ -164,6 +194,47 @@ namespace Pets
             textRect.offsetMax = Vector2.zero;
 
             return hud;
+        }
+
+        /// <summary>
+        /// Hooks into the health HUD lifecycle so deferred pet/companion requests can be honoured.
+        /// </summary>
+        private static void EnsureHealthHudEventSubscription()
+        {
+            if (subscribedToHealthHudEvents)
+                return;
+
+            HealthHUD.HealthHudCreated += HandleHealthHudCreated;
+            HealthHUD.HealthHudDestroyed += HandleHealthHudDestroyed;
+            subscribedToHealthHudEvents = true;
+        }
+
+        /// <summary>
+        /// Replays any queued requests once the health HUD has been reconstructed.
+        /// </summary>
+        private static void HandleHealthHudCreated(HealthHUD healthHud)
+        {
+            if (pendingExperience != null)
+            {
+                var exp = pendingExperience;
+                pendingExperience = null;
+                CreateForPet(exp);
+            }
+
+            if (pendingCompanionRequest)
+            {
+                pendingCompanionRequest = false;
+                CreateForCompanion();
+            }
+        }
+
+        /// <summary>
+        /// Handles health HUD teardown notifications so deferred requests can persist safely.
+        /// </summary>
+        private static void HandleHealthHudDestroyed()
+        {
+            // No explicit action is required here. Pending requests remain queued and will be
+            // replayed automatically when <see cref="HandleHealthHudCreated"/> fires again.
         }
 
         private void HandleLevelChanged(int lvl)
@@ -278,6 +349,15 @@ namespace Pets
                 StopCoroutine(xpRoutine);
             if (instance == this)
                 instance = null;
+
+            // If the HUD belonged to an active companion and the health bar is about to rebuild
+            // (scene load, minimap recreation, etc.) ensure a fresh request is queued so the player
+            // never loses the combat level display.
+            if (isCompanion && CompanionManager.HasActiveCompanion && HealthHUD.Instance == null)
+            {
+                pendingCompanionRequest = true;
+                EnsureHealthHudEventSubscription();
+            }
         }
     }
 }
