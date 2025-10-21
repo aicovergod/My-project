@@ -101,14 +101,6 @@ namespace Companions
         /// <param name="definitionOverride">Definition to use for visuals/combat data. Falls back to runtime asset when null.</param>
         public static void TrySpawnCompanion(PetDefinition definitionOverride)
         {
-            if (controller != null)
-            {
-                controller.RebindPlayer();
-                if (!controller.gameObject.activeSelf)
-                    SetStored(false);
-                return;
-            }
-
             var player = GameObject.FindGameObjectWithTag("Player");
             if (player == null)
                 return;
@@ -116,6 +108,24 @@ namespace Companions
             var resolvedDefinition = definitionOverride != null
                 ? definitionOverride
                 : CompanionRuntimeAssets.ResolveDefinition();
+
+            if (resolvedDefinition == null)
+                return;
+
+            if (controller != null)
+            {
+                controller.RebindPlayer(player.transform);
+
+                bool definitionsMatch = DefinitionsMatch(activeDefinition, resolvedDefinition);
+                if (definitionsMatch)
+                {
+                    if (!controller.gameObject.activeSelf)
+                        SetStored(false);
+                    return;
+                }
+
+                TearDownExistingCompanion();
+            }
 
             Vector3 spawnPosition = player.transform.position;
             companionObject = PetSpawner.Spawn(resolvedDefinition, spawnPosition, player.transform);
@@ -142,6 +152,51 @@ namespace Companions
 
             UpdateCombatLevel();
             EnsureHud();
+        }
+
+        /// <summary>
+        /// Determines whether the supplied definition matches the currently active companion definition.
+        /// </summary>
+        private static bool DefinitionsMatch(PetDefinition current, PetDefinition desired)
+        {
+            if (current == null || desired == null)
+                return false;
+
+            if (ReferenceEquals(current, desired))
+                return true;
+
+            return string.Equals(current.id, desired.id, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Destroys the existing companion controller so a new definition can be spawned immediately.
+        /// </summary>
+        private static void TearDownExistingCompanion()
+        {
+            if (controller == null)
+                return;
+
+            controller.SkillLevelChanged -= HandleSkillLevelChanged;
+            controller.InventoryVisibilityChanged -= HandleInventoryVisibilityChanged;
+            controller.Despawned -= HandleControllerDespawned;
+
+            var objectToDestroy = companionObject;
+
+            controller = null;
+            companionObject = null;
+            activeDefinition = null;
+            guardModeEnabled = false;
+            inventoryVisible = false;
+            storedByPet = false;
+            storedManually = false;
+            suppressRestoreAfterPet = false;
+            combatLevel = 1;
+
+            InventoryVisibilityChanged?.Invoke(false);
+            GuardModeChanged?.Invoke(false);
+
+            if (objectToDestroy != null)
+                UnityEngine.Object.Destroy(objectToDestroy);
         }
 
         /// <summary>

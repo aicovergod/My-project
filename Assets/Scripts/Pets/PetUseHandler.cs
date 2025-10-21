@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using Inventory;
-using Companions;
 
 namespace Pets
 {
@@ -27,12 +26,6 @@ namespace Pets
             var currentPet = PetDropSystem.ActivePet;
             if (inventory != null && currentPet != null && currentPet != pet && currentPet.pickupItem != null)
                 inventory.AddItem(currentPet.pickupItem);
-
-            if (pet.spawnAsCompanion)
-            {
-                CompanionManager.TrySpawnCompanion(pet);
-                return true;
-            }
 
             PetDropSystem.SpawnPet(pet, pos);
             return true;
