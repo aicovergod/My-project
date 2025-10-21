@@ -440,6 +440,23 @@ namespace Companions
         }
 
         /// <summary>
+        /// Attempts to issue a direct attack command when guard mode is disabled, mirroring pet manual targeting.
+        /// </summary>
+        /// <param name="target">Combat target selected by the player.</param>
+        /// <returns>True when the companion received the command.</returns>
+        public static bool TryCommandAttack(CombatTarget target)
+        {
+            if (guardModeEnabled || controller == null || target == null)
+                return false;
+
+            if (!controller.gameObject.activeSelf)
+                return false;
+
+            controller.CommandAttack(target);
+            return true;
+        }
+
+        /// <summary>
         /// Toggles guard mode and notifies listeners so menu labels stay in sync.
         /// </summary>
         public static void ToggleGuardMode()
