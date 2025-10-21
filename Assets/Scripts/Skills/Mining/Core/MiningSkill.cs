@@ -37,6 +37,8 @@ namespace Skills.Mining
         private Dictionary<string, ItemData> oreItems;
         private int questOreCount;
         private SkillingOutfitProgress miningOutfit;
+        private bool useCompanionChatFormatting;
+        private Func<string> companionChatSenderResolver;
 
         public event System.Action<MineableRock> OnStartMining;
         public event System.Action OnStopMining;
@@ -148,6 +150,8 @@ namespace Skills.Mining
                     Equipment = equipment,
                     EquipmentXpBonusEvaluator = data => data != null ? data.miningXpBonusMultiplier : 0f,
                     RewardMessageFormatter = qty => $"+{qty} {ore.DisplayName}",
+                    UseCompanionChatFormatting = useCompanionChatFormatting,
+                    CompanionChatSenderResolver = companionChatSenderResolver,
                         OnItemsGranted = result => OnOreGained?.Invoke(ore.Id, result.QuantityAwarded),
                         OnSuccess = result =>
                         {
@@ -228,6 +232,18 @@ namespace Skills.Mining
                 "Rock Golem",
                 ref oreItems,
                 out _);
+        }
+
+        /// <summary>
+        /// Configures the chat formatting used for gathering messages. When provided, the companion
+        /// name resolver routes mining rewards through the Companion chat channel instead of Game.
+        /// Passing a null resolver restores the default player-centric formatting.
+        /// </summary>
+        /// <param name="senderResolver">Resolver that supplies the display name for companion chat output.</param>
+        public void ConfigureCompanionChat(Func<string> senderResolver)
+        {
+            useCompanionChatFormatting = senderResolver != null;
+            companionChatSenderResolver = senderResolver;
         }
 
         /// <summary>

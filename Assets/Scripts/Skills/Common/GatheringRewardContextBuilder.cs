@@ -95,6 +95,8 @@ namespace Skills.Common
             public bool? ShowItemFloatingText;
             public bool? ShowXpPopup;
             public float? XpPopupDelayTicks;
+            public bool UseCompanionChatFormatting;
+            public Func<string> CompanionChatSenderResolver;
             public Action<GatheringRewardResult> OnItemsGranted;
             public Action<GatheringRewardResult> OnSuccess;
             public Action<GatheringRewardResult> OnFailure;
@@ -134,6 +136,8 @@ namespace Skills.Common
                 showItemFloatingText = args.ShowItemFloatingText ?? true,
                 showXpPopup = args.ShowXpPopup ?? true,
                 xpPopupDelayTicks = args.XpPopupDelayTicks ?? 5f,
+                useCompanionChatFormatting = args.UseCompanionChatFormatting,
+                companionChatSenderResolver = args.CompanionChatSenderResolver,
                 onItemsGranted = args.OnItemsGranted,
                 onSuccess = args.OnSuccess,
                 onFailure = args.OnFailure,
