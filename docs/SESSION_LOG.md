@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f101fc79d6beed4d2ca83b7e3120c38674b54a4d -->
+## 2025-10-21T19:30:26+01:00 — Merge pull request #1254 from aicovergod/codex/fix-bug-kuy436
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 17 ++ / 0 --
+- Notes:
+  Prevent non-combat companions from intercepting NPC menus
+---
+<!-- commit:1de600b2ea68699df9b2384500882b218a1c41d4 -->
+## 2025-10-21T19:30:20+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:01745b5e279e8239d5d9b24ffa9aaee36946cb7b -->
 ## 2025-10-21T19:30:02+01:00 — Prevent non-combat companions from intercepting NPC menus
 
