@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2de7b8268ad1369716262e83b8bc15689c195e38 -->
+## 2025-10-21T20:04:27+01:00 — Merge pull request #1256 from aicovergod/codex/add-save-manager-integration-for-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 164 ++ / 6 --
+- Notes:
+  Persist companion skill and inventory data
+---
+<!-- commit:55ce1c6955394e50ab98b19e35a7e1fd09c9e7c7 -->
+## 2025-10-21T20:04:09+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ec2eb5160cd036b381769fa676d042a7f6034047 -->
 ## 2025-10-21T20:03:50+01:00 — Refine companion save handling
 
