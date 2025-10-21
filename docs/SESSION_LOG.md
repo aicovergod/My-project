@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:37284799fa0f048d3824b0a57910f98cac18e348 -->
+## 2025-10-21T14:32:09+01:00 — Merge pull request #1242 from aicovergod/codex/update-handlepetdespawned-to-invoke-ensurehud
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 15 ++ / 0 --
+- Notes:
+  Ensure companion HUD restores after pet despawn
+---
+<!-- commit:f02380dbcfab16a9c47edc1f4a5b22cebd966707 -->
+## 2025-10-21T14:31:36+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:96a3171f55168213c988ab44b127bab0bae18806 -->
 ## 2025-10-21T14:31:16+01:00 — Ensure companion HUD restores after pet despawn
 
