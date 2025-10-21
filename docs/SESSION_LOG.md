@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:815c7255c91e9a6f55a2a4e2a062b3014c7890d5 -->
+## 2025-10-21T17:32:44+01:00 — Handle companion manual attack commands
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/NPC/Interaction/NpcInteractable.cs
+- Diff: 21 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:baa6063eae3f0466cbedca9fd785833f4bae4b5a -->
 ## 2025-10-21T17:16:09+01:00 — Merge pull request #1248 from aicovergod/codex/add-random-skill-xp-gains-for-companions
 
