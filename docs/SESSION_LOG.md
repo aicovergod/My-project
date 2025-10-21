@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b0ee488b83079882f467b670bdd012b0a30f3a2c -->
+## 2025-10-21T15:05:23+01:00 — Merge pull request #1243 from aicovergod/codex/update-companionmanager-despawn-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 122 ++ / 38 --
+- Notes:
+  Refine companion despawn behaviour for pet swaps
+---
+<!-- commit:d9cca085419f6aeade3d9ea82a7e62ace39ebac1 -->
+## 2025-10-21T15:05:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7e662e2b3a226fed59bf6ab22b0ad3df55b0cbaf -->
 ## 2025-10-21T15:04:54+01:00 — Refine companion despawn flow
 
