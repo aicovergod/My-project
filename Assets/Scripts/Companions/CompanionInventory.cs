@@ -203,12 +203,13 @@ namespace Companions
             if (!deferredLoadPending)
                 return;
 
-            SaveManager.ActiveAccountUsernameChanged -= HandleActiveAccountUsernameChanged;
-            deferredLoadPending = false;
-
-            // Guard against race conditions where the profile is still unavailable.
+            // Wait for the profile ID to bind before mutating subscription state so another
+            // notification can retry if the account is still initialising.
             if (string.IsNullOrEmpty(SaveManager.ActiveProfileId))
                 return;
+
+            SaveManager.ActiveAccountUsernameChanged -= HandleActiveAccountUsernameChanged;
+            deferredLoadPending = false;
 
             LoadAndRegisterInventory();
         }
