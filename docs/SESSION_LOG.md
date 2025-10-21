@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1ec9e1fbac86f78c293349e4f75a32c1ff00f410 -->
+## 2025-10-22T00:20:57+01:00 — Merge pull request #1268 from aicovergod/codex/add-font-and-color-fields-in-companionequipment
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 121 ++ / 19 --
+- Notes:
+  Align companion equipment fonts with player equipment settings
+---
+<!-- commit:6cea19b7ad258c7229306e71823a6f5755b38ae5 -->
+## 2025-10-22T00:20:50+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:39d1557aa6ebb1c678991e1515a3598380e87ecf -->
 ## 2025-10-22T00:20:28+01:00 — Mirror player equipment text styling on companion UI
 
