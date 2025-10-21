@@ -82,6 +82,21 @@ namespace Companions
         /// <summary>True when the companion exists and is currently visible in the world.</summary>
         public static bool HasActiveCompanion => controller != null && controller.gameObject != null && controller.gameObject.activeSelf;
 
+        /// <summary>
+        /// Determines whether the provided pet definition matches the currently active companion.
+        /// </summary>
+        /// <param name="definition">Definition to check against the active companion.</param>
+        public static bool IsActiveCompanionDefinition(PetDefinition definition)
+        {
+            if (definition == null || activeDefinition == null)
+                return false;
+
+            if (!HasActiveCompanion || !activeDefinition.spawnAsCompanion)
+                return false;
+
+            return DefinitionsMatch(activeDefinition, definition);
+        }
+
         /// <summary>True when the companion has been stored (picked up) but remains available to resummon.</summary>
         public static bool IsStored => storedByPet || storedManually || (controller != null && controller.gameObject != null && !controller.gameObject.activeSelf);
 

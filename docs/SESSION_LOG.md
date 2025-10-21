@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0fdf8978501c511aa77525c30585aba41c25f02c -->
+## 2025-10-21T22:42:14+01:00 — Prevent dropping active companion items
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 41 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:6fa77de1cefbb4a740204edb3a73fa92aead327f -->
 ## 2025-10-21T22:33:30+01:00 — Merge pull request #1261 from aicovergod/codex/refactor-hud-logic-into-mininghudbase
 
