@@ -191,6 +191,7 @@ namespace Companions
 
             if (chosenPickaxe == null)
             {
+                PublishMissingPickaxeMessage();
                 if (CompanionManager.EnableDebugLogging)
                     Debug.Log("[Companion Mining] Unable to find a usable pickaxe for the command.", this);
                 return false;
@@ -391,6 +392,20 @@ namespace Companions
             chat.PublishCompanionMessage(
                 CompanionManager.GetCompanionDisplayName(),
                 CompanionManager.InventoryFullChatLine);
+        }
+
+        /// <summary>
+        /// Emits a companion-channel chat message informing the player that a pickaxe is required.
+        /// </summary>
+        private void PublishMissingPickaxeMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            chat.PublishCompanionMessage(
+                CompanionManager.GetCompanionDisplayName(),
+                "I need a pickaxe to mine that");
         }
 
         private float ResolveMoveSpeed()
