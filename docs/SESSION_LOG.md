@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a871d5391948fa7fce80505e9f3929a61e8caf7b -->
+## 2025-10-21T16:29:18+01:00 — Reuse companion inventory component when available
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionInventory.cs
+- Diff: 15 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:649f4c08a040431d4832cab2ea6382021b8970be -->
 ## 2025-10-21T15:56:22+01:00 — Merge pull request #1245 from aicovergod/codex/fix-companion-respawn-petlevelbar-hud
 
