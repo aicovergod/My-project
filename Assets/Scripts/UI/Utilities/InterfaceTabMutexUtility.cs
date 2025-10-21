@@ -1,3 +1,4 @@
+using Companions;
 using Inventory;
 using Quests;
 using Skills;
@@ -49,6 +50,9 @@ namespace UI.Utilities
             where T : Component, UI.IUIWindow
         {
             if (window == null || ReferenceEquals(window, keepOpen))
+                return;
+
+            if (keepOpen is CompanionEquipment && window is Inventory.Inventory sharedInventory && sharedInventory.useSharedUIRoot)
                 return;
 
             if (window is Inventory.Inventory inventoryWindow && !inventoryWindow.useSharedUIRoot)

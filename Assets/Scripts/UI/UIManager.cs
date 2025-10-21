@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BankSystem;
+using Companions;
 using ShopSystem;
 using UnityEngine;
 using World;
@@ -70,7 +71,19 @@ namespace UI
             bool isShopWindow = window is ShopUI;
             bool isBankWindow = window is BankUI;
             bool isInventoryWindow = window is Inventory.Inventory;
+            bool isCompanionEquipmentWindow = window is CompanionEquipment;
+            bool isBlockedTabWindow =
+                window is Inventory.Equipment ||
+                window is Quests.QuestUI ||
+                window is Skills.SkillsUI ||
+                window is MagicUI ||
+                window is AttackStyleUI;
             Inventory.Inventory requestedInventory = window as Inventory.Inventory;
+
+            bool companionEquipmentActive = CompanionManager.IsEquipmentVisible();
+
+            if (companionEquipmentActive && !isCompanionEquipmentWindow && !isInventoryWindow && isBlockedTabWindow)
+                return false;
 
             // When a modal interface (shop or bank) is active, only that window and the inventory may request focus.
             if ((shopActive && !isShopWindow && !isInventoryWindow) || (bankActive && !isBankWindow && !isInventoryWindow))
@@ -92,6 +105,14 @@ namespace UI
                 bool allowShopPair = shopActive && ((isShopWindow && w is Inventory.Inventory) || (isInventoryWindow && w is ShopUI));
                 bool allowBankPair = bankActive && ((isBankWindow && w is Inventory.Inventory) || (isInventoryWindow && w is BankUI));
                 if (allowShopPair || allowBankPair)
+                    continue;
+
+                bool keepInventoryOpenForCompanionEquipment = isCompanionEquipmentWindow && w is Inventory.Inventory sharedInventory && sharedInventory.useSharedUIRoot;
+                if (keepInventoryOpenForCompanionEquipment)
+                    continue;
+
+                bool keepCompanionEquipmentOpenForInventory = isInventoryWindow && w is CompanionEquipment companionEquipmentWindow && companionEquipmentWindow.IsOpen;
+                if (keepCompanionEquipmentOpenForInventory)
                     continue;
 
                 if (requestedInventory != null && w is Inventory.Inventory existingInventory && !existingInventory.useSharedUIRoot)

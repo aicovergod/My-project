@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:118da0711266a315ab5da9d1e3c4cb43475a309f -->
+## 2025-10-22T00:04:04+01:00 — Fix companion equipment tab inventory interactions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/CompanionEquipment.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/UI/UIManager.cs, Assets/Scripts/UI/Utilities/InterfaceTabMutexUtility.cs
+- Diff: 67 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:5aeb6bc0318ffb95df31aa5dc666f80677638590 -->
 ## 2025-10-21T23:43:20+01:00 — Merge pull request #1265 from aicovergod/codex/add-companion-equipment-system
 
