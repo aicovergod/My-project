@@ -21,6 +21,9 @@ namespace Companions
         /// <summary>Raised whenever the inventory window opens or closes.</summary>
         public event Action<bool> VisibilityChanged;
 
+        /// <summary>Exposes the underlying inventory component for other companion systems.</summary>
+        public Inventory.Inventory InventoryComponent => inventory;
+
         /// <summary>Initialises the underlying inventory component using the player's styling as a template.</summary>
         public void Initialise()
         {

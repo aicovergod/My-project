@@ -2,6 +2,7 @@ using System;
 using Combat;
 using Pets;
 using Skills;
+using Skills.Mining;
 using UI.Chat;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -517,6 +518,39 @@ namespace Companions
         }
 
         /// <summary>
+        /// Exposes the current display name for chat output and context messages.
+        /// </summary>
+        public static string GetCompanionDisplayName() => ResolveCompanionName();
+
+        /// <summary>
+        /// Routes a mining command to the active companion when available.
+        /// </summary>
+        /// <param name="rock">Rock that should be mined.</param>
+        /// <returns>True when the companion accepted the command, otherwise false.</returns>
+        public static bool TryCommandMine(MineableRock rock)
+        {
+            if (rock == null)
+                return false;
+
+            if (controller == null || controller.MiningController == null)
+                return false;
+
+            if (!HasActiveCompanion)
+                return false;
+
+            bool accepted = controller.MiningController.TryCommandMine(rock);
+            if (CompanionManager.EnableDebugLogging)
+            {
+                if (accepted)
+                    Debug.Log("[Companion] Forwarded mining command to companion controller.");
+                else
+                    Debug.Log("[Companion] Companion mining command was rejected by the controller.");
+            }
+
+            return accepted;
+        }
+
+        /// <summary>
         /// Reports combat damage dealt by the companion so XP can be routed through the player formulas.
         /// </summary>
         /// <param name="damage">Damage applied to the target.</param>
@@ -550,7 +584,7 @@ namespace Companions
             if (chat == null)
                 return;
 
-            string companionName = ResolveCompanionName();
+            string companionName = GetCompanionDisplayName();
             string pronoun = ResolveCompanionPronoun();
             string skillName = SkillNameUtility.GetSentenceName(skill);
             string message = $"Just levelled up {pronoun} {skillName} to level {level}!";
