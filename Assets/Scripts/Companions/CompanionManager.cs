@@ -19,6 +19,9 @@ namespace Companions
         /// <summary>Cached GameObject returned by the pet spawner so lifecycle can be managed.</summary>
         private static GameObject companionObject;
 
+        /// <summary>Definition that supplied the current companion spawn (if any).</summary>
+        private static PetDefinition activeDefinition;
+
         /// <summary>HUD instance bound to the companion entry inside the pet level bar.</summary>
         private static PetLevelBarHUD boundHud;
 
@@ -67,20 +70,20 @@ namespace Companions
         /// <summary>Provides access to the configured inventory wrapper.</summary>
         public static CompanionInventory CompanionInventory => controller != null ? controller.Inventory : null;
 
+        /// <summary>Exposes the spawned companion object for systems that need the instance handle.</summary>
+        public static GameObject CompanionObject => companionObject;
+
         /// <summary>Ensures the companion spawns after each scene load so it persists across gameplay sessions.</summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AutoInitialise()
         {
             SceneManager.sceneLoaded -= HandleSceneLoaded;
             SceneManager.sceneLoaded += HandleSceneLoaded;
-            HandleSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
         }
 
         private static void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            if (controller == null)
-                TrySpawnCompanion();
-            else
+            if (controller != null)
                 controller.RebindPlayer();
         }
 
@@ -89,9 +92,20 @@ namespace Companions
         /// </summary>
         public static void TrySpawnCompanion()
         {
+            TrySpawnCompanion(null);
+        }
+
+        /// <summary>
+        /// Attempts to spawn the companion using the supplied definition when available.
+        /// </summary>
+        /// <param name="definitionOverride">Definition to use for visuals/combat data. Falls back to runtime asset when null.</param>
+        public static void TrySpawnCompanion(PetDefinition definitionOverride)
+        {
             if (controller != null)
             {
                 controller.RebindPlayer();
+                if (!controller.gameObject.activeSelf)
+                    SetStored(false);
                 return;
             }
 
@@ -99,9 +113,12 @@ namespace Companions
             if (player == null)
                 return;
 
-            var definition = CompanionRuntimeAssets.ResolveDefinition();
+            var resolvedDefinition = definitionOverride != null
+                ? definitionOverride
+                : CompanionRuntimeAssets.ResolveDefinition();
+
             Vector3 spawnPosition = player.transform.position;
-            companionObject = PetSpawner.Spawn(definition, spawnPosition, player.transform);
+            companionObject = PetSpawner.Spawn(resolvedDefinition, spawnPosition, player.transform);
             if (companionObject == null)
                 return;
 
@@ -116,6 +133,7 @@ namespace Companions
             if (companionObject.GetComponent<CompanionClickable>() == null)
                 companionObject.AddComponent<CompanionClickable>();
 
+            activeDefinition = resolvedDefinition;
             guardModeEnabled = false;
             inventoryVisible = false;
             storedByPet = false;
@@ -181,8 +199,16 @@ namespace Companions
             if (controller == null)
                 return;
 
+            bool alreadyStored = IsStored;
+
             if (stored)
             {
+                if (!triggeredByPet && !alreadyStored && activeDefinition != null && activeDefinition.pickupItem != null)
+                {
+                    if (!InventoryBridge.AddItem(activeDefinition.pickupItem, 1))
+                        return;
+                }
+
                 controller.HandleStoreRequest();
                 storedByPet |= triggeredByPet;
                 storedManually |= !triggeredByPet;
@@ -349,6 +375,7 @@ namespace Companions
             controller.Despawned -= HandleControllerDespawned;
             controller = null;
             companionObject = null;
+            activeDefinition = null;
             inventoryVisible = false;
             storedByPet = false;
             storedManually = false;

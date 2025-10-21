@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4271c82ee0d7ec4a764269568f85852ab8a3212d -->
+## 2025-10-21T12:35:42+01:00 — Route Isla pet assets through companion pipeline
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetDefinition.cs, Assets/Scripts/Pets/PetDropSystem.cs, Assets/Scripts/Pets/PetUseHandler.cs
+- Diff: 59 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:81a1816b742b8135c845b09276cf29cc65a10a60 -->
 ## 2025-10-21T11:54:22+01:00 — Merge pull request #1237 from aicovergod/codex/add-companion-system-to-pet-architecture
 
