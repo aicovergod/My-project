@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b2c1e348a9555f4422554b505baec3bb94c611bd -->
+## 2025-10-21T17:46:33+01:00 — Merge pull request #1250 from aicovergod/codex/add-skill-level-up-messages-in-chatbox
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 133 ++ / 13 --
+- Notes:
+  Add chat announcements for skill level ups
+---
+<!-- commit:b8b003e8b31062f070cf0834a802ade9532cf074 -->
+## 2025-10-21T17:46:27+01:00 — Merge branch 'main' into codex/add-skill-level-up-messages-in-chatbox
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:71c96af69139bb41c5c1afb4ffc01998697f4381 -->
 ## 2025-10-21T17:45:15+01:00 — feat: announce skill level ups in chat
 
