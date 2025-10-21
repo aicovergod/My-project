@@ -199,7 +199,11 @@ namespace Companions
             }
 
             if (!HasInventoryCapacityForOre(oreDef))
-                return false;
+            {
+                // Inventory full scenarios are considered handled so the player controller
+                // does not fall back to prospecting after the companion delivers the chat message.
+                return true;
+            }
 
             CancelMining(true);
 
