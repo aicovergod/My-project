@@ -94,7 +94,10 @@ namespace Pets
         public static void DestroyInstance()
         {
             if (instance != null)
+            {
+                instance.ReleaseCompanionBinding();
                 Destroy(instance.gameObject);
+            }
         }
 
         /// <summary>
@@ -115,6 +118,19 @@ namespace Pets
             CompanionManager.RegisterHud(this);
             CompanionManager.CombatLevelChanged += HandleCompanionCombatLevelChanged;
             UpdateLevelText();
+        }
+
+        /// <summary>
+        /// Releases any companion bindings so the manager can safely rebuild the HUD.
+        /// </summary>
+        private void ReleaseCompanionBinding()
+        {
+            if (!companionEventsBound)
+                return;
+
+            CompanionManager.CombatLevelChanged -= HandleCompanionCombatLevelChanged;
+            CompanionManager.UnbindHud(this);
+            companionEventsBound = false;
         }
 
         private static PetLevelBarHUD BuildHudSkeleton()
@@ -339,12 +355,7 @@ namespace Pets
         {
             if (experience != null)
                 experience.OnLevelChanged -= HandleLevelChanged;
-            if (companionEventsBound)
-            {
-                CompanionManager.CombatLevelChanged -= HandleCompanionCombatLevelChanged;
-                CompanionManager.UnbindHud(this);
-                companionEventsBound = false;
-            }
+            ReleaseCompanionBinding();
             if (xpRoutine != null)
                 StopCoroutine(xpRoutine);
             if (instance == this)

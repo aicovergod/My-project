@@ -272,13 +272,9 @@ namespace Companions
             if (controller == null)
                 return;
 
-            if (boundHud != null)
-            {
-                boundHud.BindToCompanion();
-                return;
-            }
+            if (boundHud == null || boundHud.Equals(null))
+                boundHud = PetLevelBarHUD.CreateForCompanion();
 
-            boundHud = PetLevelBarHUD.CreateForCompanion();
             boundHud?.BindToCompanion();
         }
 
