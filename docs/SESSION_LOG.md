@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e0ce6fed6bf20a4287a9e45b469ba315af26bcee -->
+## 2025-10-21T10:47:46+01:00 — Fix command context validation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Player/Commands/CommandsListCommand.cs
+- Diff: 2 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:2ba7eb091ee5e8dc5ace9afc578c1b7e52b413da -->
 ## 2025-10-20T15:59:14+01:00 — Merge pull request #1235 from aicovergod/codex/update-bank-deposit-methods-for-inventory-resolution
 
