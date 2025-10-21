@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9c91c35375ac9b558a165f8a74b26f6d673d43bd -->
+## 2025-10-21T14:04:00+01:00 — Fix companion and pet combat owner bindings
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 26 ++ / 10 --
+- Notes:
+  —
+---
 <!-- commit:736c6835ae4650dd74cb3c4c397f678e19b78d7f -->
 ## 2025-10-21T13:47:24+01:00 — Merge pull request #1240 from aicovergod/codex/fix-identified-bugs
 
