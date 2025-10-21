@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:025b7ab747de85e3ec9df219b6f8051e25dc3508 -->
+## 2025-10-22T00:37:34+01:00 — Add runtime fallback for NPC context menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/UI/RightClickMenu.cs
+- Diff: 198 ++ / 12 --
+- Notes:
+  —
+---
 <!-- commit:1ec9e1fbac86f78c293349e4f75a32c1ff00f410 -->
 ## 2025-10-22T00:20:57+01:00 — Merge pull request #1268 from aicovergod/codex/add-font-and-color-fields-in-companionequipment
 
