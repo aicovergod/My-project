@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3cb42f7cc9b8a283f8b727eaa13fcbabd3fc7b6e -->
+## 2025-10-21T22:59:31+01:00 — Prevent companion mining failures from triggering player prospect
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 5 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:d7ee45a5b2f393da71baac86bbc1088058ab1052 -->
 ## 2025-10-21T22:54:41+01:00 — Merge pull request #1263 from aicovergod/codex/add-pet-definition-helper-and-update-drop-logic
 
