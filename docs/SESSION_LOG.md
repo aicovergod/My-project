@@ -1,21 +1,12 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:402b9c15256bca50071c7457ecdd1261ea1f3c58 -->
-## 2025-10-21T17:33:39+01:00 — Merge pull request #1249 from aicovergod/codex/ensure-companions-follow-right-click-attack-logic
+<!-- commit:71c96af69139bb41c5c1afb4ffc01998697f4381 -->
+## 2025-10-21T17:45:15+01:00 — feat: announce skill level ups in chat
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 30 ++ / 0 --
-- Notes:
-  Handle companion manual attack commands
----
-<!-- commit:17b1120da33f8e9ea9e02ae5ed3440dcd6c5ac53 -->
-## 2025-10-21T17:33:04+01:00 — Update SESSION_LOG [ci]
-
-- Author: session-log-bot <actions@github.com>
-- Changed files (1): docs/SESSION_LOG.md
-- Diff: 9 ++ / 0 --
+- Changed files (5): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionRuntimeAssets.cs, Assets/Scripts/Pets/PetDefinition.cs, Assets/Scripts/Skills/SkillNameUtility.cs
+- Diff: 129 ++ / 0 --
 - Notes:
   —
 ---

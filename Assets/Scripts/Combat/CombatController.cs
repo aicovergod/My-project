@@ -17,6 +17,7 @@ using UI;
 using Magic;
 using Status;
 using Status.Freeze;
+using UI.Chat;
 using Util;
 
 namespace Combat
@@ -253,6 +254,8 @@ namespace Combat
 
         private void OnSkillLevelChanged(SkillType type, int level)
         {
+            PublishPlayerLevelUpMessage(type, level);
+
             switch (type)
             {
                 case SkillType.Magic:
@@ -282,6 +285,23 @@ namespace Combat
                     SoundManager.Instance.PlaySfx(SoundEffect.BeastmasterLevelUp);
                     break;
             }
+        }
+
+        /// <summary>
+        /// Publishes a game-channel chat message announcing the player's new level so the
+        /// chatbox mirrors the OSRS-style feedback players expect after levelling a skill.
+        /// </summary>
+        /// <param name="type">Skill that increased.</param>
+        /// <param name="level">Resulting level.</param>
+        private static void PublishPlayerLevelUpMessage(SkillType type, int level)
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string skillName = SkillNameUtility.GetDisplayName(type);
+            string message = $"You just levelled up your {skillName} to level {level}!";
+            chat.PublishGameMessage(message);
         }
 
         /// <summary>

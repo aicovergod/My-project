@@ -18,6 +18,9 @@ namespace Pets
         [Tooltip("Display name for UI messages.")]
         public string displayName;
 
+        [Tooltip("Possessive pronoun used for chat feedback (e.g. his, her, their). Defaults to neutral when empty.")]
+        public string possessivePronoun = "their";
+
         [Header("Inventory Item")]
         [Tooltip("Item awarded when picking up the pet.")]
         public ItemData pickupItem;
