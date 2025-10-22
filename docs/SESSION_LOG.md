@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9ebe76fd6f9e293032d516c77f34b93bd5387e11 -->
+## 2025-10-22T10:59:45+01:00 — Merge pull request #1274 from aicovergod/codex/update-companion-spawn-and-state-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 89 ++ / 7 --
+- Notes:
+  Fix companion reactivation flow after storing
+---
+<!-- commit:e131d0fc4b97c399d8a8ae8e296b35448daac032 -->
+## 2025-10-22T10:59:32+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:56ce2680a1d90c7894dd60cdf36960a0bcbe0f42 -->
 ## 2025-10-22T10:59:13+01:00 — Fix companion reactivation without respawn
 
