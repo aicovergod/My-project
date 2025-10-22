@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2a78363c3763650d66d97d7a6c53d0b839d66c09 -->
+## 2025-10-22T10:14:44+01:00 — Fix manual companion store resetting pet state
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetDropSystem.cs
+- Diff: 20 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b5b16271ca954a6160cd49b3330207c364aa6bd0 -->
 ## 2025-10-22T01:10:00+01:00 — Merge pull request #1271 from aicovergod/codex/implement-companion-command-workflow
 
