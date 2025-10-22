@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e5900b501b7a98ac417a8a88a00fb3f582fa4a2c -->
+## 2025-10-22T17:18:57+01:00 — Fix companion mining navigation teleport detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 48 ++ / 31 --
+- Notes:
+  —
+---
 <!-- commit:86147174f3a9bdcc0360744233d2682974441092 -->
 ## 2025-10-22T16:55:30+01:00 — Merge pull request #1295 from aicovergod/codex/update-companionminingcontroller-for-ore-golem-auto-mining
 
