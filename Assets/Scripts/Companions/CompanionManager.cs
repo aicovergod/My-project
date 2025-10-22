@@ -205,6 +205,119 @@ namespace Companions
         /// <summary>Fallback message used if the guard mode activation pool cannot supply a line.</summary>
         private const string GuardModeActivationFallbackLine = "Guard mode active, I’ve got your back!";
 
+        /// <summary>Pool of flavour messages emitted when the player disables companion guard mode.</summary>
+        private static readonly string[] GuardModeDeactivationChatMessages =
+        {
+            "Guard mode off, standing down.",
+            "Alright, lowering my guard.",
+            "Back to normal duty.",
+            "Guard mode disabled, relaxing a bit now.",
+            "Okay, no more defence drills.",
+            "I’ll take a breather now.",
+            "Standing down from guard duty.",
+            "Guess I can stop shielding you now.",
+            "Guard mode deactivated, finally.",
+            "Alright, you’re on your own again.",
+            "I’m done guarding, for now.",
+            "Protection mode off, I needed the break.",
+            "Standing easy, no more guarding.",
+            "I’ll stop hovering now.",
+            "Done being your bodyguard for the moment.",
+            "Guard mode disengaged.",
+            "Alright, back to chill mode.",
+            "Deactivating protection, hope you’re ready.",
+            "Relaxing guard stance.",
+            "Guess the danger’s over.",
+            "Lowering my weapon, I’m done guarding.",
+            "Guard duty’s over for now.",
+            "Alright, I’ll ease off the defence.",
+            "Guard mode off, we survived.",
+            "Okay, back to regular me.",
+            "Disabling guard stance, I’m exhausted.",
+            "That’s enough protecting for one day.",
+            "Alright, no more shield duty.",
+            "Standing down, looks like we’re safe.",
+            "Protection off, finally some peace.",
+            "Alright, you can fend for yourself now.",
+            "Guard mode off, I’ll stop blocking everything.",
+            "Deactivating defensive protocols.",
+            "Okay, I’m done playing the shield.",
+            "Back to neutral stance.",
+            "Guard off, I need to stretch.",
+            "I’m relaxing, no more guarding.",
+            "Protection mode cancelled.",
+            "Standing down, nice and easy.",
+            "Guarding off, I’ll rest my arms.",
+            "Alright, guard mode disabled.",
+            "I’ll stop being your wall now.",
+            "Okay, back to my usual self.",
+            "Standing down from protector mode.",
+            "I’m done watching your back for now.",
+            "Alright, I’ll stop intercepting attacks.",
+            "Guarding suspended, you’re safe.",
+            "Disabling defence mode.",
+            "I’ll let my guard down for a bit.",
+            "Protection disengaged, finally.",
+            "Guard mode off, taking a break.",
+            "Alright, time to lower my defences.",
+            "Switching off guard mode.",
+            "Done guarding, until next time.",
+            "Standing down, you’ve got this.",
+            "Guard mode disabled, easy breathing now.",
+            "Okay, no more bodyguarding.",
+            "Disengaging defence, we’re in the clear.",
+            "Guard stance relaxed, I’m done.",
+            "I’ll take it easy now.",
+            "Protection mode off, don’t get reckless.",
+            "Standing down, I’ll watch from here.",
+            "Alright, no need to guard anymore.",
+            "Guard duty paused, for now.",
+            "Okay, guard off, try not to die.",
+            "Guarding done, we can move freely again.",
+            "Disabling protection stance.",
+            "I’ll lower my shield now.",
+            "Guard mode off, finally.",
+            "Relaxing, I’ll stop protecting you for now.",
+            "Done with defence mode.",
+            "Standing down, no more guarding needed.",
+            "Guarding cancelled, peace at last.",
+            "Okay, back to adventure mode.",
+            "Protection down, I’ll rest for a second.",
+            "Alright, I’ll stop blocking hits.",
+            "Disabling guard state, done here.",
+            "I’ll chill now, guard’s off.",
+            "Guard mode turned off, nice and quiet.",
+            "Standing down, you’re fine on your own.",
+            "Alright, dropping my guard.",
+            "Okay, no more defence stance.",
+            "Back to being cute instead of useful.",
+            "Guard mode deactivated, no more heroics.",
+            "Alright, that’s enough guarding for today.",
+            "I’ll stop hovering over you.",
+            "Done shielding, time to relax.",
+            "Guard duty off, don’t break anything.",
+            "Alright, deactivating protection mode.",
+            "Back to non-guard life.",
+            "Okay, we’re safe, guard off.",
+            "Guard mode off, finally I can breathe.",
+            "Standing down, that’s my cue to rest.",
+            "Alright, no more shield time.",
+            "Defence off, good job out there.",
+            "Deactivating guard role.",
+            "I’ll stop blocking for a while.",
+            "Protection off, feels nice to relax.",
+            "Okay, we’re safe, standing down.",
+            "Guard off, I’ll just watch now.",
+            "Alright, we’re done with that phase.",
+            "Standing down, no more hero mode.",
+            "Guard mode off, ready for what’s next.",
+            "Okay, I’m resting my sword arm now.",
+            "Done guarding, time for a snack."
+        };
+
+        /// <summary>Fallback message used if the guard mode deactivation pool cannot supply a line.</summary>
+        private const string GuardModeDeactivationFallbackLine = "Guard mode off, standing down.";
+
         /// <summary>Pool of flavour messages used when the companion deposits items into the bank.</summary>
         private static readonly string[] BankDepositChatMessages =
         {
@@ -809,6 +922,8 @@ namespace Companions
 
             if (guardModeEnabled)
                 PublishRandomGuardModeActivationMessage();
+            else
+                PublishRandomGuardModeDeactivationMessage();
         }
 
         /// <summary>
@@ -1021,6 +1136,33 @@ namespace Companions
             string message = GuardModeActivationChatMessages[index];
             if (string.IsNullOrWhiteSpace(message))
                 message = GuardModeActivationFallbackLine;
+
+            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
+        }
+
+        /// <summary>
+        /// Publishes a random guard mode deactivation message when the player disables guard mode.
+        /// Keeps flavourful feedback flowing even as the companion relaxes from defence duty.
+        /// </summary>
+        private static void PublishRandomGuardModeDeactivationMessage()
+        {
+            if (GuardModeDeactivationChatMessages == null || GuardModeDeactivationChatMessages.Length == 0)
+                return;
+
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            int index = UnityEngine.Random.Range(0, GuardModeDeactivationChatMessages.Length);
+            if (index < 0 || index >= GuardModeDeactivationChatMessages.Length)
+            {
+                chat.PublishCompanionMessage(GetCompanionDisplayName(), GuardModeDeactivationFallbackLine);
+                return;
+            }
+
+            string message = GuardModeDeactivationChatMessages[index];
+            if (string.IsNullOrWhiteSpace(message))
+                message = GuardModeDeactivationFallbackLine;
 
             chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
         }
