@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:66917e980bff516b2c5fc2621d37aa6d95e70fd6 -->
+## 2025-10-22T17:19:27+01:00 — Merge pull request #1296 from aicovergod/codex/adjust-teleport-detection-in-miningcontroller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 57 ++ / 31 --
+- Notes:
+  Fix companion mining navigation teleport detection
+---
+<!-- commit:b6b8dd8b3be1630d936ce453183e653a90c2b423 -->
+## 2025-10-22T17:19:16+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:e5900b501b7a98ac417a8a88a00fb3f582fa4a2c -->
 ## 2025-10-22T17:18:57+01:00 — Fix companion mining navigation teleport detection
 
