@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f52faa208ae753202f1941e879cccf0f19571f00 -->
+## 2025-10-22T14:21:53+01:00 — Merge pull request #1287 from aicovergod/codex/update-petcombatcontroller-for-companion-attacks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 4 ++ / 1 --
+- Notes:
+  Fix companion ore golem attack guard
+---
+<!-- commit:e6be52015bef6273e8a2b316151e3ee3e32cb3ef -->
+## 2025-10-22T14:21:40+01:00 — Fix companion ore golem attack guard
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 4 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:968bd6cad59f36bc41b3b09a7e0baa7bd0e94b7a -->
 ## 2025-10-22T14:08:09+01:00 — Merge pull request #1286 from aicovergod/codex/fix-ambiguous-reference-for-random
 
