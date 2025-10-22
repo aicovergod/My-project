@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b7f811e08532de23e83ed12bcb9e475b081d3fde -->
+## 2025-10-22T12:01:28+01:00 — Merge pull request #1277 from aicovergod/codex/add-containsscreenpoint-helper-in-companioncommandmenu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 32 ++ / 6 --
+- Notes:
+  Prevent pet menu from closing when interacting with companion commands
+---
+<!-- commit:a99652856b6e2320701be04e8ff7b18622eece4c -->
+## 2025-10-22T12:01:24+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f460b24dd8b6d515626e6f41e66c735e314b36ff -->
 ## 2025-10-22T12:00:28+01:00 — Adjust companion command menu click handling
 
