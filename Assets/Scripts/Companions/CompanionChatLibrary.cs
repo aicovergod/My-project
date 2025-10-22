@@ -323,6 +323,138 @@ namespace Companions
         /// <summary>Fallback message returned when the bank deposit pool cannot supply a line.</summary>
         private const string BankDepositFallbackLine = "I've just deposited it all in the bank.";
 
+        /// <summary>Pool of flavour lines used when the companion automatically returns after a login.</summary>
+        private static readonly string[] AutoSpawnGreetingChatMessages =
+        {
+            "You're back! I missed you.",
+            "Oh, you’re awake again.",
+            "Hey, you finally logged back in.",
+            "Welcome back, sleepyhead.",
+            "Back from the void, huh?",
+            "Morning, or whatever time it is.",
+            "You disappeared on me for a bit there.",
+            "Hey, I was just about to go look for you.",
+            "There you are, I was starting to worry.",
+            "You’re back, I knew you wouldn’t stay gone long.",
+            "Look who decided to show up again.",
+            "Finally, I was getting bored.",
+            "Heya, you left me waiting.",
+            "Welcome back, partner.",
+            "Guess who’s been standing around waiting for you, me.",
+            "I thought you’d left me for good.",
+            "Ah, there you are, took you long enough.",
+            "Don’t scare me like that again, I thought I was alone.",
+            "Good timing, I just respawned too.",
+            "Back from your mysterious disappearance, I see.",
+            "I was guarding your spot the whole time.",
+            "Finally, I get to see you again.",
+            "Missed me, because I definitely missed you.",
+            "Hey, don’t make me wait that long next time.",
+            "Back online, I knew you’d return.",
+            "I kept your place warm.",
+            "You’re back, I was starting to talk to myself.",
+            "There you are, I thought the world swallowed you.",
+            "Back in action, huh.",
+            "Welcome back, boss, everything’s as you left it.",
+            "I knew you’d return eventually.",
+            "Is it time for another adventure.",
+            "About time you woke up.",
+            "You left me all alone in the dark.",
+            "Back from the land of the offline, I see.",
+            "Hello again, I was wondering when you’d log in.",
+            "Hey, I just spawned, miss me.",
+            "Nice of you to finally show up.",
+            "Back to reality, or something like it.",
+            "Ah, there you are, thought I’d lost you.",
+            "You were gone ages, I almost learned to cook.",
+            "I was starting to think I’d have to explore without you.",
+            "You're back, and I’m ready for anything.",
+            "Welcome back, I didn’t touch your stuff, promise.",
+            "Finally, someone to talk to again.",
+            "Hey, you left me unsupervised, dangerous move.",
+            "There you are, I was beginning to get lonely.",
+            "Nice timing, I was just about to nap forever.",
+            "Back already, I was mid dream.",
+            "Good to see you again, hero.",
+            "I was just dreaming about you, weird coincidence.",
+            "Welcome back, let’s get moving.",
+            "Back online, I didn’t even get to clean up.",
+            "Hey, you’re back, ready to cause trouble again.",
+            "Don’t worry, I kept everything safe.",
+            "You logged in, great, I can stop guarding rocks now.",
+            "Finally, a familiar face.",
+            "I was starting to think you’d respawn somewhere else.",
+            "Hey, don’t vanish like that again.",
+            "Good to see you alive and relatively sane.",
+            "I stayed exactly where you left me, good companion points, right.",
+            "Welcome back, did you bring snacks.",
+            "There you are, I’ve been counting the seconds.",
+            "Back again, couldn’t stay away huh.",
+            "I survived while you were gone, somehow.",
+            "You’re back, I didn’t even get to finish my nap.",
+            "Finally, I’ve been standing here so long I grew moss.",
+            "Welcome back, sleepy adventurer.",
+            "Hey, don’t worry, I didn’t let anyone steal your spot.",
+            "Ah, back to business then.",
+            "You came back, my faith in you is restored.",
+            "I was guarding your loot while you were offline.",
+            "Hey, boss, you look refreshed.",
+            "Welcome back, did you miss my voice.",
+            "I’m ready, let’s pick up where we left off.",
+            "You vanished for ages again.",
+            "You logged back in, yay, now let’s get to work.",
+            "Hey, I was worried, thought you’d forgotten me.",
+            "You’re back, I didn’t even get a postcard.",
+            "About time, I’ve been staring into nothing for hours.",
+            "Hey, you’re back, and yes, I counted how long you were gone.",
+            "You left me alone in a field again.",
+            "Welcome back, I had a staring contest with a rock while you were gone.",
+            "I knew you couldn’t survive without me for long.",
+            "Back from your offline adventure.",
+            "You're back, the world’s been quiet without you.",
+            "Don’t vanish like that next time, it gets lonely here.",
+            "Hey, the server missed you, and so did I.",
+            "Finally back, took your sweet time.",
+            "I was just about to log off myself.",
+            "Back online, let’s make some noise.",
+            "Hey, good to see you again, I almost joined another player.",
+            "Welcome back, partner, ready to get in trouble again.",
+            "There you are, I thought you’d forgotten me.",
+            "Back again, how was your nothingness.",
+            "Hey, don’t leave me hanging next time.",
+            "I was guarding your spot so well I scared myself.",
+            "Nice to see you, stranger.",
+            "You logged in, I knew it.",
+            "Hey, it’s you again, let’s go find some chaos.",
+            "I stayed put like a good girl.",
+            "Welcome back, I hope you brought energy.",
+            "Finally, it’s adventure time again.",
+            "I didn’t move an inch while you were gone.",
+            "Back already, couldn’t resist huh.",
+            "Welcome back, boss, I kept things under control.",
+            "Good morning, or evening, whatever it is.",
+            "Hey, don’t ghost me next time.",
+            "You're back, now it feels right again.",
+            "I thought you’d left me for another companion.",
+            "Welcome back, everything’s still a mess by the way.",
+            "I’ve been waiting forever, you owe me snacks.",
+            "There you are, my favourite human.",
+            "You’re back, let’s pretend you didn’t abandon me.",
+            "Good to see you again, I missed having company.",
+            "Hey, don’t disappear like that, I worry.",
+            "Finally, someone to talk to again.",
+            "Back online, let’s make up for lost time.",
+            "You were gone ages, I almost tamed a squirrel.",
+            "Welcome back, I’ve been rehearsing my battle stance.",
+            "I stayed faithful like a good companion should.",
+            "Back online, perfect timing, I’m bored.",
+            "Good to see you, I was starting to monologue.",
+            "You're here, now things can get interesting again."
+        };
+
+        /// <summary>Fallback message returned when the auto-spawn greeting pool is empty.</summary>
+        private const string AutoSpawnGreetingFallbackLine = "You're back! I missed you.";
+
         /// <summary>
         /// Returns a randomly selected inventory full chat line so repeated messages feel more natural.
         /// Falls back to a default string if the configured pool is empty or contains whitespace-only entries.
@@ -355,6 +487,15 @@ namespace Companions
         public static string GetRandomBankDepositLine()
         {
             return GetRandomLine(BankDepositChatMessages, BankDepositFallbackLine);
+        }
+
+        /// <summary>
+        /// Returns a random greeting line when the companion automatically respawns after a login.
+        /// Ensures the companion acknowledges the player's return with flavourful dialogue.
+        /// </summary>
+        public static string GetRandomAutoSpawnGreetingLine()
+        {
+            return GetRandomLine(AutoSpawnGreetingChatMessages, AutoSpawnGreetingFallbackLine);
         }
 
         /// <summary>

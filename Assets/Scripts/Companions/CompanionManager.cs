@@ -782,6 +782,26 @@ namespace Companions
         }
 
         /// <summary>
+        /// Publishes a greeting when the companion automatically respawns after a login.
+        /// Helps returning players feel acknowledged without requiring manual interaction.
+        /// </summary>
+        public static void PublishAutoSpawnGreeting()
+        {
+            if (!HasActiveCompanion)
+                return;
+
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string message = CompanionChatLibrary.GetRandomAutoSpawnGreetingLine();
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
+        }
+
+        /// <summary>
         /// Publishes a random guard mode activation message to the companion chat channel.
         /// Ensures enabling guard mode feels responsive without spamming when toggled off.
         /// </summary>
