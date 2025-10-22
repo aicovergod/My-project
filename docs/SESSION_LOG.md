@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:999db0bc65303873462bda3544002d7d58eea628 -->
+## 2025-10-22T10:15:15+01:00 — Merge pull request #1272 from aicovergod/codex/fix-companion-item-duplication-issue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 29 ++ / 0 --
+- Notes:
+  Fix manual companion storage reset bug
+---
+<!-- commit:f3ca4ae494aa112043010ce5114defcda7234854 -->
+## 2025-10-22T10:15:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2a78363c3763650d66d97d7a6c53d0b839d66c09 -->
 ## 2025-10-22T10:14:44+01:00 — Fix manual companion store resetting pet state
 
