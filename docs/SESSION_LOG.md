@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2e818ca6a2679dfc110ca085fa2f8f878fa8d308 -->
+## 2025-10-22T19:46:56+01:00 — Merge pull request #1301 from aicovergod/codex/implement-companion-bank-deposit-feature
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 229 ++ / 0 --
+- Notes:
+  Add companion bank deposit anchor support and UI access
+---
+<!-- commit:30d84e803a3436ea7c5632d2cbe205dedcee02e2 -->
+## 2025-10-22T19:43:16+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f9d5611e9e05aa0660611b1278efad5c6e4b826e -->
 ## 2025-10-22T19:42:56+01:00 — Add companion bank anchor flow and context menu wiring
 
