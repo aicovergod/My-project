@@ -158,7 +158,8 @@ namespace Companions
         /// Attempts to spawn the companion using the supplied definition when available.
         /// </summary>
         /// <param name="definitionOverride">Definition to use for visuals/combat data. Falls back to runtime asset when null.</param>
-        public static void TrySpawnCompanion(PetDefinition definitionOverride)
+        /// <param name="suppressManualSpawnGreeting">True when automated spawns (loads/restores) should skip the manual greeting line.</param>
+        public static void TrySpawnCompanion(PetDefinition definitionOverride, bool suppressManualSpawnGreeting = false)
         {
             var player = GameObject.FindGameObjectWithTag("Player");
             if (player == null)
@@ -226,7 +227,8 @@ namespace Companions
             UpdateCombatLevel();
             EnsureHud();
             UpdateEquipmentVisibility(false);
-            PublishRandomManualSpawnMessage();
+            if (!suppressManualSpawnGreeting)
+                PublishRandomManualSpawnMessage();
         }
 
         /// <summary>

@@ -452,7 +452,7 @@ namespace Pets
             PetSaveBridge.Save(pet.id);
             PetInventoryVisible = false;
 
-            CompanionManager.TrySpawnCompanion(pet);
+            CompanionManager.TrySpawnCompanion(pet, isRespawnFromSave);
 
             if (isRespawnFromSave)
                 CompanionManager.PublishAutoSpawnGreeting();
