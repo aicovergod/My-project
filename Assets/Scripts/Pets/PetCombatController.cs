@@ -48,6 +48,7 @@ namespace Pets
         private bool hasRigidbody2D;
         private CombatTarget currentTarget;
         private Coroutine attackRoutine;
+        private Coroutine pendingOreGolemHarvestRoutine;
         private float nextAttackTime;
         private CompanionController companionController;
 
@@ -462,6 +463,9 @@ namespace Pets
                 }
                 BeastmasterXp.TryGrantFromPetDamage(ownerTransform != null ? ownerTransform.gameObject : null, finalDamage);
                 companionBridge?.NotifyDamageDealt(finalDamage, attacker.Style, attacker.DamageType);
+
+                if (!target.IsAlive && IsOreGolemTarget(target))
+                    TryScheduleOreGolemHarvest(ownerTransform);
             }
             else
             {
@@ -482,6 +486,114 @@ namespace Pets
                 return behaviour.GetComponent<OreMonsterRewardController>() != null;
 
             return false;
+        }
+
+        /// <summary>
+        /// Schedules a delayed mining command after the companion defeats an ore golem so the
+        /// reward node can spawn before the mining controller engages it.
+        /// </summary>
+        /// <param name="ownerTransform">Transform representing the owning player.</param>
+        private void TryScheduleOreGolemHarvest(Transform ownerTransform)
+        {
+            if (companionController == null)
+                return;
+
+            var miningController = companionController.MiningController;
+            if (miningController == null || !miningController.isActiveAndEnabled)
+                return;
+
+            GameObject ownerObject = ownerTransform != null ? ownerTransform.gameObject : null;
+            if (ownerObject == null)
+                ownerObject = GameObject.FindGameObjectWithTag("Player");
+
+            if (ownerObject == null)
+                return;
+
+            if (pendingOreGolemHarvestRoutine != null)
+            {
+                StopCoroutine(pendingOreGolemHarvestRoutine);
+                pendingOreGolemHarvestRoutine = null;
+            }
+
+            pendingOreGolemHarvestRoutine = StartCoroutine(
+                AutoMineOreGolemNodeRoutine(ownerObject, miningController));
+        }
+
+        /// <summary>
+        /// Waits a random 1-3 tick window before attempting to mine the personal node produced by
+        /// a defeated ore golem. The delay allows the reward prefab to spawn reliably.
+        /// </summary>
+        private IEnumerator AutoMineOreGolemNodeRoutine(
+            GameObject ownerObject,
+            CompanionMiningController miningController)
+        {
+            try
+            {
+                int waitTicks = UnityEngine.Random.Range(1, 4);
+                float waitSeconds = Mathf.Max(0f, waitTicks * CombatMath.TICK_SECONDS);
+
+                if (waitSeconds > 0f)
+                    yield return new WaitForSeconds(waitSeconds);
+                else
+                    yield return null;
+
+                if (miningController == null || !miningController.isActiveAndEnabled)
+                    yield break;
+
+                if (ownerObject == null)
+                    ownerObject = GameObject.FindGameObjectWithTag("Player");
+
+                if (ownerObject == null)
+                    yield break;
+
+                var personalController = ResolvePersonalNodeController(ownerObject);
+                if (personalController == null)
+                    yield break;
+
+                var node = personalController.ActiveNode;
+                if (node == null || node.IsExpired)
+                    yield break;
+
+                var rock = node.GetComponent<MineableRock>();
+                if (rock == null || rock.IsDepleted)
+                    yield break;
+
+                miningController.TryCommandMine(rock);
+            }
+            finally
+            {
+                pendingOreGolemHarvestRoutine = null;
+            }
+        }
+
+        /// <summary>
+        /// Attempts to locate the mining personal node controller responsible for the supplied owner
+        /// so the companion can interact with the freshly spawned reward rock.
+        /// </summary>
+        private static MiningPersonalNodeController ResolvePersonalNodeController(GameObject potentialOwner)
+        {
+            if (potentialOwner == null)
+                return null;
+
+            if (potentialOwner.TryGetComponent(out MiningPersonalNodeController directController))
+                return directController;
+
+            var fromParent = potentialOwner.GetComponentInParent<MiningPersonalNodeController>();
+            if (fromParent != null)
+                return fromParent;
+
+            var root = potentialOwner.transform.root;
+            if (root != null)
+            {
+                if (root.TryGetComponent(out MiningPersonalNodeController rootController))
+                    return rootController;
+
+                var rootChildController = root.GetComponentInChildren<MiningPersonalNodeController>();
+                if (rootChildController != null)
+                    return rootChildController;
+            }
+
+            return potentialOwner.GetComponentInChildren<MiningPersonalNodeController>();
         }
 
         /// <summary>
@@ -603,6 +715,12 @@ namespace Pets
         private void OnDisable()
         {
             CancelAttack();
+
+            if (pendingOreGolemHarvestRoutine != null)
+            {
+                StopCoroutine(pendingOreGolemHarvestRoutine);
+                pendingOreGolemHarvestRoutine = null;
+            }
         }
 
         private IEnumerator AttackSpriteSwap()
