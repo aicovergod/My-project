@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:21724454c02a5793b197a3ba684e9edbdabd80c0 -->
+## 2025-10-22T23:24:58+01:00 — Merge pull request #1307 from aicovergod/codex/add-random-welcome-message-from-companion
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 164 ++ / 0 --
+- Notes:
+  Add companion auto-respawn greeting chat line
+---
+<!-- commit:f8e0254eb463cee482d72438a59d98a96ca6ca2e -->
+## 2025-10-22T23:24:30+01:00 — Add companion login greeting chat line
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetDropSystem.cs
+- Diff: 164 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9fd3d4bf1f2da9c1bcbb9e589d47f1a2ff84ef6c -->
 ## 2025-10-22T23:18:23+01:00 — Merge pull request #1306 from aicovergod/codex/add-companionchatlibrary-and-refactor-usage
 
