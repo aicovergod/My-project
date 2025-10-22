@@ -41,7 +41,6 @@ namespace Companions
     {
         private const float MiningRange = 1.5f;
         private const float ReplanDistance = MiningRange * 0.75f;
-        private const float TeleportDistance = MiningRange * 6f;
         private const float WaypointTolerance = 0.1f;
 
         private SkillManager skillManager;
@@ -374,45 +373,63 @@ namespace Companions
                             : Mathf.Max(Time.deltaTime, Mathf.Epsilon);
 
                         bool navigationStepTaken = false;
+                        bool navigationUnavailable = true;
 
                         if (pathMover != null && pathMover.isActiveAndEnabled)
                         {
-                            Vector2 nextPosition;
-                            Vector2 navVelocity;
-                            bool teleported;
-                            bool goalUnreachable;
-                            navigationStepTaken = pathMover.TryStepAttack(
-                                deltaTime,
-                                moveSpeed,
-                                MiningRange,
-                                WaypointTolerance,
-                                () => rock != null ? (Vector2)rock.transform.position : (Vector2)transform.position,
-                                ReplanDistance,
-                                TeleportDistance,
-                                out nextPosition,
-                                out navVelocity,
-                                out teleported,
-                                out goalUnreachable);
+                            navigationUnavailable = !pathMover.HasActiveNavigationGrid;
 
-                            if (goalUnreachable)
+                            if (!navigationUnavailable)
                             {
-                                if (CompanionManager.EnableDebugLogging)
-                                    Debug.Log("[Companion Mining] Navigation reported the rock as unreachable.", this);
-                                break;
-                            }
+                                Vector2 nextPosition;
+                                Vector2 navVelocity;
+                                bool teleported;
+                                bool goalUnreachable;
+                                // Use an infinite teleport detection threshold so distant rocks never trigger the
+                                // teleport branch inside PetPathMover. This keeps the companion on its path and
+                                // prevents accidental snaps across the nav grid when scanning large radii.
+                                float teleportDetectionDistance = float.PositiveInfinity;
 
-                            if (navigationStepTaken)
-                                ApplyMovement(nextPosition, navVelocity, teleported);
+                                navigationStepTaken = pathMover.TryStepAttack(
+                                    deltaTime,
+                                    moveSpeed,
+                                    MiningRange,
+                                    WaypointTolerance,
+                                    () => rock != null ? (Vector2)rock.transform.position : (Vector2)transform.position,
+                                    ReplanDistance,
+                                    teleportDetectionDistance,
+                                    out nextPosition,
+                                    out navVelocity,
+                                    out teleported,
+                                    out goalUnreachable);
+
+                                if (goalUnreachable)
+                                {
+                                    if (CompanionManager.EnableDebugLogging)
+                                        Debug.Log("[Companion Mining] Navigation reported the rock as unreachable.", this);
+                                    break;
+                                }
+
+                                if (navigationStepTaken)
+                                    ApplyMovement(nextPosition, navVelocity, teleported);
+                            }
                         }
 
                         if (!navigationStepTaken)
                         {
-                            Vector3 startPosition = transform.position;
-                            Vector3 nextPosition = Vector3.MoveTowards(startPosition, rockPosition, moveSpeed * deltaTime);
-                            Vector2 velocity = deltaTime > Mathf.Epsilon
-                                ? (Vector2)((nextPosition - startPosition) / deltaTime)
-                                : Vector2.zero;
-                            ApplyMovement(nextPosition, velocity, false);
+                            if (navigationUnavailable)
+                            {
+                                Vector3 startPosition = transform.position;
+                                Vector3 nextPosition = Vector3.MoveTowards(startPosition, rockPosition, moveSpeed * deltaTime);
+                                Vector2 velocity = deltaTime > Mathf.Epsilon
+                                    ? (Vector2)((nextPosition - startPosition) / deltaTime)
+                                    : Vector2.zero;
+                                ApplyMovement(nextPosition, velocity, false);
+                            }
+                            else if (body != null)
+                            {
+                                body.linearVelocity = Vector2.zero;
+                            }
                         }
 
                         if (miningSkill.IsMining && distance > MiningRange * 1.2f)
