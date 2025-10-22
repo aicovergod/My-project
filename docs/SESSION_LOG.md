@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:07b74c7091f132d5087f31be7eaa4d11490631c3 -->
+## 2025-10-22T14:07:42+01:00 — Fix ambiguous Random reference in pet combat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 2 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:19f836a11024ce6f9925d923e836764c62cd87f2 -->
 ## 2025-10-22T14:05:10+01:00 — Merge pull request #1285 from aicovergod/codex/refactor-petcombatcontroller-for-companion-pickaxe-check
 
