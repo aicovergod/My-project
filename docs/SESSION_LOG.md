@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c49fa2b6f063a979e76981bdd9a30148c4b395a6 -->
+## 2025-10-22T12:12:20+01:00 — Merge pull request #1279 from aicovergod/codex/add-developer-command-clearcompanioninv
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 124 ++ / 0 --
+- Notes:
+  Add developer command to clear companion inventory
+---
+<!-- commit:d74f3aefafc57e6f2a30ee0b4d1e9423f0ee5f47 -->
+## 2025-10-22T12:12:12+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:8cbe158c250ce9f232691d0f638ca7cf417d4412 -->
 ## 2025-10-22T12:11:53+01:00 — Add command to clear companion inventory
 
