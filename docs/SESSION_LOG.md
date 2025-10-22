@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:968bd6cad59f36bc41b3b09a7e0baa7bd0e94b7a -->
+## 2025-10-22T14:08:09+01:00 — Merge pull request #1286 from aicovergod/codex/fix-ambiguous-reference-for-random
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 1 --
+- Notes:
+  Fix ambiguous Random reference in pet combat controller
+---
+<!-- commit:ca122d334dadd7bc419c1866ca0203584dc3d53a -->
+## 2025-10-22T14:08:01+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:07b74c7091f132d5087f31be7eaa4d11490631c3 -->
 ## 2025-10-22T14:07:42+01:00 — Fix ambiguous Random reference in pet combat
 
