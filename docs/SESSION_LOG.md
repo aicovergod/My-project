@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9fd3d4bf1f2da9c1bcbb9e589d47f1a2ff84ef6c -->
+## 2025-10-22T23:18:23+01:00 — Merge pull request #1306 from aicovergod/codex/add-companionchatlibrary-and-refactor-usage
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 399 ++ / 363 --
+- Notes:
+  Refactor companion chat lines into shared library
+---
+<!-- commit:59644110890d8f4c59dc112734413bfdaddf12be -->
+## 2025-10-22T23:18:11+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:77e916a9cc2930a8fadb35095388d56c527528da -->
 ## 2025-10-22T23:17:53+01:00 — Refactor companion chat lines into shared library
 
