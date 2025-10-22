@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:79f79ac675579db701bafe7d3661bc40262a647e -->
+## 2025-10-23T00:37:10+01:00 — Add companion reactions to player combat skill level ups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Companions/CompanionChatLibrary.cs
+- Diff: 609 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:5ee11654081cd642be43b17453adaf2bd7aa7981 -->
 ## 2025-10-23T00:28:21+01:00 — Add companion woodcutting and mining level-up chat pools
 
