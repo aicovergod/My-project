@@ -213,10 +213,16 @@ namespace Companions.UI
             Debug.Log("[Companion UI] Mine Rocks button clicked.");
             bool accepted = CompanionManager.TryCommandMineNearby();
             Debug.Log($"[Companion UI] Mine Rocks command result: success={accepted}.");
-            if (accepted)
-                CloseAllMenus();
-            else
-                Hide();
+            if (!accepted)
+            {
+                // Surface a short chat line when the command cannot be fulfilled so the player
+                // understands why both menus closed without triggering companion behaviour.
+                PublishPlaceholderMessage("I can't find any rocks to mine right now.");
+            }
+
+            // Always close every pet-related menu after a command click so the PetLevelBarMenu
+            // and the command sub-menu never remain visible simultaneously.
+            CloseAllMenus();
         }
 
         private void OnPlaceholderClicked(string message)
