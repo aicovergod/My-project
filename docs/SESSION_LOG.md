@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d7ca0a9ec43212505275a242bc0e6c5464db5fcc -->
+## 2025-10-22T12:04:30+01:00 — Fix shift prospect triggering when commanding companion
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Mining/Core/MinerController.cs
+- Diff: 6 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:b7f811e08532de23e83ed12bcb9e475b081d3fde -->
 ## 2025-10-22T12:01:28+01:00 — Merge pull request #1277 from aicovergod/codex/add-containsscreenpoint-helper-in-companioncommandmenu
 
