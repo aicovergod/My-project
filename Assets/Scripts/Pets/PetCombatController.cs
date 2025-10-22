@@ -392,7 +392,8 @@ namespace Pets
             };
             int defRoll = CombatMath.GetDefenceRoll(defEff, defBonus);
             float chance = CombatMath.ChanceToHit(atkRoll, defRoll);
-            bool hit = Random.value < chance;
+            // UnityEngine.Random is used to keep odds consistent with the rest of the combat pipeline.
+            bool hit = UnityEngine.Random.value < chance;
 
             Vector2 diff = target.transform.position - transform.position;
             Direction8 facingDir = Direction8Utility.FromVector(diff, allowDiagonals: true, fallback: Direction8.Down);
