@@ -154,6 +154,22 @@ namespace Companions
         }
 
         /// <summary>
+        /// Attempts to command the companion to mine the supplied rock while preserving
+        /// follower hold state when a new mining routine is about to take ownership.
+        /// </summary>
+        /// <param name="rock">Rock that should be mined.</param>
+        /// <param name="preserveFollowerHold">
+        /// When <c>true</c>, existing follower holds remain intact during the hand-off so
+        /// systems like ore-golem automation can transition without briefly enabling the follower.
+        /// </param>
+        /// <returns>True when mining started or the inventory was full.</returns>
+        public bool TryCommandMine(MineableRock rock, bool preserveFollowerHold)
+        {
+            bool accepted = TryCommandMine(rock, out var result, preserveFollowerHold);
+            return accepted || result == CompanionMiningCommandResult.InventoryFull;
+        }
+
+        /// <summary>
         /// Attempts to command the companion to mine the supplied rock and reports the resulting status.
         /// </summary>
         /// <param name="rock">Rock that should be mined.</param>
@@ -161,12 +177,30 @@ namespace Companions
         /// <returns>True when mining started, otherwise false.</returns>
         public bool TryCommandMine(MineableRock rock, out CompanionMiningCommandResult result)
         {
+            return TryCommandMine(rock, out result, false);
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to mine the supplied rock and reports the resulting status.
+        /// </summary>
+        /// <param name="rock">Rock that should be mined.</param>
+        /// <param name="result">Detailed result describing whether the command was accepted.</param>
+        /// <param name="preserveFollowerHold">
+        /// When <c>true</c>, existing follower holds remain intact so automation can transfer control
+        /// without briefly re-enabling the follower component.
+        /// </param>
+        /// <returns>True when mining started, otherwise false.</returns>
+        public bool TryCommandMine(
+            MineableRock rock,
+            out CompanionMiningCommandResult result,
+            bool preserveFollowerHold)
+        {
             result = CompanionMiningCommandResult.RequirementsNotMet;
 
             if (!TryPrepareMiningCommand(rock, out var pickaxe, out result))
                 return false;
 
-            CancelAreaMiningInternal(true);
+            CancelAreaMiningInternal(true, preserveFollowerHold);
             BeginMining(rock, pickaxe);
 
             result = CompanionMiningCommandResult.Accepted;
@@ -825,17 +859,36 @@ namespace Companions
             }
         }
 
-        private void CleanupAfterMining(bool restoreFollower)
+        private void CleanupAfterMining(bool restoreFollower, bool preserveFollowerLocks = false)
         {
             if (restoreFollower)
             {
-                ForceReleaseAllFollowerHolds();
+                if (preserveFollowerLocks)
+                {
+                    // Preserve any existing follower holds so automation can complete its hand-off
+                    // before the follower component is toggled again.
+                    followerDisabledForMining = HasActiveFollowerHold;
+
+                    if (!HasActiveFollowerHold && followerHoldToggledFollower && petFollower != null && !petFollower.enabled)
+                    {
+                        petFollower.enabled = true;
+                        followerHoldToggledFollower = false;
+                    }
+                }
+                else
+                {
+                    ForceReleaseAllFollowerHolds();
+                }
             }
-            else
+            else if (!preserveFollowerLocks)
             {
                 followerDisableLockCount = 0;
                 followerDisabledForMining = false;
                 followerHoldToggledFollower = false;
+            }
+            else
+            {
+                followerDisabledForMining = HasActiveFollowerHold;
             }
 
             if (body != null)
@@ -987,7 +1040,7 @@ namespace Companions
             }
         }
 
-        private void CancelAreaMiningInternal(bool restoreFollower)
+        private void CancelAreaMiningInternal(bool restoreFollower, bool preserveFollowerLocks = false)
         {
             if (areaMiningRoutine != null)
             {
@@ -1003,7 +1056,7 @@ namespace Companions
             StopActiveMiningRoutine();
 
             if (restoreFollower)
-                CleanupAfterMining(true);
+                CleanupAfterMining(true, preserveFollowerLocks);
         }
 
         private void OnDisable()

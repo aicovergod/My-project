@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3225cbc9cb9b461ecb16ecd281e15ad43937cb07 -->
+## 2025-10-22T16:54:57+01:00 — Fix ore golem auto-mining follower hand-off
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 74 ++ / 7 --
+- Notes:
+  —
+---
 <!-- commit:381b2f3ea2f1735cfd03dd4773e16e5c12ba4113 -->
 ## 2025-10-22T16:26:16+01:00 — Merge pull request #1294 from aicovergod/codex/update-personalorenode-to-check-companion-distance
 
