@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:477dfc61d616113194dbd78cf594c4fbd61e24c1 -->
+## 2025-10-22T11:34:02+01:00 — Improve companion mining command logging
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs
+- Diff: 48 ++ / 13 --
+- Notes:
+  —
+---
 <!-- commit:9ebe76fd6f9e293032d516c77f34b93bd5387e11 -->
 ## 2025-10-22T10:59:45+01:00 — Merge pull request #1274 from aicovergod/codex/update-companion-spawn-and-state-logic
 
