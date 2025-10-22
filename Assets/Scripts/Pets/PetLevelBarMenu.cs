@@ -213,7 +213,11 @@ namespace Pets
             if (gameObject.activeSelf && Input.GetMouseButtonDown(0))
             {
                 var rect = GetComponent<RectTransform>();
-                if (!RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition, menuCanvas != null ? menuCanvas.worldCamera : null))
+                var camera = menuCanvas != null ? menuCanvas.worldCamera : null;
+                bool clickInsidePetMenu = RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition, camera);
+                bool clickInsideCommandMenu = CompanionCommandMenu.ContainsScreenPoint(Input.mousePosition);
+
+                if (!clickInsidePetMenu && !clickInsideCommandMenu)
                     Hide();
             }
         }
