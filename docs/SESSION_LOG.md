@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d9e923c292e863ff677f82399b9abd5f72b58ae8 -->
+## 2025-10-22T11:34:29+01:00 — Merge pull request #1275 from aicovergod/codex/update-logging-for-mining-commands
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 57 ++ / 13 --
+- Notes:
+  Improve companion mining command logging
+---
+<!-- commit:5cdeb4819ceef323ed2763c196f0a7736cadebdc -->
+## 2025-10-22T11:34:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:477dfc61d616113194dbd78cf594c4fbd61e24c1 -->
 ## 2025-10-22T11:34:02+01:00 — Improve companion mining command logging
 
