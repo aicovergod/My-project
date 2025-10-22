@@ -54,6 +54,51 @@ namespace Companions
         /// <summary>Chat line used when the companion cannot store additional resources.</summary>
         internal const string InventoryFullChatLine = "My inventory is full now, maybe we should visit a bank";
 
+        /// <summary>Pool of flavour messages used when the companion deposits items into the bank.</summary>
+        private static readonly string[] BankDepositChatMessages =
+        {
+            "I've just deposited it all in the bank.",
+            "I've just deposited it all.",
+            "All added <emoji=02>.",
+            "I've added the items to the bank <emoji=41>.",
+            "Items safely stored in the bank.",
+            "Deposit complete, all tidy now.",
+            "Everything’s been added to your bank.",
+            "I’ve handled the deposit for you.",
+            "All your items are safely banked.",
+            "That’s everything stored away.",
+            "Just dropped it all off at the bank.",
+            "I didn’t steal anything… promise.",
+            "All stashed away, not even one for me!",
+            "Your loot’s safe. Probably.",
+            "Deposited! You owe me a snack now.",
+            "I threw it all in the shiny box again <emoji=43>.",
+            "All banked. Try not to lose it this time.",
+            "Cleaned up after you, as usual.",
+            "Everything’s in, even that suspicious rock.",
+            "Banked! Didn’t even break a sweat.",
+            "Done and dusted!",
+            "That’s all sorted, boss!",
+            "Everything’s in the vault.",
+            "Dropped it all off, easy job.",
+            "The bank’s got it all now.",
+            "Job done, bank’s full again!",
+            "All packed away nice and neat!",
+            "I’ll guard your riches with my life <emoji=49>.",
+            "I took care of it. You can count on me.",
+            "All secure, no one touches your stash but me.",
+            "Stored, sealed, and safe.",
+            "Your treasures are in good hands.",
+            "Deposit successful. I’m a professional, you know.",
+            "I’ve placed your items with utmost care <emoji=57>.",
+            "The vault’s a bit heavier now!",
+            "Bank balance just got shinier <emoji=15>.",
+            "Your gold pile’s growing again!",
+            "Deposit complete, the banker winked at me lol <emoji=02>.",
+            "I love the sound of coins clinking <emoji=09>.",
+            "All your treasures are tucked away nicely."
+        };
+
         /// <summary>Latest combat level computed from the companion's skills.</summary>
         private static int combatLevel = 1;
 
@@ -754,7 +799,31 @@ namespace Companions
                     Debug.Log("[Companion] Deposit attempt completed but no items were moved (inventory empty or bank full).");
             }
 
-            return moved > 0;
+            if (moved > 0)
+            {
+                PublishRandomBankDepositMessage();
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Emits a random companion chat line to confirm the deposit when items reach the bank.
+        /// </summary>
+        private static void PublishRandomBankDepositMessage()
+        {
+            if (BankDepositChatMessages == null || BankDepositChatMessages.Length == 0)
+                return;
+
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            int index = UnityEngine.Random.Range(0, BankDepositChatMessages.Length);
+            string message = BankDepositChatMessages[index];
+            string companionName = GetCompanionDisplayName();
+            chat.PublishCompanionMessage(companionName, message);
         }
 
         /// <summary>
