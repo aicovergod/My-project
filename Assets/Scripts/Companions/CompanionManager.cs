@@ -1076,6 +1076,34 @@ namespace Companions
                 return;
             }
 
+            if (skill == SkillType.Beastmaster)
+            {
+                string message = CompanionChatLibrary.GetRandomBeastmasterLevelUpLine();
+                chat.PublishCompanionMessage(companionName, message);
+                return;
+            }
+
+            if (skill == SkillType.Fishing)
+            {
+                string message = CompanionChatLibrary.GetRandomFishingLevelUpLine();
+                chat.PublishCompanionMessage(companionName, message);
+                return;
+            }
+
+            if (skill == SkillType.Cooking)
+            {
+                string message = CompanionChatLibrary.GetRandomCookingLevelUpLine();
+                chat.PublishCompanionMessage(companionName, message);
+                return;
+            }
+
+            if (skill == SkillType.Firemaking)
+            {
+                string message = CompanionChatLibrary.GetRandomFiremakingLevelUpLine();
+                chat.PublishCompanionMessage(companionName, message);
+                return;
+            }
+
             string pronoun = ResolveCompanionPronoun();
             string skillName = SkillNameUtility.GetSentenceName(skill);
             string message = $"Just levelled up {pronoun} {skillName} to level {level}!";
