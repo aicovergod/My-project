@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:64a9a48bc3c227f3108c70c8686a9e37961b7707 -->
+## 2025-10-22T23:01:28+01:00 — Add companion guard mode activation chat feedback
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 142 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:34a825b2178d5f44cded9a10b3170e980c2a5129 -->
 ## 2025-10-22T22:47:56+01:00 — Merge pull request #1303 from aicovergod/codex/add-random-chat-messages-for-full-inventory
 
