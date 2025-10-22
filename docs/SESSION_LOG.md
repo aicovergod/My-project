@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:27fa11003897659bc161a866f893390d36b5e223 -->
+## 2025-10-23T00:37:28+01:00 — Merge pull request #1316 from aicovergod/codex/add-companion-dialogue-for-level-ups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 609 ++ / 0 --
+- Notes:
+  Add companion chat responses for player combat level-ups
+---
 <!-- commit:3d838656d60c1dcc09f872cf13076087e807ce69 -->
 ## 2025-10-23T00:29:29+01:00 — Merge pull request #1315 from aicovergod/codex/add-companion-messages-for-skill-leveling
 
