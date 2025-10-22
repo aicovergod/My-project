@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1fe5558a363c8a0d8611357e8acb568496119e8a -->
+## 2025-10-22T11:45:11+01:00 — Merge pull request #1276 from aicovergod/codex/add-testminerocks-command-for-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 53 ++ / 0 --
+- Notes:
+  Add developer command to trigger companion mining
+---
+<!-- commit:d76dc58c5c35bedcb3e41aba19e16755cc313c32 -->
+## 2025-10-22T11:45:02+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:535b861e640e02c34e38727a782a760584304964 -->
 ## 2025-10-22T11:44:43+01:00 — Add developer command to trigger companion mining
 
