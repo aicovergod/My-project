@@ -51,8 +51,47 @@ namespace Companions
         /// <summary>Cached handle to the active player inventory so equipment toggles can drive it.</summary>
         private static Inventory.Inventory cachedPlayerInventory;
 
-        /// <summary>Chat line used when the companion cannot store additional resources.</summary>
-        internal const string InventoryFullChatLine = "My inventory is full now, maybe we should visit a bank";
+        /// <summary>Pool of flavour chat lines used when the companion cannot store additional resources.</summary>
+        private static readonly string[] InventoryFullChatMessages =
+        {
+            "My inventory’s full, maybe we should stop by a bank.",
+            "I can’t carry any more, you’re making me a pack mule!",
+            "That’s it, no more room. We’ll need to unload soon.",
+            "I’m out of space, want to stash some things away?",
+            "My hands are full, let’s clear some room first.",
+            "I can’t fit another thing in here!",
+            "Everything’s full up, we need a bank trip.",
+            "I’m full up, nothing else is going in this bag.",
+            "Ugh, I’m packed tighter than a goblin’s purse!",
+            "If I carry any more, I’ll explode <emoji=10>!",
+            "That’s it, no more! I’m officially a walking chest now.",
+            "I swear this bag gets smaller every day!",
+            "Unless you want me dragging my feet, we’d better bank this.",
+            "Inventory’s full! Maybe *you* should carry something for once.",
+            "I can’t carry another pebble. Not one.",
+            "Everything’s overflowing, and it’s not my fault this time!",
+            "Do you secretly enjoy watching me struggle with all this loot?",
+            "Full again... you and your shiny rock obsession.",
+            "I’m out of space. Again. Why does this always happen?",
+            "I can’t take another step like this, my shoulders hurt!",
+            "That’s it, full. Maybe try throwing something out?",
+            "Please tell me we’re heading to a bank soon.",
+            "If I take one more thing, I’ll start dropping stuff at random.",
+            "I’ve done my best, but I can’t hold any more for you.",
+            "I’d carry the world for you… but it won’t fit.",
+            "All full, sorry, maybe we can store it somewhere safe?",
+            "I’d help if I could, but I’m at my limit.",
+            "That’s everything I can manage — let’s bank the rest.",
+            "Inventory full! Maybe I can wear some of it instead?",
+            "My pockets are crying for mercy <emoji=06>",
+            "If you hand me one more thing, it’s going straight on the floor.",
+            "That’s it. My inventory has officially revolted.",
+            "I think my bag just groaned.",
+            "Full! I repeat, FULL! This is not a drill!"
+        };
+
+        /// <summary>Fallback message returned when the inventory full pool is empty.</summary>
+        private const string InventoryFullFallbackLine = "My inventory’s full, maybe we should stop by a bank.";
 
         /// <summary>Pool of flavour messages used when the companion deposits items into the bank.</summary>
         private static readonly string[] BankDepositChatMessages =
@@ -98,6 +137,24 @@ namespace Companions
             "I love the sound of coins clinking <emoji=09>.",
             "All your treasures are tucked away nicely."
         };
+
+        /// <summary>
+        /// Returns a randomly selected inventory full chat line so repeated messages feel more natural.
+        /// Falls back to a default string if the configured pool is empty or contains whitespace-only entries.
+        /// </summary>
+        /// <returns>Companion chat line describing the lack of free inventory space.</returns>
+        internal static string GetRandomInventoryFullChatLine()
+        {
+            if (InventoryFullChatMessages == null || InventoryFullChatMessages.Length == 0)
+                return InventoryFullFallbackLine;
+
+            int index = UnityEngine.Random.Range(0, InventoryFullChatMessages.Length);
+            if (index < 0 || index >= InventoryFullChatMessages.Length)
+                return InventoryFullFallbackLine;
+
+            string message = InventoryFullChatMessages[index];
+            return string.IsNullOrWhiteSpace(message) ? InventoryFullFallbackLine : message;
+        }
 
         /// <summary>Latest combat level computed from the companion's skills.</summary>
         private static int combatLevel = 1;
