@@ -592,13 +592,16 @@ namespace Companions
             var rocks = FindObjectsOfType<MineableRock>();
             float radiusSqr = radius * radius;
 
+            Vector2 controllerPosition2D = (Vector2)transform.position;
+
             for (int i = 0; i < rocks.Length; i++)
             {
                 var rock = rocks[i];
                 if (rock == null || rock.IsDepleted)
                     continue;
 
-                if ((rock.transform.position - transform.position).sqrMagnitude > radiusSqr)
+                Vector2 rockPosition2D = (Vector2)rock.transform.position;
+                if ((rockPosition2D - controllerPosition2D).sqrMagnitude > radiusSqr)
                     continue;
 
                 if (rock.RockDef != null && rock.RockDef.DepleteAfterNOres == 1 && playerProtectedSingleOre.Contains(rock))
@@ -627,8 +630,10 @@ namespace Companions
                 if (b == null)
                     return -1;
 
-                float da = (a.transform.position - transform.position).sqrMagnitude;
-                float db = (b.transform.position - transform.position).sqrMagnitude;
+                Vector2 aPosition2D = (Vector2)a.transform.position;
+                Vector2 bPosition2D = (Vector2)b.transform.position;
+                float da = (aPosition2D - controllerPosition2D).sqrMagnitude;
+                float db = (bPosition2D - controllerPosition2D).sqrMagnitude;
                 return da.CompareTo(db);
             });
 
