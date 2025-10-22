@@ -240,8 +240,8 @@ namespace Companions
 
             currentRock = rock;
             currentPickaxe = pickaxe;
-            miningRoutine = StartCoroutine(MineRoutine(rock, pickaxe));
             miningActive = true;
+            miningRoutine = StartCoroutine(MineRoutine(rock, pickaxe));
 
             if (CompanionManager.EnableDebugLogging)
             {
@@ -287,6 +287,9 @@ namespace Companions
             while (rock != null && !rock.IsDepleted)
             {
                 if (!isActiveAndEnabled)
+                    break;
+
+                if (!miningActive || currentRock == null || currentRock != rock)
                     break;
 
                 Vector3 rockPosition = rock.transform.position;
@@ -349,8 +352,19 @@ namespace Companions
                     if (body != null)
                         body.linearVelocity = Vector2.zero;
 
+                    if (!miningActive || currentRock == null || currentRock != rock)
+                        break;
+
                     if (!miningSkill.IsMining)
+                    {
+                        if (!miningActive || currentRock == null || currentRock != rock)
+                            break;
+
                         miningSkill.StartMining(rock, pickaxe);
+                    }
+
+                    if (!miningActive || currentRock == null || currentRock != rock)
+                        break;
 
                     if (!miningSkill.IsMining)
                         break;
