@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1502cdb0ada9228f2bd0e3f1bd8460230415b0cc -->
+## 2025-10-23T00:12:37+01:00 — Merge pull request #1312 from aicovergod/codex/update-agents.md-for-companion-chat-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 256 ++ / 153 --
+- Notes:
+  Centralize companion level-up chat handling
+---
+<!-- commit:6eefe750c9f78ed0521e0a7fc0af2c213f2b76b5 -->
+## 2025-10-23T00:12:21+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:752f40ae14ff90ad81f1a7c5cffa7e51905e2eeb -->
 ## 2025-10-23T00:12:00+01:00 — Centralize companion level-up chat handling
 
