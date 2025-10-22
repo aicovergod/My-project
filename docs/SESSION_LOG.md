@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9cbb544669c596fd85389a4ab2b7113f163dd5e5 -->
+## 2025-10-22T15:06:36+01:00 — Ensure companion mining coroutine cancels cleanly
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 15 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:dbe43c17be9e4dd579face83aaa7b8f786c78b1d -->
 ## 2025-10-22T14:39:20+01:00 — Merge pull request #1288 from aicovergod/codex/add-wait-time-before-companion-mines
 
