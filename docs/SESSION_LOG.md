@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2269c2a8efff4e285e41657d61c9cb20c1fe9bc0 -->
+## 2025-10-23T00:50:08+01:00 — Merge pull request #1319 from aicovergod/codex/add-level-up-messages-for-skills-t4fitc
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 790 ++ / 12 --
+- Notes:
+  Add companion chat for gathering skill level-ups
+---
+<!-- commit:9cc71fbfd7e675b660453d9c367c17b73973f7e1 -->
+## 2025-10-23T00:50:02+01:00 — Merge branch 'main' into codex/add-level-up-messages-for-skills-t4fitc
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:8867e1825c14e8cf0e4f5d2b4db9c0fc82c6d0bc -->
 ## 2025-10-23T00:48:57+01:00 — Add companion chat for player gathering skill level ups
 
