@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:09f1a49023223bd545fd23508db66b75bf2aa321 -->
+## 2025-10-22T15:46:18+01:00 — Merge pull request #1292 from aicovergod/codex/expose-follower-hold-state-in-mining-controller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 27 ++ / 10 --
+- Notes:
+  Ensure pet follower remains disabled during mining holds
+---
+<!-- commit:52a4f8f2f124588b1e55b17503d02c77bcad3694 -->
+## 2025-10-22T15:46:06+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:53ce05a8a640dc32f9f804ebe087c2ec03c2886d -->
 ## 2025-10-22T15:45:46+01:00 — Guard follower reactivation during mining
 
