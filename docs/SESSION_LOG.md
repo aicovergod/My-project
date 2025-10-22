@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:522b1223a94669097a6a13614301f9d2691278e1 -->
+## 2025-10-22T23:37:13+01:00 — Merge pull request #1309 from aicovergod/codex/fix-companion-greeting-message-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 5 ++ / 3 --
+- Notes:
+  Fix companion greeting duplication on login
+---
+<!-- commit:348f5653c912fce009814aa17f8b666b9f8ddff0 -->
+## 2025-10-22T23:37:02+01:00 — Fix companion greeting duplication on login
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetDropSystem.cs
+- Diff: 5 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:543b8787396a04942036299c6c2e257b672c290d -->
 ## 2025-10-22T23:29:30+01:00 — Merge pull request #1308 from aicovergod/codex/add-random-spawn-messages-for-companion
 
