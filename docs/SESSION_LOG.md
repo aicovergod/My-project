@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2de03d758c83dee73bfcef02f01d510521cf858f -->
+## 2025-10-22T13:41:36+01:00 — Fix duplicate companion inventory full chat line
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 4 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:3e9a49aad1e59e3736d1b79e37d128543a182d2c -->
 ## 2025-10-22T13:28:55+01:00 — Merge pull request #1283 from aicovergod/codex/update-companionminingcontroller-for-failure-handling
 
