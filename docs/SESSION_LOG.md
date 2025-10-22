@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ccffdd60717986a071489a73e35edcb7b5f21329 -->
+## 2025-10-22T18:02:27+01:00 — Document companion system goals and behavior
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): AGENTS.md
+- Diff: 4 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:416037d0b1d402f7887f0bcd070adedcc563f091 -->
 ## 2025-10-22T17:43:02+01:00 — Merge pull request #1297 from aicovergod/codex/fix-companion-mining-logic-for-full-inventory
 
