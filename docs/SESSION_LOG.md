@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5a9d49f81bb21eaffc1078743be4645e607bc153 -->
+## 2025-10-23T00:53:19+01:00 — Refactor companion level up message selection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 45 ++ / 84 --
+- Notes:
+  —
+---
 <!-- commit:2269c2a8efff4e285e41657d61c9cb20c1fe9bc0 -->
 ## 2025-10-23T00:50:08+01:00 — Merge pull request #1319 from aicovergod/codex/add-level-up-messages-for-skills-t4fitc
 
