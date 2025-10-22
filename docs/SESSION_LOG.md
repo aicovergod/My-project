@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:40de78e8eae7de09079c4c6eda8e36e7c8330880 -->
+## 2025-10-23T00:23:26+01:00 — Add companion level-up chat for support skills
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 651 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:1d72955587931122f2828a0c5b836309687cfc1a -->
 ## 2025-10-23T00:19:04+01:00 — Add companion combat level-up chat variants
 
