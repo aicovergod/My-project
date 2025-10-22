@@ -60,6 +60,22 @@ namespace Companions.UI
             instance.InternalHide();
         }
 
+        /// <summary>
+        /// Determines whether the supplied screen position falls within the active command menu.
+        /// </summary>
+        /// <param name="screenPosition">Screen-space position to evaluate.</param>
+        /// <returns>
+        /// True when the menu is visible and the screen position lies within the menu rectangle; otherwise false.
+        /// </returns>
+        internal static bool ContainsScreenPoint(Vector2 screenPosition)
+        {
+            if (!IsVisible || instance.rectTransform == null)
+                return false;
+
+            var camera = menuCanvas != null ? menuCanvas.worldCamera : null;
+            return RectTransformUtility.RectangleContainsScreenPoint(instance.rectTransform, screenPosition, camera);
+        }
+
         private static void EnsureInstance()
         {
             if (instance != null)
@@ -123,11 +139,8 @@ namespace Companions.UI
             if (!menuRoot.activeSelf)
                 return;
 
-            if (Input.GetMouseButtonDown(0))
-            {
-                if (!RectTransformUtility.RectangleContainsScreenPoint(rectTransform, Input.mousePosition, menuCanvas != null ? menuCanvas.worldCamera : null))
-                    InternalHide();
-            }
+            if (Input.GetMouseButtonDown(0) && !ContainsScreenPoint(Input.mousePosition))
+                InternalHide();
         }
 
         private void ConfigureButtons(Transform parent)
