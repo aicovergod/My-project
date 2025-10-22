@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:20617161bb66be2e10971776cedad91c32b4b9c2 -->
+## 2025-10-22T12:33:28+01:00 — Ensure companion attacks cancel mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 5 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d9d38dc4930c3a5b5aeeaa548c35b1801fba2583 -->
 ## 2025-10-22T12:22:46+01:00 — Merge pull request #1281 from aicovergod/codex/fix-companion-mining-chat-messages
 
