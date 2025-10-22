@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Inventory;
@@ -57,6 +58,7 @@ namespace Companions
         private Dictionary<string, ItemData> itemCache;
         private bool miningActive;
         private bool followerDisabledForMining;
+        private int followerDisableLockCount;
         private bool suppressMiningStopCallback;
 
         private readonly List<MineableRock> areaCandidates = new List<MineableRock>();
@@ -116,6 +118,7 @@ namespace Companions
 
             miningActive = false;
             followerDisabledForMining = false;
+            followerDisableLockCount = 0;
             areaMiningActive = false;
             activeAreaRadius = 0f;
 
@@ -234,6 +237,36 @@ namespace Companions
             BindToPlayerMiningSkill(playerTransform);
         }
 
+        /// <summary>
+        /// Temporarily disables the follower component so the companion remains stationary until mining resumes.
+        /// Dispose the returned handle to restore the follower even when mining never begins.
+        /// </summary>
+        /// <remarks>
+        /// When the follower is already disabled (for example, because mining is currently active) the helper returns a
+        /// no-op disposable so existing routines are unaffected.
+        /// </remarks>
+        /// <returns>An <see cref="IDisposable"/> handle that restores the follower when disposed.</returns>
+        public IDisposable EnterTemporaryFollowerHold()
+        {
+            if (petFollower == null)
+                return NoOpDisposable.Instance;
+
+            if (followerDisableLockCount > 0)
+            {
+                followerDisableLockCount++;
+                followerDisabledForMining = true;
+                return new FollowerHold(this);
+            }
+
+            if (!petFollower.enabled)
+                return NoOpDisposable.Instance;
+
+            petFollower.enabled = false;
+            followerDisableLockCount = 1;
+            followerDisabledForMining = true;
+            return new FollowerHold(this);
+        }
+
         private void BeginMining(MineableRock rock, PickaxeDefinition pickaxe)
         {
             StopActiveMiningRoutine();
@@ -271,109 +304,106 @@ namespace Companions
 
         private IEnumerator MineRoutine(MineableRock rock, PickaxeDefinition pickaxe)
         {
-            if (petFollower != null)
+            var followerHold = EnterTemporaryFollowerHold();
+            try
             {
-                followerDisabledForMining = petFollower.enabled;
-                if (followerDisabledForMining)
-                    petFollower.enabled = false;
-            }
-            else
-            {
-                followerDisabledForMining = false;
-            }
+                pathMover?.ResetAttackTracking();
 
-            pathMover?.ResetAttackTracking();
-
-            while (rock != null && !rock.IsDepleted)
-            {
-                if (!isActiveAndEnabled)
-                    break;
-
-                if (!miningActive || currentRock == null || currentRock != rock)
-                    break;
-
-                Vector3 rockPosition = rock.transform.position;
-                float distance = Vector2.Distance(transform.position, rockPosition);
-
-                if (distance > MiningRange)
+                while (rock != null && !rock.IsDepleted)
                 {
-                    float moveSpeed = ResolveMoveSpeed();
-                    float deltaTime = body != null
-                        ? Mathf.Max(Time.fixedDeltaTime, Mathf.Epsilon)
-                        : Mathf.Max(Time.deltaTime, Mathf.Epsilon);
-
-                    bool navigationStepTaken = false;
-
-                    if (pathMover != null && pathMover.isActiveAndEnabled)
-                    {
-                        Vector2 nextPosition;
-                        Vector2 navVelocity;
-                        bool teleported;
-                        bool goalUnreachable;
-                        navigationStepTaken = pathMover.TryStepAttack(
-                            deltaTime,
-                            moveSpeed,
-                            MiningRange,
-                            WaypointTolerance,
-                            () => rock != null ? (Vector2)rock.transform.position : (Vector2)transform.position,
-                            ReplanDistance,
-                            TeleportDistance,
-                            out nextPosition,
-                            out navVelocity,
-                            out teleported,
-                            out goalUnreachable);
-
-                        if (goalUnreachable)
-                        {
-                            if (CompanionManager.EnableDebugLogging)
-                                Debug.Log("[Companion Mining] Navigation reported the rock as unreachable.", this);
-                            break;
-                        }
-
-                        if (navigationStepTaken)
-                            ApplyMovement(nextPosition, navVelocity, teleported);
-                    }
-
-                    if (!navigationStepTaken)
-                    {
-                        Vector3 startPosition = transform.position;
-                        Vector3 nextPosition = Vector3.MoveTowards(startPosition, rockPosition, moveSpeed * deltaTime);
-                        Vector2 velocity = deltaTime > Mathf.Epsilon
-                            ? (Vector2)((nextPosition - startPosition) / deltaTime)
-                            : Vector2.zero;
-                        ApplyMovement(nextPosition, velocity, false);
-                    }
-
-                    if (miningSkill.IsMining && distance > MiningRange * 1.2f)
-                        miningSkill.StopMining();
-                }
-                else
-                {
-                    if (body != null)
-                        body.linearVelocity = Vector2.zero;
+                    if (!isActiveAndEnabled)
+                        break;
 
                     if (!miningActive || currentRock == null || currentRock != rock)
                         break;
 
-                    if (!miningSkill.IsMining)
+                    Vector3 rockPosition = rock.transform.position;
+                    float distance = Vector2.Distance(transform.position, rockPosition);
+
+                    if (distance > MiningRange)
                     {
+                        float moveSpeed = ResolveMoveSpeed();
+                        float deltaTime = body != null
+                            ? Mathf.Max(Time.fixedDeltaTime, Mathf.Epsilon)
+                            : Mathf.Max(Time.deltaTime, Mathf.Epsilon);
+
+                        bool navigationStepTaken = false;
+
+                        if (pathMover != null && pathMover.isActiveAndEnabled)
+                        {
+                            Vector2 nextPosition;
+                            Vector2 navVelocity;
+                            bool teleported;
+                            bool goalUnreachable;
+                            navigationStepTaken = pathMover.TryStepAttack(
+                                deltaTime,
+                                moveSpeed,
+                                MiningRange,
+                                WaypointTolerance,
+                                () => rock != null ? (Vector2)rock.transform.position : (Vector2)transform.position,
+                                ReplanDistance,
+                                TeleportDistance,
+                                out nextPosition,
+                                out navVelocity,
+                                out teleported,
+                                out goalUnreachable);
+
+                            if (goalUnreachable)
+                            {
+                                if (CompanionManager.EnableDebugLogging)
+                                    Debug.Log("[Companion Mining] Navigation reported the rock as unreachable.", this);
+                                break;
+                            }
+
+                            if (navigationStepTaken)
+                                ApplyMovement(nextPosition, navVelocity, teleported);
+                        }
+
+                        if (!navigationStepTaken)
+                        {
+                            Vector3 startPosition = transform.position;
+                            Vector3 nextPosition = Vector3.MoveTowards(startPosition, rockPosition, moveSpeed * deltaTime);
+                            Vector2 velocity = deltaTime > Mathf.Epsilon
+                                ? (Vector2)((nextPosition - startPosition) / deltaTime)
+                                : Vector2.zero;
+                            ApplyMovement(nextPosition, velocity, false);
+                        }
+
+                        if (miningSkill.IsMining && distance > MiningRange * 1.2f)
+                            miningSkill.StopMining();
+                    }
+                    else
+                    {
+                        if (body != null)
+                            body.linearVelocity = Vector2.zero;
+
                         if (!miningActive || currentRock == null || currentRock != rock)
                             break;
 
-                        miningSkill.StartMining(rock, pickaxe);
+                        if (!miningSkill.IsMining)
+                        {
+                            if (!miningActive || currentRock == null || currentRock != rock)
+                                break;
+
+                            miningSkill.StartMining(rock, pickaxe);
+                        }
+
+                        if (!miningActive || currentRock == null || currentRock != rock)
+                            break;
+
+                        if (!miningSkill.IsMining)
+                            break;
                     }
 
-                    if (!miningActive || currentRock == null || currentRock != rock)
+                    if (rock == null || rock.IsDepleted)
                         break;
 
-                    if (!miningSkill.IsMining)
-                        break;
+                    yield return null;
                 }
-
-                if (rock == null || rock.IsDepleted)
-                    break;
-
-                yield return null;
+            }
+            finally
+            {
+                followerHold.Dispose();
             }
 
             miningRoutine = null;
@@ -785,10 +815,15 @@ namespace Companions
 
         private void CleanupAfterMining(bool restoreFollower)
         {
-            if (restoreFollower && petFollower != null && followerDisabledForMining)
-                petFollower.enabled = true;
-
-            followerDisabledForMining = false;
+            if (restoreFollower)
+            {
+                ForceReleaseAllFollowerHolds();
+            }
+            else
+            {
+                followerDisableLockCount = 0;
+                followerDisabledForMining = false;
+            }
 
             if (body != null)
                 body.linearVelocity = Vector2.zero;
@@ -798,6 +833,41 @@ namespace Companions
             currentRock = null;
             currentPickaxe = null;
             miningActive = false;
+        }
+
+        private void ReleaseTemporaryFollowerHold()
+        {
+            if (followerDisableLockCount <= 0)
+                return;
+
+            followerDisableLockCount--;
+
+            if (followerDisableLockCount > 0)
+            {
+                followerDisabledForMining = true;
+                return;
+            }
+
+            followerDisableLockCount = 0;
+            followerDisabledForMining = false;
+
+            if (petFollower != null && !petFollower.enabled)
+                petFollower.enabled = true;
+        }
+
+        private void ForceReleaseAllFollowerHolds()
+        {
+            if (followerDisableLockCount <= 0)
+            {
+                followerDisabledForMining = false;
+                return;
+            }
+
+            followerDisableLockCount = 0;
+            followerDisabledForMining = false;
+
+            if (petFollower != null && !petFollower.enabled)
+                petFollower.enabled = true;
         }
 
         private void HandleMiningStopped()
@@ -856,6 +926,46 @@ namespace Companions
         private void OnPlayerStopMining()
         {
             playerProtectedSingleOre.Clear();
+        }
+
+        /// <summary>
+        /// Disposable handle that releases the follower hold when the mining flow exits.
+        /// </summary>
+        private sealed class FollowerHold : IDisposable
+        {
+            private CompanionMiningController controller;
+            private bool disposed;
+
+            public FollowerHold(CompanionMiningController controller)
+            {
+                this.controller = controller;
+            }
+
+            public void Dispose()
+            {
+                if (disposed)
+                    return;
+
+                disposed = true;
+                controller?.ReleaseTemporaryFollowerHold();
+                controller = null;
+            }
+        }
+
+        /// <summary>
+        /// Lightweight no-op disposable used when the follower is already disabled.
+        /// </summary>
+        private sealed class NoOpDisposable : IDisposable
+        {
+            public static readonly NoOpDisposable Instance = new NoOpDisposable();
+
+            private NoOpDisposable()
+            {
+            }
+
+            public void Dispose()
+            {
+            }
         }
 
         private void CancelAreaMiningInternal(bool restoreFollower)

@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:31588cd511bec6cc596e3d26c821576d0a8df682 -->
+## 2025-10-22T15:29:23+01:00 — Ensure ore golem mining holds follower state
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 195 ++ / 83 --
+- Notes:
+  —
+---
 <!-- commit:50b5ed3ec735954f377997f058aa7a03321b40ec -->
 ## 2025-10-22T15:07:11+01:00 — Merge pull request #1290 from aicovergod/codex/guard-mineroutine-and-handle-cancellation-tmssnt
 
