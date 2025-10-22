@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1d72955587931122f2828a0c5b836309687cfc1a -->
+## 2025-10-23T00:19:04+01:00 — Add companion combat level-up chat variants
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 684 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:1502cdb0ada9228f2bd0e3f1bd8460230415b0cc -->
 ## 2025-10-23T00:12:37+01:00 — Merge pull request #1312 from aicovergod/codex/update-agents.md-for-companion-chat-logic
 
