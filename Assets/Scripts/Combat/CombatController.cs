@@ -329,6 +329,21 @@ namespace Combat
                     case SkillType.Beastmaster:
                         companionLine = CompanionChatLibrary.GetRandomPlayerBeastmasterLevelUpLine();
                         break;
+                    case SkillType.Fishing:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerFishingLevelUpLine();
+                        break;
+                    case SkillType.Cooking:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerCookingLevelUpLine();
+                        break;
+                    case SkillType.Firemaking:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerFiremakingLevelUpLine();
+                        break;
+                    case SkillType.Woodcutting:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerWoodcuttingLevelUpLine();
+                        break;
+                    case SkillType.Mining:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerMiningLevelUpLine();
+                        break;
                 }
 
                 if (!string.IsNullOrEmpty(companionLine))

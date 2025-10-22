@@ -1,21 +1,12 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:9c37c462b9b2505e0cc2db8f0d1cb68845e81a08 -->
-## 2025-10-23T00:43:40+01:00 — Merge pull request #1318 from aicovergod/codex/add-companion-messages-for-skill-level-ups-pw5rgt
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 432 ++ / 0 --
-- Notes:
-  Add companion banter for ranged magic and beastmaster level ups
----
-<!-- commit:8c55779f829bc863715621b60e98a65243d7079e -->
-## 2025-10-23T00:43:27+01:00 — Add companion banter for ranged magic and beastmaster level ups
+<!-- commit:8867e1825c14e8cf0e4f5d2b4db9c0fc82c6d0bc -->
+## 2025-10-23T00:48:57+01:00 — Add companion chat for player gathering skill level ups
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
 - Changed files (2): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Companions/CompanionChatLibrary.cs
-- Diff: 432 ++ / 0 --
+- Diff: 787 ++ / 0 --
 - Notes:
   —
 ---
