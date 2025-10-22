@@ -1033,94 +1033,55 @@ namespace Companions
                 return;
 
             string companionName = GetCompanionDisplayName();
+            string message;
 
-            if (skill == SkillType.Hitpoints)
+            switch (skill)
             {
-                string message = CompanionChatLibrary.GetRandomHitpointsLevelUpLine();
-                chat.PublishCompanionMessage(companionName, message);
-                return;
+                case SkillType.Hitpoints:
+                    message = CompanionChatLibrary.GetRandomHitpointsLevelUpLine();
+                    break;
+                case SkillType.Defence:
+                    message = CompanionChatLibrary.GetRandomDefenceLevelUpLine();
+                    break;
+                case SkillType.Strength:
+                    message = CompanionChatLibrary.GetRandomStrengthLevelUpLine();
+                    break;
+                case SkillType.Attack:
+                    message = CompanionChatLibrary.GetRandomAttackLevelUpLine();
+                    break;
+                case SkillType.Ranged:
+                    message = CompanionChatLibrary.GetRandomRangedLevelUpLine();
+                    break;
+                case SkillType.Magic:
+                    message = CompanionChatLibrary.GetRandomMagicLevelUpLine();
+                    break;
+                case SkillType.Beastmaster:
+                    message = CompanionChatLibrary.GetRandomBeastmasterLevelUpLine();
+                    break;
+                case SkillType.Fishing:
+                    message = CompanionChatLibrary.GetRandomFishingLevelUpLine();
+                    break;
+                case SkillType.Cooking:
+                    message = CompanionChatLibrary.GetRandomCookingLevelUpLine();
+                    break;
+                case SkillType.Firemaking:
+                    message = CompanionChatLibrary.GetRandomFiremakingLevelUpLine();
+                    break;
+                case SkillType.Woodcutting:
+                    message = CompanionChatLibrary.GetRandomWoodcuttingLevelUpLine();
+                    break;
+                case SkillType.Mining:
+                    message = CompanionChatLibrary.GetRandomMiningLevelUpLine();
+                    break;
+                default:
+                {
+                    string pronoun = ResolveCompanionPronoun();
+                    string skillName = SkillNameUtility.GetSentenceName(skill);
+                    message = $"Just levelled up {pronoun} {skillName} to level {level}!";
+                    break;
+                }
             }
 
-            if (skill == SkillType.Defence)
-            {
-                string message = CompanionChatLibrary.GetRandomDefenceLevelUpLine();
-                chat.PublishCompanionMessage(companionName, message);
-                return;
-            }
-
-            if (skill == SkillType.Strength)
-            {
-                string message = CompanionChatLibrary.GetRandomStrengthLevelUpLine();
-                chat.PublishCompanionMessage(companionName, message);
-                return;
-            }
-
-            if (skill == SkillType.Attack)
-            {
-                string message = CompanionChatLibrary.GetRandomAttackLevelUpLine();
-                chat.PublishCompanionMessage(companionName, message);
-                return;
-            }
-
-            if (skill == SkillType.Ranged)
-            {
-                string message = CompanionChatLibrary.GetRandomRangedLevelUpLine();
-                chat.PublishCompanionMessage(companionName, message);
-                return;
-            }
-
-            if (skill == SkillType.Magic)
-            {
-                string message = CompanionChatLibrary.GetRandomMagicLevelUpLine();
-                chat.PublishCompanionMessage(companionName, message);
-                return;
-            }
-
-            if (skill == SkillType.Beastmaster)
-            {
-                string message = CompanionChatLibrary.GetRandomBeastmasterLevelUpLine();
-                chat.PublishCompanionMessage(companionName, message);
-                return;
-            }
-
-            if (skill == SkillType.Fishing)
-            {
-                string message = CompanionChatLibrary.GetRandomFishingLevelUpLine();
-                chat.PublishCompanionMessage(companionName, message);
-                return;
-            }
-
-            if (skill == SkillType.Cooking)
-            {
-                string message = CompanionChatLibrary.GetRandomCookingLevelUpLine();
-                chat.PublishCompanionMessage(companionName, message);
-                return;
-            }
-
-            if (skill == SkillType.Firemaking)
-            {
-                string message = CompanionChatLibrary.GetRandomFiremakingLevelUpLine();
-                chat.PublishCompanionMessage(companionName, message);
-                return;
-            }
-
-            if (skill == SkillType.Woodcutting)
-            {
-                string message = CompanionChatLibrary.GetRandomWoodcuttingLevelUpLine();
-                chat.PublishCompanionMessage(companionName, message);
-                return;
-            }
-
-            if (skill == SkillType.Mining)
-            {
-                string message = CompanionChatLibrary.GetRandomMiningLevelUpLine();
-                chat.PublishCompanionMessage(companionName, message);
-                return;
-            }
-
-            string pronoun = ResolveCompanionPronoun();
-            string skillName = SkillNameUtility.GetSentenceName(skill);
-            string message = $"Just levelled up {pronoun} {skillName} to level {level}!";
             chat.PublishCompanionMessage(companionName, message);
         }
 
