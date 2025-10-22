@@ -138,6 +138,9 @@ namespace Pets
                 return;
             }
 
+            // Ensure the companion controller reference is refreshed before validating ore golem rules.
+            companionController ??= GetComponent<CompanionController>();
+
             if (ShouldBlockOreGolemAttack(target, fromDirectCommand))
             {
                 CancelAttack();
@@ -502,7 +505,7 @@ namespace Pets
             var chat = ChatService.Instance;
             chat?.PublishCompanionMessage(
                 CompanionManager.GetCompanionDisplayName(),
-                "I need a pickaxe to attack that golem");
+                "I need a pickaxe to attack the golem.");
             return true;
         }
 
