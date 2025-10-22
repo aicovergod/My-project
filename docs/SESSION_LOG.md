@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ad54c728b9e1abe7f7633a839c72c2ea883ae49e -->
+## 2025-10-22T15:58:59+01:00 — Merge pull request #1293 from aicovergod/codex/update-follower-state-handling-in-miningcontroller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 34 ++ / 8 --
+- Notes:
+  Fix mining follower hold release tracking
+---
+<!-- commit:a0b3f179f46481ac188e306ee720b86da994e945 -->
+## 2025-10-22T15:58:38+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:fe8f5ae0176bb38e6002df2498eb07e8b28a2166 -->
 ## 2025-10-22T15:58:09+01:00 — Fix mining follower hold release tracking
 
