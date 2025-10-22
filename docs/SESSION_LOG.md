@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e723bdac88d9f430343734ee9b56816ee5449bf0 -->
+## 2025-10-22T23:42:27+01:00 — Add companion storage chat flavour lines
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 173 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:522b1223a94669097a6a13614301f9d2691278e1 -->
 ## 2025-10-22T23:37:13+01:00 — Merge pull request #1309 from aicovergod/codex/fix-companion-greeting-message-logic
 
