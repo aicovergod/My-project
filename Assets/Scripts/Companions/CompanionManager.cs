@@ -454,6 +454,8 @@ namespace Companions
 
                 storedByPet = triggeredByPet && hadActiveCompanion;
                 storedManually = !triggeredByPet && hadActiveCompanion;
+                if (storedManually)
+                    PublishRandomManualStoreMessage();
                 if (!triggeredByPet)
                 {
                     companionWasActiveBeforePetSpawn = false;
@@ -832,6 +834,23 @@ namespace Companions
                 return;
 
             string message = CompanionChatLibrary.GetRandomManualSpawnGreetingLine();
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
+        }
+
+        /// <summary>
+        /// Publishes a random farewell line when the player manually stores their companion.
+        /// Keeps the pickup action flavourful so the companion acknowledges being dismissed.
+        /// </summary>
+        private static void PublishRandomManualStoreMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string message = CompanionChatLibrary.GetRandomManualStoreLine();
             if (string.IsNullOrWhiteSpace(message))
                 return;
 
