@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e1f97350130b2f7f78adc193917343608d6e9390 -->
+## 2025-10-22T13:42:04+01:00 — Merge pull request #1284 from aicovergod/codex/fix-duplicate-full-inventory-message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 13 ++ / 1 --
+- Notes:
+  Fix duplicate companion inventory full chat message
+---
+<!-- commit:ec4dd52b8147a2060656211a8c38bf5a81bad762 -->
+## 2025-10-22T13:41:55+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2de03d758c83dee73bfcef02f01d510521cf858f -->
 ## 2025-10-22T13:41:36+01:00 — Fix duplicate companion inventory full chat line
 
