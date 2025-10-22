@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a06342eb91a5c66de0d55327b735b946d4008c80 -->
+## 2025-10-22T15:30:38+01:00 — Merge pull request #1291 from aicovergod/codex/add-temporary-follower-hold-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 204 ++ / 83 --
+- Notes:
+  Ensure ore golem mining holds follower state
+---
+<!-- commit:fddc146f7a1790138808831ae086fb4c8699a082 -->
+## 2025-10-22T15:29:46+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:31588cd511bec6cc596e3d26c821576d0a8df682 -->
 ## 2025-10-22T15:29:23+01:00 — Ensure ore golem mining holds follower state
 
