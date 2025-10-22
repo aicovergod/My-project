@@ -103,7 +103,15 @@ namespace Pets
         {
             get
             {
-                return pathService != null && pathService.ActiveGrid != null && pathService.ActiveGrid.HasGrid;
+                // Always attempt to bind the navigation service when queried so callers can
+                // transition to grid-aware movement as soon as the service becomes available.
+                if (!EnsureServiceReference())
+                {
+                    return false;
+                }
+
+                var grid = pathService.ActiveGrid;
+                return grid != null && grid.HasGrid;
             }
         }
 

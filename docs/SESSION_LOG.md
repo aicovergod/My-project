@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:00c5348812d215ede206b3c89ec08d8fb7b250ad -->
+## 2025-10-22T19:14:40+01:00 — Ensure pet path mover binds nav service when queried
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetPathMover.cs
+- Diff: 9 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:b6b7ca604740888a30d0e961e4fd964913520bbc -->
 ## 2025-10-22T18:27:33+01:00 — Merge pull request #1299 from aicovergod/codex/update-chathudbootstrap-for-scene-evaluation
 
