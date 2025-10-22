@@ -454,6 +454,9 @@ namespace Pets
 
             CompanionManager.TrySpawnCompanion(pet);
 
+            if (isRespawnFromSave)
+                CompanionManager.PublishAutoSpawnGreeting();
+
             if (!replacingExisting)
                 ShowSpawnToast(pet, isRespawnFromSave);
 
