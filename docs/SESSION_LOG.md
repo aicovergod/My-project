@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8867e1825c14e8cf0e4f5d2b4db9c0fc82c6d0bc -->
+## 2025-10-23T00:48:57+01:00 — Add companion chat for player gathering skill level ups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Companions/CompanionChatLibrary.cs
+- Diff: 787 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:27fa11003897659bc161a866f893390d36b5e223 -->
 ## 2025-10-23T00:37:28+01:00 — Merge pull request #1316 from aicovergod/codex/add-companion-dialogue-for-level-ups
 
