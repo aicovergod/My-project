@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d449ac82ac7b355b729fac3a6cfd950db103ca05 -->
+## 2025-10-22T19:15:07+01:00 — Merge pull request #1300 from aicovergod/codex/fix-github-codex-error
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 18 ++ / 1 --
+- Notes:
+  Ensure pet path mover binds nav service when queried
+---
+<!-- commit:b0c4171ebdb9c7e9b63d0503bca11e18fe557435 -->
+## 2025-10-22T19:14:57+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:00c5348812d215ede206b3c89ec08d8fb7b250ad -->
 ## 2025-10-22T19:14:40+01:00 — Ensure pet path mover binds nav service when queried
 
