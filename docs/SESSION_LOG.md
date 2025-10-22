@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e96cd6970411d9740a1d8c81c7ed9960be0954f2 -->
+## 2025-10-22T23:06:55+01:00 — Add companion guard mode deactivation chat lines
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 142 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:050799f871e998d1b6a94d98abe797004533e3d7 -->
 ## 2025-10-22T23:02:24+01:00 — Merge pull request #1304 from aicovergod/codex/add-companion-guard-mode-messages
 
