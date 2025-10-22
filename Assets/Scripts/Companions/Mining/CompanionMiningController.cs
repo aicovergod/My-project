@@ -838,7 +838,7 @@ namespace Companions
 
             chat.PublishCompanionMessage(
                 CompanionManager.GetCompanionDisplayName(),
-                CompanionManager.InventoryFullChatLine);
+                CompanionManager.GetRandomInventoryFullChatLine());
         }
 
         private void PublishMissingPickaxeMessage()

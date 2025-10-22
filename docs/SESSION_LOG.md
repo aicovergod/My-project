@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1566ec18e146dc9eb16454b871c34f86cdd3a29c -->
+## 2025-10-22T22:47:22+01:00 — Add companion inventory full chat variety
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs
+- Diff: 61 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:c5a8be670dfca1f93bc478d8da13c9b5d28ed481 -->
 ## 2025-10-22T22:43:49+01:00 — Merge pull request #1302 from aicovergod/codex/add-random-chat-messages-on-deposit
 
