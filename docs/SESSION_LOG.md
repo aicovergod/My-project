@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3d838656d60c1dcc09f872cf13076087e807ce69 -->
+## 2025-10-23T00:29:29+01:00 — Merge pull request #1315 from aicovergod/codex/add-companion-messages-for-skill-leveling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 336 ++ / 5 --
+- Notes:
+  Add companion woodcutting and mining level-up chatter
+---
+<!-- commit:afd281be680da0117d9dc6549ba4b8251797f8db -->
+## 2025-10-23T00:29:23+01:00 — Merge branch 'main' into codex/add-companion-messages-for-skill-leveling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:5ee11654081cd642be43b17453adaf2bd7aa7981 -->
 ## 2025-10-23T00:28:21+01:00 — Add companion woodcutting and mining level-up chat pools
 
