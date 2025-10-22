@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ef8e15d34fe5a7b735b8e12321381d0cad87e24d -->
+## 2025-10-22T17:42:32+01:00 — Prevent companions auto-mining when inventory is full
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 36 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:66917e980bff516b2c5fc2621d37aa6d95e70fd6 -->
 ## 2025-10-22T17:19:27+01:00 — Merge pull request #1296 from aicovergod/codex/adjust-teleport-detection-in-miningcontroller
 
