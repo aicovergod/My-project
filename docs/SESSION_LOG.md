@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:381b2f3ea2f1735cfd03dd4773e16e5c12ba4113 -->
+## 2025-10-22T16:26:16+01:00 — Merge pull request #1294 from aicovergod/codex/update-personalorenode-to-check-companion-distance
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 35 ++ / 8 --
+- Notes:
+  Allow companions to keep personal ore nodes active
+---
+<!-- commit:ab54c1ac640cc4de18aee598b34ce5427e5bf155 -->
+## 2025-10-22T16:26:04+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:729553890600b5d0176b174817348394a53a2f54 -->
 ## 2025-10-22T16:25:44+01:00 — Keep personal ore nodes alive when companion is nearby
 
