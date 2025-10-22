@@ -211,18 +211,41 @@ namespace Companions.UI
         private void OnMineRocksClicked()
         {
             Debug.Log("[Companion UI] Mine Rocks button clicked.");
-            bool accepted = CompanionManager.TryCommandMineNearby();
-            Debug.Log($"[Companion UI] Mine Rocks command result: success={accepted}.");
+            bool accepted = CompanionManager.TryCommandMineNearby(out var failureReason);
+            Debug.Log($"[Companion UI] Mine Rocks command result: success={accepted}, failureReason={failureReason}.");
             if (!accepted)
             {
-                // Surface a short chat line when the command cannot be fulfilled so the player
-                // understands why both menus closed without triggering companion behaviour.
-                PublishPlaceholderMessage("I can't find any rocks to mine right now.");
+                if (!CompanionManager.HasActiveCompanion)
+                {
+                    PublishPlaceholderMessage("You need to summon me before I can go mining.");
+                }
+                else if (ShouldPublishFallbackForFailure(failureReason))
+                {
+                    // Surface a short chat line when the command cannot be fulfilled so the player
+                    // understands why both menus closed without triggering companion behaviour.
+                    PublishPlaceholderMessage("I can't find any rocks to mine right now.");
+                }
             }
 
             // Always close every pet-related menu after a command click so the PetLevelBarMenu
             // and the command sub-menu never remain visible simultaneously.
             CloseAllMenus();
+        }
+
+        private bool ShouldPublishFallbackForFailure(CompanionMiningCommandResult failureReason)
+        {
+            switch (failureReason)
+            {
+                case CompanionMiningCommandResult.InventoryFull:
+                case CompanionMiningCommandResult.NoPickaxe:
+                case CompanionMiningCommandResult.BlockedByPlayer:
+                case CompanionMiningCommandResult.RequirementsNotMet:
+                case CompanionMiningCommandResult.Unreachable:
+                    // The mining controller publishes its own descriptive chat lines for these cases.
+                    return false;
+                default:
+                    return true;
+            }
         }
 
         private void OnPlaceholderClicked(string message)

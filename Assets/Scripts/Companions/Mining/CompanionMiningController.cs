@@ -192,15 +192,7 @@ namespace Companions
 
             if (!BuildAreaCandidateList(clampedRadius, out failureReason))
             {
-                if (failureReason == CompanionMiningCommandResult.InventoryFull)
-                {
-                    PublishInventoryFullMessage();
-                }
-                else
-                {
-                    PublishNoRocksMessage();
-                }
-
+                PublishAreaMiningFailureMessage(failureReason);
                 return false;
             }
 
@@ -583,11 +575,7 @@ namespace Companions
 
                 if (!BuildAreaCandidateList(activeAreaRadius, out var rebuildFailure, suppressChat: true))
                 {
-                    if (rebuildFailure == CompanionMiningCommandResult.InventoryFull)
-                        PublishInventoryFullMessage();
-                    else
-                        PublishNoRocksMessage();
-
+                    PublishAreaMiningFailureMessage(rebuildFailure);
                     CancelAreaMiningInternal(true);
                     yield break;
                 }
@@ -608,6 +596,8 @@ namespace Companions
             float radiusSqr = radius * radius;
 
             Vector2 controllerPosition2D = (Vector2)transform.position;
+            bool observedNonInventoryFailure = false;
+            CompanionMiningCommandResult lastNonInventoryFailure = CompanionMiningCommandResult.Unreachable;
 
             for (int i = 0; i < rocks.Length; i++)
             {
@@ -628,6 +618,13 @@ namespace Companions
                     {
                         failureReason = CompanionMiningCommandResult.InventoryFull;
                         return false;
+                    }
+
+                    if (validationResult != CompanionMiningCommandResult.InventoryFull &&
+                        validationResult != CompanionMiningCommandResult.Accepted)
+                    {
+                        observedNonInventoryFailure = true;
+                        lastNonInventoryFailure = validationResult;
                     }
 
                     continue;
@@ -663,12 +660,33 @@ namespace Companions
 
             if (areaCandidates.Count == 0)
             {
-                failureReason = CompanionMiningCommandResult.Unreachable;
+                failureReason = observedNonInventoryFailure
+                    ? lastNonInventoryFailure
+                    : CompanionMiningCommandResult.Unreachable;
                 return false;
             }
 
             failureReason = CompanionMiningCommandResult.Accepted;
             return true;
+        }
+
+        private void PublishAreaMiningFailureMessage(CompanionMiningCommandResult failureReason)
+        {
+            switch (failureReason)
+            {
+                case CompanionMiningCommandResult.InventoryFull:
+                    PublishInventoryFullMessage();
+                    break;
+                case CompanionMiningCommandResult.NoPickaxe:
+                    PublishMissingPickaxeMessage();
+                    break;
+                case CompanionMiningCommandResult.BlockedByPlayer:
+                    PublishBlockedByPlayerMessage();
+                    break;
+                default:
+                    PublishNoRocksMessage();
+                    break;
+            }
         }
 
         private Vector3 GetTileCentre(Vector3 worldPosition)

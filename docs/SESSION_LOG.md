@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5322cea0fffc797b0077e383e3f3a85c04b06804 -->
+## 2025-10-22T13:28:11+01:00 — Improve companion mining failure reporting
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs
+- Diff: 87 ++ / 21 --
+- Notes:
+  —
+---
 <!-- commit:14713e3709206358c40c6a39b8965a76602be91e -->
 ## 2025-10-22T12:33:58+01:00 — Merge pull request #1282 from aicovergod/codex/update-attack-commands-to-clear-mining
 
