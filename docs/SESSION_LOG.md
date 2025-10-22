@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:94c1dd5af5dab843ca92e4e9faa697740a2a86a3 -->
+## 2025-10-22T23:28:56+01:00 — Add companion spawn greeting pool
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 171 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:21724454c02a5793b197a3ba684e9edbdabd80c0 -->
 ## 2025-10-22T23:24:58+01:00 — Merge pull request #1307 from aicovergod/codex/add-random-welcome-message-from-companion
 
