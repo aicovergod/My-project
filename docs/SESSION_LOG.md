@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:752f40ae14ff90ad81f1a7c5cffa7e51905e2eeb -->
+## 2025-10-23T00:12:00+01:00 — Centralize companion level-up chat handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): AGENTS.md, Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 247 ++ / 153 --
+- Notes:
+  —
+---
 <!-- commit:8157f41b447fbf9bf5ac92e1fed7deacef2b889e -->
 ## 2025-10-23T00:04:09+01:00 — Merge pull request #1311 from aicovergod/codex/add-companion-messages-for-hitpoints-level-up
 

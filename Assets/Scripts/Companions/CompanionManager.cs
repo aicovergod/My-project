@@ -73,155 +73,6 @@ namespace Companions
         private static bool enableDebugLogging;
 
         /// <summary>
-        /// Library of flavour messages the companion can send when levelling Hitpoints.
-        /// Messages are intentionally first-person so they read as companion chatter.
-        /// </summary>
-        private static readonly string[] HitpointsLevelUpMessages =
-        {
-            "Ha, I feel tougher already.",
-            "My hitpoints went up. Try to hurt me now.",
-            "More health for me. Less panic for you.",
-            "I can take a punch and smile about it.",
-            "That sting hurts less now. Progress.",
-            "New level in hitpoints. I am not going down easy.",
-            "I feel sturdier. Like proper armor, but inside.",
-            "My heart feels stronger. Literally.",
-            "More vitality in the tank.",
-            "Good luck knocking me out now.",
-            "Hitpoints up. Bruises down.",
-            "I can shrug off more hits now.",
-            "I am harder to squash. Science.",
-            "That upgrade felt warm and tingly.",
-            "Health bar bigger. Attitude bigger.",
-            "I can tank a little longer for you.",
-            "Patch me up less. I got this.",
-            "My ribs say thank you.",
-            "Regeneration is feeling snappier.",
-            "That hurt less than it should. Nice.",
-            "Hitpoints increased. Confidence increased.",
-            "Stronger pulse. Stronger me.",
-            "I am officially less squishy.",
-            "Call me brick wall Isla.",
-            "Another layer of toughness unlocked.",
-            "My insides feel armoured.",
-            "More life in me. More fight in us.",
-            "Nice, my red bar just grew.",
-            "I will stand between you and danger longer.",
-            "That last hit would have floored me before.",
-            "Health up. Spirits up.",
-            "I could tank a boulder now. Please do not test it.",
-            "Bring the pain. I can take it.",
-            "My healer would be so proud.",
-            "Bandages optional. Kidding. Mostly.",
-            "New HP level. New me.",
-            "That upgrade soaked into my bones.",
-            "Vitality boost achieved.",
-            "Fewer potions needed. Maybe.",
-            "Stamina steadier. Pulse calm.",
-            "I can breathe through the hits now.",
-            "Less flinching. More finishing.",
-            "My heart icon just smiled <emoji=24>.",
-            "Thicker skin. Sharper grin.",
-            "I feel unbreakable. Almost.",
-            "Hitpoints leveled. Risks permitted.",
-            "Keep fighting. I can keep standing.",
-            "My lifeforce is swole.",
-            "Tough cookie status confirmed.",
-            "That last hit barely tickled.",
-            "I can tank the boss a little longer.",
-            "My pulse sounds like a war drum.",
-            "More buffer before the floor.",
-            "Health leveled. I will be fine.",
-            "Another sip of life for me.",
-            "Feels like someone turned up my hp slider.",
-            "Resilience rising nicely.",
-            "I could sprint through arrows now. I will not.",
-            "Potion bills just went down.",
-            "More red bar. Less red flags.",
-            "That stab felt like a poke.",
-            "Ribs intact. Pride intact.",
-            "My veins are humming.",
-            "Vital spark brighter than ever.",
-            "It will take more than that to drop me.",
-            "Time to frontline with style.",
-            "I can soak a hit for you, easy.",
-            "My heartbeat says keep going.",
-            "Call me sturdy Isla today.",
-            "Tank mode improved. Cheer accordingly.",
-            "Health up means more mischief.",
-            "I feel harder to kill. Awkward for enemies.",
-            "That upgrade stitched me together tighter.",
-            "Spine steel. Smile real.",
-            "New tolerance unlocked. Ow is now meh.",
-            "I could headbutt a door and win.",
-            "My shoulders can carry more trouble.",
-            "Less wheezing. More teasing.",
-            "That slash would have been scary yesterday.",
-            "HP up. Revives down.",
-            "My lifeline just got longer.",
-            "I bounce back faster now.",
-            "I can walk it off for real.",
-            "That punch only rearranged my hair.",
-            "Health level up. Nurse Isla off duty.",
-            "Feel that. Me neither.",
-            "I am a walking fortress with jokes.",
-            "More padding on the soul.",
-            "Tempers high. Damage low.",
-            "I am not fragile glass anymore. I am fancy ceramic.",
-            "Your bodyguard just got thicker armor.",
-            "Pain threshold upgraded.",
-            "More cushion for chaos.",
-            "New personal record for not dying.",
-            "Life total rising like rent.",
-            "Enemies will need bigger sticks.",
-            "That arrow felt polite.",
-            "Potion cooldowns can relax.",
-            "I am a stubborn heartbeat in boots.",
-            "Hitpoints up. I refuse to fall.",
-            "My health is stacked and snacking.",
-            "I can wrestle fate and win.",
-            "Red bar juicy. Let us brawl.",
-            "Doctor says I am annoyingly healthy.",
-            "I will outlast their tantrum.",
-            "My pulse is laughing at danger.",
-            "Adds hit like kittens. Cute.",
-            "Armor helps. HP helps more.",
-            "Pain and I had a talk. I won.",
-            "I can take a crit and wink.",
-            "More seconds to save you if it goes wrong.",
-            "Enemy plan ruined by my health.",
-            "Stitches? Optional today.",
-            "That bruise downgraded itself.",
-            "I am tanking like a champion.",
-            "My core feels like tempered steel.",
-            "Downed? Not today.",
-            "HP leveled. Fear leveled down.",
-            "I brought an extra life. It is me.",
-            "I could nap in a battlefield. Do not let me.",
-            "Boss music less scary now.",
-            "My heartbeat learned parry.",
-            "More meat on the numbers.",
-            "I will be the last one standing, promise.",
-            "They can try again when they level up.",
-            "Hitpoints up. Healers bored.",
-            "I am a sponge for damage. A clean one.",
-            "Survival odds improved. Mood improved.",
-            "My lungs sing battle songs now.",
-            "Pain meter says try harder.",
-            "I can cover you longer than before.",
-            "That tickled my maximums.",
-            "I am durable and adorable.",
-            "Red bar says keep swinging.",
-            "I outgrew my old scars.",
-            "Vitality stacked. Courage stacked.",
-            "Health leveled. Hope leveled.",
-            "I am feeling resilient today.",
-            "My heart just high fived me <emoji=25>.",
-            "More grit in every step.",
-            "HP up. Retry denied."
-        };
-
-        /// <summary>
         /// Toggle that allows QA to enable or disable verbose companion debug logging from the AdminF2 menu.
         /// </summary>
         public static bool EnableDebugLogging
@@ -1183,11 +1034,17 @@ namespace Companions
 
             string companionName = GetCompanionDisplayName();
 
-            if (skill == SkillType.Hitpoints && HitpointsLevelUpMessages.Length > 0)
+            if (skill == SkillType.Hitpoints)
             {
-                int index = UnityEngine.Random.Range(0, HitpointsLevelUpMessages.Length);
-                string hitpointsMessage = HitpointsLevelUpMessages[index];
-                chat.PublishCompanionMessage(companionName, hitpointsMessage);
+                string message = CompanionChatLibrary.GetRandomHitpointsLevelUpLine();
+                chat.PublishCompanionMessage(companionName, message);
+                return;
+            }
+
+            if (skill == SkillType.Defence)
+            {
+                string message = CompanionChatLibrary.GetRandomDefenceLevelUpLine();
+                chat.PublishCompanionMessage(companionName, message);
                 return;
             }
 
