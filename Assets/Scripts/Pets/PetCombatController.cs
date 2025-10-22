@@ -528,6 +528,7 @@ namespace Pets
             CompanionMiningController miningController)
         {
             IDisposable followerHold = miningController?.EnterTemporaryFollowerHold();
+            bool waitForFollowerHandOff = false;
             try
             {
                 int waitTicks = UnityEngine.Random.Range(1, 4);
@@ -559,7 +560,20 @@ namespace Pets
                 if (rock == null || rock.IsDepleted)
                     yield break;
 
-                miningController.TryCommandMine(rock);
+                var commandResult = CompanionMiningCommandResult.RequirementsNotMet;
+                bool commandAccepted = miningController.TryCommandMine(
+                    rock,
+                    out commandResult,
+                    preserveFollowerHold: true);
+
+                waitForFollowerHandOff = commandAccepted || commandResult == CompanionMiningCommandResult.InventoryFull;
+
+                if (waitForFollowerHandOff)
+                {
+                    // Allow the mining coroutine to acquire its follower hold before we release the
+                    // temporary automation lock so the follower counter never drops to zero mid-handoff.
+                    yield return null;
+                }
             }
             finally
             {
