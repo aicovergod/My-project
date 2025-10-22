@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3e9a49aad1e59e3736d1b79e37d128543a182d2c -->
+## 2025-10-22T13:28:55+01:00 — Merge pull request #1283 from aicovergod/codex/update-companionminingcontroller-for-failure-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 96 ++ / 21 --
+- Notes:
+  Improve companion mining failure reporting
+---
+<!-- commit:6876a031a685414f87f17c027b39f763c3abc0ba -->
+## 2025-10-22T13:28:31+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:5322cea0fffc797b0077e383e3f3a85c04b06804 -->
 ## 2025-10-22T13:28:11+01:00 — Improve companion mining failure reporting
 
