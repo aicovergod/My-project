@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:535b861e640e02c34e38727a782a760584304964 -->
+## 2025-10-22T11:44:43+01:00 — Add developer command to trigger companion mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Commands/PlayerCommandService.cs, Assets/Scripts/Player/Commands/TestMineRocksCommand.cs
+- Diff: 44 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d9e923c292e863ff677f82399b9abd5f72b58ae8 -->
 ## 2025-10-22T11:34:29+01:00 — Merge pull request #1275 from aicovergod/codex/update-logging-for-mining-commands
 
