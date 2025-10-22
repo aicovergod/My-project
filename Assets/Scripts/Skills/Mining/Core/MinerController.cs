@@ -154,8 +154,13 @@ namespace Skills.Mining
                 shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
             }
 
-            if (shiftHeld && CompanionManager.TryCommandMine(node))
+            if (shiftHeld)
             {
+                // Shift-right click is reserved for commanding the companion. Regardless of whether the
+                // companion can accept the order (no pickaxe, out of range, inactive, etc.), we should not
+                // prospect the rock. This prevents the player from prospecting when they intended to issue
+                // a companion order and ensures the feedback from the companion remains the only response.
+                CompanionManager.TryCommandMine(node);
                 return;
             }
 
