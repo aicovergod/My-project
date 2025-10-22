@@ -180,9 +180,20 @@ namespace Companions
                 bool definitionsMatch = DefinitionsMatch(activeDefinition, resolvedDefinition);
                 if (definitionsMatch)
                 {
+                    ResetStorageFlags();
+
                     if (!controller.gameObject.activeSelf)
-                        SetStored(false);
-                    return;
+                    {
+                        if (ReactivateExistingCompanionIfNeeded())
+                            return;
+
+                        TearDownExistingCompanion();
+                    }
+                    else
+                    {
+                        EnsureHud();
+                        return;
+                    }
                 }
 
                 TearDownExistingCompanion();
@@ -321,6 +332,68 @@ namespace Companions
         }
 
         /// <summary>
+        /// Clears the storage tracking flags so subsequent summons treat the companion as active.
+        /// </summary>
+        private static void ResetStorageFlags()
+        {
+            storedByPet = false;
+            storedManually = false;
+            companionWasActiveBeforePetSpawn = false;
+            suppressRestoreAfterPet = false;
+        }
+
+        /// <summary>
+        /// Reactivates the current companion instance when it already exists but is disabled.
+        /// Ensures UI bindings refresh and verifies that the companion is visible before returning.
+        /// </summary>
+        /// <returns>True when the existing companion was successfully reactivated.</returns>
+        private static bool ReactivateExistingCompanionIfNeeded()
+        {
+            if (controller == null || controller.gameObject == null)
+                return false;
+
+            if (controller.gameObject.activeSelf)
+                return HasActiveCompanion;
+
+            controller.HandleSummonRequest();
+            controller.Inventory?.ForceClosed();
+            controller.Equipment?.ForceClosed();
+
+            EnsureHud();
+            RefreshMenusAfterRestore();
+
+            bool active = HasActiveCompanion;
+            if (!active && enableDebugLogging)
+            {
+                Debug.LogWarning("[Companion] ReactivateExistingCompanionIfNeeded expected the companion to become active but it remained disabled.");
+            }
+            else if (active && enableDebugLogging)
+            {
+                Debug.Log("[Companion] Reactivated stored companion without respawning.");
+            }
+
+            return active;
+        }
+
+        /// <summary>
+        /// Resets menu state after the companion is restored so UI overlays rebuild against the live instance.
+        /// </summary>
+        private static void RefreshMenusAfterRestore()
+        {
+            PetLevelBarMenu.HideActiveMenu();
+            CompanionCommandMenu.Hide();
+
+            if (inventoryVisible)
+            {
+                inventoryVisible = false;
+                InventoryVisibilityChanged?.Invoke(false);
+            }
+
+            if (equipmentVisible)
+                UpdateEquipmentVisibility(false);
+        }
+
+        /// <summary>
         /// Ensures the shared HUD exists and is bound to the companion instance.
         /// </summary>
         private static void EnsureHud()
@@ -399,12 +472,12 @@ namespace Companions
                     return;
                 }
 
-                storedByPet = false;
-                storedManually = false;
-                companionWasActiveBeforePetSpawn = false;
-                suppressRestoreAfterPet = false;
+                ResetStorageFlags();
 
-                TrySpawnCompanion(activeDefinition);
+                bool restoredExisting = ReactivateExistingCompanionIfNeeded();
+
+                if (!restoredExisting && !HasActiveCompanion)
+                    TrySpawnCompanion(activeDefinition);
             }
 
             if (inventoryVisible)
