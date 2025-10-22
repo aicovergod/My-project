@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:86147174f3a9bdcc0360744233d2682974441092 -->
+## 2025-10-22T16:55:30+01:00 — Merge pull request #1295 from aicovergod/codex/update-companionminingcontroller-for-ore-golem-auto-mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 83 ++ / 7 --
+- Notes:
+  Fix ore golem automation follower hold release
+---
+<!-- commit:19eb0344d5dafe6ff964699a262c9500255b3632 -->
+## 2025-10-22T16:55:17+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:3225cbc9cb9b461ecb16ecd281e15ad43937cb07 -->
 ## 2025-10-22T16:54:57+01:00 — Fix ore golem auto-mining follower hand-off
 
