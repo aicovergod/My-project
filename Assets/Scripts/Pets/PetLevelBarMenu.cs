@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UI;
 using UI.Utilities;
 using Companions;
+using Companions.UI;
 
 namespace Pets
 {
@@ -31,6 +32,9 @@ namespace Pets
         /// <summary>Button that opens the companion stats window.</summary>
         private Button statsButton;
 
+        [SerializeField]
+        private Button commandButton;
+
         /// <summary>HUD currently owning the menu so callbacks can target the right entity.</summary>
         private PetLevelBarHUD current;
 
@@ -47,6 +51,8 @@ namespace Pets
             bool isCompanion = hud != null && hud.IsCompanionHud;
             instance.statsButton.gameObject.SetActive(isCompanion);
             instance.xpButton.gameObject.SetActive(!isCompanion);
+            if (instance.commandButton != null)
+                instance.commandButton.gameObject.SetActive(isCompanion);
 
             if (isCompanion)
             {
@@ -58,6 +64,7 @@ namespace Pets
             }
             else
             {
+                CompanionCommandMenu.Hide();
                 instance.guardText.text = PetDropSystem.GuardModeEnabled ? "Guard Mode: On" : "Guard Mode: Off";
                 var pet = PetDropSystem.ActivePetObject;
                 var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
@@ -115,6 +122,23 @@ namespace Pets
             {
                 CompanionManager.OpenStats();
                 instance.Hide();
+            });
+
+            instance.commandButton = CreateButton(menuGO.transform, "Command");
+            instance.commandButton.onClick.AddListener(() =>
+            {
+                if (instance.commandButton == null)
+                    return;
+
+                var rect = instance.commandButton.GetComponent<RectTransform>();
+                if (CompanionCommandMenu.IsVisible)
+                {
+                    CompanionCommandMenu.Hide();
+                }
+                else
+                {
+                    CompanionCommandMenu.Show(rect);
+                }
             });
 
             instance.guardButton = CreateButton(menuGO.transform, "Guard Mode");
@@ -175,6 +199,13 @@ namespace Pets
         {
             gameObject.SetActive(false);
             current = null;
+            CompanionCommandMenu.Hide();
+        }
+
+        internal static void HideActiveMenu()
+        {
+            if (instance != null)
+                instance.Hide();
         }
 
         private void Update()

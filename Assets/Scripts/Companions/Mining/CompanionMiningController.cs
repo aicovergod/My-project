@@ -11,6 +11,27 @@ using UnityEngine;
 namespace Companions
 {
     /// <summary>
+    /// Enumerates the possible outcomes when issuing a mining command to the companion.
+    /// </summary>
+    public enum CompanionMiningCommandResult
+    {
+        /// <summary>Command accepted and mining has started.</summary>
+        Accepted,
+        /// <summary>Companion backpack cannot hold additional ore.</summary>
+        InventoryFull,
+        /// <summary>Command rejected because requirements (levels, ownership, etc.) were not met.</summary>
+        RequirementsNotMet,
+        /// <summary>Command blocked because the player is interacting with the rock.</summary>
+        BlockedByPlayer,
+        /// <summary>Companion lacks a valid pickaxe.</summary>
+        NoPickaxe,
+        /// <summary>Target rock cannot be reached or interacted with.</summary>
+        Unreachable,
+        /// <summary>Companion is already working on the requested rock.</summary>
+        AlreadyMining
+    }
+
+    /// <summary>
     /// Handles companion-directed mining commands by approaching rocks, validating requirements,
     /// and delegating the actual mining routine to <see cref="MiningSkill"/> once in range.
     /// </summary>
@@ -30,11 +51,22 @@ namespace Companions
         private PetPathMover pathMover;
         private Rigidbody2D body;
         private Coroutine miningRoutine;
+        private Coroutine areaMiningRoutine;
         private MineableRock currentRock;
         private PickaxeDefinition currentPickaxe;
         private Dictionary<string, ItemData> itemCache;
         private bool miningActive;
         private bool followerDisabledForMining;
+        private bool suppressMiningStopCallback;
+
+        private readonly List<MineableRock> areaCandidates = new List<MineableRock>();
+        private readonly List<Vector3> areaCandidateTileCenters = new List<Vector3>();
+        private readonly HashSet<MineableRock> playerProtectedSingleOre = new HashSet<MineableRock>();
+
+        private bool areaMiningActive;
+        private float activeAreaRadius;
+        private MiningSkill playerMiningSkill;
+        private Transform playerTransform;
 
         /// <summary>
         /// Initialises the mining controller with the owning companion components.
@@ -42,7 +74,12 @@ namespace Companions
         /// <param name="ownerController">Controller that owns this component.</param>
         /// <param name="skills">Skill manager used for level checks.</param>
         /// <param name="inventoryComponent">Inventory wrapper providing access to the backpack.</param>
-        public void Initialise(CompanionController ownerController, SkillManager skills, CompanionInventory inventoryComponent)
+        /// <param name="player">Player transform driving proximity logic.</param>
+        public void Initialise(
+            CompanionController ownerController,
+            SkillManager skills,
+            CompanionInventory inventoryComponent,
+            Transform player)
         {
             if (ownerController == null && CompanionManager.EnableDebugLogging)
                 Debug.LogWarning("[Companion Mining] Initialise invoked without a companion controller reference.", this);
@@ -54,9 +91,7 @@ namespace Companions
             inventory = inventoryComponent != null ? inventoryComponent.InventoryComponent : null;
 
             if (inventory == null && CompanionManager.EnableDebugLogging)
-            {
                 Debug.LogWarning("[Companion Mining] No inventory available for tool checks.", this);
-            }
 
             companionEquipment = ownerController != null ? ownerController.Equipment : null;
 
@@ -68,7 +103,6 @@ namespace Companions
             {
                 miningSkill.OnStopMining -= HandleMiningStopped;
                 miningSkill.OnStopMining += HandleMiningStopped;
-                // Ensure gathering rewards emit companion-formatted chat messages instead of Game channel output.
                 miningSkill.ConfigureCompanionChat(CompanionManager.GetCompanionDisplayName);
             }
             else if (CompanionManager.EnableDebugLogging)
@@ -82,6 +116,20 @@ namespace Companions
 
             miningActive = false;
             followerDisabledForMining = false;
+            areaMiningActive = false;
+            activeAreaRadius = 0f;
+
+            RebindPlayer(player);
+        }
+
+        /// <summary>
+        /// Rebinds the controller to a new player transform so navigation and player mining hooks stay in sync.
+        /// </summary>
+        /// <param name="player">Player transform to follow.</param>
+        public void RebindPlayer(Transform player)
+        {
+            playerTransform = player;
+            BindToPlayerMiningSkill(playerTransform);
         }
 
         /// <summary>
@@ -91,131 +139,65 @@ namespace Companions
         /// <returns>True when the command was accepted, otherwise false.</returns>
         public bool TryCommandMine(MineableRock rock)
         {
-            if (rock == null || rock.IsDepleted)
+            bool accepted = TryCommandMine(rock, out var result);
+            return accepted || result == CompanionMiningCommandResult.InventoryFull;
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to mine the supplied rock and reports the resulting status.
+        /// </summary>
+        /// <param name="rock">Rock that should be mined.</param>
+        /// <param name="result">Detailed result describing whether the command was accepted.</param>
+        /// <returns>True when mining started, otherwise false.</returns>
+        public bool TryCommandMine(MineableRock rock, out CompanionMiningCommandResult result)
+        {
+            result = CompanionMiningCommandResult.RequirementsNotMet;
+
+            if (!TryPrepareMiningCommand(rock, out var pickaxe, out result))
                 return false;
 
-            if (miningSkill == null || skillManager == null)
+            CancelAreaMiningInternal(true);
+            BeginMining(rock, pickaxe);
+
+            result = CompanionMiningCommandResult.Accepted;
+            return true;
+        }
+
+        /// <summary>
+        /// Initiates an area mining routine that scans nearby rocks and mines them sequentially.
+        /// </summary>
+        /// <param name="radius">Scan radius in Unity units (tiles).</param>
+        /// <returns>True when area mining started successfully.</returns>
+        public bool TryStartAreaMining(float radius)
+        {
+            if (!isActiveAndEnabled || miningSkill == null || skillManager == null)
                 return false;
 
-            if (!isActiveAndEnabled)
-                return false;
+            float clampedRadius = Mathf.Max(0.1f, radius);
 
-            if (miningActive && currentRock == rock)
+            CancelAreaMiningInternal(true);
+
+            if (!BuildAreaCandidateList(clampedRadius, out var failureReason))
             {
-                if (CompanionManager.EnableDebugLogging)
-                    Debug.Log("[Companion Mining] Ignoring duplicate mine command for the current rock.", this);
-                return false;
-            }
-
-            if (miningActive && currentRock != null && currentRock != rock)
-                CancelMining(true);
-
-            var personalNode = rock.GetComponent<PersonalOreNode>();
-            if (personalNode != null && !personalNode.CanMine(miningSkill, out _))
-            {
-                if (CompanionManager.EnableDebugLogging)
-                    Debug.Log("[Companion Mining] Personal node rejected mining request.", this);
-                return false;
-            }
-
-            var rockDef = rock.RockDef;
-            var oreDef = rockDef != null ? rockDef.Ore : null;
-            if (oreDef == null)
-                return false;
-
-            // Confirm the companion meets the mining level requirement before proceeding.
-            if (miningSkill.Level < oreDef.LevelRequirement)
-            {
-                var chat = ChatService.Instance;
-                chat?.PublishCompanionMessage(
-                    CompanionManager.GetCompanionDisplayName(),
-                    "I don't have the correct mining level for that");
-                if (CompanionManager.EnableDebugLogging)
-                    Debug.Log("[Companion Mining] Command blocked by mining level requirement.", this);
-                return false;
-            }
-
-            // Ensure we have a definition cache to evaluate available pickaxes.
-            var definitions = PickaxeDefinitionRegistry.GetAllDefinitions();
-            if (definitions == null || definitions.Count == 0)
-            {
-                var selectors = FindObjectsOfType<PickaxeToUse>(true);
-                for (int i = 0; i < selectors.Length; i++)
+                if (failureReason == CompanionMiningCommandResult.InventoryFull)
                 {
-                    var selector = selectors[i];
-                    if (selector != null)
-                        PickaxeDefinitionRegistry.RegisterDefinitions(selector.AllPickaxes);
+                    PublishInventoryFullMessage();
+                }
+                else
+                {
+                    PublishNoRocksMessage();
                 }
 
-                definitions = PickaxeDefinitionRegistry.GetAllDefinitions();
-            }
-
-            if (definitions == null || definitions.Count == 0)
-            {
-                if (CompanionManager.EnableDebugLogging)
-                    Debug.Log("[Companion Mining] No pickaxe definitions registered for selection.", this);
                 return false;
             }
 
-            PickaxeDefinition chosenPickaxe = null;
-            int requiredTier = rockDef.RequiresToolTier;
-            int miningLevel = miningSkill.Level;
-
-            foreach (var definition in definitions)
-            {
-                if (definition == null)
-                    continue;
-
-                if (definition.LevelRequirement > miningLevel)
-                    continue;
-
-                if (definition.Tier < requiredTier)
-                    continue;
-
-                // Resolve the matching ItemData so we can check inventory and equipment ownership.
-                var item = GatheringInventoryHelper.GetItemData(definition.Id, ref itemCache);
-                bool ownsInInventory = inventory != null && item != null && inventory.GetItemCount(item) > 0;
-                bool equippedTool = false;
-                if (companionEquipment != null && item != null)
-                {
-                    var entry = companionEquipment.GetEquipped(EquipmentSlot.Weapon);
-                    equippedTool = entry.item == item;
-                }
-
-                if (!ownsInInventory && !equippedTool)
-                    continue;
-
-                chosenPickaxe = definition;
-                break;
-            }
-
-            if (chosenPickaxe == null)
-            {
-                PublishMissingPickaxeMessage();
-                if (CompanionManager.EnableDebugLogging)
-                    Debug.Log("[Companion Mining] Unable to find a usable pickaxe for the command.", this);
-                return false;
-            }
-
-            if (!HasInventoryCapacityForOre(oreDef))
-            {
-                // Inventory full scenarios are considered handled so the player controller
-                // does not fall back to prospecting after the companion delivers the chat message.
-                return true;
-            }
-
-            CancelMining(true);
-
-            currentRock = rock;
-            currentPickaxe = chosenPickaxe;
-            miningRoutine = StartCoroutine(MineRoutine(rock, chosenPickaxe));
-            miningActive = true;
+            activeAreaRadius = clampedRadius;
+            areaMiningRoutine = StartCoroutine(AreaMiningRoutine());
+            areaMiningActive = true;
 
             if (CompanionManager.EnableDebugLogging)
             {
-                Debug.Log(
-                    $"[Companion Mining] Command accepted for {rock.name} using {chosenPickaxe.DisplayName} (tier {chosenPickaxe.Tier}).",
-                    this);
+                Debug.Log($"[Companion Mining] Area mining started with {areaCandidates.Count} candidates (radius {activeAreaRadius}).", this);
             }
 
             return true;
@@ -227,6 +209,41 @@ namespace Companions
         /// <param name="restoreFollower">Whether the companion follower should be re-enabled.</param>
         public void CancelMining(bool restoreFollower)
         {
+            CancelAreaMiningInternal(false);
+            StopActiveMiningRoutine();
+            CleanupAfterMining(restoreFollower);
+            UnsubscribeFromPlayerMiningSkill();
+            BindToPlayerMiningSkill(playerTransform);
+        }
+
+        /// <summary>
+        /// Cancels the running area mining routine and optionally restores the follower.
+        /// </summary>
+        /// <param name="restoreFollower">True when the follower should resume immediately.</param>
+        public void CancelAreaMining(bool restoreFollower)
+        {
+            CancelAreaMiningInternal(restoreFollower);
+            UnsubscribeFromPlayerMiningSkill();
+            BindToPlayerMiningSkill(playerTransform);
+        }
+
+        private void BeginMining(MineableRock rock, PickaxeDefinition pickaxe)
+        {
+            StopActiveMiningRoutine();
+
+            currentRock = rock;
+            currentPickaxe = pickaxe;
+            miningRoutine = StartCoroutine(MineRoutine(rock, pickaxe));
+            miningActive = true;
+
+            if (CompanionManager.EnableDebugLogging)
+            {
+                Debug.Log($"[Companion Mining] Command accepted for {rock.name} using {pickaxe.DisplayName} (tier {pickaxe.Tier}).", this);
+            }
+        }
+
+        private void StopActiveMiningRoutine()
+        {
             if (miningRoutine != null)
             {
                 StopCoroutine(miningRoutine);
@@ -234,9 +251,15 @@ namespace Companions
             }
 
             if (miningSkill != null && miningSkill.IsMining)
+            {
+                suppressMiningStopCallback = true;
                 miningSkill.StopMining();
+                suppressMiningStopCallback = false;
+            }
 
-            CleanupAfterMining(restoreFollower);
+            currentRock = null;
+            currentPickaxe = null;
+            miningActive = false;
         }
 
         private IEnumerator MineRoutine(MineableRock rock, PickaxeDefinition pickaxe)
@@ -252,7 +275,6 @@ namespace Companions
                 followerDisabledForMining = false;
             }
 
-            // Reset navigation state so the path mover can generate a clean route toward the rock.
             pathMover?.ResetAttackTracking();
 
             while (rock != null && !rock.IsDepleted)
@@ -265,7 +287,6 @@ namespace Companions
 
                 if (distance > MiningRange)
                 {
-                    // Use pathfinding when available to respect world navigation data.
                     float moveSpeed = ResolveMoveSpeed();
                     float deltaTime = body != null
                         ? Mathf.Max(Time.fixedDeltaTime, Mathf.Epsilon)
@@ -300,14 +321,11 @@ namespace Companions
                         }
 
                         if (navigationStepTaken)
-                        {
                             ApplyMovement(nextPosition, navVelocity, teleported);
-                        }
                     }
 
                     if (!navigationStepTaken)
                     {
-                        // Fall back to direct movement when navigation data is unavailable.
                         Vector3 startPosition = transform.position;
                         Vector3 nextPosition = Vector3.MoveTowards(startPosition, rockPosition, moveSpeed * deltaTime);
                         Vector2 velocity = deltaTime > Mathf.Epsilon
@@ -344,6 +362,349 @@ namespace Companions
                 miningSkill.StopMining();
 
             CleanupAfterMining(true);
+
+            if (areaMiningActive)
+            {
+                // Allow the area routine to continue scanning for additional rocks.
+                yield break;
+            }
+
+            CancelAreaMiningInternal(false);
+        }
+
+        private bool TryPrepareMiningCommand(
+            MineableRock rock,
+            out PickaxeDefinition pickaxe,
+            out CompanionMiningCommandResult result,
+            bool suppressChat = false)
+        {
+            pickaxe = null;
+            result = CompanionMiningCommandResult.RequirementsNotMet;
+
+            if (rock == null || rock.IsDepleted)
+            {
+                result = CompanionMiningCommandResult.Unreachable;
+                return false;
+            }
+
+            if (miningSkill == null || skillManager == null || !isActiveAndEnabled)
+            {
+                result = CompanionMiningCommandResult.RequirementsNotMet;
+                return false;
+            }
+
+            if (miningActive && currentRock == rock)
+            {
+                result = CompanionMiningCommandResult.AlreadyMining;
+                return false;
+            }
+
+            var personalNode = rock.GetComponent<PersonalOreNode>();
+            if (personalNode != null && !personalNode.CanMine(miningSkill, out _))
+            {
+                if (CompanionManager.EnableDebugLogging)
+                    Debug.Log("[Companion Mining] Personal node rejected mining request.", this);
+                result = CompanionMiningCommandResult.Unreachable;
+                return false;
+            }
+
+            var rockDef = rock.RockDef;
+            var oreDef = rockDef != null ? rockDef.Ore : null;
+            if (oreDef == null)
+            {
+                result = CompanionMiningCommandResult.Unreachable;
+                return false;
+            }
+
+            if (rockDef.DepleteAfterNOres == 1 && playerProtectedSingleOre.Contains(rock))
+            {
+                if (!suppressChat)
+                    PublishBlockedByPlayerMessage();
+                result = CompanionMiningCommandResult.BlockedByPlayer;
+                return false;
+            }
+
+            if (miningSkill.Level < oreDef.LevelRequirement)
+            {
+                if (!suppressChat)
+                {
+                    var chat = ChatService.Instance;
+                    chat?.PublishCompanionMessage(
+                        CompanionManager.GetCompanionDisplayName(),
+                        "I don't have the correct mining level for that");
+                }
+
+                if (CompanionManager.EnableDebugLogging)
+                    Debug.Log("[Companion Mining] Command blocked by mining level requirement.", this);
+
+                result = CompanionMiningCommandResult.RequirementsNotMet;
+                return false;
+            }
+
+            pickaxe = ResolvePickaxe(rockDef);
+            if (pickaxe == null)
+            {
+                if (!suppressChat)
+                    PublishMissingPickaxeMessage();
+                result = CompanionMiningCommandResult.NoPickaxe;
+                return false;
+            }
+
+            if (!HasInventoryCapacityForOre(oreDef, suppressChat))
+            {
+                result = CompanionMiningCommandResult.InventoryFull;
+                return false;
+            }
+
+            result = CompanionMiningCommandResult.Accepted;
+            return true;
+        }
+
+        private PickaxeDefinition ResolvePickaxe(RockDefinition rockDef)
+        {
+            if (rockDef == null)
+                return null;
+
+            var definitions = PickaxeDefinitionRegistry.GetAllDefinitions();
+            if (definitions == null || definitions.Count == 0)
+            {
+                var selectors = FindObjectsOfType<PickaxeToUse>(true);
+                for (int i = 0; i < selectors.Length; i++)
+                {
+                    var selector = selectors[i];
+                    if (selector != null)
+                        PickaxeDefinitionRegistry.RegisterDefinitions(selector.AllPickaxes);
+                }
+
+                definitions = PickaxeDefinitionRegistry.GetAllDefinitions();
+            }
+
+            if (definitions == null || definitions.Count == 0)
+                return null;
+
+            int requiredTier = rockDef.RequiresToolTier;
+            int miningLevel = miningSkill.Level;
+
+            foreach (var definition in definitions)
+            {
+                if (definition == null)
+                    continue;
+
+                if (definition.LevelRequirement > miningLevel)
+                    continue;
+
+                if (definition.Tier < requiredTier)
+                    continue;
+
+                var item = GatheringInventoryHelper.GetItemData(definition.Id, ref itemCache);
+                bool ownsInInventory = inventory != null && item != null && inventory.GetItemCount(item) > 0;
+                bool equippedTool = false;
+
+                if (companionEquipment != null && item != null)
+                {
+                    var entry = companionEquipment.GetEquipped(EquipmentSlot.Weapon);
+                    equippedTool = entry.item == item;
+                }
+
+                if (!ownsInInventory && !equippedTool)
+                    continue;
+
+                return definition;
+            }
+
+            return null;
+        }
+
+        private bool HasInventoryCapacityForOre(OreDefinition ore, bool suppressChat)
+        {
+            if (ore == null || miningSkill == null)
+                return true;
+
+            if (miningSkill.CanAddOre(ore))
+                return true;
+
+            if (!suppressChat)
+                PublishInventoryFullMessage();
+
+            if (CompanionManager.EnableDebugLogging)
+                Debug.Log("[Companion Mining] Command rejected because the companion inventory is full.", this);
+
+            return false;
+        }
+
+        private IEnumerator AreaMiningRoutine()
+        {
+            while (areaCandidates.Count > 0)
+            {
+                for (int i = 0; i < areaCandidates.Count; i++)
+                {
+                    var rock = areaCandidates[i];
+                    if (rock == null || rock.IsDepleted)
+                        continue;
+
+                    if (rock.RockDef != null && rock.RockDef.DepleteAfterNOres == 1 && playerProtectedSingleOre.Contains(rock))
+                        continue;
+
+                    if (!TryPrepareMiningCommand(rock, out var pickaxe, out var result))
+                    {
+                        if (result == CompanionMiningCommandResult.InventoryFull)
+                        {
+                            PublishInventoryFullMessage();
+                            CancelAreaMiningInternal(true);
+                            yield break;
+                        }
+
+                        continue;
+                    }
+
+                    BeginMining(rock, pickaxe);
+
+                    while (miningActive && currentRock == rock)
+                        yield return null;
+
+                    if (!areaMiningActive)
+                        yield break;
+                }
+
+                if (!BuildAreaCandidateList(activeAreaRadius, out var rebuildFailure, suppressChat: true))
+                {
+                    if (rebuildFailure == CompanionMiningCommandResult.InventoryFull)
+                        PublishInventoryFullMessage();
+                    else
+                        PublishNoRocksMessage();
+
+                    CancelAreaMiningInternal(true);
+                    yield break;
+                }
+
+                yield return null;
+            }
+
+            PublishNoRocksMessage();
+            CancelAreaMiningInternal(true);
+        }
+
+        private bool BuildAreaCandidateList(float radius, out CompanionMiningCommandResult failureReason, bool suppressChat = true)
+        {
+            areaCandidates.Clear();
+            areaCandidateTileCenters.Clear();
+
+            var rocks = FindObjectsOfType<MineableRock>();
+            float radiusSqr = radius * radius;
+
+            for (int i = 0; i < rocks.Length; i++)
+            {
+                var rock = rocks[i];
+                if (rock == null || rock.IsDepleted)
+                    continue;
+
+                if ((rock.transform.position - transform.position).sqrMagnitude > radiusSqr)
+                    continue;
+
+                if (rock.RockDef != null && rock.RockDef.DepleteAfterNOres == 1 && playerProtectedSingleOre.Contains(rock))
+                    continue;
+
+                if (!TryPrepareMiningCommand(rock, out var _, out var validationResult, suppressChat))
+                {
+                    if (validationResult == CompanionMiningCommandResult.InventoryFull)
+                    {
+                        failureReason = CompanionMiningCommandResult.InventoryFull;
+                        return false;
+                    }
+
+                    continue;
+                }
+
+                areaCandidates.Add(rock);
+            }
+
+            areaCandidates.Sort((a, b) =>
+            {
+                if (a == null && b == null)
+                    return 0;
+                if (a == null)
+                    return 1;
+                if (b == null)
+                    return -1;
+
+                float da = (a.transform.position - transform.position).sqrMagnitude;
+                float db = (b.transform.position - transform.position).sqrMagnitude;
+                return da.CompareTo(db);
+            });
+
+            for (int i = 0; i < areaCandidates.Count; i++)
+            {
+                var candidate = areaCandidates[i];
+                if (candidate == null)
+                    continue;
+
+                areaCandidateTileCenters.Add(GetTileCentre(candidate.transform.position));
+            }
+
+            if (areaCandidates.Count == 0)
+            {
+                failureReason = CompanionMiningCommandResult.Unreachable;
+                return false;
+            }
+
+            failureReason = CompanionMiningCommandResult.Accepted;
+            return true;
+        }
+
+        private Vector3 GetTileCentre(Vector3 worldPosition)
+        {
+            float x = Mathf.Round(worldPosition.x);
+            float y = Mathf.Round(worldPosition.y);
+            return new Vector3(x, y, worldPosition.z);
+        }
+
+        private void PublishInventoryFullMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            chat.PublishCompanionMessage(
+                CompanionManager.GetCompanionDisplayName(),
+                CompanionManager.InventoryFullChatLine);
+        }
+
+        private void PublishMissingPickaxeMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            chat.PublishCompanionMessage(
+                CompanionManager.GetCompanionDisplayName(),
+                "I need a pickaxe to mine that");
+        }
+
+        private void PublishNoRocksMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            chat.PublishCompanionMessage(
+                CompanionManager.GetCompanionDisplayName(),
+                "I don't see any mineable rocks round here");
+        }
+
+        private void PublishBlockedByPlayerMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            chat.PublishCompanionMessage(
+                CompanionManager.GetCompanionDisplayName(),
+                "Looks like you're already mining that rock");
+        }
+
+        private float ResolveMoveSpeed()
+        {
+            return petFollower != null ? Mathf.Max(0.1f, petFollower.moveSpeed) : 5f;
         }
 
         private void ApplyMovement(Vector3 nextPosition, Vector2 velocity, bool teleported)
@@ -367,52 +728,6 @@ namespace Companions
             }
         }
 
-        private bool HasInventoryCapacityForOre(OreDefinition ore)
-        {
-            if (ore == null || miningSkill == null)
-                return true;
-
-            if (miningSkill.CanAddOre(ore))
-                return true;
-
-            PublishInventoryFullMessage();
-
-            if (CompanionManager.EnableDebugLogging)
-                Debug.Log("[Companion Mining] Command rejected because the companion inventory is full.", this);
-
-            return false;
-        }
-
-        private void PublishInventoryFullMessage()
-        {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            chat.PublishCompanionMessage(
-                CompanionManager.GetCompanionDisplayName(),
-                CompanionManager.InventoryFullChatLine);
-        }
-
-        /// <summary>
-        /// Emits a companion-channel chat message informing the player that a pickaxe is required.
-        /// </summary>
-        private void PublishMissingPickaxeMessage()
-        {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            chat.PublishCompanionMessage(
-                CompanionManager.GetCompanionDisplayName(),
-                "I need a pickaxe to mine that");
-        }
-
-        private float ResolveMoveSpeed()
-        {
-            return petFollower != null ? Mathf.Max(0.1f, petFollower.moveSpeed) : 5f;
-        }
-
         private void CleanupAfterMining(bool restoreFollower)
         {
             if (restoreFollower && petFollower != null && followerDisabledForMining)
@@ -432,12 +747,85 @@ namespace Companions
 
         private void HandleMiningStopped()
         {
-            CancelMining(true);
+            if (suppressMiningStopCallback)
+                return;
+
+            miningActive = false;
+            CleanupAfterMining(true);
+        }
+
+        private void BindToPlayerMiningSkill(Transform player)
+        {
+            UnsubscribeFromPlayerMiningSkill();
+
+            if (player == null)
+                return;
+
+            playerMiningSkill = player.GetComponent<MiningSkill>();
+            if (playerMiningSkill == null)
+                return;
+
+            playerMiningSkill.OnStartMining += OnPlayerStartMining;
+            playerMiningSkill.OnStopMining += OnPlayerStopMining;
+        }
+
+        private void UnsubscribeFromPlayerMiningSkill()
+        {
+            if (playerMiningSkill == null)
+                return;
+
+            playerMiningSkill.OnStartMining -= OnPlayerStartMining;
+            playerMiningSkill.OnStopMining -= OnPlayerStopMining;
+            playerMiningSkill = null;
+            playerProtectedSingleOre.Clear();
+        }
+
+        private void OnPlayerStartMining(MineableRock rock)
+        {
+            if (rock == null)
+                return;
+
+            if (rock.RockDef != null && rock.RockDef.DepleteAfterNOres == 1)
+                playerProtectedSingleOre.Add(rock);
+
+            if (miningActive && currentRock == rock && rock.RockDef != null && rock.RockDef.DepleteAfterNOres == 1)
+            {
+                if (CompanionManager.EnableDebugLogging)
+                    Debug.Log("[Companion Mining] Player started mining the same single-ore rock. Cancelling companion mining.", this);
+
+                StopActiveMiningRoutine();
+                CleanupAfterMining(true);
+            }
+        }
+
+        private void OnPlayerStopMining()
+        {
+            playerProtectedSingleOre.Clear();
+        }
+
+        private void CancelAreaMiningInternal(bool restoreFollower)
+        {
+            if (areaMiningRoutine != null)
+            {
+                StopCoroutine(areaMiningRoutine);
+                areaMiningRoutine = null;
+            }
+
+            areaMiningActive = false;
+            activeAreaRadius = 0f;
+            areaCandidates.Clear();
+            areaCandidateTileCenters.Clear();
+
+            StopActiveMiningRoutine();
+
+            if (restoreFollower)
+                CleanupAfterMining(true);
         }
 
         private void OnDisable()
         {
             CancelMining(true);
+            UnsubscribeFromPlayerMiningSkill();
         }
 
         private void OnDestroy()
@@ -446,6 +834,23 @@ namespace Companions
                 miningSkill.OnStopMining -= HandleMiningStopped;
 
             CancelMining(true);
+            UnsubscribeFromPlayerMiningSkill();
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            if (!areaMiningActive || activeAreaRadius <= 0f)
+                return;
+
+            Gizmos.color = new Color(0.8f, 0.8f, 0.2f, 0.35f);
+            Gizmos.DrawWireSphere(transform.position, activeAreaRadius);
+
+            Gizmos.color = new Color(0.2f, 0.9f, 0.9f, 0.6f);
+            for (int i = 0; i < areaCandidateTileCenters.Count; i++)
+            {
+                Vector3 center = areaCandidateTileCenters[i];
+                Gizmos.DrawWireCube(center, new Vector3(1f, 1f, 0f));
+            }
         }
     }
 }

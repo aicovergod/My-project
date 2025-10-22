@@ -8,6 +8,7 @@ using Skills;
 using Skills.Cooking;
 using UI;
 using Companions;
+using Companions.UI;
 using Object = UnityEngine.Object;
 
 namespace Pets
@@ -59,12 +60,20 @@ namespace Pets
                 cookAllButton.gameObject.SetActive(false);
                 pickupButton.gameObject.SetActive(true);
                 pickupButton.GetComponentInChildren<Text>().text = CompanionManager.HasActiveCompanion ? "Pick Up" : "Summon";
+                if (commandButton != null)
+                    commandButton.gameObject.SetActive(true);
             }
             else
             {
                 if (mergeController == null)
                     mergeController = Object.FindObjectOfType<PetMergeController>();
                 pickupButton.gameObject.SetActive(PetDropSystem.ActivePetObject != null);
+
+                if (commandButton != null)
+                {
+                    commandButton.gameObject.SetActive(false);
+                    CompanionCommandMenu.Hide();
+                }
 
                 if (mergeController == null)
                 {
