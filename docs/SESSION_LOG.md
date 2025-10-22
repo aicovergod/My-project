@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4eb2e76470ea19ee102a2595a19c5ad2c4694a5c -->
+## 2025-10-22T23:07:24+01:00 — Merge pull request #1305 from aicovergod/codex/add-chat-message-for-guard-mode-off
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 151 ++ / 0 --
+- Notes:
+  Add guard mode deactivation chat lines for companions
+---
+<!-- commit:0d07a6b30c66287adfd91023e800b8b1304ebaad -->
+## 2025-10-22T23:07:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:e96cd6970411d9740a1d8c81c7ed9960be0954f2 -->
 ## 2025-10-22T23:06:55+01:00 — Add companion guard mode deactivation chat lines
 
