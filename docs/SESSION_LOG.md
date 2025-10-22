@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d9d38dc4930c3a5b5aeeaa548c35b1801fba2583 -->
+## 2025-10-22T12:22:46+01:00 — Merge pull request #1281 from aicovergod/codex/fix-companion-mining-chat-messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 34 ++ / 3 --
+- Notes:
+  Prevent companion mining inventory full from triggering rock warning
+---
+<!-- commit:b0c8ddebd45843bef30a904a431914298b72856d -->
+## 2025-10-22T12:22:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f13610d8ae46686cb1d7964504b76cd4b18668ea -->
 ## 2025-10-22T12:22:19+01:00 — Handle inventory-full mining commands without false rock warning
 
