@@ -302,6 +302,32 @@ namespace Combat
             string skillName = SkillNameUtility.GetDisplayName(type);
             string message = $"You just levelled up your {skillName} to level {level}!";
             chat.PublishGameMessage(message);
+
+            if (CompanionManager.HasActiveCompanion)
+            {
+                string companionLine = null;
+                switch (type)
+                {
+                    case SkillType.Hitpoints:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerHitpointsLevelUpLine();
+                        break;
+                    case SkillType.Attack:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerAttackLevelUpLine();
+                        break;
+                    case SkillType.Strength:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerStrengthLevelUpLine();
+                        break;
+                    case SkillType.Defence:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerDefenceLevelUpLine();
+                        break;
+                }
+
+                if (!string.IsNullOrEmpty(companionLine))
+                {
+                    string companionName = CompanionManager.GetCompanionDisplayName();
+                    chat.PublishCompanionMessage(companionName, companionLine);
+                }
+            }
         }
 
         /// <summary>
