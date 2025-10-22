@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:dbe43c17be9e4dd579face83aaa7b8f786c78b1d -->
+## 2025-10-22T14:39:20+01:00 — Merge pull request #1288 from aicovergod/codex/add-wait-time-before-companion-mines
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 127 ++ / 0 --
+- Notes:
+  Add delayed companion mining after ore golem kills
+---
+<!-- commit:bca705980687778d4361cb6827110ef979814b88 -->
+## 2025-10-22T14:39:14+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a0d230286dfacdf2eb68007bf8732b0cfbf63e65 -->
 ## 2025-10-22T14:38:54+01:00 — Delay companion ore golem harvest before auto-mining
 
