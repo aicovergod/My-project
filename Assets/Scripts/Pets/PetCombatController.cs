@@ -527,6 +527,7 @@ namespace Pets
             GameObject ownerObject,
             CompanionMiningController miningController)
         {
+            IDisposable followerHold = miningController?.EnterTemporaryFollowerHold();
             try
             {
                 int waitTicks = UnityEngine.Random.Range(1, 4);
@@ -562,6 +563,7 @@ namespace Pets
             }
             finally
             {
+                followerHold?.Dispose();
                 pendingOreGolemHarvestRoutine = null;
             }
         }
