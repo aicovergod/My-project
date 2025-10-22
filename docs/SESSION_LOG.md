@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8cbe158c250ce9f232691d0f638ca7cf417d4412 -->
+## 2025-10-22T12:11:53+01:00 — Add command to clear companion inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Commands/ClearCompanionInventoryCommand.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs
+- Diff: 115 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:5479f1892c12e127915c5b4a4a50ae9da7ae3bf8 -->
 ## 2025-10-22T12:04:54+01:00 — Merge pull request #1278 from aicovergod/codex/fix-companion-prospecting-on-shift-right-click
 
