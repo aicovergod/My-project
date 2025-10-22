@@ -320,6 +320,15 @@ namespace Combat
                     case SkillType.Defence:
                         companionLine = CompanionChatLibrary.GetRandomPlayerDefenceLevelUpLine();
                         break;
+                    case SkillType.Ranged:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerRangedLevelUpLine();
+                        break;
+                    case SkillType.Magic:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerMagicLevelUpLine();
+                        break;
+                    case SkillType.Beastmaster:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerBeastmasterLevelUpLine();
+                        break;
                 }
 
                 if (!string.IsNullOrEmpty(companionLine))
