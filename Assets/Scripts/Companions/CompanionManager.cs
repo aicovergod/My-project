@@ -93,6 +93,118 @@ namespace Companions
         /// <summary>Fallback message returned when the inventory full pool is empty.</summary>
         private const string InventoryFullFallbackLine = "My inventory’s full, maybe we should stop by a bank.";
 
+        /// <summary>Pool of flavour messages emitted when the player enables companion guard mode.</summary>
+        private static readonly string[] GuardModeActivationChatMessages =
+        {
+            "Guard mode active, I’ve got your back!",
+            "Alright, time to keep you in one piece.",
+            "Standing watch, nobody touches you on my watch.",
+            "You swing, I’ll cover.",
+            "Got it, I’ll handle the defence!",
+            "I’ll protect you, promise.",
+            "Guard mode? Finally, something to do!",
+            "I’ll take the hits if you take the glory.",
+            "Ready to shield you, boss.",
+            "You focus on fighting, I’ll keep you safe.",
+            "On guard! Let’s show them how it’s done.",
+            "I’ve switched to protection mode, stay close.",
+            "I’ll make sure nothing sneaks up on you.",
+            "Don’t worry, I’ll guard you like a dragon guards gold.",
+            "Activating guard stance, no one’s getting through me.",
+            "Understood, defence priority set.",
+            "Guard mode enabled. Let’s see them try!",
+            "I’m your wall now.",
+            "Time to play bodyguard, huh?",
+            "You fight, I’ll block!",
+            "I’ll keep the nasty ones off you.",
+            "Alright, who’s first to try their luck?",
+            "I’ll hold the line.",
+            "You won’t fall while I’m around.",
+            "Standing between you and danger.",
+            "Switching to protector mode.",
+            "I’ll guard you, even from yourself <emoji=03>.",
+            "I’ll bite back if they touch you.",
+            "I’ve got eyes everywhere, no ambushes today.",
+            "Okay, fine, I’ll be the shield again!",
+            "Stay behind me, I’ve got this.",
+            "Guard mode ready, let’s get serious.",
+            "Nobody hurts you while I’m here.",
+            "Defence active. Let’s give them a bad day.",
+            "I’ll make sure nothing gets through.",
+            "I’m ready to intercept anything that moves.",
+            "Protective instinct: engaged!",
+            "Don’t make me regret this hero stuff.",
+            "You swing wild, I’ll clean up behind you.",
+            "Stay close, I’ll cover your blind spot.",
+            "Go ahead, I’ll block for you.",
+            "Guard duty? I was born for this.",
+            "Brace yourself, I’m locking in.",
+            "I’ll hold aggro, you do your thing!",
+            "Protective mode on. Let’s roll.",
+            "You do realise this means I take all the hits, right?",
+            "Fine, but you owe me after this.",
+            "I’ll be your sword and shield.",
+            "Alright, standing guard.",
+            "Frontline engaged, I’ve got your flank.",
+            "Here we go, I’ll make sure you live through this.",
+            "Activating guard stance. Try not to get hurt.",
+            "Back-to-back, yeah?",
+            "I’ll handle anything that gets too close.",
+            "Let’s dance, I’ll keep the rhythm defensive.",
+            "Okay, they’ll hit me first this time.",
+            "I’ll guard your six!",
+            "Enemies spotted, I’m on defence!",
+            "Protecting you? My favourite pastime.",
+            "I’ll block every hit I can.",
+            "I’ll make sure no blade reaches you.",
+            "Got your back, front, and sides!",
+            "I’ll stand my ground, you finish them.",
+            "Guard mode on, temper rising!",
+            "Let’s see them get past me.",
+            "I’ll shield you like a true knight.",
+            "Stay near me, safer that way.",
+            "Guard mode enabled, and no complaints!",
+            "Shielding up,  let’s get messy.",
+            "I’ll stand between you and anything stupid.",
+            "Got it, defensive mode engaged!",
+            "You’re under my protection now.",
+            "I’ll take the front line, as usual.",
+            "Guard mode… engaged and grumpy.",
+            "Fine, I’ll be the wall again.",
+            "I’ll protect you, even if you start the fight!",
+            "I’ll hold the line until you say otherwise.",
+            "I’ll intercept every hit, just don’t get cocky.",
+            "You attack, I’ll defend.",
+            "Ready to shield you, even from your own bad ideas.",
+            "Let them come, I’m ready.",
+            "I’ll stand my ground, promise.",
+            "Protecting you is what I do best.",
+            "I’ll block their blows so you can swing free.",
+            "I’ll defend you ‘til my last hitpoint!",
+            "Guard mode active. Try not to run off again.",
+            "Defensive stance, let’s do this right.",
+            "You’re covered. Literally.",
+            "I’ll protect you, but I’m charging double <emoji=09>.",
+            "Stay close, I’ll guard every step.",
+            "I’ll absorb what I can, you handle the rest.",
+            "Okay, bodyguard Isla reporting for duty!",
+            "I’ll keep them busy while you attack.",
+            "Frontline shield: online.",
+            "Guess who’s your shield maiden again?",
+            "I’m not just cute, I’m dangerous too!",
+            "You hit hard, I guard harder.",
+            "I’ll make sure no one touches a hair on your head.",
+            "Guard mode? Finally, some action!",
+            "Protective stance active, you’re safe with me.",
+            "I’ll defend you till it’s over.",
+            "I’ll keep danger at bay.",
+            "Guard engaged, let’s finish this fight together.",
+            "Alright, let’s guard like legends."
+        };
+
+        /// <summary>Fallback message used if the guard mode activation pool cannot supply a line.</summary>
+        private const string GuardModeActivationFallbackLine = "Guard mode active, I’ve got your back!";
+
         /// <summary>Pool of flavour messages used when the companion deposits items into the bank.</summary>
         private static readonly string[] BankDepositChatMessages =
         {
@@ -694,6 +806,9 @@ namespace Companions
         {
             guardModeEnabled = !guardModeEnabled;
             GuardModeChanged?.Invoke(guardModeEnabled);
+
+            if (guardModeEnabled)
+                PublishRandomGuardModeActivationMessage();
         }
 
         /// <summary>
@@ -881,6 +996,33 @@ namespace Companions
             string message = BankDepositChatMessages[index];
             string companionName = GetCompanionDisplayName();
             chat.PublishCompanionMessage(companionName, message);
+        }
+
+        /// <summary>
+        /// Publishes a random guard mode activation message to the companion chat channel.
+        /// Ensures enabling guard mode feels responsive without spamming when toggled off.
+        /// </summary>
+        private static void PublishRandomGuardModeActivationMessage()
+        {
+            if (GuardModeActivationChatMessages == null || GuardModeActivationChatMessages.Length == 0)
+                return;
+
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            int index = UnityEngine.Random.Range(0, GuardModeActivationChatMessages.Length);
+            if (index < 0 || index >= GuardModeActivationChatMessages.Length)
+            {
+                chat.PublishCompanionMessage(GetCompanionDisplayName(), GuardModeActivationFallbackLine);
+                return;
+            }
+
+            string message = GuardModeActivationChatMessages[index];
+            if (string.IsNullOrWhiteSpace(message))
+                message = GuardModeActivationFallbackLine;
+
+            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
         }
 
         /// <summary>
