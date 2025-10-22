@@ -32,6 +32,9 @@ namespace Pets
         /// <summary>Button that opens the companion stats window.</summary>
         private Button statsButton;
 
+        /// <summary>Button that allows companions to dump their inventory into the bank.</summary>
+        private Button bankButton;
+
         [SerializeField]
         private Button commandButton;
 
@@ -53,6 +56,8 @@ namespace Pets
             instance.xpButton.gameObject.SetActive(!isCompanion);
             if (instance.commandButton != null)
                 instance.commandButton.gameObject.SetActive(isCompanion);
+            if (instance.bankButton != null)
+                instance.bankButton.gameObject.SetActive(isCompanion);
 
             if (isCompanion)
             {
@@ -162,6 +167,13 @@ namespace Pets
             instance.equipmentButton.onClick.AddListener(() =>
             {
                 instance.current?.ToggleEquipment();
+                instance.Hide();
+            });
+
+            instance.bankButton = CreateButton(menuGO.transform, "Bank");
+            instance.bankButton.onClick.AddListener(() =>
+            {
+                CompanionManager.TryDepositCompanionInventoryToBank();
                 instance.Hide();
             });
 

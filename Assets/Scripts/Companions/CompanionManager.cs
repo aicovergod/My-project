@@ -1,4 +1,5 @@
 using System;
+using BankSystem;
 using Combat;
 using Inventory;
 using Pets;
@@ -687,6 +688,73 @@ namespace Companions
             EnsureHud();
             if (boundHud != null)
                 PetLevelBarMenu.Show(boundHud, screenPosition);
+        }
+
+        /// <summary>
+        /// Attempts to deposit every item currently stored in the companion inventory into the player's bank.
+        /// </summary>
+        /// <returns>True when at least one item was deposited successfully; otherwise false.</returns>
+        public static bool TryDepositCompanionInventoryToBank()
+        {
+            if (!HasActiveCompanion)
+            {
+                if (EnableDebugLogging)
+                    Debug.Log("[Companion] Deposit aborted because no companion is active.");
+                return false;
+            }
+
+            var inventoryWrapper = CompanionInventory;
+            if (inventoryWrapper == null)
+            {
+                if (EnableDebugLogging)
+                    Debug.Log("[Companion] Deposit aborted because the inventory wrapper is unavailable.");
+                return false;
+            }
+
+            var inventoryComponent = inventoryWrapper.InventoryComponent;
+            if (inventoryComponent == null)
+            {
+                if (EnableDebugLogging)
+                    Debug.Log("[Companion] Deposit aborted because the inventory component is missing.");
+                return false;
+            }
+
+            var bank = BankUI.Instance;
+            if (bank == null)
+            {
+                if (EnableDebugLogging)
+                    Debug.Log("[Companion] Deposit aborted because the bank UI could not be resolved.");
+                return false;
+            }
+
+            var playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject == null)
+            {
+                if (EnableDebugLogging)
+                    Debug.Log("[Companion] Deposit aborted because the player object could not be located.");
+                return false;
+            }
+
+            if (!CompanionBankDepositAnchor.IsPlayerWithinDepositRange(playerObject.transform.position))
+            {
+                if (EnableDebugLogging)
+                    Debug.Log("[Companion] Deposit aborted because no bank anchors are within range.");
+
+                var chat = ChatService.Instance;
+                chat?.PublishGameMessage("There are no banks close by");
+                return false;
+            }
+
+            int moved = bank.DepositAllFromInventory(inventoryComponent);
+            if (EnableDebugLogging)
+            {
+                if (moved > 0)
+                    Debug.Log($"[Companion] Deposited {moved} item(s) from the companion inventory into the bank.");
+                else
+                    Debug.Log("[Companion] Deposit attempt completed but no items were moved (inventory empty or bank full).");
+            }
+
+            return moved > 0;
         }
 
         /// <summary>
