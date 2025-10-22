@@ -699,24 +699,38 @@ namespace Companions
         public static bool TryCommandMine(MineableRock rock)
         {
             if (rock == null)
+            {
+                Debug.LogWarning("[Companion] Cannot command mining: target rock reference was null.");
                 return false;
+            }
 
-            if (controller == null || controller.MiningController == null)
+            if (controller == null)
+            {
+                Debug.LogWarning("[Companion] Cannot command mining: companion controller has not been initialised.");
                 return false;
+            }
+
+            if (controller.MiningController == null)
+            {
+                Debug.LogWarning("[Companion] Cannot command mining: companion mining controller is missing.");
+                return false;
+            }
 
             if (!HasActiveCompanion)
+            {
+                Debug.LogWarning("[Companion] Cannot command mining: the companion is not currently active.");
                 return false;
+            }
 
             bool accepted = controller.MiningController.TryCommandMine(rock, out var result);
             if (!accepted && result == CompanionMiningCommandResult.InventoryFull)
                 accepted = true;
 
-            if (CompanionManager.EnableDebugLogging)
-            {
-                Debug.Log(accepted
-                    ? "[Companion] Forwarded mining command to companion controller."
-                    : $"[Companion] Companion mining command was rejected ({result}).");
-            }
+            string message = $"[Companion] Mining command outcome: accepted={accepted} (result={result}).";
+            if (accepted)
+                Debug.Log(message);
+            else
+                Debug.LogWarning(message);
 
             return accepted;
         }
@@ -728,21 +742,40 @@ namespace Companions
         /// <returns>True when the area mining command started successfully.</returns>
         public static bool TryCommandMineNearby(float radius = 10f)
         {
-            if (controller == null || controller.MiningController == null)
-                return false;
+            string rejectionReason = string.Empty;
 
-            if (!HasActiveCompanion)
-                return false;
-
-            bool accepted = controller.MiningController.TryStartAreaMining(radius);
-            if (CompanionManager.EnableDebugLogging)
+            if (controller == null)
             {
-                Debug.Log(accepted
-                    ? $"[Companion] Started area mining command within radius {radius}."
-                    : "[Companion] Area mining command was rejected.");
+                rejectionReason = "Companion controller has not been initialised.";
+                Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={radius}, reason={rejectionReason}");
+                return false;
             }
 
-            return accepted;
+            if (controller.MiningController == null)
+            {
+                rejectionReason = "Companion mining controller is missing.";
+                Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={radius}, reason={rejectionReason}");
+                return false;
+            }
+
+            if (!HasActiveCompanion)
+            {
+                rejectionReason = "The companion is not currently active.";
+                Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={radius}, reason={rejectionReason}");
+                return false;
+            }
+
+            bool accepted = controller.MiningController.TryStartAreaMining(radius);
+            if (!accepted)
+            {
+                rejectionReason = "The mining controller rejected the area mining request.";
+                Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={radius}, reason={rejectionReason}");
+                return false;
+            }
+
+            string successDetail = "Area mining routine started successfully.";
+            Debug.Log($"[Companion] Area mining command outcome: success=True, radius={radius}, reason={successDetail}");
+            return true;
         }
 
         /// <summary>

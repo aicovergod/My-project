@@ -197,7 +197,9 @@ namespace Companions.UI
 
         private void OnMineRocksClicked()
         {
+            Debug.Log("[Companion UI] Mine Rocks button clicked.");
             bool accepted = CompanionManager.TryCommandMineNearby();
+            Debug.Log($"[Companion UI] Mine Rocks command result: success={accepted}.");
             if (accepted)
                 CloseAllMenus();
             else
