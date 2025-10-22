@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a0d230286dfacdf2eb68007bf8732b0cfbf63e65 -->
+## 2025-10-22T14:38:54+01:00 — Delay companion ore golem harvest before auto-mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 118 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f52faa208ae753202f1941e879cccf0f19571f00 -->
 ## 2025-10-22T14:21:53+01:00 — Merge pull request #1287 from aicovergod/codex/update-petcombatcontroller-for-companion-attacks
 
