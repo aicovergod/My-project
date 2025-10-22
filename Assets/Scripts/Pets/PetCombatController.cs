@@ -793,7 +793,13 @@ namespace Pets
                 spriteRenderer.sprite = defaultSprite;
 
             if (follower != null)
-                follower.enabled = true;
+            {
+                companionController ??= GetComponent<CompanionController>();
+                var miningController = companionController != null ? companionController.MiningController : null;
+
+                if (miningController == null || !miningController.HasActiveFollowerHold)
+                    follower.enabled = true;
+            }
         }
 
         /// <summary>
