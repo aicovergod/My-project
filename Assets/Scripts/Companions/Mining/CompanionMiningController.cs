@@ -71,6 +71,11 @@ namespace Companions
         private Transform playerTransform;
 
         /// <summary>
+        /// Indicates whether any systems currently hold the follower disabled so the companion remains stationary.
+        /// </summary>
+        public bool HasActiveFollowerHold => followerDisableLockCount > 0;
+
+        /// <summary>
         /// Initialises the mining controller with the owning companion components.
         /// </summary>
         /// <param name="ownerController">Controller that owns this component.</param>
@@ -838,20 +843,16 @@ namespace Companions
         private void ReleaseTemporaryFollowerHold()
         {
             if (followerDisableLockCount <= 0)
-                return;
-
-            followerDisableLockCount--;
-
-            if (followerDisableLockCount > 0)
             {
-                followerDisabledForMining = true;
+                followerDisableLockCount = 0;
+                followerDisabledForMining = false;
                 return;
             }
 
-            followerDisableLockCount = 0;
-            followerDisabledForMining = false;
+            followerDisableLockCount = Mathf.Max(0, followerDisableLockCount - 1);
+            followerDisabledForMining = followerDisableLockCount > 0;
 
-            if (petFollower != null && !petFollower.enabled)
+            if (!HasActiveFollowerHold && petFollower != null && !petFollower.enabled)
                 petFollower.enabled = true;
         }
 
@@ -859,6 +860,7 @@ namespace Companions
         {
             if (followerDisableLockCount <= 0)
             {
+                followerDisableLockCount = 0;
                 followerDisabledForMining = false;
                 return;
             }
