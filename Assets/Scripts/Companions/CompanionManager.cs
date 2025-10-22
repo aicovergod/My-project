@@ -371,6 +371,13 @@ namespace Companions
 
                 DespawnCompanion(false);
 
+                if (!triggeredByPet)
+                {
+                    // Inform the pet drop system that the companion is no longer active so it stops
+                    // blocking re-drops of the pickup item and clears any saved spawn state.
+                    PetDropSystem.HandleCompanionManuallyStored();
+                }
+
                 storedByPet = triggeredByPet && hadActiveCompanion;
                 storedManually = !triggeredByPet && hadActiveCompanion;
                 if (!triggeredByPet)

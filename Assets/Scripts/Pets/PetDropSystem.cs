@@ -287,6 +287,19 @@ namespace Pets
         }
 
         /// <summary>
+        /// Clears the tracked companion definition when the player manually stores it in their inventory.
+        /// </summary>
+        public static void HandleCompanionManuallyStored()
+        {
+            if (activePetDef == null || !activePetDef.spawnAsCompanion)
+                return;
+
+            activePetDef = null;
+            PetInventoryVisible = false;
+            PetSaveBridge.Clear();
+        }
+
+        /// <summary>
         ///     Attempts to display floating text using the active pet's anchor when available.
         /// </summary>
         /// <param name="message">Message to display above the active pet.</param>
