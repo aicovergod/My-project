@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e2e4cdce72b60eecdda71a324759a7abf2daf212 -->
+## 2025-10-22T01:09:36+01:00 — Add companion command menu and area mining workflow
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs.meta, Assets/Scripts/Pets/PetLevelBarMenu.cs, Assets/Scripts/UI/PetLevelBarContextMenuExtender.cs
+- Diff: 861 ++ / 138 --
+- Notes:
+  —
+---
 <!-- commit:5a722be2306330b54becf24bf0a8503398e2da44 -->
 ## 2025-10-22T00:43:47+01:00 — Merge pull request #1270 from aicovergod/codex/add-chatbox-message-for-companion-mining
 

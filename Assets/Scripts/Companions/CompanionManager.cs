@@ -7,6 +7,7 @@ using Skills.Mining;
 using UI.Chat;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Companions.UI;
 
 namespace Companions
 {
@@ -50,7 +51,7 @@ namespace Companions
         private static Inventory.Inventory cachedPlayerInventory;
 
         /// <summary>Chat line used when the companion cannot store additional resources.</summary>
-        internal const string InventoryFullChatLine = "My inventory is full up.";
+        internal const string InventoryFullChatLine = "My inventory is full now, maybe we should visit a bank";
 
         /// <summary>Latest combat level computed from the companion's skills.</summary>
         private static int combatLevel = 1;
@@ -626,13 +627,39 @@ namespace Companions
             if (!HasActiveCompanion)
                 return false;
 
-            bool accepted = controller.MiningController.TryCommandMine(rock);
+            bool accepted = controller.MiningController.TryCommandMine(rock, out var result);
+            if (!accepted && result == CompanionMiningCommandResult.InventoryFull)
+                accepted = true;
+
             if (CompanionManager.EnableDebugLogging)
             {
-                if (accepted)
-                    Debug.Log("[Companion] Forwarded mining command to companion controller.");
-                else
-                    Debug.Log("[Companion] Companion mining command was rejected by the controller.");
+                Debug.Log(accepted
+                    ? "[Companion] Forwarded mining command to companion controller."
+                    : $"[Companion] Companion mining command was rejected ({result}).");
+            }
+
+            return accepted;
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to mine nearby rocks within the supplied radius.
+        /// </summary>
+        /// <param name="radius">Radius (in Unity units / tiles) to scan for rocks.</param>
+        /// <returns>True when the area mining command started successfully.</returns>
+        public static bool TryCommandMineNearby(float radius = 10f)
+        {
+            if (controller == null || controller.MiningController == null)
+                return false;
+
+            if (!HasActiveCompanion)
+                return false;
+
+            bool accepted = controller.MiningController.TryStartAreaMining(radius);
+            if (CompanionManager.EnableDebugLogging)
+            {
+                Debug.Log(accepted
+                    ? $"[Companion] Started area mining command within radius {radius}."
+                    : "[Companion] Area mining command was rejected.");
             }
 
             return accepted;
@@ -750,6 +777,7 @@ namespace Companions
             GuardModeChanged?.Invoke(false);
             PetLevelBarHUD.DestroyInstance();
             boundHud = null;
+            CompanionCommandMenu.Hide();
         }
 
         /// <summary>

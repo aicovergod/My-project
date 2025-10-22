@@ -87,7 +87,7 @@ namespace Companions
             ConfigureSkills(player);
             ConfigureInventory(player);
             ConfigureEquipment();
-            ConfigureMining();
+            ConfigureMining(player);
             ConfigureCombat();
             RebindPlayer(player);
         }
@@ -104,6 +104,9 @@ namespace Companions
 
             if (follower != null)
                 follower.SetPlayer(player);
+
+            if (miningController != null)
+                miningController.RebindPlayer(player);
         }
 
         /// <summary>
@@ -292,10 +295,10 @@ namespace Companions
             companionEquipment.ForceClosed();
         }
 
-        private void ConfigureMining()
+        private void ConfigureMining(Transform player)
         {
             miningController = gameObject.AddComponent<CompanionMiningController>();
-            miningController.Initialise(this, skillManager, companionInventory);
+            miningController.Initialise(this, skillManager, companionInventory, player);
         }
 
         private void ConfigureCombat()
