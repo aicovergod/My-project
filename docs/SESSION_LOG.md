@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:97bfb0083ca01af93e8a8752bf31b260cee7e6cd -->
+## 2025-10-23T00:19:30+01:00 — Merge pull request #1313 from aicovergod/codex/add-chat-messages-for-level-ups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 693 ++ / 0 --
+- Notes:
+  Add companion level-up combat chat dialogue
+---
+<!-- commit:57b3726f0d33015e0b6c18d7462d7f4aff339864 -->
+## 2025-10-23T00:19:20+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:1d72955587931122f2828a0c5b836309687cfc1a -->
 ## 2025-10-23T00:19:04+01:00 — Add companion combat level-up chat variants
 
