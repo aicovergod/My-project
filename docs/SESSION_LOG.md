@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ee1451f340bea6d575476f90779f07ec702bcad8 -->
+## 2025-10-22T12:15:19+01:00 — Fix companion command menu closing behaviour
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/UI/CompanionCommandMenu.cs
+- Diff: 10 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:c49fa2b6f063a979e76981bdd9a30148c4b395a6 -->
 ## 2025-10-22T12:12:20+01:00 — Merge pull request #1279 from aicovergod/codex/add-developer-command-clearcompanioninv
 
