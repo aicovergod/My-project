@@ -1,14 +1,14 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:683204ddf610684842e37884fab8ec06668a9ac0 -->
-## 2025-10-23T00:23:35+01:00 — Merge pull request #1314 from aicovergod/codex/add-level-up-messages-for-skills
+<!-- commit:5ee11654081cd642be43b17453adaf2bd7aa7981 -->
+## 2025-10-23T00:28:21+01:00 — Add companion woodcutting and mining level-up chat pools
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 651 ++ / 0 --
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 331 ++ / 0 --
 - Notes:
-  Add companion chat lines for support skill level-ups
+  —
 ---
 <!-- commit:97bfb0083ca01af93e8a8752bf31b260cee7e6cd -->
 ## 2025-10-23T00:19:30+01:00 — Merge pull request #1313 from aicovergod/codex/add-chat-messages-for-level-ups

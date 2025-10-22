@@ -1104,6 +1104,20 @@ namespace Companions
                 return;
             }
 
+            if (skill == SkillType.Woodcutting)
+            {
+                string message = CompanionChatLibrary.GetRandomWoodcuttingLevelUpLine();
+                chat.PublishCompanionMessage(companionName, message);
+                return;
+            }
+
+            if (skill == SkillType.Mining)
+            {
+                string message = CompanionChatLibrary.GetRandomMiningLevelUpLine();
+                chat.PublishCompanionMessage(companionName, message);
+                return;
+            }
+
             string pronoun = ResolveCompanionPronoun();
             string skillName = SkillNameUtility.GetSentenceName(skill);
             string message = $"Just levelled up {pronoun} {skillName} to level {level}!";
