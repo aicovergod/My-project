@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1ba8061b5af242226da4e674573c9741b73b64a5 -->
+## 2025-10-23T00:53:44+01:00 — Merge pull request #1320 from aicovergod/codex/fix-console-errors-in-companionmanager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 54 ++ / 84 --
+- Notes:
+  Resolve companion level up message redeclaration errors
+---
+<!-- commit:126a2d0d3a99b4713ed7034f6a3f9d4dc7886217 -->
+## 2025-10-23T00:53:38+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:5a9d49f81bb21eaffc1078743be4645e607bc153 -->
 ## 2025-10-23T00:53:19+01:00 — Refactor companion level up message selection
 
