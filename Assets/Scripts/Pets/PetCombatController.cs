@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +12,9 @@ using UI;
 using Player;
 using Util;
 using Companions;
+using Inventory;
+using Inventory.Core;
+using UI.Chat;
 
 namespace Pets
 {
@@ -45,6 +49,7 @@ namespace Pets
         private CombatTarget currentTarget;
         private Coroutine attackRoutine;
         private float nextAttackTime;
+        private CompanionController companionController;
 
         /// <summary>
         /// Tracks the most recent non-zero chase velocity so the sprite animator can
@@ -102,6 +107,8 @@ namespace Pets
                 hasRigidbody2D = true;
             }
 
+            companionController = GetComponent<CompanionController>();
+
             hitSplatLibrary = HitSplatLibraryResolver.Resolve(hitSplatLibrary);
 
             if (hitSplatLibrary == null)
@@ -131,10 +138,8 @@ namespace Pets
                 return;
             }
 
-            if (IsOreGolemTarget(target))
+            if (ShouldBlockOreGolemAttack(target, fromDirectCommand))
             {
-                if (fromDirectCommand)
-                    ShowOreGolemBlockedFeedback();
                 CancelAttack();
                 return;
             }
@@ -473,6 +478,109 @@ namespace Pets
                 return behaviour.GetComponent<OreMonsterRewardController>() != null;
 
             return false;
+        }
+
+        /// <summary>
+        /// Determines whether ore golem attacks should be blocked based on companion equipment and inventory state.
+        /// </summary>
+        private bool ShouldBlockOreGolemAttack(CombatTarget target, bool fromDirectCommand)
+        {
+            if (!IsOreGolemTarget(target))
+                return false;
+
+            if (companionController == null)
+            {
+                if (fromDirectCommand)
+                    ShowOreGolemBlockedFeedback();
+                return true;
+            }
+
+            if (CompanionHasPickaxe(companionController))
+                return false;
+
+            var chat = ChatService.Instance;
+            chat?.PublishCompanionMessage(
+                CompanionManager.GetCompanionDisplayName(),
+                "I need a pickaxe to attack that golem");
+            return true;
+        }
+
+        /// <summary>
+        /// Evaluates the companion inventory and equipment to confirm whether a pickaxe is available.
+        /// </summary>
+        /// <param name="controller">Controller representing the active companion.</param>
+        /// <returns>True when the companion has access to at least one pickaxe.</returns>
+        private bool CompanionHasPickaxe(CompanionController controller)
+        {
+            if (controller == null)
+                return false;
+
+            var equipment = controller.Equipment;
+            if (equipment != null)
+            {
+                var equippedEntry = equipment.GetEquipped(EquipmentSlot.Weapon);
+                if (equippedEntry.item != null && PickaxeUtility.IsPickaxe(equippedEntry.item))
+                    return true;
+            }
+
+            var inventoryWrapper = controller.Inventory;
+            Inventory.Inventory inventoryComponent = inventoryWrapper != null ? inventoryWrapper.InventoryComponent : null;
+            if (inventoryComponent == null)
+                return false;
+
+            var pickaxeDefinitions = ResolveAvailablePickaxeDefinitions();
+            if (pickaxeDefinitions.Count > 0)
+            {
+                for (int i = 0; i < pickaxeDefinitions.Count; i++)
+                {
+                    var definition = pickaxeDefinitions[i];
+                    if (definition == null)
+                        continue;
+
+                    string pickaxeId = definition.Id;
+                    if (string.IsNullOrWhiteSpace(pickaxeId))
+                        continue;
+
+                    if (inventoryComponent.HasItem(pickaxeId))
+                        return true;
+                }
+            }
+
+            InventoryModel model = inventoryComponent.Model;
+            if (model != null)
+            {
+                int slotCount = model.Size;
+                for (int i = 0; i < slotCount; i++)
+                {
+                    var entry = model.GetEntry(i);
+                    if (entry.item != null && PickaxeUtility.IsPickaxe(entry.item))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Resolves the available pickaxe definitions, mirroring the mining controller fallback so runtime checks stay in sync.
+        /// </summary>
+        private static IReadOnlyList<PickaxeDefinition> ResolveAvailablePickaxeDefinitions()
+        {
+            var definitions = PickaxeDefinitionRegistry.GetAllDefinitions();
+            if (definitions == null || definitions.Count == 0)
+            {
+                var selectors = FindObjectsOfType<PickaxeToUse>(true);
+                for (int i = 0; i < selectors.Length; i++)
+                {
+                    var selector = selectors[i];
+                    if (selector != null)
+                        PickaxeDefinitionRegistry.RegisterDefinitions(selector.AllPickaxes);
+                }
+
+                definitions = PickaxeDefinitionRegistry.GetAllDefinitions();
+            }
+
+            return definitions ?? Array.Empty<PickaxeDefinition>();
         }
 
         private void ShowOreGolemBlockedFeedback()
