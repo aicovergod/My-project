@@ -114,6 +114,8 @@ namespace Companions
         /// </summary>
         public void CommandAttack(CombatTarget target)
         {
+            // Cancel any active mining routines so direct attack orders stop both single-rock and area sweeps.
+            miningController?.CancelMining(true);
             combatController?.CommandAttack(target, true);
         }
 
