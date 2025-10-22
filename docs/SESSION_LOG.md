@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:56ce2680a1d90c7894dd60cdf36960a0bcbe0f42 -->
+## 2025-10-22T10:59:13+01:00 — Fix companion reactivation without respawn
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 80 ++ / 7 --
+- Notes:
+  —
+---
 <!-- commit:0a0f55cf3c554d5ce2dc6f9f401709b3b6b7f5c7 -->
 ## 2025-10-22T10:23:53+01:00 — Merge pull request #1273 from aicovergod/codex/refactor-mining-controller-for-2d-distance-calculations
 
