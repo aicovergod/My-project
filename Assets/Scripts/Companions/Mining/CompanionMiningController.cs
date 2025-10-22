@@ -564,7 +564,7 @@ namespace Companions
                 return false;
             }
 
-            if (!HasInventoryCapacityForOre(oreDef, suppressChat))
+            if (!HasInventoryCapacityForOreInternal(oreDef, suppressChat))
             {
                 result = CompanionMiningCommandResult.InventoryFull;
                 return false;
@@ -629,7 +629,15 @@ namespace Companions
             return null;
         }
 
-        private bool HasInventoryCapacityForOre(OreDefinition ore, bool suppressChat)
+        /// <summary>
+        /// Determines whether the companion inventory can accept the supplied ore without
+        /// emitting player-facing chat. External systems can call <see cref="HasInventoryCapacityForOre(OreDefinition)"/>
+        /// when they need to validate storage silently before issuing a mining command.
+        /// </summary>
+        /// <param name="ore">Ore that should be checked for capacity.</param>
+        /// <param name="suppressChat">When <c>true</c>, prevents the inventory full message from being published.</param>
+        /// <returns><c>true</c> when the ore can be stored, otherwise <c>false</c>.</returns>
+        private bool HasInventoryCapacityForOreInternal(OreDefinition ore, bool suppressChat)
         {
             if (ore == null || miningSkill == null)
                 return true;
@@ -644,6 +652,17 @@ namespace Companions
                 Debug.Log("[Companion Mining] Command rejected because the companion inventory is full.", this);
 
             return false;
+        }
+
+        /// <summary>
+        /// Exposes a silent inventory capacity check for external automation flows that need to
+        /// determine whether a mining command should be issued.
+        /// </summary>
+        /// <param name="ore">Ore that should be validated.</param>
+        /// <returns><c>true</c> when the ore fits in the companion inventory, otherwise <c>false</c>.</returns>
+        public bool HasInventoryCapacityForOre(OreDefinition ore)
+        {
+            return HasInventoryCapacityForOreInternal(ore, suppressChat: true);
         }
 
         private IEnumerator AreaMiningRoutine()
@@ -806,7 +825,12 @@ namespace Companions
             return new Vector3(x, y, worldPosition.z);
         }
 
-        private void PublishInventoryFullMessage()
+        /// <summary>
+        /// Publishes the standard companion chat line that indicates the inventory has run out of space.
+        /// External callers (such as automation routines) use this when skipping mining interactions so the
+        /// player still receives feedback about the blocked action.
+        /// </summary>
+        public void PublishInventoryFullMessage()
         {
             var chat = ChatService.Instance;
             if (chat == null)

@@ -560,6 +560,15 @@ namespace Pets
                 if (rock == null || rock.IsDepleted)
                     yield break;
 
+                // Skip the automated mining coroutine entirely when the companion has no space left for the
+                // ore reward. This prevents the follower hold from lingering and keeps the companion mobile.
+                var oreDefinition = rock.RockDef != null ? rock.RockDef.Ore : null;
+                if (!miningController.HasInventoryCapacityForOre(oreDefinition))
+                {
+                    miningController.PublishInventoryFullMessage();
+                    yield break;
+                }
+
                 var commandResult = CompanionMiningCommandResult.RequirementsNotMet;
                 bool commandAccepted = miningController.TryCommandMine(
                     rock,
