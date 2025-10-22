@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:53ce05a8a640dc32f9f804ebe087c2ec03c2886d -->
+## 2025-10-22T15:45:46+01:00 — Guard follower reactivation during mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 18 ++ / 10 --
+- Notes:
+  —
+---
 <!-- commit:a06342eb91a5c66de0d55327b735b946d4008c80 -->
 ## 2025-10-22T15:30:38+01:00 — Merge pull request #1291 from aicovergod/codex/add-temporary-follower-hold-helper
 
