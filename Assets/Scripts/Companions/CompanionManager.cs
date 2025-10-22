@@ -1048,6 +1048,34 @@ namespace Companions
                 return;
             }
 
+            if (skill == SkillType.Strength)
+            {
+                string message = CompanionChatLibrary.GetRandomStrengthLevelUpLine();
+                chat.PublishCompanionMessage(companionName, message);
+                return;
+            }
+
+            if (skill == SkillType.Attack)
+            {
+                string message = CompanionChatLibrary.GetRandomAttackLevelUpLine();
+                chat.PublishCompanionMessage(companionName, message);
+                return;
+            }
+
+            if (skill == SkillType.Ranged)
+            {
+                string message = CompanionChatLibrary.GetRandomRangedLevelUpLine();
+                chat.PublishCompanionMessage(companionName, message);
+                return;
+            }
+
+            if (skill == SkillType.Magic)
+            {
+                string message = CompanionChatLibrary.GetRandomMagicLevelUpLine();
+                chat.PublishCompanionMessage(companionName, message);
+                return;
+            }
+
             string pronoun = ResolveCompanionPronoun();
             string skillName = SkillNameUtility.GetSentenceName(skill);
             string message = $"Just levelled up {pronoun} {skillName} to level {level}!";
