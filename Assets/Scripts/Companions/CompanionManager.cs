@@ -226,6 +226,7 @@ namespace Companions
             UpdateCombatLevel();
             EnsureHud();
             UpdateEquipmentVisibility(false);
+            PublishRandomManualSpawnMessage();
         }
 
         /// <summary>
@@ -812,6 +813,23 @@ namespace Companions
                 return;
 
             string message = CompanionChatLibrary.GetRandomGuardActivationLine();
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
+        }
+
+        /// <summary>
+        /// Publishes a random chat line whenever the companion is freshly spawned by the player.
+        /// Adds flavour to manual summons triggered by dropping the companion’s charm item.
+        /// </summary>
+        private static void PublishRandomManualSpawnMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string message = CompanionChatLibrary.GetRandomManualSpawnGreetingLine();
             if (string.IsNullOrWhiteSpace(message))
                 return;
 
