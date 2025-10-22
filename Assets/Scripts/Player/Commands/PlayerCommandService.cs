@@ -188,6 +188,10 @@ namespace Player.Commands
             RegisterCommand(new BankCommand());
             RegisterCommand(new ClearBankCommand());
             RegisterCommand(new ClearInventoryCommand());
+            RegisterCommand(new ClearCompanionInventoryCommand());
+            RegisterCommand(ClearCompanionInventoryCommand.CreateAlias("clearcompanioninventory"));
+            RegisterCommand(ClearCompanionInventoryCommand.CreateAlias("clearcompinv"));
+            RegisterCommand(ClearCompanionInventoryCommand.CreateAlias("clearcompinventory"));
             RegisterCommand(new GiveItemCommand());
             RegisterCommand(new GiveXpCommand());
             RegisterCommand(new MaxStatsCommand());
