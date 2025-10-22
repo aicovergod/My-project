@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b5b16271ca954a6160cd49b3330207c364aa6bd0 -->
+## 2025-10-22T01:10:00+01:00 — Merge pull request #1271 from aicovergod/codex/implement-companion-command-workflow
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 870 ++ / 138 --
+- Notes:
+  Add companion command menu and area mining workflow
+---
+<!-- commit:ff1d468e278dd7d99389e976a43f8a188813e37f -->
+## 2025-10-22T01:09:52+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:e2e4cdce72b60eecdda71a324759a7abf2daf212 -->
 ## 2025-10-22T01:09:36+01:00 — Add companion command menu and area mining workflow
 
