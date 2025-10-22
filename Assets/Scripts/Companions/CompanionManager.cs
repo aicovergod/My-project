@@ -558,6 +558,9 @@ namespace Companions
             if (!controller.gameObject.activeSelf)
                 return;
 
+            if (!controller.CanFight)
+                return;
+
             controller.CommandAttack(target);
         }
 
