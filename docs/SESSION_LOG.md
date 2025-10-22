@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5479f1892c12e127915c5b4a4a50ae9da7ae3bf8 -->
+## 2025-10-22T12:04:54+01:00 — Merge pull request #1278 from aicovergod/codex/fix-companion-prospecting-on-shift-right-click
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 15 ++ / 1 --
+- Notes:
+  Prevent companion mining command from triggering prospecting
+---
+<!-- commit:32a3225b94a6bde1ebea111eb2e236a0fb9b0f41 -->
+## 2025-10-22T12:04:47+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d7ca0a9ec43212505275a242bc0e6c5464db5fcc -->
 ## 2025-10-22T12:04:30+01:00 — Fix shift prospect triggering when commanding companion
 
