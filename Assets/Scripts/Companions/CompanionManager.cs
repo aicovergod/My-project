@@ -765,10 +765,17 @@ namespace Companions
                 return false;
             }
 
-            bool accepted = controller.MiningController.TryStartAreaMining(radius);
+            bool accepted = controller.MiningController.TryStartAreaMining(radius, out var failureReason);
             if (!accepted)
             {
-                rejectionReason = "The mining controller rejected the area mining request.";
+                if (failureReason == CompanionMiningCommandResult.InventoryFull)
+                {
+                    string inventoryDetail = "Area mining aborted because the companion inventory is full.";
+                    Debug.Log($"[Companion] Area mining command outcome: success=True, radius={radius}, reason={inventoryDetail}");
+                    return true;
+                }
+
+                rejectionReason = $"The mining controller rejected the area mining request ({failureReason}).";
                 Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={radius}, reason={rejectionReason}");
                 return false;
             }
