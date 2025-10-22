@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:19f836a11024ce6f9925d923e836764c62cd87f2 -->
+## 2025-10-22T14:05:10+01:00 — Merge pull request #1285 from aicovergod/codex/refactor-petcombatcontroller-for-companion-pickaxe-check
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 111 ++ / 3 --
+- Notes:
+  Ensure companions equip pickaxes before attacking ore golems
+---
+<!-- commit:0ebe74d7fb0dfc58ae36a95806205a3195fb7a7c -->
+## 2025-10-22T14:04:56+01:00 — Require companion pickaxes for ore golem attacks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 111 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:e1f97350130b2f7f78adc193917343608d6e9390 -->
 ## 2025-10-22T13:42:04+01:00 — Merge pull request #1284 from aicovergod/codex/fix-duplicate-full-inventory-message
 
