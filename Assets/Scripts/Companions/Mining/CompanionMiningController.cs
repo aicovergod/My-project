@@ -58,6 +58,7 @@ namespace Companions
         private Dictionary<string, ItemData> itemCache;
         private bool miningActive;
         private bool followerDisabledForMining;
+        private bool followerHoldToggledFollower;
         private int followerDisableLockCount;
         private bool suppressMiningStopCallback;
 
@@ -123,6 +124,7 @@ namespace Companions
 
             miningActive = false;
             followerDisabledForMining = false;
+            followerHoldToggledFollower = false;
             followerDisableLockCount = 0;
             areaMiningActive = false;
             activeAreaRadius = 0f;
@@ -247,8 +249,8 @@ namespace Companions
         /// Dispose the returned handle to restore the follower even when mining never begins.
         /// </summary>
         /// <remarks>
-        /// When the follower is already disabled (for example, because mining is currently active) the helper returns a
-        /// no-op disposable so existing routines are unaffected.
+        /// The follower lock count is incremented even when another system already disabled the follower so subsequent
+        /// releases can determine whether mining should re-enable the behaviour.
         /// </remarks>
         /// <returns>An <see cref="IDisposable"/> handle that restores the follower when disposed.</returns>
         public IDisposable EnterTemporaryFollowerHold()
@@ -263,12 +265,17 @@ namespace Companions
                 return new FollowerHold(this);
             }
 
-            if (!petFollower.enabled)
-                return NoOpDisposable.Instance;
+            bool toggledFollower = false;
 
-            petFollower.enabled = false;
+            if (petFollower.enabled)
+            {
+                petFollower.enabled = false;
+                toggledFollower = true;
+            }
+
             followerDisableLockCount = 1;
             followerDisabledForMining = true;
+            followerHoldToggledFollower = toggledFollower;
             return new FollowerHold(this);
         }
 
@@ -828,6 +835,7 @@ namespace Companions
             {
                 followerDisableLockCount = 0;
                 followerDisabledForMining = false;
+                followerHoldToggledFollower = false;
             }
 
             if (body != null)
@@ -846,14 +854,20 @@ namespace Companions
             {
                 followerDisableLockCount = 0;
                 followerDisabledForMining = false;
+                followerHoldToggledFollower = false;
                 return;
             }
 
             followerDisableLockCount = Mathf.Max(0, followerDisableLockCount - 1);
             followerDisabledForMining = followerDisableLockCount > 0;
 
-            if (!HasActiveFollowerHold && petFollower != null && !petFollower.enabled)
-                petFollower.enabled = true;
+            if (!HasActiveFollowerHold)
+            {
+                if (followerHoldToggledFollower && petFollower != null && !petFollower.enabled)
+                    petFollower.enabled = true;
+
+                followerHoldToggledFollower = false;
+            }
         }
 
         private void ForceReleaseAllFollowerHolds()
@@ -862,14 +876,17 @@ namespace Companions
             {
                 followerDisableLockCount = 0;
                 followerDisabledForMining = false;
+                followerHoldToggledFollower = false;
                 return;
             }
 
             followerDisableLockCount = 0;
             followerDisabledForMining = false;
 
-            if (petFollower != null && !petFollower.enabled)
+            if (followerHoldToggledFollower && petFollower != null && !petFollower.enabled)
                 petFollower.enabled = true;
+
+            followerHoldToggledFollower = false;
         }
 
         private void HandleMiningStopped()

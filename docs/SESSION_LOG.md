@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fe8f5ae0176bb38e6002df2498eb07e8b28a2166 -->
+## 2025-10-22T15:58:09+01:00 — Fix mining follower hold release tracking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 25 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:09f1a49023223bd545fd23508db66b75bf2aa321 -->
 ## 2025-10-22T15:46:18+01:00 — Merge pull request #1292 from aicovergod/codex/expose-follower-hold-state-in-mining-controller
 
