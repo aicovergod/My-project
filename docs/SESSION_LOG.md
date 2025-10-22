@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:50b5ed3ec735954f377997f058aa7a03321b40ec -->
+## 2025-10-22T15:07:11+01:00 — Merge pull request #1290 from aicovergod/codex/guard-mineroutine-and-handle-cancellation-tmssnt
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 1 --
+- Notes:
+  Ensure companion mining coroutine cancels cleanly
+---
+<!-- commit:800d8f2d386fb5b1b545322c269c8a585e52f0dd -->
+## 2025-10-22T15:07:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9cbb544669c596fd85389a4ab2b7113f163dd5e5 -->
 ## 2025-10-22T15:06:36+01:00 — Ensure companion mining coroutine cancels cleanly
 
