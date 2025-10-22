@@ -739,17 +739,40 @@ namespace Companions
         }
 
         /// <summary>
+        /// Attempts to command the companion to mine nearby rocks using the default scan radius.
+        /// </summary>
+        /// <param name="failureReason">Detailed failure reason when the command is rejected.</param>
+        /// <returns>True when the area mining command started successfully.</returns>
+        public static bool TryCommandMineNearby(out CompanionMiningCommandResult failureReason)
+        {
+            return TryCommandMineNearby(10f, out failureReason);
+        }
+
+        /// <summary>
         /// Attempts to command the companion to mine nearby rocks within the supplied radius.
         /// </summary>
         /// <param name="radius">Radius (in Unity units / tiles) to scan for rocks.</param>
         /// <returns>True when the area mining command started successfully.</returns>
         public static bool TryCommandMineNearby(float radius = 10f)
         {
+            return TryCommandMineNearby(radius, out _);
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to mine nearby rocks within the supplied radius and reports the resulting status.
+        /// </summary>
+        /// <param name="radius">Radius (in Unity units / tiles) to scan for rocks.</param>
+        /// <param name="failureReason">Detailed failure reason when the command is rejected.</param>
+        /// <returns>True when the area mining command started successfully.</returns>
+        public static bool TryCommandMineNearby(float radius, out CompanionMiningCommandResult failureReason)
+        {
             string rejectionReason = string.Empty;
+            failureReason = CompanionMiningCommandResult.Unreachable;
 
             if (controller == null)
             {
                 rejectionReason = "Companion controller has not been initialised.";
+                failureReason = CompanionMiningCommandResult.RequirementsNotMet;
                 Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={radius}, reason={rejectionReason}");
                 return false;
             }
@@ -757,6 +780,7 @@ namespace Companions
             if (controller.MiningController == null)
             {
                 rejectionReason = "Companion mining controller is missing.";
+                failureReason = CompanionMiningCommandResult.RequirementsNotMet;
                 Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={radius}, reason={rejectionReason}");
                 return false;
             }
@@ -764,11 +788,12 @@ namespace Companions
             if (!HasActiveCompanion)
             {
                 rejectionReason = "The companion is not currently active.";
+                failureReason = CompanionMiningCommandResult.RequirementsNotMet;
                 Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={radius}, reason={rejectionReason}");
                 return false;
             }
 
-            bool accepted = controller.MiningController.TryStartAreaMining(radius, out var failureReason);
+            bool accepted = controller.MiningController.TryStartAreaMining(radius, out failureReason);
             if (!accepted)
             {
                 if (failureReason == CompanionMiningCommandResult.InventoryFull)
