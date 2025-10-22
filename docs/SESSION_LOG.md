@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8d3f795a19affda91df4a92ed9786f462169360f -->
+## 2025-10-22T18:27:19+01:00 — Gate chat HUD bootstrap to allowed scenes
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudBootstrap.cs
+- Diff: 65 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:60e79dcd52d26be048392a3ecac4440f9443f445 -->
 ## 2025-10-22T18:02:57+01:00 — Merge pull request #1298 from aicovergod/codex/update-agents.md-with-companion-system-details
 
