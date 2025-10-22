@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:14713e3709206358c40c6a39b8965a76602be91e -->
+## 2025-10-22T12:33:58+01:00 — Merge pull request #1282 from aicovergod/codex/update-attack-commands-to-clear-mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 0 --
+- Notes:
+  Ensure companion attack orders cancel mining
+---
+<!-- commit:3a4c841c089a0f7cefacaccac2628480a2770116 -->
+## 2025-10-22T12:33:49+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:20617161bb66be2e10971776cedad91c32b4b9c2 -->
 ## 2025-10-22T12:33:28+01:00 — Ensure companion attacks cancel mining
 
