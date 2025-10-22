@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0a0f55cf3c554d5ce2dc6f9f401709b3b6b7f5c7 -->
+## 2025-10-22T10:23:53+01:00 — Merge pull request #1273 from aicovergod/codex/refactor-mining-controller-for-2d-distance-calculations
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 17 ++ / 3 --
+- Notes:
+  Ignore z offset when selecting companion mining rocks
+---
+<!-- commit:fc1db1e151d4a00e505b81998b9f794a9504fbf2 -->
+## 2025-10-22T10:23:46+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:29141409a73508be12bedaeaa8fb9b2d3cdd7a4a -->
 ## 2025-10-22T10:23:22+01:00 — Ignore z offset when selecting companion mining rocks
 
