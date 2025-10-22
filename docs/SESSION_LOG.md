@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f9d5611e9e05aa0660611b1278efad5c6e4b826e -->
+## 2025-10-22T19:42:56+01:00 — Add companion bank anchor flow and context menu wiring
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Bank/CompanionBankDepositAnchor.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetLevelBarMenu.cs, Assets/Scripts/UI/PetLevelBarContextMenuExtender.cs
+- Diff: 220 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d449ac82ac7b355b729fac3a6cfd950db103ca05 -->
 ## 2025-10-22T19:15:07+01:00 — Merge pull request #1300 from aicovergod/codex/fix-github-codex-error
 

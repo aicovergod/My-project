@@ -62,6 +62,8 @@ namespace Pets
                 pickupButton.GetComponentInChildren<Text>().text = CompanionManager.HasActiveCompanion ? "Pick Up" : "Summon";
                 if (commandButton != null)
                     commandButton.gameObject.SetActive(true);
+                if (bankButton != null)
+                    bankButton.gameObject.SetActive(true);
             }
             else
             {
@@ -74,6 +76,9 @@ namespace Pets
                     commandButton.gameObject.SetActive(false);
                     CompanionCommandMenu.Hide();
                 }
+
+                if (bankButton != null)
+                    bankButton.gameObject.SetActive(false);
 
                 if (mergeController == null)
                 {

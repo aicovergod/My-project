@@ -799,6 +799,53 @@ namespace BankSystem
             return false;
         }
 
+        /// <summary>
+        /// Deposits every item stored in the supplied inventory into the bank, respecting stack limits.
+        /// </summary>
+        /// <param name="sourceInventory">Inventory that should be drained into the bank.</param>
+        /// <returns>Total number of items moved into the bank.</returns>
+        public int DepositAllFromInventory(Inventory.Inventory sourceInventory)
+        {
+            if (sourceInventory == null)
+                return 0;
+
+            int deposited = 0;
+            bool movedAny = false;
+
+            for (int slotIndex = 0; slotIndex < sourceInventory.size; slotIndex++)
+            {
+                var slot = sourceInventory.GetSlot(slotIndex);
+                if (slot.item == null || slot.count <= 0)
+                    continue;
+
+                var item = slot.item;
+                int remainingInSlot = slot.count;
+
+                while (remainingInSlot > 0)
+                {
+                    int added = AddItem(item, remainingInSlot);
+                    if (added <= 0)
+                        goto FinishDeposit; // bank is full; stop gracefully
+
+                    sourceInventory.RemoveFromSlot(slotIndex, added);
+                    deposited += added;
+                    movedAny = true;
+
+                    var updatedSlot = sourceInventory.GetSlot(slotIndex);
+                    if (updatedSlot.item != item)
+                        break;
+
+                    remainingInSlot = updatedSlot.count;
+                }
+            }
+
+        FinishDeposit:
+            if (movedAny)
+                SaveState();
+
+            return deposited;
+        }
+
         public void ClearBank()
         {
             for (int i = 0; i < items.Length; i++)
