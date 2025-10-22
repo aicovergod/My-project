@@ -151,7 +151,7 @@ namespace Skills.Mining
                     Equipment = equipment,
                     EquipmentXpBonusEvaluator = data => data != null ? data.miningXpBonusMultiplier : 0f,
                     RewardMessageFormatter = qty => $"+{qty} {ore.DisplayName}",
-                    InventoryFullMessage = useCompanionChatFormatting ? CompanionManager.GetRandomInventoryFullChatLine() : null,
+                    InventoryFullMessage = useCompanionChatFormatting ? CompanionChatLibrary.GetRandomInventoryFullLine() : null,
                     UseCompanionChatFormatting = useCompanionChatFormatting,
                     CompanionChatSenderResolver = companionChatSenderResolver,
                         OnItemsGranted = result => OnOreGained?.Invoke(ore.Id, result.QuantityAwarded),

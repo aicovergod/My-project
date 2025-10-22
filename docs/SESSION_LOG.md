@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:77e916a9cc2930a8fadb35095388d56c527528da -->
+## 2025-10-22T23:17:53+01:00 — Refactor companion chat lines into shared library
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs
+- Diff: 390 ++ / 363 --
+- Notes:
+  —
+---
 <!-- commit:4eb2e76470ea19ee102a2595a19c5ad2c4694a5c -->
 ## 2025-10-22T23:07:24+01:00 — Merge pull request #1305 from aicovergod/codex/add-chat-message-for-guard-mode-off
 
