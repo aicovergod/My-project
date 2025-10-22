@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ae75752208bffd19b6f48ebfe6f8ee8272b1f5e8 -->
+## 2025-10-23T00:03:45+01:00 — Add hitpoints level-up chatter for companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 158 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ac7f05307fcd76dd3ac3422301dc7491afd373fc -->
 ## 2025-10-22T23:42:52+01:00 — Merge pull request #1310 from aicovergod/codex/add-random-companion-farewell-messages
 
