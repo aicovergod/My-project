@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:729553890600b5d0176b174817348394a53a2f54 -->
+## 2025-10-22T16:25:44+01:00 — Keep personal ore nodes alive when companion is nearby
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Mining/Core/PersonalOreNode.cs
+- Diff: 26 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:ad54c728b9e1abe7f7633a839c72c2ea883ae49e -->
 ## 2025-10-22T15:58:59+01:00 — Merge pull request #1293 from aicovergod/codex/update-follower-state-handling-in-miningcontroller
 

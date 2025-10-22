@@ -1,5 +1,6 @@
 using System;
 using Combat;
+using Companions;
 using Core.Save;
 using Skills.Common;
 using Skills;
@@ -628,10 +629,34 @@ namespace Skills.Mining
 
         /// <summary>
         ///     Determines whether the owning player has exceeded the despawn distance threshold.
-        ///     When the owner leaves the allowed radius the node should immediately expire.
+        ///     Companion proximity now also keeps the node alive so rewards remain claimable when
+        ///     the follower finishes the mining interaction on the player's behalf.
         /// </summary>
         private bool ShouldExpireDueToOwnerDistance()
         {
+            float maxDistanceTiles = Mathf.Max(0f, ownerDespawnDistanceTiles);
+            if (maxDistanceTiles <= 0f)
+                return false;
+
+            Vector2 nodePosition = transform.position;
+            float maxDistanceWorld = maxDistanceTiles; // Tile size is 1 unit in world space.
+            float maxDistanceSqr = maxDistanceWorld * maxDistanceWorld;
+
+            // Companions can keep the node engaged while they mine the reward. When the companion
+            // remains within the leash distance we treat the node as active regardless of the
+            // player's position so helper automation feels responsive.
+            GameObject companionObject = CompanionManager.CompanionObject;
+            if (companionObject != null && companionObject.activeInHierarchy)
+            {
+                Transform companionTransform = companionObject.transform;
+                if (companionTransform != null)
+                {
+                    float companionDistanceSqr = ((Vector2)companionTransform.position - nodePosition).sqrMagnitude;
+                    if (companionDistanceSqr <= maxDistanceSqr)
+                        return false;
+                }
+            }
+
             if (ownerController == null)
                 return true;
 
@@ -639,15 +664,8 @@ namespace Skills.Mining
             if (controllerTransform == null || !ownerController.isActiveAndEnabled)
                 return true;
 
-            float maxDistanceTiles = Mathf.Max(0f, ownerDespawnDistanceTiles);
-            if (maxDistanceTiles <= 0f)
-                return false;
-
             Vector2 ownerPosition = controllerTransform.position;
-            Vector2 nodePosition = transform.position;
             float sqrDistance = (ownerPosition - nodePosition).sqrMagnitude;
-            float maxDistanceWorld = maxDistanceTiles; // Tile size is 1 unit in world space.
-            float maxDistanceSqr = maxDistanceWorld * maxDistanceWorld;
 
             return sqrDistance > maxDistanceSqr;
         }
