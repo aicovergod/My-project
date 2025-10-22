@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ce3de7bb1dd65b1c722cb0f1ae5430c8ae7486e4 -->
+## 2025-10-22T22:43:22+01:00 — Add companion bank deposit chat feedback
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 70 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:2e818ca6a2679dfc110ca085fa2f8f878fa8d308 -->
 ## 2025-10-22T19:46:56+01:00 — Merge pull request #1301 from aicovergod/codex/implement-companion-bank-deposit-feature
 
