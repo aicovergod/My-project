@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:732a94a4dfb7e051e08db1b03db98fa3deb80ab7 -->
+## 2025-10-22T12:15:47+01:00 — Merge pull request #1280 from aicovergod/codex/fix-menu-conflict-on-action-buttons
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 4 --
+- Notes:
+  Fix companion command menu closing behaviour
+---
+<!-- commit:1d078802bbdb7683037c1bb6c8c98ad42a3d7496 -->
+## 2025-10-22T12:15:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ee1451f340bea6d575476f90779f07ec702bcad8 -->
 ## 2025-10-22T12:15:19+01:00 — Fix companion command menu closing behaviour
 
