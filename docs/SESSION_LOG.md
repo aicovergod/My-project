@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:29141409a73508be12bedaeaa8fb9b2d3cdd7a4a -->
+## 2025-10-22T10:23:22+01:00 — Ignore z offset when selecting companion mining rocks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 8 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:999db0bc65303873462bda3544002d7d58eea628 -->
 ## 2025-10-22T10:15:15+01:00 — Merge pull request #1272 from aicovergod/codex/fix-companion-item-duplication-issue
 
