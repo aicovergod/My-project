@@ -552,7 +552,10 @@ namespace Companions
                     if (rock.RockDef != null && rock.RockDef.DepleteAfterNOres == 1 && playerProtectedSingleOre.Contains(rock))
                         continue;
 
-                    if (!TryPrepareMiningCommand(rock, out var pickaxe, out var result))
+                    // Suppress internal chat lines because the branch below publishes the
+                    // descriptive message when inventory space is exhausted. This keeps the
+                    // companion from spamming duplicate "inventory full" chat entries.
+                    if (!TryPrepareMiningCommand(rock, out var pickaxe, out var result, suppressChat: true))
                     {
                         if (result == CompanionMiningCommandResult.InventoryFull)
                         {
