@@ -170,6 +170,19 @@ namespace Companions
         /// <returns>True when area mining started successfully.</returns>
         public bool TryStartAreaMining(float radius)
         {
+            return TryStartAreaMining(radius, out _);
+        }
+
+        /// <summary>
+        /// Initiates an area mining routine that scans nearby rocks and mines them sequentially.
+        /// </summary>
+        /// <param name="radius">Scan radius in Unity units (tiles).</param>
+        /// <param name="failureReason">Detailed reason describing why the command failed when <c>false</c> is returned.</param>
+        /// <returns>True when area mining started successfully.</returns>
+        public bool TryStartAreaMining(float radius, out CompanionMiningCommandResult failureReason)
+        {
+            failureReason = CompanionMiningCommandResult.RequirementsNotMet;
+
             if (!isActiveAndEnabled || miningSkill == null || skillManager == null)
                 return false;
 
@@ -177,7 +190,7 @@ namespace Companions
 
             CancelAreaMiningInternal(true);
 
-            if (!BuildAreaCandidateList(clampedRadius, out var failureReason))
+            if (!BuildAreaCandidateList(clampedRadius, out failureReason))
             {
                 if (failureReason == CompanionMiningCommandResult.InventoryFull)
                 {
@@ -190,6 +203,8 @@ namespace Companions
 
                 return false;
             }
+
+            failureReason = CompanionMiningCommandResult.Accepted;
 
             activeAreaRadius = clampedRadius;
             areaMiningRoutine = StartCoroutine(AreaMiningRoutine());

@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f13610d8ae46686cb1d7964504b76cd4b18668ea -->
+## 2025-10-22T12:22:19+01:00 — Handle inventory-full mining commands without false rock warning
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 25 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:732a94a4dfb7e051e08db1b03db98fa3deb80ab7 -->
 ## 2025-10-22T12:15:47+01:00 — Merge pull request #1280 from aicovergod/codex/fix-menu-conflict-on-action-buttons
 
