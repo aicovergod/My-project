@@ -723,13 +723,13 @@ namespace Companions
         /// <summary>
         /// Attempts to equip an item into the companion equipment using the player's inventory entry.
         /// </summary>
-        public static bool TryEquipItemFromPlayerInventory(Inventory.Inventory playerInventory, InventoryEntry entry)
+        public static CompanionEquipAttemptResult TryEquipItemFromPlayerInventory(Inventory.Inventory playerInventory, InventoryEntry entry)
         {
             if (controller == null || controller.Equipment == null)
-                return false;
+                return CompanionEquipAttemptResult.NotHandled;
 
             if (!equipmentVisible)
-                return false;
+                return CompanionEquipAttemptResult.NotHandled;
 
             return controller.TryEquipFromPlayerInventory(entry, playerInventory);
         }

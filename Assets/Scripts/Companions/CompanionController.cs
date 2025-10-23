@@ -163,10 +163,10 @@ namespace Companions
         /// <summary>
         /// Attempts to equip an entry removed from the player inventory into the companion gear slots.
         /// </summary>
-        public bool TryEquipFromPlayerInventory(InventoryEntry entry, Inventory.Inventory playerInventory)
+        public CompanionEquipAttemptResult TryEquipFromPlayerInventory(InventoryEntry entry, Inventory.Inventory playerInventory)
         {
             if (companionEquipment == null)
-                return false;
+                return CompanionEquipAttemptResult.NotHandled;
 
             return companionEquipment.TryEquipFromPlayerInventory(entry, playerInventory);
         }

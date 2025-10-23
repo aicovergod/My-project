@@ -263,10 +263,11 @@ namespace Inventory.Core
                 return false;
 
             model.RemoveFromSlot(index, entry.count);
-            if (CompanionManager.TryEquipItemFromPlayerInventory(owner, entry))
+            var companionResult = CompanionManager.TryEquipItemFromPlayerInventory(owner, entry);
+            if (companionResult != CompanionEquipAttemptResult.NotHandled)
             {
                 controller.RefreshSlot(index);
-                return true;
+                return companionResult == CompanionEquipAttemptResult.Equipped;
             }
             if (equipment.Equip(entry))
             {
