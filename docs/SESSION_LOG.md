@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ba545360a709e2b6ed2625ce31893f2385175400 -->
+## 2025-10-23T14:09:10+01:00 — Add ore golem pickaxe removal chatter
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 235 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:1da2f35a898ebb9c56fd2adac777ad5f30df46b9 -->
 ## 2025-10-23T14:03:05+01:00 — Merge pull request #1327 from aicovergod/codex/add-equipment-slot-change-event
 
