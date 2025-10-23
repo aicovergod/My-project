@@ -1585,17 +1585,8 @@ namespace Companions.Conversation
             if (conversationMemory.TryGetLatestEvent(out var eventEntry))
                 return FormatEventEntry(eventEntry);
 
-            if (!string.IsNullOrWhiteSpace(conversationMemory.LastStatusResponse))
-                return conversationMemory.LastStatusResponse;
-
-            var entries = conversationMemory.GetRecentEntries(6);
-            for (int i = entries.Count - 1; i >= 0; i--)
-            {
-                var entry = entries[i];
-                if (entry.Speaker == CompanionConversationMemory.Speaker.Companion && !string.IsNullOrWhiteSpace(entry.Message))
-                    return entry.Message;
-            }
-
+            // No gameplay events are available. Avoid falling back to the cached status
+            // response or prior conversation lines so repeated greetings remain short.
             return string.Empty;
         }
 
