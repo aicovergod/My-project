@@ -27,6 +27,22 @@ namespace Companions.Conversation
         /// </summary>
         /// <param name="intent">Intent driving the selection.</param>
         /// <param name="context">Runtime context used by guard predicates.</param>
+        /// <param name="selection">Resulting selection containing the raw segments.</param>
+        public bool TrySelectResponse(
+            CompanionDialogueIntent intent,
+            CompanionResponseContext context,
+            out ResponseSelection selection)
+        {
+            return TrySelectResponse(intent, context, null, out selection);
+        }
+
+        /// <summary>
+        /// Attempts to select a response template for the supplied intent while skipping a specific
+        /// template key if supplied. Unity's hot reload occasionally strips optional parameters, so
+        /// this explicit overload keeps the API stable for existing call sites.
+        /// </summary>
+        /// <param name="intent">Intent driving the selection.</param>
+        /// <param name="context">Runtime context used by guard predicates.</param>
         /// <param name="disallowedTemplateKey">Optional template key that should be avoided.</param>
         /// <param name="selection">Resulting selection containing the raw segments.</param>
         public bool TrySelectResponse(

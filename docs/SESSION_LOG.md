@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6fdde1dc05da6f309ea3c7d5c5acf0ad9af9f523 -->
+## 2025-10-23T17:54:09+01:00 — Add overload for companion response selection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionDialogueResponseLibrary.cs
+- Diff: 16 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d49645174255ff08770cc705701881889180b99a -->
 ## 2025-10-23T17:46:09+01:00 — Merge pull request #1338 from aicovergod/codex/refactor-companion-response-handling
 
