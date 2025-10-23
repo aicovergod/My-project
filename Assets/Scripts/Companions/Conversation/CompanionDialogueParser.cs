@@ -27,11 +27,12 @@ namespace Companions.Conversation
             if (string.IsNullOrWhiteSpace(normalisedText))
                 return CompanionDialogueParseResult.Empty;
 
-            var tokens = Tokenise(normalisedText);
-            if (tokens.Count == 0)
+            var tokenisation = Tokenise(normalisedText);
+            if (tokenisation.Tokens.Count == 0)
                 return CompanionDialogueParseResult.Empty;
 
-            var uniqueTokens = new HashSet<string>(tokens, StringComparer.Ordinal);
+            var tokens = tokenisation.Tokens;
+            var uniqueTokens = tokenisation.UniqueTokens;
             var matches = new List<CompanionDialogueMatch>();
 
             for (int i = 0; i < rules.Count; i++)
@@ -40,10 +41,10 @@ namespace Companions.Conversation
                 if (rule == null)
                     continue;
 
-                if (!rule.Matches(uniqueTokens))
+                if (!rule.TryEvaluate(uniqueTokens, normalisedText, out float score))
                     continue;
 
-                matches.Add(new CompanionDialogueMatch(rule.Intent, rule.Priority));
+                matches.Add(new CompanionDialogueMatch(rule.Intent, rule.Priority, score));
             }
 
             if (matches.Count == 0)
@@ -59,12 +60,17 @@ namespace Companions.Conversation
             if (priorityCompare != 0)
                 return priorityCompare;
 
+            int scoreCompare = y.Score.CompareTo(x.Score);
+            if (scoreCompare != 0)
+                return scoreCompare;
+
             return x.Intent.CompareTo(y.Intent);
         }
 
-        private static List<string> Tokenise(string text)
+        private static TokenisationResult Tokenise(string text)
         {
-            var result = new List<string>();
+            var tokens = new List<string>();
+            var uniqueTokens = new HashSet<string>(StringComparer.Ordinal);
             var buffer = new List<char>(text.Length);
 
             for (int i = 0; i < text.Length; i++)
@@ -72,33 +78,81 @@ namespace Companions.Conversation
                 char c = text[i];
                 if (char.IsWhiteSpace(c))
                 {
-                    Flush(buffer, result);
+                    Flush(buffer, tokens, uniqueTokens);
                     continue;
                 }
 
                 if (!char.IsLetterOrDigit(c))
                 {
-                    Flush(buffer, result);
+                    Flush(buffer, tokens, uniqueTokens);
                     continue;
                 }
 
                 buffer.Add(char.ToLowerInvariant(c));
             }
 
-            Flush(buffer, result);
-            return result;
+            Flush(buffer, tokens, uniqueTokens);
+            return new TokenisationResult(tokens, uniqueTokens);
         }
 
-        private static void Flush(List<char> buffer, List<string> tokens)
+        private static void Flush(List<char> buffer, List<string> tokens, HashSet<string> uniqueTokens)
         {
             if (buffer.Count == 0)
                 return;
 
             string token = new string(buffer.ToArray());
             if (!string.IsNullOrEmpty(token))
-                tokens.Add(token);
+                AddToken(token, tokens, uniqueTokens);
 
             buffer.Clear();
+        }
+
+        private static void AddToken(string token, List<string> tokens, HashSet<string> uniqueTokens)
+        {
+            if (string.IsNullOrEmpty(token))
+                return;
+
+            tokens.Add(token);
+            uniqueTokens.Add(token);
+
+            string stem = StemToken(token);
+            if (!string.IsNullOrEmpty(stem))
+                uniqueTokens.Add(stem);
+        }
+
+        private static string StemToken(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+                return string.Empty;
+
+            string result = token;
+
+            if (result.Length > 4 && result.EndsWith("ing", StringComparison.Ordinal))
+                result = result.Substring(0, result.Length - 3);
+            else if (result.Length > 5 && result.EndsWith("ness", StringComparison.Ordinal))
+                result = result.Substring(0, result.Length - 4);
+            else if (result.Length > 4 && result.EndsWith("ly", StringComparison.Ordinal))
+                result = result.Substring(0, result.Length - 2);
+            else if (result.Length > 3 && result.EndsWith("ed", StringComparison.Ordinal))
+                result = result.Substring(0, result.Length - 2);
+
+            if (result.Length < 2 || string.Equals(result, token, StringComparison.Ordinal))
+                return string.Empty;
+
+            return result;
+        }
+
+        private readonly struct TokenisationResult
+        {
+            public TokenisationResult(List<string> tokens, HashSet<string> uniqueTokens)
+            {
+                Tokens = tokens ?? new List<string>();
+                UniqueTokens = uniqueTokens ?? new HashSet<string>(StringComparer.Ordinal);
+            }
+
+            public List<string> Tokens { get; }
+
+            public HashSet<string> UniqueTokens { get; }
         }
     }
 
@@ -107,15 +161,18 @@ namespace Companions.Conversation
     /// </summary>
     public readonly struct CompanionDialogueMatch
     {
-        public CompanionDialogueMatch(CompanionDialogueIntent intent, int priority)
+        public CompanionDialogueMatch(CompanionDialogueIntent intent, int priority, float score)
         {
             Intent = intent;
             Priority = priority;
+            Score = score;
         }
 
         public CompanionDialogueIntent Intent { get; }
 
         public int Priority { get; }
+
+        public float Score { get; }
     }
 
     /// <summary>
