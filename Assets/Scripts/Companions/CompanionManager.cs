@@ -72,6 +72,18 @@ namespace Companions
         /// <summary>Tracks whether verbose companion debug logging is enabled.</summary>
         private static bool enableDebugLogging;
 
+        /// <summary>True once the chat service subscription for inventory full reactions is active.</summary>
+        private static bool chatSubscribed;
+
+        /// <summary>Last unscaled time the companion reacted to a full inventory message.</summary>
+        private static float lastInventoryFullReactionTime = -10f;
+
+        /// <summary>Cooldown applied between companion responses to repeated inventory full messages.</summary>
+        private const float InventoryFullChatCooldownSeconds = 4f;
+
+        /// <summary>Normalised comparison string for detecting the standard full inventory game message.</summary>
+        private const string InventoryFullGameMessage = "your inventory is full";
+
         /// <summary>
         /// Toggle that allows QA to enable or disable verbose companion debug logging from the AdminF2 menu.
         /// </summary>
@@ -191,6 +203,7 @@ namespace Companions
                     else
                     {
                         EnsureHud();
+                        EnsureChatSubscription();
                         return;
                     }
                 }
@@ -226,6 +239,7 @@ namespace Companions
 
             UpdateCombatLevel();
             EnsureHud();
+            EnsureChatSubscription();
             UpdateEquipmentVisibility(false);
             if (!suppressManualSpawnGreeting)
                 PublishRandomManualSpawnMessage();
@@ -288,6 +302,8 @@ namespace Companions
             controller = null;
             companionObject = null;
 
+            RemoveChatSubscription();
+
             guardModeEnabled = false;
             GuardModeChanged?.Invoke(false);
 
@@ -344,6 +360,39 @@ namespace Companions
         }
 
         /// <summary>
+        /// Ensures the chat service is subscribed so the companion can react to full inventory messages.
+        /// Safe to invoke repeatedly as duplicate subscriptions are ignored.
+        /// </summary>
+        private static void EnsureChatSubscription()
+        {
+            if (chatSubscribed)
+                return;
+
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            chat.MessageReceived -= HandleChatMessageReceived;
+            chat.MessageReceived += HandleChatMessageReceived;
+            chatSubscribed = true;
+        }
+
+        /// <summary>
+        /// Removes the chat subscription when the companion is despawned so no stray callbacks fire.
+        /// </summary>
+        private static void RemoveChatSubscription()
+        {
+            if (!chatSubscribed)
+                return;
+
+            var chat = ChatService.Instance;
+            if (chat != null)
+                chat.MessageReceived -= HandleChatMessageReceived;
+
+            chatSubscribed = false;
+        }
+
+        /// <summary>
         /// Reactivates the current companion instance when it already exists but is disabled.
         /// Ensures UI bindings refresh and verifies that the companion is visible before returning.
         /// </summary>
@@ -354,13 +403,17 @@ namespace Companions
                 return false;
 
             if (controller.gameObject.activeSelf)
+            {
+                EnsureChatSubscription();
                 return HasActiveCompanion;
+            }
 
             controller.HandleSummonRequest();
             controller.Inventory?.ForceClosed();
             controller.Equipment?.ForceClosed();
 
             EnsureHud();
+            EnsureChatSubscription();
             RefreshMenusAfterRestore();
 
             bool active = HasActiveCompanion;
@@ -1086,6 +1139,49 @@ namespace Companions
         }
 
         /// <summary>
+        /// Reacts to system chat messages so the companion acknowledges when the player's inventory is full.
+        /// Ensures the companion only responds when active and applies a small cooldown to prevent spam.
+        /// </summary>
+        /// <param name="message">Chat message emitted by the game channel.</param>
+        private static void HandleChatMessageReceived(ChatMessage message)
+        {
+            if (message.Channel != ChatChannel.Game)
+                return;
+
+            if (!HasActiveCompanion)
+                return;
+
+            if (string.IsNullOrWhiteSpace(message.Text))
+                return;
+
+            string trimmed = message.Text.Trim();
+            if (!string.Equals(trimmed, InventoryFullGameMessage, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            float now = Time.unscaledTime;
+            if (now - lastInventoryFullReactionTime < InventoryFullChatCooldownSeconds)
+                return;
+
+            lastInventoryFullReactionTime = now;
+
+            string companionLine = CompanionChatLibrary.GetRandomPlayerInventoryFullLine();
+            if (string.IsNullOrWhiteSpace(companionLine))
+                return;
+
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string companionName = GetCompanionDisplayName();
+            chat.PublishCompanionMessage(companionName, companionLine);
+
+            if (enableDebugLogging)
+            {
+                Debug.Log($"[Companion] Reacted to full inventory message with: {companionLine}");
+            }
+        }
+
+        /// <summary>
         /// Resolves the companion name used for chat output, falling back to a generic label when
         /// no runtime definition is available.
         /// </summary>
@@ -1144,6 +1240,7 @@ namespace Companions
             controller.Despawned -= HandleControllerDespawned;
             controller = null;
             companionObject = null;
+            RemoveChatSubscription();
             activeDefinition = null;
             inventoryVisible = false;
             storedByPet = false;
