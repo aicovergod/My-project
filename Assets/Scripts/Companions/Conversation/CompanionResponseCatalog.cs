@@ -40,15 +40,25 @@ namespace Companions.Conversation
         {
             Register(
                 CompanionDialogueIntent.Greeting,
+                //Generic responses
+                new ResponseTemplate("Oh hey, {playerName}.", 1f),
+                new ResponseTemplate("Hi {playerName}.", 1f),
+                new ResponseTemplate("Hey {playerName} you good?", 1f),
+                new ResponseTemplate("Hello hello, {playerName}.", 0.9f),
+                new ResponseTemplate("Hey there. Nice to hear you.", 0.9f),
+                new ResponseTemplate("Yo. What’s up?", 0.9f),
+                new ResponseTemplate("Hey what’s the plan?", 0.9f),
+                new ResponseTemplate("Hi! Need me?", 0.9f),
+                new ResponseTemplate("Hey! I’m here.", 0.9f),
                 new ResponseTemplate("Hey there {playerName}, ready to chase glory?", 1f),
                 new ResponseTemplate("Well met, {playerName}! {companionName} reporting for duty.", 1f),
-                new ResponseTemplate("Greetings {playerName}, the {timeOfDay} air feels lucky today.", 0.9f, ctx => !ctx.PlayerInCombat),
-                new ResponseTemplate("Bright {timeOfDay} to you, {playerName}!|I already swept our camp for stragglers.", 0.85f, ctx => !ctx.PlayerInCombat),
-                new ResponseTemplate("Evening watch is quieter with you around, {playerName}.|Want me to brew something warm for this {timeOfDay}?", 0.75f, ctx => !ctx.PlayerInCombat),
-                new ResponseTemplate("Looks like we're {combatState}.|Just give the word and I'll tighten formation.", 0.8f),
-                new ResponseTemplate("I spotted you {recentSkillAction} earlier.|Need me to stash the kit for the next run?", 0.7f, ctx => ctx.HasRecentSkillActions),
-                new ResponseTemplate("Morning, {playerName}.|{companionName} already limbered up and checked our packs.", 0.9f, ctx => !ctx.PlayerInCombat),
-                new ResponseTemplate("Hey {playerName}, {companionMood} as ever after {recentEvent}.", 0.75f));
+
+            // time-of-day flavor (guarded)
+                new ResponseTemplate("Morning, {playerName}. You sleep okay?", 0.8f, ctx => ctx.TimeOfDay == "morning" && !ctx.PlayerInCombat),
+                new ResponseTemplate("Afternoon, {playerName}. You eating today?", 0.8f, ctx => ctx.TimeOfDay == "afternoon" && !ctx.PlayerInCombat),
+                new ResponseTemplate("Evening, {playerName}. Long day?", 0.8f, ctx => ctx.TimeOfDay == "evening" && !ctx.PlayerInCombat),
+
+              new ResponseTemplate("Hey {playerName}, {companionMood} as ever after {recentEvent}.", 0.75f));
         }
 
         /// <summary>
