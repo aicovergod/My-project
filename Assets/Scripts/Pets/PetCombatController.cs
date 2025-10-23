@@ -639,89 +639,34 @@ namespace Pets
             if (CompanionHasPickaxe(companionController))
                 return false;
 
-            var chat = ChatService.Instance;
-            chat?.PublishCompanionMessage(
-                CompanionManager.GetCompanionDisplayName(),
-                "I need a pickaxe to attack the golem.");
+            if (fromDirectCommand)
+            {
+                var chat = ChatService.Instance;
+                if (chat != null)
+                {
+                    string reminder = CompanionChatLibrary.GetRandomCompanionOreGolemPickaxeReminder();
+                    chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), reminder);
+                }
+            }
             return true;
         }
 
         /// <summary>
-        /// Evaluates the companion inventory and equipment to confirm whether a pickaxe is available.
+        /// Evaluates the companion equipment to confirm whether a pickaxe is currently wielded.
         /// </summary>
         /// <param name="controller">Controller representing the active companion.</param>
-        /// <returns>True when the companion has access to at least one pickaxe.</returns>
+        /// <returns>True when the companion has a pickaxe equipped.</returns>
         private bool CompanionHasPickaxe(CompanionController controller)
         {
             if (controller == null)
                 return false;
 
             var equipment = controller.Equipment;
-            if (equipment != null)
-            {
-                var equippedEntry = equipment.GetEquipped(EquipmentSlot.Weapon);
-                if (equippedEntry.item != null && PickaxeUtility.IsPickaxe(equippedEntry.item))
-                    return true;
-            }
-
-            var inventoryWrapper = controller.Inventory;
-            Inventory.Inventory inventoryComponent = inventoryWrapper != null ? inventoryWrapper.InventoryComponent : null;
-            if (inventoryComponent == null)
+            if (equipment == null)
                 return false;
 
-            var pickaxeDefinitions = ResolveAvailablePickaxeDefinitions();
-            if (pickaxeDefinitions.Count > 0)
-            {
-                for (int i = 0; i < pickaxeDefinitions.Count; i++)
-                {
-                    var definition = pickaxeDefinitions[i];
-                    if (definition == null)
-                        continue;
-
-                    string pickaxeId = definition.Id;
-                    if (string.IsNullOrWhiteSpace(pickaxeId))
-                        continue;
-
-                    if (inventoryComponent.HasItem(pickaxeId))
-                        return true;
-                }
-            }
-
-            InventoryModel model = inventoryComponent.Model;
-            if (model != null)
-            {
-                int slotCount = model.Size;
-                for (int i = 0; i < slotCount; i++)
-                {
-                    var entry = model.GetEntry(i);
-                    if (entry.item != null && PickaxeUtility.IsPickaxe(entry.item))
-                        return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Resolves the available pickaxe definitions, mirroring the mining controller fallback so runtime checks stay in sync.
-        /// </summary>
-        private static IReadOnlyList<PickaxeDefinition> ResolveAvailablePickaxeDefinitions()
-        {
-            var definitions = PickaxeDefinitionRegistry.GetAllDefinitions();
-            if (definitions == null || definitions.Count == 0)
-            {
-                var selectors = FindObjectsOfType<PickaxeToUse>(true);
-                for (int i = 0; i < selectors.Length; i++)
-                {
-                    var selector = selectors[i];
-                    if (selector != null)
-                        PickaxeDefinitionRegistry.RegisterDefinitions(selector.AllPickaxes);
-                }
-
-                definitions = PickaxeDefinitionRegistry.GetAllDefinitions();
-            }
-
-            return definitions ?? Array.Empty<PickaxeDefinition>();
+            var equippedEntry = equipment.GetEquipped(EquipmentSlot.Weapon);
+            return equippedEntry.item != null && PickaxeUtility.IsPickaxe(equippedEntry.item);
         }
 
         private void ShowOreGolemBlockedFeedback()

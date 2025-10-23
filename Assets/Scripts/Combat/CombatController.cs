@@ -858,6 +858,17 @@ namespace Combat
 
         private void ShowPickaxeRequirementFeedback()
         {
+            if (CompanionManager.HasActiveCompanion)
+            {
+                var chat = ChatService.Instance;
+                if (chat != null)
+                {
+                    string reminder = CompanionChatLibrary.GetRandomPlayerOreGolemPickaxeReminder();
+                    chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), reminder);
+                    return;
+                }
+            }
+
             var anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
             if (anchor == null)
                 anchor = transform;
