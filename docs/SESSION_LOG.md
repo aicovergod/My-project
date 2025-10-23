@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:499403e5158356bc0fba83157f4a22b399110d79 -->
+## 2025-10-23T01:13:48+01:00 — Add companion ore golem pickaxe reminders
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 302 ++ / 69 --
+- Notes:
+  —
+---
 <!-- commit:c0537eb7f9549184264a1f3016dbc1d1b5360b52 -->
 ## 2025-10-23T01:03:11+01:00 — Merge pull request #1321 from aicovergod/codex/add-chat-messages-for-full-inventory
 
