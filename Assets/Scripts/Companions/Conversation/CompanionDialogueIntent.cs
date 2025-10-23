@@ -19,58 +19,53 @@ namespace Companions.Conversation
         StatusQuery = 10,
 
         /// <summary>
-        /// Player shared a personal mood update such as "I'm tired".
-        /// </summary>
-        PlayerMoodReport = 20,
-
-        /// <summary>
         /// Player thanked the companion for their help.
         /// </summary>
-        Gratitude = 30,
+        Gratitude = 20,
 
         /// <summary>
         /// Player is saying farewell or stepping away.
         /// </summary>
-        Farewell = 40,
+        Farewell = 30,
 
         /// <summary>
         /// Player complimented the companion or offered positive reinforcement.
         /// </summary>
-        Compliment = 50,
+        Compliment = 40,
 
         /// <summary>
         /// Player is asking the companion for help with an upcoming task.
         /// </summary>
-        RequestAssistance = 60,
+        RequestAssistance = 50,
 
         /// <summary>
         /// Player referenced a prior shared event that deserves acknowledgement.
         /// </summary>
-        AcknowledgeRecentEvent = 70,
+        AcknowledgeRecentEvent = 60,
 
         /// <summary>
         /// Companion is proactively prompting the player about a recent skill activity.
         /// </summary>
-        ProactiveSkillQuestion = 75,
+        ProactiveSkillQuestion = 65,
 
         /// <summary>
         /// Player accepted the companion's suggested skill plan.
         /// </summary>
-        AcceptSkillPlan = 80,
+        AcceptSkillPlan = 70,
 
         /// <summary>
         /// Player declined the companion's suggested skill plan.
         /// </summary>
-        DeclineSkillPlan = 90,
+        DeclineSkillPlan = 80,
 
         /// <summary>
         /// Player deferred the suggested skill plan to a later time.
         /// </summary>
-        DeferSkillPlan = 100,
+        DeferSkillPlan = 90,
 
         /// <summary>
         /// Player requested a different skill suggestion from the companion.
         /// </summary>
-        RequestAlternateSkill = 110
+        RequestAlternateSkill = 100
     }
 }
