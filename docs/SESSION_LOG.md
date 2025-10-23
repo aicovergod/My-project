@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e30aaee624ea69a10584ad323cb19c0eb5ddb580 -->
+## 2025-10-24T00:41:40+01:00 — Merge pull request #1360 from aicovergod/codex/update-follow-up-message-probability
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 4 --
+- Notes:
+  Adjust companion follow-up frequency
+---
+<!-- commit:ad21f673235baced80bf1c85396d8771f9ea4002 -->
+## 2025-10-24T00:41:23+01:00 — Adjust companion follow-up frequency
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 19 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:0310073d5379fdd602770e0069c48fe77fd8df25 -->
 ## 2025-10-24T00:37:48+01:00 — uwu
 
