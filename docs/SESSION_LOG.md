@@ -1,21 +1,12 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:1ba8061b5af242226da4e674573c9741b73b64a5 -->
-## 2025-10-23T00:53:44+01:00 — Merge pull request #1320 from aicovergod/codex/fix-console-errors-in-companionmanager
+<!-- commit:316bd841bd22872c3d4c439fa45268a87e1bce21 -->
+## 2025-10-23T01:01:24+01:00 — Add companion chat variants for player inventory full cases
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 54 ++ / 84 --
-- Notes:
-  Resolve companion level up message redeclaration errors
----
-<!-- commit:126a2d0d3a99b4713ed7034f6a3f9d4dc7886217 -->
-## 2025-10-23T00:53:38+01:00 — Update SESSION_LOG [ci]
-
-- Author: session-log-bot <actions@github.com>
-- Changed files (1): docs/SESSION_LOG.md
-- Diff: 9 ++ / 0 --
+- Changed files (3): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Skills/Common/GatheringRewardProcessor.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs
+- Diff: 344 ++ / 6 --
 - Notes:
   —
 ---

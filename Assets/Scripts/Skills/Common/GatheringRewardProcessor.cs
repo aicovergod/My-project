@@ -1,4 +1,5 @@
 using System;
+using Companions;
 using Inventory;
 using Pets;
 using Skills;
@@ -108,20 +109,21 @@ namespace Skills.Common
 
             if (!TryAddItems(context, ref result))
             {
-                string fullMessage = string.IsNullOrEmpty(context.inventoryFullMessage)
+                string floatingTextMessage = string.IsNullOrEmpty(context.inventoryFullMessage)
                     ? "Your inventory is full"
                     : context.inventoryFullMessage;
+                string chatMessage = ResolveInventoryFullChatMessage(context, floatingTextMessage);
                 if (anchor != null)
                 {
                     bool displayed = false;
                     if (resourcePosition.HasValue)
-                        displayed = GatheringFloatingTextService.TryShowNow(fullMessage, anchor, resourcePosition.Value);
+                        displayed = GatheringFloatingTextService.TryShowNow(floatingTextMessage, anchor, resourcePosition.Value);
 
                     if (!displayed && !resourcePosition.HasValue)
-                        GatheringFloatingTextService.TryShowAtAnchor(fullMessage, anchor);
+                        GatheringFloatingTextService.TryShowAtAnchor(floatingTextMessage, anchor);
                 }
 
-                PublishChatMessage(fullMessage, context);
+                PublishChatMessage(chatMessage, context);
                 result.InventoryFull = true;
                 result.NewLevel = result.PreviousLevel;
                 context.onFailure?.Invoke(result);
@@ -208,6 +210,50 @@ namespace Skills.Common
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Determines the chat line that should be emitted when the player's inventory cannot accept more items.
+        /// Falls back to the supplied message for floating text when no special companion message is required.
+        /// </summary>
+        /// <param name="context">Reward context describing the failed gather attempt.</param>
+        /// <param name="fallbackMessage">Default message to use when no specialised companion line applies.</param>
+        /// <returns>Chat message that should be published to the appropriate channel.</returns>
+        private static string ResolveInventoryFullChatMessage(in GatheringRewardContext context, string fallbackMessage)
+        {
+            if (!string.IsNullOrWhiteSpace(context.inventoryFullMessage))
+                return context.inventoryFullMessage;
+
+            if (context.useCompanionChatFormatting && CompanionManager.HasActiveCompanion)
+            {
+                bool companionInventoryFull = IsCompanionInventoryFullForItem(context);
+                return companionInventoryFull
+                    ? CompanionChatLibrary.GetRandomPlayerAndCompanionInventoryFullLine()
+                    : CompanionChatLibrary.GetRandomPlayerInventoryFullLine();
+            }
+
+            return fallbackMessage;
+        }
+
+        /// <summary>
+        /// Checks whether the active companion's inventory can accept the gathered item.
+        /// </summary>
+        /// <param name="context">Reward context providing the item data to evaluate.</param>
+        /// <returns><c>true</c> when the companion inventory cannot store the item, otherwise <c>false</c>.</returns>
+        private static bool IsCompanionInventoryFullForItem(in GatheringRewardContext context)
+        {
+            if (context.item == null)
+                return false;
+
+            var companionInventoryWrapper = CompanionManager.CompanionInventory;
+            if (companionInventoryWrapper == null)
+                return false;
+
+            var companionInventory = companionInventoryWrapper.InventoryComponent;
+            if (companionInventory == null)
+                return false;
+
+            return !companionInventory.CanAddItem(context.item, 1);
         }
 
         private static void PublishChatMessage(string message, in GatheringRewardContext context)
