@@ -31,6 +31,8 @@ namespace Companions.Conversation
             RegisterComplimentResponses();
             RegisterAssistanceResponses();
             RegisterEventAcknowledgementResponses();
+            RegisterSkillQuestionResponses();
+            RegisterSkillQuestionFollowUps();
         }
 
         /// <summary>
@@ -375,6 +377,43 @@ new ResponseTemplate("I'll pack away the gear from that {recentSkillAction}.|See
                 new ResponseTemplate("After {recentEvent}, keeping us {combatState} feels even more important.", 0.8f),
                 new ResponseTemplate("That {timeOfDay} rush during {recentEvent} had my heart racing.", 0.75f),
                 new ResponseTemplate("While you were {recentSkillAction} I kept replaying {recentEvent}.|Maybe there's more to learn.", 0.7f, ctx => ctx.HasRecentSkillActions));
+        }
+
+        private static void RegisterSkillQuestionResponses()
+        {
+            Register(
+                CompanionDialogueIntent.ProactiveSkillQuestion,
+                new ResponseTemplate("Want to keep training {suggestedSkill} this {timeOfDay}?", 1f, ctx => ctx.HasSuggestedSkill),
+                new ResponseTemplate("Feel like pushing {suggestedSkill} a little more? It's been {skillRecency}.", 0.95f, ctx => ctx.HasSuggestedSkill && ctx.HasSuggestedSkillRecency),
+                new ResponseTemplate("We could squeeze in more {skillAction} if you're game.", 0.9f, ctx => ctx.HasSuggestedSkillAction),
+                new ResponseTemplate("Up for some extra skilling this {timeOfDay}?", 0.85f));
+        }
+
+        private static void RegisterSkillQuestionFollowUps()
+        {
+            Register(
+                CompanionDialogueIntent.AcceptSkillPlan,
+                new ResponseTemplate("Perfect. I'll prep the {suggestedSkill} route.", 1f, ctx => ctx.HasSuggestedSkill),
+                new ResponseTemplate("Nice. I'll gather gear for more {skillAction}.", 0.95f, ctx => ctx.HasSuggestedSkillAction),
+                new ResponseTemplate("Alright, let's keep the skilling train rolling.", 0.9f));
+
+            Register(
+                CompanionDialogueIntent.DeclineSkillPlan,
+                new ResponseTemplate("All good. We can shelve {suggestedSkill} for now.", 1f, ctx => ctx.HasSuggestedSkill),
+                new ResponseTemplate("No stress—call it when you're ready to dive back in.", 0.9f),
+                new ResponseTemplate("Got it. We'll pivot whenever you feel like skilling again.", 0.85f));
+
+            Register(
+                CompanionDialogueIntent.DeferSkillPlan,
+                new ResponseTemplate("Later works. I'll keep the {suggestedSkill} kit handy.", 1f, ctx => ctx.HasSuggestedSkill),
+                new ResponseTemplate("Take your time. Ping me when you want to resume {skillAction}.", 0.95f, ctx => ctx.HasSuggestedSkillAction),
+                new ResponseTemplate("Sure thing. We can circle back when the timing's better.", 0.9f));
+
+            Register(
+                CompanionDialogueIntent.RequestAlternateSkill,
+                new ResponseTemplate("Another skill? Give me a tick, I'll line something else up.", 1f),
+                new ResponseTemplate("Copy that. I'll spin up a different {timeOfDay} plan.", 0.95f),
+                new ResponseTemplate("Alright, surprise mode it is. Let me scout another skill run.", 0.9f));
         }
 
 

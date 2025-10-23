@@ -40,6 +40,15 @@ namespace Companions.Conversation
             "\\b(remind|remember|recall)\\b.*\\b(earlier|before|last|previous|yesterday|today)\\b",
             RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+        private static readonly Regex SkillKeywordRegex = new Regex(
+            "\\b(mine|mining|woodcut|woodcutting|chop|logs|fish|fishing|cook|cooking|firemaking|firemake|smith|smithing|smelt|craft|crafting)\\b",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        private static readonly string[] SkillKeywordTokens =
+        {
+            "mine", "mining", "chop", "woodcut", "woodcutting", "logs", "fish", "fishing", "cook", "cooking", "firemaking", "firemake", "smith", "smithing", "smelt", "craft", "crafting"
+        };
+
         private static readonly string[] PlayerMoodTokens =
         {
             "tired", "sleepy", "exhausted", "drained", "burnt", "burned", "burntout", "sad", "blue", "down",
@@ -238,8 +247,89 @@ namespace Companions.Conversation
                     }),
 
                 new CompanionIntentPattern(
-                    CompanionDialogueIntent.AcknowledgeRecentEvent,
+                    CompanionDialogueIntent.AcceptSkillPlan,
                     priority: 35,
+                    matchThreshold: 1.7f,
+                    synonymBuckets: new[]
+                    {
+                        new SynonymBucket(new[] { "yes", "yeah", "yep", "sure", "ok", "okay", "yup", "down", "definitely", "sounds" }, 1.1f),
+                        new SynonymBucket(new[] { "lets", "let's", "keep", "continue", "more" }, 0.6f),
+                        new SynonymBucket(SkillKeywordTokens, 0.7f)
+                    },
+                    multiWordPhrases: new[]
+                    {
+                        new MultiWordPhrase("yeah let's", 1.6f),
+                        new MultiWordPhrase("let's keep", 1.5f),
+                        new MultiWordPhrase("let's do it", 1.5f),
+                        new MultiWordPhrase("i'm in", 1.6f),
+                        new MultiWordPhrase("count me in", 1.6f),
+                        new MultiWordPhrase("sounds good", 1.4f)
+                    },
+                    regexScoreEvaluator: text => SkillKeywordRegex.IsMatch(text) ? 0.5f : 0f),
+
+                new CompanionIntentPattern(
+                    CompanionDialogueIntent.DeclineSkillPlan,
+                    priority: 36,
+                    matchThreshold: 1.6f,
+                    synonymBuckets: new[]
+                    {
+                        new SynonymBucket(new[] { "no", "nah", "nope", "pass", "skip" }, 1.2f),
+                        new SynonymBucket(new[] { "dont", "don't", "rather", "instead", "not" }, 0.6f),
+                        new SynonymBucket(SkillKeywordTokens, 0.5f)
+                    },
+                    multiWordPhrases: new[]
+                    {
+                        new MultiWordPhrase("hard pass", 1.5f),
+                        new MultiWordPhrase("i'd rather not", 1.6f),
+                        new MultiWordPhrase("not interested", 1.5f),
+                        new MultiWordPhrase("no thanks", 1.4f)
+                    },
+                    regexScoreEvaluator: text => SkillKeywordRegex.IsMatch(text) ? 0.4f : 0f),
+
+                new CompanionIntentPattern(
+                    CompanionDialogueIntent.DeferSkillPlan,
+                    priority: 37,
+                    matchThreshold: 1.6f,
+                    synonymBuckets: new[]
+                    {
+                        new SynonymBucket(new[] { "later", "after", "another", "bit", "moment" }, 0.7f),
+                        new SynonymBucket(new[] { "not", "now", "right", "currently" }, 0.6f),
+                        new SynonymBucket(new[] { "maybe", "soon" }, 0.5f),
+                        new SynonymBucket(SkillKeywordTokens, 0.4f)
+                    },
+                    multiWordPhrases: new[]
+                    {
+                        new MultiWordPhrase("not now", 1.6f),
+                        new MultiWordPhrase("maybe later", 1.6f),
+                        new MultiWordPhrase("later on", 1.5f),
+                        new MultiWordPhrase("give me a minute", 1.5f),
+                        new MultiWordPhrase("after this", 1.3f)
+                    },
+                    regexScoreEvaluator: text => SkillKeywordRegex.IsMatch(text) ? 0.3f : 0f),
+
+                new CompanionIntentPattern(
+                    CompanionDialogueIntent.RequestAlternateSkill,
+                    priority: 38,
+                    matchThreshold: 1.6f,
+                    synonymBuckets: new[]
+                    {
+                        new SynonymBucket(new[] { "another", "different", "else", "alternate", "surprise" }, 1f),
+                        new SynonymBucket(new[] { "skill", "option", "plan" }, 0.6f),
+                        new SynonymBucket(SkillKeywordTokens, 0.5f)
+                    },
+                    multiWordPhrases: new[]
+                    {
+                        new MultiWordPhrase("something else", 1.6f),
+                        new MultiWordPhrase("another skill", 1.7f),
+                        new MultiWordPhrase("pick something", 1.4f),
+                        new MultiWordPhrase("surprise me", 1.7f),
+                        new MultiWordPhrase("choose for me", 1.6f)
+                    },
+                    regexScoreEvaluator: text => SkillKeywordRegex.IsMatch(text) ? 0.4f : 0f),
+
+                new CompanionIntentPattern(
+                    CompanionDialogueIntent.AcknowledgeRecentEvent,
+                    priority: 40,
                     matchThreshold: 1.6f,
                     synonymBuckets: new[]
                     {
