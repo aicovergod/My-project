@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 using Player;
 using Player.Movement;
 using Core.Input;
+using UI.Chat;
 
 namespace Skills.Common
 {
@@ -21,6 +22,12 @@ namespace Skills.Common
         where TSkill : MonoBehaviour
         where TNode : Component
     {
+        /// <summary>
+        ///     Standardised message emitted whenever the player's inventory cannot accept more gathered items.
+        ///     Shared with <see cref="CompanionManager"/> so the companion can react to the chat event.
+        /// </summary>
+        private const string InventoryFullChatMessage = "Your inventory is full";
+
         [Header("Interaction")]
         [SerializeField]
         [Tooltip("Fallback interaction range used when the node definition does not provide one.")]
@@ -673,7 +680,10 @@ namespace Skills.Common
                 return false;
 
             if (!HasInventorySpace(node, out failureMessage))
+            {
+                TryPublishInventoryFullChatFeedback(failureMessage);
                 return false;
+            }
 
             return true;
         }
@@ -877,6 +887,27 @@ namespace Skills.Common
 
             if (!displayed && !resourcePosition.HasValue)
                 GatheringFloatingTextService.TryShowAtAnchor(message, anchor);
+        }
+
+        /// <summary>
+        ///     Emits the shared chat notification used when inventory capacity prevents a gathering action.
+        ///     Publishing the message ensures the player receives console feedback and companions can react
+        ///     with their own flavour dialogue.
+        /// </summary>
+        /// <param name="failureMessage">Message returned by the inventory capacity validation.</param>
+        private void TryPublishInventoryFullChatFeedback(string failureMessage)
+        {
+            if (string.IsNullOrWhiteSpace(failureMessage))
+                return;
+
+            if (!string.Equals(failureMessage, InventoryFullChatMessage, System.StringComparison.OrdinalIgnoreCase))
+                return;
+
+            var chatService = ChatService.Instance;
+            if (chatService == null)
+                return;
+
+            chatService.PublishGameMessage(InventoryFullChatMessage);
         }
 
         /// <summary>
