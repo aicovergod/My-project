@@ -158,9 +158,11 @@ namespace Companions.Conversation
                     matchThreshold: 1.6f,
                     synonymBuckets: new[]
                     {
-                        // Allow quick callbacks like "remember?" to fire the acknowledgement intent without
-                        // requiring multiple keywords from the same sentence.
-                        new SynonymBucket(new[] { "remember", "about", "that", "earlier", "last", "previous" }, 1.6f),
+                        // Only the strong recall verbs should clear the match threshold; supporting context
+                        // tokens now live in low-weight buckets so they merely amplify an existing recall hit.
+                        new SynonymBucket(new[] { "remember", "remind" }, 1.6f),
+                        new SynonymBucket(new[] { "about", "that" }, 0.4f),
+                        new SynonymBucket(new[] { "earlier", "before", "last", "previous" }, 0.4f),
                         new SynonymBucket(new[] { "fight", "battle", "event", "thing", "moment", "run" }, 0.8f)
                     },
                     multiWordPhrases: new[]
