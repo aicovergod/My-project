@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c8fdf1bed9451c6e090eeb2be5f9e656ee5160c6 -->
+## 2025-10-23T23:17:51+01:00 — Merge pull request #1355 from aicovergod/codex/update-synonymbucket-definitions-and-weights
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 20 ++ / 4 --
+- Notes:
+  Expand companion status query synonym coverage
+---
+<!-- commit:5eeca79460724c83336ab62be72e8943f782b619 -->
+## 2025-10-23T23:17:42+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2a3a720adb63ce1762a4122723627e9688668751 -->
 ## 2025-10-23T23:17:25+01:00 — Expand status query dialogue synonyms
 
