@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0153917d9ff093805f13b199ea300c33a2e7eab5 -->
+## 2025-10-23T23:01:06+01:00 — Fix proactive skill question template formatting call
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 0 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:c0a01b00d8c8a90d3c8f653eb6a512c6a2009592 -->
 ## 2025-10-23T22:58:47+01:00 — Merge pull request #1353 from aicovergod/codex/remove-mood/empathy-system
 
