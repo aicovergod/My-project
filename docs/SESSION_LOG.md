@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2a3a720adb63ce1762a4122723627e9688668751 -->
+## 2025-10-23T23:17:25+01:00 — Expand status query dialogue synonyms
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 11 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:b8590f0c28aa9f0e9d94b7f603271d6ed4aefdea -->
 ## 2025-10-23T23:01:27+01:00 — Merge pull request #1354 from aicovergod/codex/fix-overload-error-in-formattemplate
 

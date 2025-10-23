@@ -83,10 +83,10 @@ namespace Companions.Conversation
                     matchThreshold: 2.2f,
                     synonymBuckets: new[]
                     {
-                        new SynonymBucket(new[] { "how", "hows", "how's", "howre", "how're", "howve", "how've", "what's", "whats", "sup" }, 1.1f),
-                        new SynonymBucket(new[] { "you", "ya", "yall" }),
-                        new SynonymBucket(new[] { "doing", "feeling", "going", "holding", "hangin", "hanging", "are", "been" }, 0.9f),
-                        new SynonymBucket(new[] { "ok", "okay", "alright", "good", "chilling", "chillin" }, 0.7f),
+                        new SynonymBucket(new[] { "how", "hows", "how's", "howre", "how're", "howve", "how've", "what's", "whats", "sup" }, 1.05f),
+                        new SynonymBucket(new[] { "you", "ya", "yall", "y'all", "ya'll", "u", "ur" }, 0.95f),
+                        new SynonymBucket(new[] { "doing", "feeling", "going", "holding", "hangin", "hanging", "goin", "goin'", "doin", "doin'", "are", "been", "r" }, 0.85f),
+                        new SynonymBucket(new[] { "ok", "okay", "alright", "good", "chilling", "chillin" }, 0.65f),
                         new SynonymBucket(new[] { "today", "tonight", "lately", "there" }, 0.5f)
                     },
                     multiWordPhrases: new[]
@@ -97,6 +97,13 @@ namespace Companions.Conversation
                         new MultiWordPhrase("how've you been", 1.8f),
                         new MultiWordPhrase("what's up", 1.7f),
                         new MultiWordPhrase("how ya holding", 1.6f),
+                        new MultiWordPhrase("how ya doin", 1.8f),
+                        new MultiWordPhrase("how ya doin'", 1.8f),
+                        new MultiWordPhrase("how ya doin today", 2f),
+                        new MultiWordPhrase("how u doin", 1.8f),
+                        new MultiWordPhrase("how u doing", 1.7f),
+                        new MultiWordPhrase("how r u", 1.8f),
+                        new MultiWordPhrase("how r ya", 1.8f),
                         new MultiWordPhrase("you doing ok", 1.5f),
                         new MultiWordPhrase("you doing okay", 1.5f),
                         new MultiWordPhrase("you good", 1.5f),
