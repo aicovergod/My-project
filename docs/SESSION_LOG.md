@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f90155deeda2b0259af3a0790e01858f5cfb02cc -->
+## 2025-10-23T16:03:42+01:00 — Merge pull request #1333 from aicovergod/codex/add-companion-conversation-service-and-parser
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1323 ++ / 1 --
+- Notes:
+  Add companion conversation service and dialogue parsing
+---
+<!-- commit:eb67048736c6045b97bc6176eac1d69a673109fc -->
+## 2025-10-23T16:03:35+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6cb76e048d703f59b867d573281abd17c187e83c -->
 ## 2025-10-23T16:03:15+01:00 — Add companion chat intent parsing and response service
 
