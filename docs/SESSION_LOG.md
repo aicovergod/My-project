@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3d6c530d12b16960575f4293a8df5e0120b1eecc -->
+## 2025-10-24T00:18:44+01:00 — Merge pull request #1359 from aicovergod/codex/refactor-dialogue-blocks-into-separate-class-file
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 190 ++ / 131 --
+- Notes:
+  Extract companion skill proposal dialogue templates into dedicated class
+---
+<!-- commit:b3deb181cfced26cea7b8035e774226dcc6329d9 -->
+## 2025-10-24T00:18:37+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:8eeb23d1ded1e4ba91efb3016e3845de465bc258 -->
 ## 2025-10-24T00:18:14+01:00 — Refactor companion dialogue blocks into dedicated container
 
