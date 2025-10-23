@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:bc1006ec29f498a5b37389fe5424113a7229d8f5 -->
+## 2025-10-23T23:22:52+01:00 — Merge pull request #1356 from aicovergod/codex/add-regex-for-sms-status-queries
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 16 ++ / 1 --
+- Notes:
+  Expand status query regex coverage for shorthand
+---
+<!-- commit:f114f35ccbec6c4c4438220d62647722f83b3957 -->
+## 2025-10-23T23:22:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:8072bc0ad1970ff08dbea1c08adf36d69c2a4edc -->
 ## 2025-10-23T23:22:21+01:00 — Expand status query regex coverage for shorthand
 
