@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:25c10568da028dfd3a1cf98e669dd64e1d794ad8 -->
+## 2025-10-23T22:38:11+01:00 — Stop appending empathy for neutral moods
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 3 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:df2a5a3d98bc185dbdf5fb3001c1bfbe750a8143 -->
 ## 2025-10-23T22:31:14+01:00 — Merge pull request #1351 from aicovergod/codex/update-resolverecenteventsummary-method
 
