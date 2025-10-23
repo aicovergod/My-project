@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fc7eaf062d96f097d1825c8e19f9710a879c89e8 -->
+## 2025-10-23T19:28:07+01:00 — Merge pull request #1346 from aicovergod/codex/update-companiondialoguepatterns-for-richer-synonyms
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 135 ++ / 36 --
+- Notes:
+  Expand companion dialogue intent coverage
+---
+<!-- commit:a465303865b1bf9b7b96de564b893019070ef10c -->
+## 2025-10-23T19:27:54+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:1010aeda90b2155ac10010b1554334b89d0e3e71 -->
 ## 2025-10-23T19:27:34+01:00 — Expand companion dialogue intent coverage
 
