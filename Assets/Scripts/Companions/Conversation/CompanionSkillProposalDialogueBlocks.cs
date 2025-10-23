@@ -12,18 +12,26 @@ namespace Companions.Conversation
 
         private static readonly string[] playerMiningProposalReadyWithPickaxeSegments =
         {
-            "I've got the {tool} ready—let's get back to {skillSentence}.",
-            "Perfect timing. The {tool} has been itching for more {skillSentence}.",
-            "Happy to! The {tool} is sharpened and waiting for us to {activity}.",
-            "Yeah, let's swing the {tool} and keep that {skillSentence} streak rolling.",
-            "Love that plan. I'll grab the {tool} and we can start {activity} right away.",
-            "Consider me in. The {tool} is still warm from earlier {skillSentence} runs.",
-            "Absolutely, let's dust off the {tool} and go {activity} together.",
-            "Great shout—I've already packed the {tool} for more {skillSentence}.",
-            "That's the spirit. The {tool} and I are ready to {activity} again.",
-            "Say no more. The {tool} never left my side; {skillSentence} awaits.",
-            "Heh, you read my mind. The {tool} is prepped for a fresh round of {skillSentence}.",
-            "All right, I'll tighten my grip on the {tool} and lead us into some {skillSentence}."
+            "Yeah, I’m in. Let’s head out.",
+            "Absolutely. A bit of {skillSentence} sounds perfect.",
+            "You know what? That actually sounds nice.",
+            "Sure thing. Haven’t done any {skillSentence} in a while.",
+            "Good idea. Let’s see what we can dig up.",
+            "You read my mind. I was getting restless.",
+    "I’m down. Let’s make some noise.",
+    "Sounds like a plan—lead the way.",
+    "Love that idea. Let’s get to it.",
+    "That’s my kind of break. Let’s move.",
+    "Fine by me. Something relaxing about {activity}.",
+    "Couldn’t agree more. Let’s stretch the legs.",
+    "Alright then—let’s earn some dust on our boots.",
+    "Nice. Haven’t seen a decent vein in a bit.",
+    "If we find anything shiny, I’m claiming bragging rights.",
+    "Good call. Bit of {activity} never hurt anyone.",
+    "Sweet. Let’s go make some sparks fly.",
+    "Yeah, why not? Beats standing around.",
+    "Alright, let’s go swing at some rocks.",
+    "You got it. I’ll follow your lead."
         };
 
         private static readonly string[] playerSkillProposalReadyGenericSegments =
@@ -44,16 +52,23 @@ namespace Companions.Conversation
 
         private static readonly string[] playerMiningProposalReadyWithToolFollowUps =
         {
-            "Lead the way and I'll keep the {tool} swinging.",
-            "I'll stow anything we gather so you can stay light on your feet.",
-            "If we hit a juicy vein I'll call it out straight away.",
-            "Let's pace it—no sense dulling the {tool} on stray rocks.",
-            "I'll watch our surroundings while you line up the next target.",
-            "I'll bank anything extra once our packs start to fill.",
-            "I'll keep track of the good nodes we find for later runs.",
-            "Shout if you spot anything rare; I'll break it open with the {tool}.",
-            "I'll double-check the {tool} between swings so we don't lose rhythm.",
-            "I'll handle the heavy lifting so you can focus on the big finds."
+                "You lead, my pickaxe is ready.",
+                "I’ll call out any good spots I see.",
+    "Let’s try not to get lost this time, yeah?",
+    "If the ground starts shaking, I’m blaming you.",
+    "We’ll make quick work of this.",
+    "I’ll stash whatever we dig up later.",
+    "If you see a glint, shout—it’s probably worth it.",
+    "Let’s keep an eye out for the good stuff.",
+    "Let's hope we don't bump into any ore golems.",
+    "I’ll handle the boring chunks, you take the shiny ones.",
+    "Don’t worry, I’ll cover you if theres ore golems.",
+    "We’ll go steady. No point rushing a good find.",
+    "I’ll mark any rich veins for later runs.",
+    "Feels like a lucky day for it.",
+    "If it gets too quiet, that’s usually a bad sign.",
+    "I’ll sort what we gather once we’re done.",
+    "Let’s make it a good run."
         };
 
         private static readonly string[] playerSkillProposalReadyGenericFollowUps =
@@ -72,32 +87,56 @@ namespace Companions.Conversation
 
         private static readonly string[] playerSkillProposalMissingToolSegments =
         {
-            "I'd love to, but I'm missing {indefiniteTool} right now.",
-            "Tempting offer, yet we stashed our {definiteTool}. We'll need to fetch it first.",
-            "I'm game for {skillSentence}, though our kit lacks {indefiniteTool} at the moment.",
-            "I could, but without {indefiniteTool} we'd just bruise knuckles.",
-            "Let's pencil it in once we recover {definiteTool} from storage.",
-            "Count me interested—but the last {definiteTool} snapped, remember?",
-            "I'd say yes if we had {indefiniteTool}; we're travelling light.",
-            "Give me time to replace {definiteTool} and I'm all yours for {skillSentence}.",
-            "Can't swing {skillSentence} until we secure {indefiniteTool} again.",
-            "If we make a quick stop for {indefiniteTool}, I'm in.",
-            "Our pack is empty of {toolPlural}. Let's restock before we commit.",
-            "I'm running a little under-geared—no {definiteTool} means no {skillSentence} just yet."
+    "Ah, I would, but I don’t have {indefiniteTool} right now.",
+    "Tempting, but we left the {definiteTool} behind, didn’t we?",
+    "I'd be up for it, if only we had {indefiniteTool}.",
+    "No {definiteTool}, no {skillSentence}. Simple as that.",
+    "I'd love to, but the {definiteTool} didn’t make it into the backpack.",
+    "Dang, forgot to bring {indefiniteTool} again.",
+    "I'd be all for it, but unless you plan for me to mine with my hands...",
+    "Hold that thought. We still need {indefiniteTool}.",
+    "I’m game once we grab my {definiteTool}.",
+    "Wish I could, but I’m not exactly equipped for {skillSentence} right now.",
+    "I kinda need a {indefiniteTool} for that. Minor detail.",
+    "If only I had {definiteTool}, we’d be golden.",
+    "Hate to break it to you, but the {definiteTool} is MIA.",
+    "Can’t exactly {skillSentence} without a {indefiniteTool}, can we?",
+    "Give me a proper {definiteTool} and I’m in.",
+    "Maybe after we pick up a new {definiteTool}.",
+    "Let's circle back once we've got the right gear.",
+    "As much as I’d like to, I’m running a little light on tools.",
+    "You’d think I’d remember to bring {indefiniteTool} by now.",
+    "Missing a small thing called {definiteTool}. Slight issue.",
+    "How about after we fix that whole ‘no {indefiniteTool}’ problem?",
+    "I left {definiteTool} back at camp again, didn’t I?",
+    "Sorry, I’m useless without {indefiniteTool} for this one.",
+    "No {definiteTool}, no progress. My bad.",
+    "If only enthusiasm could replace {indefiniteTool}...",
+    "Let’s not embarrass ourselves—grab {indefiniteTool} first."
         };
 
         private static readonly string[] playerSkillProposalMissingToolFollowUps =
         {
-            "Want me to check the bank later for a spare?",
-            "We could swing by the workshop and pick one up first.",
-            "If you spot a vendor, let's grab {indefiniteTool} before we forget.",
-            "I'll keep an ear out for drops that match what we need.",
-            "Maybe we craft one after this fight? Could be a good project.",
-            "Let me mark it on our to-do list so we don't miss the chance.",
-            "I'll ping you once I've tracked down {indefiniteTool}.",
-            "We can always pivot to something else until we're re-equipped.",
-            "I'll empty some space so we can carry a fresh {definiteTool} next time.",
-            "Let's talk to the smithy after this and see what they can do."
+    "Want me to check the bank later for a spare?",
+    "We can swing by a shop and grab one on the way.",
+    "If you see a vendor, remind me to pick up {indefiniteTool}.",
+    "Could craft one pretty quick if we find the bits for it.",
+    "Might be worth checking the stash when we head back.",
+    "I’ll keep an eye out for a decent {definiteTool}.",
+    "Let’s add it to the list before we forget again.",
+    "We can always switch to something else for now.",
+    "Next time we pass a forge, I’ll sort it out.",
+    "I’ll mark it down as a reminder for later.",
+    "Let’s grab a new one next stop we make.",
+    "We could always borrow one—temporarily, of course.",
+    "I'll see if anyone nearby’s selling a {definiteTool}.",
+    "Might be a good excuse to visit the workshop anyway.",
+    "If I spot one lying around, I’ll call dibs.",
+    "Let’s craft a better one this time, yeah?",
+    "We’ll find {indefiniteTool} soon enough—don’t sweat it.",
+    "Could ask the smithy to patch something together.",
+    "I’ll keep it in mind next time we restock.",
+    "We’ll get a fresh {definiteTool} soon; no rush."
         };
 
         private static readonly string[] playerSkillProposalAlternateSkillSegments =
