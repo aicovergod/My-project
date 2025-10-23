@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6273e259431b49ee3f9c13580a3115ec73a4c3e2 -->
+## 2025-10-23T14:29:53+01:00 — Add companion death quips when player dies
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Player/PlayerRespawnSystem.cs
+- Diff: 383 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b59763467be2eecf18799fb417eb685c1e823316 -->
 ## 2025-10-23T14:09:39+01:00 — Merge pull request #1328 from aicovergod/codex/add-humorous-messages-for-disarmed-companion
 
