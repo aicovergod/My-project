@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using Companions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -27,6 +28,8 @@ namespace UI.Chat
         private static readonly Color32 ChannelToggleDisabledColor = new Color32(48, 38, 28, 180);
         private static readonly Color32 ChannelToggleEnabledTextColor = new Color32(255, 238, 170, 255);
         private static readonly Color32 ChannelToggleDisabledTextColor = new Color32(180, 170, 140, 160);
+        private static readonly Color32 OutputChannelInactiveTextColor = new Color32(220, 205, 170, 190);
+        private static readonly Color32 OutputChannelInactiveBackgroundColor = new Color32(58, 46, 32, 220);
         private static readonly Color32 GameMessageColor = new Color32(170, 255, 170, 255);
         private static readonly Color32 CompanionMessageColor = new Color32(160, 215, 255, 255);
         private static readonly Color32 PublicMessageColor = new Color32(230, 230, 230, 255);
@@ -35,6 +38,7 @@ namespace UI.Chat
 
         private static readonly ChatChannel[] ChannelValues = ChatChannelUtility.GetOrderedChannels();
         private const string EmojiMarkupPrefix = "<emoji=";
+        private const string CompanionPrefix = "//";
         private const int InputCharacterLimit = 64;
 
         private const float WindowWidth = 520f;
@@ -46,6 +50,7 @@ namespace UI.Chat
         private readonly Dictionary<ChatChannel, bool> channelFilters = new Dictionary<ChatChannel, bool>();
         private readonly Dictionary<ChatChannel, List<ChatMessage>> channelHistory = new Dictionary<ChatChannel, List<ChatMessage>>();
         private readonly Dictionary<ChatChannel, ChannelToggleState> channelToggleLookup = new Dictionary<ChatChannel, ChannelToggleState>();
+        private readonly Dictionary<ChatChannel, OutputChannelState> outputChannelLookup = new Dictionary<ChatChannel, OutputChannelState>();
         private readonly List<ChatMessage> mergedMessages = new List<ChatMessage>();
         private readonly List<ChatMessageRow> activeRows = new List<ChatMessageRow>();
         private readonly Queue<ChatMessageRow> pooledRows = new Queue<ChatMessageRow>();
@@ -64,6 +69,9 @@ namespace UI.Chat
         private EmojiTokenLayout inputPreviewRenderer;
         private Button emojiButton;
         private EmojiPickerPanel emojiPickerPanel;
+        private ChatChannel activeOutputChannel = ChatChannel.Public;
+        private bool companionPreviouslyAvailable;
+        private string cachedUsername = string.Empty;
         private bool autoScrollToBottom = true;
         private bool inputFocused;
         private bool inputFocusBlocked;
@@ -115,6 +123,10 @@ namespace UI.Chat
         {
             InitialiseChannelState();
 
+            SetActiveOutputChannel(ChatChannel.Public, force: true);
+            UpdateOutputChannelAvailability();
+            companionPreviouslyAvailable = CompanionManager.HasActiveCompanion;
+
             if (!TryBindChatService())
             {
                 Debug.LogWarning("ChatHudController: ChatService unavailable; HUD will wait for service bootstrap.");
@@ -135,6 +147,17 @@ namespace UI.Chat
             }
 
             emojiPickerPanel?.Close();
+        }
+
+        private void Update()
+        {
+            bool companionAvailable = CompanionManager.HasActiveCompanion;
+            if (companionAvailable != companionPreviouslyAvailable)
+            {
+                companionPreviouslyAvailable = companionAvailable;
+                UpdateOutputChannelAvailability();
+                RefreshInputPlaceholder();
+            }
         }
 
         /// <summary>
@@ -212,6 +235,7 @@ namespace UI.Chat
             inputField.ActivateInputField();
             ApplyInputFocusState(true);
             UpdateInputNameVisibility();
+            RefreshInputPlaceholder();
             RefreshInputPreview();
             CollapseInputSelection(inputField.text != null ? inputField.text.Length : 0);
         }
@@ -246,15 +270,21 @@ namespace UI.Chat
 
             SetInputFieldText(string.Empty);
             UpdateInputNameVisibility();
+            RefreshInputPlaceholder();
             RefreshInputPreview();
         }
 
         /// <summary>
-        /// Consumes the current input text if it contains characters.
+        /// Consumes the current input text if it contains characters, returning the resolved output channel.
         /// </summary>
-        public bool TryConsumeInput(out string message)
+        /// <param name="message">Trimmed chat payload ready for dispatch.</param>
+        /// <param name="channel">Channel the message should be published to.</param>
+        /// <returns><c>true</c> when a message was captured, otherwise <c>false</c>.</returns>
+        public bool TryConsumeInput(out string message, out ChatChannel channel)
         {
             message = string.Empty;
+            channel = activeOutputChannel;
+
             if (inputField == null)
                 return false;
 
@@ -263,10 +293,25 @@ namespace UI.Chat
             if (string.IsNullOrEmpty(trimmed))
                 return false;
 
-            message = trimmed;
+            if (TryStripCompanionPrefix(trimmed, out string stripped))
+            {
+                if (string.IsNullOrEmpty(stripped))
+                    return false;
+
+                channel = ChatChannel.Companion;
+                message = stripped;
+                SetActiveOutputChannel(ChatChannel.Companion, force: true);
+            }
+            else
+            {
+                channel = activeOutputChannel;
+                message = trimmed;
+            }
+
             SetInputFieldText(string.Empty);
             UpdateInputNameVisibility();
             RefreshInputPreview();
+            RefreshInputPlaceholder();
             return true;
         }
 
@@ -285,6 +330,7 @@ namespace UI.Chat
             SetInputFieldText(string.Empty);
             ApplyInputFocusState(false);
             UpdateInputNameVisibility();
+            RefreshInputPlaceholder();
             RefreshInputPreview();
         }
 
@@ -328,6 +374,7 @@ namespace UI.Chat
                 inputField.interactable = !blocked;
 
             UpdateInputNameVisibility();
+            RefreshInputPlaceholder();
             RefreshInputPreview();
         }
 
@@ -565,6 +612,9 @@ namespace UI.Chat
             for (int i = 0; i < ChannelValues.Length; i++)
                 CreateChannelToggle(row.transform, ChannelValues[i]);
 
+            CreateOutputToggle(row.transform, ChatChannel.Public);
+            CreateOutputToggle(row.transform, ChatChannel.Companion);
+
             return row.GetComponent<LayoutElement>();
         }
 
@@ -620,6 +670,64 @@ namespace UI.Chat
                 Label = labelText,
                 StateLabel = stateText,
                 Enabled = true
+            };
+        }
+
+        private void CreateOutputToggle(Transform parent, ChatChannel channel)
+        {
+            var toggleRoot = new GameObject($"{channel}Output", typeof(RectTransform), typeof(Image), typeof(Button));
+            var rect = toggleRoot.GetComponent<RectTransform>();
+            rect.SetParent(parent, false);
+            rect.sizeDelta = new Vector2(52f, 32f);
+
+            var background = toggleRoot.GetComponent<Image>();
+            background.color = OutputChannelInactiveBackgroundColor;
+
+            var layout = toggleRoot.AddComponent<VerticalLayoutGroup>();
+            layout.childAlignment = TextAnchor.MiddleCenter;
+            layout.childControlHeight = true;
+            layout.childControlWidth = true;
+            layout.childForceExpandHeight = true;
+            layout.childForceExpandWidth = true;
+            layout.spacing = 2f;
+
+            var labelObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
+            labelObject.transform.SetParent(toggleRoot.transform, false);
+            var label = labelObject.GetComponent<Text>();
+            label.text = channel.ToString();
+            label.alignment = TextAnchor.MiddleCenter;
+            label.fontSize = 9;
+            label.resizeTextForBestFit = true;
+            label.resizeTextMinSize = 5;
+            label.resizeTextMaxSize = 11;
+            label.color = OutputChannelInactiveTextColor;
+            LegacyFontProvider.ApplyTo(label);
+
+            var stateObject = new GameObject("State", typeof(RectTransform), typeof(Text));
+            stateObject.transform.SetParent(toggleRoot.transform, false);
+            var stateLabel = stateObject.GetComponent<Text>();
+            stateLabel.text = "...";
+            stateLabel.alignment = TextAnchor.MiddleCenter;
+            stateLabel.fontSize = 8;
+            stateLabel.resizeTextForBestFit = true;
+            stateLabel.resizeTextMinSize = 5;
+            stateLabel.resizeTextMaxSize = 10;
+            stateLabel.color = OutputChannelInactiveTextColor;
+            LegacyFontProvider.ApplyTo(stateLabel);
+
+            var button = toggleRoot.GetComponent<Button>();
+            button.onClick.AddListener(() => SetActiveOutputChannel(channel));
+
+            bool enabled = channel != ChatChannel.Companion || CompanionManager.HasActiveCompanion;
+            button.interactable = enabled;
+
+            outputChannelLookup[channel] = new OutputChannelState
+            {
+                Button = button,
+                Background = background,
+                Label = label,
+                StateLabel = stateLabel,
+                Enabled = enabled
             };
         }
 
@@ -819,6 +927,7 @@ namespace UI.Chat
 
             ApplyInputFocusState(true);
             UpdateInputNameVisibility();
+            RefreshInputPlaceholder();
             CollapseInputSelection(inputField != null && inputField.text != null ? inputField.text.Length : 0);
         }
 
@@ -830,6 +939,7 @@ namespace UI.Chat
         {
             ApplyInputFocusState(false);
             UpdateInputNameVisibility();
+            RefreshInputPlaceholder();
         }
 
         /// <summary>
@@ -921,6 +1031,8 @@ namespace UI.Chat
 
             if (caretPosition.HasValue)
                 CollapseInputSelection(caretPosition.Value);
+
+            RefreshInputPlaceholder();
         }
 
         /// <summary>
@@ -972,6 +1084,27 @@ namespace UI.Chat
 
             string updated = previous.Remove(startIndex, closingIndex - startIndex + 1);
             SetInputFieldText(updated, startIndex);
+        }
+
+        /// <summary>
+        /// Detects the double-slash prefix used to quickly reroute chat to the Companion channel.
+        /// </summary>
+        /// <param name="text">Raw input text to inspect.</param>
+        /// <param name="stripped">Message body with the prefix removed when successful.</param>
+        /// <returns><c>true</c> when the prefix was detected.</returns>
+        private bool TryStripCompanionPrefix(string text, out string stripped)
+        {
+            stripped = string.Empty;
+
+            if (string.IsNullOrEmpty(text))
+                return false;
+
+            if (!text.StartsWith(CompanionPrefix, StringComparison.Ordinal))
+                return false;
+
+            string remainder = text.Substring(CompanionPrefix.Length).TrimStart();
+            stripped = remainder;
+            return true;
         }
 
         /// <summary>
@@ -1201,6 +1334,126 @@ namespace UI.Chat
             state.StateLabel.text = enabled ? "On" : "Off";
         }
 
+        private void SetActiveOutputChannel(ChatChannel channel, bool force = false)
+        {
+            if (channel != ChatChannel.Public && channel != ChatChannel.Companion)
+                channel = ChatChannel.Public;
+
+            if (channel == ChatChannel.Companion && !force && !IsCompanionOutputAvailable())
+                channel = ChatChannel.Public;
+
+            bool changed = activeOutputChannel != channel;
+            activeOutputChannel = channel;
+
+            RefreshOutputChannelVisuals();
+            RefreshInputPlaceholder();
+            RefreshInputNameLabel();
+
+            if (changed)
+                UpdateInputNameVisibility();
+        }
+
+        private void RefreshOutputChannelVisuals()
+        {
+            foreach (var pair in outputChannelLookup)
+                ApplyOutputChannelVisuals(pair.Key, pair.Value);
+        }
+
+        private void ApplyOutputChannelVisuals(ChatChannel channel, OutputChannelState state)
+        {
+            if (state == null)
+                return;
+
+            bool isActive = channel == activeOutputChannel;
+            if (!state.Enabled)
+            {
+                if (state.Button != null)
+                    state.Button.interactable = false;
+                state.Background.color = ChannelToggleDisabledColor;
+                state.Label.color = ChannelToggleDisabledTextColor;
+                state.StateLabel.color = ChannelToggleDisabledTextColor;
+                state.StateLabel.text = "N/A";
+                return;
+            }
+
+            if (state.Button != null)
+                state.Button.interactable = true;
+
+            if (isActive)
+            {
+                state.Background.color = ChannelToggleEnabledColor;
+                state.Label.color = ChannelToggleEnabledTextColor;
+                state.StateLabel.color = ChannelToggleEnabledTextColor;
+                state.StateLabel.text = "Say";
+            }
+            else
+            {
+                state.Background.color = OutputChannelInactiveBackgroundColor;
+                state.Label.color = OutputChannelInactiveTextColor;
+                state.StateLabel.color = OutputChannelInactiveTextColor;
+                state.StateLabel.text = "...";
+            }
+        }
+
+        private void UpdateOutputChannelAvailability()
+        {
+            bool companionAvailable = IsCompanionOutputAvailable();
+
+            foreach (var pair in outputChannelLookup)
+            {
+                bool enabled = pair.Key != ChatChannel.Companion || companionAvailable;
+                pair.Value.Enabled = enabled;
+            }
+
+            if (!companionAvailable && activeOutputChannel == ChatChannel.Companion)
+                SetActiveOutputChannel(ChatChannel.Public, force: true);
+            else if (companionAvailable && activeOutputChannel == ChatChannel.Companion)
+                RefreshInputPlaceholder();
+
+            RefreshOutputChannelVisuals();
+        }
+
+        private void RefreshInputPlaceholder()
+        {
+            if (placeholderLabel == null)
+                return;
+
+            placeholderLabel.text = ComposePlaceholderText();
+        }
+
+        private string ComposePlaceholderText()
+        {
+            if (activeOutputChannel == ChatChannel.Companion)
+            {
+                if (IsCompanionOutputAvailable())
+                {
+                    string name = CompanionManager.GetCompanionDisplayName();
+                    if (string.IsNullOrWhiteSpace(name))
+                        name = "your companion";
+                    return $"Talking to {name}...";
+                }
+
+                return "Summon a companion to chat privately.";
+            }
+
+            return "Type message... (// to chat with your companion)";
+        }
+
+        private void RefreshInputNameLabel()
+        {
+            if (inputNameLabel == null)
+                return;
+
+            string displayName = string.IsNullOrEmpty(cachedUsername) ? "Adventurer" : cachedUsername;
+            string channelLabel = activeOutputChannel == ChatChannel.Companion ? "Companion" : "Public";
+            inputNameLabel.text = $"{displayName} ({channelLabel}):";
+        }
+
+        private static bool IsCompanionOutputAvailable()
+        {
+            return CompanionManager.HasActiveCompanion;
+        }
+
         private void HandleMessageReceived(ChatMessage message)
         {
             if (!channelHistory.TryGetValue(message.Channel, out var list))
@@ -1251,11 +1504,8 @@ namespace UI.Chat
 
         private void UpdateActiveUsername(string username)
         {
-            if (inputNameLabel == null)
-                return;
-
-            string displayName = string.IsNullOrEmpty(username) ? "Adventurer" : username;
-            inputNameLabel.text = $"{displayName}:";
+            cachedUsername = username ?? string.Empty;
+            RefreshInputNameLabel();
             UpdateInputNameModIcon(username);
         }
 
@@ -1559,6 +1809,15 @@ namespace UI.Chat
         }
 
         private sealed class ChannelToggleState
+        {
+            public Button Button;
+            public Image Background;
+            public Text Label;
+            public Text StateLabel;
+            public bool Enabled;
+        }
+
+        private sealed class OutputChannelState
         {
             public Button Button;
             public Image Background;

@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:030704a25b7b59fe87b087baf45a1d5914acae08 -->
+## 2025-10-23T15:34:13+01:00 — Add companion channel toggle and routing for chat HUD
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 277 ++ / 11 --
+- Notes:
+  —
+---
 <!-- commit:99d2033fccd7c53aedd2f3cd9cceec13020aaace -->
 ## 2025-10-23T14:43:38+01:00 — Merge pull request #1330 from aicovergod/codex/add-random-responses-for-no-rocks-command
 
