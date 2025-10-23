@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9b1ebc79e3fc330aefe5c0c3f7482f61a229938f -->
+## 2025-10-23T17:15:23+01:00 — Merge pull request #1337 from aicovergod/codex/implement-companiondialoguepatterns-and-parser-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 603 ++ / 72 --
+- Notes:
+  Enhance companion dialogue intent scoring
+---
+<!-- commit:d08b481f8a08e050d2370e8cc991f4c5a01f477b -->
+## 2025-10-23T17:14:40+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:40b748559ceebf329ae3034e08aba71fb7220e66 -->
 ## 2025-10-23T17:14:21+01:00 — Enhance companion dialogue intent scoring
 
