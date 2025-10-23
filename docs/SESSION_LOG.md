@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:729fb8d0e81fa3cf4a87fef71fc60c8096f262de -->
+## 2025-10-23T15:48:03+01:00 — Merge pull request #1332 from aicovergod/codex/implement-companionconversationmemory-class
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 380 ++ / 0 --
+- Notes:
+  Add companion conversation memory persistence
+---
+<!-- commit:e8a2cc4948ee967cd5be3ec6aaeef67dd822b1ae -->
+## 2025-10-23T15:47:50+01:00 — Add companion conversation memory persistence
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs, Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs.meta
+- Diff: 380 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ea278620b705fa52b64a191216f1aa44f8c4b1ca -->
 ## 2025-10-23T15:34:38+01:00 — Merge pull request #1331 from aicovergod/codex/add-channel-switching-and-message-handling
 
