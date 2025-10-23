@@ -1,6 +1,7 @@
 using UnityEngine;
 using Inventory;
 using Pets;
+using Companions.Conversation;
 
 namespace MyGame.Drops
 {
@@ -96,6 +97,8 @@ namespace MyGame.Drops
                     Debug.LogWarning($"NpcDropper: No GroundItemSpawner available; adding {drop.quantity}x {drop.item?.name} to inventory.");
                     InventoryBridge.AddItem(drop.item, drop.quantity);
                 }
+
+                RegisterLootEvent(drop, spawnPos);
             }
         }
 
@@ -105,6 +108,34 @@ namespace MyGame.Drops
         public void OnDeath()
         {
             RollAndSpawn();
+        }
+
+        private void RegisterLootEvent(ResolvedDrop drop, Vector3 position)
+        {
+            if (drop.item == null || drop.quantity <= 0)
+                return;
+
+            string itemName = !string.IsNullOrWhiteSpace(drop.item.itemName)
+                ? drop.item.itemName
+                : drop.item.name;
+
+            if (string.IsNullOrWhiteSpace(itemName))
+                itemName = "loot";
+
+            string summary = drop.quantity == 1
+                ? $"secured {itemName}"
+                : $"secured {drop.quantity} {itemName}";
+
+            string source = dropTable != null && !string.IsNullOrWhiteSpace(dropTable.tableName)
+                ? dropTable.tableName
+                : name;
+
+            var metadata = CompanionEventMetadata.Create(
+                primaryActor: "You",
+                secondaryActor: source,
+                worldPosition: position);
+
+            CompanionConversationService.RegisterEvent(summary, CompanionEventType.Loot, metadata);
         }
 
 #if UNITY_EDITOR

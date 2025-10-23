@@ -1,4 +1,7 @@
+using System;
 using Combat;
+using Companions.Conversation;
+using NPC;
 using Pets;
 using Skills;
 using UnityEngine;
@@ -48,11 +51,49 @@ namespace Companions
         }
 
         /// <summary>
-        /// Forwards damage callbacks so XP can be awarded through the shared manager.
+        /// Forwards damage callbacks so XP can be awarded through the shared manager and conversation feed.
         /// </summary>
-        public void NotifyDamageDealt(int damage, CombatStyle style, DamageType type)
+        public void NotifyDamageDealt(int damage, CombatStyle style, DamageType type, CombatTarget target)
         {
             controller?.AwardCombatXp(damage, style, type);
+
+            if (damage <= 0)
+                return;
+
+            string companionName = CompanionManager.GetCompanionDisplayName();
+            string targetName = ResolveTargetName(target);
+            var metadata = CompanionEventMetadata.Create(
+                primaryActor: companionName,
+                secondaryActor: targetName,
+                worldPosition: target != null ? (Vector3?)target.transform.position : null,
+                additionalContext: $"Used {style} for {damage} damage."
+            );
+
+            string summary = $"dealt {damage} {type.ToString().ToLowerInvariant()} damage";
+            if (!string.IsNullOrWhiteSpace(targetName))
+                summary += $" to {targetName}";
+            else
+                summary += " to an enemy";
+
+            CompanionConversationService.RegisterEvent(summary, CompanionEventType.Combat, metadata);
+        }
+
+        private static string ResolveTargetName(CombatTarget target)
+        {
+            if (target == null)
+                return string.Empty;
+
+            if (target is NpcCombatant npcCombatant)
+            {
+                var profile = npcCombatant.Profile;
+                if (profile != null && !string.IsNullOrWhiteSpace(profile.name))
+                    return profile.name;
+
+                if (!string.IsNullOrWhiteSpace(npcCombatant.name))
+                    return npcCombatant.name;
+            }
+
+            return target.transform != null ? target.transform.name : string.Empty;
         }
     }
 }

@@ -464,7 +464,7 @@ namespace Pets
                     npcAttack?.BeginAttacking(this);
                 }
                 BeastmasterXp.TryGrantFromPetDamage(ownerTransform != null ? ownerTransform.gameObject : null, finalDamage);
-                companionBridge?.NotifyDamageDealt(finalDamage, attacker.Style, attacker.DamageType);
+                companionBridge?.NotifyDamageDealt(finalDamage, attacker.Style, attacker.DamageType, target);
 
                 if (!target.IsAlive && IsOreGolemTarget(target))
                     TryScheduleOreGolemHarvest(ownerTransform);

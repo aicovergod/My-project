@@ -1,9 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Core.Save;
 using UI.Chat;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Util;
 
 namespace Companions.Conversation
 {
@@ -13,7 +15,7 @@ namespace Companions.Conversation
     /// transcript, and persists it through the shared <see cref="SaveManager"/> infrastructure.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class CompanionConversationMemory : MonoBehaviour, ISaveable
+    public sealed class CompanionConversationMemory : MonoBehaviour, ISaveable, ITickable
     {
         private const string SaveKey = "companion_conversation_history";
 
@@ -26,14 +28,30 @@ namespace Companions.Conversation
         [SerializeField, Tooltip("Optional debug flag that emits verbose logging when messages are captured.")]
         private bool enableDebugLogging;
 
+        [Header("Event Feed")]
+        [SerializeField, Tooltip("Maximum number of gameplay event entries to retain in memory."), Min(1)]
+        private int maxEventEntries = 40;
+
+        [SerializeField, Tooltip("Maximum lifetime (in minutes) for gameplay events referenced in dialogue."), Min(0.1f)]
+        private float eventRetentionWindowMinutes = 5f;
+
         /// <summary>Backing list containing the ordered conversation transcript.</summary>
         private readonly List<ConversationEntry> entries = new List<ConversationEntry>(64);
+
+        /// <summary>Rolling list of gameplay events that the companion can reference.</summary>
+        private readonly List<CompanionEventEntry> recentEvents = new List<CompanionEventEntry>(32);
 
         /// <summary>True once a chat subscription is active so duplicate hooks are prevented.</summary>
         private bool chatSubscribed;
 
         /// <summary>Cached reference to the chat service instance that currently has the listener bound.</summary>
         private ChatService subscribedChat;
+
+        /// <summary>True when the component is registered with the global ticker for expiry trimming.</summary>
+        private bool tickerSubscribed;
+
+        /// <summary>Coroutine used to wait for the ticker singleton to become available.</summary>
+        private Coroutine tickerSubscriptionRoutine;
 
         /// <summary>Tracks the last detected greeting so dialogue logic can throttle repeats.</summary>
         public DateTime? LastGreetingUtc { get; private set; }
@@ -101,6 +119,7 @@ namespace Companions.Conversation
 
             SaveManager.Register(this);
             TrySubscribeToChatService();
+            SubscribeToTicker();
 
             var conversationService = CompanionConversationService.Instance;
             if (conversationService != null)
@@ -111,6 +130,7 @@ namespace Companions.Conversation
         {
             SceneManager.sceneLoaded -= HandleSceneLoaded;
             UnsubscribeFromChat();
+            UnsubscribeFromTicker();
 
             // Persist the latest state before detaching so the next session resumes the same transcript.
             Save();
@@ -209,6 +229,7 @@ namespace Companions.Conversation
         public void ClearHistory()
         {
             entries.Clear();
+            recentEvents.Clear();
             LastGreetingUtc = null;
             LastQuestionUtc = null;
             LastKnownPlayerMood = string.Empty;
@@ -222,6 +243,7 @@ namespace Companions.Conversation
         public void Load()
         {
             entries.Clear();
+            recentEvents.Clear();
             LastGreetingUtc = null;
             LastQuestionUtc = null;
             LastKnownPlayerMood = string.Empty;
@@ -281,9 +303,49 @@ namespace Companions.Conversation
             SaveManager.Save(SaveKey, payload);
         }
 
+        /// <summary>
+        /// Registers a gameplay event so the companion can reference it during future dialogue.
+        /// </summary>
+        /// <param name="summary">Concise description of what occurred.</param>
+        /// <param name="eventType">Category describing the event.</param>
+        /// <param name="metadata">Optional metadata providing actors, skills, or location data.</param>
+        public void RegisterEvent(string summary, CompanionEventType eventType, CompanionEventMetadata? metadata = null)
+        {
+            if (string.IsNullOrWhiteSpace(summary))
+                return;
+
+            var meta = metadata ?? CompanionEventMetadata.Empty;
+            var entry = new CompanionEventEntry(summary, eventType, DateTime.UtcNow, meta);
+            recentEvents.Add(entry);
+
+            if (enableDebugLogging)
+                Debug.Log($"[CompanionConversationMemory] Registered event '{entry.Summary}' ({entry.EventType}).");
+
+            TrimEventEntries(DateTime.UtcNow);
+        }
+
+        /// <summary>
+        /// Attempts to retrieve the most recent non-expired event entry.
+        /// </summary>
+        /// <param name="entry">Receives the latest entry when available.</param>
+        public bool TryGetLatestEvent(out CompanionEventEntry entry)
+        {
+            TrimEventEntries(DateTime.UtcNow);
+
+            for (int i = recentEvents.Count - 1; i >= 0; i--)
+            {
+                entry = recentEvents[i];
+                return true;
+            }
+
+            entry = default;
+            return false;
+        }
+
         private void HandleSceneLoaded(Scene _, LoadSceneMode __)
         {
             TrySubscribeToChatService();
+            SubscribeToTicker();
         }
 
         /// <summary>
@@ -325,6 +387,67 @@ namespace Companions.Conversation
 
             chatSubscribed = false;
             subscribedChat = null;
+        }
+
+        /// <summary>
+        /// Subscribes to the global ticker so gameplay events expire on the configured cadence.
+        /// </summary>
+        private void SubscribeToTicker()
+        {
+            if (tickerSubscribed)
+                return;
+
+            if (Ticker.Instance == null)
+            {
+                if (tickerSubscriptionRoutine == null && isActiveAndEnabled)
+                    tickerSubscriptionRoutine = StartCoroutine(WaitForTicker());
+                return;
+            }
+
+            Ticker.Instance.Subscribe(this);
+            tickerSubscribed = true;
+        }
+
+        /// <summary>
+        /// Removes the ticker subscription when the component is disabled or destroyed.
+        /// </summary>
+        private void UnsubscribeFromTicker()
+        {
+            if (tickerSubscriptionRoutine != null)
+            {
+                StopCoroutine(tickerSubscriptionRoutine);
+                tickerSubscriptionRoutine = null;
+            }
+
+            if (!tickerSubscribed)
+                return;
+
+            if (Ticker.Instance != null)
+                Ticker.Instance.Unsubscribe(this);
+
+            tickerSubscribed = false;
+        }
+
+        /// <summary>
+        /// Waits for the ticker singleton so the component can subscribe even when it initialises first.
+        /// </summary>
+        private IEnumerator WaitForTicker()
+        {
+            while (Ticker.Instance == null)
+                yield return null;
+
+            tickerSubscriptionRoutine = null;
+
+            if (!isActiveAndEnabled)
+                yield break;
+
+            SubscribeToTicker();
+        }
+
+        /// <inheritdoc />
+        public void OnTick()
+        {
+            TrimEventEntries(DateTime.UtcNow);
         }
 
         private void HandleMessageReceived(ChatMessage message)
@@ -404,6 +527,26 @@ namespace Companions.Conversation
         }
 
         /// <summary>
+        /// Removes stale gameplay events and enforces the configured capacity.
+        /// </summary>
+        private void TrimEventEntries(DateTime nowUtc)
+        {
+            if (recentEvents.Count == 0)
+                return;
+
+            TimeSpan retention = ResolveEventRetentionWindow();
+            for (int i = recentEvents.Count - 1; i >= 0; i--)
+            {
+                if (recentEvents[i].IsExpired(retention, nowUtc))
+                    recentEvents.RemoveAt(i);
+            }
+
+            int limit = Mathf.Max(1, maxEventEntries);
+            if (recentEvents.Count > limit)
+                recentEvents.RemoveRange(0, recentEvents.Count - limit);
+        }
+
+        /// <summary>
         /// Recomputes metadata caches from the current transcript to keep them consistent after trimming.
         /// </summary>
         private void RebuildMetadata()
@@ -435,6 +578,12 @@ namespace Companions.Conversation
                 return null;
 
             return TimeSpan.FromMinutes(retentionWindowMinutes);
+        }
+
+        private TimeSpan ResolveEventRetentionWindow()
+        {
+            float minutes = Mathf.Max(0.1f, eventRetentionWindowMinutes);
+            return TimeSpan.FromMinutes(minutes);
         }
 
         private static DateTime EnsureUtc(DateTime timestamp)
