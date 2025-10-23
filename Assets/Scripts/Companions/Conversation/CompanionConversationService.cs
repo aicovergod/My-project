@@ -133,6 +133,18 @@ namespace Companions.Conversation
             return go.AddComponent<CompanionConversationService>();
         }
 
+        /// <summary>
+        /// Allows gameplay systems to register recent events that the companion can mention in dialogue.
+        /// </summary>
+        public static void RegisterEvent(string summary, CompanionEventType eventType, CompanionEventMetadata? metadata = null)
+        {
+            var instance = Instance;
+            if (instance == null)
+                return;
+
+            instance.RegisterEventInternal(summary, eventType, metadata);
+        }
+
         /// <inheritdoc />
         protected override void OnSingletonAwake()
         {
@@ -165,6 +177,15 @@ namespace Companions.Conversation
             conversationMemory = FindObjectOfType<CompanionConversationMemory>(true);
             if (conversationMemory != null && ShouldTraceMemory)
                 Debug.Log("[CompanionConversationService] Rebound conversation memory instance after bootstrap.");
+        }
+
+        /// <summary>
+        /// Forwards an event registration to the conversation memory when it is available.
+        /// </summary>
+        private void RegisterEventInternal(string summary, CompanionEventType eventType, CompanionEventMetadata? metadata)
+        {
+            EnsureConversationMemoryBound();
+            conversationMemory?.RegisterEvent(summary, eventType, metadata);
         }
 
         /// <inheritdoc />
@@ -822,6 +843,9 @@ namespace Companions.Conversation
                     return string.Empty;
             }
 
+            if (conversationMemory.TryGetLatestEvent(out var eventEntry))
+                return FormatEventEntry(eventEntry);
+
             if (!string.IsNullOrWhiteSpace(conversationMemory.LastStatusResponse))
                 return conversationMemory.LastStatusResponse;
 
@@ -834,6 +858,62 @@ namespace Companions.Conversation
             }
 
             return string.Empty;
+        }
+
+        private string FormatEventEntry(CompanionEventEntry entry)
+        {
+            string actor = !string.IsNullOrWhiteSpace(entry.Metadata.PrimaryActor)
+                ? entry.Metadata.PrimaryActor.Trim()
+                : "We";
+
+            string summary = !string.IsNullOrWhiteSpace(entry.Summary)
+                ? entry.Summary.Trim()
+                : "noticed something interesting";
+
+            var builder = new StringBuilder();
+            builder.Append(actor);
+            if (!summary.StartsWith(" ", StringComparison.Ordinal))
+                builder.Append(' ');
+            builder.Append(summary);
+
+            if (!string.IsNullOrWhiteSpace(entry.Metadata.SecondaryActor))
+                builder.Append($" with {entry.Metadata.SecondaryActor.Trim()}");
+
+            string location = ResolveEventLocation(entry.Metadata);
+            if (!string.IsNullOrWhiteSpace(location))
+                builder.Append($" near {location}");
+
+            if (entry.Metadata.Skill.HasValue)
+                builder.Append($" ({entry.Metadata.Skill.Value} XP)");
+
+            if (!string.IsNullOrWhiteSpace(entry.Metadata.AdditionalContext))
+            {
+                string trimmedContext = entry.Metadata.AdditionalContext.Trim();
+                if (trimmedContext.Length > 0)
+                {
+                    if (!builder.ToString().TrimEnd().EndsWith(".", StringComparison.Ordinal))
+                        builder.Append('.');
+                    builder.Append(' ').Append(trimmedContext);
+                }
+            }
+
+            return builder.ToString().Trim();
+        }
+
+        private static string ResolveEventLocation(CompanionEventMetadata metadata)
+        {
+            if (!string.IsNullOrWhiteSpace(metadata.LocationName))
+                return metadata.LocationName.Trim();
+
+            if (metadata.WorldPosition.HasValue)
+                return FormatWorldPosition(metadata.WorldPosition.Value);
+
+            return string.Empty;
+        }
+
+        private static string FormatWorldPosition(Vector3 position)
+        {
+            return $"{position.x:0.0}, {position.y:0.0}";
         }
 
         /// <summary>
