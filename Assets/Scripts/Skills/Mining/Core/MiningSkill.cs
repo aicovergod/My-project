@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Companions;
 using Inventory;
 using Util;
 using Skills.Mining;
@@ -151,7 +150,7 @@ namespace Skills.Mining
                     Equipment = equipment,
                     EquipmentXpBonusEvaluator = data => data != null ? data.miningXpBonusMultiplier : 0f,
                     RewardMessageFormatter = qty => $"+{qty} {ore.DisplayName}",
-                    InventoryFullMessage = useCompanionChatFormatting ? CompanionChatLibrary.GetRandomInventoryFullLine() : null,
+                    InventoryFullMessage = null,
                     UseCompanionChatFormatting = useCompanionChatFormatting,
                     CompanionChatSenderResolver = companionChatSenderResolver,
                         OnItemsGranted = result => OnOreGained?.Invoke(ore.Id, result.QuantityAwarded),
