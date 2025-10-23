@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:68752b43e4c6ee2479762e9b71fd0c0c827a83e7 -->
+## 2025-10-24T00:54:30+01:00 — Fix companion skill plan response composition
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 46 ++ / 15 --
+- Notes:
+  —
+---
 <!-- commit:e30aaee624ea69a10584ad323cb19c0eb5ddb580 -->
 ## 2025-10-24T00:41:40+01:00 — Merge pull request #1360 from aicovergod/codex/update-follow-up-message-probability
 
