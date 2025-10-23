@@ -89,6 +89,7 @@ namespace Companions
             ConfigureEquipment();
             ConfigureMining(player);
             ConfigureCombat();
+            combatController?.BindCompanionController(this);
             RebindPlayer(player);
         }
 
@@ -343,6 +344,7 @@ namespace Companions
                 companionEquipment.ForceClosed();
             }
 
+            combatController?.BindCompanionController(null);
             miningController = null;
             companionEquipment = null;
             Despawned?.Invoke(this);

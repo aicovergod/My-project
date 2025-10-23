@@ -51,6 +51,7 @@ namespace Pets
         private Coroutine pendingOreGolemHarvestRoutine;
         private float nextAttackTime;
         private CompanionController companionController;
+        private CompanionEquipment subscribedEquipment;
 
         /// <summary>
         /// Tracks the most recent non-zero chase velocity so the sprite animator can
@@ -141,6 +142,7 @@ namespace Pets
 
             // Ensure the companion controller reference is refreshed before validating ore golem rules.
             companionController ??= GetComponent<CompanionController>();
+            TrySubscribeToEquipmentChanges();
 
             if (ShouldBlockOreGolemAttack(target, fromDirectCommand))
             {
@@ -640,14 +642,7 @@ namespace Pets
                 return false;
 
             if (fromDirectCommand)
-            {
-                var chat = ChatService.Instance;
-                if (chat != null)
-                {
-                    string reminder = CompanionChatLibrary.GetRandomCompanionOreGolemPickaxeReminder();
-                    chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), reminder);
-                }
-            }
+                PublishOreGolemPickaxeReminder();
             return true;
         }
 
@@ -682,8 +677,33 @@ namespace Pets
             GatheringFloatingTextService.TryShowAtAnchor(message, anchor);
         }
 
+        /// <summary>
+        /// Exposes the companion controller so external systems can supply a runtime binding when the
+        /// controller is initialised. This ensures the combat controller can subscribe to equipment events
+        /// regardless of component execution order.
+        /// </summary>
+        /// <param name="controller">Controller representing the active companion.</param>
+        public void BindCompanionController(CompanionController controller)
+        {
+            if (companionController == controller)
+            {
+                TrySubscribeToEquipmentChanges();
+                return;
+            }
+
+            UnsubscribeFromEquipmentChanges();
+            companionController = controller;
+            TrySubscribeToEquipmentChanges();
+        }
+
+        private void OnEnable()
+        {
+            TrySubscribeToEquipmentChanges();
+        }
+
         private void OnDisable()
         {
+            UnsubscribeFromEquipmentChanges();
             CancelAttack();
 
             if (pendingOreGolemHarvestRoutine != null)
@@ -691,6 +711,11 @@ namespace Pets
                 StopCoroutine(pendingOreGolemHarvestRoutine);
                 pendingOreGolemHarvestRoutine = null;
             }
+        }
+
+        private void OnDestroy()
+        {
+            UnsubscribeFromEquipmentChanges();
         }
 
         private IEnumerator AttackSpriteSwap()
@@ -791,6 +816,67 @@ namespace Pets
             }
 
             return currentTarget.transform.position;
+        }
+
+        private void TrySubscribeToEquipmentChanges()
+        {
+            if (!isActiveAndEnabled)
+                return;
+
+            if (companionController == null)
+                return;
+
+            var equipment = companionController.Equipment;
+            if (equipment == null)
+                return;
+
+            if (subscribedEquipment == equipment)
+                return;
+
+            if (subscribedEquipment != null)
+                subscribedEquipment.EquipmentSlotChanged -= OnCompanionEquipmentSlotChanged;
+
+            subscribedEquipment = equipment;
+            subscribedEquipment.EquipmentSlotChanged += OnCompanionEquipmentSlotChanged;
+        }
+
+        private void UnsubscribeFromEquipmentChanges()
+        {
+            if (subscribedEquipment == null)
+                return;
+
+            subscribedEquipment.EquipmentSlotChanged -= OnCompanionEquipmentSlotChanged;
+            subscribedEquipment = null;
+        }
+
+        private void OnCompanionEquipmentSlotChanged(EquipmentSlot slot, InventoryEntry _)
+        {
+            if (slot != EquipmentSlot.Weapon)
+                return;
+
+            if (companionController == null)
+                return;
+
+            if (CompanionHasPickaxe(companionController))
+                return;
+
+            bool hadOreGolemTarget = currentTarget != null && IsOreGolemTarget(currentTarget);
+            if (!hadOreGolemTarget)
+                return;
+
+            CancelAttack();
+            PublishOreGolemPickaxeReminder();
+            ShowOreGolemBlockedFeedback();
+        }
+
+        private void PublishOreGolemPickaxeReminder()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string reminder = CompanionChatLibrary.GetRandomCompanionOreGolemPickaxeReminder();
+            chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), reminder);
         }
     }
 }

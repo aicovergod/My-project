@@ -130,6 +130,13 @@ namespace Companions
         /// <summary>Raised whenever the window visibility toggles so menus and HUDs can refresh their labels.</summary>
         public event Action<bool> VisibilityChanged;
 
+        /// <summary>
+        /// Raised whenever a slot changes so dependent systems (combat controllers, UI, etc.) can react to
+        /// equipment updates. The payload includes the affected slot alongside the latest entry stored in
+        /// <see cref="equipped"/> so listeners can query the new state immediately.
+        /// </summary>
+        public event Action<EquipmentSlot, InventoryEntry> EquipmentSlotChanged;
+
         /// <summary>Exposes whether the window is currently visible.</summary>
         public bool IsOpen => isOpen;
 
@@ -160,6 +167,7 @@ namespace Companions
             }
 
             VisibilityChanged = null;
+            EquipmentSlotChanged = null;
         }
 
         /// <summary>
@@ -327,6 +335,7 @@ namespace Companions
             UpdateBonuses();
             Save();
             ItemUseResolver.NotifyItemUsed(gameObject, item, ItemUseType.Equipped);
+            RaiseEquipmentSlotChanged(slot);
 
             if (CompanionManager.EnableDebugLogging)
             {
@@ -360,6 +369,7 @@ namespace Companions
             UpdateBonuses();
             Save();
             ItemUseResolver.NotifyItemUsed(gameObject, entry.item, ItemUseType.Unequipped);
+            RaiseEquipmentSlotChanged(slot);
 
             if (CompanionManager.EnableDebugLogging)
             {
@@ -921,6 +931,7 @@ namespace Companions
                         equipped[index] = default;
                         UpdateSlotVisual(EquipmentSlot.Weapon);
                         ItemUseResolver.NotifyItemUsed(gameObject, weaponEntry.item, ItemUseType.Unequipped);
+                        RaiseEquipmentSlotChanged(EquipmentSlot.Weapon);
                     }
                 }
             }
@@ -967,8 +978,27 @@ namespace Companions
             UpdateBonuses();
             Save();
             ItemUseResolver.NotifyItemUsed(gameObject, entry.item, ItemUseType.Equipped);
+            RaiseEquipmentSlotChanged(slot);
             failureResult = CompanionEquipAttemptResult.Equipped;
             return true;
+        }
+
+        /// <summary>
+        /// Broadcasts equipment changes so dependent systems can respond immediately (e.g., cancelling
+        /// combat when a weapon is removed mid-fight).
+        /// </summary>
+        /// <param name="slot">Slot whose state changed.</param>
+        private void RaiseEquipmentSlotChanged(EquipmentSlot slot)
+        {
+            if (slot != EquipmentSlot.Weapon)
+                return;
+
+            int index = SlotIndex(slot);
+            InventoryEntry entry = default;
+            if (index >= 0 && index < equipped.Length)
+                entry = equipped[index];
+
+            EquipmentSlotChanged?.Invoke(slot, entry);
         }
 
         private bool TryReturnEntry(InventoryEntry entry, Inventory.Inventory primary, out bool storedInPrimary)
