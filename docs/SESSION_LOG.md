@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:626949879b0cbaac7fb64b1ec5c03164af3ff014 -->
+## 2025-10-23T18:56:59+01:00 — Merge pull request #1343 from aicovergod/codex/update-acknowledgerecentevent-pattern-weights
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 3 --
+- Notes:
+  Adjust companion recent event recall weighting
+---
+<!-- commit:03adb1f7e7934606f2c73bf4ac854edb8cc949a3 -->
+## 2025-10-23T18:56:01+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d9aca8dd99e4025530ad3ef2e6b96dd119e74078 -->
 ## 2025-10-23T18:55:44+01:00 — Refine recent event recall weights
 
