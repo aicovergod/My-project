@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8072bc0ad1970ff08dbea1c08adf36d69c2a4edc -->
+## 2025-10-23T23:22:21+01:00 — Expand status query regex coverage for shorthand
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 7 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:c8fdf1bed9451c6e090eeb2be5f9e656ee5160c6 -->
 ## 2025-10-23T23:17:51+01:00 — Merge pull request #1355 from aicovergod/codex/update-synonymbucket-definitions-and-weights
 

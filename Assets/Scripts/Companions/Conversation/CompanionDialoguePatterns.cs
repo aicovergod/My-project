@@ -33,7 +33,11 @@ namespace Companions.Conversation
             RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         private static readonly Regex StatusQueryQuestionSuffixRegex = new Regex(
-            "\\b(you|ya)\\b[^?]*\\?",
+            "\\b(you|ya|u)\\b[^?]*\\?",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        private static readonly Regex StatusQueryShorthandRegex = new Regex(
+            "\\b(hru|hbu|wbu|howru|supu|supya|supyou|howya)\\b",
             RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         private static readonly Regex RecentEventRegex = new Regex(
@@ -120,6 +124,8 @@ namespace Companions.Conversation
                             score += 0.6f;
                         if (StatusQueryQuestionSuffixRegex.IsMatch(text))
                             score += 0.5f;
+                        if (StatusQueryShorthandRegex.IsMatch(text))
+                            score = Mathf.Max(score, 2.25f);
                         return score;
                     }),
 
