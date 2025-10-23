@@ -19,30 +19,6 @@ namespace Companions.Conversation
     [DisallowMultipleComponent]
     public sealed class CompanionConversationService : SceneGatedSingletonBehaviour<CompanionConversationService>
     {
-        private static readonly Dictionary<string, string> PlayerMoodLookup = new Dictionary<string, string>(StringComparer.Ordinal)
-        {
-            { "tired", "feeling tired" },
-            { "sleepy", "a bit sleepy" },
-            { "exhausted", "pretty exhausted" },
-            { "drained", "drained" },
-            { "sad", "a bit down" },
-            { "angry", "a little fired up" },
-            { "upset", "upset" },
-            { "annoyed", "annoyed" },
-            { "frustrated", "frustrated" },
-            { "good", "doing good" },
-            { "great", "feeling great" },
-            { "awesome", "feeling awesome" },
-            { "okay", "doing okay" },
-            { "ok", "doing okay" },
-            { "fine", "feeling fine" },
-            { "happy", "happy" },
-            { "excited", "excited" },
-            { "pumped", "pumped" },
-            { "nervous", "a little nervous" },
-            { "worried", "a bit worried" }
-        };
-
         [Header("Dependencies")]
         [SerializeField, Tooltip("Optional explicit reference to the conversation memory component.")]
         private CompanionConversationMemory conversationMemory;
@@ -97,6 +73,10 @@ namespace Companions.Conversation
 
         [SerializeField, Tooltip("Minimum minutes before the same status line can repeat.")]
         private float statusRepeatCooldownMinutes = 5f;
+
+        [Header("Mood Follow Ups")]
+        [SerializeField, Tooltip("Minimum minutes between proactive mood check-ins when the player feels down.")]
+        private float moodFollowUpCooldownMinutes = 2.5f;
 
         private readonly Queue<PendingResponse> pendingResponses = new Queue<PendingResponse>();
         private CompanionDialogueParser parser;
@@ -468,11 +448,25 @@ namespace Companions.Conversation
                     Debug.Log($"[CompanionConversationService] Registered status response '{response.StatusSegment}'.");
             }
 
-            if (!string.IsNullOrWhiteSpace(response.PlayerMood) && conversationMemory != null)
+            if (conversationMemory != null)
             {
-                conversationMemory.SetLastKnownPlayerMood(response.PlayerMood, DateTime.UtcNow);
-                if (ShouldTraceMemory)
-                    Debug.Log($"[CompanionConversationService] Stored last known player mood '{response.PlayerMood}'.");
+                if (response.PlayerMood.HasMood)
+                {
+                    conversationMemory.SetLastKnownPlayerMood(response.PlayerMood, DateTime.UtcNow);
+                    if (ShouldTraceMemory)
+                    {
+                        Debug.Log(
+                            $"[CompanionConversationService] Stored last known player mood '{response.PlayerMood.Descriptor}' " +
+                            $"(valence={response.PlayerMood.Valence}, intensity={response.PlayerMood.Intensity}).");
+                    }
+                }
+
+                if (response.ShouldRecordMoodFollowUp)
+                {
+                    conversationMemory.RegisterMoodFollowUp(DateTime.UtcNow);
+                    if (ShouldTraceMemory)
+                        Debug.Log("[CompanionConversationService] Logged mood follow-up timestamp.");
+                }
             }
 
             if (ShouldTraceResponses)
@@ -487,8 +481,9 @@ namespace Companions.Conversation
             if (conversationMemory == null)
                 EnsureConversationMemoryBound();
 
-            string playerMoodFromMemory = conversationMemory != null ? conversationMemory.LastKnownPlayerMood : string.Empty;
-            string detectedPlayerMood = string.Empty;
+            var memoryMood = conversationMemory != null ? conversationMemory.LastKnownPlayerMood : CompanionMoodInterpretation.Empty;
+            var detectedMood = CompanionMoodInterpretation.Empty;
+            var empathyMood = CompanionMoodInterpretation.Empty;
             string statusSegment = string.Empty;
             string companionMood = ResolveCompanionMoodDescriptor();
             string recentEvent = ResolveRecentEventSummary();
@@ -506,37 +501,43 @@ namespace Companions.Conversation
                             segments,
                             followUps,
                             playerName,
-                            playerMoodFromMemory,
+                            memoryMood.Descriptor,
                             companionMood,
                             recentEvent);
                         break;
 
                     case CompanionDialogueIntent.StatusQuery:
+                        var moodForStatus = detectedMood.HasMood ? detectedMood : memoryMood;
                         statusSegment = BuildStatusSegment(
                             playerName,
-                            playerMoodFromMemory,
+                            moodForStatus,
                             ref companionMood,
                             context,
                             followUps);
                         if (!string.IsNullOrEmpty(statusSegment))
+                        {
                             segments.Add(statusSegment);
+                            empathyMood = SelectDominantMood(empathyMood, moodForStatus);
+                        }
                         break;
 
                     case CompanionDialogueIntent.PlayerMoodReport:
-                        detectedPlayerMood = DetectPlayerMood(parseResult.Tokens);
-                        string acknowledgedMood = !string.IsNullOrEmpty(detectedPlayerMood)
-                            ? detectedPlayerMood
-                            : playerMoodFromMemory;
+                        detectedMood = DetectPlayerMood(parseResult.Tokens);
+                        var acknowledgementMood = detectedMood.HasMood ? detectedMood : memoryMood;
 
-                        TryAddResponse(
-                            CompanionDialogueIntent.PlayerMoodReport,
-                            context,
-                            segments,
-                            followUps,
-                            playerName,
-                            acknowledgedMood,
-                            companionMood,
-                            recentEvent);
+                        if (acknowledgementMood.HasMood)
+                        {
+                            TryAddResponse(
+                                CompanionDialogueIntent.PlayerMoodReport,
+                                context,
+                                segments,
+                                followUps,
+                                playerName,
+                                acknowledgementMood.Descriptor,
+                                companionMood,
+                                recentEvent);
+                            empathyMood = SelectDominantMood(empathyMood, acknowledgementMood);
+                        }
                         break;
 
                     case CompanionDialogueIntent.Gratitude:
@@ -546,7 +547,7 @@ namespace Companions.Conversation
                             segments,
                             followUps,
                             playerName,
-                            playerMoodFromMemory,
+                            memoryMood.Descriptor,
                             companionMood,
                             recentEvent);
                         break;
@@ -558,7 +559,7 @@ namespace Companions.Conversation
                             segments,
                             followUps,
                             playerName,
-                            playerMoodFromMemory,
+                            memoryMood.Descriptor,
                             companionMood,
                             recentEvent);
                         break;
@@ -570,7 +571,7 @@ namespace Companions.Conversation
                             segments,
                             followUps,
                             playerName,
-                            playerMoodFromMemory,
+                            memoryMood.Descriptor,
                             companionMood,
                             recentEvent);
                         break;
@@ -582,7 +583,7 @@ namespace Companions.Conversation
                             segments,
                             followUps,
                             playerName,
-                            playerMoodFromMemory,
+                            memoryMood.Descriptor,
                             companionMood,
                             recentEvent);
                         break;
@@ -596,7 +597,7 @@ namespace Companions.Conversation
                                 segments,
                                 followUps,
                                 playerName,
-                                playerMoodFromMemory,
+                                memoryMood.Descriptor,
                                 companionMood,
                                 recentEvent);
                         }
@@ -607,12 +608,22 @@ namespace Companions.Conversation
             if (segments.Count == 0)
                 return null;
 
+            var moodForEmpathy = SelectDominantMood(empathyMood, detectedMood);
+            if (!moodForEmpathy.HasMood)
+                moodForEmpathy = memoryMood;
+
+            if (moodForEmpathy.HasMood)
+                AppendMoodEmpathySegment(moodForEmpathy, segments);
+
+            bool recordFollowUp = MaybeQueueMoodFollowUp(detectedMood, memoryMood, moodForEmpathy, playerName, segments, followUps);
+
             string text = CombineSegments(segments);
             if (string.IsNullOrWhiteSpace(text))
                 return null;
 
             IReadOnlyList<string> followUpPayload = followUps.Count > 0 ? followUps : null;
-            return new PendingResponse(text, statusSegment, detectedPlayerMood, followUpPayload);
+            var capturedMood = detectedMood.HasMood ? detectedMood : CompanionMoodInterpretation.Empty;
+            return new PendingResponse(text, statusSegment, capturedMood, followUpPayload, recordFollowUp);
         }
 
         private void TryAddResponse(
@@ -672,13 +683,14 @@ namespace Companions.Conversation
 
         private string BuildStatusSegment(
             string playerName,
-            string playerMood,
+            CompanionMoodInterpretation playerMood,
             ref string companionMood,
             CompanionResponseContext context,
             List<string> followUps)
         {
             string lastStatus = conversationMemory != null ? conversationMemory.LastStatusResponse : string.Empty;
             const int MaxAttempts = 3;
+            string playerMoodDescriptor = playerMood.HasMood ? playerMood.Descriptor : string.Empty;
 
             for (int attempt = 0; attempt < MaxAttempts; attempt++)
             {
@@ -694,7 +706,7 @@ namespace Companions.Conversation
                 string formatted = FormatTemplate(
                     selection.PrimarySegment,
                     playerName,
-                    playerMood,
+                    playerMoodDescriptor,
                     companionMood,
                     string.Empty,
                     context);
@@ -716,18 +728,20 @@ namespace Companions.Conversation
                     formatted = FormatTemplate(
                         selection.PrimarySegment,
                         playerName,
-                        playerMood,
+                        playerMoodDescriptor,
                         companionMood,
                         string.Empty,
                         context);
                 }
 
-                if (!string.IsNullOrEmpty(playerMood))
-                    formatted = AppendSentence(formatted, $"Hope you're {playerMood}.");
-                else if (conversationMemory != null && !string.IsNullOrEmpty(conversationMemory.LastKnownPlayerMood))
-                    formatted = AppendSentence(formatted, $"Still keeping an eye on you being {conversationMemory.LastKnownPlayerMood}.");
+                string hopeLine = BuildMoodHopeLine(playerMood);
+                if (string.IsNullOrEmpty(hopeLine) && conversationMemory != null)
+                    hopeLine = BuildMoodHopeLine(conversationMemory.LastKnownPlayerMood);
 
-                AppendFollowUps(selection.FollowUpSegments, followUps, playerName, playerMood, companionMood, string.Empty, context);
+                if (!string.IsNullOrEmpty(hopeLine))
+                    formatted = AppendSentence(formatted, hopeLine);
+
+                AppendFollowUps(selection.FollowUpSegments, followUps, playerName, playerMoodDescriptor, companionMood, string.Empty, context);
                 lastStatusTemplateKey = selection.TemplateKey;
                 return formatted;
             }
@@ -735,18 +749,173 @@ namespace Companions.Conversation
             string fallback = FormatTemplate(
                 "I'm feeling {companionMood}. How are you doing?",
                 playerName,
-                playerMood,
+                playerMoodDescriptor,
                 companionMood,
                 string.Empty,
                 context);
 
-            if (!string.IsNullOrEmpty(playerMood))
-                fallback = AppendSentence(fallback, $"Hope you're {playerMood}.");
-            else if (conversationMemory != null && !string.IsNullOrEmpty(conversationMemory.LastKnownPlayerMood))
-                fallback = AppendSentence(fallback, $"Still keeping an eye on you being {conversationMemory.LastKnownPlayerMood}.");
+            string fallbackHope = BuildMoodHopeLine(playerMood);
+            if (string.IsNullOrEmpty(fallbackHope) && conversationMemory != null)
+                fallbackHope = BuildMoodHopeLine(conversationMemory.LastKnownPlayerMood);
+
+            if (!string.IsNullOrEmpty(fallbackHope))
+                fallback = AppendSentence(fallback, fallbackHope);
 
             lastStatusTemplateKey = string.Empty;
             return fallback;
+        }
+
+        private void AppendMoodEmpathySegment(CompanionMoodInterpretation mood, List<string> segments)
+        {
+            if (segments == null || !mood.HasMood)
+                return;
+
+            string empathyLine;
+            switch (mood.Valence)
+            {
+                case CompanionMoodValence.Negative:
+                    empathyLine = mood.Intensity switch
+                    {
+                        CompanionMoodIntensity.High => $"That sounds rough being {mood.Descriptor}. I'm right here if you need to slow down.",
+                        CompanionMoodIntensity.Medium => $"I'll keep watch while you're {mood.Descriptor}. Call it if you need a breather.",
+                        _ => $"Take it easy while you're {mood.Descriptor}; I'll cover the small stuff."
+                    };
+                    break;
+                case CompanionMoodValence.Positive:
+                    empathyLine = mood.Intensity switch
+                    {
+                        CompanionMoodIntensity.High => $"Love the spark from you being {mood.Descriptor}! Let's ride it while it lasts.",
+                        CompanionMoodIntensity.Medium => $"Great hearing you're {mood.Descriptor}. I'll match that energy.",
+                        _ => $"Glad you're {mood.Descriptor}. Let's keep things steady."
+                    };
+                    break;
+                default:
+                    empathyLine = $"Thanks for letting me know you're {mood.Descriptor}. I'm keeping tabs.";
+                    break;
+            }
+
+            if (!string.IsNullOrWhiteSpace(empathyLine))
+                segments.Add(empathyLine);
+        }
+
+        private string BuildMoodHopeLine(CompanionMoodInterpretation mood)
+        {
+            if (!mood.HasMood)
+                return string.Empty;
+
+            return mood.Valence switch
+            {
+                CompanionMoodValence.Negative => mood.Intensity switch
+                {
+                    CompanionMoodIntensity.High => $"Hang in there while you're {mood.Descriptor}. We can pause whenever you need.",
+                    CompanionMoodIntensity.Medium => $"Hope being {mood.Descriptor} eases up soon.",
+                    _ => $"Rest if you need to while you're {mood.Descriptor}; I've got you."
+                },
+                CompanionMoodValence.Positive => mood.Intensity switch
+                {
+                    CompanionMoodIntensity.High => $"Love hearing you're {mood.Descriptor}!",
+                    CompanionMoodIntensity.Medium => $"Glad you're {mood.Descriptor}.",
+                    _ => $"Good to know you're {mood.Descriptor}."
+                },
+                _ => $"Hope you stay {mood.Descriptor}."
+            };
+        }
+
+        private bool MaybeQueueMoodFollowUp(
+            CompanionMoodInterpretation detectedMood,
+            CompanionMoodInterpretation memoryMood,
+            CompanionMoodInterpretation empathyMood,
+            string playerName,
+            List<string> segments,
+            List<string> followUps)
+        {
+            bool recordedFollowUp = false;
+
+            if (followUps != null && detectedMood.HasMood && detectedMood.Valence == CompanionMoodValence.Negative)
+            {
+                string immediate = BuildMoodFollowUpPrompt(detectedMood, playerName, true);
+                if (!string.IsNullOrEmpty(immediate))
+                    followUps.Add(immediate);
+            }
+
+            if (conversationMemory == null || !conversationMemory.PendingMoodFollowUp)
+                return recordedFollowUp;
+
+            if (detectedMood.HasMood && detectedMood.Valence != CompanionMoodValence.Negative)
+                return recordedFollowUp;
+
+            if (!ShouldSendMoodFollowUp())
+                return recordedFollowUp;
+
+            var moodToCheck = memoryMood.HasMood ? memoryMood : empathyMood;
+            if (!moodToCheck.HasMood || moodToCheck.Valence != CompanionMoodValence.Negative)
+                return recordedFollowUp;
+
+            string checkIn = BuildMoodFollowUpPrompt(moodToCheck, playerName, false);
+            if (!string.IsNullOrEmpty(checkIn) && segments != null)
+            {
+                segments.Add(checkIn);
+                recordedFollowUp = true;
+            }
+
+            return recordedFollowUp;
+        }
+
+        private bool ShouldSendMoodFollowUp()
+        {
+            if (conversationMemory == null)
+                return false;
+
+            if (!conversationMemory.LastMoodFollowUpUtc.HasValue)
+                return true;
+
+            double minutes = (DateTime.UtcNow - conversationMemory.LastMoodFollowUpUtc.Value).TotalMinutes;
+            return minutes >= Math.Max(0.1f, moodFollowUpCooldownMinutes);
+        }
+
+        private string BuildMoodFollowUpPrompt(CompanionMoodInterpretation mood, string playerName, bool immediate)
+        {
+            if (!mood.HasMood || mood.Valence != CompanionMoodValence.Negative)
+                return string.Empty;
+
+            string name = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName;
+
+            if (immediate)
+            {
+                return mood.Intensity switch
+                {
+                    CompanionMoodIntensity.High => $"If being {mood.Descriptor} gets worse, say the word and we'll make camp, {name}.",
+                    CompanionMoodIntensity.Medium => $"Let me know if {mood.Descriptor} sticks around, {name}. We can ease up.",
+                    _ => $"Keep me posted if that {mood.Descriptor} shifts at all, {name}."
+                };
+            }
+
+            return mood.Intensity switch
+            {
+                CompanionMoodIntensity.High => $"Still watching out while you're {mood.Descriptor}, {name}. Want to slow the pace for a bit?",
+                CompanionMoodIntensity.Medium => $"How are you holding up being {mood.Descriptor} today, {name}? Need anything?",
+                _ => $"Feeling any better than {mood.Descriptor}, {name}? Happy to take a break." 
+            };
+        }
+
+        private static CompanionMoodInterpretation SelectDominantMood(CompanionMoodInterpretation current, CompanionMoodInterpretation candidate)
+        {
+            if (!candidate.HasMood)
+                return current;
+
+            if (!current.HasMood)
+                return candidate;
+
+            if (candidate.Valence == CompanionMoodValence.Negative && current.Valence != CompanionMoodValence.Negative)
+                return candidate;
+
+            if (current.Valence == CompanionMoodValence.Negative && candidate.Valence != CompanionMoodValence.Negative)
+                return current;
+
+            if ((int)candidate.Intensity > (int)current.Intensity)
+                return candidate;
+
+            return current;
         }
 
         private CompanionResponseContext BuildResponseContext()
@@ -988,58 +1157,9 @@ namespace Companions.Conversation
             return CompactWhitespace(result);
         }
 
-        private string DetectPlayerMood(IReadOnlyList<string> tokens)
+        private CompanionMoodInterpretation DetectPlayerMood(IReadOnlyList<string> tokens)
         {
-            if (tokens == null || tokens.Count == 0)
-                return string.Empty;
-
-            for (int i = 0; i < tokens.Count; i++)
-            {
-                string token = tokens[i];
-                if (string.IsNullOrEmpty(token))
-                    continue;
-
-                if (PlayerMoodLookup.TryGetValue(token, out string mood))
-                    return mood;
-
-                string stemmed = StemTokenForLookup(token);
-                if (!string.IsNullOrEmpty(stemmed) && PlayerMoodLookup.TryGetValue(stemmed, out mood))
-                    return mood;
-
-                if (token == "not" && i + 1 < tokens.Count)
-                {
-                    string next = tokens[i + 1];
-                    if (PlayerMoodLookup.TryGetValue(next, out string nextMood))
-                        return $"not {nextMood}";
-
-                    if (next == "bad")
-                        return "doing not bad";
-                }
-            }
-
-            return string.Empty;
-        }
-
-        private static string StemTokenForLookup(string token)
-        {
-            if (string.IsNullOrEmpty(token))
-                return string.Empty;
-
-            string result = token;
-
-            if (result.Length > 4 && result.EndsWith("ing", StringComparison.Ordinal))
-                result = result.Substring(0, result.Length - 3);
-            else if (result.Length > 5 && result.EndsWith("ness", StringComparison.Ordinal))
-                result = result.Substring(0, result.Length - 4);
-            else if (result.Length > 4 && result.EndsWith("ly", StringComparison.Ordinal))
-                result = result.Substring(0, result.Length - 2);
-            else if (result.Length > 3 && result.EndsWith("ed", StringComparison.Ordinal))
-                result = result.Substring(0, result.Length - 2);
-
-            if (result.Length < 2 || string.Equals(result, token, StringComparison.Ordinal))
-                return string.Empty;
-
-            return result;
+            return CompanionMoodInterpreter.Interpret(tokens);
         }
 
         private static string AppendSentence(string source, string sentence)
@@ -1248,22 +1368,26 @@ namespace Companions.Conversation
             public PendingResponse(
                 string text,
                 string statusSegment,
-                string playerMood,
-                IReadOnlyList<string> followUps = null)
+                CompanionMoodInterpretation playerMood,
+                IReadOnlyList<string> followUps = null,
+                bool shouldRecordMoodFollowUp = false)
             {
                 Text = text ?? string.Empty;
                 StatusSegment = statusSegment ?? string.Empty;
-                PlayerMood = playerMood ?? string.Empty;
+                PlayerMood = playerMood;
                 FollowUpSegments = followUps;
+                ShouldRecordMoodFollowUp = shouldRecordMoodFollowUp;
             }
 
             public string Text { get; }
 
             public string StatusSegment { get; }
 
-            public string PlayerMood { get; }
+            public CompanionMoodInterpretation PlayerMood { get; }
 
             public IReadOnlyList<string> FollowUpSegments { get; }
+
+            public bool ShouldRecordMoodFollowUp { get; }
         }
 
         [Serializable]
