@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ea278620b705fa52b64a191216f1aa44f8c4b1ca -->
+## 2025-10-23T15:34:38+01:00 — Merge pull request #1331 from aicovergod/codex/add-channel-switching-and-message-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 286 ++ / 11 --
+- Notes:
+  Add companion chat channel toggles to HUD
+---
+<!-- commit:e81d2e5097fc392b295318cde2e89828f6b5bc0d -->
+## 2025-10-23T15:34:32+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:030704a25b7b59fe87b087baf45a1d5914acae08 -->
 ## 2025-10-23T15:34:13+01:00 — Add companion channel toggle and routing for chat HUD
 
