@@ -38,6 +38,18 @@ namespace Companions.Conversation
         /// <summary>Tracks the last detected question so call-and-response flows can branch quickly.</summary>
         public DateTime? LastQuestionUtc { get; private set; }
 
+        /// <summary>Stores the most recent mood shared by the player.</summary>
+        public string LastKnownPlayerMood { get; private set; } = string.Empty;
+
+        /// <summary>Timestamp when <see cref="LastKnownPlayerMood"/> was last updated.</summary>
+        public DateTime? LastKnownPlayerMoodUtc { get; private set; }
+
+        /// <summary>Stores the most recent status response emitted by the companion.</summary>
+        public string LastStatusResponse { get; private set; } = string.Empty;
+
+        /// <summary>Timestamp when <see cref="LastStatusResponse"/> was last updated.</summary>
+        public DateTime? LastStatusResponseUtc { get; private set; }
+
         private static readonly string[] GreetingKeywords =
         {
             "hello",
@@ -126,6 +138,45 @@ namespace Companions.Conversation
         }
 
         /// <summary>
+        /// Updates the cached player mood so the conversation service can acknowledge it in future replies.
+        /// </summary>
+        /// <param name="mood">Textual description of the player's mood.</param>
+        /// <param name="timestampUtc">Timestamp to record for the update.</param>
+        public void SetLastKnownPlayerMood(string mood, DateTime timestampUtc)
+        {
+            if (string.IsNullOrWhiteSpace(mood))
+                return;
+
+            string trimmed = mood.Trim();
+            LastKnownPlayerMood = trimmed;
+            LastKnownPlayerMoodUtc = EnsureUtc(timestampUtc);
+
+            if (enableDebugLogging)
+                Debug.Log($"[CompanionConversationMemory] Recorded player mood '{LastKnownPlayerMood}' at {LastKnownPlayerMoodUtc:o}.");
+
+            Save();
+        }
+
+        /// <summary>
+        /// Stores the most recent companion status response so repeat messages can be avoided.
+        /// </summary>
+        /// <param name="responseText">Status line emitted by the companion.</param>
+        /// <param name="timestampUtc">Timestamp to log for the response.</param>
+        public void RegisterStatusResponse(string responseText, DateTime timestampUtc)
+        {
+            if (string.IsNullOrWhiteSpace(responseText))
+                return;
+
+            LastStatusResponse = responseText.Trim();
+            LastStatusResponseUtc = EnsureUtc(timestampUtc);
+
+            if (enableDebugLogging)
+                Debug.Log($"[CompanionConversationMemory] Registered status response '{LastStatusResponse}'.");
+
+            Save();
+        }
+
+        /// <summary>
         /// Appends a new entry using an explicit timestamp. Exposed to support deterministic unit tests.
         /// </summary>
         /// <param name="speaker">Speaker responsible for the dialogue line.</param>
@@ -149,6 +200,10 @@ namespace Companions.Conversation
             entries.Clear();
             LastGreetingUtc = null;
             LastQuestionUtc = null;
+            LastKnownPlayerMood = string.Empty;
+            LastKnownPlayerMoodUtc = null;
+            LastStatusResponse = string.Empty;
+            LastStatusResponseUtc = null;
             Save();
         }
 
@@ -158,6 +213,10 @@ namespace Companions.Conversation
             entries.Clear();
             LastGreetingUtc = null;
             LastQuestionUtc = null;
+            LastKnownPlayerMood = string.Empty;
+            LastKnownPlayerMoodUtc = null;
+            LastStatusResponse = string.Empty;
+            LastStatusResponseUtc = null;
 
             var data = SaveManager.Load<ConversationLogData>(SaveKey);
             if (data?.entries != null)
@@ -172,6 +231,14 @@ namespace Companions.Conversation
                 }
             }
 
+            if (data != null)
+            {
+                LastKnownPlayerMood = data.lastKnownPlayerMood ?? string.Empty;
+                LastKnownPlayerMoodUtc = SafeCreateUtcNullable(data.lastKnownPlayerMoodTimestampTicks);
+                LastStatusResponse = data.lastStatusResponse ?? string.Empty;
+                LastStatusResponseUtc = SafeCreateUtcNullable(data.lastStatusResponseTicks);
+            }
+
             bool trimmed = TrimEntries(DateTime.UtcNow);
             if (trimmed)
                 Save();
@@ -182,7 +249,11 @@ namespace Companions.Conversation
         {
             var payload = new ConversationLogData
             {
-                entries = new List<ConversationEntryData>(entries.Count)
+                entries = new List<ConversationEntryData>(entries.Count),
+                lastKnownPlayerMood = LastKnownPlayerMood,
+                lastKnownPlayerMoodTimestampTicks = LastKnownPlayerMoodUtc?.Ticks ?? 0,
+                lastStatusResponse = LastStatusResponse,
+                lastStatusResponseTicks = LastStatusResponseUtc?.Ticks ?? 0
             };
 
             for (int i = 0; i < entries.Count; i++)
@@ -346,6 +417,11 @@ namespace Companions.Conversation
             return TimeSpan.FromMinutes(retentionWindowMinutes);
         }
 
+        private static DateTime EnsureUtc(DateTime timestamp)
+        {
+            return timestamp.Kind == DateTimeKind.Utc ? timestamp : timestamp.ToUniversalTime();
+        }
+
         private static DateTime SafeCreateUtc(long ticks)
         {
             if (ticks <= 0)
@@ -361,10 +437,29 @@ namespace Companions.Conversation
             }
         }
 
+        private static DateTime? SafeCreateUtcNullable(long ticks)
+        {
+            if (ticks <= 0)
+                return null;
+
+            try
+            {
+                return new DateTime(ticks, DateTimeKind.Utc);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         [Serializable]
         private sealed class ConversationLogData
         {
             public List<ConversationEntryData> entries = new List<ConversationEntryData>();
+            public string lastKnownPlayerMood;
+            public long lastKnownPlayerMoodTimestampTicks;
+            public string lastStatusResponse;
+            public long lastStatusResponseTicks;
         }
 
         [Serializable]

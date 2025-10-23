@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6cb76e048d703f59b867d573281abd17c187e83c -->
+## 2025-10-23T16:03:15+01:00 — Add companion chat intent parsing and response service
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueParser.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueResponseLibrary.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueRule.cs
+- Diff: 1314 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:729fb8d0e81fa3cf4a87fef71fc60c8096f262de -->
 ## 2025-10-23T15:48:03+01:00 — Merge pull request #1332 from aicovergod/codex/implement-companionconversationmemory-class
 
