@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8eeb23d1ded1e4ba91efb3016e3845de465bc258 -->
+## 2025-10-24T00:18:14+01:00 — Refactor companion dialogue blocks into dedicated container
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionSkillProposalDialogueBlocks.cs
+- Diff: 181 ++ / 131 --
+- Notes:
+  —
+---
 <!-- commit:0340539c27a5f8a97d82a0d6231e403e9ba845b8 -->
 ## 2025-10-24T00:12:55+01:00 — Merge pull request #1358 from aicovergod/codex/rename-player-skill-proposal-identifiers
 
