@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:75027284436d05ed090d21bde5cf46e7aaf69578 -->
+## 2025-10-23T21:52:36+01:00 — Add developer command to force companion questions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs, Assets/Scripts/Player/Commands/TestCompanionQuestionCommand.cs, Assets/Scripts/Player/Commands/TestCompanionQuestionCommand.cs.meta
+- Diff: 150 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:4fdef8a1448c99f997fa55397e705deb1acccc3a -->
 ## 2025-10-23T21:35:28+01:00 — Merge pull request #1348 from aicovergod/codex/fix-parameterless-struct-constructor-bugs
 
