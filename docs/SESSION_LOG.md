@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ea233dfda036d7625c2d4d99fb3e3bd3d1008a2c -->
+## 2025-10-23T18:04:24+01:00 — Merge pull request #1340 from aicovergod/codex/fix-this-issue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 5 --
+- Notes:
+  Fix single-word companion dialogue intent detection
+---
+<!-- commit:bf2bb33163c45aa69f3ddd959aac47da3f81903b -->
+## 2025-10-23T18:04:16+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ce7b523dcfb4d69b7749f09810ae1a19865f567d -->
 ## 2025-10-23T18:03:56+01:00 — Restore single word companion dialogue matches
 
