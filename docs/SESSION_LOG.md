@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1da2f35a898ebb9c56fd2adac777ad5f30df46b9 -->
+## 2025-10-23T14:03:05+01:00 — Merge pull request #1327 from aicovergod/codex/add-equipment-slot-change-event
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 135 ++ / 8 --
+- Notes:
+  Stop companion ore golem attacks when pickaxe removed
+---
+<!-- commit:abdd69850eece5fac6e1aaaacdc2f3f68df7c866 -->
+## 2025-10-23T14:02:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:52186d80d2e632ca1e9c11328250e3c206dc3974 -->
 ## 2025-10-23T14:02:36+01:00 — Stop companion ore golem attacks when pickaxe removed
 
