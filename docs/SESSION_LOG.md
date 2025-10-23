@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5605d046f9679954dc807cd3c46be3afdcbfd768 -->
+## 2025-10-23T20:46:10+01:00 — more dialogue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs
+- Diff: 234 ++ / 31 --
+- Notes:
+  —
+---
 <!-- commit:07774d42747efc6761fd09c2bc7d4d3a39b1ddf1 -->
 ## 2025-10-23T19:50:17+01:00 — dialogue
 
