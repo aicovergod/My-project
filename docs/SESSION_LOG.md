@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4fdef8a1448c99f997fa55397e705deb1acccc3a -->
+## 2025-10-23T21:35:28+01:00 — Merge pull request #1348 from aicovergod/codex/fix-parameterless-struct-constructor-bugs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2 ++ / 2 --
+- Notes:
+  Fix ActiveSkillQuestion struct constructor for C# 9 compatibility
+---
+<!-- commit:9f5ace4f025b247bb28a3cde93eea6beb2c7df37 -->
+## 2025-10-23T21:35:15+01:00 — Fix ActiveSkillQuestion struct initialization
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 2 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:d2f5b603854cabde92afee5ad4f014d6d0b5f54b -->
 ## 2025-10-23T21:31:48+01:00 — Merge pull request #1347 from aicovergod/codex/implement-proactive-question-scheduling-and-response-logic
 
