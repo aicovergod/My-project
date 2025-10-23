@@ -174,6 +174,12 @@ namespace Companions.Conversation
         private static readonly TimeSpan CompanionCombatActivityWindow = TimeSpan.FromSeconds(5);
         private const float SkillProposalFollowUpChance = 0.65f;
 
+        /// <summary>
+        /// Reduced probability used for the generic ready/missing tool follow-up pools so they only
+        /// trigger roughly thirty percent of the time, keeping those beats feeling occasional.
+        /// </summary>
+        private const float SkillProposalLightFollowUpChance = 0.3f;
+
         private bool ResponseRoutineActive => responseRoutine != null;
 
         private bool ShouldTraceRules => CompanionManager.EnableDebugLogging && enableRuleTracing;
@@ -1394,7 +1400,11 @@ namespace Companions.Conversation
                 ? CompanionSkillProposalDialogueBlocks.PlayerMiningProposalReadyWithToolFollowUps
                 : CompanionSkillProposalDialogueBlocks.PlayerSkillProposalReadyGenericFollowUps;
 
-            TryAppendSkillProposalFollowUp(followUps, followUpPool, replacements);
+            float followUpChance = useMiningSpecificPool
+                ? SkillProposalFollowUpChance
+                : SkillProposalLightFollowUpChance;
+
+            TryAppendSkillProposalFollowUp(followUps, followUpPool, replacements, followUpChance);
 
             DateTime nowUtc = DateTime.UtcNow;
             lastProactiveQuestionUtc = nowUtc;
@@ -1447,7 +1457,11 @@ namespace Companions.Conversation
             if (!string.IsNullOrWhiteSpace(primary))
                 segments.Add(primary);
 
-            TryAppendSkillProposalFollowUp(followUps, CompanionSkillProposalDialogueBlocks.PlayerSkillProposalMissingToolFollowUps, replacements);
+            TryAppendSkillProposalFollowUp(
+                followUps,
+                CompanionSkillProposalDialogueBlocks.PlayerSkillProposalMissingToolFollowUps,
+                replacements,
+                SkillProposalLightFollowUpChance);
         }
 
         private void ComposeAlternateSkillResponse(
@@ -1563,12 +1577,13 @@ namespace Companions.Conversation
         private void TryAppendSkillProposalFollowUp(
             List<string> followUps,
             string[] pool,
-            IReadOnlyDictionary<string, string> replacements)
+            IReadOnlyDictionary<string, string> replacements,
+            float chance = SkillProposalFollowUpChance)
         {
             if (followUps == null || pool == null || pool.Length == 0)
                 return;
 
-            if (UnityEngine.Random.value > SkillProposalFollowUpChance)
+            if (UnityEngine.Random.value > chance)
                 return;
 
             string followUp = ApplyProposalTokens(ChooseRandom(pool), replacements);
