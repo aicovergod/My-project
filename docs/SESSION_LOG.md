@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ba255f12c6123270fc4e84e1ebcdbca4cc78ec9e -->
+## 2025-10-23T16:28:20+01:00 — Allow chat content layouts to wrap messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/UI/Chat/EmojiTokenLayout.cs, Assets/Scripts/UI/FloatingText.cs
+- Diff: 45 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:f90155deeda2b0259af3a0790e01858f5cfb02cc -->
 ## 2025-10-23T16:03:42+01:00 — Merge pull request #1333 from aicovergod/codex/add-companion-conversation-service-and-parser
 

@@ -12,6 +12,10 @@ namespace UI.Chat
     {
         [SerializeField] private float spacing = 2f;
 
+        [SerializeField]
+        [Tooltip("When enabled the layout will force all text tokens onto a single line. Disable to allow wrapping.")]
+        private bool enforceSingleLine = true;
+
         private readonly List<Component> activeComponents = new List<Component>();
         private readonly Queue<Text> textPool = new Queue<Text>();
         private readonly Queue<Image> imagePool = new Queue<Image>();
@@ -103,10 +107,7 @@ namespace UI.Chat
                     text.color = textColor;
                     text.fontSize = fontSize;
                     text.alignment = ResolveTextAlignment(alignment);
-                    // Force long chat strings to remain on a single line even when
-                    // players enter lengthy messages. Wrapping caused floating chat
-                    // bubbles to stack vertically and break the OSRS-style speech look.
-                    text.horizontalOverflow = HorizontalWrapMode.Overflow;
+                    text.horizontalOverflow = ResolveHorizontalWrapMode();
                     text.verticalOverflow = VerticalWrapMode.Overflow;
                     text.raycastTarget = false;
                     Activate(text, ref activeIndex);
@@ -114,6 +115,21 @@ namespace UI.Chat
             }
 
             TrimExcess(activeIndex);
+            RefreshLayoutSize();
+        }
+
+        /// <summary>
+        ///     Enables or disables the single-line enforcement for rendered text tokens.
+        ///     When disabled, text is allowed to wrap across multiple lines.
+        /// </summary>
+        /// <param name="shouldEnforceSingleLine">Whether tokens should remain on a single line.</param>
+        public void SetSingleLine(bool shouldEnforceSingleLine)
+        {
+            if (enforceSingleLine == shouldEnforceSingleLine)
+                return;
+
+            enforceSingleLine = shouldEnforceSingleLine;
+            ApplyOverflowModeToActiveText();
             RefreshLayoutSize();
         }
 
@@ -184,6 +200,27 @@ namespace UI.Chat
                 activeComponents.Add(component);
 
             index++;
+        }
+
+        private void ApplyOverflowModeToActiveText()
+        {
+            if (activeComponents.Count == 0)
+                return;
+
+            var wrapMode = ResolveHorizontalWrapMode();
+            for (int i = 0; i < activeComponents.Count; i++)
+            {
+                if (activeComponents[i] is Text textComponent)
+                {
+                    textComponent.horizontalOverflow = wrapMode;
+                    textComponent.verticalOverflow = VerticalWrapMode.Overflow;
+                }
+            }
+        }
+
+        private HorizontalWrapMode ResolveHorizontalWrapMode()
+        {
+            return enforceSingleLine ? HorizontalWrapMode.Overflow : HorizontalWrapMode.Wrap;
         }
 
         private Text AcquireText()

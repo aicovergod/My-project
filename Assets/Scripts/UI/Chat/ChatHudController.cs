@@ -1774,6 +1774,7 @@ namespace UI.Chat
                 prefixLayout.preferredWidth = -1f;
 
                 prefixTokenLayout = prefixObject.GetComponent<EmojiTokenLayout>();
+                prefixTokenLayout.SetSingleLine(true);
 
                 var contentObject = new GameObject("Content", typeof(RectTransform), typeof(EmojiTokenLayout), typeof(LayoutElement));
                 var contentRect = contentObject.GetComponent<RectTransform>();
@@ -1789,6 +1790,8 @@ namespace UI.Chat
                 contentLayout.preferredWidth = -1f;
 
                 TokenLayout = contentObject.GetComponent<EmojiTokenLayout>();
+                // Chat history entries should wrap long messages so the scroll view can display multi-line content.
+                TokenLayout.SetSingleLine(false);
             }
 
             public GameObject Root { get; }
