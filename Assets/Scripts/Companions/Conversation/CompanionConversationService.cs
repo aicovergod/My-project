@@ -970,9 +970,13 @@ namespace Companions.Conversation
             string companionMood = ResolveCompanionMoodDescriptor();
             string recentEvent = ResolveRecentEventSummary();
             var context = BuildResponseContext(activeSkillQuestion.TryGetCandidate());
+            bool skillResponseResolved = false;
 
             for (int i = 0; i < parseResult.Matches.Count; i++)
             {
+                if (skillResponseResolved)
+                    break;
+
                 var match = parseResult.Matches[i];
                 switch (match.Intent)
                 {
@@ -1034,14 +1038,26 @@ namespace Companions.Conversation
                     case CompanionDialogueIntent.DeclineSkillPlan:
                     case CompanionDialogueIntent.DeferSkillPlan:
                     case CompanionDialogueIntent.RequestAlternateSkill:
-                        TryHandleSkillPlanIntent(
-                            match.Intent,
-                            context,
-                            segments,
-                            followUps,
-                            playerName,
-                            ref companionMood,
-                            recentEvent);
+                        {
+                            int segmentCountBefore = segments.Count;
+                            int followUpCountBefore = followUps.Count;
+                            if (TryHandleSkillPlanIntent(
+                                    match.Intent,
+                                    context,
+                                    segments,
+                                    followUps,
+                                    playerName,
+                                    ref companionMood,
+                                    recentEvent))
+                            {
+                                if (segmentCountBefore > 0)
+                                    segments.RemoveRange(0, segmentCountBefore);
+                                if (followUpCountBefore > 0)
+                                    followUps.RemoveRange(0, followUpCountBefore);
+                                statusSegment = string.Empty;
+                                skillResponseResolved = true;
+                            }
+                        }
                         break;
 
                     case CompanionDialogueIntent.RequestAssistance:
@@ -1056,13 +1072,25 @@ namespace Companions.Conversation
                         break;
 
                     case CompanionDialogueIntent.PlayerSkillProposal:
-                        TryHandlePlayerSkillProposal(
-                            parseResult,
-                            context,
-                            segments,
-                            followUps,
-                            playerName,
-                            ref companionMood);
+                        {
+                            int segmentCountBefore = segments.Count;
+                            int followUpCountBefore = followUps.Count;
+                            if (TryHandlePlayerSkillProposal(
+                                    parseResult,
+                                    context,
+                                    segments,
+                                    followUps,
+                                    playerName,
+                                    ref companionMood))
+                            {
+                                if (segmentCountBefore > 0)
+                                    segments.RemoveRange(0, segmentCountBefore);
+                                if (followUpCountBefore > 0)
+                                    followUps.RemoveRange(0, followUpCountBefore);
+                                statusSegment = string.Empty;
+                                skillResponseResolved = true;
+                            }
+                        }
                         break;
 
                     case CompanionDialogueIntent.AcknowledgeRecentEvent:
@@ -1079,6 +1107,9 @@ namespace Companions.Conversation
                         }
                         break;
                 }
+
+                if (skillResponseResolved)
+                    break;
             }
 
             if (segments.Count == 0)
