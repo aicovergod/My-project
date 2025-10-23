@@ -117,6 +117,7 @@ namespace UI
             contentRect.anchoredPosition = Vector2.zero;
 
             instance.tokenLayout = contentGO.GetComponent<EmojiTokenLayout>();
+            instance.tokenLayout.SetSingleLine(true);
             var targetRect = background != null ? parentRect : contentRect;
             instance.rectTransform = targetRect;
             instance.mainCamera = Camera.main;
