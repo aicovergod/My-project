@@ -46,6 +46,31 @@ namespace Companions.Conversation
         /// <summary>
         /// Player referenced a prior shared event that deserves acknowledgement.
         /// </summary>
-        AcknowledgeRecentEvent = 70
+        AcknowledgeRecentEvent = 70,
+
+        /// <summary>
+        /// Companion is proactively prompting the player about a recent skill activity.
+        /// </summary>
+        ProactiveSkillQuestion = 75,
+
+        /// <summary>
+        /// Player accepted the companion's suggested skill plan.
+        /// </summary>
+        AcceptSkillPlan = 80,
+
+        /// <summary>
+        /// Player declined the companion's suggested skill plan.
+        /// </summary>
+        DeclineSkillPlan = 90,
+
+        /// <summary>
+        /// Player deferred the suggested skill plan to a later time.
+        /// </summary>
+        DeferSkillPlan = 100,
+
+        /// <summary>
+        /// Player requested a different skill suggestion from the companion.
+        /// </summary>
+        RequestAlternateSkill = 110
     }
 }

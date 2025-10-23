@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6a2c8cbde0877ced6d409a41df6a4cdf23e529ed -->
+## 2025-10-23T21:31:22+01:00 — Add coverage for skill plan intents and responses
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs, Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs, Assets/Scripts/Companions/Conversation/CompanionResponseContext.cs, Assets/Tests/Companions/CompanionDialogueIntentTests.cs
+- Diff: 873 ++ / 14 --
+- Notes:
+  —
+---
 <!-- commit:5605d046f9679954dc807cd3c46be3afdcbfd768 -->
 ## 2025-10-23T20:46:10+01:00 — more dialogue
 

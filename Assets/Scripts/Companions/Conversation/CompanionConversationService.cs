@@ -9,6 +9,7 @@ using UI.Chat;
 using UnityEngine;
 using World;
 using Skills;
+using Util;
 
 namespace Companions.Conversation
 {
@@ -17,7 +18,7 @@ namespace Companions.Conversation
     /// and orchestrates context-aware companion responses.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class CompanionConversationService : SceneGatedSingletonBehaviour<CompanionConversationService>
+    public sealed class CompanionConversationService : SceneGatedSingletonBehaviour<CompanionConversationService>, ITickable
     {
         [Header("Dependencies")]
         [SerializeField, Tooltip("Optional explicit reference to the conversation memory component.")]
@@ -37,7 +38,12 @@ namespace Companions.Conversation
             new IntentScoreThreshold(CompanionDialogueIntent.Farewell, 1.4f),
             new IntentScoreThreshold(CompanionDialogueIntent.Compliment, 1.8f),
             new IntentScoreThreshold(CompanionDialogueIntent.RequestAssistance, 1.8f),
-            new IntentScoreThreshold(CompanionDialogueIntent.AcknowledgeRecentEvent, 1.6f)
+            new IntentScoreThreshold(CompanionDialogueIntent.AcknowledgeRecentEvent, 1.6f),
+            new IntentScoreThreshold(CompanionDialogueIntent.ProactiveSkillQuestion, 1f),
+            new IntentScoreThreshold(CompanionDialogueIntent.AcceptSkillPlan, 1.7f),
+            new IntentScoreThreshold(CompanionDialogueIntent.DeclineSkillPlan, 1.6f),
+            new IntentScoreThreshold(CompanionDialogueIntent.DeferSkillPlan, 1.6f),
+            new IntentScoreThreshold(CompanionDialogueIntent.RequestAlternateSkill, 1.6f)
         };
 
         private readonly List<CompanionDialogueRule> rules = new List<CompanionDialogueRule>();
@@ -78,6 +84,16 @@ namespace Companions.Conversation
         [SerializeField, Tooltip("Minimum minutes between proactive mood check-ins when the player feels down.")]
         private float moodFollowUpCooldownMinutes = 2.5f;
 
+        [Header("Proactive Skill Scheduler")]
+        [SerializeField, Tooltip("Number of idle ticks before the companion considers prompting about a skill."), Min(1)]
+        private int proactiveIdleTickThreshold = 6;
+
+        [SerializeField, Tooltip("Cooldown applied between proactive skill questions (minutes)."), Min(0.1f)]
+        private float proactiveQuestionCooldownMinutes = 6f;
+
+        [SerializeField, Tooltip("Maximum age (in minutes) of a skill event that can seed a proactive prompt."), Min(0.1f)]
+        private float minimumSkillEventFreshnessMinutes = 12f;
+
         private readonly Queue<PendingResponse> pendingResponses = new Queue<PendingResponse>();
         private CompanionDialogueParser parser;
         private Coroutine responseRoutine;
@@ -89,9 +105,22 @@ namespace Companions.Conversation
         private Coroutine playerBindingRoutine;
         private readonly LinkedList<SkillActionRecord> recentSkillActions = new LinkedList<SkillActionRecord>();
         private string lastStatusTemplateKey = string.Empty;
+        private string lastPlayerMessage = string.Empty;
+        private DateTime? lastPlayerMessageUtc;
+        private string lastProactiveQuestion = string.Empty;
+        private DateTime? lastProactiveQuestionUtc;
+        private string lastProactiveQuestionTemplateKey = string.Empty;
+        private ActiveSkillQuestion activeSkillQuestion = ActiveSkillQuestion.Empty;
+        private readonly LinkedList<SkillQuestionCandidate> skillQuestionCandidates = new LinkedList<SkillQuestionCandidate>();
+        private int idleTickCounter;
+        private bool tickerSubscribed;
+        private Coroutine tickerSubscriptionRoutine;
+        private DateTime? lastCompanionCombatUtc;
 
         private const int MaxTrackedSkillActions = 6;
+        private const int MaxSkillQuestionCandidates = 6;
         private static readonly TimeSpan SkillActionRetention = TimeSpan.FromMinutes(15);
+        private static readonly TimeSpan CompanionCombatActivityWindow = TimeSpan.FromSeconds(5);
 
         private bool ResponseRoutineActive => responseRoutine != null;
 
@@ -140,6 +169,7 @@ namespace Companions.Conversation
 
             EnsureChatSubscription();
             EnsurePlayerContextBindings();
+            SubscribeToTicker();
 
             SceneTransitionManager.TransitionCompleted -= HandleSceneTransitionCompleted;
             SceneTransitionManager.TransitionCompleted += HandleSceneTransitionCompleted;
@@ -166,12 +196,19 @@ namespace Companions.Conversation
         {
             EnsureConversationMemoryBound();
             conversationMemory?.RegisterEvent(summary, eventType, metadata);
+
+            if ((eventType == CompanionEventType.Gathering || eventType == CompanionEventType.Crafting) && metadata.HasValue)
+                RegisterSkillEventCandidate(summary, metadata.Value);
+
+            if (eventType == CompanionEventType.Combat && metadata.HasValue)
+                TrackCompanionCombat(metadata.Value);
         }
 
         /// <inheritdoc />
         protected override void OnSingletonDestroyed()
         {
             UnsubscribeFromChat();
+            UnsubscribeFromTicker();
 
             SceneTransitionManager.TransitionCompleted -= HandleSceneTransitionCompleted;
             UnbindPlayerContext();
@@ -183,6 +220,17 @@ namespace Companions.Conversation
                 StopCoroutine(responseRoutine);
 
             pendingResponses.Clear();
+            skillQuestionCandidates.Clear();
+            activeSkillQuestion = ActiveSkillQuestion.Empty;
+            lastPlayerMessage = string.Empty;
+            lastPlayerMessageUtc = null;
+            lastProactiveQuestion = string.Empty;
+            lastProactiveQuestionUtc = null;
+            lastProactiveQuestionTemplateKey = string.Empty;
+            idleTickCounter = 0;
+            tickerSubscriptionRoutine = null;
+            tickerSubscribed = false;
+            lastCompanionCombatUtc = null;
 
             base.OnSingletonDestroyed();
         }
@@ -215,6 +263,42 @@ namespace Companions.Conversation
             var chat = ChatService.Instance;
             if (chat != null)
                 chat.MessageReceived -= HandleMessageReceived;
+        }
+
+        private void SubscribeToTicker()
+        {
+            if (Ticker.Instance != null)
+            {
+                Ticker.Instance.Subscribe(this);
+                tickerSubscribed = true;
+                return;
+            }
+
+            if (tickerSubscriptionRoutine == null)
+                tickerSubscriptionRoutine = StartCoroutine(WaitForTicker());
+        }
+
+        private IEnumerator WaitForTicker()
+        {
+            while (Ticker.Instance == null)
+                yield return null;
+
+            tickerSubscriptionRoutine = null;
+            SubscribeToTicker();
+        }
+
+        private void UnsubscribeFromTicker()
+        {
+            if (Ticker.Instance != null && tickerSubscribed)
+                Ticker.Instance.Unsubscribe(this);
+
+            tickerSubscribed = false;
+
+            if (tickerSubscriptionRoutine != null)
+            {
+                StopCoroutine(tickerSubscriptionRoutine);
+                tickerSubscriptionRoutine = null;
+            }
         }
 
         private void EnsurePlayerContextBindings()
@@ -340,6 +424,15 @@ namespace Companions.Conversation
             RecordSkillAction($"Reached level {level} in {skillName}");
         }
 
+        /// <inheritdoc />
+        public void OnTick()
+        {
+            DateTime nowUtc = DateTime.UtcNow;
+            PruneSkillActions(nowUtc);
+            ExpireActiveSkillQuestionIfStale(nowUtc);
+            MaybeScheduleProactiveQuestion(nowUtc);
+        }
+
         private void RecordSkillAction(string description)
         {
             if (string.IsNullOrWhiteSpace(description))
@@ -351,7 +444,9 @@ namespace Companions.Conversation
             while (recentSkillActions.Count > MaxTrackedSkillActions)
                 recentSkillActions.RemoveLast();
 
-            PruneSkillActions(DateTime.UtcNow);
+            DateTime nowUtc = DateTime.UtcNow;
+            PruneSkillActions(nowUtc);
+            PruneSkillQuestionCandidates(nowUtc);
         }
 
         private void PruneSkillActions(DateTime nowUtc)
@@ -365,6 +460,291 @@ namespace Companions.Conversation
 
                 node = previous;
             }
+
+            PruneSkillQuestionCandidates(nowUtc);
+        }
+
+        private void PruneSkillQuestionCandidates(DateTime nowUtc)
+        {
+            TimeSpan freshnessWindow = TimeSpan.FromMinutes(Mathf.Max(0.1f, minimumSkillEventFreshnessMinutes));
+            var node = skillQuestionCandidates.Last;
+            while (node != null)
+            {
+                var previous = node.Previous;
+                if ((nowUtc - node.Value.TimestampUtc) > freshnessWindow)
+                    skillQuestionCandidates.Remove(node);
+
+                node = previous;
+            }
+
+            while (skillQuestionCandidates.Count > MaxSkillQuestionCandidates)
+                skillQuestionCandidates.RemoveLast();
+        }
+
+        private void RegisterSkillEventCandidate(string summary, CompanionEventMetadata metadata)
+        {
+            if (!metadata.Skill.HasValue)
+                return;
+
+            DateTime nowUtc = DateTime.UtcNow;
+            string skillName = SkillNameUtility.GetDisplayName(metadata.Skill.Value);
+            string description = BuildSkillActionDescription(summary, metadata, skillName);
+            if (!string.IsNullOrWhiteSpace(description))
+                RecordSkillAction(description);
+
+            var candidate = SkillQuestionCandidate.CreateForSkill(metadata.Skill.Value, skillName, description, nowUtc);
+
+            for (var node = skillQuestionCandidates.First; node != null; node = node.Next)
+            {
+                if (node.Value.Skill.HasValue && node.Value.Skill.Value == candidate.Skill &&
+                    string.Equals(node.Value.Description, candidate.Description, StringComparison.OrdinalIgnoreCase))
+                {
+                    skillQuestionCandidates.Remove(node);
+                    break;
+                }
+            }
+
+            skillQuestionCandidates.AddFirst(candidate);
+            PruneSkillQuestionCandidates(nowUtc);
+        }
+
+        private static string BuildSkillActionDescription(string summary, CompanionEventMetadata metadata, string skillName)
+        {
+            string context = !string.IsNullOrWhiteSpace(metadata.AdditionalContext)
+                ? metadata.AdditionalContext.Trim()
+                : summary;
+
+            if (string.IsNullOrWhiteSpace(context))
+                context = $"Trained {skillName}";
+            else if (!context.Contains(skillName, StringComparison.OrdinalIgnoreCase))
+                context = $"{skillName}: {context}";
+
+            return context.Trim();
+        }
+
+        private void TrackCompanionCombat(CompanionEventMetadata metadata)
+        {
+            if (string.IsNullOrWhiteSpace(metadata.PrimaryActor))
+                return;
+
+            string companionName = CompanionManager.GetCompanionDisplayName();
+            if (string.IsNullOrWhiteSpace(companionName))
+                companionName = "Companion";
+
+            if (string.Equals(metadata.PrimaryActor.Trim(), companionName, StringComparison.OrdinalIgnoreCase))
+                lastCompanionCombatUtc = DateTime.UtcNow;
+        }
+
+        private void MaybeScheduleProactiveQuestion(DateTime nowUtc)
+        {
+            if (!isActiveAndEnabled)
+                return;
+
+            if (ResponseRoutineActive || pendingResponses.Count > 0)
+            {
+                idleTickCounter = 0;
+                return;
+            }
+
+            if (playerInCombat || IsCompanionInCombat(nowUtc))
+            {
+                idleTickCounter = 0;
+                return;
+            }
+
+            if (activeSkillQuestion.IsActive)
+            {
+                idleTickCounter = 0;
+                return;
+            }
+
+            if (conversationMemory != null && conversationMemory.LastQuestionUtc.HasValue)
+            {
+                double minutesSinceQuestion = (nowUtc - conversationMemory.LastQuestionUtc.Value).TotalMinutes;
+                if (minutesSinceQuestion < Mathf.Max(0.1f, proactiveQuestionCooldownMinutes))
+                {
+                    idleTickCounter = 0;
+                    return;
+                }
+            }
+
+            if (lastProactiveQuestionUtc.HasValue)
+            {
+                double minutesSincePrompt = (nowUtc - lastProactiveQuestionUtc.Value).TotalMinutes;
+                if (minutesSincePrompt < Mathf.Max(0.1f, proactiveQuestionCooldownMinutes))
+                {
+                    idleTickCounter = 0;
+                    return;
+                }
+            }
+
+            idleTickCounter++;
+            if (idleTickCounter < Mathf.Max(1, proactiveIdleTickThreshold))
+                return;
+
+            if (!TryGetBestSkillCandidate(nowUtc, out var candidate))
+            {
+                if (!TryBuildFallbackSkillCandidate(nowUtc, out candidate))
+                    return;
+            }
+
+            ScheduleSkillQuestion(candidate, nowUtc);
+            idleTickCounter = 0;
+        }
+
+        private bool TryGetBestSkillCandidate(DateTime nowUtc, out SkillQuestionCandidate candidate, SkillType? excludeSkill = null)
+        {
+            PruneSkillQuestionCandidates(nowUtc);
+
+            var node = skillQuestionCandidates.First;
+            TimeSpan freshnessWindow = TimeSpan.FromMinutes(Mathf.Max(0.1f, minimumSkillEventFreshnessMinutes));
+            while (node != null)
+            {
+                var next = node.Next;
+                SkillQuestionCandidate value = node.Value;
+                if (excludeSkill.HasValue && value.Skill.HasValue && value.Skill.Value == excludeSkill.Value)
+                {
+                    node = next;
+                    continue;
+                }
+
+                if ((nowUtc - value.TimestampUtc) <= freshnessWindow)
+                {
+                    skillQuestionCandidates.Remove(node);
+                    candidate = value;
+                    return true;
+                }
+
+                node = next;
+            }
+
+            candidate = default;
+            return false;
+        }
+
+        private bool TryBuildFallbackSkillCandidate(DateTime nowUtc, out SkillQuestionCandidate candidate)
+        {
+            var node = recentSkillActions.First;
+            TimeSpan freshnessWindow = TimeSpan.FromMinutes(Mathf.Max(0.1f, minimumSkillEventFreshnessMinutes));
+            while (node != null)
+            {
+                var record = node.Value;
+                if ((nowUtc - record.TimestampUtc) <= freshnessWindow)
+                {
+                    candidate = SkillQuestionCandidate.CreateFromDescription(record.Description, record.TimestampUtc);
+                    return true;
+                }
+
+                node = node.Next;
+            }
+
+            candidate = default;
+            return false;
+        }
+
+        private void ScheduleSkillQuestion(SkillQuestionCandidate candidate, DateTime nowUtc)
+        {
+            EnsureConversationMemoryBound();
+
+            SkillQuestionCandidate? optionalCandidate = candidate.IsValid ? candidate : (SkillQuestionCandidate?)null;
+            var context = BuildResponseContext(optionalCandidate);
+
+            if (!responseLibrary.TrySelectResponse(
+                    CompanionDialogueIntent.ProactiveSkillQuestion,
+                    context,
+                    lastProactiveQuestionTemplateKey,
+                    out var selection))
+            {
+                return;
+            }
+
+            string playerName = ResolvePlayerName(string.Empty);
+            string companionMood = ResolveCompanionMoodDescriptor();
+            string formatted = FormatTemplate(
+                selection.PrimarySegment,
+                playerName,
+                string.Empty,
+                companionMood,
+                string.Empty,
+                context);
+
+            formatted = EnsureQuestionMark(formatted);
+            if (string.IsNullOrWhiteSpace(formatted))
+                return;
+
+            pendingResponses.Enqueue(new PendingResponse(formatted, string.Empty, CompanionMoodInterpretation.Empty));
+            if (!ResponseRoutineActive)
+                responseRoutine = StartCoroutine(DrainResponseQueue());
+
+            idleTickCounter = 0;
+            lastProactiveQuestion = formatted;
+            lastProactiveQuestionUtc = nowUtc;
+            lastProactiveQuestionTemplateKey = selection.TemplateKey;
+            activeSkillQuestion = new ActiveSkillQuestion(candidate, selection.TemplateKey, nowUtc);
+        }
+
+        private static string EnsureQuestionMark(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            string trimmed = value.Trim();
+            if (trimmed.EndsWith("?", StringComparison.Ordinal))
+                return trimmed;
+
+            trimmed = trimmed.TrimEnd('.', '!');
+            return trimmed + "?";
+        }
+
+        private void ExpireActiveSkillQuestionIfStale(DateTime nowUtc)
+        {
+            if (!activeSkillQuestion.IsActive)
+                return;
+
+            TimeSpan cooldown = TimeSpan.FromMinutes(Mathf.Max(0.1f, proactiveQuestionCooldownMinutes));
+            if (activeSkillQuestion.IsExpired(cooldown, nowUtc))
+                ClearActiveSkillQuestion();
+        }
+
+        private void ClearActiveSkillQuestion()
+        {
+            activeSkillQuestion = ActiveSkillQuestion.Empty;
+        }
+
+        private bool IsCompanionInCombat(DateTime nowUtc)
+        {
+            if (!lastCompanionCombatUtc.HasValue)
+                return false;
+
+            return (nowUtc - lastCompanionCombatUtc.Value) <= CompanionCombatActivityWindow;
+        }
+
+        private static string DescribeSkillRecency(TimeSpan age)
+        {
+            if (age.TotalSeconds <= 30)
+                return "just now";
+            if (age.TotalMinutes < 2)
+                return "a moment ago";
+            if (age.TotalMinutes < 10)
+                return $"about {Mathf.Max(1, Mathf.RoundToInt((float)age.TotalMinutes))} minutes ago";
+            if (age.TotalMinutes < 60)
+                return $"around {Mathf.Max(1, Mathf.RoundToInt((float)(age.TotalMinutes / 5f)) * 5)} minutes ago";
+
+            int hours = Mathf.Max(1, Mathf.RoundToInt((float)age.TotalHours));
+            return hours == 1 ? "about an hour ago" : $"around {hours} hours ago";
+        }
+
+        private void TryScheduleAlternateSkillQuestion(SkillType? excludeSkill)
+        {
+            DateTime nowUtc = DateTime.UtcNow;
+            if (TryGetBestSkillCandidate(nowUtc, out var candidate, excludeSkill))
+            {
+                ScheduleSkillQuestion(candidate, nowUtc);
+                return;
+            }
+
+            if (TryBuildFallbackSkillCandidate(nowUtc, out candidate))
+                ScheduleSkillQuestion(candidate, nowUtc);
         }
 
         private void HandleMessageReceived(ChatMessage message)
@@ -376,6 +756,10 @@ namespace Companions.Conversation
                 return;
 
             EnsurePlayerContextBindings();
+
+            lastPlayerMessage = message.Text ?? string.Empty;
+            lastPlayerMessageUtc = DateTime.UtcNow;
+            idleTickCounter = 0;
 
             string cleaned = NormaliseForParsing(message.Text);
             if (string.IsNullOrEmpty(cleaned))
@@ -398,6 +782,7 @@ namespace Companions.Conversation
                 return;
 
             pendingResponses.Enqueue(response.Value);
+            idleTickCounter = 0;
             if (!ResponseRoutineActive)
                 responseRoutine = StartCoroutine(DrainResponseQueue());
         }
@@ -439,6 +824,7 @@ namespace Companions.Conversation
             if (chat == null)
                 return;
 
+            idleTickCounter = 0;
             string companionName = CompanionManager.GetCompanionDisplayName();
             chat.PublishCompanionMessage(companionName, response.Text);
 
@@ -488,7 +874,7 @@ namespace Companions.Conversation
             string statusSegment = string.Empty;
             string companionMood = ResolveCompanionMoodDescriptor();
             string recentEvent = ResolveRecentEventSummary();
-            var context = BuildResponseContext();
+            var context = BuildResponseContext(activeSkillQuestion.TryGetCandidate());
 
             for (int i = 0; i < parseResult.Matches.Count; i++)
             {
@@ -574,6 +960,21 @@ namespace Companions.Conversation
                             playerName,
                             memoryMood.Descriptor,
                             companionMood,
+                            recentEvent);
+                        break;
+
+                    case CompanionDialogueIntent.AcceptSkillPlan:
+                    case CompanionDialogueIntent.DeclineSkillPlan:
+                    case CompanionDialogueIntent.DeferSkillPlan:
+                    case CompanionDialogueIntent.RequestAlternateSkill:
+                        TryHandleSkillPlanIntent(
+                            match.Intent,
+                            context,
+                            segments,
+                            followUps,
+                            playerName,
+                            memoryMood.Descriptor,
+                            ref companionMood,
                             recentEvent);
                         break;
 
@@ -680,6 +1081,74 @@ namespace Companions.Conversation
                 if (!string.IsNullOrWhiteSpace(formatted))
                     collector.Add(formatted);
             }
+        }
+
+        private bool TryHandleSkillPlanIntent(
+            CompanionDialogueIntent intent,
+            CompanionResponseContext context,
+            List<string> segments,
+            List<string> followUps,
+            string playerName,
+            string playerMood,
+            ref string companionMood,
+            string recentEvent)
+        {
+            if (!responseLibrary.TrySelectResponse(intent, context, null, out var selection))
+                return false;
+
+            string formatted = FormatTemplate(
+                selection.PrimarySegment,
+                playerName,
+                playerMood,
+                companionMood,
+                recentEvent,
+                context);
+
+            if (string.IsNullOrWhiteSpace(formatted))
+                return false;
+
+            segments.Add(formatted);
+            AppendFollowUps(selection.FollowUpSegments, followUps, playerName, playerMood, companionMood, recentEvent, context);
+            ProcessSkillPlanResolution(intent, context, playerName);
+            return true;
+        }
+
+        private void ProcessSkillPlanResolution(CompanionDialogueIntent intent, CompanionResponseContext context, string playerName)
+        {
+            DateTime nowUtc = DateTime.UtcNow;
+            var candidate = activeSkillQuestion.TryGetCandidate();
+
+            if (activeSkillQuestion.IsActive)
+            {
+                if (intent == CompanionDialogueIntent.AcceptSkillPlan && candidate.HasValue && candidate.Value.HasSkill && conversationMemory != null)
+                {
+                    string skillName = context.HasSuggestedSkill ? context.SuggestedSkillName : SkillNameUtility.GetDisplayName(candidate.Value.Skill.Value);
+                    string summary = string.IsNullOrWhiteSpace(playerName)
+                        ? $"Agreed to train more {skillName}"
+                        : $"{playerName} agreed to train more {skillName}";
+                    var metadata = CompanionEventMetadata.Create(
+                        primaryActor: playerName,
+                        skill: candidate.Value.Skill,
+                        additionalContext: candidate.Value.Description);
+                    conversationMemory.RegisterEvent(summary, CompanionEventType.Gathering, metadata);
+                }
+
+                if (intent == CompanionDialogueIntent.RequestAlternateSkill)
+                {
+                    SkillType? excludeSkill = candidate.HasValue ? candidate.Value.Skill : (SkillType?)null;
+                    ClearActiveSkillQuestion();
+                    lastProactiveQuestionUtc = nowUtc;
+                    TryScheduleAlternateSkillQuestion(excludeSkill);
+                    return;
+                }
+
+                ClearActiveSkillQuestion();
+                lastProactiveQuestionUtc = nowUtc;
+                return;
+            }
+
+            if (intent == CompanionDialogueIntent.RequestAlternateSkill)
+                lastProactiveQuestionUtc = nowUtc;
         }
 
         private string BuildStatusSegment(
@@ -919,12 +1388,31 @@ namespace Companions.Conversation
             return current;
         }
 
-        private CompanionResponseContext BuildResponseContext()
+        private CompanionResponseContext BuildResponseContext(SkillQuestionCandidate? candidate = null)
         {
             DateTime nowUtc = DateTime.UtcNow;
             var recentSkills = ResolveRecentSkillActions(nowUtc);
             string timeOfDay = ResolveTimeOfDayDescriptor(nowUtc);
-            bool companionInCombat = false;
+            bool companionInCombat = IsCompanionInCombat(nowUtc);
+
+            SkillType? suggestedSkill = null;
+            string suggestedSkillName = string.Empty;
+            string suggestedSkillAction = string.Empty;
+            TimeSpan? skillAge = null;
+            string skillRecency = string.Empty;
+
+            if (candidate.HasValue && candidate.Value.IsValid)
+            {
+                var value = candidate.Value;
+                suggestedSkill = value.Skill;
+                suggestedSkillName = !string.IsNullOrWhiteSpace(value.SkillName) && value.HasSkill
+                    ? value.SkillName
+                    : value.Skill.HasValue ? SkillNameUtility.GetDisplayName(value.Skill.Value) : string.Empty;
+                suggestedSkillAction = value.Description;
+                skillAge = nowUtc - value.TimestampUtc;
+                if (skillAge.HasValue)
+                    skillRecency = DescribeSkillRecency(skillAge.Value);
+            }
 
             return new CompanionResponseContext(
                 nowUtc,
@@ -932,7 +1420,12 @@ namespace Companions.Conversation
                 playerInCombat,
                 companionInCombat,
                 recentSkills,
-                pendingResponses.Count);
+                pendingResponses.Count,
+                suggestedSkill,
+                suggestedSkillName,
+                suggestedSkillAction,
+                skillAge,
+                skillRecency);
         }
 
         private IReadOnlyList<string> ResolveRecentSkillActions(DateTime nowUtc)
@@ -1141,9 +1634,19 @@ namespace Companions.Conversation
             string resolvedCombatState = string.IsNullOrWhiteSpace(context.CombatStateDescriptor)
                 ? "standing down"
                 : context.CombatStateDescriptor;
-            string resolvedSkillAction = context.HasRecentSkillActions
-                ? context.LatestSkillAction
-                : "keeping skills sharp";
+            string resolvedSkillAction = !string.IsNullOrWhiteSpace(context.SuggestedSkillActionDescription)
+                ? context.SuggestedSkillActionDescription
+                : context.HasRecentSkillActions
+                    ? context.LatestSkillAction
+                    : "keeping skills sharp";
+            string resolvedSuggestedSkill = context.HasSuggestedSkill
+                ? context.SuggestedSkillName
+                : (!string.IsNullOrWhiteSpace(context.SuggestedSkillActionDescription)
+                    ? context.SuggestedSkillActionDescription
+                    : (context.HasRecentSkillActions ? context.LatestSkillAction : "skilling"));
+            string resolvedSkillRecency = context.HasSuggestedSkillRecency
+                ? context.SuggestedSkillRecency
+                : "recently";
 
             string result = template
                 .Replace("{playerName}", resolvedPlayerName)
@@ -1153,7 +1656,10 @@ namespace Companions.Conversation
                 .Replace("{recentEvent}", resolvedEvent)
                 .Replace("{timeOfDay}", resolvedTimeOfDay)
                 .Replace("{combatState}", resolvedCombatState)
-                .Replace("{recentSkillAction}", resolvedSkillAction);
+                .Replace("{recentSkillAction}", resolvedSkillAction)
+                .Replace("{suggestedSkill}", resolvedSuggestedSkill)
+                .Replace("{skillRecency}", resolvedSkillRecency)
+                .Replace("{skillAction}", resolvedSkillAction);
 
             return CompactWhitespace(result);
         }
@@ -1347,6 +1853,87 @@ namespace Companions.Conversation
             }
 
             return Mathf.Max(0f, defaultValue);
+        }
+
+        private readonly struct SkillQuestionCandidate
+        {
+            public static SkillQuestionCandidate Empty => new SkillQuestionCandidate(null, string.Empty, string.Empty, DateTime.UtcNow);
+
+            public SkillQuestionCandidate(SkillType? skill, string skillName, string description, DateTime timestampUtc)
+            {
+                Skill = skill;
+                SkillName = skillName ?? string.Empty;
+                Description = description ?? string.Empty;
+                TimestampUtc = timestampUtc.Kind == DateTimeKind.Utc ? timestampUtc : timestampUtc.ToUniversalTime();
+            }
+
+            public SkillType? Skill { get; }
+
+            public string SkillName { get; }
+
+            public string Description { get; }
+
+            public DateTime TimestampUtc { get; }
+
+            public bool HasSkill => Skill.HasValue;
+
+            public bool HasDescription => !string.IsNullOrWhiteSpace(Description);
+
+            public bool IsValid => HasSkill || HasDescription;
+
+            public static SkillQuestionCandidate CreateForSkill(SkillType skill, string skillName, string description, DateTime timestampUtc)
+            {
+                return new SkillQuestionCandidate(skill, skillName, description, timestampUtc);
+            }
+
+            public static SkillQuestionCandidate CreateFromDescription(string description, DateTime timestampUtc)
+            {
+                return new SkillQuestionCandidate(null, string.Empty, description, timestampUtc);
+            }
+        }
+
+        private readonly struct ActiveSkillQuestion
+        {
+            public static ActiveSkillQuestion Empty => new ActiveSkillQuestion();
+
+            private ActiveSkillQuestion()
+            {
+                Candidate = SkillQuestionCandidate.Empty;
+                TemplateKey = string.Empty;
+                TimestampUtc = DateTime.MinValue;
+                isActive = false;
+            }
+
+            public ActiveSkillQuestion(SkillQuestionCandidate candidate, string templateKey, DateTime timestampUtc)
+            {
+                Candidate = candidate;
+                TemplateKey = templateKey ?? string.Empty;
+                TimestampUtc = timestampUtc.Kind == DateTimeKind.Utc ? timestampUtc : timestampUtc.ToUniversalTime();
+                isActive = true;
+            }
+
+            private readonly bool isActive;
+
+            public SkillQuestionCandidate Candidate { get; }
+
+            public string TemplateKey { get; }
+
+            public DateTime TimestampUtc { get; }
+
+            public bool IsActive => isActive;
+
+            public bool IsExpired(TimeSpan duration, DateTime nowUtc)
+            {
+                if (!isActive)
+                    return false;
+
+                return (nowUtc - TimestampUtc) >= duration;
+            }
+
+            public SkillQuestionCandidate? TryGetCandidate()
+            {
+                return isActive ? Candidate : (SkillQuestionCandidate?)null;
+            }
         }
 
         private readonly struct SkillActionRecord
