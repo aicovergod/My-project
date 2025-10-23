@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c16eee08c232eb87c5fcd83412e8d039547c33bd -->
+## 2025-10-23T16:37:16+01:00 — Ensure companion conversation memory rebinds after load
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 66 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:4113de80e66789f6b59ea41717a967e5bb112911 -->
 ## 2025-10-23T16:32:33+01:00 — Merge pull request #1335 from aicovergod/codex/fix-chat-subscription-rebind-bug
 
