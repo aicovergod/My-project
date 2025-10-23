@@ -1894,9 +1894,9 @@ namespace Companions.Conversation
 
         private readonly struct ActiveSkillQuestion
         {
-            public static ActiveSkillQuestion Empty => new ActiveSkillQuestion();
+            public static ActiveSkillQuestion Empty => new ActiveSkillQuestion(false);
 
-            private ActiveSkillQuestion()
+            private ActiveSkillQuestion(bool _)
             {
                 Candidate = SkillQuestionCandidate.Empty;
                 TemplateKey = string.Empty;
