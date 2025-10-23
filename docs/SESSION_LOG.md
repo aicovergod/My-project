@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5cd49598a63bd58159d0ebacee2a96c3e4359d89 -->
+## 2025-10-23T16:32:07+01:00 — Ensure companion chat resubscribes after scene changes
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs
+- Diff: 17 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:fed083962b23e67be78845d636a5b39e2f7f5d16 -->
 ## 2025-10-23T16:29:19+01:00 — Merge pull request #1334 from aicovergod/codex/allow-chat-log-messages-to-wrap
 

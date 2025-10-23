@@ -32,6 +32,9 @@ namespace Companions.Conversation
         /// <summary>True once a chat subscription is active so duplicate hooks are prevented.</summary>
         private bool chatSubscribed;
 
+        /// <summary>Cached reference to the chat service instance that currently has the listener bound.</summary>
+        private ChatService subscribedChat;
+
         /// <summary>Tracks the last detected greeting so dialogue logic can throttle repeats.</summary>
         public DateTime? LastGreetingUtc { get; private set; }
 
@@ -280,16 +283,25 @@ namespace Companions.Conversation
         /// </summary>
         private void TrySubscribeToChatService()
         {
-            if (chatSubscribed)
-                return;
+            // Unity null check accounts for the previous instance being destroyed between scene loads.
+            if (chatSubscribed && subscribedChat == null)
+                chatSubscribed = false;
 
             var chat = ChatService.Instance;
             if (chat == null)
                 return;
 
+            if (chatSubscribed && subscribedChat == chat)
+                return;
+
+            // Ensure the listener is removed from any lingering instance before rebinding to the new one.
+            if (subscribedChat != null)
+                subscribedChat.MessageReceived -= HandleMessageReceived;
+
             chat.MessageReceived -= HandleMessageReceived;
             chat.MessageReceived += HandleMessageReceived;
             chatSubscribed = true;
+            subscribedChat = chat;
         }
 
         /// <summary>
@@ -300,11 +312,11 @@ namespace Companions.Conversation
             if (!chatSubscribed)
                 return;
 
-            var chat = ChatService.Instance;
-            if (chat != null)
-                chat.MessageReceived -= HandleMessageReceived;
+            if (subscribedChat != null)
+                subscribedChat.MessageReceived -= HandleMessageReceived;
 
             chatSubscribed = false;
+            subscribedChat = null;
         }
 
         private void HandleMessageReceived(ChatMessage message)
