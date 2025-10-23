@@ -25,7 +25,6 @@ namespace Companions.Conversation
 
             RegisterGreetingResponses();
             RegisterStatusQueryResponses();
-            RegisterPlayerMoodResponses();
             RegisterGratitudeResponses();
             RegisterFarewellResponses();
             RegisterComplimentResponses();
@@ -128,22 +127,6 @@ namespace Companions.Conversation
         new ResponseTemplate("I’m fine. Queue’s noisy, but I’ve got it.", 0.85f, ctx => ctx.HasPendingResponses),
         new ResponseTemplate("All good here. I’ll triage the chatter later.", 0.8f, ctx => ctx.HasPendingResponses),
         new ResponseTemplate("Queue's already stacked with chatter.|Want me to triage it while you stay {combatState}?", 0.7f, ctx => ctx.HasPendingResponses));
-        }
-
-        /// <summary>
-        /// Registers templates that respond to players reporting their own mood.
-        /// </summary>
-        private static void RegisterPlayerMoodResponses()
-        {
-            Register(
-                CompanionDialogueIntent.PlayerMoodReport,
-                new ResponseTemplate("Good to know you're {playerMood}, {playerName}.|Let's channel that into our next move.", 1f),
-                new ResponseTemplate("Thanks for sharing that you're {playerMood}, {playerName}.|I'll keep pace with you.", 1f),
-                new ResponseTemplate("I'll keep it in mind that you're {playerMood}.|Want me to note it in the logbook?", 0.9f),
-                new ResponseTemplate("Hearing you're {playerMood} after {recentEvent} keeps me grounded.", 0.85f),
-                new ResponseTemplate("If you're feeling {playerMood}, maybe this {timeOfDay} air will steady us both.", 0.8f, ctx => !ctx.PlayerInCombat),
-                new ResponseTemplate("While you're {playerMood}, we could follow up on {recentSkillAction}.|Say the word and I'll prep the kit.", 0.75f, ctx => ctx.HasRecentSkillActions),
-                new ResponseTemplate("Even while we're {combatState}, I'll match that {playerMood} energy.", 0.8f));
         }
 
         /// <summary>

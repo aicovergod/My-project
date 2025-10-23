@@ -49,14 +49,6 @@ namespace Companions.Conversation
             "mine", "mining", "chop", "woodcut", "woodcutting", "logs", "fish", "fishing", "cook", "cooking", "firemaking", "firemake", "smith", "smithing", "smelt", "craft", "crafting"
         };
 
-        private static readonly string[] PlayerMoodTokens =
-        {
-            "tired", "sleepy", "exhausted", "drained", "burnt", "burned", "burntout", "sad", "blue", "down",
-            "angry", "upset", "annoyed", "frustrated", "stressed", "anxious", "overwhelmed", "confused", "worried",
-            "good", "great", "awesome", "amazing", "fantastic", "wonderful", "okay", "ok", "fine", "happy",
-            "excited", "pumped", "stoked", "chill", "relaxed", "content", "energised", "energized"
-        };
-
         /// <summary>
         /// Creates the default dialogue profile composed of weighted rules for every supported intent.
         /// </summary>
@@ -122,27 +114,6 @@ namespace Companions.Conversation
                         if (StatusQueryQuestionSuffixRegex.IsMatch(text))
                             score += 0.5f;
                         return score;
-                    }),
-
-                new CompanionIntentPattern(
-                    CompanionDialogueIntent.PlayerMoodReport,
-                    priority: 8,
-                    matchThreshold: 2.2f,
-                    synonymBuckets: new[]
-                    {
-                        new SynonymBucket(new[] { "im", "i'm", "iam", "ive", "i've", "imma", "feeling", "feel", "feelin" }),
-                        new SynonymBucket(PlayerMoodTokens, 1.2f),
-                        new SynonymBucket(new[] { "kinda", "sorta", "really", "super", "so" }, 0.6f)
-                    },
-                    multiWordPhrases: new[]
-                    {
-                        new MultiWordPhrase("i feel", 1.1f),
-                        new MultiWordPhrase("i'm feeling", 1.4f),
-                        new MultiWordPhrase("feeling kind of", 1.4f),
-                        new MultiWordPhrase("feeling kinda", 1.4f),
-                        new MultiWordPhrase("i feel like", 1.5f),
-                        new MultiWordPhrase("i'm good", 1.5f),
-                        new MultiWordPhrase("i'm so", 1.2f)
                     }),
 
                 new CompanionIntentPattern(

@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:93aa0a04717a76072fc0c17513f8131acdb70608 -->
+## 2025-10-23T22:58:20+01:00 — Remove companion mood empathy system
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs, Assets/Scripts/Companions/Conversation/CompanionMoodInterpreter.cs, Assets/Scripts/Companions/Conversation/CompanionMoodInterpreter.cs.meta, Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs
+- Diff: 20 ++ / 816 --
+- Notes:
+  —
+---
 <!-- commit:b369a6377b71f166d052409c59560256984a3744 -->
 ## 2025-10-23T22:38:46+01:00 — Merge pull request #1352 from aicovergod/codex/update-empathy-guard-in-conversation-service
 
