@@ -178,7 +178,7 @@ namespace Player.Chat
             if (chatHud == null)
                 return;
 
-            if (!chatHud.TryConsumeInput(out string message))
+            if (!chatHud.TryConsumeInput(out string message, out ChatChannel channel))
                 return;
 
             var chatService = ChatService.Instance;
@@ -209,8 +209,15 @@ namespace Player.Chat
                 return;
             }
 
-            chatService.PublishPublicMessage(sender, message);
-            SpawnFloatingSpeech(message);
+            if (channel == ChatChannel.Companion)
+            {
+                chatService.PublishCompanionMessage(sender, message, true);
+            }
+            else
+            {
+                chatService.PublishPublicMessage(sender, message);
+                SpawnFloatingSpeech(message);
+            }
 
             chatHud.CancelInput();
             ReleaseModalLock();
