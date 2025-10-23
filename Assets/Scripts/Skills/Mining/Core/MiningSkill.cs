@@ -51,6 +51,8 @@ namespace Skills.Mining
         public MineableRock CurrentRock => currentRock;
         public PickaxeDefinition CurrentPickaxe => currentPickaxe;
         public int CurrentSwingSpeedTicks => currentPickaxe?.SwingSpeedTicks ?? 0;
+        /// <summary>Inventory component used for storing mined ore.</summary>
+        public Inventory.Inventory InventoryComponent => inventory;
         public float SwingProgressNormalized
         {
             get

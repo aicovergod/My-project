@@ -26,7 +26,9 @@ namespace Skills.Common
         ///     Standardised message emitted whenever the player's inventory cannot accept more gathered items.
         ///     Shared with <see cref="CompanionManager"/> so the companion can react to the chat event.
         /// </summary>
-        private const string InventoryFullChatMessage = "Your inventory is full";
+        protected const string PlayerInventoryFullChatMessage = "Your inventory is full";
+        protected const string PlayerAndCompanionInventoryFullChatMessage =
+            "Your inventory and your companion's inventory are full";
 
         [Header("Interaction")]
         [SerializeField]
@@ -900,14 +902,26 @@ namespace Skills.Common
             if (string.IsNullOrWhiteSpace(failureMessage))
                 return;
 
-            if (!string.Equals(failureMessage, InventoryFullChatMessage, System.StringComparison.OrdinalIgnoreCase))
+            string trimmed = failureMessage.Trim();
+            string messageToPublish = null;
+
+            if (string.Equals(trimmed, PlayerInventoryFullChatMessage, System.StringComparison.OrdinalIgnoreCase))
+            {
+                messageToPublish = PlayerInventoryFullChatMessage;
+            }
+            else if (string.Equals(trimmed, PlayerAndCompanionInventoryFullChatMessage, System.StringComparison.OrdinalIgnoreCase))
+            {
+                messageToPublish = PlayerAndCompanionInventoryFullChatMessage;
+            }
+
+            if (string.IsNullOrEmpty(messageToPublish))
                 return;
 
             var chatService = ChatService.Instance;
             if (chatService == null)
                 return;
 
-            chatService.PublishGameMessage(InventoryFullChatMessage);
+            chatService.PublishGameMessage(messageToPublish);
         }
 
         /// <summary>

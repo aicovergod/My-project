@@ -49,6 +49,8 @@ namespace Skills.Woodcutting
         public TreeNode CurrentTree => currentTree;
         public int CurrentChopIntervalTicks => chopProgressTracker.RequiredTicks;
         public AxeDefinition CurrentAxe => currentAxe;
+        /// <summary>Inventory component used for storing gathered logs.</summary>
+        public Inventory.Inventory InventoryComponent => inventory;
         public float ChopProgressNormalized
         {
             get

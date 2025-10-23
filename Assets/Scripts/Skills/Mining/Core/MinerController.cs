@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Skills.Common;
 using Companions;
+using Inventory;
 
 namespace Skills.Mining
 {
@@ -16,6 +18,7 @@ namespace Skills.Mining
         [SerializeField] private PickaxeToUse pickaxeSelector;
 
         private PickaxeDefinition cachedPickaxe;
+        private Dictionary<string, ItemData> gatheredItemCache;
 
         private MiningSkill MiningSkill => Skill;
 
@@ -106,10 +109,21 @@ namespace Skills.Mining
                 return false;
             }
 
-            if (MiningSkill.CanAddOre(node.RockDef.Ore))
+            var rockDefinition = node.RockDef;
+            var oreDefinition = rockDefinition != null ? rockDefinition.Ore : null;
+
+            var capacityResult = GatheringInventoryHelper.EvaluateGatheredItemCapacity(
+                MiningSkill.InventoryComponent,
+                oreDefinition != null ? oreDefinition.Id : string.Empty,
+                "Rock Golem",
+                ref gatheredItemCache);
+
+            if (capacityResult.PlayerOrPetHasCapacity)
                 return true;
 
-            failureMessage = "Your inventory is full";
+            failureMessage = capacityResult.CompanionInventoryHasCapacity
+                ? PlayerInventoryFullChatMessage
+                : PlayerAndCompanionInventoryFullChatMessage;
             return false;
         }
 
