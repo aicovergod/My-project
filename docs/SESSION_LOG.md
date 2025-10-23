@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7dd109ed61507ffbe13a1b320575c7b14ed426eb -->
+## 2025-10-23T01:28:14+01:00 — Merge pull request #1323 from aicovergod/codex/fix-chat-dialogue-for-full-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 106 ++ / 0 --
+- Notes:
+  Ensure companion reacts to full inventory game messages
+---
+<!-- commit:391c4d9c226aa3b0611f42adf15e8c928d63ccf4 -->
+## 2025-10-23T01:28:08+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:56cd784070093614b0bf19284142b9cf52d8d349 -->
 ## 2025-10-23T01:27:50+01:00 — Fix companion inventory full chat reaction
 
