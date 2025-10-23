@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ff374c0574a3d53b2925b1365d8810c3578e79df -->
+## 2025-10-23T13:45:19+01:00 — Fix companion equip requirement feedback
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionEquipAttemptResult.cs, Assets/Scripts/Companions/CompanionEquipment.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 92 ++ / 22 --
+- Notes:
+  —
+---
 <!-- commit:3a9519228e0f9b42d541d09e63ff35f91332cd95 -->
 ## 2025-10-23T13:25:30+01:00 — stuff
 

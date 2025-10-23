@@ -265,46 +265,49 @@ namespace Companions
         /// </summary>
         /// <param name="entry">Inventory entry removed from the player bag.</param>
         /// <param name="playerInventory">Player inventory that supplied the item.</param>
-        /// <returns>True when the equip succeeds.</returns>
-        public bool TryEquipFromPlayerInventory(InventoryEntry entry, Inventory.Inventory playerInventory)
+        /// <returns>
+        /// Result describing whether the equip succeeded, failed for a handled reason, or should fall back to the
+        /// default player equipment flow.
+        /// </returns>
+        public CompanionEquipAttemptResult TryEquipFromPlayerInventory(InventoryEntry entry, Inventory.Inventory playerInventory)
         {
             if (!initialised || entry.item == null)
-                return false;
+                return CompanionEquipAttemptResult.NotHandled;
 
             if (!IsOpen)
-                return false;
+                return CompanionEquipAttemptResult.NotHandled;
 
             var item = entry.item;
             var slot = item.equipmentSlot;
             if (slot == EquipmentSlot.None)
-                return false;
+                return CompanionEquipAttemptResult.NotHandled;
 
             if (!ValidateSkillRequirements(item, playerInventory, entry))
-                return false;
+                return CompanionEquipAttemptResult.RequirementsNotMet;
 
             int index = SlotIndex(slot);
             if (index < 0 || index >= equipped.Length)
             {
                 RestoreEntryToInventory(playerInventory, entry);
-                return false;
+                return CompanionEquipAttemptResult.InvalidSlot;
             }
 
             if (!HandleMutuallyExclusiveSlots(slot, playerInventory, entry))
             {
                 RestoreEntryToInventory(playerInventory, entry);
-                return false;
+                return CompanionEquipAttemptResult.InventoryFull;
             }
 
             var current = equipped[index];
             if (current.item != null && current.item == item && item.stackable)
             {
-                if (!MergeStackableEquip(entry, playerInventory, slot, index))
+                if (!MergeStackableEquip(entry, playerInventory, slot, index, out var mergeFailure))
                 {
                     RestoreEntryToInventory(playerInventory, entry);
-                    return false;
+                    return mergeFailure;
                 }
 
-                return true;
+                return CompanionEquipAttemptResult.Equipped;
             }
 
             if (current.item != null)
@@ -313,7 +316,7 @@ namespace Companions
                 {
                     ShowInventoryFullFloatingText();
                     RestoreEntryToInventory(playerInventory, entry);
-                    return false;
+                    return CompanionEquipAttemptResult.InventoryFull;
                 }
 
                 ItemUseResolver.NotifyItemUsed(gameObject, current.item, ItemUseType.Unequipped);
@@ -330,7 +333,7 @@ namespace Companions
                 Debug.Log($"[Companion Equipment] Equipped {item.itemName} into {slot}.", this);
             }
 
-            return true;
+            return CompanionEquipAttemptResult.Equipped;
         }
 
         /// <summary>
@@ -847,14 +850,16 @@ namespace Companions
             RestoreEntryToInventory(playerInventory, entry);
 
             var chat = ChatService.Instance;
+            string companionName = CompanionManager.GetCompanionDisplayName();
             if (chat != null)
             {
-                string companionName = CompanionManager.GetCompanionDisplayName();
                 string message = unmet.Count == 1
                     ? $"{companionName}:I don't have the required skill to equip that"
                     : $"{companionName}:I don't have the required skills to equip that";
                 chat.PublishCompanionMessage(companionName, message);
             }
+
+            ShowRequirementFailureFloatingText(companionName, unmet);
 
             if (CompanionManager.EnableDebugLogging)
             {
@@ -862,6 +867,19 @@ namespace Companions
             }
 
             return false;
+        }
+
+        private void ShowRequirementFailureFloatingText(string companionName, List<SkillRequirement> unmetRequirements)
+        {
+            if (unmetRequirements == null || unmetRequirements.Count == 0)
+                return;
+
+            var anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
+            var primaryRequirement = unmetRequirements[0];
+            string message = unmetRequirements.Count == 1
+                ? $"{companionName} needs {primaryRequirement.level} {primaryRequirement.skill}."
+                : $"{companionName} lacks the requirements.";
+            FloatingText.Show(message, anchor.position);
         }
 
         private bool HandleMutuallyExclusiveSlots(EquipmentSlot slot, Inventory.Inventory playerInventory, InventoryEntry incoming)
@@ -910,14 +928,16 @@ namespace Companions
             return true;
         }
 
-        private bool MergeStackableEquip(InventoryEntry entry, Inventory.Inventory playerInventory, EquipmentSlot slot, int index)
+        private bool MergeStackableEquip(InventoryEntry entry, Inventory.Inventory playerInventory, EquipmentSlot slot, int index, out CompanionEquipAttemptResult failureResult)
         {
+            failureResult = CompanionEquipAttemptResult.InventoryFull;
             var current = equipped[index];
             int maxStack = current.item.MaxStack;
             int availableSpace = Mathf.Max(0, maxStack - current.count);
             if (availableSpace <= 0)
             {
                 ShowInventoryFullFloatingText("You cannot equip any more of that.");
+                failureResult = CompanionEquipAttemptResult.StackLimitReached;
                 return false;
             }
 
@@ -925,6 +945,7 @@ namespace Companions
             if (transferAmount <= 0)
             {
                 ShowInventoryFullFloatingText("You cannot equip any more of that.");
+                failureResult = CompanionEquipAttemptResult.StackLimitReached;
                 return false;
             }
 
@@ -935,6 +956,7 @@ namespace Companions
                 if (!TryReturnEntry(overflowEntry, playerInventory, out _))
                 {
                     ShowInventoryFullFloatingText();
+                    failureResult = CompanionEquipAttemptResult.InventoryFull;
                     return false;
                 }
             }
@@ -945,6 +967,7 @@ namespace Companions
             UpdateBonuses();
             Save();
             ItemUseResolver.NotifyItemUsed(gameObject, entry.item, ItemUseType.Equipped);
+            failureResult = CompanionEquipAttemptResult.Equipped;
             return true;
         }
 
