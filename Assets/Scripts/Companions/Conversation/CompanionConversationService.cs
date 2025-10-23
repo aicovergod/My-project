@@ -1073,11 +1073,25 @@ namespace Companions.Conversation
                 return null;
 
             var moodForEmpathy = SelectDominantMood(empathyMood, detectedMood);
-            if (!moodForEmpathy.HasMood)
+            bool usedMemoryForEmpathy = false;
+
+            if (!moodForEmpathy.HasMood && memoryMood.HasMood)
+            {
                 moodForEmpathy = memoryMood;
+                usedMemoryForEmpathy = true;
+            }
 
             if (moodForEmpathy.HasMood)
-                AppendMoodEmpathySegment(moodForEmpathy, segments);
+            {
+                bool shouldAppendEmpathy = !usedMemoryForEmpathy ||
+                                            moodForEmpathy.Valence == CompanionMoodValence.Negative;
+
+                // Avoid echoing the stored positive/neutral mood on every reply; keep the
+                // fallback for negative moods so the companion still checks in when the
+                // player previously indicated they were struggling.
+                if (shouldAppendEmpathy)
+                    AppendMoodEmpathySegment(moodForEmpathy, segments);
+            }
 
             bool recordFollowUp = MaybeQueueMoodFollowUp(detectedMood, memoryMood, moodForEmpathy, playerName, segments, followUps);
 
