@@ -154,6 +154,68 @@ namespace Companions.Conversation
             instance.RegisterEventInternal(summary, eventType, metadata);
         }
 
+        /// <summary>
+        /// Forces the companion to ask a proactive question immediately, bypassing normal cooldowns.
+        /// Primarily intended for developer testing workflows triggered through privileged commands.
+        /// </summary>
+        /// <param name="overrideDescription">Optional context that should seed the generated question.</param>
+        /// <param name="failureReason">Human-readable reason describing why the request failed.</param>
+        /// <returns>True when a question was successfully queued for delivery.</returns>
+        public bool TryForceDeveloperQuestion(string overrideDescription, out string failureReason)
+        {
+            failureReason = string.Empty;
+
+            if (!isActiveAndEnabled)
+            {
+                // The service must be active in the scene before it can enqueue dialogue.
+                failureReason = "Companion conversation service is not active.";
+                return false;
+            }
+
+            if (!CompanionManager.HasActiveCompanion)
+            {
+                // There is no follower available to deliver the prompted question.
+                failureReason = "You must have a companion summoned before prompting them.";
+                return false;
+            }
+
+            var chat = ChatService.Instance;
+            if (chat == null)
+            {
+                // Without a chat service the line would never render, so short-circuit early.
+                failureReason = "Chat service is not initialised yet.";
+                return false;
+            }
+
+            DateTime nowUtc = DateTime.UtcNow;
+            SkillQuestionCandidate candidate;
+
+            if (!string.IsNullOrWhiteSpace(overrideDescription))
+            {
+                // Developers can supply ad-hoc context that should influence the generated question.
+                candidate = SkillQuestionCandidate.CreateFromDescription(overrideDescription.Trim(), nowUtc);
+            }
+            else if (!TryGetBestSkillCandidate(nowUtc, out candidate))
+            {
+                // Fall back to recent skill events so the question still feels grounded in gameplay.
+                if (!TryBuildFallbackSkillCandidate(nowUtc, out candidate))
+                    candidate = SkillQuestionCandidate.Empty;
+            }
+
+            // Clear any lingering active prompt so the forced question becomes the current focus.
+            ClearActiveSkillQuestion();
+
+            int previousCount = pendingResponses.Count;
+            ScheduleSkillQuestion(candidate, nowUtc);
+
+            if (pendingResponses.Count > previousCount)
+                return true;
+
+            // If the queue count never changed the dialogue library could not produce a template.
+            failureReason = "No suitable question template was available.";
+            return false;
+        }
+
         /// <inheritdoc />
         protected override void OnSingletonAwake()
         {
