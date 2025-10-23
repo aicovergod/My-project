@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:316bd841bd22872c3d4c439fa45268a87e1bce21 -->
+## 2025-10-23T01:01:24+01:00 — Add companion chat variants for player inventory full cases
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Skills/Common/GatheringRewardProcessor.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs
+- Diff: 344 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:5a9d49f81bb21eaffc1078743be4645e607bc153 -->
 ## 2025-10-23T00:53:19+01:00 — Refactor companion level up message selection
 
