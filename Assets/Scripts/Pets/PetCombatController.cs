@@ -865,8 +865,22 @@ namespace Pets
                 return;
 
             CancelAttack();
-            PublishOreGolemPickaxeReminder();
+            PublishOreGolemPickaxeRemovalMessage();
             ShowOreGolemBlockedFeedback();
+        }
+
+        /// <summary>
+        /// Publishes a chat line acknowledging that the player removed the companion pickaxe mid combat
+        /// while the companion was attacking an ore golem. Keeps the response flavourful and informative.
+        /// </summary>
+        private void PublishOreGolemPickaxeRemovalMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string reminder = CompanionChatLibrary.GetRandomCompanionOreGolemMidCombatPickaxeRemovalMessage();
+            chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), reminder);
         }
 
         private void PublishOreGolemPickaxeReminder()
