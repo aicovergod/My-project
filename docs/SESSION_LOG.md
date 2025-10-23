@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4113de80e66789f6b59ea41717a967e5bb112911 -->
+## 2025-10-23T16:32:33+01:00 — Merge pull request #1335 from aicovergod/codex/fix-chat-subscription-rebind-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 26 ++ / 5 --
+- Notes:
+  Ensure companion conversation memory rebinds chat service after scene changes
+---
+<!-- commit:34dbd894bdd672112135b9bc546d91cfcc96eed3 -->
+## 2025-10-23T16:32:28+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:5cd49598a63bd58159d0ebacee2a96c3e4359d89 -->
 ## 2025-10-23T16:32:07+01:00 — Ensure companion chat resubscribes after scene changes
 
