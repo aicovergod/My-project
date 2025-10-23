@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fed083962b23e67be78845d636a5b39e2f7f5d16 -->
+## 2025-10-23T16:29:19+01:00 — Merge pull request #1334 from aicovergod/codex/allow-chat-log-messages-to-wrap
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 54 ++ / 4 --
+- Notes:
+  Allow chat log messages to wrap across multiple lines
+---
+<!-- commit:cf17194f0d23f2fd82fb77224fecbc245a39223b -->
+## 2025-10-23T16:28:38+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ba255f12c6123270fc4e84e1ebcdbca4cc78ec9e -->
 ## 2025-10-23T16:28:20+01:00 — Allow chat content layouts to wrap messages
 
