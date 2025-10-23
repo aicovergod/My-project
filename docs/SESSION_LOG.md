@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c0537eb7f9549184264a1f3016dbc1d1b5360b52 -->
+## 2025-10-23T01:03:11+01:00 — Merge pull request #1321 from aicovergod/codex/add-chat-messages-for-full-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 348 ++ / 19 --
+- Notes:
+  Add chat messaging for player and companion inventory limits
+---
+<!-- commit:11e3e2aab11198248e0e3ff97bf8ce0fbfff35dc -->
+## 2025-10-23T01:03:04+01:00 — Merge branch 'main' into codex/add-chat-messages-for-full-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:316bd841bd22872c3d4c439fa45268a87e1bce21 -->
 ## 2025-10-23T01:01:24+01:00 — Add companion chat variants for player inventory full cases
 
