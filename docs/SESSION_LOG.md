@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ce7b523dcfb4d69b7749f09810ae1a19865f567d -->
+## 2025-10-23T18:03:56+01:00 — Restore single word companion dialogue matches
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 15 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:4e0bd52349277ebcbab0e70e60b6bbf854f04cfd -->
 ## 2025-10-23T17:54:35+01:00 — Merge pull request #1339 from aicovergod/codex/fix-cs1061-errors-in-companionconversationservice
 
