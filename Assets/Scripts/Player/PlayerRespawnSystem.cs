@@ -7,6 +7,8 @@ using Combat;
 using Audio;
 using Status;
 using Status.Poison;
+using Companions;
+using UI.Chat;
 
 namespace Player
 {
@@ -110,6 +112,7 @@ namespace Player
             {
                 playerMover?.StopMovement();
                 combatController?.CancelCombat();
+                TryPublishCompanionDeathLine();
                 if (poisonController == null && hitpoints != null)
                 {
                     // Cache the poison controller the first time it is needed so subsequent deaths
@@ -128,6 +131,27 @@ namespace Player
                 SoundManager.Instance.PlaySfx(SoundEffect.PlayerDeath);
                 StartCoroutine(RespawnRoutine());
             }
+        }
+
+        /// <summary>
+        /// Publishes a random snarky death line from the active companion when the player dies.
+        /// Keeps the companion flavour consistent with the shared chat library.
+        /// </summary>
+        private static void TryPublishCompanionDeathLine()
+        {
+            if (!CompanionManager.HasActiveCompanion)
+                return;
+
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string message = CompanionChatLibrary.GetRandomPlayerDeathLine();
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            string companionName = CompanionManager.GetCompanionDisplayName();
+            chat.PublishCompanionMessage(companionName, message);
         }
 
         private IEnumerator RespawnRoutine()
