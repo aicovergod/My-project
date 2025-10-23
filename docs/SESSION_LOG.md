@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6a6765f94b84c07f44d274fb26e2ab6ef80c6d32 -->
+## 2025-10-24T00:12:26+01:00 — Scope mining-specific companion proposal lines
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 9 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:8b23b57359500ffd9d6c31a853f89cb525d3bfb0 -->
 ## 2025-10-23T23:57:39+01:00 — Merge pull request #1357 from aicovergod/codex/add-playerskillproposal-intent-and-response-logic
 
