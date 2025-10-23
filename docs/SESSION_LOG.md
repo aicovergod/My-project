@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:56cd784070093614b0bf19284142b9cf52d8d349 -->
+## 2025-10-23T01:27:50+01:00 — Fix companion inventory full chat reaction
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 97 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:cc8c7bf2b46304c743411c77896f453f9bdda13e -->
 ## 2025-10-23T01:14:40+01:00 — Merge pull request #1322 from aicovergod/codex/send-companion-messages-for-unarmed-mining
 
