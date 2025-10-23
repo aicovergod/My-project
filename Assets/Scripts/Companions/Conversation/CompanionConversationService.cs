@@ -31,7 +31,7 @@ namespace Companions.Conversation
         private List<IntentScoreThreshold> intentScoreThresholds = new List<IntentScoreThreshold>
         {
             new IntentScoreThreshold(CompanionDialogueIntent.Greeting, 1f),
-            new IntentScoreThreshold(CompanionDialogueIntent.StatusQuery, 2.4f),
+            new IntentScoreThreshold(CompanionDialogueIntent.StatusQuery, 2.2f),
             new IntentScoreThreshold(CompanionDialogueIntent.PlayerMoodReport, 2.2f),
             new IntentScoreThreshold(CompanionDialogueIntent.Gratitude, 1.6f),
             new IntentScoreThreshold(CompanionDialogueIntent.Farewell, 1.4f),
