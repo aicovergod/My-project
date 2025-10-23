@@ -720,7 +720,6 @@ namespace Companions.Conversation
             string formatted = FormatTemplate(
                 selection.PrimarySegment,
                 playerName,
-                string.Empty,
                 companionMood,
                 string.Empty,
                 context);
