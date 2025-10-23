@@ -123,10 +123,23 @@ namespace Companions.Conversation
 
             parser = new CompanionDialogueParser(rules);
 
-            if (conversationMemory == null)
-                conversationMemory = FindObjectOfType<CompanionConversationMemory>(true);
+            EnsureConversationMemoryBound();
 
             EnsureChatSubscription();
+        }
+
+        /// <summary>
+        /// Ensures <see cref="conversationMemory"/> references the live memory component
+        /// so responses can log mood and status updates immediately after bootstrap.
+        /// </summary>
+        private void EnsureConversationMemoryBound()
+        {
+            if (conversationMemory != null)
+                return;
+
+            conversationMemory = FindObjectOfType<CompanionConversationMemory>(true);
+            if (conversationMemory != null && ShouldTraceMemory)
+                Debug.Log("[CompanionConversationService] Rebound conversation memory instance after bootstrap.");
         }
 
         /// <inheritdoc />
@@ -256,6 +269,9 @@ namespace Companions.Conversation
         private PendingResponse? ComposeResponse(CompanionDialogueParseResult parseResult, string playerName)
         {
             var segments = new List<string>();
+            if (conversationMemory == null)
+                EnsureConversationMemoryBound();
+
             string playerMoodFromMemory = conversationMemory != null ? conversationMemory.LastKnownPlayerMood : string.Empty;
             string detectedPlayerMood = string.Empty;
             string statusSegment = string.Empty;
@@ -443,7 +459,11 @@ namespace Companions.Conversation
         private string ResolveRecentEventSummary()
         {
             if (conversationMemory == null)
-                return string.Empty;
+            {
+                EnsureConversationMemoryBound();
+                if (conversationMemory == null)
+                    return string.Empty;
+            }
 
             if (!string.IsNullOrWhiteSpace(conversationMemory.LastStatusResponse))
                 return conversationMemory.LastStatusResponse;
@@ -457,6 +477,41 @@ namespace Companions.Conversation
             }
 
             return string.Empty;
+        }
+
+        /// <summary>
+        /// Allows <see cref="CompanionConversationMemory"/> to register itself once it becomes
+        /// active so the service always has a live reference.
+        /// </summary>
+        /// <param name="memory">Memory component that should be bound to the service.</param>
+        internal void BindConversationMemory(CompanionConversationMemory memory)
+        {
+            if (memory == null)
+                return;
+
+            if (conversationMemory == memory)
+                return;
+
+            conversationMemory = memory;
+
+            if (ShouldTraceMemory)
+                Debug.Log("[CompanionConversationService] Conversation memory bound by runtime component.");
+        }
+
+        /// <summary>
+        /// Removes a previously registered memory instance. When the provided memory matches the
+        /// active reference the helper clears it so future lookups can bind a new component.
+        /// </summary>
+        /// <param name="memory">Memory component that is detaching from the service.</param>
+        internal void UnbindConversationMemory(CompanionConversationMemory memory)
+        {
+            if (memory == null || conversationMemory != memory)
+                return;
+
+            conversationMemory = null;
+
+            if (ShouldTraceMemory)
+                Debug.Log("[CompanionConversationService] Conversation memory unbound. Waiting for replacement.");
         }
 
         private string FormatTemplate(string template, string playerName, string playerMood, string companionMood, string recentEvent)
