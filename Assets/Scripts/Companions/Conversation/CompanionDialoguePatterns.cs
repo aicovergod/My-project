@@ -231,6 +231,42 @@ namespace Companions.Conversation
                     }),
 
                 new CompanionIntentPattern(
+                    CompanionDialogueIntent.PlayerSkillProposal,
+                    priority: 34,
+                    matchThreshold: 1.9f,
+                    synonymBuckets: new[]
+                    {
+                        new SynonymBucket(new[] { "do", "are", "shall", "would", "want" }, 0.6f),
+                        new SynonymBucket(new[] { "you", "ya", "u" }, 0.5f),
+                        new SynonymBucket(new[] { "want", "wanna", "fancy", "keen", "up", "game", "feel" }, 0.9f),
+                        new SynonymBucket(SkillKeywordTokens, 0.9f)
+                    },
+                    multiWordPhrases: new[]
+                    {
+                        new MultiWordPhrase("do you want to", 1.5f),
+                        new MultiWordPhrase("do ya want to", 1.4f),
+                        new MultiWordPhrase("do you wanna", 1.5f),
+                        new MultiWordPhrase("are you up for", 1.6f),
+                        new MultiWordPhrase("up for some", 1.4f),
+                        new MultiWordPhrase("fancy some", 1.3f),
+                        new MultiWordPhrase("fancy doing", 1.3f),
+                        new MultiWordPhrase("feel like", 1.2f),
+                        new MultiWordPhrase("keen to", 1.2f),
+                        new MultiWordPhrase("want to go", 1.2f),
+                        new MultiWordPhrase("want to do", 1.2f),
+                        new MultiWordPhrase("shall we", 1.3f)
+                    },
+                    regexScoreEvaluator: text =>
+                    {
+                        float score = 0f;
+                        if (!string.IsNullOrEmpty(text) && text.IndexOf('?', StringComparison.Ordinal) >= 0)
+                            score += 0.4f;
+                        if (!string.IsNullOrEmpty(text) && text.IndexOf("you up for", StringComparison.Ordinal) >= 0)
+                            score += 0.6f;
+                        return score;
+                    }),
+
+                new CompanionIntentPattern(
                     CompanionDialogueIntent.AcceptSkillPlan,
                     priority: 35,
                     matchThreshold: 1.7f,

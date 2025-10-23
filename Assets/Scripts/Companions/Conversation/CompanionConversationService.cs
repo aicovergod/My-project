@@ -5,11 +5,14 @@ using System.Linq;
 using System.Text;
 using Combat;
 using Companions;
+using Inventory;
+using Skills;
+using Skills.Common;
+using Skills.Mining;
 using UI.Chat;
 using UnityEngine;
-using World;
-using Skills;
 using Util;
+using World;
 
 namespace Companions.Conversation
 {
@@ -37,6 +40,7 @@ namespace Companions.Conversation
             new IntentScoreThreshold(CompanionDialogueIntent.Farewell, 1.4f),
             new IntentScoreThreshold(CompanionDialogueIntent.Compliment, 1.8f),
             new IntentScoreThreshold(CompanionDialogueIntent.RequestAssistance, 1.8f),
+            new IntentScoreThreshold(CompanionDialogueIntent.PlayerSkillProposal, 1.9f),
             new IntentScoreThreshold(CompanionDialogueIntent.AcknowledgeRecentEvent, 1.6f),
             new IntentScoreThreshold(CompanionDialogueIntent.ProactiveSkillQuestion, 1f),
             new IntentScoreThreshold(CompanionDialogueIntent.AcceptSkillPlan, 1.7f),
@@ -89,6 +93,180 @@ namespace Companions.Conversation
         [SerializeField, Tooltip("Maximum age (in minutes) of a skill event that can seed a proactive prompt."), Min(0.1f)]
         private float minimumSkillEventFreshnessMinutes = 12f;
 
+        // Pools used to respond when the player suggests a joint training session. We keep them as
+        // static arrays so the helper can pick varied lines without allocating each time the player
+        // messages the companion.
+        private static readonly string[] PlayerSkillProposalReadyWithToolSegments =
+        {
+            "I've got the {tool} ready—let's get back to {skillSentence}.",
+            "Perfect timing. The {tool} has been itching for more {skillSentence}.",
+            "Happy to! The {tool} is sharpened and waiting for us to {activity}.",
+            "Yeah, let's swing the {tool} and keep that {skillSentence} streak rolling.",
+            "Love that plan. I'll grab the {tool} and we can start {activity} right away.",
+            "Consider me in. The {tool} is still warm from earlier {skillSentence} runs.",
+            "Absolutely, let's dust off the {tool} and go {activity} together.",
+            "Great shout—I've already packed the {tool} for more {skillSentence}.",
+            "That's the spirit. The {tool} and I are ready to {activity} again.",
+            "Say no more. The {tool} never left my side; {skillSentence} awaits.",
+            "Heh, you read my mind. The {tool} is prepped for a fresh round of {skillSentence}.",
+            "All right, I'll tighten my grip on the {tool} and lead us into some {skillSentence}."
+        };
+
+        private static readonly string[] PlayerSkillProposalReadyGenericSegments =
+        {
+            "Let's do it—more {skillSentence} sounds perfect right now.",
+            "I'm on board. A fresh round of {skillSentence} will hit the spot.",
+            "Count me in for {skillSentence}; I'm ready when you are.",
+            "Great idea, {playerName}. Let's dive back into {skillSentence}.",
+            "Absolutely—I've been itching for more {skillSentence}.",
+            "Love that vibe. Let's spend the next while {activity}.",
+            "You know it. {skillSentence} is exactly what I was thinking.",
+            "Ready and willing. Point me toward the next {skillSentence} spot.",
+            "Fantastic suggestion. We can start {activity} right away.",
+            "Consider it done; {skillSentence} session coming right up.",
+            "I'm game. Let's make this {skillSentence} run memorable.",
+            "Heck yes, more {skillSentence} with you is my kind of plan."
+        };
+
+        private static readonly string[] PlayerSkillProposalReadyWithToolFollowUps =
+        {
+            "Lead the way and I'll keep the {tool} swinging.",
+            "I'll stow anything we gather so you can stay light on your feet.",
+            "If we hit a juicy vein I'll call it out straight away.",
+            "Let's pace it—no sense dulling the {tool} on stray rocks.",
+            "I'll watch our surroundings while you line up the next target.",
+            "I'll bank anything extra once our packs start to fill.",
+            "I'll keep track of the good nodes we find for later runs.",
+            "Shout if you spot anything rare; I'll break it open with the {tool}.",
+            "I'll double-check the {tool} between swings so we don't lose rhythm.",
+            "I'll handle the heavy lifting so you can focus on the big finds."
+        };
+
+        private static readonly string[] PlayerSkillProposalReadyGenericFollowUps =
+        {
+            "Call out the spot you like and I'll back you up.",
+            "I'll log the gains in case we want to brag later.",
+            "We can swap tasks mid-run if you need a breather.",
+            "I'll keep an eye on stray hostiles while we work.",
+            "Let's keep the momentum rolling with quick hops between spots.",
+            "We should stash anything rare before anyone else notices.",
+            "I'll mark our route so we can repeat it tomorrow.",
+            "If you want to split duties, just say the word.",
+            "I'll shout if I notice better opportunities nearby.",
+            "Let's keep the chatter going—makes the grind faster."
+        };
+
+        private static readonly string[] PlayerSkillProposalMissingToolSegments =
+        {
+            "I'd love to, but I'm missing {indefiniteTool} right now.",
+            "Tempting offer, yet we stashed our {definiteTool}. We'll need to fetch it first.",
+            "I'm game for {skillSentence}, though our kit lacks {indefiniteTool} at the moment.",
+            "I could, but without {indefiniteTool} we'd just bruise knuckles.",
+            "Let's pencil it in once we recover {definiteTool} from storage.",
+            "Count me interested—but the last {definiteTool} snapped, remember?",
+            "I'd say yes if we had {indefiniteTool}; we're travelling light.",
+            "Give me time to replace {definiteTool} and I'm all yours for {skillSentence}.",
+            "Can't swing {skillSentence} until we secure {indefiniteTool} again.",
+            "If we make a quick stop for {indefiniteTool}, I'm in.",
+            "Our pack is empty of {toolPlural}. Let's restock before we commit.",
+            "I'm running a little under-geared—no {definiteTool} means no {skillSentence} just yet."
+        };
+
+        private static readonly string[] PlayerSkillProposalMissingToolFollowUps =
+        {
+            "Want me to check the bank later for a spare?",
+            "We could swing by the workshop and pick one up first.",
+            "If you spot a vendor, let's grab {indefiniteTool} before we forget.",
+            "I'll keep an ear out for drops that match what we need.",
+            "Maybe we craft one after this fight? Could be a good project.",
+            "Let me mark it on our to-do list so we don't miss the chance.",
+            "I'll ping you once I've tracked down {indefiniteTool}.",
+            "We can always pivot to something else until we're re-equipped.",
+            "I'll empty some space so we can carry a fresh {definiteTool} next time.",
+            "Let's talk to the smithy after this and see what they can do."
+        };
+
+        private static readonly string[] PlayerSkillProposalAlternateSkillSegments =
+        {
+            "What if we lean into {alternateDescription} instead? It suits what we've been doing.",
+            "I'm short on gear for that, but {alternateName} could be a solid pivot.",
+            "Maybe we swap to {alternateDescription}—we're already warmed up for it.",
+            "How about {alternateName}? It keeps our streak alive without waiting on supplies.",
+            "We could chase {alternateDescription} while we prep for your idea.",
+            "Until we're retooled, {alternateName} might be the smarter grind.",
+            "I'd vote for {alternateDescription} in the meantime; faster to jump into.",
+            "Could we do {alternateName} first? Gives me time to fetch the rest of the gear.",
+            "Let's bank this plan and run {alternateDescription} as a warm-up.",
+            "Maybe {alternateName} scratches the same itch without the equipment scramble.",
+            "If you're cool with it, {alternateDescription} is ready to go right now.",
+            "We can circle back after some {alternateName}; it's on my radar anyway."
+        };
+
+        private static readonly string[] PlayerSkillProposalAlternateSkillFollowUps =
+        {
+            "If that works, I'll schedule a reminder to grab the right tool later.",
+            "We can swap back the moment we're re-equipped.",
+            "I'll keep logging prospects for your original plan while we pivot.",
+            "Give the word when you'd rather return to your idea.",
+            "I'll note the cooldown so we don't forget to revisit it.",
+            "We'll still chase your plan soon—I promise.",
+            "I'll stash our finds so they're ready for the real run later.",
+            "Meanwhile I'll send feelers for anyone selling the gear we need.",
+            "I'll mark the spot so we can resume without missing a beat.",
+            "Let's treat this as prep work; the main event comes once we're geared."
+        };
+
+        private static readonly Dictionary<string, TokenSkillMapping> SkillTokenMappings =
+            new Dictionary<string, TokenSkillMapping>(StringComparer.Ordinal)
+            {
+                { "mine", TokenSkillMapping.ForSkills(1.2f, SkillType.Mining) },
+                { "mining", TokenSkillMapping.ForSkills(1.4f, SkillType.Mining) },
+                { "ore", TokenSkillMapping.ForSkills(0.8f, SkillType.Mining) },
+                { "ores", TokenSkillMapping.ForSkills(0.8f, SkillType.Mining) },
+                { "rock", TokenSkillMapping.ForSkills(0.9f, SkillType.Mining) },
+                { "rocks", TokenSkillMapping.ForSkills(0.9f, SkillType.Mining) },
+                { "pick", TokenSkillMapping.ForSkills(1.1f, SkillType.Mining) },
+                { "pickaxe", TokenSkillMapping.ForSkills(1.1f, SkillType.Mining) },
+                { "prospect", TokenSkillMapping.ForSkills(1f, SkillType.Mining) },
+                { "chop", TokenSkillMapping.ForSkills(1.2f, SkillType.Woodcutting) },
+                { "woodcut", TokenSkillMapping.ForSkills(1.3f, SkillType.Woodcutting) },
+                { "woodcutting", TokenSkillMapping.ForSkills(1.4f, SkillType.Woodcutting) },
+                { "tree", TokenSkillMapping.ForSkills(0.9f, SkillType.Woodcutting) },
+                { "trees", TokenSkillMapping.ForSkills(0.9f, SkillType.Woodcutting) },
+                { "logs", new TokenSkillMapping(1.1f, "firemaking", "firemaking", SkillType.Woodcutting, SkillType.Firemaking) },
+                { "fish", TokenSkillMapping.ForSkills(1.2f, SkillType.Fishing) },
+                { "fishing", TokenSkillMapping.ForSkills(1.4f, SkillType.Fishing) },
+                { "net", TokenSkillMapping.ForSkills(0.9f, SkillType.Fishing) },
+                { "angler", TokenSkillMapping.ForSkills(0.9f, SkillType.Fishing) },
+                { "catch", TokenSkillMapping.ForSkills(0.8f, SkillType.Fishing) },
+                { "cook", TokenSkillMapping.ForSkills(1.2f, SkillType.Cooking) },
+                { "cooking", TokenSkillMapping.ForSkills(1.3f, SkillType.Cooking) },
+                { "stew", TokenSkillMapping.ForSkills(0.6f, SkillType.Cooking) },
+                { "meal", TokenSkillMapping.ForSkills(0.6f, SkillType.Cooking) },
+                { "firemake", TokenSkillMapping.ForSkills(1.2f, SkillType.Firemaking) },
+                { "firemaking", TokenSkillMapping.ForSkills(1.3f, SkillType.Firemaking) },
+                { "bonfire", TokenSkillMapping.ForSkills(1.1f, SkillType.Firemaking) },
+                { "light", TokenSkillMapping.ForSkills(0.7f, SkillType.Firemaking) },
+                { "smith", TokenSkillMapping.ForFallback(1.2f, "smithing", "smithing") },
+                { "smithing", TokenSkillMapping.ForFallback(1.4f, "smithing", "smithing") },
+                { "smelt", TokenSkillMapping.ForFallback(1.1f, "smithing", "smithing") },
+                { "craft", TokenSkillMapping.ForFallback(1.2f, "crafting", "crafting") },
+                { "crafting", TokenSkillMapping.ForFallback(1.4f, "crafting", "crafting") },
+                { "fletch", TokenSkillMapping.ForFallback(1.2f, "fletching", "fletching") },
+                { "magic", TokenSkillMapping.ForSkills(1.1f, SkillType.Magic) },
+                { "spell", TokenSkillMapping.ForSkills(0.9f, SkillType.Magic) },
+                { "rune", TokenSkillMapping.ForSkills(0.8f, SkillType.Magic) },
+                { "cast", TokenSkillMapping.ForSkills(0.9f, SkillType.Magic) },
+                { "range", TokenSkillMapping.ForSkills(0.8f, SkillType.Ranged) },
+                { "ranged", TokenSkillMapping.ForSkills(0.9f, SkillType.Ranged) },
+                { "bow", TokenSkillMapping.ForSkills(0.7f, SkillType.Ranged) },
+                { "arrows", TokenSkillMapping.ForSkills(0.7f, SkillType.Ranged) },
+                { "attack", TokenSkillMapping.ForSkills(0.7f, SkillType.Attack) },
+                { "strength", TokenSkillMapping.ForSkills(0.7f, SkillType.Strength) },
+                { "defence", TokenSkillMapping.ForSkills(0.7f, SkillType.Defence) },
+                { "defense", TokenSkillMapping.ForSkills(0.7f, SkillType.Defence) }
+            };
+
         private readonly Queue<PendingResponse> pendingResponses = new Queue<PendingResponse>();
         private CompanionDialogueParser parser;
         private Coroutine responseRoutine;
@@ -111,11 +289,13 @@ namespace Companions.Conversation
         private bool tickerSubscribed;
         private Coroutine tickerSubscriptionRoutine;
         private DateTime? lastCompanionCombatUtc;
+        private Dictionary<string, ItemData> pickaxeItemCache;
 
         private const int MaxTrackedSkillActions = 6;
         private const int MaxSkillQuestionCandidates = 6;
         private static readonly TimeSpan SkillActionRetention = TimeSpan.FromMinutes(15);
         private static readonly TimeSpan CompanionCombatActivityWindow = TimeSpan.FromSeconds(5);
+        private const float SkillProposalFollowUpChance = 0.65f;
 
         private bool ResponseRoutineActive => responseRoutine != null;
 
@@ -992,6 +1172,16 @@ namespace Companions.Conversation
                             recentEvent);
                         break;
 
+                    case CompanionDialogueIntent.PlayerSkillProposal:
+                        TryHandlePlayerSkillProposal(
+                            parseResult,
+                            context,
+                            segments,
+                            followUps,
+                            playerName,
+                            ref companionMood);
+                        break;
+
                     case CompanionDialogueIntent.AcknowledgeRecentEvent:
                         if (!string.IsNullOrEmpty(recentEvent))
                         {
@@ -1068,6 +1258,534 @@ namespace Companions.Conversation
                 if (!string.IsNullOrWhiteSpace(formatted))
                     collector.Add(formatted);
             }
+        }
+
+        private bool TryHandlePlayerSkillProposal(
+            CompanionDialogueParseResult parseResult,
+            CompanionResponseContext context,
+            List<string> segments,
+            List<string> followUps,
+            string playerName,
+            ref string companionMood)
+        {
+            var analysis = AnalyseSkillProposal(parseResult, lastPlayerMessage);
+            if (!analysis.HasProposal)
+                return false;
+
+            var toolResult = EvaluateToolAvailability(analysis);
+
+            if (analysis.HasConcreteSkill)
+            {
+                if (toolResult.State == SkillToolState.Missing)
+                {
+                    ComposeMissingToolResponse(analysis, toolResult, segments, followUps, playerName);
+                    return true;
+                }
+
+                ComposeReadySkillResponse(analysis, toolResult, segments, followUps, playerName, ref companionMood);
+                return true;
+            }
+
+            ComposeAlternateSkillResponse(analysis, context, segments, followUps, playerName, toolResult);
+            return true;
+        }
+
+        private SkillProposalAnalysis AnalyseSkillProposal(CompanionDialogueParseResult parseResult, string rawMessage)
+        {
+            if (parseResult.UniqueTokens == null || parseResult.UniqueTokens.Count == 0)
+                return SkillProposalAnalysis.Empty;
+
+            var weightBySkill = new Dictionary<SkillType, float>();
+            SkillType? bestSkill = null;
+            float bestScore = 0f;
+            float fallbackScore = 0f;
+            string fallbackName = string.Empty;
+            string fallbackSentence = string.Empty;
+
+            foreach (string token in parseResult.UniqueTokens)
+            {
+                if (string.IsNullOrWhiteSpace(token))
+                    continue;
+
+                if (!SkillTokenMappings.TryGetValue(token, out var mapping))
+                    continue;
+
+                if (mapping.HasSkills)
+                {
+                    for (int i = 0; i < mapping.Skills.Length; i++)
+                    {
+                        SkillType skill = mapping.Skills[i];
+                        float current = weightBySkill.TryGetValue(skill, out float existing) ? existing : 0f;
+                        current += mapping.Weight;
+                        weightBySkill[skill] = current;
+
+                        if (current > bestScore)
+                        {
+                            bestScore = current;
+                            bestSkill = skill;
+                        }
+                    }
+                }
+                else if (!string.IsNullOrEmpty(mapping.FallbackName))
+                {
+                    if (mapping.Weight >= fallbackScore)
+                    {
+                        fallbackScore = mapping.Weight;
+                        fallbackName = mapping.FallbackName;
+                        fallbackSentence = mapping.FallbackSentence;
+                    }
+                }
+            }
+
+            string displayName = bestSkill.HasValue
+                ? SkillNameUtility.GetDisplayName(bestSkill.Value)
+                : fallbackName;
+
+            string sentenceName = bestSkill.HasValue
+                ? SkillNameUtility.GetSentenceName(bestSkill.Value)
+                : (!string.IsNullOrWhiteSpace(fallbackSentence)
+                    ? fallbackSentence
+                    : (!string.IsNullOrWhiteSpace(displayName)
+                        ? displayName.ToLowerInvariant()
+                        : string.Empty));
+
+            bool hasProposal = bestSkill.HasValue || !string.IsNullOrWhiteSpace(displayName);
+
+            return new SkillProposalAnalysis(
+                hasProposal,
+                bestSkill,
+                displayName,
+                sentenceName,
+                rawMessage,
+                parseResult.Tokens);
+        }
+
+        private ToolAvailabilityResult EvaluateToolAvailability(SkillProposalAnalysis analysis)
+        {
+            if (!analysis.HasConcreteSkill)
+                return ToolAvailabilityResult.AssumedReady(string.Empty);
+
+            switch (analysis.Skill.Value)
+            {
+                case SkillType.Mining:
+                    return EvaluateMiningToolAvailability();
+                case SkillType.Woodcutting:
+                    return ToolAvailabilityResult.AssumedReady("axe");
+                case SkillType.Fishing:
+                    return ToolAvailabilityResult.AssumedReady("fishing gear");
+                case SkillType.Cooking:
+                    return ToolAvailabilityResult.AssumedReady("cookware");
+                case SkillType.Firemaking:
+                    return ToolAvailabilityResult.AssumedReady("tinderbox");
+                case SkillType.Magic:
+                    return ToolAvailabilityResult.AssumedReady("spellbook");
+                case SkillType.Ranged:
+                    return ToolAvailabilityResult.AssumedReady("ranged gear");
+                case SkillType.Attack:
+                case SkillType.Strength:
+                case SkillType.Defence:
+                    return ToolAvailabilityResult.AssumedReady("training gear");
+                case SkillType.Hitpoints:
+                    return ToolAvailabilityResult.AssumedReady("supplies");
+                case SkillType.Beastmaster:
+                    return ToolAvailabilityResult.AssumedReady("beast treats");
+                default:
+                    return ToolAvailabilityResult.AssumedReady("gear");
+            }
+        }
+
+        private ToolAvailabilityResult EvaluateMiningToolAvailability()
+        {
+            var inventoryWrapper = CompanionManager.CompanionInventory;
+            Inventory.Inventory inventory = inventoryWrapper != null ? inventoryWrapper.InventoryComponent : null;
+            var equipment = CompanionManager.CompanionEquipment;
+            var skills = CompanionManager.CompanionSkills;
+            int miningLevel = skills != null ? skills.GetLevel(SkillType.Mining) : 1;
+
+            var definitions = PickaxeDefinitionRegistry.GetAllDefinitions();
+            if (definitions == null || definitions.Count == 0)
+            {
+                var selectors = FindObjectsOfType<PickaxeToUse>(true);
+                for (int i = 0; i < selectors.Length; i++)
+                {
+                    var selector = selectors[i];
+                    if (selector != null)
+                        PickaxeDefinitionRegistry.RegisterDefinitions(selector.AllPickaxes);
+                }
+
+                definitions = PickaxeDefinitionRegistry.GetAllDefinitions();
+            }
+
+            if (definitions == null || definitions.Count == 0)
+                return ToolAvailabilityResult.AssumedReady("pickaxe");
+
+            PickaxeDefinition bestOwned = null;
+            bool bestOwnedEquipped = false;
+            PickaxeDefinition bestEligible = null;
+
+            for (int i = 0; i < definitions.Count; i++)
+            {
+                var definition = definitions[i];
+                if (definition == null)
+                    continue;
+
+                if (definition.LevelRequirement > miningLevel)
+                    continue;
+
+                if (bestEligible == null || definition.Tier > bestEligible.Tier)
+                    bestEligible = definition;
+
+                var item = GatheringInventoryHelper.GetItemData(definition.Id, ref pickaxeItemCache);
+                bool owns = inventory != null && item != null && inventory.GetItemCount(item) > 0;
+                bool equippedTool = false;
+
+                if (equipment != null && item != null)
+                {
+                    var entry = equipment.GetEquipped(EquipmentSlot.Weapon);
+                    equippedTool = entry.item == item;
+                }
+
+                if (!owns && !equippedTool)
+                    continue;
+
+                bestOwned = definition;
+                bestOwnedEquipped = equippedTool;
+                break;
+            }
+
+            if (bestOwned != null)
+            {
+                return ToolAvailabilityResult.Ready(
+                    bestOwned.DisplayName,
+                    "pickaxe",
+                    bestOwnedEquipped);
+            }
+
+            if (bestEligible != null)
+            {
+                return ToolAvailabilityResult.Missing(
+                    bestEligible.DisplayName,
+                    "pickaxe",
+                    "We should fetch one before we start.");
+            }
+
+            return ToolAvailabilityResult.Missing(string.Empty, "pickaxe", "Let's secure a pickaxe first.");
+        }
+
+        private void ComposeReadySkillResponse(
+            SkillProposalAnalysis analysis,
+            ToolAvailabilityResult toolResult,
+            List<string> segments,
+            List<string> followUps,
+            string playerName,
+            ref string companionMood)
+        {
+            if (!analysis.HasConcreteSkill)
+                return;
+
+            string toolName = ResolveToolName(toolResult);
+            string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName;
+            string skillDisplay = analysis.HasDisplayName
+                ? analysis.SkillDisplayName
+                : SkillNameUtility.GetDisplayName(analysis.Skill.Value);
+            string skillSentence = !string.IsNullOrWhiteSpace(analysis.SkillSentenceName)
+                ? analysis.SkillSentenceName
+                : SkillNameUtility.GetSentenceName(analysis.Skill.Value);
+            string activity = ResolveSkillActivityDescriptor(analysis.Skill.Value);
+
+            var replacements = new Dictionary<string, string>
+            {
+                { "tool", toolName },
+                { "skillName", skillDisplay },
+                { "skillSentence", skillSentence },
+                { "activity", string.IsNullOrWhiteSpace(activity) ? skillSentence : activity },
+                { "playerName", safePlayerName }
+            };
+
+            var pool = !string.IsNullOrWhiteSpace(toolName) && toolResult.State == SkillToolState.Ready
+                ? PlayerSkillProposalReadyWithToolSegments
+                : PlayerSkillProposalReadyGenericSegments;
+
+            string primary = ApplyProposalTokens(ChooseRandom(pool), replacements);
+            if (!string.IsNullOrWhiteSpace(primary))
+                segments.Add(primary);
+
+            var followUpPool = !string.IsNullOrWhiteSpace(toolName) && toolResult.State == SkillToolState.Ready
+                ? PlayerSkillProposalReadyWithToolFollowUps
+                : PlayerSkillProposalReadyGenericFollowUps;
+
+            TryAppendSkillProposalFollowUp(followUps, followUpPool, replacements);
+
+            DateTime nowUtc = DateTime.UtcNow;
+            lastProactiveQuestionUtc = nowUtc;
+
+            if (conversationMemory != null)
+            {
+                var metadata = CompanionEventMetadata.Create(
+                    primaryActor: playerName,
+                    skill: analysis.Skill,
+                    additionalContext: analysis.RawMessage);
+
+                string summary = string.IsNullOrWhiteSpace(playerName)
+                    ? $"Agreed to train some {skillDisplay}"
+                    : $"{playerName} and the companion planned more {skillDisplay}";
+
+                conversationMemory.RegisterEvent(summary, CompanionEventType.Gathering, metadata);
+            }
+        }
+
+        private void ComposeMissingToolResponse(
+            SkillProposalAnalysis analysis,
+            ToolAvailabilityResult toolResult,
+            List<string> segments,
+            List<string> followUps,
+            string playerName)
+        {
+            string skillSentence = !string.IsNullOrWhiteSpace(analysis.SkillSentenceName)
+                ? analysis.SkillSentenceName
+                : (analysis.HasConcreteSkill
+                    ? SkillNameUtility.GetSentenceName(analysis.Skill.Value)
+                    : analysis.SkillDisplayName.ToLowerInvariant());
+
+            string skillDisplay = analysis.HasDisplayName
+                ? analysis.SkillDisplayName
+                : (analysis.HasConcreteSkill
+                    ? SkillNameUtility.GetDisplayName(analysis.Skill.Value)
+                    : skillSentence);
+
+            var replacements = new Dictionary<string, string>
+            {
+                { "skillSentence", skillSentence },
+                { "skillName", skillDisplay },
+                { "playerName", string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName },
+                { "indefiniteTool", BuildIndefiniteToolName(toolResult) },
+                { "definiteTool", BuildDefiniteToolName(toolResult) },
+                { "toolPlural", BuildToolPlural(toolResult) }
+            };
+
+            string primary = ApplyProposalTokens(ChooseRandom(PlayerSkillProposalMissingToolSegments), replacements);
+            if (!string.IsNullOrWhiteSpace(primary))
+                segments.Add(primary);
+
+            TryAppendSkillProposalFollowUp(followUps, PlayerSkillProposalMissingToolFollowUps, replacements);
+        }
+
+        private void ComposeAlternateSkillResponse(
+            SkillProposalAnalysis analysis,
+            CompanionResponseContext context,
+            List<string> segments,
+            List<string> followUps,
+            string playerName,
+            ToolAvailabilityResult toolResult)
+        {
+            DateTime nowUtc = DateTime.UtcNow;
+            SkillQuestionCandidate candidate;
+            bool hasCandidate = TryGetBestSkillCandidate(nowUtc, out candidate, analysis.HasConcreteSkill ? analysis.Skill : (SkillType?)null);
+            if (!hasCandidate)
+                hasCandidate = TryBuildFallbackSkillCandidate(nowUtc, out candidate);
+
+            string alternateName = ResolveAlternateName(analysis, candidate, context);
+            string alternateDescription = ResolveAlternateDescription(candidate, alternateName, context);
+
+            var replacements = new Dictionary<string, string>
+            {
+                { "alternateName", alternateName },
+                { "alternateDescription", alternateDescription },
+                { "playerName", string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName },
+                { "indefiniteTool", BuildIndefiniteToolName(toolResult) },
+                { "definiteTool", BuildDefiniteToolName(toolResult) },
+                { "skillName", analysis.SkillDisplayName },
+                { "skillSentence", analysis.SkillSentenceName }
+            };
+
+            string primary = ApplyProposalTokens(ChooseRandom(PlayerSkillProposalAlternateSkillSegments), replacements);
+            if (!string.IsNullOrWhiteSpace(primary))
+                segments.Add(primary);
+
+            TryAppendSkillProposalFollowUp(followUps, PlayerSkillProposalAlternateSkillFollowUps, replacements);
+
+            lastProactiveQuestionUtc = nowUtc;
+        }
+
+        private static string ResolveToolName(ToolAvailabilityResult toolResult)
+        {
+            if (!string.IsNullOrWhiteSpace(toolResult.SpecificToolName))
+                return toolResult.SpecificToolName;
+
+            if (!string.IsNullOrWhiteSpace(toolResult.GenericToolName))
+                return toolResult.GenericToolName;
+
+            return string.Empty;
+        }
+
+        private static string ResolveSkillActivityDescriptor(SkillType skill)
+        {
+            switch (skill)
+            {
+                case SkillType.Mining:
+                    return "chip into the rocks";
+                case SkillType.Woodcutting:
+                    return "chop down some trees";
+                case SkillType.Fishing:
+                    return "cast a line";
+                case SkillType.Cooking:
+                    return "cook up a meal";
+                case SkillType.Firemaking:
+                    return "light the logs";
+                case SkillType.Magic:
+                    return "sling a few spells";
+                case SkillType.Ranged:
+                    return "loose some arrows";
+                case SkillType.Attack:
+                    return "run combat drills";
+                case SkillType.Strength:
+                    return "work those muscles";
+                case SkillType.Defence:
+                    return "tighten our defenses";
+                case SkillType.Hitpoints:
+                    return "work on endurance";
+                case SkillType.Beastmaster:
+                    return "train the beasts";
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private static string ChooseRandom(IReadOnlyList<string> pool)
+        {
+            if (pool == null || pool.Count == 0)
+                return string.Empty;
+
+            int index = UnityEngine.Random.Range(0, pool.Count);
+            return pool[index];
+        }
+
+        private static string ApplyProposalTokens(string template, IReadOnlyDictionary<string, string> replacements)
+        {
+            if (string.IsNullOrWhiteSpace(template))
+                return string.Empty;
+
+            string result = template;
+
+            if (replacements != null)
+            {
+                foreach (var pair in replacements)
+                {
+                    string token = "{" + pair.Key + "}";
+                    string value = pair.Value ?? string.Empty;
+                    result = result.Replace(token, value);
+                }
+            }
+
+            return CompactWhitespace(result);
+        }
+
+        private void TryAppendSkillProposalFollowUp(
+            List<string> followUps,
+            string[] pool,
+            IReadOnlyDictionary<string, string> replacements)
+        {
+            if (followUps == null || pool == null || pool.Length == 0)
+                return;
+
+            if (UnityEngine.Random.value > SkillProposalFollowUpChance)
+                return;
+
+            string followUp = ApplyProposalTokens(ChooseRandom(pool), replacements);
+            if (!string.IsNullOrWhiteSpace(followUp))
+                followUps.Add(followUp);
+        }
+
+        private static string BuildIndefiniteToolName(ToolAvailabilityResult toolResult)
+        {
+            string baseName = !string.IsNullOrWhiteSpace(toolResult.SpecificToolName)
+                ? toolResult.SpecificToolName
+                : (!string.IsNullOrWhiteSpace(toolResult.GenericToolName) ? toolResult.GenericToolName : "tool");
+
+            return WithIndefiniteArticle(baseName);
+        }
+
+        private static string BuildDefiniteToolName(ToolAvailabilityResult toolResult)
+        {
+            if (!string.IsNullOrWhiteSpace(toolResult.SpecificToolName))
+                return $"the {toolResult.SpecificToolName}";
+
+            if (!string.IsNullOrWhiteSpace(toolResult.GenericToolName))
+                return $"the {toolResult.GenericToolName}";
+
+            return "the tool";
+        }
+
+        private static string BuildToolPlural(ToolAvailabilityResult toolResult)
+        {
+            string baseName = !string.IsNullOrWhiteSpace(toolResult.GenericToolName)
+                ? toolResult.GenericToolName
+                : (!string.IsNullOrWhiteSpace(toolResult.SpecificToolName) ? toolResult.SpecificToolName : "tools");
+
+            if (baseName.EndsWith("x", StringComparison.OrdinalIgnoreCase))
+                return baseName + "es";
+
+            if (baseName.EndsWith("s", StringComparison.OrdinalIgnoreCase))
+                return baseName;
+
+            return baseName + "s";
+        }
+
+        private static string WithIndefiniteArticle(string noun)
+        {
+            if (string.IsNullOrWhiteSpace(noun))
+                return "a tool";
+
+            string trimmed = noun.Trim();
+            char first = char.ToLowerInvariant(trimmed[0]);
+            bool useAn = first == 'a' || first == 'e' || first == 'i' || first == 'o' || first == 'u';
+            string article = useAn ? "an" : "a";
+            return $"{article} {trimmed}";
+        }
+
+        private static string ResolveAlternateName(
+            SkillProposalAnalysis analysis,
+            SkillQuestionCandidate candidate,
+            CompanionResponseContext context)
+        {
+            if (candidate.HasSkill)
+            {
+                if (!string.IsNullOrWhiteSpace(candidate.SkillName))
+                    return candidate.SkillName;
+
+                return SkillNameUtility.GetDisplayName(candidate.Skill.Value);
+            }
+
+            if (candidate.HasDescription)
+                return candidate.Description;
+
+            if (context.HasSuggestedSkill && !string.IsNullOrWhiteSpace(context.SuggestedSkillName))
+                return context.SuggestedSkillName;
+
+            if (analysis.HasDisplayName)
+                return analysis.SkillDisplayName;
+
+            return "something else";
+        }
+
+        private static string ResolveAlternateDescription(
+            SkillQuestionCandidate candidate,
+            string alternateName,
+            CompanionResponseContext context)
+        {
+            if (candidate.HasDescription)
+                return candidate.Description;
+
+            if (candidate.HasSkill)
+                return $"more {SkillNameUtility.GetSentenceName(candidate.Skill.Value)}";
+
+            if (context.HasSuggestedSkill && !string.IsNullOrWhiteSpace(context.SuggestedSkillName))
+                return context.SuggestedSkillName.ToLowerInvariant();
+
+            if (!string.IsNullOrWhiteSpace(alternateName))
+                return alternateName.ToLowerInvariant();
+
+            return "a different activity";
         }
 
         private bool TryHandleSkillPlanIntent(
@@ -1568,6 +2286,13 @@ namespace Companions.Conversation
                         builder.Append(' ');
                     previousSpace = true;
                 }
+                else if (c == '?')
+                {
+                    if (!previousSpace && builder.Length > 0)
+                        builder.Append(' ');
+                    builder.Append('?');
+                    previousSpace = false;
+                }
                 else
                 {
                     // skip punctuation
@@ -1649,6 +2374,130 @@ namespace Companions.Conversation
             }
 
             return Mathf.Max(0f, defaultValue);
+        }
+
+        private readonly struct SkillProposalAnalysis
+        {
+            public static SkillProposalAnalysis Empty => new SkillProposalAnalysis(
+                hasProposal: false,
+                skill: null,
+                skillDisplayName: string.Empty,
+                skillSentenceName: string.Empty,
+                rawMessage: string.Empty,
+                tokens: Array.Empty<string>());
+
+            public SkillProposalAnalysis(
+                bool hasProposal,
+                SkillType? skill,
+                string skillDisplayName,
+                string skillSentenceName,
+                string rawMessage,
+                IReadOnlyList<string> tokens)
+            {
+                HasProposal = hasProposal;
+                Skill = skill;
+                SkillDisplayName = skillDisplayName ?? string.Empty;
+                SkillSentenceName = skillSentenceName ?? string.Empty;
+                RawMessage = rawMessage ?? string.Empty;
+                Tokens = tokens ?? Array.Empty<string>();
+            }
+
+            public bool HasProposal { get; }
+
+            public SkillType? Skill { get; }
+
+            public bool HasConcreteSkill => Skill.HasValue;
+
+            public string SkillDisplayName { get; }
+
+            public string SkillSentenceName { get; }
+
+            public string RawMessage { get; }
+
+            public IReadOnlyList<string> Tokens { get; }
+
+            public bool HasDisplayName => !string.IsNullOrWhiteSpace(SkillDisplayName);
+        }
+
+        private readonly struct TokenSkillMapping
+        {
+            public TokenSkillMapping(float weight, string fallbackName, string fallbackSentence, params SkillType[] skills)
+            {
+                Weight = Mathf.Max(0f, weight);
+                FallbackName = fallbackName ?? string.Empty;
+                FallbackSentence = fallbackSentence ?? string.Empty;
+                Skills = skills ?? Array.Empty<SkillType>();
+            }
+
+            public float Weight { get; }
+
+            public string FallbackName { get; }
+
+            public string FallbackSentence { get; }
+
+            public SkillType[] Skills { get; }
+
+            public bool HasSkills => Skills.Length > 0;
+
+            public static TokenSkillMapping ForSkills(float weight, params SkillType[] skills)
+            {
+                return new TokenSkillMapping(weight, string.Empty, string.Empty, skills);
+            }
+
+            public static TokenSkillMapping ForFallback(float weight, string fallbackName, string fallbackSentence)
+            {
+                return new TokenSkillMapping(weight, fallbackName, fallbackSentence);
+            }
+        }
+
+        private enum SkillToolState
+        {
+            Ready = 0,
+            Missing = 1
+        }
+
+        private readonly struct ToolAvailabilityResult
+        {
+            private ToolAvailabilityResult(
+                SkillToolState state,
+                string specificToolName,
+                string genericToolName,
+                bool isEquipped,
+                string missingHint)
+            {
+                State = state;
+                SpecificToolName = specificToolName ?? string.Empty;
+                GenericToolName = genericToolName ?? string.Empty;
+                IsEquipped = isEquipped;
+                MissingHint = missingHint ?? string.Empty;
+            }
+
+            public SkillToolState State { get; }
+
+            public string SpecificToolName { get; }
+
+            public string GenericToolName { get; }
+
+            public bool IsEquipped { get; }
+
+            public string MissingHint { get; }
+
+            public bool HasSpecificTool => !string.IsNullOrWhiteSpace(SpecificToolName);
+
+            public static ToolAvailabilityResult Ready(string specificToolName, string genericToolName, bool isEquipped)
+            {
+                return new ToolAvailabilityResult(SkillToolState.Ready, specificToolName, genericToolName, isEquipped, string.Empty);
+            }
+
+            public static ToolAvailabilityResult Missing(string specificToolName, string genericToolName, string hint)
+            {
+                return new ToolAvailabilityResult(SkillToolState.Missing, specificToolName, genericToolName, false, hint);
+            }
+
+            public static ToolAvailabilityResult AssumedReady(string genericToolName)
+            {
+                return new ToolAvailabilityResult(SkillToolState.Ready, string.Empty, genericToolName, false, string.Empty);
+            }
         }
 
         private readonly struct SkillQuestionCandidate
