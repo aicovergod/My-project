@@ -49,8 +49,20 @@ namespace Companions.Conversation
         private CompanionDialogueResponseLibrary responseLibrary = new CompanionDialogueResponseLibrary();
 
         [Header("Parsing & Rules")]
-        [SerializeField, Tooltip("Keyword rules used to detect dialogue intents.")]
-        private List<CompanionDialogueRule> rules = new List<CompanionDialogueRule>();
+        [SerializeField, Tooltip("Score thresholds per dialogue intent. Values below zero are clamped to zero.")]
+        private List<IntentScoreThreshold> intentScoreThresholds = new List<IntentScoreThreshold>
+        {
+            new IntentScoreThreshold(CompanionDialogueIntent.Greeting, 1f),
+            new IntentScoreThreshold(CompanionDialogueIntent.StatusQuery, 2.4f),
+            new IntentScoreThreshold(CompanionDialogueIntent.PlayerMoodReport, 2.2f),
+            new IntentScoreThreshold(CompanionDialogueIntent.Gratitude, 1.6f),
+            new IntentScoreThreshold(CompanionDialogueIntent.Farewell, 1.4f),
+            new IntentScoreThreshold(CompanionDialogueIntent.Compliment, 1.8f),
+            new IntentScoreThreshold(CompanionDialogueIntent.RequestAssistance, 1.8f),
+            new IntentScoreThreshold(CompanionDialogueIntent.AcknowledgeRecentEvent, 1.6f)
+        };
+
+        private readonly List<CompanionDialogueRule> rules = new List<CompanionDialogueRule>();
 
         [Header("Typing Behaviour")]
         [SerializeField, Tooltip("Base delay applied before the companion responds (seconds).")]
@@ -118,9 +130,7 @@ namespace Companions.Conversation
             responseLibrary ??= new CompanionDialogueResponseLibrary();
             responseLibrary.EnsureDefaults();
 
-            if (rules == null || rules.Count == 0)
-                rules = BuildDefaultRules();
-
+            BuildRuleProfile();
             parser = new CompanionDialogueParser(rules);
 
             EnsureConversationMemoryBound();
@@ -549,6 +559,10 @@ namespace Companions.Conversation
                 if (PlayerMoodLookup.TryGetValue(token, out string mood))
                     return mood;
 
+                string stemmed = StemTokenForLookup(token);
+                if (!string.IsNullOrEmpty(stemmed) && PlayerMoodLookup.TryGetValue(stemmed, out mood))
+                    return mood;
+
                 if (token == "not" && i + 1 < tokens.Count)
                 {
                     string next = tokens[i + 1];
@@ -561,6 +575,28 @@ namespace Companions.Conversation
             }
 
             return string.Empty;
+        }
+
+        private static string StemTokenForLookup(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+                return string.Empty;
+
+            string result = token;
+
+            if (result.Length > 4 && result.EndsWith("ing", StringComparison.Ordinal))
+                result = result.Substring(0, result.Length - 3);
+            else if (result.Length > 5 && result.EndsWith("ness", StringComparison.Ordinal))
+                result = result.Substring(0, result.Length - 4);
+            else if (result.Length > 4 && result.EndsWith("ly", StringComparison.Ordinal))
+                result = result.Substring(0, result.Length - 2);
+            else if (result.Length > 3 && result.EndsWith("ed", StringComparison.Ordinal))
+                result = result.Substring(0, result.Length - 2);
+
+            if (result.Length < 2 || string.Equals(result, token, StringComparison.Ordinal))
+                return string.Empty;
+
+            return result;
         }
 
         private static string AppendSentence(string source, string sentence)
@@ -599,9 +635,13 @@ namespace Companions.Conversation
 
         private void LogRuleMatches(string cleaned, CompanionDialogueParseResult result)
         {
-            string tokens = string.Join(", ", result.UniqueTokens);
-            string intents = string.Join(", ", result.Matches.Select(m => $"{m.Intent} (p={m.Priority})"));
-            Debug.Log($"[CompanionConversationService] '{cleaned}' => [{intents}] via tokens [{tokens}].");
+            var orderedTokens = result.UniqueTokens.OrderBy(t => t, StringComparer.Ordinal).ToArray();
+            var topMatches = result.Matches
+                .OrderByDescending(m => m.Score)
+                .Take(3)
+                .Select(m => $"{m.Intent} (score={m.Score:F2}, p={m.Priority})");
+
+            Debug.Log($"[CompanionConversationService] '{cleaned}' => top intents [{string.Join(", ", topMatches)}] via tokens [{string.Join(", ", orderedTokens)}].");
         }
 
         private static string ResolvePlayerName(string sender)
@@ -671,56 +711,78 @@ namespace Companions.Conversation
             return builder.ToString().Trim();
         }
 
-        private static List<CompanionDialogueRule> BuildDefaultRules()
+        private void BuildRuleProfile()
         {
-            return new List<CompanionDialogueRule>
+            rules.Clear();
+
+            var defaultRules = CompanionDialoguePatterns.CreateDefaultProfile();
+            EnsureThresholdEntries(defaultRules);
+
+            for (int i = 0; i < defaultRules.Count; i++)
             {
-                CompanionDialogueRule.Create(
-                    CompanionDialogueIntent.Greeting,
-                    0,
-                    ToGroups(new[]{"hello","hi","hey","greetings","yo","sup","salutations","hola"})),
-
-                CompanionDialogueRule.Create(
-                    CompanionDialogueIntent.StatusQuery,
-                    5,
-                    ToGroups(new[]{"how","hows"}, new[]{"you","ya"}, new[]{"doing","feeling","are","going"})),
-
-                CompanionDialogueRule.Create(
-                    CompanionDialogueIntent.PlayerMoodReport,
-                    8,
-                    ToGroups(new[]{"im","iam","am","feeling"}, PlayerMoodLookup.Keys.ToArray())),
-
-                CompanionDialogueRule.Create(
-                    CompanionDialogueIntent.Gratitude,
-                    12,
-                    ToGroups(new[]{"thanks","thank","appreciate"}),
-                    new[]{"nothing"}),
-
-                CompanionDialogueRule.Create(
-                    CompanionDialogueIntent.Farewell,
-                    20,
-                    ToGroups(new[]{"bye","goodbye","farewell","later","cya","see","catch"})),
-
-                CompanionDialogueRule.Create(
-                    CompanionDialogueIntent.Compliment,
-                    25,
-                    ToGroups(new[]{"good","great","awesome","amazing","nice"}, new[]{"job","work","partner","friend"})),
-
-                CompanionDialogueRule.Create(
-                    CompanionDialogueIntent.RequestAssistance,
-                    30,
-                    ToGroups(new[]{"help","assist","cover","watch"})),
-
-                CompanionDialogueRule.Create(
-                    CompanionDialogueIntent.AcknowledgeRecentEvent,
-                    35,
-                    ToGroups(new[]{"remember","about","that","earlier","last"}, new[]{"fight","battle","event","thing","moment"}))
-            };
+                var rule = defaultRules[i];
+                float threshold = ResolveThreshold(rule.Intent, rule.MatchThreshold);
+                rule.OverrideMatchThreshold(threshold);
+                rules.Add(rule);
+            }
         }
 
-        private static IEnumerable<string>[] ToGroups(params IEnumerable<string>[] groups)
+        private void EnsureThresholdEntries(IReadOnlyList<CompanionDialogueRule> defaults)
         {
-            return groups;
+            if (intentScoreThresholds == null)
+                intentScoreThresholds = new List<IntentScoreThreshold>();
+
+            var seen = new HashSet<CompanionDialogueIntent>();
+            for (int i = intentScoreThresholds.Count - 1; i >= 0; i--)
+            {
+                var entry = intentScoreThresholds[i];
+                if (!seen.Add(entry.Intent))
+                {
+                    intentScoreThresholds.RemoveAt(i);
+                    continue;
+                }
+
+                entry.Clamp();
+                intentScoreThresholds[i] = entry;
+            }
+
+            for (int i = 0; i < defaults.Count; i++)
+            {
+                var rule = defaults[i];
+                bool found = false;
+                for (int j = 0; j < intentScoreThresholds.Count; j++)
+                {
+                    if (intentScoreThresholds[j].Intent == rule.Intent)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    intentScoreThresholds.Add(new IntentScoreThreshold(rule.Intent, Mathf.Max(0f, rule.MatchThreshold)));
+                }
+            }
+        }
+
+        private float ResolveThreshold(CompanionDialogueIntent intent, float defaultValue)
+        {
+            if (intentScoreThresholds != null)
+            {
+                for (int i = 0; i < intentScoreThresholds.Count; i++)
+                {
+                    if (intentScoreThresholds[i].Intent != intent)
+                        continue;
+
+                    var entry = intentScoreThresholds[i];
+                    entry.Clamp();
+                    intentScoreThresholds[i] = entry;
+                    return entry.Threshold;
+                }
+            }
+
+            return Mathf.Max(0f, defaultValue);
         }
 
         private readonly struct PendingResponse
@@ -737,6 +799,31 @@ namespace Companions.Conversation
             public string StatusSegment { get; }
 
             public string PlayerMood { get; }
+        }
+
+        [Serializable]
+        private struct IntentScoreThreshold
+        {
+            [SerializeField]
+            private CompanionDialogueIntent intent;
+
+            [SerializeField]
+            private float threshold;
+
+            public IntentScoreThreshold(CompanionDialogueIntent intent, float threshold)
+            {
+                this.intent = intent;
+                this.threshold = threshold;
+            }
+
+            public CompanionDialogueIntent Intent => intent;
+
+            public float Threshold => threshold;
+
+            public void Clamp()
+            {
+                threshold = Mathf.Max(0f, threshold);
+            }
         }
     }
 }

@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:40b748559ceebf329ae3034e08aba71fb7220e66 -->
+## 2025-10-23T17:14:21+01:00 — Enhance companion dialogue intent scoring
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueParser.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueRule.cs
+- Diff: 594 ++ / 72 --
+- Notes:
+  —
+---
 <!-- commit:4478dd18f38813a49997f3771a2ed8a93f250ae4 -->
 ## 2025-10-23T16:37:42+01:00 — Merge pull request #1336 from aicovergod/codex/fix-bug-c5f58g
 
