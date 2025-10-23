@@ -1,6 +1,8 @@
 using System;
 using Companions;
+using Companions.Conversation;
 using Inventory;
+using Player;
 using Pets;
 using Skills;
 using UnityEngine;
@@ -184,6 +186,8 @@ namespace Skills.Common
             context.onXpApplied?.Invoke(result);
             context.onSuccess?.Invoke(result);
 
+            RegisterGatheringEvent(context, result);
+
             return result;
         }
 
@@ -279,6 +283,72 @@ namespace Skills.Common
             {
                 chatService.PublishGameMessage(message);
             }
+        }
+
+        /// <summary>
+        /// Registers a structured event describing the successful gathering action so companions can reference it.
+        /// </summary>
+        private static void RegisterGatheringEvent(in GatheringRewardContext context, in GatheringRewardResult result)
+        {
+            if (!result.Success || result.QuantityAwarded <= 0)
+                return;
+
+            string summary = BuildGatheringSummary(result);
+            if (string.IsNullOrEmpty(summary))
+                return;
+
+            string actor = ResolveGatheringActor(context.runner);
+            Vector3? location = result.HasResourcePosition ? result.ResourcePosition : (Vector3?)null;
+            string additional = result.XpGained > 0 ? $"Earned {result.XpGained} XP." : null;
+
+            var metadata = CompanionEventMetadata.Create(
+                primaryActor: actor,
+                worldPosition: location,
+                skill: context.skillType,
+                additionalContext: additional);
+
+            CompanionConversationService.RegisterEvent(summary, CompanionEventType.Gathering, metadata);
+        }
+
+        private static string BuildGatheringSummary(in GatheringRewardResult result)
+        {
+            string name = !string.IsNullOrWhiteSpace(result.DisplayName)
+                ? result.DisplayName.Trim()
+                : result.Item != null ? result.Item.itemName : string.Empty;
+
+            if (string.IsNullOrWhiteSpace(name))
+                name = "resources";
+
+            if (result.QuantityAwarded <= 0)
+                return string.Empty;
+
+            if (result.QuantityAwarded == 1)
+                return $"gathered {name}";
+
+            return $"gathered {result.QuantityAwarded} {name}";
+        }
+
+        private static string ResolveGatheringActor(MonoBehaviour runner)
+        {
+            if (runner == null)
+                return "You";
+
+            var companionController = runner.GetComponentInParent<CompanionController>();
+            if (companionController != null)
+                return CompanionManager.GetCompanionDisplayName();
+
+            var companionMining = runner.GetComponentInParent<CompanionMiningController>();
+            if (companionMining != null)
+                return CompanionManager.GetCompanionDisplayName();
+
+            var playerMover = runner.GetComponentInParent<PlayerMover>();
+            if (playerMover != null)
+                return "You";
+
+            if (runner.CompareTag("Player"))
+                return "You";
+
+            return "You";
         }
 
         private static float CalculateXpBonus(in GatheringRewardContext context)

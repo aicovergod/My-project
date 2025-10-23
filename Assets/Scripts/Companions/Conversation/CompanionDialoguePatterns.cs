@@ -88,7 +88,9 @@ namespace Companions.Conversation
                     matchThreshold: 1.6f,
                     synonymBuckets: new[]
                     {
-                        new SynonymBucket(new[] { "thanks", "thank", "appreciate", "cheers" }),
+                        // Gratitude keywords should succeed on their own ("thanks!") so the bucket weight
+                        // meets the match threshold while leaving secondary context buckets optional.
+                        new SynonymBucket(new[] { "thanks", "thank", "appreciate", "cheers" }, 1.6f),
                         new SynonymBucket(new[] { "buddy", "friend", "pal", "partner" }, 0.6f)
                     },
                     multiWordPhrases: new[]
@@ -104,7 +106,9 @@ namespace Companions.Conversation
                     matchThreshold: 1.4f,
                     synonymBuckets: new[]
                     {
-                        new SynonymBucket(new[] { "bye", "goodbye", "farewell", "later", "cya", "seeya" }),
+                        // Farewells like "bye" should register immediately, so the primary bucket now
+                        // satisfies the threshold without requiring additional context tokens.
+                        new SynonymBucket(new[] { "bye", "goodbye", "farewell", "later", "cya", "seeya" }, 1.4f),
                         new SynonymBucket(new[] { "soon", "later" }, 0.6f)
                     },
                     multiWordPhrases: new[]
@@ -119,7 +123,9 @@ namespace Companions.Conversation
                     matchThreshold: 1.8f,
                     synonymBuckets: new[]
                     {
-                        new SynonymBucket(new[] { "good", "great", "awesome", "amazing", "nice", "solid", "brilliant" }),
+                        // Single-word praise such as "awesome!" should hit the compliment intent, so the
+                        // bucket weight now clears the threshold by itself.
+                        new SynonymBucket(new[] { "good", "great", "awesome", "amazing", "nice", "solid", "brilliant" }, 1.8f),
                         new SynonymBucket(new[] { "job", "work", "partner", "friend", "assist" }, 0.8f)
                     },
                     multiWordPhrases: new[]
@@ -134,7 +140,9 @@ namespace Companions.Conversation
                     matchThreshold: 1.8f,
                     synonymBuckets: new[]
                     {
-                        new SynonymBucket(new[] { "help", "assist", "cover", "watch", "support" }),
+                        // Urgent single-word cries ("help!") must succeed, so increase the weight to meet
+                        // the threshold while still allowing regex/context bonuses to stack naturally.
+                        new SynonymBucket(new[] { "help", "assist", "cover", "watch", "support" }, 1.8f),
                         new SynonymBucket(new[] { "need", "could", "can" }, 0.7f)
                     },
                     multiWordPhrases: new[]
@@ -150,7 +158,11 @@ namespace Companions.Conversation
                     matchThreshold: 1.6f,
                     synonymBuckets: new[]
                     {
-                        new SynonymBucket(new[] { "remember", "about", "that", "earlier", "last", "previous" }),
+                        // Only the strong recall verbs should clear the match threshold; supporting context
+                        // tokens now live in low-weight buckets so they merely amplify an existing recall hit.
+                        new SynonymBucket(new[] { "remember", "remind" }, 1.6f),
+                        new SynonymBucket(new[] { "about", "that" }, 0.4f),
+                        new SynonymBucket(new[] { "earlier", "before", "last", "previous" }, 0.4f),
                         new SynonymBucket(new[] { "fight", "battle", "event", "thing", "moment", "run" }, 0.8f)
                     },
                     multiWordPhrases: new[]

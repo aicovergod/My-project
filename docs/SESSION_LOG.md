@@ -1,6 +1,105 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d9aca8dd99e4025530ad3ef2e6b96dd119e74078 -->
+## 2025-10-23T18:55:44+01:00 — Refine recent event recall weights
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 5 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:37b926bdd413c56c91489863c5dc79e9ee0dfc8f -->
+## 2025-10-23T18:52:21+01:00 — Merge pull request #1342 from aicovergod/codex/implement-companionmoodinterpreter-and-refactor-mood-handlin
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 689 ++ / 131 --
+- Notes:
+  Enhance companion mood interpretation and follow-ups
+---
+<!-- commit:dee52ce0e42294edc343a87253a33fa3262f1eb1 -->
+## 2025-10-23T18:52:08+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d9c85d6c1b561e5d5128d68e3b237605899293f5 -->
+## 2025-10-23T18:51:50+01:00 — Enhance companion mood interpretation and follow-ups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionMoodInterpreter.cs
+- Diff: 680 ++ / 131 --
+- Notes:
+  —
+---
+<!-- commit:a3bf5593fe0beca06a2957f58940d5b1f93a42f2 -->
+## 2025-10-23T18:24:53+01:00 — Merge pull request #1341 from aicovergod/codex/extend-companionconversationmemory-for-event-tracking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 489 ++ / 4 --
+- Notes:
+  Add companion event feed and integrate gameplay hooks
+---
+<!-- commit:d0bb3e79d021198f965a62839028c198a36ce0a6 -->
+## 2025-10-23T18:24:33+01:00 — Add companion event feed and integrate gameplay hooks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Companions/CompanionCombatBridge.cs, Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionEventEntry.cs, Assets/Scripts/Drops/NpcDropper.cs, Assets/Scripts/Pets/PetCombatController.cs, Assets/Scripts/Skills/Common/GatheringRewardProcessor.cs
+- Diff: 489 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:ea233dfda036d7625c2d4d99fb3e3bd3d1008a2c -->
+## 2025-10-23T18:04:24+01:00 — Merge pull request #1340 from aicovergod/codex/fix-this-issue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 5 --
+- Notes:
+  Fix single-word companion dialogue intent detection
+---
+<!-- commit:bf2bb33163c45aa69f3ddd959aac47da3f81903b -->
+## 2025-10-23T18:04:16+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ce7b523dcfb4d69b7749f09810ae1a19865f567d -->
+## 2025-10-23T18:03:56+01:00 — Restore single word companion dialogue matches
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 15 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:4e0bd52349277ebcbab0e70e60b6bbf854f04cfd -->
+## 2025-10-23T17:54:35+01:00 — Merge pull request #1339 from aicovergod/codex/fix-cs1061-errors-in-companionconversationservice
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 25 ++ / 0 --
+- Notes:
+  Add overload for companion response selection
+---
+<!-- commit:209122929033f59bf4eece9e8e8cddeff3dfa211 -->
+## 2025-10-23T17:54:28+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6fdde1dc05da6f309ea3c7d5c5acf0ad9af9f523 -->
 ## 2025-10-23T17:54:09+01:00 — Add overload for companion response selection
 
