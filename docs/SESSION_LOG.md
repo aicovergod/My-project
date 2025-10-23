@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:cc8c7bf2b46304c743411c77896f453f9bdda13e -->
+## 2025-10-23T01:14:40+01:00 — Merge pull request #1322 from aicovergod/codex/send-companion-messages-for-unarmed-mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 311 ++ / 69 --
+- Notes:
+  Add companion ore golem pickaxe reminders
+---
+<!-- commit:29d4a7528d03387866823e0a9ab04ad0d2b33da4 -->
+## 2025-10-23T01:14:11+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:499403e5158356bc0fba83157f4a22b399110d79 -->
 ## 2025-10-23T01:13:48+01:00 — Add companion ore golem pickaxe reminders
 
