@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b77057565e5a4d443b7172a6b94dddb0a01a1fe6 -->
+## 2025-10-23T13:45:51+01:00 — Merge pull request #1326 from aicovergod/codex/fix-incorrect-inventory-error-message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 101 ++ / 22 --
+- Notes:
+  Handle companion equip requirement failures without inventory full popup
+---
+<!-- commit:9769413c0557265de89602f108e568da991e0c9f -->
+## 2025-10-23T13:45:42+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ff374c0574a3d53b2925b1365d8810c3578e79df -->
 ## 2025-10-23T13:45:19+01:00 — Fix companion equip requirement feedback
 
