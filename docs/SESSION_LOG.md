@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a3bf5593fe0beca06a2957f58940d5b1f93a42f2 -->
+## 2025-10-23T18:24:53+01:00 — Merge pull request #1341 from aicovergod/codex/extend-companionconversationmemory-for-event-tracking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 489 ++ / 4 --
+- Notes:
+  Add companion event feed and integrate gameplay hooks
+---
+<!-- commit:d0bb3e79d021198f965a62839028c198a36ce0a6 -->
+## 2025-10-23T18:24:33+01:00 — Add companion event feed and integrate gameplay hooks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Companions/CompanionCombatBridge.cs, Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionEventEntry.cs, Assets/Scripts/Drops/NpcDropper.cs, Assets/Scripts/Pets/PetCombatController.cs, Assets/Scripts/Skills/Common/GatheringRewardProcessor.cs
+- Diff: 489 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:ea233dfda036d7625c2d4d99fb3e3bd3d1008a2c -->
 ## 2025-10-23T18:04:24+01:00 — Merge pull request #1340 from aicovergod/codex/fix-this-issue
 
