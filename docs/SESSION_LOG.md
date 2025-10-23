@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b53b11868eda7285ba32117d33aaa7d48ab1ba8e -->
+## 2025-10-23T12:14:31+01:00 — Merge pull request #1324 from aicovergod/codex/fix-no-message-on-full-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 31 ++ / 0 --
+- Notes:
+  Ensure gathering controllers broadcast inventory full chat feedback
+---
+<!-- commit:fb25f988a0a523d38903f969400a3db6186f19e9 -->
+## 2025-10-23T12:14:08+01:00 — Ensure gathering inventory failures publish chat feedback
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Common/GatheringController.cs
+- Diff: 31 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7dd109ed61507ffbe13a1b320575c7b14ed426eb -->
 ## 2025-10-23T01:28:14+01:00 — Merge pull request #1323 from aicovergod/codex/fix-chat-dialogue-for-full-inventory
 
