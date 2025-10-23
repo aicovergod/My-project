@@ -11,8 +11,9 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 50818f887b9f45d6bc8192763c8c45ac, type: 3}
   m_Name: DefaultPlayerRankDatabase
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   supportUsernames: []
   moderatorUsernames: []
   adminUsernames: []
-  developerUsernames: []
+  developerUsernames:
+  - lewis

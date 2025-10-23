@@ -14,8 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: Isla
   displayName: Isla
+  possessivePronoun: their
   pickupItem: {fileID: 11400000, guid: dc747cf13fcf9104999c90e45d541e9b, type: 2}
-  hasInventory: 1
+  spawnAsCompanion: 1
+  hasInventory: 0
   sprite: {fileID: 0}
   pixelsPerUnit: 64
   evolutionTiers: []
@@ -66,13 +68,13 @@ MonoBehaviour:
   walkAnimationFPS: 1
   hitAnimationFPS: 1
   canFight: 1
-  petAttackLevel: 75
-  petStrengthLevel: 70
+  petAttackLevel: 0
+  petStrengthLevel: 0
   attackSpeedTicks: 4
   accuracyBonus: 0
   damageBonus: 0
   attackLevelPerBeastmasterLevel: 0
-  strengthLevelPerBeastmasterLevel: 0.02
+  strengthLevelPerBeastmasterLevel: 0
   maxHitPerBeastmasterLevel: 0
   messageColor: {r: 1, g: 1, b: 1, a: 1}
   debugBeastmasterLevel: 99
