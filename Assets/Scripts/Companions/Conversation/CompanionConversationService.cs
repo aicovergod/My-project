@@ -421,7 +421,8 @@ namespace Companions.Conversation
                         if (string.IsNullOrWhiteSpace(followUp))
                             continue;
 
-                        pendingResponses.Enqueue(new PendingResponse(followUp, string.Empty, string.Empty));
+                        pendingResponses.Enqueue(
+                            new PendingResponse(followUp, string.Empty, CompanionMoodInterpretation.Empty));
                     }
                 }
 
