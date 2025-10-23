@@ -96,7 +96,7 @@ namespace Companions.Conversation
         // Pools used to respond when the player suggests a joint training session. We keep them as
         // static arrays so the helper can pick varied lines without allocating each time the player
         // messages the companion.
-        private static readonly string[] PlayerSkillProposalReadyWithToolSegments =
+        private static readonly string[] PlayerMiningProposalReadyWithPickaxeSegments =
         {
             "I've got the {tool} ready—let's get back to {skillSentence}.",
             "Perfect timing. The {tool} has been itching for more {skillSentence}.",
@@ -128,7 +128,7 @@ namespace Companions.Conversation
             "Heck yes, more {skillSentence} with you is my kind of plan."
         };
 
-        private static readonly string[] PlayerSkillProposalReadyWithToolFollowUps =
+        private static readonly string[] PlayerMiningProposalReadyWithToolFollowUps =
         {
             "Lead the way and I'll keep the {tool} swinging.",
             "I'll stow anything we gather so you can stay light on your feet.",
@@ -1502,16 +1502,19 @@ namespace Companions.Conversation
                 { "playerName", safePlayerName }
             };
 
-            var pool = !string.IsNullOrWhiteSpace(toolName) && toolResult.State == SkillToolState.Ready
-                ? PlayerSkillProposalReadyWithToolSegments
+            bool toolReady = !string.IsNullOrWhiteSpace(toolName) && toolResult.State == SkillToolState.Ready;
+            bool useMiningSpecificPool = toolReady && analysis.Skill.Value == SkillType.Mining;
+
+            var pool = useMiningSpecificPool
+                ? PlayerMiningProposalReadyWithPickaxeSegments
                 : PlayerSkillProposalReadyGenericSegments;
 
             string primary = ApplyProposalTokens(ChooseRandom(pool), replacements);
             if (!string.IsNullOrWhiteSpace(primary))
                 segments.Add(primary);
 
-            var followUpPool = !string.IsNullOrWhiteSpace(toolName) && toolResult.State == SkillToolState.Ready
-                ? PlayerSkillProposalReadyWithToolFollowUps
+            var followUpPool = useMiningSpecificPool
+                ? PlayerMiningProposalReadyWithToolFollowUps
                 : PlayerSkillProposalReadyGenericFollowUps;
 
             TryAppendSkillProposalFollowUp(followUps, followUpPool, replacements);
