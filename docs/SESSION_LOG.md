@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:14d078a064cb807bedd8a00449ebca2e6c5837ed -->
+## 2025-10-23T13:23:08+01:00 — Merge pull request #1325 from aicovergod/codex/extend-gathering-inventory-helper-functionality
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 255 ++ / 29 --
+- Notes:
+  Add companion inventory awareness to gathering capacity checks
+---
+<!-- commit:56b404042797b3e52c3c5a275728b8fbba488534 -->
+## 2025-10-23T13:22:51+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7ad8d4b340aa7a4d12d1f6429ca40314e5080650 -->
 ## 2025-10-23T13:22:34+01:00 — Extend gathering capacity checks to companion inventory
 
