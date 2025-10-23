@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3f68dd32d502d081bf54b705e564ce098b4c3679 -->
+## 2025-10-23T17:45:36+01:00 — Refactor companion dialogue to use context-driven response catalog
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueResponseLibrary.cs, Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs, Assets/Scripts/Companions/Conversation/CompanionResponseContext.cs
+- Diff: 768 ++ / 175 --
+- Notes:
+  —
+---
 <!-- commit:9b1ebc79e3fc330aefe5c0c3f7482f61a229938f -->
 ## 2025-10-23T17:15:23+01:00 — Merge pull request #1337 from aicovergod/codex/implement-companiondialoguepatterns-and-parser-logic
 
