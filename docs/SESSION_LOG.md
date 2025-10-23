@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:52186d80d2e632ca1e9c11328250e3c206dc3974 -->
+## 2025-10-23T14:02:36+01:00 — Stop companion ore golem attacks when pickaxe removed
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionEquipment.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 126 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:b77057565e5a4d443b7172a6b94dddb0a01a1fe6 -->
 ## 2025-10-23T13:45:51+01:00 — Merge pull request #1326 from aicovergod/codex/fix-incorrect-inventory-error-message
 
