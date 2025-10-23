@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5813806d3b04098a7294d589195a8f2f5053f440 -->
+## 2025-10-23T23:57:13+01:00 — Handle player skill proposals in companion conversations
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 892 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:bc1006ec29f498a5b37389fe5424113a7229d8f5 -->
 ## 2025-10-23T23:22:52+01:00 — Merge pull request #1356 from aicovergod/codex/add-regex-for-sms-status-queries
 

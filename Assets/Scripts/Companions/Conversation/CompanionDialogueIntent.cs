@@ -39,6 +39,11 @@ namespace Companions.Conversation
         RequestAssistance = 50,
 
         /// <summary>
+        /// Player proposed tackling a specific skill activity together.
+        /// </summary>
+        PlayerSkillProposal = 55,
+
+        /// <summary>
         /// Player referenced a prior shared event that deserves acknowledgement.
         /// </summary>
         AcknowledgeRecentEvent = 60,
