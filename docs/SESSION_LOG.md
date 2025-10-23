@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1010aeda90b2155ac10010b1554334b89d0e3e71 -->
+## 2025-10-23T19:27:34+01:00 — Expand companion dialogue intent coverage
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 126 ++ / 36 --
+- Notes:
+  —
+---
 <!-- commit:2976698fdcc5af0b4256e87be6170db99a83f53f -->
 ## 2025-10-23T19:19:11+01:00 — Merge pull request #1345 from aicovergod/codex/expand-ensuredefaults-for-companionresponsecatalog
 
