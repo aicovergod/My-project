@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Skills.Common;
+using Inventory;
 
 namespace Skills.Fishing
 {
@@ -19,6 +20,7 @@ namespace Skills.Fishing
 
         private readonly List<FishDefinition> eligibleFish = new List<FishDefinition>();
         private FishingToolDefinition cachedTool;
+        private Dictionary<string, ItemData> gatheredItemCache;
 
         private FishingSkill FishingSkill => Skill;
 
@@ -175,13 +177,28 @@ namespace Skills.Fishing
                 return false;
             }
 
+            bool companionHasCapacityForAny = false;
             foreach (var fish in eligibleFish)
             {
-                if (FishingSkill.CanAddFish(fish))
+                if (fish == null)
+                    continue;
+
+                var capacityResult = GatheringInventoryHelper.EvaluateGatheredItemCapacity(
+                    FishingSkill.InventoryComponent,
+                    fish.ItemId,
+                    "Heron",
+                    ref gatheredItemCache);
+
+                if (capacityResult.PlayerOrPetHasCapacity)
                     return true;
+
+                if (capacityResult.CompanionInventoryHasCapacity)
+                    companionHasCapacityForAny = true;
             }
 
-            failureMessage = "Your inventory is full";
+            failureMessage = companionHasCapacityForAny
+                ? PlayerInventoryFullChatMessage
+                : PlayerAndCompanionInventoryFullChatMessage;
             return false;
         }
 

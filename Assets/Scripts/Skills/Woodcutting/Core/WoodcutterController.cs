@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Skills.Common;
+using Inventory;
 
 namespace Skills.Woodcutting
 {
@@ -16,6 +18,7 @@ namespace Skills.Woodcutting
         [SerializeField] private AxeToUse axeSelector;
 
         private AxeDefinition cachedAxe;
+        private Dictionary<string, ItemData> gatheredItemCache;
 
         private WoodcuttingSkill WoodcuttingSkill => Skill;
 
@@ -110,10 +113,18 @@ namespace Skills.Woodcutting
                 return false;
             }
 
-            if (WoodcuttingSkill.CanAddLog(node.def))
+            var capacityResult = GatheringInventoryHelper.EvaluateGatheredItemCapacity(
+                WoodcuttingSkill.InventoryComponent,
+                node.def.LogItemId,
+                "Beaver",
+                ref gatheredItemCache);
+
+            if (capacityResult.PlayerOrPetHasCapacity)
                 return true;
 
-            failureMessage = "Your inventory is full";
+            failureMessage = capacityResult.CompanionInventoryHasCapacity
+                ? PlayerInventoryFullChatMessage
+                : PlayerAndCompanionInventoryFullChatMessage;
             return false;
         }
 

@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7ad8d4b340aa7a4d12d1f6429ca40314e5080650 -->
+## 2025-10-23T13:22:34+01:00 — Extend gathering capacity checks to companion inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (9): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/Skills/Common/GatheringInventoryHelper.cs, Assets/Scripts/Skills/Fishing/Core/FisherController.cs, Assets/Scripts/Skills/Fishing/Core/FishingSkill.cs, Assets/Scripts/Skills/Mining/Core/MinerController.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs, Assets/Scripts/Skills/Woodcutting/Core/WoodcutterController.cs, Assets/Scripts/Skills/Woodcutting/Core/WoodcuttingSkill.cs
+- Diff: 246 ++ / 29 --
+- Notes:
+  —
+---
 <!-- commit:b53b11868eda7285ba32117d33aaa7d48ab1ba8e -->
 ## 2025-10-23T12:14:31+01:00 — Merge pull request #1324 from aicovergod/codex/fix-no-message-on-full-inventory
 

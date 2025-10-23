@@ -49,6 +49,8 @@ namespace Skills.Fishing
         public bool IsFishing => currentSpot != null;
         public FishableSpot CurrentSpot => currentSpot;
         public FishingToolDefinition CurrentTool => currentTool;
+        /// <summary>Inventory component used for storing caught fish.</summary>
+        public Inventory.Inventory InventoryComponent => inventory;
         public float CatchProgressNormalized
         {
             get

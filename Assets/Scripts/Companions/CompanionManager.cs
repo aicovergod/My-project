@@ -82,7 +82,11 @@ namespace Companions
         private const float InventoryFullChatCooldownSeconds = 4f;
 
         /// <summary>Normalised comparison string for detecting the standard full inventory game message.</summary>
-        private const string InventoryFullGameMessage = "your inventory is full";
+        private const string PlayerInventoryFullGameMessage = "your inventory is full";
+
+        /// <summary>Normalised comparison string for the combined player and companion inventory message.</summary>
+        private const string PlayerAndCompanionInventoryFullGameMessage =
+            "your inventory and your companion's inventory are full";
 
         /// <summary>
         /// Toggle that allows QA to enable or disable verbose companion debug logging from the AdminF2 menu.
@@ -1155,7 +1159,14 @@ namespace Companions
                 return;
 
             string trimmed = message.Text.Trim();
-            if (!string.Equals(trimmed, InventoryFullGameMessage, StringComparison.OrdinalIgnoreCase))
+            if (trimmed.Length == 0)
+                return;
+
+            string normalised = trimmed.ToLowerInvariant();
+            bool playerInventoryFull = string.Equals(normalised, PlayerInventoryFullGameMessage, StringComparison.Ordinal);
+            bool combinedInventoryFull = string.Equals(normalised, PlayerAndCompanionInventoryFullGameMessage, StringComparison.Ordinal);
+
+            if (!playerInventoryFull && !combinedInventoryFull)
                 return;
 
             float now = Time.unscaledTime;
@@ -1164,7 +1175,9 @@ namespace Companions
 
             lastInventoryFullReactionTime = now;
 
-            string companionLine = CompanionChatLibrary.GetRandomPlayerInventoryFullLine();
+            string companionLine = combinedInventoryFull
+                ? CompanionChatLibrary.GetRandomPlayerAndCompanionInventoryFullLine()
+                : CompanionChatLibrary.GetRandomPlayerInventoryFullLine();
             if (string.IsNullOrWhiteSpace(companionLine))
                 return;
 
@@ -1177,7 +1190,8 @@ namespace Companions
 
             if (enableDebugLogging)
             {
-                Debug.Log($"[Companion] Reacted to full inventory message with: {companionLine}");
+                string context = combinedInventoryFull ? "(player+companion)" : "(player)";
+                Debug.Log($"[Companion] Reacted to full inventory message {context} with: {companionLine}");
             }
         }
 
