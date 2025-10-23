@@ -1083,8 +1083,9 @@ namespace Companions.Conversation
 
             if (moodForEmpathy.HasMood)
             {
-                bool shouldAppendEmpathy = !usedMemoryForEmpathy ||
-                                            moodForEmpathy.Valence == CompanionMoodValence.Negative;
+                bool shouldAppendEmpathy = moodForEmpathy.Valence != CompanionMoodValence.Neutral &&
+                                            (!usedMemoryForEmpathy ||
+                                             moodForEmpathy.Valence == CompanionMoodValence.Negative);
 
                 // Avoid echoing the stored positive/neutral mood on every reply; keep the
                 // fallback for negative moods so the companion still checks in when the
