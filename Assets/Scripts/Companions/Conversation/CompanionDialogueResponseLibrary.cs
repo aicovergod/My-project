@@ -5,159 +5,148 @@ using UnityEngine;
 namespace Companions.Conversation
 {
     /// <summary>
-    /// Stores templated response fragments keyed by <see cref="CompanionDialogueIntent"/> so the conversation
-    /// service can assemble natural dialogue lines. Templates may include placeholders like {playerName},
-    /// {companionName}, {playerMood}, {companionMood}, and {recentEvent}.
+    /// Provides selection helpers that bridge the runtime dialogue systems with the static
+    /// <see cref="CompanionResponseCatalog"/>. The library applies guard predicates, performs
+    /// weighted random selection, and exposes follow-up prompts encoded within templates.
     /// </summary>
     [Serializable]
     public sealed class CompanionDialogueResponseLibrary
     {
-        [SerializeField]
-        private List<IntentResponseSet> responses = new List<IntentResponseSet>();
+        private static readonly char[] FollowUpSeparators = { '|' };
 
         /// <summary>
-        /// Retrieves a random template for the requested intent. The helper attempts to avoid repeating the
-        /// provided <paramref name="disallowed"/> template when multiple options exist.
-        /// </summary>
-        public string GetRandomTemplate(CompanionDialogueIntent intent, string disallowed = null)
-        {
-            if (responses == null || responses.Count == 0)
-                return string.Empty;
-
-            for (int i = 0; i < responses.Count; i++)
-            {
-                var set = responses[i];
-                if (set.Intent != intent)
-                    continue;
-
-                return set.GetRandom(disallowed);
-            }
-
-            return string.Empty;
-        }
-
-        /// <summary>
-        /// Ensures the library contains sensible defaults for core intents when no custom data has been configured.
+        /// Ensures the shared catalog is populated before any queries occur.
         /// </summary>
         public void EnsureDefaults()
         {
-            if (responses == null)
-                responses = new List<IntentResponseSet>();
-
-            EnsureSetExists(CompanionDialogueIntent.Greeting,
-                "Hey there {playerName},",
-                "Well met, {playerName}!",
-                "Greetings {playerName},");
-
-            EnsureSetExists(CompanionDialogueIntent.StatusQuery,
-                "I'm keeping watch and feeling {companionMood}. How are you holding up?",
-                "Staying {companionMood} and ready for whatever comes next. How about you?",
-                "I'm {companionMood} as always. Anything exciting on your agenda?");
-
-            EnsureSetExists(CompanionDialogueIntent.PlayerMoodReport,
-                "Good to know you're {playerMood}, {playerName}.",
-                "Thanks for sharing that you're {playerMood}, {playerName}.",
-                "I'll keep it in mind that you're {playerMood}.");
-
-            EnsureSetExists(CompanionDialogueIntent.Gratitude,
-                "Anytime, {playerName}! {companionName} has your back.",
-                "Happy to help, {playerName}.",
-                "You know I've always got you, {playerName}.");
-
-            EnsureSetExists(CompanionDialogueIntent.Farewell,
-                "Safe travels, {playerName}. I'll hold the fort.",
-                "I'll stay sharp while you're away, {playerName}.",
-                "Take care out there, {playerName}. I'll be right here.");
-
-            EnsureSetExists(CompanionDialogueIntent.Compliment,
-                "You're the one doing the heavy lifting, {playerName}.",
-                "Flattery will get you everywhere, {playerName}.");
-
-            EnsureSetExists(CompanionDialogueIntent.RequestAssistance,
-                "On it! Just point me where you need me, {playerName}.",
-                "Consider it handled, {playerName}.",
-                "I'll cover you, {playerName}. Let's get it done.");
-
-            EnsureSetExists(CompanionDialogueIntent.AcknowledgeRecentEvent,
-                "Hard to forget {recentEvent}. We'll be ready next time.",
-                "Yeah, {recentEvent} was a wild moment.");
-        }
-
-        private void EnsureSetExists(CompanionDialogueIntent intent, params string[] templates)
-        {
-            if (responses.Exists(r => r.Intent == intent))
-                return;
-
-            var set = new IntentResponseSet
-            {
-                Intent = intent,
-                Templates = templates ?? Array.Empty<string>()
-            };
-
-            responses.Add(set);
+            CompanionResponseCatalog.EnsureDefaults();
         }
 
         /// <summary>
-        /// Represents the collection of templates tied to a specific conversational intent.
+        /// Attempts to select a response template for the supplied intent.
         /// </summary>
-        [Serializable]
-        private sealed class IntentResponseSet
+        /// <param name="intent">Intent driving the selection.</param>
+        /// <param name="context">Runtime context used by guard predicates.</param>
+        /// <param name="disallowedTemplateKey">Optional template key that should be avoided.</param>
+        /// <param name="selection">Resulting selection containing the raw segments.</param>
+        public bool TrySelectResponse(
+            CompanionDialogueIntent intent,
+            CompanionResponseContext context,
+            string disallowedTemplateKey,
+            out ResponseSelection selection)
         {
-            [SerializeField]
-            private CompanionDialogueIntent intent;
-
-            [SerializeField, TextArea]
-            private string[] templates = Array.Empty<string>();
-
-            [NonSerialized]
-            private int lastUsedIndex = -1;
-
-            public CompanionDialogueIntent Intent
+            var templates = CompanionResponseCatalog.GetTemplates(intent);
+            if (templates.Count == 0)
             {
-                get => intent;
-                set => intent = value;
+                selection = default;
+                return false;
             }
 
-            public string[] Templates
+            var candidates = new List<CandidateTemplate>(templates.Count);
+            for (int i = 0; i < templates.Count; i++)
             {
-                get => templates;
-                set => templates = value ?? Array.Empty<string>();
-            }
+                var template = templates[i];
+                if (template.Guard != null && !template.Guard(context))
+                    continue;
 
-            public string GetRandom(string disallowed)
-            {
-                if (templates == null || templates.Length == 0)
-                    return string.Empty;
+                string rawText = template.Text?.Trim();
+                if (string.IsNullOrEmpty(rawText))
+                    continue;
 
-                if (templates.Length == 1)
+                if (!string.IsNullOrEmpty(disallowedTemplateKey) &&
+                    string.Equals(rawText, disallowedTemplateKey, StringComparison.Ordinal))
                 {
-                    string single = templates[0] ?? string.Empty;
-                    lastUsedIndex = 0;
-                    return single.Trim();
+                    continue;
                 }
 
-                const int MaxAttempts = 4;
-                int chosenIndex = -1;
-                for (int attempt = 0; attempt < MaxAttempts; attempt++)
-                {
-                    int candidate = UnityEngine.Random.Range(0, templates.Length);
-                    string value = templates[candidate] ?? string.Empty;
-                    if (!string.Equals(value, disallowed, StringComparison.Ordinal) && candidate != lastUsedIndex)
-                    {
-                        chosenIndex = candidate;
-                        break;
-                    }
+                string[] segments = rawText.Split(FollowUpSeparators, StringSplitOptions.RemoveEmptyEntries);
+                if (segments.Length == 0)
+                    continue;
 
-                    if (attempt == MaxAttempts - 1)
-                        chosenIndex = candidate;
-                }
-
-                if (chosenIndex < 0)
-                    chosenIndex = 0;
-
-                lastUsedIndex = chosenIndex;
-                return (templates[chosenIndex] ?? string.Empty).Trim();
+                candidates.Add(new CandidateTemplate(template, segments));
             }
+
+            if (candidates.Count == 0)
+            {
+                selection = default;
+                return false;
+            }
+
+            var chosen = ChooseWeighted(candidates);
+            var followUps = chosen.Segments.Length > 1
+                ? new List<string>(chosen.Segments.Length - 1)
+                : null;
+
+            if (followUps != null)
+            {
+                for (int i = 1; i < chosen.Segments.Length; i++)
+                    followUps.Add(chosen.Segments[i].Trim());
+            }
+
+            selection = new ResponseSelection(
+                chosen.Segments[0].Trim(),
+                followUps ?? (IReadOnlyList<string>)Array.Empty<string>(),
+                chosen.Template.Text);
+            return true;
+        }
+
+        private static CandidateTemplate ChooseWeighted(List<CandidateTemplate> candidates)
+        {
+            if (candidates.Count == 1)
+                return candidates[0];
+
+            float totalWeight = 0f;
+            for (int i = 0; i < candidates.Count; i++)
+            {
+                totalWeight += Mathf.Max(0.0001f, candidates[i].Template.Weight);
+            }
+
+            float roll = UnityEngine.Random.Range(0f, totalWeight);
+            float cumulative = 0f;
+            for (int i = 0; i < candidates.Count; i++)
+            {
+                float weight = Mathf.Max(0.0001f, candidates[i].Template.Weight);
+                cumulative += weight;
+                if (roll <= cumulative)
+                    return candidates[i];
+            }
+
+            return candidates[candidates.Count - 1];
+        }
+
+        private readonly struct CandidateTemplate
+        {
+            public CandidateTemplate(CompanionResponseCatalog.ResponseTemplate template, string[] segments)
+            {
+                Template = template;
+                Segments = segments;
+            }
+
+            public CompanionResponseCatalog.ResponseTemplate Template { get; }
+
+            public string[] Segments { get; }
+        }
+
+        /// <summary>
+        /// Represents the selected template and any follow-up prompts extracted from it.
+        /// </summary>
+        public readonly struct ResponseSelection
+        {
+            public ResponseSelection(string primarySegment, IReadOnlyList<string> followUps, string templateKey)
+            {
+                PrimarySegment = primarySegment ?? string.Empty;
+                FollowUpSegments = followUps ?? Array.Empty<string>();
+                TemplateKey = templateKey ?? string.Empty;
+            }
+
+            /// <summary>Primary template segment returned to the caller.</summary>
+            public string PrimarySegment { get; }
+
+            /// <summary>Additional follow-up prompts encoded within the template.</summary>
+            public IReadOnlyList<string> FollowUpSegments { get; }
+
+            /// <summary>Raw template key used to avoid immediate repeats.</summary>
+            public string TemplateKey { get; }
         }
     }
 }

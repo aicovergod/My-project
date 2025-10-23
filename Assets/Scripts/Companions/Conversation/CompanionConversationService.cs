@@ -3,10 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Combat;
 using Companions;
 using UI.Chat;
 using UnityEngine;
 using World;
+using Skills;
 
 namespace Companions.Conversation
 {
@@ -101,6 +103,15 @@ namespace Companions.Conversation
         private Coroutine responseRoutine;
         private Coroutine chatSubscriptionRoutine;
         private string lastCompanionMoodDescriptor = string.Empty;
+        private CombatController playerCombatController;
+        private SkillManager playerSkillManager;
+        private bool playerInCombat;
+        private Coroutine playerBindingRoutine;
+        private readonly LinkedList<SkillActionRecord> recentSkillActions = new LinkedList<SkillActionRecord>();
+        private string lastStatusTemplateKey = string.Empty;
+
+        private const int MaxTrackedSkillActions = 6;
+        private static readonly TimeSpan SkillActionRetention = TimeSpan.FromMinutes(15);
 
         private bool ResponseRoutineActive => responseRoutine != null;
 
@@ -136,6 +147,10 @@ namespace Companions.Conversation
             EnsureConversationMemoryBound();
 
             EnsureChatSubscription();
+            EnsurePlayerContextBindings();
+
+            SceneTransitionManager.TransitionCompleted -= HandleSceneTransitionCompleted;
+            SceneTransitionManager.TransitionCompleted += HandleSceneTransitionCompleted;
         }
 
         /// <summary>
@@ -156,6 +171,9 @@ namespace Companions.Conversation
         protected override void OnSingletonDestroyed()
         {
             UnsubscribeFromChat();
+
+            SceneTransitionManager.TransitionCompleted -= HandleSceneTransitionCompleted;
+            UnbindPlayerContext();
 
             if (chatSubscriptionRoutine != null)
                 StopCoroutine(chatSubscriptionRoutine);
@@ -198,6 +216,156 @@ namespace Companions.Conversation
                 chat.MessageReceived -= HandleMessageReceived;
         }
 
+        private void EnsurePlayerContextBindings()
+        {
+            if (!isActiveAndEnabled)
+                return;
+
+            if (TryBindToPlayer())
+            {
+                if (playerBindingRoutine != null)
+                {
+                    StopCoroutine(playerBindingRoutine);
+                    playerBindingRoutine = null;
+                }
+
+                return;
+            }
+
+            if (playerBindingRoutine == null)
+                playerBindingRoutine = StartCoroutine(WaitForPlayerBinding());
+        }
+
+        private bool TryBindToPlayer()
+        {
+            var player = GameObject.FindGameObjectWithTag("Player");
+            if (player == null)
+                return false;
+
+            var combat = player.GetComponent<CombatController>() ?? player.GetComponentInChildren<CombatController>();
+            BindCombatController(combat);
+
+            var skills = player.GetComponent<SkillManager>() ?? player.GetComponentInChildren<SkillManager>();
+            BindSkillManager(skills);
+
+            return playerCombatController != null || playerSkillManager != null;
+        }
+
+        private IEnumerator WaitForPlayerBinding()
+        {
+            while (!TryBindToPlayer())
+                yield return null;
+
+            playerBindingRoutine = null;
+        }
+
+        private void BindCombatController(CombatController controller)
+        {
+            if (playerCombatController == controller)
+                return;
+
+            if (playerCombatController != null)
+            {
+                playerCombatController.OnCombatTargetChanged -= HandlePlayerCombatTargetChanged;
+                playerCombatController.OnAttackStart -= HandlePlayerAttackStart;
+            }
+
+            playerCombatController = controller;
+            playerInCombat = false;
+
+            if (playerCombatController != null)
+            {
+                playerCombatController.OnCombatTargetChanged += HandlePlayerCombatTargetChanged;
+                playerCombatController.OnAttackStart += HandlePlayerAttackStart;
+            }
+        }
+
+        private void BindSkillManager(SkillManager skills)
+        {
+            if (playerSkillManager == skills)
+                return;
+
+            if (playerSkillManager != null)
+                playerSkillManager.LevelChanged -= HandlePlayerSkillLevelChanged;
+
+            playerSkillManager = skills;
+
+            if (playerSkillManager != null)
+                playerSkillManager.LevelChanged += HandlePlayerSkillLevelChanged;
+        }
+
+        private void UnbindPlayerContext()
+        {
+            if (playerBindingRoutine != null)
+            {
+                StopCoroutine(playerBindingRoutine);
+                playerBindingRoutine = null;
+            }
+
+            if (playerCombatController != null)
+            {
+                playerCombatController.OnCombatTargetChanged -= HandlePlayerCombatTargetChanged;
+                playerCombatController.OnAttackStart -= HandlePlayerAttackStart;
+                playerCombatController = null;
+            }
+
+            if (playerSkillManager != null)
+            {
+                playerSkillManager.LevelChanged -= HandlePlayerSkillLevelChanged;
+                playerSkillManager = null;
+            }
+
+            playerInCombat = false;
+        }
+
+        private void HandleSceneTransitionCompleted()
+        {
+            EnsurePlayerContextBindings();
+        }
+
+        private void HandlePlayerCombatTargetChanged(CombatTarget target)
+        {
+            playerInCombat = target != null;
+        }
+
+        private void HandlePlayerAttackStart()
+        {
+            playerInCombat = true;
+        }
+
+        private void HandlePlayerSkillLevelChanged(SkillType skill, int level)
+        {
+            string skillName = SkillNameUtility.GetDisplayName(skill);
+            RecordSkillAction($"Reached level {level} in {skillName}");
+        }
+
+        private void RecordSkillAction(string description)
+        {
+            if (string.IsNullOrWhiteSpace(description))
+                return;
+
+            var record = new SkillActionRecord(description.Trim(), DateTime.UtcNow);
+            recentSkillActions.AddFirst(record);
+
+            while (recentSkillActions.Count > MaxTrackedSkillActions)
+                recentSkillActions.RemoveLast();
+
+            PruneSkillActions(DateTime.UtcNow);
+        }
+
+        private void PruneSkillActions(DateTime nowUtc)
+        {
+            var node = recentSkillActions.Last;
+            while (node != null)
+            {
+                var previous = node.Previous;
+                if ((nowUtc - node.Value.TimestampUtc) > SkillActionRetention)
+                    recentSkillActions.Remove(node);
+
+                node = previous;
+            }
+        }
+
         private void HandleMessageReceived(ChatMessage message)
         {
             if (message.Channel != ChatChannel.Companion)
@@ -205,6 +373,8 @@ namespace Companions.Conversation
 
             if (!message.IsLocalPlayerAuthor)
                 return;
+
+            EnsurePlayerContextBindings();
 
             string cleaned = NormaliseForParsing(message.Text);
             if (string.IsNullOrEmpty(cleaned))
@@ -241,6 +411,18 @@ namespace Companions.Conversation
                     yield return new WaitForSeconds(delay);
 
                 PublishResponse(response);
+
+                if (pendingResponses.Count == 0 && response.FollowUpSegments != null && response.FollowUpSegments.Count > 0)
+                {
+                    for (int i = 0; i < response.FollowUpSegments.Count; i++)
+                    {
+                        string followUp = response.FollowUpSegments[i];
+                        if (string.IsNullOrWhiteSpace(followUp))
+                            continue;
+
+                        pendingResponses.Enqueue(new PendingResponse(followUp, string.Empty, string.Empty));
+                    }
+                }
 
                 // Small buffer so rapid-fire messages still feel paced.
                 yield return null;
@@ -279,6 +461,8 @@ namespace Companions.Conversation
         private PendingResponse? ComposeResponse(CompanionDialogueParseResult parseResult, string playerName)
         {
             var segments = new List<string>();
+            var followUps = new List<string>();
+
             if (conversationMemory == null)
                 EnsureConversationMemoryBound();
 
@@ -287,6 +471,7 @@ namespace Companions.Conversation
             string statusSegment = string.Empty;
             string companionMood = ResolveCompanionMoodDescriptor();
             string recentEvent = ResolveRecentEventSummary();
+            var context = BuildResponseContext();
 
             for (int i = 0; i < parseResult.Matches.Count; i++)
             {
@@ -294,16 +479,24 @@ namespace Companions.Conversation
                 switch (match.Intent)
                 {
                     case CompanionDialogueIntent.Greeting:
-                        segments.Add(FormatTemplate(
-                            responseLibrary.GetRandomTemplate(CompanionDialogueIntent.Greeting),
+                        TryAddResponse(
+                            CompanionDialogueIntent.Greeting,
+                            context,
+                            segments,
+                            followUps,
                             playerName,
                             playerMoodFromMemory,
                             companionMood,
-                            recentEvent));
+                            recentEvent);
                         break;
 
                     case CompanionDialogueIntent.StatusQuery:
-                        statusSegment = BuildStatusSegment(playerName, playerMoodFromMemory, companionMood);
+                        statusSegment = BuildStatusSegment(
+                            playerName,
+                            playerMoodFromMemory,
+                            ref companionMood,
+                            context,
+                            followUps);
                         if (!string.IsNullOrEmpty(statusSegment))
                             segments.Add(statusSegment);
                         break;
@@ -314,64 +507,77 @@ namespace Companions.Conversation
                             ? detectedPlayerMood
                             : playerMoodFromMemory;
 
-                        var moodTemplate = responseLibrary.GetRandomTemplate(CompanionDialogueIntent.PlayerMoodReport);
-                        if (!string.IsNullOrEmpty(moodTemplate))
-                        {
-                            segments.Add(FormatTemplate(
-                                moodTemplate,
-                                playerName,
-                                acknowledgedMood,
-                                companionMood,
-                                recentEvent));
-                        }
-
+                        TryAddResponse(
+                            CompanionDialogueIntent.PlayerMoodReport,
+                            context,
+                            segments,
+                            followUps,
+                            playerName,
+                            acknowledgedMood,
+                            companionMood,
+                            recentEvent);
                         break;
 
                     case CompanionDialogueIntent.Gratitude:
-                        segments.Add(FormatTemplate(
-                            responseLibrary.GetRandomTemplate(CompanionDialogueIntent.Gratitude),
+                        TryAddResponse(
+                            CompanionDialogueIntent.Gratitude,
+                            context,
+                            segments,
+                            followUps,
                             playerName,
                             playerMoodFromMemory,
                             companionMood,
-                            recentEvent));
+                            recentEvent);
                         break;
 
                     case CompanionDialogueIntent.Farewell:
-                        segments.Add(FormatTemplate(
-                            responseLibrary.GetRandomTemplate(CompanionDialogueIntent.Farewell),
+                        TryAddResponse(
+                            CompanionDialogueIntent.Farewell,
+                            context,
+                            segments,
+                            followUps,
                             playerName,
                             playerMoodFromMemory,
                             companionMood,
-                            recentEvent));
+                            recentEvent);
                         break;
 
                     case CompanionDialogueIntent.Compliment:
-                        segments.Add(FormatTemplate(
-                            responseLibrary.GetRandomTemplate(CompanionDialogueIntent.Compliment),
+                        TryAddResponse(
+                            CompanionDialogueIntent.Compliment,
+                            context,
+                            segments,
+                            followUps,
                             playerName,
                             playerMoodFromMemory,
                             companionMood,
-                            recentEvent));
+                            recentEvent);
                         break;
 
                     case CompanionDialogueIntent.RequestAssistance:
-                        segments.Add(FormatTemplate(
-                            responseLibrary.GetRandomTemplate(CompanionDialogueIntent.RequestAssistance),
+                        TryAddResponse(
+                            CompanionDialogueIntent.RequestAssistance,
+                            context,
+                            segments,
+                            followUps,
                             playerName,
                             playerMoodFromMemory,
                             companionMood,
-                            recentEvent));
+                            recentEvent);
                         break;
 
                     case CompanionDialogueIntent.AcknowledgeRecentEvent:
                         if (!string.IsNullOrEmpty(recentEvent))
                         {
-                            segments.Add(FormatTemplate(
-                                responseLibrary.GetRandomTemplate(CompanionDialogueIntent.AcknowledgeRecentEvent),
+                            TryAddResponse(
+                                CompanionDialogueIntent.AcknowledgeRecentEvent,
+                                context,
+                                segments,
+                                followUps,
                                 playerName,
                                 playerMoodFromMemory,
                                 companionMood,
-                                recentEvent));
+                                recentEvent);
                         }
                         break;
                 }
@@ -384,43 +590,184 @@ namespace Companions.Conversation
             if (string.IsNullOrWhiteSpace(text))
                 return null;
 
-            return new PendingResponse(text, statusSegment, detectedPlayerMood);
+            IReadOnlyList<string> followUpPayload = followUps.Count > 0 ? followUps : null;
+            return new PendingResponse(text, statusSegment, detectedPlayerMood, followUpPayload);
         }
 
-        private string BuildStatusSegment(string playerName, string playerMood, string companionMood)
+        private void TryAddResponse(
+            CompanionDialogueIntent intent,
+            CompanionResponseContext context,
+            List<string> segments,
+            List<string> followUps,
+            string playerName,
+            string playerMood,
+            string companionMood,
+            string recentEvent)
+        {
+            if (!responseLibrary.TrySelectResponse(intent, context, null, out var selection))
+                return;
+
+            string formatted = FormatTemplate(
+                selection.PrimarySegment,
+                playerName,
+                playerMood,
+                companionMood,
+                recentEvent,
+                context);
+
+            if (string.IsNullOrWhiteSpace(formatted))
+                return;
+
+            segments.Add(formatted);
+            AppendFollowUps(selection.FollowUpSegments, followUps, playerName, playerMood, companionMood, recentEvent, context);
+        }
+
+        private void AppendFollowUps(
+            IReadOnlyList<string> followUpSegments,
+            List<string> collector,
+            string playerName,
+            string playerMood,
+            string companionMood,
+            string recentEvent,
+            CompanionResponseContext context)
+        {
+            if (followUpSegments == null || collector == null || followUpSegments.Count == 0)
+                return;
+
+            for (int i = 0; i < followUpSegments.Count; i++)
+            {
+                string formatted = FormatTemplate(
+                    followUpSegments[i],
+                    playerName,
+                    playerMood,
+                    companionMood,
+                    recentEvent,
+                    context);
+
+                if (!string.IsNullOrWhiteSpace(formatted))
+                    collector.Add(formatted);
+            }
+        }
+
+        private string BuildStatusSegment(
+            string playerName,
+            string playerMood,
+            ref string companionMood,
+            CompanionResponseContext context,
+            List<string> followUps)
         {
             string lastStatus = conversationMemory != null ? conversationMemory.LastStatusResponse : string.Empty;
-            string template = responseLibrary.GetRandomTemplate(CompanionDialogueIntent.StatusQuery, lastStatus);
-            if (string.IsNullOrEmpty(template))
-                template = "I'm feeling {companionMood}. How are you doing?";
+            const int MaxAttempts = 3;
 
-            string result = FormatTemplate(template, playerName, playerMood, companionMood, string.Empty);
-
-            if (conversationMemory != null && !string.IsNullOrEmpty(lastStatus))
+            for (int attempt = 0; attempt < MaxAttempts; attempt++)
             {
-                bool sameLine = string.Equals(result, lastStatus, StringComparison.OrdinalIgnoreCase);
-                bool withinCooldown = conversationMemory.LastStatusResponseUtc.HasValue &&
+                if (!responseLibrary.TrySelectResponse(
+                        CompanionDialogueIntent.StatusQuery,
+                        context,
+                        lastStatusTemplateKey,
+                        out var selection))
+                {
+                    break;
+                }
+
+                string formatted = FormatTemplate(
+                    selection.PrimarySegment,
+                    playerName,
+                    playerMood,
+                    companionMood,
+                    string.Empty,
+                    context);
+
+                if (string.IsNullOrWhiteSpace(formatted))
+                    continue;
+
+                bool sameLine = conversationMemory != null &&
+                                 !string.IsNullOrEmpty(lastStatus) &&
+                                 string.Equals(formatted, lastStatus, StringComparison.OrdinalIgnoreCase);
+                bool withinCooldown = conversationMemory != null &&
+                                       conversationMemory.LastStatusResponseUtc.HasValue &&
                                        (DateTime.UtcNow - conversationMemory.LastStatusResponseUtc.Value).TotalMinutes <
                                        Math.Max(0.1f, statusRepeatCooldownMinutes);
 
                 if (sameLine && withinCooldown)
                 {
-                    // Try a different descriptor to keep things fresh.
                     companionMood = ResolveCompanionMoodDescriptor();
-                    result = FormatTemplate(template, playerName, playerMood, companionMood, string.Empty);
+                    formatted = FormatTemplate(
+                        selection.PrimarySegment,
+                        playerName,
+                        playerMood,
+                        companionMood,
+                        string.Empty,
+                        context);
                 }
+
+                if (!string.IsNullOrEmpty(playerMood))
+                    formatted = AppendSentence(formatted, $"Hope you're {playerMood}.");
+                else if (conversationMemory != null && !string.IsNullOrEmpty(conversationMemory.LastKnownPlayerMood))
+                    formatted = AppendSentence(formatted, $"Still keeping an eye on you being {conversationMemory.LastKnownPlayerMood}.");
+
+                AppendFollowUps(selection.FollowUpSegments, followUps, playerName, playerMood, companionMood, string.Empty, context);
+                lastStatusTemplateKey = selection.TemplateKey;
+                return formatted;
             }
+
+            string fallback = FormatTemplate(
+                "I'm feeling {companionMood}. How are you doing?",
+                playerName,
+                playerMood,
+                companionMood,
+                string.Empty,
+                context);
 
             if (!string.IsNullOrEmpty(playerMood))
-            {
-                result = AppendSentence(result, $"Hope you're {playerMood}.");
-            }
+                fallback = AppendSentence(fallback, $"Hope you're {playerMood}.");
             else if (conversationMemory != null && !string.IsNullOrEmpty(conversationMemory.LastKnownPlayerMood))
-            {
-                result = AppendSentence(result, $"Still keeping an eye on you being {conversationMemory.LastKnownPlayerMood}.");
-            }
+                fallback = AppendSentence(fallback, $"Still keeping an eye on you being {conversationMemory.LastKnownPlayerMood}.");
 
-            return result;
+            lastStatusTemplateKey = string.Empty;
+            return fallback;
+        }
+
+        private CompanionResponseContext BuildResponseContext()
+        {
+            DateTime nowUtc = DateTime.UtcNow;
+            var recentSkills = ResolveRecentSkillActions(nowUtc);
+            string timeOfDay = ResolveTimeOfDayDescriptor(nowUtc);
+            bool companionInCombat = false;
+
+            return new CompanionResponseContext(
+                nowUtc,
+                timeOfDay,
+                playerInCombat,
+                companionInCombat,
+                recentSkills,
+                pendingResponses.Count);
+        }
+
+        private IReadOnlyList<string> ResolveRecentSkillActions(DateTime nowUtc)
+        {
+            PruneSkillActions(nowUtc);
+
+            if (recentSkillActions.Count == 0)
+                return Array.Empty<string>();
+
+            var snapshot = new List<string>(recentSkillActions.Count);
+            foreach (var entry in recentSkillActions)
+                snapshot.Add(entry.Description);
+
+            return snapshot;
+        }
+
+        private static string ResolveTimeOfDayDescriptor(DateTime utcNow)
+        {
+            int hour = utcNow.Hour;
+            if (hour >= 5 && hour < 12)
+                return "morning";
+            if (hour >= 12 && hour < 17)
+                return "afternoon";
+            if (hour >= 17 && hour < 21)
+                return "evening";
+            return "night";
         }
 
         private string CombineSegments(IEnumerable<string> segments)
@@ -524,7 +871,13 @@ namespace Companions.Conversation
                 Debug.Log("[CompanionConversationService] Conversation memory unbound. Waiting for replacement.");
         }
 
-        private string FormatTemplate(string template, string playerName, string playerMood, string companionMood, string recentEvent)
+        private string FormatTemplate(
+            string template,
+            string playerName,
+            string playerMood,
+            string companionMood,
+            string recentEvent,
+            CompanionResponseContext context)
         {
             if (string.IsNullOrEmpty(template))
                 return string.Empty;
@@ -534,13 +887,23 @@ namespace Companions.Conversation
             string resolvedPlayerMood = string.IsNullOrWhiteSpace(playerMood) ? "doing alright" : playerMood;
             string resolvedCompanionMood = string.IsNullOrWhiteSpace(companionMood) ? "ready" : companionMood;
             string resolvedEvent = string.IsNullOrWhiteSpace(recentEvent) ? "that" : recentEvent;
+            string resolvedTimeOfDay = string.IsNullOrWhiteSpace(context.TimeOfDayLabel) ? "day" : context.TimeOfDayLabel;
+            string resolvedCombatState = string.IsNullOrWhiteSpace(context.CombatStateDescriptor)
+                ? "standing down"
+                : context.CombatStateDescriptor;
+            string resolvedSkillAction = context.HasRecentSkillActions
+                ? context.LatestSkillAction
+                : "keeping skills sharp";
 
             string result = template
                 .Replace("{playerName}", resolvedPlayerName)
                 .Replace("{companionName}", string.IsNullOrWhiteSpace(companionName) ? "Companion" : companionName)
                 .Replace("{playerMood}", resolvedPlayerMood)
                 .Replace("{companionMood}", resolvedCompanionMood)
-                .Replace("{recentEvent}", resolvedEvent);
+                .Replace("{recentEvent}", resolvedEvent)
+                .Replace("{timeOfDay}", resolvedTimeOfDay)
+                .Replace("{combatState}", resolvedCombatState)
+                .Replace("{recentSkillAction}", resolvedSkillAction);
 
             return CompactWhitespace(result);
         }
@@ -785,13 +1148,33 @@ namespace Companions.Conversation
             return Mathf.Max(0f, defaultValue);
         }
 
+        private readonly struct SkillActionRecord
+        {
+            public SkillActionRecord(string description, DateTime timestampUtc)
+            {
+                Description = description ?? string.Empty;
+                TimestampUtc = timestampUtc.Kind == DateTimeKind.Utc
+                    ? timestampUtc
+                    : timestampUtc.ToUniversalTime();
+            }
+
+            public string Description { get; }
+
+            public DateTime TimestampUtc { get; }
+        }
+
         private readonly struct PendingResponse
         {
-            public PendingResponse(string text, string statusSegment, string playerMood)
+            public PendingResponse(
+                string text,
+                string statusSegment,
+                string playerMood,
+                IReadOnlyList<string> followUps = null)
             {
-                Text = text;
-                StatusSegment = statusSegment;
-                PlayerMood = playerMood;
+                Text = text ?? string.Empty;
+                StatusSegment = statusSegment ?? string.Empty;
+                PlayerMood = playerMood ?? string.Empty;
+                FollowUpSegments = followUps;
             }
 
             public string Text { get; }
@@ -799,6 +1182,8 @@ namespace Companions.Conversation
             public string StatusSegment { get; }
 
             public string PlayerMood { get; }
+
+            public IReadOnlyList<string> FollowUpSegments { get; }
         }
 
         [Serializable]
