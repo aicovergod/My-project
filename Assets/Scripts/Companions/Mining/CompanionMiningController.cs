@@ -860,7 +860,7 @@ namespace Companions
 
             chat.PublishCompanionMessage(
                 CompanionManager.GetCompanionDisplayName(),
-                "I don't see any mineable rocks round here");
+                CompanionChatLibrary.GetRandomNoRocksLine());
         }
 
         private void PublishBlockedByPlayerMessage()

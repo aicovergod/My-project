@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b79e05dc90f79cc59c578183febccec516158230 -->
+## 2025-10-23T14:43:12+01:00 — Add varied companion chat when no rocks are available
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 156 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:1bfed6a44a59dca13b3e25e159492921e22c3f83 -->
 ## 2025-10-23T14:30:07+01:00 — Merge pull request #1329 from aicovergod/codex/add-random-companion-death-messages
 
