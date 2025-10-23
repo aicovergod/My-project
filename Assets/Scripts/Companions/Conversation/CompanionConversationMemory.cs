@@ -101,6 +101,10 @@ namespace Companions.Conversation
 
             SaveManager.Register(this);
             TrySubscribeToChatService();
+
+            var conversationService = CompanionConversationService.Instance;
+            if (conversationService != null)
+                conversationService.BindConversationMemory(this);
         }
 
         private void OnDisable()
@@ -111,6 +115,10 @@ namespace Companions.Conversation
             // Persist the latest state before detaching so the next session resumes the same transcript.
             Save();
             SaveManager.Unregister(this);
+
+            var conversationService = CompanionConversationService.Instance;
+            if (conversationService != null)
+                conversationService.UnbindConversationMemory(this);
         }
 
         /// <summary>
