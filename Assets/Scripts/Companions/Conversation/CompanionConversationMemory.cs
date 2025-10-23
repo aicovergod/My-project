@@ -60,10 +60,19 @@ namespace Companions.Conversation
         public DateTime? LastQuestionUtc { get; private set; }
 
         /// <summary>Stores the most recent mood shared by the player.</summary>
-        public string LastKnownPlayerMood { get; private set; } = string.Empty;
+        public CompanionMoodInterpretation LastKnownPlayerMood { get; private set; } = CompanionMoodInterpretation.Empty;
+
+        /// <summary>True when a mood has been captured.</summary>
+        public bool HasKnownPlayerMood => LastKnownPlayerMood.HasMood;
 
         /// <summary>Timestamp when <see cref="LastKnownPlayerMood"/> was last updated.</summary>
         public DateTime? LastKnownPlayerMoodUtc { get; private set; }
+
+        /// <summary>True while the companion should keep checking in on a negative mood.</summary>
+        public bool PendingMoodFollowUp { get; private set; }
+
+        /// <summary>Tracks when the last follow-up question about the player's mood was asked.</summary>
+        public DateTime? LastMoodFollowUpUtc { get; private set; }
 
         /// <summary>Stores the most recent status response emitted by the companion.</summary>
         public string LastStatusResponse { get; private set; } = string.Empty;
@@ -171,19 +180,40 @@ namespace Companions.Conversation
         /// <summary>
         /// Updates the cached player mood so the conversation service can acknowledge it in future replies.
         /// </summary>
-        /// <param name="mood">Textual description of the player's mood.</param>
+        /// <param name="mood">Structured interpretation of the player's mood.</param>
         /// <param name="timestampUtc">Timestamp to record for the update.</param>
-        public void SetLastKnownPlayerMood(string mood, DateTime timestampUtc)
+        public void SetLastKnownPlayerMood(CompanionMoodInterpretation mood, DateTime timestampUtc)
         {
-            if (string.IsNullOrWhiteSpace(mood))
+            if (!mood.HasMood)
                 return;
 
-            string trimmed = mood.Trim();
-            LastKnownPlayerMood = trimmed;
+            LastKnownPlayerMood = mood;
             LastKnownPlayerMoodUtc = EnsureUtc(timestampUtc);
+            PendingMoodFollowUp = mood.Valence == CompanionMoodValence.Negative;
+
+            if (!PendingMoodFollowUp)
+                LastMoodFollowUpUtc = null;
 
             if (enableDebugLogging)
-                Debug.Log($"[CompanionConversationMemory] Recorded player mood '{LastKnownPlayerMood}' at {LastKnownPlayerMoodUtc:o}.");
+            {
+                Debug.Log(
+                    $"[CompanionConversationMemory] Recorded player mood '{LastKnownPlayerMood.Descriptor}' " +
+                    $"(valence={LastKnownPlayerMood.Valence}, intensity={LastKnownPlayerMood.Intensity}) at {LastKnownPlayerMoodUtc:o}.");
+            }
+
+            Save();
+        }
+
+        /// <summary>
+        /// Records when the companion last delivered a follow-up question about the player's mood.
+        /// </summary>
+        /// <param name="timestampUtc">Timestamp to log for the follow-up.</param>
+        public void RegisterMoodFollowUp(DateTime timestampUtc)
+        {
+            LastMoodFollowUpUtc = EnsureUtc(timestampUtc);
+
+            if (enableDebugLogging)
+                Debug.Log($"[CompanionConversationMemory] Logged mood follow-up at {LastMoodFollowUpUtc:o}.");
 
             Save();
         }
@@ -232,8 +262,10 @@ namespace Companions.Conversation
             recentEvents.Clear();
             LastGreetingUtc = null;
             LastQuestionUtc = null;
-            LastKnownPlayerMood = string.Empty;
+            LastKnownPlayerMood = CompanionMoodInterpretation.Empty;
             LastKnownPlayerMoodUtc = null;
+            PendingMoodFollowUp = false;
+            LastMoodFollowUpUtc = null;
             LastStatusResponse = string.Empty;
             LastStatusResponseUtc = null;
             Save();
@@ -246,8 +278,10 @@ namespace Companions.Conversation
             recentEvents.Clear();
             LastGreetingUtc = null;
             LastQuestionUtc = null;
-            LastKnownPlayerMood = string.Empty;
+            LastKnownPlayerMood = CompanionMoodInterpretation.Empty;
             LastKnownPlayerMoodUtc = null;
+            PendingMoodFollowUp = false;
+            LastMoodFollowUpUtc = null;
             LastStatusResponse = string.Empty;
             LastStatusResponseUtc = null;
 
@@ -266,8 +300,14 @@ namespace Companions.Conversation
 
             if (data != null)
             {
-                LastKnownPlayerMood = data.lastKnownPlayerMood ?? string.Empty;
+                LastKnownPlayerMood = data.lastKnownMoodSnapshot.ToInterpretation();
+                if (!LastKnownPlayerMood.HasMood && !string.IsNullOrEmpty(data.lastKnownPlayerMood))
+                    LastKnownPlayerMood = new CompanionMoodInterpretation(data.lastKnownPlayerMood, CompanionMoodValence.Neutral, CompanionMoodIntensity.Medium, false, false);
                 LastKnownPlayerMoodUtc = SafeCreateUtcNullable(data.lastKnownPlayerMoodTimestampTicks);
+                PendingMoodFollowUp = data.pendingMoodFollowUp && LastKnownPlayerMood.Valence == CompanionMoodValence.Negative;
+                LastMoodFollowUpUtc = SafeCreateUtcNullable(data.lastMoodFollowUpTicks);
+                if (!PendingMoodFollowUp)
+                    LastMoodFollowUpUtc = null;
                 LastStatusResponse = data.lastStatusResponse ?? string.Empty;
                 LastStatusResponseUtc = SafeCreateUtcNullable(data.lastStatusResponseTicks);
             }
@@ -283,10 +323,13 @@ namespace Companions.Conversation
             var payload = new ConversationLogData
             {
                 entries = new List<ConversationEntryData>(entries.Count),
-                lastKnownPlayerMood = LastKnownPlayerMood,
+                lastKnownPlayerMood = LastKnownPlayerMood.Descriptor,
                 lastKnownPlayerMoodTimestampTicks = LastKnownPlayerMoodUtc?.Ticks ?? 0,
                 lastStatusResponse = LastStatusResponse,
-                lastStatusResponseTicks = LastStatusResponseUtc?.Ticks ?? 0
+                lastStatusResponseTicks = LastStatusResponseUtc?.Ticks ?? 0,
+                lastKnownMoodSnapshot = CreateMoodSnapshot(LastKnownPlayerMood),
+                pendingMoodFollowUp = PendingMoodFollowUp && LastKnownPlayerMood.Valence == CompanionMoodValence.Negative,
+                lastMoodFollowUpTicks = LastMoodFollowUpUtc?.Ticks ?? 0
             };
 
             for (int i = 0; i < entries.Count; i++)
@@ -621,6 +664,18 @@ namespace Companions.Conversation
             }
         }
 
+        private static MoodSnapshotData CreateMoodSnapshot(CompanionMoodInterpretation mood)
+        {
+            return new MoodSnapshotData
+            {
+                descriptor = mood.Descriptor,
+                intensity = (int)mood.Intensity,
+                valence = (int)mood.Valence,
+                wasNegated = mood.WasNegated,
+                hasExplicitIntensity = mood.HasExplicitIntensity
+            };
+        }
+
         [Serializable]
         private sealed class ConversationLogData
         {
@@ -629,6 +684,43 @@ namespace Companions.Conversation
             public long lastKnownPlayerMoodTimestampTicks;
             public string lastStatusResponse;
             public long lastStatusResponseTicks;
+            public MoodSnapshotData lastKnownMoodSnapshot;
+            public bool pendingMoodFollowUp;
+            public long lastMoodFollowUpTicks;
+        }
+
+        [Serializable]
+        private struct MoodSnapshotData
+        {
+            public string descriptor;
+            public int intensity;
+            public int valence;
+            public bool wasNegated;
+            public bool hasExplicitIntensity;
+
+            public CompanionMoodInterpretation ToInterpretation()
+            {
+                if (string.IsNullOrWhiteSpace(descriptor))
+                    return CompanionMoodInterpretation.Empty;
+
+                CompanionMoodIntensity resolvedIntensity;
+                if (Enum.IsDefined(typeof(CompanionMoodIntensity), intensity))
+                    resolvedIntensity = (CompanionMoodIntensity)intensity;
+                else if (intensity <= (int)CompanionMoodIntensity.Low)
+                    resolvedIntensity = CompanionMoodIntensity.Low;
+                else if (intensity >= (int)CompanionMoodIntensity.High)
+                    resolvedIntensity = CompanionMoodIntensity.High;
+                else
+                    resolvedIntensity = CompanionMoodIntensity.Medium;
+
+                CompanionMoodValence resolvedValence;
+                if (Enum.IsDefined(typeof(CompanionMoodValence), valence))
+                    resolvedValence = (CompanionMoodValence)valence;
+                else
+                    resolvedValence = CompanionMoodValence.Neutral;
+
+                return new CompanionMoodInterpretation(descriptor, resolvedValence, resolvedIntensity, wasNegated, hasExplicitIntensity);
+            }
         }
 
         [Serializable]
