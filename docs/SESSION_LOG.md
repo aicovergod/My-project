@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d9aca8dd99e4025530ad3ef2e6b96dd119e74078 -->
+## 2025-10-23T18:55:44+01:00 — Refine recent event recall weights
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 5 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:37b926bdd413c56c91489863c5dc79e9ee0dfc8f -->
 ## 2025-10-23T18:52:21+01:00 — Merge pull request #1342 from aicovergod/codex/implement-companionmoodinterpreter-and-refactor-mood-handlin
 
