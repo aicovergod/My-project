@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8b23b57359500ffd9d6c31a853f89cb525d3bfb0 -->
+## 2025-10-23T23:57:39+01:00 — Merge pull request #1357 from aicovergod/codex/add-playerskillproposal-intent-and-response-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 901 ++ / 2 --
+- Notes:
+  Handle player skill proposals in companion conversations
+---
+<!-- commit:2e858a30f475368e8bb688cc3db66fb7ef58e62c -->
+## 2025-10-23T23:57:33+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:5813806d3b04098a7294d589195a8f2f5053f440 -->
 ## 2025-10-23T23:57:13+01:00 — Handle player skill proposals in companion conversations
 
