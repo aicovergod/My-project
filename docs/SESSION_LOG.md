@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3388ec461a51f8b68040480c3b107b82616d6ec8 -->
+## 2025-10-23T22:30:34+01:00 — Avoid reusing status replies as recent events
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Tests/Companions/CompanionConversationServiceTests.cs
+- Diff: 64 ++ / 11 --
+- Notes:
+  —
+---
 <!-- commit:6287e731c1d3e7850375b1832347f4fc81cadc90 -->
 ## 2025-10-23T22:13:23+01:00 — Merge pull request #1350 from aicovergod/codex/fix-redundant-message-response
 
