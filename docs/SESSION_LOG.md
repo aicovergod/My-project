@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:861ace70ea40567a0d731fcc7c0001e23d410660 -->
+## 2025-10-24T11:58:24+01:00 — Merge pull request #1365 from aicovergod/codex/implement-companion-skill-cooldown-system
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 384 ++ / 3 --
+- Notes:
+  Add companion mining cooldown tracking
+---
+<!-- commit:9daff640c5a8eef52903aa3262429a351badb4f4 -->
+## 2025-10-24T11:57:12+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6f9f774f75dbfc46d04716b3709057a05fba0480 -->
 ## 2025-10-24T11:56:52+01:00 — Add companion mining cooldown tracking
 
