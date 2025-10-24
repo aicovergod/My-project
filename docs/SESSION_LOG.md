@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6581059848c7f5887b95304cde0f997a77fb98b9 -->
+## 2025-10-24T12:50:11+01:00 — Guard proactive companion prompts during cooldowns
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Tests/Companions/CompanionConversationServiceTests.cs
+- Diff: 136 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:ee1ac9839aa7080633311c5f35c11a96dc30fef8 -->
 ## 2025-10-24T12:34:17+01:00 — Merge pull request #1368 from aicovergod/codex/implement-companion-combat-skill-decline-logic
 
