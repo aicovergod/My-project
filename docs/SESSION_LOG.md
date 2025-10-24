@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e3d83f27359e1d4537cba94d9f716d56202d8114 -->
+## 2025-10-24T12:22:21+01:00 — Merge pull request #1367 from aicovergod/codex/restrict-f1,-f2,-f4-menus-to-developers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 87 ++ / 0 --
+- Notes:
+  Restrict debug menus to developer rank
+---
+<!-- commit:9d2f4f0e75c7045fc5dd8fbbf57fea4b1cf30f22 -->
+## 2025-10-24T12:22:13+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6296c0df7bbb0e03d0d426969377b0372111c5c6 -->
 ## 2025-10-24T12:21:55+01:00 — Restrict debug menus to developer rank
 
