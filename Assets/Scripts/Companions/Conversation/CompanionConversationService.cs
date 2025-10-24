@@ -1354,6 +1354,17 @@ namespace Companions.Conversation
 
             if (analysis.HasConcreteSkill)
             {
+                if (UnityEngine.Random.value < SkillProposalDeclineChance)
+                {
+                    ComposeSkillProposalDeclineResponse(
+                        analysis,
+                        segments,
+                        followUps,
+                        playerName,
+                        context);
+                    return true;
+                }
+
                 if (toolResult.State == SkillToolState.Missing)
                 {
                     ComposeMissingToolResponse(analysis, toolResult, segments, followUps, playerName);
@@ -1599,17 +1610,6 @@ namespace Companions.Conversation
         {
             if (!analysis.HasConcreteSkill)
                 return;
-
-            if (UnityEngine.Random.value < SkillProposalDeclineChance)
-            {
-                ComposeSkillProposalDeclineResponse(
-                    analysis,
-                    segments,
-                    followUps,
-                    playerName,
-                    context);
-                return;
-            }
 
             string toolName = ResolveToolName(toolResult);
             string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName;
