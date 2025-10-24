@@ -19,6 +19,7 @@ using Status.Poison;
 using Status.Freeze;
 using World;
 using UI;
+using UI.Chat;
 
 namespace Skills
 {
@@ -321,6 +322,12 @@ namespace Skills
             }
             GUI.enabled = previousGuiEnabled;
 
+            bool cooldownGuiEnabled = GUI.enabled;
+            GUI.enabled = CompanionManager.CompanionSkillCooldowns != null;
+            if (GUILayout.Button("Clear Companion Cooldown Timers"))
+                ClearCompanionCooldownsFromMenu();
+            GUI.enabled = cooldownGuiEnabled;
+
             if (GUILayout.Button("Max Stats"))
             {
                 if (playerSkillManager != null)
@@ -601,6 +608,50 @@ namespace Skills
             };
 
             BuffEvents.RaiseBuffApplied(context);
+        }
+
+        /// <summary>
+        /// Clears all active companion cooldown timers when requested from the debug UI.
+        /// </summary>
+        private void ClearCompanionCooldownsFromMenu()
+        {
+            var tracker = CompanionManager.CompanionSkillCooldowns;
+            if (tracker == null)
+            {
+                PublishAdminMessage("Companion cooldown tracker is not available.");
+                return;
+            }
+
+            int cleared = tracker.ClearAllCooldowns();
+            if (cleared <= 0)
+            {
+                PublishAdminMessage("Companion has no active skill cooldown timers.");
+                return;
+            }
+
+            string message = cleared == 1
+                ? "Cleared 1 companion skill cooldown timer."
+                : $"Cleared {cleared} companion skill cooldown timers.";
+            PublishAdminMessage(message);
+        }
+
+        /// <summary>
+        /// Publishes admin feedback to the in-game chat (falling back to the console when chat is unavailable).
+        /// </summary>
+        private static void PublishAdminMessage(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            var chat = ChatService.Instance;
+            if (chat != null)
+            {
+                chat.PublishGameMessage(message);
+            }
+            else
+            {
+                Debug.Log(message);
+            }
         }
 
         /// <summary>
