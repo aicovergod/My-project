@@ -4,6 +4,7 @@ using System.Text;
 using Combat;
 using Core.Save;
 using Inventory;
+using MyGame.Drops;
 using Skills;
 using UI;
 using UI.Chat;
@@ -266,6 +267,94 @@ namespace Companions
             if (index < 0 || index >= equipped.Length)
                 return default;
             return equipped[index];
+        }
+
+        /// <summary>
+        /// Consumes the specified amount from an equipped stack. Returns false when insufficient ammo is available.
+        /// </summary>
+        /// <param name="slot">Equipment slot to consume.</param>
+        /// <param name="amount">Number of items to remove.</param>
+        /// <param name="remaining">Outputs the stack size after consumption.</param>
+        public bool ConsumeEquipped(EquipmentSlot slot, int amount, out int remaining)
+        {
+            remaining = 0;
+            int index = SlotIndex(slot);
+            if (amount <= 0 || index < 0 || index >= equipped.Length)
+                return false;
+
+            var entry = equipped[index];
+            if (entry.item == null || entry.count < amount)
+                return false;
+
+            entry.count -= amount;
+            if (entry.count <= 0)
+            {
+                entry.item = null;
+                entry.count = 0;
+            }
+
+            equipped[index] = entry;
+            UpdateSlotVisual(slot);
+            EquipmentSlotChanged?.Invoke(slot, entry);
+            remaining = entry.count;
+            return true;
+        }
+
+        /// <summary>
+        /// Overrides the ammo slot label so ranged systems can surface LOW/OUT warnings.
+        /// Passing <c>null</c> reverts to the default behaviour that displays the equipped stack size.
+        /// </summary>
+        public void OverrideAmmoLabel(string message, Color? color = null)
+        {
+            int index = SlotIndex(EquipmentSlot.Arrow);
+            if (slotCountTexts == null || index < 0 || index >= slotCountTexts.Length)
+                return;
+
+            var label = slotCountTexts[index];
+            if (label == null)
+                return;
+
+            if (message == null)
+            {
+                var entry = GetEquipped(EquipmentSlot.Arrow);
+                if (entry.item != null && entry.item.stackable && entry.count > 1)
+                    label.text = entry.count.ToString();
+                else
+                    label.text = string.Empty;
+                label.color = ammoDefaultColor;
+                return;
+            }
+
+            label.text = message;
+            label.color = color ?? ammoDefaultColor;
+        }
+
+        /// <summary>
+        /// Routes reclaimed ammo into the companion inventory when possible, falling back to ground spawns.
+        /// </summary>
+        /// <returns>True when the ammo was stored or spawned successfully.</returns>
+        public bool TryStoreRecoveredAmmo(
+            ItemData item,
+            int amount,
+            CompanionInventory companionInventory,
+            GroundItemSpawner itemSpawner,
+            Vector3 spawnPosition,
+            bool spawnAsGroundItem)
+        {
+            if (item == null || amount <= 0)
+                return false;
+
+            var bag = companionInventory != null ? companionInventory.InventoryComponent : null;
+            if (bag != null && bag.AddItem(item, amount))
+                return true;
+
+            if (spawnAsGroundItem && itemSpawner != null)
+            {
+                itemSpawner.Spawn(item, amount, spawnPosition);
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>

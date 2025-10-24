@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c4e9191b3a0a4f20f6f107e669c259b3a0270693 -->
+## 2025-10-24T17:48:57+01:00 — Add companion ranged combat adapter and integrate ammo management
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Combat/Ranged/IRangedProjectileOwner.cs, Assets/Scripts/Combat/Ranged/RangedCombatController.cs, Assets/Scripts/Combat/Ranged/RangedProjectile.cs, Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionEquipment.cs, Assets/Scripts/Companions/CompanionRangedCombatController.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 1018 ++ / 62 --
+- Notes:
+  —
+---
 <!-- commit:17a3812a52e600724020aa96d14fd2652358ba6f -->
 ## 2025-10-24T17:31:04+01:00 — Merge pull request #1379 from aicovergod/codex/refactor-combat-stats-and-attack-speed-logic
 
