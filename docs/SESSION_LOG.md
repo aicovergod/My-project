@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6634fe438b7bf2dd23fb14d5d9d3c672afd0622e -->
+## 2025-10-24T18:04:46+01:00 — Align companion damage stats with ranged and magic overrides
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionCombatBridge.cs
+- Diff: 21 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:43454ed8507af9bdb97c10358cfeae85d0b58e71 -->
 ## 2025-10-24T17:53:25+01:00 — Merge pull request #1381 from aicovergod/codex/fix-console-error-cs0246-5qid7r
 
