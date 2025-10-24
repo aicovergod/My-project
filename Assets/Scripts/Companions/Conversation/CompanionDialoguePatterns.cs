@@ -45,12 +45,20 @@ namespace Companions.Conversation
             RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         private static readonly Regex SkillKeywordRegex = new Regex(
-            "\\b(mine|mining|woodcut|woodcutting|chop|logs|fish|fishing|cook|cooking|firemaking|firemake|smith|smithing|smelt|craft|crafting)\\b",
+            "\\b(mine|mining|miner|mines|wood|woodcut|woodcutting|wc|lumber|chop|logs|fish|fishing|fishin|rod|harpoon|cook|cooking|cookin|chef|firemaking|firemake|fire|burn|fm|smith|smithing|smelt|craft|crafting|magic|mage|wizard|wiz|sorc|range|ranged|rng|archer|archery|attack|atk|strength|str|defence|defense|def|hp|hitpoint|hitpoints|lifepoint|lifepoints|health|vitality|beast|beasts|beastmaster|pet|pets)\\b",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        private static readonly Regex SkillLevelQueryRegex = new Regex(
+            "\\b(what|whats|what's|waht|wats|wut|wat)\\s*(is|s|'s)?\\s*(ya|your|ur|you|yours?)\\b.*\\b(level|levels|lvl|lvls|levl|levll)\\b",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        private static readonly Regex SkillLevelCompactRegex = new Regex(
+            "\\b(whats|what's|waht|wats)(ya|ur|your)([a-z]{2,})(level|lvl|lv|levl|levll)\\b",
             RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         private static readonly string[] SkillKeywordTokens =
         {
-            "mine", "mining", "chop", "woodcut", "woodcutting", "logs", "fish", "fishing", "cook", "cooking", "firemaking", "firemake", "smith", "smithing", "smelt", "craft", "crafting"
+            "mine", "mining", "miner", "mines", "wood", "woodcut", "woodcutting", "wc", "lumber", "chop", "logs", "fish", "fishing", "fishin", "rod", "harpoon", "cook", "cooking", "cookin", "chef", "firemaking", "firemake", "fire", "burn", "fm", "smith", "smithing", "smelt", "craft", "crafting", "magic", "mage", "wizard", "wiz", "sorc", "range", "ranged", "rng", "archer", "archery", "attack", "atk", "strength", "str", "defence", "defense", "def", "hp", "hitpoint", "hitpoints", "lifepoint", "lifepoints", "health", "vitality", "beast", "beasts", "beastmaster", "pet", "pets"
         };
 
         /// <summary>
@@ -370,7 +378,56 @@ namespace Companions.Conversation
                         new MultiWordPhrase("earlier today", 1.4f),
                         new MultiWordPhrase("last time we", 1.6f)
                     },
-                    regexScoreEvaluator: text => RecentEventRegex.IsMatch(text) ? 0.8f : 0f)
+                    regexScoreEvaluator: text => RecentEventRegex.IsMatch(text) ? 0.8f : 0f),
+
+                new CompanionIntentPattern(
+                    CompanionDialogueIntent.SkillLevelQuery,
+                    priority: 8,
+                    matchThreshold: 2.1f,
+                    synonymBuckets: new[]
+                    {
+                        new SynonymBucket(new[] { "what", "whats", "what's", "waht", "wats", "wut", "wat" }, 1.1f),
+                        new SynonymBucket(new[] { "your", "ya", "yaa", "ur", "you" }, 0.95f),
+                        new SynonymBucket(SkillKeywordTokens, 0.9f),
+                        new SynonymBucket(new[] { "level", "levels", "lvl", "lvls", "levl", "levll" }, 1.2f)
+                    },
+                    multiWordPhrases: new[]
+                    {
+                        new MultiWordPhrase("whats your mining level", 2.6f),
+                        new MultiWordPhrase("whats your woodcutting level", 2.6f),
+                        new MultiWordPhrase("whats your wc level", 2.4f),
+                        new MultiWordPhrase("whats your fishing level", 2.6f),
+                        new MultiWordPhrase("whats your cooking level", 2.5f),
+                        new MultiWordPhrase("whats your firemaking level", 2.5f),
+                        new MultiWordPhrase("whats your fm level", 2.4f),
+                        new MultiWordPhrase("whats your magic level", 2.4f),
+                        new MultiWordPhrase("whats your mage level", 2.4f),
+                        new MultiWordPhrase("whats your ranged level", 2.4f),
+                        new MultiWordPhrase("whats your range level", 2.4f),
+                        new MultiWordPhrase("whats your attack level", 2.5f),
+                        new MultiWordPhrase("whats your atk level", 2.5f),
+                        new MultiWordPhrase("whats your strength level", 2.5f),
+                        new MultiWordPhrase("whats your str level", 2.4f),
+                        new MultiWordPhrase("whats your defence level", 2.5f),
+                        new MultiWordPhrase("whats your def level", 2.4f),
+                        new MultiWordPhrase("whats your hitpoints level", 2.6f),
+                        new MultiWordPhrase("whats your hp level", 2.6f),
+                        new MultiWordPhrase("whats your health level", 2.4f),
+                        new MultiWordPhrase("whats your beastmaster level", 2.4f),
+                        new MultiWordPhrase("whats your pet level", 2.3f),
+                        new MultiWordPhrase("what level is your mining", 2.2f),
+                        new MultiWordPhrase("what level is your magic", 2.2f),
+                        new MultiWordPhrase("what level is your hp", 2.2f)
+                    },
+                    regexScoreEvaluator: text =>
+                    {
+                        float score = 0f;
+                        if (SkillLevelQueryRegex.IsMatch(text))
+                            score += 1.4f;
+                        if (SkillLevelCompactRegex.IsMatch(text))
+                            score = Mathf.Max(score, 2.4f);
+                        return score;
+                    })
             };
 
             var rules = new List<CompanionDialogueRule>(patterns.Count);

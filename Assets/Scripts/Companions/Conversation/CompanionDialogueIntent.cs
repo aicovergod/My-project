@@ -19,6 +19,11 @@ namespace Companions.Conversation
         StatusQuery = 10,
 
         /// <summary>
+        /// Player asked about the companion's level in a specific skill.
+        /// </summary>
+        SkillLevelQuery = 15,
+
+        /// <summary>
         /// Player thanked the companion for their help.
         /// </summary>
         Gratitude = 20,

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Globalization;
 using Combat;
 using Companions;
 using Inventory;
@@ -36,6 +37,7 @@ namespace Companions.Conversation
         {
             new IntentScoreThreshold(CompanionDialogueIntent.Greeting, 1f),
             new IntentScoreThreshold(CompanionDialogueIntent.StatusQuery, 2.2f),
+            new IntentScoreThreshold(CompanionDialogueIntent.SkillLevelQuery, 2.1f),
             new IntentScoreThreshold(CompanionDialogueIntent.Gratitude, 1.6f),
             new IntentScoreThreshold(CompanionDialogueIntent.Farewell, 1.4f),
             new IntentScoreThreshold(CompanionDialogueIntent.Compliment, 1.8f),
@@ -98,6 +100,9 @@ namespace Companions.Conversation
             {
                 { "mine", TokenSkillMapping.ForSkills(1.2f, SkillType.Mining) },
                 { "mining", TokenSkillMapping.ForSkills(1.4f, SkillType.Mining) },
+                { "miner", TokenSkillMapping.ForSkills(1.1f, SkillType.Mining) },
+                { "mined", TokenSkillMapping.ForSkills(1f, SkillType.Mining) },
+                { "mines", TokenSkillMapping.ForSkills(1f, SkillType.Mining) },
                 { "ore", TokenSkillMapping.ForSkills(0.8f, SkillType.Mining) },
                 { "ores", TokenSkillMapping.ForSkills(0.8f, SkillType.Mining) },
                 { "rock", TokenSkillMapping.ForSkills(0.9f, SkillType.Mining) },
@@ -108,22 +113,38 @@ namespace Companions.Conversation
                 { "chop", TokenSkillMapping.ForSkills(1.2f, SkillType.Woodcutting) },
                 { "woodcut", TokenSkillMapping.ForSkills(1.3f, SkillType.Woodcutting) },
                 { "woodcutting", TokenSkillMapping.ForSkills(1.4f, SkillType.Woodcutting) },
+                { "wood", TokenSkillMapping.ForSkills(0.9f, SkillType.Woodcutting) },
                 { "tree", TokenSkillMapping.ForSkills(0.9f, SkillType.Woodcutting) },
                 { "trees", TokenSkillMapping.ForSkills(0.9f, SkillType.Woodcutting) },
+                { "wc", TokenSkillMapping.ForSkills(1.1f, SkillType.Woodcutting) },
+                { "lumber", TokenSkillMapping.ForSkills(1f, SkillType.Woodcutting) },
+                { "axe", TokenSkillMapping.ForSkills(1f, SkillType.Woodcutting) },
+                { "axes", TokenSkillMapping.ForSkills(1f, SkillType.Woodcutting) },
                 { "logs", new TokenSkillMapping(1.1f, "firemaking", "firemaking", SkillType.Woodcutting, SkillType.Firemaking) },
                 { "fish", TokenSkillMapping.ForSkills(1.2f, SkillType.Fishing) },
                 { "fishing", TokenSkillMapping.ForSkills(1.4f, SkillType.Fishing) },
                 { "net", TokenSkillMapping.ForSkills(0.9f, SkillType.Fishing) },
                 { "angler", TokenSkillMapping.ForSkills(0.9f, SkillType.Fishing) },
+                { "fishin", TokenSkillMapping.ForSkills(1f, SkillType.Fishing) },
+                { "rod", TokenSkillMapping.ForSkills(0.8f, SkillType.Fishing) },
+                { "harpoon", TokenSkillMapping.ForSkills(0.9f, SkillType.Fishing) },
+                { "bait", TokenSkillMapping.ForSkills(0.7f, SkillType.Fishing) },
                 { "catch", TokenSkillMapping.ForSkills(0.8f, SkillType.Fishing) },
                 { "cook", TokenSkillMapping.ForSkills(1.2f, SkillType.Cooking) },
                 { "cooking", TokenSkillMapping.ForSkills(1.3f, SkillType.Cooking) },
+                { "cookin", TokenSkillMapping.ForSkills(1f, SkillType.Cooking) },
                 { "stew", TokenSkillMapping.ForSkills(0.6f, SkillType.Cooking) },
                 { "meal", TokenSkillMapping.ForSkills(0.6f, SkillType.Cooking) },
+                { "chef", TokenSkillMapping.ForSkills(0.9f, SkillType.Cooking) },
+                { "kitchen", TokenSkillMapping.ForSkills(0.8f, SkillType.Cooking) },
                 { "firemake", TokenSkillMapping.ForSkills(1.2f, SkillType.Firemaking) },
                 { "firemaking", TokenSkillMapping.ForSkills(1.3f, SkillType.Firemaking) },
                 { "bonfire", TokenSkillMapping.ForSkills(1.1f, SkillType.Firemaking) },
                 { "light", TokenSkillMapping.ForSkills(0.7f, SkillType.Firemaking) },
+                { "fire", TokenSkillMapping.ForSkills(0.8f, SkillType.Firemaking) },
+                { "burn", TokenSkillMapping.ForSkills(0.8f, SkillType.Firemaking) },
+                { "burning", TokenSkillMapping.ForSkills(0.8f, SkillType.Firemaking) },
+                { "fm", TokenSkillMapping.ForSkills(1.1f, SkillType.Firemaking) },
                 { "smith", TokenSkillMapping.ForFallback(1.2f, "smithing", "smithing") },
                 { "smithing", TokenSkillMapping.ForFallback(1.4f, "smithing", "smithing") },
                 { "smelt", TokenSkillMapping.ForFallback(1.1f, "smithing", "smithing") },
@@ -134,14 +155,52 @@ namespace Companions.Conversation
                 { "spell", TokenSkillMapping.ForSkills(0.9f, SkillType.Magic) },
                 { "rune", TokenSkillMapping.ForSkills(0.8f, SkillType.Magic) },
                 { "cast", TokenSkillMapping.ForSkills(0.9f, SkillType.Magic) },
+                { "mage", TokenSkillMapping.ForSkills(1.1f, SkillType.Magic) },
+                { "wizard", TokenSkillMapping.ForSkills(0.9f, SkillType.Magic) },
+                { "wiz", TokenSkillMapping.ForSkills(0.9f, SkillType.Magic) },
+                { "sorc", TokenSkillMapping.ForSkills(0.8f, SkillType.Magic) },
                 { "range", TokenSkillMapping.ForSkills(0.8f, SkillType.Ranged) },
                 { "ranged", TokenSkillMapping.ForSkills(0.9f, SkillType.Ranged) },
                 { "bow", TokenSkillMapping.ForSkills(0.7f, SkillType.Ranged) },
+                { "bows", TokenSkillMapping.ForSkills(0.7f, SkillType.Ranged) },
+                { "arrow", TokenSkillMapping.ForSkills(0.7f, SkillType.Ranged) },
                 { "arrows", TokenSkillMapping.ForSkills(0.7f, SkillType.Ranged) },
+                { "rng", TokenSkillMapping.ForSkills(1.1f, SkillType.Ranged) },
+                { "archer", TokenSkillMapping.ForSkills(1f, SkillType.Ranged) },
+                { "archery", TokenSkillMapping.ForSkills(1f, SkillType.Ranged) },
                 { "attack", TokenSkillMapping.ForSkills(0.7f, SkillType.Attack) },
+                { "atk", TokenSkillMapping.ForSkills(1.2f, SkillType.Attack) },
+                { "att", TokenSkillMapping.ForSkills(1f, SkillType.Attack) },
+                { "melee", TokenSkillMapping.ForSkills(0.9f, SkillType.Attack) },
                 { "strength", TokenSkillMapping.ForSkills(0.7f, SkillType.Strength) },
+                { "str", TokenSkillMapping.ForSkills(1.2f, SkillType.Strength) },
+                { "strenght", TokenSkillMapping.ForSkills(0.9f, SkillType.Strength) },
+                { "muscle", TokenSkillMapping.ForSkills(0.8f, SkillType.Strength) },
+                { "power", TokenSkillMapping.ForSkills(0.7f, SkillType.Strength) },
                 { "defence", TokenSkillMapping.ForSkills(0.7f, SkillType.Defence) },
-                { "defense", TokenSkillMapping.ForSkills(0.7f, SkillType.Defence) }
+                { "defense", TokenSkillMapping.ForSkills(0.7f, SkillType.Defence) },
+                { "def", TokenSkillMapping.ForSkills(1.2f, SkillType.Defence) },
+                { "tank", TokenSkillMapping.ForSkills(0.8f, SkillType.Defence) },
+                { "armor", TokenSkillMapping.ForSkills(0.8f, SkillType.Defence) },
+                { "armour", TokenSkillMapping.ForSkills(0.8f, SkillType.Defence) },
+                { "hp", TokenSkillMapping.ForSkills(1.4f, SkillType.Hitpoints) },
+                { "hitpoint", TokenSkillMapping.ForSkills(1.3f, SkillType.Hitpoints) },
+                { "hitpoints", TokenSkillMapping.ForSkills(1.4f, SkillType.Hitpoints) },
+                { "health", TokenSkillMapping.ForSkills(1.2f, SkillType.Hitpoints) },
+                { "heals", TokenSkillMapping.ForSkills(0.8f, SkillType.Hitpoints) },
+                { "heart", TokenSkillMapping.ForSkills(0.8f, SkillType.Hitpoints) },
+                { "hearts", TokenSkillMapping.ForSkills(0.8f, SkillType.Hitpoints) },
+                { "life", TokenSkillMapping.ForSkills(0.7f, SkillType.Hitpoints) },
+                { "lifepoint", TokenSkillMapping.ForSkills(1.1f, SkillType.Hitpoints) },
+                { "lifepoints", TokenSkillMapping.ForSkills(1.2f, SkillType.Hitpoints) },
+                { "vitality", TokenSkillMapping.ForSkills(0.9f, SkillType.Hitpoints) },
+                { "beast", TokenSkillMapping.ForSkills(1.2f, SkillType.Beastmaster) },
+                { "beasts", TokenSkillMapping.ForSkills(1.2f, SkillType.Beastmaster) },
+                { "beastmaster", TokenSkillMapping.ForSkills(1.4f, SkillType.Beastmaster) },
+                { "beastmastery", TokenSkillMapping.ForSkills(1.2f, SkillType.Beastmaster) },
+                { "pet", TokenSkillMapping.ForSkills(1.1f, SkillType.Beastmaster) },
+                { "pets", TokenSkillMapping.ForSkills(1.1f, SkillType.Beastmaster) },
+                { "handler", TokenSkillMapping.ForSkills(0.9f, SkillType.Beastmaster) }
             };
 
         private readonly Queue<PendingResponse> pendingResponses = new Queue<PendingResponse>();
@@ -1001,6 +1060,21 @@ namespace Companions.Conversation
                             segments.Add(statusSegment);
                         break;
 
+                    case CompanionDialogueIntent.SkillLevelQuery:
+                        if (TryHandleSkillLevelQuery(
+                                parseResult,
+                                context,
+                                segments,
+                                followUps,
+                                playerName,
+                                companionMood,
+                                recentEvent))
+                        {
+                            statusSegment = string.Empty;
+                            skillResponseResolved = true;
+                        }
+                        break;
+
                     case CompanionDialogueIntent.Gratitude:
                         TryAddResponse(
                             CompanionDialogueIntent.Gratitude,
@@ -1174,6 +1248,86 @@ namespace Companions.Conversation
             }
         }
 
+        private bool TryHandleSkillLevelQuery(
+            CompanionDialogueParseResult parseResult,
+            CompanionResponseContext context,
+            List<string> segments,
+            List<string> followUps,
+            string playerName,
+            string companionMood,
+            string recentEvent)
+        {
+            if (parseResult.IsEmpty)
+                return false;
+
+            var skills = CompanionManager.CompanionSkills;
+            var analysis = AnalyseSkillLevelQuery(parseResult, lastPlayerMessage, skills);
+            var queryContext = context.WithSkillQuery(
+                analysis.Skill,
+                analysis.SkillDisplayName,
+                analysis.SkillSentenceName,
+                analysis.SkillLevel);
+
+            if (!responseLibrary.TrySelectResponse(
+                    CompanionDialogueIntent.SkillLevelQuery,
+                    queryContext,
+                    out var selection))
+            {
+                return false;
+            }
+
+            string primary = ApplySkillLevelTokens(
+                selection.PrimarySegment,
+                playerName,
+                companionMood,
+                recentEvent,
+                queryContext,
+                analysis);
+
+            if (string.IsNullOrWhiteSpace(primary))
+                return false;
+
+            segments.Add(primary);
+
+            AppendSkillLevelFollowUps(
+                selection.FollowUpSegments,
+                followUps,
+                playerName,
+                companionMood,
+                recentEvent,
+                queryContext,
+                analysis);
+
+            return true;
+        }
+
+        private void AppendSkillLevelFollowUps(
+            IReadOnlyList<string> followUpSegments,
+            List<string> collector,
+            string playerName,
+            string companionMood,
+            string recentEvent,
+            CompanionResponseContext context,
+            SkillLevelQueryResult analysis)
+        {
+            if (followUpSegments == null || collector == null || followUpSegments.Count == 0)
+                return;
+
+            for (int i = 0; i < followUpSegments.Count; i++)
+            {
+                string formatted = ApplySkillLevelTokens(
+                    followUpSegments[i],
+                    playerName,
+                    companionMood,
+                    recentEvent,
+                    context,
+                    analysis);
+
+                if (!string.IsNullOrWhiteSpace(formatted))
+                    collector.Add(formatted);
+            }
+        }
+
         private bool TryHandlePlayerSkillProposal(
             CompanionDialogueParseResult parseResult,
             CompanionResponseContext context,
@@ -1272,6 +1426,44 @@ namespace Companions.Conversation
                 sentenceName,
                 rawMessage,
                 parseResult.Tokens);
+        }
+
+        private SkillLevelQueryResult AnalyseSkillLevelQuery(
+            CompanionDialogueParseResult parseResult,
+            string rawMessage,
+            SkillManager companionSkills)
+        {
+            if (parseResult.UniqueTokens == null || parseResult.UniqueTokens.Count == 0)
+                return SkillLevelQueryResult.Empty;
+
+            var proposal = AnalyseSkillProposal(parseResult, rawMessage ?? string.Empty);
+            if (!proposal.HasProposal)
+                return SkillLevelQueryResult.Empty;
+
+            SkillType? skill = proposal.HasConcreteSkill ? proposal.Skill : (SkillType?)null;
+            string displayName = proposal.HasDisplayName
+                ? proposal.SkillDisplayName
+                : (skill.HasValue ? SkillNameUtility.GetDisplayName(skill.Value) : string.Empty);
+            string sentenceName = !string.IsNullOrWhiteSpace(proposal.SkillSentenceName)
+                ? proposal.SkillSentenceName
+                : (skill.HasValue
+                    ? SkillNameUtility.GetSentenceName(skill.Value)
+                    : (!string.IsNullOrWhiteSpace(displayName) ? displayName.ToLowerInvariant() : string.Empty));
+
+            int? level = null;
+            if (companionSkills != null && skill.HasValue)
+            {
+                try
+                {
+                    level = Mathf.Max(0, companionSkills.GetLevel(skill.Value));
+                }
+                catch (Exception)
+                {
+                    level = null;
+                }
+            }
+
+            return new SkillLevelQueryResult(skill, displayName, sentenceName, level);
         }
 
         private ToolAvailabilityResult EvaluateToolAvailability(SkillProposalAnalysis analysis)
@@ -2109,6 +2301,49 @@ namespace Companions.Conversation
             return CompactWhitespace(result);
         }
 
+        private string ApplySkillLevelTokens(
+            string template,
+            string playerName,
+            string companionMood,
+            string recentEvent,
+            CompanionResponseContext context,
+            SkillLevelQueryResult analysis)
+        {
+            string formatted = FormatTemplate(template, playerName, companionMood, recentEvent, context);
+            if (string.IsNullOrWhiteSpace(formatted))
+                return string.Empty;
+
+            string displayName = !string.IsNullOrWhiteSpace(analysis.SkillDisplayName)
+                ? analysis.SkillDisplayName
+                : (analysis.Skill.HasValue
+                    ? SkillNameUtility.GetDisplayName(analysis.Skill.Value)
+                    : string.Empty);
+            string sentenceName = !string.IsNullOrWhiteSpace(analysis.SkillSentenceName)
+                ? analysis.SkillSentenceName
+                : (analysis.Skill.HasValue
+                    ? SkillNameUtility.GetSentenceName(analysis.Skill.Value)
+                    : (!string.IsNullOrWhiteSpace(displayName)
+                        ? displayName.ToLowerInvariant()
+                        : string.Empty));
+
+            string safeDisplay = string.IsNullOrWhiteSpace(displayName) ? "that skill" : displayName;
+            string safeSentence = string.IsNullOrWhiteSpace(sentenceName)
+                ? safeDisplay.ToLowerInvariant()
+                : sentenceName;
+            string levelText = analysis.SkillLevel.HasValue
+                ? analysis.SkillLevel.Value.ToString(CultureInfo.InvariantCulture)
+                : string.Empty;
+            string levelOrUnknown = analysis.SkillLevel.HasValue ? levelText : "unknown";
+
+            formatted = formatted
+                .Replace("{skillName}", safeDisplay)
+                .Replace("{skillSentence}", safeSentence)
+                .Replace("{skillLevel}", levelText)
+                .Replace("{skillLevelOrUnknown}", levelOrUnknown);
+
+            return CompactWhitespace(formatted);
+        }
+
         private static string AppendSentence(string source, string sentence)
         {
             if (string.IsNullOrWhiteSpace(sentence))
@@ -2300,6 +2535,41 @@ namespace Companions.Conversation
             }
 
             return Mathf.Max(0f, defaultValue);
+        }
+
+        private readonly struct SkillLevelQueryResult
+        {
+            public static SkillLevelQueryResult Empty => new SkillLevelQueryResult(
+                null,
+                string.Empty,
+                string.Empty,
+                null);
+
+            public SkillLevelQueryResult(
+                SkillType? skill,
+                string skillDisplayName,
+                string skillSentenceName,
+                int? skillLevel)
+            {
+                Skill = skill;
+                SkillDisplayName = skillDisplayName ?? string.Empty;
+                SkillSentenceName = skillSentenceName ?? string.Empty;
+                SkillLevel = skillLevel;
+            }
+
+            public SkillType? Skill { get; }
+
+            public string SkillDisplayName { get; }
+
+            public string SkillSentenceName { get; }
+
+            public int? SkillLevel { get; }
+
+            public bool HasSkill => Skill.HasValue;
+
+            public bool HasSkillLevel => SkillLevel.HasValue;
+
+            public bool HasSkillName => !string.IsNullOrWhiteSpace(SkillDisplayName) || !string.IsNullOrWhiteSpace(SkillSentenceName);
         }
 
         private readonly struct SkillProposalAnalysis
