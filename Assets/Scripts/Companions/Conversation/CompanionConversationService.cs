@@ -1667,6 +1667,9 @@ namespace Companions.Conversation
 
                 conversationMemory.RegisterEvent(summary, CompanionEventType.Gathering, metadata);
             }
+
+            if (analysis.Skill.HasValue && IsCombatSkill(analysis.Skill.Value))
+                CompanionSkillCooldownTimers.ClearCombatDeclineCooldown(CompanionManager.CompanionSkillCooldowns);
         }
 
         /// <summary>
@@ -1687,15 +1690,19 @@ namespace Companions.Conversation
                 ? analysis.SkillDisplayName
                 : SkillNameUtility.GetDisplayName(analysis.Skill.Value);
 
+            bool declinedCombat = IsCombatSkill(analysis.Skill.Value);
+
             var replacements = new Dictionary<string, string>
             {
                 { "playerName", safePlayerName },
                 { "skillName", skillDisplay }
             };
 
-            string primary = ApplyProposalTokens(
-                ChooseRandom(CompanionSkillProposalDialogueBlocks.PlayerSkillProposalDeclineSegments),
-                replacements);
+            var declinePool = declinedCombat
+                ? CompanionSkillProposalDialogueBlocks.PlayerCombatSkillProposalDeclineSegments
+                : CompanionSkillProposalDialogueBlocks.PlayerSkillProposalDeclineSegments;
+
+            string primary = ApplyProposalTokens(ChooseRandom(declinePool), replacements);
 
             if (!string.IsNullOrWhiteSpace(primary))
                 segments.Add(primary);
@@ -1705,7 +1712,14 @@ namespace Companions.Conversation
             if (analysis.Skill == SkillType.Mining)
                 CompanionSkillCooldownTimers.StartMiningCooldown(CompanionManager.CompanionSkillCooldowns);
 
-            TryAppendDeclineSuggestion(followUps, analysis, safePlayerName, context);
+            if (declinedCombat)
+            {
+                CompanionSkillCooldownTimers.StartCombatDeclineCooldown(
+                    analysis.Skill.Value,
+                    CompanionManager.CompanionSkillCooldowns);
+            }
+
+            TryAppendDeclineSuggestion(followUps, analysis, safePlayerName, context, declinedCombat);
         }
 
         /// <summary>
@@ -1715,7 +1729,8 @@ namespace Companions.Conversation
             List<string> followUps,
             SkillProposalAnalysis declinedAnalysis,
             string safePlayerName,
-            CompanionResponseContext context)
+            CompanionResponseContext context,
+            bool excludeCombatSkills)
         {
             if (followUps == null)
                 return;
@@ -1723,7 +1738,10 @@ namespace Companions.Conversation
             if (UnityEngine.Random.value > SkillProposalDeclineSuggestionChance)
                 return;
 
-            string suggestionName = ResolveDeclineSuggestionSkillName(declinedAnalysis, context);
+            string suggestionName = ResolveDeclineSuggestionSkillName(
+                declinedAnalysis,
+                context,
+                excludeCombatSkills);
             if (string.IsNullOrWhiteSpace(suggestionName))
                 return;
 
@@ -1747,17 +1765,21 @@ namespace Companions.Conversation
         /// </summary>
         private string ResolveDeclineSuggestionSkillName(
             SkillProposalAnalysis declinedAnalysis,
-            CompanionResponseContext context)
+            CompanionResponseContext context,
+            bool excludeCombatSkills)
         {
             if (context.HasSuggestedSkill &&
                 (!declinedAnalysis.HasConcreteSkill || context.SuggestedSkill.Value != declinedAnalysis.Skill.Value))
             {
-                string contextName = !string.IsNullOrWhiteSpace(context.SuggestedSkillName)
-                    ? context.SuggestedSkillName
-                    : SkillNameUtility.GetDisplayName(context.SuggestedSkill.Value);
+                if (!excludeCombatSkills || !IsCombatSkill(context.SuggestedSkill.Value))
+                {
+                    string contextName = !string.IsNullOrWhiteSpace(context.SuggestedSkillName)
+                        ? context.SuggestedSkillName
+                        : SkillNameUtility.GetDisplayName(context.SuggestedSkill.Value);
 
-                if (!string.IsNullOrWhiteSpace(contextName))
-                    return contextName;
+                    if (!string.IsNullOrWhiteSpace(contextName))
+                        return contextName;
+                }
             }
 
             DateTime nowUtc = context.RequestTimeUtc.Kind == DateTimeKind.Utc && context.RequestTimeUtc != default
@@ -1769,6 +1791,9 @@ namespace Companions.Conversation
             {
                 if (candidate.HasSkill)
                 {
+                    if (excludeCombatSkills && candidate.Skill.HasValue && IsCombatSkill(candidate.Skill.Value))
+                        goto ResolveFallbackSkill;
+
                     if (!string.IsNullOrWhiteSpace(candidate.SkillName))
                         return candidate.SkillName;
 
@@ -1776,14 +1801,15 @@ namespace Companions.Conversation
                 }
             }
 
-            SkillType? fallback = ChooseAlternateSkill(excludedSkill);
+        ResolveFallbackSkill:
+            SkillType? fallback = ChooseAlternateSkill(excludedSkill, excludeCombatSkills);
             return fallback.HasValue ? SkillNameUtility.GetDisplayName(fallback.Value) : string.Empty;
         }
 
         /// <summary>
         /// Chooses a random skill other than the one that was declined so the companion can pivot naturally.
         /// </summary>
-        private static SkillType? ChooseAlternateSkill(SkillType? excludedSkill)
+        private static SkillType? ChooseAlternateSkill(SkillType? excludedSkill, bool excludeCombatSkills)
         {
             var values = (SkillType[])Enum.GetValues(typeof(SkillType));
             if (values == null || values.Length == 0)
@@ -1794,6 +1820,9 @@ namespace Companions.Conversation
             {
                 SkillType candidate = values[i];
                 if (excludedSkill.HasValue && candidate == excludedSkill.Value)
+                    continue;
+
+                if (excludeCombatSkills && IsCombatSkill(candidate))
                     continue;
 
                 available.Add(candidate);
@@ -1924,6 +1953,25 @@ namespace Companions.Conversation
                     return "train the beasts";
                 default:
                     return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the supplied skill is considered part of the combat suite.
+        /// </summary>
+        private static bool IsCombatSkill(SkillType skill)
+        {
+            switch (skill)
+            {
+                case SkillType.Hitpoints:
+                case SkillType.Attack:
+                case SkillType.Strength:
+                case SkillType.Ranged:
+                case SkillType.Defence:
+                case SkillType.Magic:
+                    return true;
+                default:
+                    return false;
             }
         }
 

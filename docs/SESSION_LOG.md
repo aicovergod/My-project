@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c05f8a6f3f4aac170c6c6a9c1a0f0d09152e7bbb -->
+## 2025-10-24T12:33:49+01:00 — Add combat decline cooldown and dialogue variants
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionSkillProposalDialogueBlocks.cs
+- Diff: 236 ++ / 14 --
+- Notes:
+  —
+---
 <!-- commit:e3d83f27359e1d4537cba94d9f716d56202d8114 -->
 ## 2025-10-24T12:22:21+01:00 — Merge pull request #1367 from aicovergod/codex/restrict-f1,-f2,-f4-menus-to-developers
 

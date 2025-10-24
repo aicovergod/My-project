@@ -104,6 +104,30 @@ namespace Companions.Conversation
             "Eh, not really feeling it. Maybe later."
         };
 
+        private static readonly string[] playerCombatSkillProposalDeclineSegments =
+        {
+            "I don't fancy any combat training right now.",
+            "I don't feel like combat training.",
+            "I don't want to train any combat, sorry {playerName}.",
+            "I don't want to train any combat.",
+            "Sorry {playerName}, I'm not really up for any combat atm.",
+            "Nah, I'll pass for now.",
+            "No thanks, not feeling any combat atm tbh.",
+            "Not in the mood for combat right now.",
+            "I’d rather not fight right now.",
+            "Think I’ll skip combat for now.",
+            "No thanks, not really feeling it.",
+            "Not today, {playerName}.",
+            "Maybe later, just not feeling combat atm.",
+            "Nah, not doing any combat right now.",
+            "I’m fine sitting out for a bit.",
+            "Not really in the mood to fight, to be honest.",
+            "Can we skip combat for now?",
+            "Nope, not training combat today.",
+            "Sorry, just not in the mood for fighting.",
+            "I’ll pass on combat for now, thanks."
+        };
+
         private static readonly string[] playerSkillProposalDeclineSuggestionSegments =
         {
             "I wouldn't mind training {suggestedSkillName} though.",
@@ -218,6 +242,11 @@ namespace Companions.Conversation
         /// Primary responses used when the companion declines the player's training request.
         /// </summary>
         internal static string[] PlayerSkillProposalDeclineSegments => playerSkillProposalDeclineSegments;
+
+        /// <summary>
+        /// Primary responses used when the companion declines a combat training request.
+        /// </summary>
+        internal static string[] PlayerCombatSkillProposalDeclineSegments => playerCombatSkillProposalDeclineSegments;
 
         /// <summary>
         /// Follow-up suggestions the companion may offer after declining.
