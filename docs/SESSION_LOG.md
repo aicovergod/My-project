@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ee1ac9839aa7080633311c5f35c11a96dc30fef8 -->
+## 2025-10-24T12:34:17+01:00 — Merge pull request #1368 from aicovergod/codex/implement-companion-combat-skill-decline-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 245 ++ / 14 --
+- Notes:
+  Implement combat decline cooldown and tailored companion dialogue
+---
+<!-- commit:76bcd463b70f4f964ec12ae6dfd64a246b41b16f -->
+## 2025-10-24T12:34:08+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c05f8a6f3f4aac170c6c6a9c1a0f0d09152e7bbb -->
 ## 2025-10-24T12:33:49+01:00 — Add combat decline cooldown and dialogue variants
 
