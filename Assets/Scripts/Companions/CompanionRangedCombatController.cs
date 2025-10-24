@@ -308,8 +308,9 @@ namespace Companions
             cooldownTicks = attackCooldownTicks;
 
             bool consumeAmmo = ammoConsumptionMultiplier > 0f && (ammo == null || !ammo.infinite);
+            EquipmentSlot ammoSlot = ResolveAmmoSlot(currentWeapon);
             int remaining = currentAmmoCount;
-            if (consumeAmmo && !ConsumeAmmo(currentWeapon, ammo, out remaining))
+            if (consumeAmmo && !ConsumeAmmo(ammoSlot, out remaining))
             {
                 HandleNoAmmo();
                 return false;
@@ -319,6 +320,8 @@ namespace Companions
             {
                 context.ammoConsumed = true;
                 currentAmmoCount = remaining;
+                if (currentAmmoCount > initialAmmoCount)
+                    initialAmmoCount = currentAmmoCount;
                 UpdateAmmoUi();
             }
 
@@ -491,7 +494,8 @@ namespace Companions
 
         private void HandleEquipmentSlotChanged(EquipmentSlot slot, InventoryEntry entry)
         {
-            RefreshEquipmentState(true);
+            bool force = slot == EquipmentSlot.Weapon;
+            RefreshEquipmentState(force);
         }
 
         private void RefreshEquipmentState(bool force)
@@ -558,6 +562,8 @@ namespace Companions
             }
 
             currentAmmoCount = ammoEntry.count;
+            if (currentAmmoCount > initialAmmoCount)
+                initialAmmoCount = currentAmmoCount;
             UpdateAmmoUi();
         }
 
@@ -583,16 +589,25 @@ namespace Companions
             }
         }
 
-        private bool ConsumeAmmo(RangedWeaponData weapon, AmmunitionData ammo, out int remaining)
+        private EquipmentSlot ResolveAmmoSlot(RangedWeaponData weapon)
+        {
+            return weapon != null && weapon.consumesWeaponStack
+                ? EquipmentSlot.Weapon
+                : EquipmentSlot.Arrow;
+        }
+
+        private bool ConsumeAmmo(EquipmentSlot slot, out int remaining)
         {
             remaining = currentAmmoCount;
             if (equipment == null)
                 return false;
 
-            EquipmentSlot slot = weapon != null && weapon.consumesWeaponStack
-                ? EquipmentSlot.Weapon
-                : EquipmentSlot.Arrow;
-            return equipment.ConsumeEquipped(slot, AmmoPerShot, out remaining);
+            if (!equipment.ConsumeEquipped(slot, AmmoPerShot, out remaining))
+                return false;
+
+            // Re-query the equipped stack to ensure the local cache mirrors the actual equipment state.
+            remaining = equipment.GetEquipped(slot).count;
+            return true;
         }
 
         private void TryHandleMissingAmmoRestriction(RangedWeaponData weapon, AmmunitionData ammo)
