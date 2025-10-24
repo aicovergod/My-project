@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:be3614edf9289426ed183789a3fd0bcbec2fc849 -->
+## 2025-10-24T12:50:47+01:00 — Merge pull request #1369 from aicovergod/codex/add-skill-cooldown-checks-and-tests
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 145 ++ / 1 --
+- Notes:
+  Prevent proactive companion prompts during skill cooldowns
+---
+<!-- commit:fb9cd5fb8e835efd457b481716873503a53a464e -->
+## 2025-10-24T12:50:29+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6581059848c7f5887b95304cde0f997a77fb98b9 -->
 ## 2025-10-24T12:50:11+01:00 — Guard proactive companion prompts during cooldowns
 
