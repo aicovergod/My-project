@@ -1001,6 +1001,7 @@ namespace Companions.Conversation
                 return;
 
             var parseResult = parser.Parse(cleaned);
+            parseResult = CompanionIntentDisambiguator.PruneContradictoryIntents(parseResult);
             if (parseResult.IsEmpty)
             {
                 if (ShouldTraceRules)
