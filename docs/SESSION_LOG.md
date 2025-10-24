@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:97309c70a8532bc003f001671c568ab7e9f4a9a8 -->
+## 2025-10-24T12:58:53+01:00 — Lock companion guard mode during combat cooldown
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Player/Commands/ClearCompanionCooldownTimersCommand.cs
+- Diff: 121 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:be3614edf9289426ed183789a3fd0bcbec2fc849 -->
 ## 2025-10-24T12:50:47+01:00 — Merge pull request #1369 from aicovergod/codex/add-skill-cooldown-checks-and-tests
 

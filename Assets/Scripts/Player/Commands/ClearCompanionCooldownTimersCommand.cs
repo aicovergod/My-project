@@ -42,6 +42,8 @@ namespace Player.Commands
                 return PlayerCommandResult.Success("Companion has no active skill cooldown timers.");
             }
 
+            CompanionManager.HandleCombatDeclineCooldownCleared();
+
             string message = clearedCount == 1
                 ? "Cleared 1 companion skill cooldown timer."
                 : $"Cleared {clearedCount} companion skill cooldown timers.";

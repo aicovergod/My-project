@@ -112,13 +112,36 @@ namespace Companions
             SkillType requestedSkill,
             CompanionSkillCooldownTracker tracker)
         {
-            if (tracker == null || !IsCombatSkill(requestedSkill))
+            if (!IsCombatSkill(requestedSkill))
+                return false;
+
+            return IsCombatDeclineCooldownActive(tracker, publishMessage: true);
+        }
+
+        /// <summary>
+        /// Determines whether the shared combat-decline cooldown is still active, optionally
+        /// publishing a companion chat line that references the remaining time.
+        /// </summary>
+        /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
+        /// <param name="publishMessage">
+        ///     When <c>true</c> a flavour line sourced from
+        ///     <see cref="CompanionChatLibrary.GetRandomCombatDeclineCooldownLine"/> is sent to the
+        ///     chat service.
+        /// </param>
+        /// <returns><c>true</c> when the cooldown is still counting down.</returns>
+        public static bool IsCombatDeclineCooldownActive(
+            CompanionSkillCooldownTracker tracker,
+            bool publishMessage)
+        {
+            if (tracker == null)
                 return false;
 
             if (!tracker.TryGetRemaining(CombatCooldownStorageKey, out var remaining) || remaining <= TimeSpan.Zero)
                 return false;
 
-            PublishCombatCooldownMessage(remaining);
+            if (publishMessage)
+                PublishCombatCooldownMessage(remaining);
+
             return true;
         }
 
@@ -135,6 +158,7 @@ namespace Companions
                 return;
 
             tracker.StartCooldown(CombatCooldownStorageKey, CombatDeclineCooldownDuration);
+            CompanionManager.HandleCombatDeclineCooldownStarted();
         }
 
         /// <summary>
@@ -144,6 +168,7 @@ namespace Companions
         public static void ClearCombatDeclineCooldown(CompanionSkillCooldownTracker tracker)
         {
             tracker?.ClearCooldown(CombatCooldownStorageKey);
+            CompanionManager.HandleCombatDeclineCooldownCleared();
         }
 
         /// <summary>
