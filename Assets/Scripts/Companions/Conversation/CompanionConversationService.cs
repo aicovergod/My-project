@@ -229,6 +229,8 @@ namespace Companions.Conversation
 
         private const int MaxTrackedSkillActions = 6;
         private const int MaxSkillQuestionCandidates = 6;
+        /// <summary>Storage key mirrored from <see cref="CompanionSkillCooldownTimers"/> for combat decline timers.</summary>
+        private const SkillType CombatDeclineCooldownStorageKey = SkillType.Hitpoints;
         private static readonly TimeSpan SkillActionRetention = TimeSpan.FromMinutes(15);
         private static readonly TimeSpan CompanionCombatActivityWindow = TimeSpan.FromSeconds(5);
         private const float SkillProposalFollowUpChance = 0.65f;
@@ -771,8 +773,12 @@ namespace Companions.Conversation
             if (idleTickCounter < Mathf.Max(1, proactiveIdleTickThreshold))
                 return;
 
-            if (!TryGetBestSkillCandidate(nowUtc, out var candidate))
+            bool blockedByCooldown;
+            if (!TryGetBestSkillCandidate(nowUtc, out var candidate, (SkillType?)null, out blockedByCooldown))
             {
+                if (blockedByCooldown)
+                    return;
+
                 if (!TryBuildFallbackSkillCandidate(nowUtc, out candidate))
                     return;
             }
@@ -783,8 +789,21 @@ namespace Companions.Conversation
 
         private bool TryGetBestSkillCandidate(DateTime nowUtc, out SkillQuestionCandidate candidate, SkillType? excludeSkill = null)
         {
+            return TryGetBestSkillCandidate(nowUtc, out candidate, excludeSkill, out _);
+        }
+
+        /// <summary>
+        /// Attempts to retrieve the freshest skill candidate, reporting whether any entries were skipped due to cooldowns.
+        /// </summary>
+        private bool TryGetBestSkillCandidate(
+            DateTime nowUtc,
+            out SkillQuestionCandidate candidate,
+            SkillType? excludeSkill,
+            out bool blockedByCooldown)
+        {
             PruneSkillQuestionCandidates(nowUtc);
 
+            blockedByCooldown = false;
             var node = skillQuestionCandidates.First;
             TimeSpan freshnessWindow = TimeSpan.FromMinutes(Mathf.Max(0.1f, minimumSkillEventFreshnessMinutes));
             while (node != null)
@@ -793,6 +812,13 @@ namespace Companions.Conversation
                 SkillQuestionCandidate value = node.Value;
                 if (excludeSkill.HasValue && value.Skill.HasValue && value.Skill.Value == excludeSkill.Value)
                 {
+                    node = next;
+                    continue;
+                }
+
+                if (value.Skill.HasValue && IsSkillUnderDeclineCooldown(value.Skill.Value))
+                {
+                    blockedByCooldown = true;
                     node = next;
                     continue;
                 }
@@ -829,6 +855,27 @@ namespace Companions.Conversation
 
             candidate = default;
             return false;
+        }
+
+        /// <summary>
+        /// Determines whether the supplied skill is currently throttled by a decline cooldown.
+        /// </summary>
+        private static bool IsSkillUnderDeclineCooldown(SkillType skill)
+        {
+            var tracker = CompanionManager.CompanionSkillCooldowns;
+            if (tracker == null)
+                return false;
+
+            if (skill == SkillType.Mining)
+            {
+                return tracker.TryGetRemaining(SkillType.Mining, out var remaining) && remaining > TimeSpan.Zero;
+            }
+
+            if (!IsCombatSkill(skill))
+                return false;
+
+            return tracker.TryGetRemaining(CombatDeclineCooldownStorageKey, out var combatRemaining) &&
+                   combatRemaining > TimeSpan.Zero;
         }
 
         private void ScheduleSkillQuestion(SkillQuestionCandidate candidate, DateTime nowUtc)
