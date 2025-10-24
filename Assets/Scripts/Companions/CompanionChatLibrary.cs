@@ -493,6 +493,29 @@ namespace Companions
         /// <summary>Fallback message returned when the mining decline cooldown pool is empty.</summary>
         private const string MiningDeclineCooldownFallbackLine = "Still on my mining cooldown. Try again later.";
 
+        /// <summary>Pool of chat lines used when the companion refuses combat due to an active cooldown.</summary>
+        private static readonly string[] CombatDeclineCooldownChatMessages =
+        {
+            "I said no combat for a few minutes, remember?",
+            "Still catching my breath, give me {minutes} before we fight again.",
+            "Not ready to swing at anything yet, {playerName}.",
+            "I’m off combat duty until that timer runs out.",
+            "Let me rest for {minutes} and we’ll talk blades after.",
+            "Easy there—combat cooldown’s still ticking.",
+            "Not sparring again until the {minutes} are up.",
+            "Hold onto that energy, I’m staying out of fights for now.",
+            "I made it clear: no combat for a bit.",
+            "Still in cool-down mode. Check back in {minutes}.",
+            "I’ll jump back into the fray once those {minutes} pass.",
+            "I promised myself a combat break. Timer’s not done yet.",
+            "Give me a breather, I’ll fight after this cooldown.",
+            "You’re keen, but my combat timer disagrees.",
+            "Nope, combat’s on pause and I’m keeping it that way for {minutes}."
+        };
+
+        /// <summary>Fallback message returned when the combat decline cooldown pool is empty.</summary>
+        private const string CombatDeclineCooldownFallbackLine = "Combat’s on pause—ask again in a few minutes.";
+
         /// <summary>Pool of chat lines used when the player dies while a companion is active.</summary>
         private static readonly string[] PlayerDeathChatMessages =
         {
@@ -5504,6 +5527,28 @@ namespace Companions
             string template = GetRandomLine(MiningDeclineCooldownChatMessages, MiningDeclineCooldownFallbackLine);
             if (string.IsNullOrWhiteSpace(template))
                 template = MiningDeclineCooldownFallbackLine;
+
+            string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName.Trim();
+            int clampedMinutes = Mathf.Max(1, minutes);
+            string minutesText = clampedMinutes == 1
+                ? "1 minute"
+                : string.Format(CultureInfo.InvariantCulture, "{0} minutes", clampedMinutes);
+
+            string resolved = template.Replace("{playerName}", safePlayerName);
+            resolved = resolved.Replace("{minutes}", minutesText);
+            return resolved;
+        }
+
+        /// <summary>
+        /// Returns a random chat line when the companion refuses combat due to an active cooldown.
+        /// </summary>
+        /// <param name="playerName">Name of the active player used for placeholder replacement.</param>
+        /// <param name="minutes">Remaining cooldown length expressed in whole minutes.</param>
+        public static string GetRandomCombatDeclineCooldownLine(string playerName, int minutes)
+        {
+            string template = GetRandomLine(CombatDeclineCooldownChatMessages, CombatDeclineCooldownFallbackLine);
+            if (string.IsNullOrWhiteSpace(template))
+                template = CombatDeclineCooldownFallbackLine;
 
             string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName.Trim();
             int clampedMinutes = Mathf.Max(1, minutes);
