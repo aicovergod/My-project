@@ -48,6 +48,24 @@ namespace Tests.Companions
         }
 
         [Test]
+        public void GreetingDoesNotRegisterAsComplimentWhenUsingTimeOfDay()
+        {
+            var result = parser.Parse("good morning isla im back");
+            Assert.IsTrue(result.Matches.Any(m => m.Intent == CompanionDialogueIntent.Greeting),
+                "Expected greeting intent when using a time-of-day salutation.");
+            Assert.IsFalse(result.Matches.Any(m => m.Intent == CompanionDialogueIntent.Compliment),
+                "Time-of-day greeting should not register as a compliment.");
+        }
+
+        [Test]
+        public void ParserStillDetectsComplimentAfterPraiseBucketSplit()
+        {
+            var result = parser.Parse("awesome job helping me");
+            Assert.IsTrue(result.Matches.Any(m => m.Intent == CompanionDialogueIntent.Compliment),
+                "Expected compliment intent for a strong praise phrase.");
+        }
+
+        [Test]
         public void ResponseCatalogIncludesProactiveSkillTemplates()
         {
             CompanionResponseCatalog.EnsureDefaults();
