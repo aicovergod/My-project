@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:566327737b002d4d81c0f7c295a1289eba549ff0 -->
+## 2025-10-24T01:18:54+01:00 — Merge pull request #1362 from aicovergod/codex/add-skilllevelquery-functionality
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 419 ++ / 6 --
+- Notes:
+  Add companion skill level query handling
+---
+<!-- commit:d3bc184ef647a297d4476b32a03c6c9ecffb1f63 -->
+## 2025-10-24T01:18:43+01:00 — Add companion skill level query handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs, Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs, Assets/Scripts/Companions/Conversation/CompanionResponseContext.cs
+- Diff: 419 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:35887bcdff7c69cb9ba86d15cd183417d20f1945 -->
 ## 2025-10-24T00:54:56+01:00 — Merge pull request #1361 from aicovergod/codex/update-companionconversationservice-for-skill-responses
 
