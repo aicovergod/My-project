@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:17a3812a52e600724020aa96d14fd2652358ba6f -->
+## 2025-10-24T17:31:04+01:00 — Merge pull request #1379 from aicovergod/codex/refactor-combat-stats-and-attack-speed-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 278 ++ / 30 --
+- Notes:
+  Improve companion weapon style handling
+---
+<!-- commit:006e0cdfb70fcd8fbbdde3117aad6851d825b00b -->
+## 2025-10-24T17:30:43+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:8d1a6ef95f766d5d8e8073ce39f97ee05d4a6a55 -->
 ## 2025-10-24T17:30:22+01:00 — Improve companion attack speed and range handling
 
