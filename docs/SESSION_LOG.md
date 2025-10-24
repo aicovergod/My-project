@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c410b14d7448cd3112418baff370e702ba574dc7 -->
+## 2025-10-24T11:26:11+01:00 — Adjust skill proposal decline ordering
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 11 ++ / 11 --
+- Notes:
+  —
+---
 <!-- commit:1074f67ea305c1c7926da400fef77651f5f3306e -->
 ## 2025-10-24T11:12:02+01:00 — stuff
 
