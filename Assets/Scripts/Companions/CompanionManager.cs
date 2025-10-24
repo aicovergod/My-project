@@ -143,6 +143,10 @@ namespace Companions
         /// <summary>Exposes the spawned companion object for systems that need the instance handle.</summary>
         public static GameObject CompanionObject => companionObject;
 
+        /// <summary>Provides access to the cooldown tracker used for throttling companion skill commands.</summary>
+        public static CompanionSkillCooldownTracker CompanionSkillCooldowns =>
+            controller != null ? controller.SkillCooldowns : null;
+
         /// <summary>Ensures the companion spawns after each scene load so it persists across gameplay sessions.</summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AutoInitialise()
@@ -967,6 +971,12 @@ namespace Companions
                 return false;
             }
 
+            if (CompanionSkillCooldownTimers.ShouldDeclineMiningRequest(controller.SkillCooldowns, out var cooldownResult))
+            {
+                Debug.LogWarning($"[Companion] Mining command outcome: accepted=False (result={cooldownResult}).");
+                return false;
+            }
+
             bool accepted = controller.MiningController.TryCommandMine(rock, out var result);
             if (!accepted && result == CompanionMiningCommandResult.InventoryFull)
                 accepted = true;
@@ -1032,6 +1042,12 @@ namespace Companions
                 rejectionReason = "The companion is not currently active.";
                 failureReason = CompanionMiningCommandResult.RequirementsNotMet;
                 Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={radius}, reason={rejectionReason}");
+                return false;
+            }
+
+            if (CompanionSkillCooldownTimers.ShouldDeclineMiningRequest(controller.SkillCooldowns, out failureReason))
+            {
+                Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={radius}, reason=Cooldown active.");
                 return false;
             }
 
