@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d3bc8258fb95206cacdbaebd5c387bdba39a3f50 -->
+## 2025-10-24T16:42:22+01:00 — Refactor companion suggestion dialogue into dedicated blocks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionSuggestionDialogueBlocks.cs
+- Diff: 121 ++ / 47 --
+- Notes:
+  —
+---
 <!-- commit:61f6411e2b2d5d2fa56e3b517e5a49048b50b1a2 -->
 ## 2025-10-24T16:19:41+01:00 — dialogue updates
 
