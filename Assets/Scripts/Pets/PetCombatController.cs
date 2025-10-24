@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Combat;
+using Combat.Ranged;
 using EquipmentSystem;
 using NPC;
 using Skills;
@@ -52,6 +53,17 @@ namespace Pets
         private float nextAttackTime;
         private CompanionController companionController;
         private CompanionEquipment subscribedEquipment;
+        private CompanionCombatBridge companionCombatBridge;
+
+        private const float TileSize = 1f;
+        private const float HalberdExtraRangeTiles = 1f;
+        private const float DefaultRangedRangeTiles = 5f;
+        private const string RangedWeaponResourcePath = "Combat/Ranged/Weapons";
+        private const string AmmunitionResourcePath = "Combat/Ranged/Ammunition";
+
+        private static readonly Dictionary<string, RangedWeaponData> RangedWeaponCache = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, AmmunitionData> AmmunitionCache = new(StringComparer.OrdinalIgnoreCase);
+        private static bool rangedCachesLoaded;
 
         /// <summary>
         /// Tracks the most recent non-zero chase velocity so the sprite animator can
@@ -110,6 +122,7 @@ namespace Pets
             }
 
             companionController = GetComponent<CompanionController>();
+            companionCombatBridge = GetComponent<CompanionCombatBridge>();
 
             hitSplatLibrary = HitSplatLibraryResolver.Resolve(hitSplatLibrary);
 
@@ -177,6 +190,14 @@ namespace Pets
                 previousTargetPosition = currentTargetPosition;
                 hasPreviousTargetPosition = true;
 
+                var attackerStats = BuildAttackerStats(out var ownerTransform, out int beastmasterLevel, out ItemData equippedWeapon);
+                int attackSpeedTicks = Mathf.Max(1, attackerStats.Equip.attackSpeedTicks);
+                float effectiveRange = ResolveEffectiveRange(attackerStats, equippedWeapon);
+                float disengageDistance = Mathf.Max(CombatMath.MELEE_RANGE * 5f, effectiveRange * 5f);
+                float stopDistance = Mathf.Clamp(effectiveRange - CombatMath.MELEE_RANGE * 0.25f, CombatMath.MELEE_RANGE * 0.5f, effectiveRange);
+                float replanDistance = Mathf.Max(CombatMath.MELEE_RANGE * 0.75f, effectiveRange * 0.75f);
+                float teleportDistance = Mathf.Max(CombatMath.MELEE_RANGE * 6f, effectiveRange * 6f);
+
                 Vector2 movementVelocity = Vector2.zero;
                 bool hasChaseVelocity = false;
                 Vector2 visualVelocity;
@@ -191,11 +212,11 @@ namespace Pets
                     navigationStepTaken = pathMover.TryStepAttack(
                         navDeltaTime,
                         moveSpeed,
-                        CombatMath.MELEE_RANGE * 0.5f,
+                        stopDistance,
                         0.1f,
                         ResolveAttackTargetPosition,
-                        CombatMath.MELEE_RANGE * 0.75f,
-                        CombatMath.MELEE_RANGE * 6f,
+                        replanDistance,
+                        teleportDistance,
                         out nextPosition,
                         out navVelocity,
                         out teleported,
@@ -279,7 +300,7 @@ namespace Pets
                     : Vector2.zero;
 
                 float dist = Vector2.Distance(transform.position, currentTarget.transform.position);
-                if (dist <= CombatMath.MELEE_RANGE)
+                if (dist <= effectiveRange)
                 {
                     if (Time.time < nextAttackTime)
                     {
@@ -298,7 +319,7 @@ namespace Pets
                     }
 
                     ApplyVisualVelocity(visualVelocity);
-                    ResolveAttack(currentTarget);
+                    ResolveAttack(currentTarget, attackerStats, ownerTransform, beastmasterLevel);
 
                     // Reset any residual velocity so the pet remains parked next to the target while waiting for the next swing.
                     movementVelocity = Vector2.zero;
@@ -308,13 +329,15 @@ namespace Pets
                         petRigidbody.linearVelocity = Vector2.zero;
 
                     ApplyVisualVelocity(visualVelocity);
-                    nextAttackTime = Time.time + definition.attackSpeedTicks * CombatMath.TICK_SECONDS;
-                    int waitTicks = definition.attackSpeedTicks;
+                    float attackInterval = attackSpeedTicks * CombatMath.TICK_SECONDS;
+                    nextAttackTime = Time.time + attackInterval;
+                    int waitTicks = attackSpeedTicks;
                     if (currentTarget == null || !currentTarget.IsAlive)
                         waitTicks = Mathf.Min(waitTicks, 2);
+                    waitTicks = Mathf.Max(1, waitTicks);
                     yield return new WaitForSeconds(waitTicks * CombatMath.TICK_SECONDS);
                 }
-                else if (dist > CombatMath.MELEE_RANGE * 5f)
+                else if (dist > disengageDistance)
                 {
                     ApplyVisualVelocity(visualVelocity);
                     break;
@@ -328,30 +351,38 @@ namespace Pets
             CancelAttackInternal(false);
         }
 
-        private void ResolveAttack(CombatTarget target)
+        private CombatantStats BuildAttackerStats(out Transform ownerTransform, out int beastmasterLevel, out ItemData equippedWeapon)
         {
+            int baseAttack = definition != null ? Mathf.Max(1, definition.petAttackLevel) : 1;
+            int baseStrength = definition != null ? Mathf.Max(1, definition.petStrengthLevel) : 1;
+            int baseAccuracy = definition != null ? definition.accuracyBonus : 0;
+            int baseDamage = definition != null ? definition.damageBonus : 0;
+            int baseSpeed = definition != null ? definition.attackSpeedTicks : 4;
+
             var attacker = new CombatantStats
             {
-                AttackLevel = definition.petAttackLevel,
-                StrengthLevel = definition.petStrengthLevel,
+                AttackLevel = baseAttack,
+                StrengthLevel = baseStrength,
                 DefenceLevel = 1,
+                RangedLevel = 1,
+                MagicLevel = 1,
                 Equip = new EquipmentAggregator.CombinedStats
                 {
-                    attack = definition.accuracyBonus,
-                    strength = definition.damageBonus,
-                    rangeStrength = definition.damageBonus,
-                    attackSpeedTicks = definition.attackSpeedTicks
+                    attack = baseAccuracy,
+                    strength = baseDamage,
+                    rangeStrength = baseDamage,
+                    attackSpeedTicks = baseSpeed
                 },
                 Style = CombatStyle.Accurate,
                 DamageType = DamageType.Melee
             };
-            var companionBridge = GetComponent<Companions.CompanionCombatBridge>();
-            bool statsOverridden = companionBridge != null && companionBridge.TryOverrideStats(ref attacker);
 
-            // Cache the owner reference and Beastmaster level so both the stat scaling logic and damage
-            // resolution later in the method can consume the same readings.
-            Transform ownerTransform = follower != null ? follower.Player : null;
-            int beastmasterLevel = ResolveBeastmasterLevel(ownerTransform);
+            companionCombatBridge ??= GetComponent<CompanionCombatBridge>();
+            ownerTransform = follower != null ? follower.Player : null;
+            beastmasterLevel = ResolveBeastmasterLevel(ownerTransform);
+            equippedWeapon = ResolveEquippedWeapon();
+
+            bool statsOverridden = companionCombatBridge != null && companionCombatBridge.TryOverrideStats(ref attacker);
 
             if (!statsOverridden)
             {
@@ -372,6 +403,161 @@ namespace Pets
                 }
             }
 
+            attacker.Equip.attackSpeedTicks = Mathf.Max(1, attacker.Equip.attackSpeedTicks);
+            return attacker;
+        }
+
+        private float ResolveEffectiveRange(CombatantStats attacker, ItemData equippedWeapon)
+        {
+            if (attacker == null)
+                return CombatMath.MELEE_RANGE;
+
+            return attacker.DamageType switch
+            {
+                DamageType.Ranged => ResolveCompanionRangedRange(attacker.Style, equippedWeapon),
+                DamageType.Magic => ResolveCompanionMagicRange(),
+                _ => ResolveCompanionMeleeRange(equippedWeapon)
+            };
+        }
+
+        private float ResolveCompanionMeleeRange(ItemData equippedWeapon)
+        {
+            float range = CombatMath.MELEE_RANGE;
+            if (equippedWeapon != null && equippedWeapon.isHalberd)
+                range = Mathf.Max(range, CombatMath.MELEE_RANGE + HalberdExtraRangeTiles * TileSize);
+            return range;
+        }
+
+        private float ResolveCompanionMagicRange()
+        {
+            // Companions currently do not cast spells, so staffs default to melee reach until spell support arrives.
+            return CombatMath.MELEE_RANGE;
+        }
+
+        private float ResolveCompanionRangedRange(CombatStyle style, ItemData equippedWeapon)
+        {
+            EnsureRangedCaches();
+
+            float baseRangeTiles = DefaultRangedRangeTiles;
+            float rangeBonusTiles = 0f;
+
+            if (equippedWeapon != null && TryGetRangedWeaponData(equippedWeapon, out var weaponData))
+            {
+                baseRangeTiles = Mathf.Max(baseRangeTiles, weaponData.baseRangeTiles);
+                rangeBonusTiles += weaponData.rangeBonusTiles;
+
+                if (weaponData.consumesWeaponStack && TryGetAmmunitionData(equippedWeapon, out var thrownAmmo))
+                    rangeBonusTiles += thrownAmmo.rangeBonusTiles;
+            }
+
+            var ammoItem = ResolveEquippedAmmo();
+            if (ammoItem != null && TryGetAmmunitionData(ammoItem, out var ammoData))
+                rangeBonusTiles += ammoData.rangeBonusTiles;
+
+            if (style == CombatStyle.Longrange)
+                rangeBonusTiles += 2f;
+
+            float resolvedTiles = Mathf.Max(0.1f, baseRangeTiles + rangeBonusTiles);
+            return Mathf.Max(CombatMath.MELEE_RANGE, resolvedTiles * TileSize);
+        }
+
+        private ItemData ResolveEquippedWeapon()
+        {
+            companionController ??= GetComponent<CompanionController>();
+            var equipment = companionController != null ? companionController.Equipment : null;
+            if (equipment == null)
+                return null;
+
+            var entry = equipment.GetEquipped(EquipmentSlot.Weapon);
+            return entry.item;
+        }
+
+        private ItemData ResolveEquippedAmmo()
+        {
+            companionController ??= GetComponent<CompanionController>();
+            var equipment = companionController != null ? companionController.Equipment : null;
+            if (equipment == null)
+                return null;
+
+            var entry = equipment.GetEquipped(EquipmentSlot.Arrow);
+            return entry.item;
+        }
+
+        private static void EnsureRangedCaches()
+        {
+            if (rangedCachesLoaded)
+                return;
+
+            rangedCachesLoaded = true;
+            CacheRangedWeapons(Resources.LoadAll<RangedWeaponData>(RangedWeaponResourcePath));
+            CacheAmmunition(Resources.LoadAll<AmmunitionData>(AmmunitionResourcePath));
+        }
+
+        private static void CacheRangedWeapons(IEnumerable<RangedWeaponData> definitions)
+        {
+            if (definitions == null)
+                return;
+
+            foreach (var def in definitions)
+            {
+                if (def == null)
+                    continue;
+
+                string id = def.WeaponId;
+                if (string.IsNullOrWhiteSpace(id))
+                    continue;
+
+                RangedWeaponCache[id] = def;
+            }
+        }
+
+        private static void CacheAmmunition(IEnumerable<AmmunitionData> definitions)
+        {
+            if (definitions == null)
+                return;
+
+            foreach (var def in definitions)
+            {
+                if (def == null)
+                    continue;
+
+                string id = def.AmmoId;
+                if (string.IsNullOrWhiteSpace(id))
+                    continue;
+
+                AmmunitionCache[id] = def;
+            }
+        }
+
+        private static bool TryGetRangedWeaponData(ItemData weapon, out RangedWeaponData data)
+        {
+            data = null;
+            if (weapon == null)
+                return false;
+
+            if (!string.IsNullOrWhiteSpace(weapon.id) && RangedWeaponCache.TryGetValue(weapon.id, out data))
+                return true;
+
+            return RangedWeaponCache.TryGetValue(weapon.name, out data);
+        }
+
+        private static bool TryGetAmmunitionData(ItemData ammo, out AmmunitionData data)
+        {
+            data = null;
+            if (ammo == null)
+                return false;
+
+            if (!string.IsNullOrWhiteSpace(ammo.id) && AmmunitionCache.TryGetValue(ammo.id, out data))
+                return true;
+
+            return AmmunitionCache.TryGetValue(ammo.name, out data);
+        }
+
+        private void ResolveAttack(CombatTarget target, CombatantStats attacker, Transform ownerTransform, int beastmasterLevel)
+        {
+            if (target == null)
+                return;
+
             var npc = target as NpcCombatant;
             CombatantStats defender;
             if (npc != null)
@@ -387,10 +573,23 @@ namespace Pets
                     DamageType = target.PreferredDefenceType
                 };
 
-            int attEff = CombatMath.GetEffectiveAttack(attacker.AttackLevel, attacker.Style);
+            int attEff = attacker.DamageType switch
+            {
+                DamageType.Magic => CombatMath.GetEffectiveAttack(attacker.MagicLevel, CombatStyle.Accurate),
+                DamageType.Ranged => CombatMath.GetEffectiveRanged(attacker.RangedLevel, attacker.Style),
+                _ => CombatMath.GetEffectiveAttack(attacker.AttackLevel, attacker.Style)
+            };
             int defEff = CombatMath.GetEffectiveDefence(defender.DefenceLevel, defender.Style);
-            int atkRoll = CombatMath.GetAttackRoll(attEff, attacker.Equip.attack);
-            int defBonus = defender.DamageType switch
+
+            int atkBonus = attacker.DamageType switch
+            {
+                DamageType.Magic => attacker.Equip.magic,
+                DamageType.Ranged => attacker.Equip.range,
+                _ => attacker.Equip.attack
+            };
+            int atkRoll = CombatMath.GetAttackRoll(attEff, atkBonus);
+
+            int defBonus = attacker.DamageType switch
             {
                 DamageType.Magic => defender.Equip.magicDef,
                 DamageType.Ranged => defender.Equip.rangeDef,
@@ -398,7 +597,6 @@ namespace Pets
             };
             int defRoll = CombatMath.GetDefenceRoll(defEff, defBonus);
             float chance = CombatMath.ChanceToHit(atkRoll, defRoll);
-            // UnityEngine.Random is used to keep odds consistent with the rest of the combat pipeline.
             bool hit = UnityEngine.Random.value < chance;
 
             Vector2 diff = target.transform.position - transform.position;
@@ -425,10 +623,26 @@ namespace Pets
                     StopCoroutine(spriteSwapRoutine);
                 spriteSwapRoutine = StartCoroutine(AttackSpriteSwap());
             }
+
+            companionCombatBridge ??= GetComponent<CompanionCombatBridge>();
+
             if (hit)
             {
-                int strEff = CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
-                int maxHit = CombatMath.GetMaxHit(strEff, attacker.Equip.strength);
+                int maxHit;
+                if (attacker.DamageType == DamageType.Magic)
+                {
+                    maxHit = Mathf.Max(0, Mathf.FloorToInt(attacker.MagicLevel * 0.2f + attacker.Equip.magic * 0.1f));
+                }
+                else
+                {
+                    int strEff = attacker.DamageType == DamageType.Ranged
+                        ? CombatMath.GetEffectiveRangedStrength(attacker.RangedLevel, attacker.Style)
+                        : CombatMath.GetEffectiveStrength(attacker.StrengthLevel, attacker.Style);
+                    int strengthBonus = attacker.DamageType == DamageType.Ranged
+                        ? Mathf.Max(0, attacker.Equip.rangeStrength)
+                        : attacker.Equip.strength;
+                    maxHit = CombatMath.GetMaxHit(strEff, strengthBonus);
+                }
                 if (definition != null && definition.maxHitPerBeastmasterLevel != 0f)
                     maxHit = Mathf.RoundToInt(maxHit * (1f + definition.maxHitPerBeastmasterLevel * beastmasterLevel));
                 int dmg = CombatMath.RollDamage(maxHit);
@@ -437,7 +651,6 @@ namespace Pets
                     source = ownerTarget;
                 int finalDamage = target.ApplyDamage(dmg, attacker.DamageType, SpellElement.None, source);
 
-                // Determine which hitsplat to display and ensure zero-damage hits surface the dedicated blue variant.
                 Sprite hitsplatSprite;
                 string hitsplatText;
                 if (finalDamage <= 0)
@@ -464,7 +677,7 @@ namespace Pets
                     npcAttack?.BeginAttacking(this);
                 }
                 BeastmasterXp.TryGrantFromPetDamage(ownerTransform != null ? ownerTransform.gameObject : null, finalDamage);
-                companionBridge?.NotifyDamageDealt(finalDamage, attacker.Style, attacker.DamageType, target);
+                companionCombatBridge?.NotifyDamageDealt(finalDamage, attacker.Style, attacker.DamageType, target);
 
                 if (!target.IsAlive && IsOreGolemTarget(target))
                     TryScheduleOreGolemHarvest(ownerTransform);

@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8d1a6ef95f766d5d8e8073ce39f97ee05d4a6a55 -->
+## 2025-10-24T17:30:22+01:00 — Improve companion attack speed and range handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionCombatBridge.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 269 ++ / 30 --
+- Notes:
+  —
+---
 <!-- commit:16f09070efd44bd606fe22d5b73db7595b5e9c73 -->
 ## 2025-10-24T17:02:53+01:00 — Merge pull request #1378 from aicovergod/codex/update-companioncombatbridge-for-combat-stats
 
