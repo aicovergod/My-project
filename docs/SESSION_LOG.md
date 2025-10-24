@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6ae929f553d3382b6369db9abd3c0b42be914fb5 -->
+## 2025-10-24T13:06:52+01:00 — Fix companion combat cooldown timers for all skills
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs
+- Diff: 54 ++ / 10 --
+- Notes:
+  —
+---
 <!-- commit:1895441b2a2123a988df0aec784143704f9b0856 -->
 ## 2025-10-24T12:59:19+01:00 — Merge pull request #1370 from aicovergod/codex/add-combat-skill-decline-restrictions
 
