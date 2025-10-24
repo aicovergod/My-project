@@ -189,21 +189,25 @@ namespace Companions.Conversation
                     matchThreshold: 1.8f,
                     synonymBuckets: new[]
                     {
-                        // Single-word praise such as "awesome!" should hit the compliment intent, so the
-                        // bucket weight now clears the threshold by itself.
-                        new SynonymBucket(new[] { "good", "great", "awesome", "amazing", "nice", "solid", "brilliant", "fantastic", "stellar", "dope", "slick" }, 1.8f),
-                        new SynonymBucket(new[] { "job", "work", "partner", "friend", "assist", "move", "play" }, 0.8f),
+                        // High-intensity praise words should succeed on their own, so they retain a weight
+                        // that clears the compliment threshold without additional context tokens.
+                        new SynonymBucket(new[] { "great", "awesome", "amazing", "brilliant", "fantastic", "stellar", "dope", "slick" }, 1.8f),
+                        // Softer praise must now pair with a contextual noun bucket to meet the threshold,
+                        // preventing greetings like "good morning" from misfiring as compliments.
+                        new SynonymBucket(new[] { "good", "nice", "solid" }, 0.95f),
+                        new SynonymBucket(new[] { "job", "work", "partner", "friend", "assist", "move", "play" }, 0.9f),
                         new SynonymBucket(new[] { "legend", "goat", "rockstar", "lifesaver" }, 0.9f)
                     },
                     multiWordPhrases: new[]
                     {
-                        new MultiWordPhrase("good job", 1.7f),
+                        new MultiWordPhrase("good job", 1.75f),
                         new MultiWordPhrase("great work", 1.7f),
-                        new MultiWordPhrase("awesome job", 1.7f),
-                        new MultiWordPhrase("nice work", 1.6f),
-                        new MultiWordPhrase("you're amazing", 1.8f),
+                        new MultiWordPhrase("awesome job", 1.75f),
+                        new MultiWordPhrase("nice work", 1.7f),
+                        new MultiWordPhrase("you're amazing", 1.85f),
                         new MultiWordPhrase("you're the best", 1.9f)
-                    }),
+                    },
+                    negativeKeywords: new[] { "morning", "afternoon", "evening", "night" }),
 
                 new CompanionIntentPattern(
                     CompanionDialogueIntent.RequestAssistance,
