@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:eb4c3b59acd93fe75523a8c4a4c3566b4c2be867 -->
+## 2025-10-24T16:17:54+01:00 — Add companion suggestion workflow and admin debug view
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs, Assets/Scripts/Companions/UI/AdminF4Menu.cs, Assets/Scripts/NPC/Combat/NpcCombatant.cs
+- Diff: 729 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:405a9b20eca6397609686e96dc85db557beb828e -->
 ## 2025-10-24T15:35:15+01:00 — Merge pull request #1375 from aicovergod/codex/update-scheduleskillquestion-logic
 

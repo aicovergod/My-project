@@ -14,6 +14,7 @@ using UI.Chat;
 using UnityEngine;
 using Util;
 using World;
+using NPC;
 
 namespace Companions.Conversation
 {
@@ -48,7 +49,9 @@ namespace Companions.Conversation
             new IntentScoreThreshold(CompanionDialogueIntent.AcceptSkillPlan, 1.7f),
             new IntentScoreThreshold(CompanionDialogueIntent.DeclineSkillPlan, 1.6f),
             new IntentScoreThreshold(CompanionDialogueIntent.DeferSkillPlan, 1.6f),
-            new IntentScoreThreshold(CompanionDialogueIntent.RequestAlternateSkill, 1.6f)
+            new IntentScoreThreshold(CompanionDialogueIntent.RequestAlternateSkill, 1.6f),
+            new IntentScoreThreshold(CompanionDialogueIntent.CompanionSuggestionRequest, 1.6f),
+            new IntentScoreThreshold(CompanionDialogueIntent.CompanionSuggestionReminder, 1.3f)
         };
 
         private readonly List<CompanionDialogueRule> rules = new List<CompanionDialogueRule>();
@@ -94,6 +97,19 @@ namespace Companions.Conversation
 
         [SerializeField, Tooltip("Maximum age (in minutes) of a skill event that can seed a proactive prompt."), Min(0.1f)]
         private float minimumSkillEventFreshnessMinutes = 12f;
+
+        [Header("Suggestion Prompt")]
+        [SerializeField, Tooltip("Cooldown applied after answering a suggestion request (minutes)."), Min(0.1f)]
+        private float suggestionCooldownMinutes = 5f;
+
+        [SerializeField, Tooltip("Maximum age (minutes) for NPC kill history considered in suggestions."), Min(0.1f)]
+        private float npcKillRetentionMinutes = 6f;
+
+        private DateTime? lastSuggestionAnsweredUtc;
+        private string lastSuggestionMessage = string.Empty;
+        private bool playerRepeatedSuggestionRequest;
+        private SuggestionPayload lastSuggestionPayload = SuggestionPayload.Empty;
+        private readonly LinkedList<NpcKillRecord> recentNpcKills = new();
 
         private static readonly Dictionary<string, TokenSkillMapping> SkillTokenMappings =
             new Dictionary<string, TokenSkillMapping>(StringComparer.Ordinal)
@@ -234,6 +250,58 @@ namespace Companions.Conversation
         private static readonly TimeSpan SkillActionRetention = TimeSpan.FromMinutes(15);
         private static readonly TimeSpan CompanionCombatActivityWindow = TimeSpan.FromSeconds(5);
         private const float SkillProposalFollowUpChance = 0.65f;
+        private const int MaxTrackedNpcKills = 16;
+
+        private static readonly SkillType[] SuggestibleSkills =
+        {
+            SkillType.Mining,
+            SkillType.Cooking,
+            SkillType.Firemaking,
+            SkillType.Woodcutting,
+            SkillType.Beastmaster,
+            SkillType.Hitpoints,
+            SkillType.Attack,
+            SkillType.Strength,
+            SkillType.Ranged,
+            SkillType.Defence,
+            SkillType.Magic,
+            SkillType.Fishing
+        };
+
+        private static readonly string[] SkillSuggestionTemplates =
+        {
+            "How about we do some {skill}?",
+            "I want to do some {skill}.",
+            "I want to get my {skill} level up.",
+            "I feel like training some {skill}.",
+            "I feel like getting my {skill} up."
+        };
+
+        private static readonly string[] RepeatSuggestionResponses =
+        {
+            "I've already told you what I want to do.",
+            "You've already asked me.",
+            "I told you earlier.",
+            "I'm not a parrot lol, I told you earlier <emoji=14>.",
+            "Have you seriously forgot {playerName} <emoji=18>."
+        };
+
+        private static readonly string[] SkillReminderResponses =
+        {
+            "We talked about training more {skill} earlier.",
+            "I already said I want to work on {skill}.",
+            "Still keen to push my {skill} level."
+        };
+
+        private static readonly string[] NpcReminderResponses =
+        {
+            "We said we'd take down more {npc}.",
+            "Pretty sure we were hunting {npc}.",
+            "I told you I'm itching to fight more {npc}."
+        };
+
+        private static readonly string NpcLatestTemplate = "Maybe we can kill some more {npc}.";
+        private static readonly string NpcRandomTemplate = "I want to kill more {npc}.";
 
         /// <summary>
         /// Probability that the companion politely declines a player-initiated training request even when prepared.
@@ -258,6 +326,44 @@ namespace Companions.Conversation
         private bool ShouldTraceResponses => CompanionManager.EnableDebugLogging && enableResponseTracing;
 
         private bool ShouldTraceMemory => CompanionManager.EnableDebugLogging && enableMemoryTracing;
+
+        /// <summary>
+        /// Indicates whether the companion has provided a suggestion that is still under its cooldown window.
+        /// Exposed for debug tooling so QA can verify the lockout without digging through logs.
+        /// </summary>
+        public static bool CompanionHasAnsweredSuggestionQuestion =>
+            Instance != null && Instance.HasActiveSuggestion(DateTime.UtcNow);
+
+        /// <summary>
+        /// Tracks whether the player repeated the suggestion request during the active cooldown window.
+        /// Used by debug menus to highlight when reminder phrases should work.
+        /// </summary>
+        public static bool PlayerHasAskedCompanionSuggestionQuestionAgain =>
+            Instance != null && Instance.playerRepeatedSuggestionRequest;
+
+        /// <summary>
+        /// Retrieves the live suggestion debug state so tooling can display cooldown and history information.
+        /// </summary>
+        public static SuggestionDebugState GetSuggestionDebugState()
+        {
+            var instance = Instance;
+            return instance != null
+                ? instance.BuildSuggestionDebugState(DateTime.UtcNow)
+                : SuggestionDebugState.Empty;
+        }
+
+        /// <summary>
+        /// Records an NPC kill so the companion can surface it in later activity suggestions.
+        /// The killing player is currently unused but kept for parity with other combat hooks.
+        /// </summary>
+        public static void RegisterNpcKill(NpcCombatant npc, GameObject killingPlayer)
+        {
+            if (npc == null)
+                return;
+
+            var instance = Instance;
+            instance?.HandleNpcKill(npc);
+        }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -422,6 +528,8 @@ namespace Companions.Conversation
             tickerSubscriptionRoutine = null;
             tickerSubscribed = false;
             lastCompanionCombatUtc = null;
+            ResetSuggestionState();
+            recentNpcKills.Clear();
 
             base.OnSingletonDestroyed();
         }
@@ -619,6 +727,8 @@ namespace Companions.Conversation
         public void OnTick()
         {
             DateTime nowUtc = DateTime.UtcNow;
+            EnsureSuggestionStateFresh(nowUtc);
+            PruneNpcKills(nowUtc);
             PruneSkillActions(nowUtc);
             ExpireActiveSkillQuestionIfStale(nowUtc);
             MaybeScheduleProactiveQuestion(nowUtc);
@@ -1003,6 +1113,7 @@ namespace Companions.Conversation
                 return;
 
             EnsurePlayerContextBindings();
+            EnsureSuggestionStateFresh(DateTime.UtcNow);
 
             lastPlayerMessage = message.Text ?? string.Empty;
             lastPlayerMessageUtc = DateTime.UtcNow;
@@ -1203,6 +1314,34 @@ namespace Companions.Conversation
                             }
                         }
                         break;
+
+                    case CompanionDialogueIntent.CompanionSuggestionRequest:
+                    {
+                        int segmentCountBefore = segments.Count;
+                        if (TryHandleSuggestionRequest(context, segments, playerName))
+                        {
+                            if (segmentCountBefore > 0)
+                                segments.RemoveRange(0, segmentCountBefore);
+                            followUps.Clear();
+                            statusSegment = string.Empty;
+                            skillResponseResolved = true;
+                        }
+                        break;
+                    }
+
+                    case CompanionDialogueIntent.CompanionSuggestionReminder:
+                    {
+                        int segmentCountBefore = segments.Count;
+                        if (TryHandleSuggestionReminder(segments, playerName))
+                        {
+                            if (segmentCountBefore > 0)
+                                segments.RemoveRange(0, segmentCountBefore);
+                            followUps.Clear();
+                            statusSegment = string.Empty;
+                            skillResponseResolved = true;
+                        }
+                        break;
+                    }
 
                     case CompanionDialogueIntent.RequestAssistance:
                         TryAddResponse(
@@ -2643,6 +2782,495 @@ namespace Companions.Conversation
             int wordCount = Math.Max(1, text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Length);
             float totalDelay = Mathf.Max(0f, baseTypingDelaySeconds) + perWordDelay * wordCount;
             return Mathf.Clamp(totalDelay, 0f, 8f);
+        }
+
+        private bool TryHandleSuggestionRequest(
+            CompanionResponseContext context,
+            List<string> segments,
+            string playerName)
+        {
+            DateTime nowUtc = DateTime.UtcNow;
+            EnsureSuggestionStateFresh(nowUtc);
+
+            if (HasActiveSuggestion(nowUtc))
+            {
+                string repeat = ChooseRepeatResponse(playerName);
+                if (!string.IsNullOrWhiteSpace(repeat))
+                    segments.Add(repeat);
+
+                playerRepeatedSuggestionRequest = true;
+                return true;
+            }
+
+            if (!TryBuildSuggestionPayload(out var suggestion))
+            {
+                segments.Add("I'm not sure what I want to do right now—your call.");
+                return true;
+            }
+
+            segments.Add(suggestion.ResponseText);
+            lastSuggestionPayload = suggestion;
+            lastSuggestionMessage = suggestion.ResponseText;
+            lastSuggestionAnsweredUtc = nowUtc;
+            playerRepeatedSuggestionRequest = false;
+            return true;
+        }
+
+        private bool TryHandleSuggestionReminder(List<string> segments, string playerName)
+        {
+            DateTime nowUtc = DateTime.UtcNow;
+            EnsureSuggestionStateFresh(nowUtc);
+
+            if (!HasActiveSuggestion(nowUtc) || lastSuggestionPayload.Type == SuggestionType.None)
+            {
+                segments.Add("Ask me what I want to do first, then I can remind you.");
+                return true;
+            }
+
+            if (!playerRepeatedSuggestionRequest)
+            {
+                segments.Add("You haven't asked me twice yet, so there's nothing to remind you about.");
+                return true;
+            }
+
+            string response = BuildReminderResponse();
+            if (string.IsNullOrWhiteSpace(response))
+                response = "I told you earlier, remember?";
+
+            segments.Add(response);
+            return true;
+        }
+
+        private string BuildReminderResponse()
+        {
+            switch (lastSuggestionPayload.Type)
+            {
+                case SuggestionType.Skill:
+                    {
+                        string skill = string.IsNullOrWhiteSpace(lastSuggestionPayload.SkillDisplayName)
+                            ? "that skill"
+                            : lastSuggestionPayload.SkillDisplayName;
+
+                        return FormatReminder(SkillReminderResponses, "{skill}", skill);
+                    }
+
+                case SuggestionType.NpcLatest:
+                case SuggestionType.NpcHistory:
+                    {
+                        string npc = FormatNpcPlural(lastSuggestionPayload.NpcName);
+                        if (string.IsNullOrWhiteSpace(npc))
+                            npc = "those foes";
+
+                        return FormatReminder(NpcReminderResponses, "{npc}", npc);
+                    }
+
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private static string FormatReminder(string[] templates, string token, string replacement)
+        {
+            if (templates == null || templates.Length == 0)
+                return string.Empty;
+
+            int index = UnityEngine.Random.Range(0, templates.Length);
+            string template = templates[index];
+            return string.IsNullOrWhiteSpace(template)
+                ? string.Empty
+                : template.Replace(token, replacement);
+        }
+
+        private bool TryBuildSuggestionPayload(out SuggestionPayload suggestion)
+        {
+            suggestion = SuggestionPayload.Empty;
+
+            var candidates = new List<SuggestionPayload>();
+
+            if (TryResolveSkillSuggestion(out var skillInfo))
+            {
+                for (int i = 0; i < SkillSuggestionTemplates.Length; i++)
+                {
+                    string template = SkillSuggestionTemplates[i];
+                    if (string.IsNullOrWhiteSpace(template))
+                        continue;
+
+                    string text = template.Replace("{skill}", skillInfo.SkillDisplayName);
+                    candidates.Add(SuggestionPayload.ForSkill(skillInfo.Skill, skillInfo.SkillDisplayName, text));
+                }
+            }
+
+            if (TryGetLatestNpcKill(out string latestNpc))
+            {
+                string plural = FormatNpcPlural(latestNpc);
+                candidates.Add(SuggestionPayload.ForNpc(SuggestionType.NpcLatest, latestNpc, NpcLatestTemplate.Replace("{npc}", plural)));
+            }
+
+            if (TryGetRandomNpcKill(out string randomNpc))
+            {
+                string plural = FormatNpcPlural(randomNpc);
+                candidates.Add(SuggestionPayload.ForNpc(SuggestionType.NpcHistory, randomNpc, NpcRandomTemplate.Replace("{npc}", plural)));
+            }
+
+            if (candidates.Count == 0)
+                return false;
+
+            suggestion = candidates[UnityEngine.Random.Range(0, candidates.Count)];
+            return suggestion.HasValue;
+        }
+
+        private bool TryResolveSkillSuggestion(out SkillSuggestionInfo suggestion)
+        {
+            suggestion = default;
+            DateTime nowUtc = DateTime.UtcNow;
+
+            if (TryGetBestSkillCandidate(nowUtc, out var candidate) &&
+                candidate.HasSkill &&
+                candidate.Skill.HasValue &&
+                !IsSkillUnderDeclineCooldown(candidate.Skill.Value))
+            {
+                suggestion = new SkillSuggestionInfo(candidate.Skill.Value, SkillNameUtility.GetDisplayName(candidate.Skill.Value));
+                return true;
+            }
+
+            if (TryBuildFallbackSkillCandidate(nowUtc, out candidate) &&
+                candidate.HasSkill &&
+                candidate.Skill.HasValue &&
+                !IsSkillUnderDeclineCooldown(candidate.Skill.Value))
+            {
+                suggestion = new SkillSuggestionInfo(candidate.Skill.Value, SkillNameUtility.GetDisplayName(candidate.Skill.Value));
+                return true;
+            }
+
+            if (TryGetFallbackSkill(out var fallback) && !IsSkillUnderDeclineCooldown(fallback))
+            {
+                suggestion = new SkillSuggestionInfo(fallback, SkillNameUtility.GetDisplayName(fallback));
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool TryGetFallbackSkill(out SkillType skill)
+        {
+            var available = new List<SkillType>(SuggestibleSkills.Length);
+            for (int i = 0; i < SuggestibleSkills.Length; i++)
+            {
+                SkillType candidate = SuggestibleSkills[i];
+                if (IsSkillUnderDeclineCooldown(candidate))
+                    continue;
+
+                available.Add(candidate);
+            }
+
+            if (available.Count == 0)
+            {
+                skill = default;
+                return false;
+            }
+
+            skill = available[UnityEngine.Random.Range(0, available.Count)];
+            return true;
+        }
+
+        private string ChooseRepeatResponse(string playerName)
+        {
+            if (RepeatSuggestionResponses.Length == 0)
+                return "I've already told you what I want to do.";
+
+            int index = UnityEngine.Random.Range(0, RepeatSuggestionResponses.Length);
+            string template = RepeatSuggestionResponses[index];
+            if (string.IsNullOrWhiteSpace(template))
+                return "I've already told you what I want to do.";
+
+            string resolved = string.IsNullOrWhiteSpace(playerName)
+                ? ResolvePlayerName(string.Empty)
+                : playerName;
+
+            if (string.IsNullOrWhiteSpace(resolved))
+                resolved = "friend";
+
+            return template.Replace("{playerName}", resolved);
+        }
+
+        private void HandleNpcKill(NpcCombatant npc)
+        {
+            if (npc == null)
+                return;
+
+            string rawName = npc.Profile != null && !string.IsNullOrWhiteSpace(npc.Profile.name)
+                ? npc.Profile.name
+                : npc.name;
+
+            string sanitized = SanitizeNpcName(rawName);
+            if (string.IsNullOrWhiteSpace(sanitized))
+                sanitized = "foe";
+
+            DateTime nowUtc = DateTime.UtcNow;
+            RecordNpcKill(sanitized, nowUtc);
+
+            EnsureConversationMemoryBound();
+            string playerName = ResolvePlayerName(string.Empty);
+            string plural = FormatNpcPlural(sanitized);
+
+            var metadata = CompanionEventMetadata.Create(
+                primaryActor: string.IsNullOrWhiteSpace(playerName) ? "You" : playerName,
+                secondaryActor: plural,
+                worldPosition: npc.transform != null ? (Vector3?)npc.transform.position : null);
+
+            conversationMemory?.RegisterEvent($"defeated {plural}", CompanionEventType.Combat, metadata);
+        }
+
+        private void RecordNpcKill(string npcName, DateTime timestampUtc)
+        {
+            if (string.IsNullOrWhiteSpace(npcName))
+                return;
+
+            recentNpcKills.AddFirst(new NpcKillRecord(npcName, timestampUtc));
+            while (recentNpcKills.Count > MaxTrackedNpcKills)
+                recentNpcKills.RemoveLast();
+
+            PruneNpcKills(timestampUtc);
+        }
+
+        private void PruneNpcKills(DateTime nowUtc)
+        {
+            TimeSpan retention = TimeSpan.FromMinutes(Mathf.Max(0.1f, npcKillRetentionMinutes));
+            var node = recentNpcKills.Last;
+            while (node != null)
+            {
+                var previous = node.Previous;
+                if ((nowUtc - node.Value.TimestampUtc) > retention)
+                    recentNpcKills.Remove(node);
+
+                node = previous;
+            }
+        }
+
+        private bool TryGetLatestNpcKill(out string npcName)
+        {
+            if (recentNpcKills.Count == 0)
+            {
+                npcName = string.Empty;
+                return false;
+            }
+
+            npcName = recentNpcKills.First.Value.Name;
+            return !string.IsNullOrWhiteSpace(npcName);
+        }
+
+        private bool TryGetRandomNpcKill(out string npcName)
+        {
+            if (recentNpcKills.Count == 0)
+            {
+                npcName = string.Empty;
+                return false;
+            }
+
+            int index = UnityEngine.Random.Range(0, recentNpcKills.Count);
+            var node = recentNpcKills.First;
+            for (int i = 0; i < index && node != null; i++)
+                node = node.Next;
+
+            npcName = node != null ? node.Value.Name : recentNpcKills.First.Value.Name;
+            return !string.IsNullOrWhiteSpace(npcName);
+        }
+
+        private static string SanitizeNpcName(string rawName)
+        {
+            if (string.IsNullOrWhiteSpace(rawName))
+                return string.Empty;
+
+            string trimmed = rawName.Trim();
+
+            if (trimmed.StartsWith("NPC_", StringComparison.OrdinalIgnoreCase))
+                trimmed = trimmed.Substring(4);
+
+            int parenIndex = trimmed.IndexOf('(');
+            if (parenIndex >= 0)
+                trimmed = trimmed.Substring(0, parenIndex);
+
+            trimmed = trimmed.Replace('_', ' ').Trim();
+
+            var builder = new StringBuilder(trimmed.Length);
+            for (int i = 0; i < trimmed.Length; i++)
+            {
+                char c = trimmed[i];
+                if (char.IsLetter(c) || char.IsWhiteSpace(c) || "-'".IndexOf(c) >= 0)
+                    builder.Append(c);
+            }
+
+            string cleaned = builder.ToString().Trim();
+            if (cleaned.Length == 0)
+                return string.Empty;
+
+            string lower = cleaned.ToLower(CultureInfo.InvariantCulture);
+            return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(lower);
+        }
+
+        private static string FormatNpcPlural(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return string.Empty;
+
+            string trimmed = name.Trim();
+            if (trimmed.EndsWith("s", StringComparison.OrdinalIgnoreCase) ||
+                trimmed.EndsWith("x", StringComparison.OrdinalIgnoreCase) ||
+                trimmed.EndsWith("z", StringComparison.OrdinalIgnoreCase) ||
+                trimmed.EndsWith("ch", StringComparison.OrdinalIgnoreCase) ||
+                trimmed.EndsWith("sh", StringComparison.OrdinalIgnoreCase))
+            {
+                return trimmed + "es";
+            }
+
+            if (trimmed.EndsWith("y", StringComparison.OrdinalIgnoreCase) &&
+                trimmed.Length > 1 &&
+                !IsVowel(trimmed[trimmed.Length - 2]))
+            {
+                return trimmed.Substring(0, trimmed.Length - 1) + "ies";
+            }
+
+            return trimmed + "s";
+        }
+
+        private static bool IsVowel(char c)
+        {
+            char lower = char.ToLowerInvariant(c);
+            return lower == 'a' || lower == 'e' || lower == 'i' || lower == 'o' || lower == 'u';
+        }
+
+        private void EnsureSuggestionStateFresh(DateTime nowUtc)
+        {
+            if (!HasActiveSuggestion(nowUtc))
+                ResetSuggestionState();
+        }
+
+        private void ResetSuggestionState()
+        {
+            lastSuggestionAnsweredUtc = null;
+            lastSuggestionMessage = string.Empty;
+            lastSuggestionPayload = SuggestionPayload.Empty;
+            playerRepeatedSuggestionRequest = false;
+        }
+
+        private bool HasActiveSuggestion(DateTime nowUtc)
+        {
+            return GetSuggestionRemaining(nowUtc).HasValue;
+        }
+
+        private TimeSpan? GetSuggestionRemaining(DateTime nowUtc)
+        {
+            if (!lastSuggestionAnsweredUtc.HasValue)
+                return null;
+
+            TimeSpan cooldown = TimeSpan.FromMinutes(Mathf.Max(0.1f, suggestionCooldownMinutes));
+            TimeSpan elapsed = nowUtc - lastSuggestionAnsweredUtc.Value;
+            if (elapsed >= cooldown)
+                return null;
+
+            return cooldown - elapsed;
+        }
+
+        private SuggestionDebugState BuildSuggestionDebugState(DateTime nowUtc)
+        {
+            EnsureSuggestionStateFresh(nowUtc);
+            TimeSpan? remaining = GetSuggestionRemaining(nowUtc);
+            return new SuggestionDebugState(
+                remaining.HasValue,
+                playerRepeatedSuggestionRequest,
+                remaining,
+                lastSuggestionMessage);
+        }
+
+        private readonly struct NpcKillRecord
+        {
+            public NpcKillRecord(string name, DateTime timestampUtc)
+            {
+                Name = name ?? string.Empty;
+                TimestampUtc = timestampUtc;
+            }
+
+            public string Name { get; }
+            public DateTime TimestampUtc { get; }
+        }
+
+        private readonly struct SkillSuggestionInfo
+        {
+            public SkillSuggestionInfo(SkillType skill, string displayName)
+            {
+                Skill = skill;
+                SkillDisplayName = string.IsNullOrWhiteSpace(displayName)
+                    ? SkillNameUtility.GetDisplayName(skill)
+                    : displayName.Trim();
+            }
+
+            public SkillType Skill { get; }
+            public string SkillDisplayName { get; }
+        }
+
+        private enum SuggestionType
+        {
+            None = 0,
+            Skill = 1,
+            NpcLatest = 2,
+            NpcHistory = 3
+        }
+
+        private readonly struct SuggestionPayload
+        {
+            public static SuggestionPayload Empty => new SuggestionPayload(SuggestionType.None, null, string.Empty, string.Empty, string.Empty);
+
+            public SuggestionPayload(
+                SuggestionType type,
+                SkillType? skill,
+                string skillDisplayName,
+                string npcName,
+                string responseText)
+            {
+                Type = type;
+                Skill = skill;
+                SkillDisplayName = skillDisplayName ?? string.Empty;
+                NpcName = npcName ?? string.Empty;
+                ResponseText = responseText ?? string.Empty;
+            }
+
+            public SuggestionType Type { get; }
+            public SkillType? Skill { get; }
+            public string SkillDisplayName { get; }
+            public string NpcName { get; }
+            public string ResponseText { get; }
+            public bool HasValue => Type != SuggestionType.None && !string.IsNullOrWhiteSpace(ResponseText);
+
+            public static SuggestionPayload ForSkill(SkillType skill, string skillDisplayName, string responseText) =>
+                new SuggestionPayload(SuggestionType.Skill, skill, skillDisplayName, string.Empty, responseText);
+
+            public static SuggestionPayload ForNpc(SuggestionType type, string npcName, string responseText) =>
+                new SuggestionPayload(type, null, string.Empty, npcName, responseText);
+        }
+
+        /// <summary>
+        /// Lightweight immutable payload mirrored into the admin tooling so QA can inspect suggestion state.
+        /// </summary>
+        public readonly struct SuggestionDebugState
+        {
+            public static SuggestionDebugState Empty => new SuggestionDebugState(false, false, null, string.Empty);
+
+            public SuggestionDebugState(
+                bool hasActiveSuggestion,
+                bool playerAskedAgain,
+                TimeSpan? timeRemaining,
+                string lastSuggestion)
+            {
+                HasActiveSuggestion = hasActiveSuggestion;
+                PlayerAskedAgain = playerAskedAgain;
+                TimeRemaining = timeRemaining;
+                LastSuggestion = lastSuggestion ?? string.Empty;
+            }
+
+            public bool HasActiveSuggestion { get; }
+            public bool PlayerAskedAgain { get; }
+            public TimeSpan? TimeRemaining { get; }
+            public string LastSuggestion { get; }
         }
 
         private void LogRuleMatches(string cleaned, CompanionDialogueParseResult result)
