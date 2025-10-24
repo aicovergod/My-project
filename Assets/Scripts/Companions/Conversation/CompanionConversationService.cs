@@ -234,6 +234,16 @@ namespace Companions.Conversation
         private const float SkillProposalFollowUpChance = 0.65f;
 
         /// <summary>
+        /// Probability that the companion politely declines a player-initiated training request even when prepared.
+        /// </summary>
+        private const float SkillProposalDeclineChance = 0.15f;
+
+        /// <summary>
+        /// Probability that the companion follows a decline with an alternate skill suggestion.
+        /// </summary>
+        private const float SkillProposalDeclineSuggestionChance = 0.5f;
+
+        /// <summary>
         /// Reduced probability used for the generic ready/missing tool follow-up pools so they only
         /// trigger roughly thirty percent of the time, keeping those beats feeling occasional.
         /// </summary>
@@ -1350,7 +1360,7 @@ namespace Companions.Conversation
                     return true;
                 }
 
-                ComposeReadySkillResponse(analysis, toolResult, segments, followUps, playerName, ref companionMood);
+                ComposeReadySkillResponse(analysis, toolResult, segments, followUps, playerName, ref companionMood, context);
                 return true;
             }
 
@@ -1584,10 +1594,22 @@ namespace Companions.Conversation
             List<string> segments,
             List<string> followUps,
             string playerName,
-            ref string companionMood)
+            ref string companionMood,
+            CompanionResponseContext context)
         {
             if (!analysis.HasConcreteSkill)
                 return;
+
+            if (UnityEngine.Random.value < SkillProposalDeclineChance)
+            {
+                ComposeSkillProposalDeclineResponse(
+                    analysis,
+                    segments,
+                    followUps,
+                    playerName,
+                    context);
+                return;
+            }
 
             string toolName = ResolveToolName(toolResult);
             string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName;
@@ -1645,6 +1667,140 @@ namespace Companions.Conversation
 
                 conversationMemory.RegisterEvent(summary, CompanionEventType.Gathering, metadata);
             }
+        }
+
+        /// <summary>
+        /// Composes a decline response when the companion opts out of the requested training session.
+        /// </summary>
+        private void ComposeSkillProposalDeclineResponse(
+            SkillProposalAnalysis analysis,
+            List<string> segments,
+            List<string> followUps,
+            string playerName,
+            CompanionResponseContext context)
+        {
+            if (!analysis.HasConcreteSkill)
+                return;
+
+            string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName;
+            string skillDisplay = analysis.HasDisplayName
+                ? analysis.SkillDisplayName
+                : SkillNameUtility.GetDisplayName(analysis.Skill.Value);
+
+            var replacements = new Dictionary<string, string>
+            {
+                { "playerName", safePlayerName },
+                { "skillName", skillDisplay }
+            };
+
+            string primary = ApplyProposalTokens(
+                ChooseRandom(CompanionSkillProposalDialogueBlocks.PlayerSkillProposalDeclineSegments),
+                replacements);
+
+            if (!string.IsNullOrWhiteSpace(primary))
+                segments.Add(primary);
+
+            lastProactiveQuestionUtc = DateTime.UtcNow;
+
+            TryAppendDeclineSuggestion(followUps, analysis, safePlayerName, context);
+        }
+
+        /// <summary>
+        /// Attempts to add an alternate skill suggestion after a decline to keep the conversation flowing.
+        /// </summary>
+        private void TryAppendDeclineSuggestion(
+            List<string> followUps,
+            SkillProposalAnalysis declinedAnalysis,
+            string safePlayerName,
+            CompanionResponseContext context)
+        {
+            if (followUps == null)
+                return;
+
+            if (UnityEngine.Random.value > SkillProposalDeclineSuggestionChance)
+                return;
+
+            string suggestionName = ResolveDeclineSuggestionSkillName(declinedAnalysis, context);
+            if (string.IsNullOrWhiteSpace(suggestionName))
+                return;
+
+            var replacements = new Dictionary<string, string>
+            {
+                { "playerName", safePlayerName },
+                { "skillName", suggestionName },
+                { "suggestedSkillName", suggestionName }
+            };
+
+            string followUp = ApplyProposalTokens(
+                ChooseRandom(CompanionSkillProposalDialogueBlocks.PlayerSkillProposalDeclineSuggestionSegments),
+                replacements);
+
+            if (!string.IsNullOrWhiteSpace(followUp))
+                followUps.Add(followUp);
+        }
+
+        /// <summary>
+        /// Resolves which skill name should be suggested after the companion declines the proposal.
+        /// </summary>
+        private string ResolveDeclineSuggestionSkillName(
+            SkillProposalAnalysis declinedAnalysis,
+            CompanionResponseContext context)
+        {
+            if (context.HasSuggestedSkill &&
+                (!declinedAnalysis.HasConcreteSkill || context.SuggestedSkill.Value != declinedAnalysis.Skill.Value))
+            {
+                string contextName = !string.IsNullOrWhiteSpace(context.SuggestedSkillName)
+                    ? context.SuggestedSkillName
+                    : SkillNameUtility.GetDisplayName(context.SuggestedSkill.Value);
+
+                if (!string.IsNullOrWhiteSpace(contextName))
+                    return contextName;
+            }
+
+            DateTime nowUtc = context.RequestTimeUtc.Kind == DateTimeKind.Utc && context.RequestTimeUtc != default
+                ? context.RequestTimeUtc
+                : DateTime.UtcNow;
+
+            SkillType? excludedSkill = declinedAnalysis.HasConcreteSkill ? declinedAnalysis.Skill : (SkillType?)null;
+            if (TryGetBestSkillCandidate(nowUtc, out var candidate, excludedSkill))
+            {
+                if (candidate.HasSkill)
+                {
+                    if (!string.IsNullOrWhiteSpace(candidate.SkillName))
+                        return candidate.SkillName;
+
+                    return SkillNameUtility.GetDisplayName(candidate.Skill.Value);
+                }
+            }
+
+            SkillType? fallback = ChooseAlternateSkill(excludedSkill);
+            return fallback.HasValue ? SkillNameUtility.GetDisplayName(fallback.Value) : string.Empty;
+        }
+
+        /// <summary>
+        /// Chooses a random skill other than the one that was declined so the companion can pivot naturally.
+        /// </summary>
+        private static SkillType? ChooseAlternateSkill(SkillType? excludedSkill)
+        {
+            var values = (SkillType[])Enum.GetValues(typeof(SkillType));
+            if (values == null || values.Length == 0)
+                return null;
+
+            var available = new List<SkillType>(values.Length);
+            for (int i = 0; i < values.Length; i++)
+            {
+                SkillType candidate = values[i];
+                if (excludedSkill.HasValue && candidate == excludedSkill.Value)
+                    continue;
+
+                available.Add(candidate);
+            }
+
+            if (available.Count == 0)
+                return null;
+
+            int index = UnityEngine.Random.Range(0, available.Count);
+            return available[index];
         }
 
         private void ComposeMissingToolResponse(

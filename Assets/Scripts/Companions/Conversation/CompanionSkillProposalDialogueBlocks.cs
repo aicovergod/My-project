@@ -85,6 +85,34 @@ namespace Companions.Conversation
             "Let's keep the chatter going—makes the grind faster."
         };
 
+        private static readonly string[] playerSkillProposalDeclineSegments =
+        {
+            "No thanks, I'd rather not.",
+            "I'll pass for now, thanks.",
+            "I don't really feel like doing {skillName} right now.",
+            "No thank you, {playerName}.",
+            "Not in the mood for {skillName} today, sorry.",
+            "Think I'll sit this one out.",
+            "Nah, I'm good. You go ahead.",
+            "Maybe later, just not feeling {skillName} at the moment.",
+            "I've had my fill of {skillName} for the day.",
+            "I'd rather do something else right now, if that's alright.",
+            "You're welcome to, but I'll watch from the sidelines this time.",
+            "Not this time, {playerName}. My energy's somewhere else.",
+            "I'd love to, but my heart's not in it today.",
+            "Appreciate the invite, but I'll give {skillName} a miss.",
+            "Eh, not really feeling it. Maybe later."
+        };
+
+        private static readonly string[] playerSkillProposalDeclineSuggestionSegments =
+        {
+            "I wouldn't mind training {suggestedSkillName} though.",
+            "How about we train {suggestedSkillName}?",
+            "We could train some {suggestedSkillName} if you're up for it.",
+            "I feel like training some {suggestedSkillName} though.",
+            "Can we not train some {suggestedSkillName}?"
+        };
+
         private static readonly string[] playerSkillProposalMissingToolSegments =
         {
     "Ah, I would, but I don’t have {indefiniteTool} right now.",
@@ -188,6 +216,16 @@ namespace Companions.Conversation
         /// Follow-up lines used after a generic affirmative skill response.
         /// </summary>
         internal static string[] PlayerSkillProposalReadyGenericFollowUps => playerSkillProposalReadyGenericFollowUps;
+
+        /// <summary>
+        /// Primary responses used when the companion declines the player's training request.
+        /// </summary>
+        internal static string[] PlayerSkillProposalDeclineSegments => playerSkillProposalDeclineSegments;
+
+        /// <summary>
+        /// Follow-up suggestions the companion may offer after declining.
+        /// </summary>
+        internal static string[] PlayerSkillProposalDeclineSuggestionSegments => playerSkillProposalDeclineSuggestionSegments;
 
         /// <summary>
         /// Primary responses that explain the companion is missing the required tool.

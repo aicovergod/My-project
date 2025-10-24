@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fd2129b973942133770680dcc0dcfbdd4a8254a0 -->
+## 2025-10-24T11:09:55+01:00 — feat: allow companion to decline player skill requests
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionSkillProposalDialogueBlocks.cs
+- Diff: 196 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:566327737b002d4d81c0f7c295a1289eba549ff0 -->
 ## 2025-10-24T01:18:54+01:00 — Merge pull request #1362 from aicovergod/codex/add-skilllevelquery-functionality
 
