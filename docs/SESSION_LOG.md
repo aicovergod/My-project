@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:43454ed8507af9bdb97c10358cfeae85d0b58e71 -->
+## 2025-10-24T17:53:25+01:00 — Merge pull request #1381 from aicovergod/codex/fix-console-error-cs0246-5qid7r
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 10 ++ / 0 --
+- Notes:
+  Fix missing EquipmentAggregator reference
+---
+<!-- commit:c0db22f31f948301788a2e4a2f6ce38689e232e7 -->
+## 2025-10-24T17:53:16+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2111e48f55fa012e6ec4a97a20ba96942b7238ae -->
 ## 2025-10-24T17:52:57+01:00 — Fix missing EquipmentAggregator reference
 
