@@ -1,6 +1,8 @@
+using System;
 using UnityEngine;
 using World;
 using Player.Ranks;
+using Companions.Conversation;
 
 namespace Companions.UI
 {
@@ -13,7 +15,7 @@ namespace Companions.UI
     {
         private const int WindowId = 0xF40F4;
 
-        private Rect windowRect = new Rect(10f, 10f, 280f, 140f);
+        private Rect windowRect = new Rect(10f, 10f, 320f, 220f);
         private bool visible;
 
         /// <summary>Indicates whether the F4 admin menu is currently visible.</summary>
@@ -71,6 +73,27 @@ namespace Companions.UI
             }
 
             GUILayout.Space(6f);
+            GUILayout.Label("Suggestion prompt state");
+
+            var debugState = CompanionConversationService.GetSuggestionDebugState();
+            GUILayout.Label($"CompanionHasAnsweredSuggestionQuestion: {debugState.HasActiveSuggestion}");
+
+            string remaining = debugState.TimeRemaining.HasValue
+                ? FormatTimeSpan(debugState.TimeRemaining.Value)
+                : "--";
+            GUILayout.Label($"Time remaining: {remaining}");
+
+            if (!string.IsNullOrWhiteSpace(debugState.LastSuggestion))
+                GUILayout.Label($"Last suggestion: {debugState.LastSuggestion}");
+
+            Color previousColor = GUI.color;
+            if (debugState.PlayerAskedAgain)
+                GUI.color = Color.yellow;
+
+            GUILayout.Label($"PlayerHasAskedCompanionSuggestionQuestionAgain: {debugState.PlayerAskedAgain}");
+            GUI.color = previousColor;
+
+            GUILayout.Space(6f);
             GUILayout.Label("Press F4 again to close this menu.");
 
             GUI.DragWindow(new Rect(0f, 0f, windowRect.width, 24f));
@@ -86,6 +109,13 @@ namespace Companions.UI
                 return false;
 
             return rankService.HasPermission(rankService.ActivePlayerRank, PlayerRank.Developer);
+        }
+
+        private static string FormatTimeSpan(TimeSpan value)
+        {
+            return value.TotalHours >= 1d
+                ? value.ToString(@"hh\:mm\:ss")
+                : value.ToString(@"mm\:ss");
         }
     }
 }

@@ -12,6 +12,14 @@ namespace Companions.Conversation
     /// </summary>
     public static class CompanionDialoguePatterns
     {
+        private static readonly Regex SuggestionQuestionRegex = new Regex(
+            "\\bwhat\\s+(do|would)\\s+(you|ya)\\s+(want|wanna|like)\\s+(to\\s+)?(train|do)\\b",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        private static readonly Regex SuggestionReminderRegex = new Regex(
+            "\\b(remind|reminder|again|forgot|forget)\\b",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
         private static readonly Regex RequestAssistanceRegex = new Regex(
             "\\b(can|could|will|would|please|mind)\\s+(you|ya)\\b",
             RegexOptions.Compiled | RegexOptions.CultureInvariant);
@@ -338,6 +346,52 @@ namespace Companions.Conversation
                         new MultiWordPhrase("after this", 1.3f)
                     },
                     regexScoreEvaluator: text => SkillKeywordRegex.IsMatch(text) ? 0.3f : 0f),
+
+                new CompanionIntentPattern(
+                    CompanionDialogueIntent.CompanionSuggestionRequest,
+                    priority: 32,
+                    matchThreshold: 1.6f,
+                    synonymBuckets: new[]
+                    {
+                        new SynonymBucket(new[] { "what", "whats", "what's" }, 1f),
+                        new SynonymBucket(new[] { "do", "doing" }, 0.6f),
+                        new SynonymBucket(new[] { "want", "wanna", "like" }, 0.8f),
+                        new SynonymBucket(new[] { "train", "training", "do", "doing", "activity", "plan" }, 0.6f),
+                        new SynonymBucket(new[] { "you", "ya" }, 0.8f)
+                    },
+                    multiWordPhrases: new[]
+                    {
+                        new MultiWordPhrase("what do you want to train", 2.2f),
+                        new MultiWordPhrase("what do you wanna train", 2.2f),
+                        new MultiWordPhrase("what do you want to do", 2.2f),
+                        new MultiWordPhrase("what do you wanna do", 2.2f),
+                        new MultiWordPhrase("what would you like to do", 2.2f),
+                        new MultiWordPhrase("what should we do", 1.8f)
+                    },
+                    regexScoreEvaluator: text => SuggestionQuestionRegex.IsMatch(text) ? 0.4f : 0f),
+
+                new CompanionIntentPattern(
+                    CompanionDialogueIntent.CompanionSuggestionReminder,
+                    priority: 33,
+                    matchThreshold: 1.3f,
+                    synonymBuckets: new[]
+                    {
+                        new SynonymBucket(new[] { "remind", "reminder", "again", "forgot", "forget" }, 1.1f),
+                        new SynonymBucket(new[] { "me", "us" }, 0.7f),
+                        new SynonymBucket(new[] { "tell", "say" }, 0.6f)
+                    },
+                    multiWordPhrases: new[]
+                    {
+                        new MultiWordPhrase("remind me", 1.8f),
+                        new MultiWordPhrase("tell me again", 1.8f),
+                        new MultiWordPhrase("i forgot", 1.6f),
+                        new MultiWordPhrase("remind me again", 1.9f),
+                        new MultiWordPhrase("tell us again", 1.8f),
+                        new MultiWordPhrase("what was it again", 1.9f),
+                        new MultiWordPhrase("what did you want to do again", 2.0f),
+                        new MultiWordPhrase("what did you wanna do again", 2.0f)
+                    },
+                    regexScoreEvaluator: text => SuggestionReminderRegex.IsMatch(text) ? 0.4f : 0f),
 
                 new CompanionIntentPattern(
                     CompanionDialogueIntent.RequestAlternateSkill,

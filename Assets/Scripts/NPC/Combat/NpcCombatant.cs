@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Combat;
+using Companions.Conversation;
 using MyGame.Drops;
 using Player;
 using Pets;
@@ -271,7 +272,10 @@ namespace NPC
                     $"{name} recorded recent player damage but has no tracked playerDamage. Ensure ClearDamageContributors is invoked when combat resets.");
 
                 if (killedByPlayer && killingPlayer != null)
+                {
                     OnKilledByPlayer?.Invoke(this, killingPlayer);
+                    CompanionConversationService.RegisterNpcKill(this, killingPlayer);
+                }
 
                 if (killedByPlayer || playerDamage > npcDamage)
                     dropper?.OnDeath();

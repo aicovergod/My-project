@@ -76,6 +76,16 @@ namespace Companions.Conversation
         /// <summary>
         /// Player requested a different skill suggestion from the companion.
         /// </summary>
-        RequestAlternateSkill = 100
+        RequestAlternateSkill = 100,
+
+        /// <summary>
+        /// Player asked the companion what they would like to train or do next.
+        /// </summary>
+        CompanionSuggestionRequest = 110,
+
+        /// <summary>
+        /// Player asked the companion to repeat their last activity suggestion.
+        /// </summary>
+        CompanionSuggestionReminder = 120
     }
 }
