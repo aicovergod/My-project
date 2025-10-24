@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2111e48f55fa012e6ec4a97a20ba96942b7238ae -->
+## 2025-10-24T17:52:57+01:00 — Fix missing EquipmentAggregator reference
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionRangedCombatController.cs
+- Diff: 1 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2039299ec97a2ecc97b93cb77f5137ca62990569 -->
 ## 2025-10-24T17:49:21+01:00 — Merge pull request #1380 from aicovergod/codex/introduce-companion-ready-ranged-controller
 
