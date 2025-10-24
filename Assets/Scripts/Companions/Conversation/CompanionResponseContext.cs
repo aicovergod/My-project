@@ -25,6 +25,10 @@ namespace Companions.Conversation
         /// <param name="suggestedSkillAction">Description of the underlying skill action.</param>
         /// <param name="suggestedSkillAge">How long ago the skill event occurred.</param>
         /// <param name="suggestedSkillRecency">Human-readable label describing the skill recency.</param>
+        /// <param name="queriedSkill">Skill explicitly referenced in the active chat query.</param>
+        /// <param name="queriedSkillName">Display name for the queried skill when available.</param>
+        /// <param name="queriedSkillSentence">Sentence-friendly name for the queried skill.</param>
+        /// <param name="queriedSkillLevel">Companion's current level for the queried skill if resolved.</param>
         public CompanionResponseContext(
             DateTime requestTimeUtc,
             string timeOfDayLabel,
@@ -36,7 +40,11 @@ namespace Companions.Conversation
             string suggestedSkillName,
             string suggestedSkillAction,
             TimeSpan? suggestedSkillAge,
-            string suggestedSkillRecency)
+            string suggestedSkillRecency,
+            SkillType? queriedSkill = null,
+            string queriedSkillName = "",
+            string queriedSkillSentence = "",
+            int? queriedSkillLevel = null)
         {
             RequestTimeUtc = requestTimeUtc;
             TimeOfDayLabel = timeOfDayLabel ?? string.Empty;
@@ -49,6 +57,11 @@ namespace Companions.Conversation
             SuggestedSkillActionDescription = suggestedSkillAction ?? string.Empty;
             SuggestedSkillAge = suggestedSkillAge;
             SuggestedSkillRecency = suggestedSkillRecency ?? string.Empty;
+
+            QueriedSkill = queriedSkill;
+            QueriedSkillName = queriedSkillName ?? string.Empty;
+            QueriedSkillSentence = queriedSkillSentence ?? string.Empty;
+            QueriedSkillLevel = queriedSkillLevel;
 
             CombatStateDescriptor = ResolveCombatStateDescriptor(playerInCombat, companionInCombat);
         }
@@ -106,6 +119,54 @@ namespace Companions.Conversation
 
         /// <summary>True when a recency label is available for the suggested skill.</summary>
         public bool HasSuggestedSkillRecency => !string.IsNullOrWhiteSpace(SuggestedSkillRecency);
+
+        /// <summary>Skill referenced directly in the player's message, if any.</summary>
+        public SkillType? QueriedSkill { get; }
+
+        /// <summary>Display name for the queried skill if it could be resolved.</summary>
+        public string QueriedSkillName { get; }
+
+        /// <summary>Sentence-form name for the queried skill when available.</summary>
+        public string QueriedSkillSentence { get; }
+
+        /// <summary>Companion's resolved level for the queried skill.</summary>
+        public int? QueriedSkillLevel { get; }
+
+        /// <summary>True when the context tracks a specific skill referenced in chat.</summary>
+        public bool HasQueriedSkill => QueriedSkill.HasValue ||
+            !string.IsNullOrWhiteSpace(QueriedSkillName) ||
+            !string.IsNullOrWhiteSpace(QueriedSkillSentence);
+
+        /// <summary>True when the companion's level for the queried skill is known.</summary>
+        public bool HasQueriedSkillLevel => QueriedSkillLevel.HasValue;
+
+        /// <summary>
+        /// Returns a copy of the context with updated skill query information while preserving all other
+        /// properties. Useful when composing responses that rely on parsed chat details.
+        /// </summary>
+        public CompanionResponseContext WithSkillQuery(
+            SkillType? queriedSkill,
+            string queriedSkillName,
+            string queriedSkillSentence,
+            int? queriedSkillLevel)
+        {
+            return new CompanionResponseContext(
+                RequestTimeUtc,
+                TimeOfDayLabel,
+                PlayerInCombat,
+                CompanionInCombat,
+                RecentSkillActions,
+                PendingResponseCount,
+                SuggestedSkill,
+                SuggestedSkillName,
+                SuggestedSkillActionDescription,
+                SuggestedSkillAge,
+                SuggestedSkillRecency,
+                queriedSkill,
+                queriedSkillName,
+                queriedSkillSentence,
+                queriedSkillLevel);
+        }
 
         private static string ResolveCombatStateDescriptor(bool playerInCombat, bool companionInCombat)
         {

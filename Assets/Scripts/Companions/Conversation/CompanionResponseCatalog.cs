@@ -25,6 +25,7 @@ namespace Companions.Conversation
 
             RegisterGreetingResponses();
             RegisterStatusQueryResponses();
+            RegisterSkillLevelQueryResponses();
             RegisterGratitudeResponses();
             RegisterFarewellResponses();
             RegisterComplimentResponses();
@@ -126,7 +127,26 @@ namespace Companions.Conversation
         // admin/pending chatter awareness (still answering first)
         new ResponseTemplate("I’m fine. Queue’s noisy, but I’ve got it.", 0.85f, ctx => ctx.HasPendingResponses),
         new ResponseTemplate("All good here. I’ll triage the chatter later.", 0.8f, ctx => ctx.HasPendingResponses),
-        new ResponseTemplate("Queue's already stacked with chatter.|Want me to triage it while you stay {combatState}?", 0.7f, ctx => ctx.HasPendingResponses));
+                new ResponseTemplate("Queue's already stacked with chatter.|Want me to triage it while you stay {combatState}?", 0.7f, ctx => ctx.HasPendingResponses));
+        }
+
+        /// <summary>
+        /// Populates the templates companions use when reporting their skill levels.
+        /// </summary>
+        private static void RegisterSkillLevelQueryResponses()
+        {
+            Register(
+                CompanionDialogueIntent.SkillLevelQuery,
+                new ResponseTemplate("My {skillName} level is {skillLevel}.|Want the rundown on another skill?", 1f, ctx => ctx.HasQueriedSkillLevel),
+                new ResponseTemplate("Currently sitting at level {skillLevel} in {skillSentence}.", 0.95f, ctx => ctx.HasQueriedSkillLevel),
+                new ResponseTemplate("I'm rocking level {skillLevel} {skillSentence} right now.", 0.9f, ctx => ctx.HasQueriedSkillLevel),
+                new ResponseTemplate("{skillName}? Level {skillLevel}.", 0.9f, ctx => ctx.HasQueriedSkillLevel),
+                new ResponseTemplate("Keeping {skillSentence} sharp at level {skillLevel}.", 0.85f, ctx => ctx.HasQueriedSkillLevel),
+                new ResponseTemplate("If you're asking about {skillName}, let's call it level {skillLevelOrUnknown}.", 0.8f, ctx => ctx.HasQueriedSkill),
+                new ResponseTemplate("Can't pull that level right now, but I know it's solid.|Ask again after the next tick?", 0.75f, ctx => ctx.HasQueriedSkill && !ctx.HasQueriedSkillLevel),
+                new ResponseTemplate("Name the skill and I'll tell you.", 0.85f, ctx => !ctx.HasQueriedSkill),
+                new ResponseTemplate("Say the skill out loud and I’ll grab the level.", 0.8f, ctx => !ctx.HasQueriedSkill),
+                new ResponseTemplate("Spell out the skill and I’ll spill the number.", 0.75f, ctx => !ctx.HasQueriedSkill));
         }
 
         /// <summary>
