@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:025407546060f0f4e71464c2379cbd46ea345a07 -->
+## 2025-10-24T15:34:41+01:00 — Allow proactive questions to reuse fallback templates
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 18 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:848b93a556984ff3c2b28cce61a8335351cf805b -->
 ## 2025-10-24T13:29:55+01:00 — Merge pull request #1374 from aicovergod/codex/introduce-intent-suppression-helper-in-companionconversation
 

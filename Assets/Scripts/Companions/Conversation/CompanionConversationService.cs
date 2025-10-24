@@ -885,13 +885,25 @@ namespace Companions.Conversation
             SkillQuestionCandidate? optionalCandidate = candidate.IsValid ? candidate : (SkillQuestionCandidate?)null;
             var context = BuildResponseContext(optionalCandidate);
 
-            if (!responseLibrary.TrySelectResponse(
-                    CompanionDialogueIntent.ProactiveSkillQuestion,
-                    context,
-                    lastProactiveQuestionTemplateKey,
-                    out var selection))
+            bool responseSelected = responseLibrary.TrySelectResponse(
+                CompanionDialogueIntent.ProactiveSkillQuestion,
+                context,
+                lastProactiveQuestionTemplateKey,
+                out var selection);
+
+            if (!responseSelected)
             {
-                return;
+                if (string.IsNullOrEmpty(lastProactiveQuestionTemplateKey))
+                    return;
+
+                if (!responseLibrary.TrySelectResponse(
+                        CompanionDialogueIntent.ProactiveSkillQuestion,
+                        context,
+                        string.Empty,
+                        out selection))
+                {
+                    return;
+                }
             }
 
             string playerName = ResolvePlayerName(string.Empty);
