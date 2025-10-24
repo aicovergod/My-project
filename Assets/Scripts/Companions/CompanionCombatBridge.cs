@@ -85,6 +85,23 @@ namespace Companions
                     if (slot == EquipmentSlot.Weapon)
                     {
                         weapon = item;
+
+                        // Determine the most appropriate combat style before querying the weapon's speed overrides so
+                        // ranged and magic gear can surface their Rapid/Accurate cadence instead of the melee default.
+                        if (WeaponClassificationUtility.IsMagicWeapon(weapon))
+                        {
+                            // Magic currently only exposes the Accurate style just like the player staff presets.
+                            attacker.Style = CombatStyle.Accurate;
+                        }
+                        else if (WeaponClassificationUtility.IsRangedWeapon(weapon))
+                        {
+                            attacker.Style = CombatStyle.Rapid;
+                        }
+                        else
+                        {
+                            attacker.Style = CombatStyle.Accurate;
+                        }
+
                         // Respect weapon-specific attack speed overrides for the companion's current combat style.
                         int speed = item.GetAttackSpeedTicks(attacker.Style);
                         if (speed > 0)
@@ -94,8 +111,17 @@ namespace Companions
             }
 
             attacker.Equip.attackSpeedTicks = Mathf.Max(1, attacker.Equip.attackSpeedTicks);
+
+            if (weapon != null)
+            {
+                int styledSpeed = weapon.GetAttackSpeedTicks(attacker.Style);
+                if (styledSpeed > 0)
+                    attacker.Equip.attackSpeedTicks = Mathf.Max(1, styledSpeed);
+            }
+
             // Classify the equipped weapon to pick the most appropriate damage type, falling back to melee when empty.
-            attacker.DamageType = WeaponClassificationUtility.ResolveDamageType(weapon);
+            var resolvedDamageType = WeaponClassificationUtility.ResolveDamageType(weapon);
+            attacker.DamageType = resolvedDamageType;
             return true;
         }
 
