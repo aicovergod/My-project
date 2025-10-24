@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:acd98d3adf0dc2978c763b23c64e46f5109920d9 -->
+## 2025-10-24T13:29:27+01:00 — Prune conflicting companion compliments
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionIntentDisambiguator.cs, Assets/Tests/Companions/CompanionIntentDisambiguatorTests.cs
+- Diff: 165 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:e2166a051790a59d817c031dd1a0bba350104d1f -->
 ## 2025-10-24T13:20:56+01:00 — Merge pull request #1373 from aicovergod/codex/refactor-compliment-patterns-and-add-tests
 
