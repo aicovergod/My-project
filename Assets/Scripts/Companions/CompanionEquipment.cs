@@ -294,6 +294,8 @@ namespace Companions
             }
 
             equipped[index] = entry;
+            UpdateBonuses();
+            Save();
             UpdateSlotVisual(slot);
             EquipmentSlotChanged?.Invoke(slot, entry);
             remaining = entry.count;
