@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:65fb9ef2f8f6618558e00b0dfc44326a4d80d888 -->
+## 2025-10-24T20:55:29+01:00 — Merge pull request #1384 from aicovergod/codex/fix-companion-ranged-ammo-consumption
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 31 ++ / 7 --
+- Notes:
+  Fix companion ranged ammo consumption
+---
+<!-- commit:e40de31e1f50bc16e7d6a6a213c31ac782780264 -->
+## 2025-10-24T20:55:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:99fdf91c6d53820be651be9b9657eba8c7cfc517 -->
 ## 2025-10-24T20:55:03+01:00 — Fix companion ranged ammo consumption
 
