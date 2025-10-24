@@ -54,6 +54,7 @@ namespace Pets
         private CompanionController companionController;
         private CompanionEquipment subscribedEquipment;
         private CompanionCombatBridge companionCombatBridge;
+        private CompanionRangedCombatController rangedCombatController;
 
         private const float TileSize = 1f;
         private const float HalberdExtraRangeTiles = 1f;
@@ -123,6 +124,7 @@ namespace Pets
 
             companionController = GetComponent<CompanionController>();
             companionCombatBridge = GetComponent<CompanionCombatBridge>();
+            rangedCombatController = GetComponent<CompanionRangedCombatController>();
 
             hitSplatLibrary = HitSplatLibraryResolver.Resolve(hitSplatLibrary);
 
@@ -319,7 +321,9 @@ namespace Pets
                     }
 
                     ApplyVisualVelocity(visualVelocity);
-                    ResolveAttack(currentTarget, attackerStats, ownerTransform, beastmasterLevel);
+                    int resolvedTicks = ResolveAttack(currentTarget, attackerStats, ownerTransform, beastmasterLevel);
+                    if (resolvedTicks > 0)
+                        attackSpeedTicks = resolvedTicks;
 
                     // Reset any residual velocity so the pet remains parked next to the target while waiting for the next swing.
                     movementVelocity = Vector2.zero;
@@ -553,10 +557,10 @@ namespace Pets
             return AmmunitionCache.TryGetValue(ammo.name, out data);
         }
 
-        private void ResolveAttack(CombatTarget target, CombatantStats attacker, Transform ownerTransform, int beastmasterLevel)
+        private int ResolveAttack(CombatTarget target, CombatantStats attacker, Transform ownerTransform, int beastmasterLevel)
         {
             if (target == null)
-                return;
+                return Mathf.Max(1, attacker.Equip.attackSpeedTicks);
 
             var npc = target as NpcCombatant;
             CombatantStats defender;
@@ -572,6 +576,39 @@ namespace Pets
                     Style = CombatStyle.Defensive,
                     DamageType = target.PreferredDefenceType
                 };
+
+            Vector2 diff = target.transform.position - transform.position;
+            Direction8 facingDir = Direction8Utility.FromVector(diff, allowDiagonals: true, fallback: Direction8.Down);
+            if (spriteAnimator != null)
+                spriteAnimator.SetFacing(facingDir);
+            else if (spriteRenderer != null)
+                spriteRenderer.flipX = Direction8Utility.IsFacingRight(facingDir);
+
+            if (animator != null)
+            {
+                animator.SetInteger("Dir", Direction8Utility.ToAnimatorIndex8(facingDir));
+                animator.SetTrigger("Attack");
+            }
+            else if (spriteAnimator != null && spriteAnimator.HasHitAnimation(facingDir))
+            {
+                if (spriteSwapRoutine != null)
+                    StopCoroutine(spriteSwapRoutine);
+                spriteSwapRoutine = StartCoroutine(spriteAnimator.PlayHitAnimation(facingDir));
+            }
+            else if (spriteRenderer != null && definition != null && definition.attackSprite != null)
+            {
+                if (spriteSwapRoutine != null)
+                    StopCoroutine(spriteSwapRoutine);
+                spriteSwapRoutine = StartCoroutine(AttackSpriteSwap());
+            }
+
+            if (attacker.DamageType == DamageType.Ranged && rangedCombatController != null)
+            {
+                if (rangedCombatController.TryResolveAttack(attacker, target, ownerTransform, beastmasterLevel, out int cooldownTicks))
+                    return Mathf.Max(1, cooldownTicks);
+
+                return Mathf.Max(1, attacker.Equip.attackSpeedTicks);
+            }
 
             int attEff = attacker.DamageType switch
             {
@@ -599,36 +636,11 @@ namespace Pets
             float chance = CombatMath.ChanceToHit(atkRoll, defRoll);
             bool hit = UnityEngine.Random.value < chance;
 
-            Vector2 diff = target.transform.position - transform.position;
-            Direction8 facingDir = Direction8Utility.FromVector(diff, allowDiagonals: true, fallback: Direction8.Down);
-            if (spriteAnimator != null)
-                spriteAnimator.SetFacing(facingDir);
-            else if (spriteRenderer != null)
-                spriteRenderer.flipX = Direction8Utility.IsFacingRight(facingDir);
-
-            if (animator != null)
-            {
-                animator.SetInteger("Dir", Direction8Utility.ToAnimatorIndex8(facingDir));
-                animator.SetTrigger("Attack");
-            }
-            else if (spriteAnimator != null && spriteAnimator.HasHitAnimation(facingDir))
-            {
-                if (spriteSwapRoutine != null)
-                    StopCoroutine(spriteSwapRoutine);
-                spriteSwapRoutine = StartCoroutine(spriteAnimator.PlayHitAnimation(facingDir));
-            }
-            else if (spriteRenderer != null && definition != null && definition.attackSprite != null)
-            {
-                if (spriteSwapRoutine != null)
-                    StopCoroutine(spriteSwapRoutine);
-                spriteSwapRoutine = StartCoroutine(AttackSpriteSwap());
-            }
-
             companionCombatBridge ??= GetComponent<CompanionCombatBridge>();
 
+            int maxHit;
             if (hit)
             {
-                int maxHit;
                 if (attacker.DamageType == DamageType.Magic)
                 {
                     maxHit = Mathf.Max(0, Mathf.FloorToInt(attacker.MagicLevel * 0.2f + attacker.Equip.magic * 0.1f));
@@ -646,46 +658,89 @@ namespace Pets
                 if (definition != null && definition.maxHitPerBeastmasterLevel != 0f)
                     maxHit = Mathf.RoundToInt(maxHit * (1f + definition.maxHitPerBeastmasterLevel * beastmasterLevel));
                 int dmg = CombatMath.RollDamage(maxHit);
-                object source = this;
-                if (ownerTransform != null && ownerTransform.TryGetComponent<PlayerCombatTarget>(out var ownerTarget))
-                    source = ownerTarget;
-                int finalDamage = target.ApplyDamage(dmg, attacker.DamageType, SpellElement.None, source);
-
-                Sprite hitsplatSprite;
-                string hitsplatText;
-                if (finalDamage <= 0)
+                var damageResult = new CombatController.DamageResult
                 {
-                    hitsplatSprite = zeroHitsplat;
-                    hitsplatText = "0";
-                }
-                else if (finalDamage == maxHit)
-                {
-                    hitsplatSprite = maxHitHitsplat;
-                    hitsplatText = finalDamage.ToString();
-                }
-                else
-                {
-                    hitsplatSprite = damageHitsplat;
-                    hitsplatText = finalDamage.ToString();
-                }
-
-                Vector3 hitsplatPosition = FloatingTextAnchorUtility.ResolveAnchorPosition(target.transform, hitsplatFallbackOffset, hitsplatAnchorCache);
-                FloatingText.Show(hitsplatText, hitsplatPosition, Color.white, null, hitsplatSprite);
-                if (npc != null)
-                {
-                    var npcAttack = npc.GetComponent<NpcAttackController>();
-                    npcAttack?.BeginAttacking(this);
-                }
-                BeastmasterXp.TryGrantFromPetDamage(ownerTransform != null ? ownerTransform.gameObject : null, finalDamage);
-                companionCombatBridge?.NotifyDamageDealt(finalDamage, attacker.Style, attacker.DamageType, target);
-
-                if (!target.IsAlive && IsOreGolemTarget(target))
-                    TryScheduleOreGolemHarvest(ownerTransform);
+                    damage = dmg,
+                    hit = true,
+                    maxHit = maxHit
+                };
+                ApplyDamageResult(target, attacker, damageResult, ownerTransform, beastmasterLevel);
             }
             else
             {
-                Vector3 hitsplatPosition = FloatingTextAnchorUtility.ResolveAnchorPosition(target.transform, hitsplatFallbackOffset, hitsplatAnchorCache);
-                FloatingText.Show("0", hitsplatPosition, Color.white, null, zeroHitsplat);
+                var damageResult = new CombatController.DamageResult
+                {
+                    damage = 0,
+                    hit = false,
+                    maxHit = 0
+                };
+                ApplyDamageResult(target, attacker, damageResult, ownerTransform, beastmasterLevel);
+            }
+            return Mathf.Max(1, attacker.Equip.attackSpeedTicks);
+        }
+
+        /// <summary>
+        /// Applies the supplied damage result to the current target, resolving hitsplats, XP, and follow-up hooks.
+        /// </summary>
+        public void ApplyDamageResult(
+            CombatTarget target,
+            CombatantStats attacker,
+            CombatController.DamageResult result,
+            Transform ownerTransform,
+            int beastmasterLevel)
+        {
+            if (target == null)
+                return;
+
+            bool hit = result.hit;
+            int damage = Mathf.Max(0, result.damage);
+            int maxHit = Mathf.Max(0, result.maxHit);
+
+            if (hit && definition != null && definition.maxHitPerBeastmasterLevel != 0f)
+                damage = Mathf.RoundToInt(damage * (1f + definition.maxHitPerBeastmasterLevel * beastmasterLevel));
+
+            object source = this;
+            if (ownerTransform != null && ownerTransform.TryGetComponent<PlayerCombatTarget>(out var ownerTarget))
+                source = ownerTarget;
+
+            int finalDamage = hit
+                ? target.ApplyDamage(damage, attacker.DamageType, SpellElement.None, source)
+                : 0;
+
+            Sprite hitsplatSprite;
+            string hitsplatText;
+            if (!hit || finalDamage <= 0)
+            {
+                hitsplatSprite = zeroHitsplat;
+                hitsplatText = "0";
+            }
+            else if (finalDamage == Mathf.Max(maxHit, damage))
+            {
+                hitsplatSprite = maxHitHitsplat;
+                hitsplatText = finalDamage.ToString();
+            }
+            else
+            {
+                hitsplatSprite = damageHitsplat;
+                hitsplatText = finalDamage.ToString();
+            }
+
+            Vector3 hitsplatPosition = FloatingTextAnchorUtility.ResolveAnchorPosition(target.transform, hitsplatFallbackOffset, hitsplatAnchorCache);
+            FloatingText.Show(hitsplatText, hitsplatPosition, Color.white, null, hitsplatSprite);
+
+            if (hit)
+            {
+                if (target is NpcCombatant npcCombatant)
+                {
+                    var npcAttack = npcCombatant.GetComponent<NpcAttackController>();
+                    npcAttack?.BeginAttacking(this);
+                }
+
+                BeastmasterXp.TryGrantFromPetDamage(ownerTransform != null ? ownerTransform.gameObject : null, finalDamage);
+                companionCombatBridge?.NotifyDamageDealt(finalDamage, attacker.Style, attacker.DamageType, target);
+
+                if (finalDamage > 0 && !target.IsAlive && IsOreGolemTarget(target))
+                    TryScheduleOreGolemHarvest(ownerTransform);
             }
         }
 

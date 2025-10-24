@@ -1,6 +1,7 @@
 using System;
 using Combat;
 using Inventory;
+using MyGame.Drops;
 using Pets;
 using Skills;
 using UnityEngine;
@@ -31,6 +32,9 @@ namespace Companions
 
         /// <summary>Bridges pet combat calculations so the companion uses its own stats.</summary>
         private CompanionCombatBridge combatBridge;
+
+        /// <summary>Adapter that enables ranged projectiles for the companion.</summary>
+        private CompanionRangedCombatController rangedCombatController;
 
         /// <summary>Follower logic that keeps the companion next to the player.</summary>
         private PetFollower follower;
@@ -318,6 +322,12 @@ namespace Companions
         {
             combatBridge = gameObject.AddComponent<CompanionCombatBridge>();
             combatBridge.Initialise(this, skillManager);
+
+            rangedCombatController = GetComponent<CompanionRangedCombatController>() ?? gameObject.AddComponent<CompanionRangedCombatController>();
+            var floatingText = GetComponent<PetFloatingTextController>() ?? GetComponentInChildren<PetFloatingTextController>();
+            Transform floatingAnchor = floatingText != null ? floatingText.FloatingTextAnchor : transform;
+            GroundItemSpawner spawner = FindFirstObjectByType<GroundItemSpawner>();
+            rangedCombatController.Initialise(combatController, companionEquipment, companionInventory, floatingAnchor, spawner);
         }
 
         private void OnSkillLevelChanged(SkillType type, int level)

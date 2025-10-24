@@ -19,7 +19,7 @@ namespace Combat.Ranged
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(CombatController))]
-    public class RangedCombatController : MonoBehaviour, ITickable
+    public class RangedCombatController : MonoBehaviour, ITickable, IRangedProjectileOwner
     {
         [Header("Data Sources")]
         [Tooltip("Explicit ranged weapon definitions. Resources at 'Combat/Ranged/Weapons' are auto-loaded in addition to this list.")]
