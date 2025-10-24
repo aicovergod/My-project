@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:61f6411e2b2d5d2fa56e3b517e5a49048b50b1a2 -->
+## 2025-10-24T16:19:41+01:00 — dialogue updates
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (10): Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs.meta, Assets/Scripts/Companions/CompanionSkillCooldownTracker.cs.meta, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs, Assets/Scripts/Companions/Conversation/CompanionIntentDisambiguator.cs.meta, Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs, Assets/Scripts/Companions/Conversation/CompanionSkillProposalDialogueBlocks.cs, Assets/Scripts/Companions/UI/AdminF4Menu.cs.meta, Assets/Scripts/Companions/UI/CompanionCooldownsWindow.cs.meta, Assets/Scripts/Player/Commands/ClearCompanionCooldownTimersCommand.cs.meta, Assets/Tests/Companions/CompanionIntentDisambiguatorTests.cs.meta
+- Diff: 274 ++ / 47 --
+- Notes:
+  —
+---
 <!-- commit:0a350b58cd769c98b1a38deed96c1cb3571c2bc9 -->
 ## 2025-10-24T16:18:22+01:00 — Merge pull request #1376 from aicovergod/codex/implement-companion-suggestion-workflow
 
