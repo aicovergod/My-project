@@ -35,5 +35,6 @@ MonoBehaviour:
   - {fileID: 3816101378255015165, guid: 0f53e1c23f6e9444fb2635c2e008d6c1, type: 3}
   - {fileID: 3365990806118628324, guid: bedce8b940e7b1047a254651615d4776, type: 3}
   - {fileID: 506812458082154741, guid: f33a98c17022cc640b26065d499428b7, type: 3}
+  - {fileID: 6845085416818505632, guid: 2f876ec749756974ba30c75405b08de4, type: 3}
   excludedSceneNames:
   - Login

@@ -137,9 +137,9 @@ namespace Companions.Conversation
         {
             Register(
                 CompanionDialogueIntent.SkillLevelQuery,
-                new ResponseTemplate("My {skillName} level is {skillLevel}.|Want the rundown on another skill?", 1f, ctx => ctx.HasQueriedSkillLevel),
+                new ResponseTemplate("My {skillName} level is {skillLevel}.", 1f, ctx => ctx.HasQueriedSkillLevel),
                 new ResponseTemplate("Currently sitting at level {skillLevel} in {skillSentence}.", 0.95f, ctx => ctx.HasQueriedSkillLevel),
-                new ResponseTemplate("I'm rocking level {skillLevel} {skillSentence} right now.", 0.9f, ctx => ctx.HasQueriedSkillLevel),
+                new ResponseTemplate("I'm level {skillLevel} {skillSentence} right now.", 0.9f, ctx => ctx.HasQueriedSkillLevel),
                 new ResponseTemplate("{skillName}? Level {skillLevel}.", 0.9f, ctx => ctx.HasQueriedSkillLevel),
                 new ResponseTemplate("Keeping {skillSentence} sharp at level {skillLevel}.", 0.85f, ctx => ctx.HasQueriedSkillLevel),
                 new ResponseTemplate("If you're asking about {skillName}, let's call it level {skillLevelOrUnknown}.", 0.8f, ctx => ctx.HasQueriedSkill),
