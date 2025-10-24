@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Audio;
 using Combat;
+using EquipmentSystem;
 using Combat.Ranged;
 using Inventory;
 using MyGame.Drops;
