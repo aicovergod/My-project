@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:320a4031ce0f9c24532046be541ccdfc0ef04349 -->
+## 2025-10-24T16:42:58+01:00 — Merge pull request #1377 from aicovergod/codex/move-dialogue-to-separate-script-file
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 130 ++ / 47 --
+- Notes:
+  Refactor companion suggestion dialogue into dedicated blocks
+---
+<!-- commit:3503c723746d1ae5fd5997953657d40d2c6a941f -->
+## 2025-10-24T16:42:40+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d3bc8258fb95206cacdbaebd5c387bdba39a3f50 -->
 ## 2025-10-24T16:42:22+01:00 — Refactor companion suggestion dialogue into dedicated blocks
 
