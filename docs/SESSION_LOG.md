@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1895441b2a2123a988df0aec784143704f9b0856 -->
+## 2025-10-24T12:59:19+01:00 — Merge pull request #1370 from aicovergod/codex/add-combat-skill-decline-restrictions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 130 ++ / 6 --
+- Notes:
+  Lock companion guard mode during combat cooldown
+---
+<!-- commit:ca43b9122eed5d61fe9b9bc94401a787aeecf24d -->
+## 2025-10-24T12:59:11+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:97309c70a8532bc003f001671c568ab7e9f4a9a8 -->
 ## 2025-10-24T12:58:53+01:00 — Lock companion guard mode during combat cooldown
 
