@@ -23,9 +23,6 @@ namespace Companions
         /// <summary>Time span representation of <see cref="CombatDeclineCooldownMinutes"/>.</summary>
         public static readonly TimeSpan CombatDeclineCooldownDuration = TimeSpan.FromMinutes(CombatDeclineCooldownMinutes);
 
-        /// <summary>Skill key used to persist the shared combat-decline cooldown.</summary>
-        private const SkillType CombatCooldownStorageKey = SkillType.Hitpoints;
-
         /// <summary>Skills that are treated as combat disciplines.</summary>
         private static readonly SkillType[] CombatSkills =
         {
@@ -115,7 +112,14 @@ namespace Companions
             if (!IsCombatSkill(requestedSkill))
                 return false;
 
-            return IsCombatDeclineCooldownActive(tracker, publishMessage: true);
+            if (tracker == null)
+                return false;
+
+            if (!tracker.TryGetRemaining(requestedSkill, out var remaining) || remaining <= TimeSpan.Zero)
+                return false;
+
+            PublishCombatCooldownMessage(remaining);
+            return true;
         }
 
         /// <summary>
@@ -133,10 +137,7 @@ namespace Companions
             CompanionSkillCooldownTracker tracker,
             bool publishMessage)
         {
-            if (tracker == null)
-                return false;
-
-            if (!tracker.TryGetRemaining(CombatCooldownStorageKey, out var remaining) || remaining <= TimeSpan.Zero)
+            if (!TryGetAnyCombatCooldownRemaining(tracker, out var remaining))
                 return false;
 
             if (publishMessage)
@@ -157,7 +158,9 @@ namespace Companions
             if (tracker == null || !IsCombatSkill(declinedSkill))
                 return;
 
-            tracker.StartCooldown(CombatCooldownStorageKey, CombatDeclineCooldownDuration);
+            for (int i = 0; i < CombatSkills.Length; i++)
+                tracker.StartCooldown(CombatSkills[i], CombatDeclineCooldownDuration);
+
             CompanionManager.HandleCombatDeclineCooldownStarted();
         }
 
@@ -167,7 +170,12 @@ namespace Companions
         /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
         public static void ClearCombatDeclineCooldown(CompanionSkillCooldownTracker tracker)
         {
-            tracker?.ClearCooldown(CombatCooldownStorageKey);
+            if (tracker != null)
+            {
+                for (int i = 0; i < CombatSkills.Length; i++)
+                    tracker.ClearCooldown(CombatSkills[i]);
+            }
+
             CompanionManager.HandleCombatDeclineCooldownCleared();
         }
 
@@ -205,6 +213,42 @@ namespace Companions
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Attempts to resolve the remaining duration for any active combat cooldown timer.
+        /// </summary>
+        /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
+        /// <param name="remaining">Remaining time when an active timer is found.</param>
+        /// <returns><c>true</c> when any combat cooldown timer is active.</returns>
+        private static bool TryGetAnyCombatCooldownRemaining(
+            CompanionSkillCooldownTracker tracker,
+            out TimeSpan remaining)
+        {
+            remaining = TimeSpan.Zero;
+
+            if (tracker == null)
+                return false;
+
+            TimeSpan longest = TimeSpan.Zero;
+            bool active = false;
+
+            for (int i = 0; i < CombatSkills.Length; i++)
+            {
+                if (!tracker.TryGetRemaining(CombatSkills[i], out var skillRemaining) || skillRemaining <= TimeSpan.Zero)
+                    continue;
+
+                if (skillRemaining > longest)
+                    longest = skillRemaining;
+
+                active = true;
+            }
+
+            if (!active)
+                return false;
+
+            remaining = longest;
+            return true;
         }
     }
 }
