@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2f5b376d787ce6096d999d7588189570249b62bd -->
+## 2025-10-24T11:10:25+01:00 — Merge pull request #1363 from aicovergod/codex/add-companion-skill-decline-feature
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 205 ++ / 2 --
+- Notes:
+  feat: allow companion to decline player skill requests
+---
+<!-- commit:79c66b7b491c3a784a627c83d8fd2c55435c5974 -->
+## 2025-10-24T11:10:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:fd2129b973942133770680dcc0dcfbdd4a8254a0 -->
 ## 2025-10-24T11:09:55+01:00 — feat: allow companion to decline player skill requests
 
