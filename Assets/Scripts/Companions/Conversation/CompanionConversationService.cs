@@ -268,41 +268,6 @@ namespace Companions.Conversation
             SkillType.Fishing
         };
 
-        private static readonly string[] SkillSuggestionTemplates =
-        {
-            "How about we do some {skill}?",
-            "I want to do some {skill}.",
-            "I want to get my {skill} level up.",
-            "I feel like training some {skill}.",
-            "I feel like getting my {skill} up."
-        };
-
-        private static readonly string[] RepeatSuggestionResponses =
-        {
-            "I've already told you what I want to do.",
-            "You've already asked me.",
-            "I told you earlier.",
-            "I'm not a parrot lol, I told you earlier <emoji=14>.",
-            "Have you seriously forgot {playerName} <emoji=18>."
-        };
-
-        private static readonly string[] SkillReminderResponses =
-        {
-            "We talked about training more {skill} earlier.",
-            "I already said I want to work on {skill}.",
-            "Still keen to push my {skill} level."
-        };
-
-        private static readonly string[] NpcReminderResponses =
-        {
-            "We said we'd take down more {npc}.",
-            "Pretty sure we were hunting {npc}.",
-            "I told you I'm itching to fight more {npc}."
-        };
-
-        private static readonly string NpcLatestTemplate = "Maybe we can kill some more {npc}.";
-        private static readonly string NpcRandomTemplate = "I want to kill more {npc}.";
-
         /// <summary>
         /// Probability that the companion politely declines a player-initiated training request even when prepared.
         /// </summary>
@@ -2851,7 +2816,10 @@ namespace Companions.Conversation
                             ? "that skill"
                             : lastSuggestionPayload.SkillDisplayName;
 
-                        return FormatReminder(SkillReminderResponses, "{skill}", skill);
+                        return FormatReminder(
+                            CompanionSuggestionDialogueBlocks.SkillReminderResponses,
+                            "{skill}",
+                            skill);
                     }
 
                 case SuggestionType.NpcLatest:
@@ -2861,7 +2829,10 @@ namespace Companions.Conversation
                         if (string.IsNullOrWhiteSpace(npc))
                             npc = "those foes";
 
-                        return FormatReminder(NpcReminderResponses, "{npc}", npc);
+                        return FormatReminder(
+                            CompanionSuggestionDialogueBlocks.NpcReminderResponses,
+                            "{npc}",
+                            npc);
                     }
 
                 default:
@@ -2869,12 +2840,12 @@ namespace Companions.Conversation
             }
         }
 
-        private static string FormatReminder(string[] templates, string token, string replacement)
+        private static string FormatReminder(IReadOnlyList<string> templates, string token, string replacement)
         {
-            if (templates == null || templates.Length == 0)
+            if (templates == null || templates.Count == 0)
                 return string.Empty;
 
-            int index = UnityEngine.Random.Range(0, templates.Length);
+            int index = UnityEngine.Random.Range(0, templates.Count);
             string template = templates[index];
             return string.IsNullOrWhiteSpace(template)
                 ? string.Empty
@@ -2889,9 +2860,10 @@ namespace Companions.Conversation
 
             if (TryResolveSkillSuggestion(out var skillInfo))
             {
-                for (int i = 0; i < SkillSuggestionTemplates.Length; i++)
+                var skillSuggestionTemplates = CompanionSuggestionDialogueBlocks.SkillSuggestionTemplates;
+                for (int i = 0; i < skillSuggestionTemplates.Count; i++)
                 {
-                    string template = SkillSuggestionTemplates[i];
+                    string template = skillSuggestionTemplates[i];
                     if (string.IsNullOrWhiteSpace(template))
                         continue;
 
@@ -2903,13 +2875,19 @@ namespace Companions.Conversation
             if (TryGetLatestNpcKill(out string latestNpc))
             {
                 string plural = FormatNpcPlural(latestNpc);
-                candidates.Add(SuggestionPayload.ForNpc(SuggestionType.NpcLatest, latestNpc, NpcLatestTemplate.Replace("{npc}", plural)));
+                candidates.Add(SuggestionPayload.ForNpc(
+                    SuggestionType.NpcLatest,
+                    latestNpc,
+                    CompanionSuggestionDialogueBlocks.NpcLatestTemplate.Replace("{npc}", plural)));
             }
 
             if (TryGetRandomNpcKill(out string randomNpc))
             {
                 string plural = FormatNpcPlural(randomNpc);
-                candidates.Add(SuggestionPayload.ForNpc(SuggestionType.NpcHistory, randomNpc, NpcRandomTemplate.Replace("{npc}", plural)));
+                candidates.Add(SuggestionPayload.ForNpc(
+                    SuggestionType.NpcHistory,
+                    randomNpc,
+                    CompanionSuggestionDialogueBlocks.NpcRandomTemplate.Replace("{npc}", plural)));
             }
 
             if (candidates.Count == 0)
@@ -2975,11 +2953,12 @@ namespace Companions.Conversation
 
         private string ChooseRepeatResponse(string playerName)
         {
-            if (RepeatSuggestionResponses.Length == 0)
+            var repeatResponses = CompanionSuggestionDialogueBlocks.RepeatSuggestionResponses;
+            if (repeatResponses == null || repeatResponses.Count == 0)
                 return "I've already told you what I want to do.";
 
-            int index = UnityEngine.Random.Range(0, RepeatSuggestionResponses.Length);
-            string template = RepeatSuggestionResponses[index];
+            int index = UnityEngine.Random.Range(0, repeatResponses.Count);
+            string template = repeatResponses[index];
             if (string.IsNullOrWhiteSpace(template))
                 return "I've already told you what I want to do.";
 
