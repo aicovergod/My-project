@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:53bfa676127ce6c2dac0e4673942981fa82bd79e -->
+## 2025-10-24T19:43:46+01:00 — Ensure consumed companion ammo updates bonuses and saves
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionEquipment.cs
+- Diff: 2 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d004bdc27d373fb8f88b036784e740f3046dfc1c -->
 ## 2025-10-24T18:05:37+01:00 — Merge pull request #1382 from aicovergod/codex/fix-potential-error-found-by-codex
 
