@@ -1,6 +1,7 @@
 using System;
 using Combat;
 using Companions.Conversation;
+using Inventory;
 using NPC;
 using Pets;
 using Skills;
@@ -38,15 +39,63 @@ namespace Companions
             if (skillManager == null)
                 return false;
 
+            // Clamp combat skill levels so calculations never drop below level one even when XP data is missing.
             attacker.AttackLevel = Mathf.Max(1, skillManager.GetLevel(SkillType.Attack));
             attacker.StrengthLevel = Mathf.Max(1, skillManager.GetLevel(SkillType.Strength));
             attacker.DefenceLevel = Mathf.Max(1, skillManager.GetLevel(SkillType.Defence));
+            attacker.RangedLevel = Mathf.Max(1, skillManager.GetLevel(SkillType.Ranged));
+            attacker.MagicLevel = Mathf.Max(1, skillManager.GetLevel(SkillType.Magic));
             attacker.Style = CombatStyle.Accurate;
-            attacker.DamageType = DamageType.Melee;
-            attacker.Equip.attack = Mathf.RoundToInt(attacker.AttackLevel * 1.5f);
-            attacker.Equip.strength = Mathf.RoundToInt(attacker.StrengthLevel * 1.5f);
-            attacker.Equip.rangeStrength = attacker.Equip.strength;
-            attacker.Equip.attackSpeedTicks = Mathf.Max(2, attacker.Equip.attackSpeedTicks);
+            // Reset equipment bonuses so the loop below rebuilds the totals from the currently equipped gear.
+            attacker.Equip.attack = 0;
+            attacker.Equip.strength = 0;
+            attacker.Equip.range = 0;
+            attacker.Equip.rangeStrength = 0;
+            attacker.Equip.magic = 0;
+            attacker.Equip.meleeDef = 0;
+            attacker.Equip.rangeDef = 0;
+            attacker.Equip.magicDef = 0;
+            attacker.Equip.attackSpeedTicks = 4;
+
+            ItemData weapon = null;
+            var equipment = controller != null ? controller.Equipment : null;
+            if (equipment != null)
+            {
+                // Mirror the equipment aggregation performed for the player so companion gear grants identical bonuses.
+                foreach (EquipmentSlot slot in Enum.GetValues(typeof(EquipmentSlot)))
+                {
+                    if (slot == EquipmentSlot.None)
+                        continue;
+
+                    var entry = equipment.GetEquipped(slot);
+                    var item = entry.item;
+                    if (item == null)
+                        continue;
+
+                    var stats = item.combat;
+                    attacker.Equip.attack += stats.Attack;
+                    attacker.Equip.strength += stats.Strength;
+                    attacker.Equip.range += stats.Range;
+                    attacker.Equip.rangeStrength += stats.RangeStrength;
+                    attacker.Equip.magic += stats.Magic;
+                    attacker.Equip.meleeDef += stats.MeleeDefence;
+                    attacker.Equip.rangeDef += stats.RangeDefence;
+                    attacker.Equip.magicDef += stats.MagicDefence;
+
+                    if (slot == EquipmentSlot.Weapon)
+                    {
+                        weapon = item;
+                        // Respect weapon-specific attack speed overrides for the companion's current combat style.
+                        int speed = item.GetAttackSpeedTicks(attacker.Style);
+                        if (speed > 0)
+                            attacker.Equip.attackSpeedTicks = speed;
+                    }
+                }
+            }
+
+            attacker.Equip.attackSpeedTicks = Mathf.Max(1, attacker.Equip.attackSpeedTicks);
+            // Classify the equipped weapon to pick the most appropriate damage type, falling back to melee when empty.
+            attacker.DamageType = WeaponClassificationUtility.ResolveDamageType(weapon);
             return true;
         }
 
