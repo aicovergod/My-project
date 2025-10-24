@@ -121,6 +121,27 @@ namespace Companions
 
             // Classify the equipped weapon to pick the most appropriate damage type, falling back to melee when empty.
             var resolvedDamageType = WeaponClassificationUtility.ResolveDamageType(weapon);
+
+            // Mirror the player combat pipeline by ensuring the generic attack/strength fields reflect
+            // the resolved combat style. Some downstream hooks (pet damage fallbacks, XP routing, etc.)
+            // still probe these properties directly, so propagating the ranged/magic data prevents them
+            // from silently falling back to melee calculations when companions use spellbooks or bows.
+            switch (resolvedDamageType)
+            {
+                case DamageType.Ranged:
+                    attacker.AttackLevel = Mathf.Max(attacker.AttackLevel, attacker.RangedLevel);
+                    attacker.StrengthLevel = Mathf.Max(attacker.StrengthLevel, attacker.RangedLevel);
+                    attacker.Equip.attack = attacker.Equip.range;
+                    attacker.Equip.strength = attacker.Equip.rangeStrength;
+                    break;
+                case DamageType.Magic:
+                    attacker.AttackLevel = Mathf.Max(attacker.AttackLevel, attacker.MagicLevel);
+                    attacker.StrengthLevel = Mathf.Max(attacker.StrengthLevel, attacker.MagicLevel);
+                    attacker.Equip.attack = attacker.Equip.magic;
+                    attacker.Equip.strength = attacker.Equip.magic;
+                    break;
+            }
+
             attacker.DamageType = resolvedDamageType;
             return true;
         }
