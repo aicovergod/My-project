@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b11fadee5e2dfefbf756f4a2818fef021e647879 -->
+## 2025-10-24T13:15:26+01:00 — Prevent menu during companion cooldown
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Interaction/NpcInteractable.cs
+- Diff: 11 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:895cac6494a122049b83339b1ff918ff40951365 -->
 ## 2025-10-24T13:08:02+01:00 — Merge pull request #1371 from aicovergod/codex/add-countdown-timer-for-all-combat-skills
 
