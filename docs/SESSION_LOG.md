@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:848b93a556984ff3c2b28cce61a8335351cf805b -->
+## 2025-10-24T13:29:55+01:00 — Merge pull request #1374 from aicovergod/codex/introduce-intent-suppression-helper-in-companionconversation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 174 ++ / 0 --
+- Notes:
+  Prune greeting compliments lacking praise context
+---
+<!-- commit:9a61cd1b5dc850483e484559b2d882c4e079cfd5 -->
+## 2025-10-24T13:29:46+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:acd98d3adf0dc2978c763b23c64e46f5109920d9 -->
 ## 2025-10-24T13:29:27+01:00 — Prune conflicting companion compliments
 
