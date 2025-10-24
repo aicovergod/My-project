@@ -36,18 +36,26 @@ namespace Companions.Conversation
 
         private static readonly string[] playerSkillProposalReadyGenericSegments =
         {
-            "Let's do it—more {skillSentence} sounds perfect right now.",
-            "I'm on board. A fresh round of {skillSentence} will hit the spot.",
-            "Count me in for {skillSentence}; I'm ready when you are.",
-            "Great idea, {playerName}. Let's dive back into {skillSentence}.",
-            "Absolutely—I've been itching for more {skillSentence}.",
-            "Love that vibe. Let's spend the next while {activity}.",
-            "You know it. {skillSentence} is exactly what I was thinking.",
-            "Ready and willing. Point me toward the next {skillSentence} spot.",
-            "Fantastic suggestion. We can start {activity} right away.",
-            "Consider it done; {skillSentence} session coming right up.",
-            "I'm game. Let's make this {skillSentence} run memorable.",
-            "Heck yes, more {skillSentence} with you is my kind of plan."
+            "Yeah, I’m up for some {skillSentence}.",
+            "Let’s do it, sounds chill.",
+            "Sure thing, {playerName}, I’m in.",
+            "Sounds like a plan, let’s get started.",
+            "Absolutely, I could use a bit of {skillSentence}.",
+            "I’m down for that. Lead the way.",
+            "You read my mind — I was just thinking about {skillSentence}.",
+            "Alright, let’s make it happen.",
+            "Good shout, I’m game for it.",
+            "Perfect, let’s get moving.",
+            "Yeah, let’s go {activity} for a bit.",
+            "I’m all for it, keeps things interesting.",
+            "Let’s crack on then, {playerName}.",
+            "Love it. A bit of {skillSentence} never hurt anyone.",
+            "Count me in.",
+            "Heh, why not? Could be fun.",
+            "I’m feeling it, let’s do some {skillSentence}.",
+            "That works for me. Let’s get to it.",
+            "Sure, I’m happy to help with {skillSentence}.",
+            "Alright then, let’s get our hands busy."
         };
 
         private static readonly string[] playerMiningProposalReadyWithToolFollowUps =
@@ -73,16 +81,36 @@ namespace Companions.Conversation
 
         private static readonly string[] playerSkillProposalReadyGenericFollowUps =
         {
-            "Call out the spot you like and I'll back you up.",
-            "I'll log the gains in case we want to brag later.",
-            "We can swap tasks mid-run if you need a breather.",
-            "I'll keep an eye on stray hostiles while we work.",
-            "Let's keep the momentum rolling with quick hops between spots.",
-            "We should stash anything rare before anyone else notices.",
-            "I'll mark our route so we can repeat it tomorrow.",
-            "If you want to split duties, just say the word.",
-            "I'll shout if I notice better opportunities nearby.",
-            "Let's keep the chatter going—makes the grind faster."
+                "Lead the way, boss.",
+    "Alright, let’s roll.",
+    "You got it.",
+    "Cool, I’m with you.",
+    "Let’s get it done.",
+    "Sounds good to me.",
+    "I’m right behind you.",
+    "Let’s see how this goes.",
+    "Yeah, let’s make it a good run.",
+    "You start, I’ll follow your lead.",
+    "If it gets dull, we’ll find something else.",
+    "I’m down—let’s not overthink it.",
+    "Sweet, let’s go do this.",
+    "Alright, I’m ready when you are.",
+    "Let’s keep it chill, yeah?",
+    "Easy enough—let’s go.",
+    "Cool, I’ll stick with you.",
+    "Yeah, let’s knock it out.",
+    "You handle the plan, I’ll just vibe.",
+    "Alright, show me what you’ve got.",
+    "Let’s make it quick and clean.",
+    "I’ll follow your rhythm.",
+    "Let’s not make a mess of it this time.",
+    "Cool, just tell me where to start.",
+    "Alright, let’s see what happens.",
+    "Let’s just wing it, yeah?",
+    "You lead, I’ll just pretend I know what I’m doing.",
+    "Yeah alright, let’s grind a bit.",
+    "Sounds like a chill plan to me.",
+    "Alright, no complaints from me."
         };
 
         private static readonly string[] playerSkillProposalDeclineSegments =

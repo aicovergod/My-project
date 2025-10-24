@@ -47,25 +47,18 @@ namespace Companions.Conversation
                 new ResponseTemplate("Hi {playerName}.", 1f),
                 new ResponseTemplate("Hey {playerName} you good?", 1f),
                 new ResponseTemplate("Hello hello, {playerName}.", 0.9f),
-                new ResponseTemplate("Hey there. Nice to hear you.", 0.9f),
+                new ResponseTemplate("Hey there.", 0.9f),
                 new ResponseTemplate("Yo. What’s up?", 0.9f),
                 new ResponseTemplate("Hey what’s the plan?", 0.9f),
-                new ResponseTemplate("Hi! Need me?", 0.9f),
-                new ResponseTemplate("Hey! I’m here.", 0.9f),
-                new ResponseTemplate("Hey there {playerName}, ready to chase glory?", 1f),
-                new ResponseTemplate("Well met, {playerName}! {companionName} reporting for duty.", 1f),
+                new ResponseTemplate("Hi!", 0.9f),
+                new ResponseTemplate("Hey!.", 0.9f),
+                new ResponseTemplate("Hey there {playerName}", 1f),
 
             // time-of-day flavor (guarded)
                 new ResponseTemplate("Morning, {playerName}. You sleep okay?", 0.8f, ctx => ctx.TimeOfDayLabel == "morning" && !ctx.PlayerInCombat),
                 new ResponseTemplate("Afternoon, {playerName}. You eating today?", 0.8f, ctx => ctx.TimeOfDayLabel == "afternoon" && !ctx.PlayerInCombat),
                 new ResponseTemplate("Evening, {playerName}. Long day?", 0.8f, ctx => ctx.TimeOfDayLabel == "evening" && !ctx.PlayerInCombat),
 
-            // light personality
-                new ResponseTemplate("Hey. Miss me?", 0.8f),
-                new ResponseTemplate("Hi, thought you’d gone quiet on me.", 0.8f),
-                new ResponseTemplate("Hey there. I was just thinking of you.", 0.8f),
-                new ResponseTemplate("Oh! Hi. Didn’t see you for a second.", 0.8f),
-                new ResponseTemplate("Hey. Ready when you are.", 0.9f),
 
         // in-combat variants
         new ResponseTemplate("Hey. Eyes up—still {combatState}.", 0.8f, ctx => ctx.PlayerInCombat),
@@ -105,20 +98,17 @@ namespace Companions.Conversation
         new ResponseTemplate("Steady under fire.", 0.85f, ctx => ctx.PlayerInCombat),
 
         // recent event/skill-aware (light touch)
-        new ResponseTemplate("Still thinking about {recentEvent}, but I’m okay.", 0.85f),
-        new ResponseTemplate("Recovered from {recentEvent}. Ready to move.", 0.85f),
         new ResponseTemplate("That {recentSkillAction} run woke me up. I’m set.", 0.8f, ctx => ctx.HasRecentSkillActions),
 
         // practical/grounded
         new ResponseTemplate("Rested, fed, and ready.", 0.9f, ctx => !ctx.PlayerInCombat),
         new ResponseTemplate("A bit tired, nothing serious.", 0.9f),
         new ResponseTemplate("Could use water, otherwise fine.", 0.85f, ctx => !ctx.PlayerInCombat),
-        new ResponseTemplate("All systems green.", 0.9f),
 
         // longer but still natural
         new ResponseTemplate("I’m fine, clear head, steady hands.", 0.9f),
         new ResponseTemplate("Better now you’re here, honestly.", 0.9f),
-        new ResponseTemplate("Not bad at all. Ready when you are.", 0.9f),
+        new ResponseTemplate("Not bad at all.", 0.9f),
 
         // slightly low mood (variety)
         new ResponseTemplate("A little worn, but I’ll manage.", 0.85f),
@@ -191,7 +181,7 @@ namespace Companions.Conversation
         new ResponseTemplate("Means a lot hearing that, {playerName}.", 0.9f),
         new ResponseTemplate("It’s good fighting beside someone who notices.", 0.9f),
 
-        // mood / event aware
+       // mood / event aware
        new ResponseTemplate("You’re welcome. That {recentSkillAction} went smoother than expected.", 0.85f, ctx => ctx.HasRecentSkillActions),
        new ResponseTemplate("That’s one less thing to worry about this {timeOfDay}.", 0.85f, ctx => !ctx.PlayerInCombat),
 
@@ -308,13 +298,40 @@ new ResponseTemplate("I'll pack away the gear from that {recentSkillAction}.|See
         {
             Register(
                 CompanionDialogueIntent.Compliment,
-                new ResponseTemplate("You're the one doing the heavy lifting, {playerName}.", 1f),
-                new ResponseTemplate("Flattery will get you everywhere, {playerName}.", 1f),
-                new ResponseTemplate("Keep this up and you'll outshine the legends, {playerName}.", 0.9f),
-                new ResponseTemplate("After {recentEvent}, I'd say we both earned the praise.", 0.85f),
-                new ResponseTemplate("If you saw me during that {recentSkillAction}, you know I was just keeping pace with you.", 0.75f, ctx => ctx.HasRecentSkillActions),
-                new ResponseTemplate("Compliments hit different in the {timeOfDay} light, huh?", 0.8f, ctx => !ctx.PlayerInCombat),
-                new ResponseTemplate("Call me {companionMood}, but you're the one keeping us {combatState}.", 0.8f));
+        // grateful / modest
+        new ResponseTemplate("Ha, thanks, {playerName}. That means a lot.", 1f),
+        new ResponseTemplate("Cheers, {playerName}. Appreciate it.", 1f),
+        new ResponseTemplate("You're too kind.", 1f),
+        new ResponseTemplate("Aww, you’ll make me blush.", 1f),
+        new ResponseTemplate("Thanks, I do try.", 1f),
+        new ResponseTemplate("Glad you noticed.", 1f),
+
+        // playful / teasing
+        new ResponseTemplate("Flattery, huh? Keep it coming.", 0.9f),
+        new ResponseTemplate("Careful, {playerName}, I might start believing you.", 0.9f),
+        new ResponseTemplate("Ha! Someone’s in a good mood.", 0.9f),
+        new ResponseTemplate("You just like saying nice things, don’t you?", 0.9f),
+        new ResponseTemplate("Trying to charm me again, {playerName}?", 0.9f),
+        new ResponseTemplate("Smooth talker. Don’t stop now.", 0.9f),
+
+        // friendly humility
+        new ResponseTemplate("Hey, credit goes both ways, {playerName}.", 0.9f),
+        new ResponseTemplate("You did most of the work, I just tagged along.", 0.9f),
+        new ResponseTemplate("Nah, you’re the one carrying us.", 0.9f),
+        new ResponseTemplate("Thanks, but I think we both pulled our weight.", 0.9f),
+        new ResponseTemplate("Appreciate it, though I was just keeping up with you.", 0.9f),
+
+        // situational flavour
+        new ResponseTemplate("Guess {timeOfDay} brings out my good side.", 0.8f, ctx => !ctx.PlayerInCombat),
+        new ResponseTemplate("That {recentSkillAction} run did go pretty smooth.", 0.8f, ctx => ctx.HasRecentSkillActions),
+        new ResponseTemplate("Compliments mid-fight? You’re wild, {playerName}.", 0.8f, ctx => ctx.PlayerInCombat),
+
+        // light humour / realism
+        new ResponseTemplate("Keep talking like that, I’ll start expecting gifts.", 0.8f),
+        new ResponseTemplate("Ha, I’ll take the compliment before you change your mind.", 0.8f),
+        new ResponseTemplate("Careful, {playerName}, my ego’s fragile.", 0.8f),
+        new ResponseTemplate("Don’t make it weird, but thanks.", 0.8f),
+        new ResponseTemplate("Alright, alright—you’re making me look good.", 0.8f));
         }
 
         /// <summary>
