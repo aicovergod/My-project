@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:99fdf91c6d53820be651be9b9657eba8c7cfc517 -->
+## 2025-10-24T20:55:03+01:00 — Fix companion ranged ammo consumption
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionRangedCombatController.cs
+- Diff: 22 ++ / 7 --
+- Notes:
+  —
+---
 <!-- commit:4c1b086e82ae6f2fd429f6ddc40bc2482f60cc02 -->
 ## 2025-10-24T19:44:04+01:00 — Merge pull request #1383 from aicovergod/codex/update-consumeequipped-to-save-loadout-changes
 
