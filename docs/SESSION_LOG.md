@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2039299ec97a2ecc97b93cb77f5137ca62990569 -->
+## 2025-10-24T17:49:21+01:00 — Merge pull request #1380 from aicovergod/codex/introduce-companion-ready-ranged-controller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1027 ++ / 62 --
+- Notes:
+  Add companion ranged combat controller for pets
+---
+<!-- commit:e5582ed595c55c54adf1755877d66cd0b28f6624 -->
+## 2025-10-24T17:49:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c4e9191b3a0a4f20f6f107e669c259b3a0270693 -->
 ## 2025-10-24T17:48:57+01:00 — Add companion ranged combat adapter and integrate ammo management
 
