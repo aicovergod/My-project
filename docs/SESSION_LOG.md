@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ad2665921f9d381dd88a0041fcdbb035b7585303 -->
+## 2025-10-24T13:20:46+01:00 — Adjust companion compliment detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs, Assets/Tests/Companions/CompanionDialogueIntentTests.cs
+- Diff: 31 ++ / 9 --
+- Notes:
+  —
+---
 <!-- commit:713de1eb6861bf9c21b8eea9125a5aa72ae922d8 -->
 ## 2025-10-24T13:15:38+01:00 — Merge pull request #1372 from aicovergod/codex/update-npcinteractable-to-check-combat-cooldown
 
