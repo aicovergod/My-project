@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:405a9b20eca6397609686e96dc85db557beb828e -->
+## 2025-10-24T15:35:15+01:00 — Merge pull request #1375 from aicovergod/codex/update-scheduleskillquestion-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 27 ++ / 6 --
+- Notes:
+  Allow proactive companion questions to reuse fallback templates
+---
+<!-- commit:bf633681e5b8301e9d358d30baf1ebe7ab264209 -->
+## 2025-10-24T15:35:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:025407546060f0f4e71464c2379cbd46ea345a07 -->
 ## 2025-10-24T15:34:41+01:00 — Allow proactive questions to reuse fallback templates
 
