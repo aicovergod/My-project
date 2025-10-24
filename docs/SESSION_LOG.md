@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d004bdc27d373fb8f88b036784e740f3046dfc1c -->
+## 2025-10-24T18:05:37+01:00 — Merge pull request #1382 from aicovergod/codex/fix-potential-error-found-by-codex
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 30 ++ / 0 --
+- Notes:
+  Fix companion ranged and magic combat stat propagation
+---
+<!-- commit:15a824e47cf6404b8e2139b16eda379dd8fcdb2d -->
+## 2025-10-24T18:05:24+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6634fe438b7bf2dd23fb14d5d9d3c672afd0622e -->
 ## 2025-10-24T18:04:46+01:00 — Align companion damage stats with ranged and magic overrides
 
