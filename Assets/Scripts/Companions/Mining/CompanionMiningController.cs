@@ -29,7 +29,9 @@ namespace Companions
         /// <summary>Target rock cannot be reached or interacted with.</summary>
         Unreachable,
         /// <summary>Companion is already working on the requested rock.</summary>
-        AlreadyMining
+        AlreadyMining,
+        /// <summary>Command declined because the companion is observing a cooldown.</summary>
+        Declined
     }
 
     /// <summary>
@@ -69,6 +71,7 @@ namespace Companions
         private float activeAreaRadius;
         private MiningSkill playerMiningSkill;
         private Transform playerTransform;
+        private CompanionSkillCooldownTracker skillCooldownTracker;
 
         /// <summary>
         /// Indicates whether any systems currently hold the follower disabled so the companion remains stationary.
@@ -86,7 +89,8 @@ namespace Companions
             CompanionController ownerController,
             SkillManager skills,
             CompanionInventory inventoryComponent,
-            Transform player)
+            Transform player,
+            CompanionSkillCooldownTracker cooldownTracker)
         {
             if (ownerController == null && CompanionManager.EnableDebugLogging)
                 Debug.LogWarning("[Companion Mining] Initialise invoked without a companion controller reference.", this);
@@ -127,6 +131,8 @@ namespace Companions
             followerDisableLockCount = 0;
             areaMiningActive = false;
             activeAreaRadius = 0f;
+
+            skillCooldownTracker = cooldownTracker;
 
             RebindPlayer(player);
         }
@@ -194,6 +200,9 @@ namespace Companions
             out CompanionMiningCommandResult result,
             bool preserveFollowerHold)
         {
+            if (CompanionSkillCooldownTimers.ShouldDeclineMiningRequest(skillCooldownTracker, out result))
+                return false;
+
             result = CompanionMiningCommandResult.RequirementsNotMet;
 
             if (!TryPrepareMiningCommand(rock, out var pickaxe, out result))
@@ -203,6 +212,7 @@ namespace Companions
             BeginMining(rock, pickaxe);
 
             result = CompanionMiningCommandResult.Accepted;
+            CompanionSkillCooldownTimers.ClearMiningCooldown(skillCooldownTracker);
             return true;
         }
 
@@ -233,6 +243,9 @@ namespace Companions
 
             CancelAreaMiningInternal(true);
 
+            if (CompanionSkillCooldownTimers.ShouldDeclineMiningRequest(skillCooldownTracker, out failureReason))
+                return false;
+
             if (!BuildAreaCandidateList(clampedRadius, out failureReason))
             {
                 PublishAreaMiningFailureMessage(failureReason);
@@ -244,6 +257,8 @@ namespace Companions
             activeAreaRadius = clampedRadius;
             areaMiningRoutine = StartCoroutine(AreaMiningRoutine());
             areaMiningActive = true;
+
+            CompanionSkillCooldownTimers.ClearMiningCooldown(skillCooldownTracker);
 
             if (CompanionManager.EnableDebugLogging)
             {
@@ -811,6 +826,9 @@ namespace Companions
                     break;
                 case CompanionMiningCommandResult.BlockedByPlayer:
                     PublishBlockedByPlayerMessage();
+                    break;
+                case CompanionMiningCommandResult.Declined:
+                    // Cooldown messaging is emitted when the decline is detected.
                     break;
                 default:
                     PublishNoRocksMessage();

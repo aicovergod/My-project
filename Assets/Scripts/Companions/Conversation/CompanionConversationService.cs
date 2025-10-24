@@ -1702,6 +1702,9 @@ namespace Companions.Conversation
 
             lastProactiveQuestionUtc = DateTime.UtcNow;
 
+            if (analysis.Skill == SkillType.Mining)
+                CompanionSkillCooldownTimers.StartMiningCooldown(CompanionManager.CompanionSkillCooldowns);
+
             TryAppendDeclineSuggestion(followUps, analysis, safePlayerName, context);
         }
 

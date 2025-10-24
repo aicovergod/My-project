@@ -241,6 +241,7 @@ namespace Companions.UI
                 case CompanionMiningCommandResult.BlockedByPlayer:
                 case CompanionMiningCommandResult.RequirementsNotMet:
                 case CompanionMiningCommandResult.Unreachable:
+                case CompanionMiningCommandResult.Declined:
                     // The mining controller publishes its own descriptive chat lines for these cases.
                     return false;
                 default:

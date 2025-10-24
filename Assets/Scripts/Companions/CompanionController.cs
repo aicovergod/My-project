@@ -38,6 +38,9 @@ namespace Companions
         /// <summary>Underlying pet combat controller reused for attack routines.</summary>
         private PetCombatController combatController;
 
+        /// <summary>Tracks per-skill cooldown timers for gathering command throttling.</summary>
+        private CompanionSkillCooldownTracker skillCooldownTracker;
+
         /// <summary>Raised when a skill level changes so the manager can refresh combat level text.</summary>
         public event Action<SkillType, int> SkillLevelChanged;
 
@@ -62,6 +65,9 @@ namespace Companions
         /// <summary>Provides access to the equipment component configured for the companion.</summary>
         public CompanionEquipment Equipment => companionEquipment;
 
+        /// <summary>Provides access to the cooldown tracker used for skill command throttling.</summary>
+        public CompanionSkillCooldownTracker SkillCooldowns => skillCooldownTracker;
+
         /// <summary>
         /// Indicates whether the companion has an active combat controller capable of fighting.
         /// </summary>
@@ -83,6 +89,10 @@ namespace Companions
         {
             follower = GetComponent<PetFollower>();
             combatController = GetComponent<PetCombatController>();
+
+            skillCooldownTracker = GetComponent<CompanionSkillCooldownTracker>();
+            if (skillCooldownTracker == null)
+                skillCooldownTracker = gameObject.AddComponent<CompanionSkillCooldownTracker>();
 
             ConfigureSkills(player);
             ConfigureInventory(player);
@@ -301,7 +311,7 @@ namespace Companions
         private void ConfigureMining(Transform player)
         {
             miningController = gameObject.AddComponent<CompanionMiningController>();
-            miningController.Initialise(this, skillManager, companionInventory, player);
+            miningController.Initialise(this, skillManager, companionInventory, player, skillCooldownTracker);
         }
 
         private void ConfigureCombat()

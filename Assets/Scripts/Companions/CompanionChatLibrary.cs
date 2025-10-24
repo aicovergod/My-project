@@ -1,3 +1,4 @@
+using System.Globalization;
 using UnityEngine;
 
 namespace Companions
@@ -469,6 +470,28 @@ namespace Companions
 
         /// <summary>Fallback message returned when the no rocks pool is empty.</summary>
         private const string NoRocksFallbackLine = "There are no rocks here unless you count your head";
+
+        /// <summary>Pool of chat lines used when the companion refuses mining due to an active cooldown.</summary>
+        private static readonly string[] MiningDeclineCooldownChatMessages =
+        {
+            "Didn’t I just say I’m not mining right now?",
+            "Oi, easy there, still not in the mood to swing a pickaxe.",
+            "I’m on a short break from smashing rocks, remember?",
+            "Nice try, but my arms are officially off duty.",
+            "You can click all you want, I’m still not mining.",
+            "Pretty sure I said no to mining for a bit.",
+            "Nope. Not touching another rock for at least {minutes}.",
+            "Let the rocks rest, and me, preferably.",
+            "You’re persistent, I’ll give you that. Still no, though.",
+            "Go on without me, I’ll just watch you work for once.",
+            "Patience, {playerName}. I said {minutes}, and I meant it.",
+            "You can glare at that rock all you want, I’m not budging.",
+            "Still on my mining cooldown. Try again later.",
+            "Nice enthusiasm, wrong timing. Ask me again in a bit."
+        };
+
+        /// <summary>Fallback message returned when the mining decline cooldown pool is empty.</summary>
+        private const string MiningDeclineCooldownFallbackLine = "Still on my mining cooldown. Try again later.";
 
         /// <summary>Pool of chat lines used when the player dies while a companion is active.</summary>
         private static readonly string[] PlayerDeathChatMessages =
@@ -5469,6 +5492,28 @@ namespace Companions
         public static string GetRandomNoRocksLine()
         {
             return GetRandomLine(NoRocksChatMessages, NoRocksFallbackLine);
+        }
+
+        /// <summary>
+        /// Returns a random chat line when the companion refuses to mine because a cooldown is still active.
+        /// </summary>
+        /// <param name="playerName">Name of the active player used for placeholder replacement.</param>
+        /// <param name="minutes">Remaining cooldown length expressed in whole minutes.</param>
+        public static string GetRandomMiningDeclineCooldownLine(string playerName, int minutes)
+        {
+            string template = GetRandomLine(MiningDeclineCooldownChatMessages, MiningDeclineCooldownFallbackLine);
+            if (string.IsNullOrWhiteSpace(template))
+                template = MiningDeclineCooldownFallbackLine;
+
+            string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName.Trim();
+            int clampedMinutes = Mathf.Max(1, minutes);
+            string minutesText = clampedMinutes == 1
+                ? "1 minute"
+                : string.Format(CultureInfo.InvariantCulture, "{0} minutes", clampedMinutes);
+
+            string resolved = template.Replace("{playerName}", safePlayerName);
+            resolved = resolved.Replace("{minutes}", minutesText);
+            return resolved;
         }
 
         /// <summary>
