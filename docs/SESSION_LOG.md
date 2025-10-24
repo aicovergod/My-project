@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1230061807e94514fd6d128e881f45369b351f83 -->
+## 2025-10-24T17:02:39+01:00 — Enhance companion combat stat overrides
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionCombatBridge.cs
+- Diff: 54 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:320a4031ce0f9c24532046be541ccdfc0ef04349 -->
 ## 2025-10-24T16:42:58+01:00 — Merge pull request #1377 from aicovergod/codex/move-dialogue-to-separate-script-file
 
