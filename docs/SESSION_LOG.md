@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ea43286cb6efaee9a66af03fd3b489611d691331 -->
+## 2025-10-24T12:16:39+01:00 — Merge pull request #1366 from aicovergod/codex/add-clearccdt-command-and-admin-ui-updates
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 648 ++ / 12 --
+- Notes:
+  Add companion cooldown reset tools and UI
+---
+<!-- commit:8fb905bbeeffea6061da61474b7815213df709fd -->
+## 2025-10-24T12:16:31+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b9d9522212f1a703a08af15c9252682f3da3cd3f -->
 ## 2025-10-24T12:16:13+01:00 — Add companion cooldown reset tools and UI
 
