@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Player.Ranks;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -88,6 +89,22 @@ namespace Inventory
 
         private void Update()
         {
+            bool hasDeveloperAccess = HasDeveloperAccess();
+
+            if (!hasDeveloperAccess)
+            {
+                if (visible)
+                {
+                    // Immediately close the menu when the active account loses developer access so
+                    // privileged tooling is never exposed to lower ranks.
+                    visible = false;
+                    amountItem = null;
+                    HasTextInputFocus = false;
+                }
+
+                return;
+            }
+
             if (Input.GetKeyDown(KeyCode.F1))
             {
                 visible = !visible;
@@ -183,6 +200,18 @@ namespace Inventory
                 Instance = null;
 
             HasTextInputFocus = false;
+        }
+
+        /// <summary>
+        /// Determines whether the currently authenticated account has access to developer-only tooling.
+        /// </summary>
+        private static bool HasDeveloperAccess()
+        {
+            var rankService = PlayerRankService.Instance;
+            if (rankService == null)
+                return false;
+
+            return rankService.HasPermission(rankService.ActivePlayerRank, PlayerRank.Developer);
         }
     }
 }

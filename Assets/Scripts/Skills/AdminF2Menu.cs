@@ -20,6 +20,7 @@ using Status.Freeze;
 using World;
 using UI;
 using UI.Chat;
+using Player.Ranks;
 
 namespace Skills
 {
@@ -122,6 +123,20 @@ namespace Skills
 
         private void Update()
         {
+            bool hasDeveloperAccess = HasDeveloperAccess();
+            if (!hasDeveloperAccess)
+            {
+                if (visible)
+                {
+                    // Immediately hide the menu whenever developer access is revoked so privileged actions remain secure.
+                    visible = false;
+                    showFreezePopup = false;
+                    HasTextInputFocus = false;
+                }
+
+                return;
+            }
+
             if (Input.GetKeyDown(KeyCode.F2))
             {
                 visible = !visible;
@@ -920,6 +935,18 @@ namespace Skills
             freezeError = string.Empty;
             GUI.FocusControl(null);
             HasTextInputFocus = false;
+        }
+
+        /// <summary>
+        /// Determines whether the active player currently holds the developer rank required to access the menu.
+        /// </summary>
+        private static bool HasDeveloperAccess()
+        {
+            var rankService = PlayerRankService.Instance;
+            if (rankService == null)
+                return false;
+
+            return rankService.HasPermission(rankService.ActivePlayerRank, PlayerRank.Developer);
         }
     }
 }

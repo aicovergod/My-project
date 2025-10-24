@@ -1,5 +1,6 @@
 using UnityEngine;
 using World;
+using Player.Ranks;
 
 namespace Companions.UI
 {
@@ -32,6 +33,15 @@ namespace Companions.UI
 
         private void Update()
         {
+            bool hasDeveloperAccess = HasDeveloperAccess();
+            if (!hasDeveloperAccess)
+            {
+                if (visible)
+                    visible = false;
+
+                return;
+            }
+
             if (Input.GetKeyDown(KeyCode.F4))
                 visible = !visible;
         }
@@ -64,6 +74,18 @@ namespace Companions.UI
             GUILayout.Label("Press F4 again to close this menu.");
 
             GUI.DragWindow(new Rect(0f, 0f, windowRect.width, 24f));
+        }
+
+        /// <summary>
+        /// Determines whether the active account has developer permissions for the companion debug menu.
+        /// </summary>
+        private static bool HasDeveloperAccess()
+        {
+            var rankService = PlayerRankService.Instance;
+            if (rankService == null)
+                return false;
+
+            return rankService.HasPermission(rankService.ActivePlayerRank, PlayerRank.Developer);
         }
     }
 }
