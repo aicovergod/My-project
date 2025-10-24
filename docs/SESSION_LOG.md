@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b9d9522212f1a703a08af15c9252682f3da3cd3f -->
+## 2025-10-24T12:16:13+01:00 — Add companion cooldown reset tools and UI
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): AGENTS.md, Assets/Scripts/Companions/CompanionSkillCooldownTracker.cs, Assets/Scripts/Companions/UI/AdminF4Menu.cs, Assets/Scripts/Companions/UI/CompanionCooldownsWindow.cs, Assets/Scripts/Player/Commands/ClearCompanionCooldownTimersCommand.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs, Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 639 ++ / 12 --
+- Notes:
+  —
+---
 <!-- commit:861ace70ea40567a0d731fcc7c0001e23d410660 -->
 ## 2025-10-24T11:58:24+01:00 — Merge pull request #1365 from aicovergod/codex/implement-companion-skill-cooldown-system
 
