@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6f9f774f75dbfc46d04716b3709057a05fba0480 -->
+## 2025-10-24T11:56:52+01:00 — Add companion mining cooldown tracking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (8): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/CompanionSkillCooldownTracker.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs
+- Diff: 375 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:2e8898a8fda49877843eb877dedacf7f56f328c7 -->
 ## 2025-10-24T11:27:51+01:00 — Merge pull request #1364 from aicovergod/codex/update-decline-handling-in-skill-proposal
 
