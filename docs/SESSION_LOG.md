@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:895cac6494a122049b83339b1ff918ff40951365 -->
+## 2025-10-24T13:08:02+01:00 — Merge pull request #1371 from aicovergod/codex/add-countdown-timer-for-all-combat-skills
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 63 ++ / 10 --
+- Notes:
+  Fix companion combat decline cooldown timers for all skills
+---
+<!-- commit:d2c4a4005d28935761fd422ed02778caca5dc1c2 -->
+## 2025-10-24T13:07:13+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6ae929f553d3382b6369db9abd3c0b42be914fb5 -->
 ## 2025-10-24T13:06:52+01:00 — Fix companion combat cooldown timers for all skills
 
