@@ -380,8 +380,17 @@ namespace NPC
                 return;
             }
 
-            if (combatTarget != null && CompanionManager.TryCommandAttack(combatTarget))
-                return;
+            if (combatTarget != null)
+            {
+                if (CompanionManager.TryCommandAttack(combatTarget))
+                    return;
+
+                if (CompanionManager.IsGuardModeLockedByCombatCooldown)
+                {
+                    // Guard mode toggle is currently locked by a cooldown, so suppress the menu until the timer expires.
+                    return;
+                }
+            }
 
             if (!EnsureMenuInstance())
                 return;
