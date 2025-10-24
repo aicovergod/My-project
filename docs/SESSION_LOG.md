@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6296c0df7bbb0e03d0d426969377b0372111c5c6 -->
+## 2025-10-24T12:21:55+01:00 — Restrict debug menus to developer rank
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/UI/AdminF4Menu.cs, Assets/Scripts/Inventory/InventoryDebugMenu.cs, Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 78 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ea43286cb6efaee9a66af03fd3b489611d691331 -->
 ## 2025-10-24T12:16:39+01:00 — Merge pull request #1366 from aicovergod/codex/add-clearccdt-command-and-admin-ui-updates
 
