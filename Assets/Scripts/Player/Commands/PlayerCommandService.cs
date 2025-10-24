@@ -192,6 +192,7 @@ namespace Player.Commands
             RegisterCommand(ClearCompanionInventoryCommand.CreateAlias("clearcompanioninventory"));
             RegisterCommand(ClearCompanionInventoryCommand.CreateAlias("clearcompinv"));
             RegisterCommand(ClearCompanionInventoryCommand.CreateAlias("clearcompinventory"));
+            RegisterCommand(new ClearCompanionCooldownTimersCommand());
             RegisterCommand(new GiveItemCommand());
             RegisterCommand(new GiveXpCommand());
             RegisterCommand(new MaxStatsCommand());

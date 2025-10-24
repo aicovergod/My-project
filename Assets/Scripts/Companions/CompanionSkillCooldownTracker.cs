@@ -18,6 +18,11 @@ namespace Companions
         /// <summary>Runtime cache storing UTC expiry ticks for each tracked skill cooldown.</summary>
         private readonly Dictionary<SkillType, long> cooldownExpiryTicks = new Dictionary<SkillType, long>();
 
+        /// <summary>
+        /// Reusable buffer that stores skills which should be removed after an enumeration finishes.
+        /// </summary>
+        private readonly List<SkillType> expiredSkillsBuffer = new List<SkillType>(4);
+
         private void OnEnable()
         {
             SaveManager.Register(this);
@@ -144,25 +149,15 @@ namespace Companions
             if (!cooldownExpiryTicks.TryGetValue(skill, out long ticks) || ticks <= 0)
                 return false;
 
-            DateTime expiryUtc;
-            try
-            {
-                expiryUtc = new DateTime(ticks, DateTimeKind.Utc);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                cooldownExpiryTicks.Remove(skill);
-                return false;
-            }
-
             DateTime utcNow = DateTime.UtcNow;
-            if (expiryUtc <= utcNow)
+            if (!TryResolveRemainingDuration(ticks, utcNow, out DateTime expiryUtc, out TimeSpan resolvedRemaining))
             {
                 cooldownExpiryTicks.Remove(skill);
+                Save();
                 return false;
             }
 
-            remaining = expiryUtc - utcNow;
+            remaining = resolvedRemaining;
             return true;
         }
 
@@ -176,6 +171,125 @@ namespace Companions
                 return;
 
             Save();
+        }
+
+        /// <summary>
+        /// Clears every tracked cooldown and returns how many active timers were removed.
+        /// </summary>
+        /// <returns>Total number of timers that were actively counting down.</returns>
+        public int ClearAllCooldowns()
+        {
+            if (cooldownExpiryTicks.Count == 0)
+            {
+                Save();
+                return 0;
+            }
+
+            DateTime utcNow = DateTime.UtcNow;
+            int clearedCount = 0;
+
+            foreach (var kvp in cooldownExpiryTicks)
+            {
+                if (TryResolveRemainingDuration(kvp.Value, utcNow, out _, out TimeSpan remaining) && remaining > TimeSpan.Zero)
+                    clearedCount++;
+            }
+
+            cooldownExpiryTicks.Clear();
+            Save();
+            return clearedCount;
+        }
+
+        /// <summary>
+        /// Fills the supplied buffer with snapshots describing each active cooldown.
+        /// </summary>
+        /// <param name="buffer">Destination list that receives the active cooldown states.</param>
+        /// <returns>A read-only view over the populated buffer.</returns>
+        public IReadOnlyList<CooldownState> GetActiveCooldowns(List<CooldownState> buffer = null)
+        {
+            buffer ??= new List<CooldownState>(cooldownExpiryTicks.Count);
+            buffer.Clear();
+
+            if (cooldownExpiryTicks.Count == 0)
+                return buffer;
+
+            DateTime utcNow = DateTime.UtcNow;
+            expiredSkillsBuffer.Clear();
+
+            foreach (var kvp in cooldownExpiryTicks)
+            {
+                if (!TryResolveRemainingDuration(kvp.Value, utcNow, out DateTime expiryUtc, out TimeSpan remaining))
+                {
+                    expiredSkillsBuffer.Add(kvp.Key);
+                    continue;
+                }
+
+                buffer.Add(new CooldownState(kvp.Key, expiryUtc, remaining));
+            }
+
+            if (expiredSkillsBuffer.Count > 0)
+            {
+                for (int i = 0; i < expiredSkillsBuffer.Count; i++)
+                    cooldownExpiryTicks.Remove(expiredSkillsBuffer[i]);
+
+                expiredSkillsBuffer.Clear();
+                Save();
+            }
+
+            buffer.Sort((left, right) => left.ExpiryUtc.CompareTo(right.ExpiryUtc));
+            return buffer;
+        }
+
+        /// <summary>
+        /// Attempts to convert the stored expiry ticks into a remaining duration snapshot.
+        /// </summary>
+        private static bool TryResolveRemainingDuration(
+            long ticks,
+            DateTime utcNow,
+            out DateTime expiryUtc,
+            out TimeSpan remaining)
+        {
+            expiryUtc = DateTime.MinValue;
+            remaining = TimeSpan.Zero;
+
+            if (ticks <= 0)
+                return false;
+
+            try
+            {
+                expiryUtc = new DateTime(ticks, DateTimeKind.Utc);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return false;
+            }
+
+            if (expiryUtc <= utcNow)
+                return false;
+
+            remaining = expiryUtc - utcNow;
+            return true;
+        }
+
+        /// <summary>
+        /// Immutable snapshot describing a single active cooldown.
+        /// </summary>
+        public readonly struct CooldownState
+        {
+            public CooldownState(SkillType skill, DateTime expiryUtc, TimeSpan remaining)
+            {
+                Skill = skill;
+                ExpiryUtc = expiryUtc;
+                Remaining = remaining;
+            }
+
+            /// <summary>Skill whose cooldown is currently active.</summary>
+            public SkillType Skill { get; }
+
+            /// <summary>UTC timestamp when the cooldown will expire.</summary>
+            public DateTime ExpiryUtc { get; }
+
+            /// <summary>Remaining time until the cooldown ends.</summary>
+            public TimeSpan Remaining { get; }
         }
 
         [Serializable]
