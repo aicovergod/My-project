@@ -493,6 +493,42 @@ namespace Companions
         /// <summary>Fallback message returned when the mining decline cooldown pool is empty.</summary>
         private const string MiningDeclineCooldownFallbackLine = "Still on my mining cooldown. Try again later.";
 
+        /// <summary>Pool of chat lines used when the companion refuses woodcutting due to an active cooldown.</summary>
+        private static readonly string[] WoodcuttingDeclineCooldownChatMessages =
+        {
+            "My axe arm needs a breather—give me {minutes}, {playerName}.",
+            "Still shaking the splinters out. Let’s chop again in {minutes}, {playerName}.",
+            "Cooldown’s ticking; no tree chopping for another {minutes}, {playerName}.",
+            "Let me sharpen the blade and rest for {minutes}, {playerName}.",
+            "Hands are still buzzing from that last tree. Check back in {minutes}, {playerName}.",
+            "Need {minutes} to clear the woodchips out of my gear, {playerName}.",
+            "Axe arm’s on cooldown. Catch me after {minutes}, {playerName}.",
+            "Let’s give the forest a breather for {minutes}, {playerName}.",
+            "Need {minutes} before I take another swing, {playerName}.",
+            "Still cooling off from those swings—{minutes} and I’m ready, {playerName}."
+        };
+
+        /// <summary>Fallback message returned when the woodcutting decline cooldown pool is empty.</summary>
+        private const string WoodcuttingDeclineCooldownFallbackLine = "My axe arm needs a breather—give me {minutes}, {playerName}.";
+
+        /// <summary>Pool of chat lines used when the companion refuses fishing due to an active cooldown.</summary>
+        private static readonly string[] FishingDeclineCooldownChatMessages =
+        {
+            "Rod arm’s resting—give me {minutes}, {playerName}.",
+            "Still drying out the nets. Try again in {minutes}, {playerName}.",
+            "Need {minutes} to prep fresh bait, {playerName}.",
+            "Fishing cooldown’s ticking—{minutes} before the next trip, {playerName}.",
+            "Let me untangle the line for {minutes}, {playerName}.",
+            "Hands are still pruny. Give me {minutes}, {playerName}.",
+            "Need {minutes} to swap bait and breathe, {playerName}.",
+            "Still on fishing cooldown—circle back in {minutes}, {playerName}.",
+            "Let me warm back up; {minutes} and we’ll cast again, {playerName}.",
+            "Need {minutes} to dry off these boots before we fish again, {playerName}."
+        };
+
+        /// <summary>Fallback message returned when the fishing decline cooldown pool is empty.</summary>
+        private const string FishingDeclineCooldownFallbackLine = "Rod arm’s resting—give me {minutes}, {playerName}.";
+
         /// <summary>Pool of chat lines used when the companion refuses combat due to an active cooldown.</summary>
         private static readonly string[] CombatDeclineCooldownChatMessages =
         {
@@ -5553,19 +5589,39 @@ namespace Companions
         /// <param name="minutes">Remaining cooldown length expressed in whole minutes.</param>
         public static string GetRandomMiningDeclineCooldownLine(string playerName, int minutes)
         {
-            string template = GetRandomLine(MiningDeclineCooldownChatMessages, MiningDeclineCooldownFallbackLine);
-            if (string.IsNullOrWhiteSpace(template))
-                template = MiningDeclineCooldownFallbackLine;
+            return FormatCooldownLine(
+                MiningDeclineCooldownChatMessages,
+                MiningDeclineCooldownFallbackLine,
+                playerName,
+                minutes);
+        }
 
-            string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName.Trim();
-            int clampedMinutes = Mathf.Max(1, minutes);
-            string minutesText = clampedMinutes == 1
-                ? "1 minute"
-                : string.Format(CultureInfo.InvariantCulture, "{0} minutes", clampedMinutes);
+        /// <summary>
+        /// Returns a random chat line when the companion refuses to woodcut because a cooldown is still active.
+        /// </summary>
+        /// <param name="playerName">Name of the active player used for placeholder replacement.</param>
+        /// <param name="minutes">Remaining cooldown length expressed in whole minutes.</param>
+        public static string GetRandomWoodcuttingDeclineCooldownLine(string playerName, int minutes)
+        {
+            return FormatCooldownLine(
+                WoodcuttingDeclineCooldownChatMessages,
+                WoodcuttingDeclineCooldownFallbackLine,
+                playerName,
+                minutes);
+        }
 
-            string resolved = template.Replace("{playerName}", safePlayerName);
-            resolved = resolved.Replace("{minutes}", minutesText);
-            return resolved;
+        /// <summary>
+        /// Returns a random chat line when the companion refuses to fish because a cooldown is still active.
+        /// </summary>
+        /// <param name="playerName">Name of the active player used for placeholder replacement.</param>
+        /// <param name="minutes">Remaining cooldown length expressed in whole minutes.</param>
+        public static string GetRandomFishingDeclineCooldownLine(string playerName, int minutes)
+        {
+            return FormatCooldownLine(
+                FishingDeclineCooldownChatMessages,
+                FishingDeclineCooldownFallbackLine,
+                playerName,
+                minutes);
         }
 
         /// <summary>
@@ -5575,9 +5631,38 @@ namespace Companions
         /// <param name="minutes">Remaining cooldown length expressed in whole minutes.</param>
         public static string GetRandomCombatDeclineCooldownLine(string playerName, int minutes)
         {
-            string template = GetRandomLine(CombatDeclineCooldownChatMessages, CombatDeclineCooldownFallbackLine);
+            return FormatCooldownLine(
+                CombatDeclineCooldownChatMessages,
+                CombatDeclineCooldownFallbackLine,
+                playerName,
+                minutes);
+        }
+
+        /// <summary>
+        /// Returns a random chat line for when the player's inventory is full but the companion can still help.
+        /// </summary>
+        public static string GetRandomPlayerInventoryFullLine()
+        {
+            return GetRandomLine(PlayerInventoryFullChatMessages, PlayerInventoryFullFallbackLine);
+        }
+
+        /// <summary>
+        /// Formats a cooldown template with the supplied player name and duration, ensuring sensible fallbacks.
+        /// </summary>
+        /// <param name="pool">Pool of cooldown templates to select from.</param>
+        /// <param name="fallback">Fallback template used when the pool is empty.</param>
+        /// <param name="playerName">Name of the active player.</param>
+        /// <param name="minutes">Cooldown duration expressed in whole minutes.</param>
+        /// <returns>Formatted cooldown line with placeholders resolved.</returns>
+        private static string FormatCooldownLine(
+            string[] pool,
+            string fallback,
+            string playerName,
+            int minutes)
+        {
+            string template = GetRandomLine(pool, fallback);
             if (string.IsNullOrWhiteSpace(template))
-                template = CombatDeclineCooldownFallbackLine;
+                template = fallback;
 
             string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName.Trim();
             int clampedMinutes = Mathf.Max(1, minutes);
@@ -5588,14 +5673,6 @@ namespace Companions
             string resolved = template.Replace("{playerName}", safePlayerName);
             resolved = resolved.Replace("{minutes}", minutesText);
             return resolved;
-        }
-
-        /// <summary>
-        /// Returns a random chat line for when the player's inventory is full but the companion can still help.
-        /// </summary>
-        public static string GetRandomPlayerInventoryFullLine()
-        {
-            return GetRandomLine(PlayerInventoryFullChatMessages, PlayerInventoryFullFallbackLine);
         }
 
         /// <summary>

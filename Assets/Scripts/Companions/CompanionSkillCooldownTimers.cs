@@ -210,7 +210,7 @@ namespace Companions
             double totalMinutes = Math.Max(0d, remaining.TotalMinutes);
             int minutes = Mathf.Max(1, (int)Math.Ceiling(totalMinutes));
 
-            string message = CompanionWoodcuttingDialogueLibrary.GetCooldownLine(safePlayerName, minutes);
+            string message = CompanionChatLibrary.GetRandomWoodcuttingDeclineCooldownLine(safePlayerName, minutes);
             if (string.IsNullOrWhiteSpace(message))
                 return;
 
@@ -232,7 +232,7 @@ namespace Companions
             double totalMinutes = Math.Max(0d, remaining.TotalMinutes);
             int minutes = Mathf.Max(1, (int)Math.Ceiling(totalMinutes));
 
-            string message = CompanionFishingDialogueLibrary.GetCooldownLine(safePlayerName, minutes);
+            string message = CompanionChatLibrary.GetRandomFishingDeclineCooldownLine(safePlayerName, minutes);
             if (string.IsNullOrWhiteSpace(message))
                 return;
 

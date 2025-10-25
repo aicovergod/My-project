@@ -34,6 +34,54 @@ namespace Companions.Conversation
     "You got it. I’ll follow your lead."
         };
 
+        private static readonly string[] playerWoodcuttingProposalReadyWithAxeSegments =
+        {
+            "Yeah, I’m in. Let’s go drop some trees.",
+            "Absolutely. A bit of {skillSentence} sounds perfect.",
+            "You know what? That actually sounds nice.",
+            "Sure thing. Haven’t chopped any trunks in a while.",
+            "Good idea. Let’s see what we can haul back.",
+            "You read my mind. I was itching to stretch the axe arm.",
+            "I’m down. Let’s make the forest a little thinner.",
+            "Sounds like a plan—lead the way to the grove.",
+            "Love that idea. Let’s fill the pack with fresh logs.",
+            "That’s my kind of break. Let’s move.",
+            "Fine by me. Something relaxing about {activity}.",
+            "Couldn’t agree more. Let’s stretch the legs.",
+            "Alright then—let’s give the axe a workout.",
+            "Nice. Haven’t smelled fresh sap in a bit.",
+            "If we find anything rare, I’m calling dibs on bragging rights.",
+            "Good call. Bit of {activity} never hurt anyone.",
+            "Sweet. Let’s go make some chips fly.",
+            "Yeah, why not? Beats standing around.",
+            "Alright, let’s go swing at some trees.",
+            "You got it. I’ll follow your lead."
+        };
+
+        private static readonly string[] playerFishingProposalReadyWithGearSegments =
+        {
+            "Yeah, I’m in. Let’s go find a good spot to cast.",
+            "Absolutely. A bit of {skillSentence} sounds perfect.",
+            "You know what? That actually sounds nice.",
+            "Sure thing. Haven’t taken a proper fishing trip in a while.",
+            "Good idea. Let’s see what we can reel in.",
+            "You read my mind. I was ready to unwind by the water.",
+            "I’m down. Let’s make some waves.",
+            "Sounds like a plan—lead the way to the shore.",
+            "Love that idea. Let’s bring home a haul.",
+            "That’s my kind of break. Let’s move.",
+            "Fine by me. Something relaxing about {activity}.",
+            "Couldn’t agree more. Let’s stretch the legs.",
+            "Alright then—let’s get the line wet.",
+            "Nice. Haven’t listened to the water in a bit.",
+            "If we hook something rare, I’m bragging first.",
+            "Good call. Bit of {activity} never hurt anyone.",
+            "Sweet. Let’s go see what bites.",
+            "Yeah, why not? Beats standing around.",
+            "Alright, let’s go cast a few lines.",
+            "You got it. I’ll follow your lead."
+        };
+
         private static readonly string[] playerSkillProposalReadyGenericSegments =
         {
             "Yeah, I’m up for some {skillSentence}.",
@@ -77,6 +125,48 @@ namespace Companions.Conversation
     "If it gets too quiet, that’s usually a bad sign.",
     "I’ll sort what we gather once we’re done.",
     "Let’s make it a good run."
+        };
+
+        private static readonly string[] playerWoodcuttingProposalReadyWithToolFollowUps =
+        {
+            "You lead, my axe is sharpened and ready.",
+            "I’ll call out any good trees I spot.",
+            "Let’s try not to leave stumps everywhere this time, yeah?",
+            "If the forest guardian shows up, I’m blaming you.",
+            "We’ll make quick work of this grove.",
+            "I’ll stash whatever logs we haul later.",
+            "If you see a rare trunk, shout—it’s probably worth it.",
+            "Let’s keep an eye out for bird nests before we swing.",
+            "Let’s hope we don’t anger any tree spirits.",
+            "I’ll take the thick trunks, you handle the rest.",
+            "Don’t worry, I’ll cover you if a tree decides to fall funny.",
+            "We’ll pace it. No point dulling the axe in a rush.",
+            "I’ll mark the good spots for later runs.",
+            "Feels like a lucky day for a bird’s nest.",
+            "If it gets too quiet, that’s when the ents usually show.",
+            "I’ll sort what we chop once we’re done.",
+            "Let’s make it a clean run—no stray branches left behind."
+        };
+
+        private static readonly string[] playerFishingProposalReadyWithToolFollowUps =
+        {
+            "You lead, my rod is all set.",
+            "I’ll call out any spots that look lively.",
+            "Let’s try not to spook the fish this time, yeah?",
+            "If the line snaps, I’m making you tie the next one.",
+            "We’ll make quick work of these waters.",
+            "I’ll stash whatever we catch once we’re done.",
+            "If you see a ripple, shout—it’s probably worth a cast.",
+            "Let’s keep an eye on the tide so we don’t get stranded.",
+            "Hopefully no river trolls crash the party.",
+            "I’ll handle the bait prep, you handle the casts.",
+            "Don’t worry, I’ll cover you if something big yanks the line.",
+            "We’ll pace the casts. No point burning through bait.",
+            "I’ll mark the lucky spots for our next trip.",
+            "Feels like a lucky day for a golden catch.",
+            "If it gets too quiet, that’s when the big fish usually bite.",
+            "I’ll sort the catch once we head back.",
+            "Let’s keep it tidy—no fish guts everywhere this time."
         };
 
         private static readonly string[] playerSkillProposalReadyGenericFollowUps =
@@ -262,9 +352,29 @@ namespace Companions.Conversation
         internal static string[] PlayerMiningProposalReadyWithToolFollowUps => playerMiningProposalReadyWithToolFollowUps;
 
         /// <summary>
+        /// Dialogue lines the companion uses when they are prepared to chop trees alongside the player.
+        /// </summary>
+        internal static string[] PlayerWoodcuttingProposalReadyWithAxeSegments => playerWoodcuttingProposalReadyWithAxeSegments;
+
+        /// <summary>
+        /// Dialogue lines the companion uses when they are prepared to fish alongside the player.
+        /// </summary>
+        internal static string[] PlayerFishingProposalReadyWithGearSegments => playerFishingProposalReadyWithGearSegments;
+
+        /// <summary>
         /// Follow-up lines used after a generic affirmative skill response.
         /// </summary>
         internal static string[] PlayerSkillProposalReadyGenericFollowUps => playerSkillProposalReadyGenericFollowUps;
+
+        /// <summary>
+        /// Follow-up lines that add flavour when the woodcutting kit is available.
+        /// </summary>
+        internal static string[] PlayerWoodcuttingProposalReadyWithToolFollowUps => playerWoodcuttingProposalReadyWithToolFollowUps;
+
+        /// <summary>
+        /// Follow-up lines that add flavour when the fishing gear is available.
+        /// </summary>
+        internal static string[] PlayerFishingProposalReadyWithToolFollowUps => playerFishingProposalReadyWithToolFollowUps;
 
         /// <summary>
         /// Primary responses used when the companion declines the player's training request.
