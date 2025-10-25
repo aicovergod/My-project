@@ -43,6 +43,19 @@ namespace Inventory.Core
             public GroundItemSpawner GroundItemSpawner;
         }
 
+        /// <summary>
+        ///     Preset companion barks used when their inventory cannot accept additional items.
+        /// </summary>
+        private static readonly string[] CompanionInventoryFullResponses =
+        {
+            "My inventory is full.",
+            "I need room for that.",
+            "I don't have enough room.",
+            "There's not enough space.",
+            "I need more space for that.",
+            "I can't fit that in my inventory."
+        };
+
         private readonly InventoryComponent owner;
         private readonly InventoryModel model;
         private readonly InventoryWindowController controller;
@@ -759,8 +772,7 @@ namespace Inventory.Core
 
             if (!playerInventory.CanAddItem(entry.item, entry.count))
             {
-                var chat = ChatService.Instance;
-                chat?.PublishGameMessage("Your inventory is full");
+                PublishPlayerInventoryFullMessage();
                 return false;
             }
 
@@ -771,9 +783,8 @@ namespace Inventory.Core
             if (!playerInventory.AddItem(removedEntry.item, removedEntry.count))
             {
                 model.SetEntry(slotIndex, removedEntry);
-                var chat = ChatService.Instance;
-                chat?.PublishGameMessage("Your inventory is full");
                 controller.RefreshSlot(slotIndex);
+                PublishPlayerInventoryFullMessage();
                 return false;
             }
 
@@ -803,8 +814,7 @@ namespace Inventory.Core
 
             if (!companionInventoryComponent.CanAddItem(entry.item, entry.count))
             {
-                var chat = ChatService.Instance;
-                chat?.PublishGameMessage("Your inventory is full");
+                PublishCompanionInventoryFullMessage();
                 return false;
             }
 
@@ -816,8 +826,7 @@ namespace Inventory.Core
             {
                 model.SetEntry(slotIndex, removedEntry);
                 controller.RefreshSlot(slotIndex);
-                var chat = ChatService.Instance;
-                chat?.PublishGameMessage("Your inventory is full");
+                PublishCompanionInventoryFullMessage();
                 return false;
             }
 
@@ -1246,6 +1255,34 @@ namespace Inventory.Core
                 questUi = UnityEngine.Object.FindObjectOfType<QuestUI>(true);
 #endif
             }
+        }
+
+        /// <summary>
+        ///     Emits the standard "inventory full" message from the companion when the player
+        ///     attempts to transfer an item but the follower cannot accept it.
+        /// </summary>
+        private void PublishCompanionInventoryFullMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string companionName = CompanionManager.GetCompanionDisplayName();
+            string line = CompanionInventoryFullResponses.Length > 0
+                ? CompanionInventoryFullResponses[UnityEngine.Random.Range(0, CompanionInventoryFullResponses.Length)]
+                : "My inventory is full.";
+
+            chat.PublishCompanionMessage(companionName, line);
+        }
+
+        /// <summary>
+        ///     Emits the game channel feedback used when the player cannot receive an item
+        ///     from their companion because their own inventory is full.
+        /// </summary>
+        private static void PublishPlayerInventoryFullMessage()
+        {
+            var chat = ChatService.Instance;
+            chat?.PublishGameMessage("My inventory is full.");
         }
 
         private void SubscribeToController()
