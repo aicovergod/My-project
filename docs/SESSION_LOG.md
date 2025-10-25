@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:79bd8d76fd2acc11a9d40d4d0ebcba3c87a17f65 -->
+## 2025-10-25T12:28:50+01:00 — Allow transferring items to companion inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 61 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c95553e89a3e839574e109c6ffbb163636fa02e5 -->
 ## 2025-10-25T12:03:13+01:00 — Merge pull request #1392 from aicovergod/codex/add-layoutelement-to-inventory-context-menu
 
