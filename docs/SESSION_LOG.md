@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:39e011c6fe7b5babade5703d189973035d6de009 -->
+## 2025-10-25T13:42:20+01:00 — Improve companion mining movement visuals
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 52 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:7d5881ea38bcf7824d276369a5762b77a56d33b9 -->
 ## 2025-10-25T13:35:03+01:00 — Merge pull request #1396 from aicovergod/codex/modify-bank-message-for-companions
 
