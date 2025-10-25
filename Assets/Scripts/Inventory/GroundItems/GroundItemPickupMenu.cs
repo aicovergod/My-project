@@ -1,8 +1,10 @@
+/// Feature: Added pointer-button aware callbacks for companion ground item pickup commands.
 using System;
 using System.Collections.Generic;
 using UI;
 using UI.ContextMenus;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Inventory.GroundItems
@@ -55,7 +57,7 @@ namespace Inventory.GroundItems
         private VerticalLayoutGroup layoutGroup;
         private ContentSizeFitter contentSizeFitter;
 
-        private Action<ItemPickup> onOptionSelected;
+        private Action<ItemPickup, PointerEventData.InputButton> onOptionSelected;
         private Vector2 lastRequestedScreenPosition;
         
         /// <summary>Pixels of cursor leeway before the menu auto-closes.</summary>
@@ -106,7 +108,10 @@ namespace Inventory.GroundItems
         }
 
         /// <summary>Displays the menu using the supplied pickup list.</summary>
-        public void Show(IReadOnlyList<ItemPickup> pickups, Vector2 screenPosition, Action<ItemPickup> onOptionSelected)
+        public void Show(
+            IReadOnlyList<ItemPickup> pickups,
+            Vector2 screenPosition,
+            Action<ItemPickup, PointerEventData.InputButton> onOptionSelected)
         {
             if (pickups == null || pickups.Count == 0)
             {
@@ -278,17 +283,25 @@ namespace Inventory.GroundItems
                 Pickup = null
             };
 
-            button.onClick.AddListener(() => OnOptionClicked(entry));
+            var forwarder = optionGO.AddComponent<OptionClickForwarder>();
+            forwarder.Initialise(this, entry);
+
+            button.onClick.AddListener(() => HandleOptionPointerClicked(entry, null));
+
             button.gameObject.SetActive(false);
             return entry;
         }
 
-        private void OnOptionClicked(OptionEntry entry)
+        internal void HandleOptionPointerClicked(OptionEntry entry, PointerEventData eventData)
         {
-            if (entry?.Pickup == null)
+            if (entry == null)
                 return;
 
-            onOptionSelected?.Invoke(entry.Pickup);
+            if (entry.Pickup == null)
+                return;
+
+            var button = eventData != null ? eventData.button : PointerEventData.InputButton.Left;
+            onOptionSelected?.Invoke(entry.Pickup, button);
         }
 
         private string BuildLabel(ItemPickup pickup)
@@ -353,6 +366,37 @@ namespace Inventory.GroundItems
             for (int i = 0; i < pickups.Count; i++)
             {
                 currentPickups.Add(pickups[i]);
+            }
+        }
+
+        /// <summary>
+        /// Forwarder component that captures pointer button information for each option entry.
+        /// </summary>
+        private sealed class OptionClickForwarder : MonoBehaviour, IPointerClickHandler
+        {
+            private GroundItemPickupMenu owner;
+            private OptionEntry entry;
+
+            /// <summary>Initialises the forwarder with the owning menu and entry reference.</summary>
+            public void Initialise(GroundItemPickupMenu owningMenu, OptionEntry optionEntry)
+            {
+                owner = owningMenu;
+                entry = optionEntry;
+            }
+
+            /// <inheritdoc />
+            public void OnPointerClick(PointerEventData eventData)
+            {
+                if (eventData == null)
+                {
+                    owner?.HandleOptionPointerClicked(entry, null);
+                    return;
+                }
+
+                if (eventData.button == PointerEventData.InputButton.Left)
+                    return;
+
+                owner?.HandleOptionPointerClicked(entry, eventData);
             }
         }
     }
