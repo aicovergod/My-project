@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e7f334bf5048c07ceb54f2d55f5edc6f81750b5b -->
+## 2025-10-25T10:10:29+01:00 — Notify equipment change after load
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Equipment.cs
+- Diff: 15 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:65fb9ef2f8f6618558e00b0dfc44326a4d80d888 -->
 ## 2025-10-24T20:55:29+01:00 — Merge pull request #1384 from aicovergod/codex/fix-companion-ranged-ammo-consumption
 
