@@ -152,6 +152,9 @@ namespace Companions
         /// <summary>Provides access to the configured equipment wrapper.</summary>
         public static CompanionEquipment CompanionEquipment => controller != null ? controller.Equipment : null;
 
+        /// <summary>Safely exposes the cached player inventory used for companion transfers.</summary>
+        public static Inventory.Inventory GetPlayerInventory() => ResolvePlayerInventory();
+
         /// <summary>Exposes the spawned companion object for systems that need the instance handle.</summary>
         public static GameObject CompanionObject => companionObject;
 

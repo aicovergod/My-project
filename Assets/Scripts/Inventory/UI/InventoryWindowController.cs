@@ -1,11 +1,11 @@
 // Assets/Scripts/Inventory/UI/InventoryWindowController.cs
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UI.Utilities;
 using Inventory.Core;
-using UI.Utilities;
 using InventoryComponent = global::Inventory.Inventory;
 
 #if ENABLE_INPUT_SYSTEM
@@ -313,12 +313,36 @@ namespace Inventory.UI
             public int TargetIndex { get; }
         }
 
+        /// <summary>
+        /// Raised whenever an item context menu option is selected so gameplay systems can react.
+        /// </summary>
+        public readonly struct ItemContextActionEvent
+        {
+            public ItemContextActionEvent(
+                InventoryWindowController controller,
+                int slotIndex,
+                InventoryItemContextAction action,
+                Vector2 pointerPosition)
+            {
+                Controller = controller;
+                SlotIndex = slotIndex;
+                Action = action;
+                PointerPosition = pointerPosition;
+            }
+
+            public InventoryWindowController Controller { get; }
+            public int SlotIndex { get; }
+            public InventoryItemContextAction Action { get; }
+            public Vector2 PointerPosition { get; }
+        }
+
         public event Action<InventoryWindowController, SlotClickEvent> SlotClicked;
         public event Action<InventoryWindowController, DropRequestEvent> DropRequested;
         public event Action<InventoryWindowController, StackSplitPromptEvent> SplitPromptRequested;
         public event Action<InventoryWindowController, DragDropEvent> DragDropRequested;
         public event Action<InventoryWindowController> DragCancelled;
         public event Action<InventoryWindowController> CloseRequested;
+        public event Action<InventoryWindowController, ItemContextActionEvent> ContextActionSelected;
 
         private readonly InventoryModel model;
         private WindowConfig config;
@@ -333,6 +357,8 @@ namespace Inventory.UI
         private Text tooltipNameText;
         private Text tooltipDescriptionText;
         private InventoryDropMenu dropMenu;
+        private InventoryItemContextMenu itemContextMenu;
+        private Vector2 lastContextMenuPointerPosition;
 
         private static InventoryWindowController activeDragController;
         private static int activeDragIndex = -1;
@@ -358,6 +384,9 @@ namespace Inventory.UI
         public InventoryComponent Owner { get; internal set; }
 
         public GameObject UiRoot => uiRoot;
+
+        /// <summary>Last pointer position used to display a context menu.</summary>
+        public Vector2 LastContextMenuPointerPosition => lastContextMenuPointerPosition;
 
         public Vector2 SlotSize => config.SlotSize;
 
@@ -416,7 +445,7 @@ namespace Inventory.UI
             }
 
             HideTooltip();
-            HideDropMenu();
+            DismissContextMenus();
         }
 
         /// <summary>
@@ -649,15 +678,41 @@ namespace Inventory.UI
             }
         }
 
+        internal void HandleItemContextMenuSelection(
+            InventoryWindowController controller,
+            int slotIndex,
+            InventoryItemContextAction action,
+            Vector2 pointerPosition)
+        {
+            if (controller != this)
+                return;
+
+            HideItemContextMenu();
+            lastContextMenuPointerPosition = pointerPosition;
+            ContextActionSelected?.Invoke(this, new ItemContextActionEvent(this, slotIndex, action, pointerPosition));
+        }
+
         private void HideDropMenu()
         {
             if (dropMenu != null)
                 dropMenu.Hide();
         }
 
+        internal void HideItemContextMenu()
+        {
+            if (itemContextMenu != null)
+                itemContextMenu.Hide();
+        }
+
         public void DismissDropMenu()
         {
             HideDropMenu();
+        }
+
+        public void DismissContextMenus()
+        {
+            HideDropMenu();
+            HideItemContextMenu();
         }
 
         private void ShowTooltip(int slotIndex, RectTransform slotRect)
@@ -746,7 +801,28 @@ namespace Inventory.UI
                 return;
 
             HideTooltip();
+            HideItemContextMenu();
+            lastContextMenuPointerPosition = position;
             dropMenu.Show(this, slotIndex, position);
+        }
+
+        internal void ShowItemContextMenu(
+            int slotIndex,
+            Vector2 pointerPosition,
+            IReadOnlyList<InventoryItemContextMenu.Option> options)
+        {
+            if (itemContextMenu == null)
+                return;
+
+            HideTooltip();
+            HideDropMenu();
+            HideItemContextMenu();
+
+            if (options == null || options.Count == 0)
+                return;
+
+            lastContextMenuPointerPosition = pointerPosition;
+            itemContextMenu.Show(this, slotIndex, pointerPosition, options);
         }
 
         private void BuildUserInterface()
@@ -959,7 +1035,11 @@ namespace Inventory.UI
             tooltipRect.pivot = new Vector2(0f, 1f);
             tooltip.SetActive(false);
 
-            dropMenu = InventoryDropMenu.Create(uiRoot.transform, config.StackCountFont != null ? config.StackCountFont : config.DefaultFont);
+            Font menuFont = config.StackCountFont != null ? config.StackCountFont : config.DefaultFont;
+            dropMenu = InventoryDropMenu.Create(uiRoot.transform, menuFont);
+            itemContextMenu = InventoryItemContextMenu.Create(uiRoot.transform, menuFont);
+            if (itemContextMenu != null)
+                itemContextMenu.SelectionRequested += HandleItemContextMenuSelection;
 
             if (config.UseSharedRoot)
                 SharedCanvasRoot = uiRoot.transform;
@@ -971,6 +1051,12 @@ namespace Inventory.UI
             {
                 UnityEngine.Object.Destroy(uiRoot);
                 uiRoot = null;
+            }
+
+            if (itemContextMenu != null)
+            {
+                itemContextMenu.SelectionRequested -= HandleItemContextMenuSelection;
+                itemContextMenu = null;
             }
 
             slotImages = null;

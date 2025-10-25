@@ -437,6 +437,77 @@ namespace Companions
         }
 
         /// <summary>
+        /// Attempts to equip an entry that originated from the companion's own inventory.
+        /// </summary>
+        /// <param name="entry">Inventory entry removed from the companion bag.</param>
+        /// <param name="companionBag">Companion inventory used when returning items on failure.</param>
+        /// <returns>Result describing whether the equip succeeded or why it failed.</returns>
+        public CompanionEquipAttemptResult TryEquipFromCompanionInventory(InventoryEntry entry, Inventory.Inventory companionBag)
+        {
+            if (!initialised || entry.item == null)
+                return CompanionEquipAttemptResult.NotHandled;
+
+            var item = entry.item;
+            var slot = item.equipmentSlot;
+            if (slot == EquipmentSlot.None)
+                return CompanionEquipAttemptResult.NotHandled;
+
+            if (!ValidateSkillRequirements(item, companionBag, entry))
+                return CompanionEquipAttemptResult.RequirementsNotMet;
+
+            int index = SlotIndex(slot);
+            if (index < 0 || index >= equipped.Length)
+            {
+                RestoreEntryToInventory(companionBag, entry);
+                return CompanionEquipAttemptResult.InvalidSlot;
+            }
+
+            if (!HandleMutuallyExclusiveSlots(slot, companionBag, entry))
+            {
+                RestoreEntryToInventory(companionBag, entry);
+                return CompanionEquipAttemptResult.InventoryFull;
+            }
+
+            var current = equipped[index];
+            if (current.item != null && current.item == item && item.stackable)
+            {
+                if (!MergeStackableEquip(entry, companionBag, slot, index, out var mergeFailure))
+                {
+                    RestoreEntryToInventory(companionBag, entry);
+                    return mergeFailure;
+                }
+
+                return CompanionEquipAttemptResult.Equipped;
+            }
+
+            if (current.item != null)
+            {
+                if (!TryReturnEntry(current, companionBag, out _))
+                {
+                    ShowInventoryFullFloatingText();
+                    RestoreEntryToInventory(companionBag, entry);
+                    return CompanionEquipAttemptResult.InventoryFull;
+                }
+
+                ItemUseResolver.NotifyItemUsed(gameObject, current.item, ItemUseType.Unequipped);
+            }
+
+            equipped[index] = entry;
+            UpdateSlotVisual(slot);
+            UpdateBonuses();
+            Save();
+            ItemUseResolver.NotifyItemUsed(gameObject, item, ItemUseType.Equipped);
+            RaiseEquipmentSlotChanged(slot);
+
+            if (CompanionManager.EnableDebugLogging)
+            {
+                Debug.Log($"[Companion Equipment] Equipped {item.itemName} into {slot} from companion inventory.", this);
+            }
+
+            return CompanionEquipAttemptResult.Equipped;
+        }
+
+        /// <summary>
         /// Unequips the requested slot into the provided inventory, falling back to the companion bag when needed.
         /// </summary>
         public void UnequipToInventory(EquipmentSlot slot, Inventory.Inventory destinationInventory)
