@@ -404,6 +404,7 @@ namespace Companions
             MineableRock stuckRock = null;
             float noProgressTimer = 0f;
             float lastRecordedDistance = 0f;
+            float cumulativeDistanceClosed = 0f;
             bool hasDistanceSample = false;
             try
             {
@@ -424,17 +425,29 @@ namespace Companions
                     {
                         hasDistanceSample = true;
                         lastRecordedDistance = distance;
+                        cumulativeDistanceClosed = 0f;
                         noProgressTimer = 0f;
                     }
                     else
                     {
-                        bool closedGap = distance < lastRecordedDistance - ProgressResetThreshold;
+                        float delta = lastRecordedDistance - distance;
+                        if (delta > 0f)
+                        {
+                            cumulativeDistanceClosed += delta;
+                        }
+                        else if (delta < 0f)
+                        {
+                            cumulativeDistanceClosed = 0f;
+                        }
+
+                        bool closedGap = cumulativeDistanceClosed >= ProgressResetThreshold;
                         bool effectivelyClose = distance <= MiningRange * CloseEnoughDistanceMultiplier;
                         bool activelyMining = miningSkill != null && miningSkill.IsMining;
 
                         if (closedGap || effectivelyClose || activelyMining)
                         {
                             noProgressTimer = 0f;
+                            cumulativeDistanceClosed = 0f;
                         }
                         else
                         {
