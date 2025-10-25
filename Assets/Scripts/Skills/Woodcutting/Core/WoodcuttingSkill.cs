@@ -37,6 +37,8 @@ namespace Skills.Woodcutting
         private Dictionary<string, ItemData> logItems;
         private int questLogCount;
         private SkillingOutfitProgress woodcuttingOutfit;
+        private bool useCompanionChatFormatting;
+        private Func<string> companionChatSenderResolver;
 
         public event System.Action<TreeNode> OnStartChopping;
         public event System.Action OnStopChopping;
@@ -144,6 +146,8 @@ namespace Skills.Woodcutting
                     Equipment = equipment,
                     EquipmentXpBonusEvaluator = data => data != null ? data.woodcuttingXpBonusMultiplier : 0f,
                     RewardMessageFormatter = qty => $"+{qty} {logName}",
+                    UseCompanionChatFormatting = useCompanionChatFormatting,
+                    CompanionChatSenderResolver = companionChatSenderResolver,
                     OnItemsGranted = result => OnLogGained?.Invoke(logId, result.QuantityAwarded),
                     OnSuccess = result =>
                     {
@@ -229,6 +233,18 @@ namespace Skills.Woodcutting
                 "Beaver",
                 ref logItems,
                 out _);
+        }
+
+        /// <summary>
+        /// Configures the chat formatting used when the skill is operated by a companion. Providing
+        /// a resolver routes reward messages through the companion chat channel instead of the
+        /// default game channel. Passing null restores player-centric formatting.
+        /// </summary>
+        /// <param name="senderResolver">Resolver that supplies the display name for companion chat output.</param>
+        public void ConfigureCompanionChat(Func<string> senderResolver)
+        {
+            useCompanionChatFormatting = senderResolver != null;
+            companionChatSenderResolver = senderResolver;
         }
 
         /// <summary>
