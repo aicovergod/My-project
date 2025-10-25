@@ -8,6 +8,7 @@ using Skills.Common;
 using Skills.Mining;
 using UI.Chat;
 using UnityEngine;
+using Util;
 
 namespace Companions
 {
@@ -44,6 +45,7 @@ namespace Companions
         private const float MiningRange = 1.5f;
         private const float ReplanDistance = MiningRange * 0.75f;
         private const float WaypointTolerance = 0.1f;
+        private const float FacingDeadzoneSqrMagnitude = 0.0001f;
 
         private SkillManager skillManager;
         private Inventory.Inventory inventory;
@@ -52,6 +54,9 @@ namespace Companions
         private PetFollower petFollower;
         private PetPathMover pathMover;
         private Rigidbody2D body;
+        private PetSpriteAnimator petSpriteAnimator;
+        private SpriteRenderer fallbackSpriteRenderer;
+        private Direction8 lastFacing = Direction8.Down;
         private Coroutine miningRoutine;
         private Coroutine areaMiningRoutine;
         private MineableRock currentRock;
@@ -124,6 +129,20 @@ namespace Companions
             petFollower = GetComponent<PetFollower>();
             pathMover = GetComponent<PetPathMover>();
             body = GetComponent<Rigidbody2D>();
+            petSpriteAnimator = GetComponent<PetSpriteAnimator>() ?? GetComponentInChildren<PetSpriteAnimator>();
+            if (petSpriteAnimator != null)
+            {
+                fallbackSpriteRenderer = petSpriteAnimator.spriteRenderer;
+                if (fallbackSpriteRenderer == null)
+                {
+                    fallbackSpriteRenderer = petSpriteAnimator.GetComponent<SpriteRenderer>() ??
+                        petSpriteAnimator.GetComponentInChildren<SpriteRenderer>();
+                }
+            }
+            else
+            {
+                fallbackSpriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
+            }
 
             miningActive = false;
             followerDisabledForMining = false;
@@ -899,6 +918,10 @@ namespace Companions
 
         private void ApplyMovement(Vector3 nextPosition, Vector2 velocity, bool teleported)
         {
+            Vector3 currentPosition = body != null ? (Vector3)body.position : transform.position;
+            Vector2 displacement = (Vector2)(nextPosition - currentPosition);
+            Vector2 appliedVelocity = teleported ? Vector2.zero : velocity;
+
             if (body != null)
             {
                 if (teleported)
@@ -909,13 +932,41 @@ namespace Companions
                 else
                 {
                     body.MovePosition(nextPosition);
-                    body.linearVelocity = velocity;
+                    body.linearVelocity = appliedVelocity;
                 }
             }
             else
             {
                 transform.position = nextPosition;
             }
+
+            UpdateMovementVisuals(displacement, appliedVelocity);
+        }
+
+        /// <summary>
+        ///     Updates the cached animator or sprite renderer so the companion visually faces the direction of travel.
+        /// </summary>
+        /// <param name="displacement">Raw displacement applied during the movement step.</param>
+        /// <param name="appliedVelocity">Velocity fed to the rigidbody (zeroed when teleporting).</param>
+        private void UpdateMovementVisuals(Vector2 displacement, Vector2 appliedVelocity)
+        {
+            Vector2 visualVector = displacement.sqrMagnitude > FacingDeadzoneSqrMagnitude
+                ? displacement
+                : appliedVelocity;
+
+            if (visualVector.sqrMagnitude > FacingDeadzoneSqrMagnitude)
+                lastFacing = Direction8Utility.FromVector(visualVector, allowDiagonals: true, fallback: lastFacing);
+
+            if (petSpriteAnimator != null)
+            {
+                petSpriteAnimator.UpdateVisuals(visualVector);
+                return;
+            }
+
+            if (fallbackSpriteRenderer == null)
+                return;
+
+            fallbackSpriteRenderer.flipX = Direction8Utility.IsFacingLeft(lastFacing);
         }
 
         private void CleanupAfterMining(bool restoreFollower, bool preserveFollowerLocks = false)
