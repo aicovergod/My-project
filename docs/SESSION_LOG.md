@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f2f2c92e40e51d3c203750b3042a215891f1049a -->
+## 2025-10-25T14:31:47+01:00 — Keep pets moving while awaiting replans
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetPathMover.cs
+- Diff: 36 ++ / 12 --
+- Notes:
+  —
+---
 <!-- commit:94152ed60c05f767060fa50d1c4e59323e36182b -->
 ## 2025-10-25T14:07:16+01:00 — Merge pull request #1398 from aicovergod/codex/add-mining-progress-tracking-and-stuck-handling
 
