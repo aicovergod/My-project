@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:57245dd1f02ea834b2d4366e656ba8e30d483663 -->
+## 2025-10-25T13:21:02+01:00 — Ensure inventory transfer option stays available
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 3 ++ / 7 --
+- Notes:
+  —
+---
 <!-- commit:4a11633603815b732748876d21e10a5602bbbfd2 -->
 ## 2025-10-25T12:47:54+01:00 — Merge pull request #1394 from aicovergod/codex/add-feedback-for-inventory-transfer-errors
 
