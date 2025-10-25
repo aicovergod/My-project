@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0e94c14ba7e6fad16ea575d45d925161714d4f4a -->
+## 2025-10-25T10:18:10+01:00 — Ensure companion equipment load raises weapon change event
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionEquipment.cs
+- Diff: 8 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2732c8461845174a726b87974f308edecee73592 -->
 ## 2025-10-25T10:11:02+01:00 — Merge pull request #1385 from aicovergod/codex/update-equipment-load-and-change-detection
 
