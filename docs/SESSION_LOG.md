@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:834348b9a67a020030773153d1673b70266cecc0 -->
+## 2025-10-25T13:21:24+01:00 — Merge pull request #1395 from aicovergod/codex/enable-transfer-option-for-all-inventories
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 12 ++ / 7 --
+- Notes:
+  Ensure inventory transfer option stays available
+---
+<!-- commit:cf16ef59005d5a4c17234cb8790698b94f9f9f00 -->
+## 2025-10-25T13:21:21+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:57245dd1f02ea834b2d4366e656ba8e30d483663 -->
 ## 2025-10-25T13:21:02+01:00 — Ensure inventory transfer option stays available
 
