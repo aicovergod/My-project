@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b6cd90449bee3e4f5f72d65fa64f165b188d975f -->
+## 2025-10-26T00:32:31+01:00 — Merge pull request #1416 from aicovergod/codex/add-chatbox-commands-for-companion-control
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 496 ++ / 5 --
+- Notes:
+  Add chat-based companion commands and fishing shift-click order
+---
+<!-- commit:bf7237ce2c789ebfe532538a3235517b62dc5db1 -->
+## 2025-10-26T00:32:15+01:00 — Merge branch 'main' into codex/add-chatbox-commands-for-companion-control
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 79 ++ / 25 --
+- Notes:
+  —
+---
 <!-- commit:659869cd8c1e2f68a89be2a0541064d7dca814c9 -->
 ## 2025-10-26T00:31:28+01:00 — Add companion chat commands and fishing shift-click support
 
