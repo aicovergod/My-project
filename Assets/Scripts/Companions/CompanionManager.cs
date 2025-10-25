@@ -899,9 +899,6 @@ namespace Companions
                     Debug.Log("[Companion] Deposit aborted because no bank anchors are within range.");
 
                 PublishRandomBankOutOfRangeMessage();
-
-                var chat = ChatService.Instance;
-                chat?.PublishGameMessage("There are no banks close by");
                 return false;
             }
 
