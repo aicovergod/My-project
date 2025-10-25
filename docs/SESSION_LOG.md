@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:63e2e2fb2e36276fa3b51fee44caf8884fd76ecb -->
+## 2025-10-25T11:50:39+01:00 — Merge pull request #1391 from aicovergod/codex/implement-full-featured-inventory-context-menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 722 ++ / 15 --
+- Notes:
+  Add rich inventory item context menus for player and companion
+---
+<!-- commit:48f859bf91a863626869f63d464dc967221a2a8e -->
+## 2025-10-25T11:50:21+01:00 — Add rich inventory item context menus for player and companion
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/CompanionEquipment.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Inventory/UI/InventoryItemContextMenu.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs
+- Diff: 722 ++ / 15 --
+- Notes:
+  —
+---
 <!-- commit:f15fc92a7e3aeb0fda545ecdbf1e1ec242e64f59 -->
 ## 2025-10-25T11:12:21+01:00 — Merge pull request #1390 from aicovergod/codex/implement-player-speech-color-prefixes
 
