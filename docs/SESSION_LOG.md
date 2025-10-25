@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f1c09abd87a69368ac3bb3835062e4a0056fd5ee -->
+## 2025-10-26T00:19:40+01:00 — Add woodcutting and fishing companion dialogue coverage
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionSkillProposalDialogueBlocks.cs, Assets/Tests/Companions/CompanionChatLibraryCooldownTests.cs, Assets/Tests/Companions/CompanionChatLibraryCooldownTests.cs.meta
+- Diff: 290 ++ / 35 --
+- Notes:
+  —
+---
 <!-- commit:8ca2104bf1904dd05893b9eb55830183bd3057a7 -->
 ## 2025-10-26T00:05:47+01:00 — Merge pull request #1414 from aicovergod/codex/fix-null-comparison-bug-in-companionmanager
 
