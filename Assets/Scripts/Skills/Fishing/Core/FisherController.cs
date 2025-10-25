@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Skills.Common;
+using Companions;
 using Inventory;
 
 namespace Skills.Fishing
@@ -231,7 +233,28 @@ namespace Skills.Fishing
         /// <inheritdoc />
         protected override void Prospect(FishableSpot node)
         {
-            node?.Prospect(transform);
+            if (node == null)
+                return;
+
+            bool shiftHeld = false;
+            var keyboard = Keyboard.current;
+            if (keyboard != null)
+            {
+                shiftHeld = (keyboard.leftShiftKey != null && keyboard.leftShiftKey.isPressed)
+                    || (keyboard.rightShiftKey != null && keyboard.rightShiftKey.isPressed);
+            }
+            else
+            {
+                shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            }
+
+            if (shiftHeld)
+            {
+                CompanionManager.TryCommandFish(node);
+                return;
+            }
+
+            node.Prospect(transform);
         }
 
         /// <summary>

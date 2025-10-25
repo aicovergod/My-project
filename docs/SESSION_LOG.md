@@ -1,12 +1,12 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:7ae74bb1d699232950db3ad828093b5681c710f0 -->
-## 2025-10-26T00:30:16+01:00 — dialogue updated
+<!-- commit:659869cd8c1e2f68a89be2a0541064d7dca814c9 -->
+## 2025-10-26T00:31:28+01:00 — Add companion chat commands and fishing shift-click support
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (1): Assets/Scripts/Companions/CompanionChatLibrary.cs
-- Diff: 61 ++ / 25 --
+- Changed files (3): Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs, Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/Skills/Fishing/Core/FisherController.cs
+- Diff: 492 ++ / 1 --
 - Notes:
   —
 ---
