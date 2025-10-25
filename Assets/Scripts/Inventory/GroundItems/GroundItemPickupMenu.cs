@@ -292,7 +292,11 @@ namespace Inventory.GroundItems
             return entry;
         }
 
-        internal void HandleOptionPointerClicked(OptionEntry entry, PointerEventData eventData)
+        /// <summary>
+        /// Invokes the pickup callback for the supplied option entry, capturing the pointer button.
+        /// Private scope keeps accessibility aligned with the nested <see cref="OptionEntry"/> type.
+        /// </summary>
+        private void HandleOptionPointerClicked(OptionEntry entry, PointerEventData eventData)
         {
             if (entry == null)
                 return;
