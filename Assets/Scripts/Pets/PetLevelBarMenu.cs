@@ -29,6 +29,12 @@ namespace Pets
         /// <summary>Label reflecting the current equipment visibility state.</summary>
         private Text equipmentText;
 
+        /// <summary>Button that cancels the companion's current action.</summary>
+        private Button stopActionButton;
+
+        /// <summary>Label that reflects the action-specific stop command.</summary>
+        private Text stopActionText;
+
         /// <summary>Button that opens the companion stats window.</summary>
         private Button statsButton;
 
@@ -66,6 +72,7 @@ namespace Pets
                 instance.inventoryText.text = CompanionManager.IsInventoryVisible() ? "Inventory: On" : "Inventory: Off";
                 instance.equipmentButton.gameObject.SetActive(true);
                 instance.equipmentText.text = CompanionManager.IsEquipmentVisible() ? "Equipment: On" : "Equipment: Off";
+                instance.UpdateStopActionButton(true);
             }
             else
             {
@@ -79,10 +86,12 @@ namespace Pets
                 if (hasInventory)
                     instance.inventoryText.text = PetDropSystem.PetInventoryVisible ? "Inventory: On" : "Inventory: Off";
                 instance.equipmentButton.gameObject.SetActive(false);
+                instance.UpdateStopActionButton(false);
             }
             instance.transform.position = position;
             instance.gameObject.SetActive(true);
             instance.OnMenuShown();
+            instance.UpdateStopActionButton(isCompanion);
         }
 
         private static void CreateInstance()
@@ -144,6 +153,13 @@ namespace Pets
                 {
                     CompanionCommandMenu.Show(rect);
                 }
+            });
+
+            instance.stopActionButton = CreateButton(menuGO.transform, "Stop");
+            instance.stopActionText = instance.stopActionButton.GetComponentInChildren<Text>();
+            instance.stopActionButton.onClick.AddListener(() =>
+            {
+                instance.OnStopActionClicked();
             });
 
             instance.guardButton = CreateButton(menuGO.transform, "Guard Mode");
@@ -222,19 +238,54 @@ namespace Pets
 
         private void Update()
         {
-            if (gameObject.activeSelf && Input.GetMouseButtonDown(0))
-            {
-                var rect = GetComponent<RectTransform>();
-                var camera = menuCanvas != null ? menuCanvas.worldCamera : null;
-                bool clickInsidePetMenu = RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition, camera);
-                bool clickInsideCommandMenu = CompanionCommandMenu.ContainsScreenPoint(Input.mousePosition);
+            if (!gameObject.activeSelf)
+                return;
 
-                if (!clickInsidePetMenu && !clickInsideCommandMenu)
-                    Hide();
-            }
+            UpdateStopActionButton(current != null && current.IsCompanionHud);
+
+            if (!Input.GetMouseButtonDown(0))
+                return;
+
+            var rect = GetComponent<RectTransform>();
+            var camera = menuCanvas != null ? menuCanvas.worldCamera : null;
+            bool clickInsidePetMenu = RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition, camera);
+            bool clickInsideCommandMenu = CompanionCommandMenu.ContainsScreenPoint(Input.mousePosition);
+
+            if (!clickInsidePetMenu && !clickInsideCommandMenu)
+                Hide();
         }
 
         partial void OnMenuCreated(Transform menuRoot);
         partial void OnMenuShown();
+
+        private void UpdateStopActionButton(bool isCompanionHud)
+        {
+            if (stopActionButton == null)
+                return;
+
+            if (!isCompanionHud)
+            {
+                stopActionButton.gameObject.SetActive(false);
+                return;
+            }
+
+            bool show = CompanionManager.HasActiveAction;
+            stopActionButton.gameObject.SetActive(show);
+
+            if (!show || stopActionText == null)
+                return;
+
+            stopActionText.text = CompanionManager.GetStopActionLabel();
+        }
+
+        private void OnStopActionClicked()
+        {
+            bool cancelled = CompanionManager.TryCancelCurrentAction();
+
+            if (CompanionManager.EnableDebugLogging)
+                Debug.Log($"[PetLevelBarMenu] Stop action button clicked. Cancelled={cancelled}.");
+
+            Hide();
+        }
     }
 }

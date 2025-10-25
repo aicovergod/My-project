@@ -104,6 +104,12 @@ namespace Companions
         public bool HasActiveFollowerHold => followerDisableLockCount > 0;
 
         /// <summary>
+        /// True while the fishing controller has an active routine or the underlying skill reports fishing activity.
+        /// Allows external systems to determine whether "stop" commands should be offered.
+        /// </summary>
+        public bool IsFishing => fishingActive || (fishingSkill != null && fishingSkill.IsFishing);
+
+        /// <summary>
         /// Initialises the fishing controller with the owning companion components.
         /// </summary>
         /// <param name="ownerController">Controller that owns this component.</param>

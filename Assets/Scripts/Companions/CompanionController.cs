@@ -121,6 +121,9 @@ namespace Companions
         /// <summary>Provides access to the cooldown tracker used for skill command throttling.</summary>
         public CompanionSkillCooldownTracker SkillCooldowns => skillCooldownTracker;
 
+        /// <summary>True while the combat controller currently has an active target engaged.</summary>
+        public bool IsInCombat => combatController != null && combatController.HasActiveTarget;
+
         /// <summary>
         /// Indicates whether the companion has an active combat controller capable of fighting.
         /// </summary>
@@ -192,6 +195,14 @@ namespace Companions
             miningController?.CancelMining(true);
             woodcuttingController?.CancelWoodcutting(true);
             combatController?.CommandAttack(target, true);
+        }
+
+        /// <summary>
+        /// Cancels the current combat engagement so the companion returns to follow behaviour immediately.
+        /// </summary>
+        public void CancelActiveCombat()
+        {
+            combatController?.CancelCombat();
         }
 
         /// <summary>

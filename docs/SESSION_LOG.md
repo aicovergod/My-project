@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b2637af15faf1c5ecb6e0c57b51f92d3b735d693 -->
+## 2025-10-25T23:54:03+01:00 — Add companion stop controls and chat commands
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (9): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/UI/AdminF4Menu.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs, Assets/Scripts/Pets/PetCombatController.cs, Assets/Scripts/Pets/PetLevelBarMenu.cs
+- Diff: 540 ++ / 10 --
+- Notes:
+  —
+---
 <!-- commit:ff4c29a1008575ff66c0134641c6e3964f525545 -->
 ## 2025-10-25T23:31:20+01:00 — Merge pull request #1411 from aicovergod/codex/add-right-click-tree-chopping-support
 

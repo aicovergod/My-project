@@ -98,6 +98,12 @@ namespace Companions
         public bool HasActiveFollowerHold => followerDisableLockCount > 0;
 
         /// <summary>
+        /// True while the mining controller has an active mining routine or the underlying skill reports mining activity.
+        /// Exposed so UI layers and chat commands can determine whether a stop request should be surfaced.
+        /// </summary>
+        public bool IsMining => miningActive || (miningSkill != null && miningSkill.IsMining);
+
+        /// <summary>
         /// Initialises the mining controller with the owning companion components.
         /// </summary>
         /// <param name="ownerController">Controller that owns this component.</param>

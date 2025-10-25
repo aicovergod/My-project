@@ -146,6 +146,12 @@ namespace Pets
         /// <summary>Returns true if this pet has combat capabilities.</summary>
         public bool CanFight => definition != null && definition.canFight;
 
+        /// <summary>
+        /// True when the combat controller currently has an active, living target assigned.
+        /// Used by the companion manager to expose stop commands while engaged in combat.
+        /// </summary>
+        public bool HasActiveTarget => currentTarget != null && currentTarget.IsAlive;
+
         /// <summary>Order the pet to attack the given combat target.</summary>
         public void CommandAttack(CombatTarget target, bool fromDirectCommand = false)
         {
@@ -1016,6 +1022,15 @@ namespace Pets
                 return Mathf.Max(1, skills.GetLevel(SkillType.Beastmaster));
 
             return 1;
+        }
+
+        /// <summary>
+        /// Stops any active attack behaviour and restores the follower state so pets resume
+        /// trailing their owner immediately after being hidden or disabled.
+        /// </summary>
+        public void CancelCombat()
+        {
+            CancelAttack();
         }
 
         /// <summary>
