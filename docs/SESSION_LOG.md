@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7ae74bb1d699232950db3ad828093b5681c710f0 -->
+## 2025-10-26T00:30:16+01:00 — dialogue updated
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionChatLibrary.cs
+- Diff: 61 ++ / 25 --
+- Notes:
+  —
+---
 <!-- commit:fa908fe92730b8fd521be1d460db0412ff6afeff -->
 ## 2025-10-26T00:19:54+01:00 — Merge pull request #1415 from aicovergod/codex/expand-companionskillproposaldialogueblocks
 
