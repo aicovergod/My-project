@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c6869c4aee557bcb13cc0e85b04d740b3ea06f34 -->
+## 2025-10-25T20:37:48+01:00 — Merge pull request #1409 from aicovergod/codex/fix-configurecompanionchat-method-error
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 16 ++ / 0 --
+- Notes:
+  Fix woodcutting companion chat configuration
+---
+<!-- commit:43492bbde6d4881dae898ce1172ba1f42631f67f -->
+## 2025-10-25T20:37:36+01:00 — Fix companion chat hook for woodcutting skill
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Woodcutting/Core/WoodcuttingSkill.cs
+- Diff: 16 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6837882b4f68db81c7247248c91d22dccc05a577 -->
 ## 2025-10-25T20:23:08+01:00 — Merge pull request #1408 from aicovergod/codex/implement-woodcutting-companion-features
 
