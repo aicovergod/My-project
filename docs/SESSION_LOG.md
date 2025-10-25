@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d8bda8054fe6abf478cdb8655666e27fa286bb80 -->
+## 2025-10-25T15:41:52+01:00 — Merge pull request #1404 from aicovergod/codex/refactor-companion-movement-visuals-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 12 ++ / 5 --
+- Notes:
+  Ensure companions stay upright during pickups
+---
+<!-- commit:722d039e19948b22bf340e2a7e912ab6a40427dc -->
+## 2025-10-25T15:41:43+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:62749ba21dbee76cf1eedfc89d82f26e6f20a621 -->
 ## 2025-10-25T15:41:26+01:00 — Keep companion upright during pickup sequences
 
