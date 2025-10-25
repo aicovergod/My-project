@@ -1,10 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Companions;
-using Companions.Fishing;
-using Companions.Mining;
-using Companions.Woodcutting;
 using UI.Chat;
 using UnityEngine;
 
