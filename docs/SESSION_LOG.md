@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:43f1b9f45974000d8da20b844dae6532e619e940 -->
+## 2025-10-26T00:05:36+01:00 — Fix companion chat handler null guard
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 2 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:9488e1795f4492ab92065c59616ccce34070dc57 -->
 ## 2025-10-25T23:54:34+01:00 — Merge pull request #1412 from aicovergod/codex/add-stop-action-button-to-companion-menu
 
