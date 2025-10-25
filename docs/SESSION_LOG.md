@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fe05e7cd7eafa6208491f160954dadfdf9b3bf32 -->
+## 2025-10-25T15:32:04+01:00 — Fix accessibility of ground item menu handler
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs
+- Diff: 5 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:c4cdc79b219cc17b988ebf781101ba59d887322b -->
 ## 2025-10-25T15:26:55+01:00 — Merge pull request #1402 from aicovergod/codex/implement-companion-pickup-on-right-click
 
