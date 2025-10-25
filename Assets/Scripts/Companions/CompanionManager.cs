@@ -1824,7 +1824,8 @@ namespace Companions
         /// <param name="message">Chat message emitted by the game channel.</param>
         private static void HandleChatMessageReceived(ChatMessage message)
         {
-            if (message == null)
+            // Default struct instances represent unusable chat lines; guard so we ignore placeholder payloads.
+            if (message.Equals(default))
                 return;
 
             if (message.Channel == ChatChannel.Game)
