@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ab99c35c470575b3d77b0da4ed2cea77efebe417 -->
+## 2025-10-25T14:49:19+01:00 — Fix companion mining stuck detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 14 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:d7a688ddb313f408a0c994ded42a3049822281e3 -->
 ## 2025-10-25T14:42:34+01:00 — Merge pull request #1400 from aicovergod/codex/fix-duplicated-chatbox-message
 
