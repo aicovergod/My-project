@@ -472,6 +472,12 @@ namespace Companions
                         StepDirectlyTowards(targetPosition, ResolvePickupMoveSpeed(), out nextPosition, out velocity);
                         teleported = false;
                     }
+                    else if ((nextPosition - currentPosition).sqrMagnitude <= 0.0001f && velocity.sqrMagnitude <= 0.0001f)
+                    {
+                        // Navigation is still resolving a path; treat this as progress so the stuck timer does not abort early.
+                        lastProgressSample = Time.unscaledTime;
+                        lastDistance = distance;
+                    }
 
                     ApplyPickupMovement(nextPosition, velocity, teleported);
 
@@ -552,9 +558,9 @@ namespace Companions
                 out navTeleported,
                 out goalUnreachable);
 
-            if (!stepped || goalUnreachable)
+            if (goalUnreachable)
             {
-                if (goalUnreachable && CompanionManager.EnableDebugLogging)
+                if (CompanionManager.EnableDebugLogging)
                 {
                     Debug.Log("[Companion Pickup] Navigation reported the drop as unreachable. Falling back to direct steering.", this);
                 }
@@ -562,9 +568,20 @@ namespace Companions
                 return false;
             }
 
-            nextPosition = new Vector3(navNext.x, navNext.y, transform.position.z);
-            velocity = navVelocity;
-            teleported = navTeleported;
+            if (stepped)
+            {
+                nextPosition = new Vector3(navNext.x, navNext.y, transform.position.z);
+                velocity = navVelocity;
+                teleported = navTeleported;
+                return true;
+            }
+
+            // Navigation is active but has not produced a waypoint yet (likely waiting for a path response).
+            // Hold position so the coroutine can wait for the navigation data instead of reverting to direct steering.
+            Vector3 currentPosition = body2D != null ? (Vector3)body2D.position : transform.position;
+            nextPosition = new Vector3(currentPosition.x, currentPosition.y, transform.position.z);
+            velocity = Vector2.zero;
+            teleported = false;
             return true;
         }
 
