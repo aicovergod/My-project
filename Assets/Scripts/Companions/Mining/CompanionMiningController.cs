@@ -72,11 +72,25 @@ namespace Companions
         private readonly List<Vector3> areaCandidateTileCenters = new List<Vector3>();
         private readonly HashSet<MineableRock> playerProtectedSingleOre = new HashSet<MineableRock>();
 
+        [Header("Stuck Detection")]
+        [Tooltip("Grace period before a lack of progress is considered \"stuck\".")]
+        [SerializeField, Min(0.1f)] private float stuckTimeoutSeconds = 2.5f;
+
         private bool areaMiningActive;
         private float activeAreaRadius;
         private MiningSkill playerMiningSkill;
         private Transform playerTransform;
         private CompanionSkillCooldownTracker skillCooldownTracker;
+        private bool areaAllCandidatesBlocked;
+
+        private readonly Dictionary<MineableRock, float> blockedRocks = new Dictionary<MineableRock, float>();
+        private readonly List<MineableRock> blockedRockPruneBuffer = new List<MineableRock>();
+        private MineableRock lastStuckRock;
+        private int consecutiveStuckRockCount;
+
+        private const float ProgressResetThreshold = 0.1f;
+        private const float CloseEnoughDistanceMultiplier = 0.9f;
+        private const int ConsecutiveStuckCancelThreshold = 2;
 
         /// <summary>
         /// Indicates whether any systems currently hold the follower disabled so the companion remains stationary.
@@ -298,6 +312,7 @@ namespace Companions
             CleanupAfterMining(restoreFollower);
             UnsubscribeFromPlayerMiningSkill();
             BindToPlayerMiningSkill(playerTransform);
+            ResetStuckHistory();
         }
 
         /// <summary>
@@ -309,6 +324,7 @@ namespace Companions
             CancelAreaMiningInternal(restoreFollower);
             UnsubscribeFromPlayerMiningSkill();
             BindToPlayerMiningSkill(playerTransform);
+            ResetStuckHistory();
         }
 
         /// <summary>
@@ -384,6 +400,11 @@ namespace Companions
         private IEnumerator MineRoutine(MineableRock rock, PickaxeDefinition pickaxe)
         {
             var followerHold = EnterTemporaryFollowerHold();
+            bool stuckTriggered = false;
+            MineableRock stuckRock = null;
+            float noProgressTimer = 0f;
+            float lastRecordedDistance = 0f;
+            bool hasDistanceSample = false;
             try
             {
                 pathMover?.ResetAttackTracking();
@@ -398,6 +419,42 @@ namespace Companions
 
                     Vector3 rockPosition = rock.transform.position;
                     float distance = Vector2.Distance(transform.position, rockPosition);
+
+                    if (!hasDistanceSample)
+                    {
+                        hasDistanceSample = true;
+                        lastRecordedDistance = distance;
+                        noProgressTimer = 0f;
+                    }
+                    else
+                    {
+                        bool closedGap = distance < lastRecordedDistance - ProgressResetThreshold;
+                        bool effectivelyClose = distance <= MiningRange * CloseEnoughDistanceMultiplier;
+                        bool activelyMining = miningSkill != null && miningSkill.IsMining;
+
+                        if (closedGap || effectivelyClose || activelyMining)
+                        {
+                            noProgressTimer = 0f;
+                        }
+                        else
+                        {
+                            noProgressTimer += Time.deltaTime;
+                        }
+
+                        lastRecordedDistance = distance;
+                    }
+
+                    if (noProgressTimer >= stuckTimeoutSeconds)
+                    {
+                        if (CompanionManager.EnableDebugLogging)
+                        {
+                            Debug.Log("[Companion Mining] Movement stalled while approaching the rock.", this);
+                        }
+
+                        stuckTriggered = true;
+                        stuckRock = rock;
+                        break;
+                    }
 
                     if (distance > MiningRange)
                     {
@@ -441,6 +498,8 @@ namespace Companions
                                 {
                                     if (CompanionManager.EnableDebugLogging)
                                         Debug.Log("[Companion Mining] Navigation reported the rock as unreachable.", this);
+                                    stuckTriggered = true;
+                                    stuckRock = rock;
                                     break;
                                 }
 
@@ -448,6 +507,9 @@ namespace Companions
                                     ApplyMovement(nextPosition, navVelocity, teleported);
                             }
                         }
+
+                        if (stuckTriggered)
+                            break;
 
                         if (!navigationStepTaken)
                         {
@@ -503,6 +565,12 @@ namespace Companions
                 followerHold.Dispose();
             }
 
+            if (stuckTriggered)
+            {
+                HandleMiningStuck(stuckRock);
+                yield break;
+            }
+
             miningRoutine = null;
             miningActive = false;
 
@@ -510,6 +578,7 @@ namespace Companions
                 miningSkill.StopMining();
 
             CleanupAfterMining(true);
+            ResetStuckHistory();
 
             if (areaMiningActive)
             {
@@ -518,6 +587,60 @@ namespace Companions
             }
 
             CancelAreaMiningInternal(false);
+        }
+
+        private void HandleMiningStuck(MineableRock rock)
+        {
+            if (CompanionManager.EnableDebugLogging)
+            {
+                string rockName = rock != null ? rock.name : "<null>";
+                Debug.Log($"[Companion Mining] Detected a stuck state while targeting {rockName}.", this);
+            }
+
+            float now = Time.time;
+            if (rock != null)
+            {
+                blockedRocks[rock] = now + stuckTimeoutSeconds;
+            }
+
+            if (miningSkill != null && miningSkill.IsMining)
+            {
+                suppressMiningStopCallback = true;
+                miningSkill.StopMining();
+                suppressMiningStopCallback = false;
+            }
+
+            CleanupAfterMining(true);
+            miningRoutine = null;
+            miningActive = false;
+
+            pathMover?.ResetFollowTracking();
+
+            if (petFollower != null && playerTransform != null)
+                petFollower.SetPlayer(playerTransform);
+
+            if (rock != null)
+            {
+                if (rock == lastStuckRock)
+                {
+                    consecutiveStuckRockCount++;
+                }
+                else
+                {
+                    lastStuckRock = rock;
+                    consecutiveStuckRockCount = 1;
+                }
+            }
+            else
+            {
+                lastStuckRock = null;
+                consecutiveStuckRockCount = 0;
+            }
+
+            if (consecutiveStuckRockCount >= ConsecutiveStuckCancelThreshold)
+            {
+                CancelMiningDueToStuck();
+            }
         }
 
         private bool TryPrepareMiningCommand(
@@ -530,6 +653,15 @@ namespace Companions
             result = CompanionMiningCommandResult.RequirementsNotMet;
 
             if (rock == null || rock.IsDepleted)
+            {
+                result = CompanionMiningCommandResult.Unreachable;
+                return false;
+            }
+
+            float now = Time.time;
+            PruneExpiredBlockedRocks(now);
+
+            if (IsRockTemporarilyBlocked(rock, now))
             {
                 result = CompanionMiningCommandResult.Unreachable;
                 return false;
@@ -712,6 +844,9 @@ namespace Companions
                     if (rock.RockDef != null && rock.RockDef.DepleteAfterNOres == 1 && playerProtectedSingleOre.Contains(rock))
                         continue;
 
+                    if (IsRockTemporarilyBlocked(rock, Time.time))
+                        continue;
+
                     // Suppress internal chat lines because the branch below publishes the
                     // descriptive message when inventory space is exhausted. This keeps the
                     // companion from spamming duplicate "inventory full" chat entries.
@@ -738,6 +873,12 @@ namespace Companions
 
                 if (!BuildAreaCandidateList(activeAreaRadius, out var rebuildFailure, suppressChat: true))
                 {
+                    if (areaAllCandidatesBlocked)
+                    {
+                        CancelMiningDueToStuck();
+                        yield break;
+                    }
+
                     PublishAreaMiningFailureMessage(rebuildFailure);
                     CancelAreaMiningInternal(true);
                     yield break;
@@ -754,6 +895,7 @@ namespace Companions
         {
             areaCandidates.Clear();
             areaCandidateTileCenters.Clear();
+            areaAllCandidatesBlocked = false;
 
             var rocks = FindObjectsOfType<MineableRock>();
             float radiusSqr = radius * radius;
@@ -761,6 +903,10 @@ namespace Companions
             Vector2 controllerPosition2D = (Vector2)transform.position;
             bool observedNonInventoryFailure = false;
             CompanionMiningCommandResult lastNonInventoryFailure = CompanionMiningCommandResult.Unreachable;
+            int blockedByStuckCount = 0;
+
+            float now = Time.time;
+            PruneExpiredBlockedRocks(now);
 
             for (int i = 0; i < rocks.Length; i++)
             {
@@ -774,6 +920,12 @@ namespace Companions
 
                 if (rock.RockDef != null && rock.RockDef.DepleteAfterNOres == 1 && playerProtectedSingleOre.Contains(rock))
                     continue;
+
+                if (IsRockTemporarilyBlocked(rock, now))
+                {
+                    blockedByStuckCount++;
+                    continue;
+                }
 
                 if (!TryPrepareMiningCommand(rock, out var _, out var validationResult, suppressChat))
                 {
@@ -823,6 +975,9 @@ namespace Companions
 
             if (areaCandidates.Count == 0)
             {
+                if (blockedByStuckCount > 0 && !observedNonInventoryFailure)
+                    areaAllCandidatesBlocked = true;
+
                 failureReason = observedNonInventoryFailure
                     ? lastNonInventoryFailure
                     : CompanionMiningCommandResult.Unreachable;
@@ -860,6 +1015,74 @@ namespace Companions
             float x = Mathf.Round(worldPosition.x);
             float y = Mathf.Round(worldPosition.y);
             return new Vector3(x, y, worldPosition.z);
+        }
+
+        private void CancelMiningDueToStuck()
+        {
+            if (CompanionManager.EnableDebugLogging)
+                Debug.Log("[Companion Mining] Cancelling mining because the companion is stuck.", this);
+
+            CancelAreaMiningInternal(true);
+            PublishStuckApologyMessage();
+            areaAllCandidatesBlocked = false;
+            ResetStuckHistory();
+        }
+
+        private void PublishStuckApologyMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            chat.PublishCompanionMessage(
+                CompanionManager.GetCompanionDisplayName(),
+                "Hey, I got stuck while I was mining, sorry.");
+        }
+
+        private void PruneExpiredBlockedRocks(float now)
+        {
+            blockedRockPruneBuffer.Clear();
+
+            foreach (var kvp in blockedRocks)
+            {
+                var rock = kvp.Key;
+                bool expired = rock == null || rock.IsDepleted || kvp.Value <= now;
+                if (!expired)
+                    continue;
+
+                blockedRockPruneBuffer.Add(rock);
+            }
+
+            for (int i = 0; i < blockedRockPruneBuffer.Count; i++)
+            {
+                var rock = blockedRockPruneBuffer[i];
+                blockedRocks.Remove(rock);
+            }
+
+            blockedRockPruneBuffer.Clear();
+        }
+
+        private bool IsRockTemporarilyBlocked(MineableRock rock, float now)
+        {
+            if (rock == null)
+                return false;
+
+            if (!blockedRocks.TryGetValue(rock, out float expiry))
+                return false;
+
+            if (rock.IsDepleted || expiry <= now)
+            {
+                blockedRocks.Remove(rock);
+                return false;
+            }
+
+            return true;
+        }
+
+        private void ResetStuckHistory()
+        {
+            lastStuckRock = null;
+            consecutiveStuckRockCount = 0;
         }
 
         /// <summary>
@@ -1059,6 +1282,7 @@ namespace Companions
 
             miningActive = false;
             CleanupAfterMining(true);
+            ResetStuckHistory();
         }
 
         private void BindToPlayerMiningSkill(Transform player)
@@ -1173,6 +1397,10 @@ namespace Companions
         {
             CancelMining(true);
             UnsubscribeFromPlayerMiningSkill();
+            blockedRocks.Clear();
+            blockedRockPruneBuffer.Clear();
+            areaAllCandidatesBlocked = false;
+            ResetStuckHistory();
         }
 
         private void OnDestroy()
