@@ -1294,6 +1294,10 @@ namespace Companions
             int len = Mathf.Min(equipped.Length, data.slots.Length);
             for (int i = 0; i < len; i++)
             {
+                // Mirror the player equipment load flow by capturing the previous state before mutating the slot.
+                // InventoryEntry is a struct, so this copy safely preserves the original data for comparisons.
+                var previousEntry = equipped[i];
+
                 var slot = data.slots[i];
                 if (!string.IsNullOrEmpty(slot.id))
                 {
@@ -1312,6 +1316,10 @@ namespace Companions
                 }
 
                 UpdateSlotVisual((EquipmentSlot)(i + 1));
+
+                var currentEntry = equipped[i];
+                if (previousEntry.item != currentEntry.item || previousEntry.count != currentEntry.count)
+                    RaiseEquipmentSlotChanged((EquipmentSlot)(i + 1));
             }
         }
 
