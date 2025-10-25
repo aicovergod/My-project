@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:47b4f8c1e28897127662ac7910f244e5f3454937 -->
+## 2025-10-25T15:50:20+01:00 — Merge pull request #1405 from aicovergod/codex/fix-companion-navigation-path-for-pickups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 22 ++ / 5 --
+- Notes:
+  Fix companion drop pickups to respect navigation
+---
+<!-- commit:24ab3b2fa4b1f6d9f279217284a1b60c23692489 -->
+## 2025-10-25T15:50:05+01:00 — Fix companion drop pickups to wait for navigation paths
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionController.cs
+- Diff: 22 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:d8bda8054fe6abf478cdb8655666e27fa286bb80 -->
 ## 2025-10-25T15:41:52+01:00 — Merge pull request #1404 from aicovergod/codex/refactor-companion-movement-visuals-handling
 
