@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:092c073931b550119d3a852737f25b08df565b71 -->
+## 2025-10-26T00:34:55+01:00 — namespace bug fix
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Chat.meta, Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs, Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs.meta
+- Diff: 10 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:b6cd90449bee3e4f5f72d65fa64f165b188d975f -->
 ## 2025-10-26T00:32:31+01:00 — Merge pull request #1416 from aicovergod/codex/add-chatbox-commands-for-companion-control
 
