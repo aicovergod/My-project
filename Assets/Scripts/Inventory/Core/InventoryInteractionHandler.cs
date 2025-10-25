@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using BankSystem;
 using Books;
 using Companions;
@@ -52,6 +53,11 @@ namespace Inventory.Core
         private QuestUI questUi;
         private PetStorage petStorage;
         private GroundItemSpawner groundItemSpawner;
+        private CompanionInventory companionInventory;
+        private CompanionEquipment companionEquipment;
+        private readonly List<InventoryItemContextMenu.Option> contextMenuOptions = new();
+
+        private bool IsCompanionOwner => companionInventory != null && companionInventory.InventoryComponent == owner;
 
         private Shop currentShop;
 
@@ -70,6 +76,15 @@ namespace Inventory.Core
             this.owner = owner ?? throw new ArgumentNullException(nameof(owner));
             this.model = model ?? throw new ArgumentNullException(nameof(model));
             this.controller = controller ?? throw new ArgumentNullException(nameof(controller));
+
+            companionInventory = owner.GetComponent<CompanionInventory>() ??
+                                 owner.GetComponentInParent<CompanionInventory>();
+            if (IsCompanionOwner)
+            {
+                companionEquipment = owner.GetComponent<CompanionEquipment>() ??
+                                      owner.GetComponentInParent<CompanionEquipment>() ??
+                                      CompanionManager.CompanionEquipment;
+            }
 
             SubscribeToController();
         }
@@ -100,6 +115,24 @@ namespace Inventory.Core
             questUi = context.QuestUi ?? questUi;
             petStorage = context.PetStorage ?? petStorage;
             groundItemSpawner = context.GroundItemSpawner ?? groundItemSpawner;
+
+            if (companionInventory == null)
+            {
+                companionInventory = owner.GetComponent<CompanionInventory>() ??
+                                     owner.GetComponentInParent<CompanionInventory>();
+            }
+
+            if (IsCompanionOwner)
+            {
+                if (companionEquipment == null)
+                {
+                    companionEquipment = owner.GetComponent<CompanionEquipment>() ??
+                                         owner.GetComponentInParent<CompanionEquipment>();
+                }
+
+                if (companionEquipment == null)
+                    companionEquipment = CompanionManager.CompanionEquipment;
+            }
 
             RefreshControllerState();
         }
@@ -230,7 +263,7 @@ namespace Inventory.Core
             {
                 controller.Hide();
                 controller.DismissTooltip();
-                controller.DismissDropMenu();
+                controller.DismissContextMenus();
                 ClosePetStorage();
             }
             finally
@@ -376,7 +409,7 @@ namespace Inventory.Core
 
         private void HandleSlotClicked(InventoryWindowController _, InventoryWindowController.SlotClickEvent evt)
         {
-            controller.DismissDropMenu();
+            controller.DismissContextMenus();
 
             int index = evt.SlotIndex;
             if (index < 0 || index >= model.Size)
@@ -470,21 +503,293 @@ namespace Inventory.Core
                 return;
             }
 
-            if (!CanDropItems)
-                return;
-
             var entry = model.GetEntry(index);
             if (entry.item == null)
                 return;
 
-            if (entry.count > 1)
+            contextMenuOptions.Clear();
+
+            bool isPlayerInventory = !IsCompanionOwner;
+            bool canDrop = CanDropItems && !entry.item.isUndroppable;
+            bool hasInteractable = false;
+
+            if (isPlayerInventory)
             {
-                controller.ShowDropMenu(index, evt.PointerPosition);
-                return;
+                if (entry.item.equipmentSlot != EquipmentSlot.None && equipment != null)
+                {
+                    contextMenuOptions.Add(new InventoryItemContextMenu.Option(
+                        "Equip",
+                        InventoryItemContextAction.Equip,
+                        true));
+                    hasInteractable = true;
+                }
+
+                var eater = owner.GetComponent<PlayerEat>();
+                bool canEat = eater != null && entry.item.healAmount > 0;
+                if (canEat)
+                {
+                    contextMenuOptions.Add(new InventoryItemContextMenu.Option(
+                        "Eat",
+                        InventoryItemContextAction.Eat,
+                        true));
+                    hasInteractable = true;
+                }
+
+                contextMenuOptions.Add(new InventoryItemContextMenu.Option(
+                    "Use",
+                    InventoryItemContextAction.Use,
+                    true));
+                hasInteractable = true;
+
+                contextMenuOptions.Add(new InventoryItemContextMenu.Option(
+                    "Drop",
+                    InventoryItemContextAction.Drop,
+                    canDrop));
+                hasInteractable |= canDrop;
+
+                contextMenuOptions.Add(new InventoryItemContextMenu.Option(
+                    "Examine",
+                    InventoryItemContextAction.Examine,
+                    true));
+                hasInteractable = true;
+            }
+            else
+            {
+                if (entry.item.equipmentSlot != EquipmentSlot.None && companionEquipment != null)
+                {
+                    contextMenuOptions.Add(new InventoryItemContextMenu.Option(
+                        "Equip",
+                        InventoryItemContextAction.Equip,
+                        true));
+                    hasInteractable = true;
+                }
+
+                var playerInventory = CompanionManager.GetPlayerInventory();
+                bool canResolvePlayerInventory = playerInventory != null;
+                bool canTransfer = canResolvePlayerInventory &&
+                                   playerInventory.CanAddItem(entry.item, entry.count);
+                if (canResolvePlayerInventory)
+                {
+                    contextMenuOptions.Add(new InventoryItemContextMenu.Option(
+                        "Transfer",
+                        InventoryItemContextAction.Transfer,
+                        canTransfer));
+                    hasInteractable |= canTransfer;
+                }
+
+                contextMenuOptions.Add(new InventoryItemContextMenu.Option(
+                    "Use",
+                    InventoryItemContextAction.Use,
+                    true));
+                hasInteractable = true;
+
+                contextMenuOptions.Add(new InventoryItemContextMenu.Option(
+                    "Drop",
+                    InventoryItemContextAction.Drop,
+                    canDrop));
+                hasInteractable |= canDrop;
+
+                contextMenuOptions.Add(new InventoryItemContextMenu.Option(
+                    "Examine",
+                    InventoryItemContextAction.Examine,
+                    true));
+                hasInteractable = true;
             }
 
-            if (!entry.item.isUndroppable)
-                DropItem(index, 1);
+            if (contextMenuOptions.Count == 0 || !hasInteractable)
+                return;
+
+            controller.ShowItemContextMenu(index, evt.PointerPosition, contextMenuOptions);
+        }
+
+        private void HandleContextActionSelected(
+            InventoryWindowController _,
+            InventoryWindowController.ItemContextActionEvent evt)
+        {
+            controller.DismissContextMenus();
+
+            int slotIndex = evt.SlotIndex;
+            if (slotIndex < 0 || slotIndex >= model.Size)
+                return;
+
+            var entry = model.GetEntry(slotIndex);
+            var item = entry.item;
+
+            switch (evt.Action)
+            {
+                case InventoryItemContextAction.Equip:
+                    if (item == null)
+                        break;
+
+                    if (IsCompanionOwner)
+                        TryEquipCompanionItem(slotIndex);
+                    else
+                        EquipItem(slotIndex);
+                    break;
+
+                case InventoryItemContextAction.Eat:
+                    if (!IsCompanionOwner)
+                        UseItem(slotIndex);
+                    break;
+
+                case InventoryItemContextAction.Use:
+                    if (item == null)
+                        break;
+
+                    bool handled = false;
+                    if (!IsCompanionOwner)
+                    {
+                        var eater = owner.GetComponent<PlayerEat>();
+                        if (eater != null && item.healAmount > 0)
+                        {
+                            SelectItemForUse(slotIndex);
+                            handled = true;
+                        }
+                    }
+
+                    if (!handled)
+                    {
+                        handled = UseItem(slotIndex);
+                        if (!handled)
+                            SelectItemForUse(slotIndex);
+                    }
+                    break;
+
+                case InventoryItemContextAction.Drop:
+                    if (item == null)
+                        break;
+
+                    if (!CanDropItems || item.isUndroppable)
+                        break;
+
+                    if (entry.count > 1)
+                        controller.ShowDropMenu(slotIndex, evt.PointerPosition);
+                    else
+                        DropItem(slotIndex, 1);
+                    break;
+
+                case InventoryItemContextAction.Transfer:
+                    if (IsCompanionOwner)
+                        TryTransferToPlayerInventory(slotIndex);
+                    break;
+
+                case InventoryItemContextAction.Examine:
+                    ExamineItem(slotIndex);
+                    break;
+            }
+
+            controller.DismissTooltip();
+        }
+
+        private void SelectItemForUse(int slotIndex)
+        {
+            if (slotIndex < 0 || slotIndex >= model.Size)
+                return;
+
+            var entry = model.GetEntry(slotIndex);
+            if (entry.item == null)
+                return;
+
+            owner.selectedIndex = slotIndex;
+            controller.SetSelectedIndex(slotIndex);
+        }
+
+        private bool TryEquipCompanionItem(int slotIndex)
+        {
+            if (!IsCompanionOwner || companionEquipment == null)
+                return false;
+            if (slotIndex < 0 || slotIndex >= model.Size)
+                return false;
+
+            var entry = model.GetEntry(slotIndex);
+            if (entry.item == null || entry.item.equipmentSlot == EquipmentSlot.None)
+                return false;
+
+            var removedEntry = model.TakeEntry(slotIndex);
+            var result = companionEquipment.TryEquipFromCompanionInventory(removedEntry, owner);
+
+            if (result == CompanionEquipAttemptResult.NotHandled)
+            {
+                model.SetEntry(slotIndex, removedEntry);
+                controller.RefreshSlot(slotIndex);
+                return false;
+            }
+
+            controller.RefreshSlot(slotIndex);
+
+            if (result != CompanionEquipAttemptResult.Equipped)
+                return false;
+
+            if (owner.selectedIndex == slotIndex)
+                ClearSelection();
+
+            return true;
+        }
+
+        private bool TryTransferToPlayerInventory(int slotIndex)
+        {
+            if (!IsCompanionOwner)
+                return false;
+            if (slotIndex < 0 || slotIndex >= model.Size)
+                return false;
+
+            var entry = model.GetEntry(slotIndex);
+            if (entry.item == null)
+                return false;
+
+            var playerInventory = CompanionManager.GetPlayerInventory();
+            if (playerInventory == null)
+                return false;
+
+            if (!playerInventory.CanAddItem(entry.item, entry.count))
+            {
+                var chat = ChatService.Instance;
+                chat?.PublishGameMessage("Your inventory is full");
+                return false;
+            }
+
+            var removedEntry = model.TakeEntry(slotIndex);
+            if (removedEntry.item == null)
+                return false;
+
+            if (!playerInventory.AddItem(removedEntry.item, removedEntry.count))
+            {
+                model.SetEntry(slotIndex, removedEntry);
+                var chat = ChatService.Instance;
+                chat?.PublishGameMessage("Your inventory is full");
+                controller.RefreshSlot(slotIndex);
+                return false;
+            }
+
+            controller.RefreshSlot(slotIndex);
+            if (owner.selectedIndex == slotIndex)
+                ClearSelection();
+
+            playerInventory.WindowController?.RefreshAllSlots();
+            return true;
+        }
+
+        private void ExamineItem(int slotIndex)
+        {
+            if (slotIndex < 0 || slotIndex >= model.Size)
+                return;
+
+            var entry = model.GetEntry(slotIndex);
+            var item = entry.item;
+            if (item == null)
+                return;
+
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
+            string description = item.description;
+            string message = string.IsNullOrWhiteSpace(description)
+                ? $"You examine the {name}."
+                : $"{name}: {description.Trim()}";
+
+            chat.PublishGameMessage(message);
         }
 
         private void CombineSlots(int sourceIndex, int targetIndex)
@@ -668,7 +973,7 @@ namespace Inventory.Core
 
                 PublishActivePetDropBlockedMessage(activeDisplayName);
                 controller.RefreshSlot(slotIndex);
-                controller.DismissDropMenu();
+                controller.DismissContextMenus();
                 return;
             }
 
@@ -681,7 +986,7 @@ namespace Inventory.Core
                     : petDefinition.displayName;
                 PublishActivePetDropBlockedMessage(displayName);
                 controller.RefreshSlot(slotIndex);
-                controller.DismissDropMenu();
+                controller.DismissContextMenus();
                 return;
             }
 
@@ -721,7 +1026,7 @@ namespace Inventory.Core
             if (type == StackSplitType.Drop && entry.item.isUndroppable)
                 return;
 
-            controller.DismissDropMenu();
+            controller.DismissContextMenus();
             StackSplitDialog.Show(controller.UiRoot.transform, entry.count, amount =>
             {
                 amount = Mathf.Clamp(amount, 1, entry.count);
@@ -892,6 +1197,7 @@ namespace Inventory.Core
             controller.SplitPromptRequested += HandleSplitPromptRequested;
             controller.DragDropRequested += HandleDragDropRequested;
             controller.DragCancelled += HandleDragCancelled;
+            controller.ContextActionSelected += HandleContextActionSelected;
             controllerEventsSubscribed = true;
         }
 
@@ -905,6 +1211,7 @@ namespace Inventory.Core
             controller.SplitPromptRequested -= HandleSplitPromptRequested;
             controller.DragDropRequested -= HandleDragDropRequested;
             controller.DragCancelled -= HandleDragCancelled;
+            controller.ContextActionSelected -= HandleContextActionSelected;
             controllerEventsSubscribed = false;
         }
     }
