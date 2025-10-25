@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Companions.Chat;
 using Core.Input;
 using Player;
 using Player.Commands;
@@ -227,6 +228,16 @@ namespace Player.Chat
 
             // Resolve any speech colour prefix before broadcasting so the chat log remains untouched while bubbles inherit the override.
             bool hasSpeechColor = TryResolveSpeechColor(message, out string sanitisedMessage, out Color speechColor);
+
+            if (channel == ChatChannel.Companion)
+            {
+                if (CompanionChatCommandProcessor.TryProcessChatCommand(sender, sanitisedMessage))
+                {
+                    chatHud.CancelInput();
+                    ReleaseModalLock();
+                    return;
+                }
+            }
 
             if (channel == ChatChannel.Companion)
             {
