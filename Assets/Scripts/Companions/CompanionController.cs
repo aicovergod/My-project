@@ -624,10 +624,6 @@ namespace Companions
             {
                 spriteAnimator.UpdateVisuals(velocity);
             }
-            else if (displacement.sqrMagnitude > 0.0001f)
-            {
-                transform.up = displacement.normalized;
-            }
         }
 
         /// <summary>
@@ -664,6 +660,8 @@ namespace Companions
             }
 
             spriteAnimator?.UpdateVisuals(Vector2.zero);
+
+            transform.rotation = Quaternion.identity;
 
             if (followerDisabledByPickup && follower != null && !follower.enabled)
             {
@@ -742,7 +740,7 @@ namespace Companions
                 spriteAnimator.UpdateVisuals(Vector2.zero);
             }
 
-            transform.up = direction.normalized;
+            transform.rotation = Quaternion.identity;
         }
 
         /// <summary>
