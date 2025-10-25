@@ -6,6 +6,7 @@ using Inventory;
 using Pets;
 using Skills;
 using Skills.Mining;
+using Skills.Woodcutting;
 using UI.Chat;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -1230,6 +1231,137 @@ namespace Companions
 
             string successDetail = "Area mining routine started successfully.";
             Debug.Log($"[Companion] Area mining command outcome: success=True, radius={radius}, reason={successDetail}");
+            return true;
+        }
+
+        /// <summary>
+        /// Routes a woodcutting command to the active companion when available.
+        /// </summary>
+        /// <param name="tree">Tree that should be chopped.</param>
+        /// <returns>True when the companion accepted the command, otherwise false.</returns>
+        public static bool TryCommandChop(TreeNode tree)
+        {
+            if (tree == null)
+            {
+                Debug.LogWarning("[Companion] Cannot command woodcutting: target tree reference was null.");
+                return false;
+            }
+
+            if (controller == null)
+            {
+                Debug.LogWarning("[Companion] Cannot command woodcutting: companion controller has not been initialised.");
+                return false;
+            }
+
+            if (controller.WoodcuttingController == null)
+            {
+                Debug.LogWarning("[Companion] Cannot command woodcutting: companion woodcutting controller is missing.");
+                return false;
+            }
+
+            if (!HasActiveCompanion)
+            {
+                Debug.LogWarning("[Companion] Cannot command woodcutting: the companion is not currently active.");
+                return false;
+            }
+
+            if (CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest(controller.SkillCooldowns, out var cooldownResult))
+            {
+                Debug.LogWarning($"[Companion] Woodcutting command outcome: accepted=False (result={cooldownResult}).");
+                return false;
+            }
+
+            bool accepted = controller.WoodcuttingController.TryCommandChop(tree, out var result);
+            if (!accepted && result == CompanionWoodcuttingCommandResult.InventoryFull)
+                accepted = true;
+
+            string message = $"[Companion] Woodcutting command outcome: accepted={accepted} (result={result}).";
+            if (accepted)
+                Debug.Log(message);
+            else
+                Debug.LogWarning(message);
+
+            return accepted;
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to chop nearby trees using the default scan radius.
+        /// </summary>
+        /// <param name="failureReason">Detailed failure reason when the command is rejected.</param>
+        /// <returns>True when the area woodcutting command started successfully.</returns>
+        public static bool TryCommandChopNearby(out CompanionWoodcuttingCommandResult failureReason)
+        {
+            return TryCommandChopNearby(10f, out failureReason);
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to chop nearby trees within the supplied radius.
+        /// </summary>
+        /// <param name="radius">Radius (in Unity units / tiles) to scan for trees.</param>
+        /// <returns>True when the area woodcutting command started successfully.</returns>
+        public static bool TryCommandChopNearby(float radius = 10f)
+        {
+            return TryCommandChopNearby(radius, out _);
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to chop nearby trees within the supplied radius and reports the resulting status.
+        /// </summary>
+        /// <param name="radius">Radius (in Unity units / tiles) to scan for trees.</param>
+        /// <param name="failureReason">Detailed failure reason when the command is rejected.</param>
+        /// <returns>True when the area woodcutting command started successfully.</returns>
+        public static bool TryCommandChopNearby(float radius, out CompanionWoodcuttingCommandResult failureReason)
+        {
+            string rejectionReason = string.Empty;
+            failureReason = CompanionWoodcuttingCommandResult.Unreachable;
+
+            if (controller == null)
+            {
+                rejectionReason = "Companion controller has not been initialised.";
+                failureReason = CompanionWoodcuttingCommandResult.RequirementsNotMet;
+                Debug.LogWarning($"[Companion] Area woodcutting command outcome: success=False, radius={radius}, reason={rejectionReason}");
+                return false;
+            }
+
+            if (controller.WoodcuttingController == null)
+            {
+                rejectionReason = "Companion woodcutting controller is missing.";
+                failureReason = CompanionWoodcuttingCommandResult.RequirementsNotMet;
+                Debug.LogWarning($"[Companion] Area woodcutting command outcome: success=False, radius={radius}, reason={rejectionReason}");
+                return false;
+            }
+
+            if (!HasActiveCompanion)
+            {
+                rejectionReason = "The companion is not currently active.";
+                failureReason = CompanionWoodcuttingCommandResult.RequirementsNotMet;
+                Debug.LogWarning($"[Companion] Area woodcutting command outcome: success=False, radius={radius}, reason={rejectionReason}");
+                return false;
+            }
+
+            if (CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest(controller.SkillCooldowns, out failureReason))
+            {
+                Debug.LogWarning($"[Companion] Area woodcutting command outcome: success=False, radius={radius}, reason=Cooldown active.");
+                return false;
+            }
+
+            bool accepted = controller.WoodcuttingController.TryStartAreaWoodcutting(radius, out failureReason);
+            if (!accepted)
+            {
+                if (failureReason == CompanionWoodcuttingCommandResult.InventoryFull)
+                {
+                    string inventoryDetail = "Area woodcutting aborted because the companion inventory is full.";
+                    Debug.Log($"[Companion] Area woodcutting command outcome: success=True, radius={radius}, reason={inventoryDetail}");
+                    return true;
+                }
+
+                rejectionReason = $"The woodcutting controller rejected the area woodcutting request ({failureReason}).";
+                Debug.LogWarning($"[Companion] Area woodcutting command outcome: success=False, radius={radius}, reason={rejectionReason}");
+                return false;
+            }
+
+            string successDetail = "Area woodcutting routine started successfully.";
+            Debug.Log($"[Companion] Area woodcutting command outcome: success=True, radius={radius}, reason={successDetail}");
             return true;
         }
 

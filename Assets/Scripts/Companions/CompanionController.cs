@@ -35,6 +35,10 @@ namespace Companions
         /// <summary>Controller that manages mining-specific behaviour for the companion.</summary>
         private CompanionMiningController miningController;
 
+        /// <summary>Controller that manages woodcutting-specific behaviour for the companion.</summary>
+        [SerializeField]
+        private CompanionWoodcuttingController woodcuttingController;
+
         /// <summary>Equipment component responsible for the companion gear window and state.</summary>
         private CompanionEquipment companionEquipment;
 
@@ -102,6 +106,9 @@ namespace Companions
         /// <summary>Exposes the mining controller responsible for companion gathering commands.</summary>
         public CompanionMiningController MiningController => miningController;
 
+        /// <summary>Exposes the woodcutting controller responsible for companion gathering commands.</summary>
+        public CompanionWoodcuttingController WoodcuttingController => woodcuttingController;
+
         /// <summary>Provides access to the equipment component configured for the companion.</summary>
         public CompanionEquipment Equipment => companionEquipment;
 
@@ -138,6 +145,7 @@ namespace Companions
             ConfigureInventory(player);
             ConfigureEquipment();
             ConfigureMining(player);
+            ConfigureWoodcutting(player);
             ConfigureCombat();
             combatController?.BindCompanionController(this);
             ConfigurePickupMovementHelpers();
@@ -159,6 +167,9 @@ namespace Companions
 
             if (miningController != null)
                 miningController.RebindPlayer(player);
+
+            if (woodcuttingController != null)
+                woodcuttingController.RebindPlayer(player);
         }
 
         /// <summary>
@@ -167,8 +178,9 @@ namespace Companions
         public void CommandAttack(CombatTarget target)
         {
             CancelActivePickupRoutine();
-            // Cancel any active mining routines so direct attack orders stop both single-rock and area sweeps.
+            // Cancel any active gathering routines so direct attack orders stop ongoing skill behaviour.
             miningController?.CancelMining(true);
+            woodcuttingController?.CancelWoodcutting(true);
             combatController?.CommandAttack(target, true);
         }
 
@@ -189,6 +201,7 @@ namespace Companions
 
             CancelActivePickupRoutine();
             miningController?.CancelMining(true);
+            woodcuttingController?.CancelWoodcutting(true);
 
             ConfigurePickupMovementHelpers();
             pickupRoutine = StartCoroutine(PickupRoutine(targetDrop));
@@ -379,8 +392,22 @@ namespace Companions
 
         private void ConfigureMining(Transform player)
         {
-            miningController = gameObject.AddComponent<CompanionMiningController>();
+            miningController = miningController != null
+                ? miningController
+                : GetComponent<CompanionMiningController>();
+            if (miningController == null)
+                miningController = gameObject.AddComponent<CompanionMiningController>();
             miningController.Initialise(this, skillManager, companionInventory, player, skillCooldownTracker);
+        }
+
+        private void ConfigureWoodcutting(Transform player)
+        {
+            woodcuttingController = woodcuttingController != null
+                ? woodcuttingController
+                : GetComponent<CompanionWoodcuttingController>();
+            if (woodcuttingController == null)
+                woodcuttingController = gameObject.AddComponent<CompanionWoodcuttingController>();
+            woodcuttingController.Initialise(this, skillManager, companionInventory, player, skillCooldownTracker);
         }
 
         private void ConfigureCombat()
@@ -872,6 +899,7 @@ namespace Companions
         {
             CancelActivePickupRoutine();
             miningController?.CancelMining(true);
+            woodcuttingController?.CancelWoodcutting(true);
 
             if (skillManager != null)
                 skillManager.LevelChanged -= OnSkillLevelChanged;
@@ -887,6 +915,7 @@ namespace Companions
 
             combatController?.BindCompanionController(null);
             miningController = null;
+            woodcuttingController = null;
             companionEquipment = null;
             Despawned?.Invoke(this);
         }
