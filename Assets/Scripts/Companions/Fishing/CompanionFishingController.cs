@@ -145,6 +145,7 @@ namespace Companions
             {
                 fishingSkill.OnStopFishing -= HandleFishingStopped;
                 fishingSkill.OnStopFishing += HandleFishingStopped;
+                fishingSkill.ConfigureCompanionChat(CompanionManager.GetCompanionDisplayName);
             }
             else if (CompanionManager.EnableDebugLogging)
             {

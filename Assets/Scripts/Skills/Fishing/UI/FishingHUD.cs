@@ -1,5 +1,3 @@
-using Inventory;
-using Skills.Common.UI;
 using UnityEngine;
 
 namespace Skills.Fishing
@@ -7,7 +5,7 @@ namespace Skills.Fishing
     /// <summary>
     /// Presents fishing progress above the active spot, including the equipped tool sprite and tick timing.
     /// </summary>
-    public class FishingHUD : GatheringToolHudBase<FishingHUD, FishingSkill>
+    public class FishingHUD : FishingHudBase<FishingHUD>
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -21,53 +19,30 @@ namespace Skills.Fishing
             return go.AddComponent<FishingHUD>();
         }
 
-        protected override string ProgressRootName => "FishingProgress";
+        protected override string ResolveProgressRootName() => "FishingProgress";
 
-        protected override string ToolRootName => "FishingTool";
+        protected override string ResolveToolRootName() => "FishingTool";
 
-        protected override bool IsGatheringActive => skill != null && skill.IsFishing;
-
-        protected override int ResolveProgressIntervalTicks()
+        protected override FishingSkill LocateSkill()
         {
-            return skill != null ? skill.CurrentCatchIntervalTicks : 0;
-        }
-
-        protected override Sprite ResolveToolSprite()
-        {
-            var tool = skill?.CurrentTool;
-            if (tool == null)
+            var skills = Object.FindObjectsOfType<FishingSkill>(true);
+            if (skills == null || skills.Length == 0)
                 return null;
 
-            return GatheringToolIconResolver.GetIcon(tool.Id);
-        }
-
-        protected override void OnSkillLocated(FishingSkill located)
-        {
-            located.OnStartFishing += HandleStart;
-            located.OnStopFishing += HandleStop;
-        }
-
-        protected override void OnSkillDetached(FishingSkill previous)
-        {
-            previous.OnStartFishing -= HandleStart;
-            previous.OnStopFishing -= HandleStop;
-        }
-
-        private void HandleStart(FishableSpot spot)
-        {
-            if (spot == null)
+            for (int i = 0; i < skills.Length; i++)
             {
-                EndTrackingTarget();
-                return;
+                var candidate = skills[i];
+                if (candidate == null)
+                    continue;
+
+                if (IsCompanionSkill(candidate))
+                    continue;
+
+                if (BelongsToPlayer(candidate))
+                    return candidate;
             }
 
-            var renderer = spot.GetComponent<SpriteRenderer>();
-            BeginTrackingTarget(spot.transform, renderer);
-        }
-
-        private void HandleStop()
-        {
-            EndTrackingTarget();
+            return null;
         }
     }
 }

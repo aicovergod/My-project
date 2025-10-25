@@ -1,5 +1,3 @@
-using Inventory;
-using Skills.Common.UI;
 using UnityEngine;
 
 namespace Skills.Woodcutting
@@ -7,7 +5,7 @@ namespace Skills.Woodcutting
     /// <summary>
     /// Displays woodcutting progress above the current tree, mirroring the player's axe and tick cadence.
     /// </summary>
-    public class WoodcuttingHUD : GatheringToolHudBase<WoodcuttingHUD, WoodcuttingSkill>
+    public class WoodcuttingHUD : WoodcuttingHudBase<WoodcuttingHUD>
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -21,53 +19,30 @@ namespace Skills.Woodcutting
             return go.AddComponent<WoodcuttingHUD>();
         }
 
-        protected override string ProgressRootName => "WoodcuttingProgress";
+        protected override string ResolveProgressRootName() => "WoodcuttingProgress";
 
-        protected override string ToolRootName => "WoodcuttingAxe";
+        protected override string ResolveToolRootName() => "WoodcuttingAxe";
 
-        protected override bool IsGatheringActive => skill != null && skill.IsChopping;
-
-        protected override int ResolveProgressIntervalTicks()
+        protected override WoodcuttingSkill LocateSkill()
         {
-            return skill != null ? skill.CurrentChopIntervalTicks : 0;
-        }
-
-        protected override Sprite ResolveToolSprite()
-        {
-            var axe = skill?.CurrentAxe;
-            if (axe == null)
+            var skills = Object.FindObjectsOfType<WoodcuttingSkill>(true);
+            if (skills == null || skills.Length == 0)
                 return null;
 
-            return GatheringToolIconResolver.GetIcon(axe.Id);
-        }
-
-        protected override void OnSkillLocated(WoodcuttingSkill located)
-        {
-            located.OnStartChopping += HandleStart;
-            located.OnStopChopping += HandleStop;
-        }
-
-        protected override void OnSkillDetached(WoodcuttingSkill previous)
-        {
-            previous.OnStartChopping -= HandleStart;
-            previous.OnStopChopping -= HandleStop;
-        }
-
-        private void HandleStart(TreeNode tree)
-        {
-            if (tree == null)
+            for (int i = 0; i < skills.Length; i++)
             {
-                EndTrackingTarget();
-                return;
+                var candidate = skills[i];
+                if (candidate == null)
+                    continue;
+
+                if (IsCompanionSkill(candidate))
+                    continue;
+
+                if (BelongsToPlayer(candidate))
+                    return candidate;
             }
 
-            var renderer = tree.GetComponent<SpriteRenderer>();
-            BeginTrackingTarget(tree.transform, renderer);
-        }
-
-        private void HandleStop()
-        {
-            EndTrackingTarget();
+            return null;
         }
     }
 }
