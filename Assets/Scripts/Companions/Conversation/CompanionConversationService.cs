@@ -946,6 +946,16 @@ namespace Companions.Conversation
                 return tracker.TryGetRemaining(SkillType.Mining, out var remaining) && remaining > TimeSpan.Zero;
             }
 
+            if (skill == SkillType.Woodcutting)
+            {
+                return tracker.TryGetRemaining(SkillType.Woodcutting, out var remaining) && remaining > TimeSpan.Zero;
+            }
+
+            if (skill == SkillType.Fishing)
+            {
+                return tracker.TryGetRemaining(SkillType.Fishing, out var remaining) && remaining > TimeSpan.Zero;
+            }
+
             if (!IsCombatSkill(skill))
                 return false;
 
@@ -1795,23 +1805,36 @@ namespace Companions.Conversation
             };
 
             bool toolReady = !string.IsNullOrWhiteSpace(toolName) && toolResult.State == SkillToolState.Ready;
-            bool useMiningSpecificPool = toolReady && analysis.Skill.Value == SkillType.Mining;
 
-            var pool = useMiningSpecificPool
-                ? CompanionSkillProposalDialogueBlocks.PlayerMiningProposalReadyWithPickaxeSegments
-                : CompanionSkillProposalDialogueBlocks.PlayerSkillProposalReadyGenericSegments;
+            string[] pool = CompanionSkillProposalDialogueBlocks.PlayerSkillProposalReadyGenericSegments;
+            string[] followUpPool = CompanionSkillProposalDialogueBlocks.PlayerSkillProposalReadyGenericFollowUps;
+            float followUpChance = SkillProposalLightFollowUpChance;
+
+            if (toolReady && analysis.Skill.HasValue)
+            {
+                switch (analysis.Skill.Value)
+                {
+                    case SkillType.Mining:
+                        pool = CompanionSkillProposalDialogueBlocks.PlayerMiningProposalReadyWithPickaxeSegments;
+                        followUpPool = CompanionSkillProposalDialogueBlocks.PlayerMiningProposalReadyWithToolFollowUps;
+                        followUpChance = SkillProposalFollowUpChance;
+                        break;
+                    case SkillType.Woodcutting:
+                        pool = CompanionSkillProposalDialogueBlocks.PlayerWoodcuttingProposalReadyWithAxeSegments;
+                        followUpPool = CompanionSkillProposalDialogueBlocks.PlayerWoodcuttingProposalReadyWithToolFollowUps;
+                        followUpChance = SkillProposalFollowUpChance;
+                        break;
+                    case SkillType.Fishing:
+                        pool = CompanionSkillProposalDialogueBlocks.PlayerFishingProposalReadyWithGearSegments;
+                        followUpPool = CompanionSkillProposalDialogueBlocks.PlayerFishingProposalReadyWithToolFollowUps;
+                        followUpChance = SkillProposalFollowUpChance;
+                        break;
+                }
+            }
 
             string primary = ApplyProposalTokens(ChooseRandom(pool), replacements);
             if (!string.IsNullOrWhiteSpace(primary))
                 segments.Add(primary);
-
-            var followUpPool = useMiningSpecificPool
-                ? CompanionSkillProposalDialogueBlocks.PlayerMiningProposalReadyWithToolFollowUps
-                : CompanionSkillProposalDialogueBlocks.PlayerSkillProposalReadyGenericFollowUps;
-
-            float followUpChance = useMiningSpecificPool
-                ? SkillProposalFollowUpChance
-                : SkillProposalLightFollowUpChance;
 
             TryAppendSkillProposalFollowUp(followUps, followUpPool, replacements, followUpChance);
 
@@ -1875,6 +1898,9 @@ namespace Companions.Conversation
 
             if (analysis.Skill == SkillType.Mining)
                 CompanionSkillCooldownTimers.StartMiningCooldown(CompanionManager.CompanionSkillCooldowns);
+
+            if (analysis.Skill == SkillType.Woodcutting)
+                CompanionSkillCooldownTimers.StartWoodcuttingCooldown(CompanionManager.CompanionSkillCooldowns);
 
             if (analysis.Skill == SkillType.Fishing)
                 CompanionSkillCooldownTimers.StartFishingCooldown(CompanionManager.CompanionSkillCooldowns);
