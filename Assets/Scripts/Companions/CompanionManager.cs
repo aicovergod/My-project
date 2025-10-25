@@ -5,6 +5,7 @@ using Combat;
 using Inventory;
 using Pets;
 using Skills;
+using Skills.Fishing;
 using Skills.Mining;
 using Skills.Woodcutting;
 using UI.Chat;
@@ -156,6 +157,9 @@ namespace Companions
 
         /// <summary>Provides access to the configured equipment wrapper.</summary>
         public static CompanionEquipment CompanionEquipment => controller != null ? controller.Equipment : null;
+
+        /// <summary>Provides access to the configured fishing controller.</summary>
+        public static CompanionFishingController CompanionFishingController => controller != null ? controller.FishingController : null;
 
         /// <summary>Safely exposes the cached player inventory used for companion transfers.</summary>
         public static Inventory.Inventory GetPlayerInventory() => ResolvePlayerInventory();
@@ -1231,6 +1235,137 @@ namespace Companions
 
             string successDetail = "Area mining routine started successfully.";
             Debug.Log($"[Companion] Area mining command outcome: success=True, radius={radius}, reason={successDetail}");
+            return true;
+        }
+
+        /// <summary>
+        /// Routes a fishing command to the active companion when available.
+        /// </summary>
+        /// <param name="spot">Spot that should be fished.</param>
+        /// <returns>True when the companion accepted the command, otherwise false.</returns>
+        public static bool TryCommandFish(FishableSpot spot)
+        {
+            if (spot == null)
+            {
+                Debug.LogWarning("[Companion] Cannot command fishing: target spot reference was null.");
+                return false;
+            }
+
+            if (controller == null)
+            {
+                Debug.LogWarning("[Companion] Cannot command fishing: companion controller has not been initialised.");
+                return false;
+            }
+
+            if (controller.FishingController == null)
+            {
+                Debug.LogWarning("[Companion] Cannot command fishing: companion fishing controller is missing.");
+                return false;
+            }
+
+            if (!HasActiveCompanion)
+            {
+                Debug.LogWarning("[Companion] Cannot command fishing: the companion is not currently active.");
+                return false;
+            }
+
+            if (CompanionSkillCooldownTimers.ShouldDeclineFishingRequest(controller.SkillCooldowns, out var cooldownResult))
+            {
+                Debug.LogWarning($"[Companion] Fishing command outcome: accepted=False (result={cooldownResult}).");
+                return false;
+            }
+
+            bool accepted = controller.FishingController.TryCommandFish(spot, out var result);
+            if (!accepted && result == CompanionFishingCommandResult.InventoryFull)
+                accepted = true;
+
+            string message = $"[Companion] Fishing command outcome: accepted={accepted} (result={result}).";
+            if (accepted)
+                Debug.Log(message);
+            else
+                Debug.LogWarning(message);
+
+            return accepted;
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to fish nearby spots using the default scan radius.
+        /// </summary>
+        /// <param name="failureReason">Detailed failure reason when the command is rejected.</param>
+        /// <returns>True when the area fishing command started successfully.</returns>
+        public static bool TryCommandFishNearby(out CompanionFishingCommandResult failureReason)
+        {
+            return TryCommandFishNearby(10f, out failureReason);
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to fish nearby spots within the supplied radius.
+        /// </summary>
+        /// <param name="radius">Radius (in Unity units / tiles) to scan for spots.</param>
+        /// <returns>True when the area fishing command started successfully.</returns>
+        public static bool TryCommandFishNearby(float radius = 10f)
+        {
+            return TryCommandFishNearby(radius, out _);
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to fish nearby spots within the supplied radius and reports the resulting status.
+        /// </summary>
+        /// <param name="radius">Radius (in Unity units / tiles) to scan for spots.</param>
+        /// <param name="failureReason">Detailed failure reason when the command is rejected.</param>
+        /// <returns>True when the area fishing command started successfully.</returns>
+        public static bool TryCommandFishNearby(float radius, out CompanionFishingCommandResult failureReason)
+        {
+            string rejectionReason = string.Empty;
+            failureReason = CompanionFishingCommandResult.Unreachable;
+
+            if (controller == null)
+            {
+                rejectionReason = "Companion controller has not been initialised.";
+                failureReason = CompanionFishingCommandResult.RequirementsNotMet;
+                Debug.LogWarning($"[Companion] Area fishing command outcome: success=False, radius={radius}, reason={rejectionReason}");
+                return false;
+            }
+
+            if (controller.FishingController == null)
+            {
+                rejectionReason = "Companion fishing controller is missing.";
+                failureReason = CompanionFishingCommandResult.RequirementsNotMet;
+                Debug.LogWarning($"[Companion] Area fishing command outcome: success=False, radius={radius}, reason={rejectionReason}");
+                return false;
+            }
+
+            if (!HasActiveCompanion)
+            {
+                rejectionReason = "The companion is not currently active.";
+                failureReason = CompanionFishingCommandResult.RequirementsNotMet;
+                Debug.LogWarning($"[Companion] Area fishing command outcome: success=False, radius={radius}, reason={rejectionReason}");
+                return false;
+            }
+
+            if (CompanionSkillCooldownTimers.ShouldDeclineFishingRequest(controller.SkillCooldowns, out failureReason))
+            {
+                Debug.LogWarning($"[Companion] Area fishing command outcome: success=False, radius={radius}, reason=Cooldown active.");
+                return false;
+            }
+
+            bool accepted = controller.FishingController.TryStartAreaFishing(radius, out failureReason);
+            if (!accepted)
+            {
+                if (failureReason == CompanionFishingCommandResult.InventoryFull)
+                {
+                    string inventoryDetail = "Area fishing aborted because the companion inventory is full.";
+                    Debug.Log($"[Companion] Area fishing command outcome: success=True, radius={radius}, reason={inventoryDetail}");
+                    return true;
+                }
+
+                rejectionReason = $"The fishing controller rejected the area fishing request ({failureReason}).";
+                Debug.LogWarning($"[Companion] Area fishing command outcome: success=False, radius={radius}, reason={rejectionReason}");
+                return false;
+            }
+
+            string successDetail = "Area fishing routine started successfully.";
+            Debug.Log($"[Companion] Area fishing command outcome: success=True, radius={radius}, reason={successDetail}");
             return true;
         }
 

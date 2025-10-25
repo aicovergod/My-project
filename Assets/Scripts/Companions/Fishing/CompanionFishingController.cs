@@ -1,0 +1,1433 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
+using Inventory;
+using Pets;
+using Skills;
+using Skills.Common;
+using Skills.Fishing;
+using UI.Chat;
+using UnityEngine;
+using Util;
+
+namespace Companions
+{
+    /// <summary>
+    /// Enumerates the possible outcomes when issuing a fishing command to the companion.
+    /// </summary>
+    public enum CompanionFishingCommandResult
+    {
+        /// <summary>Command accepted and fishing has started.</summary>
+        Accepted,
+        /// <summary>Companion backpack cannot hold additional fish.</summary>
+        InventoryFull,
+        /// <summary>Command rejected because requirements (levels, ownership, etc.) were not met.</summary>
+        RequirementsNotMet,
+        /// <summary>Command blocked because the player is interacting with the spot.</summary>
+        BlockedByPlayer,
+        /// <summary>Companion lacks a valid fishing tool.</summary>
+        NoTool,
+        /// <summary>Companion cannot fish because bait requirements are not satisfied.</summary>
+        NoBait,
+        /// <summary>Target spot cannot be reached or interacted with.</summary>
+        Unreachable,
+        /// <summary>Companion is already working on the requested spot.</summary>
+        AlreadyFishing,
+        /// <summary>Command declined because the companion is observing a cooldown.</summary>
+        Declined
+    }
+
+    /// <summary>
+    /// Handles companion-directed fishing commands by approaching spots, validating requirements,
+    /// and delegating the actual fishing routine to <see cref="FishingSkill"/> once in range.
+    /// </summary>
+    [DisallowMultipleComponent]
+    public sealed class CompanionFishingController : MonoBehaviour
+    {
+        private const float FishingRange = 1.5f;
+        private const float ReplanDistance = FishingRange * 0.75f;
+        private const float WaypointTolerance = 0.1f;
+        private const float FacingDeadzoneSqrMagnitude = 0.0001f;
+        private const float BlockedSpotExpirySeconds = 4f;
+
+        private SkillManager skillManager;
+        private Inventory.Inventory inventory;
+        private CompanionEquipment companionEquipment;
+        private FishingSkill fishingSkill;
+        private PetFollower petFollower;
+        private PetPathMover pathMover;
+        private Rigidbody2D body;
+        private PetSpriteAnimator petSpriteAnimator;
+        private SpriteRenderer fallbackSpriteRenderer;
+        private Direction8 lastFacing = Direction8.Down;
+
+        private Coroutine fishingRoutine;
+        private Coroutine areaFishingRoutine;
+        private FishableSpot currentSpot;
+        private FishingToolDefinition currentTool;
+
+        private readonly List<FishableSpot> areaCandidates = new List<FishableSpot>();
+        private readonly List<Vector3> areaCandidateTileCenters = new List<Vector3>();
+        private readonly Dictionary<FishableSpot, float> blockedSpots = new Dictionary<FishableSpot, float>();
+        private readonly List<FishableSpot> blockedSpotPruneBuffer = new List<FishableSpot>();
+        private readonly List<FishDefinition> eligibleFishBuffer = new List<FishDefinition>();
+        private Dictionary<string, ItemData> itemCache;
+
+        private bool fishingActive;
+        private bool areaFishingActive;
+        private bool followerDisabledForFishing;
+        private bool followerHoldToggledFollower;
+        private bool suppressFishingStopCallback;
+        private bool areaAllCandidatesBlocked;
+        private int followerDisableLockCount;
+        private float activeAreaRadius;
+        private FishableSpot lastStuckSpot;
+        private int consecutiveStuckSpotCount;
+
+        private Transform playerTransform;
+        private FishingSkill playerFishingSkill;
+        private FishableSpot playerActiveSpot;
+        private CompanionSkillCooldownTracker skillCooldownTracker;
+
+        [Header("Stuck Detection")]
+        [Tooltip("Grace period before a lack of progress is considered \"stuck\".")]
+        [SerializeField, Min(0.1f)] private float stuckTimeoutSeconds = 2.5f;
+
+        private const float ProgressResetThreshold = 0.1f;
+        private const float CloseEnoughDistanceMultiplier = 0.9f;
+        private const int ConsecutiveStuckCancelThreshold = 2;
+
+        /// <summary>
+        /// Indicates whether any systems currently hold the follower disabled so the companion remains stationary.
+        /// </summary>
+        public bool HasActiveFollowerHold => followerDisableLockCount > 0;
+
+        /// <summary>
+        /// Initialises the fishing controller with the owning companion components.
+        /// </summary>
+        /// <param name="ownerController">Controller that owns this component.</param>
+        /// <param name="skills">Skill manager used for level checks.</param>
+        /// <param name="inventoryComponent">Inventory wrapper providing access to the backpack.</param>
+        /// <param name="player">Player transform driving proximity logic.</param>
+        public void Initialise(
+            CompanionController ownerController,
+            SkillManager skills,
+            CompanionInventory inventoryComponent,
+            Transform player,
+            CompanionSkillCooldownTracker cooldownTracker)
+        {
+            if (ownerController == null && CompanionManager.EnableDebugLogging)
+                Debug.LogWarning("[Companion Fishing] Initialise invoked without a companion controller reference.", this);
+
+            if (skills == null && CompanionManager.EnableDebugLogging)
+                Debug.LogWarning("[Companion Fishing] Initialise received a null SkillManager reference.", this);
+
+            skillManager = skills;
+            inventory = inventoryComponent != null ? inventoryComponent.InventoryComponent : null;
+
+            if (inventory == null && CompanionManager.EnableDebugLogging)
+                Debug.LogWarning("[Companion Fishing] No inventory available for tool checks.", this);
+
+            companionEquipment = ownerController != null ? ownerController.Equipment : null;
+
+            fishingSkill = GetComponent<FishingSkill>();
+            if (fishingSkill == null)
+                fishingSkill = gameObject.AddComponent<FishingSkill>();
+
+            if (fishingSkill != null)
+            {
+                fishingSkill.OnStopFishing -= HandleFishingStopped;
+                fishingSkill.OnStopFishing += HandleFishingStopped;
+            }
+            else if (CompanionManager.EnableDebugLogging)
+            {
+                Debug.LogError("[Companion Fishing] Failed to resolve FishingSkill component.", this);
+            }
+
+            petFollower = GetComponent<PetFollower>();
+            pathMover = GetComponent<PetPathMover>();
+            body = GetComponent<Rigidbody2D>();
+            petSpriteAnimator = GetComponent<PetSpriteAnimator>() ?? GetComponentInChildren<PetSpriteAnimator>();
+            if (petSpriteAnimator != null)
+            {
+                fallbackSpriteRenderer = petSpriteAnimator.spriteRenderer;
+                if (fallbackSpriteRenderer == null)
+                {
+                    fallbackSpriteRenderer = petSpriteAnimator.GetComponent<SpriteRenderer>() ??
+                        petSpriteAnimator.GetComponentInChildren<SpriteRenderer>();
+                }
+            }
+            else
+            {
+                fallbackSpriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
+            }
+
+            fishingActive = false;
+            areaFishingActive = false;
+            followerDisabledForFishing = false;
+            followerHoldToggledFollower = false;
+            followerDisableLockCount = 0;
+            areaAllCandidatesBlocked = false;
+            activeAreaRadius = 0f;
+            itemCache = new Dictionary<string, ItemData>();
+
+            skillCooldownTracker = cooldownTracker;
+
+            RebindPlayer(player);
+        }
+
+        /// <summary>
+        /// Rebinds the controller to a new player transform so navigation and player fishing hooks stay in sync.
+        /// </summary>
+        /// <param name="player">Player transform to follow.</param>
+        public void RebindPlayer(Transform player)
+        {
+            playerTransform = player;
+            BindToPlayerFishingSkill(playerTransform);
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to fish the supplied spot.
+        /// </summary>
+        /// <param name="spot">Spot that should be fished.</param>
+        /// <returns>True when the command was accepted, otherwise false.</returns>
+        public bool TryCommandFish(FishableSpot spot)
+        {
+            bool accepted = TryCommandFish(spot, out var result);
+            return accepted || result == CompanionFishingCommandResult.InventoryFull;
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to fish the supplied spot while optionally preserving follower holds.
+        /// </summary>
+        /// <param name="spot">Spot that should be fished.</param>
+        /// <param name="preserveFollowerHold">
+        /// When <c>true</c>, existing follower holds remain intact during the hand-off so
+        /// automation can maintain control of the follower state.
+        /// </param>
+        /// <returns>True when the command was accepted, otherwise false.</returns>
+        public bool TryCommandFish(FishableSpot spot, bool preserveFollowerHold)
+        {
+            bool accepted = TryCommandFish(spot, out var result, preserveFollowerHold);
+            return accepted || result == CompanionFishingCommandResult.InventoryFull;
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to fish the supplied spot while reporting the outcome.
+        /// </summary>
+        /// <param name="spot">Spot that should be fished.</param>
+        /// <param name="result">Detailed outcome describing why the command failed when <c>false</c> is returned.</param>
+        /// <returns>True when the command was accepted, otherwise false.</returns>
+        public bool TryCommandFish(FishableSpot spot, out CompanionFishingCommandResult result)
+        {
+            return TryCommandFish(spot, out result, false);
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to fish the supplied spot while reporting the outcome and
+        /// optionally preserving follower holds.
+        /// </summary>
+        private bool TryCommandFish(
+            FishableSpot spot,
+            out CompanionFishingCommandResult result,
+            bool preserveFollowerHold)
+        {
+            result = CompanionFishingCommandResult.RequirementsNotMet;
+
+            if (!isActiveAndEnabled)
+                return false;
+
+            if (CompanionSkillCooldownTimers.ShouldDeclineFishingRequest(skillCooldownTracker, out result))
+                return false;
+
+            if (!TryPrepareFishingCommand(spot, out var tool, out result))
+                return false;
+
+            if (preserveFollowerHold)
+                followerDisabledForFishing = HasActiveFollowerHold;
+            else
+                followerDisabledForFishing = false;
+
+            BeginFishing(spot, tool);
+            CompanionSkillCooldownTimers.ClearFishingCooldown(skillCooldownTracker);
+            result = CompanionFishingCommandResult.Accepted;
+            return true;
+        }
+
+        /// <summary>
+        /// Initiates an area fishing routine that scans nearby spots and works through them sequentially.
+        /// </summary>
+        /// <param name="radius">Scan radius in Unity units (tiles).</param>
+        /// <param name="failureReason">Detailed reason describing why the command failed when <c>false</c> is returned.</param>
+        /// <returns>True when area fishing started successfully.</returns>
+        public bool TryStartAreaFishing(float radius, out CompanionFishingCommandResult failureReason)
+        {
+            failureReason = CompanionFishingCommandResult.RequirementsNotMet;
+
+            if (!isActiveAndEnabled || fishingSkill == null || skillManager == null)
+                return false;
+
+            if (CompanionSkillCooldownTimers.ShouldDeclineFishingRequest(skillCooldownTracker, out failureReason))
+                return false;
+
+            float clampedRadius = Mathf.Max(0.1f, radius);
+
+            CancelAreaFishingInternal(true);
+
+            if (!BuildAreaCandidateList(clampedRadius, out failureReason))
+            {
+                PublishAreaFishingFailureMessage(failureReason);
+                return false;
+            }
+
+            failureReason = CompanionFishingCommandResult.Accepted;
+
+            activeAreaRadius = clampedRadius;
+            areaFishingRoutine = StartCoroutine(AreaFishingRoutine());
+            areaFishingActive = true;
+
+            CompanionSkillCooldownTimers.ClearFishingCooldown(skillCooldownTracker);
+
+            if (CompanionManager.EnableDebugLogging)
+            {
+                Debug.Log($"[Companion Fishing] Area fishing started with {areaCandidates.Count} candidates (radius {activeAreaRadius}).", this);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Stops the active fishing routine and optionally restores the follower component.
+        /// </summary>
+        /// <param name="restoreFollower">Whether the companion follower should be re-enabled.</param>
+        public void CancelFishing(bool restoreFollower)
+        {
+            CancelAreaFishingInternal(false);
+            StopActiveFishingRoutine();
+            CleanupAfterFishing(restoreFollower);
+            UnsubscribeFromPlayerFishingSkill();
+            BindToPlayerFishingSkill(playerTransform);
+            ResetStuckHistory();
+        }
+
+        /// <summary>
+        /// Cancels the running area fishing routine and optionally restores the follower.
+        /// </summary>
+        /// <param name="restoreFollower">True when the follower should resume immediately.</param>
+        public void CancelAreaFishing(bool restoreFollower)
+        {
+            CancelAreaFishingInternal(restoreFollower);
+            UnsubscribeFromPlayerFishingSkill();
+            BindToPlayerFishingSkill(playerTransform);
+            ResetStuckHistory();
+        }
+
+        /// <summary>
+        /// Temporarily disables the follower component so the companion remains stationary until fishing resumes.
+        /// Dispose the returned handle to restore the follower even when fishing never begins.
+        /// </summary>
+        /// <returns>An <see cref="IDisposable"/> handle that restores the follower when disposed.</returns>
+        public IDisposable EnterTemporaryFollowerHold()
+        {
+            if (petFollower == null)
+                return NoOpDisposable.Instance;
+
+            if (followerDisableLockCount > 0)
+            {
+                followerDisableLockCount++;
+                followerDisabledForFishing = true;
+                return new FollowerHold(this);
+            }
+
+            bool toggledFollower = false;
+
+            if (petFollower.enabled)
+            {
+                petFollower.enabled = false;
+                toggledFollower = true;
+            }
+
+            followerDisableLockCount = 1;
+            followerDisabledForFishing = true;
+            followerHoldToggledFollower = toggledFollower;
+            return new FollowerHold(this);
+        }
+
+        private bool TryPrepareFishingCommand(
+            FishableSpot spot,
+            out FishingToolDefinition tool,
+            out CompanionFishingCommandResult result,
+            bool suppressChat = false)
+        {
+            tool = null;
+            result = CompanionFishingCommandResult.RequirementsNotMet;
+
+            if (spot == null)
+            {
+                result = CompanionFishingCommandResult.Unreachable;
+                return false;
+            }
+
+            if (spot.IsDepleted)
+            {
+                result = CompanionFishingCommandResult.Unreachable;
+                return false;
+            }
+
+            if (spot.IsBusy || spot == playerActiveSpot)
+            {
+                if (!suppressChat)
+                    PublishBlockedByPlayerMessage();
+                result = CompanionFishingCommandResult.BlockedByPlayer;
+                return false;
+            }
+
+            float now = Time.time;
+            PruneExpiredBlockedSpots(now);
+
+            if (IsSpotTemporarilyBlocked(spot, now))
+            {
+                result = CompanionFishingCommandResult.Unreachable;
+                return false;
+            }
+
+            if (fishingSkill == null || skillManager == null || !isActiveAndEnabled)
+            {
+                result = CompanionFishingCommandResult.RequirementsNotMet;
+                return false;
+            }
+
+            if (fishingActive && currentSpot == spot)
+            {
+                result = CompanionFishingCommandResult.AlreadyFishing;
+                return false;
+            }
+
+            var spotDef = spot.def;
+            if (spotDef == null)
+            {
+                result = CompanionFishingCommandResult.Unreachable;
+                return false;
+            }
+
+            eligibleFishBuffer.Clear();
+            int minimumRequiredLevel = int.MaxValue;
+            int fishingLevel = fishingSkill.Level;
+
+            if (spotDef.AvailableFish != null)
+            {
+                for (int i = 0; i < spotDef.AvailableFish.Count; i++)
+                {
+                    var fish = spotDef.AvailableFish[i];
+                    if (fish == null)
+                        continue;
+
+                    minimumRequiredLevel = Mathf.Min(minimumRequiredLevel, fish.RequiredLevel);
+                    if (fishingLevel >= fish.RequiredLevel)
+                        eligibleFishBuffer.Add(fish);
+                }
+            }
+
+            if (eligibleFishBuffer.Count == 0)
+            {
+                if (!suppressChat)
+                {
+                    var chat = ChatService.Instance;
+                    if (chat != null)
+                    {
+                        string message = minimumRequiredLevel == int.MaxValue
+                            ? CompanionFishingDialogueLibrary.GetRandomNoSpotsLine()
+                            : CompanionFishingDialogueLibrary.GetLevelRequirementLine(minimumRequiredLevel);
+                        chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), message);
+                    }
+                }
+
+                if (CompanionManager.EnableDebugLogging)
+                    Debug.Log("[Companion Fishing] Command blocked by fishing level requirement.", this);
+
+                result = CompanionFishingCommandResult.RequirementsNotMet;
+                return false;
+            }
+
+            tool = ResolveFishingTool(spotDef);
+            if (tool == null)
+            {
+                if (!suppressChat)
+                    PublishMissingToolMessage();
+                result = CompanionFishingCommandResult.NoTool;
+                return false;
+            }
+
+            if (fishingLevel < tool.RequiredLevel)
+            {
+                if (!suppressChat)
+                {
+                    var chat = ChatService.Instance;
+                    if (chat != null)
+                    {
+                        string message = CompanionFishingDialogueLibrary.GetToolLevelRequirementLine(tool.RequiredLevel, tool.DisplayName);
+                        chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), message);
+                    }
+                }
+
+                if (CompanionManager.EnableDebugLogging)
+                    Debug.Log("[Companion Fishing] Command blocked by tool level requirement.", this);
+
+                result = CompanionFishingCommandResult.RequirementsNotMet;
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(spotDef.BaitItemId))
+            {
+                bool hasBait = inventory != null && inventory.HasItem(spotDef.BaitItemId);
+                if (!hasBait)
+                {
+                    if (!suppressChat)
+                        PublishMissingBaitMessage();
+                    result = CompanionFishingCommandResult.NoBait;
+                    return false;
+                }
+            }
+
+            if (!HasInventoryCapacityForFishInternal(eligibleFishBuffer, suppressChat))
+            {
+                result = CompanionFishingCommandResult.InventoryFull;
+                return false;
+            }
+
+            result = CompanionFishingCommandResult.Accepted;
+            return true;
+        }
+
+        private FishingToolDefinition ResolveFishingTool(FishingSpotDefinition spotDef)
+        {
+            if (spotDef == null)
+                return null;
+
+            var definitions = FishingToolDefinitionRegistry.GetAllDefinitions();
+            if (definitions == null || definitions.Count == 0)
+            {
+                RegisterToolsFromSelectors();
+                definitions = FishingToolDefinitionRegistry.GetAllDefinitions();
+            }
+
+            if (definitions == null || definitions.Count == 0)
+                return null;
+
+            int fishingLevel = fishingSkill != null ? fishingSkill.Level : 1;
+
+            foreach (var definition in definitions)
+            {
+                if (definition == null)
+                    continue;
+
+                if (spotDef.AllowedTools != null && spotDef.AllowedTools.Count > 0 && !spotDef.AllowedTools.Contains(definition))
+                    continue;
+
+                if (definition.RequiredLevel > fishingLevel)
+                    continue;
+
+                var item = GatheringInventoryHelper.GetItemData(definition.Id, ref itemCache);
+                bool ownsInInventory = inventory != null && item != null && inventory.GetItemCount(item) > 0;
+                bool equippedTool = false;
+
+                if (companionEquipment != null && item != null)
+                {
+                    var entry = companionEquipment.GetEquipped(EquipmentSlot.Weapon);
+                    equippedTool = entry.item == item;
+                }
+
+                if (!ownsInInventory && !equippedTool)
+                    continue;
+
+                return definition;
+            }
+
+            return null;
+        }
+
+        private void RegisterToolsFromSelectors()
+        {
+            var selectors = FindObjectsOfType<FishingToolToUse>(true);
+            if (selectors == null || selectors.Length == 0)
+                return;
+
+            for (int i = 0; i < selectors.Length; i++)
+            {
+                var selector = selectors[i];
+                if (selector == null)
+                    continue;
+
+                var tools = ReflectionToolBuffer.ClearAndPopulate(selector);
+                if (tools.Count > 0)
+                    FishingToolDefinitionRegistry.RegisterDefinitions(tools);
+            }
+        }
+
+        private bool HasInventoryCapacityForFishInternal(IReadOnlyList<FishDefinition> fishOptions, bool suppressChat)
+        {
+            if (fishOptions == null || fishOptions.Count == 0 || fishingSkill == null)
+                return true;
+
+            for (int i = 0; i < fishOptions.Count; i++)
+            {
+                var fish = fishOptions[i];
+                if (fish != null && fishingSkill.CanAddFish(fish))
+                    return true;
+            }
+
+            if (!suppressChat)
+                PublishInventoryFullMessage();
+
+            if (CompanionManager.EnableDebugLogging)
+                Debug.Log("[Companion Fishing] Command rejected because the companion inventory is full.", this);
+
+            return false;
+        }
+
+        private void BeginFishing(FishableSpot spot, FishingToolDefinition tool)
+        {
+            StopActiveFishingRoutine();
+
+            currentSpot = spot;
+            currentTool = tool;
+            fishingActive = true;
+            fishingRoutine = StartCoroutine(FishingRoutine(spot, tool));
+
+            if (CompanionManager.EnableDebugLogging)
+            {
+                string toolName = tool != null ? tool.DisplayName : "<unknown tool>";
+                Debug.Log($"[Companion Fishing] Command accepted for {spot.name} using {toolName}.", this);
+            }
+        }
+
+        private void StopActiveFishingRoutine()
+        {
+            if (fishingRoutine != null)
+            {
+                StopCoroutine(fishingRoutine);
+                fishingRoutine = null;
+            }
+
+            if (fishingSkill != null && fishingSkill.IsFishing)
+            {
+                suppressFishingStopCallback = true;
+                fishingSkill.StopFishing();
+                suppressFishingStopCallback = false;
+            }
+
+            currentSpot = null;
+            currentTool = null;
+            fishingActive = false;
+        }
+
+        private IEnumerator FishingRoutine(FishableSpot spot, FishingToolDefinition tool)
+        {
+            var followerHold = EnterTemporaryFollowerHold();
+            bool stuckTriggered = false;
+            FishableSpot stuckSpot = null;
+            float noProgressTimer = 0f;
+            float lastRecordedDistance = 0f;
+            float cumulativeDistanceClosed = 0f;
+            bool hasDistanceSample = false;
+
+            try
+            {
+                pathMover?.ResetAttackTracking();
+
+                while (spot != null && !spot.IsDepleted)
+                {
+                    if (!isActiveAndEnabled)
+                        break;
+
+                    if (!fishingActive || currentSpot == null || currentSpot != spot)
+                        break;
+
+                    Vector3 targetPosition = spot.transform.position;
+                    float distance = Vector2.Distance(transform.position, targetPosition);
+
+                    if (!hasDistanceSample)
+                    {
+                        hasDistanceSample = true;
+                        lastRecordedDistance = distance;
+                        cumulativeDistanceClosed = 0f;
+                        noProgressTimer = 0f;
+                    }
+                    else
+                    {
+                        float delta = lastRecordedDistance - distance;
+                        if (delta > 0f)
+                        {
+                            cumulativeDistanceClosed += delta;
+                        }
+                        else if (delta < 0f)
+                        {
+                            cumulativeDistanceClosed = 0f;
+                        }
+
+                        bool closedGap = cumulativeDistanceClosed >= ProgressResetThreshold;
+                        bool effectivelyClose = distance <= FishingRange * CloseEnoughDistanceMultiplier;
+                        bool activelyFishing = fishingSkill != null && fishingSkill.IsFishing;
+
+                        if (closedGap || effectivelyClose || activelyFishing)
+                        {
+                            noProgressTimer = 0f;
+                            cumulativeDistanceClosed = 0f;
+                        }
+                        else
+                        {
+                            noProgressTimer += Time.deltaTime;
+                        }
+
+                        lastRecordedDistance = distance;
+                    }
+
+                    if (noProgressTimer >= stuckTimeoutSeconds)
+                    {
+                        if (CompanionManager.EnableDebugLogging)
+                            Debug.Log("[Companion Fishing] Movement stalled while approaching the spot.", this);
+
+                        stuckTriggered = true;
+                        stuckSpot = spot;
+                        break;
+                    }
+
+                    if (distance > FishingRange)
+                    {
+                        float moveSpeed = ResolveMoveSpeed();
+                        float deltaTime = body != null
+                            ? Mathf.Max(Time.fixedDeltaTime, Mathf.Epsilon)
+                            : Mathf.Max(Time.deltaTime, Mathf.Epsilon);
+
+                        bool navigationStepTaken = false;
+                        bool navigationUnavailable = true;
+
+                        if (pathMover != null && pathMover.isActiveAndEnabled)
+                        {
+                            navigationUnavailable = !pathMover.HasActiveNavigationGrid;
+
+                            if (!navigationUnavailable)
+                            {
+                                Vector2 nextPosition;
+                                Vector2 navVelocity;
+                                bool teleported;
+                                bool goalUnreachable;
+                                float teleportDetectionDistance = float.PositiveInfinity;
+
+                                navigationStepTaken = pathMover.TryStepAttack(
+                                    deltaTime,
+                                    moveSpeed,
+                                    FishingRange,
+                                    WaypointTolerance,
+                                    () => spot != null ? (Vector2)spot.transform.position : (Vector2)transform.position,
+                                    ReplanDistance,
+                                    teleportDetectionDistance,
+                                    out nextPosition,
+                                    out navVelocity,
+                                    out teleported,
+                                    out goalUnreachable);
+
+                                if (goalUnreachable)
+                                {
+                                    if (CompanionManager.EnableDebugLogging)
+                                        Debug.Log("[Companion Fishing] Navigation reported the spot as unreachable.", this);
+                                    stuckTriggered = true;
+                                    stuckSpot = spot;
+                                    break;
+                                }
+
+                                if (navigationStepTaken)
+                                    ApplyMovement(nextPosition, navVelocity, teleported);
+                            }
+                        }
+
+                        if (stuckTriggered)
+                            break;
+
+                        if (!navigationStepTaken)
+                        {
+                            if (navigationUnavailable)
+                            {
+                                Vector3 startPosition = transform.position;
+                                Vector3 nextPosition = Vector3.MoveTowards(startPosition, targetPosition, moveSpeed * deltaTime);
+                                Vector2 velocity = deltaTime > Mathf.Epsilon
+                                    ? (Vector2)((nextPosition - startPosition) / deltaTime)
+                                    : Vector2.zero;
+                                ApplyMovement(nextPosition, velocity, false);
+                            }
+                            else if (body != null)
+                            {
+                                body.linearVelocity = Vector2.zero;
+                            }
+                        }
+
+                        if (fishingSkill.IsFishing && distance > FishingRange * 1.2f)
+                            fishingSkill.StopFishing();
+                    }
+                    else
+                    {
+                        if (body != null)
+                            body.linearVelocity = Vector2.zero;
+
+                        if (!fishingActive || currentSpot == null || currentSpot != spot)
+                            break;
+
+                        if (!fishingSkill.IsFishing)
+                        {
+                            if (!fishingActive || currentSpot == null || currentSpot != spot)
+                                break;
+
+                            fishingSkill.StartFishing(spot, tool);
+                        }
+
+                        if (!fishingActive || currentSpot == null || currentSpot != spot)
+                            break;
+
+                        if (!fishingSkill.IsFishing)
+                            break;
+                    }
+
+                    if (spot == null || spot.IsDepleted)
+                        break;
+
+                    yield return null;
+                }
+            }
+            finally
+            {
+                followerHold.Dispose();
+            }
+
+            if (stuckTriggered)
+            {
+                HandleFishingStuck(stuckSpot);
+                yield break;
+            }
+
+            fishingRoutine = null;
+            fishingActive = false;
+
+            if (fishingSkill != null && fishingSkill.IsFishing)
+                fishingSkill.StopFishing();
+
+            CleanupAfterFishing(true);
+            ResetStuckHistory();
+
+            if (areaFishingActive)
+            {
+                yield break;
+            }
+
+            CancelAreaFishingInternal(false);
+        }
+
+        private void HandleFishingStuck(FishableSpot spot)
+        {
+            if (CompanionManager.EnableDebugLogging)
+            {
+                string spotName = spot != null ? spot.name : "<null>";
+                Debug.Log($"[Companion Fishing] Detected a stuck state while targeting {spotName}.", this);
+            }
+
+            float now = Time.time;
+            if (spot != null)
+            {
+                blockedSpots[spot] = now + BlockedSpotExpirySeconds;
+            }
+
+            if (fishingSkill != null && fishingSkill.IsFishing)
+                fishingSkill.StopFishing();
+
+            CleanupAfterFishing(true);
+            PublishStuckApologyMessage();
+
+            if (lastStuckSpot == spot)
+            {
+                consecutiveStuckSpotCount++;
+                if (consecutiveStuckSpotCount >= ConsecutiveStuckCancelThreshold)
+                {
+                    CancelAreaFishingInternal(true);
+                    areaAllCandidatesBlocked = true;
+                }
+            }
+            else
+            {
+                lastStuckSpot = spot;
+                consecutiveStuckSpotCount = 1;
+            }
+        }
+
+        private void PruneExpiredBlockedSpots(float now)
+        {
+            blockedSpotPruneBuffer.Clear();
+
+            foreach (var kvp in blockedSpots)
+            {
+                var candidate = kvp.Key;
+                bool expired = candidate == null || candidate.IsDepleted || kvp.Value <= now;
+                if (expired)
+                    blockedSpotPruneBuffer.Add(candidate);
+            }
+
+            for (int i = 0; i < blockedSpotPruneBuffer.Count; i++)
+            {
+                var candidate = blockedSpotPruneBuffer[i];
+                blockedSpots.Remove(candidate);
+            }
+
+            blockedSpotPruneBuffer.Clear();
+        }
+
+        private bool IsSpotTemporarilyBlocked(FishableSpot spot, float now)
+        {
+            if (spot == null)
+                return false;
+
+            if (!blockedSpots.TryGetValue(spot, out float expiry))
+                return false;
+
+            if (spot.IsDepleted || expiry <= now)
+            {
+                blockedSpots.Remove(spot);
+                return false;
+            }
+
+            return true;
+        }
+
+        private void ResetStuckHistory()
+        {
+            lastStuckSpot = null;
+            consecutiveStuckSpotCount = 0;
+        }
+
+        private IEnumerator AreaFishingRoutine()
+        {
+            while (areaCandidates.Count > 0)
+            {
+                bool attemptedCommand = false;
+
+                for (int i = 0; i < areaCandidates.Count; i++)
+                {
+                    var spot = areaCandidates[i];
+                    if (spot == null || spot.IsDepleted)
+                    {
+                        RemoveAreaCandidateAt(i--);
+                        continue;
+                    }
+
+                    if (spot.IsBusy || spot == playerActiveSpot)
+                        continue;
+
+                    if (IsSpotTemporarilyBlocked(spot, Time.time))
+                        continue;
+
+                    attemptedCommand = true;
+
+                    if (TryCommandFish(spot, out var result, preserveFollowerHold: true))
+                    {
+                        while (fishingActive && currentSpot == spot)
+                            yield return null;
+
+                        if (fishingSkill != null && fishingSkill.IsFishing)
+                            fishingSkill.StopFishing();
+                    }
+                    else
+                    {
+                        if (result == CompanionFishingCommandResult.InventoryFull)
+                        {
+                            PublishInventoryFullMessage();
+                            CancelAreaFishingInternal(true);
+                            yield break;
+                        }
+
+                        if (result == CompanionFishingCommandResult.BlockedByPlayer)
+                            blockedSpots[spot] = Time.time + BlockedSpotExpirySeconds;
+
+                        if (result != CompanionFishingCommandResult.Declined && result != CompanionFishingCommandResult.Accepted)
+                            blockedSpots[spot] = Time.time + BlockedSpotExpirySeconds;
+                    }
+
+                    yield return null;
+                }
+
+                if (!attemptedCommand)
+                    break;
+
+                yield return null;
+            }
+
+            CancelAreaFishingInternal(true);
+        }
+
+        private bool BuildAreaCandidateList(float radius, out CompanionFishingCommandResult failureReason, bool suppressChat = true)
+        {
+            areaCandidates.Clear();
+            areaCandidateTileCenters.Clear();
+            areaAllCandidatesBlocked = false;
+
+            var allSpots = FindObjectsOfType<FishableSpot>();
+            if (allSpots == null || allSpots.Length == 0)
+            {
+                failureReason = CompanionFishingCommandResult.Unreachable;
+                return false;
+            }
+
+            Vector3 origin = transform.position;
+            float radiusSqr = radius * radius;
+            bool anyReachable = false;
+            CompanionFishingCommandResult lastNonInventoryFailure = CompanionFishingCommandResult.Unreachable;
+
+            for (int i = 0; i < allSpots.Length; i++)
+            {
+                var spot = allSpots[i];
+                if (spot == null || spot.IsDepleted)
+                    continue;
+
+                if (spot.IsBusy || spot == playerActiveSpot)
+                    continue;
+
+                float distanceSqr = (spot.transform.position - origin).sqrMagnitude;
+                if (distanceSqr > radiusSqr)
+                    continue;
+
+                if (!TryPrepareFishingCommand(spot, out var _, out var validationResult, suppressChat))
+                {
+                    if (validationResult == CompanionFishingCommandResult.InventoryFull)
+                    {
+                        failureReason = CompanionFishingCommandResult.InventoryFull;
+                        return false;
+                    }
+
+                    if (validationResult != CompanionFishingCommandResult.Accepted)
+                        lastNonInventoryFailure = validationResult;
+
+                    continue;
+                }
+
+                anyReachable = true;
+                areaCandidates.Add(spot);
+                areaCandidateTileCenters.Add(GetTileCentre(spot.transform.position));
+            }
+
+            if (!anyReachable)
+            {
+                failureReason = lastNonInventoryFailure;
+                return false;
+            }
+
+            failureReason = CompanionFishingCommandResult.Accepted;
+            return true;
+        }
+
+        private void PublishAreaFishingFailureMessage(CompanionFishingCommandResult failureReason)
+        {
+            switch (failureReason)
+            {
+                case CompanionFishingCommandResult.InventoryFull:
+                    PublishInventoryFullMessage();
+                    break;
+                case CompanionFishingCommandResult.NoTool:
+                    PublishMissingToolMessage();
+                    break;
+                case CompanionFishingCommandResult.BlockedByPlayer:
+                    PublishBlockedByPlayerMessage();
+                    break;
+                case CompanionFishingCommandResult.NoBait:
+                    PublishMissingBaitMessage();
+                    break;
+                case CompanionFishingCommandResult.Declined:
+                    break;
+                default:
+                    PublishNoSpotsMessage();
+                    break;
+            }
+        }
+
+        private Vector3 GetTileCentre(Vector3 worldPosition)
+        {
+            float x = Mathf.Round(worldPosition.x);
+            float y = Mathf.Round(worldPosition.y);
+            return new Vector3(x, y, worldPosition.z);
+        }
+
+        private void CancelAreaFishingInternal(bool restoreFollower)
+        {
+            if (areaFishingRoutine != null)
+            {
+                StopCoroutine(areaFishingRoutine);
+                areaFishingRoutine = null;
+            }
+
+            areaFishingActive = false;
+            activeAreaRadius = 0f;
+            areaCandidates.Clear();
+            areaCandidateTileCenters.Clear();
+
+            if (restoreFollower)
+                CleanupAfterFishing(true, true);
+        }
+
+        private void RemoveAreaCandidateAt(int index)
+        {
+            if (index < 0 || index >= areaCandidates.Count)
+                return;
+
+            areaCandidates.RemoveAt(index);
+            if (index < areaCandidateTileCenters.Count)
+                areaCandidateTileCenters.RemoveAt(index);
+        }
+
+        private void PublishInventoryFullMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            chat.PublishCompanionMessage(
+                CompanionManager.GetCompanionDisplayName(),
+                CompanionFishingDialogueLibrary.GetRandomInventoryFullLine());
+        }
+
+        private void PublishMissingToolMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            chat.PublishCompanionMessage(
+                CompanionManager.GetCompanionDisplayName(),
+                CompanionFishingDialogueLibrary.GetRandomMissingToolLine());
+        }
+
+        private void PublishMissingBaitMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            chat.PublishCompanionMessage(
+                CompanionManager.GetCompanionDisplayName(),
+                CompanionFishingDialogueLibrary.GetRandomMissingBaitLine());
+        }
+
+        private void PublishNoSpotsMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            chat.PublishCompanionMessage(
+                CompanionManager.GetCompanionDisplayName(),
+                CompanionFishingDialogueLibrary.GetRandomNoSpotsLine());
+        }
+
+        private void PublishBlockedByPlayerMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            chat.PublishCompanionMessage(
+                CompanionManager.GetCompanionDisplayName(),
+                CompanionFishingDialogueLibrary.GetRandomPlayerBusyLine());
+        }
+
+        private void PublishStuckApologyMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            chat.PublishCompanionMessage(
+                CompanionManager.GetCompanionDisplayName(),
+                CompanionFishingDialogueLibrary.GetRandomStuckApologyLine());
+        }
+
+        private float ResolveMoveSpeed()
+        {
+            return petFollower != null ? Mathf.Max(0.1f, petFollower.moveSpeed) : 5f;
+        }
+
+        private void ApplyMovement(Vector3 nextPosition, Vector2 velocity, bool teleported)
+        {
+            Vector3 currentPosition = body != null ? (Vector3)body.position : transform.position;
+            Vector2 displacement = (Vector2)(nextPosition - currentPosition);
+            Vector2 appliedVelocity = teleported ? Vector2.zero : velocity;
+
+            if (body != null)
+            {
+                if (teleported)
+                {
+                    body.position = nextPosition;
+                    body.linearVelocity = Vector2.zero;
+                }
+                else
+                {
+                    body.MovePosition(nextPosition);
+                    body.linearVelocity = appliedVelocity;
+                }
+            }
+            else
+            {
+                transform.position = nextPosition;
+            }
+
+            UpdateMovementVisuals(displacement, appliedVelocity);
+        }
+
+        private void UpdateMovementVisuals(Vector2 displacement, Vector2 appliedVelocity)
+        {
+            Vector2 visualVector = displacement.sqrMagnitude > FacingDeadzoneSqrMagnitude
+                ? displacement
+                : appliedVelocity;
+
+            if (visualVector.sqrMagnitude > FacingDeadzoneSqrMagnitude)
+                lastFacing = Direction8Utility.FromVector(visualVector, allowDiagonals: true, fallback: lastFacing);
+
+            if (petSpriteAnimator != null)
+            {
+                petSpriteAnimator.UpdateVisuals(visualVector);
+                return;
+            }
+
+            if (fallbackSpriteRenderer == null)
+                return;
+
+            fallbackSpriteRenderer.flipX = Direction8Utility.IsFacingLeft(lastFacing);
+        }
+
+        private void CleanupAfterFishing(bool restoreFollower, bool preserveFollowerLocks = false)
+        {
+            if (restoreFollower)
+            {
+                if (preserveFollowerLocks)
+                {
+                    followerDisabledForFishing = HasActiveFollowerHold;
+
+                    if (!HasActiveFollowerHold && followerHoldToggledFollower && petFollower != null && !petFollower.enabled)
+                    {
+                        petFollower.enabled = true;
+                        followerHoldToggledFollower = false;
+                    }
+                }
+                else
+                {
+                    ForceReleaseAllFollowerHolds();
+                }
+            }
+            else if (!preserveFollowerLocks)
+            {
+                followerDisableLockCount = 0;
+                followerDisabledForFishing = false;
+                followerHoldToggledFollower = false;
+            }
+            else
+            {
+                followerDisabledForFishing = HasActiveFollowerHold;
+            }
+
+            if (body != null)
+                body.linearVelocity = Vector2.zero;
+
+            pathMover?.ResetAttackTracking();
+
+            currentSpot = null;
+            currentTool = null;
+            fishingActive = false;
+        }
+
+        private void ReleaseTemporaryFollowerHold()
+        {
+            if (followerDisableLockCount <= 0)
+            {
+                followerDisableLockCount = 0;
+                followerDisabledForFishing = false;
+                followerHoldToggledFollower = false;
+                return;
+            }
+
+            followerDisableLockCount = Mathf.Max(0, followerDisableLockCount - 1);
+            followerDisabledForFishing = followerDisableLockCount > 0;
+
+            if (!HasActiveFollowerHold)
+            {
+                if (followerHoldToggledFollower && petFollower != null && !petFollower.enabled)
+                    petFollower.enabled = true;
+
+                followerHoldToggledFollower = false;
+            }
+        }
+
+        private void ForceReleaseAllFollowerHolds()
+        {
+            if (followerDisableLockCount <= 0)
+            {
+                followerDisableLockCount = 0;
+                followerDisabledForFishing = false;
+                followerHoldToggledFollower = false;
+                return;
+            }
+
+            followerDisableLockCount = 0;
+            followerDisabledForFishing = false;
+
+            if (followerHoldToggledFollower && petFollower != null && !petFollower.enabled)
+                petFollower.enabled = true;
+
+            followerHoldToggledFollower = false;
+        }
+
+        private void HandleFishingStopped()
+        {
+            if (suppressFishingStopCallback)
+                return;
+
+            fishingActive = false;
+            CleanupAfterFishing(true);
+            ResetStuckHistory();
+        }
+
+        private void BindToPlayerFishingSkill(Transform player)
+        {
+            UnsubscribeFromPlayerFishingSkill();
+
+            if (player == null)
+                return;
+
+            playerFishingSkill = player.GetComponent<FishingSkill>();
+            if (playerFishingSkill == null)
+                return;
+
+            playerFishingSkill.OnStartFishing += OnPlayerStartFishing;
+            playerFishingSkill.OnStopFishing += OnPlayerStopFishing;
+        }
+
+        private void UnsubscribeFromPlayerFishingSkill()
+        {
+            if (playerFishingSkill == null)
+                return;
+
+            playerFishingSkill.OnStartFishing -= OnPlayerStartFishing;
+            playerFishingSkill.OnStopFishing -= OnPlayerStopFishing;
+            playerFishingSkill = null;
+            playerActiveSpot = null;
+        }
+
+        private void OnPlayerStartFishing(FishableSpot spot)
+        {
+            playerActiveSpot = spot;
+
+            if (fishingActive && currentSpot == spot)
+            {
+                if (CompanionManager.EnableDebugLogging)
+                    Debug.Log("[Companion Fishing] Player started fishing the same spot. Cancelling companion fishing.", this);
+
+                StopActiveFishingRoutine();
+                CleanupAfterFishing(true);
+            }
+        }
+
+        private void OnPlayerStopFishing()
+        {
+            playerActiveSpot = null;
+        }
+
+        private void OnDisable()
+        {
+            CancelFishing(true);
+            UnsubscribeFromPlayerFishingSkill();
+            blockedSpots.Clear();
+            blockedSpotPruneBuffer.Clear();
+            areaAllCandidatesBlocked = false;
+            ResetStuckHistory();
+        }
+
+        private void OnDestroy()
+        {
+            if (fishingSkill != null)
+                fishingSkill.OnStopFishing -= HandleFishingStopped;
+
+            CancelFishing(true);
+            UnsubscribeFromPlayerFishingSkill();
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            if (!areaFishingActive || activeAreaRadius <= 0f)
+                return;
+
+            Gizmos.color = new Color(0.2f, 0.8f, 0.9f, 0.35f);
+            Gizmos.DrawWireSphere(transform.position, activeAreaRadius);
+
+            Gizmos.color = new Color(0.2f, 0.9f, 0.2f, 0.6f);
+            for (int i = 0; i < areaCandidateTileCenters.Count; i++)
+            {
+                Vector3 center = areaCandidateTileCenters[i];
+                Gizmos.DrawWireCube(center, new Vector3(1f, 1f, 0f));
+            }
+        }
+
+        private sealed class FollowerHold : IDisposable
+        {
+            private CompanionFishingController controller;
+            private bool disposed;
+
+            public FollowerHold(CompanionFishingController controller)
+            {
+                this.controller = controller;
+            }
+
+            public void Dispose()
+            {
+                if (disposed)
+                    return;
+
+                disposed = true;
+                controller?.ReleaseTemporaryFollowerHold();
+                controller = null;
+            }
+        }
+
+        private sealed class NoOpDisposable : IDisposable
+        {
+            public static readonly NoOpDisposable Instance = new NoOpDisposable();
+
+            private NoOpDisposable()
+            {
+            }
+
+            public void Dispose()
+            {
+            }
+        }
+
+        private static class ReflectionToolBuffer
+        {
+            private static readonly FieldInfo AllToolsField = typeof(FishingToolToUse)
+                .GetField("allTools", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            private static readonly List<FishingToolDefinition> Buffer = new List<FishingToolDefinition>();
+
+            public static List<FishingToolDefinition> ClearAndPopulate(FishingToolToUse selector)
+            {
+                Buffer.Clear();
+
+                if (selector == null || AllToolsField == null)
+                    return Buffer;
+
+                if (AllToolsField.GetValue(selector) is IEnumerable<FishingToolDefinition> tools)
+                {
+                    foreach (var tool in tools)
+                    {
+                        if (tool != null && !Buffer.Contains(tool))
+                            Buffer.Add(tool);
+                    }
+                }
+
+                return Buffer;
+            }
+        }
+    }
+}

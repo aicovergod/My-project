@@ -17,6 +17,9 @@ namespace Companions
         /// <summary>Default cooldown duration (in minutes) applied after a woodcutting refusal.</summary>
         public const float WoodcuttingCooldownMinutes = 5f;
 
+        /// <summary>Default cooldown duration (in minutes) applied after a fishing refusal.</summary>
+        public const float FishingCooldownMinutes = 5f;
+
         /// <summary>Default cooldown duration (in minutes) applied after a combat training refusal.</summary>
         public const float CombatDeclineCooldownMinutes = 5f;
 
@@ -25,6 +28,9 @@ namespace Companions
 
         /// <summary>Time span representation of <see cref="WoodcuttingCooldownMinutes"/>.</summary>
         public static readonly TimeSpan WoodcuttingCooldownDuration = TimeSpan.FromMinutes(WoodcuttingCooldownMinutes);
+
+        /// <summary>Time span representation of <see cref="FishingCooldownMinutes"/>.</summary>
+        public static readonly TimeSpan FishingCooldownDuration = TimeSpan.FromMinutes(FishingCooldownMinutes);
 
         /// <summary>Time span representation of <see cref="CombatDeclineCooldownMinutes"/>.</summary>
         public static readonly TimeSpan CombatDeclineCooldownDuration = TimeSpan.FromMinutes(CombatDeclineCooldownMinutes);
@@ -90,6 +96,30 @@ namespace Companions
         }
 
         /// <summary>
+        /// Checks whether a fishing command should be rejected because the cooldown is still active.
+        /// When active a flavour line is published and <paramref name="failureReason"/> is set to
+        /// <see cref="CompanionFishingCommandResult.Declined"/>.
+        /// </summary>
+        /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
+        /// <param name="failureReason">Failure reason populated when a decline occurs.</param>
+        public static bool ShouldDeclineFishingRequest(
+            CompanionSkillCooldownTracker tracker,
+            out CompanionFishingCommandResult failureReason)
+        {
+            failureReason = CompanionFishingCommandResult.Accepted;
+
+            if (tracker == null)
+                return false;
+
+            if (!tracker.TryGetRemaining(SkillType.Fishing, out var remaining) || remaining <= TimeSpan.Zero)
+                return false;
+
+            PublishFishingCooldownMessage(remaining);
+            failureReason = CompanionFishingCommandResult.Declined;
+            return true;
+        }
+
+        /// <summary>
         /// Starts or refreshes the mining cooldown using the shared default duration.
         /// </summary>
         /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
@@ -108,6 +138,15 @@ namespace Companions
         }
 
         /// <summary>
+        /// Starts or refreshes the fishing cooldown using the shared default duration.
+        /// </summary>
+        /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
+        public static void StartFishingCooldown(CompanionSkillCooldownTracker tracker)
+        {
+            tracker?.StartCooldown(SkillType.Fishing, FishingCooldownDuration);
+        }
+
+        /// <summary>
         /// Clears any active mining cooldown so new commands can be processed immediately.
         /// </summary>
         /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
@@ -123,6 +162,15 @@ namespace Companions
         public static void ClearWoodcuttingCooldown(CompanionSkillCooldownTracker tracker)
         {
             tracker?.ClearCooldown(SkillType.Woodcutting);
+        }
+
+        /// <summary>
+        /// Clears any active fishing cooldown so new commands can be processed immediately.
+        /// </summary>
+        /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
+        public static void ClearFishingCooldown(CompanionSkillCooldownTracker tracker)
+        {
+            tracker?.ClearCooldown(SkillType.Fishing);
         }
 
         /// <summary>
@@ -163,6 +211,28 @@ namespace Companions
             int minutes = Mathf.Max(1, (int)Math.Ceiling(totalMinutes));
 
             string message = CompanionWoodcuttingDialogueLibrary.GetCooldownLine(safePlayerName, minutes);
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), message);
+        }
+
+        /// <summary>
+        /// Publishes a companion chat line describing how long remains on the fishing cooldown.
+        /// </summary>
+        private static void PublishFishingCooldownMessage(TimeSpan remaining)
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string playerName = chat.ActiveUsername;
+            string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName.Trim();
+
+            double totalMinutes = Math.Max(0d, remaining.TotalMinutes);
+            int minutes = Mathf.Max(1, (int)Math.Ceiling(totalMinutes));
+
+            string message = CompanionFishingDialogueLibrary.GetCooldownLine(safePlayerName, minutes);
             if (string.IsNullOrWhiteSpace(message))
                 return;
 
