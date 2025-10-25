@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:153e3f4af6f656ddb85ffa82f42e41d13eb4705b -->
+## 2025-10-25T10:48:29+01:00 — Ensure pet ranged combat controller is resolved
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 12 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0f69ed484fe8224c0d7f7beb74c6725193a11526 -->
 ## 2025-10-25T10:18:40+01:00 — Merge pull request #1386 from aicovergod/codex/enhance-equipment-load-with-change-detection
 

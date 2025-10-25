@@ -557,8 +557,19 @@ namespace Pets
             return AmmunitionCache.TryGetValue(ammo.name, out data);
         }
 
+        /// <summary>
+        /// Lazily resolves the ranged combat controller so late-added components are
+        /// available when ranged attacks attempt to execute.
+        /// </summary>
+        private void EnsureRangedController()
+        {
+            rangedCombatController ??= GetComponent<CompanionRangedCombatController>();
+        }
+
         private int ResolveAttack(CombatTarget target, CombatantStats attacker, Transform ownerTransform, int beastmasterLevel)
         {
+            EnsureRangedController();
+
             if (target == null)
                 return Mathf.Max(1, attacker.Equip.attackSpeedTicks);
 
@@ -961,6 +972,7 @@ namespace Pets
 
             UnsubscribeFromEquipmentChanges();
             companionController = controller;
+            EnsureRangedController();
             TrySubscribeToEquipmentChanges();
         }
 
