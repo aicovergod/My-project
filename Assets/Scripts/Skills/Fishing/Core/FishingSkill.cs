@@ -38,6 +38,8 @@ namespace Skills.Fishing
 
         private Dictionary<string, ItemData> fishItems;
         private SkillingOutfitProgress fishingOutfit;
+        private bool useCompanionChatFormatting;
+        private Func<string> companionChatSenderResolver;
 
         public event System.Action<FishableSpot> OnStartFishing;
         public event System.Action OnStopFishing;
@@ -243,6 +245,8 @@ namespace Skills.Fishing
                             ? data.fishingXpBonusMultiplier
                             : 0f,
                     RewardMessageFormatter = qty => $"+{qty} {fish.DisplayName}",
+                    UseCompanionChatFormatting = useCompanionChatFormatting,
+                    CompanionChatSenderResolver = companionChatSenderResolver,
                     OnItemsGranted = result => OnFishCaught?.Invoke(fish.Id, result.QuantityAwarded),
                     OnSuccess = result =>
                     {
@@ -493,6 +497,18 @@ namespace Skills.Fishing
                 "Heron",
                 ref fishItems,
                 out _);
+        }
+
+        /// <summary>
+        /// Configures the chat formatting used when the skill is operated by a companion. Providing
+        /// a resolver routes reward messages through the companion chat channel instead of the
+        /// default game channel. Passing null restores player-centric formatting.
+        /// </summary>
+        /// <param name="senderResolver">Resolver that supplies the display name for companion chat output.</param>
+        public void ConfigureCompanionChat(Func<string> senderResolver)
+        {
+            useCompanionChatFormatting = senderResolver != null;
+            companionChatSenderResolver = senderResolver;
         }
 
         public void DebugSetLevel(int newLevel)
