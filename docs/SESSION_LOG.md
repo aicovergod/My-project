@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0383b9219e97fa8c85bdcf42e627d34989fe863d -->
+## 2025-10-25T15:26:24+01:00 — Refine companion drop pickup pathing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (9): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionInventory.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionPickupService.cs, Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs, Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs, Assets/Scripts/Inventory/GroundItems/WorldDrop.cs, Assets/Scripts/Inventory/ItemStack.cs, Assets/Scripts/UI/Chat/ChatboxUI.cs
+- Diff: 697 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:cce0a93ecfcfa3efb064700243d79fa6f7c728bd -->
 ## 2025-10-25T14:49:45+01:00 — Merge pull request #1401 from aicovergod/codex/fix-bug-in-codex-github
 
