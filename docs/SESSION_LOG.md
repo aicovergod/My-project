@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2732c8461845174a726b87974f308edecee73592 -->
+## 2025-10-25T10:11:02+01:00 — Merge pull request #1385 from aicovergod/codex/update-equipment-load-and-change-detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 0 --
+- Notes:
+  Trigger equipment change events on load
+---
+<!-- commit:5d07a0a20a34238bd550754117fd83dbe3949b54 -->
+## 2025-10-25T10:10:53+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:e7f334bf5048c07ceb54f2d55f5edc6f81750b5b -->
 ## 2025-10-25T10:10:29+01:00 — Notify equipment change after load
 
