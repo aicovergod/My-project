@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:45a1dd848710c37314aa337a56d9cf9998b63e76 -->
+## 2025-10-26T00:03:26+01:00 — Allow player and companion fishing/woodcutting HUDs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (12): Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Skills/Fishing/Core/FishingSkill.cs, Assets/Scripts/Skills/Fishing/UI/CompanionFishingHUD.cs, Assets/Scripts/Skills/Fishing/UI/CompanionFishingHUD.cs.meta, Assets/Scripts/Skills/Fishing/UI/FishingHUD.cs, Assets/Scripts/Skills/Fishing/UI/FishingHudBase.cs, Assets/Scripts/Skills/Fishing/UI/FishingHudBase.cs.meta, Assets/Scripts/Skills/Woodcutting/UI/CompanionWoodcuttingHUD.cs, Assets/Scripts/Skills/Woodcutting/UI/CompanionWoodcuttingHUD.cs.meta, Assets/Scripts/Skills/Woodcutting/UI/WoodcuttingHUD.cs, Assets/Scripts/Skills/Woodcutting/UI/WoodcuttingHudBase.cs, Assets/Scripts/Skills/Woodcutting/UI/WoodcuttingHudBase.cs.meta
+- Diff: 580 ++ / 82 --
+- Notes:
+  —
+---
 <!-- commit:9488e1795f4492ab92065c59616ccce34070dc57 -->
 ## 2025-10-25T23:54:34+01:00 — Merge pull request #1412 from aicovergod/codex/add-stop-action-button-to-companion-menu
 
