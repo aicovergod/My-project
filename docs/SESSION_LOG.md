@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0825da0c58a8d249b4dd1b63b9dd5dcdaa26e9e8 -->
+## 2025-10-25T23:30:49+01:00 — Enable companion woodcutting commands via tree right-click
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Woodcutting/Core/WoodcutterController.cs
+- Diff: 33 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a52e0aa7553b1f9356403309a2e287299a316804 -->
 ## 2025-10-25T21:25:08+01:00 — Merge pull request #1410 from aicovergod/codex/implement-fishing-feature-in-companioncontroller
 
