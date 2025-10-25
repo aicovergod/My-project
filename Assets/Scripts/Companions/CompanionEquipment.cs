@@ -1026,8 +1026,8 @@ namespace Companions
             if (chat != null)
             {
                 string message = unmet.Count == 1
-                    ? $"{companionName}:I don't have the required skill to equip that"
-                    : $"{companionName}:I don't have the required skills to equip that";
+                    ? "I don't have the required skill to equip that."
+                    : "I don't have the required skills to equip that.";
                 chat.PublishCompanionMessage(companionName, message);
             }
 
