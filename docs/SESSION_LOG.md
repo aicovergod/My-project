@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ff4c29a1008575ff66c0134641c6e3964f525545 -->
+## 2025-10-25T23:31:20+01:00 — Merge pull request #1411 from aicovergod/codex/add-right-click-tree-chopping-support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 42 ++ / 0 --
+- Notes:
+  Enable companion woodcutting commands via tree right-click
+---
+<!-- commit:d4630ec8ab2cecd4d925ad6feaf042dfd8924565 -->
+## 2025-10-25T23:31:07+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0825da0c58a8d249b4dd1b63b9dd5dcdaa26e9e8 -->
 ## 2025-10-25T23:30:49+01:00 — Enable companion woodcutting commands via tree right-click
 
