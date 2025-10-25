@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Core.Input;
 using Player;
 using Player.Commands;
@@ -17,6 +19,20 @@ namespace Player.Chat
     public sealed class PlayerChatController : MonoBehaviour
     {
         private const float FloatingTextFallbackHeight = 1.6f;
+
+        /// <summary>
+        /// Maps supported speech colour prefixes to their OSRS-inspired hues for floating speech bubbles.
+        /// </summary>
+        private static readonly Dictionary<string, Color> SpeechColorLookup = new Dictionary<string, Color>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Red", new Color32(255, 46, 36, 255) },
+            { "Green", new Color32(76, 255, 0, 255) },
+            { "Cyan", new Color32(0, 255, 255, 255) },
+            { "Purple", new Color32(170, 85, 255, 255) },
+            { "Black", Color.black },
+            { "Orange", new Color32(255, 140, 0, 255) },
+            { "Yellow", Color.yellow }
+        };
 
         [Header("Input")]
         [SerializeField] private PlayerInput playerInput;
@@ -209,14 +225,17 @@ namespace Player.Chat
                 return;
             }
 
+            // Resolve any speech colour prefix before broadcasting so the chat log remains untouched while bubbles inherit the override.
+            bool hasSpeechColor = TryResolveSpeechColor(message, out string sanitisedMessage, out Color speechColor);
+
             if (channel == ChatChannel.Companion)
             {
-                chatService.PublishCompanionMessage(sender, message, true);
+                chatService.PublishCompanionMessage(sender, sanitisedMessage, true);
             }
             else
             {
-                chatService.PublishPublicMessage(sender, message);
-                SpawnFloatingSpeech(message);
+                chatService.PublishPublicMessage(sender, sanitisedMessage);
+                SpawnFloatingSpeech(sanitisedMessage, hasSpeechColor ? speechColor : (Color?)null);
             }
 
             chatHud.CancelInput();
@@ -241,7 +260,41 @@ namespace Player.Chat
                 ReleaseModalLock();
         }
 
-        private void SpawnFloatingSpeech(string message)
+        /// <summary>
+        /// Attempts to strip a supported <c>&lt;ColourName&gt;:</c> prefix from the supplied message, returning the remaining text
+        /// and the associated colour override for floating speech bubbles. The method succeeds only when a known prefix is
+        /// provided alongside a non-empty message. When resolution fails the original message is preserved and white is used.
+        /// </summary>
+        private static bool TryResolveSpeechColor(string rawMessage, out string sanitisedMessage, out Color color)
+        {
+            sanitisedMessage = rawMessage;
+            color = Color.white;
+
+            if (string.IsNullOrEmpty(rawMessage))
+                return false;
+
+            int separatorIndex = rawMessage.IndexOf(':');
+            if (separatorIndex <= 0)
+                return false;
+
+            string potentialPrefix = rawMessage.Substring(0, separatorIndex).Trim();
+            if (string.IsNullOrEmpty(potentialPrefix))
+                return false;
+
+            if (!SpeechColorLookup.TryGetValue(potentialPrefix, out Color resolvedColor))
+                return false;
+
+            string remainder = rawMessage.Substring(separatorIndex + 1);
+            string trimmedRemainder = remainder.TrimStart();
+            if (string.IsNullOrEmpty(trimmedRemainder))
+                return false;
+
+            color = resolvedColor;
+            sanitisedMessage = trimmedRemainder;
+            return true;
+        }
+
+        private void SpawnFloatingSpeech(string message, Color? overrideColor = null)
         {
             if (string.IsNullOrEmpty(message))
                 return;
@@ -252,7 +305,8 @@ namespace Player.Chat
             Vector3 followOffset = position - anchorTransform.position;
             // Chat prefixes control moderator icon rendering, so keep speech bubbles free of badge markup to prevent spoofing.
             var tokens = EmojiMarkupParser.Parse(message ?? string.Empty, allowModeratorIcons: false);
-            FloatingText.ShowAnchored(tokens, anchorTransform, followOffset, Color.white);
+            var colourToApply = overrideColor ?? Color.white;
+            FloatingText.ShowAnchored(tokens, anchorTransform, followOffset, colourToApply);
         }
 
         private void ReleaseModalLock()
