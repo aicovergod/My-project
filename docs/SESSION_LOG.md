@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fe5d419bd698ad9ee2cd4d2779ddb7bd15df9efd -->
+## 2025-10-25T11:01:10+01:00 — Add companion bank out of range responses
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 43 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:35b86a36b34afdf1245dc941057a06b2408c6783 -->
 ## 2025-10-25T10:58:04+01:00 — Merge pull request #1388 from aicovergod/codex/add-random-messages-for-empty-inventory
 
