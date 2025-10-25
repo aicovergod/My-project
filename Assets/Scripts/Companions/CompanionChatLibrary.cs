@@ -5077,6 +5077,19 @@ namespace Companions
         /// <summary>Fallback message returned when the bank deposit pool cannot supply a line.</summary>
         private const string BankDepositFallbackLine = "I've just deposited it all in the bank.";
 
+        /// <summary>Pool of snarky responses when the companion is asked to bank an empty inventory.</summary>
+        private static readonly string[] BankDepositEmptyInventoryMessages =
+        {
+            "What do you want me to add...the dust in my inv?<emoji=17>",
+            "Nothing to add, boss.",
+            "I haven't even got anything to add.",
+            "Did you mean to do that, lol...<emoji=20>",
+            "My inventory is empty."
+        };
+
+        /// <summary>Fallback line used when the empty-inventory pool fails to produce a response.</summary>
+        private const string BankDepositEmptyInventoryFallbackLine = "Nothing to add, boss.";
+
         /// <summary>Pool of flavour lines used when the companion manually spawns from an item drop.</summary>
         private static readonly string[] ManualSpawnGreetingChatMessages =
         {
@@ -5599,6 +5612,14 @@ namespace Companions
         public static string GetRandomBankDepositLine()
         {
             return GetRandomLine(BankDepositChatMessages, BankDepositFallbackLine);
+        }
+
+        /// <summary>
+        /// Returns a random companion chat line when the player requests a bank deposit but no items exist.
+        /// </summary>
+        public static string GetRandomEmptyBankInventoryLine()
+        {
+            return GetRandomLine(BankDepositEmptyInventoryMessages, BankDepositEmptyInventoryFallbackLine);
         }
 
         /// <summary>

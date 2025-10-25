@@ -900,6 +900,15 @@ namespace Companions
                 return false;
             }
 
+            if (IsCompanionInventoryEmpty(inventoryComponent))
+            {
+                if (EnableDebugLogging)
+                    Debug.Log("[Companion] Deposit aborted because the inventory is empty.");
+
+                PublishRandomEmptyBankInventoryMessage();
+                return false;
+            }
+
             int moved = bank.DepositAllFromInventory(inventoryComponent);
             if (EnableDebugLogging)
             {
@@ -919,6 +928,33 @@ namespace Companions
         }
 
         /// <summary>
+        /// Determines whether the supplied inventory currently has any occupied slots.
+        /// </summary>
+        /// <param name="inventory">Companion inventory component to inspect.</param>
+        /// <returns>
+        /// <c>true</c> when the inventory exists but all slots are empty; otherwise <c>false</c>.
+        /// </returns>
+        private static bool IsCompanionInventoryEmpty(Inventory.Inventory inventory)
+        {
+            if (inventory == null)
+                return true;
+
+            var model = inventory.Model;
+            if (model == null)
+                return true;
+
+            int slotCount = model.Size;
+            for (int i = 0; i < slotCount; i++)
+            {
+                var entry = model.GetEntry(i);
+                if (entry.item != null && entry.count > 0)
+                    return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Emits a random companion chat line to confirm the deposit when items reach the bank.
         /// </summary>
         private static void PublishRandomBankDepositMessage()
@@ -928,6 +964,22 @@ namespace Companions
                 return;
 
             string message = CompanionChatLibrary.GetRandomBankDepositLine();
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
+        }
+
+        /// <summary>
+        /// Emits a random flavour line when the companion is asked to bank items but has nothing to deposit.
+        /// </summary>
+        private static void PublishRandomEmptyBankInventoryMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string message = CompanionChatLibrary.GetRandomEmptyBankInventoryLine();
             if (string.IsNullOrWhiteSpace(message))
                 return;
 
