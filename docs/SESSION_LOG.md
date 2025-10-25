@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:15a49b3979ad1d0ff86b6a24c5f3fe286c66e463 -->
+## 2025-10-25T18:04:14+01:00 — Merge pull request #1407 from aicovergod/codex/add-inventory-full-messages-for-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 206 ++ / 29 --
+- Notes:
+  Add companion pickup chatter for inventory full and success cases
+---
+<!-- commit:fdbf537098d39760cb8c28edb7278bac75569902 -->
+## 2025-10-25T18:04:06+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:116b59a8f0068c1326c00256b0d11907d2ab4080 -->
 ## 2025-10-25T18:03:46+01:00 — Add companion pickup chatter and new inventory full responses
 
