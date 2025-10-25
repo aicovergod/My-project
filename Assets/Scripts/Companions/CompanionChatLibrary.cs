@@ -496,16 +496,32 @@ namespace Companions
         /// <summary>Pool of chat lines used when the companion refuses woodcutting due to an active cooldown.</summary>
         private static readonly string[] WoodcuttingDeclineCooldownChatMessages =
         {
-            "My axe arm needs a breather—give me {minutes}, {playerName}.",
-            "Still shaking the splinters out. Let’s chop again in {minutes}, {playerName}.",
-            "Cooldown’s ticking; no tree chopping for another {minutes}, {playerName}.",
-            "Let me sharpen the blade and rest for {minutes}, {playerName}.",
-            "Hands are still buzzing from that last tree. Check back in {minutes}, {playerName}.",
-            "Need {minutes} to clear the woodchips out of my gear, {playerName}.",
-            "Axe arm’s on cooldown. Catch me after {minutes}, {playerName}.",
-            "Let’s give the forest a breather for {minutes}, {playerName}.",
-            "Need {minutes} before I take another swing, {playerName}.",
-            "Still cooling off from those swings—{minutes} and I’m ready, {playerName}."
+            "I told you, i don't want to woodcut at the moment,",
+            "I told you, i dont fancy woodcutting at the moment.",
+            "I still don't wanna wc, sorry.",
+            "I told you, i don't wanna woodcut at the moment.",
+            "I told you, i don't wanna woodcut atm....",
+            "I ain't cutting nothing yet [playerName].",
+            "I said I’m not in the mood to woodcut right now.",
+            "Didn’t I just say I don’t wanna woodcut?",
+            "Not chopping trees right now, sorry.",
+            "Still not feeling like woodcutting, mate.",
+            "Not today, [playerName] — leave the trees alone for now.",
+            "I’m off duty from tree-cutting, thanks.",
+            "How many times I gotta say it? No woodcutting right now.",
+            "Yeah… still not doing that.",
+            "Woodcutting? Nah, I’m good.",
+            "Ask me again later, I’m not chopping anything right now.",
+            "Still not touching a tree, [playerName].",
+            "I told you once, not picking up that axe yet.",
+            "Not swinging at trees yet, sorry.",
+            "Maybe later, I’m not in a chopping mood.",
+            "Not feeling the axe grind right now.",
+            "I told you, I’m not woodcutting today.",
+            "Still a hard no on woodcutting, [playerName].",
+            "I said no, I’m chilling for now.",
+            "Stop asking, I’m not cutting trees yet.",
+            "I ain’t swinging that axe any time soon."
         };
 
         /// <summary>Fallback message returned when the woodcutting decline cooldown pool is empty.</summary>
@@ -514,16 +530,36 @@ namespace Companions
         /// <summary>Pool of chat lines used when the companion refuses fishing due to an active cooldown.</summary>
         private static readonly string[] FishingDeclineCooldownChatMessages =
         {
-            "Rod arm’s resting—give me {minutes}, {playerName}.",
-            "Still drying out the nets. Try again in {minutes}, {playerName}.",
-            "Need {minutes} to prep fresh bait, {playerName}.",
-            "Fishing cooldown’s ticking—{minutes} before the next trip, {playerName}.",
-            "Let me untangle the line for {minutes}, {playerName}.",
-            "Hands are still pruny. Give me {minutes}, {playerName}.",
-            "Need {minutes} to swap bait and breathe, {playerName}.",
-            "Still on fishing cooldown—circle back in {minutes}, {playerName}.",
-            "Let me warm back up; {minutes} and we’ll cast again, {playerName}.",
-            "Need {minutes} to dry off these boots before we fish again, {playerName}."
+            "I told you, I don’t wanna fish right now.",
+            "Didn’t I just say I’m not up for fishing?",
+            "Still not feeling the fishing mood, sorry.",
+            "I’m not casting anything yet, [playerName].",
+            "I said no fishing, at least not for now.",
+            "Not touching that rod today.",
+            "I ain’t fishing right now, leave it.",
+            "Still not up for catching soggy boots.",
+            "I told you, I don’t fancy fishing at the moment.",
+            "I’m not throwing a line out, not today.",
+            "I said no, I’m done with fish smells for a bit.",
+            "Still not in the mood to fish, [playerName].",
+            "Yeah, I’ll pass on the fishing trip right now.",
+            "I’m not reeling in anything yet.",
+            "Fishing? Nah, I’m good, thanks.",
+            "Ask me again later, I’m not fishing right now.",
+            "Still a no on fishing, mate.",
+            "I ain’t holding a rod for a while, alright?",
+            "Not today, my hands still smell like tuna.",
+            "I said I’m not fishing right now, stop asking.",
+            "Fishing’s off the table for now.",
+            "I told you before, I’m not in a fishing mood.",
+            "Still not biting, same as the fish.",
+            "I’m not fishing — simple as that.",
+            "Yeah… still not touching the rod, [playerName].",
+            "Fishing again? No chance.",
+            "Not casting that line yet, chill.",
+            "I said no fishing, maybe later.",
+            "Still not feeling like catching anything.",
+            "I ain’t fishing, not now, not soon."
         };
 
         /// <summary>Fallback message returned when the fishing decline cooldown pool is empty.</summary>
@@ -2877,7 +2913,7 @@ namespace Companions
         /// <summary>Fallback message returned when the Beastmaster pool is empty.</summary>
         private const string BeastmasterLevelUpFallbackLine = "My Beastmaster skill leveled up, the animals trust me more already.";
 
-        
+
         /// <summary>
         /// Pool of flavour messages used when the player levels Fishing with a companion present.
         /// Keeps the companion congratulating the player with OSRS-inspired encouragement.
@@ -3176,7 +3212,7 @@ namespace Companions
         /// <summary>Fallback message returned when the Fishing pool is empty.</summary>
         private const string FishingLevelUpFallbackLine = "My fishing skill leveled up, I’m basically a pro now.";
 
-        
+
         /// <summary>
         /// Pool of flavour messages used when the player levels Cooking with a companion present.
         /// Keeps the companion congratulating the player with OSRS-inspired encouragement.
@@ -3469,7 +3505,7 @@ namespace Companions
         /// <summary>Fallback message returned when the Cooking pool is empty.</summary>
         private const string CookingLevelUpFallbackLine = "My cooking skill leveled up, smells amazing already.";
 
-        
+
         /// <summary>
         /// Pool of flavour messages used when the player levels Firemaking with a companion present.
         /// Keeps the companion congratulating the player with OSRS-inspired encouragement.
@@ -3762,7 +3798,7 @@ namespace Companions
         /// <summary>Fallback message returned when the Firemaking pool is empty.</summary>
         private const string FiremakingLevelUpFallbackLine = "My firemaking skill leveled up, things are getting hotter.";
 
-        
+
         /// <summary>
         /// Pool of flavour messages used when the player levels Woodcutting with a companion present.
         /// Keeps the companion congratulating the player with OSRS-inspired encouragement.
@@ -4078,7 +4114,7 @@ namespace Companions
         /// <summary>Fallback message returned when the Woodcutting pool is empty.</summary>
         private const string WoodcuttingLevelUpFallbackLine = "My woodcutting skill leveled up, these trees don’t stand a chance.";
 
-        
+
         /// <summary>
         /// Pool of flavour messages used when the player levels Mining with a companion present.
         /// Keeps the companion congratulating the player with OSRS-inspired encouragement.
