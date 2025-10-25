@@ -51,7 +51,8 @@ namespace Companions.Conversation
             new IntentScoreThreshold(CompanionDialogueIntent.DeferSkillPlan, 1.6f),
             new IntentScoreThreshold(CompanionDialogueIntent.RequestAlternateSkill, 1.6f),
             new IntentScoreThreshold(CompanionDialogueIntent.CompanionSuggestionRequest, 1.6f),
-            new IntentScoreThreshold(CompanionDialogueIntent.CompanionSuggestionReminder, 1.3f)
+            new IntentScoreThreshold(CompanionDialogueIntent.CompanionSuggestionReminder, 1.3f),
+            new IntentScoreThreshold(CompanionDialogueIntent.PlayerApology, 1.25f)
         };
 
         private readonly List<CompanionDialogueRule> rules = new List<CompanionDialogueRule>();
@@ -108,6 +109,7 @@ namespace Companions.Conversation
         private DateTime? lastSuggestionAnsweredUtc;
         private string lastSuggestionMessage = string.Empty;
         private bool playerRepeatedSuggestionRequest;
+        private bool playerNeededSkillReminderApology;
         private SuggestionPayload lastSuggestionPayload = SuggestionPayload.Empty;
         private readonly LinkedList<NpcKillRecord> recentNpcKills = new();
 
@@ -1317,6 +1319,15 @@ namespace Companions.Conversation
                         }
                         break;
                     }
+
+                    case CompanionDialogueIntent.PlayerApology:
+                        TryHandlePlayerApology(
+                            context,
+                            segments,
+                            playerName,
+                            companionMood,
+                            recentEvent);
+                        break;
 
                     case CompanionDialogueIntent.RequestAssistance:
                         TryAddResponse(
@@ -2793,6 +2804,7 @@ namespace Companions.Conversation
                     segments.Add(repeat);
 
                 playerRepeatedSuggestionRequest = true;
+                playerNeededSkillReminderApology = false;
                 return true;
             }
 
@@ -2807,6 +2819,7 @@ namespace Companions.Conversation
             lastSuggestionMessage = suggestion.ResponseText;
             lastSuggestionAnsweredUtc = nowUtc;
             playerRepeatedSuggestionRequest = false;
+            playerNeededSkillReminderApology = false;
             return true;
         }
 
@@ -2818,12 +2831,14 @@ namespace Companions.Conversation
             if (!HasActiveSuggestion(nowUtc) || lastSuggestionPayload.Type == SuggestionType.None)
             {
                 segments.Add("Ask me what I want to do first, then I can remind you.");
+                playerNeededSkillReminderApology = false;
                 return true;
             }
 
             if (!playerRepeatedSuggestionRequest)
             {
                 segments.Add("You haven't asked me twice yet, so there's nothing to remind you about.");
+                playerNeededSkillReminderApology = false;
                 return true;
             }
 
@@ -2832,6 +2847,33 @@ namespace Companions.Conversation
                 response = "I told you earlier, remember?";
 
             segments.Add(response);
+            playerNeededSkillReminderApology = lastSuggestionPayload.Type == SuggestionType.Skill;
+            return true;
+        }
+
+        private bool TryHandlePlayerApology(
+            CompanionResponseContext context,
+            List<string> segments,
+            string playerName,
+            string companionMood,
+            string recentEvent)
+        {
+            string template = playerNeededSkillReminderApology
+                ? CompanionApologyDialogueLibrary.GetReminderAcknowledgementLine()
+                : CompanionApologyDialogueLibrary.GetUnpromptedApologyLine();
+
+            if (string.IsNullOrWhiteSpace(template))
+                return false;
+
+            string formatted = FormatTemplate(template, playerName, companionMood, recentEvent, context);
+            if (string.IsNullOrWhiteSpace(formatted))
+                return false;
+
+            segments.Add(formatted);
+
+            if (playerNeededSkillReminderApology)
+                playerNeededSkillReminderApology = false;
+
             return true;
         }
 
@@ -3159,6 +3201,7 @@ namespace Companions.Conversation
             lastSuggestionMessage = string.Empty;
             lastSuggestionPayload = SuggestionPayload.Empty;
             playerRepeatedSuggestionRequest = false;
+            playerNeededSkillReminderApology = false;
         }
 
         private bool HasActiveSuggestion(DateTime nowUtc)
