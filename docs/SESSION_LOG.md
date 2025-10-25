@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7d5881ea38bcf7824d276369a5762b77a56d33b9 -->
+## 2025-10-25T13:35:03+01:00 — Merge pull request #1396 from aicovergod/codex/modify-bank-message-for-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 9 ++ / 3 --
+- Notes:
+  Prevent duplicate bank out-of-range notification
+---
+<!-- commit:9794961fd74696a6d5cd3eb8f7bf23e5a71b42b8 -->
+## 2025-10-25T13:34:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:11849c823d78f3bc04c812743868c56314857242 -->
 ## 2025-10-25T13:34:38+01:00 — Remove duplicate bank out of range game message
 
