@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d7a688ddb313f408a0c994ded42a3049822281e3 -->
+## 2025-10-25T14:42:34+01:00 — Merge pull request #1400 from aicovergod/codex/fix-duplicated-chatbox-message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2 ++ / 2 --
+- Notes:
+  Fix duplicate companion name in equipment requirement chat
+---
+<!-- commit:8df15e5dfd7d60eaf0984844fdcba961b9a3a4d0 -->
+## 2025-10-25T14:42:19+01:00 — Fix duplicate companion name in equipment requirement chat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionEquipment.cs
+- Diff: 2 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:a01b0e892fe6ed44484bf49dc1685f27fad02deb -->
 ## 2025-10-25T14:33:06+01:00 — Merge pull request #1399 from aicovergod/codex/update-pet-movement-during-path-replans
 
