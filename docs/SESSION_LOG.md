@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6837882b4f68db81c7247248c91d22dccc05a577 -->
+## 2025-10-25T20:23:08+01:00 — Merge pull request #1408 from aicovergod/codex/implement-woodcutting-companion-features
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1984 ++ / 3 --
+- Notes:
+  Add companion woodcutting support
+---
+<!-- commit:dbef1be955b7c4c3231b929342a51b4055e54afc -->
+## 2025-10-25T20:22:53+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:dfc5b82596d908631124f0ba08acc7675a8e60b3 -->
 ## 2025-10-25T20:22:35+01:00 — Add companion woodcutting support
 
