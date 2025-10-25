@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f59c94b03244e13db52ec39296c18ab6501d1402 -->
+## 2025-10-25T12:29:54+01:00 — Merge pull request #1393 from aicovergod/codex/add-transfer-option-for-companion-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 70 ++ / 0 --
+- Notes:
+  Support player-to-companion inventory transfers
+---
+<!-- commit:53deef2021045107d910bd4dec0948eaca279bbb -->
+## 2025-10-25T12:29:09+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:79bd8d76fd2acc11a9d40d4d0ebcba3c87a17f65 -->
 ## 2025-10-25T12:28:50+01:00 — Allow transferring items to companion inventory
 
