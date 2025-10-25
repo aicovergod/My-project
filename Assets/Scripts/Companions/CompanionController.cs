@@ -427,7 +427,12 @@ namespace Companions
             pathMover?.ResetCachedVelocity();
 
             float lastProgressSample = Time.unscaledTime;
-            float lastDistance = float.MaxValue;
+            float lastProgressDistance = float.MaxValue;
+            Vector3 lastProgressPosition = body2D != null ? (Vector3)body2D.position : transform.position;
+            // Thresholds used to decide when progress samples should refresh.
+            const float progressPositionThreshold = 0.02f;
+            const float progressDistanceThreshold = 0.01f;
+            float stuckTimeout = Mathf.Max(0.1f, pickupStuckTimeoutSeconds);
 
             try
             {
@@ -448,12 +453,29 @@ namespace Companions
                     if (distance <= stopDistance)
                         break;
 
-                    if (distance <= lastDistance - 0.01f)
+                    bool distanceImproved = distance <= lastProgressDistance - progressDistanceThreshold;
+                    if (distanceImproved)
                     {
                         lastProgressSample = Time.unscaledTime;
-                        lastDistance = distance;
+                        lastProgressDistance = distance;
+                        lastProgressPosition = currentPosition;
                     }
-                    else if (Time.unscaledTime - lastProgressSample >= Mathf.Max(0.1f, pickupStuckTimeoutSeconds))
+                    else
+                    {
+                        float movementDelta = Vector2.Distance(currentPosition, lastProgressPosition);
+                        if (movementDelta >= progressPositionThreshold)
+                        {
+                            lastProgressSample = Time.unscaledTime;
+                            lastProgressPosition = currentPosition;
+                            if (distance < lastProgressDistance)
+                                lastProgressDistance = distance;
+                        }
+                    }
+
+                    bool timedOut = Time.unscaledTime - lastProgressSample >= stuckTimeout;
+                    bool lackingMovement = Vector2.Distance(currentPosition, lastProgressPosition) < progressPositionThreshold;
+                    bool noGoalApproach = distance >= lastProgressDistance - progressDistanceThreshold;
+                    if (timedOut && lackingMovement && noGoalApproach)
                     {
                         if (CompanionManager.EnableDebugLogging)
                         {
@@ -467,16 +489,27 @@ namespace Companions
                     Vector2 velocity;
                     bool teleported;
 
-                    if (!TryStepWithNavigation(targetDrop, stopDistance, out nextPosition, out velocity, out teleported))
+                    bool navigationProvidedStep = TryStepWithNavigation(targetDrop, stopDistance, out nextPosition, out velocity, out teleported);
+                    if (!navigationProvidedStep)
                     {
                         StepDirectlyTowards(targetPosition, ResolvePickupMoveSpeed(), out nextPosition, out velocity);
                         teleported = false;
                     }
-                    else if ((nextPosition - currentPosition).sqrMagnitude <= 0.0001f && velocity.sqrMagnitude <= 0.0001f)
+                    else
                     {
-                        // Navigation is still resolving a path; treat this as progress so the stuck timer does not abort early.
                         lastProgressSample = Time.unscaledTime;
-                        lastDistance = distance;
+                        lastProgressPosition = currentPosition;
+                        if (distance < lastProgressDistance)
+                            lastProgressDistance = distance;
+
+                        if ((nextPosition - currentPosition).sqrMagnitude <= 0.0001f && velocity.sqrMagnitude <= 0.0001f)
+                        {
+                            // Navigation is still resolving a path; treat this as progress so the stuck timer does not abort early.
+                            lastProgressSample = Time.unscaledTime;
+                            lastProgressPosition = currentPosition;
+                            if (distance < lastProgressDistance)
+                                lastProgressDistance = distance;
+                        }
                     }
 
                     ApplyPickupMovement(nextPosition, velocity, teleported);
