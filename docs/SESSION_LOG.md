@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8ca2104bf1904dd05893b9eb55830183bd3057a7 -->
+## 2025-10-26T00:05:47+01:00 — Merge pull request #1414 from aicovergod/codex/fix-null-comparison-bug-in-companionmanager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2 ++ / 1 --
+- Notes:
+  Fix companion chat handler null guard
+---
 <!-- commit:f389a1515bd411b196b7990256038638335161e6 -->
 ## 2025-10-26T00:03:42+01:00 — Merge pull request #1413 from aicovergod/codex/fix-fishing-and-woodcutting-huds
 
