@@ -1,3 +1,4 @@
+/// Feature: Exposed active companion accessor for pickup service integration.
 using System;
 using BankSystem;
 using Combat;
@@ -112,6 +113,9 @@ namespace Companions
 
         /// <summary>True when the companion exists and is currently visible in the world.</summary>
         public static bool HasActiveCompanion => controller != null && controller.gameObject != null && controller.gameObject.activeSelf;
+
+        /// <summary>Provides direct access to the active companion controller instance.</summary>
+        public static CompanionController ActiveCompanion => controller;
 
         /// <summary>
         /// Determines whether the provided pet definition matches the currently active companion.

@@ -1,6 +1,8 @@
+/// Feature: Enabled companion pickup context menu actions for ground drops.
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Companions;
 using Core;
 using Player;
 using Pets;
@@ -529,9 +531,20 @@ namespace Inventory.GroundItems
             EnsurePhysicsRaycaster();
         }
 
-        private void OnMenuSelection(ItemPickup pickup)
+        private void OnMenuSelection(ItemPickup pickup, PointerEventData.InputButton button)
         {
             HideMenu();
+            if (pickup == null)
+                return;
+
+            if (button == PointerEventData.InputButton.Right)
+            {
+                var drop = WorldDrop.FromPickup(pickup);
+                if (drop != null)
+                    CompanionPickupService.RequestPickup(drop);
+                return;
+            }
+
             BeginPickupRoutine(pickup);
         }
 

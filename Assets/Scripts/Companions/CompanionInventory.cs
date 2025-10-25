@@ -1,3 +1,4 @@
+/// Feature: Added stack-based add helper for companion pickup commands.
 using System;
 using Core.Save;
 using Inventory;
@@ -179,6 +180,22 @@ namespace Companions
                 isOpen = false;
                 VisibilityChanged?.Invoke(false);
             }
+        }
+
+        /// <summary>
+        /// Attempts to add the provided stack to the companion inventory.
+        /// </summary>
+        /// <param name="stack">Item stack that should be inserted.</param>
+        /// <returns>True when the stack was successfully added.</returns>
+        public bool TryAddItem(ItemStack stack)
+        {
+            if (!stack.IsValid || inventory == null)
+                return false;
+
+            if (!inventory.CanAddItem(stack.Item, stack.Quantity))
+                return false;
+
+            return inventory.AddItem(stack.Item, stack.Quantity);
         }
 
         private void OnDestroy()
