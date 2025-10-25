@@ -830,6 +830,12 @@ namespace Inventory
             int len = Mathf.Min(equipped.Length, data.slots.Length);
             for (int i = 0; i < len; i++)
             {
+                // Capture the previous state before mutating the equipped array so we can detect
+                // whether the load operation introduces a change for this slot. The struct copy is
+                // by-value which keeps the comparison safe even when the current slot is modified
+                // further down in this iteration.
+                var previousEntry = equipped[i];
+
                 var slot = data.slots[i];
                 if (!string.IsNullOrEmpty(slot.id))
                 {
@@ -853,6 +859,15 @@ namespace Inventory
                     equipped[i].count = 0;
                 }
                 UpdateSlotVisual((EquipmentSlot)(i + 1));
+
+                var currentEntry = equipped[i];
+                if (previousEntry.item != currentEntry.item || previousEntry.count != currentEntry.count)
+                {
+                    // Notify listeners that this equipment slot changed as part of the load. The
+                    // event is fired after the state and visuals are refreshed so dependants like
+                    // PlayerCombatLoadout can immediately read the updated state.
+                    OnEquipmentChanged?.Invoke((EquipmentSlot)(i + 1));
+                }
             }
 
             UpdateBonuses();
