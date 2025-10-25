@@ -562,6 +562,48 @@ namespace Companions.Conversation
                     regexScoreEvaluator: text => SuggestionReminderRegex.IsMatch(text) ? 0.4f : 0f),
 
                 new CompanionIntentPattern(
+                    CompanionDialogueIntent.PlayerApology,
+                    priority: 34,
+                    matchThreshold: 1.25f,
+                    synonymBuckets: new[]
+                    {
+                        new SynonymBucket(new[]
+                        {
+                            "sorry", "soz", "sozzer", "sowwy", "sowy", "sry", "srry", "srri", "oops", "whoops", "woops",
+                            "apology", "apologies", "apologise", "apologize", "apologized", "apologised", "mb"
+                        }, 1.3f),
+                        new SynonymBucket(new[] { "forgive", "fault", "mistake", "culpa" }, 0.7f)
+                    },
+                    multiWordPhrases: new[]
+                    {
+                        new MultiWordPhrase("im sorry", 1.6f),
+                        new MultiWordPhrase("i'm sorry", 1.6f),
+                        new MultiWordPhrase("i am sorry", 1.6f),
+                        new MultiWordPhrase("so sorry", 1.4f),
+                        new MultiWordPhrase("very sorry", 1.4f),
+                        new MultiWordPhrase("real sorry", 1.4f),
+                        new MultiWordPhrase("really sorry", 1.4f),
+                        new MultiWordPhrase("soooorry", 1.4f),
+                        new MultiWordPhrase("sowwy", 1.4f),
+                        new MultiWordPhrase("sowy", 1.4f),
+                        new MultiWordPhrase("soz m8", 1.5f),
+                        new MultiWordPhrase("my bad", 1.6f),
+                        new MultiWordPhrase("my fault", 1.6f),
+                        new MultiWordPhrase("my mistake", 1.6f),
+                        new MultiWordPhrase("that's on me", 1.6f),
+                        new MultiWordPhrase("thats on me", 1.6f),
+                        new MultiWordPhrase("forgive me", 1.6f),
+                        new MultiWordPhrase("didn't mean to", 1.5f),
+                        new MultiWordPhrase("didnt mean to", 1.5f),
+                        new MultiWordPhrase("didn't mean it", 1.5f),
+                        new MultiWordPhrase("won't happen again", 1.5f),
+                        new MultiWordPhrase("wont happen again", 1.5f),
+                        new MultiWordPhrase("mea culpa", 1.7f),
+                        new MultiWordPhrase("i apologise", 1.5f),
+                        new MultiWordPhrase("i apologize", 1.5f)
+                    }),
+
+                new CompanionIntentPattern(
                     CompanionDialogueIntent.RequestAlternateSkill,
                     priority: 38,
                     matchThreshold: 1.6f,

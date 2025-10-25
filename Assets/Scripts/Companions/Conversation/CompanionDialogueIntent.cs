@@ -86,6 +86,11 @@ namespace Companions.Conversation
         /// <summary>
         /// Player asked the companion to repeat their last activity suggestion.
         /// </summary>
-        CompanionSuggestionReminder = 120
+        CompanionSuggestionReminder = 120,
+
+        /// <summary>
+        /// Player apologised to the companion, either after a reminder or without prompting.
+        /// </summary>
+        PlayerApology = 130
     }
 }
