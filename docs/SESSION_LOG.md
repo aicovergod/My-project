@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:11849c823d78f3bc04c812743868c56314857242 -->
+## 2025-10-25T13:34:38+01:00 — Remove duplicate bank out of range game message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 0 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:834348b9a67a020030773153d1673b70266cecc0 -->
 ## 2025-10-25T13:21:24+01:00 — Merge pull request #1395 from aicovergod/codex/enable-transfer-option-for-all-inventories
 
