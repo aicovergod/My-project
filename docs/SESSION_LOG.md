@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:35f66af5cb8a8edadc1832f8377bde99d8d43cee -->
+## 2025-10-25T14:06:49+01:00 — Add stuck handling for companion mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 228 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:bc9c14e7b9fadb7d39390f2270f665786589127e -->
 ## 2025-10-25T13:42:38+01:00 — Merge pull request #1397 from aicovergod/codex/improve-companionminingcontroller-behavior
 
