@@ -557,9 +557,7 @@ namespace Inventory.Core
                 bool companionInventoryVisible = CompanionManager.IsInventoryVisible();
                 var companionInventoryWrapper = CompanionManager.CompanionInventory;
                 var companionInventoryComponent = companionInventoryWrapper?.InventoryComponent;
-                if (companionInventoryVisible &&
-                    companionInventoryComponent != null &&
-                    companionInventoryComponent.CanAddItem(entry.item, entry.count))
+                if (companionInventoryVisible && companionInventoryComponent != null)
                 {
                     contextMenuOptions.Add(new InventoryItemContextMenu.Option(
                         "Transfer",
@@ -593,15 +591,13 @@ namespace Inventory.Core
 
                 var playerInventory = CompanionManager.GetPlayerInventory();
                 bool canResolvePlayerInventory = playerInventory != null;
-                bool canTransfer = canResolvePlayerInventory &&
-                                   playerInventory.CanAddItem(entry.item, entry.count);
                 if (canResolvePlayerInventory)
                 {
                     contextMenuOptions.Add(new InventoryItemContextMenu.Option(
                         "Transfer",
                         InventoryItemContextAction.Transfer,
-                        canTransfer));
-                    hasInteractable |= canTransfer;
+                        true));
+                    hasInteractable = true;
                 }
 
                 contextMenuOptions.Add(new InventoryItemContextMenu.Option(
