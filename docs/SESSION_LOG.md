@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:116b59a8f0068c1326c00256b0d11907d2ab4080 -->
+## 2025-10-25T18:03:46+01:00 — Add companion pickup chatter and new inventory full responses
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionPickupDialogueLibrary.cs, Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 197 ++ / 29 --
+- Notes:
+  —
+---
 <!-- commit:a0caf4f5ef800899b99137eb8ab09d86b6d0af33 -->
 ## 2025-10-25T16:13:20+01:00 — Merge pull request #1406 from aicovergod/codex/extend-pickuproutine-and-update-stuck-timeout-branch
 
