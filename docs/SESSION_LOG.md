@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c4cdc79b219cc17b988ebf781101ba59d887322b -->
+## 2025-10-25T15:26:55+01:00 — Merge pull request #1402 from aicovergod/codex/implement-companion-pickup-on-right-click
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 706 ++ / 8 --
+- Notes:
+  Route companion drop pickups through path mover system
+---
+<!-- commit:a536e03f241c462df63f8a3ca2f14c9f77a1dae0 -->
+## 2025-10-25T15:26:42+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0383b9219e97fa8c85bdcf42e627d34989fe863d -->
 ## 2025-10-25T15:26:24+01:00 — Refine companion drop pickup pathing
 
