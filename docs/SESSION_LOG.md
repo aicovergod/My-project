@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:733f82f03cdaeb96cf8695300bcac9f808e5a090 -->
+## 2025-10-25T15:32:32+01:00 — Merge pull request #1403 from aicovergod/codex/fix-inconsistent-accessibility-error-in-grounditempickupmenu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 1 --
+- Notes:
+  Fix accessibility of ground item menu handler
+---
+<!-- commit:6cd2edcdf5265988cb70daf410832288dde1c9b4 -->
+## 2025-10-25T15:32:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:fe05e7cd7eafa6208491f160954dadfdf9b3bf32 -->
 ## 2025-10-25T15:32:04+01:00 — Fix accessibility of ground item menu handler
 
