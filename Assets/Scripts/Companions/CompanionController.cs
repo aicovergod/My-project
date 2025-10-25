@@ -81,13 +81,6 @@ namespace Companions
         private bool followerDisabledByPickup;
         private WaitForFixedUpdate pickupFixedUpdateYield;
 
-        private static readonly string[] CompanionInventoryFullResponses =
-        {
-            "My pack is full, I can't carry that.",
-            "No more space—sort your stash!",
-            "I need to drop something before grabbing that."
-        };
-
         /// <summary>Raised when a skill level changes so the manager can refresh combat level text.</summary>
         public event Action<SkillType, int> SkillLevelChanged;
 
@@ -751,6 +744,7 @@ namespace Companions
             {
                 drop.Despawn();
                 TryPlayPickupAnimation();
+                MaybePostPickupSuccessMessage();
             }
             else
             {
@@ -798,11 +792,43 @@ namespace Companions
         /// </summary>
         private void PostInventoryFullMessage()
         {
-            if (CompanionInventoryFullResponses == null || CompanionInventoryFullResponses.Length == 0)
+            string message = CompanionPickupDialogueLibrary.GetRandomInventoryFullResponse(ResolveActivePlayerName());
+            if (string.IsNullOrEmpty(message))
                 return;
 
-            int index = UnityEngine.Random.Range(0, CompanionInventoryFullResponses.Length);
-            ChatboxUI.PostSystemMessage(CompanionInventoryFullResponses[index]);
+            ChatboxUI.PostSystemMessage(message);
+        }
+
+        /// <summary>
+        /// Attempts to emit a companion bark after a successful pickup with a 1-in-10 chance.
+        /// </summary>
+        private void MaybePostPickupSuccessMessage()
+        {
+            if (!CompanionPickupDialogueLibrary.TryGetPickupSuccessResponse(ResolveActivePlayerName(), out string message))
+                return;
+
+            var chat = ChatService.Instance;
+            if (chat != null)
+            {
+                string companionName = CompanionManager.GetCompanionDisplayName();
+                if (string.IsNullOrWhiteSpace(companionName))
+                    companionName = "Companion";
+
+                chat.PublishCompanionMessage(companionName, message);
+            }
+            else
+            {
+                ChatboxUI.PostSystemMessage(message);
+            }
+        }
+
+        /// <summary>
+        /// Resolves the active player's username for placeholder substitution in chat lines.
+        /// </summary>
+        private static string ResolveActivePlayerName()
+        {
+            var chat = ChatService.Instance;
+            return chat != null ? chat.ActiveUsername : string.Empty;
         }
 
         /// <summary>

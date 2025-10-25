@@ -43,19 +43,6 @@ namespace Inventory.Core
             public GroundItemSpawner GroundItemSpawner;
         }
 
-        /// <summary>
-        ///     Preset companion barks used when their inventory cannot accept additional items.
-        /// </summary>
-        private static readonly string[] CompanionInventoryFullResponses =
-        {
-            "My inventory is full.",
-            "I need room for that.",
-            "I don't have enough room.",
-            "There's not enough space.",
-            "I need more space for that.",
-            "I can't fit that in my inventory."
-        };
-
         private readonly InventoryComponent owner;
         private readonly InventoryModel model;
         private readonly InventoryWindowController controller;
@@ -1260,15 +1247,22 @@ namespace Inventory.Core
         private void PublishCompanionInventoryFullMessage()
         {
             var chat = ChatService.Instance;
-            if (chat == null)
+            string line = CompanionPickupDialogueLibrary.GetRandomInventoryFullResponse(chat != null ? chat.ActiveUsername : string.Empty);
+            if (string.IsNullOrEmpty(line))
                 return;
 
-            string companionName = CompanionManager.GetCompanionDisplayName();
-            string line = CompanionInventoryFullResponses.Length > 0
-                ? CompanionInventoryFullResponses[UnityEngine.Random.Range(0, CompanionInventoryFullResponses.Length)]
-                : "My inventory is full.";
+            if (chat != null)
+            {
+                string companionName = CompanionManager.GetCompanionDisplayName();
+                if (string.IsNullOrWhiteSpace(companionName))
+                    companionName = "Companion";
 
-            chat.PublishCompanionMessage(companionName, line);
+                chat.PublishCompanionMessage(companionName, line);
+            }
+            else
+            {
+                ChatboxUI.PostSystemMessage(line);
+            }
         }
 
         /// <summary>
