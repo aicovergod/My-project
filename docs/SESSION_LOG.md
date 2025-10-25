@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:dfc5b82596d908631124f0ba08acc7675a8e60b3 -->
+## 2025-10-25T20:22:35+01:00 — Add companion woodcutting support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (11): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/CompanionWoodcuttingDialogueLibrary.cs, Assets/Scripts/Companions/CompanionWoodcuttingDialogueLibrary.cs.meta, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs, Assets/Scripts/Companions/Woodcutting.meta, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs.meta, Assets/Scripts/Skills/Woodcutting/Core/AxeDefinitionRegistry.cs, Assets/Scripts/Skills/Woodcutting/Core/AxeDefinitionRegistry.cs.meta
+- Diff: 1975 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:15a49b3979ad1d0ff86b6a24c5f3fe286c66e463 -->
 ## 2025-10-25T18:04:14+01:00 — Merge pull request #1407 from aicovergod/codex/add-inventory-full-messages-for-companions
 
