@@ -99,6 +99,12 @@ namespace Companions
         public bool HasActiveFollowerHold => followerDisableLockCount > 0;
 
         /// <summary>
+        /// True while the woodcutting controller has an active routine or the woodcutting skill reports chopping activity.
+        /// Enables UI surfaces and chat commands to reflect the current action accurately.
+        /// </summary>
+        public bool IsWoodcutting => woodcuttingActive || (woodcuttingSkill != null && woodcuttingSkill.IsChopping);
+
+        /// <summary>
         /// Initialises the woodcutting controller with the owning companion components.
         /// </summary>
         /// <param name="ownerController">Controller that owns this component.</param>

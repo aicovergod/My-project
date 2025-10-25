@@ -1,5 +1,7 @@
 /// Feature: Exposed active companion accessor for pickup service integration.
 using System;
+using System.Collections.Generic;
+using System.Text;
 using BankSystem;
 using Combat;
 using Inventory;
@@ -15,6 +17,27 @@ using Companions.UI;
 
 namespace Companions
 {
+    /// <summary>
+    /// Describes the high-level activity the companion is currently performing so UI and chat logic can react consistently.
+    /// </summary>
+    public enum CompanionActiveAction
+    {
+        /// <summary>No notable action is currently in progress.</summary>
+        None = 0,
+
+        /// <summary>The companion is actively engaged in combat.</summary>
+        Combat = 1,
+
+        /// <summary>The companion is fishing at a nearby spot.</summary>
+        Fishing = 2,
+
+        /// <summary>The companion is mining a rock.</summary>
+        Mining = 3,
+
+        /// <summary>The companion is chopping a tree.</summary>
+        Woodcutting = 4
+    }
+
     /// <summary>
     /// Centralised runtime entry point that spawns, tracks, and coordinates the companion entity.
     /// Responsible for wiring combat/skill integration, guard mode behaviour, and context menu actions.
@@ -97,6 +120,123 @@ namespace Companions
         private const string PlayerAndCompanionInventoryFullGameMessage =
             "your inventory and your companion's inventory are full";
 
+        /// <summary>Global stop commands that should cancel any active companion action when spoken by the player.</summary>
+        private static readonly HashSet<string> GlobalStopCommands = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "stop",
+            "halt",
+            "lets go",
+            "let us go",
+            "let's go",
+            "follow me",
+            "follow me back",
+            "follow me here",
+            "follow",
+            "come",
+            "come now",
+            "come here",
+            "come back",
+            "come on",
+            "come along",
+            "come with me",
+            "return",
+            "return here",
+            "return to me",
+            "rejoin me",
+            "rally"
+        };
+
+        /// <summary>Allowed filler tokens that may follow a recognised command without invalidating the intent.</summary>
+        private static readonly HashSet<string> AllowedCommandSuffixTokens = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "please",
+            "now",
+            "thanks",
+            "thank",
+            "you",
+            "buddy",
+            "pal",
+            "friend",
+            "mate",
+            "chief",
+            "champ",
+            "bro",
+            "bruv"
+        };
+
+        /// <summary>Action-specific stop commands that should only trigger when the companion is performing the mapped activity.</summary>
+        private static readonly Dictionary<CompanionActiveAction, HashSet<string>> ActionSpecificStopCommands =
+            new Dictionary<CompanionActiveAction, HashSet<string>>
+            {
+                {
+                    CompanionActiveAction.Combat,
+                    new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        "stop combat",
+                        "stop the combat",
+                        "stop fighting",
+                        "stop fight",
+                        "stop attacking",
+                        "stop attack",
+                        "cease attack",
+                        "cease fire",
+                        "stand down",
+                        "disengage",
+                        "stop engaging",
+                        "break off",
+                        "fall back"
+                    }
+                },
+                {
+                    CompanionActiveAction.Fishing,
+                    new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        "stop fishing",
+                        "stop the fishing",
+                        "stop fish",
+                        "stop catching",
+                        "stop catching fish",
+                        "stop casting",
+                        "stop angling",
+                        "stop net",
+                        "stop harpoon"
+                    }
+                },
+                {
+                    CompanionActiveAction.Mining,
+                    new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        "stop mining",
+                        "stop the mining",
+                        "stop mine",
+                        "stop smashing rocks",
+                        "stop breaking rocks",
+                        "stop rock",
+                        "stop rocks",
+                        "stop pickaxe",
+                        "stop swinging pickaxe"
+                    }
+                },
+                {
+                    CompanionActiveAction.Woodcutting,
+                    new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        "stop woodcutting",
+                        "stop the woodcutting",
+                        "stop woodcut",
+                        "stop cutting",
+                        "stop cut",
+                        "stop chopping",
+                        "stop chop",
+                        "stop chopping trees",
+                        "stop cutting trees",
+                        "stop logging",
+                        "stop felling",
+                        "stop wc"
+                    }
+                }
+            };
+
         /// <summary>
         /// Toggle that allows QA to enable or disable verbose companion debug logging from the AdminF2 menu.
         /// </summary>
@@ -170,6 +310,96 @@ namespace Companions
         /// <summary>Provides access to the cooldown tracker used for throttling companion skill commands.</summary>
         public static CompanionSkillCooldownTracker CompanionSkillCooldowns =>
             controller != null ? controller.SkillCooldowns : null;
+
+        /// <summary>Resolves the companion's current high-level action so UI and chat logic can react appropriately.</summary>
+        public static CompanionActiveAction GetActiveAction()
+        {
+            if (!HasActiveCompanion || controller == null)
+                return CompanionActiveAction.None;
+
+            if (controller.IsInCombat)
+                return CompanionActiveAction.Combat;
+
+            var fishing = controller.FishingController;
+            if (fishing != null && fishing.IsFishing)
+                return CompanionActiveAction.Fishing;
+
+            var mining = controller.MiningController;
+            if (mining != null && mining.IsMining)
+                return CompanionActiveAction.Mining;
+
+            var woodcutting = controller.WoodcuttingController;
+            if (woodcutting != null && woodcutting.IsWoodcutting)
+                return CompanionActiveAction.Woodcutting;
+
+            return CompanionActiveAction.None;
+        }
+
+        /// <summary>True while the companion is performing any cancellable action.</summary>
+        public static bool HasActiveAction => GetActiveAction() != CompanionActiveAction.None;
+
+        /// <summary>Returns a player-facing label describing the current companion action.</summary>
+        public static string GetActiveActionDisplayName() => GetActiveActionDisplayName(GetActiveAction());
+
+        /// <summary>Translates an action enum value into a human-readable description.</summary>
+        public static string GetActiveActionDisplayName(CompanionActiveAction action)
+        {
+            return action switch
+            {
+                CompanionActiveAction.Combat => "Combat",
+                CompanionActiveAction.Fishing => "Fishing",
+                CompanionActiveAction.Mining => "Mining",
+                CompanionActiveAction.Woodcutting => "Chopping",
+                _ => "Idle"
+            };
+        }
+
+        /// <summary>Returns the label that should be displayed on stop buttons for the current action.</summary>
+        public static string GetStopActionLabel() => GetStopActionLabel(GetActiveAction());
+
+        /// <summary>Returns the label that should be displayed on stop buttons for the supplied action.</summary>
+        public static string GetStopActionLabel(CompanionActiveAction action)
+        {
+            return action switch
+            {
+                CompanionActiveAction.Combat => "Stop Combat",
+                CompanionActiveAction.Fishing => "Stop Fishing",
+                CompanionActiveAction.Mining => "Stop Mining",
+                CompanionActiveAction.Woodcutting => "Stop Chopping",
+                _ => "Stop"
+            };
+        }
+
+        /// <summary>Attempts to cancel whichever action the companion is currently performing.</summary>
+        public static bool TryCancelCurrentAction()
+        {
+            var action = GetActiveAction();
+            if (action == CompanionActiveAction.None)
+                return false;
+
+            switch (action)
+            {
+                case CompanionActiveAction.Combat:
+                    controller?.CancelActiveCombat();
+                    break;
+                case CompanionActiveAction.Fishing:
+                    controller?.FishingController?.CancelFishing(true);
+                    break;
+                case CompanionActiveAction.Mining:
+                    controller?.MiningController?.CancelMining(true);
+                    break;
+                case CompanionActiveAction.Woodcutting:
+                    controller?.WoodcuttingController?.CancelWoodcutting(true);
+                    break;
+                default:
+                    return false;
+            }
+
+            if (EnableDebugLogging)
+                Debug.Log($"[Companion] Cancelled active {action} action via stop request.");
+
+            return true;
+        }
 
         /// <summary>Ensures the companion spawns after each scene load so it persists across gameplay sessions.</summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -1594,9 +1824,29 @@ namespace Companions
         /// <param name="message">Chat message emitted by the game channel.</param>
         private static void HandleChatMessageReceived(ChatMessage message)
         {
-            if (message.Channel != ChatChannel.Game)
+            if (message == null)
                 return;
 
+            if (message.Channel == ChatChannel.Game)
+            {
+                HandleGameChatMessage(message);
+                return;
+            }
+
+            if (!message.IsLocalPlayerAuthor)
+                return;
+
+            if (message.Channel != ChatChannel.Companion && message.Channel != ChatChannel.Public)
+                return;
+
+            TryHandleStopChatCommand(message.Text);
+        }
+
+        /// <summary>
+        /// Processes game-channel messages so the companion can acknowledge shared inventory events.
+        /// </summary>
+        private static void HandleGameChatMessage(ChatMessage message)
+        {
             if (!HasActiveCompanion)
                 return;
 
@@ -1638,6 +1888,142 @@ namespace Companions
                 string context = combinedInventoryFull ? "(player+companion)" : "(player)";
                 Debug.Log($"[Companion] Reacted to full inventory message {context} with: {companionLine}");
             }
+        }
+
+        /// <summary>
+        /// Evaluates local-player chat to determine whether a stop command should cancel the active companion action.
+        /// </summary>
+        private static void TryHandleStopChatCommand(string rawText)
+        {
+            if (string.IsNullOrWhiteSpace(rawText))
+                return;
+
+            if (!HasActiveCompanion)
+                return;
+
+            var action = GetActiveAction();
+            if (action == CompanionActiveAction.None)
+                return;
+
+            string normalised = NormaliseStopCommand(rawText);
+            if (string.IsNullOrEmpty(normalised))
+                return;
+
+            bool matched = false;
+
+            if (ActionSpecificStopCommands.TryGetValue(action, out var specificCommands) &&
+                CommandMatches(normalised, specificCommands))
+            {
+                matched = true;
+            }
+            else if (CommandMatches(normalised, GlobalStopCommands))
+            {
+                matched = true;
+            }
+
+            if (!matched)
+                return;
+
+            if (!TryCancelCurrentAction())
+                return;
+
+            if (enableDebugLogging)
+                Debug.Log($"[Companion] Stop command '{normalised}' cancelled active {action}.");
+        }
+
+        /// <summary>
+        /// Normalises a free-form chat command by removing punctuation, collapsing whitespace, and lower-casing the content.
+        /// </summary>
+        private static string NormaliseStopCommand(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            var builder = new StringBuilder(value.Length);
+            bool previousWasSpace = false;
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                char c = value[i];
+
+                if (c == '\'' || c == '’')
+                    continue;
+
+                if (char.IsLetterOrDigit(c))
+                {
+                    builder.Append(char.ToLowerInvariant(c));
+                    previousWasSpace = false;
+                }
+                else if (char.IsWhiteSpace(c))
+                {
+                    if (!previousWasSpace && builder.Length > 0)
+                    {
+                        builder.Append(' ');
+                        previousWasSpace = true;
+                    }
+                }
+                else
+                {
+                    if (!previousWasSpace && builder.Length > 0)
+                    {
+                        builder.Append(' ');
+                        previousWasSpace = true;
+                    }
+                }
+            }
+
+            return builder.ToString().Trim();
+        }
+
+        /// <summary>
+        /// Determines whether the normalised command matches any entry in the supplied set, allowing polite suffixes.
+        /// </summary>
+        private static bool CommandMatches(string normalised, HashSet<string> commands)
+        {
+            if (commands == null || commands.Count == 0 || string.IsNullOrEmpty(normalised))
+                return false;
+
+            if (commands.Contains(normalised))
+                return true;
+
+            foreach (var command in commands)
+            {
+                if (!normalised.StartsWith(command, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                if (normalised.Length == command.Length)
+                    return true;
+
+                if (normalised[command.Length] != ' ')
+                    continue;
+
+                string suffix = normalised.Substring(command.Length + 1);
+                if (IsAllowedSuffix(suffix))
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Validates whether the suffix following a command only contains friendly filler tokens ("please", "now", etc.).
+        /// </summary>
+        private static bool IsAllowedSuffix(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return true;
+
+            var tokens = value.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length == 0)
+                return true;
+
+            for (int i = 0; i < tokens.Length; i++)
+            {
+                if (!AllowedCommandSuffixTokens.Contains(tokens[i]))
+                    return false;
+            }
+
+            return true;
         }
 
         /// <summary>

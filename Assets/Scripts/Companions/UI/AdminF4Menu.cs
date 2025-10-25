@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using World;
 using Player.Ranks;
+using Companions;
 using Companions.Conversation;
 
 namespace Companions.UI
@@ -17,6 +18,7 @@ namespace Companions.UI
 
         private Rect windowRect = new Rect(10f, 10f, 320f, 220f);
         private bool visible;
+        private Vector2 scrollPosition;
 
         /// <summary>Indicates whether the F4 admin menu is currently visible.</summary>
         public static bool IsVisible => Instance != null && Instance.visible;
@@ -58,6 +60,8 @@ namespace Companions.UI
 
         private void DrawWindowContents(int windowId)
         {
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUIStyle.none, GUI.skin.verticalScrollbar);
+
             GUILayout.Label("Companion debugging shortcuts");
 
             if (CompanionManager.CompanionSkillCooldowns == null)
@@ -71,6 +75,15 @@ namespace Companions.UI
 
                 visible = false;
             }
+
+            GUILayout.Space(6f);
+            GUILayout.Label("Active companion status");
+            GUILayout.Label($"Has active companion: {CompanionManager.HasActiveCompanion}");
+
+            var activeAction = CompanionManager.GetActiveAction();
+            GUILayout.Label($"Current action: {CompanionManager.GetActiveActionDisplayName(activeAction)}");
+            if (CompanionManager.HasActiveAction)
+                GUILayout.Label($"Stop button label: {CompanionManager.GetStopActionLabel(activeAction)}");
 
             GUILayout.Space(6f);
             GUILayout.Label("Suggestion prompt state");
@@ -95,6 +108,8 @@ namespace Companions.UI
 
             GUILayout.Space(6f);
             GUILayout.Label("Press F4 again to close this menu.");
+
+            GUILayout.EndScrollView();
 
             GUI.DragWindow(new Rect(0f, 0f, windowRect.width, 24f));
         }

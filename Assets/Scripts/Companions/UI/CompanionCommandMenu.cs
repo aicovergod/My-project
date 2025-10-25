@@ -25,6 +25,8 @@ namespace Companions.UI
         private RectTransform canvasRect;
         private GameObject menuRoot;
 
+        private Button stopButton;
+        private Text stopButtonText;
         private Button mineButton;
         private Button chopButton;
         private Button fishButton;
@@ -48,6 +50,7 @@ namespace Companions.UI
                 return;
 
             instance.PositionBeside(anchor);
+            instance.RefreshStopButton();
             instance.menuRoot.SetActive(true);
         }
 
@@ -139,12 +142,18 @@ namespace Companions.UI
             if (!menuRoot.activeSelf)
                 return;
 
+            RefreshStopButton();
+
             if (Input.GetMouseButtonDown(0) && !ContainsScreenPoint(Input.mousePosition))
                 InternalHide();
         }
 
         private void ConfigureButtons(Transform parent)
         {
+            stopButton = CreateButton(parent, "Stop");
+            stopButtonText = stopButton.GetComponentInChildren<Text>();
+            stopButton.onClick.AddListener(OnStopActionClicked);
+
             mineButton = CreateButton(parent, "Mine Rocks");
             mineButton.onClick.AddListener(OnMineRocksClicked);
 
@@ -206,6 +215,31 @@ namespace Companions.UI
             localPoint.x += halfWidth + HorizontalPadding;
 
             rectTransform.anchoredPosition = localPoint;
+        }
+
+        private void RefreshStopButton()
+        {
+            if (stopButton == null)
+                return;
+
+            bool show = CompanionManager.HasActiveAction;
+            stopButton.gameObject.SetActive(show);
+            stopButton.interactable = show;
+
+            if (!show || stopButtonText == null)
+                return;
+
+            stopButtonText.text = CompanionManager.GetStopActionLabel();
+        }
+
+        private void OnStopActionClicked()
+        {
+            bool cancelled = CompanionManager.TryCancelCurrentAction();
+
+            if (CompanionManager.EnableDebugLogging)
+                Debug.Log($"[Companion UI] Stop command invoked. Cancelled={cancelled}.");
+
+            CloseAllMenus();
         }
 
         private void OnMineRocksClicked()
