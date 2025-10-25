@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:62749ba21dbee76cf1eedfc89d82f26e6f20a621 -->
+## 2025-10-25T15:41:26+01:00 — Keep companion upright during pickup sequences
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionController.cs
+- Diff: 3 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:733f82f03cdaeb96cf8695300bcac9f808e5a090 -->
 ## 2025-10-25T15:32:32+01:00 — Merge pull request #1403 from aicovergod/codex/fix-inconsistent-accessibility-error-in-grounditempickupmenu
 
