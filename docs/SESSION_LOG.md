@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c95553e89a3e839574e109c6ffbb163636fa02e5 -->
+## 2025-10-25T12:03:13+01:00 — Merge pull request #1392 from aicovergod/codex/add-layoutelement-to-inventory-context-menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 8 ++ / 0 --
+- Notes:
+  Ensure inventory context menu options size correctly
+---
+<!-- commit:e51367ce3ab8daf2bcca054603082fd27e631c79 -->
+## 2025-10-25T12:02:59+01:00 — Ensure inventory context menu options size correctly
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/UI/InventoryItemContextMenu.cs
+- Diff: 8 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:63e2e2fb2e36276fa3b51fee44caf8884fd76ecb -->
 ## 2025-10-25T11:50:39+01:00 — Merge pull request #1391 from aicovergod/codex/implement-full-featured-inventory-context-menu
 
