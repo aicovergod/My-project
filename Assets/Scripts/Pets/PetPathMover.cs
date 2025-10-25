@@ -233,10 +233,7 @@ namespace Pets
                 RequestPath(currentPosition, anchor, Mode.Follow);
             }
 
-            if (awaitingPath)
-            {
-                return false;
-            }
+            bool awaitingWithDestination = awaitingPath && hasResolvedDestination;
 
             if (hasResolvedDestination)
             {
@@ -246,6 +243,17 @@ namespace Pets
                     ClearPathData();
                     return false;
                 }
+            }
+
+            if (awaitingWithDestination)
+            {
+                // Continue advancing toward the last known destination while a refreshed path is in-flight.
+                return StepToward(resolvedDestination, currentPosition, moveSpeed, deltaTime, out nextPosition, out velocity, waypointTolerance, anchor);
+            }
+
+            if (awaitingPath)
+            {
+                return false;
             }
 
             if (waypointQueue.Count == 0)
@@ -379,10 +387,7 @@ namespace Pets
                 RequestPath(currentPosition, target, Mode.Attack);
             }
 
-            if (awaitingPath)
-            {
-                return false;
-            }
+            bool awaitingWithDestination = awaitingPath && hasResolvedDestination;
 
             if (hasResolvedDestination)
             {
@@ -392,6 +397,17 @@ namespace Pets
                     ClearPathData();
                     return false;
                 }
+            }
+
+            if (awaitingWithDestination)
+            {
+                // Continue pursuing the previous destination while the new path request is pending.
+                return StepToward(resolvedDestination, currentPosition, moveSpeed, deltaTime, out nextPosition, out velocity, waypointTolerance, target);
+            }
+
+            if (awaitingPath)
+            {
+                return false;
             }
 
             if (waypointQueue.Count == 0)
@@ -470,10 +486,7 @@ namespace Pets
                 RequestPath(currentPosition, target, Mode.Wander);
             }
 
-            if (awaitingPath)
-            {
-                return false;
-            }
+            bool awaitingWithDestination = awaitingPath && hasResolvedDestination;
 
             if (hasResolvedDestination)
             {
@@ -483,6 +496,17 @@ namespace Pets
                     ClearPathData();
                     return false;
                 }
+            }
+
+            if (awaitingWithDestination)
+            {
+                // Keep drifting toward the last resolved wander destination while awaiting the refreshed path.
+                return StepToward(resolvedDestination, currentPosition, moveSpeed, deltaTime, out nextPosition, out velocity, waypointTolerance, target);
+            }
+
+            if (awaitingPath)
+            {
+                return false;
             }
 
             if (waypointQueue.Count == 0)
