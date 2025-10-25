@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8df15e5dfd7d60eaf0984844fdcba961b9a3a4d0 -->
+## 2025-10-25T14:42:19+01:00 — Fix duplicate companion name in equipment requirement chat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionEquipment.cs
+- Diff: 2 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:a01b0e892fe6ed44484bf49dc1685f27fad02deb -->
 ## 2025-10-25T14:33:06+01:00 — Merge pull request #1399 from aicovergod/codex/update-pet-movement-during-path-replans
 
