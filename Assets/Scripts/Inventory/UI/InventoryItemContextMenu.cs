@@ -200,6 +200,14 @@ namespace Inventory.UI
             image.color = new Color(0f, 0f, 0f, 0f);
             image.raycastTarget = true;
 
+            // Ensure the layout group can determine the correct sizing for each option entry.
+            var layoutElement = buttonGo.AddComponent<LayoutElement>();
+            layoutElement.preferredWidth = 140f;
+            layoutElement.minWidth = 140f;
+            layoutElement.flexibleWidth = 1f;
+            layoutElement.preferredHeight = 26f;
+            layoutElement.minHeight = 26f;
+
             var button = buttonGo.GetComponent<Button>();
 
             var textGo = new GameObject("Label", typeof(Text));
