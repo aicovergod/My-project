@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:79e69a3e22d8f86024a4701012e65bdabb229d0e -->
+## 2025-10-25T10:48:57+01:00 — Merge pull request #1387 from aicovergod/codex/add-helper-for-ranged-combat-controller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 21 ++ / 0 --
+- Notes:
+  Ensure pet ranged combat controller is resolved
+---
+<!-- commit:6c1d358991e2ee6f189bf6c3fe19033aed77a254 -->
+## 2025-10-25T10:48:49+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:153e3f4af6f656ddb85ffa82f42e41d13eb4705b -->
 ## 2025-10-25T10:48:29+01:00 — Ensure pet ranged combat controller is resolved
 
