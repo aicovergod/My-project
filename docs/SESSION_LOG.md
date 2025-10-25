@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0f69ed484fe8224c0d7f7beb74c6725193a11526 -->
+## 2025-10-25T10:18:40+01:00 — Merge pull request #1386 from aicovergod/codex/enhance-equipment-load-with-change-detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 17 ++ / 0 --
+- Notes:
+  Ensure companion equipment load raises weapon change event
+---
+<!-- commit:478ac3035cb86e56ab578d6e1a73a9aac096834e -->
+## 2025-10-25T10:18:29+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0e94c14ba7e6fad16ea575d45d925161714d4f4a -->
 ## 2025-10-25T10:18:10+01:00 — Ensure companion equipment load raises weapon change event
 
