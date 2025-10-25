@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:cce0a93ecfcfa3efb064700243d79fa6f7c728bd -->
+## 2025-10-25T14:49:45+01:00 — Merge pull request #1401 from aicovergod/codex/fix-bug-in-codex-github
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 23 ++ / 1 --
+- Notes:
+  Fix companion mining stuck detection
+---
+<!-- commit:bb100544f2962e77c4d175f96a675ee15bd4013a -->
+## 2025-10-25T14:49:36+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ab99c35c470575b3d77b0da4ed2cea77efebe417 -->
 ## 2025-10-25T14:49:19+01:00 — Fix companion mining stuck detection
 
