@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d30e32ba58e3d4261ee2e99ee22f3a81ec358836 -->
+## 2025-10-26T00:57:01+01:00 — Add companion apology handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Conversation/CompanionApologyDialogueLibrary.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 191 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:092c073931b550119d3a852737f25b08df565b71 -->
 ## 2025-10-26T00:34:55+01:00 — namespace bug fix
 
