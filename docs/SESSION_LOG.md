@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:73677534f1a4d51dccd89dbae3838ba51b152f4e -->
+## 2025-10-25T16:07:06+01:00 — Improve companion pickup progress detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionController.cs
+- Diff: 41 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:47b4f8c1e28897127662ac7910f244e5f3454937 -->
 ## 2025-10-25T15:50:20+01:00 — Merge pull request #1405 from aicovergod/codex/fix-companion-navigation-path-for-pickups
 
