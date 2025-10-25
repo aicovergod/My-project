@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Skills.Common;
+using Companions;
 using Inventory;
 
 namespace Skills.Woodcutting
@@ -31,6 +33,11 @@ namespace Skills.Woodcutting
             if (axeSelector == null)
                 axeSelector = GetComponent<AxeToUse>();
         }
+
+        /// <summary>
+        /// Enables shift-right click handling so the companion can be instructed to chop trees.
+        /// </summary>
+        protected override bool SupportsProspecting => true;
 
         /// <inheritdoc />
         protected override bool IsPerformingAction => WoodcuttingSkill != null && WoodcuttingSkill.IsChopping;
@@ -149,6 +156,32 @@ namespace Skills.Woodcutting
 
             WoodcuttingSkill.StartChopping(node, cachedAxe);
             return WoodcuttingSkill.IsChopping;
+        }
+
+        /// <summary>
+        /// Detects shift-right clicks and forwards them to the companion manager so the follower can chop the
+        /// requested tree, mirroring the mining right click behaviour. Falls back to no-op when shift is not held.
+        /// </summary>
+        /// <param name="node">Tree node that should be assigned to the companion.</param>
+        protected override void Prospect(TreeNode node)
+        {
+            if (node == null)
+                return;
+
+            bool shiftHeld = false;
+            var keyboard = Keyboard.current;
+            if (keyboard != null)
+            {
+                shiftHeld = (keyboard.leftShiftKey != null && keyboard.leftShiftKey.isPressed)
+                    || (keyboard.rightShiftKey != null && keyboard.rightShiftKey.isPressed);
+            }
+            else
+            {
+                shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            }
+
+            if (shiftHeld)
+                CompanionManager.TryCommandChop(node);
         }
     }
 }
