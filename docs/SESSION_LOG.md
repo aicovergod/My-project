@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:bd9303815bf7969093f9a5790c0f2bc25baa132a -->
+## 2025-10-25T21:23:21+01:00 — Add companion fishing controller and integrate fishing commands
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (12): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionFishingDialogueLibrary.cs, Assets/Scripts/Companions/CompanionFishingDialogueLibrary.cs.meta, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Fishing.meta, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs.meta, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs, Assets/Scripts/Skills/Fishing/Core/FishingToolDefinitionRegistry.cs, Assets/Scripts/Skills/Fishing/Core/FishingToolDefinitionRegistry.cs.meta
+- Diff: 1994 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:6837882b4f68db81c7247248c91d22dccc05a577 -->
 ## 2025-10-25T20:23:08+01:00 — Merge pull request #1408 from aicovergod/codex/implement-woodcutting-companion-features
 
