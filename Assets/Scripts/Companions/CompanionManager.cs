@@ -895,6 +895,8 @@ namespace Companions
                 if (EnableDebugLogging)
                     Debug.Log("[Companion] Deposit aborted because no bank anchors are within range.");
 
+                PublishRandomBankOutOfRangeMessage();
+
                 var chat = ChatService.Instance;
                 chat?.PublishGameMessage("There are no banks close by");
                 return false;
@@ -980,6 +982,23 @@ namespace Companions
                 return;
 
             string message = CompanionChatLibrary.GetRandomEmptyBankInventoryLine();
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
+        }
+
+        /// <summary>
+        /// Emits a random reminder when the companion cannot deposit items because no banks are nearby.
+        /// Keeps flavour consistent with the right-click and pet level bar bank interactions.
+        /// </summary>
+        private static void PublishRandomBankOutOfRangeMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string message = CompanionChatLibrary.GetRandomBankOutOfRangeLine();
             if (string.IsNullOrWhiteSpace(message))
                 return;
 

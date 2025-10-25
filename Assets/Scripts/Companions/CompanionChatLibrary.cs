@@ -5077,6 +5077,22 @@ namespace Companions
         /// <summary>Fallback message returned when the bank deposit pool cannot supply a line.</summary>
         private const string BankDepositFallbackLine = "I've just deposited it all in the bank.";
 
+        /// <summary>Pool of responses when the companion is asked to bank items while out of range.</summary>
+        private static readonly string[] BankOutOfRangeChatMessages =
+        {
+            "I need to be closer to a bank.",
+            "My magic powers, cannot reach from here.",
+            "My powers can't reach the bank from here.",
+            "We need to move closer, for me to do that.",
+            "I need to get closer, to the bank.",
+            "Let's try moving closer, to do that.",
+            "I'm unable to reach from here.",
+            "That's out of reach at the moment."
+        };
+
+        /// <summary>Fallback message used when no bank out-of-range lines can be selected.</summary>
+        private const string BankOutOfRangeFallbackLine = "I need to be closer to a bank.";
+
         /// <summary>Pool of snarky responses when the companion is asked to bank an empty inventory.</summary>
         private static readonly string[] BankDepositEmptyInventoryMessages =
         {
@@ -5620,6 +5636,14 @@ namespace Companions
         public static string GetRandomEmptyBankInventoryLine()
         {
             return GetRandomLine(BankDepositEmptyInventoryMessages, BankDepositEmptyInventoryFallbackLine);
+        }
+
+        /// <summary>
+        /// Returns a random companion chat line when a bank deposit is requested but no bank is within range.
+        /// </summary>
+        public static string GetRandomBankOutOfRangeLine()
+        {
+            return GetRandomLine(BankOutOfRangeChatMessages, BankOutOfRangeFallbackLine);
         }
 
         /// <summary>
