@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a01b0e892fe6ed44484bf49dc1685f27fad02deb -->
+## 2025-10-25T14:33:06+01:00 — Merge pull request #1399 from aicovergod/codex/update-pet-movement-during-path-replans
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 45 ++ / 12 --
+- Notes:
+  Keep pets moving while awaiting replans
+---
+<!-- commit:6eef792798c99d134cde8cbdaeff9ff2752f3b9c -->
+## 2025-10-25T14:32:04+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f2f2c92e40e51d3c203750b3042a215891f1049a -->
 ## 2025-10-25T14:31:47+01:00 — Keep pets moving while awaiting replans
 
