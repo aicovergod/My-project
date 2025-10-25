@@ -152,7 +152,7 @@ namespace Companions.UI
             chopButton.onClick.AddListener(OnChopTreesClicked);
 
             fishButton = CreateButton(parent, "Go Fishing");
-            fishButton.onClick.AddListener(() => OnPlaceholderClicked("I can't do that yet"));
+            fishButton.onClick.AddListener(OnGoFishingClicked);
         }
 
         private Button CreateButton(Transform parent, string label)
@@ -252,6 +252,35 @@ namespace Companions.UI
             CloseAllMenus();
         }
 
+        private void OnGoFishingClicked()
+        {
+            Debug.Log("[Companion UI] Go Fishing button clicked.");
+            bool accepted = CompanionManager.TryCommandFishNearby(out var failureReason);
+            Debug.Log($"[Companion UI] Go Fishing command result: success={accepted}, failureReason={failureReason}.");
+            if (!accepted)
+            {
+                if (!CompanionManager.HasActiveCompanion)
+                {
+                    PublishPlaceholderMessage("You need to summon me before I can go fishing.");
+                }
+                else if (ShouldPublishFishingFallback(failureReason))
+                {
+                    switch (failureReason)
+                    {
+                        case CompanionFishingCommandResult.RequirementsNotMet:
+                        case CompanionFishingCommandResult.Unreachable:
+                            PublishPlaceholderMessage(CompanionFishingDialogueLibrary.GetRandomNoSpotsLine());
+                            break;
+                        default:
+                            PublishPlaceholderMessage("I can't find a good fishing spot right now.");
+                            break;
+                    }
+                }
+            }
+
+            CloseAllMenus();
+        }
+
         private bool ShouldPublishFallbackForFailure(CompanionMiningCommandResult failureReason)
         {
             switch (failureReason)
@@ -279,6 +308,23 @@ namespace Companions.UI
                 case CompanionWoodcuttingCommandResult.RequirementsNotMet:
                 case CompanionWoodcuttingCommandResult.Declined:
                 case CompanionWoodcuttingCommandResult.AlreadyChopping:
+                    return false;
+                default:
+                    return true;
+            }
+        }
+
+        private bool ShouldPublishFishingFallback(CompanionFishingCommandResult failureReason)
+        {
+            switch (failureReason)
+            {
+                case CompanionFishingCommandResult.InventoryFull:
+                case CompanionFishingCommandResult.NoTool:
+                case CompanionFishingCommandResult.NoBait:
+                case CompanionFishingCommandResult.BlockedByPlayer:
+                case CompanionFishingCommandResult.RequirementsNotMet:
+                case CompanionFishingCommandResult.Declined:
+                case CompanionFishingCommandResult.AlreadyFishing:
                     return false;
                 default:
                     return true;

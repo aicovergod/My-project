@@ -35,6 +35,9 @@ namespace Companions
         /// <summary>Controller that manages mining-specific behaviour for the companion.</summary>
         private CompanionMiningController miningController;
 
+        /// <summary>Controller that manages fishing-specific behaviour for the companion.</summary>
+        private CompanionFishingController fishingController;
+
         /// <summary>Controller that manages woodcutting-specific behaviour for the companion.</summary>
         [SerializeField]
         private CompanionWoodcuttingController woodcuttingController;
@@ -106,6 +109,9 @@ namespace Companions
         /// <summary>Exposes the mining controller responsible for companion gathering commands.</summary>
         public CompanionMiningController MiningController => miningController;
 
+        /// <summary>Exposes the fishing controller responsible for companion gathering commands.</summary>
+        public CompanionFishingController FishingController => fishingController;
+
         /// <summary>Exposes the woodcutting controller responsible for companion gathering commands.</summary>
         public CompanionWoodcuttingController WoodcuttingController => woodcuttingController;
 
@@ -145,6 +151,7 @@ namespace Companions
             ConfigureInventory(player);
             ConfigureEquipment();
             ConfigureMining(player);
+            ConfigureFishing(player);
             ConfigureWoodcutting(player);
             ConfigureCombat();
             combatController?.BindCompanionController(this);
@@ -167,6 +174,9 @@ namespace Companions
 
             if (miningController != null)
                 miningController.RebindPlayer(player);
+
+            if (fishingController != null)
+                fishingController.RebindPlayer(player);
 
             if (woodcuttingController != null)
                 woodcuttingController.RebindPlayer(player);
@@ -398,6 +408,16 @@ namespace Companions
             if (miningController == null)
                 miningController = gameObject.AddComponent<CompanionMiningController>();
             miningController.Initialise(this, skillManager, companionInventory, player, skillCooldownTracker);
+        }
+
+        private void ConfigureFishing(Transform player)
+        {
+            fishingController = fishingController != null
+                ? fishingController
+                : GetComponent<CompanionFishingController>();
+            if (fishingController == null)
+                fishingController = gameObject.AddComponent<CompanionFishingController>();
+            fishingController.Initialise(this, skillManager, companionInventory, player, skillCooldownTracker);
         }
 
         private void ConfigureWoodcutting(Transform player)

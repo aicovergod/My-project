@@ -1876,6 +1876,9 @@ namespace Companions.Conversation
             if (analysis.Skill == SkillType.Mining)
                 CompanionSkillCooldownTimers.StartMiningCooldown(CompanionManager.CompanionSkillCooldowns);
 
+            if (analysis.Skill == SkillType.Fishing)
+                CompanionSkillCooldownTimers.StartFishingCooldown(CompanionManager.CompanionSkillCooldowns);
+
             if (declinedCombat)
             {
                 CompanionSkillCooldownTimers.StartCombatDeclineCooldown(

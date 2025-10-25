@@ -1,21 +1,12 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:c6869c4aee557bcb13cc0e85b04d740b3ea06f34 -->
-## 2025-10-25T20:37:48+01:00 — Merge pull request #1409 from aicovergod/codex/fix-configurecompanionchat-method-error
+<!-- commit:bd9303815bf7969093f9a5790c0f2bc25baa132a -->
+## 2025-10-25T21:23:21+01:00 — Add companion fishing controller and integrate fishing commands
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 16 ++ / 0 --
-- Notes:
-  Fix woodcutting companion chat configuration
----
-<!-- commit:43492bbde6d4881dae898ce1172ba1f42631f67f -->
-## 2025-10-25T20:37:36+01:00 — Fix companion chat hook for woodcutting skill
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (1): Assets/Scripts/Skills/Woodcutting/Core/WoodcuttingSkill.cs
-- Diff: 16 ++ / 0 --
+- Changed files (12): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionFishingDialogueLibrary.cs, Assets/Scripts/Companions/CompanionFishingDialogueLibrary.cs.meta, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Fishing.meta, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs.meta, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs, Assets/Scripts/Skills/Fishing/Core/FishingToolDefinitionRegistry.cs, Assets/Scripts/Skills/Fishing/Core/FishingToolDefinitionRegistry.cs.meta
+- Diff: 1994 ++ / 1 --
 - Notes:
   —
 ---
