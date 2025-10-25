@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:49e491565d7938c5c38f8e2e6c4f81510d1f96ab -->
+## 2025-10-25T11:11:55+01:00 — Implement speech colour prefixes for player chat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Player/Chat/PlayerChatController.cs
+- Diff: 59 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:91a438be999d4df436829032286a297134ed48f0 -->
 ## 2025-10-25T11:01:39+01:00 — Merge pull request #1389 from aicovergod/codex/add-random-bank-proximity-messages
 
