@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:35b86a36b34afdf1245dc941057a06b2408c6783 -->
+## 2025-10-25T10:58:04+01:00 — Merge pull request #1388 from aicovergod/codex/add-random-messages-for-empty-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 73 ++ / 0 --
+- Notes:
+  feat: add companion banter when banking empty inventory
+---
+<!-- commit:853def1961a9ddf26c84beb0ee1e42687fdabfd3 -->
+## 2025-10-25T10:57:44+01:00 — feat: add companion banter when banking empty inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 73 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:79e69a3e22d8f86024a4701012e65bdabb229d0e -->
 ## 2025-10-25T10:48:57+01:00 — Merge pull request #1387 from aicovergod/codex/add-helper-for-ranged-combat-controller
 
