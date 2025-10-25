@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a0caf4f5ef800899b99137eb8ab09d86b6d0af33 -->
+## 2025-10-25T16:13:20+01:00 — Merge pull request #1406 from aicovergod/codex/extend-pickuproutine-and-update-stuck-timeout-branch
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 50 ++ / 8 --
+- Notes:
+  Improve companion pickup progress detection
+---
+<!-- commit:b8e75a6bc020778f14461f2104335c24a4fb5e3c -->
+## 2025-10-25T16:07:25+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:73677534f1a4d51dccd89dbae3838ba51b152f4e -->
 ## 2025-10-25T16:07:06+01:00 — Improve companion pickup progress detection
 
