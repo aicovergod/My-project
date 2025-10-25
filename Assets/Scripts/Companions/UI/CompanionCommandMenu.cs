@@ -149,7 +149,7 @@ namespace Companions.UI
             mineButton.onClick.AddListener(OnMineRocksClicked);
 
             chopButton = CreateButton(parent, "Chop Trees");
-            chopButton.onClick.AddListener(() => OnPlaceholderClicked("I can't do that yet"));
+            chopButton.onClick.AddListener(OnChopTreesClicked);
 
             fishButton = CreateButton(parent, "Go Fishing");
             fishButton.onClick.AddListener(() => OnPlaceholderClicked("I can't do that yet"));
@@ -232,6 +232,26 @@ namespace Companions.UI
             CloseAllMenus();
         }
 
+        private void OnChopTreesClicked()
+        {
+            Debug.Log("[Companion UI] Chop Trees button clicked.");
+            bool accepted = CompanionManager.TryCommandChopNearby(out var failureReason);
+            Debug.Log($"[Companion UI] Chop Trees command result: success={accepted}, failureReason={failureReason}.");
+            if (!accepted)
+            {
+                if (!CompanionManager.HasActiveCompanion)
+                {
+                    PublishPlaceholderMessage("You need to summon me before I can start chopping.");
+                }
+                else if (ShouldPublishWoodcuttingFallback(failureReason))
+                {
+                    PublishPlaceholderMessage(CompanionWoodcuttingDialogueLibrary.GetRandomNoTreesLine());
+                }
+            }
+
+            CloseAllMenus();
+        }
+
         private bool ShouldPublishFallbackForFailure(CompanionMiningCommandResult failureReason)
         {
             switch (failureReason)
@@ -243,6 +263,22 @@ namespace Companions.UI
                 case CompanionMiningCommandResult.Unreachable:
                 case CompanionMiningCommandResult.Declined:
                     // The mining controller publishes its own descriptive chat lines for these cases.
+                    return false;
+                default:
+                    return true;
+            }
+        }
+
+        private bool ShouldPublishWoodcuttingFallback(CompanionWoodcuttingCommandResult failureReason)
+        {
+            switch (failureReason)
+            {
+                case CompanionWoodcuttingCommandResult.InventoryFull:
+                case CompanionWoodcuttingCommandResult.NoAxe:
+                case CompanionWoodcuttingCommandResult.BlockedByPlayer:
+                case CompanionWoodcuttingCommandResult.RequirementsNotMet:
+                case CompanionWoodcuttingCommandResult.Declined:
+                case CompanionWoodcuttingCommandResult.AlreadyChopping:
                     return false;
                 default:
                     return true;
