@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f15fc92a7e3aeb0fda545ecdbf1e1ec242e64f59 -->
+## 2025-10-25T11:12:21+01:00 — Merge pull request #1390 from aicovergod/codex/implement-player-speech-color-prefixes
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 68 ++ / 5 --
+- Notes:
+  Add player speech colour prefix handling
+---
+<!-- commit:eee32ca5ae869c6dcf2950c94698794d5cb31a3e -->
+## 2025-10-25T11:12:13+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:49e491565d7938c5c38f8e2e6c4f81510d1f96ab -->
 ## 2025-10-25T11:11:55+01:00 — Implement speech colour prefixes for player chat
 
