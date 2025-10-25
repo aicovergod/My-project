@@ -541,6 +541,20 @@ namespace Inventory.Core
                     true));
                 hasInteractable = true;
 
+                bool companionInventoryVisible = CompanionManager.IsInventoryVisible();
+                var companionInventoryWrapper = CompanionManager.CompanionInventory;
+                var companionInventoryComponent = companionInventoryWrapper?.InventoryComponent;
+                if (companionInventoryVisible &&
+                    companionInventoryComponent != null &&
+                    companionInventoryComponent.CanAddItem(entry.item, entry.count))
+                {
+                    contextMenuOptions.Add(new InventoryItemContextMenu.Option(
+                        "Transfer",
+                        InventoryItemContextAction.Transfer,
+                        true));
+                    hasInteractable = true;
+                }
+
                 contextMenuOptions.Add(new InventoryItemContextMenu.Option(
                     "Drop",
                     InventoryItemContextAction.Drop,
@@ -671,6 +685,8 @@ namespace Inventory.Core
                 case InventoryItemContextAction.Transfer:
                     if (IsCompanionOwner)
                         TryTransferToPlayerInventory(slotIndex);
+                    else
+                        TryTransferToCompanionInventory(slotIndex);
                     break;
 
                 case InventoryItemContextAction.Examine:
@@ -766,6 +782,51 @@ namespace Inventory.Core
                 ClearSelection();
 
             playerInventory.WindowController?.RefreshAllSlots();
+            return true;
+        }
+
+        private bool TryTransferToCompanionInventory(int slotIndex)
+        {
+            if (IsCompanionOwner)
+                return false;
+            if (slotIndex < 0 || slotIndex >= model.Size)
+                return false;
+
+            var entry = model.GetEntry(slotIndex);
+            if (entry.item == null)
+                return false;
+
+            var companionInventoryWrapper = CompanionManager.CompanionInventory;
+            var companionInventoryComponent = companionInventoryWrapper?.InventoryComponent;
+            if (companionInventoryComponent == null)
+                return false;
+
+            if (!companionInventoryComponent.CanAddItem(entry.item, entry.count))
+            {
+                var chat = ChatService.Instance;
+                chat?.PublishGameMessage("Your inventory is full");
+                return false;
+            }
+
+            var removedEntry = model.TakeEntry(slotIndex);
+            if (removedEntry.item == null)
+                return false;
+
+            if (!companionInventoryComponent.AddItem(removedEntry.item, removedEntry.count))
+            {
+                model.SetEntry(slotIndex, removedEntry);
+                controller.RefreshSlot(slotIndex);
+                var chat = ChatService.Instance;
+                chat?.PublishGameMessage("Your inventory is full");
+                return false;
+            }
+
+            controller.RefreshSlot(slotIndex);
+            if (owner.selectedIndex == slotIndex)
+                ClearSelection();
+
+            companionInventoryComponent.WindowController?.RefreshAllSlots();
+            owner.WindowController?.RefreshAllSlots();
             return true;
         }
 
