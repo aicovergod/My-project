@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:94152ed60c05f767060fa50d1c4e59323e36182b -->
+## 2025-10-25T14:07:16+01:00 — Merge pull request #1398 from aicovergod/codex/add-mining-progress-tracking-and-stuck-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 237 ++ / 0 --
+- Notes:
+  Add stuck handling for companion mining
+---
+<!-- commit:e37bfbc36916f690f2d35c8aa6d819a7e21776ed -->
+## 2025-10-25T14:07:07+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:35f66af5cb8a8edadc1832f8377bde99d8d43cee -->
 ## 2025-10-25T14:06:49+01:00 — Add stuck handling for companion mining
 
