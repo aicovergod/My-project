@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9488e1795f4492ab92065c59616ccce34070dc57 -->
+## 2025-10-25T23:54:34+01:00 — Merge pull request #1412 from aicovergod/codex/add-stop-action-button-to-companion-menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 549 ++ / 10 --
+- Notes:
+  Add stop controls and status reporting for companion actions
+---
+<!-- commit:c2b1cc717724b1a8200667a3ef2296e8faa7c4c1 -->
+## 2025-10-25T23:54:19+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b2637af15faf1c5ecb6e0c57b51f92d3b735d693 -->
 ## 2025-10-25T23:54:03+01:00 — Add companion stop controls and chat commands
 
