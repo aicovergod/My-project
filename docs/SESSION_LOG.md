@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7ab199158d10e520d61550ea57b7f535db94645d -->
+## 2025-10-26T09:18:46+00:00 — Refine companion equipment requirement messaging
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionEquipment.cs
+- Diff: 128 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:13696579454dd4ef4644f8feb05387d67d9358dc -->
 ## 2025-10-26T09:13:43+00:00 — Merge pull request #1421 from aicovergod/codex/add-method-to-format-cooking-level-requirement
 
