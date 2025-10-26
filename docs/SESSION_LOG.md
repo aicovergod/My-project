@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0817e35d98c890f769cc22d6b036c80be0b9ad4f -->
+## 2025-10-26T09:25:51+00:00 — Merge pull request #1423 from aicovergod/codex/update-companionminingdialoguelibrary-for-rng
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 50 ++ / 8 --
+- Notes:
+  Use shared RNG for companion dialogue lines
+---
+<!-- commit:46a0f37c261fedb2ee545d84a68ffe089964c05b -->
+## 2025-10-26T09:25:40+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0ee51c0fb251476e445a222ec280ae16baed6018 -->
 ## 2025-10-26T09:25:20+00:00 — Use shared RNG for companion dialogue lines
 
