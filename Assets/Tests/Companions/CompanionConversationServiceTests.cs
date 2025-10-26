@@ -49,6 +49,69 @@ namespace Tests.Companions
         }
 
         [Test]
+        public void FormatTemplate_FishingSuggestionAvoidsStaleSkillActions()
+        {
+            var method = typeof(CompanionConversationService).GetMethod(
+                "FormatTemplate",
+                BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.IsNotNull(method, "FormatTemplate should be discoverable for targeted validation.");
+
+            const string Template = "Nice. I'll gather gear for more {skillAction}.";
+            var recentActions = new List<string> { "smelting bars" };
+            var baseArgs = new object[] { Template, "Tester", "ready", string.Empty, null };
+
+            var staleActionContext = new CompanionResponseContext(
+                DateTime.UtcNow,
+                "dawn",
+                playerInCombat: false,
+                companionInCombat: false,
+                recentActions,
+                pendingResponseCount: 0,
+                suggestedSkill: SkillType.Fishing,
+                suggestedSkillName: string.Empty,
+                suggestedSkillAction: "Chopping yews",
+                suggestedSkillAge: TimeSpan.FromMinutes(5),
+                suggestedSkillRecency: "moments ago");
+
+            baseArgs[4] = staleActionContext;
+            string staleFormatted = (string)method.Invoke(service, baseArgs);
+
+            Assert.GreaterOrEqual(
+                staleFormatted.IndexOf("fishing", StringComparison.OrdinalIgnoreCase),
+                0,
+                "When the suggested skill is fishing the acceptance line should reference fishing explicitly.");
+            Assert.Less(
+                staleFormatted.IndexOf("Chopping", StringComparison.OrdinalIgnoreCase),
+                0,
+                "Stale action descriptions from unrelated skills should be replaced by the suggested skill name.");
+
+            var emptyActionContext = new CompanionResponseContext(
+                DateTime.UtcNow,
+                "dawn",
+                playerInCombat: false,
+                companionInCombat: false,
+                recentActions,
+                pendingResponseCount: 0,
+                suggestedSkill: SkillType.Fishing,
+                suggestedSkillName: SkillNameUtility.GetDisplayName(SkillType.Fishing),
+                suggestedSkillAction: string.Empty,
+                suggestedSkillAge: TimeSpan.FromMinutes(10),
+                suggestedSkillRecency: "recently");
+
+            baseArgs[4] = emptyActionContext;
+            string emptyFormatted = (string)method.Invoke(service, baseArgs);
+
+            Assert.GreaterOrEqual(
+                emptyFormatted.IndexOf("fishing", StringComparison.OrdinalIgnoreCase),
+                0,
+                "Empty action descriptions should fall back to the suggested skill sentence name.");
+            Assert.Less(
+                emptyFormatted.IndexOf("smelting", StringComparison.OrdinalIgnoreCase),
+                0,
+                "Latest unrelated skill actions should not leak into suggestion acceptance lines when the action is missing.");
+        }
+
+        [Test]
         public void IsAwaitingSkillPlanResponse_ReflectsActiveSkillQuestion()
         {
             Assert.IsFalse(

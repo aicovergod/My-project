@@ -2972,13 +2972,56 @@ namespace Companions.Conversation
             string resolvedCombatState = string.IsNullOrWhiteSpace(context.CombatStateDescriptor)
                 ? "standing down"
                 : context.CombatStateDescriptor;
+            string suggestedSkillDisplayName = context.HasSuggestedSkill
+                ? (!string.IsNullOrWhiteSpace(context.SuggestedSkillName)
+                    ? context.SuggestedSkillName
+                    : SkillNameUtility.GetDisplayName(context.SuggestedSkill.Value))
+                : string.Empty;
+            string suggestedSkillSentenceName = context.HasSuggestedSkill
+                ? SkillNameUtility.GetSentenceName(context.SuggestedSkill.Value)
+                : (!string.IsNullOrWhiteSpace(suggestedSkillDisplayName)
+                    ? suggestedSkillDisplayName.ToLowerInvariant()
+                    : string.Empty);
+
             string resolvedSkillAction = !string.IsNullOrWhiteSpace(context.SuggestedSkillActionDescription)
                 ? context.SuggestedSkillActionDescription
                 : context.HasRecentSkillActions
                     ? context.LatestSkillAction
                     : "keeping skills sharp";
+
+            if (context.HasSuggestedSkill)
+            {
+                bool suggestionActionEmpty = string.IsNullOrWhiteSpace(context.SuggestedSkillActionDescription);
+                bool mentionsDisplayName = !string.IsNullOrWhiteSpace(resolvedSkillAction) &&
+                    !string.IsNullOrWhiteSpace(suggestedSkillDisplayName) &&
+                    resolvedSkillAction.IndexOf(
+                        suggestedSkillDisplayName,
+                        StringComparison.OrdinalIgnoreCase) >= 0;
+                bool mentionsSentenceName = !string.IsNullOrWhiteSpace(resolvedSkillAction) &&
+                    !string.IsNullOrWhiteSpace(suggestedSkillSentenceName) &&
+                    resolvedSkillAction.IndexOf(
+                        suggestedSkillSentenceName,
+                        StringComparison.OrdinalIgnoreCase) >= 0;
+
+                if (suggestionActionEmpty || (!mentionsDisplayName && !mentionsSentenceName))
+                {
+                    string fallbackSuggestion = !string.IsNullOrWhiteSpace(suggestedSkillSentenceName)
+                        ? suggestedSkillSentenceName
+                        : suggestedSkillDisplayName;
+
+                    if (!string.IsNullOrWhiteSpace(fallbackSuggestion))
+                        resolvedSkillAction = fallbackSuggestion;
+                }
+            }
+
             string resolvedSuggestedSkill = context.HasSuggestedSkill
-                ? context.SuggestedSkillName
+                ? (!string.IsNullOrWhiteSpace(suggestedSkillDisplayName)
+                    ? suggestedSkillDisplayName
+                    : (!string.IsNullOrWhiteSpace(suggestedSkillSentenceName)
+                        ? suggestedSkillSentenceName
+                        : (!string.IsNullOrWhiteSpace(context.SuggestedSkillActionDescription)
+                            ? context.SuggestedSkillActionDescription
+                            : "skilling")))
                 : (!string.IsNullOrWhiteSpace(context.SuggestedSkillActionDescription)
                     ? context.SuggestedSkillActionDescription
                     : (context.HasRecentSkillActions ? context.LatestSkillAction : "skilling"));
