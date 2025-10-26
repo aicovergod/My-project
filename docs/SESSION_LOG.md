@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:219eb5588820af15c8e686928cc0cc120a62411a -->
+## 2025-10-26T15:00:03+00:00 — Merge pull request #1437 from aicovergod/codex/update-formattemplate-for-suggestion-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 116 ++ / 1 --
+- Notes:
+  Ensure companion suggestions reference the correct skill
+---
+<!-- commit:8cf97bdbce52ee439c6f4a4b7d581012cfe046c1 -->
+## 2025-10-26T14:59:55+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:aa106d4a61fbe8835d6246bc4fe06107e66e7e50 -->
 ## 2025-10-26T14:59:37+00:00 — Fix companion suggestion skill action fallback
 
