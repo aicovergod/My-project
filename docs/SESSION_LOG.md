@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1a304e5dc003e4f80a279ff297996c7487b10455 -->
+## 2025-10-26T09:39:53+00:00 — Merge pull request #1425 from aicovergod/codex/add-level-up-line-helper-method
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 40 ++ / 1 --
+- Notes:
+  Add helper for companion generic level-up chat lines
+---
+<!-- commit:46c43a20bf592cc3d63a987be13746118361dca8 -->
+## 2025-10-26T09:39:48+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d31cd663c9f6f3b01ca08250f15c097c3f4cbf15 -->
 ## 2025-10-26T09:39:27+00:00 — Refactor generic companion level-up message
 
