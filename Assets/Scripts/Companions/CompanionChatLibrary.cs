@@ -3505,6 +3505,17 @@ namespace Companions
         /// <summary>Fallback message returned when the Cooking pool is empty.</summary>
         private const string CookingLevelUpFallbackLine = "My cooking skill leveled up, smells amazing already.";
 
+        private static readonly string[] CompanionCookingStartChatMessages =
+        {
+            "Apron on, I’ll whip something up.",
+            "Heading to the range now, let me cook!",
+            "Time to stir up a proper meal.",
+            "I’ll get a fresh dish sizzling in no time.",
+            "Consider the kitchen handled."
+        };
+
+        private const string CompanionCookingStartFallbackLine = "I’ll start cooking something tasty.";
+
 
         /// <summary>
         /// Pool of flavour messages used when the player levels Firemaking with a companion present.
@@ -5911,6 +5922,11 @@ namespace Companions
         public static string GetRandomCookingLevelUpLine()
         {
             return GetRandomLine(CookingLevelUpChatMessages, CookingLevelUpFallbackLine);
+        }
+
+        public static string GetRandomCompanionCookingStartLine()
+        {
+            return GetRandomLine(CompanionCookingStartChatMessages, CompanionCookingStartFallbackLine);
         }
 
         /// <summary>Returns a random chat line used when the companion levels Firemaking.</summary>

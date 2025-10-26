@@ -38,6 +38,9 @@ namespace Companions
         /// <summary>Controller that manages fishing-specific behaviour for the companion.</summary>
         private CompanionFishingController fishingController;
 
+        /// <summary>Controller that manages cooking-specific behaviour for the companion.</summary>
+        private CompanionCookingController cookingController;
+
         /// <summary>Controller that manages woodcutting-specific behaviour for the companion.</summary>
         [SerializeField]
         private CompanionWoodcuttingController woodcuttingController;
@@ -112,6 +115,9 @@ namespace Companions
         /// <summary>Exposes the fishing controller responsible for companion gathering commands.</summary>
         public CompanionFishingController FishingController => fishingController;
 
+        /// <summary>Exposes the cooking controller responsible for companion commands.</summary>
+        public CompanionCookingController CookingController => cookingController;
+
         /// <summary>Exposes the woodcutting controller responsible for companion gathering commands.</summary>
         public CompanionWoodcuttingController WoodcuttingController => woodcuttingController;
 
@@ -155,6 +161,7 @@ namespace Companions
             ConfigureEquipment();
             ConfigureMining(player);
             ConfigureFishing(player);
+            ConfigureCooking(player);
             ConfigureWoodcutting(player);
             ConfigureCombat();
             combatController?.BindCompanionController(this);
@@ -181,6 +188,9 @@ namespace Companions
             if (fishingController != null)
                 fishingController.RebindPlayer(player);
 
+            if (cookingController != null)
+                cookingController.RebindPlayer(player);
+
             if (woodcuttingController != null)
                 woodcuttingController.RebindPlayer(player);
         }
@@ -193,6 +203,7 @@ namespace Companions
             CancelActivePickupRoutine();
             // Cancel any active gathering routines so direct attack orders stop ongoing skill behaviour.
             miningController?.CancelMining(true);
+            cookingController?.CancelCooking(true);
             woodcuttingController?.CancelWoodcutting(true);
             combatController?.CommandAttack(target, true);
         }
@@ -222,6 +233,7 @@ namespace Companions
 
             CancelActivePickupRoutine();
             miningController?.CancelMining(true);
+            cookingController?.CancelCooking(true);
             woodcuttingController?.CancelWoodcutting(true);
 
             ConfigurePickupMovementHelpers();
@@ -429,6 +441,16 @@ namespace Companions
             if (fishingController == null)
                 fishingController = gameObject.AddComponent<CompanionFishingController>();
             fishingController.Initialise(this, skillManager, companionInventory, player, skillCooldownTracker);
+        }
+
+        private void ConfigureCooking(Transform player)
+        {
+            cookingController = cookingController != null
+                ? cookingController
+                : GetComponent<CompanionCookingController>();
+            if (cookingController == null)
+                cookingController = gameObject.AddComponent<CompanionCookingController>();
+            cookingController.Initialise(this, skillManager, companionInventory, companionEquipment, player, skillCooldownTracker);
         }
 
         private void ConfigureWoodcutting(Transform player)

@@ -30,6 +30,7 @@ namespace Companions.UI
         private Button mineButton;
         private Button chopButton;
         private Button fishButton;
+        private Button cookButton;
 
         private readonly Vector3[] anchorCorners = new Vector3[4];
 
@@ -162,6 +163,9 @@ namespace Companions.UI
 
             fishButton = CreateButton(parent, "Go Fishing");
             fishButton.onClick.AddListener(OnGoFishingClicked);
+
+            cookButton = CreateButton(parent, "Cook Food");
+            cookButton.onClick.AddListener(OnCookFoodClicked);
         }
 
         private Button CreateButton(Transform parent, string label)
@@ -315,6 +319,40 @@ namespace Companions.UI
             CloseAllMenus();
         }
 
+        private void OnCookFoodClicked()
+        {
+            Debug.Log("[Companion UI] Cook Food button clicked.");
+            bool accepted = CompanionManager.TryCommandCookNearby(out var failureReason);
+            Debug.Log($"[Companion UI] Cook Food command result: success={accepted}, failureReason={failureReason}.");
+            if (!accepted)
+            {
+                if (!CompanionManager.HasActiveCompanion)
+                {
+                    PublishPlaceholderMessage("You need to summon me before I can start cooking.");
+                }
+                else if (ShouldPublishCookingFallback(failureReason))
+                {
+                    switch (failureReason)
+                    {
+                        case CompanionCookingCommandResult.MissingIngredients:
+                            PublishPlaceholderMessage(CompanionCookingDialogueLibrary.GetRandomMissingIngredientLine());
+                            break;
+                        case CompanionCookingCommandResult.MissingTool:
+                            PublishPlaceholderMessage(CompanionCookingDialogueLibrary.GetRandomMissingToolLine());
+                            break;
+                        case CompanionCookingCommandResult.PlayerBusy:
+                            PublishPlaceholderMessage(CompanionCookingDialogueLibrary.GetRandomPlayerBusyLine());
+                            break;
+                        default:
+                            PublishPlaceholderMessage(CompanionCookingDialogueLibrary.GetRandomStationUnavailableLine());
+                            break;
+                    }
+                }
+            }
+
+            CloseAllMenus();
+        }
+
         private bool ShouldPublishFallbackForFailure(CompanionMiningCommandResult failureReason)
         {
             switch (failureReason)
@@ -359,6 +397,25 @@ namespace Companions.UI
                 case CompanionFishingCommandResult.RequirementsNotMet:
                 case CompanionFishingCommandResult.Declined:
                 case CompanionFishingCommandResult.AlreadyFishing:
+                    return false;
+                default:
+                    return true;
+            }
+        }
+
+        private bool ShouldPublishCookingFallback(CompanionCookingCommandResult failureReason)
+        {
+            switch (failureReason)
+            {
+                case CompanionCookingCommandResult.InventoryFull:
+                case CompanionCookingCommandResult.MissingIngredients:
+                case CompanionCookingCommandResult.MissingTool:
+                case CompanionCookingCommandResult.PlayerBusy:
+                case CompanionCookingCommandResult.RequirementsNotMet:
+                case CompanionCookingCommandResult.StationUnavailable:
+                case CompanionCookingCommandResult.StationOccupied:
+                case CompanionCookingCommandResult.Declined:
+                case CompanionCookingCommandResult.AlreadyCooking:
                     return false;
                 default:
                     return true;

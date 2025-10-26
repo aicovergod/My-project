@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:044dd2afb99d1e939cf6be45d07ec7f29b073e71 -->
+## 2025-10-26T08:57:44+00:00 — Add companion cooking integration
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (10): Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs, Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionCookingDialogueLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs, Assets/Scripts/Skills/AdminF2Menu.cs, Assets/Scripts/Skills/Cooking/UI/CompanionCookingHUD.cs
+- Diff: 1702 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:45e724948b410bda03f115e03335332e4d77becf -->
 ## 2025-10-26T01:06:14+01:00 — Merge pull request #1418 from aicovergod/codex/update-admin-f4-menu-and-agents.md
 

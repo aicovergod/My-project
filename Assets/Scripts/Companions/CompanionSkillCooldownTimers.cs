@@ -20,6 +20,9 @@ namespace Companions
         /// <summary>Default cooldown duration (in minutes) applied after a fishing refusal.</summary>
         public const float FishingCooldownMinutes = 5f;
 
+        /// <summary>Default cooldown duration (in minutes) applied after a cooking refusal.</summary>
+        public const float CookingCooldownMinutes = 5f;
+
         /// <summary>Default cooldown duration (in minutes) applied after a combat training refusal.</summary>
         public const float CombatDeclineCooldownMinutes = 5f;
 
@@ -31,6 +34,9 @@ namespace Companions
 
         /// <summary>Time span representation of <see cref="FishingCooldownMinutes"/>.</summary>
         public static readonly TimeSpan FishingCooldownDuration = TimeSpan.FromMinutes(FishingCooldownMinutes);
+
+        /// <summary>Time span representation of <see cref="CookingCooldownMinutes"/>.</summary>
+        public static readonly TimeSpan CookingCooldownDuration = TimeSpan.FromMinutes(CookingCooldownMinutes);
 
         /// <summary>Time span representation of <see cref="CombatDeclineCooldownMinutes"/>.</summary>
         public static readonly TimeSpan CombatDeclineCooldownDuration = TimeSpan.FromMinutes(CombatDeclineCooldownMinutes);
@@ -120,6 +126,26 @@ namespace Companions
         }
 
         /// <summary>
+        /// Checks whether a cooking command should be rejected because the cooldown is still active.
+        /// </summary>
+        public static bool ShouldDeclineCookingRequest(
+            CompanionSkillCooldownTracker tracker,
+            out CompanionCookingCommandResult failureReason)
+        {
+            failureReason = CompanionCookingCommandResult.Accepted;
+
+            if (tracker == null)
+                return false;
+
+            if (!tracker.TryGetRemaining(SkillType.Cooking, out var remaining) || remaining <= TimeSpan.Zero)
+                return false;
+
+            PublishCookingCooldownMessage(remaining);
+            failureReason = CompanionCookingCommandResult.Declined;
+            return true;
+        }
+
+        /// <summary>
         /// Starts or refreshes the mining cooldown using the shared default duration.
         /// </summary>
         /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
@@ -147,6 +173,14 @@ namespace Companions
         }
 
         /// <summary>
+        /// Starts or refreshes the cooking cooldown using the shared default duration.
+        /// </summary>
+        public static void StartCookingCooldown(CompanionSkillCooldownTracker tracker)
+        {
+            tracker?.StartCooldown(SkillType.Cooking, CookingCooldownDuration);
+        }
+
+        /// <summary>
         /// Clears any active mining cooldown so new commands can be processed immediately.
         /// </summary>
         /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
@@ -171,6 +205,14 @@ namespace Companions
         public static void ClearFishingCooldown(CompanionSkillCooldownTracker tracker)
         {
             tracker?.ClearCooldown(SkillType.Fishing);
+        }
+
+        /// <summary>
+        /// Clears any active cooking cooldown so new commands can be processed immediately.
+        /// </summary>
+        public static void ClearCookingCooldown(CompanionSkillCooldownTracker tracker)
+        {
+            tracker?.ClearCooldown(SkillType.Cooking);
         }
 
         /// <summary>
@@ -233,6 +275,28 @@ namespace Companions
             int minutes = Mathf.Max(1, (int)Math.Ceiling(totalMinutes));
 
             string message = CompanionChatLibrary.GetRandomFishingDeclineCooldownLine(safePlayerName, minutes);
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), message);
+        }
+
+        /// <summary>
+        /// Publishes a companion chat line describing how long remains on the cooking cooldown.
+        /// </summary>
+        private static void PublishCookingCooldownMessage(TimeSpan remaining)
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string playerName = chat.ActiveUsername;
+            string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName.Trim();
+
+            double totalMinutes = Math.Max(0d, remaining.TotalMinutes);
+            int minutes = Mathf.Max(1, (int)Math.Ceiling(totalMinutes));
+
+            string message = CompanionCookingDialogueLibrary.GetCooldownLine(safePlayerName, minutes);
             if (string.IsNullOrWhiteSpace(message))
                 return;
 
