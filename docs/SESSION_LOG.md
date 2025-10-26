@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4dc8e776f66b06cf27f4057694369adb31688c9b -->
+## 2025-10-26T20:56:59+00:00 — Ensure ore bag inventory config precedes activation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 38 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:16e052beef304d5144bd82e7f74fe3e787f91cd6 -->
 ## 2025-10-26T20:41:21+00:00 — Merge pull request #1445 from aicovergod/codex/fix-ore-bag-adding-itself-to-inventory
 
