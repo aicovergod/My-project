@@ -116,7 +116,8 @@ namespace Inventory.OreBag
             for (int i = 0; i < model.Size; i++)
             {
                 var entry = model.GetEntry(i);
-                if (entry.item == null || !oreBagInventory.IsOre(entry.item) || entry.count <= 0)
+                // Skip empty slots, the ore bag item itself, and anything that is not a valid ore stack.
+                if (entry.item == null || entry.item is OreBagItemData || !oreBagInventory.IsOre(entry.item) || entry.count <= 0)
                     continue;
 
                 int added = oreBagInventory.AddOre(entry.item, entry.count);
@@ -168,7 +169,8 @@ namespace Inventory.OreBag
                 return false;
 
             var entry = model.GetEntry(slotIndex);
-            if (entry.item == null || !oreBagInventory.IsOre(entry.item) || entry.count <= 0)
+            // Ignore empty slots, the ore bag item, and anything that fails the ore validation.
+            if (entry.item == null || entry.item is OreBagItemData || !oreBagInventory.IsOre(entry.item) || entry.count <= 0)
                 return false;
 
             ApplyActiveBag(bagData, playerInventory);
