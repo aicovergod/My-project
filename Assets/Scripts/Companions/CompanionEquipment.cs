@@ -1111,7 +1111,7 @@ namespace Companions
             int availableSpace = Mathf.Max(0, maxStack - current.count);
             if (availableSpace <= 0)
             {
-                ShowInventoryFullFloatingText("You cannot equip any more of that.");
+                ShowStackLimitFloatingText(entry.item);
                 failureResult = CompanionEquipAttemptResult.StackLimitReached;
                 return false;
             }
@@ -1119,7 +1119,7 @@ namespace Companions
             int transferAmount = Mathf.Min(entry.count, availableSpace);
             if (transferAmount <= 0)
             {
-                ShowInventoryFullFloatingText("You cannot equip any more of that.");
+                ShowStackLimitFloatingText(entry.item);
                 failureResult = CompanionEquipAttemptResult.StackLimitReached;
                 return false;
             }
@@ -1297,10 +1297,45 @@ namespace Companions
             if (magicDefenceBonusText != null) magicDefenceBonusText.text = $"Magic = {magicDef}{defenceSuffix}";
         }
 
-        private void ShowInventoryFullFloatingText(string message = "Your inventory is full")
+        private void ShowInventoryFullFloatingText()
         {
             var anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
+            string companionName = CompanionManager.GetCompanionDisplayName();
+            string playerName = ResolveActivePlayerName();
+            string message = CompanionChatLibrary.GetRandomCompanionInventoryFullFloatingTextLine(
+                companionName,
+                playerName);
             FloatingText.Show(message, anchor.position);
+        }
+
+        private void ShowStackLimitFloatingText(ItemData item)
+        {
+            var anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
+            string companionName = CompanionManager.GetCompanionDisplayName();
+            string playerName = ResolveActivePlayerName();
+            string itemName = ResolveItemDisplayName(item);
+            string message = CompanionChatLibrary.GetRandomCompanionStackLimitFloatingTextLine(
+                companionName,
+                itemName,
+                playerName);
+            FloatingText.Show(message, anchor.position);
+        }
+
+        private static string ResolveActivePlayerName()
+        {
+            var chat = ChatService.Instance;
+            return chat != null ? chat.ActiveUsername : string.Empty;
+        }
+
+        private static string ResolveItemDisplayName(ItemData item)
+        {
+            if (item == null)
+                return string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(item.itemName))
+                return item.itemName.Trim();
+
+            return string.IsNullOrWhiteSpace(item.name) ? string.Empty : item.name;
         }
 
         private int SlotIndex(EquipmentSlot slot) => (int)slot - 1;
