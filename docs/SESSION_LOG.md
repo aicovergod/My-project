@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c23132f782e28721ad333ac318f97c8fc607e1da -->
+## 2025-10-26T14:18:59+00:00 — Organize companion pickup scripts
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/ItemPickup.meta, Assets/Scripts/Companions/ItemPickup/CompanionPickupDialogueLibrary.cs, Assets/Scripts/Companions/ItemPickup/CompanionPickupDialogueLibrary.cs.meta, Assets/Scripts/Companions/ItemPickup/CompanionPickupService.cs, Assets/Scripts/Companions/ItemPickup/CompanionPickupService.cs.meta
+- Diff: 8 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:10fb42d730eaeddd72a73ed68845d13d1e5aac3c -->
 ## 2025-10-26T14:15:29+00:00 — Merge pull request #1431 from aicovergod/codex/move-dialogue-libraries-to-companions
 
