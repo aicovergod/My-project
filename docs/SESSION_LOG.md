@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:befc33475ea7eafa7740f122563eb39a9d6224c5 -->
+## 2025-10-26T09:33:53+00:00 — Add shared companion command dialogue helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs, Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs
+- Diff: 260 ++ / 16 --
+- Notes:
+  —
+---
 <!-- commit:0817e35d98c890f769cc22d6b036c80be0b9ad4f -->
 ## 2025-10-26T09:25:51+00:00 — Merge pull request #1423 from aicovergod/codex/update-companionminingdialoguelibrary-for-rng
 
