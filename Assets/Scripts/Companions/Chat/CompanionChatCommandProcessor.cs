@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Companions.Conversation;
 using UI.Chat;
 using UnityEngine;
 
@@ -105,6 +106,8 @@ namespace Companions.Chat
             "cook nearby", "cook something", "make dinner", "fire up the kitchen"
         };
 
+        private static readonly HashSet<string> SkillTokens = BuildSkillTokenSet();
+
         private static readonly string[] MiningPhrases =
         {
             "start mining", "start minin", "start smashing", "start smashin",
@@ -163,6 +166,9 @@ namespace Companions.Chat
 
             string[] tokens = ExtractTokens(normalised);
             if (tokens.Length == 0)
+                return false;
+
+            if (CompanionConversationService.IsAwaitingSkillPlanResponse && LooksLikeInclusiveAgreement(tokens))
                 return false;
 
             CompanionChatCommandType commandType = DetectCommandType(normalised, tokens);
@@ -347,6 +353,64 @@ namespace Companions.Chat
                 return true;
 
             return tokens.Count == 1;
+        }
+
+        /// <summary>
+        /// Detects inclusive responses such as "let's go fishing" so they can be routed back to the
+        /// conversation flow while the companion is waiting for a skill plan confirmation.
+        /// </summary>
+        private static bool LooksLikeInclusiveAgreement(IReadOnlyList<string> tokens)
+        {
+            if (tokens == null || tokens.Count == 0)
+                return false;
+
+            for (int i = 0; i < tokens.Count; i++)
+            {
+                string token = tokens[i];
+                if (!string.Equals(token, "lets", StringComparison.Ordinal) &&
+                    !string.Equals(token, "let", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                for (int j = i + 1; j < tokens.Count; j++)
+                {
+                    string candidate = tokens[j];
+                    if (SkillTokens.Contains(candidate))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Builds a lookup covering all recognised skilling tokens so inclusive phrases can be
+        /// detected efficiently at runtime.
+        /// </summary>
+        private static HashSet<string> BuildSkillTokenSet()
+        {
+            var set = new HashSet<string>(StringComparer.Ordinal);
+
+            void AddRange(IEnumerable<string> source)
+            {
+                if (source == null)
+                    return;
+
+                foreach (var token in source)
+                    set.Add(token);
+            }
+
+            AddRange(MiningVerbs);
+            AddRange(MiningNouns);
+            AddRange(FishingVerbs);
+            AddRange(FishingNouns);
+            AddRange(WoodcuttingVerbs);
+            AddRange(WoodcuttingNouns);
+            AddRange(CookingVerbs);
+            AddRange(CookingNouns);
+
+            return set;
         }
 
         private static bool ContainsPhrase(string normalised, IEnumerable<string> phrases)

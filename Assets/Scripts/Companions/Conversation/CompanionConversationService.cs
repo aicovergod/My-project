@@ -248,6 +248,22 @@ namespace Companions.Conversation
         private DateTime? lastProactiveQuestionUtc;
         private string lastProactiveQuestionTemplateKey = string.Empty;
         private ActiveSkillQuestion activeSkillQuestion = ActiveSkillQuestion.Empty;
+
+        /// <summary>
+        /// Indicates whether the service is currently waiting for the player to respond to a
+        /// proactive skill plan question posed by the companion.
+        /// </summary>
+        public static bool IsAwaitingSkillPlanResponse
+        {
+            get
+            {
+                var instance = Instance;
+                if (instance == null)
+                    return false;
+
+                return instance.activeSkillQuestion.IsActive;
+            }
+        }
         private readonly LinkedList<SkillQuestionCandidate> skillQuestionCandidates = new LinkedList<SkillQuestionCandidate>();
         private int idleTickCounter;
         private int smallTalkIdleTicks;
