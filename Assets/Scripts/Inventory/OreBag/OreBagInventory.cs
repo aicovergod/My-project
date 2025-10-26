@@ -104,7 +104,8 @@ namespace Inventory.OreBag
 
         /// <summary>
         /// Attempts to add up to <paramref name="quantity"/> ores, respecting tier capacity and slot availability.
-        /// Returns the number of ores successfully stored.
+        /// Returns the number of ores successfully stored. The ore bag treats every ore as stackable regardless
+        /// of the underlying <see cref="ItemData"/> configuration so identical ores always occupy a single slot.
         /// </summary>
         public int AddOre(ItemData item, int quantity)
         {
@@ -118,30 +119,50 @@ namespace Inventory.OreBag
             int toAdd = Mathf.Min(quantity, remainingCapacity);
             int added = 0;
 
-            if (item.stackable)
-            {
-                int attempt = toAdd;
-                while (attempt > 0)
-                {
-                    if (inventory.AddItem(item, attempt))
-                    {
-                        added += attempt;
-                        break;
-                    }
+            if (model == null)
+                EnsureInventoryConfigured();
 
-                    attempt--;
+            if (model == null)
+                return 0;
+
+            // Merge any pre-existing stacks for this ore so the bag can reclaim slots that were previously
+            // fragmented by per-item entries (the behaviour reported by the user).
+            MergeExistingStacksForOre(item);
+
+            // Try to top up an existing stack first so the bag retains a single stack per ore type.
+            int primaryIndex = FindFirstSlotWithItem(item);
+            if (primaryIndex != -1)
+            {
+                var entry = model.GetEntry(primaryIndex);
+                int addToExisting = Mathf.Min(toAdd, Mathf.Max(0, int.MaxValue - entry.count));
+                if (addToExisting > 0)
+                {
+                    entry.count += addToExisting;
+                    if (model.SetEntry(primaryIndex, entry))
+                    {
+                        added += addToExisting;
+                        toAdd -= addToExisting;
+                    }
                 }
             }
-            else
-            {
-                int remaining = toAdd;
-                while (remaining > 0)
-                {
-                    if (!inventory.AddItem(item, 1))
-                        break;
 
-                    added++;
-                    remaining--;
+            // If there is still ore remaining to be stored, allocate a fresh slot.
+            if (toAdd > 0)
+            {
+                int emptyIndex = FindFirstEmptySlot();
+                if (emptyIndex != -1)
+                {
+                    var entry = new InventoryEntry
+                    {
+                        item = item,
+                        count = toAdd
+                    };
+
+                    if (model.SetEntry(emptyIndex, entry))
+                    {
+                        added += toAdd;
+                        toAdd = 0;
+                    }
                 }
             }
 
@@ -231,6 +252,105 @@ namespace Inventory.OreBag
                 if (candidate.itemName.IndexOf("Ore", StringComparison.OrdinalIgnoreCase) >= 0)
                     oreItemIds.Add(candidate.id);
             }
+        }
+
+        /// <summary>
+        /// Collapses any duplicate stacks for the supplied ore so the bag keeps a single stack per ore type.
+        /// </summary>
+        private void MergeExistingStacksForOre(ItemData ore)
+        {
+            if (model == null || ore == null)
+                return;
+
+            int primaryIndex = -1;
+            long combinedCount = 0;
+            List<int> duplicates = null;
+
+            for (int i = 0; i < model.Size; i++)
+            {
+                var entry = model.GetEntry(i);
+                if (entry.item == ore)
+                {
+                    if (entry.count <= 0)
+                    {
+                        // Remove empty remnants so the bag does not lose slots to zero-count stacks.
+                        model.SetEntry(i, default);
+                        continue;
+                    }
+
+                    combinedCount += entry.count;
+
+                    if (primaryIndex == -1)
+                    {
+                        primaryIndex = i;
+                    }
+                    else
+                    {
+                        duplicates ??= new List<int>();
+                        duplicates.Add(i);
+                    }
+                }
+                else if (entry.item == null && entry.count > 0)
+                {
+                    // Clean up invalid entries that may have been created by corrupted save data.
+                    model.SetEntry(i, default);
+                }
+            }
+
+            if (primaryIndex == -1)
+                return;
+
+            var primary = model.GetEntry(primaryIndex);
+
+            if (duplicates != null)
+            {
+                foreach (int duplicateIndex in duplicates)
+                    model.SetEntry(duplicateIndex, default);
+            }
+
+            long sanitizedTotal = combinedCount < 0 ? 0 : combinedCount;
+            int clampedTotal = sanitizedTotal > int.MaxValue ? int.MaxValue : (int)sanitizedTotal;
+            if (primary.count != clampedTotal)
+            {
+                primary.count = clampedTotal;
+                model.SetEntry(primaryIndex, primary);
+            }
+        }
+
+        /// <summary>
+        /// Finds the first slot containing <paramref name="item"/>. Returns -1 when no matching slot exists.
+        /// </summary>
+        private int FindFirstSlotWithItem(ItemData item)
+        {
+            if (model == null || item == null)
+                return -1;
+
+            for (int i = 0; i < model.Size; i++)
+            {
+                var entry = model.GetEntry(i);
+                if (entry.item == item && entry.count > 0)
+                    return i;
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Returns the index of the first empty slot that can be reused for ore storage.
+        /// </summary>
+        private int FindFirstEmptySlot()
+        {
+            if (model == null)
+                return -1;
+
+            for (int i = 0; i < model.Size; i++)
+            {
+                var entry = model.GetEntry(i);
+                if (entry.item == null || entry.count <= 0)
+                    return i;
+            }
+
+            return -1;
         }
     }
 }
