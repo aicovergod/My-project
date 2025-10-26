@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6d7da0a7b020ad4a102f3f8965ced406f4229a38 -->
+## 2025-10-26T09:12:54+00:00 — Refine companion cooking level requirement dialogue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionCookingDialogueLibrary.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs
+- Diff: 10 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:5f3567d8294f46e2423f1df250c9d52cd5d3e4eb -->
 ## 2025-10-26T09:10:07+00:00 — Merge pull request #1420 from aicovergod/codex/add-new-dialogue-helper-for-mining
 
