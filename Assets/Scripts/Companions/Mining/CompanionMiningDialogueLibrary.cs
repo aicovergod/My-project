@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Companions
 {
@@ -79,7 +78,7 @@ namespace Companions
         {
             if (pool != null && pool.Count > 0)
             {
-                int index = Random.Range(0, pool.Count);
+                int index = CompanionDialogueRandomProvider.SampleIndex(pool.Count);
                 string line = pool[index];
                 if (!string.IsNullOrWhiteSpace(line))
                     return line;
