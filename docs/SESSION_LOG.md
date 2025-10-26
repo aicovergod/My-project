@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6e36f9f6fc82bb288c8f8a9a86146eb793c5f0ef -->
+## 2025-10-26T16:53:33+00:00 — Add mining shop awareness dialogue for companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/Conversation/AreaSpecificAwareDialogue.cs, Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs
+- Diff: 36 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:7f58ddcc9142a351b1d4f266b51510d15417f2c8 -->
 ## 2025-10-26T16:16:09+00:00 — Merge pull request #1440 from aicovergod/codex/extract-areaspecificawareness-dialogue
 
