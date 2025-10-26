@@ -5488,6 +5488,19 @@ namespace Companions
         /// <summary>Fallback line when the ocean awareness pool is empty.</summary>
         private const string OceanAwarenessFallbackLine = "Ah, I do love the view of the ocean.";
 
+        /// <summary>Pool of flavour lines used when the companion notices a graveyard.</summary>
+        private static readonly string[] GraveyardAwarenessChatMessages =
+        {
+            "I hope no ghosts pop out, {playerName}.",
+            "Graveyards really are creepy.",
+            "I hate graveyards.",
+            "I don't want to run into a ghost here.",
+            "I hope the dead are resting easy."
+        };
+
+        /// <summary>Fallback line when the graveyard awareness pool cannot produce a message.</summary>
+        private const string GraveyardAwarenessFallbackLine = "Graveyards really are creepy.";
+
         /// <summary>Pool of flavour lines used when the companion manually spawns from an item drop.</summary>
         private static readonly string[] ManualSpawnGreetingChatMessages =
         {
@@ -6272,6 +6285,12 @@ namespace Companions
         public static string GetRandomOceanAwarenessLine()
         {
             return GetRandomLine(OceanAwarenessChatMessages, OceanAwarenessFallbackLine);
+        }
+
+        /// <summary>Returns a graveyard-flavoured awareness line.</summary>
+        public static string GetRandomGraveyardAwarenessLine()
+        {
+            return GetRandomLine(GraveyardAwarenessChatMessages, GraveyardAwarenessFallbackLine);
         }
 
         /// <summary>
