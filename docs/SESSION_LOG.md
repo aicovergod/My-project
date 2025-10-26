@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:aa106d4a61fbe8835d6246bc4fe06107e66e7e50 -->
+## 2025-10-26T14:59:37+00:00 — Fix companion suggestion skill action fallback
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Tests/Companions/CompanionConversationServiceTests.cs
+- Diff: 107 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:0abcbb3aeee8e0bebf538223d8416c5a89a63f55 -->
 ## 2025-10-26T14:54:43+00:00 — Merge pull request #1436 from aicovergod/codex/expose-skill-response-status-and-modify-command-processing
 
