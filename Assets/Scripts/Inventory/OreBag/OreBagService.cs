@@ -62,9 +62,10 @@ namespace Inventory.OreBag
 
             instance = this;
             var runtimeInventory = GetComponent<RuntimeInventory>();
-            bool restoreInventoryState = runtimeInventory != null && runtimeInventory.enabled;
 
-            if (restoreInventoryState)
+            // Disable any existing runtime inventory immediately so its original OnEnable logic
+            // cannot capture the player's state before the ore bag reconfigures the component.
+            if (runtimeInventory != null)
                 runtimeInventory.enabled = false;
 
             base.Awake();
@@ -73,12 +74,30 @@ namespace Inventory.OreBag
             if (oreBagInventory == null)
                 oreBagInventory = gameObject.AddComponent<OreBagInventory>();
 
-            runtimeInventory ??= oreBagInventory?.InventoryComponent ?? GetComponent<RuntimeInventory>();
+            runtimeInventory = oreBagInventory?.InventoryComponent ?? GetComponent<RuntimeInventory>();
 
-            oreBagInventory?.EnsureInventoryConfigured();
+            if (runtimeInventory != null)
+            {
+                // The RequireComponent attribute will auto-create a runtime inventory when the
+                // ore bag component is added. Explicitly disable it here as well so the bag can
+                // safely reapply layout/save settings without leaking player inventory state.
+                runtimeInventory.enabled = false;
 
-            if (restoreInventoryState && runtimeInventory != null)
+                // Apply the ore bag configuration before any save registration logic in OnEnable runs.
+                oreBagInventory?.EnsureInventoryConfigured();
+
+                // Clear any stale player slots so the subsequent OnEnable load only restores
+                // data from the ore bag's dedicated save key.
+                runtimeInventory.ClearAllSlots();
+
+                // Re-enable the inventory so its OnEnable sequence runs again with the ore bag
+                // configuration, allowing SaveManager to load the stored ore contents.
                 runtimeInventory.enabled = true;
+            }
+            else
+            {
+                oreBagInventory?.EnsureInventoryConfigured();
+            }
         }
 
         private void OnDestroy()
