@@ -39,7 +39,16 @@ namespace Inventory.OreBag
                 return instance;
 
             var go = new GameObject(nameof(OreBagService));
-            instance = go.AddComponent<OreBagService>();
+            go.SetActive(false);
+
+            var createdInstance = go.AddComponent<OreBagService>();
+
+            if (createdInstance != null)
+            {
+                instance = createdInstance;
+                go.SetActive(true);
+            }
+
             return instance;
         }
 
@@ -52,11 +61,24 @@ namespace Inventory.OreBag
             }
 
             instance = this;
+            var runtimeInventory = GetComponent<RuntimeInventory>();
+            bool restoreInventoryState = runtimeInventory != null && runtimeInventory.enabled;
+
+            if (restoreInventoryState)
+                runtimeInventory.enabled = false;
+
             base.Awake();
 
             oreBagInventory = GetComponent<OreBagInventory>();
             if (oreBagInventory == null)
                 oreBagInventory = gameObject.AddComponent<OreBagInventory>();
+
+            runtimeInventory ??= oreBagInventory?.InventoryComponent ?? GetComponent<RuntimeInventory>();
+
+            oreBagInventory?.EnsureInventoryConfigured();
+
+            if (restoreInventoryState && runtimeInventory != null)
+                runtimeInventory.enabled = true;
         }
 
         private void OnDestroy()
