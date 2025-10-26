@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4a7d11010a432f84df07b7fde7c678421a5e19d0 -->
+## 2025-10-26T10:12:04+00:00 — Add supportive companion death messaging
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Player/PlayerRespawnSystem.cs, Assets/Tests/Companions/CompanionChatLibraryDeathToneTests.cs, Assets/Tests/Companions/CompanionChatLibraryDeathToneTests.cs.meta, Assets/Tests/Player.meta, Assets/Tests/Player/PlayerRespawnSystemToneTests.cs, Assets/Tests/Player/PlayerRespawnSystemToneTests.cs.meta
+- Diff: 250 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:b2575f500897c51eb240c1917bf32a6e45506584 -->
 ## 2025-10-26T09:58:42+00:00 — Merge pull request #1426 from aicovergod/codex/add-ammo-and-inventory-dialogue-support
 
