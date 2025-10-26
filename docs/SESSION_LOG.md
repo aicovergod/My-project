@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5163efab6e2fb86a2298169710bad6e47c2a0ba6 -->
+## 2025-10-26T15:55:52+00:00 — Merge pull request #1438 from aicovergod/codex/add-environmental-awareness-script-for-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 315 ++ / 0 --
+- Notes:
+  Add companion environment awareness zones
+---
+<!-- commit:b2518c1d67c1a6e18e0136b2153afd78e66f80c6 -->
+## 2025-10-26T15:55:41+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:78534a4129f6c00985e0bf369347b7f314a547c7 -->
 ## 2025-10-26T15:55:22+00:00 — Add companion environment awareness zones
 
