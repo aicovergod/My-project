@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:cac028273664a1525e33084ab37e3253b516282f -->
+## 2025-10-26T16:15:40+00:00 — Refactor area awareness dialogue into dedicated class
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/Conversation/AreaSpecificAwareDialogue.cs
+- Diff: 157 ++ / 90 --
+- Notes:
+  —
+---
 <!-- commit:b232989208edcf51f47b2301a95f673824cddf49 -->
 ## 2025-10-26T16:01:24+00:00 — Merge pull request #1439 from aicovergod/codex/add-areaisgraveyard-support
 
