@@ -6,6 +6,7 @@ using Inventory.Core;
 using Skills.Mining;
 using UI;
 using UnityEngine;
+using RuntimeInventory = global::Inventory.Inventory;
 
 namespace Inventory.OreBag
 {
@@ -14,25 +15,25 @@ namespace Inventory.OreBag
     /// 12-slot (3x4) layout, and a combined capacity derived from the active bag tier.
     /// </summary>
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(Inventory.Inventory))]
+    [RequireComponent(typeof(RuntimeInventory))]
     public sealed class OreBagInventory : MonoBehaviour
     {
         private static HashSet<string> oreItemIds;
 
-        private Inventory.Inventory inventory;
+        private RuntimeInventory inventory;
         private InventoryModel model;
         private OreBagItemData activeBagDefinition;
         private int activeCapacity;
 
         /// <summary>Expose the underlying inventory component for UI refreshes.</summary>
-        public Inventory.Inventory InventoryComponent => inventory;
+        public RuntimeInventory InventoryComponent => inventory;
 
         /// <summary>Combined ore capacity enforced for the currently active bag tier.</summary>
         public int CurrentCapacity => activeCapacity;
 
         private void Awake()
         {
-            inventory = GetComponent<Inventory.Inventory>();
+            inventory = GetComponent<RuntimeInventory>();
             ConfigureInventoryWindow();
 
             model = inventory.Model;
@@ -40,7 +41,7 @@ namespace Inventory.OreBag
         }
 
         /// <summary>Copies fonts/visual settings from the player inventory for consistent styling.</summary>
-        public void SyncStylingFrom(Inventory.Inventory source)
+        public void SyncStylingFrom(RuntimeInventory source)
         {
             if (source == null || inventory == null || source == inventory)
                 return;
