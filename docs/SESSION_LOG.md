@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:017fda791870da283bf70e6740591f9c70f3aa07 -->
+## 2025-10-26T20:25:32+00:00 — Merge pull request #1444 from aicovergod/codex/fix-inventory-type-errors
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 17 ++ / 15 --
+- Notes:
+  Fix ore bag inventory type references
+---
+<!-- commit:b1aaefb45fe4dcf54f30f9383dec87ade9b220e9 -->
+## 2025-10-26T20:25:18+00:00 — Fix ore bag inventory type references
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 17 ++ / 15 --
+- Notes:
+  —
+---
 <!-- commit:c1ebcc125b8be73fdbf52cc727ab2f64f05bf25a -->
 ## 2025-10-26T20:14:30+00:00 — Merge pull request #1443 from aicovergod/codex/add-transfer-all-button-for-ore-bag
 
