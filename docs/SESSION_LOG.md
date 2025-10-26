@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e0a5e37a7dd263a9be17e73a1b1b344ebb54648b -->
+## 2025-10-26T09:19:13+00:00 — Merge pull request #1422 from aicovergod/codex/add-dialogue-helper-for-failure-messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 137 ++ / 4 --
+- Notes:
+  Add helper-driven companion equipment requirement messaging
+---
+<!-- commit:bca377185f12c96b52a51de714031e80b54ccd51 -->
+## 2025-10-26T09:19:04+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7ab199158d10e520d61550ea57b7f535db94645d -->
 ## 2025-10-26T09:18:46+00:00 — Refine companion equipment requirement messaging
 
