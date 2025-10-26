@@ -42,6 +42,20 @@ namespace Companions.Conversation
         /// <summary>Fallback message for mining cave awareness when the pool is unavailable.</summary>
         private const string MiningCaveAwarenessFallbackLine = "Time for some mining, eh?";
 
+        /// <summary>Lines triggered when the companion spots a mining equipment shop.</summary>
+        private static readonly string[] MiningShopAwarenessChatMessages =
+        {
+            "Are you here to buy a new pickaxe?",
+            "Are you upgrading my pickaxe",
+            "My pickaxe has been a little rusty lately.",
+            "I'm due a new pickaxe.",
+            "I'm due an upgrade.",
+            "You've just reminded me, I need to do some mining."
+        };
+
+        /// <summary>Fallback message for mining shop awareness when the pool is unavailable.</summary>
+        private const string MiningShopAwarenessFallbackLine = "Are you here to buy a new pickaxe?";
+
         /// <summary>Lines triggered when the companion steps inside a goblin cave.</summary>
         private static readonly string[] GoblinCaveAwarenessChatMessages =
         {
@@ -109,6 +123,12 @@ namespace Companions.Conversation
         public static string GetRandomMiningCaveAwarenessLine()
         {
             return GetRandomLine(MiningCaveAwarenessChatMessages, MiningCaveAwarenessFallbackLine);
+        }
+
+        /// <summary>Returns a flavour line for mining shop awareness.</summary>
+        public static string GetRandomMiningShopAwarenessLine()
+        {
+            return GetRandomLine(MiningShopAwarenessChatMessages, MiningShopAwarenessFallbackLine);
         }
 
         /// <summary>Returns a flavour line for goblin cave awareness.</summary>

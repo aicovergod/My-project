@@ -6191,6 +6191,12 @@ namespace Companions
             return AreaSpecificAwareDialogue.GetRandomMiningCaveAwarenessLine();
         }
 
+        /// <summary>Returns a flavour line for mining shop awareness.</summary>
+        public static string GetRandomMiningShopAwarenessLine()
+        {
+            return AreaSpecificAwareDialogue.GetRandomMiningShopAwarenessLine();
+        }
+
         /// <summary>Returns a flavour line for goblin cave awareness.</summary>
         public static string GetRandomGoblinCaveAwarenessLine()
         {
