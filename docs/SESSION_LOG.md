@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d31cd663c9f6f3b01ca08250f15c097c3f4cbf15 -->
+## 2025-10-26T09:39:27+00:00 — Refactor generic companion level-up message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 31 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:8c7cf231d95fe043cb6cda55c850913c2efc8249 -->
 ## 2025-10-26T09:34:24+00:00 — Merge pull request #1424 from aicovergod/codex/add-shared-dialogue-helpers-for-tasks
 

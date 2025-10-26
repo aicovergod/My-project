@@ -2022,7 +2022,7 @@ namespace Companions
                 {
                     string pronoun = ResolveCompanionPronoun();
                     string skillName = SkillNameUtility.GetSentenceName(skill);
-                    message = $"Just levelled up {pronoun} {skillName} to level {level}!";
+                    message = CompanionChatLibrary.BuildGenericLevelUpLine(pronoun, skillName, level);
                     break;
                 }
             }

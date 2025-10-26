@@ -6328,6 +6328,36 @@ namespace Companions
         }
 
         /// <summary>
+        /// Builds the generic level-up acknowledgement string so ad-hoc systems can reuse the
+        /// same phrasing while still supplying bespoke pronouns and skill names.
+        /// </summary>
+        /// <param name="possessivePronoun">Possessive pronoun preferred by the speaking companion.</param>
+        /// <param name="skillName">Display-ready skill name that should appear in the message.</param>
+        /// <param name="level">New level reached by the companion.</param>
+        /// <returns>Formatted chat line celebrating the level up.</returns>
+        public static string BuildGenericLevelUpLine(string possessivePronoun, string skillName, int level)
+        {
+            // Guard against null/whitespace values so the sentence remains readable if a definition
+            // omits optional metadata.
+            string safePronoun = string.IsNullOrWhiteSpace(possessivePronoun)
+                ? "their"
+                : possessivePronoun.Trim();
+
+            string safeSkillName = string.IsNullOrWhiteSpace(skillName)
+                ? "skill"
+                : skillName.Trim();
+
+            int clampedLevel = Mathf.Max(1, level);
+
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "Just levelled up {0} {1} to level {2}!",
+                safePronoun,
+                safeSkillName,
+                clampedLevel);
+        }
+
+        /// <summary>
         /// Shared helper that selects a random entry from the supplied pool while handling edge cases.
         /// </summary>
         /// <param name="pool">Array of potential chat lines.</param>
