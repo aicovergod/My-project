@@ -410,6 +410,12 @@ namespace Pets
             if (pet == null)
                 return;
 
+            // When companions automatically respawn after a login we avoid surfacing a toast.
+            // The login flow already greets the player through the companion chat pipeline,
+            // and the legacy "funny feeling" toast caused duplicate messaging on every load.
+            if (pet.spawnAsCompanion && isRespawnFromSave)
+                return;
+
             if (isRespawnFromSave)
             {
                 PetToastUI.Show("Your pet appears by your side", pet.messageColor);
