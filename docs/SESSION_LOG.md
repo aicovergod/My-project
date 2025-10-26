@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:bf3f7a39706ab0a66477e76bd3352ce58789b070 -->
+## 2025-10-26T22:26:47+00:00 — Merge pull request #1453 from aicovergod/codex/fix-ore-whitelisting-for-sanitizer
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 38 ++ / 1 --
+- Notes:
+  Fix ore bag fallback ore detection
+---
+<!-- commit:44fd3957fdd617a65ad2cfac3253010ff66cd12c -->
+## 2025-10-26T22:26:39+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:be9cdb69796b6eb51759524e6734a20d0326c832 -->
 ## 2025-10-26T22:26:20+00:00 — Fix ore bag fallback ore detection
 
