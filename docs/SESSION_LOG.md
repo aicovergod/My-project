@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:963c33eac7c2513145d928cfc0d79df7fc093b4c -->
+## 2025-10-26T20:41:08+00:00 — Fix ore bag depositing itself
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 9 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:017fda791870da283bf70e6740591f9c70f3aa07 -->
 ## 2025-10-26T20:25:32+00:00 — Merge pull request #1444 from aicovergod/codex/fix-inventory-type-errors
 
