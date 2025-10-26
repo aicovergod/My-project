@@ -1,4 +1,5 @@
 using System.Globalization;
+using Inventory;
 using UnityEngine;
 
 namespace Companions
@@ -46,6 +47,46 @@ namespace Companions
             "That’s it. My inventory has officially revolted.",
             "I think my bag just groaned.",
             "Full! I repeat, FULL! This is not a drill!"
+        };
+
+        /// <summary>Pool of chat lines used when an equipment attempt fails because of a single unmet skill requirement.</summary>
+        private static readonly string[] CompanionEquipmentSingleRequirementFailureChatMessages =
+        {
+            "I don't have the required skill to equip that.",
+            "I need a bit more training before I can wear that.",
+            "That equipment is still above my current skill.",
+            "I am missing the skill needed to use that.",
+            "I have to level up before I can equip that."
+        };
+
+        /// <summary>Pool of chat lines used when an equipment attempt fails because of multiple unmet skill requirements.</summary>
+        private static readonly string[] CompanionEquipmentMultipleRequirementFailureChatMessages =
+        {
+            "I don't have the required skills to equip that.",
+            "That gear needs more training than I have right now.",
+            "I am missing a few skills to make that work.",
+            "I need several skill boosts before I can wear that.",
+            "I lack the skills needed to equip that."
+        };
+
+        /// <summary>Pool of floating-text templates for single requirement failures.</summary>
+        private static readonly string[] CompanionEquipmentSingleRequirementFailureFloatingTextTemplates =
+        {
+            "{companionName} needs {requirement}.",
+            "{companionName} needs {level} {skill}.",
+            "Requires {level} {skill} for {companionName}.",
+            "{companionName} must reach {level} {skill}.",
+            "{companionName} still needs {requirement}."
+        };
+
+        /// <summary>Pool of floating-text templates for multi requirement failures.</summary>
+        private static readonly string[] CompanionEquipmentMultipleRequirementFailureFloatingTextTemplates =
+        {
+            "{companionName} lacks the requirements.",
+            "{companionName} doesn't meet all requirements.",
+            "{companionName} is missing multiple requirements.",
+            "{companionName} needs more training overall.",
+            "{companionName} must meet all requirements first."
         };
 
         /// <summary>Fallback message returned when the inventory full pool is empty.</summary>
@@ -189,6 +230,18 @@ namespace Companions
             "Inventory full another fine mess",
             "You filled every slot in record time"
         };
+
+        /// <summary>Fallback message returned when a single requirement failure chat pool is empty.</summary>
+        private const string CompanionEquipmentSingleRequirementFailureChatFallbackLine = "I don't have the required skill to equip that.";
+
+        /// <summary>Fallback message returned when a multiple requirement failure chat pool is empty.</summary>
+        private const string CompanionEquipmentMultipleRequirementFailureChatFallbackLine = "I don't have the required skills to equip that.";
+
+        /// <summary>Fallback message returned when the single requirement floating-text pool is empty.</summary>
+        private const string CompanionEquipmentSingleRequirementFailureFloatingTextFallback = "{companionName} needs {requirement}.";
+
+        /// <summary>Fallback message returned when the multiple requirement floating-text pool is empty.</summary>
+        private const string CompanionEquipmentMultipleRequirementFailureFloatingTextFallback = "{companionName} lacks the requirements.";
 
         /// <summary>Fallback message returned when the player inventory full pool is empty.</summary>
         private const string PlayerInventoryFullFallbackLine = "Your bag looks heavier than you right now";
@@ -5609,6 +5662,75 @@ namespace Companions
 
         /// <summary>Fallback message returned when the auto-spawn greeting pool is empty.</summary>
         private const string AutoSpawnGreetingFallbackLine = "You're back! I missed you.";
+
+        /// <summary>
+        /// Returns a random chat line for when the companion cannot equip an item due to a single missing requirement.
+        /// </summary>
+        public static string GetRandomCompanionEquipmentSingleRequirementFailureLine()
+        {
+            return GetRandomLine(
+                CompanionEquipmentSingleRequirementFailureChatMessages,
+                CompanionEquipmentSingleRequirementFailureChatFallbackLine);
+        }
+
+        /// <summary>
+        /// Returns a random chat line for when the companion cannot equip an item due to several missing requirements.
+        /// </summary>
+        public static string GetRandomCompanionEquipmentMultipleRequirementFailureLine()
+        {
+            return GetRandomLine(
+                CompanionEquipmentMultipleRequirementFailureChatMessages,
+                CompanionEquipmentMultipleRequirementFailureChatFallbackLine);
+        }
+
+        /// <summary>
+        /// Returns a floating-text line describing the primary requirement blocking an equip attempt.
+        /// </summary>
+        /// <param name="companionName">Display name of the active companion.</param>
+        /// <param name="requirement">Primary requirement preventing the equip.</param>
+        public static string GetRandomCompanionEquipmentSingleRequirementFloatingTextLine(
+            string companionName,
+            SkillRequirement requirement)
+        {
+            string template = GetRandomLine(
+                CompanionEquipmentSingleRequirementFailureFloatingTextTemplates,
+                CompanionEquipmentSingleRequirementFailureFloatingTextFallback);
+
+            string safeName = string.IsNullOrWhiteSpace(companionName)
+                ? "Your companion"
+                : companionName.Trim();
+
+            int clampedLevel = Mathf.Max(1, requirement.level);
+            string levelText = clampedLevel.ToString(CultureInfo.InvariantCulture);
+            string skillName = requirement.skill.ToString();
+            string requirementText = string.Format(
+                CultureInfo.InvariantCulture,
+                "{0} {1}",
+                levelText,
+                skillName);
+
+            string resolved = template.Replace("{companionName}", safeName);
+            resolved = resolved.Replace("{requirement}", requirementText);
+            resolved = resolved.Replace("{level}", levelText);
+            resolved = resolved.Replace("{skill}", skillName);
+            return resolved;
+        }
+
+        /// <summary>
+        /// Returns a floating-text line describing that multiple requirements block an equip attempt.
+        /// </summary>
+        /// <param name="companionName">Display name of the active companion.</param>
+        public static string GetRandomCompanionEquipmentMultipleRequirementFloatingTextLine(string companionName)
+        {
+            string template = GetRandomLine(
+                CompanionEquipmentMultipleRequirementFailureFloatingTextTemplates,
+                CompanionEquipmentMultipleRequirementFailureFloatingTextFallback);
+
+            string safeName = string.IsNullOrWhiteSpace(companionName)
+                ? "Your companion"
+                : companionName.Trim();
+            return template.Replace("{companionName}", safeName);
+        }
 
         /// <summary>
         /// Returns a randomly selected inventory full chat line so repeated messages feel more natural.
