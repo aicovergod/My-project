@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9024c33edd4bf78d7e2c9adb3aa33e86ff690544 -->
+## 2025-10-26T10:35:37+00:00 — Add companion small talk scheduling and memory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs, Assets/Scripts/Companions/Conversation/CompanionResponseContext.cs, Assets/Scripts/Companions/Conversation/CompanionSmallTalkDialogueBlocks.cs, Assets/Scripts/Companions/Conversation/CompanionSmallTalkDialogueBlocks.cs.meta
+- Diff: 456 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:270395e947ed12262cb87b3d232d474b6a7d3e2f -->
 ## 2025-10-26T10:12:34+00:00 — Merge pull request #1427 from aicovergod/codex/add-empathetic-condolence-lines-and-tone-selector
 

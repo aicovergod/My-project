@@ -24,6 +24,7 @@ namespace Companions.Conversation
             defaultsBuilt = true;
 
             RegisterGreetingResponses();
+            RegisterSmallTalkResponses();
             RegisterStatusQueryResponses();
             RegisterSkillLevelQueryResponses();
             RegisterGratitudeResponses();
@@ -64,6 +65,34 @@ namespace Companions.Conversation
         new ResponseTemplate("Hey. Eyes up—still {combatState}.", 0.8f, ctx => ctx.PlayerInCombat),
         new ResponseTemplate("Hi. I’ve got you. Keep moving.", 0.8f, ctx => ctx.PlayerInCombat),
               new ResponseTemplate("Hey {playerName}, {companionMood} as ever after {recentEvent}.", 0.75f));
+        }
+
+        /// <summary>
+        /// Populates the casual small-talk lines companions can lean on between major beats.
+        /// </summary>
+        private static void RegisterSmallTalkResponses()
+        {
+            Register(
+                CompanionDialogueIntent.SmallTalk,
+                // Time-of-day riffs
+                new ResponseTemplate("Quiet {timeOfDay} today. Feels nice to breathe for a second.", 1f, ctx => !ctx.PlayerInCombat),
+                new ResponseTemplate("Sun hits different this {timeOfDay}. Kinda calming.", 0.95f, ctx => !ctx.PlayerInCombat),
+                new ResponseTemplate("Breeze has that {timeOfDay} chill. Keeps me sharp.", 0.9f, ctx => !ctx.PlayerInCombat),
+
+                // Location observations
+                new ResponseTemplate("Feels like {ambientLocation} is finally relaxing with us.", 0.9f, ctx => !ctx.PlayerInCombat && ctx.HasAmbientLocation),
+                new ResponseTemplate("Never thought we’d spend this long around {ambientLocation}, but I’m not complaining.", 0.85f, ctx => !ctx.PlayerInCombat && ctx.HasAmbientLocation),
+                new ResponseTemplate("{ambientLocation} has a vibe today. Can’t quite name it.", 0.85f, ctx => !ctx.PlayerInCombat && ctx.HasAmbientLocation),
+
+                // Memory callouts
+                new ResponseTemplate("Still replaying {memorySummary}. Wild how fast the day moves.", 0.9f, ctx => !ctx.PlayerInCombat && ctx.HasMemorySummary),
+                new ResponseTemplate("Hard to believe {memorySummary} was just {skillRecency}.", 0.85f, ctx => !ctx.PlayerInCombat && ctx.HasMemorySummary && ctx.HasSuggestedSkillRecency),
+                new ResponseTemplate("I keep thinking about {memorySummary}. Makes the grind worth it.", 0.8f, ctx => !ctx.PlayerInCombat && ctx.HasMemorySummary),
+
+                // General connective tissue
+                new ResponseTemplate("Whatever comes next, this {timeOfDay} lull is welcome.", 0.8f, ctx => !ctx.PlayerInCombat),
+                new ResponseTemplate("Feels good to just exist for a tick, yeah?", 0.75f, ctx => !ctx.PlayerInCombat),
+                new ResponseTemplate("I’ll take a calm {timeOfDay} like this any day.", 0.75f, ctx => !ctx.PlayerInCombat));
         }
 
         /// <summary>

@@ -12,6 +12,7 @@ using Skills.Common;
 using Skills.Mining;
 using UI.Chat;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Util;
 using World;
 using NPC;
@@ -37,6 +38,7 @@ namespace Companions.Conversation
         private List<IntentScoreThreshold> intentScoreThresholds = new List<IntentScoreThreshold>
         {
             new IntentScoreThreshold(CompanionDialogueIntent.Greeting, 1f),
+            new IntentScoreThreshold(CompanionDialogueIntent.SmallTalk, 1.2f),
             new IntentScoreThreshold(CompanionDialogueIntent.StatusQuery, 2.2f),
             new IntentScoreThreshold(CompanionDialogueIntent.SkillLevelQuery, 2.1f),
             new IntentScoreThreshold(CompanionDialogueIntent.Gratitude, 1.6f),
@@ -98,6 +100,13 @@ namespace Companions.Conversation
 
         [SerializeField, Tooltip("Maximum age (in minutes) of a skill event that can seed a proactive prompt."), Min(0.1f)]
         private float minimumSkillEventFreshnessMinutes = 12f;
+
+        [Header("Small Talk")]
+        [SerializeField, Tooltip("Number of idle ticks before the companion drifts into small talk."), Min(1)]
+        private int smallTalkIdleTickThreshold = 8;
+
+        [SerializeField, Tooltip("Cooldown applied between proactive small-talk beats (minutes)."), Min(0.1f)]
+        private float smallTalkCooldownMinutes = 4f;
 
         [Header("Suggestion Prompt")]
         [SerializeField, Tooltip("Cooldown applied after answering a suggestion request (minutes)."), Min(0.1f)]
@@ -240,6 +249,9 @@ namespace Companions.Conversation
         private ActiveSkillQuestion activeSkillQuestion = ActiveSkillQuestion.Empty;
         private readonly LinkedList<SkillQuestionCandidate> skillQuestionCandidates = new LinkedList<SkillQuestionCandidate>();
         private int idleTickCounter;
+        private int smallTalkIdleTicks;
+        private DateTime? lastSmallTalkQueuedUtc;
+        private string lastSmallTalkTemplateKey = string.Empty;
         private bool tickerSubscribed;
         private Coroutine tickerSubscriptionRoutine;
         private DateTime? lastCompanionCombatUtc;
@@ -492,6 +504,9 @@ namespace Companions.Conversation
             lastProactiveQuestionUtc = null;
             lastProactiveQuestionTemplateKey = string.Empty;
             idleTickCounter = 0;
+            smallTalkIdleTicks = 0;
+            lastSmallTalkQueuedUtc = null;
+            lastSmallTalkTemplateKey = string.Empty;
             tickerSubscriptionRoutine = null;
             tickerSubscribed = false;
             lastCompanionCombatUtc = null;
@@ -699,6 +714,7 @@ namespace Companions.Conversation
             PruneSkillActions(nowUtc);
             ExpireActiveSkillQuestionIfStale(nowUtc);
             MaybeScheduleProactiveQuestion(nowUtc);
+            MaybeScheduleSmallTalk(nowUtc);
         }
 
         private void RecordSkillAction(string description)
@@ -811,18 +827,21 @@ namespace Companions.Conversation
             if (ResponseRoutineActive || pendingResponses.Count > 0)
             {
                 idleTickCounter = 0;
+                smallTalkIdleTicks = 0;
                 return;
             }
 
             if (playerInCombat || IsCompanionInCombat(nowUtc))
             {
                 idleTickCounter = 0;
+                smallTalkIdleTicks = 0;
                 return;
             }
 
             if (activeSkillQuestion.IsActive)
             {
                 idleTickCounter = 0;
+                smallTalkIdleTicks = 0;
                 return;
             }
 
@@ -832,6 +851,7 @@ namespace Companions.Conversation
                 if (minutesSinceQuestion < Mathf.Max(0.1f, proactiveQuestionCooldownMinutes))
                 {
                     idleTickCounter = 0;
+                    smallTalkIdleTicks = 0;
                     return;
                 }
             }
@@ -842,6 +862,7 @@ namespace Companions.Conversation
                 if (minutesSincePrompt < Mathf.Max(0.1f, proactiveQuestionCooldownMinutes))
                 {
                     idleTickCounter = 0;
+                    smallTalkIdleTicks = 0;
                     return;
                 }
             }
@@ -862,6 +883,172 @@ namespace Companions.Conversation
 
             ScheduleSkillQuestion(candidate, nowUtc);
             idleTickCounter = 0;
+            smallTalkIdleTicks = 0;
+        }
+
+        private void MaybeScheduleSmallTalk(DateTime nowUtc)
+        {
+            if (!isActiveAndEnabled)
+                return;
+
+            if (ResponseRoutineActive || pendingResponses.Count > 0)
+            {
+                smallTalkIdleTicks = 0;
+                return;
+            }
+
+            if (playerInCombat || IsCompanionInCombat(nowUtc))
+            {
+                smallTalkIdleTicks = 0;
+                return;
+            }
+
+            if (activeSkillQuestion.IsActive)
+            {
+                smallTalkIdleTicks = 0;
+                return;
+            }
+
+            if (skillQuestionCandidates.Count > 0)
+            {
+                smallTalkIdleTicks = 0;
+                return;
+            }
+
+            EnsureConversationMemoryBound();
+            if (conversationMemory != null && conversationMemory.LastSmallTalkUtc.HasValue)
+            {
+                double minutesSinceLast = (nowUtc - conversationMemory.LastSmallTalkUtc.Value).TotalMinutes;
+                if (minutesSinceLast < Mathf.Max(0.1f, smallTalkCooldownMinutes))
+                {
+                    smallTalkIdleTicks = 0;
+                    return;
+                }
+            }
+
+            if (lastSmallTalkQueuedUtc.HasValue)
+            {
+                double minutesSinceQueued = (nowUtc - lastSmallTalkQueuedUtc.Value).TotalMinutes;
+                if (minutesSinceQueued < Mathf.Max(0.1f, smallTalkCooldownMinutes * 0.5f))
+                {
+                    smallTalkIdleTicks = 0;
+                    return;
+                }
+            }
+
+            smallTalkIdleTicks++;
+            if (smallTalkIdleTicks < Mathf.Max(1, smallTalkIdleTickThreshold))
+                return;
+
+            if (!TryComposeSmallTalk(nowUtc, out var pending))
+            {
+                smallTalkIdleTicks = 0;
+                return;
+            }
+
+            pendingResponses.Enqueue(pending);
+            if (!ResponseRoutineActive)
+                responseRoutine = StartCoroutine(DrainResponseQueue());
+
+            smallTalkIdleTicks = 0;
+            lastSmallTalkQueuedUtc = nowUtc;
+        }
+
+        private bool TryComposeSmallTalk(DateTime nowUtc, out PendingResponse response)
+        {
+            response = default;
+
+            var context = BuildResponseContext();
+            string playerName = ResolvePlayerName(string.Empty);
+            string companionMood = ResolveCompanionMoodDescriptor();
+            string recentEvent = ResolveRecentEventSummary();
+
+            var options = new List<CompanionSmallTalkDialogueBlocks.SmallTalkEntry>(
+                CompanionSmallTalkDialogueBlocks.TimeOfDayEntries.Count +
+                CompanionSmallTalkDialogueBlocks.LocationEntries.Count +
+                CompanionSmallTalkDialogueBlocks.MemoryEntries.Count);
+
+            options.AddRange(CompanionSmallTalkDialogueBlocks.TimeOfDayEntries);
+
+            if (context.HasAmbientLocation)
+                options.AddRange(CompanionSmallTalkDialogueBlocks.LocationEntries);
+
+            if (context.HasMemorySummary)
+                options.AddRange(CompanionSmallTalkDialogueBlocks.MemoryEntries);
+
+            if (options.Count == 0)
+                return false;
+
+            if (!string.IsNullOrWhiteSpace(lastSmallTalkTemplateKey))
+                options.RemoveAll(entry => string.Equals(entry.Template, lastSmallTalkTemplateKey, StringComparison.OrdinalIgnoreCase));
+
+            int attempts = 0;
+            while (options.Count > 0 && attempts < 4)
+            {
+                attempts++;
+                var selection = ChooseSmallTalkEntry(options);
+                string eventForTemplate = selection.Category == CompanionSmallTalkDialogueBlocks.SmallTalkCategory.Memory && context.HasMemorySummary
+                    ? context.MemorySummary
+                    : recentEvent;
+
+                string formatted = FormatTemplate(
+                    selection.Template,
+                    playerName,
+                    companionMood,
+                    eventForTemplate,
+                    context);
+
+                formatted = CompactWhitespace(formatted);
+                if (string.IsNullOrWhiteSpace(formatted))
+                {
+                    options.Remove(selection);
+                    continue;
+                }
+
+                if (conversationMemory != null && conversationMemory.LastSmallTalkUtc.HasValue)
+                {
+                    double minutesSince = (nowUtc - conversationMemory.LastSmallTalkUtc.Value).TotalMinutes;
+                    if (minutesSince < Mathf.Max(0.1f, smallTalkCooldownMinutes * 1.5f) &&
+                        !string.IsNullOrWhiteSpace(conversationMemory.LastSmallTalkResponse) &&
+                        string.Equals(formatted, conversationMemory.LastSmallTalkResponse, StringComparison.OrdinalIgnoreCase))
+                    {
+                        options.Remove(selection);
+                        continue;
+                    }
+                }
+
+                response = new PendingResponse(formatted, string.Empty, intent: CompanionDialogueIntent.SmallTalk);
+                lastSmallTalkTemplateKey = selection.Template;
+                return true;
+            }
+
+            response = default;
+            return false;
+        }
+
+        private static CompanionSmallTalkDialogueBlocks.SmallTalkEntry ChooseSmallTalkEntry(IReadOnlyList<CompanionSmallTalkDialogueBlocks.SmallTalkEntry> entries)
+        {
+            if (entries == null || entries.Count == 0)
+                return default;
+
+            if (entries.Count == 1)
+                return entries[0];
+
+            float totalWeight = 0f;
+            for (int i = 0; i < entries.Count; i++)
+                totalWeight += Mathf.Max(0.0001f, entries[i].Weight);
+
+            float roll = UnityEngine.Random.Range(0f, totalWeight);
+            float cumulative = 0f;
+            for (int i = 0; i < entries.Count; i++)
+            {
+                float weight = Mathf.Max(0.0001f, entries[i].Weight);
+                cumulative += weight;
+                if (roll <= cumulative)
+                    return entries[i];
+            }
+
+            return entries[entries.Count - 1];
         }
 
         private bool TryGetBestSkillCandidate(DateTime nowUtc, out SkillQuestionCandidate candidate, SkillType? excludeSkill = null)
@@ -1006,11 +1193,12 @@ namespace Companions.Conversation
             if (string.IsNullOrWhiteSpace(formatted))
                 return;
 
-            pendingResponses.Enqueue(new PendingResponse(formatted, string.Empty));
+            pendingResponses.Enqueue(new PendingResponse(formatted, string.Empty, intent: CompanionDialogueIntent.ProactiveSkillQuestion));
             if (!ResponseRoutineActive)
                 responseRoutine = StartCoroutine(DrainResponseQueue());
 
             idleTickCounter = 0;
+            smallTalkIdleTicks = 0;
             lastProactiveQuestion = formatted;
             lastProactiveQuestionUtc = nowUtc;
             lastProactiveQuestionTemplateKey = selection.TemplateKey;
@@ -1095,6 +1283,7 @@ namespace Companions.Conversation
             lastPlayerMessage = message.Text ?? string.Empty;
             lastPlayerMessageUtc = DateTime.UtcNow;
             idleTickCounter = 0;
+            smallTalkIdleTicks = 0;
 
             string cleaned = NormaliseForParsing(message.Text);
             if (string.IsNullOrEmpty(cleaned))
@@ -1119,6 +1308,7 @@ namespace Companions.Conversation
 
             pendingResponses.Enqueue(response.Value);
             idleTickCounter = 0;
+            smallTalkIdleTicks = 0;
             if (!ResponseRoutineActive)
                 responseRoutine = StartCoroutine(DrainResponseQueue());
         }
@@ -1143,7 +1333,7 @@ namespace Companions.Conversation
                             continue;
 
                         pendingResponses.Enqueue(
-                            new PendingResponse(followUp, string.Empty));
+                            new PendingResponse(followUp, string.Empty, intent: response.Intent));
                     }
                 }
 
@@ -1161,6 +1351,7 @@ namespace Companions.Conversation
                 return;
 
             idleTickCounter = 0;
+            smallTalkIdleTicks = 0;
             string companionName = CompanionManager.GetCompanionDisplayName();
             chat.PublishCompanionMessage(companionName, response.Text);
 
@@ -1169,6 +1360,13 @@ namespace Companions.Conversation
                 conversationMemory.RegisterStatusResponse(response.StatusSegment, DateTime.UtcNow);
                 if (ShouldTraceMemory)
                     Debug.Log($"[CompanionConversationService] Registered status response '{response.StatusSegment}'.");
+            }
+
+            if (response.Intent == CompanionDialogueIntent.SmallTalk && conversationMemory != null)
+            {
+                conversationMemory.RegisterSmallTalkResponse(response.Text, DateTime.UtcNow);
+                if (ShouldTraceMemory)
+                    Debug.Log($"[CompanionConversationService] Logged small talk '{response.Text}'.");
             }
 
             if (ShouldTraceResponses)
@@ -1200,6 +1398,17 @@ namespace Companions.Conversation
                     case CompanionDialogueIntent.Greeting:
                         TryAddResponse(
                             CompanionDialogueIntent.Greeting,
+                            context,
+                            segments,
+                            followUps,
+                            playerName,
+                            companionMood,
+                            recentEvent);
+                        break;
+
+                    case CompanionDialogueIntent.SmallTalk:
+                        TryAddResponse(
+                            CompanionDialogueIntent.SmallTalk,
                             context,
                             segments,
                             followUps,
@@ -2474,6 +2683,9 @@ namespace Companions.Conversation
                     skillRecency = DescribeSkillRecency(skillAge.Value);
             }
 
+            string ambientLocation = ResolveAmbientLocationDescriptor();
+            string memorySummary = ResolveAmbientMemorySummary();
+
             return new CompanionResponseContext(
                 nowUtc,
                 timeOfDay,
@@ -2485,7 +2697,9 @@ namespace Companions.Conversation
                 suggestedSkillName,
                 suggestedSkillAction,
                 skillAge,
-                skillRecency);
+                skillRecency,
+                ambientLocation: ambientLocation,
+                memorySummary: memorySummary);
         }
 
         private IReadOnlyList<string> ResolveRecentSkillActions(DateTime nowUtc)
@@ -2574,6 +2788,51 @@ namespace Companions.Conversation
             return string.Empty;
         }
 
+        private string ResolveAmbientLocationDescriptor()
+        {
+            EnsureConversationMemoryBound();
+            if (conversationMemory != null && conversationMemory.TryGetLatestEvent(out var eventEntry))
+            {
+                string location = ResolveEventLocation(eventEntry.Metadata);
+                if (!string.IsNullOrWhiteSpace(location))
+                    return location;
+            }
+
+            var scene = SceneManager.GetActiveScene();
+            if (scene.IsValid() && !string.IsNullOrWhiteSpace(scene.name))
+                return FormatSceneName(scene.name);
+
+            return string.Empty;
+        }
+
+        private string ResolveAmbientMemorySummary()
+        {
+            EnsureConversationMemoryBound();
+            if (conversationMemory != null && conversationMemory.TryGetLatestEvent(out var eventEntry))
+            {
+                if (!string.IsNullOrWhiteSpace(eventEntry.Summary))
+                    return eventEntry.Summary.Trim();
+
+                if (!string.IsNullOrWhiteSpace(eventEntry.Metadata.AdditionalContext))
+                    return eventEntry.Metadata.AdditionalContext.Trim();
+            }
+
+            if (TryGetLatestNpcKill(out string npcName) && !string.IsNullOrWhiteSpace(npcName))
+            {
+                string plural = FormatNpcPlural(npcName);
+                return string.IsNullOrWhiteSpace(plural) ? npcName.Trim() : $"fighting {plural}";
+            }
+
+            if (recentSkillActions.Count > 0)
+            {
+                var first = recentSkillActions.First;
+                if (first != null && !string.IsNullOrWhiteSpace(first.Value.Description))
+                    return first.Value.Description.Trim();
+            }
+
+            return string.Empty;
+        }
+
         private string FormatEventEntry(CompanionEventEntry entry)
         {
             string actor = !string.IsNullOrWhiteSpace(entry.Metadata.PrimaryActor)
@@ -2628,6 +2887,19 @@ namespace Companions.Conversation
         private static string FormatWorldPosition(Vector3 position)
         {
             return $"{position.x:0.0}, {position.y:0.0}";
+        }
+
+        private static string FormatSceneName(string rawName)
+        {
+            if (string.IsNullOrWhiteSpace(rawName))
+                return string.Empty;
+
+            string trimmed = rawName.Replace('_', ' ').Trim();
+            if (trimmed.Length == 0)
+                return string.Empty;
+
+            var textInfo = CultureInfo.InvariantCulture.TextInfo;
+            return textInfo.ToTitleCase(trimmed.ToLowerInvariant());
         }
 
         /// <summary>
@@ -2696,6 +2968,10 @@ namespace Companions.Conversation
             string resolvedSkillRecency = context.HasSuggestedSkillRecency
                 ? context.SuggestedSkillRecency
                 : "recently";
+            string resolvedLocation = context.HasAmbientLocation ? context.AmbientLocation : "around here";
+            string resolvedMemory = context.HasMemorySummary
+                ? context.MemorySummary
+                : (!string.IsNullOrWhiteSpace(recentEvent) ? recentEvent : resolvedSuggestedSkill);
 
             string result = template
                 .Replace("{playerName}", resolvedPlayerName)
@@ -2707,7 +2983,9 @@ namespace Companions.Conversation
                 .Replace("{recentSkillAction}", resolvedSkillAction)
                 .Replace("{suggestedSkill}", resolvedSuggestedSkill)
                 .Replace("{skillRecency}", resolvedSkillRecency)
-                .Replace("{skillAction}", resolvedSkillAction);
+                .Replace("{skillAction}", resolvedSkillAction)
+                .Replace("{ambientLocation}", resolvedLocation)
+                .Replace("{memorySummary}", resolvedMemory);
 
             return CompactWhitespace(result);
         }
@@ -3740,11 +4018,16 @@ namespace Companions.Conversation
 
         private readonly struct PendingResponse
         {
-            public PendingResponse(string text, string statusSegment, IReadOnlyList<string> followUps = null)
+            public PendingResponse(
+                string text,
+                string statusSegment,
+                IReadOnlyList<string> followUps = null,
+                CompanionDialogueIntent? intent = null)
             {
                 Text = text ?? string.Empty;
                 StatusSegment = statusSegment ?? string.Empty;
                 FollowUpSegments = followUps ?? Array.Empty<string>();
+                Intent = intent;
             }
 
             public string Text { get; }
@@ -3752,6 +4035,8 @@ namespace Companions.Conversation
             public string StatusSegment { get; }
 
             public IReadOnlyList<string> FollowUpSegments { get; }
+
+            public CompanionDialogueIntent? Intent { get; }
         }
 
         [Serializable]
