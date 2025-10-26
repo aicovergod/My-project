@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9c7ee0cc90236a60cfec506e050e77760f3389e7 -->
+## 2025-10-26T22:08:20+00:00 — Sanitize ore bag save data on load
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Inventory/OreBag/OreBagInventory.cs
+- Diff: 112 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:bdabf28d7032d4a3a1f6b88eb88d75d0bd530716 -->
 ## 2025-10-26T21:38:23+00:00 — Merge pull request #1451 from aicovergod/codex/update-orebagservice-to-prevent-inventory-wipe
 
