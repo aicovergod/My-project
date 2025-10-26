@@ -155,6 +155,11 @@ namespace Inventory.OreBag
             if (item == null)
                 return false;
 
+            // Prevent the ore bag item itself from being considered an ore so players cannot
+            // accidentally stash the bag inside its own storage and lose access to it.
+            if (item is OreBagItemData)
+                return false;
+
             EnsureOreItemIds();
             return oreItemIds.Contains(item.id);
         }
