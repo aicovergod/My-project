@@ -22,7 +22,8 @@ namespace Environment.Companion
             Bank,
             MiningCave,
             GoblinCave,
-            Ocean
+            Ocean,
+            Graveyard
         }
 
         private const int TriggerChanceDenominator = 20;
@@ -40,6 +41,9 @@ namespace Environment.Companion
         [SerializeField]
         private bool areaIsOcean;
 
+        [SerializeField]
+        private bool areaIsGraveyard;
+
         [Header("Cooldown"), Tooltip("Minimum number of seconds before the same companion can react again inside this zone.")]
         [SerializeField, Min(0f)]
         private float retriggerCooldownSeconds = 10f;
@@ -48,7 +52,7 @@ namespace Environment.Companion
         private readonly Dictionary<CompanionController, float> lastReactionTimes = new Dictionary<CompanionController, float>();
 
         /// <summary>Reusable buffer that stores the active flags for the current evaluation.</summary>
-        private readonly List<AwarenessArea> activeAreas = new List<AwarenessArea>(4);
+        private readonly List<AwarenessArea> activeAreas = new List<AwarenessArea>(5);
 
         /// <summary>Cached collider reference so we can confirm trigger state during <see cref="Awake"/>.</summary>
         private Collider2D cachedCollider;
@@ -113,7 +117,7 @@ namespace Environment.Companion
         /// <summary>Returns <c>true</c> when any area flag is active on this zone.</summary>
         private bool HasAnyAreaFlag()
         {
-            return areaIsBank || areaIsMiningCave || areaIsGoblinCave || areaIsOcean;
+            return areaIsBank || areaIsMiningCave || areaIsGoblinCave || areaIsOcean || areaIsGraveyard;
         }
 
         /// <summary>Rolls the 1-in-20 entry chance that governs whether the companion speaks.</summary>
@@ -146,6 +150,8 @@ namespace Environment.Companion
                 activeAreas.Add(AwarenessArea.GoblinCave);
             if (areaIsOcean)
                 activeAreas.Add(AwarenessArea.Ocean);
+            if (areaIsGraveyard)
+                activeAreas.Add(AwarenessArea.Graveyard);
 
             if (activeAreas.Count == 0)
                 return string.Empty;
@@ -161,6 +167,8 @@ namespace Environment.Companion
                     return CompanionChatLibrary.GetRandomGoblinCaveAwarenessLine();
                 case AwarenessArea.Ocean:
                     return CompanionChatLibrary.GetRandomOceanAwarenessLine();
+                case AwarenessArea.Graveyard:
+                    return CompanionChatLibrary.GetRandomGraveyardAwarenessLine();
                 default:
                     return string.Empty;
             }
