@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:270395e947ed12262cb87b3d232d474b6a7d3e2f -->
+## 2025-10-26T10:12:34+00:00 — Merge pull request #1427 from aicovergod/codex/add-empathetic-condolence-lines-and-tone-selector
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 259 ++ / 6 --
+- Notes:
+  Add supportive companion death tone and respawn heuristics
+---
+<!-- commit:2f4d96344052bfc356319307d53ab078430c1831 -->
+## 2025-10-26T10:12:25+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:4a7d11010a432f84df07b7fde7c678421a5e19d0 -->
 ## 2025-10-26T10:12:04+00:00 — Add supportive companion death messaging
 
