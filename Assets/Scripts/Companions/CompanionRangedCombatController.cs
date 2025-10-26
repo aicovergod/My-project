@@ -10,6 +10,7 @@ using MyGame.Drops;
 using NPC;
 using Pets;
 using UI;
+using UI.Chat;
 using UnityEngine;
 using Util;
 
@@ -617,9 +618,19 @@ namespace Companions
 
             if (currentAmmo == ammo)
             {
+                string companionName = CompanionManager.GetCompanionDisplayName();
+                string weaponName = ResolveWeaponDisplayName(weapon);
+                string ammoName = ResolveAmmoDisplayName(ammo);
+                string playerName = ResolveActivePlayerName();
+                string warning = CompanionChatLibrary.GetRandomCompanionAmmoRestrictionLine(
+                    companionName,
+                    weaponName,
+                    ammoName,
+                    playerName);
+
                 RejectCurrentAmmo(
                     $"Ammunition '{ammo.name}' is blocked by '{weapon.name}' restriction data.",
-                    "Your weapon cannot use that ammo.");
+                    warning);
             }
         }
 
@@ -646,7 +657,16 @@ namespace Companions
         private void HandleNoAmmo()
         {
             equipment?.OverrideAmmoLabel(ammoEmptyLabel, ammoDepletedColor);
-            ShowAmmoWarning("I'm out of ammo!", true);
+
+            string companionName = CompanionManager.GetCompanionDisplayName();
+            string weaponName = ResolveWeaponDisplayName(currentWeapon);
+            string playerName = ResolveActivePlayerName();
+            string message = CompanionChatLibrary.GetRandomCompanionAmmoDepletedLine(
+                companionName,
+                weaponName,
+                playerName);
+
+            ShowAmmoWarning(message, true);
         }
 
         private void ShowAmmoWarning(string message, bool playDepletedSound)
@@ -790,6 +810,46 @@ namespace Companions
                 return definition;
 
             return null;
+        }
+
+        private static string ResolveWeaponDisplayName(RangedWeaponData weapon)
+        {
+            if (weapon == null)
+                return string.Empty;
+
+            ItemData item = weapon.WeaponItem;
+            if (item != null)
+            {
+                if (!string.IsNullOrWhiteSpace(item.itemName))
+                    return item.itemName.Trim();
+                if (!string.IsNullOrWhiteSpace(item.name))
+                    return item.name;
+            }
+
+            return string.IsNullOrWhiteSpace(weapon.name) ? string.Empty : weapon.name;
+        }
+
+        private static string ResolveAmmoDisplayName(AmmunitionData ammo)
+        {
+            if (ammo == null)
+                return string.Empty;
+
+            ItemData item = ammo.AmmoItem;
+            if (item != null)
+            {
+                if (!string.IsNullOrWhiteSpace(item.itemName))
+                    return item.itemName.Trim();
+                if (!string.IsNullOrWhiteSpace(item.name))
+                    return item.name;
+            }
+
+            return string.IsNullOrWhiteSpace(ammo.name) ? string.Empty : ammo.name;
+        }
+
+        private static string ResolveActivePlayerName()
+        {
+            var chat = ChatService.Instance;
+            return chat != null ? chat.ActiveUsername : string.Empty;
         }
 
         private void Log(string message)

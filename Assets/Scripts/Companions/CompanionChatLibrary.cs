@@ -90,6 +90,32 @@ namespace Companions
             "{companionName} must meet all requirements first."
         };
 
+        /// <summary>Pool of floating-text templates used when the equipped stack has reached its limit.</summary>
+        private static readonly string[] CompanionEquipmentStackLimitFloatingTextTemplates =
+        {
+            "{companionName} can't equip more {itemName}.",
+            "Stack limit reached on {itemName} for {companionName}.",
+            "No more room for {itemName} on {companionName}.",
+            "{companionName} is capped on {itemName}, {playerName}.",
+            "{itemName} stack is maxed for {companionName}."
+        };
+
+        /// <summary>Pool of floating-text templates used when the companion's equipment slots are full.</summary>
+        private static readonly string[] CompanionEquipmentInventoryFullFloatingTextTemplates =
+        {
+            "{companionName} can't hold anything else.",
+            "All slots are packed for {companionName}.",
+            "{playerName}, {companionName} has no space left.",
+            "{companionName}'s loadout is full.",
+            "No room left—{companionName} is maxed out."
+        };
+
+        /// <summary>Fallback message returned when the stack-limit floating-text pool is empty.</summary>
+        private const string CompanionEquipmentStackLimitFloatingTextFallback = "{companionName} can't equip more {itemName}.";
+
+        /// <summary>Fallback message returned when the equipment inventory full floating-text pool is empty.</summary>
+        private const string CompanionEquipmentInventoryFullFloatingTextFallback = "{companionName} can't hold anything else.";
+
         /// <summary>Fallback message returned when the inventory full pool is empty.</summary>
         private const string InventoryFullFallbackLine = "My inventory’s full, maybe we should stop by a bank.";
 
@@ -714,6 +740,32 @@ namespace Companions
 
         /// <summary>Fallback message returned when the fishing decline cooldown pool is empty.</summary>
         private const string FishingDeclineCooldownFallbackLine = "Rod arm’s resting—give me {minutes}, {playerName}.";
+
+        /// <summary>Pool of chat lines used when a ranged weapon rejects the equipped ammo.</summary>
+        private static readonly string[] CompanionAmmoRestrictionChatMessages =
+        {
+            "{companionName} can't fire {ammoName} with {weaponName}, {playerName}.",
+            "{ammoName} won't work with {weaponName}.",
+            "That ammo doesn't fit this weapon, {playerName}.",
+            "Wrong ammo for {weaponName}.",
+            "{companionName} needs different ammo before {playerName} orders another shot."
+        };
+
+        /// <summary>Fallback message returned when the ammo restriction pool is empty.</summary>
+        private const string CompanionAmmoRestrictionFallbackLine = "{companionName} can't use that ammo with this weapon.";
+
+        /// <summary>Pool of chat lines used when the companion runs out of ammunition.</summary>
+        private static readonly string[] CompanionAmmoDepletedChatMessages =
+        {
+            "{companionName} is out of ammo!",
+            "No ammo left for {weaponName}, {playerName}.",
+            "Quiver's empty—I need more ammo.",
+            "Nothing left to fire with {weaponName}.",
+            "Out of shots, {playerName}. Grab some ammo."
+        };
+
+        /// <summary>Fallback message returned when the ammo depleted pool is empty.</summary>
+        private const string CompanionAmmoDepletedFallbackLine = "{companionName} is out of ammo!";
 
         /// <summary>Pool of chat lines used when the companion refuses combat due to an active cooldown.</summary>
         private static readonly string[] CombatDeclineCooldownChatMessages =
@@ -5830,6 +5882,43 @@ namespace Companions
         }
 
         /// <summary>
+        /// Returns floating-text feedback when the companion cannot equip additional items because a stack is capped.
+        /// </summary>
+        /// <param name="companionName">Display name of the companion.</param>
+        /// <param name="itemName">Display-ready item name that hit the stack limit.</param>
+        /// <param name="playerName">Display name of the issuing player.</param>
+        public static string GetRandomCompanionStackLimitFloatingTextLine(
+            string companionName,
+            string itemName,
+            string playerName)
+        {
+            string template = GetRandomLine(
+                CompanionEquipmentStackLimitFloatingTextTemplates,
+                CompanionEquipmentStackLimitFloatingTextFallback);
+
+            template = ApplyCompanionName(template, companionName);
+            template = ApplyPlayerName(template, playerName);
+            template = ApplyItemName(template, itemName);
+            return template;
+        }
+
+        /// <summary>
+        /// Returns floating-text feedback when the companion equipment inventory is full.
+        /// </summary>
+        /// <param name="companionName">Display name of the companion.</param>
+        /// <param name="playerName">Display name of the issuing player.</param>
+        public static string GetRandomCompanionInventoryFullFloatingTextLine(string companionName, string playerName)
+        {
+            string template = GetRandomLine(
+                CompanionEquipmentInventoryFullFloatingTextTemplates,
+                CompanionEquipmentInventoryFullFloatingTextFallback);
+
+            template = ApplyCompanionName(template, companionName);
+            template = ApplyPlayerName(template, playerName);
+            return template;
+        }
+
+        /// <summary>
         /// Returns a randomly selected inventory full chat line so repeated messages feel more natural.
         /// Falls back to a default string if the configured pool is empty or contains whitespace-only entries.
         /// </summary>
@@ -6299,6 +6388,51 @@ namespace Companions
         }
 
         /// <summary>
+        /// Returns a ranged-combat line explaining that the equipped ammunition is incompatible with the active weapon.
+        /// </summary>
+        /// <param name="companionName">Display name of the active companion.</param>
+        /// <param name="weaponName">Weapon name used for substitution.</param>
+        /// <param name="ammoName">Ammunition name used for substitution.</param>
+        /// <param name="playerName">Display name of the player issuing the command.</param>
+        public static string GetRandomCompanionAmmoRestrictionLine(
+            string companionName,
+            string weaponName,
+            string ammoName,
+            string playerName)
+        {
+            string template = GetRandomLine(
+                CompanionAmmoRestrictionChatMessages,
+                CompanionAmmoRestrictionFallbackLine);
+
+            template = ApplyCompanionName(template, companionName);
+            template = ApplyPlayerName(template, playerName);
+            template = ApplyWeaponName(template, weaponName);
+            template = ApplyAmmoName(template, ammoName);
+            return template;
+        }
+
+        /// <summary>
+        /// Returns a ranged-combat line informing the player that the companion has no ammunition remaining.
+        /// </summary>
+        /// <param name="companionName">Display name of the active companion.</param>
+        /// <param name="weaponName">Weapon name used for substitution.</param>
+        /// <param name="playerName">Display name of the player issuing the command.</param>
+        public static string GetRandomCompanionAmmoDepletedLine(
+            string companionName,
+            string weaponName,
+            string playerName)
+        {
+            string template = GetRandomLine(
+                CompanionAmmoDepletedChatMessages,
+                CompanionAmmoDepletedFallbackLine);
+
+            template = ApplyCompanionName(template, companionName);
+            template = ApplyPlayerName(template, playerName);
+            template = ApplyWeaponName(template, weaponName);
+            return template;
+        }
+
+        /// <summary>
         /// Resolves a random line from the supplied pool while applying an optional player-name substitution.
         /// </summary>
         /// <param name="pool">Array of potential chat lines.</param>
@@ -6317,14 +6451,54 @@ namespace Companions
         /// <param name="playerName">Player display name to insert.</param>
         private static string ApplyPlayerName(string template, string playerName)
         {
+            return ApplyToken(template, "{playerName}", "friend", playerName);
+        }
+
+        /// <summary>
+        /// Replaces <c>{companionName}</c> placeholders with a safe companion name fallback.
+        /// </summary>
+        private static string ApplyCompanionName(string template, string companionName)
+        {
+            return ApplyToken(template, "{companionName}", "Your companion", companionName);
+        }
+
+        /// <summary>
+        /// Replaces <c>{weaponName}</c> placeholders while guarding against null/whitespace inputs.
+        /// </summary>
+        private static string ApplyWeaponName(string template, string weaponName)
+        {
+            return ApplyToken(template, "{weaponName}", "that weapon", weaponName);
+        }
+
+        /// <summary>
+        /// Replaces <c>{ammoName}</c> placeholders while guarding against null/whitespace inputs.
+        /// </summary>
+        private static string ApplyAmmoName(string template, string ammoName)
+        {
+            return ApplyToken(template, "{ammoName}", "that ammo", ammoName);
+        }
+
+        /// <summary>
+        /// Replaces <c>{itemName}</c> placeholders while guarding against null/whitespace inputs.
+        /// </summary>
+        private static string ApplyItemName(string template, string itemName)
+        {
+            return ApplyToken(template, "{itemName}", "that item", itemName);
+        }
+
+        /// <summary>
+        /// Shared token replacement helper that trims values and applies safe fallbacks.
+        /// </summary>
+        private static string ApplyToken(string template, string token, string fallback, string value)
+        {
             if (string.IsNullOrEmpty(template))
                 return template;
 
-            if (template.IndexOf("{playerName}", StringComparison.Ordinal) < 0)
+            if (template.IndexOf(token, StringComparison.Ordinal) < 0)
                 return template;
 
-            string safeName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName.Trim();
-            return template.Replace("{playerName}", safeName);
+            string safeValue = string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
+            return template.Replace(token, safeValue);
         }
 
         /// <summary>
