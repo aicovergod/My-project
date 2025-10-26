@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c488b5cb3a8bc76cce27698cfae6ce983640fdcc -->
+## 2025-10-26T14:34:37+00:00 — Enable shift-right-click companion cooking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Cooking/Core/CookingController.cs
+- Diff: 55 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9872bd79d4b46a0defe2596712eaa507444e19cb -->
 ## 2025-10-26T14:28:53+00:00 — Merge pull request #1434 from aicovergod/codex/remove-pettoast-on-companion-login
 
