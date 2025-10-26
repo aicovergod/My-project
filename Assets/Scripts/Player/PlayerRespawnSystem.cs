@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Core;
@@ -28,6 +30,17 @@ namespace Player
         private string cachedSpawnPointId;
         private Vector3 cachedFallbackPosition;
         private bool hasCachedRespawnData;
+        /// <summary>Rolling list of recent player death timestamps used to modulate companion tone.</summary>
+        private readonly List<float> recentDeathTimestamps = new List<float>();
+
+        /// <summary>Delegate used to fetch the final chat line. Tests can temporarily replace this selector.</summary>
+        private static Func<CompanionChatTone, string> playerDeathLineSelector = CompanionChatLibrary.GetRandomPlayerDeathLine;
+
+        /// <summary>Amount of real time the player has to avoid rapid-fire deaths before the tone resets.</summary>
+        private const float SupportiveDeathWindowSeconds = 45f;
+
+        /// <summary>Number of deaths inside <see cref="SupportiveDeathWindowSeconds"/> required before switching tones.</summary>
+        private const int SupportiveDeathThreshold = 3;
 
         protected override void Awake()
         {
@@ -112,7 +125,8 @@ namespace Player
             {
                 playerMover?.StopMovement();
                 combatController?.CancelCombat();
-                TryPublishCompanionDeathLine();
+                CompanionChatTone tone = RegisterDeathForToneEvaluation(Time.unscaledTime);
+                TryPublishCompanionDeathLine(tone);
                 if (poisonController == null && hitpoints != null)
                 {
                     // Cache the poison controller the first time it is needed so subsequent deaths
@@ -134,10 +148,11 @@ namespace Player
         }
 
         /// <summary>
-        /// Publishes a random snarky death line from the active companion when the player dies.
+        /// Publishes a random death line from the active companion when the player dies using the supplied tone.
         /// Keeps the companion flavour consistent with the shared chat library.
         /// </summary>
-        private static void TryPublishCompanionDeathLine()
+        /// <param name="tone">Tone requested by the recent-death heuristic.</param>
+        private static void TryPublishCompanionDeathLine(CompanionChatTone tone)
         {
             if (!CompanionManager.HasActiveCompanion)
                 return;
@@ -146,12 +161,38 @@ namespace Player
             if (chat == null)
                 return;
 
-            string message = CompanionChatLibrary.GetRandomPlayerDeathLine();
+            var selector = playerDeathLineSelector ?? CompanionChatLibrary.GetRandomPlayerDeathLine;
+            string message = selector(tone);
             if (string.IsNullOrWhiteSpace(message))
                 return;
 
             string companionName = CompanionManager.GetCompanionDisplayName();
             chat.PublishCompanionMessage(companionName, message);
+        }
+
+        /// <summary>
+        /// Registers the latest death timestamp and resolves which tone the companion should use.
+        /// </summary>
+        /// <param name="timestamp">Unscaled time the death occurred.</param>
+        /// <returns>The tone the companion should adopt for the next death quip.</returns>
+        private CompanionChatTone RegisterDeathForToneEvaluation(float timestamp)
+        {
+            // Remove any entries that fall outside of the configured window so stale deaths do not skew the tone.
+            for (int i = recentDeathTimestamps.Count - 1; i >= 0; i--)
+            {
+                if (timestamp - recentDeathTimestamps[i] > SupportiveDeathWindowSeconds)
+                    recentDeathTimestamps.RemoveAt(i);
+            }
+
+            recentDeathTimestamps.Add(timestamp);
+
+            // Clamp the list to the threshold size to avoid unbounded growth when the player repeatedly dies in-bounds.
+            if (recentDeathTimestamps.Count > SupportiveDeathThreshold)
+                recentDeathTimestamps.RemoveRange(0, recentDeathTimestamps.Count - SupportiveDeathThreshold);
+
+            return recentDeathTimestamps.Count >= SupportiveDeathThreshold
+                ? CompanionChatTone.Supportive
+                : CompanionChatTone.Snarky;
         }
 
         private IEnumerator RespawnRoutine()

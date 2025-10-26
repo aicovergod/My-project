@@ -6,6 +6,19 @@ using UnityEngine;
 namespace Companions
 {
     /// <summary>
+    /// Describes the tonal variants companions can use when reacting to player events.
+    /// Snarky remains the classic banter while Supportive aims to comfort the player.
+    /// </summary>
+    public enum CompanionChatTone
+    {
+        /// <summary>Represents the default teasing/snarky delivery used historically.</summary>
+        Snarky = 0,
+
+        /// <summary>Represents an empathetic and supportive delivery for sensitive moments.</summary>
+        Supportive = 1
+    }
+
+    /// <summary>
     /// Centralises the companion chat pools used by gameplay systems so flavour text stays consistent.
     /// Provides random selection helpers that gracefully fall back to default lines when pools are empty.
     /// </summary>
@@ -1140,8 +1153,36 @@ namespace Companions
             "Your coordination is about as stable as your health bar"
         };
 
+        /// <summary>Pool of chat lines used when the player dies and the companion aims to comfort them.</summary>
+        private static readonly string[] PlayerDeathSupportiveChatMessages =
+        {
+            "Hey, deep breath. We pick ourselves up and try again together.",
+            "Rough break, but I’ve got you. Let’s regroup and go back stronger.",
+            "You fought hard. I’ll stand guard until you’re ready for the next run.",
+            "It happens to the best of us. I’m right here when you’re ready.",
+            "No shame in that fall. We’ll learn and make the next attempt count.",
+            "I know that sting. Shake it off—we’ll get them on the next pass.",
+            "Rest a moment. I’ll handle the pep talk and we’ll reset the plan.",
+            "Even legends stumble. I’m proud of how you keep pushing.",
+            "You gave it everything. Let’s take a moment and then go again.",
+            "We’ve seen worse days. I’m with you every respawn, promise.",
+            "Hey, it’s okay to feel rattled. I believe in you.",
+            "Take your time catching your breath—I’ll be ready when you are.",
+            "You’re not alone in this. We face the next challenge side by side.",
+            "I’ll keep the morale high. When you’re ready, we’ll charge back in.",
+            "You’re allowed to fall. What matters is that we rise together.",
+            "Let’s reset and plan the next move. I’ve got faith in you.",
+            "That was a tough fight. I’m still in your corner.",
+            "Lean on me. We’ll turn this around.",
+            "I’m proud of your effort. Let’s refocus and win the next round.",
+            "I’ll watch over things while you steady yourself. We’ve got this."
+        };
+
         /// <summary>Fallback message returned when the player death pool is empty.</summary>
         private const string PlayerDeathFallbackLine = "Oh fantastic you died again that’s my favorite hobby now";
+
+        /// <summary>Fallback message returned when the supportive player death pool is empty.</summary>
+        private const string PlayerDeathSupportiveFallbackLine = "You did your best—rest a moment, I’m still with you.";
 
         /// <summary>Fallback message returned when the combined inventory full pool is empty.</summary>
         private const string PlayerAndCompanionInventoryFullFallbackLine = "Well this is awkward we are both full";
@@ -6381,10 +6422,28 @@ namespace Companions
                 PlayerOreGolemPickaxeReminderFallbackLine);
         }
 
-        /// <summary>Returns a random chat line used when the player dies while a companion is active.</summary>
+        /// <summary>
+        /// Returns a random chat line used when the player dies while a companion is active.
+        /// Defaults to the snarky tone to preserve the original flavour.
+        /// </summary>
         public static string GetRandomPlayerDeathLine()
         {
-            return GetRandomLine(PlayerDeathChatMessages, PlayerDeathFallbackLine);
+            return GetRandomPlayerDeathLine(CompanionChatTone.Snarky);
+        }
+
+        /// <summary>
+        /// Returns a random chat line used when the player dies while a companion is active, respecting the requested tone.
+        /// </summary>
+        /// <param name="tone">Determines whether the line should be playful/snarky or supportive.</param>
+        public static string GetRandomPlayerDeathLine(CompanionChatTone tone)
+        {
+            switch (tone)
+            {
+                case CompanionChatTone.Supportive:
+                    return GetRandomLine(PlayerDeathSupportiveChatMessages, PlayerDeathSupportiveFallbackLine);
+                default:
+                    return GetRandomLine(PlayerDeathChatMessages, PlayerDeathFallbackLine);
+            }
         }
 
         /// <summary>
