@@ -78,7 +78,7 @@ namespace Companions.UI
 
             GUILayout.Space(6f);
             GUILayout.Label("Active companion status");
-            GUILayout.Label($"Has active companion: {CompanionManager.HasActiveCompanion}");
+            DrawBooleanLabel("Has active companion", CompanionManager.HasActiveCompanion);
 
             var activeAction = CompanionManager.GetActiveAction();
             GUILayout.Label($"Current action: {CompanionManager.GetActiveActionDisplayName(activeAction)}");
@@ -86,10 +86,39 @@ namespace Companions.UI
                 GUILayout.Label($"Stop button label: {CompanionManager.GetStopActionLabel(activeAction)}");
 
             GUILayout.Space(6f);
+            GUILayout.Label("Guard and storage state");
+            DrawBooleanLabel("Companion stored", CompanionManager.IsStored);
+            DrawBooleanLabel("Guard mode enabled", CompanionManager.GuardModeEnabled);
+            DrawBooleanLabel(
+                "Guard mode locked by combat cooldown",
+                CompanionManager.IsGuardModeLockedByCombatCooldown,
+                Color.yellow);
+
+            GUILayout.Space(6f);
+            GUILayout.Label("UI visibility");
+            DrawBooleanLabel("Companion inventory visible", CompanionManager.IsInventoryVisible());
+            DrawBooleanLabel("Companion equipment visible", CompanionManager.IsEquipmentVisible());
+            DrawBooleanLabel(
+                "Command radial visible",
+                CompanionCommandMenu.IsVisible,
+                new Color(0.65f, 0.85f, 1f));
+            DrawBooleanLabel(
+                "Cooldown inspector open",
+                CompanionCooldownsWindow.Instance != null && CompanionCooldownsWindow.Instance.IsOpen,
+                new Color(0.75f, 0.75f, 1f));
+
+            GUILayout.Space(6f);
+            GUILayout.Label("Debug toggles");
+            DrawBooleanLabel("Companion debug logging enabled", CompanionManager.EnableDebugLogging);
+
+            GUILayout.Space(6f);
             GUILayout.Label("Suggestion prompt state");
 
+            DrawBooleanLabel(
+                "CompanionHasAnsweredSuggestionQuestion",
+                CompanionConversationService.CompanionHasAnsweredSuggestionQuestion);
+
             var debugState = CompanionConversationService.GetSuggestionDebugState();
-            GUILayout.Label($"CompanionHasAnsweredSuggestionQuestion: {debugState.HasActiveSuggestion}");
 
             string remaining = debugState.TimeRemaining.HasValue
                 ? FormatTimeSpan(debugState.TimeRemaining.Value)
@@ -99,12 +128,10 @@ namespace Companions.UI
             if (!string.IsNullOrWhiteSpace(debugState.LastSuggestion))
                 GUILayout.Label($"Last suggestion: {debugState.LastSuggestion}");
 
-            Color previousColor = GUI.color;
-            if (debugState.PlayerAskedAgain)
-                GUI.color = Color.yellow;
-
-            GUILayout.Label($"PlayerHasAskedCompanionSuggestionQuestionAgain: {debugState.PlayerAskedAgain}");
-            GUI.color = previousColor;
+            DrawBooleanLabel(
+                "PlayerHasAskedCompanionSuggestionQuestionAgain",
+                CompanionConversationService.PlayerHasAskedCompanionSuggestionQuestionAgain,
+                Color.yellow);
 
             GUILayout.Space(6f);
             GUILayout.Label("Press F4 again to close this menu.");
@@ -131,6 +158,28 @@ namespace Companions.UI
             return value.TotalHours >= 1d
                 ? value.ToString(@"hh\:mm\:ss")
                 : value.ToString(@"mm\:ss");
+        }
+
+        /// <summary>
+        /// Renders a boolean value using a consistent yes/no format and optional highlight colour.
+        /// </summary>
+        private static void DrawBooleanLabel(string label, bool value, Color? trueColor = null)
+        {
+            Color originalColor = GUI.color;
+
+            if (trueColor.HasValue && value)
+                GUI.color = trueColor.Value;
+
+            GUILayout.Label($"{label}: {FormatBoolean(value)}");
+            GUI.color = originalColor;
+        }
+
+        /// <summary>
+        /// Formats a boolean into a short, human-friendly string for GUI output.
+        /// </summary>
+        private static string FormatBoolean(bool value)
+        {
+            return value ? "Yes" : "No";
         }
     }
 }
