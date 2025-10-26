@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:be9cdb69796b6eb51759524e6734a20d0326c832 -->
+## 2025-10-26T22:26:20+00:00 — Fix ore bag fallback ore detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs
+- Diff: 29 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:1134a88d9c22449909dc97593f5d54d6f0981778 -->
 ## 2025-10-26T22:08:52+00:00 — Merge pull request #1452 from aicovergod/codex/add-inventory-cleaning-and-update-routines
 
