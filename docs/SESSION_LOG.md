@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2f6bce33c04b928db488c3b85b38c2ffba1108ee -->
+## 2025-10-26T22:52:32+00:00 — Merge pull request #1454 from aicovergod/codex/update-orebagservice-instance-management
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 27 ++ / 10 --
+- Notes:
+  Ensure ore bag inventory save key is applied before enabling runtime inventory
+---
+<!-- commit:a4647f00b22964e7a6e83532e85fedfabaee4e76 -->
+## 2025-10-26T22:52:20+00:00 — Ensure ore bag inventory config runs before enable
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 27 ++ / 10 --
+- Notes:
+  —
+---
 <!-- commit:bf3f7a39706ab0a66477e76bd3352ce58789b070 -->
 ## 2025-10-26T22:26:47+00:00 — Merge pull request #1453 from aicovergod/codex/fix-ore-whitelisting-for-sanitizer
 
