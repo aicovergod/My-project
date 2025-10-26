@@ -416,10 +416,12 @@ namespace Companions.Chat
             if (chat == null)
                 return;
 
+            string playerName = chat.ActiveUsername;
+
             if (!CompanionManager.HasActiveCompanion)
             {
                 chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
-                    "You need to summon me before I can go mining.");
+                    CompanionChatLibrary.GetRandomMiningSummonRequiredLine(playerName));
                 return;
             }
 
@@ -434,7 +436,7 @@ namespace Companions.Chat
                     return; // The mining systems already publish descriptive chat.
                 default:
                     chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
-                        "I can't find any rocks to mine right now.");
+                        CompanionChatLibrary.GetRandomMiningGenericFailureLine(playerName));
                     break;
             }
         }
@@ -445,10 +447,12 @@ namespace Companions.Chat
             if (chat == null)
                 return;
 
+            string playerName = chat.ActiveUsername;
+
             if (!CompanionManager.HasActiveCompanion)
             {
                 chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
-                    "You need to summon me before I can go fishing.");
+                    CompanionChatLibrary.GetRandomFishingSummonRequiredLine(playerName));
                 return;
             }
 
@@ -468,7 +472,7 @@ namespace Companions.Chat
                     break;
                 default:
                     chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
-                        "I can't find a good fishing spot right now.");
+                        CompanionChatLibrary.GetRandomFishingGenericFailureLine(playerName));
                     break;
             }
         }
@@ -479,10 +483,12 @@ namespace Companions.Chat
             if (chat == null)
                 return;
 
+            string playerName = chat.ActiveUsername;
+
             if (!CompanionManager.HasActiveCompanion)
             {
                 chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
-                    "You need to summon me before I can start chopping.");
+                    CompanionChatLibrary.GetRandomWoodcuttingSummonRequiredLine(playerName));
                 return;
             }
 
@@ -497,7 +503,7 @@ namespace Companions.Chat
                     return;
                 default:
                     chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
-                        CompanionWoodcuttingDialogueLibrary.GetRandomNoTreesLine());
+                        CompanionChatLibrary.GetRandomWoodcuttingGenericFailureLine(playerName));
                     break;
             }
         }
@@ -508,10 +514,12 @@ namespace Companions.Chat
             if (chat == null)
                 return;
 
+            string playerName = chat.ActiveUsername;
+
             if (!CompanionManager.HasActiveCompanion)
             {
                 chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
-                    "You need to summon me before I can start cooking.");
+                    CompanionChatLibrary.GetRandomCookingSummonRequiredLine(playerName));
                 return;
             }
 
@@ -527,7 +535,7 @@ namespace Companions.Chat
                     return; // The cooking systems already published context-specific chatter.
                 default:
                     chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
-                        "I can't find a free range to cook on right now.");
+                        CompanionChatLibrary.GetRandomCookingGenericFailureLine(playerName));
                     break;
             }
         }
