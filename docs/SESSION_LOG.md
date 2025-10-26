@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9872bd79d4b46a0defe2596712eaa507444e19cb -->
+## 2025-10-26T14:28:53+00:00 — Merge pull request #1434 from aicovergod/codex/remove-pettoast-on-companion-login
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 6 ++ / 0 --
+- Notes:
+  Fix companion login toast duplication
+---
+<!-- commit:2fbd0b6a07b4be9b9c7c6c37b3b80aec8592b90e -->
+## 2025-10-26T14:28:43+00:00 — Fix companion login toast duplication
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetDropSystem.cs
+- Diff: 6 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d8dd3361c84e41054130833eb7c4b689faa13494 -->
 ## 2025-10-26T14:25:01+00:00 — Merge pull request #1433 from aicovergod/codex/organize-companion-scripts-into-folders
 
