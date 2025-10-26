@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Beastmaster;
 using Inventory;
+using Inventory.OreBag;
 using Skills;
 using Skills.Cooking;
 using UI;
@@ -29,6 +30,8 @@ namespace Pets
         private Button cookAllButton;
         private Text cookAllText;
 
+        private Button oreBagButton;
+
         /// <summary>Stores the next time the cook-all option can be invoked.</summary>
         private static float cookAllCooldownEnd;
 
@@ -47,6 +50,9 @@ namespace Pets
             cookAllButton = CreateButton(menuRoot, "Cook All");
             cookAllText = cookAllButton.GetComponentInChildren<Text>();
             cookAllButton.onClick.AddListener(OnCookAllClicked);
+
+            oreBagButton = CreateButton(menuRoot, "Ore Bag");
+            oreBagButton.onClick.AddListener(OnOreBagClicked);
         }
 
         partial void OnMenuShown()
@@ -64,6 +70,10 @@ namespace Pets
                     commandButton.gameObject.SetActive(true);
                 if (bankButton != null)
                     bankButton.gameObject.SetActive(true);
+
+                bool hasOreBag = OreBagService.Instance.HasBagInInventory();
+                if (oreBagButton != null)
+                    oreBagButton.gameObject.SetActive(isCompanion && hasOreBag);
             }
             else
             {
@@ -79,6 +89,9 @@ namespace Pets
 
                 if (bankButton != null)
                     bankButton.gameObject.SetActive(false);
+
+                if (oreBagButton != null)
+                    oreBagButton.gameObject.SetActive(false);
 
                 if (mergeController == null)
                 {
@@ -192,6 +205,12 @@ namespace Pets
             CookAll();
 
             cookAllCooldownEnd = Time.time + GetCooldownSeconds(level);
+            Hide();
+        }
+
+        private void OnOreBagClicked()
+        {
+            OreBagService.Instance.TryDepositCompanionOre(out _);
             Hide();
         }
 

@@ -17,7 +17,9 @@ namespace Inventory.UI
         Equip,
         Drop,
         Transfer,
-        Examine
+        Examine,
+        AddToOreBag,
+        UpgradeOreBag
     }
 
     /// <summary>
