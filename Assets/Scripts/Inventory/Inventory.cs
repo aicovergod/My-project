@@ -266,6 +266,33 @@ namespace Inventory
         }
 
         /// <summary>
+        /// Executes <paramref name="operation"/> while persistence notifications are suppressed.
+        /// Callers can batch inventory mutations without triggering save writes until the block
+        /// completes. The supplied action receives the backing <see cref="InventoryModel"/> so
+        /// slot adjustments can be applied directly.
+        /// </summary>
+        /// <param name="operation">Callback that performs the inventory mutations.</param>
+        public void RunWithoutPersistence(Action<InventoryModel> operation)
+        {
+            if (operation == null)
+                return;
+
+            EnsureModelInitialized();
+            var targetModel = Model;
+
+            bool previousState = suppressPersistenceNotifications;
+            suppressPersistenceNotifications = true;
+            try
+            {
+                operation(targetModel);
+            }
+            finally
+            {
+                suppressPersistenceNotifications = previousState;
+            }
+        }
+
+        /// <summary>
         /// Removes all items from the inventory without triggering persistence writes.
         /// This is used by bootstrap flows that need to reset layout/state before the
         /// inventory has restored its saved data.
@@ -273,18 +300,9 @@ namespace Inventory
         /// <returns><c>true</c> when one or more slots were cleared; otherwise <c>false</c>.</returns>
         public bool ClearAllSlotsWithoutPersistence()
         {
-            EnsureModelInitialized();
-
-            bool previousState = suppressPersistenceNotifications;
-            suppressPersistenceNotifications = true;
-            try
-            {
-                return Model.ClearAllSlots();
-            }
-            finally
-            {
-                suppressPersistenceNotifications = previousState;
-            }
+            bool cleared = false;
+            RunWithoutPersistence(model => { cleared = model.ClearAllSlots(); });
+            return cleared;
         }
 
         /// <summary>

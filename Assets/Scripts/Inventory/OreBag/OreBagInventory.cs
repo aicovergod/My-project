@@ -24,6 +24,8 @@ namespace Inventory.OreBag
         private InventoryModel model;
         private OreBagItemData activeBagDefinition;
         private int activeCapacity;
+        private bool inventoryChangeSubscribed;
+        private bool sanitizedAfterInitialRestore;
 
         /// <summary>Expose the underlying inventory component for UI refreshes.</summary>
         public RuntimeInventory InventoryComponent => inventory;
@@ -52,6 +54,66 @@ namespace Inventory.OreBag
 
             model = inventory.Model;
             model.CanStoreRule = CanStoreOreOnly;
+
+            if (!inventoryChangeSubscribed && inventory != null)
+            {
+                inventory.OnInventoryChanged += HandleInventoryChanged;
+                inventoryChangeSubscribed = true;
+            }
+        }
+
+        /// <summary>
+        /// Scrubs any non-ore data that may have been restored into the bag before the
+        /// dedicated save migrated. Valid ore entries are preserved in their original
+        /// slots so the player retains stack positions.
+        /// </summary>
+        public void SanitizeLoadedContents()
+        {
+            EnsureInventoryConfigured();
+
+            if (inventory == null || model == null)
+                return;
+
+            // Cache valid ore entries so their original slot positions can be restored after scrubbing.
+            var validEntries = new List<(int slotIndex, InventoryEntry entry)>();
+            bool scrubbed = false;
+
+            for (int i = 0; i < model.Size; i++)
+            {
+                var entry = model.GetEntry(i);
+
+                if (entry.item == null)
+                {
+                    if (entry.count != 0)
+                        scrubbed = true;
+                    continue;
+                }
+
+                if (!IsOre(entry.item) || entry.count <= 0)
+                {
+                    scrubbed = true;
+                    continue;
+                }
+
+                validEntries.Add((i, new InventoryEntry
+                {
+                    item = entry.item,
+                    count = entry.count
+                }));
+            }
+
+            if (!scrubbed)
+                return;
+
+            inventory.RunWithoutPersistence(targetModel =>
+            {
+                // Clear everything so only verified ore stacks return to the bag.
+                targetModel.ClearAllSlots();
+                foreach (var (slotIndex, entry) in validEntries)
+                    targetModel.SetEntry(slotIndex, entry);
+            });
+
+            inventory.Save();
         }
 
         /// <summary>Copies fonts/visual settings from the player inventory for consistent styling.</summary>
@@ -227,6 +289,18 @@ namespace Inventory.OreBag
             return IsOre(item);
         }
 
+        private void HandleInventoryChanged()
+        {
+            if (sanitizedAfterInitialRestore)
+                return;
+
+            if (inventory == null || !inventory.isActiveAndEnabled)
+                return;
+
+            sanitizedAfterInitialRestore = true;
+            SanitizeLoadedContents();
+        }
+
         private static void EnsureOreItemIds()
         {
             if (oreItemIds != null)
@@ -351,6 +425,20 @@ namespace Inventory.OreBag
             }
 
             return -1;
+        }
+
+        private void OnDisable()
+        {
+            sanitizedAfterInitialRestore = false;
+        }
+
+        private void OnDestroy()
+        {
+            if (inventory != null && inventoryChangeSubscribed)
+            {
+                inventory.OnInventoryChanged -= HandleInventoryChanged;
+                inventoryChangeSubscribed = false;
+            }
         }
     }
 }
