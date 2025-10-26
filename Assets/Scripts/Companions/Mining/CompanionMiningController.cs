@@ -730,7 +730,7 @@ namespace Companions
                     var chat = ChatService.Instance;
                     chat?.PublishCompanionMessage(
                         CompanionManager.GetCompanionDisplayName(),
-                        "I don't have the correct mining level for that");
+                        CompanionMiningDialogueLibrary.GetLevelRequirementLine(oreDef.LevelRequirement));
                 }
 
                 if (CompanionManager.EnableDebugLogging)
@@ -1055,7 +1055,7 @@ namespace Companions
 
             chat.PublishCompanionMessage(
                 CompanionManager.GetCompanionDisplayName(),
-                "Hey, I got stuck while I was mining, sorry.");
+                CompanionMiningDialogueLibrary.GetRandomStuckApologyLine());
         }
 
         private void PruneExpiredBlockedRocks(float now)
@@ -1128,7 +1128,7 @@ namespace Companions
 
             chat.PublishCompanionMessage(
                 CompanionManager.GetCompanionDisplayName(),
-                "I need a pickaxe to mine that");
+                CompanionMiningDialogueLibrary.GetRandomMissingPickaxeLine());
         }
 
         private void PublishNoRocksMessage()
@@ -1150,7 +1150,7 @@ namespace Companions
 
             chat.PublishCompanionMessage(
                 CompanionManager.GetCompanionDisplayName(),
-                "Looks like you're already mining that rock");
+                CompanionMiningDialogueLibrary.GetRandomPlayerBusyLine());
         }
 
         private float ResolveMoveSpeed()

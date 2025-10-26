@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c9eb934b2cfb3b866e1aaded4128e987a89a8ff1 -->
+## 2025-10-26T09:08:55+00:00 — Refactor mining companion dialogue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Mining/CompanionMiningDialogueLibrary.cs
+- Diff: 95 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:f9c1e9a6667ab01ff4fa7ab942eb9fb7fbf210e8 -->
 ## 2025-10-26T08:58:39+00:00 — Merge pull request #1419 from aicovergod/codex/implement-companion-cooking-system-features
 
