@@ -6601,7 +6601,7 @@ namespace Companions
             if (pool == null || pool.Length == 0)
                 return fallback;
 
-            int index = Random.Range(0, pool.Length);
+            int index = UnityEngine.Random.Range(0, pool.Length);
             if (index < 0 || index >= pool.Length)
                 return fallback;
 
