@@ -21,6 +21,7 @@ namespace Environment.Companion
         {
             Bank,
             MiningCave,
+            MiningShop,
             GoblinCave,
             Ocean,
             Graveyard
@@ -34,6 +35,9 @@ namespace Environment.Companion
 
         [SerializeField]
         private bool areaIsMiningCave;
+
+        [SerializeField]
+        private bool areaIsMiningShop;
 
         [SerializeField]
         private bool areaIsGoblinCave;
@@ -52,7 +56,7 @@ namespace Environment.Companion
         private readonly Dictionary<CompanionController, float> lastReactionTimes = new Dictionary<CompanionController, float>();
 
         /// <summary>Reusable buffer that stores the active flags for the current evaluation.</summary>
-        private readonly List<AwarenessArea> activeAreas = new List<AwarenessArea>(5);
+        private readonly List<AwarenessArea> activeAreas = new List<AwarenessArea>(6);
 
         /// <summary>Cached collider reference so we can confirm trigger state during <see cref="Awake"/>.</summary>
         private Collider2D cachedCollider;
@@ -117,7 +121,7 @@ namespace Environment.Companion
         /// <summary>Returns <c>true</c> when any area flag is active on this zone.</summary>
         private bool HasAnyAreaFlag()
         {
-            return areaIsBank || areaIsMiningCave || areaIsGoblinCave || areaIsOcean || areaIsGraveyard;
+            return areaIsBank || areaIsMiningCave || areaIsMiningShop || areaIsGoblinCave || areaIsOcean || areaIsGraveyard;
         }
 
         /// <summary>Rolls the 1-in-20 entry chance that governs whether the companion speaks.</summary>
@@ -146,6 +150,8 @@ namespace Environment.Companion
                 activeAreas.Add(AwarenessArea.Bank);
             if (areaIsMiningCave)
                 activeAreas.Add(AwarenessArea.MiningCave);
+            if (areaIsMiningShop)
+                activeAreas.Add(AwarenessArea.MiningShop);
             if (areaIsGoblinCave)
                 activeAreas.Add(AwarenessArea.GoblinCave);
             if (areaIsOcean)
@@ -163,6 +169,8 @@ namespace Environment.Companion
                     return CompanionChatLibrary.GetRandomBankAwarenessLine(IsInventoryFull(controller?.Inventory?.InventoryComponent));
                 case AwarenessArea.MiningCave:
                     return CompanionChatLibrary.GetRandomMiningCaveAwarenessLine();
+                case AwarenessArea.MiningShop:
+                    return CompanionChatLibrary.GetRandomMiningShopAwarenessLine();
                 case AwarenessArea.GoblinCave:
                     return CompanionChatLibrary.GetRandomGoblinCaveAwarenessLine();
                 case AwarenessArea.Ocean:
