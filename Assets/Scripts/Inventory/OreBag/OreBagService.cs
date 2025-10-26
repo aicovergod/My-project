@@ -36,7 +36,12 @@ namespace Inventory.OreBag
 
             instance = FindObjectOfType<OreBagService>(true);
             if (instance != null)
+            {
+                if (!instance.gameObject.activeInHierarchy)
+                    instance.ConfigureInventoryWhileInactive();
+
                 return instance;
+            }
 
             var go = new GameObject(nameof(OreBagService));
             go.SetActive(false);
@@ -46,6 +51,7 @@ namespace Inventory.OreBag
             if (createdInstance != null)
             {
                 instance = createdInstance;
+                createdInstance.ConfigureInventoryWhileInactive();
                 go.SetActive(true);
             }
 
@@ -63,8 +69,6 @@ namespace Inventory.OreBag
             instance = this;
             var runtimeInventory = GetComponent<RuntimeInventory>();
 
-            // Disable any existing runtime inventory immediately so its original OnEnable logic
-            // cannot capture the player's state before the ore bag reconfigures the component.
             if (runtimeInventory != null)
                 runtimeInventory.enabled = false;
 
@@ -78,26 +82,39 @@ namespace Inventory.OreBag
 
             if (runtimeInventory != null)
             {
-                // The RequireComponent attribute will auto-create a runtime inventory when the
-                // ore bag component is added. Explicitly disable it here as well so the bag can
-                // safely reapply layout/save settings without leaking player inventory state.
                 runtimeInventory.enabled = false;
 
-                // Apply the ore bag configuration before any save registration logic in OnEnable runs.
                 oreBagInventory?.EnsureInventoryConfigured();
 
-                // Clear any stale player slots without persisting so the subsequent OnEnable
-                // load only restores data from the ore bag's dedicated save key.
                 runtimeInventory.ClearAllSlotsWithoutPersistence();
 
-                // Re-enable the inventory so its OnEnable sequence runs again with the ore bag
-                // configuration, allowing SaveManager to load the stored ore contents.
                 runtimeInventory.enabled = true;
             }
             else
             {
                 oreBagInventory?.EnsureInventoryConfigured();
             }
+        }
+
+        /// <summary>
+        /// Ensures the ore bag inventory is present and configured while the GameObject
+        /// remains inactive so the runtime inventory never enables itself with the default
+        /// save key.
+        /// </summary>
+        private void ConfigureInventoryWhileInactive()
+        {
+            if (oreBagInventory == null)
+                oreBagInventory = GetComponent<OreBagInventory>();
+
+            if (oreBagInventory == null)
+                oreBagInventory = gameObject.AddComponent<OreBagInventory>();
+
+            var runtimeInventory = oreBagInventory.InventoryComponent ?? GetComponent<RuntimeInventory>();
+
+            if (runtimeInventory != null)
+                runtimeInventory.enabled = false;
+
+            oreBagInventory.EnsureInventoryConfigured();
         }
 
         private void OnDestroy()
