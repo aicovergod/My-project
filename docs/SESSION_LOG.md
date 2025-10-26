@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c1ebcc125b8be73fdbf52cc727ab2f64f05bf25a -->
+## 2025-10-26T20:14:30+00:00 — Merge pull request #1443 from aicovergod/codex/add-transfer-all-button-for-ore-bag
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 101 ++ / 3 --
+- Notes:
+  Add ore bag transfer option to bank deposit menu
+---
+<!-- commit:fd04139e124c37f3363d6bd56607e52954c56534 -->
+## 2025-10-26T20:14:14+00:00 — Add ore bag transfer option in bank
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Bank/BankDepositMenu.cs, Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 101 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:31918e6698e75116639abaf136441a6930d4f770 -->
 ## 2025-10-26T19:12:16+00:00 — Merge pull request #1442 from aicovergod/codex/implement-ore-bag-feature-in-unity
 
