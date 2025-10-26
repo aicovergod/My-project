@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0abcbb3aeee8e0bebf538223d8416c5a89a63f55 -->
+## 2025-10-26T14:54:43+00:00 — Merge pull request #1436 from aicovergod/codex/expose-skill-response-status-and-modify-command-processing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 171 ++ / 0 --
+- Notes:
+  Prevent inclusive skill replies from triggering commands
+---
+<!-- commit:72caeb5afdfeca62f5bddf1a0d3cca740d059d32 -->
+## 2025-10-26T14:54:28+00:00 — Prevent inclusive skill replies from triggering commands
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Tests/Companions/CompanionConversationServiceTests.cs
+- Diff: 171 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2c7164d4c7fb50ce974910dbb7fcb12cf0b7b0ab -->
 ## 2025-10-26T14:34:46+00:00 — Merge pull request #1435 from aicovergod/codex/add-shift-right-click-cooking-support
 
