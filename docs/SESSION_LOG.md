@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d91fe5ff093a36bc308cee523b4fde58b4163523 -->
+## 2025-10-26T21:38:13+00:00 — Prevent ore bag bootstrap from wiping saved slots
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 31 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:2765e1358e581b8c4fecbd65545119bca409808a -->
 ## 2025-10-26T21:23:32+00:00 — Merge pull request #1450 from aicovergod/codex/update-orebagservice-to-manage-runtimeinventory
 
