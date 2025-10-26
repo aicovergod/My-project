@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:13696579454dd4ef4644f8feb05387d67d9358dc -->
+## 2025-10-26T09:13:43+00:00 — Merge pull request #1421 from aicovergod/codex/add-method-to-format-cooking-level-requirement
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 1 --
+- Notes:
+  Add helper for companion cooking level requirements
+---
+<!-- commit:3be106e82b892da414d0f0e5aae6afcb5afbcfd4 -->
+## 2025-10-26T09:13:11+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6d7da0a7b020ad4a102f3f8965ced406f4229a38 -->
 ## 2025-10-26T09:12:54+00:00 — Refine companion cooking level requirement dialogue
 
