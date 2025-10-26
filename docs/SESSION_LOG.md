@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:cad671f0893fc05d5044ecdd9a4e7d0dd4bc31c8 -->
+## 2025-10-26T21:05:32+00:00 — Fix ore bag stacking behaviour
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs
+- Diff: 136 ++ / 16 --
+- Notes:
+  —
+---
 <!-- commit:b217129c0bb4a591c6abd064393f48cff48e4800 -->
 ## 2025-10-26T20:57:28+00:00 — Merge pull request #1446 from aicovergod/codex/update-orebagservice-for-component-configuration
 
