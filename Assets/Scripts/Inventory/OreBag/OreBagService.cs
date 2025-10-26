@@ -7,6 +7,7 @@ using Inventory.Core;
 using UI.Chat;
 using UnityEngine;
 using World;
+using RuntimeInventory = global::Inventory.Inventory;
 
 namespace Inventory.OreBag
 {
@@ -79,7 +80,7 @@ namespace Inventory.OreBag
         /// <summary>
         /// Opens the ore bag window when the supplied slot contains a valid bag.
         /// </summary>
-        public bool TryOpenBagFromSlot(Inventory.Inventory playerInventory, int slotIndex)
+        public bool TryOpenBagFromSlot(RuntimeInventory playerInventory, int slotIndex)
         {
             if (oreBagInventory == null || playerInventory == null)
                 return false;
@@ -96,7 +97,7 @@ namespace Inventory.OreBag
         /// <summary>
         /// Deposits every ore stack in the player inventory into the bag.
         /// </summary>
-        public bool TryDepositAllPlayerOre(Inventory.Inventory playerInventory, bool showMessages, out int totalAdded, out bool bagFull)
+        public bool TryDepositAllPlayerOre(RuntimeInventory playerInventory, bool showMessages, out int totalAdded, out bool bagFull)
         {
             totalAdded = 0;
             bagFull = false;
@@ -151,7 +152,7 @@ namespace Inventory.OreBag
         /// <summary>
         /// Deposits a single player inventory slot (used by drag-and-drop flows).
         /// </summary>
-        public bool TryDepositSlotFromPlayer(Inventory.Inventory playerInventory, int slotIndex, bool showMessages, out int added, out bool bagFull)
+        public bool TryDepositSlotFromPlayer(RuntimeInventory playerInventory, int slotIndex, bool showMessages, out int added, out bool bagFull)
         {
             added = 0;
             bagFull = false;
@@ -262,7 +263,7 @@ namespace Inventory.OreBag
         /// <summary>
         /// Attempts to upgrade the bag located at <paramref name="slotIndex"/> using Hades fragments.
         /// </summary>
-        public bool TryUpgradeBag(Inventory.Inventory playerInventory, int slotIndex)
+        public bool TryUpgradeBag(RuntimeInventory playerInventory, int slotIndex)
         {
             if (oreBagInventory == null || playerInventory == null)
                 return false;
@@ -314,7 +315,7 @@ namespace Inventory.OreBag
         /// <param name="totalTransferred">Total number of ores moved into the bank.</param>
         /// <returns>True when the transfer attempt completed (even if nothing moved).</returns>
         public bool TryTransferAllOreToBank(
-            Inventory.Inventory playerInventory,
+            RuntimeInventory playerInventory,
             int slotIndex,
             BankUI bank,
             bool showMessages,
@@ -365,13 +366,13 @@ namespace Inventory.OreBag
             return true;
         }
 
-        private void ApplyActiveBag(OreBagItemData bagData, Inventory.Inventory playerInventory)
+        private void ApplyActiveBag(OreBagItemData bagData, RuntimeInventory playerInventory)
         {
             oreBagInventory.ApplyBagDefinition(bagData);
             oreBagInventory.SyncStylingFrom(playerInventory);
         }
 
-        private bool TryFindBag(out Inventory.Inventory playerInventory, out int slotIndex, out OreBagItemData bagData)
+        private bool TryFindBag(out RuntimeInventory playerInventory, out int slotIndex, out OreBagItemData bagData)
         {
             playerInventory = CompanionManager.GetPlayerInventory();
             slotIndex = -1;
@@ -383,12 +384,12 @@ namespace Inventory.OreBag
             return TryLocateBag(playerInventory, out slotIndex, out bagData);
         }
 
-        private bool TryResolveBagForInventory(Inventory.Inventory inventory, out OreBagItemData bagData)
+        private bool TryResolveBagForInventory(RuntimeInventory inventory, out OreBagItemData bagData)
         {
             return TryLocateBag(inventory, out _, out bagData);
         }
 
-        private bool TryResolveBagFromSlot(Inventory.Inventory inventory, int slotIndex, out OreBagItemData bagData)
+        private bool TryResolveBagFromSlot(RuntimeInventory inventory, int slotIndex, out OreBagItemData bagData)
         {
             bagData = null;
             if (inventory == null)
@@ -406,7 +407,7 @@ namespace Inventory.OreBag
             return true;
         }
 
-        private bool TryLocateBag(Inventory.Inventory inventory, out int slotIndex, out OreBagItemData bagData)
+        private bool TryLocateBag(RuntimeInventory inventory, out int slotIndex, out OreBagItemData bagData)
         {
             slotIndex = -1;
             bagData = null;
