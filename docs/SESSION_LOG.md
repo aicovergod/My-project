@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8528758fecfdd1b8aa6e3f47827c4df83897ff2e -->
+## 2025-10-26T09:58:17+00:00 — Add companion ammo and equipment dialogue helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionEquipment.cs, Assets/Scripts/Companions/CompanionRangedCombatController.cs
+- Diff: 277 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:1a304e5dc003e4f80a279ff297996c7487b10455 -->
 ## 2025-10-26T09:39:53+00:00 — Merge pull request #1425 from aicovergod/codex/add-level-up-line-helper-method
 
