@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:45e724948b410bda03f115e03335332e4d77becf -->
+## 2025-10-26T01:06:14+01:00 — Merge pull request #1418 from aicovergod/codex/update-admin-f4-menu-and-agents.md
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 58 ++ / 8 --
+- Notes:
+  Expand Admin F4 menu companion diagnostics
+---
+<!-- commit:9a80ab45f62f5846e0b4ee9dd5fcfd6d6deea417 -->
+## 2025-10-26T01:06:05+01:00 — Expand Admin F4 menu companion diagnostics
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): AGENTS.md, Assets/Scripts/Companions/UI/AdminF4Menu.cs
+- Diff: 58 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:bb11992dde96c095970e47a35e929398ba8b4abf -->
 ## 2025-10-26T00:57:14+01:00 — Merge pull request #1417 from aicovergod/codex/add-player-apology-support-for-companion
 
