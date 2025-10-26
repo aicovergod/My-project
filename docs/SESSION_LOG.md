@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:46a257b7af430764c439416a13b95eecd6fe39f4 -->
+## 2025-10-26T21:08:59+00:00 — Update companion overworld reference
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionChatLibrary.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:74f88af823e348a0b54c33fce0c5a8906fc3664d -->
 ## 2025-10-26T21:05:46+00:00 — Merge pull request #1447 from aicovergod/codex/fix-ore-bag-stacking-issue
 
