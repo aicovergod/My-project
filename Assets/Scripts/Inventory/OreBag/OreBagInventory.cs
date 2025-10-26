@@ -323,9 +323,37 @@ namespace Inventory.OreBag
                 if (candidate == null || string.IsNullOrEmpty(candidate.id))
                     continue;
 
-                if (candidate.itemName.IndexOf("Ore", StringComparison.OrdinalIgnoreCase) >= 0)
+                if (ContainsOreToken(candidate.itemName) || ContainsOreToken(candidate.id))
                     oreItemIds.Add(candidate.id);
             }
+        }
+
+        /// <summary>
+        /// Returns true when the supplied value contains the standalone word "Ore".
+        /// </summary>
+        private static bool ContainsOreToken(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return false;
+
+            int searchIndex = 0;
+            while (searchIndex < value.Length)
+            {
+                int matchIndex = value.IndexOf("Ore", searchIndex, StringComparison.OrdinalIgnoreCase);
+                if (matchIndex == -1)
+                    return false;
+
+                bool hasValidPrefix = matchIndex == 0 || !char.IsLetter(value[matchIndex - 1]);
+                int suffixIndex = matchIndex + 3;
+                bool hasValidSuffix = suffixIndex >= value.Length || !char.IsLetter(value[suffixIndex]);
+
+                if (hasValidPrefix && hasValidSuffix)
+                    return true;
+
+                searchIndex = matchIndex + 3;
+            }
+
+            return false;
         }
 
         /// <summary>
