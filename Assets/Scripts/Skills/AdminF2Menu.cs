@@ -283,6 +283,20 @@ namespace Skills
                 () => cookingSkillBehaviour.EnableDebugLogging,
                 value => cookingSkillBehaviour.EnableDebugLogging = value);
             DrawSkillDebugToggle(
+                "Companion Cooking Debug Logging",
+                () => ResolveCompanionCookingSkill() != null,
+                () =>
+                {
+                    var skill = ResolveCompanionCookingSkill();
+                    return skill != null && skill.EnableDebugLogging;
+                },
+                value =>
+                {
+                    var skill = ResolveCompanionCookingSkill();
+                    if (skill != null)
+                        skill.EnableDebugLogging = value;
+                });
+            DrawSkillDebugToggle(
                 "Firemaking Debug Logging",
                 () => firemakingSkillBehaviour != null,
                 () => firemakingSkillBehaviour.EnableDebugLogging,
@@ -699,6 +713,27 @@ namespace Skills
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Locates the companion's dedicated <see cref="CookingSkill"/> instance so debug toggles can
+        /// control its logging flag without relying on scene hierarchy assumptions.
+        /// </summary>
+        private static CookingSkill ResolveCompanionCookingSkill()
+        {
+            var cookingController = CompanionManager.CompanionCookingController;
+            if (cookingController == null)
+                return null;
+
+            if (cookingController.TryGetComponent(out CookingSkill skill))
+                return skill;
+
+            skill = cookingController.GetComponentInChildren<CookingSkill>();
+            if (skill != null)
+                return skill;
+
+            // Fallback: if the controller lives on a nested child return any ancestor CookingSkill.
+            return cookingController.GetComponentInParent<CookingSkill>();
         }
 
         /// <summary>

@@ -19,7 +19,8 @@ namespace Companions.Chat
             None,
             Mining,
             Fishing,
-            Woodcutting
+            Woodcutting,
+            Cooking
         }
 
         private static readonly HashSet<string> ActionTokens = new HashSet<string>(
@@ -77,6 +78,32 @@ namespace Companions.Chat
                 "tree", "trees", "treez", "log", "logs", "logz", "loggs",
                 "wood", "woods", "woodz", "stump", "stumps"
             });
+
+        private static readonly HashSet<string> CookingVerbs = new HashSet<string>(
+            new[]
+            {
+                "cook", "cooking", "cookin", "bake", "baking", "bakin",
+                "grill", "grilling", "grillin", "fry", "frying", "fryin",
+                "stew", "stewing", "stewin", "prepare", "prepping",
+                "mix", "mixing", "mixin", "knead", "simmer", "season",
+                "pan", "panfry", "sear"
+            });
+
+        private static readonly HashSet<string> CookingNouns = new HashSet<string>(
+            new[]
+            {
+                "meal", "meals", "food", "foods", "dish", "dishes",
+                "stew", "stews", "pie", "pies", "cake", "cakes",
+                "kitchen", "range", "oven", "fire", "pan", "skillet",
+                "grill", "hob"
+            });
+
+        private static readonly string[] CookingPhrases =
+        {
+            "start cooking", "go cook", "cook some food", "cook the meal",
+            "prepare a meal", "make some food", "start baking", "start the cooking",
+            "cook nearby", "cook something", "make dinner", "fire up the kitchen"
+        };
 
         private static readonly string[] MiningPhrases =
         {
@@ -163,6 +190,10 @@ namespace Companions.Chat
                     if (!CompanionManager.TryCommandChopNearby(out var woodcutFailure))
                         PublishWoodcuttingFallback(woodcutFailure);
                     break;
+                case CompanionChatCommandType.Cooking:
+                    if (!CompanionManager.TryCommandCookNearby(out var cookingFailure))
+                        PublishCookingFallback(cookingFailure);
+                    break;
                 default:
                     return false;
             }
@@ -240,6 +271,9 @@ namespace Companions.Chat
             if (MatchesWoodcuttingCommand(normalised, tokens))
                 return CompanionChatCommandType.Woodcutting;
 
+            if (MatchesCookingCommand(normalised, tokens))
+                return CompanionChatCommandType.Cooking;
+
             return CompanionChatCommandType.None;
         }
 
@@ -290,6 +324,24 @@ namespace Companions.Chat
 
             bool hasAction = ContainsToken(tokens, ActionTokens);
             bool hasNoun = ContainsToken(tokens, WoodcuttingNouns);
+
+            if (hasAction || hasNoun)
+                return true;
+
+            return tokens.Count == 1;
+        }
+
+        private static bool MatchesCookingCommand(string normalised, IReadOnlyList<string> tokens)
+        {
+            if (ContainsPhrase(normalised, CookingPhrases))
+                return true;
+
+            bool hasVerb = ContainsToken(tokens, CookingVerbs);
+            if (!hasVerb)
+                return false;
+
+            bool hasAction = ContainsToken(tokens, ActionTokens);
+            bool hasNoun = ContainsToken(tokens, CookingNouns);
 
             if (hasAction || hasNoun)
                 return true;
@@ -446,6 +498,36 @@ namespace Companions.Chat
                 default:
                     chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
                         CompanionWoodcuttingDialogueLibrary.GetRandomNoTreesLine());
+                    break;
+            }
+        }
+
+        private static void PublishCookingFallback(CompanionCookingCommandResult failureReason)
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            if (!CompanionManager.HasActiveCompanion)
+            {
+                chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
+                    "You need to summon me before I can start cooking.");
+                return;
+            }
+
+            switch (failureReason)
+            {
+                case CompanionCookingCommandResult.InventoryFull:
+                case CompanionCookingCommandResult.MissingIngredients:
+                case CompanionCookingCommandResult.MissingTool:
+                case CompanionCookingCommandResult.PlayerBusy:
+                case CompanionCookingCommandResult.StationUnavailable:
+                case CompanionCookingCommandResult.StationOccupied:
+                case CompanionCookingCommandResult.Declined:
+                    return; // The cooking systems already published context-specific chatter.
+                default:
+                    chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
+                        "I can't find a free range to cook on right now.");
                     break;
             }
         }

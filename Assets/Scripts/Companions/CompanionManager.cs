@@ -7,6 +7,7 @@ using Combat;
 using Inventory;
 using Pets;
 using Skills;
+using Skills.Cooking;
 using Skills.Fishing;
 using Skills.Mining;
 using Skills.Woodcutting;
@@ -35,7 +36,10 @@ namespace Companions
         Mining = 3,
 
         /// <summary>The companion is chopping a tree.</summary>
-        Woodcutting = 4
+        Woodcutting = 4,
+
+        /// <summary>The companion is cooking at a nearby station.</summary>
+        Cooking = 5
     }
 
     /// <summary>
@@ -234,6 +238,20 @@ namespace Companions
                         "stop felling",
                         "stop wc"
                     }
+                },
+                {
+                    CompanionActiveAction.Cooking,
+                    new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        "stop cooking",
+                        "stop the cooking",
+                        "stop cook",
+                        "stop baking",
+                        "stop making food",
+                        "stop preparing food",
+                        "stop meal",
+                        "stop in the kitchen"
+                    }
                 }
             };
 
@@ -301,6 +319,9 @@ namespace Companions
         /// <summary>Provides access to the configured fishing controller.</summary>
         public static CompanionFishingController CompanionFishingController => controller != null ? controller.FishingController : null;
 
+        /// <summary>Provides access to the configured cooking controller.</summary>
+        public static CompanionCookingController CompanionCookingController => controller != null ? controller.CookingController : null;
+
         /// <summary>Safely exposes the cached player inventory used for companion transfers.</summary>
         public static Inventory.Inventory GetPlayerInventory() => ResolvePlayerInventory();
 
@@ -328,6 +349,10 @@ namespace Companions
             if (mining != null && mining.IsMining)
                 return CompanionActiveAction.Mining;
 
+            var cooking = controller.CookingController;
+            if (cooking != null && cooking.IsCooking)
+                return CompanionActiveAction.Cooking;
+
             var woodcutting = controller.WoodcuttingController;
             if (woodcutting != null && woodcutting.IsWoodcutting)
                 return CompanionActiveAction.Woodcutting;
@@ -349,6 +374,7 @@ namespace Companions
                 CompanionActiveAction.Combat => "Combat",
                 CompanionActiveAction.Fishing => "Fishing",
                 CompanionActiveAction.Mining => "Mining",
+                CompanionActiveAction.Cooking => "Cooking",
                 CompanionActiveAction.Woodcutting => "Chopping",
                 _ => "Idle"
             };
@@ -365,6 +391,7 @@ namespace Companions
                 CompanionActiveAction.Combat => "Stop Combat",
                 CompanionActiveAction.Fishing => "Stop Fishing",
                 CompanionActiveAction.Mining => "Stop Mining",
+                CompanionActiveAction.Cooking => "Stop Cooking",
                 CompanionActiveAction.Woodcutting => "Stop Chopping",
                 _ => "Stop"
             };
@@ -387,6 +414,9 @@ namespace Companions
                     break;
                 case CompanionActiveAction.Mining:
                     controller?.MiningController?.CancelMining(true);
+                    break;
+                case CompanionActiveAction.Cooking:
+                    controller?.CookingController?.CancelCooking(true);
                     break;
                 case CompanionActiveAction.Woodcutting:
                     controller?.WoodcuttingController?.CancelWoodcutting(true);
@@ -1597,6 +1627,189 @@ namespace Companions
             string successDetail = "Area fishing routine started successfully.";
             Debug.Log($"[Companion] Area fishing command outcome: success=True, radius={radius}, reason={successDetail}");
             return true;
+        }
+
+        private static void PublishCookingFailureMessage(CompanionCookingCommandResult reason)
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string message = reason switch
+            {
+                CompanionCookingCommandResult.InventoryFull => CompanionCookingDialogueLibrary.GetRandomInventoryFullLine(),
+                CompanionCookingCommandResult.MissingIngredients => CompanionCookingDialogueLibrary.GetRandomMissingIngredientLine(),
+                CompanionCookingCommandResult.MissingTool => CompanionCookingDialogueLibrary.GetRandomMissingToolLine(),
+                CompanionCookingCommandResult.PlayerBusy => CompanionCookingDialogueLibrary.GetRandomPlayerBusyLine(),
+                CompanionCookingCommandResult.StationUnavailable => CompanionCookingDialogueLibrary.GetRandomStationUnavailableLine(),
+                CompanionCookingCommandResult.StationOccupied => CompanionCookingDialogueLibrary.GetRandomStationOccupiedLine(),
+                CompanionCookingCommandResult.Unreachable => CompanionCookingDialogueLibrary.GetRandomStationUnavailableLine(),
+                _ => string.Empty
+            };
+
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to cook at the supplied station.
+        /// </summary>
+        public static bool TryCommandCook(CookingObject station, CookableRecipe recipe, out CompanionCookingCommandResult result)
+        {
+            result = CompanionCookingCommandResult.RequirementsNotMet;
+
+            if (station == null)
+            {
+                Debug.LogWarning("[Companion] Cannot command cooking: station reference was null.");
+                PublishCookingFailureMessage(CompanionCookingCommandResult.StationUnavailable);
+                return false;
+            }
+
+            if (controller == null)
+            {
+                Debug.LogWarning("[Companion] Cannot command cooking: companion controller has not been initialised.");
+                return false;
+            }
+
+            var cooking = controller.CookingController;
+            if (cooking == null)
+            {
+                Debug.LogWarning("[Companion] Cannot command cooking: companion cooking controller is missing.");
+                return false;
+            }
+
+            if (!HasActiveCompanion)
+            {
+                Debug.LogWarning("[Companion] Cannot command cooking: the companion is not currently active.");
+                return false;
+            }
+
+            if (CompanionSkillCooldownTimers.ShouldDeclineCookingRequest(controller.SkillCooldowns, out var cooldownResult))
+            {
+                Debug.LogWarning($"[Companion] Cooking command outcome: accepted=False (result={cooldownResult}).");
+                return false;
+            }
+
+            bool accepted = cooking.TryCommandCook(station, recipe, out result);
+            if (!accepted && result == CompanionCookingCommandResult.InventoryFull)
+            {
+                bool deposited = TryDepositCompanionInventoryToBank();
+                if (deposited)
+                    accepted = cooking.TryCommandCook(station, recipe, out result);
+                if (!accepted)
+                    accepted = true;
+            }
+
+            string message = $"[Companion] Cooking command outcome: accepted={accepted} (result={result}).";
+            if (accepted)
+                Debug.Log(message);
+            else
+                Debug.LogWarning(message);
+
+            if (accepted && result == CompanionCookingCommandResult.Accepted)
+                PublishCookingStartMessage();
+
+            if (!accepted)
+                PublishCookingFailureMessage(result);
+
+            return accepted;
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to cook at any nearby station within the default radius.
+        /// </summary>
+        public static bool TryCommandCookNearby(out CompanionCookingCommandResult failureReason)
+        {
+            return TryCommandCookNearby(10f, out failureReason);
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to cook at any nearby station within the supplied radius.
+        /// </summary>
+        public static bool TryCommandCookNearby(float radius = 10f)
+        {
+            return TryCommandCookNearby(radius, out _);
+        }
+
+        /// <summary>
+        /// Attempts to command the companion to cook at any nearby station within the supplied radius and reports the result.
+        /// </summary>
+        public static bool TryCommandCookNearby(float radius, out CompanionCookingCommandResult failureReason)
+        {
+            string rejectionReason = string.Empty;
+            failureReason = CompanionCookingCommandResult.StationUnavailable;
+
+            if (controller == null)
+            {
+                rejectionReason = "Companion controller has not been initialised.";
+                failureReason = CompanionCookingCommandResult.RequirementsNotMet;
+                Debug.LogWarning($"[Companion] Area cooking command outcome: success=False, radius={radius}, reason={rejectionReason}.");
+                return false;
+            }
+
+            var cooking = controller.CookingController;
+            if (cooking == null)
+            {
+                rejectionReason = "Companion cooking controller is missing.";
+                failureReason = CompanionCookingCommandResult.RequirementsNotMet;
+                Debug.LogWarning($"[Companion] Area cooking command outcome: success=False, radius={radius}, reason={rejectionReason}.");
+                return false;
+            }
+
+            if (!HasActiveCompanion)
+            {
+                rejectionReason = "The companion is not currently active.";
+                failureReason = CompanionCookingCommandResult.RequirementsNotMet;
+                Debug.LogWarning($"[Companion] Area cooking command outcome: success=False, radius={radius}, reason={rejectionReason}.");
+                return false;
+            }
+
+            if (CompanionSkillCooldownTimers.ShouldDeclineCookingRequest(controller.SkillCooldowns, out failureReason))
+            {
+                Debug.LogWarning($"[Companion] Area cooking command outcome: success=False, radius={radius}, reason=Cooldown active.");
+                return false;
+            }
+
+            bool accepted = cooking.TryStartAreaCooking(radius, out failureReason);
+            if (!accepted)
+            {
+                if (failureReason == CompanionCookingCommandResult.InventoryFull)
+                {
+                    bool deposited = TryDepositCompanionInventoryToBank();
+                    if (deposited)
+                        accepted = cooking.TryStartAreaCooking(radius, out failureReason);
+                    if (!accepted)
+                    {
+                        Debug.Log($"[Companion] Area cooking command outcome: success=True, radius={radius}, reason=Inventory full.");
+                        return true;
+                    }
+                }
+
+                rejectionReason = $"The cooking controller rejected the area cooking request ({failureReason}).";
+                Debug.LogWarning($"[Companion] Area cooking command outcome: success=False, radius={radius}, reason={rejectionReason}.");
+                PublishCookingFailureMessage(failureReason);
+                return false;
+            }
+
+            string successDetail = "Area cooking routine started successfully.";
+            Debug.Log($"[Companion] Area cooking command outcome: success=True, radius={radius}, reason={successDetail}");
+            PublishCookingStartMessage();
+            return true;
+        }
+
+        private static void PublishCookingStartMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string line = CompanionChatLibrary.GetRandomCompanionCookingStartLine();
+            if (string.IsNullOrWhiteSpace(line))
+                return;
+
+            chat.PublishCompanionMessage(GetCompanionDisplayName(), line);
         }
 
         /// <summary>
