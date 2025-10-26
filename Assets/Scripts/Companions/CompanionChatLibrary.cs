@@ -5468,7 +5468,7 @@ namespace Companions
             "I felt the call, and I answered.",
             "Well, that was dramatic.",
             "I’m back, what did I miss.",
-            "Ah, home sweet overworld.",
+            "Ah, home sweet Viosla.",
             "Summoning complete, let’s go cause trouble.",
             "I was hoping you’d drop that item again.",
             "I’m free, and ready for action.",
