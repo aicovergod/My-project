@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b2575f500897c51eb240c1917bf32a6e45506584 -->
+## 2025-10-26T09:58:42+00:00 — Merge pull request #1426 from aicovergod/codex/add-ammo-and-inventory-dialogue-support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 286 ++ / 8 --
+- Notes:
+  Add companion ammo and equipment dialogue helpers
+---
+<!-- commit:8c7d0812f6b5064cf1bc72739e0ebec99b018e00 -->
+## 2025-10-26T09:58:35+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:8528758fecfdd1b8aa6e3f47827c4df83897ff2e -->
 ## 2025-10-26T09:58:17+00:00 — Add companion ammo and equipment dialogue helpers
 
