@@ -33,7 +33,21 @@ namespace Inventory.OreBag
 
         private void Awake()
         {
-            inventory = GetComponent<RuntimeInventory>();
+            EnsureInventoryConfigured();
+        }
+
+        /// <summary>
+        /// Ensures the runtime inventory component is initialised with the ore bag layout
+        /// and filtering rules before the component participates in save/load.
+        /// </summary>
+        public void EnsureInventoryConfigured()
+        {
+            if (inventory == null)
+                inventory = GetComponent<RuntimeInventory>();
+
+            if (inventory == null)
+                return;
+
             ConfigureInventoryWindow();
 
             model = inventory.Model;
