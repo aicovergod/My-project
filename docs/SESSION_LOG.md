@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b928187597453dc58f38070580ee3c2a373a648e -->
+## 2025-10-26T21:12:37+00:00 — Merge pull request #1449 from aicovergod/codex/change-overworld-to-viosla-in-messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 7 ++ / 0 --
+- Notes:
+  Map overworld companion dialogue reference to Viosla
+---
 <!-- commit:00d1e457e547565da90f918413ab9d45c58fe9c7 -->
 ## 2025-10-26T21:09:13+00:00 — Merge pull request #1448 from aicovergod/codex/replace-overworld-text-with-viosla
 
