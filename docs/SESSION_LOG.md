@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:faedd2504ea9d0c4f31730ae7352f0cdabae2497 -->
+## 2025-10-26T14:03:09+00:00 — Fix close button background raycast
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Utilities/CloseButtonBuilder.cs
+- Diff: 25 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:4d5a5aa554e1f24e787cc10400be72c67151b4d8 -->
 ## 2025-10-26T10:36:26+00:00 — Merge pull request #1428 from aicovergod/codex/add-smalltalk-intent-and-response-handling
 
