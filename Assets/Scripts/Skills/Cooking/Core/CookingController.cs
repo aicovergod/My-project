@@ -1,7 +1,9 @@
+using Companions;
 using Inventory;
 using Skills.Common;
 using Skills.Firemaking;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Skills.Cooking
 {
@@ -34,6 +36,9 @@ namespace Skills.Cooking
         private string cachedFailureMessage;
 
         private CookingSkill CookingSkill => Skill;
+
+        /// <inheritdoc />
+        protected override bool SupportsProspecting => true;
 
         /// <summary>
         ///     Resolve optional references and ensure default configuration values are populated.
@@ -320,6 +325,56 @@ namespace Skills.Cooking
 
             ClearCachedInteraction();
             return false;
+        }
+
+        /// <inheritdoc />
+        protected override void Prospect(CookingObject node)
+        {
+            if (node == null)
+                return;
+
+            bool shiftHeld = false;
+            var keyboard = Keyboard.current;
+            if (keyboard != null)
+            {
+                shiftHeld = (keyboard.leftShiftKey != null && keyboard.leftShiftKey.isPressed)
+                    || (keyboard.rightShiftKey != null && keyboard.rightShiftKey.isPressed);
+            }
+            else
+            {
+                shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            }
+
+            if (!shiftHeld)
+                return;
+
+            CookableRecipe companionRecipe = null;
+
+            if (inventory != null && CookingSkill != null)
+            {
+                // Prefer the player's highlighted slot so shift-right click mirrors the standard "Cook" flow.
+                var preferredSearch = CookingInventoryHelper.FindCookableRecipe(
+                    inventory,
+                    CookingSkill,
+                    inventory.selectedIndex);
+
+                var resolvedSearch = preferredSearch;
+
+                if (!resolvedSearch.CanCook)
+                {
+                    // When the highlight does not contain a valid raw item, fall back to scanning the entire bag.
+                    resolvedSearch = CookingInventoryHelper.FindCookableRecipe(
+                        inventory,
+                        CookingSkill,
+                        -1);
+                }
+
+                if (resolvedSearch.CanCook)
+                    companionRecipe = resolvedSearch.Recipe;
+            }
+
+            // Delegate to the companion manager which handles routing the order and surfacing any failure feedback.
+            CompanionManager.TryCommandCook(node, companionRecipe, out _);
         }
 
         private void ClearCachedInteraction()
