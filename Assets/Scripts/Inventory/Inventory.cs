@@ -121,6 +121,10 @@ namespace Inventory
         private bool modelEventsSubscribed;
         private bool controllerEventsSubscribed;
 
+        // Prevents persistence writes when true so bootstrap sequences can
+        // reconfigure the inventory without clobbering saved data.
+        private bool suppressPersistenceNotifications;
+
         private PlayerMover playerMover;
         private Equipment equipment;
         private FiremakingSkill firemakingSkill;
@@ -182,7 +186,8 @@ namespace Inventory
         /// <param name="persist">True to write the inventory state before notifying listeners.</param>
         private void OnModelInventoryChanged(bool persist)
         {
-            NotifyInventoryChanged(persist);
+            bool shouldPersist = persist && !suppressPersistenceNotifications;
+            NotifyInventoryChanged(shouldPersist);
         }
 
         /// <summary>
@@ -258,6 +263,28 @@ namespace Inventory
         {
             EnsureModelInitialized();
             return Model.ClearAllSlots();
+        }
+
+        /// <summary>
+        /// Removes all items from the inventory without triggering persistence writes.
+        /// This is used by bootstrap flows that need to reset layout/state before the
+        /// inventory has restored its saved data.
+        /// </summary>
+        /// <returns><c>true</c> when one or more slots were cleared; otherwise <c>false</c>.</returns>
+        public bool ClearAllSlotsWithoutPersistence()
+        {
+            EnsureModelInitialized();
+
+            bool previousState = suppressPersistenceNotifications;
+            suppressPersistenceNotifications = true;
+            try
+            {
+                return Model.ClearAllSlots();
+            }
+            finally
+            {
+                suppressPersistenceNotifications = previousState;
+            }
         }
 
         /// <summary>

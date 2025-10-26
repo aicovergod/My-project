@@ -86,9 +86,9 @@ namespace Inventory.OreBag
                 // Apply the ore bag configuration before any save registration logic in OnEnable runs.
                 oreBagInventory?.EnsureInventoryConfigured();
 
-                // Clear any stale player slots so the subsequent OnEnable load only restores
-                // data from the ore bag's dedicated save key.
-                runtimeInventory.ClearAllSlots();
+                // Clear any stale player slots without persisting so the subsequent OnEnable
+                // load only restores data from the ore bag's dedicated save key.
+                runtimeInventory.ClearAllSlotsWithoutPersistence();
 
                 // Re-enable the inventory so its OnEnable sequence runs again with the ore bag
                 // configuration, allowing SaveManager to load the stored ore contents.
