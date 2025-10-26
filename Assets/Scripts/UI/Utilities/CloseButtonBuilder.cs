@@ -96,6 +96,22 @@ namespace UI.Utilities
             public Color BackgroundColor { get; set; } = Color.red;
 
             /// <summary>
+            /// Optional sprite assigned to the button background image. When
+            /// omitted the builder falls back to Unity's built-in UI sprite so
+            /// the entire red square can receive raycasts rather than relying
+            /// solely on the text glyph.
+            /// </summary>
+            public Sprite BackgroundSprite { get; set; } = null;
+
+            /// <summary>
+            /// Image type applied to the background when a sprite is present.
+            /// Defaults to <see cref="Image.Type.Sliced"/> to match the
+            /// standard UI sprite behaviour while allowing callers to override
+            /// when they need a simple quad.
+            /// </summary>
+            public Image.Type BackgroundImageType { get; set; } = Image.Type.Sliced;
+
+            /// <summary>
             /// Colour assigned to the button text.
             /// </summary>
             public Color TextColor { get; set; } = Color.white;
@@ -134,10 +150,19 @@ namespace UI.Utilities
                 rect.offsetMax = options.OffsetMax.Value;
 
             var image = closeButtonGO.GetComponent<Image>();
+            var backgroundSprite = options.BackgroundSprite != null
+                ? options.BackgroundSprite
+                : Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
+            image.sprite = backgroundSprite;
+            if (backgroundSprite != null)
+            {
+                image.type = options.BackgroundImageType;
+            }
             image.color = options.BackgroundColor;
             image.raycastTarget = options.ImageRaycastTarget;
 
             var button = closeButtonGO.GetComponent<Button>();
+            button.targetGraphic = image;
             button.onClick.AddListener(onClick);
 
             var textGO = new GameObject(options.TextName, typeof(Text));
