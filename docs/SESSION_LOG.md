@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:78534a4129f6c00985e0bf369347b7f314a547c7 -->
+## 2025-10-26T15:55:22+00:00 — Add companion environment awareness zones
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs, Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs.meta
+- Diff: 306 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:219eb5588820af15c8e686928cc0cc120a62411a -->
 ## 2025-10-26T15:00:03+00:00 — Merge pull request #1437 from aicovergod/codex/update-formattemplate-for-suggestion-handling
 
