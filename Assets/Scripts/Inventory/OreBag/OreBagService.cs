@@ -1,5 +1,6 @@
 // Assets/Scripts/Inventory/OreBag/OreBagService.cs
 using System;
+using BankSystem;
 using Companions;
 using Inventory;
 using Inventory.Core;
@@ -300,6 +301,67 @@ namespace Inventory.OreBag
             PublishPlayerMessage($"Your ore bag has been upgraded to tier {nextTier.Tier}.");
             ApplyActiveBag(nextTier, playerInventory);
             oreBagInventory.InventoryComponent.WindowController?.RefreshAllSlots();
+            return true;
+        }
+
+        /// <summary>
+        /// Transfers the entire contents of the active ore bag into the supplied bank instance.
+        /// </summary>
+        /// <param name="playerInventory">Inventory that owns the ore bag item.</param>
+        /// <param name="slotIndex">Inventory slot index that was right-clicked.</param>
+        /// <param name="bank">Bank UI that should receive the ores.</param>
+        /// <param name="showMessages">Whether chat feedback should be emitted.</param>
+        /// <param name="totalTransferred">Total number of ores moved into the bank.</param>
+        /// <returns>True when the transfer attempt completed (even if nothing moved).</returns>
+        public bool TryTransferAllOreToBank(
+            Inventory.Inventory playerInventory,
+            int slotIndex,
+            BankUI bank,
+            bool showMessages,
+            out int totalTransferred)
+        {
+            totalTransferred = 0;
+
+            if (oreBagInventory == null || playerInventory == null || bank == null)
+                return false;
+
+            if (!TryResolveBagFromSlot(playerInventory, slotIndex, out var bagData) &&
+                !TryResolveBagForInventory(playerInventory, out bagData))
+            {
+                return false;
+            }
+
+            ApplyActiveBag(bagData, playerInventory);
+
+            int existingOre = oreBagInventory.GetCurrentOreCount();
+            if (existingOre <= 0)
+            {
+                if (showMessages)
+                    PublishPlayerMessage("Your ore bag is empty.");
+
+                oreBagInventory.InventoryComponent?.WindowController?.RefreshAllSlots();
+                playerInventory.WindowController?.RefreshSlot(slotIndex);
+                return true;
+            }
+
+            var bagInventory = oreBagInventory.InventoryComponent;
+            if (bagInventory == null)
+                return false;
+
+            totalTransferred = bank.DepositAllFromInventory(bagInventory);
+            oreBagInventory.InventoryComponent.WindowController?.RefreshAllSlots();
+            playerInventory.WindowController?.RefreshSlot(slotIndex);
+
+            int remainingAfterTransfer = oreBagInventory.GetCurrentOreCount();
+
+            if (showMessages)
+            {
+                if (totalTransferred > 0 && remainingAfterTransfer <= 0)
+                    PublishPlayerMessage("You have transferred all the ores to your bank.");
+                else
+                    PublishPlayerMessage("Your bank doesn't have enough space for more ores.");
+            }
+
             return true;
         }
 

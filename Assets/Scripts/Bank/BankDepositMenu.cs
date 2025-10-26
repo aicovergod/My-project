@@ -15,6 +15,7 @@ namespace BankSystem
         private int slotIndex;
         private Font font;
         private RectTransform rect;
+        private Button transferAllButton;
 
         public static BankDepositMenu Create(Transform parent, Font font)
         {
@@ -56,9 +57,12 @@ namespace BankSystem
             CreateButton("Add 10", () => { bank?.DepositFromInventory(slotIndex, 10); Hide(); });
             CreateButton("Add X", () => { bank?.PromptDepositAmount(slotIndex); Hide(); });
             CreateButton("Add All", () => { bank?.DepositAllFromInventory(slotIndex); Hide(); });
+            transferAllButton = CreateButton("Transfer All", HandleTransferAllClicked);
+            if (transferAllButton != null)
+                transferAllButton.gameObject.SetActive(false);
         }
 
-        private void CreateButton(string label, UnityAction onClick)
+        private Button CreateButton(string label, UnityAction onClick)
         {
             var btnGO = new GameObject(label, typeof(Image), typeof(Button));
             btnGO.transform.SetParent(transform, false);
@@ -85,9 +89,11 @@ namespace BankSystem
             txtRect.anchorMax = Vector2.one;
             txtRect.offsetMin = Vector2.zero;
             txtRect.offsetMax = Vector2.zero;
+
+            return btn;
         }
 
-        public void Show(BankUI bank, int index, Vector2 position)
+        public void Show(BankUI bank, int index, Vector2 position, bool showTransferAll)
         {
             this.bank = bank;
             slotIndex = index;
@@ -95,17 +101,27 @@ namespace BankSystem
             gameObject.SetActive(true);
             DeferSafeZoneCheck();
             transform.SetAsLastSibling();
+            if (transferAllButton != null)
+                transferAllButton.gameObject.SetActive(showTransferAll);
         }
 
         public void Hide()
         {
             gameObject.SetActive(false);
             bank = null;
+            if (transferAllButton != null)
+                transferAllButton.gameObject.SetActive(false);
         }
 
         /// <inheritdoc />
         protected override void OnCloseRequested()
         {
+            Hide();
+        }
+
+        private void HandleTransferAllClicked()
+        {
+            bank?.TransferAllOreFromBag(slotIndex);
             Hide();
         }
     }

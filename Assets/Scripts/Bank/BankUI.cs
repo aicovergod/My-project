@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Inventory;
+using Inventory.OreBag;
 using Core.Save;
 using Pets;
 using UI;
@@ -495,7 +496,10 @@ namespace BankSystem
                 return;
             }
 
-            depositMenu?.Show(this, invIndex, position);
+            var entry = playerInventory.GetSlot(invIndex);
+            bool showTransferAll = entry.item is OreBagItemData;
+
+            depositMenu?.Show(this, invIndex, position, showTransferAll);
         }
 
         public void PromptWithdrawAmount(int bankIndex)
@@ -675,6 +679,22 @@ namespace BankSystem
                 return false;
             int available = playerInventory.GetItemCount(entry.item);
             return DepositFromInventory(invIndex, available);
+        }
+
+        public void TransferAllOreFromBag(int invIndex)
+        {
+            if (!ResolvePlayerInventory())
+                return;
+
+            var entry = playerInventory.GetSlot(invIndex);
+            if (entry.item is not OreBagItemData)
+                return;
+
+            var service = OreBagService.Instance;
+            if (service == null)
+                return;
+
+            service.TryTransferAllOreToBank(playerInventory, invIndex, this, true, out _);
         }
 
         public bool DepositFromInventory(int invIndex, int amount)
