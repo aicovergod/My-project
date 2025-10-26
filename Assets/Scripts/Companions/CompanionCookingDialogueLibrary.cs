@@ -89,6 +89,7 @@ namespace Companions
         private const string StationOccupiedFallback = "That cooking spot is already taken.";
         private const string StuckFallback = "Got hung up for a moment, sorry.";
         private const string CooldownFallback = "Need a short break before cooking again, {1}.";
+        private const string LevelRequirementFormat = "I need Cooking level {0} before I can cook that.";
 
         public static string GetRandomInventoryFullLine()
         {
@@ -133,6 +134,14 @@ namespace Companions
             string safeName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName.Trim();
             string template = GetRandomLine(CooldownLines, CooldownFallback);
             return string.Format(template, minutes, safeName);
+        }
+
+        public static string GetLevelRequirementLine(int requiredLevel)
+        {
+            if (requiredLevel < 1)
+                requiredLevel = 1;
+
+            return string.Format(LevelRequirementFormat, requiredLevel);
         }
 
         private static string GetRandomLine(IReadOnlyList<string> pool, string fallback)

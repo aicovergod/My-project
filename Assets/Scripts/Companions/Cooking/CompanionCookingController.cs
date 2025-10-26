@@ -824,7 +824,7 @@ namespace Companions
 
         private void PublishLevelRequirementMessage(int requiredLevel)
         {
-            string line = $"I need Cooking level {Mathf.Max(1, requiredLevel)} before I can cook that.";
+            string line = CompanionCookingDialogueLibrary.GetLevelRequirementLine(requiredLevel);
             PublishChat(line);
         }
 
