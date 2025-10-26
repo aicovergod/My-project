@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using BankSystem;
 using Companions;
+using Companions.Equipment;
 using ShopSystem;
 using UnityEngine;
 using World;

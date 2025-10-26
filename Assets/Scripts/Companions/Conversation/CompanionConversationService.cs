@@ -12,6 +12,7 @@ using Skills.Common;
 using Skills.Mining;
 using UI.Chat;
 using UnityEngine;
+using Companions.Equipment;
 using UnityEngine.SceneManagement;
 using Util;
 using World;

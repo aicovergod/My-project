@@ -5,6 +5,7 @@ using Audio;
 using Combat;
 using EquipmentSystem;
 using Combat.Ranged;
+using Companions.Equipment;
 using Inventory;
 using MyGame.Drops;
 using NPC;
@@ -14,7 +15,7 @@ using UI.Chat;
 using UnityEngine;
 using Util;
 
-namespace Companions
+namespace Companions.Combat
 {
     /// <summary>
     /// Companion-specific ranged controller that reuses the player projectile pipeline while sourcing

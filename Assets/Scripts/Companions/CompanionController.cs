@@ -11,6 +11,8 @@ using Skills;
 using UI.Chat;
 using UnityEngine;
 using Util;
+using Companions.Combat;
+using Companions.Equipment;
 
 namespace Companions
 {

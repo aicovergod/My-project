@@ -10,6 +10,7 @@ using Skills.Fishing;
 using UI.Chat;
 using UnityEngine;
 using Util;
+using Companions.Equipment;
 
 namespace Companions
 {

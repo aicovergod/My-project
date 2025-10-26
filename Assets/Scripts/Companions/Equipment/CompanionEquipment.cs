@@ -13,7 +13,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Companions
+namespace Companions.Equipment
 {
     /// <summary>
     /// Builds and manages a companion-specific equipment window that mirrors the player's OSRS-style layout.

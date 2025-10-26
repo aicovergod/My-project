@@ -3,6 +3,7 @@ using Inventory;
 using Quests;
 using Skills;
 using UnityEngine;
+using Companions.Equipment;
 
 namespace UI.Utilities
 {

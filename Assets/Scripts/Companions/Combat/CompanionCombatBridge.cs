@@ -7,7 +7,7 @@ using Pets;
 using Skills;
 using UnityEngine;
 
-namespace Companions
+namespace Companions.Combat
 {
     /// <summary>
     /// Overrides the pet combat controller's stat calculations so the companion uses its own skill levels

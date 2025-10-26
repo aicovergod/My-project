@@ -1,6 +1,6 @@
 using System;
 
-namespace Companions
+namespace Companions.Equipment
 {
     /// <summary>
     ///     Describes the outcome of a companion equipment attempt initiated from the player inventory.

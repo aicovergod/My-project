@@ -13,6 +13,8 @@ using UI;
 using Player;
 using Util;
 using Companions;
+using Companions.Combat;
+using Companions.Equipment;
 using Inventory;
 using Inventory.Core;
 using UI.Chat;
