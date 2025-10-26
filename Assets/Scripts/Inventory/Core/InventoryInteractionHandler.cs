@@ -15,6 +15,7 @@ using Skills.Firemaking;
 using UI;
 using UI.Chat;
 using UI.Utilities;
+using Companions.Equipment;
 using UnityEngine;
 using UnityEngine.EventSystems;
 

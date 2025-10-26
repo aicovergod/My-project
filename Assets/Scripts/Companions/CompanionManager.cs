@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using BankSystem;
 using Combat;
+using Companions.Equipment;
 using Inventory;
 using Pets;
 using Skills;

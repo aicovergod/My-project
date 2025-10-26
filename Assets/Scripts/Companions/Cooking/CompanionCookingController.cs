@@ -9,6 +9,7 @@ using Skills.Common;
 using UI.Chat;
 using UnityEngine;
 using Util;
+using Companions.Equipment;
 
 namespace Companions
 {
