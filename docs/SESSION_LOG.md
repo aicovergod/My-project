@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c2c0dc59cc79a414f99af91c5c566528b6abc506 -->
+## 2025-10-26T21:12:24+00:00 — Map overworld scene name to Viosla
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 7 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:74f88af823e348a0b54c33fce0c5a8906fc3664d -->
 ## 2025-10-26T21:05:46+00:00 — Merge pull request #1447 from aicovergod/codex/fix-ore-bag-stacking-issue
 
