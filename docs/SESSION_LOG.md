@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5f3567d8294f46e2423f1df250c9d52cd5d3e4eb -->
+## 2025-10-26T09:10:07+00:00 — Merge pull request #1420 from aicovergod/codex/add-new-dialogue-helper-for-mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 104 ++ / 4 --
+- Notes:
+  Add mining companion dialogue helper
+---
+<!-- commit:2626ba74deccefebf9ac8c1972ad6217222fd134 -->
+## 2025-10-26T09:09:16+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c9eb934b2cfb3b866e1aaded4128e987a89a8ff1 -->
 ## 2025-10-26T09:08:55+00:00 — Refactor mining companion dialogue
 
