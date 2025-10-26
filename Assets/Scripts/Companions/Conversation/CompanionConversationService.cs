@@ -2915,6 +2915,13 @@ namespace Companions.Conversation
             if (trimmed.Length == 0)
                 return string.Empty;
 
+            // The primary overworld scene should be surfaced to players as "Viosla" to
+            // match the worldbuilding terminology used across the UI and narrative.
+            // Handle this before applying title casing so variations like "OverWorld"
+            // and "overworld" are normalised correctly.
+            if (string.Equals(trimmed, "overworld", StringComparison.OrdinalIgnoreCase))
+                return "Viosla";
+
             var textInfo = CultureInfo.InvariantCulture.TextInfo;
             return textInfo.ToTitleCase(trimmed.ToLowerInvariant());
         }
