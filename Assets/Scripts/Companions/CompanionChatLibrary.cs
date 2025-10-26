@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using Inventory;
 using UnityEngine;
@@ -523,6 +524,102 @@ namespace Companions
 
         /// <summary>Fallback message returned when the no rocks pool is empty.</summary>
         private const string NoRocksFallbackLine = "There are no rocks here unless you count your head";
+
+        /// <summary>Pool of chat lines used when a mining command is issued without an active summon.</summary>
+        private static readonly string[] MiningSummonRequiredChatMessages =
+        {
+            "You need to summon me before I can go mining.",
+            "Call me in first and I'll swing the pickaxe.",
+            "Summon me back and I’ll start cracking rocks.",
+            "No mining without a companion on the field—summon me!"
+        };
+
+        /// <summary>Fallback message returned when the mining summon-required pool is empty.</summary>
+        private const string MiningSummonRequiredFallbackLine = "You need to summon me before I can go mining.";
+
+        /// <summary>Pool of chat lines surfaced when the companion cannot locate a mining target.</summary>
+        private static readonly string[] MiningGenericFailureChatMessages =
+        {
+            "I can't find any rocks to mine right now.",
+            "No ores nearby worth swinging at.",
+            "Looks clear of mineable veins at the moment.",
+            "Nothing to mine here—pick another spot."
+        };
+
+        /// <summary>Fallback message returned when the mining generic failure pool is empty.</summary>
+        private const string MiningGenericFailureFallbackLine = "I can't find any rocks to mine right now.";
+
+        /// <summary>Pool of chat lines used when a woodcutting command is issued without an active summon.</summary>
+        private static readonly string[] WoodcuttingSummonRequiredChatMessages =
+        {
+            "You need to summon me before I can start chopping.",
+            "Summon me first and I'll grab the axe.",
+            "Call me in and I'll get to chopping.",
+            "No chopping until you summon me back."
+        };
+
+        /// <summary>Fallback message returned when the woodcutting summon-required pool is empty.</summary>
+        private const string WoodcuttingSummonRequiredFallbackLine = "You need to summon me before I can start chopping.";
+
+        /// <summary>Pool of chat lines surfaced when the companion cannot locate a tree to chop.</summary>
+        private static readonly string[] WoodcuttingGenericFailureChatMessages =
+        {
+            "I can't find any trees worth chopping right now.",
+            "Looks like we're out of trees in range.",
+            "No trees close enough for me to chop.",
+            "Nothing leafy nearby to swing at."
+        };
+
+        /// <summary>Fallback message returned when the woodcutting generic failure pool is empty.</summary>
+        private const string WoodcuttingGenericFailureFallbackLine = "I can't find any trees worth chopping right now.";
+
+        /// <summary>Pool of chat lines used when a fishing command is issued without an active summon.</summary>
+        private static readonly string[] FishingSummonRequiredChatMessages =
+        {
+            "You need to summon me before I can go fishing.",
+            "Call me back first and I'll cast a line.",
+            "Summon me and I'll get the rod ready.",
+            "No fishing from the void—summon me in!"
+        };
+
+        /// <summary>Fallback message returned when the fishing summon-required pool is empty.</summary>
+        private const string FishingSummonRequiredFallbackLine = "You need to summon me before I can go fishing.";
+
+        /// <summary>Pool of chat lines surfaced when the companion cannot locate a fishing spot.</summary>
+        private static readonly string[] FishingGenericFailureChatMessages =
+        {
+            "I can't find a good fishing spot right now.",
+            "No decent water to cast into from here.",
+            "Looks quiet—no catchable spots nearby.",
+            "I’m not seeing any fishable nodes in range."
+        };
+
+        /// <summary>Fallback message returned when the fishing generic failure pool is empty.</summary>
+        private const string FishingGenericFailureFallbackLine = "I can't find a good fishing spot right now.";
+
+        /// <summary>Pool of chat lines used when a cooking command is issued without an active summon.</summary>
+        private static readonly string[] CookingSummonRequiredChatMessages =
+        {
+            "You need to summon me before I can start cooking.",
+            "Summon me back and I'll fire up the range.",
+            "No cooking from storage—call me in.",
+            "Bring me out here first, then I'll cook."
+        };
+
+        /// <summary>Fallback message returned when the cooking summon-required pool is empty.</summary>
+        private const string CookingSummonRequiredFallbackLine = "You need to summon me before I can start cooking.";
+
+        /// <summary>Pool of chat lines surfaced when the companion cannot locate a cooking station.</summary>
+        private static readonly string[] CookingGenericFailureChatMessages =
+        {
+            "I can't find a free range to cook on right now.",
+            "No open cooking stations nearby.",
+            "Looks like every range is occupied.",
+            "I need a free range before I can cook."
+        };
+
+        /// <summary>Fallback message returned when the cooking generic failure pool is empty.</summary>
+        private const string CookingGenericFailureFallbackLine = "I can't find a free range to cook on right now.";
 
         /// <summary>Pool of chat lines used when the companion refuses mining due to an active cooldown.</summary>
         private static readonly string[] MiningDeclineCooldownChatMessages =
@@ -5752,6 +5849,102 @@ namespace Companions
         }
 
         /// <summary>
+        /// Returns a summon-required line for mining commands so caller logic stays consistent.
+        /// </summary>
+        /// <param name="playerName">Display name of the issuing player for placeholder substitution.</param>
+        public static string GetRandomMiningSummonRequiredLine(string playerName)
+        {
+            return ResolveLineWithPlayerName(
+                MiningSummonRequiredChatMessages,
+                MiningSummonRequiredFallbackLine,
+                playerName);
+        }
+
+        /// <summary>
+        /// Returns a generic mining failure line when no rocks can be found nearby.
+        /// </summary>
+        /// <param name="playerName">Display name of the issuing player for placeholder substitution.</param>
+        public static string GetRandomMiningGenericFailureLine(string playerName)
+        {
+            return ResolveLineWithPlayerName(
+                MiningGenericFailureChatMessages,
+                MiningGenericFailureFallbackLine,
+                playerName);
+        }
+
+        /// <summary>
+        /// Returns a summon-required line for woodcutting commands so caller logic stays consistent.
+        /// </summary>
+        /// <param name="playerName">Display name of the issuing player for placeholder substitution.</param>
+        public static string GetRandomWoodcuttingSummonRequiredLine(string playerName)
+        {
+            return ResolveLineWithPlayerName(
+                WoodcuttingSummonRequiredChatMessages,
+                WoodcuttingSummonRequiredFallbackLine,
+                playerName);
+        }
+
+        /// <summary>
+        /// Returns a generic woodcutting failure line when no trees can be located nearby.
+        /// </summary>
+        /// <param name="playerName">Display name of the issuing player for placeholder substitution.</param>
+        public static string GetRandomWoodcuttingGenericFailureLine(string playerName)
+        {
+            return ResolveLineWithPlayerName(
+                WoodcuttingGenericFailureChatMessages,
+                WoodcuttingGenericFailureFallbackLine,
+                playerName);
+        }
+
+        /// <summary>
+        /// Returns a summon-required line for fishing commands so caller logic stays consistent.
+        /// </summary>
+        /// <param name="playerName">Display name of the issuing player for placeholder substitution.</param>
+        public static string GetRandomFishingSummonRequiredLine(string playerName)
+        {
+            return ResolveLineWithPlayerName(
+                FishingSummonRequiredChatMessages,
+                FishingSummonRequiredFallbackLine,
+                playerName);
+        }
+
+        /// <summary>
+        /// Returns a generic fishing failure line when no valid spots exist nearby.
+        /// </summary>
+        /// <param name="playerName">Display name of the issuing player for placeholder substitution.</param>
+        public static string GetRandomFishingGenericFailureLine(string playerName)
+        {
+            return ResolveLineWithPlayerName(
+                FishingGenericFailureChatMessages,
+                FishingGenericFailureFallbackLine,
+                playerName);
+        }
+
+        /// <summary>
+        /// Returns a summon-required line for cooking commands so caller logic stays consistent.
+        /// </summary>
+        /// <param name="playerName">Display name of the issuing player for placeholder substitution.</param>
+        public static string GetRandomCookingSummonRequiredLine(string playerName)
+        {
+            return ResolveLineWithPlayerName(
+                CookingSummonRequiredChatMessages,
+                CookingSummonRequiredFallbackLine,
+                playerName);
+        }
+
+        /// <summary>
+        /// Returns a generic cooking failure line when no stations are available.
+        /// </summary>
+        /// <param name="playerName">Display name of the issuing player for placeholder substitution.</param>
+        public static string GetRandomCookingGenericFailureLine(string playerName)
+        {
+            return ResolveLineWithPlayerName(
+                CookingGenericFailureChatMessages,
+                CookingGenericFailureFallbackLine,
+                playerName);
+        }
+
+        /// <summary>
         /// Returns a random chat line when the companion refuses to mine because a cooldown is still active.
         /// </summary>
         /// <param name="playerName">Name of the active player used for placeholder replacement.</param>
@@ -6103,6 +6296,35 @@ namespace Companions
         public static string GetRandomPlayerDeathLine()
         {
             return GetRandomLine(PlayerDeathChatMessages, PlayerDeathFallbackLine);
+        }
+
+        /// <summary>
+        /// Resolves a random line from the supplied pool while applying an optional player-name substitution.
+        /// </summary>
+        /// <param name="pool">Array of potential chat lines.</param>
+        /// <param name="fallback">Fallback line used when the pool is empty.</param>
+        /// <param name="playerName">Player display name injected into any <c>{playerName}</c> placeholders.</param>
+        private static string ResolveLineWithPlayerName(string[] pool, string fallback, string playerName)
+        {
+            string template = GetRandomLine(pool, fallback);
+            return ApplyPlayerName(template, playerName);
+        }
+
+        /// <summary>
+        /// Replaces <c>{playerName}</c> placeholders with a safe player name fallback.
+        /// </summary>
+        /// <param name="template">Template string that may include player placeholders.</param>
+        /// <param name="playerName">Player display name to insert.</param>
+        private static string ApplyPlayerName(string template, string playerName)
+        {
+            if (string.IsNullOrEmpty(template))
+                return template;
+
+            if (template.IndexOf("{playerName}", StringComparison.Ordinal) < 0)
+                return template;
+
+            string safeName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName.Trim();
+            return template.Replace("{playerName}", safeName);
         }
 
         /// <summary>

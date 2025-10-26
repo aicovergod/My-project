@@ -253,15 +253,17 @@ namespace Companions.UI
             Debug.Log($"[Companion UI] Mine Rocks command result: success={accepted}, failureReason={failureReason}.");
             if (!accepted)
             {
+                string playerName = GetActivePlayerName();
+
                 if (!CompanionManager.HasActiveCompanion)
                 {
-                    PublishPlaceholderMessage("You need to summon me before I can go mining.");
+                    PublishPlaceholderMessage(CompanionChatLibrary.GetRandomMiningSummonRequiredLine(playerName));
                 }
                 else if (ShouldPublishFallbackForFailure(failureReason))
                 {
                     // Surface a short chat line when the command cannot be fulfilled so the player
                     // understands why both menus closed without triggering companion behaviour.
-                    PublishPlaceholderMessage("I can't find any rocks to mine right now.");
+                    PublishPlaceholderMessage(CompanionChatLibrary.GetRandomMiningGenericFailureLine(playerName));
                 }
             }
 
@@ -277,13 +279,15 @@ namespace Companions.UI
             Debug.Log($"[Companion UI] Chop Trees command result: success={accepted}, failureReason={failureReason}.");
             if (!accepted)
             {
+                string playerName = GetActivePlayerName();
+
                 if (!CompanionManager.HasActiveCompanion)
                 {
-                    PublishPlaceholderMessage("You need to summon me before I can start chopping.");
+                    PublishPlaceholderMessage(CompanionChatLibrary.GetRandomWoodcuttingSummonRequiredLine(playerName));
                 }
                 else if (ShouldPublishWoodcuttingFallback(failureReason))
                 {
-                    PublishPlaceholderMessage(CompanionWoodcuttingDialogueLibrary.GetRandomNoTreesLine());
+                    PublishPlaceholderMessage(CompanionChatLibrary.GetRandomWoodcuttingGenericFailureLine(playerName));
                 }
             }
 
@@ -297,9 +301,11 @@ namespace Companions.UI
             Debug.Log($"[Companion UI] Go Fishing command result: success={accepted}, failureReason={failureReason}.");
             if (!accepted)
             {
+                string playerName = GetActivePlayerName();
+
                 if (!CompanionManager.HasActiveCompanion)
                 {
-                    PublishPlaceholderMessage("You need to summon me before I can go fishing.");
+                    PublishPlaceholderMessage(CompanionChatLibrary.GetRandomFishingSummonRequiredLine(playerName));
                 }
                 else if (ShouldPublishFishingFallback(failureReason))
                 {
@@ -310,7 +316,7 @@ namespace Companions.UI
                             PublishPlaceholderMessage(CompanionFishingDialogueLibrary.GetRandomNoSpotsLine());
                             break;
                         default:
-                            PublishPlaceholderMessage("I can't find a good fishing spot right now.");
+                            PublishPlaceholderMessage(CompanionChatLibrary.GetRandomFishingGenericFailureLine(playerName));
                             break;
                     }
                 }
@@ -326,9 +332,11 @@ namespace Companions.UI
             Debug.Log($"[Companion UI] Cook Food command result: success={accepted}, failureReason={failureReason}.");
             if (!accepted)
             {
+                string playerName = GetActivePlayerName();
+
                 if (!CompanionManager.HasActiveCompanion)
                 {
-                    PublishPlaceholderMessage("You need to summon me before I can start cooking.");
+                    PublishPlaceholderMessage(CompanionChatLibrary.GetRandomCookingSummonRequiredLine(playerName));
                 }
                 else if (ShouldPublishCookingFallback(failureReason))
                 {
@@ -344,7 +352,7 @@ namespace Companions.UI
                             PublishPlaceholderMessage(CompanionCookingDialogueLibrary.GetRandomPlayerBusyLine());
                             break;
                         default:
-                            PublishPlaceholderMessage(CompanionCookingDialogueLibrary.GetRandomStationUnavailableLine());
+                            PublishPlaceholderMessage(CompanionChatLibrary.GetRandomCookingGenericFailureLine(playerName));
                             break;
                     }
                 }
@@ -435,6 +443,12 @@ namespace Companions.UI
                 return;
 
             chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), message);
+        }
+
+        private static string GetActivePlayerName()
+        {
+            var chat = ChatService.Instance;
+            return chat != null ? chat.ActiveUsername : string.Empty;
         }
 
         private void InternalHide()
