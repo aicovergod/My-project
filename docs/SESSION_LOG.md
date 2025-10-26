@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:88dad635ec1b8231412546ff5a2e1d16b5f1740e -->
+## 2025-10-26T14:07:31+00:00 — Fix companion cooking orientation and chat random selection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs
+- Diff: 26 ++ / 9 --
+- Notes:
+  —
+---
 <!-- commit:698d8db9b4e6da5c3da8dde7929a1db92c3bc9ac -->
 ## 2025-10-26T14:03:25+00:00 — Merge pull request #1429 from aicovergod/codex/fix-closebutton-interaction-issue
 

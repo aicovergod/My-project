@@ -501,32 +501,49 @@ namespace Companions
 
         private void ApplyMovement(Vector3 nextPosition, Vector2 velocity, bool teleported)
         {
+            Vector3 currentPosition = body != null ? (Vector3)body.position : transform.position;
+            Vector2 displacement = (Vector2)(nextPosition - currentPosition);
+            Vector2 appliedVelocity = teleported ? Vector2.zero : velocity;
+
             if (body != null)
             {
                 if (teleported)
+                {
                     body.position = nextPosition;
+                    body.linearVelocity = Vector2.zero;
+                }
                 else
+                {
                     body.MovePosition(nextPosition);
-
-                body.linearVelocity = velocity;
+                    body.linearVelocity = velocity;
+                }
             }
             else
             {
                 transform.position = nextPosition;
             }
 
-            Vector2 direction = velocity.sqrMagnitude < FacingDeadzone ? Vector2.down : velocity.normalized;
-            UpdateFacing(direction);
+            UpdateFacing(displacement, appliedVelocity);
         }
 
-        private void UpdateFacing(Vector2 direction)
+        private void UpdateFacing(Vector2 displacement, Vector2 appliedVelocity)
         {
             if (spriteAnimator == null && fallbackSpriteRenderer == null)
                 return;
 
-            var facing = DirectionUtility.ToDirection8(direction, lastFacing);
-            lastFacing = facing;
-            spriteAnimator?.SetDirection(facing);
+            Vector2 visualVector = displacement.sqrMagnitude > FacingDeadzone ? displacement : appliedVelocity;
+
+            if (visualVector.sqrMagnitude > FacingDeadzone)
+                lastFacing = Direction8Utility.FromVector(visualVector, allowDiagonals: true, fallback: lastFacing);
+
+            if (spriteAnimator != null)
+            {
+                spriteAnimator.SetFacing(lastFacing);
+                spriteAnimator.UpdateVisuals(visualVector);
+            }
+
+            if (fallbackSpriteRenderer != null)
+                fallbackSpriteRenderer.flipX = Direction8Utility.IsFacingLeft(lastFacing);
         }
         private CookingObject FindBestStation(float radius)
         {
