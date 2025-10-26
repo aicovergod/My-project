@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d8dd3361c84e41054130833eb7c4b689faa13494 -->
+## 2025-10-26T14:25:01+00:00 — Merge pull request #1433 from aicovergod/codex/organize-companion-scripts-into-folders
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 27 ++ / 4 --
+- Notes:
+  Organize companion combat and equipment scripts into dedicated folders
+---
+<!-- commit:72f61b1c3618f67f2d4b3e8576279975a3319504 -->
+## 2025-10-26T14:24:54+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ee657bf6b747f77ba4fe4d30d860ce4ff96b77d0 -->
 ## 2025-10-26T14:24:35+00:00 — Refactor companion combat and equipment namespaces
 
