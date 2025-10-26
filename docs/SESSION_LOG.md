@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b232989208edcf51f47b2301a95f673824cddf49 -->
+## 2025-10-26T16:01:24+00:00 — Merge pull request #1439 from aicovergod/codex/add-areaisgraveyard-support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 30 ++ / 3 --
+- Notes:
+  Add graveyard awareness reactions for companions
+---
+<!-- commit:b6704c21a997111c696febb981dad852558f56ce -->
+## 2025-10-26T16:01:06+00:00 — Add graveyard awareness dialogue for companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs
+- Diff: 30 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:5163efab6e2fb86a2298169710bad6e47c2a0ba6 -->
 ## 2025-10-26T15:55:52+00:00 — Merge pull request #1438 from aicovergod/codex/add-environmental-awareness-script-for-companions
 
