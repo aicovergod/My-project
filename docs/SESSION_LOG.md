@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0ee51c0fb251476e445a222ec280ae16baed6018 -->
+## 2025-10-26T09:25:20+00:00 — Use shared RNG for companion dialogue lines
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/CompanionCookingDialogueLibrary.cs, Assets/Scripts/Companions/CompanionDialogueRandomProvider.cs, Assets/Scripts/Companions/CompanionFishingDialogueLibrary.cs, Assets/Scripts/Companions/CompanionWoodcuttingDialogueLibrary.cs, Assets/Scripts/Companions/Mining/CompanionMiningDialogueLibrary.cs
+- Diff: 41 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:e0a5e37a7dd263a9be17e73a1b1b344ebb54648b -->
 ## 2025-10-26T09:19:13+00:00 — Merge pull request #1422 from aicovergod/codex/add-dialogue-helper-for-failure-messages
 
