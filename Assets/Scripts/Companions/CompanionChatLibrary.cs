@@ -5432,6 +5432,62 @@ namespace Companions
         /// <summary>Fallback line used when the empty-inventory pool fails to produce a response.</summary>
         private const string BankDepositEmptyInventoryFallbackLine = "Nothing to add, boss.";
 
+        /// <summary>Pool of contextual reactions when companions recognise they have entered a bank.</summary>
+        private static readonly string[] BankAwarenessChatMessages =
+        {
+            "Oooh, we're at the bank.",
+            "Well, hello banker.",
+            "Ah, we're at a bank in Viosla."
+        };
+
+        /// <summary>Fallback chat used if the bank awareness pool cannot provide a line.</summary>
+        private const string BankAwarenessFallbackLine = "Looks like we're at the bank.";
+
+        /// <summary>Pool containing the special bank line that should only appear when the companion is full.</summary>
+        private static readonly string[] BankAwarenessInventoryFullChatMessages =
+        {
+            "My inventory is full, maybe I should deposit these items."
+        };
+
+        /// <summary>Fallback used when the bank full-awareness pool is empty or malformed.</summary>
+        private const string BankAwarenessInventoryFullFallbackLine = "My inventory is full, maybe I should deposit these items.";
+
+        /// <summary>Pool of flavour lines triggered when the companion enters a mining cave.</summary>
+        private static readonly string[] MiningCaveAwarenessChatMessages =
+        {
+            "Time for some mining, eh?",
+            "I hope there's no ore golems in here.",
+            "I do enjoy a bit of mining.",
+            "Are we here to mine?"
+        };
+
+        /// <summary>Fallback message for mining cave awareness when the pool is unavailable.</summary>
+        private const string MiningCaveAwarenessFallbackLine = "Time for some mining, eh?";
+
+        /// <summary>Pool of quips triggered when the companion steps inside a goblin cave.</summary>
+        private static readonly string[] GoblinCaveAwarenessChatMessages =
+        {
+            "I really hate goblins.",
+            "Time to kill some goblins, hmm?",
+            "Damn green buggers.",
+            "Let's kill some goblins."
+        };
+
+        /// <summary>Fallback chat for goblin cave awareness when no pool entry is available.</summary>
+        private const string GoblinCaveAwarenessFallbackLine = "Time to kill some goblins, hmm?";
+
+        /// <summary>Pool of flavour lines used when the companion reaches the ocean.</summary>
+        private static readonly string[] OceanAwarenessChatMessages =
+        {
+            "Ah, I do love the view of the ocean.",
+            "The sweet smell of the salty ocean.",
+            "Do you ever wonder what else is out there?",
+            "Do you think there's any sea monsters?"
+        };
+
+        /// <summary>Fallback line when the ocean awareness pool is empty.</summary>
+        private const string OceanAwarenessFallbackLine = "Ah, I do love the view of the ocean.";
+
         /// <summary>Pool of flavour lines used when the companion manually spawns from an item drop.</summary>
         private static readonly string[] ManualSpawnGreetingChatMessages =
         {
@@ -6173,6 +6229,49 @@ namespace Companions
         public static string GetRandomPlayerAndCompanionInventoryFullLine()
         {
             return GetRandomLine(PlayerAndCompanionInventoryFullChatMessages, PlayerAndCompanionInventoryFullFallbackLine);
+        }
+
+        /// <summary>
+        /// Returns a bank-themed awareness line, including the inventory full warning when appropriate.
+        /// </summary>
+        /// <param name="companionInventoryFull">Whether the companion inventory has reached capacity.</param>
+        public static string GetRandomBankAwarenessLine(bool companionInventoryFull)
+        {
+            if (companionInventoryFull)
+            {
+                int fullPool = BankAwarenessInventoryFullChatMessages != null ? BankAwarenessInventoryFullChatMessages.Length : 0;
+                int generalPool = BankAwarenessChatMessages != null ? BankAwarenessChatMessages.Length : 0;
+                int total = fullPool + generalPool;
+
+                if (total <= 0)
+                    return BankAwarenessInventoryFullFallbackLine;
+
+                int index = UnityEngine.Random.Range(0, total);
+                if (index < fullPool)
+                    return GetRandomLine(BankAwarenessInventoryFullChatMessages, BankAwarenessInventoryFullFallbackLine);
+
+                return GetRandomLine(BankAwarenessChatMessages, BankAwarenessFallbackLine);
+            }
+
+            return GetRandomLine(BankAwarenessChatMessages, BankAwarenessFallbackLine);
+        }
+
+        /// <summary>Returns a flavour line for mining cave awareness.</summary>
+        public static string GetRandomMiningCaveAwarenessLine()
+        {
+            return GetRandomLine(MiningCaveAwarenessChatMessages, MiningCaveAwarenessFallbackLine);
+        }
+
+        /// <summary>Returns a flavour line for goblin cave awareness.</summary>
+        public static string GetRandomGoblinCaveAwarenessLine()
+        {
+            return GetRandomLine(GoblinCaveAwarenessChatMessages, GoblinCaveAwarenessFallbackLine);
+        }
+
+        /// <summary>Returns a flavour line for ocean awareness.</summary>
+        public static string GetRandomOceanAwarenessLine()
+        {
+            return GetRandomLine(OceanAwarenessChatMessages, OceanAwarenessFallbackLine);
         }
 
         /// <summary>
