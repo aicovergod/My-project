@@ -14,6 +14,11 @@ namespace Companions.Conversation
         Greeting = 0,
 
         /// <summary>
+        /// Lightweight chatter that keeps the conversation warm between major topics.
+        /// </summary>
+        SmallTalk = 5,
+
+        /// <summary>
         /// Player asked how the companion is doing or requested a status update.
         /// </summary>
         StatusQuery = 10,

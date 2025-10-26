@@ -29,6 +29,8 @@ namespace Companions.Conversation
         /// <param name="queriedSkillName">Display name for the queried skill when available.</param>
         /// <param name="queriedSkillSentence">Sentence-friendly name for the queried skill.</param>
         /// <param name="queriedSkillLevel">Companion's current level for the queried skill if resolved.</param>
+        /// <param name="ambientLocation">Friendly description of the current surroundings.</param>
+        /// <param name="memorySummary">Short summary of a recent shared event.</param>
         public CompanionResponseContext(
             DateTime requestTimeUtc,
             string timeOfDayLabel,
@@ -44,7 +46,9 @@ namespace Companions.Conversation
             SkillType? queriedSkill = null,
             string queriedSkillName = "",
             string queriedSkillSentence = "",
-            int? queriedSkillLevel = null)
+            int? queriedSkillLevel = null,
+            string ambientLocation = "",
+            string memorySummary = "")
         {
             RequestTimeUtc = requestTimeUtc;
             TimeOfDayLabel = timeOfDayLabel ?? string.Empty;
@@ -62,6 +66,9 @@ namespace Companions.Conversation
             QueriedSkillName = queriedSkillName ?? string.Empty;
             QueriedSkillSentence = queriedSkillSentence ?? string.Empty;
             QueriedSkillLevel = queriedSkillLevel;
+
+            AmbientLocation = ambientLocation ?? string.Empty;
+            MemorySummary = memorySummary ?? string.Empty;
 
             CombatStateDescriptor = ResolveCombatStateDescriptor(playerInCombat, companionInCombat);
         }
@@ -132,6 +139,12 @@ namespace Companions.Conversation
         /// <summary>Companion's resolved level for the queried skill.</summary>
         public int? QueriedSkillLevel { get; }
 
+        /// <summary>Friendly description of the area surrounding the player and companion.</summary>
+        public string AmbientLocation { get; }
+
+        /// <summary>Summary of a recent shared experience useful for casual callbacks.</summary>
+        public string MemorySummary { get; }
+
         /// <summary>True when the context tracks a specific skill referenced in chat.</summary>
         public bool HasQueriedSkill => QueriedSkill.HasValue ||
             !string.IsNullOrWhiteSpace(QueriedSkillName) ||
@@ -139,6 +152,12 @@ namespace Companions.Conversation
 
         /// <summary>True when the companion's level for the queried skill is known.</summary>
         public bool HasQueriedSkillLevel => QueriedSkillLevel.HasValue;
+
+        /// <summary>True when the context exposes a location descriptor that can be woven into dialogue.</summary>
+        public bool HasAmbientLocation => !string.IsNullOrWhiteSpace(AmbientLocation);
+
+        /// <summary>True when a short memory summary is available for flavour text.</summary>
+        public bool HasMemorySummary => !string.IsNullOrWhiteSpace(MemorySummary);
 
         /// <summary>
         /// Returns a copy of the context with updated skill query information while preserving all other
@@ -165,7 +184,9 @@ namespace Companions.Conversation
                 queriedSkill,
                 queriedSkillName,
                 queriedSkillSentence,
-                queriedSkillLevel);
+                queriedSkillLevel,
+                AmbientLocation,
+                MemorySummary);
         }
 
         private static string ResolveCombatStateDescriptor(bool playerInCombat, bool companionInCombat)
