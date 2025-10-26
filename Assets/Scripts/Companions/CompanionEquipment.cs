@@ -1026,8 +1026,8 @@ namespace Companions
             if (chat != null)
             {
                 string message = unmet.Count == 1
-                    ? "I don't have the required skill to equip that."
-                    : "I don't have the required skills to equip that.";
+                    ? CompanionChatLibrary.GetRandomCompanionEquipmentSingleRequirementFailureLine()
+                    : CompanionChatLibrary.GetRandomCompanionEquipmentMultipleRequirementFailureLine();
                 chat.PublishCompanionMessage(companionName, message);
             }
 
@@ -1049,8 +1049,10 @@ namespace Companions
             var anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
             var primaryRequirement = unmetRequirements[0];
             string message = unmetRequirements.Count == 1
-                ? $"{companionName} needs {primaryRequirement.level} {primaryRequirement.skill}."
-                : $"{companionName} lacks the requirements.";
+                ? CompanionChatLibrary.GetRandomCompanionEquipmentSingleRequirementFloatingTextLine(
+                    companionName,
+                    primaryRequirement)
+                : CompanionChatLibrary.GetRandomCompanionEquipmentMultipleRequirementFloatingTextLine(companionName);
             FloatingText.Show(message, anchor.position);
         }
 
