@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BankSystem;
 using Books;
 using Companions;
+using Inventory.OreBag;
 using Inventory.UI;
 using InventoryComponent = global::Inventory.Inventory;
 using MyGame.Drops;
@@ -55,10 +56,12 @@ namespace Inventory.Core
         private PetStorage petStorage;
         private GroundItemSpawner groundItemSpawner;
         private CompanionInventory companionInventory;
+        private OreBagInventory oreBagInventory;
         private CompanionEquipment companionEquipment;
         private readonly List<InventoryItemContextMenu.Option> contextMenuOptions = new();
 
         private bool IsCompanionOwner => companionInventory != null && companionInventory.InventoryComponent == owner;
+        private bool IsOreBagOwner => oreBagInventory != null && oreBagInventory.InventoryComponent == owner;
 
         private Shop currentShop;
 
@@ -80,6 +83,8 @@ namespace Inventory.Core
 
             companionInventory = owner.GetComponent<CompanionInventory>() ??
                                  owner.GetComponentInParent<CompanionInventory>();
+            oreBagInventory = owner.GetComponent<OreBagInventory>() ??
+                               owner.GetComponentInParent<OreBagInventory>();
             if (IsCompanionOwner)
             {
                 companionEquipment = owner.GetComponent<CompanionEquipment>() ??
@@ -122,6 +127,9 @@ namespace Inventory.Core
                 companionInventory = owner.GetComponent<CompanionInventory>() ??
                                      owner.GetComponentInParent<CompanionInventory>();
             }
+
+            oreBagInventory = owner.GetComponent<OreBagInventory>() ??
+                               owner.GetComponentInParent<OreBagInventory>();
 
             if (IsCompanionOwner)
             {
@@ -468,6 +476,9 @@ namespace Inventory.Core
         private void HandlePrimaryClick(int index)
         {
             var entry = model.GetEntry(index);
+            if (!IsCompanionOwner && entry.item is OreBagItemData && OreBagService.Instance.TryOpenBagFromSlot(owner, index))
+                return;
+
             if (entry.item != null && entry.item.healAmount > 0)
             {
                 UseItem(index);
@@ -541,6 +552,26 @@ namespace Inventory.Core
                     InventoryItemContextAction.Use,
                     true));
                 hasInteractable = true;
+
+                bool hasOreBag = OreBagService.Instance.HasBagInInventory();
+                bool isOre = OreBagService.Instance.IsOre(entry.item);
+                if (hasOreBag && isOre)
+                {
+                    contextMenuOptions.Add(new InventoryItemContextMenu.Option(
+                        "Add to Ore Bag",
+                        InventoryItemContextAction.AddToOreBag,
+                        true));
+                    hasInteractable = true;
+                }
+
+                if (entry.item is OreBagItemData bagData && bagData.UpgradeTarget != null)
+                {
+                    contextMenuOptions.Add(new InventoryItemContextMenu.Option(
+                        "Upgrade",
+                        InventoryItemContextAction.UpgradeOreBag,
+                        true));
+                    hasInteractable = true;
+                }
 
                 bool companionInventoryVisible = CompanionManager.IsInventoryVisible();
                 var companionInventoryWrapper = CompanionManager.CompanionInventory;
@@ -689,9 +720,33 @@ namespace Inventory.Core
                 case InventoryItemContextAction.Examine:
                     ExamineItem(slotIndex);
                     break;
+
+                case InventoryItemContextAction.AddToOreBag:
+                    if (!IsCompanionOwner)
+                        TryDepositAllOreToBag();
+                    break;
+
+                case InventoryItemContextAction.UpgradeOreBag:
+                    if (!IsCompanionOwner)
+                        TryUpgradeOreBag(slotIndex);
+                    break;
             }
 
             controller.DismissTooltip();
+        }
+
+        private void TryDepositAllOreToBag()
+        {
+            var service = OreBagService.Instance;
+            if (service.TryDepositAllPlayerOre(owner, true, out int added, out _))
+                controller.RefreshAllSlots();
+        }
+
+        private void TryUpgradeOreBag(int slotIndex)
+        {
+            var service = OreBagService.Instance;
+            if (service.TryUpgradeBag(owner, slotIndex))
+                controller.RefreshSlot(slotIndex);
         }
 
         private void SelectItemForUse(int slotIndex)
@@ -929,6 +984,13 @@ namespace Inventory.Core
 
         private void HandleExternalDrag(InventoryComponent sourceInventory, int sourceIndex, int targetIndex)
         {
+            if (IsOreBagOwner)
+            {
+                if (sourceInventory != null)
+                    OreBagService.Instance.TryDepositSlotFromPlayer(sourceInventory, sourceIndex, true, out _, out _);
+                return;
+            }
+
             if (targetIndex < 0 || targetIndex >= model.Size)
                 return;
 
