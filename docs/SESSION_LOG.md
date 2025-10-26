@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:698d8db9b4e6da5c3da8dde7929a1db92c3bc9ac -->
+## 2025-10-26T14:03:25+00:00 — Merge pull request #1429 from aicovergod/codex/fix-closebutton-interaction-issue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 25 ++ / 0 --
+- Notes:
+  Fix close button background raycast
+---
+<!-- commit:faedd2504ea9d0c4f31730ae7352f0cdabae2497 -->
+## 2025-10-26T14:03:09+00:00 — Fix close button background raycast
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Utilities/CloseButtonBuilder.cs
+- Diff: 25 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:4d5a5aa554e1f24e787cc10400be72c67151b4d8 -->
 ## 2025-10-26T10:36:26+00:00 — Merge pull request #1428 from aicovergod/codex/add-smalltalk-intent-and-response-handling
 
