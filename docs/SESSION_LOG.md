@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:df4761b47c0abd3aea9d437b7713d7c36986a952 -->
+## 2025-10-26T16:54:04+00:00 — Merge pull request #1441 from aicovergod/codex/add-areaisminingshop-feature
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 45 ++ / 2 --
+- Notes:
+  Add mining shop awareness dialogue for companions
+---
+<!-- commit:290ed90523be47eaa4d96906519ec6ef8f3ab5d1 -->
+## 2025-10-26T16:53:52+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6e36f9f6fc82bb288c8f8a9a86146eb793c5f0ef -->
 ## 2025-10-26T16:53:33+00:00 — Add mining shop awareness dialogue for companions
 
