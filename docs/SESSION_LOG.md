@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:596a210e13f08a2ec360082304701d1f694ce14d -->
+## 2025-10-26T14:15:18+00:00 — Organize companion dialogue libraries by skill
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/Cooking/CompanionCookingDialogueLibrary.cs, Assets/Scripts/Companions/Fishing/CompanionFishingDialogueLibrary.cs, Assets/Scripts/Companions/Fishing/CompanionFishingDialogueLibrary.cs.meta, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingDialogueLibrary.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingDialogueLibrary.cs.meta
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:893e157d2e321dfd89491e33e93d0a2ceb6ae78d -->
 ## 2025-10-26T14:07:59+00:00 — Merge pull request #1430 from aicovergod/codex/fix-console-errors-in-scripts-jqc9g1
 
