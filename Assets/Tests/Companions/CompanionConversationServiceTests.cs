@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Companions;
+using Companions.Chat;
 using Companions.Conversation;
 using NUnit.Framework;
 using Skills;
@@ -45,6 +46,56 @@ namespace Tests.Companions
                 UnityEngine.Object.DestroyImmediate(serviceObject);
             if (memoryObject != null)
                 UnityEngine.Object.DestroyImmediate(memoryObject);
+        }
+
+        [Test]
+        public void IsAwaitingSkillPlanResponse_ReflectsActiveSkillQuestion()
+        {
+            Assert.IsFalse(
+                CompanionConversationService.IsAwaitingSkillPlanResponse,
+                "Service should not report an active question immediately after setup.");
+
+            SetActiveSkillQuestion(SkillType.Fishing);
+
+            Assert.IsTrue(
+                CompanionConversationService.IsAwaitingSkillPlanResponse,
+                "Property should report true when the active skill question has been populated.");
+
+            ClearActiveSkillQuestion();
+
+            Assert.IsFalse(
+                CompanionConversationService.IsAwaitingSkillPlanResponse,
+                "Clearing the active question should reset the helper back to false.");
+        }
+
+        [Test]
+        public void TryProcessChatCommand_InclusiveAgreementDuringActiveQuestion_IsIgnored()
+        {
+            SetActiveSkillQuestion(SkillType.Fishing);
+
+            bool consumed = CompanionChatCommandProcessor.TryProcessChatCommand(
+                "Tester",
+                "ok let's go fishing");
+
+            Assert.IsFalse(
+                consumed,
+                "Inclusive confirmations should be routed through the conversation pipeline instead of firing commands.");
+
+            ClearActiveSkillQuestion();
+        }
+
+        [Test]
+        public void TryProcessChatCommand_ImperativeCommandStillProcesses()
+        {
+            ClearActiveSkillQuestion();
+
+            bool consumed = CompanionChatCommandProcessor.TryProcessChatCommand(
+                "Tester",
+                "Companion, go fish");
+
+            Assert.IsTrue(
+                consumed,
+                "Imperative messages should continue to trigger companion command processing.");
         }
 
         [Test]
@@ -145,6 +196,46 @@ namespace Tests.Companions
                 if (controllerObject != null)
                     UnityEngine.Object.DestroyImmediate(controllerObject);
             }
+        }
+
+        private void SetActiveSkillQuestion(SkillType skill)
+        {
+            var serviceType = typeof(CompanionConversationService);
+
+            var candidateType = serviceType.GetNestedType("SkillQuestionCandidate", BindingFlags.NonPublic);
+            var createMethod = candidateType?.GetMethod(
+                "CreateForSkill",
+                BindingFlags.Public | BindingFlags.Static);
+            Assert.IsNotNull(createMethod, "CreateForSkill factory should be discoverable for tests.");
+
+            object candidate = createMethod.Invoke(
+                null,
+                new object[] { skill, skill.ToString(), "Testing prompt", DateTime.UtcNow });
+
+            var activeType = serviceType.GetNestedType("ActiveSkillQuestion", BindingFlags.NonPublic);
+            var constructor = activeType?.GetConstructor(new[] { candidateType, typeof(string), typeof(DateTime) });
+            Assert.IsNotNull(constructor, "ActiveSkillQuestion constructor should be discoverable for tests.");
+
+            object activeQuestion = constructor.Invoke(new[] { candidate, "test_template", DateTime.UtcNow });
+
+            var field = serviceType.GetField("activeSkillQuestion", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.IsNotNull(field, "Active skill question field should be accessible for tests.");
+
+            field.SetValue(service, activeQuestion);
+        }
+
+        private void ClearActiveSkillQuestion()
+        {
+            var serviceType = typeof(CompanionConversationService);
+            var activeType = serviceType.GetNestedType("ActiveSkillQuestion", BindingFlags.NonPublic);
+            var emptyProperty = activeType?.GetProperty("Empty", BindingFlags.Public | BindingFlags.Static);
+            Assert.IsNotNull(emptyProperty, "ActiveSkillQuestion.Empty should be discoverable for tests.");
+
+            object emptyValue = emptyProperty.GetValue(null);
+            var field = serviceType.GetField("activeSkillQuestion", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.IsNotNull(field, "Active skill question field should be accessible for tests.");
+
+            field.SetValue(service, emptyValue);
         }
     }
 }
