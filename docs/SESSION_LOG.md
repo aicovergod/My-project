@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ee657bf6b747f77ba4fe4d30d860ce4ff96b77d0 -->
+## 2025-10-26T14:24:35+00:00 — Refactor companion combat and equipment namespaces
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (19): Assets/Scripts/Companions/Combat/CompanionCombatBridge.cs, Assets/Scripts/Companions/Combat/CompanionCombatBridge.cs.meta, Assets/Scripts/Companions/Combat/CompanionRangedCombatController.cs, Assets/Scripts/Companions/Combat/CompanionRangedCombatController.cs.meta, Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs, Assets/Scripts/Companions/Equipment/CompanionEquipAttemptResult.cs, Assets/Scripts/Companions/Equipment/CompanionEquipAttemptResult.cs.meta, Assets/Scripts/Companions/Equipment/CompanionEquipment.cs, Assets/Scripts/Companions/Equipment/CompanionEquipment.cs.meta, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs, Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Pets/PetCombatController.cs, Assets/Scripts/UI/UIManager.cs, Assets/Scripts/UI/Utilities/InterfaceTabMutexUtility.cs
+- Diff: 18 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:84501500a0e6ad9a9b72305ae8b042e4334e01d7 -->
 ## 2025-10-26T14:19:08+00:00 — Merge pull request #1432 from aicovergod/codex/move-scripts-to-companions/itempickup
 
