@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8c7cf231d95fe043cb6cda55c850913c2efc8249 -->
+## 2025-10-26T09:34:24+00:00 — Merge pull request #1424 from aicovergod/codex/add-shared-dialogue-helpers-for-tasks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 269 ++ / 16 --
+- Notes:
+  Add shared companion command dialogue helpers
+---
+<!-- commit:b2b746112698c027675073c2c1d09490c09bed5d -->
+## 2025-10-26T09:34:13+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:befc33475ea7eafa7740f122563eb39a9d6224c5 -->
 ## 2025-10-26T09:33:53+00:00 — Add shared companion command dialogue helpers
 
