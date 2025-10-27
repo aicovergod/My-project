@@ -26,7 +26,11 @@ namespace Inventory.OreBag
         private string hadesFragmentItemId = "HadesFragment";
 
         private OreBagInventory oreBagInventory;
-        private static bool hasBootstrapRun;
+
+        // Tracks which profile has already been evaluated so new logins can
+        // re-run the bootstrap guard without repeatedly clearing the bag for
+        // returning accounts that already possess persisted ore data.
+        private string lastBootstrapProfileId = string.Empty;
 
         /// <summary>Singleton accessor. Ensures a service instance exists before returning it.</summary>
         public static OreBagService Instance => EnsureInstance();
@@ -88,9 +92,6 @@ namespace Inventory.OreBag
 
                 oreBagInventory?.EnsureInventoryConfigured();
 
-                if (ShouldClearInventoryDuringBootstrap(runtimeInventory))
-                    runtimeInventory.ClearAllSlotsWithoutPersistence();
-
                 runtimeInventory.enabled = true;
             }
             else
@@ -98,26 +99,9 @@ namespace Inventory.OreBag
                 oreBagInventory?.EnsureInventoryConfigured();
             }
 
-            hasBootstrapRun = true;
-        }
+            SaveManager.ActiveAccountUsernameChanged += HandleActiveAccountUsernameChanged;
 
-        /// <summary>
-        /// Determines whether the ore bag inventory should be scrubbed during the
-        /// initial bootstrap sequence. We only clear slots when no account profile
-        /// has been bound yet so that saved data survives reloads and logins.
-        /// </summary>
-        private static bool ShouldClearInventoryDuringBootstrap(RuntimeInventory runtimeInventory)
-        {
-            if (hasBootstrapRun || runtimeInventory == null)
-                return false;
-
-            // When a profile has already been bound, SaveManager will restore the
-            // inventory contents immediately. Clearing at this point would wipe the
-            // recovered data, so restrict the scrub to the pre-login bootstrap.
-            if (!string.IsNullOrEmpty(SaveManager.ActiveProfileId))
-                return false;
-
-            return true;
+            EvaluateBootstrapForActiveAccount();
         }
 
         /// <summary>
@@ -141,8 +125,70 @@ namespace Inventory.OreBag
             oreBagInventory.EnsureInventoryConfigured();
         }
 
+        /// <summary>
+        /// Reacts to the active account changing so the ore bag is only cleared for
+        /// fresh profiles that have never saved dedicated ore bag data.
+        /// </summary>
+        /// <param name="username">Username that became active. Empty when unbinding.</param>
+        private void HandleActiveAccountUsernameChanged(string username)
+        {
+            if (string.IsNullOrEmpty(username))
+            {
+                // Reset the evaluation cache so a subsequent login re-runs the guard.
+                lastBootstrapProfileId = string.Empty;
+                return;
+            }
+
+            EvaluateBootstrapForActiveAccount();
+        }
+
+        /// <summary>
+        /// Inspects the save payload for the currently bound profile and clears the
+        /// runtime inventory only when the profile lacks a dedicated ore bag entry.
+        /// Returning accounts retain their restored ore stacks.
+        /// </summary>
+        private void EvaluateBootstrapForActiveAccount()
+        {
+            var runtimeInventory = oreBagInventory?.InventoryComponent ?? GetComponent<RuntimeInventory>();
+
+            if (runtimeInventory == null)
+                return;
+
+            string profileId = SaveManager.ActiveProfileId;
+            if (string.IsNullOrEmpty(profileId))
+                return;
+
+            if (string.Equals(lastBootstrapProfileId, profileId, StringComparison.Ordinal))
+                return;
+
+            lastBootstrapProfileId = profileId;
+
+            var data = SaveManager.Load<InventoryModel.InventorySaveData>(runtimeInventory.saveKey);
+            if (HasPersistedOreBagPayload(data))
+                return;
+
+            runtimeInventory.ClearAllSlotsWithoutPersistence();
+        }
+
+        /// <summary>
+        /// Determines whether the provided save data represents an ore bag payload.
+        /// </summary>
+        /// <param name="data">Persisted inventory data retrieved from <see cref="SaveManager"/>.</param>
+        private static bool HasPersistedOreBagPayload(InventoryModel.InventorySaveData data)
+        {
+            if (data == null)
+                return false;
+
+            if (data.slots == null || data.slots.Length == 0)
+                return false;
+
+            return true;
+        }
+
         private void OnDestroy()
         {
+            SaveManager.ActiveAccountUsernameChanged -= HandleActiveAccountUsernameChanged;
+
             if (instance == this)
                 instance = null;
         }
