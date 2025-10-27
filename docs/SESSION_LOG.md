@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d161a4803e6a7867b7f4e5d4d67284be3dee35ae -->
+## 2025-10-27T14:07:02+00:00 — Merge pull request #1471 from aicovergod/codex/add-position-helper-to-inventoryitemcontextmenu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 79 ++ / 1 --
+- Notes:
+  Refine inventory context menu positioning
+---
+<!-- commit:c7714cf1bc29361860245da9d20a11b33589035d -->
+## 2025-10-27T14:00:45+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c7bbae03d1e08a6766edd525328d6ecc48f76a86 -->
 ## 2025-10-27T14:00:27+00:00 — Refine inventory context menu positioning
 
