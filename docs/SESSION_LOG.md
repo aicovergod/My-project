@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3cf245ca5365516e228d7bd0b8452badc6d0500b -->
+## 2025-10-27T11:21:56+00:00 — Merge branch 'main' into codex/toggle-ore-bag-debug-logs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 54 ++ / 10 --
+- Notes:
+  —
+---
 <!-- commit:caa5c7c504a3e39042bf707037da0bcc04679715 -->
 ## 2025-10-27T11:06:37+00:00 — Make ore bag debug logging optional
 
