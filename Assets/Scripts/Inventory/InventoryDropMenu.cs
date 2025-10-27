@@ -144,6 +144,7 @@ namespace Inventory
                 return;
 
             targetRect.GetWorldCorners(worldCorners);
+
             float minX = float.PositiveInfinity;
             float minY = float.PositiveInfinity;
             float maxX = float.NegativeInfinity;
@@ -151,8 +152,8 @@ namespace Inventory
 
             for (int i = 0; i < worldCorners.Length; i++)
             {
-                screenCorners[i] = RectTransformUtility.WorldToScreenPoint(MenuCanvasCamera, worldCorners[i]);
-                Vector2 screenCorner = screenCorners[i];
+                Vector2 screenCorner = RectTransformUtility.WorldToScreenPoint(MenuCanvasCamera, worldCorners[i]);
+                screenCorners[i] = screenCorner;
                 if (screenCorner.x < minX)
                     minX = screenCorner.x;
                 if (screenCorner.x > maxX)
@@ -163,20 +164,30 @@ namespace Inventory
                     maxY = screenCorner.y;
             }
 
-            float menuWidth = Mathf.Max(0f, maxX - minX);
-            float menuHeight = Mathf.Max(0f, maxY - minY);
+            // Use the canvas pixel rect instead of Screen.width/height so scaling performed by the
+            // canvas scaler (for example, matching the OSRS reference resolution) is respected.
+            Rect pixelRect = canvas.pixelRect;
             Vector2 pivotScreenPosition = RectTransformUtility.WorldToScreenPoint(MenuCanvasCamera, targetRect.position);
 
-            float horizontalMax = Mathf.Max(0f, Screen.width - menuWidth);
-            float verticalMin = Mathf.Clamp(menuHeight, 0f, Screen.height);
+            Vector2 screenOffset = Vector2.zero;
+            float canvasMinX = pixelRect.xMin;
+            float canvasMaxX = pixelRect.xMax;
+            float canvasMinY = pixelRect.yMin;
+            float canvasMaxY = pixelRect.yMax;
 
-            float clampedX = Mathf.Clamp(pivotScreenPosition.x, 0f, horizontalMax);
-            float clampedY = Mathf.Clamp(pivotScreenPosition.y, verticalMin, Screen.height);
-            Vector2 clampedScreenPosition = new Vector2(clampedX, clampedY);
+            if (maxX > canvasMaxX)
+                screenOffset.x += canvasMaxX - maxX;
+            if (minX < canvasMinX)
+                screenOffset.x += canvasMinX - minX;
+            if (maxY > canvasMaxY)
+                screenOffset.y += canvasMaxY - maxY;
+            if (minY < canvasMinY)
+                screenOffset.y += canvasMinY - minY;
 
-            if (Vector2.SqrMagnitude(clampedScreenPosition - pivotScreenPosition) < Mathf.Epsilon)
+            if (screenOffset.sqrMagnitude < Mathf.Epsilon)
                 return;
 
+            Vector2 clampedScreenPosition = pivotScreenPosition + screenOffset;
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle(targetRect, clampedScreenPosition, MenuCanvasCamera, out Vector3 worldPosition))
             {
                 targetRect.position = worldPosition;
