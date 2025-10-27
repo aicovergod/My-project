@@ -841,6 +841,13 @@ namespace Companions.Conversation
             if (!isActiveAndEnabled)
                 return;
 
+            if (!CompanionManager.HasActiveCompanion)
+            {
+                idleTickCounter = 0;
+                smallTalkIdleTicks = 0;
+                return;
+            }
+
             if (ResponseRoutineActive || pendingResponses.Count > 0)
             {
                 idleTickCounter = 0;
@@ -907,6 +914,13 @@ namespace Companions.Conversation
         {
             if (!isActiveAndEnabled)
                 return;
+
+            if (!CompanionManager.HasActiveCompanion)
+            {
+                idleTickCounter = 0;
+                smallTalkIdleTicks = 0;
+                return;
+            }
 
             if (ResponseRoutineActive || pendingResponses.Count > 0)
             {
