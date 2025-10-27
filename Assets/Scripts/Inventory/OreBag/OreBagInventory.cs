@@ -457,11 +457,17 @@ namespace Inventory.OreBag
 
         private void OnDisable()
         {
+            // Persist any ore layout adjustments before the bag is hidden so exiting to menus/desktops keeps the latest state.
+            inventory?.Save();
             sanitizedAfterInitialRestore = false;
         }
 
         private void OnDestroy()
         {
+            // Mirror the disable safeguard in destruction paths so runtime teardown without disable still commits the bag state.
+            if (inventory != null)
+                inventory.Save();
+
             if (inventory != null && inventoryChangeSubscribed)
             {
                 inventory.OnInventoryChanged -= HandleInventoryChanged;
