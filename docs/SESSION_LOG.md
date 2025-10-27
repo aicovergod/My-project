@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:bd8ded1145d2c8fdd90f653a2f5b9b87eda74fe8 -->
+## 2025-10-27T08:24:24+00:00 — ore bag data
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (35): Assets/Prefabs/SceneObjects/OreBagService.prefab, Assets/Prefabs/SceneObjects/OreBagService.prefab.meta, Assets/Resources/Item/Hades Fragment.asset, Assets/Resources/Item/Hades Fragment.asset.meta, Assets/Resources/Item/Ore Bag (T1).asset, Assets/Resources/Item/Ore Bag (T1).asset.meta, Assets/Resources/Item/Ore Bag (T2).asset, Assets/Resources/Item/Ore Bag (T2).asset.meta, Assets/Resources/Item/Ore Bag (T3).asset, Assets/Resources/Item/Ore Bag (T3).asset.meta, Assets/Resources/Item/Ore Bag (T4).asset, Assets/Resources/Item/Ore Bag (T4).asset.meta, Assets/Resources/Item/Ore Bag (T5).asset, Assets/Resources/Item/Ore Bag (T5).asset.meta, Assets/Resources/Item/Ore Bag (T6).asset, Assets/Resources/Item/Ore Bag (T6).asset.meta, Assets/Resources/PersistentObjects.asset, Assets/Scripts/Companions/Combat.meta, Assets/Scripts/Companions/CompanionDialogueRandomProvider.cs.meta, Assets/Scripts/Companions/Conversation/AreaSpecificAwareDialogue.cs.meta, Assets/Scripts/Companions/Conversation/CompanionApologyDialogueLibrary.cs.meta, Assets/Scripts/Companions/Cooking.meta, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs.meta, Assets/Scripts/Companions/Cooking/CompanionCookingDialogueLibrary.cs.meta, Assets/Scripts/Companions/Equipment.meta, Assets/Scripts/Companions/Mining/CompanionMiningDialogueLibrary.cs.meta, Assets/Scripts/Environment/Companion.meta, Assets/Scripts/Inventory/OreBag.meta, Assets/Scripts/Inventory/OreBag/OreBagInventory.cs.meta, Assets/Scripts/Inventory/OreBag/OreBagItemData.cs.meta, Assets/Scripts/Inventory/OreBag/OreBagService.cs.meta, Assets/Scripts/Skills/Cooking/UI/CompanionCookingHUD.cs.meta, Assets/Sprites/Ore BAgs.meta, Assets/Sprites/Ore BAgs/Ore Bag_64x64.png, Assets/Sprites/Ore BAgs/Ore Bag_64x64.png.meta
+- Diff: 721 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:557e18c8d5d5a46e128930cd7e8f8f408d33f971 -->
 ## 2025-10-27T08:01:55+00:00 — Merge pull request #1455 from aicovergod/codex/add-reset-account-command
 
