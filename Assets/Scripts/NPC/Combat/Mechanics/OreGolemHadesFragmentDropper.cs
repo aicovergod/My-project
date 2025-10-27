@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Combat;
+using Core.Save;
 using Companions;
 using Companions.Conversation;
 using Inventory;
@@ -195,7 +196,7 @@ namespace NPC.Combat.Mechanics
                 InventoryBridge.AddItem(fragment, 1);
 
             var chat = ChatService.Instance;
-            chat?.PublishGameMessage("The ore golem, has dropped a Hades Fragment.");
+            PublishHadesFragmentGameMessage(chat, killingPlayer);
 
             CompanionConversationService.RegisterEvent(
                 "secured a Hades Fragment",
@@ -301,6 +302,65 @@ namespace NPC.Combat.Mechanics
 
             string speaker = CompanionManager.GetCompanionDisplayName();
             chatService.PublishCompanionMessage(speaker, line);
+        }
+
+        /// <summary>
+        /// Publishes a descriptive Game channel message describing who obtained the fragment and
+        /// which NPC supplied the drop. Falls back to second-person phrasing when no explicit
+        /// player name is available.
+        /// </summary>
+        private void PublishHadesFragmentGameMessage(ChatService chatService, GameObject killingPlayer)
+        {
+            if (chatService == null)
+                return;
+
+            string playerName = ResolvePlayerDisplayName(chatService, killingPlayer);
+            string npcName = ResolveNpcDisplayName();
+            if (string.IsNullOrWhiteSpace(npcName))
+                npcName = "the ore golem";
+
+            string message = string.IsNullOrWhiteSpace(playerName)
+                ? $"You receive a Hades Fragment drop from {npcName}."
+                : $"{playerName} receives a Hades Fragment drop from {npcName}.";
+
+            chatService.PublishGameMessage(message);
+        }
+
+        /// <summary>
+        /// Resolves the player display name for chat output, preferring the ChatService username,
+        /// followed by the active save profile, and finally the killing player object name.
+        /// </summary>
+        private static string ResolvePlayerDisplayName(ChatService chatService, GameObject killingPlayer)
+        {
+            if (chatService != null && !string.IsNullOrWhiteSpace(chatService.ActiveUsername))
+                return chatService.ActiveUsername.Trim();
+
+            string activeAccount = SaveManager.ActiveAccountUsername;
+            if (!string.IsNullOrWhiteSpace(activeAccount))
+                return activeAccount.Trim();
+
+            if (killingPlayer != null && !string.IsNullOrWhiteSpace(killingPlayer.name))
+                return killingPlayer.name.Trim();
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Resolves the NPC display name for use in chat output, favouring the combat profile name
+        /// when available and falling back to the runtime GameObject name.
+        /// </summary>
+        private string ResolveNpcDisplayName()
+        {
+            if (combatant != null)
+            {
+                if (combatant.Profile != null && !string.IsNullOrWhiteSpace(combatant.Profile.name))
+                    return combatant.Profile.name.Trim();
+
+                if (!string.IsNullOrWhiteSpace(combatant.name))
+                    return combatant.name.Trim();
+            }
+
+            return !string.IsNullOrWhiteSpace(name) ? name.Trim() : string.Empty;
         }
 
         private static bool ContainsIgnoreCase(string source, string value)
