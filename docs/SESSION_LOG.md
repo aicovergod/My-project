@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ca5e6d518646f90349d2c3259d6422b83c2bdcce -->
+## 2025-10-27T14:32:32+00:00 — Guard companion dialogue scheduling when no companion is active
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 14 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d161a4803e6a7867b7f4e5d4d67284be3dee35ae -->
 ## 2025-10-27T14:07:02+00:00 — Merge pull request #1471 from aicovergod/codex/add-position-helper-to-inventoryitemcontextmenu
 
