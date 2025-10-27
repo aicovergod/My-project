@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8270eb48022c3d812a169b5ed34461a898493254 -->
+## 2025-10-27T13:31:54+00:00 — Merge pull request #1469 from aicovergod/codex/refactor-inventorydropmenu-position-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 22 ++ / 32 --
+- Notes:
+  Align drop menu positioning with tooltip logic
+---
+<!-- commit:e63b13fc0d0f7dbd7b13fc4b219a9b119619a179 -->
+## 2025-10-27T13:31:43+00:00 — Align drop menu positioning with tooltip logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/InventoryDropMenu.cs
+- Diff: 22 ++ / 32 --
+- Notes:
+  —
+---
 <!-- commit:34c4757888e73ebd5dadd9a75cd44912b5e4dc6b -->
 ## 2025-10-27T13:16:00+00:00 — Merge pull request #1468 from aicovergod/codex/fix-ore-bag-companion-messages
 
