@@ -63,6 +63,8 @@ namespace Inventory.UI
         private Font labelFont;
         private RectTransform menuRect;
         private Vector2 lastPointerPosition;
+        private Vector2 menuPointerScreenPosition;
+        private readonly Vector3[] worldCorners = new Vector3[4];
 
         /// <summary>
         /// Creates a new context menu instance and parents it under the supplied transform.
@@ -145,8 +147,8 @@ namespace Inventory.UI
                 button.onClick.AddListener(() => HandleSelection(capturedAction));
             }
 
-            transform.position = pointerPosition;
             gameObject.SetActive(true);
+            PositionMenu(pointerPosition);
             transform.SetAsLastSibling();
             DeferSafeZoneCheck();
         }
@@ -245,6 +247,73 @@ namespace Inventory.UI
 
             Hide();
             SelectionRequested?.Invoke(target, index, action, pointer);
+        }
+
+        private void OnRectTransformDimensionsChange()
+        {
+            if (!isActiveAndEnabled)
+                return;
+
+            PositionMenu(menuPointerScreenPosition);
+        }
+
+        /// <summary>
+        /// Repositions the menu so it remains inside the visible screen bounds and honours the
+        /// requested pointer anchor.
+        /// </summary>
+        /// <param name="pointerPosition">Screen-space pointer coordinate provided when the menu opened.</param>
+        private void PositionMenu(Vector2 pointerPosition)
+        {
+            if (!gameObject.activeInHierarchy)
+                return;
+
+            menuPointerScreenPosition = pointerPosition;
+
+            var targetRect = menuRect ??= GetComponent<RectTransform>();
+            if (targetRect == null)
+                return;
+
+            var canvas = MenuCanvas;
+            if (canvas == null)
+                return;
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(targetRect);
+            targetRect.GetWorldCorners(worldCorners);
+
+            float minX = float.PositiveInfinity;
+            float minY = float.PositiveInfinity;
+            float maxX = float.NegativeInfinity;
+            float maxY = float.NegativeInfinity;
+
+            for (int i = 0; i < worldCorners.Length; i++)
+            {
+                Vector2 screenCorner = RectTransformUtility.WorldToScreenPoint(MenuCanvasCamera, worldCorners[i]);
+                if (screenCorner.x < minX)
+                    minX = screenCorner.x;
+                if (screenCorner.x > maxX)
+                    maxX = screenCorner.x;
+                if (screenCorner.y < minY)
+                    minY = screenCorner.y;
+                if (screenCorner.y > maxY)
+                    maxY = screenCorner.y;
+            }
+
+            float width = maxX - minX;
+            float height = maxY - minY;
+
+            Vector2 clampedScreenPosition = pointerPosition;
+            float maxAllowedX = Mathf.Max(0f, Screen.width - width);
+            clampedScreenPosition.x = Mathf.Clamp(clampedScreenPosition.x, 0f, maxAllowedX);
+            clampedScreenPosition.y = Mathf.Clamp(clampedScreenPosition.y, height, Screen.height);
+
+            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(targetRect, clampedScreenPosition, MenuCanvasCamera, out Vector3 worldPosition))
+            {
+                targetRect.position = worldPosition;
+            }
+            else
+            {
+                targetRect.position = new Vector3(clampedScreenPosition.x, clampedScreenPosition.y, targetRect.position.z);
+            }
         }
     }
 }
