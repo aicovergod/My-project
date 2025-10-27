@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8574e86d2f41eb73c614b78c74ed6365444ca932 -->
+## 2025-10-27T11:24:05+00:00 — Merge pull request #1465 from aicovergod/codex/add-developer-commands-for-setspeed-and-resetaccount
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 140 ++ / 1 --
+- Notes:
+  Add ::setspeed developer command and secure account reset
+---
 <!-- commit:c37cfddda76ad3f9e7668305d76e9ea8c9c017de -->
 ## 2025-10-27T11:22:04+00:00 — Merge pull request #1463 from aicovergod/codex/toggle-ore-bag-debug-logs
 
