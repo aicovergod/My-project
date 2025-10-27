@@ -17,7 +17,7 @@ namespace Inventory
         private Font font;
         private RectTransform rect;
         private readonly Vector3[] worldCorners = new Vector3[4];
-        private readonly Vector2[] screenCorners = new Vector2[4];
+        private Vector2 pointerScreenPosition;
 
         public static InventoryDropMenu Create(Transform parent, Font font)
         {
@@ -92,11 +92,9 @@ namespace Inventory
         {
             this.controller = controller;
             slotIndex = index;
-            transform.position = position;
+            pointerScreenPosition = position;
             gameObject.SetActive(true);
-            if (rect != null)
-                LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-            ClampToScreenBounds();
+            PositionMenu();
             DeferSafeZoneCheck();
             transform.SetAsLastSibling();
         }
@@ -112,7 +110,7 @@ namespace Inventory
             if (!isActiveAndEnabled)
                 return;
 
-            ClampToScreenBounds();
+            PositionMenu();
         }
 
         /// <inheritdoc />
@@ -130,7 +128,7 @@ namespace Inventory
         /// <summary>
         /// Ensures the menu remains inside the visible screen bounds so the player can always reach each option.
         /// </summary>
-        private void ClampToScreenBounds()
+        private void PositionMenu()
         {
             if (!gameObject.activeInHierarchy)
                 return;
@@ -143,6 +141,7 @@ namespace Inventory
             if (canvas == null)
                 return;
 
+            LayoutRebuilder.ForceRebuildLayoutImmediate(targetRect);
             targetRect.GetWorldCorners(worldCorners);
 
             float minX = float.PositiveInfinity;
@@ -153,7 +152,6 @@ namespace Inventory
             for (int i = 0; i < worldCorners.Length; i++)
             {
                 Vector2 screenCorner = RectTransformUtility.WorldToScreenPoint(MenuCanvasCamera, worldCorners[i]);
-                screenCorners[i] = screenCorner;
                 if (screenCorner.x < minX)
                     minX = screenCorner.x;
                 if (screenCorner.x > maxX)
@@ -164,33 +162,25 @@ namespace Inventory
                     maxY = screenCorner.y;
             }
 
-            // Use the canvas pixel rect instead of Screen.width/height so scaling performed by the
-            // canvas scaler (for example, matching the OSRS reference resolution) is respected.
-            Rect pixelRect = canvas.pixelRect;
-            Vector2 pivotScreenPosition = RectTransformUtility.WorldToScreenPoint(MenuCanvasCamera, targetRect.position);
+            float width = maxX - minX;
+            float height = maxY - minY;
 
-            Vector2 screenOffset = Vector2.zero;
-            float canvasMinX = pixelRect.xMin;
-            float canvasMaxX = pixelRect.xMax;
-            float canvasMinY = pixelRect.yMin;
-            float canvasMaxY = pixelRect.yMax;
+            Vector2 clampedScreenPosition = pointerScreenPosition;
+            float maxAllowedX = Mathf.Max(0f, Screen.width - width);
+            clampedScreenPosition.x = Mathf.Clamp(clampedScreenPosition.x, 0f, maxAllowedX);
+            clampedScreenPosition.y = Mathf.Clamp(clampedScreenPosition.y, height, Screen.height);
 
-            if (maxX > canvasMaxX)
-                screenOffset.x += canvasMaxX - maxX;
-            if (minX < canvasMinX)
-                screenOffset.x += canvasMinX - minX;
-            if (maxY > canvasMaxY)
-                screenOffset.y += canvasMaxY - maxY;
-            if (minY < canvasMinY)
-                screenOffset.y += canvasMinY - minY;
-
-            if (screenOffset.sqrMagnitude < Mathf.Epsilon)
-                return;
-
-            Vector2 clampedScreenPosition = pivotScreenPosition + screenOffset;
-            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(targetRect, clampedScreenPosition, MenuCanvasCamera, out Vector3 worldPosition))
+            if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+            {
+                targetRect.position = new Vector3(clampedScreenPosition.x, clampedScreenPosition.y, targetRect.position.z);
+            }
+            else if (RectTransformUtility.ScreenPointToWorldPointInRectangle(targetRect, clampedScreenPosition, MenuCanvasCamera, out Vector3 worldPosition))
             {
                 targetRect.position = worldPosition;
+            }
+            else
+            {
+                targetRect.position = new Vector3(clampedScreenPosition.x, clampedScreenPosition.y, targetRect.position.z);
             }
         }
     }
