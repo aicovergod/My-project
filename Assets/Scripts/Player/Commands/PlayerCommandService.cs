@@ -196,6 +196,7 @@ namespace Player.Commands
             RegisterCommand(new GiveItemCommand());
             RegisterCommand(new GiveXpCommand());
             RegisterCommand(new MaxStatsCommand());
+            RegisterCommand(new SetSpeedCommand());
             RegisterCommand(new TestMineRocksCommand());
             RegisterCommand(new TestCompanionQuestionCommand());
             RegisterCommand(new ResetAccountCommand());
