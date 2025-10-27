@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:20b2ab1e714c7f77f8ae893ce1fc883d4269310c -->
+## 2025-10-27T09:07:49+00:00 — Merge pull request #1457 from aicovergod/codex/augment-ondisable-to-save-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 15 ++ / 0 --
+- Notes:
+  Ensure ore bag inventory persists before teardown
+---
+<!-- commit:d5f19833fbf61da3017594044e580ddeca2e62b6 -->
+## 2025-10-27T09:07:33+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:59df3ec81103cca9e6b88852d2a59f56d4e73b97 -->
 ## 2025-10-27T09:07:05+00:00 — Ensure ore bag saves state before teardown
 
