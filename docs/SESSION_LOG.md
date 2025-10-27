@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a9f8c4c3dc79a5004302b3d0affbf0710703cd8b -->
+## 2025-10-27T11:34:14+00:00 — Merge pull request #1466 from aicovergod/codex/fix-inventory-menu-popup-positioning
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 79 ++ / 1 --
+- Notes:
+  Fix inventory drop menu clamping and ore bag item interactions
+---
+<!-- commit:172f4124a2095bfc017a7e7654694a3f154383e8 -->
+## 2025-10-27T11:34:02+00:00 — Fix inventory context menu positioning and ore bag interactions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Inventory/InventoryDropMenu.cs
+- Diff: 79 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:8574e86d2f41eb73c614b78c74ed6365444ca932 -->
 ## 2025-10-27T11:24:05+00:00 — Merge pull request #1465 from aicovergod/codex/add-developer-commands-for-setspeed-and-resetaccount
 
