@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:59df3ec81103cca9e6b88852d2a59f56d4e73b97 -->
+## 2025-10-27T09:07:05+00:00 — Ensure ore bag saves state before teardown
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs
+- Diff: 6 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:4a49ba9e1d4f9e45b71437cf1aed345d4886ee21 -->
 ## 2025-10-27T09:00:44+00:00 — Merge pull request #1456 from aicovergod/codex/update-handlestorerequest-to-save-inventory
 
