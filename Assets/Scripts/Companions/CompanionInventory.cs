@@ -57,7 +57,7 @@ namespace Companions
             inventory.size = 28;
             inventory.useSharedUIRoot = false;
             inventory.centerOnScreen = true;
-            inventory.showCloseButton = false;
+            inventory.showCloseButton = true;
             inventory.slotSize = new Vector2(64f, 64f);
             inventory.slotSpacing = new Vector2(4f, 4f);
             inventory.windowPadding = new Vector2(6f, 6f);
@@ -164,6 +164,23 @@ namespace Companions
 
             VisibilityChanged?.Invoke(isOpen);
             return isOpen;
+        }
+
+        /// <summary>
+        /// Synchronises the cached visibility flag with the inventory window so external listeners
+        /// are notified when the UI is closed through the new close button or other indirect paths.
+        /// </summary>
+        private void Update()
+        {
+            if (inventory == null)
+                return;
+
+            bool currentlyOpen = inventory.IsOpen;
+            if (currentlyOpen == isOpen)
+                return;
+
+            isOpen = currentlyOpen;
+            VisibilityChanged?.Invoke(isOpen);
         }
 
         /// <summary>
