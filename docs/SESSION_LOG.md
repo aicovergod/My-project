@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4c5c818b92b8565015d6addac94a64c3e6f8b59d -->
+## 2025-10-27T21:00:01+00:00 — Merge pull request #1478 from aicovergod/codex/add-hades-fragment-drop-message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 70 ++ / 1 --
+- Notes:
+  Add game chat messaging for Hades fragment drops
+---
+<!-- commit:743c377c6c62f752ce8b10fa5be23f0319e54850 -->
+## 2025-10-27T20:59:49+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:1f9cd79f136ab9975e493b6247cfde633ce9b1ee -->
 ## 2025-10-27T20:59:35+00:00 — Add game chat message for ore golem Hades fragment drops
 
