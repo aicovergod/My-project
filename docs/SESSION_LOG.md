@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:18a04b3f4dcd63f4796dbdd745e598a526c6ffb6 -->
+## 2025-10-27T19:58:17+00:00 — Refactor ore golem fragment drop handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Prefabs/NPCS/COPPER_ORE_GOLEM.prefab, Assets/Scripts/NPC/Combat/Mechanics/OreGolemHadesFragmentDropper.cs, Assets/Scripts/NPC/Combat/Mechanics/OreGolemHadesFragmentDropper.cs.meta, Assets/Scripts/NPC/Combat/NpcCombatant.cs
+- Diff: 395 ++ / 236 --
+- Notes:
+  —
+---
 <!-- commit:7ec0dcfeed7a2025a753114274908a48dc6c30ac -->
 ## 2025-10-27T15:37:23+00:00 — Merge pull request #1476 from aicovergod/codex/add-hades-fragment-drop-mechanics
 

@@ -3,14 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Combat;
-using Companions;
 using Companions.Conversation;
-using Inventory;
 using MyGame.Drops;
 using Player;
 using Pets;
 using UI;
-using UI.Chat;
 using Status.Freeze;
 
 namespace NPC
@@ -27,74 +24,6 @@ namespace NPC
         /// <see cref="Object.FindObjectsOfType{T}()"/> calls each frame.
         /// </summary>
         private static readonly List<NpcCombatant> activeCombatants = new();
-
-        /// <summary>Case-insensitive keyword used to detect ore golem combatants.</summary>
-        private const string OreGolemNameKeyword = "Ore Golem";
-
-        /// <summary>Unique item identifier for the Hades fragment drop.</summary>
-        private const string HadesFragmentItemId = "Hades Fragment";
-
-        /// <summary>Denominator applied to the ore golem Hades fragment roll (1 in N chance).</summary>
-        private const int OreGolemHadesDropDenominator = 40;
-
-        /// <summary>Shared cache of the ground item spawner used when spawning forced drops.</summary>
-        private static GroundItemSpawner sharedGroundItemSpawner;
-
-        /// <summary>Dialogue options surfaced when the player receives a fragment with a companion active.</summary>
-        private static readonly string[] OreGolemCompanionPlayerDropLines =
-        {
-            "Damn, lucky sod.",
-            "I must be your good luck charm.",
-            "Congrats on the Hades Fragment.",
-            "I heard those fragments, can upgrade your Ore Bag.",
-            "I wonder where the Ore Golem, was hiding that fragment <emoji=02>,",
-            "Whoa, no way you actually got one!",
-            "Alright, share some of that luck, yeah?",
-            "Wait, you just got a Hades Fragment? Seriously?",
-            "How the hell did *you* pull that?",
-            "Yo, that’s actually rare as hell.",
-            "Nice drop, guess the Ore Golem liked you.",
-            "See? Told you this spot was worth it.",
-            "Don’t mind me, just over here getting nothing.",
-            "That’s huge, {playerName}. You lucky git.",
-            "Hold up… was that a Hades Fragment? gz!!!",
-            "That’ll fetch a nice price.",
-            "Okay, that’s actually sick, fair play.",
-            "Guess killing Ore Golem's is finally paying off, huh?",
-            "Hope you’re not planning to flex that all day.",
-            "Alright, now I’m officially jealous.",
-            "That’s a solid pull, I’ll give you that."
-        };
-
-        /// <summary>Dialogue options surfaced when the companion secures the fragment kill credit.</summary>
-        private static readonly string[] OreGolemCompanionSelfDropLines =
-        {
-            "Must be my lucky day.",
-            "I can keep this, right? <emoji=24>",
-            "Now, that's lucky.",
-            "Wonder where that golem was hiding that, lol.",
-            "guess the golem liked me more than you.",
-            "hey, look what just dropped for me!",
-            "no way, i actually got one!",
-            "finally, some good loot for a change.",
-            "that’s going straight in my bag.",
-            "looks like the gods are smiling on me today.",
-            "well, would you look at that.",
-            "haha, jackpot.",
-            "yep, i’ll be bragging about this one later.",
-            "hope you’re not too jealous, {playerName}.",
-            "i swear i wasn’t even trying for it.",
-            "that’s one for the collection.",
-            "gotta love when luck actually shows up.",
-            "oh nice, that’s rare, right?",
-            "didn’t expect that drop at all.",
-            "guess it’s my turn to be the lucky one.",
-            "this’ll upgrade my gear nicely.",
-            "you saw that, right? i wasn’t imagining it.",
-            "finally, the grind pays off.",
-            "maybe i should buy a lottery ticket next.",
-            "oh damn, that shimmer’s pretty."
-        };
 
         /// <summary>
         /// Read-only view of the currently active NPC combatants. Consumers should treat the
@@ -128,9 +57,6 @@ namespace NPC
         [SerializeField, Tooltip("Tracks whether respawning is temporarily suppressed by external systems (e.g. personal nodes).")]
         private bool respawnSuppressed;
         private Coroutine respawnCoroutine;
-        /// <summary>Prevents the ore golem fragment logic from rolling multiple times per death.</summary>
-        private bool oreGolemHadesDropResolved;
-
         /// <summary>
         /// Tracks whether the global NPC combat damage logging override is enabled. When true all
         /// combatants emit verbose logs regardless of their inspector configuration.
@@ -140,6 +66,7 @@ namespace NPC
         public event System.Action<int, int> OnHealthChanged; // current, max
         public event System.Action OnDeath;
         public event System.Action<NpcCombatant, GameObject> OnKilledByPlayer;
+        public event System.Action<object, CombatTarget> OnDamageAttributed;
 
         public bool IsAlive => currentHp > 0;
         public DamageType PreferredDefenceType => profile != null ? profile.AttackType : DamageType.Melee;
@@ -320,6 +247,8 @@ namespace NPC
                 combat?.BeginAttacking(combatSource);
             }
 
+            OnDamageAttributed?.Invoke(source, combatSource);
+
             var killedByPlayer = creditedToPlayer;
             if (currentHp <= 0)
             {
@@ -353,9 +282,6 @@ namespace NPC
 
                 if (killedByPlayer || playerDamage > npcDamage)
                     dropper?.OnDeath();
-
-                if (killingPlayer != null)
-                    TryAwardOreGolemHadesFragment(dropper, killingPlayer, source, combatSource);
 
                 ClearDamageContributors("NPC death resolution");
                 combat?.ResetCombatState();
@@ -454,7 +380,7 @@ namespace NPC
         public void ClearDamageContributors(string reason = null)
         {
             knockbackReceiver?.CancelKnockback();
-            ResetDamageCounters(currentHp > 0);
+            ResetDamageCounters();
             if (logDamage)
             {
                 string context = string.IsNullOrEmpty(reason) ? "without context" : reason;
@@ -462,12 +388,10 @@ namespace NPC
             }
         }
 
-        private void ResetDamageCounters(bool resetOreGolemDrop)
+        private void ResetDamageCounters()
         {
             playerDamage = 0;
             npcDamage = 0;
-            if (resetOreGolemDrop)
-                oreGolemHadesDropResolved = false;
         }
 
         /// <summary>
@@ -502,159 +426,6 @@ namespace NPC
         private void ApplyGlobalDamageLoggingState()
         {
             logDamage = globalDamageLoggingEnabled;
-        }
-
-        /// <summary>
-        /// Attempts to award a Hades fragment when an ore golem dies to the player or their companion.
-        /// </summary>
-        /// <param name="dropper">Dropper component responsible for standard loot resolution.</param>
-        /// <param name="killingPlayer">Player GameObject credited with the kill.</param>
-        /// <param name="source">Raw damage source passed into <see cref="ApplyDamage"/>.</param>
-        /// <param name="combatSource">Combat target derived from <paramref name="source"/> when available.</param>
-        private void TryAwardOreGolemHadesFragment(
-            NpcDropper dropper,
-            GameObject killingPlayer,
-            object source,
-            CombatTarget combatSource)
-        {
-            if (oreGolemHadesDropResolved)
-                return;
-
-            if (!IsOreGolemCombatant())
-                return;
-
-            oreGolemHadesDropResolved = true;
-
-            if (!RollOreGolemHadesFragment())
-                return;
-
-            var fragment = ItemDatabase.GetItem(HadesFragmentItemId);
-            if (fragment == null)
-            {
-                Debug.LogError($"NpcCombatant could not locate item '{HadesFragmentItemId}' while spawning an ore golem drop.", this);
-                return;
-            }
-
-            Vector3 spawnPosition = transform.position;
-            var spawner = ResolveGroundItemSpawner(dropper);
-            if (spawner != null)
-                spawner.Spawn(fragment, 1, spawnPosition);
-            else
-                InventoryBridge.AddItem(fragment, 1);
-
-            var chat = ChatService.Instance;
-            chat?.PublishGameMessage("The ore golem, has dropped a Hades Fragment.");
-
-            CompanionConversationService.RegisterEvent(
-                "secured a Hades Fragment",
-                CompanionEventType.Loot,
-                CompanionEventMetadata.Create("You", name, null, spawnPosition));
-
-            bool companionKill = DetermineCompanionKill(source, combatSource, killingPlayer);
-            TryEmitOreGolemCompanionDialogue(chat, companionKill);
-        }
-
-        /// <summary>Determines whether this combatant represents an ore golem.</summary>
-        private bool IsOreGolemCombatant()
-        {
-            if (string.IsNullOrWhiteSpace(OreGolemNameKeyword))
-                return false;
-
-            if (ContainsIgnoreCase(name, OreGolemNameKeyword))
-                return true;
-
-            if (profile != null && ContainsIgnoreCase(profile.name, OreGolemNameKeyword))
-                return true;
-
-            return false;
-        }
-
-        /// <summary>Executes the 1-in-N roll for the ore golem fragment drop.</summary>
-        private bool RollOreGolemHadesFragment()
-        {
-            if (OreGolemHadesDropDenominator <= 1)
-                return true;
-
-            int roll = UnityEngine.Random.Range(1, OreGolemHadesDropDenominator + 1);
-            bool success = roll == 1;
-
-            if (logDamage)
-            {
-                Debug.Log($"{name} rolled Hades fragment drop 1/{OreGolemHadesDropDenominator} (rolled {roll}) => {(success ? "success" : "no drop")}.", this);
-            }
-
-            return success;
-        }
-
-        /// <summary>Resolves the ground item spawner used when forcing ore golem drops.</summary>
-        private GroundItemSpawner ResolveGroundItemSpawner(NpcDropper dropper)
-        {
-            if (dropper != null && dropper.spawner != null)
-                return dropper.spawner;
-
-            if (sharedGroundItemSpawner == null)
-                sharedGroundItemSpawner = FindObjectOfType<GroundItemSpawner>();
-
-            return sharedGroundItemSpawner;
-        }
-
-        /// <summary>Determines whether the companion delivered the killing blow for dialogue selection.</summary>
-        private bool DetermineCompanionKill(object source, CombatTarget combatSource, GameObject killingPlayer)
-        {
-            if (!CompanionManager.HasActiveCompanion)
-                return false;
-
-            var activeCompanion = CompanionManager.ActiveCompanion;
-            if (activeCompanion == null)
-                return false;
-
-            if (killingPlayer == activeCompanion.gameObject)
-                return true;
-
-            if (source is Component sourceComponent && sourceComponent.GetComponentInParent<CompanionController>() != null)
-                return true;
-
-            if (source is GameObject sourceObject && sourceObject.GetComponentInParent<CompanionController>() != null)
-                return true;
-
-            if (combatSource is Component combatComponent && combatComponent.GetComponentInParent<CompanionController>() != null)
-                return true;
-
-            return false;
-        }
-
-        /// <summary>Publishes companion dialogue describing the ore golem fragment drop.</summary>
-        private void TryEmitOreGolemCompanionDialogue(ChatService chatService, bool companionKill)
-        {
-            if (!CompanionManager.HasActiveCompanion || chatService == null)
-                return;
-
-            string[] sourceLines = companionKill ? OreGolemCompanionSelfDropLines : OreGolemCompanionPlayerDropLines;
-            if (sourceLines == null || sourceLines.Length == 0)
-                return;
-
-            if (!companionKill && UnityEngine.Random.value > 0.5f)
-                return;
-
-            int index = UnityEngine.Random.Range(0, sourceLines.Length);
-            string template = sourceLines[index];
-            if (string.IsNullOrWhiteSpace(template))
-                return;
-
-            string playerName = chatService.ActiveUsername;
-            string replacement = string.IsNullOrWhiteSpace(playerName) ? "you" : playerName.Trim();
-            string line = template.Replace("{playerName}", replacement);
-
-            string speaker = CompanionManager.GetCompanionDisplayName();
-            chatService.PublishCompanionMessage(speaker, line);
-        }
-
-        /// <summary>Performs a case-insensitive substring test.</summary>
-        private static bool ContainsIgnoreCase(string source, string value)
-        {
-            return !string.IsNullOrWhiteSpace(source) &&
-                   !string.IsNullOrWhiteSpace(value) &&
-                   source.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         /// <summary>
