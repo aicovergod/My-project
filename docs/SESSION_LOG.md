@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7ec0dcfeed7a2025a753114274908a48dc6c30ac -->
+## 2025-10-27T15:37:23+00:00 — Merge pull request #1476 from aicovergod/codex/add-hades-fragment-drop-mechanics
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 246 ++ / 3 --
+- Notes:
+  Add ore golem Hades fragment drops
+---
+<!-- commit:39c9d77082af1d81865d286a02c5dbe669a78cc8 -->
+## 2025-10-27T15:37:01+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:924f31bc0951df2ca6ed3a405e80c49f3144a25d -->
 ## 2025-10-27T15:36:43+00:00 — Add Hades fragment drops for ore golems
 
