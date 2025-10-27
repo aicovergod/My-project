@@ -1,21 +1,12 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:5a7ed7870c471d09dc84c47ec4519075ceb390b8 -->
-## 2025-10-27T11:17:54+00:00 — Merge pull request #1464 from aicovergod/codex/add-throttle-utility-for-companion-chat
+<!-- commit:caa5c7c504a3e39042bf707037da0bcc04679715 -->
+## 2025-10-27T11:06:37+00:00 — Make ore bag debug logging optional
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 54 ++ / 10 --
-- Notes:
-  Add shared companion dialogue throttle
----
-<!-- commit:a2bf2f0dbd69a57da2c2091a518913b79665116d -->
-## 2025-10-27T11:17:42+00:00 — Add shared companion dialogue throttle
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (3): Assets/Scripts/Companions/CompanionDialogueThrottle.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetCombatController.cs
-- Diff: 54 ++ / 10 --
+- Changed files (2): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 43 ++ / 30 --
 - Notes:
   —
 ---
