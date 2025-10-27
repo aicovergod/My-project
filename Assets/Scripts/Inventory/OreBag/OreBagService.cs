@@ -30,6 +30,22 @@ namespace Inventory.OreBag
         [Tooltip("When enabled the ore bag service emits detailed logs for persistence, deposits, and transfers.")]
         private bool enableDebugLogging = false;
 
+        /// <summary>
+        /// Random companion chat lines broadcast after a successful ore transfer.
+        /// Includes an optional player name placeholder so the companion can
+        /// directly address the active account when flavour text requires it.
+        /// </summary>
+        private static readonly string[] CompanionDepositSuccessMessages =
+        {
+            "I've added the ores to your ore bag.",
+            "All added.",
+            "There, all added.",
+            "I've added all the ores.",
+            "Added the ores boss.",
+            "Added the ores.",
+            "There, all added {playerName}."
+        };
+
         private OreBagInventory oreBagInventory;
 
         // Tracks which profile has already been evaluated so new logins can
@@ -478,13 +494,22 @@ namespace Inventory.OreBag
             if (totalAdded > 0)
             {
                 PublishPlayerDepositMessage(totalAdded);
+                PublishCompanionDepositSuccessMessage();
                 companionInventory.WindowController?.RefreshAllSlots();
                 oreBagInventory.InventoryComponent.WindowController?.RefreshAllSlots();
                 Log($"Companion deposit complete. Total moved: {totalAdded}.");
             }
             else
             {
-                PublishPlayerBagFullMessage();
+                if (capacityHit)
+                {
+                    PublishPlayerBagFullMessage();
+                }
+                else
+                {
+                    PublishCompanionNoOreMessage();
+                }
+
                 Log("Companion deposit failed because no ores were moved.");
             }
 
@@ -700,6 +725,69 @@ namespace Inventory.OreBag
             if (chat != null)
                 chat.PublishGameMessage(text);
             Log($"Published player chat message: {text}");
+        }
+
+        /// <summary>
+        /// Sends a companion chat acknowledgement when ore transfers succeed so the
+        /// player receives flavourful confirmation from their follower.
+        /// </summary>
+        private void PublishCompanionDepositSuccessMessage()
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string companionName = CompanionManager.GetCompanionDisplayName();
+            if (string.IsNullOrWhiteSpace(companionName))
+                companionName = "Companion";
+
+            string message = ResolveCompanionDepositSuccessLine();
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            chat.PublishCompanionMessage(companionName, message);
+            Log($"Companion deposit success message published: {message}");
+        }
+
+        /// <summary>
+        /// Resolves the chat line used after a successful companion ore transfer.
+        /// Applies the active player's name to any placeholders when available.
+        /// </summary>
+        private string ResolveCompanionDepositSuccessLine()
+        {
+            if (CompanionDepositSuccessMessages == null || CompanionDepositSuccessMessages.Length == 0)
+                return "I've added the ores to your ore bag.";
+
+            int index = UnityEngine.Random.Range(0, CompanionDepositSuccessMessages.Length);
+            string template = CompanionDepositSuccessMessages[index] ?? string.Empty;
+
+            string playerName = ResolveActivePlayerName();
+            string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName.Trim();
+
+            return template.Replace("{playerName}", safePlayerName);
+        }
+
+        /// <summary>
+        /// Publishes a corrected game message when the companion has no ore to share.
+        /// Keeps the messaging accurate instead of implying the bag is already full.
+        /// </summary>
+        private void PublishCompanionNoOreMessage()
+        {
+            string companionName = CompanionManager.GetCompanionDisplayName();
+            if (string.IsNullOrWhiteSpace(companionName))
+                companionName = "Your companion";
+
+            PublishPlayerMessage($"{companionName} doesn't have anything to add to your ore bag.");
+        }
+
+        /// <summary>
+        /// Pulls the active player's username from the chat service so the companion
+        /// can reference them directly when flavour text allows.
+        /// </summary>
+        private static string ResolveActivePlayerName()
+        {
+            var chat = ChatService.Instance;
+            return chat != null ? chat.ActiveUsername : string.Empty;
         }
 
         private void PublishCompanionBagOverflowMessage()
