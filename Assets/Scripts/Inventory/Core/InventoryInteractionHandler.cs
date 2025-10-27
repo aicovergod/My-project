@@ -710,7 +710,13 @@ namespace Inventory.Core
                     if (item == null)
                         break;
 
-                    if (!CanDropItems || item.isUndroppable)
+                    if (item.isUndroppable)
+                    {
+                        PublishUndroppableItemMessage();
+                        break;
+                    }
+
+                    if (!CanDropItems)
                         break;
 
                     if (entry.count > 1)
@@ -1079,8 +1085,14 @@ namespace Inventory.Core
                 return;
 
             var entry = model.GetEntry(slotIndex);
-            if (entry.item == null || entry.item.isUndroppable)
+            if (entry.item == null)
                 return;
+
+            if (entry.item.isUndroppable)
+            {
+                PublishUndroppableItemMessage();
+                return;
+            }
 
             int dropAmount = Mathf.Clamp(quantity, 1, entry.count);
 
@@ -1149,7 +1161,10 @@ namespace Inventory.Core
                 return;
 
             if (type == StackSplitType.Drop && entry.item.isUndroppable)
+            {
+                PublishUndroppableItemMessage();
                 return;
+            }
 
             controller.DismissContextMenus();
             StackSplitDialog.Show(controller.UiRoot.transform, entry.count, amount =>
@@ -1196,6 +1211,15 @@ namespace Inventory.Core
                 petDisplayName = "pet";
 
             chat.PublishGameMessage($"You already have a \"{petDisplayName}\" spawned");
+        }
+
+        /// <summary>
+        /// Publishes the standard feedback when an undroppable item is interacted with.
+        /// </summary>
+        private static void PublishUndroppableItemMessage()
+        {
+            var chat = ChatService.Instance;
+            chat?.PublishGameMessage("This item is undroppable.");
         }
 
         private GroundItemSpawner ResolveGroundItemSpawner()
