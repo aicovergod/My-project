@@ -28,7 +28,7 @@ namespace Inventory.OreBag
         [Header("Debug")]
         [SerializeField]
         [Tooltip("When enabled the ore bag service emits detailed logs for persistence, deposits, and transfers.")]
-        private bool enableDebugLogging;
+        private bool enableDebugLogging = true;
 
         private OreBagInventory oreBagInventory;
 
@@ -43,18 +43,21 @@ namespace Inventory.OreBag
         /// <summary>Exposes the debug logging flag so Admin tooling can toggle it at runtime.</summary>
         public static bool EnableDebugLogging
         {
-            get => instance != null && instance.enableDebugLogging;
+            get => true;
             set
             {
                 var resolvedInstance = EnsureInstance();
                 if (resolvedInstance == null)
                     return;
 
-                if (resolvedInstance.enableDebugLogging == value)
-                    return;
+                // Debug logs must stay active so QA can track ore deletion when sessions
+                // start. Ignore requests to disable the channel and instead reconfirm the
+                // forced-on state so both the service and its inventory companion remain
+                // noisy.
+                if (!resolvedInstance.enableDebugLogging)
+                    resolvedInstance.enableDebugLogging = true;
 
-                resolvedInstance.enableDebugLogging = value;
-                resolvedInstance.ApplyDebugLoggingState("External toggle");
+                resolvedInstance.ApplyDebugLoggingState(value ? "External toggle" : "External toggle ignored");
             }
         }
 
@@ -84,7 +87,7 @@ namespace Inventory.OreBag
             if (createdInstance != null)
             {
                 instance = createdInstance;
-                createdInstance.enableDebugLogging = EnableDebugLogging;
+                createdInstance.enableDebugLogging = true;
                 createdInstance.ConfigureInventoryWhileInactive();
                 go.SetActive(true);
                 createdInstance.Log("EnsureInstance created a new service instance at runtime.");
@@ -154,7 +157,7 @@ namespace Inventory.OreBag
                 runtimeInventory.enabled = false;
 
             oreBagInventory.EnsureInventoryConfigured();
-            oreBagInventory.EnableDebugLogging = enableDebugLogging;
+            oreBagInventory.EnableDebugLogging = true;
 
             Log("Configured ore bag inventory while inactive to prevent default save key usage.");
         }
@@ -689,32 +692,23 @@ namespace Inventory.OreBag
 
         private void ApplyDebugLoggingState(string reason)
         {
-            if (oreBagInventory != null)
-                oreBagInventory.EnableDebugLogging = enableDebugLogging;
+            enableDebugLogging = true;
 
-            if (enableDebugLogging)
-            {
-                Debug.Log($"[OreBagService] Debug logging enabled ({reason}).", this);
-            }
-            else
-            {
-                Debug.Log($"[OreBagService] Debug logging disabled ({reason}).", this);
-            }
+            if (oreBagInventory != null)
+                oreBagInventory.EnableDebugLogging = true;
+
+            Debug.Log($"[OreBagService] Debug logging forced on ({reason}).", this);
         }
 
+        /// <summary>Writes an always-on debug log message for ore bag service flows.</summary>
         private void Log(string message)
         {
-            if (!enableDebugLogging)
-                return;
-
             Debug.Log($"[OreBagService] {message}", this);
         }
 
+        /// <summary>Writes an always-on warning log message for ore bag service flows.</summary>
         private void LogWarning(string message)
         {
-            if (!enableDebugLogging)
-                return;
-
             Debug.LogWarning($"[OreBagService] {message}", this);
         }
     }
