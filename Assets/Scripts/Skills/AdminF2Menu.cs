@@ -7,6 +7,7 @@ using Beastmaster;
 using Pets;
 using NPC;
 using BankSystem;
+using Inventory.OreBag;
 using Skills.Cooking;
 using Skills.Fishing;
 using Skills.Mining;
@@ -301,6 +302,11 @@ namespace Skills
                 () => firemakingSkillBehaviour != null,
                 () => firemakingSkillBehaviour.EnableDebugLogging,
                 value => firemakingSkillBehaviour.EnableDebugLogging = value);
+
+            bool oreBagDebugLogging = OreBagService.EnableDebugLogging;
+            bool requestedOreBagDebugLogging = GUILayout.Toggle(oreBagDebugLogging, "Ore Bag Debug Logging");
+            if (requestedOreBagDebugLogging != oreBagDebugLogging)
+                OreBagService.EnableDebugLogging = requestedOreBagDebugLogging;
 
             bool companionDebugLogging = CompanionManager.EnableDebugLogging;
             bool requestedCompanionDebugLogging = GUILayout.Toggle(companionDebugLogging, "Companion Debug Logging");

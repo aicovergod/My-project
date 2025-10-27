@@ -25,6 +25,11 @@ namespace Inventory.OreBag
         [Tooltip("Item id used when consuming fragments to upgrade the ore bag.")]
         private string hadesFragmentItemId = "HadesFragment";
 
+        [Header("Debug")]
+        [SerializeField]
+        [Tooltip("When enabled the ore bag service emits detailed logs for persistence, deposits, and transfers.")]
+        private bool enableDebugLogging;
+
         private OreBagInventory oreBagInventory;
 
         // Tracks which profile has already been evaluated so new logins can
@@ -35,10 +40,31 @@ namespace Inventory.OreBag
         /// <summary>Singleton accessor. Ensures a service instance exists before returning it.</summary>
         public static OreBagService Instance => EnsureInstance();
 
+        /// <summary>Exposes the debug logging flag so Admin tooling can toggle it at runtime.</summary>
+        public static bool EnableDebugLogging
+        {
+            get => instance != null && instance.enableDebugLogging;
+            set
+            {
+                var resolvedInstance = EnsureInstance();
+                if (resolvedInstance == null)
+                    return;
+
+                if (resolvedInstance.enableDebugLogging == value)
+                    return;
+
+                resolvedInstance.enableDebugLogging = value;
+                resolvedInstance.ApplyDebugLoggingState("External toggle");
+            }
+        }
+
         private static OreBagService EnsureInstance()
         {
             if (instance != null)
+            {
+                instance.Log("EnsureInstance returning cached singleton instance.");
                 return instance;
+            }
 
             instance = FindObjectOfType<OreBagService>(true);
             if (instance != null)
@@ -46,6 +72,7 @@ namespace Inventory.OreBag
                 if (!instance.gameObject.activeInHierarchy)
                     instance.ConfigureInventoryWhileInactive();
 
+                instance.Log("EnsureInstance located an existing inactive service in the scene.");
                 return instance;
             }
 
@@ -57,8 +84,10 @@ namespace Inventory.OreBag
             if (createdInstance != null)
             {
                 instance = createdInstance;
+                createdInstance.enableDebugLogging = EnableDebugLogging;
                 createdInstance.ConfigureInventoryWhileInactive();
                 go.SetActive(true);
+                createdInstance.Log("EnsureInstance created a new service instance at runtime.");
             }
 
             return instance;
@@ -99,6 +128,8 @@ namespace Inventory.OreBag
                 oreBagInventory?.EnsureInventoryConfigured();
             }
 
+            ApplyDebugLoggingState("Awake");
+
             SaveManager.ActiveAccountUsernameChanged += HandleActiveAccountUsernameChanged;
 
             EvaluateBootstrapForActiveAccount();
@@ -123,6 +154,9 @@ namespace Inventory.OreBag
                 runtimeInventory.enabled = false;
 
             oreBagInventory.EnsureInventoryConfigured();
+            oreBagInventory.EnableDebugLogging = enableDebugLogging;
+
+            Log("Configured ore bag inventory while inactive to prevent default save key usage.");
         }
 
         /// <summary>
@@ -136,9 +170,11 @@ namespace Inventory.OreBag
             {
                 // Reset the evaluation cache so a subsequent login re-runs the guard.
                 lastBootstrapProfileId = string.Empty;
+                Log("Active account cleared. Reset bootstrap evaluation cache.");
                 return;
             }
 
+            Log($"Active account changed to {username}. Evaluating ore bag bootstrap state.");
             EvaluateBootstrapForActiveAccount();
         }
 
@@ -152,36 +188,57 @@ namespace Inventory.OreBag
             var runtimeInventory = oreBagInventory?.InventoryComponent ?? GetComponent<RuntimeInventory>();
 
             if (runtimeInventory == null)
+            {
+                LogWarning("EvaluateBootstrapForActiveAccount aborted because the runtime inventory could not be resolved.");
                 return;
+            }
 
             string profileId = SaveManager.ActiveProfileId;
             if (string.IsNullOrEmpty(profileId))
+            {
+                LogWarning("EvaluateBootstrapForActiveAccount aborted because there is no active profile id.");
                 return;
+            }
 
             if (string.Equals(lastBootstrapProfileId, profileId, StringComparison.Ordinal))
+            {
+                Log($"Bootstrap already evaluated for profile {profileId}. Skipping re-run.");
                 return;
+            }
 
             lastBootstrapProfileId = profileId;
 
             var data = SaveManager.Load<InventoryModel.InventorySaveData>(runtimeInventory.saveKey);
+            Log(data == null
+                ? $"No persisted ore bag data found for profile {profileId}. Clearing runtime slots to avoid stale contents."
+                : $"Persisted ore bag payload detected for profile {profileId}. Preserving restored contents.");
+
             if (HasPersistedOreBagPayload(data))
                 return;
 
             runtimeInventory.ClearAllSlotsWithoutPersistence();
+            Log("Runtime ore bag inventory cleared because no dedicated payload was present in the save file.");
         }
 
         /// <summary>
         /// Determines whether the provided save data represents an ore bag payload.
         /// </summary>
         /// <param name="data">Persisted inventory data retrieved from <see cref="SaveManager"/>.</param>
-        private static bool HasPersistedOreBagPayload(InventoryModel.InventorySaveData data)
+        private bool HasPersistedOreBagPayload(InventoryModel.InventorySaveData data)
         {
             if (data == null)
+            {
+                Log("Persisted payload missing or null.");
                 return false;
+            }
 
             if (data.slots == null || data.slots.Length == 0)
+            {
+                Log("Persisted payload contained no slots array.");
                 return false;
+            }
 
+            Log($"Persisted payload contains {data.slots.Length} slots.");
             return true;
         }
 
@@ -190,7 +247,10 @@ namespace Inventory.OreBag
             SaveManager.ActiveAccountUsernameChanged -= HandleActiveAccountUsernameChanged;
 
             if (instance == this)
+            {
+                Log("OreBagService destroyed. Clearing singleton reference.");
                 instance = null;
+            }
         }
 
         /// <summary>Returns true when the player currently has any ore bag in their inventory.</summary>
@@ -216,6 +276,7 @@ namespace Inventory.OreBag
             if (!TryResolveBagFromSlot(playerInventory, slotIndex, out var bagData))
                 return false;
 
+            Log($"Opening ore bag from slot {slotIndex} using bag definition {bagData?.name ?? "<null>"}.");
             ApplyActiveBag(bagData, playerInventory);
             oreBagInventory.OpenWindow();
             oreBagInventory.InventoryComponent.WindowController?.RefreshAllSlots();
@@ -238,6 +299,7 @@ namespace Inventory.OreBag
 
             ApplyActiveBag(bagData, playerInventory);
 
+            Log("Depositing all player ore into the ore bag.");
             var model = playerInventory.Model;
             bool capacityHit = false;
 
@@ -251,12 +313,15 @@ namespace Inventory.OreBag
                 int added = oreBagInventory.AddOre(entry.item, entry.count);
                 if (added <= 0)
                 {
+                    Log($"Failed to add ore {entry.item.id} x{entry.count} from slot {i}. Capacity likely hit.");
                     capacityHit = true;
                     continue;
                 }
 
                 totalAdded += added;
                 model.RemoveFromSlot(i, added);
+
+                Log($"Transferred {added}/{entry.count} ores from player slot {i}.");
 
                 if (added < entry.count)
                     capacityHit = true;
@@ -269,12 +334,15 @@ namespace Inventory.OreBag
 
                 if (showMessages)
                     PublishPlayerDepositMessage(totalAdded);
+
+                Log($"Player ore deposit complete. Total moved: {totalAdded}. Capacity hit: {capacityHit}.");
             }
 
             if ((capacityHit || totalAdded == 0) && showMessages)
                 PublishPlayerBagFullMessage();
 
             bagFull = capacityHit || totalAdded == 0;
+            Log($"Deposit all result - success: {totalAdded > 0}, bag full: {bagFull}.");
             return totalAdded > 0;
         }
 
@@ -303,12 +371,14 @@ namespace Inventory.OreBag
 
             ApplyActiveBag(bagData, playerInventory);
 
+            Log($"Attempting to deposit player slot {slotIndex} item {entry.item.id} x{entry.count}.");
             int accepted = oreBagInventory.AddOre(entry.item, entry.count);
             if (accepted <= 0)
             {
                 bagFull = true;
                 if (showMessages)
                     PublishPlayerBagFullMessage();
+                Log("Slot deposit failed because the bag was full.");
                 return false;
             }
 
@@ -324,9 +394,11 @@ namespace Inventory.OreBag
                 bagFull = true;
                 if (showMessages)
                     PublishPlayerBagFullMessage();
+                Log($"Slot deposit partially succeeded ({accepted}/{entry.count}). Bag reported as full.");
             }
 
             added = accepted;
+            Log($"Slot deposit succeeded with {accepted} ores moved. Bag full flag: {bagFull}.");
             return true;
         }
 
@@ -350,6 +422,7 @@ namespace Inventory.OreBag
 
             ApplyActiveBag(bagData, playerInventory);
 
+            Log("Depositing companion ore into the ore bag.");
             var model = companionInventory.Model;
             bool capacityHit = false;
 
@@ -362,12 +435,15 @@ namespace Inventory.OreBag
                 int added = oreBagInventory.AddOre(entry.item, entry.count);
                 if (added <= 0)
                 {
+                    Log($"Failed to add companion ore {entry.item.id} x{entry.count} from slot {i}.");
                     capacityHit = true;
                     continue;
                 }
 
                 totalAdded += added;
                 model.RemoveFromSlot(i, added);
+
+                Log($"Transferred {added}/{entry.count} companion ores from slot {i}.");
 
                 if (added < entry.count)
                     capacityHit = true;
@@ -378,15 +454,18 @@ namespace Inventory.OreBag
                 PublishPlayerDepositMessage(totalAdded);
                 companionInventory.WindowController?.RefreshAllSlots();
                 oreBagInventory.InventoryComponent.WindowController?.RefreshAllSlots();
+                Log($"Companion deposit complete. Total moved: {totalAdded}.");
             }
             else
             {
                 PublishPlayerBagFullMessage();
+                Log("Companion deposit failed because no ores were moved.");
             }
 
             if (capacityHit)
                 PublishCompanionBagOverflowMessage();
 
+            Log($"Companion deposit result - success: {totalAdded > 0}, capacity hit: {capacityHit}.");
             return totalAdded > 0;
         }
 
@@ -422,6 +501,7 @@ namespace Inventory.OreBag
             if (owned < required)
             {
                 PublishPlayerMessage($"You need {required} Hades fragments to upgrade your ore bag.");
+                Log($"Upgrade aborted. Owned {owned}/{required} fragments.");
                 return false;
             }
 
@@ -432,6 +512,7 @@ namespace Inventory.OreBag
             PublishPlayerMessage($"Your ore bag has been upgraded to tier {nextTier.Tier}.");
             ApplyActiveBag(nextTier, playerInventory);
             oreBagInventory.InventoryComponent.WindowController?.RefreshAllSlots();
+            Log($"Ore bag upgraded from tier {bagData.Tier} to tier {nextTier.Tier} using {required} fragments.");
             return true;
         }
 
@@ -472,6 +553,7 @@ namespace Inventory.OreBag
 
                 oreBagInventory.InventoryComponent?.WindowController?.RefreshAllSlots();
                 playerInventory.WindowController?.RefreshSlot(slotIndex);
+                Log("Bank transfer aborted because the ore bag was empty.");
                 return true;
             }
 
@@ -484,6 +566,8 @@ namespace Inventory.OreBag
             playerInventory.WindowController?.RefreshSlot(slotIndex);
 
             int remainingAfterTransfer = oreBagInventory.GetCurrentOreCount();
+
+            Log($"Transferred {totalTransferred} ores to the bank. Remaining in bag: {remainingAfterTransfer}.");
 
             if (showMessages)
             {
@@ -500,6 +584,10 @@ namespace Inventory.OreBag
         {
             oreBagInventory.ApplyBagDefinition(bagData);
             oreBagInventory.SyncStylingFrom(playerInventory);
+            oreBagInventory.EnableDebugLogging = enableDebugLogging;
+            Log(bagData == null
+                ? "Cleared active bag definition while applying active bag."
+                : $"Active bag set to {bagData.name} (tier {bagData.Tier}).");
         }
 
         private bool TryFindBag(out RuntimeInventory playerInventory, out int slotIndex, out OreBagItemData bagData)
@@ -511,12 +599,20 @@ namespace Inventory.OreBag
             if (playerInventory == null)
                 return false;
 
-            return TryLocateBag(playerInventory, out slotIndex, out bagData);
+            bool found = TryLocateBag(playerInventory, out slotIndex, out bagData);
+            Log(found
+                ? $"Located ore bag in player inventory slot {slotIndex} ({bagData?.name ?? "<null>"})."
+                : "Player inventory does not currently contain an ore bag.");
+            return found;
         }
 
         private bool TryResolveBagForInventory(RuntimeInventory inventory, out OreBagItemData bagData)
         {
-            return TryLocateBag(inventory, out _, out bagData);
+            bool found = TryLocateBag(inventory, out _, out bagData);
+            Log(found
+                ? $"Resolved ore bag definition {bagData?.name ?? "<null>"} for provided inventory."
+                : "Failed to resolve ore bag for provided inventory.");
+            return found;
         }
 
         private bool TryResolveBagFromSlot(RuntimeInventory inventory, int slotIndex, out OreBagItemData bagData)
@@ -534,6 +630,7 @@ namespace Inventory.OreBag
                 return false;
 
             bagData = data;
+            Log($"Resolved ore bag from explicit slot {slotIndex}: {bagData.name} (tier {bagData.Tier}).");
             return true;
         }
 
@@ -550,10 +647,12 @@ namespace Inventory.OreBag
                 {
                     slotIndex = i;
                     bagData = data;
+                    Log($"TryLocateBag found bag {data.name} in slot {i}.");
                     return true;
                 }
             }
 
+            Log("TryLocateBag did not find an ore bag in the provided inventory.");
             return false;
         }
 
@@ -574,6 +673,7 @@ namespace Inventory.OreBag
             var chat = ChatService.Instance;
             if (chat != null)
                 chat.PublishGameMessage(text);
+            Log($"Published player chat message: {text}");
         }
 
         private void PublishCompanionBagOverflowMessage()
@@ -584,6 +684,38 @@ namespace Inventory.OreBag
                 string speaker = CompanionManager.GetCompanionDisplayName();
                 chat.PublishCompanionMessage(speaker, "There Isn't enough room in the ore bag.");
             }
+            Log("Companion bag overflow message published.");
+        }
+
+        private void ApplyDebugLoggingState(string reason)
+        {
+            if (oreBagInventory != null)
+                oreBagInventory.EnableDebugLogging = enableDebugLogging;
+
+            if (enableDebugLogging)
+            {
+                Debug.Log($"[OreBagService] Debug logging enabled ({reason}).", this);
+            }
+            else
+            {
+                Debug.Log($"[OreBagService] Debug logging disabled ({reason}).", this);
+            }
+        }
+
+        private void Log(string message)
+        {
+            if (!enableDebugLogging)
+                return;
+
+            Debug.Log($"[OreBagService] {message}", this);
+        }
+
+        private void LogWarning(string message)
+        {
+            if (!enableDebugLogging)
+                return;
+
+            Debug.LogWarning($"[OreBagService] {message}", this);
         }
     }
 }
