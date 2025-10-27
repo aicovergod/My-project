@@ -22,6 +22,7 @@ using World;
 using UI;
 using UI.Chat;
 using Player.Ranks;
+using Environment.Companion;
 
 namespace Skills
 {
@@ -312,6 +313,11 @@ namespace Skills
             bool requestedCompanionDebugLogging = GUILayout.Toggle(companionDebugLogging, "Companion Debug Logging");
             if (requestedCompanionDebugLogging != companionDebugLogging)
                 CompanionManager.EnableDebugLogging = requestedCompanionDebugLogging;
+
+            bool awarenessZoneDebugLogging = CompanionEnvironmentAwarenessZone.EnableDebugLogging;
+            bool requestedAwarenessZoneDebugLogging = GUILayout.Toggle(awarenessZoneDebugLogging, "Companion Awareness Zone Debug Logging");
+            if (requestedAwarenessZoneDebugLogging != awarenessZoneDebugLogging)
+                CompanionEnvironmentAwarenessZone.EnableDebugLogging = requestedAwarenessZoneDebugLogging;
 
             DrawNpcDamageLoggingControls();
 
