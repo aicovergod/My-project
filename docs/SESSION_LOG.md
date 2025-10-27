@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0cb9dc9b0a91a54c29a273ccdb324923fe132f94 -->
+## 2025-10-27T07:59:10+00:00 — Add reset account player command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Player/Commands/PlayerCommandService.cs, Assets/Scripts/Player/Commands/ResetAccountCommand.cs, Assets/Scripts/Player/Commands/ResetAccountCommand.cs.meta
+- Diff: 147 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2f6bce33c04b928db488c3b85b38c2ffba1108ee -->
 ## 2025-10-26T22:52:32+00:00 — Merge pull request #1454 from aicovergod/codex/update-orebagservice-instance-management
 
