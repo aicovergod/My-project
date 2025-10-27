@@ -11,7 +11,7 @@ public static class CreateMiningDatabase
     [MenuItem("Tools/Create Mining Database")]
     public static void Create()
     {
-        string basePath = "Assets/MiningDatabase";
+        string basePath = "Assets/Resources/MiningDatabase";
         if (!Directory.Exists(basePath))
             Directory.CreateDirectory(basePath);
 
