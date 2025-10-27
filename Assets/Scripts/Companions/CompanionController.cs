@@ -245,6 +245,11 @@ namespace Companions
         /// <summary>Invoked when the companion should be hidden. Closes UI and disables the object.</summary>
         public void HandleStoreRequest()
         {
+            // Persist the companion's runtime inventory before closing any associated UI panels.
+            var runtimeInventory = companionInventory?.InventoryComponent;
+            if (runtimeInventory != null)
+                runtimeInventory.Save();
+
             companionInventory?.ForceClosed();
             companionEquipment?.ForceClosed();
             if (gameObject.activeSelf)

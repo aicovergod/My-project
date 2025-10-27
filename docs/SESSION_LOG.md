@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a3abc796ee5e7d4383d7dc37eea273c855b6a93c -->
+## 2025-10-27T09:00:16+00:00 — Ensure companion inventory saves before storing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionController.cs
+- Diff: 5 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:bd8ded1145d2c8fdd90f653a2f5b9b87eda74fe8 -->
 ## 2025-10-27T08:24:24+00:00 — ore bag data
 
