@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f195012f429d38ccfd53df258f75182aac98a646 -->
+## 2025-10-27T11:23:53+00:00 — Add developer speed presets command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Player/Commands/PlayerCommandService.cs, Assets/Scripts/Player/Commands/ResetAccountCommand.cs, Assets/Scripts/Player/Commands/SetSpeedCommand.cs
+- Diff: 140 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:5a7ed7870c471d09dc84c47ec4519075ceb390b8 -->
 ## 2025-10-27T11:17:54+00:00 — Merge pull request #1464 from aicovergod/codex/add-throttle-utility-for-companion-chat
 
