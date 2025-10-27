@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3df45970c56426041c180416f9c395fcbef8da53 -->
+## 2025-10-27T14:35:22+00:00 — Merge pull request #1472 from aicovergod/codex/add-early-return-check-in-conversation-methods
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 23 ++ / 0 --
+- Notes:
+  Guard companion chat scheduling when no follower is present
+---
+<!-- commit:735edd3172faf7cf85df248fd38a06d2e1254406 -->
+## 2025-10-27T14:32:59+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ca5e6d518646f90349d2c3259d6422b83c2bdcce -->
 ## 2025-10-27T14:32:32+00:00 — Guard companion dialogue scheduling when no companion is active
 
