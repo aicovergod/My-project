@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:caa5c7c504a3e39042bf707037da0bcc04679715 -->
+## 2025-10-27T11:06:37+00:00 — Make ore bag debug logging optional
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 43 ++ / 30 --
+- Notes:
+  —
+---
 <!-- commit:9879d44540aa2d7ecb546c4891750685bcbc39af -->
 ## 2025-10-27T10:56:46+00:00 — Merge pull request #1462 from aicovergod/codex/update-orebagservice-for-inventory-initialization
 
