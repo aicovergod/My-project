@@ -319,6 +319,11 @@ namespace Skills
             if (requestedAwarenessZoneDebugLogging != awarenessZoneDebugLogging)
                 CompanionEnvironmentAwarenessZone.EnableDebugLogging = requestedAwarenessZoneDebugLogging;
 
+            bool sceneInteractableDebugLogging = SceneInteractableObject.EnableDebugLogging;
+            bool requestedSceneInteractableDebugLogging = GUILayout.Toggle(sceneInteractableDebugLogging, "Scene Interactable Arrival Debug Logging");
+            if (requestedSceneInteractableDebugLogging != sceneInteractableDebugLogging)
+                SceneInteractableObject.EnableDebugLogging = requestedSceneInteractableDebugLogging;
+
             DrawNpcDamageLoggingControls();
 
             // Allow QA to mirror floating text popups in the console for firemaking/cooking debugging.
