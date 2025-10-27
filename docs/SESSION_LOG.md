@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ff9e77070328e1c53ed338f9b300b925354d90ba -->
+## 2025-10-27T13:04:29+00:00 — Merge pull request #1467 from aicovergod/codex/fix-inventory-right-click-menu-position
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 32 ++ / 12 --
+- Notes:
+  Clamp inventory drop menu to canvas bounds
+---
+<!-- commit:d683cd7742f407d059fb475424b29a12b011a70b -->
+## 2025-10-27T11:49:40+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0dcc63aaa8f997fa7fd2434ec03f1d18ab4de107 -->
 ## 2025-10-27T11:49:22+00:00 — Clamp inventory drop menu to canvas bounds
 
