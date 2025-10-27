@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1c066e79958f86a95985c9559b1216c027f06fed -->
+## 2025-10-27T10:21:53+00:00 — Force ore bag debug logging to stay enabled
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 33 ++ / 37 --
+- Notes:
+  —
+---
 <!-- commit:6d51aa5430607ae4d883b47bfd432c2b89f071df -->
 ## 2025-10-27T10:18:06+00:00 — Merge pull request #1460 from aicovergod/codex/add-debug-logs-for-ore-bag-issue
 
