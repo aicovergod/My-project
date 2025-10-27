@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4a49ba9e1d4f9e45b71437cf1aed345d4886ee21 -->
+## 2025-10-27T09:00:44+00:00 — Merge pull request #1456 from aicovergod/codex/update-handlestorerequest-to-save-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 0 --
+- Notes:
+  Ensure companion inventory saves before storing
+---
+<!-- commit:644fbd8f41b2470908d148b675e624065bae6622 -->
+## 2025-10-27T09:00:36+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a3abc796ee5e7d4383d7dc37eea273c855b6a93c -->
 ## 2025-10-27T09:00:16+00:00 — Ensure companion inventory saves before storing
 
