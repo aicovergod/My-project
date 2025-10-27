@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6d51aa5430607ae4d883b47bfd432c2b89f071df -->
+## 2025-10-27T10:18:06+00:00 — Merge pull request #1460 from aicovergod/codex/add-debug-logs-for-ore-bag-issue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 303 ++ / 5 --
+- Notes:
+  Add verbose ore bag logging and admin toggle
+---
+<!-- commit:13e137e5d5d4ad55bb569afd00765f8a70e0ffc4 -->
+## 2025-10-27T10:17:53+00:00 — Add verbose ore bag logging and admin toggle
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs, Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 303 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:14f3a6681a553d34d3392a32e361df7af6085cf9 -->
 ## 2025-10-27T09:55:28+00:00 — Merge pull request #1459 from aicovergod/codex/update-orebagservice-clear-logic
 
