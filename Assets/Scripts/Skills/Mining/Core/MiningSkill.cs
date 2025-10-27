@@ -27,7 +27,7 @@ namespace Skills.Mining
         [SerializeField] private Transform floatingTextAnchor;
         [Header("Hades Fragment Rewards")]
         [SerializeField, Tooltip("Unique item identifier for the Hades fragment drop.")]
-        private string hadesFragmentItemId = "HadesFragment";
+        private string hadesFragmentItemId = "Hades Fragment";
         [SerializeField, Tooltip("Chance denominator for awarding a Hades fragment. A value of 50 represents a 1 in 50 roll.")]
         private int hadesFragmentDropDenominator = 50;
         [SerializeField, Tooltip("ScriptableObject containing the Prospector outfit configuration.")]
