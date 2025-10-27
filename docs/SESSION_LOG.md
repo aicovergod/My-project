@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f39cf2eef965acfcdb3672f88ac735c648edf12b -->
+## 2025-10-27T09:32:23+00:00 — Guard ore bag bootstrap clearing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 25 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:20b2ab1e714c7f77f8ae893ce1fc883d4269310c -->
 ## 2025-10-27T09:07:49+00:00 — Merge pull request #1457 from aicovergod/codex/augment-ondisable-to-save-inventory
 
