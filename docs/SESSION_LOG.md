@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:38947639ffa3edc4dbf99c0395794021ab526f81 -->
+## 2025-10-27T21:58:08+00:00 — Add companion dialogue chance for scene interactables
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/AdminF2Menu.cs, Assets/Scripts/World/SceneInteractableObject.cs
+- Diff: 307 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:adb8de007e2b7742c8d47f2455912ca36734b70f -->
 ## 2025-10-27T21:39:04+00:00 — Merge pull request #1480 from aicovergod/codex/extend-companionenvironmentawarenesszone-functionality
 
