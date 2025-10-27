@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e31d32e9ce938e825c0d98dd2198f856f4d9cfdb -->
+## 2025-10-27T15:08:41+00:00 — feat: add hades fragment drops to mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Mining/Core/MiningSkill.cs
+- Diff: 236 ++ / 15 --
+- Notes:
+  —
+---
 <!-- commit:3df45970c56426041c180416f9c395fcbef8da53 -->
 ## 2025-10-27T14:35:22+00:00 — Merge pull request #1472 from aicovergod/codex/add-early-return-check-in-conversation-methods
 
