@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c7bbae03d1e08a6766edd525328d6ecc48f76a86 -->
+## 2025-10-27T14:00:27+00:00 — Refine inventory context menu positioning
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/UI/InventoryItemContextMenu.cs
+- Diff: 70 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:7b4a37dd1645c0849392c865a4dbd28acc53bd67 -->
 ## 2025-10-27T13:36:30+00:00 — Merge pull request #1470 from aicovergod/codex/move-miningdatabase-to-resources
 
