@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6393fec0fbe2b92b6e87d0f18bf745511545c119 -->
+## 2025-10-27T21:58:34+00:00 — Merge pull request #1481 from aicovergod/codex/add-logic-for-companion-dialogue-on-scene-load
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 316 ++ / 0 --
+- Notes:
+  Add companion dialogue chance for scene interactables
+---
+<!-- commit:e622cf4c47fef1354e459167c864b7b76fee8ad0 -->
+## 2025-10-27T21:58:20+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:38947639ffa3edc4dbf99c0395794021ab526f81 -->
 ## 2025-10-27T21:58:08+00:00 — Add companion dialogue chance for scene interactables
 
