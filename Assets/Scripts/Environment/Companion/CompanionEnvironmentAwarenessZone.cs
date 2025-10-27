@@ -39,6 +39,9 @@ namespace Environment.Companion
         /// <summary>Prefix included in every debug log so the output is easy to filter in the Unity console.</summary>
         private const string DebugLogPrefix = "[CompanionAwarenessZone]";
 
+        /// <summary>Minimum velocity a companion must have for directional entry checks to pass.</summary>
+        private const float MinimumDirectionalVelocity = 0.05f;
+
         [Header("Area Flags"), Tooltip("Mark the contextual identity of this zone so companions know how to react.")]
         [SerializeField]
         private bool areaIsBank;
@@ -58,6 +61,26 @@ namespace Environment.Companion
         [SerializeField]
         private bool areaIsGraveyard;
 
+        [Header("Directional Entry"), Tooltip("Toggle whether the companion must enter along a specific heading before reactions are allowed.")]
+        [SerializeField]
+        private bool requireDirectionalEntry;
+
+        [Tooltip("Normalized local-space vector describing the heading companions must travel along to trigger this zone.")]
+        [SerializeField]
+        private Vector2 requiredEntryDirection = Vector2.right;
+
+        [Tooltip("Minimum dot product required between the companion velocity and the world-space heading to permit entry."), Range(0f, 1f)]
+        [SerializeField]
+        private float directionalDotProductTolerance = 0.75f;
+
+        [Tooltip("Color used for the Scene view gizmo that visualises the required entry heading.")]
+        [SerializeField]
+        private Color directionalGizmoColor = Color.cyan;
+
+        [Tooltip("Length of the Scene view gizmo arrow that illustrates the entry heading.")]
+        [SerializeField, Min(0f)]
+        private float directionalGizmoLength = 1.5f;
+
         [Header("Cooldown"), Tooltip("Minimum number of seconds before the same companion can react again inside this zone.")]
         [SerializeField, Min(0f)]
         private float retriggerCooldownSeconds = 10f;
@@ -73,6 +96,9 @@ namespace Environment.Companion
 
         /// <summary>Stores the most recent awareness area used to generate a reaction so debug logs can report it.</summary>
         private AwarenessArea lastSelectedArea;
+
+        /// <summary>Caches the most recent world-space heading evaluated for directional entry checks.</summary>
+        private Vector2 cachedWorldEntryDirection = Vector2.right;
 
         private void Awake()
         {
@@ -94,6 +120,22 @@ namespace Environment.Companion
             lastReactionTimes.Clear();
         }
 
+        private void OnValidate()
+        {
+            if (requiredEntryDirection.sqrMagnitude <= Mathf.Epsilon)
+            {
+                requiredEntryDirection = Vector2.right;
+            }
+            else
+            {
+                requiredEntryDirection = requiredEntryDirection.normalized;
+            }
+
+            directionalDotProductTolerance = Mathf.Clamp01(directionalDotProductTolerance);
+            directionalGizmoLength = Mathf.Max(0f, directionalGizmoLength);
+            cachedWorldEntryDirection = ComputeWorldEntryDirection();
+        }
+
         private void OnTriggerEnter2D(Collider2D other)
         {
             var controller = ResolveCompanionController(other);
@@ -104,6 +146,9 @@ namespace Environment.Companion
             }
 
             LogDebug($"Companion {controller.name} entered zone; evaluating awareness reaction.", controller);
+
+            if (!EvaluateDirectionalEntryRequirement(other, controller))
+                return;
 
             if (!HasAnyAreaFlag())
             {
@@ -263,5 +308,85 @@ namespace Environment.Companion
             string companionName = controller != null ? controller.name : "None";
             Debug.Log($"{DebugLogPrefix} Zone: {name}, Companion: {companionName} => {message}", this);
         }
+
+        /// <summary>
+        /// Validates the companion entry direction when directional gating is enabled.
+        /// Blocks the trigger if the companion is moving too slowly or approaching from the wrong heading.
+        /// </summary>
+        private bool EvaluateDirectionalEntryRequirement(Collider2D other, CompanionController controller)
+        {
+            if (!requireDirectionalEntry)
+                return true;
+
+            Vector2 worldEntryDirection = ComputeWorldEntryDirection();
+            cachedWorldEntryDirection = worldEntryDirection;
+
+            Rigidbody2D body = other != null ? other.attachedRigidbody : null;
+            if (body == null && controller != null)
+                body = controller.GetComponent<Rigidbody2D>();
+
+            if (body == null)
+            {
+                LogDebug("Directional entry is required but no Rigidbody2D velocity could be located; trigger blocked.", controller);
+                return false;
+            }
+
+            Vector2 velocity = body.velocity;
+            if (velocity.sqrMagnitude < MinimumDirectionalVelocity * MinimumDirectionalVelocity)
+            {
+                LogDebug("Directional entry blocked because the companion is moving too slowly to determine heading.", controller);
+                return false;
+            }
+
+            Vector2 normalizedVelocity = velocity.normalized;
+            float dot = Vector2.Dot(normalizedVelocity, worldEntryDirection);
+            if (dot < directionalDotProductTolerance)
+            {
+                LogDebug($"Directional entry blocked; velocity alignment {dot:0.000} fell below tolerance {directionalDotProductTolerance:0.000}. Required heading: {cachedWorldEntryDirection}.", controller);
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>Calculates the normalized world-space heading used for directional gating and gizmo rendering.</summary>
+        private Vector2 ComputeWorldEntryDirection()
+        {
+            Vector3 local = new Vector3(requiredEntryDirection.x, requiredEntryDirection.y, 0f);
+            Vector3 world = transform.TransformDirection(local);
+            Vector2 planar = new Vector2(world.x, world.y);
+            if (planar.sqrMagnitude <= Mathf.Epsilon)
+                return Vector2.right;
+
+            return planar.normalized;
+        }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            if (directionalGizmoLength <= 0f)
+                return;
+
+            Vector3 origin = transform.position;
+            Vector2 worldDirection = ComputeWorldEntryDirection();
+            cachedWorldEntryDirection = worldDirection;
+            Vector3 direction3D = new Vector3(worldDirection.x, worldDirection.y, 0f);
+            if (direction3D.sqrMagnitude <= Mathf.Epsilon)
+                direction3D = Vector3.right;
+
+            Vector3 normalizedDirection = direction3D.normalized;
+            Vector3 tip = origin + normalizedDirection * directionalGizmoLength;
+
+            Gizmos.color = directionalGizmoColor;
+            Gizmos.DrawLine(origin, tip);
+
+            const float arrowHeadAngle = 25f;
+            float arrowHeadLength = Mathf.Max(0.1f, directionalGizmoLength * 0.25f);
+            Quaternion rightRotation = Quaternion.AngleAxis(180f - arrowHeadAngle, Vector3.forward);
+            Quaternion leftRotation = Quaternion.AngleAxis(-(180f - arrowHeadAngle), Vector3.forward);
+            Gizmos.DrawLine(tip, tip + (rightRotation * normalizedDirection) * arrowHeadLength);
+            Gizmos.DrawLine(tip, tip + (leftRotation * normalizedDirection) * arrowHeadLength);
+        }
+#endif
     }
 }
