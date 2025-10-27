@@ -19,12 +19,12 @@ namespace Inventory.OreBag
     public sealed class OreBagInventory : MonoBehaviour
     {
         private static HashSet<string> oreItemIds;
-        private static bool globalDebugLogging = true;
+        private static bool globalDebugLogging = false;
 
         [Header("Debug")]
         [SerializeField]
         [Tooltip("When enabled the ore bag prints verbose logging for persistence, sanitisation, and transfer flows.")]
-        private bool enableDebugLogging = true;
+        private bool enableDebugLogging = false;
 
         private RuntimeInventory inventory;
         private InventoryModel model;
@@ -38,18 +38,16 @@ namespace Inventory.OreBag
         /// </summary>
         internal bool EnableDebugLogging
         {
-            get => true;
+            get => enableDebugLogging;
             set
             {
-                // Debug logging must remain enabled at all times while we investigate
-                // ore deletion issues. Ignore any attempt to disable the toggle and
-                // force both the instance and the static cache flag to true so helper
-                // methods (like EnsureOreItemIds) always emit diagnostics.
-                if (!enableDebugLogging || !globalDebugLogging)
-                    Debug.Log("[OreBagInventory] Debug logging forced on for investigative session.", this);
+                if (enableDebugLogging == value && globalDebugLogging == value)
+                    return;
 
-                enableDebugLogging = true;
-                globalDebugLogging = true;
+                enableDebugLogging = value;
+                globalDebugLogging = value;
+
+                Debug.Log($"[OreBagInventory] Debug logging {(value ? "enabled" : "disabled")}.", this);
             }
         }
 
@@ -61,8 +59,7 @@ namespace Inventory.OreBag
 
         private void Awake()
         {
-            enableDebugLogging = true;
-            globalDebugLogging = true;
+            globalDebugLogging = enableDebugLogging;
             Log("Awake invoked. Ensuring inventory is configured.");
             EnsureInventoryConfigured();
         }
@@ -628,12 +625,18 @@ namespace Inventory.OreBag
         /// <summary>Utility wrapper that always writes a debug message for the ore bag inventory.</summary>
         private void Log(string message)
         {
+            if (!enableDebugLogging)
+                return;
+
             Debug.Log($"[OreBagInventory] {message}", this);
         }
 
         /// <summary>Utility wrapper that always writes a warning for the ore bag inventory.</summary>
         private void LogWarning(string message)
         {
+            if (!enableDebugLogging)
+                return;
+
             Debug.LogWarning($"[OreBagInventory] {message}", this);
         }
     }
