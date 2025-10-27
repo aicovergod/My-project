@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f9cb1d4f50a6b0703a8641af333c9b55c4a0dfd9 -->
+## 2025-10-27T09:32:37+00:00 — Merge pull request #1458 from aicovergod/codex/update-orebagservice-to-preserve-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 25 ++ / 1 --
+- Notes:
+  Guard ore bag bootstrap clearing
+---
+<!-- commit:f39cf2eef965acfcdb3672f88ac735c648edf12b -->
+## 2025-10-27T09:32:23+00:00 — Guard ore bag bootstrap clearing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 25 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:20b2ab1e714c7f77f8ae893ce1fc883d4269310c -->
 ## 2025-10-27T09:07:49+00:00 — Merge pull request #1457 from aicovergod/codex/augment-ondisable-to-save-inventory
 
