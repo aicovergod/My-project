@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0dcc63aaa8f997fa7fd2434ec03f1d18ab4de107 -->
+## 2025-10-27T11:49:22+00:00 — Clamp inventory drop menu to canvas bounds
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/InventoryDropMenu.cs
+- Diff: 23 ++ / 12 --
+- Notes:
+  —
+---
 <!-- commit:a9f8c4c3dc79a5004302b3d0affbf0710703cd8b -->
 ## 2025-10-27T11:34:14+00:00 — Merge pull request #1466 from aicovergod/codex/fix-inventory-menu-popup-positioning
 
