@@ -19,6 +19,12 @@ namespace Inventory.OreBag
     public sealed class OreBagInventory : MonoBehaviour
     {
         private static HashSet<string> oreItemIds;
+        private static bool globalDebugLogging;
+
+        [Header("Debug")]
+        [SerializeField]
+        [Tooltip("When enabled the ore bag prints verbose logging for persistence, sanitisation, and transfer flows.")]
+        private bool enableDebugLogging;
 
         private RuntimeInventory inventory;
         private InventoryModel model;
@@ -26,6 +32,19 @@ namespace Inventory.OreBag
         private int activeCapacity;
         private bool inventoryChangeSubscribed;
         private bool sanitizedAfterInitialRestore;
+
+        /// <summary>
+        /// Allows <see cref="OreBagService"/> and the Admin F2 menu to toggle verbose logging at runtime.
+        /// </summary>
+        internal bool EnableDebugLogging
+        {
+            get => enableDebugLogging;
+            set
+            {
+                enableDebugLogging = value;
+                globalDebugLogging = value;
+            }
+        }
 
         /// <summary>Expose the underlying inventory component for UI refreshes.</summary>
         public RuntimeInventory InventoryComponent => inventory;
@@ -35,6 +54,8 @@ namespace Inventory.OreBag
 
         private void Awake()
         {
+            globalDebugLogging = enableDebugLogging;
+            Log("Awake invoked. Ensuring inventory is configured.");
             EnsureInventoryConfigured();
         }
 
@@ -44,13 +65,23 @@ namespace Inventory.OreBag
         /// </summary>
         public void EnsureInventoryConfigured()
         {
-            if (inventory == null)
-                inventory = GetComponent<RuntimeInventory>();
+            Log("EnsureInventoryConfigured invoked.");
 
             if (inventory == null)
+            {
+                Log("Caching runtime inventory component reference.");
+                inventory = GetComponent<RuntimeInventory>();
+            }
+
+            if (inventory == null)
+            {
+                LogWarning("Runtime inventory component missing. Configuration aborted.");
                 return;
+            }
 
             ConfigureInventoryWindow();
+
+            Log("Inventory window configured. Resolving inventory model.");
 
             model = inventory.Model;
             model.CanStoreRule = CanStoreOreOnly;
@@ -59,6 +90,7 @@ namespace Inventory.OreBag
             {
                 inventory.OnInventoryChanged += HandleInventoryChanged;
                 inventoryChangeSubscribed = true;
+                Log("Subscribed to inventory change notifications for sanitisation.");
             }
         }
 
@@ -69,10 +101,14 @@ namespace Inventory.OreBag
         /// </summary>
         public void SanitizeLoadedContents()
         {
+            Log("SanitizeLoadedContents invoked. Verifying restored slots for non-ore data.");
             EnsureInventoryConfigured();
 
             if (inventory == null || model == null)
+            {
+                LogWarning("Cannot sanitize contents because the inventory or model reference is missing.");
                 return;
+            }
 
             // Cache valid ore entries so their original slot positions can be restored after scrubbing.
             var validEntries = new List<(int slotIndex, InventoryEntry entry)>();
@@ -82,15 +118,21 @@ namespace Inventory.OreBag
             {
                 var entry = model.GetEntry(i);
 
+                Log($"Inspecting slot {i}: item={(entry.item != null ? entry.item.id : "<null>")}, count={entry.count}.");
+
                 if (entry.item == null)
                 {
                     if (entry.count != 0)
+                    {
+                        LogWarning($"Slot {i} contained a null item with count {entry.count}. Marking for scrub.");
                         scrubbed = true;
+                    }
                     continue;
                 }
 
                 if (!IsOre(entry.item) || entry.count <= 0)
                 {
+                    LogWarning($"Slot {i} contained non-ore item {entry.item.id} (count {entry.count}). Removing entry.");
                     scrubbed = true;
                     continue;
                 }
@@ -103,16 +145,24 @@ namespace Inventory.OreBag
             }
 
             if (!scrubbed)
+            {
+                Log("No sanitisation required. All restored entries already valid ores.");
                 return;
+            }
 
             inventory.RunWithoutPersistence(targetModel =>
             {
                 // Clear everything so only verified ore stacks return to the bag.
+                Log("Scrub detected. Clearing and restoring verified ore entries.");
                 targetModel.ClearAllSlots();
                 foreach (var (slotIndex, entry) in validEntries)
+                {
+                    Log($"Restoring ore {entry.item.id} x{entry.count} into slot {slotIndex}.");
                     targetModel.SetEntry(slotIndex, entry);
+                }
             });
 
+            Log("Saving sanitized ore bag payload.");
             inventory.Save();
         }
 
@@ -122,6 +172,7 @@ namespace Inventory.OreBag
             if (source == null || inventory == null || source == inventory)
                 return;
 
+            Log("Syncing ore bag UI styling from player inventory.");
             inventory.windowColor = source.windowColor;
             inventory.slotSize = source.slotSize;
             inventory.slotSpacing = source.slotSpacing;
@@ -139,6 +190,9 @@ namespace Inventory.OreBag
         {
             activeBagDefinition = bag;
             activeCapacity = bag != null ? bag.OreCapacity : 0;
+            Log(bag == null
+                ? "Cleared active bag definition. Capacity reset to zero."
+                : $"Applied bag definition {bag.name} (tier {bag.Tier}) with capacity {activeCapacity}.");
         }
 
         /// <summary>Total number of ores currently stored in the bag.</summary>
@@ -155,13 +209,16 @@ namespace Inventory.OreBag
                     total += entry.count;
             }
 
+            Log($"Computed current ore count: {total}.");
             return total;
         }
 
         /// <summary>Remaining combined capacity before the bag reaches its tier limit.</summary>
         public int GetCapacityRemaining()
         {
-            return Mathf.Max(0, activeCapacity - GetCurrentOreCount());
+            int remaining = Mathf.Max(0, activeCapacity - GetCurrentOreCount());
+            Log($"Capacity remaining: {remaining} (active capacity {activeCapacity}).");
+            return remaining;
         }
 
         /// <summary>
@@ -171,30 +228,45 @@ namespace Inventory.OreBag
         /// </summary>
         public int AddOre(ItemData item, int quantity)
         {
+            Log($"AddOre requested for item={(item != null ? item.id : "<null>")} quantity={quantity}.");
             if (!IsOre(item) || quantity <= 0)
+            {
+                LogWarning("AddOre rejected because the item is not a valid ore or quantity was non-positive.");
                 return 0;
+            }
 
             int remainingCapacity = GetCapacityRemaining();
             if (remainingCapacity <= 0)
+            {
+                LogWarning("AddOre aborted because the bag has no remaining capacity.");
                 return 0;
+            }
 
             int toAdd = Mathf.Min(quantity, remainingCapacity);
             int added = 0;
 
             if (model == null)
+            {
+                Log("Inventory model missing. Attempting to reconfigure before adding ore.");
                 EnsureInventoryConfigured();
+            }
 
             if (model == null)
+            {
+                LogWarning("AddOre failed because the inventory model could not be resolved.");
                 return 0;
+            }
 
             // Merge any pre-existing stacks for this ore so the bag can reclaim slots that were previously
             // fragmented by per-item entries (the behaviour reported by the user).
+            Log("Collapsing existing stacks for incoming ore type.");
             MergeExistingStacksForOre(item);
 
             // Try to top up an existing stack first so the bag retains a single stack per ore type.
             int primaryIndex = FindFirstSlotWithItem(item);
             if (primaryIndex != -1)
             {
+                Log($"Found existing stack for {item.id} in slot {primaryIndex}. Attempting to top up by {toAdd}.");
                 var entry = model.GetEntry(primaryIndex);
                 int addToExisting = Mathf.Min(toAdd, Mathf.Max(0, int.MaxValue - entry.count));
                 if (addToExisting > 0)
@@ -204,6 +276,7 @@ namespace Inventory.OreBag
                     {
                         added += addToExisting;
                         toAdd -= addToExisting;
+                        Log($"Topped up existing stack by {addToExisting}. Remaining to allocate: {toAdd}.");
                     }
                 }
             }
@@ -214,6 +287,7 @@ namespace Inventory.OreBag
                 int emptyIndex = FindFirstEmptySlot();
                 if (emptyIndex != -1)
                 {
+                    Log($"Allocating new slot {emptyIndex} for {item.id} with quantity {toAdd}.");
                     var entry = new InventoryEntry
                     {
                         item = item,
@@ -224,12 +298,24 @@ namespace Inventory.OreBag
                     {
                         added += toAdd;
                         toAdd = 0;
+                        Log("New slot allocation succeeded.");
                     }
+                }
+                else
+                {
+                    LogWarning("No empty slot available while attempting to add ore. Remaining quantity could not be stored.");
                 }
             }
 
             if (added > 0)
+            {
+                Log($"AddOre completed. Total stored: {added}. Triggering window refresh.");
                 inventory.WindowController?.RefreshAllSlots();
+            }
+            else
+            {
+                LogWarning("AddOre completed without storing any ore.");
+            }
 
             return added;
         }
@@ -237,12 +323,14 @@ namespace Inventory.OreBag
         /// <summary>Opens the ore bag UI window.</summary>
         public void OpenWindow()
         {
+            Log("Opening ore bag window.");
             inventory.OpenUI();
         }
 
         /// <summary>Closes the ore bag UI window.</summary>
         public void CloseWindow()
         {
+            Log("Closing ore bag window.");
             inventory.CloseUI();
         }
 
@@ -250,19 +338,28 @@ namespace Inventory.OreBag
         public bool IsOre(ItemData item)
         {
             if (item == null)
+            {
+                LogWarning("IsOre called with a null item reference.");
                 return false;
+            }
 
             // Prevent the ore bag item itself from being considered an ore so players cannot
             // accidentally stash the bag inside its own storage and lose access to it.
             if (item is OreBagItemData)
+            {
+                LogWarning("IsOre rejected the ore bag item itself to prevent recursive storage.");
                 return false;
+            }
 
             EnsureOreItemIds();
-            return oreItemIds.Contains(item.id);
+            bool result = oreItemIds.Contains(item.id);
+            Log($"IsOre evaluated item {item.id}: {(result ? "VALID" : "INVALID")} ore entry.");
+            return result;
         }
 
         private void ConfigureInventoryWindow()
         {
+            Log("Configuring ore bag inventory window defaults.");
             inventory.saveKey = "OreBagInventory";
             inventory.size = 12;
             inventory.columns = 3;
@@ -297,6 +394,7 @@ namespace Inventory.OreBag
             if (inventory == null || !inventory.isActiveAndEnabled)
                 return;
 
+            Log("Inventory change detected after restore. Scheduling single sanitisation pass.");
             sanitizedAfterInitialRestore = true;
             SanitizeLoadedContents();
         }
@@ -308,10 +406,20 @@ namespace Inventory.OreBag
 
             oreItemIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var definitions = Resources.LoadAll<OreDefinition>("MiningDatabase");
+            int definitionCount = 0;
             foreach (var def in definitions)
             {
                 if (def != null && !string.IsNullOrEmpty(def.Id))
+                {
                     oreItemIds.Add(def.Id);
+                    definitionCount++;
+                }
+            }
+
+            if (definitionCount > 0)
+            {
+                if (globalDebugLogging)
+                    Debug.Log($"[OreBagInventory] Cached {definitionCount} ore definitions from the mining database.");
             }
 
             if (oreItemIds.Count > 0)
@@ -326,6 +434,9 @@ namespace Inventory.OreBag
                 if (ContainsOreToken(candidate.itemName) || ContainsOreToken(candidate.id))
                     oreItemIds.Add(candidate.id);
             }
+
+            if (globalDebugLogging)
+                Debug.Log($"[OreBagInventory] Fallback ore cache populated with {oreItemIds.Count} entries.");
         }
 
         /// <summary>
@@ -362,7 +473,10 @@ namespace Inventory.OreBag
         private void MergeExistingStacksForOre(ItemData ore)
         {
             if (model == null || ore == null)
+            {
+                LogWarning("MergeExistingStacksForOre aborted because the model or ore reference is null.");
                 return;
+            }
 
             int primaryIndex = -1;
             long combinedCount = 0;
@@ -376,6 +490,7 @@ namespace Inventory.OreBag
                     if (entry.count <= 0)
                     {
                         // Remove empty remnants so the bag does not lose slots to zero-count stacks.
+                        LogWarning($"Removing empty stack for {ore.id} in slot {i}.");
                         model.SetEntry(i, default);
                         continue;
                     }
@@ -384,28 +499,35 @@ namespace Inventory.OreBag
 
                     if (primaryIndex == -1)
                     {
+                        Log($"Slot {i} selected as primary stack for {ore.id}.");
                         primaryIndex = i;
                     }
                     else
                     {
                         duplicates ??= new List<int>();
+                        Log($"Marking duplicate stack for {ore.id} in slot {i} for consolidation.");
                         duplicates.Add(i);
                     }
                 }
                 else if (entry.item == null && entry.count > 0)
                 {
                     // Clean up invalid entries that may have been created by corrupted save data.
+                    LogWarning($"Slot {i} contains null item with residual count {entry.count}. Clearing entry.");
                     model.SetEntry(i, default);
                 }
             }
 
             if (primaryIndex == -1)
+            {
+                Log("No existing stacks found for incoming ore. Nothing to merge.");
                 return;
+            }
 
             var primary = model.GetEntry(primaryIndex);
 
             if (duplicates != null)
             {
+                Log($"Consolidating {duplicates.Count} duplicate stacks for {ore.id}.");
                 foreach (int duplicateIndex in duplicates)
                     model.SetEntry(duplicateIndex, default);
             }
@@ -416,6 +538,7 @@ namespace Inventory.OreBag
             {
                 primary.count = clampedTotal;
                 model.SetEntry(primaryIndex, primary);
+                Log($"Primary stack for {ore.id} now contains {clampedTotal} after consolidation.");
             }
         }
 
@@ -425,15 +548,22 @@ namespace Inventory.OreBag
         private int FindFirstSlotWithItem(ItemData item)
         {
             if (model == null || item == null)
+            {
+                LogWarning("FindFirstSlotWithItem invoked with null model or item.");
                 return -1;
+            }
 
             for (int i = 0; i < model.Size; i++)
             {
                 var entry = model.GetEntry(i);
                 if (entry.item == item && entry.count > 0)
+                {
+                    Log($"Found item {item.id} in slot {i} while searching for existing stack.");
                     return i;
+                }
             }
 
+            Log($"No slot currently contains item {item.id}.");
             return -1;
         }
 
@@ -443,21 +573,29 @@ namespace Inventory.OreBag
         private int FindFirstEmptySlot()
         {
             if (model == null)
+            {
+                LogWarning("FindFirstEmptySlot invoked with null model reference.");
                 return -1;
+            }
 
             for (int i = 0; i < model.Size; i++)
             {
                 var entry = model.GetEntry(i);
                 if (entry.item == null || entry.count <= 0)
+                {
+                    Log($"Found empty slot at index {i}.");
                     return i;
+                }
             }
 
+            LogWarning("No empty slot available in ore bag inventory.");
             return -1;
         }
 
         private void OnDisable()
         {
             // Persist any ore layout adjustments before the bag is hidden so exiting to menus/desktops keeps the latest state.
+            Log("OnDisable invoked. Saving ore bag state and resetting sanitisation guard.");
             inventory?.Save();
             sanitizedAfterInitialRestore = false;
         }
@@ -466,13 +604,35 @@ namespace Inventory.OreBag
         {
             // Mirror the disable safeguard in destruction paths so runtime teardown without disable still commits the bag state.
             if (inventory != null)
+            {
+                Log("OnDestroy saving ore bag inventory prior to teardown.");
                 inventory.Save();
+            }
 
             if (inventory != null && inventoryChangeSubscribed)
             {
                 inventory.OnInventoryChanged -= HandleInventoryChanged;
                 inventoryChangeSubscribed = false;
+                Log("Unsubscribed from inventory change notifications on destroy.");
             }
+        }
+
+        /// <summary>Utility wrapper that writes a debug message when <see cref="enableDebugLogging"/> is true.</summary>
+        private void Log(string message)
+        {
+            if (!enableDebugLogging)
+                return;
+
+            Debug.Log($"[OreBagInventory] {message}", this);
+        }
+
+        /// <summary>Utility wrapper that writes a warning when <see cref="enableDebugLogging"/> is true.</summary>
+        private void LogWarning(string message)
+        {
+            if (!enableDebugLogging)
+                return;
+
+            Debug.LogWarning($"[OreBagInventory] {message}", this);
         }
     }
 }
