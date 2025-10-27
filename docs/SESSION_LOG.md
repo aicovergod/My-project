@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a2bf2f0dbd69a57da2c2091a518913b79665116d -->
+## 2025-10-27T11:17:42+00:00 — Add shared companion dialogue throttle
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionDialogueThrottle.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 54 ++ / 10 --
+- Notes:
+  —
+---
 <!-- commit:9879d44540aa2d7ecb546c4891750685bcbc39af -->
 ## 2025-10-27T10:56:46+00:00 — Merge pull request #1462 from aicovergod/codex/update-orebagservice-for-inventory-initialization
 
