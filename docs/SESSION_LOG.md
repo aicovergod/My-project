@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1f9cd79f136ab9975e493b6247cfde633ce9b1ee -->
+## 2025-10-27T20:59:35+00:00 — Add game chat message for ore golem Hades fragment drops
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Combat/Mechanics/OreGolemHadesFragmentDropper.cs
+- Diff: 61 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:30be779c18e386425ef339672b12366b114326fd -->
 ## 2025-10-27T19:58:41+00:00 — Merge pull request #1477 from aicovergod/codex/add-oregolemhadesfragmentdropper-script
 
