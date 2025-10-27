@@ -354,7 +354,9 @@ namespace Skills.Mining
                 return false;
 
             int roll = Random.Range(1, hadesFragmentDropDenominator + 1);
-            return roll == 1;
+            bool success = roll == 1;
+            LogDebug($"Hades fragment roll 1/{hadesFragmentDropDenominator} (rolled {roll}) => {(success ? "success" : "no drop")}");
+            return success;
         }
 
         /// <summary>
