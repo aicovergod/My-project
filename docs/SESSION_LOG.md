@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:995f93489492625c6bb83373346096601eed4da9 -->
+## 2025-10-27T10:56:35+00:00 — Guard ore bag inventory configuration from default save key
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 45 ++ / 25 --
+- Notes:
+  —
+---
 <!-- commit:1ffe563470a6771108b3dd6588b495d16a43df1a -->
 ## 2025-10-27T10:22:05+00:00 — Merge pull request #1461 from aicovergod/codex/set-ore-bag-debugs-always-active
 
