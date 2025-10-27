@@ -112,18 +112,15 @@ namespace Companions
         /// <summary>True once the chat service subscription for inventory full reactions is active.</summary>
         private static bool chatSubscribed;
 
-        /// <summary>Last unscaled time the companion reacted to a full inventory message.</summary>
-        private static float lastInventoryFullReactionTime = -10f;
-
-        /// <summary>Cooldown applied between companion responses to repeated inventory full messages.</summary>
-        private const float InventoryFullChatCooldownSeconds = 4f;
-
         /// <summary>Normalised comparison string for detecting the standard full inventory game message.</summary>
         private const string PlayerInventoryFullGameMessage = "your inventory is full";
 
         /// <summary>Normalised comparison string for the combined player and companion inventory message.</summary>
         private const string PlayerAndCompanionInventoryFullGameMessage =
             "your inventory and your companion's inventory are full";
+
+        /// <summary>Throttle key used for inventory full chatter.</summary>
+        private const string InventoryFullChatThrottleKey = "InventoryFullMessage";
 
         /// <summary>Global stop commands that should cancel any active companion action when spoken by the player.</summary>
         private static readonly HashSet<string> GlobalStopCommands = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -2079,11 +2076,10 @@ namespace Companions
             if (!playerInventoryFull && !combinedInventoryFull)
                 return;
 
-            float now = Time.unscaledTime;
-            if (now - lastInventoryFullReactionTime < InventoryFullChatCooldownSeconds)
+            if (!CompanionDialogueThrottle.TryConsume(
+                    InventoryFullChatThrottleKey,
+                    CompanionDialogueThrottle.DefaultDelaySeconds))
                 return;
-
-            lastInventoryFullReactionTime = now;
 
             string companionLine = combinedInventoryFull
                 ? CompanionChatLibrary.GetRandomPlayerAndCompanionInventoryFullLine()
