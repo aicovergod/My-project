@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0b0f43c598e0ca2e5feb8b4995638cf8420b473d -->
+## 2025-10-27T15:23:15+00:00 — Add chat feedback for undroppable item drops
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 26 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:f331bb21e54ff2347df021f79c390ca211d5fd8b -->
 ## 2025-10-27T15:10:12+00:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
 
