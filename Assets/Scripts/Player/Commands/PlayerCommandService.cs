@@ -198,6 +198,7 @@ namespace Player.Commands
             RegisterCommand(new MaxStatsCommand());
             RegisterCommand(new TestMineRocksCommand());
             RegisterCommand(new TestCompanionQuestionCommand());
+            RegisterCommand(new ResetAccountCommand());
             RegisterCommand(new SaveProfileCommand());
             RegisterCommand(new SetSkillLevelCommand());
             RegisterCommand(new TeleportCommand());
