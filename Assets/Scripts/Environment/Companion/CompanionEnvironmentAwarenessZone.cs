@@ -325,25 +325,49 @@ namespace Environment.Companion
             if (body == null && controller != null)
                 body = controller.GetComponent<Rigidbody2D>();
 
-            if (body == null)
+            const float minimumVelocitySqr = MinimumDirectionalVelocity * MinimumDirectionalVelocity;
+            bool hasHeading = false;
+            bool headingFromFallback = false;
+            Vector2 entryHeading = Vector2.zero;
+
+            if (body != null)
             {
-                LogDebug("Directional entry is required but no Rigidbody2D velocity could be located; trigger blocked.", controller);
-                return false;
+                Vector2 velocity = body.velocity;
+                if (velocity.sqrMagnitude >= minimumVelocitySqr)
+                {
+                    entryHeading = velocity.normalized;
+                    hasHeading = true;
+                }
             }
 
-            Vector2 velocity = body.velocity;
-            if (velocity.sqrMagnitude < MinimumDirectionalVelocity * MinimumDirectionalVelocity)
+            if (!hasHeading && controller != null && controller.TryGetMovementHeading(out Vector2 fallbackHeading))
+            {
+                if (fallbackHeading.sqrMagnitude > Mathf.Epsilon)
+                {
+                    entryHeading = fallbackHeading.normalized;
+                    hasHeading = true;
+                    headingFromFallback = true;
+                    LogDebug("Directional entry is evaluating using the companion's cached heading because Rigidbody velocity was below threshold.", controller);
+                }
+            }
+
+            if (!hasHeading)
             {
                 LogDebug("Directional entry blocked because the companion is moving too slowly to determine heading.", controller);
                 return false;
             }
 
-            Vector2 normalizedVelocity = velocity.normalized;
-            float dot = Vector2.Dot(normalizedVelocity, worldEntryDirection);
+            float dot = Vector2.Dot(entryHeading, worldEntryDirection);
             if (dot < directionalDotProductTolerance)
             {
-                LogDebug($"Directional entry blocked; velocity alignment {dot:0.000} fell below tolerance {directionalDotProductTolerance:0.000}. Required heading: {cachedWorldEntryDirection}.", controller);
+                string source = headingFromFallback ? "cached heading" : "Rigidbody velocity";
+                LogDebug($"Directional entry blocked; {source} alignment {dot:0.000} fell below tolerance {directionalDotProductTolerance:0.000}. Required heading: {cachedWorldEntryDirection}.", controller);
                 return false;
+            }
+
+            if (headingFromFallback)
+            {
+                LogDebug("Directional entry permitted after confirming cached heading satisfied the alignment tolerance.", controller);
             }
 
             return true;

@@ -86,6 +86,29 @@ namespace Pets
 
         public Transform Player => player;
 
+        /// <summary>
+        /// Provides the last meaningful movement heading used by the follower.
+        /// Prefers the current velocity direction and falls back to the cached
+        /// <see cref="lastHeading"/> captured while steering around the player.
+        /// Returns <see cref="Vector2.zero"/> when no heading information is available.
+        /// </summary>
+        public Vector2 LastKnownHeading
+        {
+            get
+            {
+                if (currentVelocity.sqrMagnitude > MovementDeadZoneSqr)
+                {
+                    Vector2 heading = new Vector2(currentVelocity.x, currentVelocity.y);
+                    return heading.sqrMagnitude > 0f ? heading.normalized : Vector2.zero;
+                }
+
+                if (lastHeading.sqrMagnitude > Mathf.Epsilon)
+                    return lastHeading.normalized;
+
+                return Vector2.zero;
+            }
+        }
+
         private void Reset()
         {
             respectNavigation = true;

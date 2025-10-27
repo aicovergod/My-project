@@ -198,6 +198,54 @@ namespace Companions
         }
 
         /// <summary>
+        /// Attempts to resolve the most recent heading used while moving the companion.
+        /// This supports systems that need a direction even when the Rigidbody velocity is near zero
+        /// due to MovePosition integration used by <see cref="PetFollower"/>.
+        /// </summary>
+        /// <param name="heading">Normalized heading describing the last meaningful movement direction.</param>
+        /// <returns><c>true</c> when heading data could be recovered.</returns>
+        public bool TryGetMovementHeading(out Vector2 heading)
+        {
+            const float headingEpsilon = 0.0001f;
+
+            body2D ??= GetComponent<Rigidbody2D>();
+            if (body2D != null)
+            {
+                Vector2 bodyVelocity = body2D.velocity;
+                if (bodyVelocity.sqrMagnitude > headingEpsilon)
+                {
+                    heading = bodyVelocity.normalized;
+                    return true;
+                }
+            }
+
+            pathMover ??= GetComponent<PetPathMover>();
+            if (pathMover != null)
+            {
+                Vector2 moverVelocity = pathMover.CurrentVelocity;
+                if (moverVelocity.sqrMagnitude > headingEpsilon)
+                {
+                    heading = moverVelocity.normalized;
+                    return true;
+                }
+            }
+
+            follower ??= GetComponent<PetFollower>();
+            if (follower != null)
+            {
+                Vector2 followerHeading = follower.LastKnownHeading;
+                if (followerHeading.sqrMagnitude > headingEpsilon)
+                {
+                    heading = followerHeading.normalized;
+                    return true;
+                }
+            }
+
+            heading = Vector2.zero;
+            return false;
+        }
+
+        /// <summary>
         /// Issues a direct attack command, respecting the pet combat controller's targeting rules.
         /// </summary>
         public void CommandAttack(CombatTarget target)
