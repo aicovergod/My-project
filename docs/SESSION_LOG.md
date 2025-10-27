@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:24965232a2b25459adc26f3dcf7ba26fc03bc1a7 -->
+## 2025-10-27T22:08:24+00:00 — Merge pull request #1482 from aicovergod/codex/fix-companion-awareness-zone-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 103 ++ / 8 --
+- Notes:
+  Fix companion awareness directional entry fallback
+---
+<!-- commit:c1bc41fb1638cefaaf21ce27dab5ca04de3001a3 -->
+## 2025-10-27T22:08:13+00:00 — Improve companion directional entry detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs, Assets/Scripts/Pets/PetFollower.cs
+- Diff: 103 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:6393fec0fbe2b92b6e87d0f18bf745511545c119 -->
 ## 2025-10-27T21:58:34+00:00 — Merge pull request #1481 from aicovergod/codex/add-logic-for-companion-dialogue-on-scene-load
 
