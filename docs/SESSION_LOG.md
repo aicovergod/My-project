@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:34c4757888e73ebd5dadd9a75cd44912b5e4dc6b -->
+## 2025-10-27T13:16:00+00:00 — Merge pull request #1468 from aicovergod/codex/fix-ore-bag-companion-messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 89 ++ / 1 --
+- Notes:
+  Adjust companion ore bag feedback
+---
+<!-- commit:411d297d241110ece2046d1f838f926c90303302 -->
+## 2025-10-27T13:15:47+00:00 — Improve companion ore bag messaging
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 89 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:ff9e77070328e1c53ed338f9b300b925354d90ba -->
 ## 2025-10-27T13:04:29+00:00 — Merge pull request #1467 from aicovergod/codex/fix-inventory-right-click-menu-position
 
