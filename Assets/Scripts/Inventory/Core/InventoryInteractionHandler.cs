@@ -476,6 +476,10 @@ namespace Inventory.Core
         private void HandlePrimaryClick(int index)
         {
             var entry = model.GetEntry(index);
+            // Prevent interacting with ore stacks that already reside inside the ore bag inventory UI.
+            if (IsOreBagOwner && entry.item != null && OreBagService.Instance.IsOre(entry.item))
+                return;
+
             if (!IsCompanionOwner && entry.item is OreBagItemData && OreBagService.Instance.TryOpenBagFromSlot(owner, index))
                 return;
 
@@ -509,13 +513,18 @@ namespace Inventory.Core
 
         private void HandleSecondaryClick(int index, InventoryWindowController.SlotClickEvent evt)
         {
+            var entry = model.GetEntry(index);
+
+            // Block right-click menus for ores housed inside the ore bag so players cannot attempt disallowed actions.
+            if (IsOreBagOwner && entry.item != null && OreBagService.Instance.IsOre(entry.item))
+                return;
+
             if (evt.ShiftHeld)
             {
                 ShowStackSplitPrompt(index, StackSplitType.Drop);
                 return;
             }
 
-            var entry = model.GetEntry(index);
             if (entry.item == null)
                 return;
 
