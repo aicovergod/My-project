@@ -63,6 +63,7 @@ namespace Pets
         private const float DefaultRangedRangeTiles = 5f;
         private const string RangedWeaponResourcePath = "Combat/Ranged/Weapons";
         private const string AmmunitionResourcePath = "Combat/Ranged/Ammunition";
+        private const string OreGolemPickaxeReminderThrottleKey = "OreGolemPickaxeReminder";
 
         private static readonly Dictionary<string, RangedWeaponData> RangedWeaponCache = new(StringComparer.OrdinalIgnoreCase);
         private static readonly Dictionary<string, AmmunitionData> AmmunitionCache = new(StringComparer.OrdinalIgnoreCase);
@@ -1182,6 +1183,13 @@ namespace Pets
 
         private void PublishOreGolemPickaxeReminder()
         {
+            if (!CompanionDialogueThrottle.TryConsume(
+                    OreGolemPickaxeReminderThrottleKey,
+                    CompanionDialogueThrottle.DefaultDelaySeconds))
+            {
+                return;
+            }
+
             var chat = ChatService.Instance;
             if (chat == null)
                 return;
