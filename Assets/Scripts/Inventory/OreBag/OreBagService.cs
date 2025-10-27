@@ -2,6 +2,7 @@
 using System;
 using BankSystem;
 using Companions;
+using Core.Save;
 using Inventory;
 using Inventory.Core;
 using UI.Chat;
@@ -25,6 +26,7 @@ namespace Inventory.OreBag
         private string hadesFragmentItemId = "HadesFragment";
 
         private OreBagInventory oreBagInventory;
+        private static bool hasBootstrapRun;
 
         /// <summary>Singleton accessor. Ensures a service instance exists before returning it.</summary>
         public static OreBagService Instance => EnsureInstance();
@@ -86,7 +88,8 @@ namespace Inventory.OreBag
 
                 oreBagInventory?.EnsureInventoryConfigured();
 
-                runtimeInventory.ClearAllSlotsWithoutPersistence();
+                if (ShouldClearInventoryDuringBootstrap(runtimeInventory))
+                    runtimeInventory.ClearAllSlotsWithoutPersistence();
 
                 runtimeInventory.enabled = true;
             }
@@ -94,6 +97,27 @@ namespace Inventory.OreBag
             {
                 oreBagInventory?.EnsureInventoryConfigured();
             }
+
+            hasBootstrapRun = true;
+        }
+
+        /// <summary>
+        /// Determines whether the ore bag inventory should be scrubbed during the
+        /// initial bootstrap sequence. We only clear slots when no account profile
+        /// has been bound yet so that saved data survives reloads and logins.
+        /// </summary>
+        private static bool ShouldClearInventoryDuringBootstrap(RuntimeInventory runtimeInventory)
+        {
+            if (hasBootstrapRun || runtimeInventory == null)
+                return false;
+
+            // When a profile has already been bound, SaveManager will restore the
+            // inventory contents immediately. Clearing at this point would wipe the
+            // recovered data, so restrict the scrub to the pre-login bootstrap.
+            if (!string.IsNullOrEmpty(SaveManager.ActiveProfileId))
+                return false;
+
+            return true;
         }
 
         /// <summary>
