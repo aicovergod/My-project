@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7daba58c12fad3f5449fe72970146bb73a503302 -->
+## 2025-10-27T21:24:02+00:00 — Add awareness zone debug logging and admin toggle
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs, Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 65 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:4c5c818b92b8565015d6addac94a64c3e6f8b59d -->
 ## 2025-10-27T21:00:01+00:00 — Merge pull request #1478 from aicovergod/codex/add-hades-fragment-drop-message
 
