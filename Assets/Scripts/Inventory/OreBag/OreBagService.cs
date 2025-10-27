@@ -105,31 +105,33 @@ namespace Inventory.OreBag
             }
 
             instance = this;
-            var runtimeInventory = GetComponent<RuntimeInventory>();
 
+            // Cache whether the service needs to add its inventory companions. When either is
+            // missing we temporarily deactivate the GameObject so Unity will not invoke
+            // RuntimeInventory.OnEnable with the default "InventoryData" key as the components
+            // are attached.
+            bool requiresComponentCreation = GetComponent<RuntimeInventory>() == null ||
+                                             GetComponent<OreBagInventory>() == null;
+            bool reactivateGameObject = false;
+
+            if (requiresComponentCreation && gameObject.activeSelf)
+            {
+                gameObject.SetActive(false);
+                reactivateGameObject = true;
+            }
+
+            var runtimeInventory = GetComponent<RuntimeInventory>();
             if (runtimeInventory != null)
                 runtimeInventory.enabled = false;
 
             base.Awake();
 
-            oreBagInventory = GetComponent<OreBagInventory>();
-            if (oreBagInventory == null)
-                oreBagInventory = gameObject.AddComponent<OreBagInventory>();
+            runtimeInventory = ConfigureInventoryComponentsWhileInactive();
 
-            runtimeInventory = oreBagInventory?.InventoryComponent ?? GetComponent<RuntimeInventory>();
+            if (reactivateGameObject)
+                gameObject.SetActive(true);
 
-            if (runtimeInventory != null)
-            {
-                runtimeInventory.enabled = false;
-
-                oreBagInventory?.EnsureInventoryConfigured();
-
-                runtimeInventory.enabled = true;
-            }
-            else
-            {
-                oreBagInventory?.EnsureInventoryConfigured();
-            }
+            runtimeInventory.enabled = true;
 
             ApplyDebugLoggingState("Awake");
 
@@ -145,21 +147,39 @@ namespace Inventory.OreBag
         /// </summary>
         private void ConfigureInventoryWhileInactive()
         {
-            if (oreBagInventory == null)
-                oreBagInventory = GetComponent<OreBagInventory>();
+            bool wasActive = gameObject.activeSelf;
+            if (wasActive)
+                gameObject.SetActive(false);
 
-            if (oreBagInventory == null)
-                oreBagInventory = gameObject.AddComponent<OreBagInventory>();
+            var runtimeInventory = ConfigureInventoryComponentsWhileInactive();
 
-            var runtimeInventory = oreBagInventory.InventoryComponent ?? GetComponent<RuntimeInventory>();
+            if (wasActive)
+                gameObject.SetActive(true);
 
-            if (runtimeInventory != null)
-                runtimeInventory.enabled = false;
+            runtimeInventory.enabled = true;
+
+            Log("Configured ore bag inventory while inactive to prevent default save key usage.");
+        }
+
+        /// <summary>
+        /// Ensures the ore bag inventory and runtime inventory components exist and are
+        /// configured while the service is inactive so Unity cannot register them with the
+        /// default save key.
+        /// </summary>
+        private RuntimeInventory ConfigureInventoryComponentsWhileInactive()
+        {
+            oreBagInventory = GetComponent<OreBagInventory>() ?? gameObject.AddComponent<OreBagInventory>();
+
+            var runtimeInventory = oreBagInventory.InventoryComponent ??
+                                    GetComponent<RuntimeInventory>() ??
+                                    gameObject.AddComponent<RuntimeInventory>();
+
+            runtimeInventory.enabled = false;
 
             oreBagInventory.EnsureInventoryConfigured();
             oreBagInventory.EnableDebugLogging = true;
 
-            Log("Configured ore bag inventory while inactive to prevent default save key usage.");
+            return runtimeInventory;
         }
 
         /// <summary>
