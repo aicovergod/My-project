@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:924f31bc0951df2ca6ed3a405e80c49f3144a25d -->
+## 2025-10-27T15:36:43+00:00 — Add Hades fragment drops for ore golems
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Combat/NpcCombatant.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs
+- Diff: 237 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:21195dd3b54aafd7542b07e73aaec69ab978c29b -->
 ## 2025-10-27T15:23:26+00:00 — Merge pull request #1475 from aicovergod/codex/add-message-for-undroppable-items
 
