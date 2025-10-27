@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:30be779c18e386425ef339672b12366b114326fd -->
+## 2025-10-27T19:58:41+00:00 — Merge pull request #1477 from aicovergod/codex/add-oregolemhadesfragmentdropper-script
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 404 ++ / 236 --
+- Notes:
+  Extract ore golem fragment drop into dedicated component
+---
+<!-- commit:07b3b3463b3585458f42f23001f9c5002618ff3c -->
+## 2025-10-27T19:58:34+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:18a04b3f4dcd63f4796dbdd745e598a526c6ffb6 -->
 ## 2025-10-27T19:58:17+00:00 — Refactor ore golem fragment drop handling
 
