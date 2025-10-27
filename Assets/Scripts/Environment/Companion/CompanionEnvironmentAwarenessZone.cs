@@ -29,6 +29,16 @@ namespace Environment.Companion
 
         private const int TriggerChanceDenominator = 20;
 
+        /// <summary>
+        /// Global toggle that controls whether this component mirrors its decision making to the console.
+        /// The Admin F2 menu wires directly into this flag so QA can inspect why a companion did or did not
+        /// react when entering an awareness zone.
+        /// </summary>
+        public static bool EnableDebugLogging { get; set; }
+
+        /// <summary>Prefix included in every debug log so the output is easy to filter in the Unity console.</summary>
+        private const string DebugLogPrefix = "[CompanionAwarenessZone]";
+
         [Header("Area Flags"), Tooltip("Mark the contextual identity of this zone so companions know how to react.")]
         [SerializeField]
         private bool areaIsBank;
@@ -61,6 +71,9 @@ namespace Environment.Companion
         /// <summary>Cached collider reference so we can confirm trigger state during <see cref="Awake"/>.</summary>
         private Collider2D cachedCollider;
 
+        /// <summary>Stores the most recent awareness area used to generate a reaction so debug logs can report it.</summary>
+        private AwarenessArea lastSelectedArea;
+
         private void Awake()
         {
             cachedCollider = GetComponent<Collider2D>();
@@ -85,28 +98,52 @@ namespace Environment.Companion
         {
             var controller = ResolveCompanionController(other);
             if (controller == null)
+            {
+                LogDebug("Ignored trigger enter because no companion controller was found on the collider hierarchy.");
                 return;
+            }
+
+            LogDebug($"Companion {controller.name} entered zone; evaluating awareness reaction.", controller);
 
             if (!HasAnyAreaFlag())
+            {
+                LogDebug("Zone has no area flags configured; skipping reaction.", controller);
                 return;
+            }
 
-            if (!RollTrigger())
+            bool shouldReact = RollTrigger();
+            if (!shouldReact)
+            {
+                LogDebug("1-in-20 awareness roll failed; companion remains silent.", controller);
                 return;
+            }
 
             float now = Time.time;
-            if (IsOnCooldown(controller, now))
+            if (IsOnCooldown(controller, now, out float remainingCooldown))
+            {
+                LogDebug($"Companion is on cooldown for another {Mathf.Max(remainingCooldown, 0f):0.00}s; reaction aborted.", controller);
                 return;
+            }
 
             string message = BuildReaction(controller);
             if (string.IsNullOrWhiteSpace(message))
+            {
+                LogDebug("No awareness message could be resolved for the current zone configuration.", controller);
                 return;
+            }
+
+            LogDebug($"Awareness roll succeeded for area {lastSelectedArea}; broadcasting: \"{message}\".", controller);
 
             var chat = ChatService.Instance;
             if (chat == null)
+            {
+                LogDebug("ChatService instance is unavailable; cannot publish awareness message.", controller);
                 return;
+            }
 
             chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), message);
             lastReactionTimes[controller] = now;
+            LogDebug("Awareness message published successfully; cooldown timer refreshed.", controller);
         }
 
         /// <summary>Resolves the <see cref="CompanionController"/> tied to the supplied collider.</summary>
@@ -131,20 +168,24 @@ namespace Environment.Companion
         }
 
         /// <summary>Determines if the supplied companion is still cooling down from a previous reaction.</summary>
-        private bool IsOnCooldown(CompanionController controller, float now)
+        private bool IsOnCooldown(CompanionController controller, float now, out float remainingCooldownSeconds)
         {
+            remainingCooldownSeconds = 0f;
             if (controller == null)
                 return true;
 
             if (!lastReactionTimes.TryGetValue(controller, out float lastTime))
                 return false;
 
-            return now - lastTime < retriggerCooldownSeconds;
+            float elapsed = now - lastTime;
+            remainingCooldownSeconds = retriggerCooldownSeconds - elapsed;
+            return remainingCooldownSeconds > 0f;
         }
 
         /// <summary>Builds the flavour message appropriate for the currently active zone flags.</summary>
         private string BuildReaction(CompanionController controller)
         {
+            lastSelectedArea = default;
             activeAreas.Clear();
             if (areaIsBank)
                 activeAreas.Add(AwarenessArea.Bank);
@@ -163,6 +204,7 @@ namespace Environment.Companion
                 return string.Empty;
 
             AwarenessArea selected = activeAreas[UnityEngine.Random.Range(0, activeAreas.Count)];
+            lastSelectedArea = selected;
             switch (selected)
             {
                 case AwarenessArea.Bank:
@@ -207,6 +249,19 @@ namespace Environment.Companion
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Emits a formatted debug log when <see cref="EnableDebugLogging"/> is active.
+        /// Provides the zone name and companion context so QA can trace behaviour in the console.
+        /// </summary>
+        private void LogDebug(string message, CompanionController controller = null)
+        {
+            if (!EnableDebugLogging)
+                return;
+
+            string companionName = controller != null ? controller.name : "None";
+            Debug.Log($"{DebugLogPrefix} Zone: {name}, Companion: {companionName} => {message}", this);
         }
     }
 }
