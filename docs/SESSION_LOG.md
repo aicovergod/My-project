@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:557e18c8d5d5a46e128930cd7e8f8f408d33f971 -->
+## 2025-10-27T08:01:55+00:00 — Merge pull request #1455 from aicovergod/codex/add-reset-account-command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 156 ++ / 0 --
+- Notes:
+  Add reset account player command
+---
+<!-- commit:51326c5a24d7696ecd09a822e729616c7c5388f4 -->
+## 2025-10-27T07:59:30+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0cb9dc9b0a91a54c29a273ccdb324923fe132f94 -->
 ## 2025-10-27T07:59:10+00:00 — Add reset account player command
 
