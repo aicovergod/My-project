@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:adb8de007e2b7742c8d47f2455912ca36734b70f -->
+## 2025-10-27T21:39:04+00:00 — Merge pull request #1480 from aicovergod/codex/extend-companionenvironmentawarenesszone-functionality
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 125 ++ / 0 --
+- Notes:
+  Add directional gating to companion awareness zones
+---
+<!-- commit:5a34777e951d3880a74ffacdddb29b6ff4178773 -->
+## 2025-10-27T21:38:48+00:00 — Add directional gating to companion awareness zones
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs
+- Diff: 125 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:3aeee37204271b17db17d3e4df42c37ce461f368 -->
 ## 2025-10-27T21:24:12+00:00 — Merge pull request #1479 from aicovergod/codex/add-debug-logs-for-companion-triggers
 
