@@ -25,7 +25,7 @@ namespace Player.Commands
         public string Description => "Deletes the active account save and returns to the login screen.";
 
         /// <inheritdoc />
-        public PlayerRank RequiredRank => PlayerRank.Player;
+        public PlayerRank RequiredRank => PlayerRank.Developer;
 
         /// <inheritdoc />
         public PlayerCommandResult Execute(PlayerCommandContext context)
