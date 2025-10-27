@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7420f7252ae55005a5272f3baaad18992cd14e99 -->
+## 2025-10-27T14:49:56+00:00 — Add close button support to companion inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionInventory.cs
+- Diff: 18 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:3df45970c56426041c180416f9c395fcbef8da53 -->
 ## 2025-10-27T14:35:22+00:00 — Merge pull request #1472 from aicovergod/codex/add-early-return-check-in-conversation-methods
 
