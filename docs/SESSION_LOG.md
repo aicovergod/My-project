@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:68c2f65ad754a47cf18c7ef222c5ca1dc3ae83dd -->
+## 2025-10-28T10:22:13+00:00 — Merge branch 'main' into codex/fix-companion-behavior-while-cooking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 283 ++ / 182 --
+- Notes:
+  —
+---
 <!-- commit:78a893076219402ac8766800f5e9bccca20368e7 -->
 ## 2025-10-28T10:21:14+00:00 — Fix companion follower enabling during cooking
 
