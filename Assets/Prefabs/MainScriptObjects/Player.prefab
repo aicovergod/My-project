@@ -419,6 +419,8 @@ MonoBehaviour:
   inventory: {fileID: 491447706204386932}
   equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
+  hadesFragmentItemId: Hades Fragment
+  hadesFragmentDropDenominator: 50
   miningOutfitDefinition: {fileID: 11400000, guid: 7fb20f9846b84a7fa9ef024a9b7b21b8, type: 2}
 --- !u!114 &4484345410366226628
 MonoBehaviour:
@@ -630,6 +632,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rangedLevel: 
+  thievingLevel: 
 --- !u!114 &6870303436262208742
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1357,8 +1360,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b13a0a8a5a6b4eb886fa6d7109139dc1, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableDebugLogging: 1
   inventory: {fileID: 491447706204386932}
   movement: {fileID: 2793536999350240794}
   hitpoints: {fileID: 6554036775103191577}
@@ -1376,8 +1380,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 84e43a472edb4bb0a45f3f7e7eb93a5d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   defaultInteractRange: 1.5
   defaultCancelDistance: 3
   interactionCooldownSeconds: 0.2

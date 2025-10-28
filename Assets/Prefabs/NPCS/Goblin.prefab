@@ -27,6 +27,9 @@ GameObject:
   - component: {fileID: 8901135699789091071}
   - component: {fileID: 1174345271934556159}
   - component: {fileID: 3370003897924781013}
+  - component: {fileID: 8209983591033409917}
+  - component: {fileID: 3016150103729284024}
+  - component: {fileID: 2620239198351941839}
   m_Layer: 10
   m_Name: Goblin
   m_TagString: NPC
@@ -389,9 +392,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shop: {fileID: 0}
-  menuPrefab: {fileID: 0}
   playerInput: {fileID: 0}
   openMenuActionReference: {fileID: 0}
+  interactionOptions: {fileID: 0}
 --- !u!114 &-7034281214918345802
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -570,6 +573,55 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8209983591033409917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 388f3e544a8e52041abbe9c2a9859d12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcInteractionOptions
+  enableExamine: 1
+  examineDescription: A little green goblin.
+  enableAttack: 1
+  enablePetAttack: 1
+  enableCompanionAttack: 1
+  enableTalk: 1
+  enableTrade: 0
+  enablePickpocket: 1
+--- !u!114 &3016150103729284024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14905cb5a6ab44c795ff41f769ea3326, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.RightClickMenu
+--- !u!114 &2620239198351941839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b7f630f1c9248638b8fbdca9615d33c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Skills.Thieving.NpcThievingTarget
+  definition: {fileID: 11400000, guid: e1316cf4608efef4d9ce4f42a8acfb3e, type: 2}
+  definitionOverride: {fileID: 0}
+  consecutiveFailures: 0
+  lockoutEndTime: 0
+  isBusy: 0
 --- !u!1 &8276902036755621917
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0a5f908c6fb44fcb889f73cf54c5ecbe, type: 3}
-  m_Name: Guard
+  m_Name: Goblin
   m_EditorClassIdentifier: 
   id: Guard
   displayName: Guard
