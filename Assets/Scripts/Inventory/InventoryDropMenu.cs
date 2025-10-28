@@ -141,47 +141,12 @@ namespace Inventory
             if (canvas == null)
                 return;
 
-            LayoutRebuilder.ForceRebuildLayoutImmediate(targetRect);
-            targetRect.GetWorldCorners(worldCorners);
-
-            float minX = float.PositiveInfinity;
-            float minY = float.PositiveInfinity;
-            float maxX = float.NegativeInfinity;
-            float maxY = float.NegativeInfinity;
-
-            for (int i = 0; i < worldCorners.Length; i++)
-            {
-                Vector2 screenCorner = RectTransformUtility.WorldToScreenPoint(MenuCanvasCamera, worldCorners[i]);
-                if (screenCorner.x < minX)
-                    minX = screenCorner.x;
-                if (screenCorner.x > maxX)
-                    maxX = screenCorner.x;
-                if (screenCorner.y < minY)
-                    minY = screenCorner.y;
-                if (screenCorner.y > maxY)
-                    maxY = screenCorner.y;
-            }
-
-            float width = maxX - minX;
-            float height = maxY - minY;
-
-            Vector2 clampedScreenPosition = pointerScreenPosition;
-            float maxAllowedX = Mathf.Max(0f, Screen.width - width);
-            clampedScreenPosition.x = Mathf.Clamp(clampedScreenPosition.x, 0f, maxAllowedX);
-            clampedScreenPosition.y = Mathf.Clamp(clampedScreenPosition.y, height, Screen.height);
-
-            if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
-            {
-                targetRect.position = new Vector3(clampedScreenPosition.x, clampedScreenPosition.y, targetRect.position.z);
-            }
-            else if (RectTransformUtility.ScreenPointToWorldPointInRectangle(targetRect, clampedScreenPosition, MenuCanvasCamera, out Vector3 worldPosition))
-            {
-                targetRect.position = worldPosition;
-            }
-            else
-            {
-                targetRect.position = new Vector3(clampedScreenPosition.x, clampedScreenPosition.y, targetRect.position.z);
-            }
+            ContextMenuPositioner.PositionMenu(
+                targetRect,
+                canvas,
+                MenuCanvasCamera,
+                () => pointerScreenPosition,
+                worldCorners);
         }
     }
 }
