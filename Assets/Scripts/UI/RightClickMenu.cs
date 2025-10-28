@@ -41,7 +41,13 @@ namespace UI
             if (parent == null)
                 return null;
 
-            var menuRoot = new GameObject("RightClickMenu", typeof(RectTransform));
+            var menuRoot = new GameObject(
+                "RightClickMenu",
+                typeof(RectTransform),
+                typeof(CanvasGroup),
+                typeof(Image),
+                typeof(VerticalLayoutGroup),
+                typeof(ContentSizeFitter));
             menuRoot.transform.SetParent(parent, false);
             return menuRoot.AddComponent<RightClickMenu>();
         }
