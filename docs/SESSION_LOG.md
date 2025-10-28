@@ -1,30 +1,12 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:0e85238ef30d26a7f0557b90a607bf48fd4272c3 -->
-## 2025-10-28T09:32:08+00:00 — Merge pull request #1483 from aicovergod/codex/remove-and-replace-right-click-menu
+<!-- commit:78a893076219402ac8766800f5e9bccca20368e7 -->
+## 2025-10-28T10:21:14+00:00 — Fix companion follower enabling during cooking
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 292 ++ / 182 --
-- Notes:
-  Refactor NPC right-click menu to dynamic options
----
-<!-- commit:b998fb589326db494abe7300c1d8b2187131c74c -->
-## 2025-10-28T09:24:54+00:00 — Update SESSION_LOG [ci]
-
-- Author: session-log-bot <actions@github.com>
-- Changed files (1): docs/SESSION_LOG.md
-- Diff: 9 ++ / 0 --
-- Notes:
-  —
----
-<!-- commit:ca3fb9a4b7a49b547d603a2f34dc2304331d86c1 -->
-## 2025-10-28T09:24:41+00:00 — Refactor NPC right-click menu to use dynamic options
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (3): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/NPC/Interaction/NpcInteractionOptions.cs, Assets/Scripts/UI/RightClickMenu.cs
-- Diff: 283 ++ / 182 --
+- Changed files (1): Assets/Scripts/Companions/Cooking/CompanionCookingController.cs
+- Diff: 3 ++ / 2 --
 - Notes:
   —
 ---
