@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d5be6edd4ed2dff7f2575abbe706635ad629e084 -->
+## 2025-10-28T11:11:46+00:00 — Merge pull request #1485 from aicovergod/codex/implement-thieving-skill-with-pickpocketing-and-theft
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2702 ++ / 2 --
+- Notes:
+  Add thieving skill with pickpocketing and stall theft
+---
+<!-- commit:9429edce19bf1071f6ed2463bf3d2e19cb044ada -->
+## 2025-10-28T11:11:38+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:76312d4a63d9a1858bd6efde76edbe75bac6b992 -->
 ## 2025-10-28T11:11:22+00:00 — Allow edit mode tests to access thieving internals
 
