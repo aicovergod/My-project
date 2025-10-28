@@ -479,15 +479,18 @@ namespace NPC
             if (!TryResolveCombatTarget(out _))
                 return false;
 
+            bool allowPetAttack = interactionOptions == null || interactionOptions.IsPetAttackEnabled;
+            bool allowCompanionAttack = interactionOptions == null || interactionOptions.IsCompanionAttackEnabled;
+
             var petCombat = PetDropSystem.ActivePetCombat;
-            if (petCombat != null && petCombat.isActiveAndEnabled && petCombat.CanFight && !PetDropSystem.GuardModeEnabled)
+            if (allowPetAttack && petCombat != null && petCombat.isActiveAndEnabled && petCombat.CanFight && !PetDropSystem.GuardModeEnabled)
             {
                 type = NpcFollowerAttackType.Pet;
                 label = "Pet Attack";
                 return true;
             }
 
-            if (CompanionManager.HasActiveCompanion && !CompanionManager.GuardModeEnabled && !CompanionManager.IsGuardModeLockedByCombatCooldown)
+            if (allowCompanionAttack && CompanionManager.HasActiveCompanion && !CompanionManager.GuardModeEnabled && !CompanionManager.IsGuardModeLockedByCombatCooldown)
             {
                 var companion = CompanionManager.ActiveCompanion;
                 if (companion != null && companion.isActiveAndEnabled && companion.CanFight)
@@ -509,6 +512,15 @@ namespace NPC
         {
             if (!TryResolveCombatTarget(out var target) || target == null)
                 return;
+
+            if (interactionOptions != null)
+            {
+                if (type == NpcFollowerAttackType.Pet && !interactionOptions.IsPetAttackEnabled)
+                    return;
+
+                if (type == NpcFollowerAttackType.Companion && !interactionOptions.IsCompanionAttackEnabled)
+                    return;
+            }
 
             switch (type)
             {
@@ -534,6 +546,9 @@ namespace NPC
 
         public void AttackWithPet()
         {
+            if (interactionOptions != null && !interactionOptions.IsPetAttackEnabled)
+                return;
+
             ExecuteFollowerAttack(NpcFollowerAttackType.Pet);
         }
 

@@ -93,6 +93,9 @@ namespace NPC.Editor
     [CustomEditor(typeof(NpcInteractionOptions))]
     internal sealed class NpcInteractionOptionsEditor : UnityEditor.Editor
     {
+        private SerializedProperty attackProperty;
+        private SerializedProperty petAttackProperty;
+        private SerializedProperty companionAttackProperty;
         private SerializedProperty talkProperty;
         private SerializedProperty tradeProperty;
         private SerializedProperty pickpocketProperty;
@@ -101,6 +104,9 @@ namespace NPC.Editor
 
         private void OnEnable()
         {
+            attackProperty = serializedObject.FindProperty("enableAttack");
+            petAttackProperty = serializedObject.FindProperty("enablePetAttack");
+            companionAttackProperty = serializedObject.FindProperty("enableCompanionAttack");
             talkProperty = serializedObject.FindProperty("enableTalk");
             tradeProperty = serializedObject.FindProperty("enableTrade");
             pickpocketProperty = serializedObject.FindProperty("enablePickpocket");
@@ -113,6 +119,15 @@ namespace NPC.Editor
             serializedObject.Update();
 
             EditorGUILayout.LabelField("Right-Click Menu Options", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(attackProperty);
+
+            EditorGUI.indentLevel++;
+            EditorGUI.BeginDisabledGroup(!attackProperty.boolValue);
+            EditorGUILayout.PropertyField(petAttackProperty);
+            EditorGUILayout.PropertyField(companionAttackProperty);
+            EditorGUI.EndDisabledGroup();
+            EditorGUI.indentLevel--;
+
             EditorGUILayout.PropertyField(talkProperty);
             EditorGUILayout.PropertyField(tradeProperty);
             EditorGUILayout.PropertyField(pickpocketProperty);
