@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f774da04b51bfe589a751090e184628d673c96d3 -->
+## 2025-10-28T16:06:37+00:00 — Add farming pickable resource node
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Farming/PickableResourceNode.cs
+- Diff: 360 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0377320a7310487c10432760c62fa5f3829a6a89 -->
 ## 2025-10-28T14:23:47+00:00 — Merge pull request #1497 from aicovergod/codex/add-attack-options-to-npcinteractionoptions-script
 
