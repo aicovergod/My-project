@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c686305c0c2b6c79386d580cdf5a6f577a2748d5 -->
+## 2025-10-28T13:36:53+00:00 — Fix right-click menu positioning
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/RightClickMenu.cs
+- Diff: 13 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:d66bd0fb7300eba8c45c324c47bc2d6e1c8ffaa2 -->
 ## 2025-10-28T13:29:17+00:00 — Merge pull request #1493 from aicovergod/codex/add-player-movement-towards-npc-on-trade
 
