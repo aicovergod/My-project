@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f79707b301a98035f58cc34922f8c4a24e710351 -->
+## 2025-10-28T20:35:42+00:00 — Merge pull request #1501 from aicovergod/codex/add-thievingnpcdefinition-simulator-window
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 421 ++ / 0 --
+- Notes:
+  Add thieving NPC pickpocket simulator window
+---
+<!-- commit:d987262710132c417f287d8e58498740ad334302 -->
+## 2025-10-28T20:35:14+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0521995aec02ed30ce306875e78614ec5a81ab47 -->
 ## 2025-10-28T20:35:00+00:00 — Add thieving NPC pickpocket simulator window
 
