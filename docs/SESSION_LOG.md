@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2d857223430377de5da1e525e97deafcac1183e8 -->
+## 2025-10-28T13:08:41+00:00 — Ensure RightClickMenu factory prebuilds UI components
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/RightClickMenu.cs
+- Diff: 7 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:446db1f24d149b598377a9c4528b74ed74cca4e6 -->
 ## 2025-10-28T12:58:34+00:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
 
