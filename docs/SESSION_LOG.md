@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e564e0a53f81ad84dca377ee6156b6ead55e9ca3 -->
+## 2025-10-28T16:44:41+00:00 — Tighten thieving action detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Thieving/Core/ThievingController.cs
+- Diff: 2 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:e64884bccc79cd4035ddd1f96064d5ce7f4ca9ab -->
 ## 2025-10-28T16:08:35+00:00 — Merge pull request #1498 from aicovergod/codex/create-pickableresourcenode-script-for-unity
 
