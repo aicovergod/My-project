@@ -24,14 +24,13 @@ GameObject:
   - component: {fileID: 4856330758820000550}
   - component: {fileID: 6410839004971985729}
   - component: {fileID: 3665449629679586575}
-  - component: {fileID: 330093352596913383}
   - component: {fileID: 8901135699789091071}
   - component: {fileID: 1174345271934556159}
   - component: {fileID: 3099355452794840895}
   - component: {fileID: -3744258465739700549}
   - component: {fileID: 4659069299622069912}
   m_Layer: 10
-  m_Name: COPPER_ORE_GOLEM
+  m_Name: Copper Ore Golem
   m_TagString: NPC
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -184,6 +183,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &5466147605252358142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 943236ba5ba2478c969c9675931910a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactionCollider: {fileID: 1225287366087380678}
 --- !u!114 &4462744165104283374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -199,23 +211,10 @@ MonoBehaviour:
   profile: {fileID: 11400000, guid: 59de4073d9caf3a45a7cab05187d6de7, type: 2}
   logDamage: 0
   hitSplatLibrary: {fileID: 11400000, guid: 3bdb17896f374e8bb098d628ca4ba2f4, type: 2}
-  knockbackReceiver: {fileID: 330093352596913383}
+  knockbackReceiver: {fileID: 0}
   hitsplatFallbackOffset: 1
   pendingRespawnDelaySeconds: 0
   respawnSuppressed: 1
---- !u!114 &5466147605252358142
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8077571585701284791}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 943236ba5ba2478c969c9675931910a8, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  interactionCollider: {fileID: 1225287366087380678}
 --- !u!114 &7573619506058784387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -226,76 +225,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 61bb65ffa90bdaa4f9a868dc200e9550, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   dropTable: {fileID: 0}
   luckMultiplier: 1
+  enableSpawnSpread: 0
   spawnSpreadRadius: 0.35
   spawnAtFeet: 1
   spawner: {fileID: 2834110941215306221, guid: f461b75dda0f24e41b585a40ec57efb4, type: 3}
---- !u!114 &4659069299622069912
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8077571585701284791}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 39505baff44a43a28d9e9cdf09b9040e, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  oreGolemNameKeyword: Ore Golem
-  fragmentItemId: Hades Fragment
-  dropDenominator: 40
-  companionPlayerDropLines:
-  - "Damn, lucky sod."
-  - "I must be your good luck charm."
-  - "Congrats on the Hades Fragment."
-  - "I heard those fragments, can upgrade your Ore Bag."
-  - "I wonder where the Ore Golem, was hiding that fragment <emoji=02>,"
-  - "Whoa, no way you actually got one!"
-  - "Alright, share some of that luck, yeah?"
-  - "Wait, you just got a Hades Fragment? Seriously?"
-  - "How the hell did *you* pull that?"
-  - "Yo, that’s actually rare as hell."
-  - "Nice drop, guess the Ore Golem liked you."
-  - "See? Told you this spot was worth it."
-  - "Don’t mind me, just over here getting nothing."
-  - "That’s huge, {playerName}. You lucky git."
-  - "Hold up… was that a Hades Fragment? gz!!!"
-  - "That’ll fetch a nice price."
-  - "Okay, that’s actually sick, fair play."
-  - "Guess killing Ore Golem's is finally paying off, huh?"
-  - "Hope you’re not planning to flex that all day."
-  - "Alright, now I’m officially jealous."
-  - "That’s a solid pull, I’ll give you that."
-  companionSelfDropLines:
-  - "Must be my lucky day."
-  - "I can keep this, right? <emoji=24>"
-  - "Now, that's lucky."
-  - "Wonder where that golem was hiding that, lol."
-  - "guess the golem liked me more than you."
-  - "hey, look what just dropped for me!"
-  - "no way, i actually got one!"
-  - "finally, some good loot for a change."
-  - "that’s going straight in my bag."
-  - "looks like the gods are smiling on me today."
-  - "well, would you look at that."
-  - "haha, jackpot."
-  - "yep, i’ll be bragging about this one later."
-  - "hope you’re not too jealous, {playerName}."
-  - "i swear i wasn’t even trying for it."
-  - "that’s one for the collection."
-  - "gotta love when luck actually shows up."
-  - "oh nice, that’s rare, right?"
-  - "didn’t expect that drop at all."
-  - "guess it’s my turn to be the lucky one."
-  - "this’ll upgrade my gear nicely."
-  - "you saw that, right? i wasn’t imagining it."
-  - "finally, the grind pays off."
-  - "maybe i should buy a lottery ticket next."
-  - "oh damn, that shimmer’s pretty."
 --- !u!114 &2394211271730700276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -507,49 +444,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ade83d186a2426484d785699fb0c95b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcFacing
---- !u!114 &330093352596913383
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8077571585701284791}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a6a9b1d4474b0f41b7f62e6a86fba13, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enableKnockback: 1
-  baseDistance: 0.5
-  knockbackDuration: 0.3
-  scaleWithDamage: 1
-  distancePerDamagePoint: 0.02
-  maxScaledDistance: 1.8
-  clampToMovementBounds: 1
-  knockbackCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &8901135699789091071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -675,6 +569,69 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4659069299622069912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39505baff44a43a28d9e9cdf09b9040e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  oreGolemNameKeyword: Ore Golem
+  fragmentItemId: Hades Fragment
+  dropDenominator: 40
+  companionPlayerDropLines:
+  - Damn, lucky sod.
+  - I must be your good luck charm.
+  - Congrats on the Hades Fragment.
+  - I heard those fragments, can upgrade your Ore Bag.
+  - I wonder where the Ore Golem, was hiding that fragment <emoji=02>,
+  - Whoa, no way you actually got one!
+  - Alright, share some of that luck, yeah?
+  - Wait, you just got a Hades Fragment? Seriously?
+  - How the hell did *you* pull that?
+  - "Yo, that\u2019s actually rare as hell."
+  - Nice drop, guess the Ore Golem liked you.
+  - See? Told you this spot was worth it.
+  - "Don\u2019t mind me, just over here getting nothing."
+  - "That\u2019s huge, {playerName}. You lucky git."
+  - "Hold up\u2026 was that a Hades Fragment? gz!!!"
+  - "That\u2019ll fetch a nice price."
+  - "Okay, that\u2019s actually sick, fair play."
+  - Guess killing Ore Golem's is finally paying off, huh?
+  - "Hope you\u2019re not planning to flex that all day."
+  - "Alright, now I\u2019m officially jealous."
+  - "That\u2019s a solid pull, I\u2019ll give you that."
+  companionSelfDropLines:
+  - Must be my lucky day.
+  - I can keep this, right? <emoji=24>
+  - Now, that's lucky.
+  - Wonder where that golem was hiding that, lol.
+  - guess the golem liked me more than you.
+  - hey, look what just dropped for me!
+  - no way, i actually got one!
+  - finally, some good loot for a change.
+  - "that\u2019s going straight in my bag."
+  - looks like the gods are smiling on me today.
+  - well, would you look at that.
+  - haha, jackpot.
+  - "yep, i\u2019ll be bragging about this one later."
+  - "hope you\u2019re not too jealous, {playerName}."
+  - "i swear i wasn\u2019t even trying for it."
+  - "that\u2019s one for the collection."
+  - gotta love when luck actually shows up.
+  - "oh nice, that\u2019s rare, right?"
+  - "didn\u2019t expect that drop at all."
+  - "guess it\u2019s my turn to be the lucky one."
+  - "this\u2019ll upgrade my gear nicely."
+  - "you saw that, right? i wasn\u2019t imagining it."
+  - finally, the grind pays off.
+  - maybe i should buy a lottery ticket next.
+  - "oh damn, that shimmer\u2019s pretty."
 --- !u!1 &8276902036755621917
 GameObject:
   m_ObjectHideFlags: 0

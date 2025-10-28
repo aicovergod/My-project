@@ -1007,6 +1007,7 @@ GameObject:
   - component: {fileID: 338972038}
   - component: {fileID: 338972037}
   - component: {fileID: 338972036}
+  - component: {fileID: 338972040}
   m_Layer: 7
   m_Name: VioletsTownMinerBuildingExit
   m_TagString: Untagged
@@ -1157,6 +1158,20 @@ Transform:
   - {fileID: 183339049}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &338972040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338972035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1decf64eae2fc544eb6e534655aefdfc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::World.SceneInteractableObject
+  isBank: 0
+  isMiningShop: 1
 --- !u!1001 &518063638
 PrefabInstance:
   m_ObjectHideFlags: 0

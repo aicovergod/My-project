@@ -15,6 +15,7 @@ MonoBehaviour:
   AttackLevel: 1
   StrengthLevel: 1
   DefenceLevel: 1
+  RangedLevel: 1
   MagicLevel: 1
   HitpointsLevel: 5
   MeleeDefence: 1
@@ -24,7 +25,7 @@ MonoBehaviour:
   RespawnSeconds: 15
   AttackType: 0
   Style: 0
-  IsAggressive: 1
+  IsAggressive: 0
   AggroTimeoutSeconds: 5
   RangedAttackRange: 6
   MagicAttackRange: 7

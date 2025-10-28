@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Inventory.OreBag.OreBagItemData
   id: Ore Bag (T3)
   itemName: Ore Bag (T3)
-  icon: {fileID: 21300000, guid: 473b6e865b228bc46a576c371ef4e267, type: 3}
+  icon: {fileID: 21300000, guid: 6dd7b7b6bf4acd64285ee2fba00786b9, type: 3}
   stackSpriteOverrides: []
   description: A bag that stores 75 of any ore
   equipmentTooltipLines: []
