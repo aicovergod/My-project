@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:82749d09c677f46921c299e2f18aaa2a24663164 -->
+## 2025-10-28T13:43:40+00:00 — Clarify trade context menu shop delegation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/UI/RightClickMenu.cs
+- Diff: 13 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:501d4b8d98fb048b9a4fc32cec9322123a5515e0 -->
 ## 2025-10-28T13:37:08+00:00 — Merge pull request #1494 from aicovergod/codex/update-rightclickmenu-show-method
 
