@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0521995aec02ed30ce306875e78614ec5a81ab47 -->
+## 2025-10-28T20:35:00+00:00 — Add thieving NPC pickpocket simulator window
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Thieving/Editor/ThievingNpcDefinitionSimulatorWindow.cs
+- Diff: 412 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:cd0261f25fe28c6e1187fa99bbefb814a4097445 -->
 ## 2025-10-28T17:07:47+00:00 — Merge pull request #1500 from aicovergod/codex/update-thieving-loot-system-for-drop-chances
 
