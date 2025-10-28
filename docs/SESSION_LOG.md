@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e64884bccc79cd4035ddd1f96064d5ce7f4ca9ab -->
+## 2025-10-28T16:08:35+00:00 — Merge pull request #1498 from aicovergod/codex/create-pickableresourcenode-script-for-unity
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 369 ++ / 0 --
+- Notes:
+  Add pickable farming resource node behaviour
+---
+<!-- commit:2f96f9462efbf53231d31e1895883e4b4f5d90a4 -->
+## 2025-10-28T16:06:56+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f774da04b51bfe589a751090e184628d673c96d3 -->
 ## 2025-10-28T16:06:37+00:00 — Add farming pickable resource node
 
