@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a5f908c6fb44fcb889f73cf54c5ecbe, type: 3}
+  m_Name: ManWoman
+  m_EditorClassIdentifier:
+  id: ManWoman
+  displayName: Man/Woman
+  requiredLevel: 1
+  baseXp: 8
+  lowSuccessThreshold: 180
+  highSuccessThreshold: 240
+  post99ThresholdGain: 0
+  coinRange: {x: 3, y: 3}
+  lootTable: []
+  baseLootRolls: 1
+  rogueOutfitBonusRolls: 0
+  damageOnFail: 1
+  stunTicks: 4
+  cooldownTicks: 12
+  failuresBeforeCooldown: 3
+  petRollDenominator: 0
+  interactionTicks: 2

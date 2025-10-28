@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b826bc130d7402ca784186236416e27, type: 3}
+  m_Name: BakersStall
+  m_EditorClassIdentifier:
+  id: BakersStall
+  displayName: Baker's stall
+  requiredLevel: 5
+  baseXp: 16
+  coinRange: {x: 0, y: 0}
+  lootTable:
+  - itemId: Bread
+    quantityRange: {x: 1, y: 1}
+    weight: 50
+    guaranteed: 0
+    notedQuantity: 0
+  - itemId: Cake
+    quantityRange: {x: 1, y: 1}
+    weight: 30
+    guaranteed: 0
+    notedQuantity: 0
+  - itemId: Chocolate Slice
+    quantityRange: {x: 1, y: 1}
+    weight: 20
+    guaranteed: 0
+    notedQuantity: 0
+  baseLootRolls: 1
+  rogueOutfitBonusRolls: 1
+  petRollDenominator: 0
+  interactionTicks: 3
+  depletionTicks: 3
+  respawnTicks: 4

@@ -31,6 +31,7 @@ namespace Skills
             SkillType.Magic,
             SkillType.Beastmaster,
             SkillType.Fishing,
+            SkillType.Thieving,
             SkillType.Cooking,
             SkillType.Firemaking,
             SkillType.Woodcutting,

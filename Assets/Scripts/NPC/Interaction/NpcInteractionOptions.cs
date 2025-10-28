@@ -45,6 +45,21 @@ namespace NPC
             if (enableExamine)
                 yield return NpcInteractionAction.Examine;
         }
+
+        /// <summary>
+        ///     Gets whether the pickpocket option is currently enabled for the NPC.
+        ///     Runtime systems toggle this during lockouts while designers still control the default state via the inspector.
+        /// </summary>
+        public bool IsPickpocketEnabled => enablePickpocket;
+
+        /// <summary>
+        ///     Updates the pickpocket availability at runtime so skills can temporarily disable the option during cooldowns.
+        /// </summary>
+        /// <param name="enabled">True when pickpocketing should be exposed in the context menu.</param>
+        public void SetPickpocketEnabled(bool enabled)
+        {
+            enablePickpocket = enabled;
+        }
     }
 
     /// <summary>

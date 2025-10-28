@@ -89,6 +89,8 @@ GameObject:
   - component: {fileID: 5214551407693897022}
   - component: {fileID: 2069911887794511935}
   - component: {fileID: 1564341770880048146}
+  - component: {fileID: 6045123456789012345}
+  - component: {fileID: 6045123456789012346}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -1345,3 +1347,47 @@ MonoBehaviour:
   submitChatAction: {fileID: 0}
   cancelChatAction: {fileID: 0}
   chatHud: {fileID: 0}
+--- !u!114 &6045123456789012345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b13a0a8a5a6b4eb886fa6d7109139dc1, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  inventory: {fileID: 491447706204386932}
+  movement: {fileID: 2793536999350240794}
+  hitpoints: {fileID: 6554036775103191577}
+  skillManager: {fileID: 5028650979715864874}
+  floatingTextAnchor: {fileID: 487381587706843324}
+  database: {fileID: 11400000, guid: c8a52b09d0ec4c94a5b63b612a395bc7, type: 2}
+  rogueOutfitDefinition: {fileID: 0}
+--- !u!114 &6045123456789012346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84e43a472edb4bb0a45f3f7e7eb93a5d, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  defaultInteractRange: 1.5
+  defaultCancelDistance: 3
+  interactionCooldownSeconds: 0.2
+  prospectCooldownSeconds: 3
+  autoMoveIntoRange: 1
+  autoMoveStopBuffer: 0.1
+  playerInput: {fileID: 7000745351061079601}
+  interactActionReference: {fileID: 0}
+  prospectActionReference: {fileID: 0}
+  cancelActionReference: {fileID: 0}
+  skill: {fileID: 6045123456789012345}
+  explicitMovementController: {fileID: 2793536999350240794}
+  worldCamera: {fileID: 0}
