@@ -429,7 +429,15 @@ namespace NPC
 
         public void OpenShop()
         {
-            if (shop == null) return;
+            if (TryGetComponent(out NpcShopOpener shopOpener) && shopOpener != null)
+            {
+                shopOpener.OpenShop();
+                return;
+            }
+
+            if (shop == null)
+                return;
+
             var ui = ShopUI.Instance;
             if (ui != null)
             {

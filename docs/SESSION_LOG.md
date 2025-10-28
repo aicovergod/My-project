@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:613b9b5c1aa0e7d97da6e8a42d791dab116c2140 -->
+## 2025-10-28T13:28:56+00:00 — Auto-walk player into trade range before opening shops
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/NPC/Interaction/NpcShopOpener.cs
+- Diff: 169 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:b7abf2fd13f70770c76e3bd75ff4483eab59aec0 -->
 ## 2025-10-28T13:19:54+00:00 — Merge pull request #1492 from aicovergod/codex/add-examine-field-to-npc-interaction
 

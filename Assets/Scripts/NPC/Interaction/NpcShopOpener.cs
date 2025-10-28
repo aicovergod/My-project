@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -7,6 +8,7 @@ using ShopSystem;
 using Combat;
 using Pets;
 using Core.Input;
+using Player;
 
 namespace NPC
 {
@@ -22,6 +24,15 @@ namespace NPC
         [Tooltip("If true, open the shop immediately when right-clicked.")]
         public bool openDirectly;
 
+        [Header("Trade Range")]
+        [SerializeField, Min(0f)]
+        [Tooltip("Maximum distance in tiles the player can be from this NPC before the shop opens.")]
+        private float tradeRangeTiles = 1.5f;
+
+        [SerializeField, Min(0f)]
+        [Tooltip("Tiles subtracted from the range so auto-walk stops slightly inside the radius.")]
+        private float approachStopBufferTiles = 0.1f;
+
         [Header("Input")]
         [SerializeField]
         [Tooltip("Player input component providing the interaction map. Auto-resolved when empty.")]
@@ -35,6 +46,15 @@ namespace NPC
         private InputAction openMenuAction;
         private bool openMenuActionOwned;
         private bool pointerHovering;
+
+        // Tracks the coroutine responsible for guiding the player into the trade radius.
+        private Coroutine tradeApproachRoutine;
+
+        // Stores the mover involved with the current trade approach so it can be cancelled cleanly.
+        private PlayerMover approachingMover;
+
+        // Project tiles map 1:1 to world units (64x64 pixel sprites per tile).
+        private const float TileSize = 1f;
 
         private void Awake()
         {
@@ -57,6 +77,7 @@ namespace NPC
             pointerHovering = false;
             SceneManager.sceneLoaded -= HandleSceneLoaded;
             UnsubscribeFromInput();
+            CancelTradeApproach();
         }
 
         /// <summary>
@@ -130,12 +151,39 @@ namespace NPC
             OpenShop();
         }
 
+        /// <summary>
+        ///     Opens the shop, optionally guiding the player into the configured trade radius first.
+        /// </summary>
         public void OpenShop()
         {
-            if (shop == null) return;
-            var ui = ShopUI.Instance;
-            if (ui != null)
-                ui.Open(shop, GetComponent<NpcWanderer>());
+            if (shop == null)
+                return;
+
+            CancelTradeApproach();
+
+            if (!TryResolvePlayerMover(out var mover, out var playerTransform))
+            {
+                OpenShopInternal();
+                return;
+            }
+
+            float requiredDistance = ResolveTradeRangeWorld();
+            if (requiredDistance <= 0f)
+            {
+                OpenShopInternal();
+                return;
+            }
+
+            Vector2 npcPosition = transform.position;
+            Vector2 playerPosition = playerTransform.position;
+            if (Vector2.SqrMagnitude(playerPosition - npcPosition) <= requiredDistance * requiredDistance)
+            {
+                OpenShopInternal();
+                return;
+            }
+
+            approachingMover = mover;
+            tradeApproachRoutine = StartCoroutine(ApproachAndOpenShopRoutine(mover, playerTransform, requiredDistance));
         }
 
         /// <summary>
@@ -208,7 +256,9 @@ namespace NPC
                 sharedPointerEventSystem = eventSystem;
             }
             else
+            {
                 sharedPointerEventData.Reset();
+            }
 
             sharedPointerEventData.position = screenPosition;
             eventSystem.RaycastAll(sharedPointerEventData, hits);
@@ -221,6 +271,112 @@ namespace NPC
             }
 
             return hits.Count > 0;
+        }
+
+        /// <summary>
+        ///     Attempts to resolve the player mover so the NPC can guide the character into trade range.
+        /// </summary>
+        private static bool TryResolvePlayerMover(out PlayerMover mover, out Transform playerTransform)
+        {
+            mover = null;
+            playerTransform = null;
+
+            if (!PlayerLocator.TryFindPlayer(out var playerObject) || playerObject == null)
+                return false;
+
+            if (!playerObject.TryGetComponent(out mover) || mover == null)
+                return false;
+
+            playerTransform = mover.transform;
+            return playerTransform != null;
+        }
+
+        /// <summary>
+        ///     Converts the configured trade radius from tiles into world units.
+        /// </summary>
+        private float ResolveTradeRangeWorld()
+        {
+            return Mathf.Max(0f, tradeRangeTiles * TileSize);
+        }
+
+        /// <summary>
+        ///     Calculates the stop distance used by the auto-walk routine so the player ends inside the trade radius.
+        /// </summary>
+        private float ResolveApproachStopDistance(float requiredDistance)
+        {
+            float bufferWorld = Mathf.Max(0f, approachStopBufferTiles * TileSize);
+            return Mathf.Max(0f, requiredDistance - bufferWorld);
+        }
+
+        /// <summary>
+        ///     Guides the player into the trade radius and opens the shop once close enough.
+        /// </summary>
+        private IEnumerator ApproachAndOpenShopRoutine(PlayerMover mover, Transform playerTransform, float requiredDistance)
+        {
+            if (mover == null || playerTransform == null)
+            {
+                tradeApproachRoutine = null;
+                approachingMover = null;
+                yield break;
+            }
+
+            float stopDistance = ResolveApproachStopDistance(requiredDistance);
+            mover.MoveTo(transform, stopDistance);
+
+            float requiredDistanceSqr = requiredDistance * requiredDistance;
+            while (mover != null && playerTransform != null)
+            {
+                Vector2 npcPosition = transform.position;
+                Vector2 playerPosition = playerTransform.position;
+                if (Vector2.SqrMagnitude(playerPosition - npcPosition) <= requiredDistanceSqr)
+                    break;
+
+                yield return null;
+            }
+
+            if (mover == null || playerTransform == null)
+            {
+                tradeApproachRoutine = null;
+                approachingMover = null;
+                yield break;
+            }
+
+            tradeApproachRoutine = null;
+            approachingMover = null;
+
+            OpenShopInternal();
+        }
+
+        /// <summary>
+        ///     Stops any active trade approach and clears the mover reference when appropriate.
+        /// </summary>
+        private void CancelTradeApproach()
+        {
+            if (tradeApproachRoutine != null)
+            {
+                StopCoroutine(tradeApproachRoutine);
+                tradeApproachRoutine = null;
+            }
+
+            if (approachingMover != null && approachingMover.IsAutoMoving)
+                approachingMover.StopMovement();
+
+            approachingMover = null;
+        }
+
+        /// <summary>
+        ///     Opens the shop UI immediately without validating the player's distance.
+        /// </summary>
+        private void OpenShopInternal()
+        {
+            if (shop == null)
+                return;
+
+            var ui = ShopUI.Instance;
+            if (ui == null)
+                return;
+
+            ui.Open(shop, GetComponent<NpcWanderer>());
         }
     }
 }
