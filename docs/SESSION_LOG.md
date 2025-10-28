@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:bab4c58a12a2ee6371478f0986cb8317170798f6 -->
+## 2025-10-28T12:46:57+00:00 — Simplify thieving tests to standard NUnit
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Tests/EditMode/Skills/Thieving/ThievingSuccessCalculatorTests.cs
+- Diff: 5 ++ / 9 --
+- Notes:
+  —
+---
 <!-- commit:35f9fa1c898a302c14a77e5e2df59797076329b9 -->
 ## 2025-10-28T12:38:18+00:00 — Merge pull request #1488 from aicovergod/codex/fix-merge-conflict-errors-in-companionenvironmentawarenesszo
 
