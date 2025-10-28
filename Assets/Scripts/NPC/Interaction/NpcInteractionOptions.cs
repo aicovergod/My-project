@@ -13,6 +13,10 @@ namespace NPC
     {
         [Header("Right-Click Menu Options")]
         [SerializeField]
+        [Tooltip("When enabled the Attack option will appear in the right-click menu when combat components are present.")]
+        private bool enableAttack = false;
+
+        [SerializeField]
         [Tooltip("When enabled the Talk-to option will appear in the right-click menu.")]
         private bool enableTalk = true;
 
@@ -29,6 +33,9 @@ namespace NPC
         /// </summary>
         public IEnumerable<NpcInteractionAction> GetEnabledActions()
         {
+            if (IsAttackEnabled)
+                yield return NpcInteractionAction.Attack;
+
             if (enableTalk)
                 yield return NpcInteractionAction.Talk;
 
@@ -49,12 +56,26 @@ namespace NPC
         public bool IsPickpocketEnabled => enablePickpocket;
 
         /// <summary>
+        ///     Gets whether the attack option is exposed for the NPC in the right-click menu.
+        /// </summary>
+        public bool IsAttackEnabled => enableAttack;
+
+        /// <summary>
         ///     Updates the pickpocket availability at runtime so skills can temporarily disable the option during cooldowns.
         /// </summary>
         /// <param name="enabled">True when pickpocketing should be exposed in the context menu.</param>
         public void SetPickpocketEnabled(bool enabled)
         {
             enablePickpocket = enabled;
+        }
+
+        /// <summary>
+        ///     Updates the attack availability at runtime, allowing quests or scripted encounters to temporarily suppress combat.
+        /// </summary>
+        /// <param name="enabled">True when the attack entry should appear in the right-click menu.</param>
+        public void SetAttackEnabled(bool enabled)
+        {
+            enableAttack = enabled;
         }
     }
 
@@ -63,6 +84,7 @@ namespace NPC
     /// </summary>
     public enum NpcInteractionAction
     {
+        Attack,
         Talk,
         Trade,
         Pickpocket,

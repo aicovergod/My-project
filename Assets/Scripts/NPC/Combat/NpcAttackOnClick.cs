@@ -30,37 +30,37 @@ namespace NPC
         private void OnDisable()
         {
             // Ensure pending routines do not leak when this component is disabled or destroyed.
-            if (heldAttackRoutine != null)
-            {
-                StopCoroutine(heldAttackRoutine);
-                heldAttackRoutine = null;
-            }
+            CancelHeldAttackRoutine();
         }
 
         private void OnMouseDown()
         {
-            // Abort when the pointer is currently interacting with genuine UI so clicks on
-            // overlays (inventory, spellbook, etc.) do not also command NPC attacks.
-            if (PointerRaycastUtility.IsPointerOverBlockingUI(Input.mousePosition))
-                return;
+            TryCommandPlayerAttack();
+        }
+
+        /// <summary>
+        /// Attempts to initiate the player's standard combat behaviour against this NPC.
+        /// </summary>
+        /// <param name="ignorePointerBlockers">
+        /// When true the method bypasses UI raycast checks. Context menus set this so the button can be pressed while hovering UI.
+        /// </param>
+        /// <returns>True when an attack command was issued or queued.</returns>
+        public bool TryCommandPlayerAttack(bool ignorePointerBlockers = false)
+        {
+            if (!ignorePointerBlockers && PointerRaycastUtility.IsPointerOverBlockingUI(Input.mousePosition))
+                return false;
 
             var playerController = FindObjectOfType<CombatController>();
             if (playerController == null)
-                return;
+                return false;
+
             var movementController = playerController.GetComponent<PlayerMovementController>()
                 ?? playerController.GetComponent<PlayerMover>()?.MovementController;
             if (movementController == null)
-                return;
+                return false;
 
-            if (heldAttackRoutine != null)
-            {
-                StopCoroutine(heldAttackRoutine);
-                heldAttackRoutine = null;
-            }
+            CancelHeldAttackRoutine();
 
-            // Determine whether the player is currently frozen so we can decide how to handle
-            // the attack click. Frozen players should not be able to move but should retain the
-            // attack command so it can fire if the NPC walks into range.
             var moverFacade = playerController.GetComponent<PlayerMover>() ?? playerController.GetComponentInChildren<PlayerMover>();
             var freezeController = playerController.GetComponent<FrozenStatusController>()
                 ?? moverFacade?.GetComponent<FrozenStatusController>();
@@ -69,29 +69,36 @@ namespace NPC
             float range = playerController.CurrentAttackRange;
             float distance = Vector2.Distance(playerController.transform.position, transform.position);
 
-            // Always try to attack immediately when already in range; this covers both frozen and
-            // unfrozen states.
             if (distance <= range)
             {
                 playerController.TryAttackTarget(combatant);
-                return;
+                return true;
             }
 
             if (playerFrozen)
             {
-                // The player is frozen and out of range. Hold the attack command and repeatedly
-                // check whether the NPC moves into range or the freeze expires.
                 heldAttackRoutine = StartCoroutine(HoldAttackWhileFrozen(
                     playerController,
                     movementController,
                     freezeController,
                     combatant));
-                return;
+                return true;
             }
 
-            // Default behaviour for mobile players remains unchanged – auto walk into range and
-            // fire once close enough.
             movementController.MoveTo(transform, range, () => playerController.TryAttackTarget(combatant));
+            return true;
+        }
+
+        /// <summary>
+        /// Stops and clears any active held-attack coroutine so duplicate routines are not queued.
+        /// </summary>
+        private void CancelHeldAttackRoutine()
+        {
+            if (heldAttackRoutine == null)
+                return;
+
+            StopCoroutine(heldAttackRoutine);
+            heldAttackRoutine = null;
         }
 
         /// <summary>
