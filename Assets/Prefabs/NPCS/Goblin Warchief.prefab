@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7487083981726320206}
   - component: {fileID: 1285495058149382175}
   - component: {fileID: 1225287366087380678}
-  - component: {fileID: 7960778426191620468}
+  - component: {fileID: 5249979066121302518}
   - component: {fileID: 4462744165104283374}
   - component: {fileID: 7573619506058784387}
   - component: {fileID: 2394211271730700276}
@@ -23,11 +23,12 @@ GameObject:
   - component: {fileID: -7034281214918345802}
   - component: {fileID: 4856330758820000550}
   - component: {fileID: 3665449629679586575}
-  - component: {fileID: 8760582560412806108}
-  - component: {fileID: 686960219074157846}
+  - component: {fileID: 1214185441905924890}
   - component: {fileID: 6410839004971985729}
-  m_Layer: 7
-  m_Name: NPC_GOBLIN_WARMAGE
+  - component: {fileID: -1616939295907987060}
+  - component: {fileID: 1174345271934556159}
+  m_Layer: 10
+  m_Name: Goblin Warchief
   m_TagString: NPC
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -192,8 +193,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   profile: {fileID: 11400000, guid: a2f9345330f24e74da31849069a079ad, type: 2}
-  hitSplatLibrary: {fileID: 0}
---- !u!114 &7960778426191620468
+  logDamage: 0
+  hitSplatLibrary: {fileID: 11400000, guid: 3bdb17896f374e8bb098d628ca4ba2f4, type: 2}
+  knockbackReceiver: {fileID: -1616939295907987060}
+  hitsplatFallbackOffset: 1
+--- !u!114 &5249979066121302518
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -245,11 +249,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a3499121a43ce7a4c81402d2529f06e0, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   obstructionMask:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 2240
+  replanCooldownSeconds: 0.6
+  enablePathDebugLogging: 0
 --- !u!114 &1276688815178828107
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -262,7 +268,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29d046d9f0ec20d488834948f15ef84a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  heightOffset: 1.5
+  heightOffset: 0.6
+  sortingOrder: 5000
   fadeDuration: 0.25
 --- !u!114 &4408143068028046321
 MonoBehaviour:
@@ -344,6 +351,10 @@ MonoBehaviour:
   arriveDistance: 0.05
   minIdleTime: 0.5
   maxIdleTime: 2
+  stallTimeoutSeconds: 6
+  movementDeltaEpsilon: 0.01
+  validatePatrolReachability: 1
+  maxReachabilitySampleAttempts: 8
   chaseRadius: 5
   spriteAnimator: {fileID: 4408143068028046321}
 --- !u!114 &4856330758820000550
@@ -372,7 +383,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ade83d186a2426484d785699fb0c95b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &8760582560412806108
+--- !u!114 &1214185441905924890
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -381,20 +392,34 @@ MonoBehaviour:
   m_GameObject: {fileID: 8077571585701284791}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4d99e0cc6ca4d9c88cb2e594d89c3e2, type: 3}
+  m_Script: {fileID: 11500000, guid: 58d974d03c6542e0a33364a3dac3fa1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meteorInterval: 10
-  meteorCount: 5
-  spreadRadius: 5
-  impactDamage: 6
-  burnDamagePerTick: 1
-  burnDuration: 5
-  meteorPrefab: {fileID: 6111494187698877684, guid: ec39911e4d64dec46878ae62d069d0b7, type: 3}
-  burnPrefab: {fileID: 6111494187698877684, guid: 9e9effd4291159241bc8f42d478e4569, type: 3}
-  dropHeight: 8
-  meteorSpeed: 5
---- !u!114 &686960219074157846
+  obstructionMask:
+    serializedVersion: 2
+    m_Bits: 64
+  slamInterval: 10
+  slamDamage: 10
+  slamDustPrefab: {fileID: 6111494187698877684, guid: 6af1b55044c31a34db2173e37299b34e, type: 3}
+  slamRange: 1.5
+  shakeDuration: 0.2
+  shakeMagnitude: 0.1
+--- !u!114 &6410839004971985729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1e0d2e22e364d8fa4319372994f9847, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Status.Freeze.FrozenStatusController
+  playerMover: {fileID: 0}
+  npcWanderer: {fileID: -7034281214918345802}
+  rigidBody: {fileID: 1285495058149382175}
+--- !u!114 &-1616939295907987060
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -404,14 +429,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a6a9b1d4474b0f41b7f62e6a86fba13, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcKnockbackReceiver
   enableKnockback: 1
-  baseDistance: 1.1
-  knockbackDuration: 0.32
+  baseDistance: 0.75
+  knockbackDuration: 0.3
   scaleWithDamage: 1
-  distancePerDamagePoint: 0.035
-  maxScaledDistance: 2.2
+  distancePerDamagePoint: 0.02
+  maxScaledDistance: 1.8
   clampToMovementBounds: 1
   knockbackCurve:
     serializedVersion: 2
@@ -437,7 +462,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &6410839004971985729
+--- !u!114 &1174345271934556159
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -446,9 +471,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 8077571585701284791}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1e0d2e22e364d8fa4319372994f9847, type: 3}
+  m_Script: {fileID: 11500000, guid: bb1fbc3bf94e10c479dbc5d6e2a09d26, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Status.Freeze.FrozenStatusController
-  playerMover: {fileID: 0}
-  npcWanderer: {fileID: -7034281214918345802}
-  rigidBody: {fileID: 1285495058149382175}
+  m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcPathMover
+  tileTraverseDuration: 0.6
+  waypointTolerance: 0.05
+  stopDistance: 1
+  repathCooldownSeconds: 0.6
+  stuckTimeoutSeconds: 3
+  destinationRepathThreshold: 0.75
+  enableDebugLogging: 0
+  drawDebugPath: 1
+  debugPathColor: {r: 1, g: 0.75, b: 0, a: 0.9}

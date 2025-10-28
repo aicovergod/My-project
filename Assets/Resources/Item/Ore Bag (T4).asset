@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Inventory.OreBag.OreBagItemData
   id: Ore Bag (T4)
   itemName: Ore Bag (T4)
-  icon: {fileID: 21300000, guid: 473b6e865b228bc46a576c371ef4e267, type: 3}
+  icon: {fileID: 21300000, guid: 6dd7b7b6bf4acd64285ee2fba00786b9, type: 3}
   stackSpriteOverrides: []
   description: A bag that stores 100 of any ore
   equipmentTooltipLines: []
@@ -56,4 +56,4 @@ MonoBehaviour:
   buffEffects: []
   tier: 4
   customCapacity: 0
-  upgradeTarget: {fileID: 0}
+  upgradeTarget: {fileID: 11400000, guid: a0246a9624f4ab8478868eceacd10616, type: 2}
