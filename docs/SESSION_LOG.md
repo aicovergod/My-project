@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:83fdbecbdc2eebcfe198a783d34bcd317e0010cf -->
+## 2025-10-28T13:43:57+00:00 — Merge pull request #1495 from aicovergod/codex/ensure-right-click-trade-button-shares-shop-flow
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 22 ++ / 1 --
+- Notes:
+  Clarify trade context menu shop delegation
+---
+<!-- commit:337b2713457665e8f3454636bcc37f64ff103683 -->
+## 2025-10-28T13:43:52+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:82749d09c677f46921c299e2f18aaa2a24663164 -->
 ## 2025-10-28T13:43:40+00:00 — Clarify trade context menu shop delegation
 
