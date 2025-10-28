@@ -63,7 +63,8 @@ namespace Skills.Thieving.Core
 
         protected override bool SupportsProspecting => false;
 
-        protected override bool IsPerformingAction => Skill != null && Skill.IsAttemptActive;
+        protected override bool IsPerformingAction =>
+            Skill != null && Skill.IsAttemptActive && Skill.ActiveObjectNode != null;
 
         protected override ThievingObjectNode CurrentNode => Skill != null ? Skill.ActiveObjectNode : null;
 
