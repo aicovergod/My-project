@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:35f9fa1c898a302c14a77e5e2df59797076329b9 -->
+## 2025-10-28T12:38:18+00:00 — Merge pull request #1488 from aicovergod/codex/fix-merge-conflict-errors-in-companionenvironmentawarenesszo
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 6 --
+- Notes:
+  Resolve merge conflict in companion awareness zone
+---
+<!-- commit:fb772fca8c0382ee1fe04cee60a32752026eb9ab -->
+## 2025-10-28T12:38:07+00:00 — Resolve merge conflict in companion awareness zone
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs
+- Diff: 1 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:e0b9bba0a8d9cdfa8c649f03171046ca85ef5771 -->
 ## 2025-10-28T12:35:53+00:00 — Merge pull request #1487 from aicovergod/codex/create-utility-class-for-menu-positioning
 
