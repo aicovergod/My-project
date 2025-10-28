@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6f310aa76e27811d23baa27cee1bdab8fd078287 -->
+## 2025-10-28T14:23:20+00:00 — Expose attack toggles for NPC context menus
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/NPC/Interaction/NpcExamine.cs, Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/NPC/Interaction/NpcInteractionOptions.cs
+- Diff: 68 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:79fb1bbb839ffe70b02c4df7f955e200fcc31922 -->
 ## 2025-10-28T14:06:42+00:00 — Merge pull request #1496 from aicovergod/codex/add-attack-button-to-right-click-menu
 
