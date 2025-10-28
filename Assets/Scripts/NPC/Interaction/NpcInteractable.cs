@@ -427,6 +427,10 @@ namespace NPC
             Debug.Log($"{name} has nothing to say yet.");
         }
 
+        /// <summary>
+        ///     Opens the NPC's shop, delegating to <see cref="NpcShopOpener"/> when available so
+        ///     the auto-walk coroutine ushers the player into range before showing the UI.
+        /// </summary>
         public void OpenShop()
         {
             if (TryGetComponent(out NpcShopOpener shopOpener) && shopOpener != null)

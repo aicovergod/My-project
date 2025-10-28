@@ -261,7 +261,15 @@ namespace UI
         /// <summary>Handles the Trade option by forwarding to the interactable and hiding the menu.</summary>
         private void HandleTradePressed()
         {
-            current?.OpenShop();
+            if (current == null)
+            {
+                Hide();
+                return;
+            }
+
+            // Always delegate to the interactable so any attached NpcShopOpener can
+            // guide the player into the correct interaction radius before the shop opens.
+            current.OpenShop();
             Hide();
         }
 
