@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0377320a7310487c10432760c62fa5f3829a6a89 -->
+## 2025-10-28T14:23:47+00:00 — Merge pull request #1497 from aicovergod/codex/add-attack-options-to-npcinteractionoptions-script
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 77 ++ / 2 --
+- Notes:
+  Expose attack toggles for NPC context menus
+---
+<!-- commit:86a229119740580121455ffe977e0af91b09f133 -->
+## 2025-10-28T14:23:35+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6f310aa76e27811d23baa27cee1bdab8fd078287 -->
 ## 2025-10-28T14:23:20+00:00 — Expose attack toggles for NPC context menus
 
