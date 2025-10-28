@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e8f73e01c746c8b5c11148340eb5ca99b2d4e223 -->
+## 2025-10-28T16:50:38+00:00 — thieve
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (44): Assets/Prefabs/MainScriptObjects/Player.prefab, Assets/Prefabs/NPCS/Goblin.prefab, Assets/Resources/Item/Cabbage.asset, Assets/Resources/Item/Cabbage.asset.meta, Assets/Resources/Item/String.asset, Assets/Resources/Item/String.asset.meta, Assets/Resources/Item/Thread.asset, Assets/Resources/Item/Thread.asset.meta, Assets/Resources/Item/Wheat.asset, Assets/Resources/Item/Wheat.asset.meta, Assets/Resources/Item/Wool.asset, Assets/Resources/Item/Wool.asset.meta, Assets/Resources/Thieving/Npcs/Goblin.asset, Assets/Resources/Thieving/Npcs/Goblin.asset.meta, Assets/Resources/Thieving/Npcs/Guard.asset, Assets/Scenes/VioletsTownMinerBuilding.unity, Assets/Scripts/NPC/Interaction/NpcExamine.cs.meta, Assets/Scripts/Skills/Farming.meta, Assets/Scripts/Skills/Farming/PickableResourceNode.cs.meta, Assets/Sprites/Cooked Food Items.meta, Assets/Sprites/Cooking.meta, Assets/Sprites/Cooking/Cooked Food Items.meta, Assets/Sprites/Cooking/Cooked Food Items/Bread Loaf_64x64.png, Assets/Sprites/Cooking/Cooked Food Items/Bread Loaf_64x64.png.meta, Assets/Sprites/Cooking/Cooked Food Items/Bread Roll_64x64.png, Assets/Sprites/Cooking/Cooked Food Items/Bread Roll_64x64.png.meta, Assets/Sprites/Cooking/CookingObjects.meta, Assets/Sprites/Cooking/CookingObjects/Cooking Range_64x64.png, Assets/Sprites/Cooking/CookingObjects/Cooking Range_64x64.png.meta, Assets/Sprites/Cooking/Raw Food Items.meta, Assets/Sprites/Cooking/Raw Food Items/Cabbage_64x64.png, Assets/Sprites/Cooking/Raw Food Items/Cabbage_64x64.png.meta, Assets/Sprites/Cooking/Raw Food Items/Wheat_64x64.png, Assets/Sprites/Cooking/Raw Food Items/Wheat_64x64.png.meta, Assets/Sprites/Crafting.meta, Assets/Sprites/Crafting/Materials.meta, Assets/Sprites/Crafting/Materials/String_64x64.png, Assets/Sprites/Crafting/Materials/String_64x64.png.meta, Assets/Sprites/Crafting/Materials/Thread_64x64.png, Assets/Sprites/Crafting/Materials/Thread_64x64.png.meta, Assets/Sprites/Crafting/Materials/Wool_64x64.png, Assets/Sprites/Crafting/Materials/Wool_64x64.png.meta, Assets/Sprites/Farming.meta, Assets/Sprites/Raw Food Items.meta
+- Diff: 1663 ++ / 8 --
+- Notes:
+  —
+---
 <!-- commit:921b4d755973db85af1afbd6316d3f4e452629ce -->
 ## 2025-10-28T16:45:07+00:00 — Merge pull request #1499 from aicovergod/codex/tighten-isperformingaction-logic-in-thievingcontroller
 
