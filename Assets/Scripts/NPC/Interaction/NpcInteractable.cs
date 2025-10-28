@@ -23,7 +23,7 @@ namespace NPC
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
     [RequireComponent(typeof(NpcInteractionOptions))]
-    public class NpcInteractable : MonoBehaviour
+    public partial class NpcInteractable : MonoBehaviour
     {
         [Tooltip("Optional shop component for this NPC.")]
         public Shop shop;
@@ -435,11 +435,6 @@ namespace NPC
             {
                 ui.Open(shop, GetComponent<NpcWanderer>());
             }
-        }
-
-        public void Examine()
-        {
-            Debug.Log($"You examine {name}.");
         }
 
         public void AttackWithPet()
