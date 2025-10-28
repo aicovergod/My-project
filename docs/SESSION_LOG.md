@@ -1,12 +1,12 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:d1eaad81a035c4fe237302a1916fd7a291aa3e51 -->
-## 2025-10-28T12:31:24+00:00 — uwu
+<!-- commit:74640295a09f720764eb7a3813086ebd63657be5 -->
+## 2025-10-28T12:33:44+00:00 — Refactor context menu positioning into shared helper
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (30): Assets/NPCCombatProfile/Goblin.asset, Assets/Prefabs/CompanionZoneTrigger.meta, Assets/Prefabs/CompanionZoneTrigger/GoblinZoneTriggerPoint.prefab, Assets/Prefabs/CompanionZoneTrigger/GoblinZoneTriggerPoint.prefab.meta, Assets/Prefabs/CompanionZoneTrigger/GraveyardTriggerPoint.prefab, Assets/Prefabs/CompanionZoneTrigger/GraveyardTriggerPoint.prefab.meta, Assets/Prefabs/CompanionZoneTrigger/OceanTriggerPoint.prefab, Assets/Prefabs/CompanionZoneTrigger/OceanTriggerPoint.prefab.meta, Assets/Prefabs/CompanionZoneTrigger/VioslaCaveTriggerPoint.prefab, Assets/Prefabs/CompanionZoneTrigger/VioslaCaveTriggerPoint.prefab.meta, Assets/Prefabs/NPCS/Copper Ore Golem.prefab, Assets/Prefabs/NPCS/Copper Ore Golem.prefab.meta, Assets/Prefabs/NPCS/Goblin Warchief.prefab, Assets/Prefabs/NPCS/Goblin Warchief.prefab.meta, Assets/Prefabs/NPCS/Goblin.prefab, Assets/Prefabs/NPCS/Goblin.prefab.meta, Assets/Prefabs/NPCS/NPC_GOBLIN_WARMAGE.prefab, Assets/Resources/Item/Hades Fragment.asset, Assets/Resources/Item/Ore Bag (T1).asset, Assets/Resources/Item/Ore Bag (T2).asset, Assets/Resources/Item/Ore Bag (T3).asset, Assets/Resources/Item/Ore Bag (T4).asset, Assets/Resources/Item/Ore Bag (T5).asset, Assets/Resources/Item/Ore Bag (T6).asset, Assets/Resources/PlayerRanks/DefaultPlayerRankDatabase.asset, Assets/Scenes/OverWorld.unity, Assets/Scenes/VioletsTownMinerBuilding.unity, Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs, Assets/Scripts/NPC/Combat/Mechanics.meta, Assets/Scripts/World/SceneInteractableObject.cs.meta
-- Diff: 2202 ++ / 900 --
+- Changed files (4): Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs, Assets/Scripts/Inventory/InventoryDropMenu.cs, Assets/Scripts/Inventory/UI/InventoryItemContextMenu.cs, Assets/Scripts/UI/ContextMenus/ContextMenuPositioner.cs
+- Diff: 186 ++ / 93 --
 - Notes:
   —
 ---

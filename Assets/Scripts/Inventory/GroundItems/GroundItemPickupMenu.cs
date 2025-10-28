@@ -51,6 +51,7 @@ namespace Inventory.GroundItems
 
         private readonly List<OptionEntry> optionEntries = new List<OptionEntry>();
         private readonly List<ItemPickup> currentPickups = new List<ItemPickup>();
+        private readonly Vector3[] worldCorners = new Vector3[4];
 
         private Canvas canvas;
         private RectTransform menuRect;
@@ -323,23 +324,17 @@ namespace Inventory.GroundItems
         private void PositionMenu(Vector2 requestedPosition)
         {
             Canvas.ForceUpdateCanvases();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(menuRect);
 
-            Vector2 size = menuRect.rect.size;
-            size.x = Mathf.Max(size.x, minimumWidth);
-            Vector3 lossyScale = menuRect.lossyScale;
-            Vector2 scaledSize = new Vector2(size.x * lossyScale.x, size.y * lossyScale.y);
+            var canvas = MenuCanvas;
+            if (canvas == null)
+                return;
 
-            float minX = 0f;
-            float maxX = Mathf.Max(minX, Screen.width - scaledSize.x);
-            float minY = Mathf.Min(Screen.height, scaledSize.y);
-            float maxY = Screen.height;
-
-            Vector2 clamped = new Vector2(
-                Mathf.Clamp(requestedPosition.x, minX, maxX),
-                Mathf.Clamp(requestedPosition.y, minY, maxY));
-
-            menuRect.position = clamped;
+            ContextMenuPositioner.PositionMenu(
+                menuRect,
+                canvas,
+                MenuCanvasCamera,
+                requestedPosition,
+                worldCorners);
         }
 
         /// <summary>Applies the serialized scale to the menu root so designers can resize it.</summary>
