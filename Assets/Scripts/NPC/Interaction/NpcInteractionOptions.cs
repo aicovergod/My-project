@@ -9,7 +9,7 @@ namespace NPC
     ///     programmatically to match the configuration at runtime.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class NpcInteractionOptions : MonoBehaviour
+    public sealed partial class NpcInteractionOptions : MonoBehaviour
     {
         [Header("Right-Click Menu Options")]
         [SerializeField]
@@ -23,10 +23,6 @@ namespace NPC
         [SerializeField]
         [Tooltip("When enabled the Pickpocket option will appear in the right-click menu.")]
         private bool enablePickpocket = false;
-
-        [SerializeField]
-        [Tooltip("When enabled the Examine option will appear in the right-click menu.")]
-        private bool enableExamine = true;
 
         /// <summary>
         /// Enumerates the enabled actions in the order they should appear inside the menu.
@@ -42,7 +38,7 @@ namespace NPC
             if (enablePickpocket)
                 yield return NpcInteractionAction.Pickpocket;
 
-            if (enableExamine)
+            if (IsExamineEnabled)
                 yield return NpcInteractionAction.Examine;
         }
 
