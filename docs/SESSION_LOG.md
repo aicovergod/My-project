@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ca3fb9a4b7a49b547d603a2f34dc2304331d86c1 -->
+## 2025-10-28T09:24:41+00:00 — Refactor NPC right-click menu to use dynamic options
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/NPC/Interaction/NpcInteractionOptions.cs, Assets/Scripts/UI/RightClickMenu.cs
+- Diff: 283 ++ / 182 --
+- Notes:
+  —
+---
 <!-- commit:24965232a2b25459adc26f3dcf7ba26fc03bc1a7 -->
 ## 2025-10-27T22:08:24+00:00 — Merge pull request #1482 from aicovergod/codex/fix-companion-awareness-zone-bug
 
