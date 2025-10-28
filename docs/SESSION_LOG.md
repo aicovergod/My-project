@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:cd0261f25fe28c6e1187fa99bbefb814a4097445 -->
+## 2025-10-28T17:07:47+00:00 — Merge pull request #1500 from aicovergod/codex/update-thieving-loot-system-for-drop-chances
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 135 ++ / 55 --
+- Notes:
+  Switch Thieving loot tables to percentage-based drops
+---
+<!-- commit:5c82d928e9782abd3c7b6a09ab6498dc1000ce0f -->
+## 2025-10-28T17:07:21+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7a33bef912c74485bc27b4565f477ecf82593182 -->
 ## 2025-10-28T17:07:06+00:00 — Refine thieving loot rolls to use percentage chances
 
