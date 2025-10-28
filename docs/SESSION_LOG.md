@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:78a893076219402ac8766800f5e9bccca20368e7 -->
+## 2025-10-28T10:21:14+00:00 — Fix companion follower enabling during cooking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Cooking/CompanionCookingController.cs
+- Diff: 3 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:24965232a2b25459adc26f3dcf7ba26fc03bc1a7 -->
 ## 2025-10-27T22:08:24+00:00 — Merge pull request #1482 from aicovergod/codex/fix-companion-awareness-zone-bug
 
