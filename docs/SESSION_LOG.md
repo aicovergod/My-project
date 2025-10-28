@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:dabc2e9d2512345a86aa6f0f5b178dcdd0cd7375 -->
+## 2025-10-28T14:06:08+00:00 — Add attack options to NPC right-click menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/NPC/Combat/NpcAttackOnClick.cs, Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/NPC/Interaction/NpcInteractionOptions.cs, Assets/Scripts/UI/RightClickMenu.cs
+- Diff: 223 ++ / 51 --
+- Notes:
+  —
+---
 <!-- commit:83fdbecbdc2eebcfe198a783d34bcd317e0010cf -->
 ## 2025-10-28T13:43:57+00:00 — Merge pull request #1495 from aicovergod/codex/ensure-right-click-trade-button-shares-shop-flow
 
