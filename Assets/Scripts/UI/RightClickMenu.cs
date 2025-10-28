@@ -20,6 +20,7 @@ namespace UI
 
         private static readonly Dictionary<NpcInteractionAction, string> LabelLookup = new()
         {
+            { NpcInteractionAction.Attack, "Attack" },
             { NpcInteractionAction.Talk, "Talk-to" },
             { NpcInteractionAction.Trade, "Trade" },
             { NpcInteractionAction.Pickpocket, "Pickpocket" },
@@ -31,6 +32,7 @@ namespace UI
 
         private NpcInteractable current;
         private Font menuFont;
+        private NpcFollowerAttackType followerAttackType = NpcFollowerAttackType.None;
 
         /// <summary>
         ///     Factory helper that constructs a new menu instance beneath the supplied parent
@@ -99,6 +101,7 @@ namespace UI
         {
             gameObject.SetActive(false);
             current = null;
+            followerAttackType = NpcFollowerAttackType.None;
         }
 
         /// <summary>
@@ -142,6 +145,7 @@ namespace UI
         /// </summary>
         private void CacheHandlers()
         {
+            handlerLookup[NpcInteractionAction.Attack] = HandleAttackPressed;
             handlerLookup[NpcInteractionAction.Talk] = HandleTalkPressed;
             handlerLookup[NpcInteractionAction.Trade] = HandleTradePressed;
             handlerLookup[NpcInteractionAction.Pickpocket] = HandlePickpocketPressed;
@@ -155,12 +159,19 @@ namespace UI
         private int RebuildButtons(NpcInteractionOptions options)
         {
             ClearButtons();
+            followerAttackType = NpcFollowerAttackType.None;
 
             if (options == null)
                 return 0;
 
             foreach (var action in options.GetEnabledActions())
             {
+                if (action == NpcInteractionAction.Attack)
+                {
+                    TryAddAttackButtons();
+                    continue;
+                }
+
                 if (!handlerLookup.TryGetValue(action, out var handler) || handler == null)
                     continue;
 
@@ -251,6 +262,28 @@ namespace UI
             activeButtons.Clear();
         }
 
+        /// <summary>
+        ///     Adds the Attack option (and any follower attack options) to the menu when eligible.
+        /// </summary>
+        private void TryAddAttackButtons()
+        {
+            if (current == null || !current.CanPlayerAttack())
+                return;
+
+            string label = LabelLookup.TryGetValue(NpcInteractionAction.Attack, out var mappedLabel)
+                ? mappedLabel
+                : "Attack";
+            var attackButton = CreateButton("AttackButton", label, HandleAttackPressed);
+            activeButtons.Add(attackButton);
+
+            if (current.TryGetFollowerAttackOption(out var type, out string followerLabel) && !string.IsNullOrEmpty(followerLabel))
+            {
+                followerAttackType = type;
+                var followerButton = CreateButton("FollowerAttackButton", followerLabel, HandleFollowerAttackPressed);
+                activeButtons.Add(followerButton);
+            }
+        }
+
         /// <summary>Handles the Talk option by forwarding to the interactable and hiding the menu.</summary>
         private void HandleTalkPressed()
         {
@@ -284,6 +317,26 @@ namespace UI
         private void HandleExaminePressed()
         {
             current?.Examine();
+            Hide();
+        }
+
+        /// <summary>
+        ///     Handles the Attack option by delegating to the NPC interactable and closing the menu.
+        /// </summary>
+        private void HandleAttackPressed()
+        {
+            current?.TryCommandPlayerAttack();
+            Hide();
+        }
+
+        /// <summary>
+        ///     Handles the Pet/Companion Attack option and resets the cached follower state.
+        /// </summary>
+        private void HandleFollowerAttackPressed()
+        {
+            var type = followerAttackType;
+            followerAttackType = NpcFollowerAttackType.None;
+            current?.ExecuteFollowerAttack(type);
             Hide();
         }
     }

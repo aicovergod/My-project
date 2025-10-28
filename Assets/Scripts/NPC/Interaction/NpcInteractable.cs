@@ -238,29 +238,10 @@ namespace NPC
         }
 
         /// <summary>
-        ///     Executes the pet attack fallback or shows the NPC context menu at the specified screen position.
+        ///     Displays the NPC context menu at the specified screen position.
         /// </summary>
         private void ProcessOpenMenu(Vector2 screenPosition)
         {
-            var combatTarget = GetComponent<CombatTarget>();
-            if (!PetDropSystem.GuardModeEnabled && PetDropSystem.ActivePetCombat != null && combatTarget != null)
-            {
-                PetDropSystem.ActivePetCombat.CommandAttack(combatTarget, true);
-                return;
-            }
-
-            if (combatTarget != null)
-            {
-                if (CompanionManager.TryCommandAttack(combatTarget))
-                    return;
-
-                if (CompanionManager.IsGuardModeLockedByCombatCooldown)
-                {
-                    // Guard mode toggle is currently locked by a cooldown, so suppress the menu until the timer expires.
-                    return;
-                }
-            }
-
             if (!EnsureMenuInstance())
                 return;
 
@@ -449,12 +430,111 @@ namespace NPC
             }
         }
 
+        /// <summary>
+        ///     Determines whether this NPC currently supports player-initiated combat via the context menu.
+        /// </summary>
+        public bool CanPlayerAttack()
+        {
+            if (interactionOptions == null || !interactionOptions.IsAttackEnabled)
+                return false;
+
+            if (!TryResolveCombatTarget(out _))
+                return false;
+
+            if (!TryGetComponent(out NpcAttackOnClick attackComponent) || attackComponent == null)
+                return false;
+
+            return attackComponent.isActiveAndEnabled;
+        }
+
+        /// <summary>
+        ///     Attempts to command the player to attack this NPC using the standard combat pipeline.
+        /// </summary>
+        /// <returns>True when an attack command was issued or queued.</returns>
+        public bool TryCommandPlayerAttack()
+        {
+            if (!CanPlayerAttack())
+                return false;
+
+            if (!TryGetComponent(out NpcAttackOnClick attackComponent) || attackComponent == null)
+                return false;
+
+            return attackComponent.TryCommandPlayerAttack(true);
+        }
+
+        /// <summary>
+        ///     Evaluates whether a combat pet or companion can receive a manual attack command for this NPC.
+        /// </summary>
+        /// <param name="type">Outputs the follower type capable of attacking.</param>
+        /// <param name="label">Outputs the localized label that should be displayed in the menu.</param>
+        /// <returns>True when a pet or companion is ready to accept the command.</returns>
+        public bool TryGetFollowerAttackOption(out NpcFollowerAttackType type, out string label)
+        {
+            type = NpcFollowerAttackType.None;
+            label = null;
+
+            if (!CanPlayerAttack())
+                return false;
+
+            if (!TryResolveCombatTarget(out _))
+                return false;
+
+            var petCombat = PetDropSystem.ActivePetCombat;
+            if (petCombat != null && petCombat.isActiveAndEnabled && petCombat.CanFight && !PetDropSystem.GuardModeEnabled)
+            {
+                type = NpcFollowerAttackType.Pet;
+                label = "Pet Attack";
+                return true;
+            }
+
+            if (CompanionManager.HasActiveCompanion && !CompanionManager.GuardModeEnabled && !CompanionManager.IsGuardModeLockedByCombatCooldown)
+            {
+                var companion = CompanionManager.ActiveCompanion;
+                if (companion != null && companion.isActiveAndEnabled && companion.CanFight)
+                {
+                    type = NpcFollowerAttackType.Companion;
+                    label = "Companion Attack";
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        ///     Issues the follower attack command previously advertised by <see cref="TryGetFollowerAttackOption"/>.
+        /// </summary>
+        /// <param name="type">Follower that should attack the NPC.</param>
+        public void ExecuteFollowerAttack(NpcFollowerAttackType type)
+        {
+            if (!TryResolveCombatTarget(out var target) || target == null)
+                return;
+
+            switch (type)
+            {
+                case NpcFollowerAttackType.Pet:
+                    var petCombat = PetDropSystem.ActivePetCombat;
+                    if (petCombat != null && petCombat.isActiveAndEnabled && petCombat.CanFight && !PetDropSystem.GuardModeEnabled)
+                        petCombat.CommandAttack(target, true);
+                    break;
+                case NpcFollowerAttackType.Companion:
+                    CompanionManager.TryCommandAttack(target);
+                    break;
+            }
+        }
+
+        /// <summary>
+        ///     Attempts to resolve the <see cref="CombatTarget"/> adapter for this NPC.
+        /// </summary>
+        private bool TryResolveCombatTarget(out CombatTarget target)
+        {
+            target = GetComponent<CombatTarget>();
+            return target != null && target.IsAlive;
+        }
+
         public void AttackWithPet()
         {
-            var pet = PetDropSystem.ActivePetCombat;
-            var target = GetComponent<CombatTarget>();
-            if (pet != null && target != null)
-                pet.CommandAttack(target, true);
+            ExecuteFollowerAttack(NpcFollowerAttackType.Pet);
         }
 
         public virtual void Pickpocket()
@@ -479,5 +559,15 @@ namespace NPC
 
             thievingSkill.TryStartPickpocket(thievingTarget);
         }
+    }
+
+    /// <summary>
+    /// Enumerates the follower attack commands that can be exposed within the right-click menu.
+    /// </summary>
+    public enum NpcFollowerAttackType
+    {
+        None,
+        Pet,
+        Companion
     }
 }
