@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:921b4d755973db85af1afbd6316d3f4e452629ce -->
+## 2025-10-28T16:45:07+00:00 — Merge pull request #1499 from aicovergod/codex/tighten-isperformingaction-logic-in-thievingcontroller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 1 --
+- Notes:
+  Adjust thieving action detection
+---
+<!-- commit:a55f4dae0b911dd7f4f8fad6afe303e08bafbbaa -->
+## 2025-10-28T16:44:57+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:e564e0a53f81ad84dca377ee6156b6ead55e9ca3 -->
 ## 2025-10-28T16:44:41+00:00 — Tighten thieving action detection
 
