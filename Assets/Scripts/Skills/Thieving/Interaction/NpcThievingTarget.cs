@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using NPC;
+using Skills.Thieving.Core;
 using Skills.Thieving.Data;
 using Util;
 

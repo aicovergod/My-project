@@ -439,7 +439,7 @@ namespace Skills.Thieving.Core
             isLocked = true;
 
             GatheringFloatingTextService.TryShowAtAnchor(FailureFloatingText, floatingTextAnchor);
-            ChatService.Instance?.PublishSystemMessage("You fail to pick the pocket.");
+            ChatService.Instance?.PublishGameMessage("You fail to pick the pocket.");
 
             if (EnableDebugLogging)
             {
@@ -557,7 +557,7 @@ namespace Skills.Thieving.Core
                     if (floatingTextAnchor != null)
                         GatheringFloatingTextService.TryShowAtAnchor(FailureFloatingText, floatingTextAnchor);
 
-                    ChatService.Instance?.PublishSystemMessage(FailureFloatingText);
+                    ChatService.Instance?.PublishGameMessage(FailureFloatingText);
 
                     if (EnableDebugLogging)
                     {
