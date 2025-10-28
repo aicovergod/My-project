@@ -211,7 +211,7 @@ namespace Companions
             body2D ??= GetComponent<Rigidbody2D>();
             if (body2D != null)
             {
-                Vector2 bodyVelocity = body2D.velocity;
+                Vector2 bodyVelocity = body2D.linearVelocity;
                 if (bodyVelocity.sqrMagnitude > headingEpsilon)
                 {
                     heading = bodyVelocity.normalized;
