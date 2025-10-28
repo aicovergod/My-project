@@ -10,6 +10,7 @@ using Skills.Outfits;
 using UI.Chat;
 using Util;
 using Random = UnityEngine.Random;
+using Pets;
 
 namespace Skills.Thieving.Core
 {
@@ -507,17 +508,87 @@ namespace Skills.Thieving.Core
             if (inventory == null)
                 return;
 
+            var activePetStorage = PetDropSystem.ActivePetObject != null
+                ? PetDropSystem.ActivePetObject.GetComponent<PetStorage>()
+                : null;
+            bool anyRewardSucceeded = false;
+            bool inventoryBlocked = false;
+
             foreach (var reward in rewards)
             {
                 if (reward.item == null || reward.quantity <= 0)
                     continue;
 
-                inventory.AddItem(reward.item, reward.quantity);
-                GatheringFloatingTextService.TryShowNow($"+{reward.quantity} {reward.item.itemName}", floatingTextAnchor, worldPosition);
+                string rewardName = !string.IsNullOrEmpty(reward.item.itemName)
+                    ? reward.item.itemName
+                    : reward.item.name;
+
+                var context = GatheringRewardContextBuilder.BuildContext(new GatheringRewardContextBuilder.ContextArgs
+                {
+                    Runner = this,
+                    Skills = skillManager,
+                    SkillType = SkillType.Thieving,
+                    Inventory = inventory,
+                    PetStorage = activePetStorage,
+                    Item = reward.item,
+                    RewardDisplayName = rewardName,
+                    Quantity = reward.quantity,
+                    XpPerItem = 0f,
+                    FloatingTextAnchor = floatingTextAnchor,
+                    FallbackAnchor = transform,
+                    ResourcePosition = worldPosition,
+                    RewardMessageFormatter = quantity => $"+{quantity} {rewardName}",
+                    ShowXpPopup = false
+                });
+
+                var result = GatheringRewardProcessor.Process(context);
+
+                if (EnableDebugLogging)
+                {
+                    Debug.Log(
+                        $"[Thieving] Processed reward {rewardName} x{reward.quantity}. Success: {result.Success}, InventoryFull: {result.InventoryFull}.",
+                        this);
+                }
+
+                if (result.InventoryFull)
+                {
+                    inventoryBlocked = true;
+
+                    if (floatingTextAnchor != null)
+                        GatheringFloatingTextService.TryShowAtAnchor(FailureFloatingText, floatingTextAnchor);
+
+                    ChatService.Instance?.PublishSystemMessage(FailureFloatingText);
+
+                    if (EnableDebugLogging)
+                    {
+                        Debug.Log("[Thieving] Inventory full encountered while processing rewards. Aborting remaining rewards.", this);
+                    }
+
+                    break;
+                }
+
+                if (result.Success)
+                    anyRewardSucceeded = true;
+            }
+
+            if (!anyRewardSucceeded)
+            {
+                if (EnableDebugLogging)
+                {
+                    string reason = inventoryBlocked ? "inventory was full" : "no valid rewards were generated";
+                    Debug.Log($"[Thieving] Skipping XP grant because {reason}.", this);
+                }
+
+                return;
             }
 
             if (xp > 0f && skillManager != null)
             {
+                if (EnableDebugLogging)
+                {
+                    Debug.Log($"[Thieving] Granting {xp} Thieving XP for the successful attempt.", this);
+                }
+
                 int previousLevel = skillManager.GetLevel(SkillType.Thieving);
                 int newLevel = skillManager.AddXP(SkillType.Thieving, xp);
                 GatheringFloatingTextService.QueueDelayedXpPopup(Mathf.RoundToInt(xp), floatingTextAnchor, worldPosition, 1f);
@@ -527,6 +598,10 @@ namespace Skills.Thieving.Core
                     GatheringFloatingTextService.TryShowAtAnchor($"Thieving level {newLevel}", floatingTextAnchor);
                     LevelledUp?.Invoke(newLevel);
                 }
+            }
+            else if (EnableDebugLogging)
+            {
+                Debug.Log("[Thieving] XP grant skipped because XP value was non-positive or SkillManager was missing.", this);
             }
         }
 
