@@ -1,10 +1,9 @@
-using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
 using Skills.Thieving.Data;
 using Skills.Thieving.Core;
 using NPC;
+using Skills.Thieving;
 
 namespace Tests.EditMode.Skills.Thieving
 {
@@ -28,8 +27,8 @@ namespace Tests.EditMode.Skills.Thieving
             Assert.AreEqual(255, definition.GetSuccessThreshold(150));
         }
 
-        [UnityTest]
-        public IEnumerator PickpocketRoll_UsesInjectedRandomSource()
+        [Test]
+        public void PickpocketRoll_UsesInjectedRandomSource()
         {
             var skill = CreateSkill(out var target, out var definition);
             SetField(definition, "lowSuccessThreshold", 255);
@@ -41,15 +40,14 @@ namespace Tests.EditMode.Skills.Thieving
 
             skill.PickpocketRoll = () => 0;
             Assert.IsTrue(skill.TryStartPickpocket(target));
-            yield return null;
             skill.OnTick();
             skill.OnTick();
 
             Assert.IsTrue(successNotified, "Expected pickpocket to succeed when roll is forced to 0.");
         }
 
-        [UnityTest]
-        public IEnumerator ConsecutiveFailures_TriggerNpcLockout()
+        [Test]
+        public void ConsecutiveFailures_TriggerNpcLockout()
         {
             var skill = CreateSkill(out var target, out var definition);
             SetField(definition, "failuresBeforeCooldown", 2);
@@ -60,14 +58,12 @@ namespace Tests.EditMode.Skills.Thieving
             bool firstAttempt = skill.TryStartPickpocket(target);
             Assert.IsTrue(firstAttempt);
             skill.PickpocketRoll = () => 255;
-            yield return null;
             skill.OnTick();
             skill.OnTick();
             Assert.IsTrue(target.CanPickpocket, "NPC should still be available after the first failure.");
 
             bool secondAttempt = skill.TryStartPickpocket(target);
             Assert.IsTrue(secondAttempt);
-            yield return null;
             skill.OnTick();
             skill.OnTick();
 
