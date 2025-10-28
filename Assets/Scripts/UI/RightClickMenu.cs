@@ -78,7 +78,19 @@ namespace UI
                 return;
             }
 
-            transform.position = position;
+            // The menu renders on a screen-space overlay canvas, so convert the incoming
+            // screen coordinate into the appropriate world point for the RectTransform.
+            var rectTransform = (RectTransform)transform;
+            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rectTransform, position, null, out var worldPoint))
+            {
+                rectTransform.position = worldPoint;
+            }
+            else
+            {
+                // Fall back to the previous behaviour if the conversion fails for any reason.
+                transform.position = position;
+            }
+
             gameObject.SetActive(true);
         }
 
