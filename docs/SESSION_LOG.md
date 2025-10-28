@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2532c901e006180af392ec0e86948959619fce8f -->
+## 2025-10-28T12:50:16+00:00 — Fix thieving chat messaging and namespace references
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs, Assets/Scripts/Skills/Thieving/Interaction/NpcThievingTarget.cs
+- Diff: 3 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:e8afd8edcae56800293bdbb37279aebcd164a113 -->
 ## 2025-10-28T12:47:08+00:00 — Merge pull request #1489 from aicovergod/codex/fix-console-errors-in-thievingsuccesscalculatortests
 
