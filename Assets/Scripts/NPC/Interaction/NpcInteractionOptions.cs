@@ -17,6 +17,14 @@ namespace NPC
         private bool enableAttack = false;
 
         [SerializeField]
+        [Tooltip("When enabled the Pet Attack option will be exposed whenever an eligible combat pet is active.")]
+        private bool enablePetAttack = true;
+
+        [SerializeField]
+        [Tooltip("When enabled the Companion Attack option will be exposed whenever an eligible combat companion is active.")]
+        private bool enableCompanionAttack = true;
+
+        [SerializeField]
         [Tooltip("When enabled the Talk-to option will appear in the right-click menu.")]
         private bool enableTalk = true;
 
@@ -61,6 +69,16 @@ namespace NPC
         public bool IsAttackEnabled => enableAttack;
 
         /// <summary>
+        ///     Gets whether the pet attack option is exposed for the NPC when pets are able to fight.
+        /// </summary>
+        public bool IsPetAttackEnabled => enablePetAttack;
+
+        /// <summary>
+        ///     Gets whether the companion attack option is exposed for the NPC when companions are able to fight.
+        /// </summary>
+        public bool IsCompanionAttackEnabled => enableCompanionAttack;
+
+        /// <summary>
         ///     Updates the pickpocket availability at runtime so skills can temporarily disable the option during cooldowns.
         /// </summary>
         /// <param name="enabled">True when pickpocketing should be exposed in the context menu.</param>
@@ -76,6 +94,24 @@ namespace NPC
         public void SetAttackEnabled(bool enabled)
         {
             enableAttack = enabled;
+        }
+
+        /// <summary>
+        ///     Updates the pet attack availability at runtime, allowing scripted encounters to override the default configuration.
+        /// </summary>
+        /// <param name="enabled">True when the pet attack entry should appear in the right-click menu.</param>
+        public void SetPetAttackEnabled(bool enabled)
+        {
+            enablePetAttack = enabled;
+        }
+
+        /// <summary>
+        ///     Updates the companion attack availability at runtime, allowing scripted encounters to override the default configuration.
+        /// </summary>
+        /// <param name="enabled">True when the companion attack entry should appear in the right-click menu.</param>
+        public void SetCompanionAttackEnabled(bool enabled)
+        {
+            enableCompanionAttack = enabled;
         }
     }
 
