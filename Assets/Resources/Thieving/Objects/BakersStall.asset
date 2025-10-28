@@ -20,17 +20,17 @@ MonoBehaviour:
   lootTable:
   - itemId: Bread
     quantityRange: {x: 1, y: 1}
-    weight: 50
+    dropChancePercent: 50
     guaranteed: 0
     notedQuantity: 0
   - itemId: Cake
     quantityRange: {x: 1, y: 1}
-    weight: 30
+    dropChancePercent: 30
     guaranteed: 0
     notedQuantity: 0
   - itemId: Chocolate Slice
     quantityRange: {x: 1, y: 1}
-    weight: 20
+    dropChancePercent: 20
     guaranteed: 0
     notedQuantity: 0
   baseLootRolls: 1

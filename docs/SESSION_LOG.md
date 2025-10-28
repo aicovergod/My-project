@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7a33bef912c74485bc27b4565f477ecf82593182 -->
+## 2025-10-28T17:07:06+00:00 — Refine thieving loot rolls to use percentage chances
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (14): Assets/Resources/Thieving/Npcs/Hero.asset, Assets/Resources/Thieving/Npcs/KnightOfArdougne.asset, Assets/Resources/Thieving/Npcs/MasterFarmer.asset, Assets/Resources/Thieving/Npcs/Paladin.asset, Assets/Resources/Thieving/Objects/BakersStall.asset, Assets/Resources/Thieving/Objects/FurStall.asset, Assets/Resources/Thieving/Objects/GemStall.asset, Assets/Resources/Thieving/Objects/SilkStall.asset, Assets/Resources/Thieving/Objects/SilverStall.asset, Assets/Resources/Thieving/Objects/TeaStall.asset, Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs, Assets/Scripts/Skills/Thieving/Data/ThievingLootTableEntry.cs, Assets/Scripts/Skills/Thieving/Data/ThievingNpcDefinition.cs, Assets/Scripts/Skills/Thieving/Data/ThievingObjectDefinition.cs
+- Diff: 126 ++ / 55 --
+- Notes:
+  —
+---
 <!-- commit:e8f73e01c746c8b5c11148340eb5ca99b2d4e223 -->
 ## 2025-10-28T16:50:38+00:00 — thieve
 

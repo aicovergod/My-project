@@ -40,7 +40,7 @@ namespace Skills.Thieving.Data
         [SerializeField, Tooltip("Guaranteed coin payout range (min/max inclusive). Set x and y to 0 to disable coins.")]
         private Vector2Int coinRange = new Vector2Int(0, 0);
 
-        [SerializeField, Tooltip("Additional loot entries rolled per successful pickpocket.")]
+        [SerializeField, Tooltip("Additional loot entries rolled per successful pickpocket. Configure chance (%) per entry in the table.")]
         private List<ThievingLootTableEntry> lootTable = new List<ThievingLootTableEntry>();
 
         [SerializeField, Tooltip("Base number of loot rolls performed when resolving the table.")]
@@ -96,7 +96,7 @@ namespace Skills.Thieving.Data
         public Vector2Int CoinRange => coinRange;
 
         /// <summary>
-        ///     Weighted loot table used for additional rewards.
+        ///     Loot table evaluated using per-entry chance percentages for additional rewards.
         /// </summary>
         public IReadOnlyList<ThievingLootTableEntry> LootTable => lootTable;
 

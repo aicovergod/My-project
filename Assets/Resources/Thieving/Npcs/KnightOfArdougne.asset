@@ -23,7 +23,7 @@ MonoBehaviour:
   lootTable:
   - itemId: Nature Rune
     quantityRange: {x: 1, y: 2}
-    weight: 10
+    dropChancePercent: 100
     guaranteed: 0
     notedQuantity: 0
   baseLootRolls: 1

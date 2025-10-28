@@ -23,22 +23,22 @@ MonoBehaviour:
   lootTable:
   - itemId: Potato Seed
     quantityRange: {x: 1, y: 4}
-    weight: 40
+    dropChancePercent: 36.36
     guaranteed: 0
     notedQuantity: 0
   - itemId: Onion Seed
     quantityRange: {x: 1, y: 4}
-    weight: 35
+    dropChancePercent: 31.82
     guaranteed: 0
     notedQuantity: 0
   - itemId: Sweetcorn Seed
     quantityRange: {x: 1, y: 2}
-    weight: 20
+    dropChancePercent: 18.18
     guaranteed: 0
     notedQuantity: 0
   - itemId: Strawberry Seed
     quantityRange: {x: 1, y: 2}
-    weight: 15
+    dropChancePercent: 13.64
     guaranteed: 0
     notedQuantity: 0
   baseLootRolls: 1

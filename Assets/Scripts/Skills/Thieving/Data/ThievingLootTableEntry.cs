@@ -5,7 +5,7 @@ namespace Skills.Thieving.Data
 {
     /// <summary>
     ///     Defines an entry within a thieving loot table. Mirrors the OSRS pickpocket and stall
-    ///     loot behaviour where each entry can contribute weighted chances and optional guaranteed drops.
+    ///     loot behaviour where each entry can contribute percentage-based chances and optional guaranteed drops.
     /// </summary>
     [Serializable]
     public struct ThievingLootTableEntry
@@ -16,8 +16,9 @@ namespace Skills.Thieving.Data
         [Tooltip("Inclusive quantity range rolled when the entry is awarded (min, max).")]
         public Vector2Int quantityRange;
 
-        [Tooltip("Relative weight used when rolling this entry. Set to 0 for purely guaranteed rewards.")]
-        public float weight;
+        [Tooltip("Percentage chance used when rolling this entry (0-100). Set to 0 for purely guaranteed rewards.")]
+        [Range(0f, 100f)]
+        public float dropChancePercent;
 
         [Tooltip("When true the entry is always granted before any weighted rolls.")]
         public bool guaranteed;

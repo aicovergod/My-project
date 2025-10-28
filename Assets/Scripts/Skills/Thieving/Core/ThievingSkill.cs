@@ -626,58 +626,128 @@ namespace Skills.Thieving.Core
             if (lootTable == null || lootTable.Count == 0 || rolls <= 0)
                 return rewards;
 
-            // Guaranteed entries are added once before weighted rolls.
+            var chanceEntries = new List<(ThievingLootTableEntry entry, ItemData item, float clampedChance)>();
+            float totalChance = 0f;
+
+            // Guaranteed entries are added once before percentage-based rolls.
             for (int i = 0; i < lootTable.Count; i++)
             {
                 var entry = lootTable[i];
-                if (!entry.guaranteed)
-                    continue;
-
-                var item = ItemDatabase.GetItem(entry.itemId);
-                if (item == null)
-                    continue;
-
-                int quantity = ResolveQuantity(entry.quantityRange);
-                if (quantity <= 0)
-                    continue;
-
-                rewards.Add((item, quantity));
-            }
-
-            float totalWeight = 0f;
-            for (int i = 0; i < lootTable.Count; i++)
-            {
-                if (!lootTable[i].guaranteed)
-                    totalWeight += Mathf.Max(0f, lootTable[i].weight);
-            }
-
-            if (totalWeight <= 0f)
-                return rewards;
-
-            for (int r = 0; r < rolls; r++)
-            {
-                float roll = Random.Range(0f, totalWeight);
-                float accumulator = 0f;
-                for (int i = 0; i < lootTable.Count; i++)
+                if (entry.guaranteed)
                 {
-                    var entry = lootTable[i];
-                    if (entry.guaranteed || entry.weight <= 0f)
-                        continue;
-
-                    accumulator += entry.weight;
-                    if (roll > accumulator)
-                        continue;
-
                     var item = ItemDatabase.GetItem(entry.itemId);
                     if (item == null)
-                        break;
+                    {
+                        if (EnableDebugLogging)
+                        {
+                            Debug.Log($"[Thieving] Skipping guaranteed loot entry '{entry.itemId}' because the ItemDatabase lookup failed.", this);
+                        }
+
+                        continue;
+                    }
 
                     int quantity = ResolveQuantity(entry.quantityRange);
                     if (quantity <= 0)
-                        break;
+                    {
+                        if (EnableDebugLogging)
+                        {
+                            Debug.Log($"[Thieving] Guaranteed loot entry '{entry.itemId}' resolved to a non-positive quantity ({quantity}) and was skipped.", this);
+                        }
+
+                        continue;
+                    }
 
                     rewards.Add((item, quantity));
+
+                    if (EnableDebugLogging)
+                    {
+                        string guaranteedName = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
+                        Debug.Log($"[Thieving] Added guaranteed loot '{guaranteedName}' x{quantity}.", this);
+                    }
+
+                    continue;
+                }
+
+                float clampedChance = Mathf.Clamp(entry.dropChancePercent, 0f, 100f);
+                if (clampedChance <= 0f)
+                    continue;
+
+                var nonGuaranteedItem = ItemDatabase.GetItem(entry.itemId);
+                if (nonGuaranteedItem == null)
+                {
+                    if (EnableDebugLogging)
+                    {
+                        Debug.Log($"[Thieving] Skipping loot entry '{entry.itemId}' because the ItemDatabase lookup failed.", this);
+                    }
+
+                    continue;
+                }
+
+                chanceEntries.Add((entry, nonGuaranteedItem, clampedChance));
+                totalChance += clampedChance;
+            }
+
+            if (chanceEntries.Count == 0)
+                return rewards;
+
+            if (EnableDebugLogging)
+            {
+                float clampedTotal = Mathf.Min(100f, totalChance);
+                Debug.Log(
+                    $"[Thieving] Prepared {chanceEntries.Count} loot entries totalling {clampedTotal:F2}% chance (raw {totalChance:F2}%).",
+                    this);
+            }
+
+            for (int r = 0; r < rolls; r++)
+            {
+                float rollValue = Random.Range(0f, 100f);
+                float cumulativeChance = 0f;
+                bool awarded = false;
+
+                for (int i = 0; i < chanceEntries.Count; i++)
+                {
+                    var candidate = chanceEntries[i];
+                    cumulativeChance += candidate.clampedChance;
+
+                    if (rollValue > cumulativeChance)
+                        continue;
+
+                    int quantity = ResolveQuantity(candidate.entry.quantityRange);
+                    if (quantity <= 0)
+                    {
+                        if (EnableDebugLogging)
+                        {
+                            Debug.Log(
+                                $"[Thieving] Loot roll {r + 1}/{rolls}: rolled {rollValue:F2}% and hit '{candidate.entry.itemId}' but the resolved quantity ({quantity}) was non-positive.",
+                                this);
+                        }
+
+                        awarded = true;
+                        break;
+                    }
+
+                    rewards.Add((candidate.item, quantity));
+
+                    if (EnableDebugLogging)
+                    {
+                        string candidateName = !string.IsNullOrEmpty(candidate.item.itemName)
+                            ? candidate.item.itemName
+                            : candidate.item.name;
+                        Debug.Log(
+                            $"[Thieving] Loot roll {r + 1}/{rolls}: rolled {rollValue:F2}% -> '{candidateName}' x{quantity} (threshold {cumulativeChance:F2}%).",
+                            this);
+                    }
+
+                    awarded = true;
                     break;
+                }
+
+                if (!awarded && EnableDebugLogging)
+                {
+                    float effectiveTotalChance = Mathf.Min(100f, totalChance);
+                    Debug.Log(
+                        $"[Thieving] Loot roll {r + 1}/{rolls}: rolled {rollValue:F2}% with total configured chance {effectiveTotalChance:F2}% -> no drop.",
+                        this);
                 }
             }
 

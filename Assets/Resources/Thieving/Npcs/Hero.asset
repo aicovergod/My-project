@@ -23,17 +23,17 @@ MonoBehaviour:
   lootTable:
   - itemId: Diamond
     quantityRange: {x: 1, y: 1}
-    weight: 5
+    dropChancePercent: 16.67
     guaranteed: 0
     notedQuantity: 0
   - itemId: Ruby
     quantityRange: {x: 1, y: 1}
-    weight: 10
+    dropChancePercent: 33.33
     guaranteed: 0
     notedQuantity: 0
   - itemId: Emerald
     quantityRange: {x: 1, y: 1}
-    weight: 15
+    dropChancePercent: 50
     guaranteed: 0
     notedQuantity: 0
   baseLootRolls: 1
