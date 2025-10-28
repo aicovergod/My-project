@@ -332,7 +332,7 @@ namespace Environment.Companion
 
             if (body != null)
             {
-                Vector2 velocity = body.velocity;
+                Vector2 velocity = body.linearVelocity;
                 if (velocity.sqrMagnitude >= minimumVelocitySqr)
                 {
                     entryHeading = velocity.normalized;
@@ -340,7 +340,6 @@ namespace Environment.Companion
                 }
             }
 
-<<<<<<< Updated upstream
             if (!hasHeading && controller != null && controller.TryGetMovementHeading(out Vector2 fallbackHeading))
             {
                 if (fallbackHeading.sqrMagnitude > Mathf.Epsilon)
@@ -353,10 +352,6 @@ namespace Environment.Companion
             }
 
             if (!hasHeading)
-=======
-            Vector2 velocity = body.linearVelocity;
-            if (velocity.sqrMagnitude < MinimumDirectionalVelocity * MinimumDirectionalVelocity)
->>>>>>> Stashed changes
             {
                 LogDebug("Directional entry blocked because the companion is moving too slowly to determine heading.", controller);
                 return false;
