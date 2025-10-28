@@ -415,11 +415,10 @@ namespace Companions
                 yield return new WaitForFixedUpdate();
             }
 
-            EnableFollower();
-
             if (station == null || recipe == null)
             {
                 PublishStationUnavailableMessage();
+                EnableFollower();
                 yield break;
             }
 
@@ -430,6 +429,7 @@ namespace Companions
                 if (transferred <= 0)
                 {
                     PublishMissingIngredientMessage();
+                    EnableFollower();
                     yield break;
                 }
 
@@ -446,6 +446,7 @@ namespace Companions
                 else
                     PublishStationUnavailableMessage();
 
+                EnableFollower();
                 yield break;
             }
 
