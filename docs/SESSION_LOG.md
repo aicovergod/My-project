@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:83e984470cd3f915180c8f4a542c58fc74fb43fd -->
+## 2025-10-28T12:50:35+00:00 — Merge pull request #1490 from aicovergod/codex/fix-console-errors-in-thieving-scripts
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 12 ++ / 2 --
+- Notes:
+  Fix thieving chat messaging and namespace references
+---
+<!-- commit:ea7fcabca98b9dff78e4dca7150ac099696d107b -->
+## 2025-10-28T12:50:28+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2532c901e006180af392ec0e86948959619fce8f -->
 ## 2025-10-28T12:50:16+00:00 — Fix thieving chat messaging and namespace references
 
