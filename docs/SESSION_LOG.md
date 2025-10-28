@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b7abf2fd13f70770c76e3bd75ff4483eab59aec0 -->
+## 2025-10-28T13:19:54+00:00 — Merge pull request #1492 from aicovergod/codex/add-examine-field-to-npc-interaction
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 141 ++ / 12 --
+- Notes:
+  Add configurable NPC examine messaging
+---
+<!-- commit:8deea0cf9fa1ded1ef7753100b43a42f5d6c3d0b -->
+## 2025-10-28T13:19:42+00:00 — Add configurable NPC examine messaging
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/NPC/Interaction/NpcExamine.cs, Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/NPC/Interaction/NpcInteractionOptions.cs
+- Diff: 141 ++ / 12 --
+- Notes:
+  —
+---
 <!-- commit:50770bf700fd79e2f5e99e9977e594a9c6596d63 -->
 ## 2025-10-28T13:09:05+00:00 — Merge pull request #1491 from aicovergod/codex/update-rightclickmenu-for-dependency-injection
 
