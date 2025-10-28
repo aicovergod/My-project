@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:50770bf700fd79e2f5e99e9977e594a9c6596d63 -->
+## 2025-10-28T13:09:05+00:00 — Merge pull request #1491 from aicovergod/codex/update-rightclickmenu-for-dependency-injection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 16 ++ / 1 --
+- Notes:
+  Ensure RightClickMenu factory pre-installs required UI components
+---
+<!-- commit:d4ab295989952bbdadf1d7b68b686864f60e3d14 -->
+## 2025-10-28T13:08:55+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:2d857223430377de5da1e525e97deafcac1183e8 -->
 ## 2025-10-28T13:08:41+00:00 — Ensure RightClickMenu factory prebuilds UI components
 
