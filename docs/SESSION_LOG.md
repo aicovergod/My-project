@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d66bd0fb7300eba8c45c324c47bc2d6e1c8ffaa2 -->
+## 2025-10-28T13:29:17+00:00 — Merge pull request #1493 from aicovergod/codex/add-player-movement-towards-npc-on-trade
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 178 ++ / 5 --
+- Notes:
+  Auto-walk player into NPC trade range
+---
+<!-- commit:8ab68a076839c99243e456fca2fd15a699d02e08 -->
+## 2025-10-28T13:29:10+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:613b9b5c1aa0e7d97da6e8a42d791dab116c2140 -->
 ## 2025-10-28T13:28:56+00:00 — Auto-walk player into trade range before opening shops
 
