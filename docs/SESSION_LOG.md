@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:74640295a09f720764eb7a3813086ebd63657be5 -->
+## 2025-10-28T12:33:44+00:00 — Refactor context menu positioning into shared helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs, Assets/Scripts/Inventory/InventoryDropMenu.cs, Assets/Scripts/Inventory/UI/InventoryItemContextMenu.cs, Assets/Scripts/UI/ContextMenus/ContextMenuPositioner.cs
+- Diff: 186 ++ / 93 --
+- Notes:
+  —
+---
 <!-- commit:90bdaa75ab22daea0348c9ef4e59afa16c623381 -->
 ## 2025-10-28T12:05:46+00:00 — Merge pull request #1486 from aicovergod/codex/update-processrewards-for-item-handling
 
