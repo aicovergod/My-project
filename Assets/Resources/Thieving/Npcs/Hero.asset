@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a5f908c6fb44fcb889f73cf54c5ecbe, type: 3}
+  m_Name: Hero
+  m_EditorClassIdentifier:
+  id: Hero
+  displayName: Hero
+  requiredLevel: 80
+  baseXp: 275
+  lowSuccessThreshold: 110
+  highSuccessThreshold: 230
+  post99ThresholdGain: 0
+  coinRange: {x: 200, y: 300}
+  lootTable:
+  - itemId: Diamond
+    quantityRange: {x: 1, y: 1}
+    weight: 5
+    guaranteed: 0
+    notedQuantity: 0
+  - itemId: Ruby
+    quantityRange: {x: 1, y: 1}
+    weight: 10
+    guaranteed: 0
+    notedQuantity: 0
+  - itemId: Emerald
+    quantityRange: {x: 1, y: 1}
+    weight: 15
+    guaranteed: 0
+    notedQuantity: 0
+  baseLootRolls: 1
+  rogueOutfitBonusRolls: 0
+  damageOnFail: 4
+  stunTicks: 6
+  cooldownTicks: 20
+  failuresBeforeCooldown: 3
+  petRollDenominator: 0
+  interactionTicks: 2

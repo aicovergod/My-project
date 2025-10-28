@@ -19,6 +19,7 @@ namespace Skills
         Ranged,
         Defence,
         Magic,
-        Fishing
+        Fishing,
+        Thieving
     }
 }

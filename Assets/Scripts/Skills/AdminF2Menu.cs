@@ -14,6 +14,7 @@ using Skills.Mining;
 using Skills.Outfits;
 using Skills.Woodcutting;
 using Skills.Firemaking;
+using Skills.Thieving.Core;
 using Status;
 using Status.Antifire;
 using Status.Poison;
@@ -69,6 +70,9 @@ namespace Skills
         private string woodcuttingLevel = "";
         private string firemakingLevel = "";
         private string fishingLevel = "";
+        [SerializeField]
+        [Tooltip("Serialized so QA can pre-configure Thieving level overrides for spawn rooms when needed.")]
+        private string thievingLevel = "";
         private string cookingLevel = "";
         private string beastmasterLevel = "";
 
@@ -89,6 +93,7 @@ namespace Skills
         private const string MagicLevelControlName = "AdminF2Menu_MagicLevel";
         private const string MiningLevelControlName = "AdminF2Menu_MiningLevel";
         private const string FishingLevelControlName = "AdminF2Menu_FishingLevel";
+        private const string ThievingLevelControlName = "AdminF2Menu_ThievingLevel";
         private const string CookingLevelControlName = "AdminF2Menu_CookingLevel";
         private const string FiremakingLevelControlName = "AdminF2Menu_FiremakingLevel";
         private const string WoodcuttingLevelControlName = "AdminF2Menu_WoodcuttingLevel";
@@ -100,6 +105,7 @@ namespace Skills
         private FiremakingSkill firemakingSkillBehaviour;
         private FishingSkill fishingSkillBehaviour;
         private CookingSkill cookingSkillBehaviour;
+        private ThievingSkill thievingSkillBehaviour;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -180,6 +186,8 @@ namespace Skills
                 fishingSkillBehaviour = FindObjectOfType<FishingSkill>();
             if (cookingSkillBehaviour == null)
                 cookingSkillBehaviour = FindObjectOfType<CookingSkill>();
+            if (thievingSkillBehaviour == null)
+                thievingSkillBehaviour = FindObjectOfType<ThievingSkill>();
         }
 
         private void RefreshFields()
@@ -205,6 +213,7 @@ namespace Skills
             firemakingSkillBehaviour = FindObjectOfType<FiremakingSkill>();
             fishingSkillBehaviour = FindObjectOfType<FishingSkill>();
             cookingSkillBehaviour = FindObjectOfType<CookingSkill>();
+            thievingSkillBehaviour = FindObjectOfType<ThievingSkill>();
 
             hpLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Hitpoints).ToString() : "";
             attackLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Attack).ToString() : "";
@@ -216,6 +225,7 @@ namespace Skills
             woodcuttingLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Woodcutting).ToString() : "";
             firemakingLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Firemaking).ToString() : "";
             fishingLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Fishing).ToString() : "";
+            thievingLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Thieving).ToString() : "";
             cookingLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Cooking).ToString() : "";
             beastmasterLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Beastmaster).ToString() : "";
         }
@@ -247,6 +257,7 @@ namespace Skills
             magicLevel = DrawLevelField("Magic Level", MagicLevelControlName, magicLevel);
             miningLevel = DrawLevelField("Mining Level", MiningLevelControlName, miningLevel);
             fishingLevel = DrawLevelField("Fishing Level", FishingLevelControlName, fishingLevel);
+            thievingLevel = DrawLevelField("Thieving Level", ThievingLevelControlName, thievingLevel);
             cookingLevel = DrawLevelField("Cooking Level", CookingLevelControlName, cookingLevel);
             firemakingLevel = DrawLevelField("Firemaking Level", FiremakingLevelControlName, firemakingLevel);
             woodcuttingLevel = DrawLevelField("Woodcutting Level", WoodcuttingLevelControlName, woodcuttingLevel);
@@ -279,6 +290,11 @@ namespace Skills
                 () => fishingSkillBehaviour != null,
                 () => fishingSkillBehaviour.EnableDebugLogging,
                 value => fishingSkillBehaviour.EnableDebugLogging = value);
+            DrawSkillDebugToggle(
+                "Thieving Debug Logging",
+                () => thievingSkillBehaviour != null,
+                () => thievingSkillBehaviour.EnableDebugLogging,
+                value => thievingSkillBehaviour.EnableDebugLogging = value);
             DrawSkillDebugToggle(
                 "Cooking Debug Logging",
                 () => cookingSkillBehaviour != null,
@@ -788,6 +804,8 @@ namespace Skills
                 targetSkillManager.DebugSetLevel(SkillType.Mining, mine);
             if (int.TryParse(fishingLevel, out var fish))
                 targetSkillManager.DebugSetLevel(SkillType.Fishing, fish);
+            if (int.TryParse(thievingLevel, out var thv))
+                targetSkillManager.DebugSetLevel(SkillType.Thieving, thv);
             if (int.TryParse(cookingLevel, out var cook))
                 targetSkillManager.DebugSetLevel(SkillType.Cooking, cook);
             if (int.TryParse(firemakingLevel, out var fire))
@@ -840,6 +858,8 @@ namespace Skills
             {
                 case SkillType.Hitpoints:
                     return 10;
+                case SkillType.Thieving:
+                    return 1;
                 default:
                     return 1;
             }

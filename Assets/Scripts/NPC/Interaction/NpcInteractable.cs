@@ -8,10 +8,13 @@ using ShopSystem;
 using Pets;
 using Companions;
 using Combat;
+using Player;
 using UI;
 using UI.Utilities;
 using Util;
 using Core.Input;
+using Skills.Thieving;
+using Skills.Thieving.Core;
 
 namespace NPC
 {
@@ -449,7 +452,25 @@ namespace NPC
 
         public virtual void Pickpocket()
         {
-            Debug.Log($"You attempt to pickpocket {name}, but nothing happens yet.");
+            if (!PlayerLocator.TryFindPlayer(out var playerObject) || playerObject == null)
+            {
+                Debug.LogWarning($"{nameof(NpcInteractable)}.{nameof(Pickpocket)} could not locate the player.", this);
+                return;
+            }
+
+            if (!playerObject.TryGetComponent(out ThievingSkill thievingSkill) || thievingSkill == null)
+            {
+                Debug.LogWarning($"{nameof(NpcInteractable)}.{nameof(Pickpocket)} missing ThievingSkill on player.", playerObject);
+                return;
+            }
+
+            if (!TryGetComponent(out NpcThievingTarget thievingTarget) || thievingTarget == null)
+            {
+                Debug.LogWarning($"{nameof(NpcInteractable)}.{nameof(Pickpocket)} missing {nameof(NpcThievingTarget)}.", this);
+                return;
+            }
+
+            thievingSkill.TryStartPickpocket(thievingTarget);
         }
     }
 }

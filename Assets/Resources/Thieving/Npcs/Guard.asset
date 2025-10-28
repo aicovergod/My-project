@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a5f908c6fb44fcb889f73cf54c5ecbe, type: 3}
+  m_Name: Guard
+  m_EditorClassIdentifier:
+  id: Guard
+  displayName: Guard
+  requiredLevel: 40
+  baseXp: 46.8
+  lowSuccessThreshold: 128
+  highSuccessThreshold: 230
+  post99ThresholdGain: 0
+  coinRange: {x: 30, y: 30}
+  lootTable: []
+  baseLootRolls: 1
+  rogueOutfitBonusRolls: 0
+  damageOnFail: 2
+  stunTicks: 5
+  cooldownTicks: 12
+  failuresBeforeCooldown: 3
+  petRollDenominator: 0
+  interactionTicks: 2
