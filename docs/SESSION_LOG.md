@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:79fb1bbb839ffe70b02c4df7f955e200fcc31922 -->
+## 2025-10-28T14:06:42+00:00 — Merge pull request #1496 from aicovergod/codex/add-attack-button-to-right-click-menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 232 ++ / 51 --
+- Notes:
+  Add attack options to NPC right-click menu
+---
+<!-- commit:464f838473b59489098b7fd4024b9a7763656204 -->
+## 2025-10-28T14:06:23+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:dabc2e9d2512345a86aa6f0f5b178dcdd0cd7375 -->
 ## 2025-10-28T14:06:08+00:00 — Add attack options to NPC right-click menu
 
