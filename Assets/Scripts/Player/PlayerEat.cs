@@ -68,16 +68,25 @@ namespace Player
 
             bool cachedFreezeSprite = spriteController != null && spriteController.FreezeSprite;
             bool spriteFreezeChangedByEat = false;
+            bool obtainedMovementLockThisCall = false;
 
-            movementFrozenByEat = false;
-            if (TryFreezeMovement())
+            if (!movementFrozenByEat)
             {
-                movementFrozenByEat = true;
+                obtainedMovementLockThisCall = TryFreezeMovement();
+                if (obtainedMovementLockThisCall)
+                    movementFrozenByEat = true;
+            }
 
-                if (spriteController != null)
+            if (movementFrozenByEat && spriteController != null)
+            {
+                // Only adjust the sprite freeze flag if we either grabbed the movement lock just now
+                // or if another system re-enabled sprite freezing while we still own the lock.
+                bool shouldUnfreezeSprite = obtainedMovementLockThisCall || spriteController.FreezeSprite;
+                if (shouldUnfreezeSprite)
                 {
-                    spriteFreezeChangedByEat = spriteController.FreezeSprite != false;
-                    spriteController.FreezeSprite = false;
+                    spriteFreezeChangedByEat = spriteController.FreezeSprite;
+                    if (spriteFreezeChangedByEat)
+                        spriteController.FreezeSprite = false;
                 }
             }
 
