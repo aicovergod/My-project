@@ -622,7 +622,7 @@ namespace Companions.Equipment
             Font fallbackFont = LegacyFontProvider.GetLegacyFont();
             ApplyDefaultTextStyling(fallbackFont);
 
-            var playerEquipment = FindObjectOfType<Inventory.Equipment>();
+            var playerEquipment = FindObjectOfType<global::Inventory.Equipment>();
             if (playerEquipment == null)
             {
                 emptySlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Empty_Slot");

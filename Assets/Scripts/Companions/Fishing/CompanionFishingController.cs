@@ -608,7 +608,7 @@ namespace Companions
                         }
 
                         bool closedGap = cumulativeDistanceClosed >= ProgressResetThreshold;
-                        bool effectivelyClose = distance <= FishingRange * CloseEnoughDistanceMultiplier;
+                        bool effectivelyClose = distance <= GatheringRange * CloseEnoughDistanceMultiplier;
                         bool activelyFishing = fishingSkill != null && fishingSkill.IsFishing;
 
                         if (closedGap || effectivelyClose || activelyFishing)
@@ -634,7 +634,7 @@ namespace Companions
                         break;
                     }
 
-                    if (distance > FishingRange)
+                    if (distance > GatheringRange)
                     {
                         float moveSpeed = ResolveMoveSpeed();
                         float deltaTime = body != null
@@ -659,7 +659,7 @@ namespace Companions
                                 navigationStepTaken = pathMover.TryStepAttack(
                                     deltaTime,
                                     moveSpeed,
-                                    FishingRange,
+                                    GatheringRange,
                                     WaypointTolerance,
                                     () => spot != null ? (Vector2)spot.transform.position : (Vector2)transform.position,
                                     ReplanDistance,
@@ -703,7 +703,7 @@ namespace Companions
                             }
                         }
 
-                        if (fishingSkill.IsFishing && distance > FishingRange * 1.2f)
+                        if (fishingSkill.IsFishing && distance > GatheringRange * 1.2f)
                             fishingSkill.StopFishing();
                     }
                     else

@@ -1113,7 +1113,8 @@ namespace Companions
                 "[Companion] Cannot command mining: the companion is not currently active.",
                 CompanionSkillCooldownTimers.ShouldDeclineMiningRequest,
                 result => $"[Companion] Mining command outcome: accepted=False (result={result}).",
-                (skillController, out CompanionMiningCommandResult result) => skillController.TryCommandMine(rock, out result),
+                (CompanionMiningController skillController, out CompanionMiningCommandResult result) =>
+                    skillController.TryCommandMine(rock, out result),
                 result => result == CompanionMiningCommandResult.InventoryFull,
                 (accepted, result) =>
                 {
@@ -1165,7 +1166,8 @@ namespace Companions
                 CompanionMiningCommandResult.RequirementsNotMet,
                 CompanionSkillCooldownTimers.ShouldDeclineMiningRequest,
                 (r, result) => $"[Companion] Area mining command outcome: success=False, radius={r}, reason=Cooldown active.",
-                (skillController, scanRadius, out CompanionMiningCommandResult result) => skillController.TryStartAreaMining(scanRadius, out result),
+                (CompanionMiningController skillController, float scanRadius, out CompanionMiningCommandResult result) =>
+                    skillController.TryStartAreaMining(scanRadius, out result),
                 result => result == CompanionMiningCommandResult.InventoryFull,
                 (accepted, result, scanRadius) =>
                 {
@@ -1208,7 +1210,8 @@ namespace Companions
                 "[Companion] Cannot command fishing: the companion is not currently active.",
                 CompanionSkillCooldownTimers.ShouldDeclineFishingRequest,
                 result => $"[Companion] Fishing command outcome: accepted=False (result={result}).",
-                (skillController, out CompanionFishingCommandResult result) => skillController.TryCommandFish(spot, out result),
+                (CompanionFishingController skillController, out CompanionFishingCommandResult result) =>
+                    skillController.TryCommandFish(spot, out result),
                 result => result == CompanionFishingCommandResult.InventoryFull,
                 (accepted, result) =>
                 {
@@ -1260,7 +1263,8 @@ namespace Companions
                 CompanionFishingCommandResult.RequirementsNotMet,
                 CompanionSkillCooldownTimers.ShouldDeclineFishingRequest,
                 (r, result) => $"[Companion] Area fishing command outcome: success=False, radius={r}, reason=Cooldown active.",
-                (skillController, scanRadius, out CompanionFishingCommandResult result) => skillController.TryStartAreaFishing(scanRadius, out result),
+                (CompanionFishingController skillController, float scanRadius, out CompanionFishingCommandResult result) =>
+                    skillController.TryStartAreaFishing(scanRadius, out result),
                 result => result == CompanionFishingCommandResult.InventoryFull,
                 (accepted, result, scanRadius) =>
                 {
@@ -1330,7 +1334,8 @@ namespace Companions
                 "[Companion] Cannot command cooking: the companion is not currently active.",
                 CompanionSkillCooldownTimers.ShouldDeclineCookingRequest,
                 cooldown => $"[Companion] Cooking command outcome: accepted=False (result={cooldown}).",
-                (skillController, out CompanionCookingCommandResult commandResult) => skillController.TryCommandCook(station, recipe, out commandResult),
+                (CompanionCookingController skillController, out CompanionCookingCommandResult commandResult) =>
+                    skillController.TryCommandCook(station, recipe, out commandResult),
                 commandResult => commandResult == CompanionCookingCommandResult.InventoryFull,
                 (accepted, commandResult) =>
                 {
@@ -1349,7 +1354,8 @@ namespace Companions
                 },
                 commandResult => commandResult == CompanionCookingCommandResult.InventoryFull,
                 TryDepositCompanionInventoryToBank,
-                (skillController, out CompanionCookingCommandResult retryResult) => skillController.TryCommandCook(station, recipe, out retryResult));
+                (CompanionCookingController skillController, out CompanionCookingCommandResult retryResult) =>
+                    skillController.TryCommandCook(station, recipe, out retryResult));
         }
 
         /// <summary>
@@ -1387,7 +1393,8 @@ namespace Companions
                 CompanionCookingCommandResult.RequirementsNotMet,
                 CompanionSkillCooldownTimers.ShouldDeclineCookingRequest,
                 (r, result) => $"[Companion] Area cooking command outcome: success=False, radius={r}, reason=Cooldown active.",
-                (skillController, scanRadius, out CompanionCookingCommandResult result) => skillController.TryStartAreaCooking(scanRadius, out result),
+                (CompanionCookingController skillController, float scanRadius, out CompanionCookingCommandResult result) =>
+                    skillController.TryStartAreaCooking(scanRadius, out result),
                 result => result == CompanionCookingCommandResult.InventoryFull,
                 (accepted, result, scanRadius) =>
                 {
@@ -1413,7 +1420,8 @@ namespace Companions
                 out failureReason,
                 result => result == CompanionCookingCommandResult.InventoryFull,
                 TryDepositCompanionInventoryToBank,
-                (skillController, scanRadius, out CompanionCookingCommandResult retryResult) => skillController.TryStartAreaCooking(scanRadius, out retryResult));
+                (CompanionCookingController skillController, float scanRadius, out CompanionCookingCommandResult retryResult) =>
+                    skillController.TryStartAreaCooking(scanRadius, out retryResult));
         }
 
         private static void PublishCookingStartMessage()
@@ -1450,7 +1458,8 @@ namespace Companions
                 "[Companion] Cannot command woodcutting: the companion is not currently active.",
                 CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest,
                 result => $"[Companion] Woodcutting command outcome: accepted=False (result={result}).",
-                (skillController, out CompanionWoodcuttingCommandResult result) => skillController.TryCommandChop(tree, out result),
+                (CompanionWoodcuttingController skillController, out CompanionWoodcuttingCommandResult result) =>
+                    skillController.TryCommandChop(tree, out result),
                 result => result == CompanionWoodcuttingCommandResult.InventoryFull,
                 (accepted, result) =>
                 {
@@ -1502,7 +1511,8 @@ namespace Companions
                 CompanionWoodcuttingCommandResult.RequirementsNotMet,
                 CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest,
                 (r, result) => $"[Companion] Area woodcutting command outcome: success=False, radius={r}, reason=Cooldown active.",
-                (skillController, scanRadius, out CompanionWoodcuttingCommandResult result) => skillController.TryStartAreaWoodcutting(scanRadius, out result),
+                (CompanionWoodcuttingController skillController, float scanRadius, out CompanionWoodcuttingCommandResult result) =>
+                    skillController.TryStartAreaWoodcutting(scanRadius, out result),
                 result => result == CompanionWoodcuttingCommandResult.InventoryFull,
                 (accepted, result, scanRadius) =>
                 {
