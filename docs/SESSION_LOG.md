@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:01e8f59ad9cd848976487cd71312eefcc8bfa50d -->
+## 2025-10-29T23:37:03+00:00 — chore: reset area blocked flag when cancelling routines
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 685 ++ / 893 --
+- Notes:
+  —
+---
 <!-- commit:54d124d555e902577429805f735f9e2e4f37920d -->
 ## 2025-10-29T23:11:50+00:00 — Merge pull request #1541 from aicovergod/codex/update-agents.md-with-latest-changes-uvj1em
 

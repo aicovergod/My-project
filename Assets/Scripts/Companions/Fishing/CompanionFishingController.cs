@@ -44,12 +44,8 @@ namespace Companions
     /// and delegating the actual fishing routine to <see cref="FishingSkill"/> once in range.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class CompanionFishingController : CompanionSkillingControllerBase
+    public sealed class CompanionFishingController : CompanionGatheringControllerBase<FishableSpot, CompanionFishingCommandResult>
     {
-        private const float FishingRange = 1.5f;
-        private const float ReplanDistance = FishingRange * 0.75f;
-        private const float WaypointTolerance = 0.1f;
-        private const float FacingDeadzoneSqrMagnitude = 0.0001f;
         private const float BlockedSpotExpirySeconds = 4f;
 
         private SkillManager skillManager;
@@ -58,43 +54,19 @@ namespace Companions
         private FishingSkill fishingSkill;
 
         private Coroutine fishingRoutine;
-        private Coroutine areaFishingRoutine;
         private FishableSpot currentSpot;
         private FishingToolDefinition currentTool;
 
-        private readonly List<FishableSpot> areaCandidates = new List<FishableSpot>();
-        private readonly List<Vector3> areaCandidateTileCenters = new List<Vector3>();
-        private readonly Dictionary<FishableSpot, float> blockedSpots = new Dictionary<FishableSpot, float>();
-        private readonly List<FishableSpot> blockedSpotPruneBuffer = new List<FishableSpot>();
         private readonly List<FishDefinition> eligibleFishBuffer = new List<FishDefinition>();
         private Dictionary<string, ItemData> itemCache;
 
         private bool fishingActive;
-        private bool areaFishingActive;
-        private bool followerDisabledForFishing;
         private bool suppressFishingStopCallback;
-        private bool areaAllCandidatesBlocked;
-        private float activeAreaRadius;
-        private FishableSpot lastStuckSpot;
-        private int consecutiveStuckSpotCount;
 
         private Transform playerTransform;
         private FishingSkill playerFishingSkill;
         private FishableSpot playerActiveSpot;
         private CompanionSkillCooldownTracker skillCooldownTracker;
-
-        [Header("Stuck Detection")]
-        [Tooltip("Grace period before a lack of progress is considered \"stuck\".")]
-        [SerializeField, Min(0.1f)] private float stuckTimeoutSeconds = 2.5f;
-
-        private const float ProgressResetThreshold = 0.1f;
-        private const float CloseEnoughDistanceMultiplier = 0.9f;
-        private const int ConsecutiveStuckCancelThreshold = 2;
-
-        /// <summary>
-        /// Indicates whether any systems currently hold the follower disabled so the companion remains stationary.
-        /// </summary>
-        public bool HasActiveFollowerHold => followerDisableLockCount > 0;
 
         /// <summary>
         /// True while the fishing controller has an active routine or the underlying skill reports fishing activity.
@@ -149,8 +121,8 @@ namespace Companions
             ResetFollowerState();
 
             fishingActive = false;
-            areaFishingActive = false;
-            followerDisabledForFishing = false;
+            areaRoutineActive = false;
+            followerDisabledForGathering = false;
             areaAllCandidatesBlocked = false;
             activeAreaRadius = 0f;
             itemCache = new Dictionary<string, ItemData>();
@@ -177,8 +149,7 @@ namespace Companions
         /// <returns>True when the command was accepted, otherwise false.</returns>
         public bool TryCommandFish(FishableSpot spot)
         {
-            bool accepted = TryCommandFish(spot, out var result);
-            return accepted || result == CompanionFishingCommandResult.InventoryFull;
+            return TryCommandAllowingInventoryFull(spot);
         }
 
         /// <summary>
@@ -192,8 +163,7 @@ namespace Companions
         /// <returns>True when the command was accepted, otherwise false.</returns>
         public bool TryCommandFish(FishableSpot spot, bool preserveFollowerHold)
         {
-            bool accepted = TryCommandFish(spot, out var result, preserveFollowerHold);
-            return accepted || result == CompanionFishingCommandResult.InventoryFull;
+            return TryCommandAllowingInventoryFull(spot, preserveFollowerHold);
         }
 
         /// <summary>
@@ -204,7 +174,7 @@ namespace Companions
         /// <returns>True when the command was accepted, otherwise false.</returns>
         public bool TryCommandFish(FishableSpot spot, out CompanionFishingCommandResult result)
         {
-            return TryCommandFish(spot, out result, false);
+            return TryCommandWithResult(spot, out result);
         }
 
         /// <summary>
@@ -216,26 +186,53 @@ namespace Companions
             out CompanionFishingCommandResult result,
             bool preserveFollowerHold)
         {
-            result = CompanionFishingCommandResult.RequirementsNotMet;
+            return TryCommandWithResult(spot, out result, preserveFollowerHold);
+        }
+
+        /// <inheritdoc />
+        protected override CommandAttempt PerformGatheringCommand(FishableSpot spot, bool preserveFollowerHold)
+        {
+            var attempt = new CommandAttempt
+            {
+                Accepted = false,
+                Result = CompanionFishingCommandResult.RequirementsNotMet
+            };
 
             if (!isActiveAndEnabled)
-                return false;
+                return attempt;
 
-            if (CompanionSkillCooldownTimers.ShouldDeclineFishingRequest(skillCooldownTracker, out result))
-                return false;
+            if (CompanionSkillCooldownTimers.ShouldDeclineFishingRequest(skillCooldownTracker, out var cooldownResult))
+            {
+                attempt.Result = cooldownResult;
+                return attempt;
+            }
 
-            if (!TryPrepareFishingCommand(spot, out var tool, out result))
-                return false;
+            if (!TryPrepareFishingCommand(spot, out var tool, out var validationResult))
+            {
+                attempt.Result = validationResult;
+                return attempt;
+            }
 
-            if (preserveFollowerHold)
-                followerDisabledForFishing = HasActiveFollowerHold;
-            else
-                followerDisabledForFishing = false;
+            followerDisabledForGathering = preserveFollowerHold ? HasActiveFollowerHold : false;
 
             BeginFishing(spot, tool);
             CompanionSkillCooldownTimers.ClearFishingCooldown(skillCooldownTracker);
-            result = CompanionFishingCommandResult.Accepted;
-            return true;
+
+            attempt.Accepted = true;
+            attempt.Result = CompanionFishingCommandResult.Accepted;
+            return attempt;
+        }
+
+        /// <inheritdoc />
+        protected override bool ShouldTreatInventoryFullAsSuccess(CompanionFishingCommandResult result)
+        {
+            return result == CompanionFishingCommandResult.InventoryFull;
+        }
+
+        /// <inheritdoc />
+        protected override bool IsNodeDepleted(FishableSpot node)
+        {
+            return node == null || node.IsDepleted;
         }
 
         /// <summary>
@@ -254,30 +251,21 @@ namespace Companions
             if (CompanionSkillCooldownTimers.ShouldDeclineFishingRequest(skillCooldownTracker, out failureReason))
                 return false;
 
-            float clampedRadius = Mathf.Max(0.1f, radius);
+            bool started = TryStartAreaGathering(
+                radius,
+                out failureReason,
+                CompanionFishingCommandResult.Accepted,
+                clampedRadius =>
+                {
+                    bool success = BuildAreaCandidateList(clampedRadius, out var buildFailure);
+                    return (success, buildFailure);
+                },
+                PublishAreaFishingFailureMessage,
+                AreaFishingRoutine,
+                () => CompanionSkillCooldownTimers.ClearFishingCooldown(skillCooldownTracker),
+                "Companion Fishing");
 
-            CancelAreaFishingInternal(true);
-
-            if (!BuildAreaCandidateList(clampedRadius, out failureReason))
-            {
-                PublishAreaFishingFailureMessage(failureReason);
-                return false;
-            }
-
-            failureReason = CompanionFishingCommandResult.Accepted;
-
-            activeAreaRadius = clampedRadius;
-            areaFishingRoutine = StartCoroutine(AreaFishingRoutine());
-            areaFishingActive = true;
-
-            CompanionSkillCooldownTimers.ClearFishingCooldown(skillCooldownTracker);
-
-            if (CompanionManager.EnableDebugLogging)
-            {
-                Debug.Log($"[Companion Fishing] Area fishing started with {areaCandidates.Count} candidates (radius {activeAreaRadius}).", this);
-            }
-
-            return true;
+            return started;
         }
 
         /// <summary>
@@ -304,37 +292,6 @@ namespace Companions
             UnsubscribeFromPlayerFishingSkill();
             BindToPlayerFishingSkill(playerTransform);
             ResetStuckHistory();
-        }
-
-        /// <summary>
-        /// Temporarily disables the follower component so the companion remains stationary until fishing resumes.
-        /// Dispose the returned handle to restore the follower even when fishing never begins.
-        /// </summary>
-        /// <returns>An <see cref="IDisposable"/> handle that restores the follower when disposed.</returns>
-        public IDisposable EnterTemporaryFollowerHold()
-        {
-            if (petFollower == null)
-                return NoOpDisposable.Instance;
-
-            if (followerDisableLockCount > 0)
-            {
-                followerDisableLockCount++;
-                followerDisabledForFishing = true;
-                return new FollowerHold(this);
-            }
-
-            bool toggledFollower = false;
-
-            if (petFollower.enabled)
-            {
-                petFollower.enabled = false;
-                toggledFollower = true;
-            }
-
-            followerDisableLockCount = 1;
-            followerDisabledForFishing = true;
-            followerHoldToggledFollower = toggledFollower;
-            return new FollowerHold(this);
         }
 
         private bool TryPrepareFishingCommand(
@@ -367,9 +324,9 @@ namespace Companions
             }
 
             float now = Time.time;
-            PruneExpiredBlockedSpots(now);
+            PruneExpiredBlockedNodes();
 
-            if (IsSpotTemporarilyBlocked(spot, now))
+            if (IsNodeTemporarilyBlocked(spot, now))
             {
                 result = CompanionFishingCommandResult.Unreachable;
                 return false;
@@ -797,7 +754,7 @@ namespace Companions
             CleanupAfterFishing(true);
             ResetStuckHistory();
 
-            if (areaFishingActive)
+            if (areaRoutineActive)
             {
                 yield break;
             }
@@ -815,9 +772,7 @@ namespace Companions
 
             float now = Time.time;
             if (spot != null)
-            {
-                blockedSpots[spot] = now + BlockedSpotExpirySeconds;
-            }
+                MarkNodeBlocked(spot, now + BlockedSpotExpirySeconds);
 
             if (fishingSkill != null && fishingSkill.IsFishing)
                 fishingSkill.StopFishing();
@@ -825,10 +780,10 @@ namespace Companions
             CleanupAfterFishing(true);
             PublishStuckApologyMessage();
 
-            if (lastStuckSpot == spot)
+            if (lastStuckNode == spot)
             {
-                consecutiveStuckSpotCount++;
-                if (consecutiveStuckSpotCount >= ConsecutiveStuckCancelThreshold)
+                consecutiveStuckNodeCount++;
+                if (consecutiveStuckNodeCount >= ConsecutiveStuckCancelThreshold)
                 {
                     CancelAreaFishingInternal(true);
                     areaAllCandidatesBlocked = true;
@@ -836,53 +791,14 @@ namespace Companions
             }
             else
             {
-                lastStuckSpot = spot;
-                consecutiveStuckSpotCount = 1;
+                lastStuckNode = spot;
+                consecutiveStuckNodeCount = 1;
             }
-        }
-
-        private void PruneExpiredBlockedSpots(float now)
-        {
-            blockedSpotPruneBuffer.Clear();
-
-            foreach (var kvp in blockedSpots)
-            {
-                var candidate = kvp.Key;
-                bool expired = candidate == null || candidate.IsDepleted || kvp.Value <= now;
-                if (expired)
-                    blockedSpotPruneBuffer.Add(candidate);
-            }
-
-            for (int i = 0; i < blockedSpotPruneBuffer.Count; i++)
-            {
-                var candidate = blockedSpotPruneBuffer[i];
-                blockedSpots.Remove(candidate);
-            }
-
-            blockedSpotPruneBuffer.Clear();
-        }
-
-        private bool IsSpotTemporarilyBlocked(FishableSpot spot, float now)
-        {
-            if (spot == null)
-                return false;
-
-            if (!blockedSpots.TryGetValue(spot, out float expiry))
-                return false;
-
-            if (spot.IsDepleted || expiry <= now)
-            {
-                blockedSpots.Remove(spot);
-                return false;
-            }
-
-            return true;
         }
 
         private void ResetStuckHistory()
         {
-            lastStuckSpot = null;
-            consecutiveStuckSpotCount = 0;
+            ResetStuckHistoryInternal();
         }
 
         private IEnumerator AreaFishingRoutine()
@@ -903,7 +819,7 @@ namespace Companions
                     if (spot.IsBusy || spot == playerActiveSpot)
                         continue;
 
-                    if (IsSpotTemporarilyBlocked(spot, Time.time))
+                    if (IsNodeTemporarilyBlocked(spot, Time.time))
                         continue;
 
                     attemptedCommand = true;
@@ -926,10 +842,10 @@ namespace Companions
                         }
 
                         if (result == CompanionFishingCommandResult.BlockedByPlayer)
-                            blockedSpots[spot] = Time.time + BlockedSpotExpirySeconds;
+                            MarkNodeBlocked(spot, Time.time + BlockedSpotExpirySeconds);
 
                         if (result != CompanionFishingCommandResult.Declined && result != CompanionFishingCommandResult.Accepted)
-                            blockedSpots[spot] = Time.time + BlockedSpotExpirySeconds;
+                            MarkNodeBlocked(spot, Time.time + BlockedSpotExpirySeconds);
                     }
 
                     yield return null;
@@ -1028,38 +944,9 @@ namespace Companions
             }
         }
 
-        private Vector3 GetTileCentre(Vector3 worldPosition)
-        {
-            float x = Mathf.Round(worldPosition.x);
-            float y = Mathf.Round(worldPosition.y);
-            return new Vector3(x, y, worldPosition.z);
-        }
-
         private void CancelAreaFishingInternal(bool restoreFollower)
         {
-            if (areaFishingRoutine != null)
-            {
-                StopCoroutine(areaFishingRoutine);
-                areaFishingRoutine = null;
-            }
-
-            areaFishingActive = false;
-            activeAreaRadius = 0f;
-            areaCandidates.Clear();
-            areaCandidateTileCenters.Clear();
-
-            if (restoreFollower)
-                CleanupAfterFishing(true, true);
-        }
-
-        private void RemoveAreaCandidateAt(int index)
-        {
-            if (index < 0 || index >= areaCandidates.Count)
-                return;
-
-            areaCandidates.RemoveAt(index);
-            if (index < areaCandidateTileCenters.Count)
-                areaCandidateTileCenters.RemoveAt(index);
+            CancelAreaInternal(restoreFollower, true);
         }
 
         private void PublishInventoryFullMessage()
@@ -1183,33 +1070,7 @@ namespace Companions
 
         private void CleanupAfterFishing(bool restoreFollower, bool preserveFollowerLocks = false)
         {
-            if (restoreFollower)
-            {
-                if (preserveFollowerLocks)
-                {
-                    followerDisabledForFishing = HasActiveFollowerHold;
-
-                    if (!HasActiveFollowerHold && followerHoldToggledFollower && petFollower != null && !petFollower.enabled)
-                    {
-                        petFollower.enabled = true;
-                        followerHoldToggledFollower = false;
-                    }
-                }
-                else
-                {
-                    ForceReleaseAllFollowerHolds();
-                }
-            }
-            else if (!preserveFollowerLocks)
-            {
-                followerDisableLockCount = 0;
-                followerDisabledForFishing = false;
-                followerHoldToggledFollower = false;
-            }
-            else
-            {
-                followerDisabledForFishing = HasActiveFollowerHold;
-            }
+            CleanupFollowerAfterGathering(restoreFollower, preserveFollowerLocks);
 
             if (body != null)
                 body.linearVelocity = Vector2.zero;
@@ -1219,47 +1080,6 @@ namespace Companions
             currentSpot = null;
             currentTool = null;
             fishingActive = false;
-        }
-
-        private void ReleaseTemporaryFollowerHold()
-        {
-            if (followerDisableLockCount <= 0)
-            {
-                followerDisableLockCount = 0;
-                followerDisabledForFishing = false;
-                followerHoldToggledFollower = false;
-                return;
-            }
-
-            followerDisableLockCount = Mathf.Max(0, followerDisableLockCount - 1);
-            followerDisabledForFishing = followerDisableLockCount > 0;
-
-            if (!HasActiveFollowerHold)
-            {
-                if (followerHoldToggledFollower && petFollower != null && !petFollower.enabled)
-                    petFollower.enabled = true;
-
-                followerHoldToggledFollower = false;
-            }
-        }
-
-        private void ForceReleaseAllFollowerHolds()
-        {
-            if (followerDisableLockCount <= 0)
-            {
-                followerDisableLockCount = 0;
-                followerDisabledForFishing = false;
-                followerHoldToggledFollower = false;
-                return;
-            }
-
-            followerDisableLockCount = 0;
-            followerDisabledForFishing = false;
-
-            if (followerHoldToggledFollower && petFollower != null && !petFollower.enabled)
-                petFollower.enabled = true;
-
-            followerHoldToggledFollower = false;
         }
 
         private void HandleFishingStopped()
@@ -1321,8 +1141,8 @@ namespace Companions
         {
             CancelFishing(true);
             UnsubscribeFromPlayerFishingSkill();
-            blockedSpots.Clear();
-            blockedSpotPruneBuffer.Clear();
+            blockedNodes.Clear();
+            blockedNodePruneBuffer.Clear();
             areaAllCandidatesBlocked = false;
             ResetStuckHistory();
         }
@@ -1338,7 +1158,7 @@ namespace Companions
 
         private void OnDrawGizmosSelected()
         {
-            if (!areaFishingActive || activeAreaRadius <= 0f)
+            if (!areaRoutineActive || activeAreaRadius <= 0f)
                 return;
 
             Gizmos.color = new Color(0.2f, 0.8f, 0.9f, 0.35f);
@@ -1349,40 +1169,6 @@ namespace Companions
             {
                 Vector3 center = areaCandidateTileCenters[i];
                 Gizmos.DrawWireCube(center, new Vector3(1f, 1f, 0f));
-            }
-        }
-
-        private sealed class FollowerHold : IDisposable
-        {
-            private CompanionFishingController controller;
-            private bool disposed;
-
-            public FollowerHold(CompanionFishingController controller)
-            {
-                this.controller = controller;
-            }
-
-            public void Dispose()
-            {
-                if (disposed)
-                    return;
-
-                disposed = true;
-                controller?.ReleaseTemporaryFollowerHold();
-                controller = null;
-            }
-        }
-
-        private sealed class NoOpDisposable : IDisposable
-        {
-            public static readonly NoOpDisposable Instance = new NoOpDisposable();
-
-            private NoOpDisposable()
-            {
-            }
-
-            public void Dispose()
-            {
             }
         }
 

@@ -41,54 +41,23 @@ namespace Companions
     /// and delegating the actual mining routine to <see cref="MiningSkill"/> once in range.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class CompanionMiningController : CompanionSkillingControllerBase
+    public sealed class CompanionMiningController : CompanionGatheringControllerBase<MineableRock, CompanionMiningCommandResult>
     {
-        private const float MiningRange = 1.5f;
-        private const float ReplanDistance = MiningRange * 0.75f;
-        private const float WaypointTolerance = 0.1f;
-        private const float FacingDeadzoneSqrMagnitude = 0.0001f;
-
         private SkillManager skillManager;
         private Inventory.Inventory inventory;
         private CompanionEquipment companionEquipment;
         private MiningSkill miningSkill;
         private Coroutine miningRoutine;
-        private Coroutine areaMiningRoutine;
         private MineableRock currentRock;
         private PickaxeDefinition currentPickaxe;
         private Dictionary<string, ItemData> itemCache;
         private bool miningActive;
-        private bool followerDisabledForMining;
         private bool suppressMiningStopCallback;
-
-        private readonly List<MineableRock> areaCandidates = new List<MineableRock>();
-        private readonly List<Vector3> areaCandidateTileCenters = new List<Vector3>();
         private readonly HashSet<MineableRock> playerProtectedSingleOre = new HashSet<MineableRock>();
 
-        [Header("Stuck Detection")]
-        [Tooltip("Grace period before a lack of progress is considered \"stuck\".")]
-        [SerializeField, Min(0.1f)] private float stuckTimeoutSeconds = 2.5f;
-
-        private bool areaMiningActive;
-        private float activeAreaRadius;
         private MiningSkill playerMiningSkill;
         private Transform playerTransform;
         private CompanionSkillCooldownTracker skillCooldownTracker;
-        private bool areaAllCandidatesBlocked;
-
-        private readonly Dictionary<MineableRock, float> blockedRocks = new Dictionary<MineableRock, float>();
-        private readonly List<MineableRock> blockedRockPruneBuffer = new List<MineableRock>();
-        private MineableRock lastStuckRock;
-        private int consecutiveStuckRockCount;
-
-        private const float ProgressResetThreshold = 0.1f;
-        private const float CloseEnoughDistanceMultiplier = 0.9f;
-        private const int ConsecutiveStuckCancelThreshold = 2;
-
-        /// <summary>
-        /// Indicates whether any systems currently hold the follower disabled so the companion remains stationary.
-        /// </summary>
-        public bool HasActiveFollowerHold => followerDisableLockCount > 0;
 
         /// <summary>
         /// True while the mining controller has an active mining routine or the underlying skill reports mining activity.
@@ -143,8 +112,8 @@ namespace Companions
             ResetFollowerState();
 
             miningActive = false;
-            followerDisabledForMining = false;
-            areaMiningActive = false;
+            followerDisabledForGathering = false;
+            areaRoutineActive = false;
             activeAreaRadius = 0f;
 
             skillCooldownTracker = cooldownTracker;
@@ -169,8 +138,7 @@ namespace Companions
         /// <returns>True when the command was accepted, otherwise false.</returns>
         public bool TryCommandMine(MineableRock rock)
         {
-            bool accepted = TryCommandMine(rock, out var result);
-            return accepted || result == CompanionMiningCommandResult.InventoryFull;
+            return TryCommandAllowingInventoryFull(rock);
         }
 
         /// <summary>
@@ -185,8 +153,7 @@ namespace Companions
         /// <returns>True when mining started or the inventory was full.</returns>
         public bool TryCommandMine(MineableRock rock, bool preserveFollowerHold)
         {
-            bool accepted = TryCommandMine(rock, out var result, preserveFollowerHold);
-            return accepted || result == CompanionMiningCommandResult.InventoryFull;
+            return TryCommandAllowingInventoryFull(rock, preserveFollowerHold);
         }
 
         /// <summary>
@@ -197,7 +164,7 @@ namespace Companions
         /// <returns>True when mining started, otherwise false.</returns>
         public bool TryCommandMine(MineableRock rock, out CompanionMiningCommandResult result)
         {
-            return TryCommandMine(rock, out result, false);
+            return TryCommandWithResult(rock, out result);
         }
 
         /// <summary>
@@ -215,20 +182,50 @@ namespace Companions
             out CompanionMiningCommandResult result,
             bool preserveFollowerHold)
         {
-            if (CompanionSkillCooldownTimers.ShouldDeclineMiningRequest(skillCooldownTracker, out result))
-                return false;
+            return TryCommandWithResult(rock, out result, preserveFollowerHold);
+        }
 
-            result = CompanionMiningCommandResult.RequirementsNotMet;
+        /// <inheritdoc />
+        protected override CommandAttempt PerformGatheringCommand(MineableRock rock, bool preserveFollowerHold)
+        {
+            var attempt = new CommandAttempt
+            {
+                Accepted = false,
+                Result = CompanionMiningCommandResult.RequirementsNotMet
+            };
 
-            if (!TryPrepareMiningCommand(rock, out var pickaxe, out result))
-                return false;
+            if (CompanionSkillCooldownTimers.ShouldDeclineMiningRequest(skillCooldownTracker, out var cooldownResult))
+            {
+                attempt.Result = cooldownResult;
+                return attempt;
+            }
+
+            if (!TryPrepareMiningCommand(rock, out var pickaxe, out var validationResult))
+            {
+                attempt.Result = validationResult;
+                return attempt;
+            }
 
             CancelAreaMiningInternal(true, preserveFollowerHold);
+            followerDisabledForGathering = preserveFollowerHold ? HasActiveFollowerHold : false;
             BeginMining(rock, pickaxe);
 
-            result = CompanionMiningCommandResult.Accepted;
+            attempt.Accepted = true;
+            attempt.Result = CompanionMiningCommandResult.Accepted;
             CompanionSkillCooldownTimers.ClearMiningCooldown(skillCooldownTracker);
-            return true;
+            return attempt;
+        }
+
+        /// <inheritdoc />
+        protected override bool ShouldTreatInventoryFullAsSuccess(CompanionMiningCommandResult result)
+        {
+            return result == CompanionMiningCommandResult.InventoryFull;
+        }
+
+        /// <inheritdoc />
+        protected override bool IsNodeDepleted(MineableRock node)
+        {
+            return node == null || node.IsDepleted;
         }
 
         /// <summary>
@@ -254,33 +251,26 @@ namespace Companions
             if (!isActiveAndEnabled || miningSkill == null || skillManager == null)
                 return false;
 
-            float clampedRadius = Mathf.Max(0.1f, radius);
-
-            CancelAreaMiningInternal(true);
-
             if (CompanionSkillCooldownTimers.ShouldDeclineMiningRequest(skillCooldownTracker, out failureReason))
                 return false;
 
-            if (!BuildAreaCandidateList(clampedRadius, out failureReason))
-            {
-                PublishAreaMiningFailureMessage(failureReason);
-                return false;
-            }
+            bool started = TryStartAreaGathering(
+                radius,
+                out failureReason,
+                CompanionMiningCommandResult.Accepted,
+                clampedRadius =>
+                {
+                    bool success = BuildAreaCandidateList(clampedRadius, out var buildFailure);
+                    return (success, buildFailure);
+                },
+                PublishAreaMiningFailureMessage,
+                AreaMiningRoutine,
+                () => CompanionSkillCooldownTimers.ClearMiningCooldown(skillCooldownTracker),
+                "Companion Mining",
+                StopActiveMiningRoutine,
+                preserveFollowerLocks: false);
 
-            failureReason = CompanionMiningCommandResult.Accepted;
-
-            activeAreaRadius = clampedRadius;
-            areaMiningRoutine = StartCoroutine(AreaMiningRoutine());
-            areaMiningActive = true;
-
-            CompanionSkillCooldownTimers.ClearMiningCooldown(skillCooldownTracker);
-
-            if (CompanionManager.EnableDebugLogging)
-            {
-                Debug.Log($"[Companion Mining] Area mining started with {areaCandidates.Count} candidates (radius {activeAreaRadius}).", this);
-            }
-
-            return true;
+            return started;
         }
 
         /// <summary>
@@ -290,7 +280,6 @@ namespace Companions
         public void CancelMining(bool restoreFollower)
         {
             CancelAreaMiningInternal(false);
-            StopActiveMiningRoutine();
             CleanupAfterMining(restoreFollower);
             UnsubscribeFromPlayerMiningSkill();
             BindToPlayerMiningSkill(playerTransform);
@@ -307,41 +296,6 @@ namespace Companions
             UnsubscribeFromPlayerMiningSkill();
             BindToPlayerMiningSkill(playerTransform);
             ResetStuckHistory();
-        }
-
-        /// <summary>
-        /// Temporarily disables the follower component so the companion remains stationary until mining resumes.
-        /// Dispose the returned handle to restore the follower even when mining never begins.
-        /// </summary>
-        /// <remarks>
-        /// The follower lock count is incremented even when another system already disabled the follower so subsequent
-        /// releases can determine whether mining should re-enable the behaviour.
-        /// </remarks>
-        /// <returns>An <see cref="IDisposable"/> handle that restores the follower when disposed.</returns>
-        public IDisposable EnterTemporaryFollowerHold()
-        {
-            if (petFollower == null)
-                return NoOpDisposable.Instance;
-
-            if (followerDisableLockCount > 0)
-            {
-                followerDisableLockCount++;
-                followerDisabledForMining = true;
-                return new FollowerHold(this);
-            }
-
-            bool toggledFollower = false;
-
-            if (petFollower.enabled)
-            {
-                petFollower.enabled = false;
-                toggledFollower = true;
-            }
-
-            followerDisableLockCount = 1;
-            followerDisabledForMining = true;
-            followerHoldToggledFollower = toggledFollower;
-            return new FollowerHold(this);
         }
 
         private void BeginMining(MineableRock rock, PickaxeDefinition pickaxe)
@@ -423,7 +377,7 @@ namespace Companions
                         }
 
                         bool closedGap = cumulativeDistanceClosed >= ProgressResetThreshold;
-                        bool effectivelyClose = distance <= MiningRange * CloseEnoughDistanceMultiplier;
+                        bool effectivelyClose = distance <= GatheringRange * CloseEnoughDistanceMultiplier;
                         bool activelyMining = miningSkill != null && miningSkill.IsMining;
 
                         if (closedGap || effectivelyClose || activelyMining)
@@ -451,7 +405,7 @@ namespace Companions
                         break;
                     }
 
-                    if (distance > MiningRange)
+                    if (distance > GatheringRange)
                     {
                         float moveSpeed = ResolveMoveSpeed();
                         float deltaTime = body != null
@@ -479,7 +433,7 @@ namespace Companions
                                 navigationStepTaken = pathMover.TryStepAttack(
                                     deltaTime,
                                     moveSpeed,
-                                    MiningRange,
+                                    GatheringRange,
                                     WaypointTolerance,
                                     () => rock != null ? (Vector2)rock.transform.position : (Vector2)transform.position,
                                     ReplanDistance,
@@ -523,7 +477,7 @@ namespace Companions
                             }
                         }
 
-                        if (miningSkill.IsMining && distance > MiningRange * 1.2f)
+                        if (miningSkill.IsMining && distance > GatheringRange * 1.2f)
                             miningSkill.StopMining();
                     }
                     else
@@ -575,7 +529,7 @@ namespace Companions
             CleanupAfterMining(true);
             ResetStuckHistory();
 
-            if (areaMiningActive)
+            if (areaRoutineActive)
             {
                 // Allow the area routine to continue scanning for additional rocks.
                 yield break;
@@ -594,9 +548,7 @@ namespace Companions
 
             float now = Time.time;
             if (rock != null)
-            {
-                blockedRocks[rock] = now + stuckTimeoutSeconds;
-            }
+                MarkNodeBlocked(rock, now + stuckTimeoutSeconds);
 
             if (miningSkill != null && miningSkill.IsMining)
             {
@@ -616,23 +568,23 @@ namespace Companions
 
             if (rock != null)
             {
-                if (rock == lastStuckRock)
+                if (rock == lastStuckNode)
                 {
-                    consecutiveStuckRockCount++;
+                    consecutiveStuckNodeCount++;
                 }
                 else
                 {
-                    lastStuckRock = rock;
-                    consecutiveStuckRockCount = 1;
+                    lastStuckNode = rock;
+                    consecutiveStuckNodeCount = 1;
                 }
             }
             else
             {
-                lastStuckRock = null;
-                consecutiveStuckRockCount = 0;
+                lastStuckNode = null;
+                consecutiveStuckNodeCount = 0;
             }
 
-            if (consecutiveStuckRockCount >= ConsecutiveStuckCancelThreshold)
+            if (consecutiveStuckNodeCount >= ConsecutiveStuckCancelThreshold)
             {
                 CancelMiningDueToStuck();
             }
@@ -654,9 +606,9 @@ namespace Companions
             }
 
             float now = Time.time;
-            PruneExpiredBlockedRocks(now);
+            PruneExpiredBlockedNodes();
 
-            if (IsRockTemporarilyBlocked(rock, now))
+            if (IsNodeTemporarilyBlocked(rock, now))
             {
                 result = CompanionMiningCommandResult.Unreachable;
                 return false;
@@ -839,7 +791,7 @@ namespace Companions
                     if (rock.RockDef != null && rock.RockDef.DepleteAfterNOres == 1 && playerProtectedSingleOre.Contains(rock))
                         continue;
 
-                    if (IsRockTemporarilyBlocked(rock, Time.time))
+                    if (IsNodeTemporarilyBlocked(rock, Time.time))
                         continue;
 
                     // Suppress internal chat lines because the branch below publishes the
@@ -862,7 +814,7 @@ namespace Companions
                     while (miningActive && currentRock == rock)
                         yield return null;
 
-                    if (!areaMiningActive)
+                    if (!areaRoutineActive)
                         yield break;
                 }
 
@@ -901,7 +853,7 @@ namespace Companions
             int blockedByStuckCount = 0;
 
             float now = Time.time;
-            PruneExpiredBlockedRocks(now);
+            PruneExpiredBlockedNodes();
 
             for (int i = 0; i < rocks.Length; i++)
             {
@@ -916,7 +868,7 @@ namespace Companions
                 if (rock.RockDef != null && rock.RockDef.DepleteAfterNOres == 1 && playerProtectedSingleOre.Contains(rock))
                     continue;
 
-                if (IsRockTemporarilyBlocked(rock, now))
+                if (IsNodeTemporarilyBlocked(rock, now))
                 {
                     blockedByStuckCount++;
                     continue;
@@ -1034,50 +986,9 @@ namespace Companions
                 CompanionMiningDialogueLibrary.GetRandomStuckApologyLine());
         }
 
-        private void PruneExpiredBlockedRocks(float now)
-        {
-            blockedRockPruneBuffer.Clear();
-
-            foreach (var kvp in blockedRocks)
-            {
-                var rock = kvp.Key;
-                bool expired = rock == null || rock.IsDepleted || kvp.Value <= now;
-                if (!expired)
-                    continue;
-
-                blockedRockPruneBuffer.Add(rock);
-            }
-
-            for (int i = 0; i < blockedRockPruneBuffer.Count; i++)
-            {
-                var rock = blockedRockPruneBuffer[i];
-                blockedRocks.Remove(rock);
-            }
-
-            blockedRockPruneBuffer.Clear();
-        }
-
-        private bool IsRockTemporarilyBlocked(MineableRock rock, float now)
-        {
-            if (rock == null)
-                return false;
-
-            if (!blockedRocks.TryGetValue(rock, out float expiry))
-                return false;
-
-            if (rock.IsDepleted || expiry <= now)
-            {
-                blockedRocks.Remove(rock);
-                return false;
-            }
-
-            return true;
-        }
-
         private void ResetStuckHistory()
         {
-            lastStuckRock = null;
-            consecutiveStuckRockCount = 0;
+            ResetStuckHistoryInternal();
         }
 
         /// <summary>
@@ -1189,35 +1100,7 @@ namespace Companions
 
         private void CleanupAfterMining(bool restoreFollower, bool preserveFollowerLocks = false)
         {
-            if (restoreFollower)
-            {
-                if (preserveFollowerLocks)
-                {
-                    // Preserve any existing follower holds so automation can complete its hand-off
-                    // before the follower component is toggled again.
-                    followerDisabledForMining = HasActiveFollowerHold;
-
-                    if (!HasActiveFollowerHold && followerHoldToggledFollower && petFollower != null && !petFollower.enabled)
-                    {
-                        petFollower.enabled = true;
-                        followerHoldToggledFollower = false;
-                    }
-                }
-                else
-                {
-                    ForceReleaseAllFollowerHolds();
-                }
-            }
-            else if (!preserveFollowerLocks)
-            {
-                followerDisableLockCount = 0;
-                followerDisabledForMining = false;
-                followerHoldToggledFollower = false;
-            }
-            else
-            {
-                followerDisabledForMining = HasActiveFollowerHold;
-            }
+            CleanupFollowerAfterGathering(restoreFollower, preserveFollowerLocks);
 
             if (body != null)
                 body.linearVelocity = Vector2.zero;
@@ -1227,47 +1110,6 @@ namespace Companions
             currentRock = null;
             currentPickaxe = null;
             miningActive = false;
-        }
-
-        private void ReleaseTemporaryFollowerHold()
-        {
-            if (followerDisableLockCount <= 0)
-            {
-                followerDisableLockCount = 0;
-                followerDisabledForMining = false;
-                followerHoldToggledFollower = false;
-                return;
-            }
-
-            followerDisableLockCount = Mathf.Max(0, followerDisableLockCount - 1);
-            followerDisabledForMining = followerDisableLockCount > 0;
-
-            if (!HasActiveFollowerHold)
-            {
-                if (followerHoldToggledFollower && petFollower != null && !petFollower.enabled)
-                    petFollower.enabled = true;
-
-                followerHoldToggledFollower = false;
-            }
-        }
-
-        private void ForceReleaseAllFollowerHolds()
-        {
-            if (followerDisableLockCount <= 0)
-            {
-                followerDisableLockCount = 0;
-                followerDisabledForMining = false;
-                followerHoldToggledFollower = false;
-                return;
-            }
-
-            followerDisableLockCount = 0;
-            followerDisabledForMining = false;
-
-            if (followerHoldToggledFollower && petFollower != null && !petFollower.enabled)
-                petFollower.enabled = true;
-
-            followerHoldToggledFollower = false;
         }
 
         private void HandleMiningStopped()
@@ -1329,71 +1171,17 @@ namespace Companions
             playerProtectedSingleOre.Clear();
         }
 
-        /// <summary>
-        /// Disposable handle that releases the follower hold when the mining flow exits.
-        /// </summary>
-        private sealed class FollowerHold : IDisposable
-        {
-            private CompanionMiningController controller;
-            private bool disposed;
-
-            public FollowerHold(CompanionMiningController controller)
-            {
-                this.controller = controller;
-            }
-
-            public void Dispose()
-            {
-                if (disposed)
-                    return;
-
-                disposed = true;
-                controller?.ReleaseTemporaryFollowerHold();
-                controller = null;
-            }
-        }
-
-        /// <summary>
-        /// Lightweight no-op disposable used when the follower is already disabled.
-        /// </summary>
-        private sealed class NoOpDisposable : IDisposable
-        {
-            public static readonly NoOpDisposable Instance = new NoOpDisposable();
-
-            private NoOpDisposable()
-            {
-            }
-
-            public void Dispose()
-            {
-            }
-        }
-
         private void CancelAreaMiningInternal(bool restoreFollower, bool preserveFollowerLocks = false)
         {
-            if (areaMiningRoutine != null)
-            {
-                StopCoroutine(areaMiningRoutine);
-                areaMiningRoutine = null;
-            }
-
-            areaMiningActive = false;
-            activeAreaRadius = 0f;
-            areaCandidates.Clear();
-            areaCandidateTileCenters.Clear();
-
-            StopActiveMiningRoutine();
-
-            if (restoreFollower)
-                CleanupAfterMining(true, preserveFollowerLocks);
+            CancelAreaInternal(restoreFollower, preserveFollowerLocks, StopActiveMiningRoutine);
         }
 
         private void OnDisable()
         {
             CancelMining(true);
             UnsubscribeFromPlayerMiningSkill();
-            blockedRocks.Clear();
-            blockedRockPruneBuffer.Clear();
+            blockedNodes.Clear();
+            blockedNodePruneBuffer.Clear();
             areaAllCandidatesBlocked = false;
             ResetStuckHistory();
         }
@@ -1409,7 +1197,7 @@ namespace Companions
 
         private void OnDrawGizmosSelected()
         {
-            if (!areaMiningActive || activeAreaRadius <= 0f)
+            if (!areaRoutineActive || activeAreaRadius <= 0f)
                 return;
 
             Gizmos.color = new Color(0.8f, 0.8f, 0.2f, 0.35f);
