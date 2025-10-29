@@ -45,6 +45,11 @@ namespace Audio
         CookingLevelUp,
 
         /// <summary>
+        /// Played when the player gains a Thieving level.
+        /// </summary>
+        ThievingLevelUp,
+
+        /// <summary>
         /// Played when the player gains a Beastmaster level. Reuses the defence level up chime.
         /// </summary>
         BeastmasterLevelUp,

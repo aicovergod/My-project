@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:eb923df7b4271cc58c880b534571d33dbcf7c53e -->
+## 2025-10-29T11:55:27+00:00 — Add thieving level up audio cue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Audio/SoundEffect.cs, Assets/Scripts/Audio/SoundManager.cs, Assets/Scripts/Combat/CombatController.cs
+- Diff: 10 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:40a0c0fe3be2e5101f6f3390115bc48c2f8e1c4f -->
 ## 2025-10-29T11:51:08+00:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
 

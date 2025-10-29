@@ -69,6 +69,7 @@ namespace Audio
             { SoundEffect.WoodcuttingLevelUp, "09_Woodcutting_Level_Up" },
             { SoundEffect.FishingLevelUp, "11_Fishing_Level_Up" },
             { SoundEffect.CookingLevelUp, "10_Cooking_Level_Up" },
+            { SoundEffect.ThievingLevelUp, "13_Thieving_Level_Up" },
             { SoundEffect.BeastmasterLevelUp, "03_Defence_Level_Up" },
             { SoundEffect.PlayerDeath, "12_You_Are_Dead" },
             { SoundEffect.TreeChop, "01_Tree_Chop" }
@@ -87,6 +88,7 @@ namespace Audio
             SoundEffect.WoodcuttingLevelUp,
             SoundEffect.FishingLevelUp,
             SoundEffect.CookingLevelUp,
+            SoundEffect.ThievingLevelUp,
             SoundEffect.BeastmasterLevelUp
         };
 
