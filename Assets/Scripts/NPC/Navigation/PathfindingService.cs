@@ -1447,7 +1447,7 @@ namespace NPC
         /// <summary>
         /// Verifies that a diagonal traversal between two cells is valid by checking the orthogonal flank cells.
         /// </summary>
-        private static bool HasClearDiagonal(Vector2Int origin, Vector2Int target, NavGridBuilder grid)
+        private static bool HasClearDiagonal(Vector2Int origin, Vector2Int target, INavGridData grid)
         {
             if (!IsDiagonalMove(origin, target))
             {
