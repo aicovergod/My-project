@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1373a4fd5aa9865799d12d5ae7cafbe03a22df07 -->
+## 2025-10-29T21:14:06+00:00 — Merge pull request #1530 from aicovergod/codex/refactor-eat-method-for-movement-freezing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 15 ++ / 6 --
+- Notes:
+  Fix PlayerEat chained movement freeze handling
+---
+<!-- commit:3e259a901949677de300cd5023c1cb61688d3ae4 -->
+## 2025-10-29T21:13:53+00:00 — Fix PlayerEat movement freeze handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Player/PlayerEat.cs
+- Diff: 15 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:18d7e66716335f92c3862ac9abe367efef1a12b0 -->
 ## 2025-10-29T21:07:09+00:00 — Merge pull request #1529 from aicovergod/codex/add-interaction-delay-to-pickable-resource
 
