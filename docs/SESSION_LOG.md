@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d744b434a7d5a0a1c0098aeae80c3a5c6f382773 -->
+## 2025-10-29T22:24:09+00:00 — Merge pull request #1535 from aicovergod/codex/update-companion-cooking-and-follower-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 67 ++ / 3 --
+- Notes:
+  Prevent companion follower from resuming during cooking holds
+---
+<!-- commit:563375e5e83d11e84029cda2e59fc556b9dab2f7 -->
+## 2025-10-29T22:23:48+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c1eafd641a9fb706a083fc3c2294af5e7d108f99 -->
 ## 2025-10-29T22:23:34+00:00 — Guard follower state during companion cooking
 
