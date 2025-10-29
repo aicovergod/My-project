@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using Companions;
 using Inventory;
 using Player;
 using Skills.Common;
 using UI.Chat;
+using UI.Utilities;
+using Core.Input;
 
 namespace Skills.Farming
 {
@@ -51,6 +54,14 @@ namespace Skills.Farming
         [Tooltip("Optional transform used when resolving the active player for range checks.")]
         private Transform playerAnchorOverride;
 
+        [SerializeField]
+        [Tooltip("PlayerInput component supplying the default action map when no override is provided.")]
+        private PlayerInput playerInput;
+
+        [SerializeField]
+        [Tooltip("Optional InputActionReference overriding which action triggers harvesting.")]
+        private InputActionReference interactActionReference;
+
         [Header("Visual Toggles")]
         [SerializeField]
         [Tooltip("Renderers disabled while the node is depleted.")]
@@ -70,6 +81,8 @@ namespace Skills.Farming
         private string cachedItemId = string.Empty;
         private Transform cachedPlayerTransform;
         private PlayerMover cachedPlayerMover;
+        private InputAction interactAction;
+        private bool interactActionEnabledByResolver;
 
         /// <summary>
         ///     Auto-populates the toggle arrays from the current hierarchy so designers can quickly
@@ -130,17 +143,23 @@ namespace Skills.Farming
             ResolveItem();
         }
 
-        /// <summary>
-        ///     Subscribes to the shared ticker during startup so respawn logic executes on the global cadence.
-        /// </summary>
-        private void Start()
+        /// <inheritdoc />
+        protected override void OnEnable()
         {
-            TrySubscribeToTicker();
+            base.OnEnable();
+            SubscribeToInteractAction();
+        }
+
+        /// <inheritdoc />
+        protected override void OnDisable()
+        {
+            UnsubscribeFromInteractAction();
+            base.OnDisable();
         }
 
         /// <summary>
         ///     Handles pointer clicks emitted by the Unity EventSystem.
-        ///     Only primary button presses trigger harvesting and the node must not already be depleted.
+        ///     Only primary button presses trigger harvesting and UI blockers are respected.
         /// </summary>
         /// <param name="eventData">Pointer event payload provided by the EventSystem.</param>
         public void OnPointerClick(PointerEventData eventData)
@@ -148,46 +167,35 @@ namespace Skills.Farming
             if (eventData == null || eventData.button != PointerEventData.InputButton.Left)
                 return;
 
-            if (isDepleted)
+            if (PointerRaycastUtility.IsPointerOverBlockingUI(eventData.position))
                 return;
 
-            var inventory = CompanionManager.GetPlayerInventory();
-            if (inventory == null)
-            {
-                Debug.LogWarning("PickableResourceNode could not locate the player inventory.", this);
+            if (TryHarvest(eventData.position))
+                eventData.Use();
+        }
+
+        /// <summary>
+        ///     Attempts to harvest the node via the interact action so controllers and keyboards share behaviour.
+        /// </summary>
+        /// <param name="context">Callback context supplied by the Input System.</param>
+        private void HandleInteractAction(InputAction.CallbackContext context)
+        {
+            if (!context.performed)
                 return;
-            }
 
-            var item = ResolveItem();
-            if (item == null)
-            {
-                Debug.LogError("PickableResourceNode is missing a valid item definition. Ensure itemId maps to an ItemData asset.", this);
+            if (!isActiveAndEnabled)
                 return;
-            }
 
-            var playerTransform = ResolvePlayerTransform();
-            if (playerTransform != null && interactRange > 0f)
-            {
-                // Range enforcement keeps gathering behaviour consistent with other skills.
-                float distance = Vector2.Distance(playerTransform.position, transform.position);
-                if (distance > interactRange)
-                {
-                    PublishChatMessage("You need to get closer to pick that.");
-                    return;
-                }
-            }
+            Vector2 pointerPosition = InputActionResolver.GetPointerScreenPosition(
+                new Vector2(Screen.width * 0.5f, Screen.height * 0.5f));
 
-            // Prefer checking capacity before attempting to add items so we can exit early without side effects.
-            if (!inventory.CanAddItem(item, quantity) || !inventory.AddItem(item, quantity))
-            {
-                PublishChatMessage("Your inventory is full");
+            if (PointerRaycastUtility.IsPointerOverBlockingUI(pointerPosition))
                 return;
-            }
 
-            PublishChatMessage(ComposeChatMessage(item));
-            eventData.Use();
+            if (!RaycastConfirmsThisNode(pointerPosition))
+                return;
 
-            BeginRespawnCountdown();
+            TryHarvest(pointerPosition);
         }
 
         /// <summary>
@@ -200,6 +208,123 @@ namespace Skills.Farming
 
             if (Time.timeAsDouble >= respawnAt)
                 RespawnNow();
+        }
+
+        /// <summary>
+        ///     Resolves the interact action so controller/gamepad input can trigger harvesting alongside pointer clicks.
+        /// </summary>
+        private void SubscribeToInteractAction()
+        {
+            UnsubscribeFromInteractAction();
+
+            if (playerInput == null)
+            {
+                playerInput = GetComponent<PlayerInput>();
+                if (playerInput == null)
+                    playerInput = GetComponentInParent<PlayerInput>();
+                if (playerInput == null)
+                    playerInput = FindObjectOfType<PlayerInput>();
+
+                if (playerInput == null && interactActionReference == null)
+                    Debug.LogWarning("PickableResourceNode could not locate a PlayerInput to resolve the Interact action.", this);
+            }
+
+            interactAction = InputActionResolver.Resolve(playerInput, interactActionReference, "Interact", out interactActionEnabledByResolver);
+            if (interactAction != null)
+                interactAction.performed += HandleInteractAction;
+        }
+
+        /// <summary>
+        ///     Tears down the interact action subscription and disables actions enabled through the resolver.
+        /// </summary>
+        private void UnsubscribeFromInteractAction()
+        {
+            if (interactAction != null)
+            {
+                interactAction.performed -= HandleInteractAction;
+                if (interactActionEnabledByResolver)
+                    interactAction.Disable();
+
+                interactAction = null;
+                interactActionEnabledByResolver = false;
+            }
+        }
+
+        /// <summary>
+        ///     Shared harvesting path used by pointer clicks and interact action callbacks.
+        /// </summary>
+        /// <param name="screenPosition">Screen position associated with the triggering pointer.</param>
+        /// <returns>True when the node successfully grants its item.</returns>
+        private bool TryHarvest(Vector2 screenPosition)
+        {
+            _ = screenPosition; // Screen position reserved for future logging/analytics hooks.
+
+            if (isDepleted)
+                return false;
+
+            var inventory = CompanionManager.GetPlayerInventory();
+            if (inventory == null)
+            {
+                Debug.LogWarning("PickableResourceNode could not locate the player inventory.", this);
+                return false;
+            }
+
+            var item = ResolveItem();
+            if (item == null)
+            {
+                Debug.LogError("PickableResourceNode is missing a valid item definition. Ensure itemId maps to an ItemData asset.", this);
+                return false;
+            }
+
+            var playerTransform = ResolvePlayerTransform();
+            if (playerTransform != null && interactRange > 0f)
+            {
+                // Range enforcement keeps gathering behaviour consistent with other skills.
+                float distance = Vector2.Distance(playerTransform.position, transform.position);
+                if (distance > interactRange)
+                {
+                    PublishChatMessage("You need to get closer to pick that.");
+                    return false;
+                }
+            }
+
+            // Prefer checking capacity before attempting to add items so we can exit early without side effects.
+            if (!inventory.CanAddItem(item, quantity) || !inventory.AddItem(item, quantity))
+            {
+                PublishChatMessage("Your inventory is full");
+                return false;
+            }
+
+            PublishChatMessage(ComposeChatMessage(item));
+            BeginRespawnCountdown();
+            return true;
+        }
+
+        /// <summary>
+        ///     Confirms the provided pointer position maps to this node by raycasting from the active camera.
+        /// </summary>
+        /// <param name="screenPosition">Screen-space pointer coordinates.</param>
+        /// <returns>True when the raycast hits one of the node's colliders.</returns>
+        private bool RaycastConfirmsThisNode(Vector2 screenPosition)
+        {
+            var activeCamera = Camera.main;
+            if (activeCamera == null)
+            {
+                Debug.LogWarning("PickableResourceNode could not locate the active camera to validate interact input.", this);
+                return false;
+            }
+
+            var ray = activeCamera.ScreenPointToRay(screenPosition);
+            float maxDistance = Mathf.Max(activeCamera.farClipPlane, 0f);
+            if (maxDistance <= 0f)
+                maxDistance = float.PositiveInfinity;
+
+            var hit = Physics2D.GetRayIntersection(ray, maxDistance);
+            if (hit.collider == null)
+                return false;
+
+            var hitTransform = hit.collider.transform;
+            return hitTransform == transform || hitTransform.IsChildOf(transform);
         }
 
         /// <summary>
