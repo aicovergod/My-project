@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:82fd1e690098104632977603eded7410eae85c30 -->
+## 2025-10-29T20:16:02+00:00 — Merge pull request #1526 from aicovergod/codex/add-customizable-input-for-pickable-resources
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 144 ++ / 19 --
+- Notes:
+  Enable interact action harvesting for farming nodes
+---
+<!-- commit:d8c88f9d5e8e32c01507afb0fd2b1eb2875895fe -->
+## 2025-10-29T20:15:54+00:00 — Enable interact action harvesting for farming nodes
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Farming/PickableResourceNode.cs
+- Diff: 144 ++ / 19 --
+- Notes:
+  —
+---
 <!-- commit:aa92fbf4dfe4d20fd168e115641fca48f6bff3d8 -->
 ## 2025-10-29T19:50:01+00:00 — cabbage object
 
