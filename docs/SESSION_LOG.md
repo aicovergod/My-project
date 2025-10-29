@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c0635795b52b07f65be57556d4a746bc65a39fdf -->
+## 2025-10-29T23:00:46+00:00 — Add companion skill command guard helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Commands/CompanionSkillCommandGuard.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 474 ++ / 358 --
+- Notes:
+  —
+---
 <!-- commit:0d24cf89c805fb8247ffb354e3513050b388365e -->
 ## 2025-10-29T22:50:10+00:00 — Merge pull request #1538 from aicovergod/codex/update-agents.md-with-latest-updates
 
