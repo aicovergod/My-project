@@ -6,6 +6,7 @@ using Combat;
 using Companions.Chat;
 using Companions.Commands;
 using Companions.Equipment;
+using Companions.Inventory;
 using Inventory;
 using Pets;
 using Skills;
@@ -991,155 +992,10 @@ namespace Companions
         /// <returns>True when at least one item was deposited successfully; otherwise false.</returns>
         public static bool TryDepositCompanionInventoryToBank()
         {
-            if (!HasActiveCompanion)
-            {
-                if (EnableDebugLogging)
-                    Debug.Log("[Companion] Deposit aborted because no companion is active.");
-                return false;
-            }
-
-            var inventoryWrapper = CompanionInventory;
-            if (inventoryWrapper == null)
-            {
-                if (EnableDebugLogging)
-                    Debug.Log("[Companion] Deposit aborted because the inventory wrapper is unavailable.");
-                return false;
-            }
-
-            var inventoryComponent = inventoryWrapper.InventoryComponent;
-            if (inventoryComponent == null)
-            {
-                if (EnableDebugLogging)
-                    Debug.Log("[Companion] Deposit aborted because the inventory component is missing.");
-                return false;
-            }
-
-            var bank = BankUI.Instance;
-            if (bank == null)
-            {
-                if (EnableDebugLogging)
-                    Debug.Log("[Companion] Deposit aborted because the bank UI could not be resolved.");
-                return false;
-            }
-
-            var playerObject = GameObject.FindGameObjectWithTag("Player");
-            if (playerObject == null)
-            {
-                if (EnableDebugLogging)
-                    Debug.Log("[Companion] Deposit aborted because the player object could not be located.");
-                return false;
-            }
-
-            if (!CompanionBankDepositAnchor.IsPlayerWithinDepositRange(playerObject.transform.position))
-            {
-                if (EnableDebugLogging)
-                    Debug.Log("[Companion] Deposit aborted because no bank anchors are within range.");
-
-                PublishRandomBankOutOfRangeMessage();
-                return false;
-            }
-
-            if (IsCompanionInventoryEmpty(inventoryComponent))
-            {
-                if (EnableDebugLogging)
-                    Debug.Log("[Companion] Deposit aborted because the inventory is empty.");
-
-                PublishRandomEmptyBankInventoryMessage();
-                return false;
-            }
-
-            int moved = bank.DepositAllFromInventory(inventoryComponent);
-            if (EnableDebugLogging)
-            {
-                if (moved > 0)
-                    Debug.Log($"[Companion] Deposited {moved} item(s) from the companion inventory into the bank.");
-                else
-                    Debug.Log("[Companion] Deposit attempt completed but no items were moved (inventory empty or bank full).");
-            }
-
-            if (moved > 0)
-            {
-                PublishRandomBankDepositMessage();
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Determines whether the supplied inventory currently has any occupied slots.
-        /// </summary>
-        /// <param name="inventory">Companion inventory component to inspect.</param>
-        /// <returns>
-        /// <c>true</c> when the inventory exists but all slots are empty; otherwise <c>false</c>.
-        /// </returns>
-        private static bool IsCompanionInventoryEmpty(Inventory.Inventory inventory)
-        {
-            if (inventory == null)
-                return true;
-
-            var model = inventory.Model;
-            if (model == null)
-                return true;
-
-            int slotCount = model.Size;
-            for (int i = 0; i < slotCount; i++)
-            {
-                var entry = model.GetEntry(i);
-                if (entry.item != null && entry.count > 0)
-                    return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Emits a random companion chat line to confirm the deposit when items reach the bank.
-        /// </summary>
-        private static void PublishRandomBankDepositMessage()
-        {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string message = CompanionChatLibrary.GetRandomBankDepositLine();
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-
-            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
-        }
-
-        /// <summary>
-        /// Emits a random flavour line when the companion is asked to bank items but has nothing to deposit.
-        /// </summary>
-        private static void PublishRandomEmptyBankInventoryMessage()
-        {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string message = CompanionChatLibrary.GetRandomEmptyBankInventoryLine();
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-
-            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
-        }
-
-        /// <summary>
-        /// Emits a random reminder when the companion cannot deposit items because no banks are nearby.
-        /// Keeps flavour consistent with the right-click and pet level bar bank interactions.
-        /// </summary>
-        private static void PublishRandomBankOutOfRangeMessage()
-        {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string message = CompanionChatLibrary.GetRandomBankOutOfRangeLine();
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-
-            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
+            return CompanionBankDepositService.TryDepositCompanionInventoryToBank(
+                controller,
+                EnableDebugLogging,
+                GetCompanionDisplayName());
         }
 
         /// <summary>

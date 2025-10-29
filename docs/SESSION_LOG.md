@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b615c75d9bb8c03c8b137089e3bdca3daa201b27 -->
+## 2025-10-29T23:08:09+00:00 — Refactor companion bank deposits into dedicated service
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Inventory/CompanionBankDepositService.cs, Assets/Scripts/Pets/PetLevelBarMenu.cs
+- Diff: 201 ++ / 150 --
+- Notes:
+  —
+---
 <!-- commit:a1b727e0f34a5b729277a514702f1a9cb7c0bfa8 -->
 ## 2025-10-29T23:01:09+00:00 — Merge pull request #1539 from aicovergod/codex/create-and-integrate-new-command-guard-helper
 

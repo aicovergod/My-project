@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UI;
 using UI.Utilities;
 using Companions;
+using Companions.Inventory;
 using Companions.UI;
 
 namespace Pets
@@ -189,7 +190,10 @@ namespace Pets
             instance.bankButton = CreateButton(menuGO.transform, "Bank");
             instance.bankButton.onClick.AddListener(() =>
             {
-                CompanionManager.TryDepositCompanionInventoryToBank();
+                CompanionBankDepositService.TryDepositCompanionInventoryToBank(
+                    CompanionManager.ActiveCompanion,
+                    CompanionManager.EnableDebugLogging,
+                    CompanionManager.GetCompanionDisplayName());
                 instance.Hide();
             });
 
