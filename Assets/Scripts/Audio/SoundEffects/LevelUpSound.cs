@@ -13,19 +13,33 @@ namespace Audio.SoundEffects
     public sealed class LevelUpSound : MonoBehaviour
     {
         /// <summary>
-        /// Cached lookup linking each supported skill to its corresponding sound effect.
+        /// Delegate used to resolve the sound effect that should play for a given skill level.
+        /// Some skills (Hitpoints/Strength) change clip depending on the milestone reached.
         /// </summary>
-        private static readonly Dictionary<SkillType, SoundEffect> SkillSoundMap = new()
+        /// <param name="level">Player level that triggered the event.</param>
+        /// <returns>Sound effect identifier that should be played.</returns>
+        private delegate SoundEffect LevelUpEffectResolver(int level);
+
+        /// <summary>
+        /// Cached lookup linking each supported skill to a resolver capable of selecting the
+        /// appropriate sound effect for the new level. This keeps the logic centralised and
+        /// avoids scattering conditional statements across the listener.
+        /// </summary>
+        private static readonly Dictionary<SkillType, LevelUpEffectResolver> SkillSoundResolvers = new()
         {
-            { SkillType.Magic, SoundEffect.MagicLevelUp },
-            { SkillType.Attack, SoundEffect.AttackLevelUp },
-            { SkillType.Defence, SoundEffect.DefenceLevelUp },
-            { SkillType.Mining, SoundEffect.MiningLevelUp },
-            { SkillType.Woodcutting, SoundEffect.WoodcuttingLevelUp },
-            { SkillType.Fishing, SoundEffect.FishingLevelUp },
-            { SkillType.Cooking, SoundEffect.CookingLevelUp },
-            { SkillType.Thieving, SoundEffect.ThievingLevelUp },
-            { SkillType.Beastmaster, SoundEffect.BeastmasterLevelUp }
+            { SkillType.Magic, _ => SoundEffect.MagicLevelUp },
+            { SkillType.Attack, _ => SoundEffect.AttackLevelUp },
+            { SkillType.Defence, _ => SoundEffect.DefenceLevelUp },
+            { SkillType.Mining, _ => SoundEffect.MiningLevelUp },
+            { SkillType.Woodcutting, _ => SoundEffect.WoodcuttingLevelUp },
+            { SkillType.Fishing, _ => SoundEffect.FishingLevelUp },
+            { SkillType.Cooking, _ => SoundEffect.CookingLevelUp },
+            { SkillType.Thieving, _ => SoundEffect.ThievingLevelUp },
+            { SkillType.Beastmaster, _ => SoundEffect.BeastmasterLevelUp },
+            { SkillType.Firemaking, _ => SoundEffect.FiremakingLevelUp },
+            { SkillType.Ranged, _ => SoundEffect.RangedLevelUp },
+            { SkillType.Strength, level => level >= 50 ? SoundEffect.StrengthLevelUpHigh : SoundEffect.StrengthLevelUpLow },
+            { SkillType.Hitpoints, level => level >= 50 ? SoundEffect.HitpointsLevelUpHigh : SoundEffect.HitpointsLevelUpLow }
         };
 
         [SerializeField]
@@ -77,9 +91,10 @@ namespace Audio.SoundEffects
         /// </summary>
         private static void OnSkillLevelChanged(SkillType type, int level)
         {
-            if (!SkillSoundMap.TryGetValue(type, out var effect))
+            if (!SkillSoundResolvers.TryGetValue(type, out var resolver))
                 return;
 
+            var effect = resolver(level);
             SoundManager.Instance.PlaySfx(effect);
         }
     }

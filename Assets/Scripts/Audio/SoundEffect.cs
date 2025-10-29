@@ -15,14 +15,44 @@ namespace Audio
         AttackLevelUp,
 
         /// <summary>
+        /// Played when the player gains a Hitpoints level between 2 and 49.
+        /// </summary>
+        HitpointsLevelUpLow,
+
+        /// <summary>
+        /// Played when the player gains a Hitpoints level between 50 and 99.
+        /// </summary>
+        HitpointsLevelUpHigh,
+
+        /// <summary>
         /// Played when the player gains a Defence level.
         /// </summary>
         DefenceLevelUp,
 
         /// <summary>
+        /// Played when the player gains a Strength level between 2 and 49.
+        /// </summary>
+        StrengthLevelUpLow,
+
+        /// <summary>
+        /// Played when the player gains a Strength level between 50 and 99.
+        /// </summary>
+        StrengthLevelUpHigh,
+
+        /// <summary>
         /// Played when the player gains a Magic level.
         /// </summary>
         MagicLevelUp,
+
+        /// <summary>
+        /// Played when the player gains a Ranged level.
+        /// </summary>
+        RangedLevelUp,
+
+        /// <summary>
+        /// Played when the player gains a Firemaking level.
+        /// </summary>
+        FiremakingLevelUp,
 
         /// <summary>
         /// Played when the player gains a Mining level.

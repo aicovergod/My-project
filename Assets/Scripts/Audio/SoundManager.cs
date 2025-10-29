@@ -63,8 +63,16 @@ namespace Audio
         private readonly Dictionary<SoundEffect, string> soundFileMap = new()
         {
             { SoundEffect.AttackLevelUp, "02_Attack_Level_Up" },
+            { SoundEffect.HitpointsLevelUpLow, "04_Hitpoints_Level_Up_2_49" },
+            { SoundEffect.HitpointsLevelUpHigh, "05_Hitpoints_Level_Up_50_99" },
             { SoundEffect.DefenceLevelUp, "03_Defence_Level_Up" },
+            { SoundEffect.StrengthLevelUpLow, "06_Strength_Level_Up_2_49" },
+            { SoundEffect.StrengthLevelUpHigh, "07_Strength_Level_Up_50_99" },
             { SoundEffect.MagicLevelUp, "09_Magic_Level_Up" },
+            // Ranged currently reuses the attack chime until bespoke audio is authored.
+            { SoundEffect.RangedLevelUp, "02_Attack_Level_Up" },
+            // Firemaking shares the woodcutting chime to preserve the skilling fantasy.
+            { SoundEffect.FiremakingLevelUp, "09_Woodcutting_Level_Up" },
             { SoundEffect.MiningLevelUp, "08_Mining_Level_Up" },
             { SoundEffect.WoodcuttingLevelUp, "09_Woodcutting_Level_Up" },
             { SoundEffect.FishingLevelUp, "11_Fishing_Level_Up" },
@@ -82,8 +90,14 @@ namespace Audio
         private static readonly HashSet<SoundEffect> LevelUpEffects = new()
         {
             SoundEffect.AttackLevelUp,
+            SoundEffect.HitpointsLevelUpLow,
+            SoundEffect.HitpointsLevelUpHigh,
             SoundEffect.DefenceLevelUp,
+            SoundEffect.StrengthLevelUpLow,
+            SoundEffect.StrengthLevelUpHigh,
             SoundEffect.MagicLevelUp,
+            SoundEffect.RangedLevelUp,
+            SoundEffect.FiremakingLevelUp,
             SoundEffect.MiningLevelUp,
             SoundEffect.WoodcuttingLevelUp,
             SoundEffect.FishingLevelUp,

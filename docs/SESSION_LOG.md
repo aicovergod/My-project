@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1088fb5d769eacbe357981d32ec04fa477eb531c -->
+## 2025-10-29T19:31:50+00:00 — Fix skill level up sound routing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Audio/SoundEffect.cs, Assets/Scripts/Audio/SoundEffects/LevelUpSound.cs, Assets/Scripts/Audio/SoundManager.cs
+- Diff: 71 ++ / 12 --
+- Notes:
+  —
+---
 <!-- commit:53c538e5c40eada60b6f71ed8f1ef6fd0f250854 -->
 ## 2025-10-29T18:56:09+00:00 — Merge pull request #1524 from aicovergod/codex/implement-scene-loading-validation-in-login-flow
 
