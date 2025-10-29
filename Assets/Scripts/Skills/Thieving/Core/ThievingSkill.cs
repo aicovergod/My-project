@@ -7,6 +7,7 @@ using Player;
 using Skills.Common;
 using Skills.Thieving.Data;
 using Skills.Outfits;
+using Skills.Thieving.NpcPickpocketDialogue;
 using UI.Chat;
 using Util;
 using Random = UnityEngine.Random;
@@ -389,6 +390,7 @@ namespace Skills.Thieving.Core
             {
                 consecutiveNpcFailures = 0;
                 AwardNpcRewards(definition, activeNpc.transform.position);
+                NpcPickpocketDialogueService.TryPublishDialogue(definition, true);
                 activeNpc.NotifyAttemptFinished(true, false);
                 PickpocketFinished?.Invoke(activeNpc, true);
             }
@@ -396,6 +398,7 @@ namespace Skills.Thieving.Core
             {
                 consecutiveNpcFailures++;
                 HandlePickpocketFailure(definition);
+                NpcPickpocketDialogueService.TryPublishDialogue(definition, false);
                 bool triggerLockout = consecutiveNpcFailures >= definition.FailuresBeforeCooldown;
                 activeNpc.NotifyAttemptFinished(false, triggerLockout);
                 if (triggerLockout)
