@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c49b702f65917f9bc997619e628cd25e1c2cb94a -->
+## 2025-10-29T16:53:28+00:00 — Merge pull request #1521 from aicovergod/codex/update-navgridbuilder-gizmo-rendering
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 32 ++ / 5 --
+- Notes:
+  Ensure blocked nav grid cells render fully in gizmos
+---
+<!-- commit:9389e53f66ba996c849e88006de8f585dd29e53b -->
+## 2025-10-29T16:49:35+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c0c52f479d5a8cdb5dcf0857751437aa74a90629 -->
 ## 2025-10-29T16:49:18+00:00 — Improve nav grid gizmo sampling for blocked tiles
 
