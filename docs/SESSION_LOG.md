@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:30cd064350dc09bb19ed1697f3018d94ee22a995 -->
+## 2025-10-29T14:59:42+00:00 — Add scene-wide fallback lookup for level up sound manager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Audio/SoundEffects/LevelUpSound.cs
+- Diff: 8 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:5befe42585a4a496d64bdd4cc6fc93bce0bc5e75 -->
 ## 2025-10-29T14:33:51+00:00 — Merge pull request #1515 from aicovergod/codex/add-pickpocket-restriction-in-combat
 
