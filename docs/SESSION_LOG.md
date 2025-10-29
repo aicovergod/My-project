@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c0c52f479d5a8cdb5dcf0857751437aa74a90629 -->
+## 2025-10-29T16:49:18+00:00 — Improve nav grid gizmo sampling for blocked tiles
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Navigation/NavGridBuilder.cs
+- Diff: 23 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:d1fa3093775a6150ad2a62e92da2d9f456073dd6 -->
 ## 2025-10-29T16:36:46+00:00 — Merge pull request #1520 from aicovergod/codex/update-navgridbuilder-for-gizmo-limits
 
