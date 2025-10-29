@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4bc6df8be67bd9c91a16b2ef9243287c2617ab0b -->
+## 2025-10-29T23:55:57+00:00 — Merge pull request #1544 from aicovergod/codex/fix-console-errors-in-fishingcontroller-and-manager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 25 ++ / 15 --
+- Notes:
+  Fix companion command delegates and fishing range constant
+---
+<!-- commit:8a061d133d573595c23fdb3e75a413e046beeca0 -->
+## 2025-10-29T23:55:41+00:00 — Fix companion command delegates and fishing range constant
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Equipment/CompanionEquipment.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs
+- Diff: 25 ++ / 15 --
+- Notes:
+  —
+---
 <!-- commit:c67bb4eb33f580ea6b86f976ecc437303bc58f34 -->
 ## 2025-10-29T23:49:23+00:00 — Merge pull request #1543 from aicovergod/codex/update-agents.md-and-fix-console-bugs
 
