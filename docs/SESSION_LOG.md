@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:561d98fd2d494bd0754543d82f322644380dd364 -->
+## 2025-10-29T15:00:03+00:00 — Merge pull request #1516 from aicovergod/codex/modify-levelupsound-for-skillmanager-fallback
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 17 ++ / 0 --
+- Notes:
+  Add fallback SkillManager lookup for level up sound effects
+---
+<!-- commit:2d7b3b52d7d8216253ecf0420d5d31a3c73a63a5 -->
+## 2025-10-29T14:59:56+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:30cd064350dc09bb19ed1697f3018d94ee22a995 -->
 ## 2025-10-29T14:59:42+00:00 — Add scene-wide fallback lookup for level up sound manager
 
