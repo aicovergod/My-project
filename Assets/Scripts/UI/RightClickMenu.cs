@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using NPC;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Util;
 
@@ -29,7 +30,11 @@ namespace UI
 
         private readonly Dictionary<NpcInteractionAction, UnityAction> handlerLookup = new();
         private readonly List<Button> activeButtons = new();
+        private readonly List<Vector2> pointerPressPositions = new();
 
+        private RectTransform cachedRectTransform;
+        private Canvas parentCanvas;
+        private bool suppressCloseUntilNextFrame;
         private NpcInteractable current;
         private Font menuFont;
         private NpcFollowerAttackType followerAttackType = NpcFollowerAttackType.None;
@@ -56,6 +61,7 @@ namespace UI
 
         private void Awake()
         {
+            CacheRectTransformAndCanvas();
             menuFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             if (menuFont == null)
                 menuFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
@@ -63,6 +69,16 @@ namespace UI
             EnsureVisualHierarchy();
             CacheHandlers();
             Hide();
+        }
+
+        /// <summary>
+        ///     Unity callback invoked whenever this transform is reparented. The menu caches
+        ///     its <see cref="RectTransform"/> and <see cref="Canvas"/> references so we refresh
+        ///     them whenever the hierarchy changes.
+        /// </summary>
+        private void OnTransformParentChanged()
+        {
+            CacheRectTransformAndCanvas();
         }
 
         /// <summary>
@@ -80,20 +96,23 @@ namespace UI
                 return;
             }
 
+            CacheRectTransformAndCanvas();
+            gameObject.SetActive(true);
+            suppressCloseUntilNextFrame = true;
+
             // The menu renders on a screen-space overlay canvas, so convert the incoming
             // screen coordinate into the appropriate world point for the RectTransform.
-            var rectTransform = (RectTransform)transform;
-            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rectTransform, position, null, out var worldPoint))
+            var targetRect = cachedRectTransform != null ? cachedRectTransform : (RectTransform)transform;
+            var canvasCamera = parentCanvas != null ? parentCanvas.worldCamera : null;
+            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(targetRect, position, canvasCamera, out var worldPoint))
             {
-                rectTransform.position = worldPoint;
+                targetRect.position = worldPoint;
             }
             else
             {
                 // Fall back to the previous behaviour if the conversion fails for any reason.
                 transform.position = position;
             }
-
-            gameObject.SetActive(true);
         }
 
         /// <summary>Hides the menu and clears the active NPC reference.</summary>
@@ -102,6 +121,53 @@ namespace UI
             gameObject.SetActive(false);
             current = null;
             followerAttackType = NpcFollowerAttackType.None;
+            suppressCloseUntilNextFrame = false;
+        }
+
+        /// <summary>
+        ///     Unity update loop that monitors for pointer presses outside of the menu bounds.
+        ///     When an input is detected outside the cached rectangle the menu closes
+        ///     immediately to mirror OSRS context menu behaviour.
+        /// </summary>
+        private void Update()
+        {
+            if (!gameObject.activeSelf)
+                return;
+
+            // Skip closing logic for the frame in which the menu just opened so the opening
+            // click does not instantly hide the menu again.
+            if (suppressCloseUntilNextFrame)
+            {
+                suppressCloseUntilNextFrame = false;
+                return;
+            }
+
+            // Ensure the cached references stay valid if the hierarchy changes at runtime.
+            if (cachedRectTransform == null)
+                CacheRectTransformAndCanvas();
+
+            pointerPressPositions.Clear();
+            CollectPointerPresses(pointerPressPositions);
+            if (pointerPressPositions.Count == 0)
+                return;
+
+            var canvasCamera = parentCanvas != null ? parentCanvas.worldCamera : null;
+            foreach (var screenPosition in pointerPressPositions)
+            {
+                if (cachedRectTransform == null)
+                    break;
+
+                bool pointerInside = RectTransformUtility.RectangleContainsScreenPoint(
+                    cachedRectTransform,
+                    screenPosition,
+                    canvasCamera);
+
+                if (pointerInside)
+                    continue;
+
+                Hide();
+                break;
+            }
         }
 
         /// <summary>
@@ -110,7 +176,7 @@ namespace UI
         /// </summary>
         private void EnsureVisualHierarchy()
         {
-            var rectTransform = GetComponent<RectTransform>();
+            var rectTransform = cachedRectTransform ??= GetComponent<RectTransform>();
             rectTransform.anchorMin = new Vector2(0f, 1f);
             rectTransform.anchorMax = new Vector2(0f, 1f);
             rectTransform.pivot = new Vector2(0f, 1f);
@@ -150,6 +216,56 @@ namespace UI
             handlerLookup[NpcInteractionAction.Trade] = HandleTradePressed;
             handlerLookup[NpcInteractionAction.Pickpocket] = HandlePickpocketPressed;
             handlerLookup[NpcInteractionAction.Examine] = HandleExaminePressed;
+        }
+
+        /// <summary>
+        ///     Captures references to the menu's <see cref="RectTransform"/> and parent
+        ///     <see cref="Canvas"/> so input checks and positioning logic can use cached
+        ///     values without repeated component lookups.
+        /// </summary>
+        private void CacheRectTransformAndCanvas()
+        {
+            cachedRectTransform = GetComponent<RectTransform>();
+            parentCanvas = cachedRectTransform != null
+                ? cachedRectTransform.GetComponentInParent<Canvas>(true)
+                : GetComponentInParent<Canvas>(true);
+        }
+
+        /// <summary>
+        ///     Collects screen positions for any pointer presses that began this frame across
+        ///     mouse, pen, and touch devices. A legacy input fallback ensures environments still
+        ///     configured for the old <see cref="Input"/> API behave correctly.
+        /// </summary>
+        private static void CollectPointerPresses(ICollection<Vector2> positions)
+        {
+            var mouse = Mouse.current;
+            if (mouse != null)
+            {
+                if (mouse.leftButton.wasPressedThisFrame)
+                    positions.Add(mouse.position.ReadValue());
+                if (mouse.rightButton.wasPressedThisFrame)
+                    positions.Add(mouse.position.ReadValue());
+                if (mouse.middleButton.wasPressedThisFrame)
+                    positions.Add(mouse.position.ReadValue());
+            }
+
+            var pen = Pen.current;
+            if (pen != null && pen.tip != null && pen.tip.wasPressedThisFrame)
+                positions.Add(pen.position.ReadValue());
+
+            var touchscreen = Touchscreen.current;
+            if (touchscreen != null)
+            {
+                foreach (var touch in touchscreen.touches)
+                {
+                    if (touch.press.wasPressedThisFrame)
+                        positions.Add(touch.position.ReadValue());
+                }
+            }
+
+            // Fallback for any scenes still relying on the legacy input system bindings.
+            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
+                positions.Add(Input.mousePosition);
         }
 
         /// <summary>
