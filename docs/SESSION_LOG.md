@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:02d09dc4a34e1aecc76d5449c17de66ba2edfe7e -->
+## 2025-10-29T15:37:16+00:00 — Merge pull request #1517 from aicovergod/codex/add-navgridchunkdefinition-and-navgridchunkbaker
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1070 ++ / 0 --
+- Notes:
+  Add nav grid chunk baking pipeline and streaming metadata
+---
+<!-- commit:8a48ee066ef24ec3913c0b4428658f9b299d2b5c -->
+## 2025-10-29T15:36:48+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a6342fbab1a5d86add3e4eeed442e82a641455e8 -->
 ## 2025-10-29T15:36:26+00:00 — Add nav grid chunk streaming assets and baker
 
