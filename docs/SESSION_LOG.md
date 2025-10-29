@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1f318dd5c5fb3e5d1f15c40ce1e59d42bd941f99 -->
+## 2025-10-29T14:02:51+00:00 — Merge pull request #1513 from aicovergod/codex/refactor-popuptext-to-floatingtext
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 4 ++ / 183 --
+- Notes:
+  Replace PopupText with FloatingText
+---
+<!-- commit:3bc93e96348bf23d23e9cf0dd68343dc4fd970bc -->
+## 2025-10-29T14:02:38+00:00 — Replace PopupText with FloatingText
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): AGENTS.md, Assets/Scripts/World/PopupText.cs, Assets/Scripts/World/PopupText.cs.meta, Assets/Scripts/World/PopupTextPool.cs, Assets/Scripts/World/PopupTextPool.cs.meta, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 4 ++ / 183 --
+- Notes:
+  —
+---
 <!-- commit:3a180a3dee1820f1d9bc3972c2aebae5ad78e192 -->
 ## 2025-10-29T13:55:50+00:00 — Merge pull request #1512 from aicovergod/codex/make-thieving-failure-dialogue-text-larger
 
