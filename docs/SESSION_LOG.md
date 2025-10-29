@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:dad4db99e4ef6b65e3ee7758e3aba81c2fac3483 -->
+## 2025-10-29T12:23:20+00:00 — Fix RNG seeding in thieving simulator
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Thieving/Editor/ThievingNpcDefinitionSimulatorWindow.cs
+- Diff: 4 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:f62b6d659669373cfebc93d979d87a1e6d71b872 -->
 ## 2025-10-29T12:20:06+00:00 — Show pickpocket dialogue as NPC floating text
 
