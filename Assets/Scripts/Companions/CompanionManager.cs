@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using BankSystem;
 using Combat;
 using Companions.Chat;
+using Companions.Commands;
 using Companions.Equipment;
 using Inventory;
 using Pets;
@@ -1247,41 +1248,24 @@ namespace Companions
                 return false;
             }
 
-            if (controller == null)
-            {
-                Debug.LogWarning("[Companion] Cannot command mining: companion controller has not been initialised.");
-                return false;
-            }
-
-            if (controller.MiningController == null)
-            {
-                Debug.LogWarning("[Companion] Cannot command mining: companion mining controller is missing.");
-                return false;
-            }
-
-            if (!HasActiveCompanion)
-            {
-                Debug.LogWarning("[Companion] Cannot command mining: the companion is not currently active.");
-                return false;
-            }
-
-            if (CompanionSkillCooldownTimers.ShouldDeclineMiningRequest(controller.SkillCooldowns, out var cooldownResult))
-            {
-                Debug.LogWarning($"[Companion] Mining command outcome: accepted=False (result={cooldownResult}).");
-                return false;
-            }
-
-            bool accepted = controller.MiningController.TryCommandMine(rock, out var result);
-            if (!accepted && result == CompanionMiningCommandResult.InventoryFull)
-                accepted = true;
-
-            string message = $"[Companion] Mining command outcome: accepted={accepted} (result={result}).";
-            if (accepted)
-                Debug.Log(message);
-            else
-                Debug.LogWarning(message);
-
-            return accepted;
+            return CompanionSkillCommandGuard.TryExecuteSingleTargetCommand(
+                controller,
+                controller?.MiningController,
+                "[Companion] Cannot command mining: companion controller has not been initialised.",
+                "[Companion] Cannot command mining: companion mining controller is missing.",
+                "[Companion] Cannot command mining: the companion is not currently active.",
+                CompanionSkillCooldownTimers.ShouldDeclineMiningRequest,
+                result => $"[Companion] Mining command outcome: accepted=False (result={result}).",
+                (skillController, out CompanionMiningCommandResult result) => skillController.TryCommandMine(rock, out result),
+                result => result == CompanionMiningCommandResult.InventoryFull,
+                (accepted, result) =>
+                {
+                    string message = $"[Companion] Mining command outcome: accepted={accepted} (result={result}).";
+                    if (accepted)
+                        Debug.Log(message);
+                    else
+                        Debug.LogWarning(message);
+                });
         }
 
         /// <summary>
@@ -1312,57 +1296,38 @@ namespace Companions
         /// <returns>True when the area mining command started successfully.</returns>
         public static bool TryCommandMineNearby(float radius, out CompanionMiningCommandResult failureReason)
         {
-            string rejectionReason = string.Empty;
-            failureReason = CompanionMiningCommandResult.Unreachable;
-
-            if (controller == null)
-            {
-                rejectionReason = "Companion controller has not been initialised.";
-                failureReason = CompanionMiningCommandResult.RequirementsNotMet;
-                Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={radius}, reason={rejectionReason}");
-                return false;
-            }
-
-            if (controller.MiningController == null)
-            {
-                rejectionReason = "Companion mining controller is missing.";
-                failureReason = CompanionMiningCommandResult.RequirementsNotMet;
-                Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={radius}, reason={rejectionReason}");
-                return false;
-            }
-
-            if (!HasActiveCompanion)
-            {
-                rejectionReason = "The companion is not currently active.";
-                failureReason = CompanionMiningCommandResult.RequirementsNotMet;
-                Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={radius}, reason={rejectionReason}");
-                return false;
-            }
-
-            if (CompanionSkillCooldownTimers.ShouldDeclineMiningRequest(controller.SkillCooldowns, out failureReason))
-            {
-                Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={radius}, reason=Cooldown active.");
-                return false;
-            }
-
-            bool accepted = controller.MiningController.TryStartAreaMining(radius, out failureReason);
-            if (!accepted)
-            {
-                if (failureReason == CompanionMiningCommandResult.InventoryFull)
+            return CompanionSkillCommandGuard.TryExecuteAreaCommand(
+                controller,
+                controller?.MiningController,
+                radius,
+                r => $"[Companion] Area mining command outcome: success=False, radius={r}, reason=Companion controller has not been initialised.",
+                CompanionMiningCommandResult.RequirementsNotMet,
+                r => $"[Companion] Area mining command outcome: success=False, radius={r}, reason=Companion mining controller is missing.",
+                CompanionMiningCommandResult.RequirementsNotMet,
+                r => $"[Companion] Area mining command outcome: success=False, radius={r}, reason=The companion is not currently active.",
+                CompanionMiningCommandResult.RequirementsNotMet,
+                CompanionSkillCooldownTimers.ShouldDeclineMiningRequest,
+                (r, result) => $"[Companion] Area mining command outcome: success=False, radius={r}, reason=Cooldown active.",
+                (skillController, scanRadius, out CompanionMiningCommandResult result) => skillController.TryStartAreaMining(scanRadius, out result),
+                result => result == CompanionMiningCommandResult.InventoryFull,
+                (accepted, result, scanRadius) =>
                 {
-                    string inventoryDetail = "Area mining aborted because the companion inventory is full.";
-                    Debug.Log($"[Companion] Area mining command outcome: success=True, radius={radius}, reason={inventoryDetail}");
-                    return true;
-                }
-
-                rejectionReason = $"The mining controller rejected the area mining request ({failureReason}).";
-                Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={radius}, reason={rejectionReason}");
-                return false;
-            }
-
-            string successDetail = "Area mining routine started successfully.";
-            Debug.Log($"[Companion] Area mining command outcome: success=True, radius={radius}, reason={successDetail}");
-            return true;
+                    if (accepted)
+                    {
+                        string detail = result == CompanionMiningCommandResult.InventoryFull
+                            ? "Area mining aborted because the companion inventory is full."
+                            : "Area mining routine started successfully.";
+                        Debug.Log($"[Companion] Area mining command outcome: success=True, radius={scanRadius}, reason={detail}");
+                    }
+                    else
+                    {
+                        string rejectionDetail = $"The mining controller rejected the area mining request ({result}).";
+                        Debug.LogWarning($"[Companion] Area mining command outcome: success=False, radius={scanRadius}, reason={rejectionDetail}");
+                    }
+                },
+                null,
+                null,
+                out failureReason);
         }
 
         /// <summary>
@@ -1378,41 +1343,24 @@ namespace Companions
                 return false;
             }
 
-            if (controller == null)
-            {
-                Debug.LogWarning("[Companion] Cannot command fishing: companion controller has not been initialised.");
-                return false;
-            }
-
-            if (controller.FishingController == null)
-            {
-                Debug.LogWarning("[Companion] Cannot command fishing: companion fishing controller is missing.");
-                return false;
-            }
-
-            if (!HasActiveCompanion)
-            {
-                Debug.LogWarning("[Companion] Cannot command fishing: the companion is not currently active.");
-                return false;
-            }
-
-            if (CompanionSkillCooldownTimers.ShouldDeclineFishingRequest(controller.SkillCooldowns, out var cooldownResult))
-            {
-                Debug.LogWarning($"[Companion] Fishing command outcome: accepted=False (result={cooldownResult}).");
-                return false;
-            }
-
-            bool accepted = controller.FishingController.TryCommandFish(spot, out var result);
-            if (!accepted && result == CompanionFishingCommandResult.InventoryFull)
-                accepted = true;
-
-            string message = $"[Companion] Fishing command outcome: accepted={accepted} (result={result}).";
-            if (accepted)
-                Debug.Log(message);
-            else
-                Debug.LogWarning(message);
-
-            return accepted;
+            return CompanionSkillCommandGuard.TryExecuteSingleTargetCommand(
+                controller,
+                controller?.FishingController,
+                "[Companion] Cannot command fishing: companion controller has not been initialised.",
+                "[Companion] Cannot command fishing: companion fishing controller is missing.",
+                "[Companion] Cannot command fishing: the companion is not currently active.",
+                CompanionSkillCooldownTimers.ShouldDeclineFishingRequest,
+                result => $"[Companion] Fishing command outcome: accepted=False (result={result}).",
+                (skillController, out CompanionFishingCommandResult result) => skillController.TryCommandFish(spot, out result),
+                result => result == CompanionFishingCommandResult.InventoryFull,
+                (accepted, result) =>
+                {
+                    string message = $"[Companion] Fishing command outcome: accepted={accepted} (result={result}).";
+                    if (accepted)
+                        Debug.Log(message);
+                    else
+                        Debug.LogWarning(message);
+                });
         }
 
         /// <summary>
@@ -1443,57 +1391,38 @@ namespace Companions
         /// <returns>True when the area fishing command started successfully.</returns>
         public static bool TryCommandFishNearby(float radius, out CompanionFishingCommandResult failureReason)
         {
-            string rejectionReason = string.Empty;
-            failureReason = CompanionFishingCommandResult.Unreachable;
-
-            if (controller == null)
-            {
-                rejectionReason = "Companion controller has not been initialised.";
-                failureReason = CompanionFishingCommandResult.RequirementsNotMet;
-                Debug.LogWarning($"[Companion] Area fishing command outcome: success=False, radius={radius}, reason={rejectionReason}");
-                return false;
-            }
-
-            if (controller.FishingController == null)
-            {
-                rejectionReason = "Companion fishing controller is missing.";
-                failureReason = CompanionFishingCommandResult.RequirementsNotMet;
-                Debug.LogWarning($"[Companion] Area fishing command outcome: success=False, radius={radius}, reason={rejectionReason}");
-                return false;
-            }
-
-            if (!HasActiveCompanion)
-            {
-                rejectionReason = "The companion is not currently active.";
-                failureReason = CompanionFishingCommandResult.RequirementsNotMet;
-                Debug.LogWarning($"[Companion] Area fishing command outcome: success=False, radius={radius}, reason={rejectionReason}");
-                return false;
-            }
-
-            if (CompanionSkillCooldownTimers.ShouldDeclineFishingRequest(controller.SkillCooldowns, out failureReason))
-            {
-                Debug.LogWarning($"[Companion] Area fishing command outcome: success=False, radius={radius}, reason=Cooldown active.");
-                return false;
-            }
-
-            bool accepted = controller.FishingController.TryStartAreaFishing(radius, out failureReason);
-            if (!accepted)
-            {
-                if (failureReason == CompanionFishingCommandResult.InventoryFull)
+            return CompanionSkillCommandGuard.TryExecuteAreaCommand(
+                controller,
+                controller?.FishingController,
+                radius,
+                r => $"[Companion] Area fishing command outcome: success=False, radius={r}, reason=Companion controller has not been initialised.",
+                CompanionFishingCommandResult.RequirementsNotMet,
+                r => $"[Companion] Area fishing command outcome: success=False, radius={r}, reason=Companion fishing controller is missing.",
+                CompanionFishingCommandResult.RequirementsNotMet,
+                r => $"[Companion] Area fishing command outcome: success=False, radius={r}, reason=The companion is not currently active.",
+                CompanionFishingCommandResult.RequirementsNotMet,
+                CompanionSkillCooldownTimers.ShouldDeclineFishingRequest,
+                (r, result) => $"[Companion] Area fishing command outcome: success=False, radius={r}, reason=Cooldown active.",
+                (skillController, scanRadius, out CompanionFishingCommandResult result) => skillController.TryStartAreaFishing(scanRadius, out result),
+                result => result == CompanionFishingCommandResult.InventoryFull,
+                (accepted, result, scanRadius) =>
                 {
-                    string inventoryDetail = "Area fishing aborted because the companion inventory is full.";
-                    Debug.Log($"[Companion] Area fishing command outcome: success=True, radius={radius}, reason={inventoryDetail}");
-                    return true;
-                }
-
-                rejectionReason = $"The fishing controller rejected the area fishing request ({failureReason}).";
-                Debug.LogWarning($"[Companion] Area fishing command outcome: success=False, radius={radius}, reason={rejectionReason}");
-                return false;
-            }
-
-            string successDetail = "Area fishing routine started successfully.";
-            Debug.Log($"[Companion] Area fishing command outcome: success=True, radius={radius}, reason={successDetail}");
-            return true;
+                    if (accepted)
+                    {
+                        string detail = result == CompanionFishingCommandResult.InventoryFull
+                            ? "Area fishing aborted because the companion inventory is full."
+                            : "Area fishing routine started successfully.";
+                        Debug.Log($"[Companion] Area fishing command outcome: success=True, radius={scanRadius}, reason={detail}");
+                    }
+                    else
+                    {
+                        string rejectionDetail = $"The fishing controller rejected the area fishing request ({result}).";
+                        Debug.LogWarning($"[Companion] Area fishing command outcome: success=False, radius={scanRadius}, reason={rejectionDetail}");
+                    }
+                },
+                null,
+                null,
+                out failureReason);
         }
 
         private static void PublishCookingFailureMessage(CompanionCookingCommandResult reason)
@@ -1534,54 +1463,36 @@ namespace Companions
                 return false;
             }
 
-            if (controller == null)
-            {
-                Debug.LogWarning("[Companion] Cannot command cooking: companion controller has not been initialised.");
-                return false;
-            }
+            var cooking = controller != null ? controller.CookingController : null;
 
-            var cooking = controller.CookingController;
-            if (cooking == null)
-            {
-                Debug.LogWarning("[Companion] Cannot command cooking: companion cooking controller is missing.");
-                return false;
-            }
-
-            if (!HasActiveCompanion)
-            {
-                Debug.LogWarning("[Companion] Cannot command cooking: the companion is not currently active.");
-                return false;
-            }
-
-            if (CompanionSkillCooldownTimers.ShouldDeclineCookingRequest(controller.SkillCooldowns, out var cooldownResult))
-            {
-                Debug.LogWarning($"[Companion] Cooking command outcome: accepted=False (result={cooldownResult}).");
-                return false;
-            }
-
-            bool accepted = cooking.TryCommandCook(station, recipe, out result);
-            if (!accepted && result == CompanionCookingCommandResult.InventoryFull)
-            {
-                bool deposited = TryDepositCompanionInventoryToBank();
-                if (deposited)
-                    accepted = cooking.TryCommandCook(station, recipe, out result);
-                if (!accepted)
-                    accepted = true;
-            }
-
-            string message = $"[Companion] Cooking command outcome: accepted={accepted} (result={result}).";
-            if (accepted)
-                Debug.Log(message);
-            else
-                Debug.LogWarning(message);
-
-            if (accepted && result == CompanionCookingCommandResult.Accepted)
-                PublishCookingStartMessage();
-
-            if (!accepted)
-                PublishCookingFailureMessage(result);
-
-            return accepted;
+            return CompanionSkillCommandGuard.TryExecuteSingleTargetCommand(
+                controller,
+                cooking,
+                "[Companion] Cannot command cooking: companion controller has not been initialised.",
+                "[Companion] Cannot command cooking: companion cooking controller is missing.",
+                "[Companion] Cannot command cooking: the companion is not currently active.",
+                CompanionSkillCooldownTimers.ShouldDeclineCookingRequest,
+                cooldown => $"[Companion] Cooking command outcome: accepted=False (result={cooldown}).",
+                (skillController, out CompanionCookingCommandResult commandResult) => skillController.TryCommandCook(station, recipe, out commandResult),
+                commandResult => commandResult == CompanionCookingCommandResult.InventoryFull,
+                (accepted, commandResult) =>
+                {
+                    string message = $"[Companion] Cooking command outcome: accepted={accepted} (result={commandResult}).";
+                    if (accepted)
+                        Debug.Log(message);
+                    else
+                        Debug.LogWarning(message);
+                    result = commandResult;
+                },
+                PublishCookingFailureMessage,
+                commandResult =>
+                {
+                    if (commandResult == CompanionCookingCommandResult.Accepted)
+                        PublishCookingStartMessage();
+                },
+                commandResult => commandResult == CompanionCookingCommandResult.InventoryFull,
+                TryDepositCompanionInventoryToBank,
+                (skillController, out CompanionCookingCommandResult retryResult) => skillController.TryCommandCook(station, recipe, out retryResult));
         }
 
         /// <summary>
@@ -1605,65 +1516,47 @@ namespace Companions
         /// </summary>
         public static bool TryCommandCookNearby(float radius, out CompanionCookingCommandResult failureReason)
         {
-            string rejectionReason = string.Empty;
-            failureReason = CompanionCookingCommandResult.StationUnavailable;
+            var cooking = controller != null ? controller.CookingController : null;
 
-            if (controller == null)
-            {
-                rejectionReason = "Companion controller has not been initialised.";
-                failureReason = CompanionCookingCommandResult.RequirementsNotMet;
-                Debug.LogWarning($"[Companion] Area cooking command outcome: success=False, radius={radius}, reason={rejectionReason}.");
-                return false;
-            }
-
-            var cooking = controller.CookingController;
-            if (cooking == null)
-            {
-                rejectionReason = "Companion cooking controller is missing.";
-                failureReason = CompanionCookingCommandResult.RequirementsNotMet;
-                Debug.LogWarning($"[Companion] Area cooking command outcome: success=False, radius={radius}, reason={rejectionReason}.");
-                return false;
-            }
-
-            if (!HasActiveCompanion)
-            {
-                rejectionReason = "The companion is not currently active.";
-                failureReason = CompanionCookingCommandResult.RequirementsNotMet;
-                Debug.LogWarning($"[Companion] Area cooking command outcome: success=False, radius={radius}, reason={rejectionReason}.");
-                return false;
-            }
-
-            if (CompanionSkillCooldownTimers.ShouldDeclineCookingRequest(controller.SkillCooldowns, out failureReason))
-            {
-                Debug.LogWarning($"[Companion] Area cooking command outcome: success=False, radius={radius}, reason=Cooldown active.");
-                return false;
-            }
-
-            bool accepted = cooking.TryStartAreaCooking(radius, out failureReason);
-            if (!accepted)
-            {
-                if (failureReason == CompanionCookingCommandResult.InventoryFull)
+            return CompanionSkillCommandGuard.TryExecuteAreaCommand(
+                controller,
+                cooking,
+                radius,
+                r => $"[Companion] Area cooking command outcome: success=False, radius={r}, reason=Companion controller has not been initialised.",
+                CompanionCookingCommandResult.RequirementsNotMet,
+                r => $"[Companion] Area cooking command outcome: success=False, radius={r}, reason=Companion cooking controller is missing.",
+                CompanionCookingCommandResult.RequirementsNotMet,
+                r => $"[Companion] Area cooking command outcome: success=False, radius={r}, reason=The companion is not currently active.",
+                CompanionCookingCommandResult.RequirementsNotMet,
+                CompanionSkillCooldownTimers.ShouldDeclineCookingRequest,
+                (r, result) => $"[Companion] Area cooking command outcome: success=False, radius={r}, reason=Cooldown active.",
+                (skillController, scanRadius, out CompanionCookingCommandResult result) => skillController.TryStartAreaCooking(scanRadius, out result),
+                result => result == CompanionCookingCommandResult.InventoryFull,
+                (accepted, result, scanRadius) =>
                 {
-                    bool deposited = TryDepositCompanionInventoryToBank();
-                    if (deposited)
-                        accepted = cooking.TryStartAreaCooking(radius, out failureReason);
-                    if (!accepted)
+                    if (accepted)
                     {
-                        Debug.Log($"[Companion] Area cooking command outcome: success=True, radius={radius}, reason=Inventory full.");
-                        return true;
+                        string detail = result == CompanionCookingCommandResult.InventoryFull
+                            ? "Inventory full."
+                            : "Area cooking routine started successfully.";
+                        Debug.Log($"[Companion] Area cooking command outcome: success=True, radius={scanRadius}, reason={detail}");
                     }
-                }
-
-                rejectionReason = $"The cooking controller rejected the area cooking request ({failureReason}).";
-                Debug.LogWarning($"[Companion] Area cooking command outcome: success=False, radius={radius}, reason={rejectionReason}.");
-                PublishCookingFailureMessage(failureReason);
-                return false;
-            }
-
-            string successDetail = "Area cooking routine started successfully.";
-            Debug.Log($"[Companion] Area cooking command outcome: success=True, radius={radius}, reason={successDetail}");
-            PublishCookingStartMessage();
-            return true;
+                    else
+                    {
+                        string rejectionDetail = $"The cooking controller rejected the area cooking request ({result}).";
+                        Debug.LogWarning($"[Companion] Area cooking command outcome: success=False, radius={scanRadius}, reason={rejectionDetail}.");
+                    }
+                },
+                PublishCookingFailureMessage,
+                resultValue =>
+                {
+                    if (resultValue == CompanionCookingCommandResult.Accepted)
+                        PublishCookingStartMessage();
+                },
+                result => result == CompanionCookingCommandResult.InventoryFull,
+                TryDepositCompanionInventoryToBank,
+                (skillController, scanRadius, out CompanionCookingCommandResult retryResult) => skillController.TryStartAreaCooking(scanRadius, out retryResult),
+                out failureReason);
         }
 
         private static void PublishCookingStartMessage()
@@ -1692,41 +1585,24 @@ namespace Companions
                 return false;
             }
 
-            if (controller == null)
-            {
-                Debug.LogWarning("[Companion] Cannot command woodcutting: companion controller has not been initialised.");
-                return false;
-            }
-
-            if (controller.WoodcuttingController == null)
-            {
-                Debug.LogWarning("[Companion] Cannot command woodcutting: companion woodcutting controller is missing.");
-                return false;
-            }
-
-            if (!HasActiveCompanion)
-            {
-                Debug.LogWarning("[Companion] Cannot command woodcutting: the companion is not currently active.");
-                return false;
-            }
-
-            if (CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest(controller.SkillCooldowns, out var cooldownResult))
-            {
-                Debug.LogWarning($"[Companion] Woodcutting command outcome: accepted=False (result={cooldownResult}).");
-                return false;
-            }
-
-            bool accepted = controller.WoodcuttingController.TryCommandChop(tree, out var result);
-            if (!accepted && result == CompanionWoodcuttingCommandResult.InventoryFull)
-                accepted = true;
-
-            string message = $"[Companion] Woodcutting command outcome: accepted={accepted} (result={result}).";
-            if (accepted)
-                Debug.Log(message);
-            else
-                Debug.LogWarning(message);
-
-            return accepted;
+            return CompanionSkillCommandGuard.TryExecuteSingleTargetCommand(
+                controller,
+                controller?.WoodcuttingController,
+                "[Companion] Cannot command woodcutting: companion controller has not been initialised.",
+                "[Companion] Cannot command woodcutting: companion woodcutting controller is missing.",
+                "[Companion] Cannot command woodcutting: the companion is not currently active.",
+                CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest,
+                result => $"[Companion] Woodcutting command outcome: accepted=False (result={result}).",
+                (skillController, out CompanionWoodcuttingCommandResult result) => skillController.TryCommandChop(tree, out result),
+                result => result == CompanionWoodcuttingCommandResult.InventoryFull,
+                (accepted, result) =>
+                {
+                    string message = $"[Companion] Woodcutting command outcome: accepted={accepted} (result={result}).";
+                    if (accepted)
+                        Debug.Log(message);
+                    else
+                        Debug.LogWarning(message);
+                });
         }
 
         /// <summary>
@@ -1757,57 +1633,38 @@ namespace Companions
         /// <returns>True when the area woodcutting command started successfully.</returns>
         public static bool TryCommandChopNearby(float radius, out CompanionWoodcuttingCommandResult failureReason)
         {
-            string rejectionReason = string.Empty;
-            failureReason = CompanionWoodcuttingCommandResult.Unreachable;
-
-            if (controller == null)
-            {
-                rejectionReason = "Companion controller has not been initialised.";
-                failureReason = CompanionWoodcuttingCommandResult.RequirementsNotMet;
-                Debug.LogWarning($"[Companion] Area woodcutting command outcome: success=False, radius={radius}, reason={rejectionReason}");
-                return false;
-            }
-
-            if (controller.WoodcuttingController == null)
-            {
-                rejectionReason = "Companion woodcutting controller is missing.";
-                failureReason = CompanionWoodcuttingCommandResult.RequirementsNotMet;
-                Debug.LogWarning($"[Companion] Area woodcutting command outcome: success=False, radius={radius}, reason={rejectionReason}");
-                return false;
-            }
-
-            if (!HasActiveCompanion)
-            {
-                rejectionReason = "The companion is not currently active.";
-                failureReason = CompanionWoodcuttingCommandResult.RequirementsNotMet;
-                Debug.LogWarning($"[Companion] Area woodcutting command outcome: success=False, radius={radius}, reason={rejectionReason}");
-                return false;
-            }
-
-            if (CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest(controller.SkillCooldowns, out failureReason))
-            {
-                Debug.LogWarning($"[Companion] Area woodcutting command outcome: success=False, radius={radius}, reason=Cooldown active.");
-                return false;
-            }
-
-            bool accepted = controller.WoodcuttingController.TryStartAreaWoodcutting(radius, out failureReason);
-            if (!accepted)
-            {
-                if (failureReason == CompanionWoodcuttingCommandResult.InventoryFull)
+            return CompanionSkillCommandGuard.TryExecuteAreaCommand(
+                controller,
+                controller?.WoodcuttingController,
+                radius,
+                r => $"[Companion] Area woodcutting command outcome: success=False, radius={r}, reason=Companion controller has not been initialised.",
+                CompanionWoodcuttingCommandResult.RequirementsNotMet,
+                r => $"[Companion] Area woodcutting command outcome: success=False, radius={r}, reason=Companion woodcutting controller is missing.",
+                CompanionWoodcuttingCommandResult.RequirementsNotMet,
+                r => $"[Companion] Area woodcutting command outcome: success=False, radius={r}, reason=The companion is not currently active.",
+                CompanionWoodcuttingCommandResult.RequirementsNotMet,
+                CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest,
+                (r, result) => $"[Companion] Area woodcutting command outcome: success=False, radius={r}, reason=Cooldown active.",
+                (skillController, scanRadius, out CompanionWoodcuttingCommandResult result) => skillController.TryStartAreaWoodcutting(scanRadius, out result),
+                result => result == CompanionWoodcuttingCommandResult.InventoryFull,
+                (accepted, result, scanRadius) =>
                 {
-                    string inventoryDetail = "Area woodcutting aborted because the companion inventory is full.";
-                    Debug.Log($"[Companion] Area woodcutting command outcome: success=True, radius={radius}, reason={inventoryDetail}");
-                    return true;
-                }
-
-                rejectionReason = $"The woodcutting controller rejected the area woodcutting request ({failureReason}).";
-                Debug.LogWarning($"[Companion] Area woodcutting command outcome: success=False, radius={radius}, reason={rejectionReason}");
-                return false;
-            }
-
-            string successDetail = "Area woodcutting routine started successfully.";
-            Debug.Log($"[Companion] Area woodcutting command outcome: success=True, radius={radius}, reason={successDetail}");
-            return true;
+                    if (accepted)
+                    {
+                        string detail = result == CompanionWoodcuttingCommandResult.InventoryFull
+                            ? "Area woodcutting aborted because the companion inventory is full."
+                            : "Area woodcutting routine started successfully.";
+                        Debug.Log($"[Companion] Area woodcutting command outcome: success=True, radius={scanRadius}, reason={detail}");
+                    }
+                    else
+                    {
+                        string rejectionDetail = $"The woodcutting controller rejected the area woodcutting request ({result}).";
+                        Debug.LogWarning($"[Companion] Area woodcutting command outcome: success=False, radius={scanRadius}, reason={rejectionDetail}");
+                    }
+                },
+                null,
+                null,
+                out failureReason);
         }
 
         /// <summary>
