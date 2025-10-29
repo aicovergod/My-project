@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0eb5ba1fc0159b178815c654ac5209aa6025c923 -->
+## 2025-10-29T21:54:34+00:00 — Spawn ore golem fragments on killer tile
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Combat/Mechanics/OreGolemHadesFragmentDropper.cs
+- Diff: 35 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:94d8960d894f25d7b74bb3d9672243128782a4b6 -->
 ## 2025-10-29T21:39:26+00:00 — Merge pull request #1533 from aicovergod/codex/update-auto-harvest-stop-distance
 
