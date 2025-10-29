@@ -46,4 +46,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPC.PathfindingService
   navGrid: {fileID: 604674411650766202, guid: 7e7f9857c5de333468379150e40380f6, type: 3}
   maxNodesPerTick: 128
+  maxConcurrentRequests: 4
+  occupancyService: {fileID: 0}
+  enablePathSmoothing: 1
+  useLineOfSightForSmoothing: 1
+  zoneChunkBindings:
+  - zoneId: Overworld_Central
+    chunkIds:
+    - chunk_0_0
+    - chunk_0_1
   enableDebugLogging: 0

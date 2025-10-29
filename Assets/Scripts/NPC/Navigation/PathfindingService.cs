@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using Util;
 using World;
+using NPC.Navigation;
 
 namespace NPC
 {
@@ -265,6 +266,72 @@ namespace NPC
         }
 
         /// <summary>
+        /// Mapping between a navmesh zone identifier and the chunk identifiers that should load when the zone activates.
+        /// </summary>
+        [Serializable]
+        public sealed class NavMeshZoneBinding
+        {
+            [Tooltip("Unique identifier emitted by navmesh zone triggers when the player crosses into the region.")]
+            [SerializeField] private string zoneId;
+
+            [Tooltip("Chunk identifiers (chunk_X_Y) that should be streamed in while this zone is active.")]
+            [SerializeField] private List<string> chunkIds = new List<string>();
+
+            /// <summary>
+            /// Navmesh zone identifier that the binding represents.
+            /// </summary>
+            public string ZoneId => zoneId;
+
+            /// <summary>
+            /// Chunk identifiers associated with the binding.
+            /// </summary>
+            public IReadOnlyList<string> ChunkIds => chunkIds;
+
+            /// <summary>
+            /// Returns <c>true</c> when the supplied identifier matches the binding's zone id.
+            /// </summary>
+            public bool Matches(string candidate)
+            {
+                return !string.IsNullOrEmpty(zoneId) && string.Equals(zoneId, candidate, StringComparison.Ordinal);
+            }
+
+#if UNITY_EDITOR
+            /// <summary>
+            /// Normalises user input so duplicate chunk identifiers and whitespace are stripped from the inspector.
+            /// </summary>
+            public void Sanitize()
+            {
+                zoneId = string.IsNullOrWhiteSpace(zoneId) ? string.Empty : zoneId.Trim();
+                if (chunkIds == null)
+                {
+                    chunkIds = new List<string>();
+                    return;
+                }
+
+                var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                for (int i = chunkIds.Count - 1; i >= 0; i--)
+                {
+                    string entry = chunkIds[i];
+                    if (string.IsNullOrWhiteSpace(entry))
+                    {
+                        chunkIds.RemoveAt(i);
+                        continue;
+                    }
+
+                    string trimmed = entry.Trim();
+                    if (!seen.Add(trimmed))
+                    {
+                        chunkIds.RemoveAt(i);
+                        continue;
+                    }
+
+                    chunkIds[i] = trimmed;
+                }
+            }
+#endif
+        }
+
+        /// <summary>
         /// Tolerance used when comparing f-costs fetched from the heap against the authoritative node record.
         /// Prevents floating point precision drift from flagging fresh entries as stale.
         /// </summary>
@@ -297,6 +364,10 @@ namespace NPC
 
         [Tooltip("Attempts to merge straight corridors whenever a clear line exists between cell endpoints.")]
         [SerializeField] private bool useLineOfSightForSmoothing = true;
+
+        [Header("Streaming")]
+        [Tooltip("Mappings between navmesh zone identifiers and the chunk IDs baked via the NavGridChunkBaker.")]
+        [SerializeField] private List<NavMeshZoneBinding> zoneChunkBindings = new List<NavMeshZoneBinding>();
 
         [Header("Debug")]
         [Tooltip("Writes verbose logging for path requests and failures.")]
@@ -339,6 +410,27 @@ namespace NPC
         /// Revision counter for the active grid, incremented every time it is rebuilt.
         /// </summary>
         public int GridRevision => navGrid != null ? navGrid.Revision : 0;
+
+        /// <summary>
+        /// Zone to chunk bindings configured in the inspector.
+        /// </summary>
+        public IReadOnlyList<NavMeshZoneBinding> ZoneChunkBindings => zoneChunkBindings;
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (zoneChunkBindings == null)
+            {
+                zoneChunkBindings = new List<NavMeshZoneBinding>();
+                return;
+            }
+
+            for (int i = 0; i < zoneChunkBindings.Count; i++)
+            {
+                zoneChunkBindings[i]?.Sanitize();
+            }
+        }
+#endif
 
         protected override void Awake()
         {
@@ -436,6 +528,69 @@ namespace NPC
             {
                 Debug.Log($"PathfindingService registered grid '{navGrid.name}'.", this);
             }
+        }
+
+        /// <summary>
+        /// Attempts to map a zone identifier to the baked chunk identifiers that should be loaded.
+        /// </summary>
+        /// <param name="zoneId">Identifier emitted by a <see cref="NPC.Navigation.NavGridStreamingZone"/> or similar runtime trigger.</param>
+        /// <param name="chunkIds">Populated with the chunk identifiers associated with the zone.</param>
+        /// <returns><c>true</c> when the zone has at least one chunk binding.</returns>
+        public bool TryGetChunkIdsForZone(string zoneId, out IReadOnlyList<string> chunkIds)
+        {
+            chunkIds = Array.Empty<string>();
+
+            if (string.IsNullOrEmpty(zoneId) || zoneChunkBindings == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < zoneChunkBindings.Count; i++)
+            {
+                NavMeshZoneBinding binding = zoneChunkBindings[i];
+                if (binding != null && binding.Matches(zoneId))
+                {
+                    IReadOnlyList<string> ids = binding.ChunkIds ?? Array.Empty<string>();
+                    chunkIds = ids;
+                    return ids.Count > 0;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Converts the chunk identifiers assigned to a zone into chunk coordinate pairs.
+        /// </summary>
+        /// <param name="zoneId">Identifier emitted by the navmesh zone.</param>
+        /// <param name="results">Buffer that receives the parsed coordinates.</param>
+        /// <returns><c>true</c> when at least one chunk coordinate was parsed successfully.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="results"/> is <c>null</c>.</exception>
+        public bool TryGetChunkCoordinatesForZone(string zoneId, List<Vector2Int> results)
+        {
+            if (results == null)
+            {
+                throw new ArgumentNullException(nameof(results));
+            }
+
+            results.Clear();
+
+            if (!TryGetChunkIdsForZone(zoneId, out IReadOnlyList<string> ids))
+            {
+                return false;
+            }
+
+            bool any = false;
+            for (int i = 0; i < ids.Count; i++)
+            {
+                if (NavGridChunkDefinition.TryParseChunkId(ids[i], out Vector2Int coords))
+                {
+                    results.Add(coords);
+                    any = true;
+                }
+            }
+
+            return any;
         }
 
         /// <summary>

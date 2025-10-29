@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a6342fbab1a5d86add3e4eeed442e82a641455e8 -->
+## 2025-10-29T15:36:26+00:00 — Add nav grid chunk streaming assets and baker
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (10): Assets/Prefabs/MainScriptObjects/NavGridBuilder.prefab, Assets/Prefabs/SceneObjects/PathfindingService.prefab, Assets/Resources/NavGridChunks.meta, Assets/Scripts/NPC/Navigation/Editor/NavGridChunkBaker.cs, Assets/Scripts/NPC/Navigation/Editor/NavGridChunkBaker.cs.meta, Assets/Scripts/NPC/Navigation/NavGridChunkDefinition.cs, Assets/Scripts/NPC/Navigation/NavGridChunkDefinition.cs.meta, Assets/Scripts/NPC/Navigation/NavGridStreamingZone.cs, Assets/Scripts/NPC/Navigation/NavGridStreamingZone.cs.meta, Assets/Scripts/NPC/Navigation/PathfindingService.cs
+- Diff: 1061 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:561d98fd2d494bd0754543d82f322644380dd364 -->
 ## 2025-10-29T15:00:03+00:00 — Merge pull request #1516 from aicovergod/codex/modify-levelupsound-for-skillmanager-fallback
 
