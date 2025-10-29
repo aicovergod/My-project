@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:bf64ec62933bf9f339faab9dd29df057d795e86d -->
+## 2025-10-29T23:37:34+00:00 — Merge pull request #1542 from aicovergod/codex/add-companiongatheringcontrollerbase-script
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 694 ++ / 893 --
+- Notes:
+  Refactor companion gathering controllers into shared base
+---
+<!-- commit:e0b83b68707ed91aa3f464b86d3649e7f47ee59f -->
+## 2025-10-29T23:37:21+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:01e8f59ad9cd848976487cd71312eefcc8bfa50d -->
 ## 2025-10-29T23:37:03+00:00 — chore: reset area blocked flag when cancelling routines
 
