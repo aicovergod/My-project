@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:18d7e66716335f92c3862ac9abe367efef1a12b0 -->
+## 2025-10-29T21:07:09+00:00 — Merge pull request #1529 from aicovergod/codex/add-interaction-delay-to-pickable-resource
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 33 ++ / 0 --
+- Notes:
+  Add interaction cooldown to pickable resource nodes
+---
+<!-- commit:8fa2c8fe3e910a4c1e19e37c6939110af2989854 -->
+## 2025-10-29T21:07:02+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:fc0b4a943edf1a1f8d3539257849ea9ee099957e -->
 ## 2025-10-29T21:06:48+00:00 — Add cooldown to pickable resource nodes
 
