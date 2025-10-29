@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5317cff1804b62811f9eed4e416595276fd0c872 -->
+## 2025-10-29T22:49:46+00:00 — Document companion skilling controller guidance
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): AGENTS.md
+- Diff: 2 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9ba8da22e8e1b88857c94aaedd526fc3457613e7 -->
 ## 2025-10-29T22:43:33+00:00 — Merge pull request #1537 from aicovergod/codex/refactor-companions-into-shared-base-class
 
