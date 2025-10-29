@@ -390,7 +390,7 @@ namespace Skills.Thieving.Core
             {
                 consecutiveNpcFailures = 0;
                 AwardNpcRewards(definition, activeNpc.transform.position);
-                NpcPickpocketDialogueService.TryPublishDialogue(definition, true);
+                NpcPickpocketDialogueService.TryPublishDialogue(definition, activeNpc.DialogueAnchor, true);
                 activeNpc.NotifyAttemptFinished(true, false);
                 PickpocketFinished?.Invoke(activeNpc, true);
             }
@@ -398,7 +398,7 @@ namespace Skills.Thieving.Core
             {
                 consecutiveNpcFailures++;
                 HandlePickpocketFailure(definition);
-                NpcPickpocketDialogueService.TryPublishDialogue(definition, false);
+                NpcPickpocketDialogueService.TryPublishDialogue(definition, activeNpc.DialogueAnchor, false);
                 bool triggerLockout = consecutiveNpcFailures >= definition.FailuresBeforeCooldown;
                 activeNpc.NotifyAttemptFinished(false, triggerLockout);
                 if (triggerLockout)
