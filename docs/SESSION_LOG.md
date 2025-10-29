@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3667f8cf8e0f3df0b405f591d11450975b8be842 -->
+## 2025-10-29T12:44:54+00:00 — Add fallback floating text for pickpocket failures
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs
+- Diff: 8 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:15536f6724644f5d2de2312eea6b17a4b186007e -->
 ## 2025-10-29T12:33:36+00:00 — Merge pull request #1507 from aicovergod/codex/add-simulate-loot-rolls-checkbox
 
