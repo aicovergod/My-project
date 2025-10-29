@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:461b92a6d346a6cb30a4750c30257e9e74308819 -->
+## 2025-10-29T19:33:42+00:00 — Merge pull request #1525 from aicovergod/codex/fix-level-up-sounds-not-playing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 80 ++ / 12 --
+- Notes:
+  Fix level up sound playback for all skills
+---
+<!-- commit:7a74d8e2a050636b0350b3ab59b67fde57b0d8a0 -->
+## 2025-10-29T19:32:03+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:1088fb5d769eacbe357981d32ec04fa477eb531c -->
 ## 2025-10-29T19:31:50+00:00 — Fix skill level up sound routing
 
