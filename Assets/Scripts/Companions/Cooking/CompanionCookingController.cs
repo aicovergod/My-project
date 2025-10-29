@@ -10,6 +10,7 @@ using UI.Chat;
 using UnityEngine;
 using Util;
 using Companions.Equipment;
+using RuntimeInventory = global::Inventory.Inventory;
 
 namespace Companions
 {
@@ -52,8 +53,8 @@ namespace Companions
 
         private CompanionController ownerController;
         private SkillManager skillManager;
-        private Inventory.Inventory companionInventory;
-        private Inventory.Inventory playerInventory;
+        private RuntimeInventory companionInventory;
+        private RuntimeInventory playerInventory;
         private CompanionEquipment companionEquipment;
         private CookingSkill cookingSkill;
         private CompanionSkillCooldownTracker cooldownTracker;
@@ -166,7 +167,7 @@ namespace Companions
             }
 
             var recipe = explicitRecipe;
-            Inventory.Inventory sourceInventory;
+            RuntimeInventory sourceInventory;
             ItemData rawItem;
             int availableQuantity;
             bool usingPlayerInventory;
@@ -339,7 +340,7 @@ namespace Companions
         private void StartCookingRoutine(
             CookingObject station,
             CookableRecipe recipe,
-            Inventory.Inventory sourceInventory,
+            RuntimeInventory sourceInventory,
             ItemData rawItem,
             int availableQuantity,
             bool usingPlayerInventory)
@@ -360,7 +361,7 @@ namespace Companions
         private IEnumerator CookRoutine(
             CookingObject station,
             CookableRecipe recipe,
-            Inventory.Inventory sourceInventory,
+            RuntimeInventory sourceInventory,
             ItemData rawItem,
             int availableQuantity,
             bool usingPlayerInventory)
@@ -599,7 +600,7 @@ namespace Companions
         }
 
         private CookableRecipe ResolveRecipeFromInventories(
-            out Inventory.Inventory sourceInventory,
+            out RuntimeInventory sourceInventory,
             out ItemData rawItem,
             out int quantity,
             out bool usingPlayerInventory,
@@ -644,7 +645,7 @@ namespace Companions
 
         private CookableRecipe ValidateRecipe(
             CookableRecipe recipe,
-            out Inventory.Inventory sourceInventory,
+            out RuntimeInventory sourceInventory,
             out ItemData rawItem,
             out int quantity,
             out bool usingPlayerInventory,

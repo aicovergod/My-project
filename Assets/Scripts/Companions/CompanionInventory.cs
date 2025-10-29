@@ -5,6 +5,7 @@ using Inventory;
 using Inventory.Core;
 using UI;
 using UnityEngine;
+using RuntimeInventory = global::Inventory.Inventory;
 
 namespace Companions
 {
@@ -16,7 +17,7 @@ namespace Companions
     public sealed class CompanionInventory : MonoBehaviour
     {
         /// <summary>Inventory component that renders the companion's backpack.</summary>
-        private Inventory.Inventory inventory;
+        private RuntimeInventory inventory;
 
         /// <summary>Tracks whether the inventory UI is currently visible.</summary>
         private bool isOpen;
@@ -28,17 +29,17 @@ namespace Companions
         public event Action<bool> VisibilityChanged;
 
         /// <summary>Exposes the underlying inventory component for other companion systems.</summary>
-        public Inventory.Inventory InventoryComponent => inventory;
+        public RuntimeInventory InventoryComponent => inventory;
 
         /// <summary>Initialises the underlying inventory component using the player's styling as a template.</summary>
         public void Initialise()
         {
             // Try to reuse an existing inventory component so pet storage leftovers are retained.
-            inventory = GetComponent<Inventory.Inventory>();
+            inventory = GetComponent<RuntimeInventory>();
 
             if (inventory == null)
             {
-                inventory = gameObject.AddComponent<Inventory.Inventory>();
+                inventory = gameObject.AddComponent<RuntimeInventory>();
             }
 
             // If we still failed to acquire an inventory component something is misconfigured, so abort.
@@ -69,7 +70,7 @@ namespace Companions
             inventory.tooltipNameFont = LegacyFontProvider.GetLegacyFont();
             inventory.tooltipDescriptionFont = LegacyFontProvider.GetLegacyFont();
 
-            var playerInventory = GameObject.FindGameObjectWithTag("Player")?.GetComponent<Inventory.Inventory>();
+            var playerInventory = GameObject.FindGameObjectWithTag("Player")?.GetComponent<RuntimeInventory>();
             if (playerInventory != null && playerInventory != inventory)
             {
                 inventory.windowColor = playerInventory.windowColor;

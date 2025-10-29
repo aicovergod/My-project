@@ -1,4 +1,7 @@
 ## Unity Development Principles for the RuneScape-Style Project
+
+### Last Update
+- Aligned companion skill command guards with C# optional parameter ordering rules and retargeted companion inventory references to the global inventory namespace to clear recent console build errors.
 1. **Maintain steady progress.** Keep iterating on gameplay, skills, UI, and NPC systems without waiting for follow-up instructions whenever the goal is clear. If you must pause, be ready to explain the blocker (missing assets, unclear requirements, technical issues, etc.).
 2. **Plan before debugging.** When behaviour in the Unity Editor or Play Mode looks off, review the relevant scripts and scene setup first. Use `Debug.Log`, the Unity Console, and targeted checks to validate assumptions about variables, object references, and execution order, and lean on the per-system `EnableDebugLogging` flags already in gathering skills—wire any new debug switches into the `AdminF2Menu` so tooling stays consistent.
 3. **Validate changes in Unity.** After updating or creating scripts, attach them to the correct GameObjects, enter Play Mode, and confirm they function as intended. When altering gameplay, persistence, or scene transitions, run the Unity Test Runner edit/play mode suites under `Assets/Tests` and walk the login regression steps in `PlaytestNotes_LoginFlow.md` to cover regressions.

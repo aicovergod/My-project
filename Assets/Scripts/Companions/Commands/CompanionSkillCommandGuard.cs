@@ -159,10 +159,10 @@ namespace Companions.Commands
         /// <param name="logOutcome">Callback used to emit the success/failure log once the controller responds.</param>
         /// <param name="onFailure">Invoked when the command ultimately fails.</param>
         /// <param name="onSuccess">Invoked when the command completes successfully (excluding forced successes).</param>
+        /// <param name="failureReason">Detailed failure result when the guard or controller rejects the command.</param>
         /// <param name="shouldAttemptInventoryFallback">Optional predicate that indicates whether the inventory fallback should run.</param>
         /// <param name="inventoryFallback">Optional fallback that tries to free inventory space before retrying.</param>
         /// <param name="fallbackCommandExecutor">Command executor used after a successful inventory fallback.</param>
-        /// <param name="failureReason">Detailed failure result when the guard or controller rejects the command.</param>
         /// <returns>True when the command is accepted (either immediately or after any fallback logic).</returns>
         public static bool TryExecuteAreaCommand<TController, TResult>(
             CompanionController companionController,
@@ -181,10 +181,10 @@ namespace Companions.Commands
             Action<bool, TResult, float> logOutcome,
             Action<TResult> onFailure,
             Action<TResult> onSuccess,
+            out TResult failureReason,
             Func<TResult, bool> shouldAttemptInventoryFallback = null,
             Func<bool> inventoryFallback = null,
-            AreaCommandExecutor<TController, TResult> fallbackCommandExecutor = null,
-            out TResult failureReason)
+            AreaCommandExecutor<TController, TResult> fallbackCommandExecutor = null)
         {
             if (companionController == null)
             {

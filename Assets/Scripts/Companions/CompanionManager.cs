@@ -18,6 +18,7 @@ using UI.Chat;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Companions.UI;
+using RuntimeInventory = global::Inventory.Inventory;
 
 namespace Companions
 {
@@ -88,7 +89,7 @@ namespace Companions
         private static bool equipmentVisible;
 
         /// <summary>Cached handle to the active player inventory so equipment toggles can drive it.</summary>
-        private static Inventory.Inventory cachedPlayerInventory;
+        private static RuntimeInventory cachedPlayerInventory;
 
         /// <summary>Latest combat level computed from the companion's skills.</summary>
         private static int combatLevel = 1;
@@ -192,7 +193,7 @@ namespace Companions
         public static CompanionCookingController CompanionCookingController => controller != null ? controller.CookingController : null;
 
         /// <summary>Safely exposes the cached player inventory used for companion transfers.</summary>
-        public static Inventory.Inventory GetPlayerInventory() => ResolvePlayerInventory();
+        public static RuntimeInventory GetPlayerInventory() => ResolvePlayerInventory();
 
         /// <summary>Exposes the spawned companion object for systems that need the instance handle.</summary>
         public static GameObject CompanionObject => companionObject;
@@ -955,7 +956,7 @@ namespace Companions
         /// <summary>
         /// Attempts to equip an item into the companion equipment using the player's inventory entry.
         /// </summary>
-        public static CompanionEquipAttemptResult TryEquipItemFromPlayerInventory(Inventory.Inventory playerInventory, InventoryEntry entry)
+        public static CompanionEquipAttemptResult TryEquipItemFromPlayerInventory(RuntimeInventory playerInventory, InventoryEntry entry)
         {
             if (controller == null || controller.Equipment == null)
                 return CompanionEquipAttemptResult.NotHandled;
@@ -1409,10 +1410,10 @@ namespace Companions
                     if (resultValue == CompanionCookingCommandResult.Accepted)
                         PublishCookingStartMessage();
                 },
+                out failureReason,
                 result => result == CompanionCookingCommandResult.InventoryFull,
                 TryDepositCompanionInventoryToBank,
-                (skillController, scanRadius, out CompanionCookingCommandResult retryResult) => skillController.TryStartAreaCooking(scanRadius, out retryResult),
-                out failureReason);
+                (skillController, scanRadius, out CompanionCookingCommandResult retryResult) => skillController.TryStartAreaCooking(scanRadius, out retryResult));
         }
 
         private static void PublishCookingStartMessage()
@@ -1829,7 +1830,7 @@ namespace Companions
         /// <summary>
         /// Resolves the active player inventory, caching the result so repeated equipment toggles stay fast.
         /// </summary>
-        private static Inventory.Inventory ResolvePlayerInventory()
+        private static RuntimeInventory ResolvePlayerInventory()
         {
             if (cachedPlayerInventory != null)
                 return cachedPlayerInventory;
@@ -1839,13 +1840,13 @@ namespace Companions
             var playerObject = GameObject.FindGameObjectWithTag("Player");
             if (playerObject != null)
             {
-                cachedPlayerInventory = playerObject.GetComponent<Inventory.Inventory>() ??
-                                        playerObject.GetComponentInChildren<Inventory.Inventory>();
+                cachedPlayerInventory = playerObject.GetComponent<RuntimeInventory>() ??
+                                        playerObject.GetComponentInChildren<RuntimeInventory>();
                 if (cachedPlayerInventory != null)
                     return cachedPlayerInventory;
             }
 
-            var inventories = UnityEngine.Object.FindObjectsOfType<Inventory.Inventory>(true);
+            var inventories = UnityEngine.Object.FindObjectsOfType<RuntimeInventory>(true);
             foreach (var inventory in inventories)
             {
                 if (inventory == null)

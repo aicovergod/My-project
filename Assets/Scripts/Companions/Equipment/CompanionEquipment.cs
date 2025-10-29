@@ -12,6 +12,7 @@ using UI.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using RuntimeInventory = global::Inventory.Inventory;
 
 namespace Companions.Equipment
 {
@@ -368,7 +369,7 @@ namespace Companions.Equipment
         /// Result describing whether the equip succeeded, failed for a handled reason, or should fall back to the
         /// default player equipment flow.
         /// </returns>
-        public CompanionEquipAttemptResult TryEquipFromPlayerInventory(InventoryEntry entry, Inventory.Inventory playerInventory)
+        public CompanionEquipAttemptResult TryEquipFromPlayerInventory(InventoryEntry entry, RuntimeInventory playerInventory)
         {
             if (!initialised || entry.item == null)
                 return CompanionEquipAttemptResult.NotHandled;
@@ -442,7 +443,7 @@ namespace Companions.Equipment
         /// <param name="entry">Inventory entry removed from the companion bag.</param>
         /// <param name="companionBag">Companion inventory used when returning items on failure.</param>
         /// <returns>Result describing whether the equip succeeded or why it failed.</returns>
-        public CompanionEquipAttemptResult TryEquipFromCompanionInventory(InventoryEntry entry, Inventory.Inventory companionBag)
+        public CompanionEquipAttemptResult TryEquipFromCompanionInventory(InventoryEntry entry, RuntimeInventory companionBag)
         {
             if (!initialised || entry.item == null)
                 return CompanionEquipAttemptResult.NotHandled;
@@ -510,7 +511,7 @@ namespace Companions.Equipment
         /// <summary>
         /// Unequips the requested slot into the provided inventory, falling back to the companion bag when needed.
         /// </summary>
-        public void UnequipToInventory(EquipmentSlot slot, Inventory.Inventory destinationInventory)
+        public void UnequipToInventory(EquipmentSlot slot, RuntimeInventory destinationInventory)
         {
             int index = SlotIndex(slot);
             if (index < 0 || index >= equipped.Length)
@@ -996,7 +997,7 @@ namespace Companions.Equipment
             });
         }
 
-        private bool ValidateSkillRequirements(ItemData item, Inventory.Inventory playerInventory, InventoryEntry entry)
+        private bool ValidateSkillRequirements(ItemData item, RuntimeInventory playerInventory, InventoryEntry entry)
         {
             if (item.skillRequirements == null || item.skillRequirements.Length == 0)
                 return true;
@@ -1056,7 +1057,7 @@ namespace Companions.Equipment
             FloatingText.Show(message, anchor.position);
         }
 
-        private bool HandleMutuallyExclusiveSlots(EquipmentSlot slot, Inventory.Inventory playerInventory, InventoryEntry incoming)
+        private bool HandleMutuallyExclusiveSlots(EquipmentSlot slot, RuntimeInventory playerInventory, InventoryEntry incoming)
         {
             if (slot == EquipmentSlot.Weapon && incoming.item != null && incoming.item.isTwoHanded)
             {
@@ -1103,7 +1104,7 @@ namespace Companions.Equipment
             return true;
         }
 
-        private bool MergeStackableEquip(InventoryEntry entry, Inventory.Inventory playerInventory, EquipmentSlot slot, int index, out CompanionEquipAttemptResult failureResult)
+        private bool MergeStackableEquip(InventoryEntry entry, RuntimeInventory playerInventory, EquipmentSlot slot, int index, out CompanionEquipAttemptResult failureResult)
         {
             failureResult = CompanionEquipAttemptResult.InventoryFull;
             var current = equipped[index];
@@ -1165,7 +1166,7 @@ namespace Companions.Equipment
             EquipmentSlotChanged?.Invoke(slot, entry);
         }
 
-        private bool TryReturnEntry(InventoryEntry entry, Inventory.Inventory primary, out bool storedInPrimary)
+        private bool TryReturnEntry(InventoryEntry entry, RuntimeInventory primary, out bool storedInPrimary)
         {
             storedInPrimary = false;
             if (entry.item == null || entry.count <= 0)
@@ -1190,7 +1191,7 @@ namespace Companions.Equipment
             return false;
         }
 
-        private void RestoreEntryToInventory(Inventory.Inventory playerInventory, InventoryEntry entry)
+        private void RestoreEntryToInventory(RuntimeInventory playerInventory, InventoryEntry entry)
         {
             if (entry.item == null || entry.count <= 0)
                 return;

@@ -13,6 +13,7 @@ using UnityEngine;
 using Util;
 using Companions.Combat;
 using Companions.Equipment;
+using RuntimeInventory = global::Inventory.Inventory;
 
 namespace Companions
 {
@@ -363,7 +364,7 @@ namespace Companions
         /// <summary>
         /// Attempts to equip an entry removed from the player inventory into the companion gear slots.
         /// </summary>
-        public CompanionEquipAttemptResult TryEquipFromPlayerInventory(InventoryEntry entry, Inventory.Inventory playerInventory)
+        public CompanionEquipAttemptResult TryEquipFromPlayerInventory(InventoryEntry entry, RuntimeInventory playerInventory)
         {
             if (companionEquipment == null)
                 return CompanionEquipAttemptResult.NotHandled;

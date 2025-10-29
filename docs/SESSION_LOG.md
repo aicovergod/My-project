@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:cb76381fc18a90f446c75e55ed9d08ba8efc60a5 -->
+## 2025-10-29T23:49:04+00:00 — Fix companion inventory namespace usage and guard signature
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (11): AGENTS.md, Assets/Scripts/Companions/Commands/CompanionSkillCommandGuard.cs, Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionInventory.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs, Assets/Scripts/Companions/Equipment/CompanionEquipment.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 49 ++ / 37 --
+- Notes:
+  —
+---
 <!-- commit:bf64ec62933bf9f339faab9dd29df057d795e86d -->
 ## 2025-10-29T23:37:34+00:00 — Merge pull request #1542 from aicovergod/codex/add-companiongatheringcontrollerbase-script
 

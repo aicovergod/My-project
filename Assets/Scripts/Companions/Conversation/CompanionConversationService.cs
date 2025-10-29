@@ -17,6 +17,7 @@ using UnityEngine.SceneManagement;
 using Util;
 using World;
 using NPC;
+using RuntimeInventory = global::Inventory.Inventory;
 
 namespace Companions.Conversation
 {
@@ -1949,7 +1950,7 @@ namespace Companions.Conversation
         private ToolAvailabilityResult EvaluateMiningToolAvailability()
         {
             var inventoryWrapper = CompanionManager.CompanionInventory;
-            Inventory.Inventory inventory = inventoryWrapper != null ? inventoryWrapper.InventoryComponent : null;
+            RuntimeInventory inventory = inventoryWrapper != null ? inventoryWrapper.InventoryComponent : null;
             var equipment = CompanionManager.CompanionEquipment;
             var skills = CompanionManager.CompanionSkills;
             int miningLevel = skills != null ? skills.GetLevel(SkillType.Mining) : 1;
