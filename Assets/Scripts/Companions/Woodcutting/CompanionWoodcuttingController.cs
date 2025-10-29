@@ -42,54 +42,23 @@ namespace Companions
     /// and delegating the actual woodcutting routine to <see cref="WoodcuttingSkill"/> once in range.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class CompanionWoodcuttingController : CompanionSkillingControllerBase
+    public sealed class CompanionWoodcuttingController : CompanionGatheringControllerBase<TreeNode, CompanionWoodcuttingCommandResult>
     {
-        private const float WoodcuttingRange = 1.5f;
-        private const float ReplanDistance = WoodcuttingRange * 0.75f;
-        private const float WaypointTolerance = 0.1f;
-        private const float FacingDeadzoneSqrMagnitude = 0.0001f;
-
         private SkillManager skillManager;
         private Inventory.Inventory inventory;
         private CompanionEquipment companionEquipment;
         private WoodcuttingSkill woodcuttingSkill;
         private Coroutine woodcuttingRoutine;
-        private Coroutine areaWoodcuttingRoutine;
         private TreeNode currentTree;
         private AxeDefinition currentAxe;
         private Dictionary<string, ItemData> itemCache;
         private bool woodcuttingActive;
-        private bool followerDisabledForWoodcutting;
         private bool suppressWoodcuttingStopCallback;
-
-        private readonly List<TreeNode> areaCandidates = new List<TreeNode>();
-        private readonly List<Vector3> areaCandidateTileCenters = new List<Vector3>();
         private readonly HashSet<TreeNode> playerProtectedSingleLog = new HashSet<TreeNode>();
 
-        [Header("Stuck Detection")]
-        [Tooltip("Grace period before a lack of progress is considered \"stuck\".")]
-        [SerializeField, Min(0.1f)] private float stuckTimeoutSeconds = 2.5f;
-
-        private bool areaWoodcuttingActive;
-        private float activeAreaRadius;
         private WoodcuttingSkill playerWoodcuttingSkill;
         private Transform playerTransform;
         private CompanionSkillCooldownTracker skillCooldownTracker;
-        private bool areaAllCandidatesBlocked;
-
-        private readonly Dictionary<TreeNode, float> blockedTrees = new Dictionary<TreeNode, float>();
-        private readonly List<TreeNode> blockedTreePruneBuffer = new List<TreeNode>();
-        private TreeNode lastStuckTree;
-        private int consecutiveStuckTreeCount;
-
-        private const float ProgressResetThreshold = 0.1f;
-        private const float CloseEnoughDistanceMultiplier = 0.9f;
-        private const int ConsecutiveStuckCancelThreshold = 2;
-
-        /// <summary>
-        /// Indicates whether any systems currently hold the follower disabled so the companion remains stationary.
-        /// </summary>
-        public bool HasActiveFollowerHold => followerDisableLockCount > 0;
 
         /// <summary>
         /// True while the woodcutting controller has an active routine or the woodcutting skill reports chopping activity.
@@ -144,8 +113,8 @@ namespace Companions
             ResetFollowerState();
 
             woodcuttingActive = false;
-            followerDisabledForWoodcutting = false;
-            areaWoodcuttingActive = false;
+            followerDisabledForGathering = false;
+            areaRoutineActive = false;
             activeAreaRadius = 0f;
 
             skillCooldownTracker = cooldownTracker;
@@ -170,8 +139,7 @@ namespace Companions
         /// <returns>True when the command was accepted, otherwise false.</returns>
         public bool TryCommandChop(TreeNode tree)
         {
-            bool accepted = TryCommandChop(tree, out var result);
-            return accepted || result == CompanionWoodcuttingCommandResult.InventoryFull;
+            return TryCommandAllowingInventoryFull(tree);
         }
 
         /// <summary>
@@ -186,8 +154,7 @@ namespace Companions
         /// <returns>True when woodcutting started or the inventory was full.</returns>
         public bool TryCommandChop(TreeNode tree, bool preserveFollowerHold)
         {
-            bool accepted = TryCommandChop(tree, out var result, preserveFollowerHold);
-            return accepted || result == CompanionWoodcuttingCommandResult.InventoryFull;
+            return TryCommandAllowingInventoryFull(tree, preserveFollowerHold);
         }
 
         /// <summary>
@@ -198,7 +165,7 @@ namespace Companions
         /// <returns>True when woodcutting started, otherwise false.</returns>
         public bool TryCommandChop(TreeNode tree, out CompanionWoodcuttingCommandResult result)
         {
-            return TryCommandChop(tree, out result, false);
+            return TryCommandWithResult(tree, out result);
         }
 
         /// <summary>
@@ -216,20 +183,50 @@ namespace Companions
             out CompanionWoodcuttingCommandResult result,
             bool preserveFollowerHold)
         {
-            if (CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest(skillCooldownTracker, out result))
-                return false;
+            return TryCommandWithResult(tree, out result, preserveFollowerHold);
+        }
 
-            result = CompanionWoodcuttingCommandResult.RequirementsNotMet;
+        /// <inheritdoc />
+        protected override CommandAttempt PerformGatheringCommand(TreeNode tree, bool preserveFollowerHold)
+        {
+            var attempt = new CommandAttempt
+            {
+                Accepted = false,
+                Result = CompanionWoodcuttingCommandResult.RequirementsNotMet
+            };
 
-            if (!TryPrepareWoodcuttingCommand(tree, out var axe, out result))
-                return false;
+            if (CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest(skillCooldownTracker, out var cooldownResult))
+            {
+                attempt.Result = cooldownResult;
+                return attempt;
+            }
+
+            if (!TryPrepareWoodcuttingCommand(tree, out var axe, out var validationResult))
+            {
+                attempt.Result = validationResult;
+                return attempt;
+            }
 
             CancelAreaWoodcuttingInternal(true, preserveFollowerHold);
+            followerDisabledForGathering = preserveFollowerHold ? HasActiveFollowerHold : false;
             BeginWoodcutting(tree, axe);
 
-            result = CompanionWoodcuttingCommandResult.Accepted;
+            attempt.Accepted = true;
+            attempt.Result = CompanionWoodcuttingCommandResult.Accepted;
             CompanionSkillCooldownTimers.ClearWoodcuttingCooldown(skillCooldownTracker);
-            return true;
+            return attempt;
+        }
+
+        /// <inheritdoc />
+        protected override bool ShouldTreatInventoryFullAsSuccess(CompanionWoodcuttingCommandResult result)
+        {
+            return result == CompanionWoodcuttingCommandResult.InventoryFull;
+        }
+
+        /// <inheritdoc />
+        protected override bool IsNodeDepleted(TreeNode node)
+        {
+            return node == null || node.IsDepleted;
         }
 
         /// <summary>
@@ -255,33 +252,26 @@ namespace Companions
             if (!isActiveAndEnabled || woodcuttingSkill == null || skillManager == null)
                 return false;
 
-            float clampedRadius = Mathf.Max(0.1f, radius);
-
-            CancelAreaWoodcuttingInternal(true);
-
             if (CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest(skillCooldownTracker, out failureReason))
                 return false;
 
-            if (!BuildAreaCandidateList(clampedRadius, out failureReason))
-            {
-                PublishAreaWoodcuttingFailureMessage(failureReason);
-                return false;
-            }
+            bool started = TryStartAreaGathering(
+                radius,
+                out failureReason,
+                CompanionWoodcuttingCommandResult.Accepted,
+                clampedRadius =>
+                {
+                    bool success = BuildAreaCandidateList(clampedRadius, out var buildFailure);
+                    return (success, buildFailure);
+                },
+                PublishAreaWoodcuttingFailureMessage,
+                AreaWoodcuttingRoutine,
+                () => CompanionSkillCooldownTimers.ClearWoodcuttingCooldown(skillCooldownTracker),
+                "Companion Woodcutting",
+                StopActiveWoodcuttingRoutine,
+                preserveFollowerLocks: false);
 
-            failureReason = CompanionWoodcuttingCommandResult.Accepted;
-
-            activeAreaRadius = clampedRadius;
-            areaWoodcuttingRoutine = StartCoroutine(AreaWoodcuttingRoutine());
-            areaWoodcuttingActive = true;
-
-            CompanionSkillCooldownTimers.ClearWoodcuttingCooldown(skillCooldownTracker);
-
-            if (CompanionManager.EnableDebugLogging)
-            {
-                Debug.Log($"[Companion Woodcutting] Area woodcutting started with {areaCandidates.Count} candidates (radius {activeAreaRadius}).", this);
-            }
-
-            return true;
+            return started;
         }
 
         /// <summary>
@@ -291,7 +281,6 @@ namespace Companions
         public void CancelWoodcutting(bool restoreFollower)
         {
             CancelAreaWoodcuttingInternal(false);
-            StopActiveWoodcuttingRoutine();
             CleanupAfterWoodcutting(restoreFollower);
             UnsubscribeFromPlayerWoodcuttingSkill();
             BindToPlayerWoodcuttingSkill(playerTransform);
@@ -308,41 +297,6 @@ namespace Companions
             UnsubscribeFromPlayerWoodcuttingSkill();
             BindToPlayerWoodcuttingSkill(playerTransform);
             ResetStuckHistory();
-        }
-
-        /// <summary>
-        /// Temporarily disables the follower component so the companion remains stationary until woodcutting resumes.
-        /// Dispose the returned handle to restore the follower even when woodcutting never begins.
-        /// </summary>
-        /// <remarks>
-        /// The follower lock count is incremented even when another system already disabled the follower so subsequent
-        /// releases can determine whether woodcutting should re-enable the behaviour.
-        /// </remarks>
-        /// <returns>An <see cref="IDisposable"/> handle that restores the follower when disposed.</returns>
-        public IDisposable EnterTemporaryFollowerHold()
-        {
-            if (petFollower == null)
-                return NoOpDisposable.Instance;
-
-            if (followerDisableLockCount > 0)
-            {
-                followerDisableLockCount++;
-                followerDisabledForWoodcutting = true;
-                return new FollowerHold(this);
-            }
-
-            bool toggledFollower = false;
-
-            if (petFollower.enabled)
-            {
-                petFollower.enabled = false;
-                toggledFollower = true;
-            }
-
-            followerDisableLockCount = 1;
-            followerDisabledForWoodcutting = true;
-            followerHoldToggledFollower = toggledFollower;
-            return new FollowerHold(this);
         }
 
         private void BeginWoodcutting(TreeNode tree, AxeDefinition axe)
@@ -424,7 +378,7 @@ namespace Companions
                         }
 
                         bool closedGap = cumulativeDistanceClosed >= ProgressResetThreshold;
-                        bool effectivelyClose = distance <= WoodcuttingRange * CloseEnoughDistanceMultiplier;
+                        bool effectivelyClose = distance <= GatheringRange * CloseEnoughDistanceMultiplier;
                         bool activelyWoodcutting = woodcuttingSkill != null && woodcuttingSkill.IsChopping;
 
                         if (closedGap || effectivelyClose || activelyWoodcutting)
@@ -452,7 +406,7 @@ namespace Companions
                         break;
                     }
 
-                    if (distance > WoodcuttingRange)
+                    if (distance > GatheringRange)
                     {
                         float moveSpeed = ResolveMoveSpeed();
                         float deltaTime = body != null
@@ -480,7 +434,7 @@ namespace Companions
                                 navigationStepTaken = pathMover.TryStepAttack(
                                     deltaTime,
                                     moveSpeed,
-                                    WoodcuttingRange,
+                                    GatheringRange,
                                     WaypointTolerance,
                                     () => tree != null ? (Vector2)tree.transform.position : (Vector2)transform.position,
                                     ReplanDistance,
@@ -524,7 +478,7 @@ namespace Companions
                             }
                         }
 
-                        if (woodcuttingSkill.IsChopping && distance > WoodcuttingRange * 1.2f)
+                        if (woodcuttingSkill.IsChopping && distance > GatheringRange * 1.2f)
                             woodcuttingSkill.StopChopping();
                     }
                     else
@@ -576,7 +530,7 @@ namespace Companions
             CleanupAfterWoodcutting(true);
             ResetStuckHistory();
 
-            if (areaWoodcuttingActive)
+            if (areaRoutineActive)
             {
                 // Allow the area routine to continue scanning for additional trees.
                 yield break;
@@ -595,9 +549,7 @@ namespace Companions
 
             float now = Time.time;
             if (tree != null)
-            {
-                blockedTrees[tree] = now + stuckTimeoutSeconds;
-            }
+                MarkNodeBlocked(tree, now + stuckTimeoutSeconds);
 
             if (woodcuttingSkill != null && woodcuttingSkill.IsChopping)
             {
@@ -617,23 +569,23 @@ namespace Companions
 
             if (tree != null)
             {
-                if (tree == lastStuckTree)
+                if (tree == lastStuckNode)
                 {
-                    consecutiveStuckTreeCount++;
+                    consecutiveStuckNodeCount++;
                 }
                 else
                 {
-                    lastStuckTree = tree;
-                    consecutiveStuckTreeCount = 1;
+                    lastStuckNode = tree;
+                    consecutiveStuckNodeCount = 1;
                 }
             }
             else
             {
-                lastStuckTree = null;
-                consecutiveStuckTreeCount = 0;
+                lastStuckNode = null;
+                consecutiveStuckNodeCount = 0;
             }
 
-            if (consecutiveStuckTreeCount >= ConsecutiveStuckCancelThreshold)
+            if (consecutiveStuckNodeCount >= ConsecutiveStuckCancelThreshold)
             {
                 CancelWoodcuttingDueToStuck();
             }
@@ -655,9 +607,9 @@ namespace Companions
             }
 
             float now = Time.time;
-            PruneExpiredBlockedTrees(now);
+            PruneExpiredBlockedNodes();
 
-            if (IsTreeTemporarilyBlocked(tree, now))
+            if (IsNodeTemporarilyBlocked(tree, now))
             {
                 result = CompanionWoodcuttingCommandResult.Unreachable;
                 return false;
@@ -867,7 +819,7 @@ namespace Companions
                     if (tree.def != null && tree.def.DepletesAfterOneLog && playerProtectedSingleLog.Contains(tree))
                         continue;
 
-                    if (IsTreeTemporarilyBlocked(tree, Time.time))
+                    if (IsNodeTemporarilyBlocked(tree, Time.time))
                         continue;
 
                     // Suppress internal chat lines because the branch below publishes the
@@ -890,7 +842,7 @@ namespace Companions
                     while (woodcuttingActive && currentTree == tree)
                         yield return null;
 
-                    if (!areaWoodcuttingActive)
+                    if (!areaRoutineActive)
                         yield break;
                 }
 
@@ -929,7 +881,7 @@ namespace Companions
             int blockedByStuckCount = 0;
 
             float now = Time.time;
-            PruneExpiredBlockedTrees(now);
+            PruneExpiredBlockedNodes();
 
             for (int i = 0; i < trees.Length; i++)
             {
@@ -944,7 +896,7 @@ namespace Companions
                 if (tree.def != null && tree.def.DepletesAfterOneLog && playerProtectedSingleLog.Contains(tree))
                     continue;
 
-                if (IsTreeTemporarilyBlocked(tree, now))
+                if (IsNodeTemporarilyBlocked(tree, now))
                 {
                     blockedByStuckCount++;
                     continue;
@@ -1033,13 +985,6 @@ namespace Companions
             }
         }
 
-        private Vector3 GetTileCentre(Vector3 worldPosition)
-        {
-            float x = Mathf.Round(worldPosition.x);
-            float y = Mathf.Round(worldPosition.y);
-            return new Vector3(x, y, worldPosition.z);
-        }
-
         private void CancelWoodcuttingDueToStuck()
         {
             if (CompanionManager.EnableDebugLogging)
@@ -1062,50 +1007,9 @@ namespace Companions
                 CompanionWoodcuttingDialogueLibrary.GetRandomStuckApologyLine());
         }
 
-        private void PruneExpiredBlockedTrees(float now)
-        {
-            blockedTreePruneBuffer.Clear();
-
-            foreach (var kvp in blockedTrees)
-            {
-                var tree = kvp.Key;
-                bool expired = tree == null || tree.IsDepleted || kvp.Value <= now;
-                if (!expired)
-                    continue;
-
-                blockedTreePruneBuffer.Add(tree);
-            }
-
-            for (int i = 0; i < blockedTreePruneBuffer.Count; i++)
-            {
-                var tree = blockedTreePruneBuffer[i];
-                blockedTrees.Remove(tree);
-            }
-
-            blockedTreePruneBuffer.Clear();
-        }
-
-        private bool IsTreeTemporarilyBlocked(TreeNode tree, float now)
-        {
-            if (tree == null)
-                return false;
-
-            if (!blockedTrees.TryGetValue(tree, out float expiry))
-                return false;
-
-            if (tree.IsDepleted || expiry <= now)
-            {
-                blockedTrees.Remove(tree);
-                return false;
-            }
-
-            return true;
-        }
-
         private void ResetStuckHistory()
         {
-            lastStuckTree = null;
-            consecutiveStuckTreeCount = 0;
+            ResetStuckHistoryInternal();
         }
 
         /// <summary>
@@ -1217,35 +1121,7 @@ namespace Companions
 
         private void CleanupAfterWoodcutting(bool restoreFollower, bool preserveFollowerLocks = false)
         {
-            if (restoreFollower)
-            {
-                if (preserveFollowerLocks)
-                {
-                    // Preserve any existing follower holds so automation can complete its hand-off
-                    // before the follower component is toggled again.
-                    followerDisabledForWoodcutting = HasActiveFollowerHold;
-
-                    if (!HasActiveFollowerHold && followerHoldToggledFollower && petFollower != null && !petFollower.enabled)
-                    {
-                        petFollower.enabled = true;
-                        followerHoldToggledFollower = false;
-                    }
-                }
-                else
-                {
-                    ForceReleaseAllFollowerHolds();
-                }
-            }
-            else if (!preserveFollowerLocks)
-            {
-                followerDisableLockCount = 0;
-                followerDisabledForWoodcutting = false;
-                followerHoldToggledFollower = false;
-            }
-            else
-            {
-                followerDisabledForWoodcutting = HasActiveFollowerHold;
-            }
+            CleanupFollowerAfterGathering(restoreFollower, preserveFollowerLocks);
 
             if (body != null)
                 body.linearVelocity = Vector2.zero;
@@ -1255,47 +1131,6 @@ namespace Companions
             currentTree = null;
             currentAxe = null;
             woodcuttingActive = false;
-        }
-
-        private void ReleaseTemporaryFollowerHold()
-        {
-            if (followerDisableLockCount <= 0)
-            {
-                followerDisableLockCount = 0;
-                followerDisabledForWoodcutting = false;
-                followerHoldToggledFollower = false;
-                return;
-            }
-
-            followerDisableLockCount = Mathf.Max(0, followerDisableLockCount - 1);
-            followerDisabledForWoodcutting = followerDisableLockCount > 0;
-
-            if (!HasActiveFollowerHold)
-            {
-                if (followerHoldToggledFollower && petFollower != null && !petFollower.enabled)
-                    petFollower.enabled = true;
-
-                followerHoldToggledFollower = false;
-            }
-        }
-
-        private void ForceReleaseAllFollowerHolds()
-        {
-            if (followerDisableLockCount <= 0)
-            {
-                followerDisableLockCount = 0;
-                followerDisabledForWoodcutting = false;
-                followerHoldToggledFollower = false;
-                return;
-            }
-
-            followerDisableLockCount = 0;
-            followerDisabledForWoodcutting = false;
-
-            if (followerHoldToggledFollower && petFollower != null && !petFollower.enabled)
-                petFollower.enabled = true;
-
-            followerHoldToggledFollower = false;
         }
 
         private void HandleWoodcuttingStopped()
@@ -1357,71 +1192,17 @@ namespace Companions
             playerProtectedSingleLog.Clear();
         }
 
-        /// <summary>
-        /// Disposable handle that releases the follower hold when the woodcutting flow exits.
-        /// </summary>
-        private sealed class FollowerHold : IDisposable
-        {
-            private CompanionWoodcuttingController controller;
-            private bool disposed;
-
-            public FollowerHold(CompanionWoodcuttingController controller)
-            {
-                this.controller = controller;
-            }
-
-            public void Dispose()
-            {
-                if (disposed)
-                    return;
-
-                disposed = true;
-                controller?.ReleaseTemporaryFollowerHold();
-                controller = null;
-            }
-        }
-
-        /// <summary>
-        /// Lightweight no-op disposable used when the follower is already disabled.
-        /// </summary>
-        private sealed class NoOpDisposable : IDisposable
-        {
-            public static readonly NoOpDisposable Instance = new NoOpDisposable();
-
-            private NoOpDisposable()
-            {
-            }
-
-            public void Dispose()
-            {
-            }
-        }
-
         private void CancelAreaWoodcuttingInternal(bool restoreFollower, bool preserveFollowerLocks = false)
         {
-            if (areaWoodcuttingRoutine != null)
-            {
-                StopCoroutine(areaWoodcuttingRoutine);
-                areaWoodcuttingRoutine = null;
-            }
-
-            areaWoodcuttingActive = false;
-            activeAreaRadius = 0f;
-            areaCandidates.Clear();
-            areaCandidateTileCenters.Clear();
-
-            StopActiveWoodcuttingRoutine();
-
-            if (restoreFollower)
-                CleanupAfterWoodcutting(true, preserveFollowerLocks);
+            CancelAreaInternal(restoreFollower, preserveFollowerLocks, StopActiveWoodcuttingRoutine);
         }
 
         private void OnDisable()
         {
             CancelWoodcutting(true);
             UnsubscribeFromPlayerWoodcuttingSkill();
-            blockedTrees.Clear();
-            blockedTreePruneBuffer.Clear();
+            blockedNodes.Clear();
+            blockedNodePruneBuffer.Clear();
             areaAllCandidatesBlocked = false;
             ResetStuckHistory();
         }
@@ -1437,7 +1218,7 @@ namespace Companions
 
         private void OnDrawGizmosSelected()
         {
-            if (!areaWoodcuttingActive || activeAreaRadius <= 0f)
+            if (!areaRoutineActive || activeAreaRadius <= 0f)
                 return;
 
             Gizmos.color = new Color(0.8f, 0.8f, 0.2f, 0.35f);
