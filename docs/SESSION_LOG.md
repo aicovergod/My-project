@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6e522065aac1edf6329037ec4b6c4d20c91311d1 -->
+## 2025-10-29T12:51:27+00:00 — Add detailed thieving debug logging and admin toggle
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Skills/AdminF2Menu.cs, Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueService.cs, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueSet.cs
+- Diff: 182 ++ / 11 --
+- Notes:
+  —
+---
 <!-- commit:953d54d2b1472bf4231f2c5b38f19462dbf509e6 -->
 ## 2025-10-29T12:45:04+00:00 — Merge pull request #1508 from aicovergod/codex/update-pickpocket-failure-handling
 
