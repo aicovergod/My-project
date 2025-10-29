@@ -1,6 +1,6 @@
 using Skills.Thieving.Data;
+using UI;
 using UnityEngine;
-using World;
 
 namespace Skills.Thieving.NpcPickpocketDialogue
 {
@@ -12,6 +12,11 @@ namespace Skills.Thieving.NpcPickpocketDialogue
     /// </summary>
     internal static class NpcPickpocketDialogueService
     {
+        /// <summary>
+        ///     Offset applied to anchored floating text so the dialogue appears above the NPC's head.
+        /// </summary>
+        private static readonly Vector3 DialogueOffset = new Vector3(0f, 1f, 0f);
+
         private const int SuccessDialogueDenominator = 20;
         private const string LogPrefix = "[ThievingDialogue]";
 
@@ -128,7 +133,7 @@ namespace Skills.Thieving.NpcPickpocketDialogue
                 Debug.Log(
                     $"{LogPrefix} Publishing dialogue. Speaker='{resolvedSpeaker}', Line='{line}', Anchor={DescribeAnchor(anchor)}.");
             }
-            PopupText.Show($"{resolvedSpeaker}: {line}", anchor);
+            FloatingText.ShowAnchored($"{resolvedSpeaker}: {line}", anchor, DialogueOffset);
         }
 
         private static string DescribeAnchor(Transform anchor)
