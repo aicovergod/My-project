@@ -164,7 +164,10 @@ namespace Skills.Thieving.Editor
             float totalXp = 0f;
             int petProcCount = 0;
 
-            var rng = new System.Random(Environment.TickCount ^ GetHashCode() ^ DateTime.Now.Millisecond);
+            // Environment is also used as a project namespace so explicitly reference the BCL type
+            // to ensure we seed the RNG correctly even when the namespace is in scope.
+            int seed = unchecked(System.Environment.TickCount ^ GetHashCode() ^ DateTime.Now.Millisecond);
+            var rng = new System.Random(seed);
 
             for (int i = 0; i < attemptCount; i++)
             {
