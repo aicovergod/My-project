@@ -3,6 +3,7 @@ using Player;
 using Player.Movement;
 using Util;
 using NPC;
+using NPC.Navigation;
 
 namespace Pets
 {
@@ -247,7 +248,7 @@ namespace Pets
 
             if (wandering)
             {
-                HandleWander(playerPos, activeGrid, navAvailable);
+                HandleWander(playerPos, navData, navAvailable);
                 return;
             }
 
@@ -375,7 +376,7 @@ namespace Pets
             UpdateVisuals(visualVelocity, playerMoving, navUsed);
         }
 
-        private void HandleWander(Vector3 playerPos, NavGridBuilder grid, bool navAvailable)
+        private void HandleWander(Vector3 playerPos, INavGridData grid, bool navAvailable)
         {
             float deltaTime = Time.fixedDeltaTime;
             Vector3 currentPosition = transform.position;
@@ -482,7 +483,7 @@ namespace Pets
             UpdateVisuals(visualVelocity, playerMoving: false, navUsed);
         }
 
-        private Vector3 SampleWanderTarget(Vector3 playerPos, NavGridBuilder grid)
+        private Vector3 SampleWanderTarget(Vector3 playerPos, INavGridData grid)
         {
             Vector3 origin = transform.position;
             float baseRadius = Mathf.Max(0.1f, wanderRadius);
