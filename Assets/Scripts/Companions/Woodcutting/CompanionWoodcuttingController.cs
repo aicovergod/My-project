@@ -42,7 +42,7 @@ namespace Companions
     /// and delegating the actual woodcutting routine to <see cref="WoodcuttingSkill"/> once in range.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class CompanionWoodcuttingController : MonoBehaviour
+    public sealed class CompanionWoodcuttingController : CompanionSkillingControllerBase
     {
         private const float WoodcuttingRange = 1.5f;
         private const float ReplanDistance = WoodcuttingRange * 0.75f;
@@ -53,12 +53,6 @@ namespace Companions
         private Inventory.Inventory inventory;
         private CompanionEquipment companionEquipment;
         private WoodcuttingSkill woodcuttingSkill;
-        private PetFollower petFollower;
-        private PetPathMover pathMover;
-        private Rigidbody2D body;
-        private PetSpriteAnimator petSpriteAnimator;
-        private SpriteRenderer fallbackSpriteRenderer;
-        private Direction8 lastFacing = Direction8.Down;
         private Coroutine woodcuttingRoutine;
         private Coroutine areaWoodcuttingRoutine;
         private TreeNode currentTree;
@@ -66,8 +60,6 @@ namespace Companions
         private Dictionary<string, ItemData> itemCache;
         private bool woodcuttingActive;
         private bool followerDisabledForWoodcutting;
-        private bool followerHoldToggledFollower;
-        private int followerDisableLockCount;
         private bool suppressWoodcuttingStopCallback;
 
         private readonly List<TreeNode> areaCandidates = new List<TreeNode>();
@@ -148,28 +140,11 @@ namespace Companions
                 Debug.LogError("[Companion Woodcutting] Failed to resolve WoodcuttingSkill component.", this);
             }
 
-            petFollower = GetComponent<PetFollower>();
-            pathMover = GetComponent<PetPathMover>();
-            body = GetComponent<Rigidbody2D>();
-            petSpriteAnimator = GetComponent<PetSpriteAnimator>() ?? GetComponentInChildren<PetSpriteAnimator>();
-            if (petSpriteAnimator != null)
-            {
-                fallbackSpriteRenderer = petSpriteAnimator.spriteRenderer;
-                if (fallbackSpriteRenderer == null)
-                {
-                    fallbackSpriteRenderer = petSpriteAnimator.GetComponent<SpriteRenderer>() ??
-                        petSpriteAnimator.GetComponentInChildren<SpriteRenderer>();
-                }
-            }
-            else
-            {
-                fallbackSpriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
-            }
+            InitialiseMovementComponents();
+            ResetFollowerState();
 
             woodcuttingActive = false;
             followerDisabledForWoodcutting = false;
-            followerHoldToggledFollower = false;
-            followerDisableLockCount = 0;
             areaWoodcuttingActive = false;
             activeAreaRadius = 0f;
 
@@ -1340,7 +1315,7 @@ namespace Companions
             if (player == null)
                 return;
 
-            playerWoodcuttingSkill = player.GetComponent<WoodcuttingSkill>();
+            RebindPlayerSkill(player, ref playerWoodcuttingSkill);
             if (playerWoodcuttingSkill == null)
                 return;
 
