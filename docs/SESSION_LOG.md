@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:10339e028935aa7f3e40ccac916b6b0af0d6b900 -->
+## 2025-10-29T12:53:57+00:00 — Merge pull request #1510 from aicovergod/codex/fix-console-errors-in-npcpickpocketdialogueservice
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 0 --
+- Notes:
+  Fix pickpocket dialogue success roll block
+---
+<!-- commit:eb2b380bef0a247ddb9009d537ad93e0be344be9 -->
+## 2025-10-29T12:53:50+00:00 — Fix pickpocket dialogue success roll block
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueService.cs
+- Diff: 1 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:434382547d171647d8423b0e63b59c9178ac75e7 -->
 ## 2025-10-29T12:51:46+00:00 — Merge pull request #1509 from aicovergod/codex/add-debug-logs-for-thievingdialogue
 
