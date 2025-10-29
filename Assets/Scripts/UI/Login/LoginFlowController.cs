@@ -5,6 +5,7 @@ using Core.Save;
 using Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using World;
 
 namespace UI.Login
 {
@@ -54,8 +55,16 @@ namespace UI.Login
                 return;
             }
 
-            string targetScene = string.IsNullOrWhiteSpace(save.savedSceneName) ? fallbackSceneName : save.savedSceneName;
-            Vector2 targetPosition = new Vector2(save.savedX, save.savedY);
+            bool hasSavedScene = !string.IsNullOrWhiteSpace(save.savedSceneName);
+            string targetScene = hasSavedScene ? save.savedSceneName : fallbackSceneName;
+            Vector2 targetPosition = hasSavedScene ? new Vector2(save.savedX, save.savedY) : fallbackSpawnPosition;
+
+            if (hasSavedScene && !PersistentSceneGate.IsSceneAllowed(targetScene))
+            {
+                NotifyFallback($"Saved scene '{targetScene}' is excluded by the persistent catalog. Loading fallback scene '{fallbackSceneName}'.");
+                targetScene = fallbackSceneName;
+                targetPosition = fallbackSpawnPosition;
+            }
 
             if (!CanLoadScene(targetScene))
             {
@@ -110,6 +119,9 @@ namespace UI.Login
         private bool CanLoadScene(string sceneName)
         {
             if (string.IsNullOrWhiteSpace(sceneName))
+                return false;
+
+            if (!PersistentSceneGate.IsSceneAllowed(sceneName))
                 return false;
 
             return Application.CanStreamedLevelBeLoaded(sceneName);

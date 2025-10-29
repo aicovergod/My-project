@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using World;
 
 namespace Core.Save
 {
@@ -228,6 +229,9 @@ namespace Core.Save
         /// <param name="position">World position that should be recorded.</param>
         internal static void UpdateLastKnownLocation(string scene, Vector3 position)
         {
+            if (!PersistentSceneGate.IsSceneAllowed(scene))
+                return;
+
             lock (flushLock)
             {
                 if (boundAccount == null)
