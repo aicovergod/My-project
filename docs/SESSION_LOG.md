@@ -1,21 +1,12 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:3e4e26b0d16cf9245a5b5262af3270e852c66da9 -->
-## 2025-10-29T22:36:00+00:00 — Merge pull request #1536 from aicovergod/codex/refactor-stop-command-logic-to-companionchatcommandprocessor
+<!-- commit:5de204ce72a8328833d9335ea7c1854c2cccdeed -->
+## 2025-10-29T22:42:38+00:00 — Refactor companion skilling controller setup
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 255 ++ / 243 --
-- Notes:
-  Refactor companion stop command handling
----
-<!-- commit:edf47a5edd5ea88133b1f9b06a2dc3c03226d7db -->
-## 2025-10-29T22:35:44+00:00 — Refactor companion stop command handling
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (2): Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs, Assets/Scripts/Companions/CompanionManager.cs
-- Diff: 255 ++ / 243 --
+- Changed files (5): Assets/Scripts/Companions/CompanionSkillingControllerBase.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 129 ++ / 117 --
 - Notes:
   —
 ---

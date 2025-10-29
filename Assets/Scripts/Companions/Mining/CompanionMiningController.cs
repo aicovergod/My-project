@@ -41,7 +41,7 @@ namespace Companions
     /// and delegating the actual mining routine to <see cref="MiningSkill"/> once in range.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class CompanionMiningController : MonoBehaviour
+    public sealed class CompanionMiningController : CompanionSkillingControllerBase
     {
         private const float MiningRange = 1.5f;
         private const float ReplanDistance = MiningRange * 0.75f;
@@ -52,12 +52,6 @@ namespace Companions
         private Inventory.Inventory inventory;
         private CompanionEquipment companionEquipment;
         private MiningSkill miningSkill;
-        private PetFollower petFollower;
-        private PetPathMover pathMover;
-        private Rigidbody2D body;
-        private PetSpriteAnimator petSpriteAnimator;
-        private SpriteRenderer fallbackSpriteRenderer;
-        private Direction8 lastFacing = Direction8.Down;
         private Coroutine miningRoutine;
         private Coroutine areaMiningRoutine;
         private MineableRock currentRock;
@@ -65,8 +59,6 @@ namespace Companions
         private Dictionary<string, ItemData> itemCache;
         private bool miningActive;
         private bool followerDisabledForMining;
-        private bool followerHoldToggledFollower;
-        private int followerDisableLockCount;
         private bool suppressMiningStopCallback;
 
         private readonly List<MineableRock> areaCandidates = new List<MineableRock>();
@@ -147,28 +139,11 @@ namespace Companions
                 Debug.LogError("[Companion Mining] Failed to resolve MiningSkill component.", this);
             }
 
-            petFollower = GetComponent<PetFollower>();
-            pathMover = GetComponent<PetPathMover>();
-            body = GetComponent<Rigidbody2D>();
-            petSpriteAnimator = GetComponent<PetSpriteAnimator>() ?? GetComponentInChildren<PetSpriteAnimator>();
-            if (petSpriteAnimator != null)
-            {
-                fallbackSpriteRenderer = petSpriteAnimator.spriteRenderer;
-                if (fallbackSpriteRenderer == null)
-                {
-                    fallbackSpriteRenderer = petSpriteAnimator.GetComponent<SpriteRenderer>() ??
-                        petSpriteAnimator.GetComponentInChildren<SpriteRenderer>();
-                }
-            }
-            else
-            {
-                fallbackSpriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
-            }
+            InitialiseMovementComponents();
+            ResetFollowerState();
 
             miningActive = false;
             followerDisabledForMining = false;
-            followerHoldToggledFollower = false;
-            followerDisableLockCount = 0;
             areaMiningActive = false;
             activeAreaRadius = 0f;
 
@@ -1312,7 +1287,7 @@ namespace Companions
             if (player == null)
                 return;
 
-            playerMiningSkill = player.GetComponent<MiningSkill>();
+            RebindPlayerSkill(player, ref playerMiningSkill);
             if (playerMiningSkill == null)
                 return;
 

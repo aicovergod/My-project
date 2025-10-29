@@ -36,7 +36,7 @@ namespace Companions
     /// inventory requirements, and delegating the actual skill execution to <see cref="CookingSkill"/>.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class CompanionCookingController : MonoBehaviour
+    public sealed class CompanionCookingController : CompanionSkillingControllerBase
     {
         private const float ApproachRange = 1.25f;
         private const float ReplanDistance = ApproachRange * 0.75f;
@@ -58,19 +58,11 @@ namespace Companions
         private CookingSkill cookingSkill;
         private CompanionSkillCooldownTracker cooldownTracker;
 
-        private PetFollower petFollower;
-        private PetPathMover pathMover;
-        private Rigidbody2D body;
-        private PetSpriteAnimator spriteAnimator;
-        private SpriteRenderer fallbackSpriteRenderer;
-        private Direction8 lastFacing = Direction8.Down;
-
         private Coroutine cookingRoutine;
         private CookingObject currentStation;
         private CookableRecipe currentRecipe;
 
         private bool followerDisabled;
-        private int followerDisableLockCount;
         private bool suppressStopCallback;
         private bool stuckTriggered;
 
@@ -129,23 +121,10 @@ namespace Companions
                 Debug.LogError("[Companion Cooking] Failed to resolve CookingSkill component.", this);
             }
 
-            petFollower = GetComponent<PetFollower>();
-            pathMover = GetComponent<PetPathMover>();
-            body = GetComponent<Rigidbody2D>();
-            spriteAnimator = GetComponent<PetSpriteAnimator>() ?? GetComponentInChildren<PetSpriteAnimator>();
-            if (spriteAnimator != null)
-            {
-                fallbackSpriteRenderer = spriteAnimator.spriteRenderer;
-                if (fallbackSpriteRenderer == null)
-                    fallbackSpriteRenderer = spriteAnimator.GetComponent<SpriteRenderer>() ?? spriteAnimator.GetComponentInChildren<SpriteRenderer>();
-            }
-            else
-            {
-                fallbackSpriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
-            }
+            InitialiseMovementComponents();
+            ResetFollowerState();
 
             followerDisabled = false;
-            followerDisableLockCount = 0;
             stuckTriggered = false;
 
             RebindPlayer(player);
@@ -157,8 +136,7 @@ namespace Companions
         public void RebindPlayer(Transform player)
         {
             playerTransform = player;
-            if (playerTransform != null)
-                playerCookingSkill = playerTransform.GetComponent<CookingSkill>();
+            RebindPlayerSkill(playerTransform, ref playerCookingSkill);
 
             playerInventory = CompanionManager.GetPlayerInventory();
         }
@@ -562,7 +540,7 @@ namespace Companions
 
         private void UpdateFacing(Vector2 displacement, Vector2 appliedVelocity)
         {
-            if (spriteAnimator == null && fallbackSpriteRenderer == null)
+            if (petSpriteAnimator == null && fallbackSpriteRenderer == null)
                 return;
 
             Vector2 visualVector = displacement.sqrMagnitude > FacingDeadzone ? displacement : appliedVelocity;
@@ -570,10 +548,10 @@ namespace Companions
             if (visualVector.sqrMagnitude > FacingDeadzone)
                 lastFacing = Direction8Utility.FromVector(visualVector, allowDiagonals: true, fallback: lastFacing);
 
-            if (spriteAnimator != null)
+            if (petSpriteAnimator != null)
             {
-                spriteAnimator.SetFacing(lastFacing);
-                spriteAnimator.UpdateVisuals(visualVector);
+                petSpriteAnimator.SetFacing(lastFacing);
+                petSpriteAnimator.UpdateVisuals(visualVector);
             }
 
             if (fallbackSpriteRenderer != null)

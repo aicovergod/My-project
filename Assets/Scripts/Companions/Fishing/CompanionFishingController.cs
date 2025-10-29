@@ -44,7 +44,7 @@ namespace Companions
     /// and delegating the actual fishing routine to <see cref="FishingSkill"/> once in range.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class CompanionFishingController : MonoBehaviour
+    public sealed class CompanionFishingController : CompanionSkillingControllerBase
     {
         private const float FishingRange = 1.5f;
         private const float ReplanDistance = FishingRange * 0.75f;
@@ -56,12 +56,6 @@ namespace Companions
         private Inventory.Inventory inventory;
         private CompanionEquipment companionEquipment;
         private FishingSkill fishingSkill;
-        private PetFollower petFollower;
-        private PetPathMover pathMover;
-        private Rigidbody2D body;
-        private PetSpriteAnimator petSpriteAnimator;
-        private SpriteRenderer fallbackSpriteRenderer;
-        private Direction8 lastFacing = Direction8.Down;
 
         private Coroutine fishingRoutine;
         private Coroutine areaFishingRoutine;
@@ -78,10 +72,8 @@ namespace Companions
         private bool fishingActive;
         private bool areaFishingActive;
         private bool followerDisabledForFishing;
-        private bool followerHoldToggledFollower;
         private bool suppressFishingStopCallback;
         private bool areaAllCandidatesBlocked;
-        private int followerDisableLockCount;
         private float activeAreaRadius;
         private FishableSpot lastStuckSpot;
         private int consecutiveStuckSpotCount;
@@ -153,29 +145,12 @@ namespace Companions
                 Debug.LogError("[Companion Fishing] Failed to resolve FishingSkill component.", this);
             }
 
-            petFollower = GetComponent<PetFollower>();
-            pathMover = GetComponent<PetPathMover>();
-            body = GetComponent<Rigidbody2D>();
-            petSpriteAnimator = GetComponent<PetSpriteAnimator>() ?? GetComponentInChildren<PetSpriteAnimator>();
-            if (petSpriteAnimator != null)
-            {
-                fallbackSpriteRenderer = petSpriteAnimator.spriteRenderer;
-                if (fallbackSpriteRenderer == null)
-                {
-                    fallbackSpriteRenderer = petSpriteAnimator.GetComponent<SpriteRenderer>() ??
-                        petSpriteAnimator.GetComponentInChildren<SpriteRenderer>();
-                }
-            }
-            else
-            {
-                fallbackSpriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
-            }
+            InitialiseMovementComponents();
+            ResetFollowerState();
 
             fishingActive = false;
             areaFishingActive = false;
             followerDisabledForFishing = false;
-            followerHoldToggledFollower = false;
-            followerDisableLockCount = 0;
             areaAllCandidatesBlocked = false;
             activeAreaRadius = 0f;
             itemCache = new Dictionary<string, ItemData>();
@@ -1304,7 +1279,7 @@ namespace Companions
             if (player == null)
                 return;
 
-            playerFishingSkill = player.GetComponent<FishingSkill>();
+            RebindPlayerSkill(player, ref playerFishingSkill);
             if (playerFishingSkill == null)
                 return;
 
