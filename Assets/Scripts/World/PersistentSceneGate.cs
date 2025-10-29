@@ -118,13 +118,28 @@ namespace World
             return allowed;
         }
 
-        private static bool IsSceneAllowed(Scene scene)
+        /// <summary>
+        /// Determines whether the persistent catalog allows the specified scene name.
+        /// </summary>
+        /// <param name="sceneName">Scene that should be checked against the exclusion list.</param>
+        /// <returns><c>true</c> when the scene is permitted; otherwise, <c>false</c>.</returns>
+        public static bool IsSceneAllowed(string sceneName)
         {
+            EnsureInitialised();
+
+            if (string.IsNullOrWhiteSpace(sceneName))
+                return true;
+
             var catalog = GetCatalog();
             if (catalog == null)
                 return true;
 
-            return catalog.ShouldSpawnInScene(scene.name);
+            return catalog.ShouldSpawnInScene(sceneName);
+        }
+
+        private static bool IsSceneAllowed(Scene scene)
+        {
+            return IsSceneAllowed(scene.name);
         }
 
         private static PersistentObjectCatalog GetCatalog()
