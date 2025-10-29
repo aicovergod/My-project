@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:94afed6aa1b0d9e5e64f728e3877f63d9e8eef5a -->
+## 2025-10-29T21:02:48+00:00 — Fix auto harvest reset when auto move cancelled
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Farming/PickableResourceNode.cs
+- Diff: 13 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:716e259001d6bc7eb51a6538c87376355d079d51 -->
 ## 2025-10-29T20:23:16+00:00 — Merge pull request #1527 from aicovergod/codex/implement-auto-harvest-features-in-pickableresourcenode
 

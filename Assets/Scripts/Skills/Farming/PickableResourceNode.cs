@@ -516,7 +516,19 @@ namespace Skills.Farming
                 return false;
 
             if (autoHarvestInProgress)
-                return true;
+            {
+                // If an earlier auto-move was interrupted (manual input, freezes, etc.) the mover will no longer
+                // report an active auto path. Reset our local flag so we can queue a fresh MoveTo below instead of
+                // silently ignoring the new click.
+                if (!mover.IsAutoMoving)
+                {
+                    ClearAutoHarvestState();
+                }
+                else
+                {
+                    return true;
+                }
+            }
 
             autoHarvestInProgress = true;
             mover.MoveTo(transform, Mathf.Max(0f, autoMoveStopBuffer), HandleAutoMoveCompleted);
