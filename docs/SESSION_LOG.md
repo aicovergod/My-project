@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:97cb0c92ed9d7bf5a8e7308e8f66584cbe247e68 -->
+## 2025-10-29T21:18:01+00:00 — Merge pull request #1531 from aicovergod/codex/implement-right-click-menu-behavior
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 122 ++ / 6 --
+- Notes:
+  Improve right-click menu input handling
+---
+<!-- commit:a4ed2c1ca58c561f60fce24c2250e1c6c682db54 -->
+## 2025-10-29T21:17:49+00:00 — Improve right-click menu input handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/RightClickMenu.cs
+- Diff: 122 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:1373a4fd5aa9865799d12d5ae7cafbe03a22df07 -->
 ## 2025-10-29T21:14:06+00:00 — Merge pull request #1530 from aicovergod/codex/refactor-eat-method-for-movement-freezing
 
