@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c22764980c70686eb6af4b69da2f1b98321f086d -->
+## 2025-10-29T16:36:25+00:00 — Limit nav grid gizmo rendering
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Navigation/NavGridBuilder.cs
+- Diff: 32 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:24490422ccf52e40b780cdd9d5526e5bcea5869a -->
 ## 2025-10-29T16:07:11+00:00 — Merge pull request #1519 from aicovergod/codex/fix-console-errors-in-pathfinding-and-pet-follower
 
