@@ -34,6 +34,10 @@ namespace Skills.Thieving.Editor
         private int attempts = DefaultAttemptCount;
 
         [SerializeField]
+        [Tooltip("When enabled the loot table rolls are evaluated and aggregated in the results.")]
+        private bool simulateLootRolls = true;
+
+        [SerializeField]
         [Tooltip("When enabled the Rogue outfit bonus rolls are included in the simulation.")]
         private bool simulateRogueOutfit;
 
@@ -46,6 +50,8 @@ namespace Skills.Thieving.Editor
         private bool copySummaryToClipboard;
 
         private readonly Dictionary<string, ItemAggregation> aggregatedLoot = new Dictionary<string, ItemAggregation>(StringComparer.Ordinal);
+        private Vector2 summaryScrollPosition;
+        private string latestSummary = string.Empty;
 
         /// <summary>
         ///     Opens the simulator window directly from a ThievingNpcDefinition inspector context menu.
@@ -121,9 +127,16 @@ namespace Skills.Thieving.Editor
                     1,
                     10_000_000);
 
-                simulateRogueOutfit = EditorGUILayout.Toggle(
-                    new GUIContent("Simulate Rogue Outfit", "When enabled the Rogue outfit bonus rolls are included."),
-                    simulateRogueOutfit);
+                simulateLootRolls = EditorGUILayout.Toggle(
+                    new GUIContent("Simulate Loot Rolls", "When enabled the loot table rolls are evaluated."),
+                    simulateLootRolls);
+
+                using (new EditorGUI.DisabledScope(!simulateLootRolls))
+                {
+                    simulateRogueOutfit = EditorGUILayout.Toggle(
+                        new GUIContent("Simulate Rogue Outfit", "When enabled the Rogue outfit bonus rolls are included."),
+                        simulateRogueOutfit);
+                }
 
                 simulatePetRolls = EditorGUILayout.Toggle(
                     new GUIContent("Simulate Pet Rolls", "When enabled Rocky pet rolls are evaluated using the definition denominator."),
@@ -144,6 +157,9 @@ namespace Skills.Thieving.Editor
                     }
                     GUILayout.FlexibleSpace();
                 }
+
+                EditorGUILayout.Space(12f);
+                DrawSummaryArea();
             }
         }
 
@@ -159,6 +175,7 @@ namespace Skills.Thieving.Editor
             int level = Mathf.Clamp(thievingLevel > 0 ? thievingLevel : definition.RequiredLevel, 1, 255);
 
             aggregatedLoot.Clear();
+            latestSummary = string.Empty;
             int successCount = 0;
             int failureCount = 0;
             float totalXp = 0f;
@@ -184,16 +201,19 @@ namespace Skills.Thieving.Editor
                 successCount++;
                 totalXp += definition.BaseXp;
 
-                var rewards = ResolveLootRolls(definition.CoinRange, definition.LootTable, definition.BaseLootRolls, rng);
-                if (simulateRogueOutfit && definition.RogueOutfitBonusRolls > 0)
+                if (simulateLootRolls)
                 {
-                    var bonusRewards = ResolveLootRolls(Vector2Int.zero, definition.LootTable, definition.RogueOutfitBonusRolls, rng);
-                    rewards.AddRange(bonusRewards);
-                }
+                    var rewards = ResolveLootRolls(definition.CoinRange, definition.LootTable, definition.BaseLootRolls, rng);
+                    if (simulateRogueOutfit && definition.RogueOutfitBonusRolls > 0)
+                    {
+                        var bonusRewards = ResolveLootRolls(Vector2Int.zero, definition.LootTable, definition.RogueOutfitBonusRolls, rng);
+                        rewards.AddRange(bonusRewards);
+                    }
 
-                foreach (var reward in rewards)
-                {
-                    AccumulateLoot(reward.item, reward.quantity);
+                    foreach (var reward in rewards)
+                    {
+                        AccumulateLoot(reward.item, reward.quantity);
+                    }
                 }
 
                 if (simulatePetRolls && definition.PetRollDenominator > 0)
@@ -222,7 +242,11 @@ namespace Skills.Thieving.Editor
                 builder.AppendLine($"Pet Procs: {petProcCount:N0}");
             }
 
-            if (aggregatedLoot.Count == 0)
+            if (!simulateLootRolls)
+            {
+                builder.AppendLine("Loot simulation disabled. Enable \"Simulate Loot Rolls\" to view loot breakdowns.");
+            }
+            else if (aggregatedLoot.Count == 0)
             {
                 builder.AppendLine("No loot generated during this run.");
             }
@@ -237,11 +261,34 @@ namespace Skills.Thieving.Editor
 
             string summary = builder.ToString();
             Debug.Log(summary);
+            latestSummary = summary;
 
             if (copySummaryToClipboard)
             {
                 EditorGUIUtility.systemCopyBuffer = summary;
             }
+        }
+
+        /// <summary>
+        ///     Renders the scrollable text area showing the most recent simulation results.
+        /// </summary>
+        private void DrawSummaryArea()
+        {
+            EditorGUILayout.LabelField("Simulation Summary", EditorStyles.boldLabel);
+
+            if (string.IsNullOrEmpty(latestSummary))
+            {
+                EditorGUILayout.HelpBox("Run the simulation to view success, XP, and loot breakdowns.", MessageType.Info);
+                return;
+            }
+
+            summaryScrollPosition = EditorGUILayout.BeginScrollView(summaryScrollPosition, GUILayout.MinHeight(160f));
+            using (new EditorGUI.DisabledScope(true))
+            {
+                EditorGUILayout.TextArea(latestSummary, GUILayout.ExpandHeight(true));
+            }
+
+            EditorGUILayout.EndScrollView();
         }
 
         /// <summary>
