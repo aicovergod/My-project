@@ -25,6 +25,7 @@ namespace World
             {
                 popup = PopupTextPool.Instance.Get();
                 tmp = popup.GetComponent<TextMeshPro>();
+                ApplySortingLayer(tmp, target);
             }
             else
             {
@@ -33,6 +34,7 @@ namespace World
                 tmp = goNew.AddComponent<TextMeshPro>();
                 tmp.alignment = TextAlignmentOptions.Center;
                 tmp.fontSize = 2f;
+                ApplySortingLayer(tmp, target);
             }
 
             var go = popup.gameObject;
@@ -45,6 +47,39 @@ namespace World
             tmp.text = message;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.fontSize = 2f;
+        }
+
+        /// <summary>
+        /// Ensures the popup text renders above the associated world elements by aligning sorting settings.
+        /// </summary>
+        /// <param name="tmp">The TextMeshPro component that renders the popup.</param>
+        /// <param name="anchor">The transform the popup is anchored to for positioning.</param>
+        private static void ApplySortingLayer(TextMeshPro tmp, Transform anchor)
+        {
+            if (tmp == null) return;
+
+            // Retrieve the renderer responsible for displaying the popup text so we can update its sorting data.
+            var textRenderer = tmp.GetComponent<Renderer>();
+            if (textRenderer == null) return;
+
+            // Attempt to mirror the sorting layer/order from the target object so the popup remains visible above it.
+            var anchorRenderer = anchor != null ? anchor.GetComponentInParent<Renderer>() : null;
+            if (anchorRenderer != null)
+            {
+                textRenderer.sortingLayerID = anchorRenderer.sortingLayerID;
+                textRenderer.sortingOrder = Mathf.Max(anchorRenderer.sortingOrder + 1, textRenderer.sortingOrder);
+                return;
+            }
+
+            // Fall back to the "Physical Objects" sorting layer which sits above ground/character layers in the project.
+            var fallbackLayerId = SortingLayer.NameToID("Physical Objects");
+            if (fallbackLayerId != 0)
+            {
+                textRenderer.sortingLayerID = fallbackLayerId;
+            }
+
+            // Ensure the text draws above most world elements even when falling back to the default layer choice.
+            textRenderer.sortingOrder = Mathf.Max(textRenderer.sortingOrder, 1);
         }
 
         private void Update()
