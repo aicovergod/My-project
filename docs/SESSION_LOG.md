@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3e4e26b0d16cf9245a5b5262af3270e852c66da9 -->
+## 2025-10-29T22:36:00+00:00 — Merge pull request #1536 from aicovergod/codex/refactor-stop-command-logic-to-companionchatcommandprocessor
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 255 ++ / 243 --
+- Notes:
+  Refactor companion stop command handling
+---
+<!-- commit:edf47a5edd5ea88133b1f9b06a2dc3c03226d7db -->
+## 2025-10-29T22:35:44+00:00 — Refactor companion stop command handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 255 ++ / 243 --
+- Notes:
+  —
+---
 <!-- commit:d744b434a7d5a0a1c0098aeae80c3a5c6f382773 -->
 ## 2025-10-29T22:24:09+00:00 — Merge pull request #1535 from aicovergod/codex/update-companion-cooking-and-follower-logic
 
