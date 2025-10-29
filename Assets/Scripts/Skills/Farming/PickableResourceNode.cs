@@ -542,7 +542,11 @@ namespace Skills.Farming
             }
 
             autoHarvestInProgress = true;
-            mover.MoveTo(transform, Mathf.Max(0f, autoMoveStopBuffer), HandleAutoMoveCompleted);
+
+            // Ensure the mover halts as soon as the player reaches a valid harvesting distance so
+            // they do not walk into the collider when inventory/cooldown checks block the harvest.
+            float stopDistance = Mathf.Max(autoMoveStopBuffer, interactRange);
+            mover.MoveTo(transform, stopDistance, HandleAutoMoveCompleted);
             return true;
         }
 
