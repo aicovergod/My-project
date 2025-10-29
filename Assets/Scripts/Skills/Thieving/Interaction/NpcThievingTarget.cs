@@ -35,7 +35,15 @@ namespace Skills.Thieving
         [SerializeField, Tooltip("True while the player is mid pickpocket attempt.")]
         private bool isBusy;
 
+        [Header("Counter Attack")]
+        [SerializeField, Tooltip("Optional facing component used to rotate towards the player when countering failed pickpockets.")]
+        private NpcFacing npcFacing;
+
+        [SerializeField, Tooltip("Optional sprite animator override used to drive counter-attack animations when no facing component is present.")]
+        private NpcSpriteAnimator spriteAnimator;
+
         private Coroutine lockoutCoroutine;
+        private Coroutine counterAttackRoutine;
         private NpcInteractionOptions interactionOptions;
 
         /// <summary>
@@ -57,6 +65,8 @@ namespace Skills.Thieving
         {
             if (interactionOptions == null)
                 interactionOptions = GetComponent<NpcInteractionOptions>();
+
+            EnsureAnimationReferences();
         }
 
         private void OnValidate()
@@ -69,6 +79,17 @@ namespace Skills.Thieving
 
             if (Definition == null)
                 Debug.LogWarning($"{name} is configured with {nameof(NpcThievingTarget)} but no definition is assigned.", this);
+
+            EnsureAnimationReferences();
+        }
+
+        private void OnDisable()
+        {
+            if (counterAttackRoutine != null)
+            {
+                StopCoroutine(counterAttackRoutine);
+                counterAttackRoutine = null;
+            }
         }
 
         /// <summary>
@@ -168,5 +189,89 @@ namespace Skills.Thieving
         ///     Indicates when the lockout expires (Time.time). Primarily surfaced for debugging and tests.
         /// </summary>
         public float LockoutEndTime => lockoutEndTime;
+
+        /// <summary>
+        ///     Faces the supplied player transform and plays an attack animation when available so the NPC visibly retaliates
+        ///     after a failed pickpocket that deals damage.
+        /// </summary>
+        /// <param name="playerTransform">Transform describing the player's world position.</param>
+        public void TriggerPickpocketCounterAttack(Transform playerTransform)
+        {
+            EnsureAnimationReferences();
+
+            if (playerTransform != null)
+            {
+                if (npcFacing != null)
+                {
+                    npcFacing.FaceTarget(playerTransform);
+                }
+                else if (spriteAnimator != null)
+                {
+                    Vector2 direction = playerTransform.position - transform.position;
+                    if (direction.sqrMagnitude > Mathf.Epsilon)
+                    {
+                        var facing = Direction8Utility.FromVector(direction, allowDiagonals: true, fallback: Direction8.Down);
+                        spriteAnimator.SetFacing(facing);
+                    }
+                }
+            }
+
+            NpcSpriteAnimator animator = ResolveAnimator();
+            if (animator == null)
+                return;
+
+            Direction8 attackDirection = npcFacing != null
+                ? npcFacing.FacingDirection
+                : ResolveFacingFromPlayer(playerTransform);
+
+            if (!animator.HasAttackAnimation(attackDirection))
+                return;
+
+            if (counterAttackRoutine != null)
+                StopCoroutine(counterAttackRoutine);
+
+            counterAttackRoutine = StartCoroutine(PlayCounterAttack(animator, attackDirection));
+        }
+
+        private void EnsureAnimationReferences()
+        {
+            if (npcFacing == null)
+                npcFacing = GetComponent<NpcFacing>() ?? GetComponentInChildren<NpcFacing>();
+
+            if (spriteAnimator == null)
+                spriteAnimator = GetComponent<NpcSpriteAnimator>() ?? GetComponentInChildren<NpcSpriteAnimator>();
+
+            if (npcFacing != null && npcFacing.Animator != null)
+                spriteAnimator = npcFacing.Animator;
+        }
+
+        private NpcSpriteAnimator ResolveAnimator()
+        {
+            if (npcFacing != null && npcFacing.Animator != null)
+                return npcFacing.Animator;
+
+            return spriteAnimator;
+        }
+
+        private Direction8 ResolveFacingFromPlayer(Transform playerTransform)
+        {
+            if (playerTransform == null)
+                return npcFacing != null ? npcFacing.FacingDirection : Direction8.Down;
+
+            Vector2 direction = playerTransform.position - transform.position;
+            return Direction8Utility.FromVector(direction, allowDiagonals: true, fallback: Direction8.Down);
+        }
+
+        private IEnumerator PlayCounterAttack(NpcSpriteAnimator animator, Direction8 direction)
+        {
+            if (animator == null)
+            {
+                counterAttackRoutine = null;
+                yield break;
+            }
+
+            yield return animator.PlayAttackAnimation(direction);
+            counterAttackRoutine = null;
+        }
     }
 }
