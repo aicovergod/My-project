@@ -111,6 +111,11 @@ namespace Combat
         private IPlayerMovementController movementController;
         private Coroutine attackRoutine;
         private CombatTarget currentTarget;
+
+        /// <summary>
+        ///     Current combat target the player is actively attacking. Returns null when idle.
+        /// </summary>
+        public CombatTarget CurrentTarget => currentTarget;
         private float nextAttackTime;
         private RangedCombatController rangedController;
 
