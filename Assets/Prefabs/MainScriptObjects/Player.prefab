@@ -91,6 +91,7 @@ GameObject:
   - component: {fileID: 1564341770880048146}
   - component: {fileID: 6045123456789012345}
   - component: {fileID: 6045123456789012346}
+  - component: {fileID: 3691873968031645550}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -1367,6 +1368,7 @@ MonoBehaviour:
   movement: {fileID: 2793536999350240794}
   hitpoints: {fileID: 6554036775103191577}
   skillManager: {fileID: 5028650979715864874}
+  combatController: {fileID: 0}
   floatingTextAnchor: {fileID: 487381587706843324}
   database: {fileID: 11400000, guid: c8a52b09d0ec4c94a5b63b612a395bc7, type: 2}
   rogueOutfitDefinition: {fileID: 0}
@@ -1395,3 +1397,16 @@ MonoBehaviour:
   skill: {fileID: 6045123456789012345}
   explicitMovementController: {fileID: 2793536999350240794}
   worldCamera: {fileID: 0}
+--- !u!114 &3691873968031645550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57a472af0c85a784797ad38af2ad846e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Audio.SoundEffects.LevelUpSound
+  skillManager: {fileID: 5028650979715864874}
