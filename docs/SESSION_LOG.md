@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:434382547d171647d8423b0e63b59c9178ac75e7 -->
+## 2025-10-29T12:51:46+00:00 — Merge pull request #1509 from aicovergod/codex/add-debug-logs-for-thievingdialogue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 191 ++ / 11 --
+- Notes:
+  Add detailed thieving debug logging and admin toggle
+---
+<!-- commit:53fc443a26cfdbf8f856a50620bc66f3783abe9b -->
+## 2025-10-29T12:51:40+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6e522065aac1edf6329037ec4b6c4d20c91311d1 -->
 ## 2025-10-29T12:51:27+00:00 — Add detailed thieving debug logging and admin toggle
 
