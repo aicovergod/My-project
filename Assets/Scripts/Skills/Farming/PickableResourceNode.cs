@@ -62,6 +62,16 @@ namespace Skills.Farming
         [Tooltip("Optional InputActionReference overriding which action triggers harvesting.")]
         private InputActionReference interactActionReference;
 
+        [Header("Auto Movement")]
+        [SerializeField]
+        [Tooltip("When enabled, clicking out of range will auto-walk the player into harvesting distance.")]
+        private bool autoMoveIntoRange = true;
+
+        [SerializeField]
+        [Min(0f)]
+        [Tooltip("Additional distance the auto-move routine stops short of the node to avoid overlap.")]
+        private float autoMoveStopBuffer = 0.25f;
+
         [Header("Visual Toggles")]
         [SerializeField]
         [Tooltip("Renderers disabled while the node is depleted.")]
@@ -83,6 +93,7 @@ namespace Skills.Farming
         private PlayerMover cachedPlayerMover;
         private InputAction interactAction;
         private bool interactActionEnabledByResolver;
+        private bool autoHarvestInProgress;
 
         /// <summary>
         ///     Auto-populates the toggle arrays from the current hierarchy so designers can quickly
@@ -121,6 +132,7 @@ namespace Skills.Farming
             quantity = Mathf.Max(1, quantity);
             respawnSeconds = Mathf.Max(0f, respawnSeconds);
             interactRange = Mathf.Max(0.1f, interactRange);
+            autoMoveStopBuffer = Mathf.Max(0f, autoMoveStopBuffer);
 
             renderersToToggle ??= Array.Empty<SpriteRenderer>();
             collidersToToggle ??= Array.Empty<Collider2D>();
@@ -154,6 +166,7 @@ namespace Skills.Farming
         protected override void OnDisable()
         {
             UnsubscribeFromInteractAction();
+            ClearAutoHarvestState();
             base.OnDisable();
         }
 
@@ -283,21 +296,15 @@ namespace Skills.Farming
                 float distance = Vector2.Distance(playerTransform.position, transform.position);
                 if (distance > interactRange)
                 {
+                    if (autoMoveIntoRange && TryBeginAutoHarvest())
+                        return false;
+
                     PublishChatMessage("You need to get closer to pick that.");
                     return false;
                 }
             }
 
-            // Prefer checking capacity before attempting to add items so we can exit early without side effects.
-            if (!inventory.CanAddItem(item, quantity) || !inventory.AddItem(item, quantity))
-            {
-                PublishChatMessage("Your inventory is full");
-                return false;
-            }
-
-            PublishChatMessage(ComposeChatMessage(item));
-            BeginRespawnCountdown();
-            return true;
+            return TryProcessHarvest(inventory, item);
         }
 
         /// <summary>
@@ -400,14 +407,9 @@ namespace Skills.Farming
             if (cachedPlayerTransform != null)
                 return cachedPlayerTransform;
 
-            if (cachedPlayerMover == null)
-                cachedPlayerMover = FindObjectOfType<PlayerMover>();
-
-            if (cachedPlayerMover != null)
-            {
-                cachedPlayerTransform = cachedPlayerMover.transform;
+            var playerMover = ResolvePlayerMover();
+            if (playerMover != null)
                 return cachedPlayerTransform;
-            }
 
             var playerObject = GameObject.FindGameObjectWithTag("Player");
             if (playerObject != null)
@@ -457,6 +459,7 @@ namespace Skills.Farming
         /// </summary>
         private void BeginRespawnCountdown()
         {
+            ClearAutoHarvestState();
             isDepleted = true;
             SetNodeActive(false);
 
@@ -474,12 +477,112 @@ namespace Skills.Farming
         /// </summary>
         private void RespawnNow()
         {
+            ClearAutoHarvestState();
             isDepleted = false;
             respawnAt = 0d;
             SetNodeActive(true);
 
             // Clearing the cached player transform ensures we reacquire the latest instance after scene loads.
             cachedPlayerTransform = null;
+        }
+
+        /// <summary>
+        ///     Resolves the player mover so auto-move routines can be issued without repeated scene searches.
+        /// </summary>
+        /// <returns>The active <see cref="PlayerMover"/> if available; otherwise, null.</returns>
+        private PlayerMover ResolvePlayerMover()
+        {
+            if (cachedPlayerMover != null)
+                return cachedPlayerMover;
+
+            cachedPlayerMover = FindObjectOfType<PlayerMover>();
+            if (cachedPlayerMover != null)
+                cachedPlayerTransform = cachedPlayerMover.transform;
+
+            return cachedPlayerMover;
+        }
+
+        /// <summary>
+        ///     Attempts to queue an auto-harvest by walking the player into interaction range.
+        /// </summary>
+        /// <returns>True when an auto-move routine was queued or is already active.</returns>
+        private bool TryBeginAutoHarvest()
+        {
+            if (!autoMoveIntoRange)
+                return false;
+
+            var mover = ResolvePlayerMover();
+            if (mover == null)
+                return false;
+
+            if (autoHarvestInProgress)
+                return true;
+
+            autoHarvestInProgress = true;
+            mover.MoveTo(transform, Mathf.Max(0f, autoMoveStopBuffer), HandleAutoMoveCompleted);
+            return true;
+        }
+
+        /// <summary>
+        ///     Processes the actual item handoff, ensuring inventory capacity exists before the respawn timer begins.
+        /// </summary>
+        /// <param name="inventory">Inventory receiving the harvested item.</param>
+        /// <param name="item">Item definition being granted.</param>
+        /// <returns>True when the harvest succeeds.</returns>
+        private bool TryProcessHarvest(Inventory.Inventory inventory, ItemData item)
+        {
+            if (isDepleted || inventory == null || item == null)
+                return false;
+
+            if (!inventory.CanAddItem(item, quantity) || !inventory.AddItem(item, quantity))
+            {
+                PublishChatMessage("Your inventory is full");
+                return false;
+            }
+
+            PublishChatMessage(ComposeChatMessage(item));
+            BeginRespawnCountdown();
+            return true;
+        }
+
+        /// <summary>
+        ///     Invoked when the auto-move routine completes so the node can attempt to harvest again.
+        /// </summary>
+        private void HandleAutoMoveCompleted()
+        {
+            if (!autoHarvestInProgress)
+                return;
+
+            autoHarvestInProgress = false;
+
+            if (!isActiveAndEnabled || isDepleted)
+                return;
+
+            var inventory = CompanionManager.GetPlayerInventory();
+            if (inventory == null)
+                return;
+
+            var item = ResolveItem();
+            if (item == null)
+                return;
+
+            var playerTransform = ResolvePlayerTransform();
+            if (playerTransform != null && interactRange > 0f)
+            {
+                float distance = Vector2.Distance(playerTransform.position, transform.position);
+                if (distance > interactRange)
+                    return;
+            }
+
+            TryProcessHarvest(inventory, item);
+        }
+
+        /// <summary>
+        ///     Clears any cached auto-move state so callbacks are ignored once the node is no longer valid.
+        /// </summary>
+        private void ClearAutoHarvestState()
+        {
+            autoHarvestInProgress = false;
         }
     }
 }
