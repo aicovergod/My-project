@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b063aab0056ec81d8139f6ec989ccd10f435a42c -->
+## 2025-10-29T14:33:40+00:00 — Block combat pickpocket attempts
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/NPC/Combat/BaseNpcCombat.cs, Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs
+- Diff: 85 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:63f340d3b519462a63e9832fc08a8d2ff4397d54 -->
 ## 2025-10-29T14:21:31+00:00 — Merge pull request #1514 from aicovergod/codex/add-npc-reaction-to-failed-pickpocketing
 
