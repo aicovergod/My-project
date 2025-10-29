@@ -66,7 +66,7 @@ namespace NPC
         [Tooltip("Elevates gizmos slightly so they do not z-fight with sprites in the scene.")]
         [SerializeField] private float gizmoHeightOffset = 0.05f;
 
-        [Tooltip("Maximum number of cells visualised when drawing gizmos. Larger grids fall back to an outline and sparse sampling so designers understand the bounds without freezing the editor.")]
+        [Tooltip("Maximum number of cells visualised when drawing gizmos. Larger grids fall back to an outline and sparse sampling for walkable tiles while still rendering every blocked cell so designers can spot issues without freezing the editor.")]
         [SerializeField, Min(16)] private int maxGizmoCells = 4096;
 
         private static readonly HashSet<string> reportedMissingTags = new HashSet<string>();
@@ -913,14 +913,32 @@ namespace NPC
 
                 float ratio = totalCells / (float)Mathf.Max(1, maxGizmoCells);
                 int samplingStride = Mathf.Clamp(Mathf.CeilToInt(Mathf.Sqrt(ratio)), 1, Mathf.Max(gridSize.x, gridSize.y));
+                Vector3 walkableSampleSize = size * 0.5f;
+                Vector3 blockedSampleSize = size * 0.6f;
 
-                for (int y = 0; y < gridSize.y; y += samplingStride)
+                // Draw blocked cells at full density so designers can still inspect obstruction placement while
+                // walkable tiles retain the lightweight sparse sampling that keeps editor rendering responsive.
+                for (int y = 0; y < gridSize.y; y++)
                 {
-                    for (int x = 0; x < gridSize.x; x += samplingStride)
+                    for (int x = 0; x < gridSize.x; x++)
                     {
+                        bool isWalkable = walkableGrid[x, y];
                         Vector3 centre = new Vector3(gridOrigin.x + (x + 0.5f) * tileSize, gridOrigin.y + (y + 0.5f) * tileSize, z);
-                        Gizmos.color = walkableGrid[x, y] ? walkableColor : blockedColor;
-                        Gizmos.DrawCube(centre, size * 0.5f);
+
+                        if (!isWalkable)
+                        {
+                            Gizmos.color = blockedColor;
+                            Gizmos.DrawCube(centre, blockedSampleSize);
+                            continue;
+                        }
+
+                        if ((x % samplingStride) != 0 || (y % samplingStride) != 0)
+                        {
+                            continue;
+                        }
+
+                        Gizmos.color = walkableColor;
+                        Gizmos.DrawCube(centre, walkableSampleSize);
                     }
                 }
 
