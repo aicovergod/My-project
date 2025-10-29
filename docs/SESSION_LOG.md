@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9ba8da22e8e1b88857c94aaedd526fc3457613e7 -->
+## 2025-10-29T22:43:33+00:00 — Merge pull request #1537 from aicovergod/codex/refactor-companions-into-shared-base-class
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 133 ++ / 130 --
+- Notes:
+  Refactor companion skilling controller setup
+---
+<!-- commit:d9e5d4fba6ad70de76e1349aaea20e42317b2b47 -->
+## 2025-10-29T22:43:26+00:00 — Merge branch 'main' into codex/refactor-companions-into-shared-base-class
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:5de204ce72a8328833d9335ea7c1854c2cccdeed -->
 ## 2025-10-29T22:42:38+00:00 — Refactor companion skilling controller setup
 
