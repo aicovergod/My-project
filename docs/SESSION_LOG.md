@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:54d124d555e902577429805f735f9e2e4f37920d -->
+## 2025-10-29T23:11:50+00:00 — Merge pull request #1541 from aicovergod/codex/update-agents.md-with-latest-changes-uvj1em
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2 ++ / 0 --
+- Notes:
+  Document companion skill guard and banking helper in AGENTS
+---
+<!-- commit:f6f5ae9ae4d1812367721c6063a11f6cf38409ab -->
+## 2025-10-29T23:11:39+00:00 — Document companion command guard and banking helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): AGENTS.md
+- Diff: 2 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:8adbeb9b81e4a437eeac7085bded794761a2ebee -->
 ## 2025-10-29T23:08:31+00:00 — Merge pull request #1540 from aicovergod/codex/add-companionbankdepositservice-and-refactor-companionmanage
 
