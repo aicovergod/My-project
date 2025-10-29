@@ -1,11 +1,11 @@
 using Skills.Thieving.Data;
-using UI.Chat;
 using UnityEngine;
+using World;
 
 namespace Skills.Thieving.NpcPickpocketDialogue
 {
     /// <summary>
-    ///     Centralised helper that emits flavour dialogue to the chat service when NPC pickpockets
+    ///     Centralised helper that emits flavour dialogue above the NPC when pickpocket attempts
     ///     succeed or fail. The service looks up <see cref="NpcPickpocketDialogueSet"/> instances
     ///     using the NPC definition identifier and handles the success roll odds internally so
     ///     gameplay code can remain focused on XP, loot and stun logic.
@@ -18,10 +18,11 @@ namespace Skills.Thieving.NpcPickpocketDialogue
         ///     Attempts to emit a pickpocket dialogue line for the supplied definition.
         /// </summary>
         /// <param name="definition">Definition describing the NPC being pickpocketed.</param>
+        /// <param name="dialogueAnchor">Transform used to position the floating dialogue.</param>
         /// <param name="success">True when the pickpocket resolved successfully.</param>
-        public static void TryPublishDialogue(ThievingNpcDefinition definition, bool success)
+        public static void TryPublishDialogue(ThievingNpcDefinition definition, Transform dialogueAnchor, bool success)
         {
-            if (definition == null)
+            if (definition == null || dialogueAnchor == null)
                 return;
 
             if (!NpcPickpocketDialogueSet.TryGet(definition.Id, out var set))
@@ -35,14 +36,14 @@ namespace Skills.Thieving.NpcPickpocketDialogue
                 if (!set.TryGetRandomSuccessLine(out string line))
                     return;
 
-                Publish(definition.DisplayName, line);
+                Publish(definition.DisplayName, dialogueAnchor, line);
                 return;
             }
 
             if (!set.TryGetRandomFailureLine(out string failureLine))
                 return;
 
-            Publish(definition.DisplayName, failureLine);
+            Publish(definition.DisplayName, dialogueAnchor, failureLine);
         }
 
         /// <summary>
@@ -54,19 +55,15 @@ namespace Skills.Thieving.NpcPickpocketDialogue
         }
 
         /// <summary>
-        ///     Formats and publishes the resolved dialogue line to the Game channel.
+        ///     Formats and displays the resolved dialogue line above the NPC.
         /// </summary>
-        private static void Publish(string speaker, string line)
+        private static void Publish(string speaker, Transform anchor, string line)
         {
-            if (string.IsNullOrWhiteSpace(line))
-                return;
-
-            var chatService = ChatService.Instance;
-            if (chatService == null)
+            if (anchor == null || string.IsNullOrWhiteSpace(line))
                 return;
 
             string resolvedSpeaker = string.IsNullOrWhiteSpace(speaker) ? "NPC" : speaker.Trim();
-            chatService.PublishGameMessage($"{resolvedSpeaker}: {line}");
+            PopupText.Show($"{resolvedSpeaker}: {line}", anchor);
         }
     }
 }

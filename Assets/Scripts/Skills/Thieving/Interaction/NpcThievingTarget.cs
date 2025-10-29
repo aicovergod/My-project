@@ -21,6 +21,10 @@ namespace Skills.Thieving
         [SerializeField, Tooltip("Optional definition override used to tweak the base definition per-NPC.")]
         private ThievingNpcDefinition definitionOverride;
 
+        [Header("Dialogue")]
+        [SerializeField, Tooltip("Optional transform used as the anchor for floating dialogue popups.")]
+        private Transform dialogueAnchor;
+
         [Header("State")]
         [SerializeField, Tooltip("Runtime counter tracking consecutive failures so the lockout trigger can be enforced.")]
         private int consecutiveFailures;
@@ -43,6 +47,11 @@ namespace Skills.Thieving
         ///     Definition resolved for this NPC (override falls back to the base definition).
         /// </summary>
         public ThievingNpcDefinition Definition => definitionOverride != null ? definitionOverride : definition;
+
+        /// <summary>
+        ///     Transform used as the anchor when displaying pickpocket dialogue above the NPC.
+        /// </summary>
+        public Transform DialogueAnchor => dialogueAnchor != null ? dialogueAnchor : transform;
 
         private void Awake()
         {
