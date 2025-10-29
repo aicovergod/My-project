@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f62b6d659669373cfebc93d979d87a1e6d71b872 -->
+## 2025-10-29T12:20:06+00:00 — Show pickpocket dialogue as NPC floating text
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs, Assets/Scripts/Skills/Thieving/Interaction/NpcThievingTarget.cs, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueService.cs
+- Diff: 22 ++ / 16 --
+- Notes:
+  —
+---
 <!-- commit:d86525a6ece57c5710cb5192eef01e993a08a2d1 -->
 ## 2025-10-29T12:14:42+00:00 — Merge pull request #1504 from aicovergod/codex/add-npcpickpocketdialogue-folder-and-scripts
 
