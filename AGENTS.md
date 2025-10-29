@@ -59,7 +59,7 @@
 - **NPCs & World** (`Assets/Scripts/NPC`, `Assets/Scripts/World`)
   - NPC combat/movement live under `NPC/Combat`, `NPC/Movement`, and `NPC/Navigation`; interaction/UI wrappers route right-click menus and HUDs. `NpcFaction` powers faction-aware tests.
   - `World/SceneTransitionManager` now owns additive scene swaps, persistent-object callbacks, spawn point routing, and fade timing. Use `SceneTransitionInteractable` to trigger transitions, populate `SceneTransitionManager.NextSpawnPoint`, and keep persistent services registered via `IScenePersistent` so they receive unload/load callbacks.
-  - `World/Minimap` & `MinimapMarker` render the overworld HUD, `PopupText`/`PopupTextPool` feed floating world text, and `Environment/FenceColliderFoot` supplies nav blockers for fence kits.
+  - `World/Minimap` & `MinimapMarker` render the overworld HUD, while `UI/FloatingText` handles world popups (anchored or drifting). `Environment/FenceColliderFoot` supplies nav blockers for fence kits.
   - Lighter NPC prefabs should include `NpcKnockbackReceiver` alongside `NpcWanderer` so damage-driven knockback eases displacement without breaking wander bounds. Heavy or boss NPCs can disable or omit the receiver to stay rooted.
 - **Companion System** (`Assets/Scripts/Companions`, `Assets/Scripts/Pets`)
   - `CompanionManager` is the runtime hub: it spawns the follower next to the player (using `CompanionRuntimeAssets` unless a specific `PetDefinition` override is supplied), rebinds across additive scene loads, and tracks guard mode, inventory/equipment visibility, and combat level events. Subscribe to its events instead of duplicating state so UI and gameplay stay in sync.
