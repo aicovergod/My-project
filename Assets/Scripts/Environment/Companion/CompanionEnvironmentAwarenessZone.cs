@@ -24,7 +24,8 @@ namespace Environment.Companion
             MiningShop,
             GoblinCave,
             Ocean,
-            Graveyard
+            Graveyard,
+            CabbageField
         }
 
         private const int TriggerChanceDenominator = 20;
@@ -61,6 +62,10 @@ namespace Environment.Companion
         [SerializeField]
         private bool areaIsGraveyard;
 
+        /// <summary>Marks the zone as a cabbage field so companions can react to the pungent crops.</summary>
+        [SerializeField]
+        private bool areaIsCabbageField;
+
         [Header("Directional Entry"), Tooltip("Toggle whether the companion must enter along a specific heading before reactions are allowed.")]
         [SerializeField]
         private bool requireDirectionalEntry;
@@ -89,7 +94,7 @@ namespace Environment.Companion
         private readonly Dictionary<CompanionController, float> lastReactionTimes = new Dictionary<CompanionController, float>();
 
         /// <summary>Reusable buffer that stores the active flags for the current evaluation.</summary>
-        private readonly List<AwarenessArea> activeAreas = new List<AwarenessArea>(6);
+        private readonly List<AwarenessArea> activeAreas = new List<AwarenessArea>(7);
 
         /// <summary>Cached collider reference so we can confirm trigger state during <see cref="Awake"/>.</summary>
         private Collider2D cachedCollider;
@@ -203,7 +208,13 @@ namespace Environment.Companion
         /// <summary>Returns <c>true</c> when any area flag is active on this zone.</summary>
         private bool HasAnyAreaFlag()
         {
-            return areaIsBank || areaIsMiningCave || areaIsMiningShop || areaIsGoblinCave || areaIsOcean || areaIsGraveyard;
+            return areaIsBank
+                   || areaIsMiningCave
+                   || areaIsMiningShop
+                   || areaIsGoblinCave
+                   || areaIsOcean
+                   || areaIsGraveyard
+                   || areaIsCabbageField;
         }
 
         /// <summary>Rolls the 1-in-20 entry chance that governs whether the companion speaks.</summary>
@@ -244,6 +255,8 @@ namespace Environment.Companion
                 activeAreas.Add(AwarenessArea.Ocean);
             if (areaIsGraveyard)
                 activeAreas.Add(AwarenessArea.Graveyard);
+            if (areaIsCabbageField)
+                activeAreas.Add(AwarenessArea.CabbageField);
 
             if (activeAreas.Count == 0)
                 return string.Empty;
@@ -264,6 +277,8 @@ namespace Environment.Companion
                     return CompanionChatLibrary.GetRandomOceanAwarenessLine();
                 case AwarenessArea.Graveyard:
                     return CompanionChatLibrary.GetRandomGraveyardAwarenessLine();
+                case AwarenessArea.CabbageField:
+                    return CompanionChatLibrary.GetRandomCabbageFieldAwarenessLine();
                 default:
                     return string.Empty;
             }

@@ -93,6 +93,29 @@ namespace Companions.Conversation
         /// <summary>Fallback line when the graveyard awareness pool cannot produce a message.</summary>
         private const string GraveyardAwarenessFallbackLine = "Graveyards really are creepy.";
 
+        /// <summary>Lines surfaced when the companion trudges through a cabbage field.</summary>
+        private static readonly string[] CabbageFieldAwarenessChatMessages =
+        {
+            "Ugh… that smell. Why do cabbages always smell like regret?",
+            "Careful where you step — these things bite back, I swear.",
+            "You planning on making stew, or just upsetting the local goblins?",
+            "If I see one more cabbage, I'm turning vegetarian just to avoid them.",
+            "Ah, the mighty cabbage. Nature's green disappointment.",
+            "Don't eat those. They're staring at me funny.",
+            "You really brought me here? To this… leafy nightmare?",
+            "I once heard these fields are haunted by angry salad spirits.",
+            "You pick one, I'll keep watch. No cabbage ambushes on my watch.",
+            "They say cabbages whisper if you listen close. Probably lies. Still creepy.",
+            "Oh great, cabbages again… what are we, farmers now?",
+            "Careful, I heard the Cabbage God doesn't like trespassers.",
+            "If you fart, I'm blaming the cabbages.",
+            "You smell that? That's the scent of adventure… and decay.",
+            "I swear one of them just moved. Let's hurry before it grows legs."
+        };
+
+        /// <summary>Fallback line when the cabbage field awareness pool cannot produce a message.</summary>
+        private const string CabbageFieldAwarenessFallbackLine = "Ugh… that smell. Why do cabbages always smell like regret?";
+
         /// <summary>
         /// Returns a bank-themed awareness line, optionally including inventory warnings when full.
         /// </summary>
@@ -147,6 +170,12 @@ namespace Companions.Conversation
         public static string GetRandomGraveyardAwarenessLine()
         {
             return GetRandomLine(GraveyardAwarenessChatMessages, GraveyardAwarenessFallbackLine);
+        }
+
+        /// <summary>Returns a flavour line for cabbage field awareness.</summary>
+        public static string GetRandomCabbageFieldAwarenessLine()
+        {
+            return GetRandomLine(CabbageFieldAwarenessChatMessages, CabbageFieldAwarenessFallbackLine);
         }
 
         /// <summary>
