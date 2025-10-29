@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:861e29b06c493e00fb878abb8080d5d3d91ef29c -->
+## 2025-10-29T21:21:22+00:00 — Add cabbage field companion awareness dialogue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/Conversation/AreaSpecificAwareDialogue.cs, Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs
+- Diff: 53 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:97cb0c92ed9d7bf5a8e7308e8f66584cbe247e68 -->
 ## 2025-10-29T21:18:01+00:00 — Merge pull request #1531 from aicovergod/codex/implement-right-click-menu-behavior
 
