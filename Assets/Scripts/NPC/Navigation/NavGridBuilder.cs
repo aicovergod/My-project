@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using NPC.Navigation;
 #if UNITY_EDITOR
 using UnityEditorInternal;
 #endif
@@ -13,7 +14,7 @@ namespace NPC
     /// </summary>
     [ExecuteAlways]
     [DisallowMultipleComponent]
-    public sealed class NavGridBuilder : MonoBehaviour, ISerializationCallbackReceiver
+    public sealed class NavGridBuilder : MonoBehaviour, ISerializationCallbackReceiver, INavGridData
     {
         /// <summary>
         /// Event raised whenever the grid is rebuilt.
@@ -88,6 +89,12 @@ namespace NPC
         /// </summary>
         public float TileSize => tileSize;
 
+        /// <inheritdoc />
+        LayerMask INavGridData.BlockingLayerMask => blockingLayers;
+
+        /// <inheritdoc />
+        bool INavGridData.HasData => HasGrid;
+
         /// <summary>
         /// Number of tiles along the X/Y axes.
         /// </summary>
@@ -107,6 +114,55 @@ namespace NPC
         /// Indicates whether a valid grid is currently cached.
         /// </summary>
         public bool HasGrid => walkableGrid != null && gridSize.x > 0 && gridSize.y > 0;
+
+        /// <inheritdoc />
+        int INavGridData.Revision => Revision;
+
+        /// <inheritdoc />
+        bool INavGridData.TryGetCell(Vector2 worldPosition, out Vector2Int cell) => TryGetCell(worldPosition, out cell);
+
+        /// <inheritdoc />
+        Vector2Int INavGridData.WorldToCellClamped(Vector2 worldPosition) => WorldToCellClamped(worldPosition);
+
+        /// <inheritdoc />
+        Vector2 INavGridData.GetCellCenter(Vector2Int cell) => GetCellCenter(cell);
+
+        /// <inheritdoc />
+        bool INavGridData.IsCellWalkable(Vector2Int cell) => IsCellWalkable(cell);
+
+        /// <inheritdoc />
+        bool INavGridData.IsCellWithinBounds(Vector2Int cell) => IsCellWithinBounds(cell);
+
+        /// <inheritdoc />
+        bool INavGridData.HasClearLineBetweenCells(Vector2Int origin, Vector2Int goal) => HasClearLineBetweenCells(origin, goal);
+
+        /// <inheritdoc />
+        bool INavGridData.TryResolveChunkForCell(Vector2Int cell, out Vector2Int chunkCoordinates)
+        {
+            if (!IsCellWithinBounds(cell))
+            {
+                chunkCoordinates = default;
+                return false;
+            }
+
+            chunkCoordinates = Vector2Int.zero;
+            return true;
+        }
+
+        /// <inheritdoc />
+        bool INavGridData.TryResolveLocalCell(Vector2Int cell, out Vector2Int chunkCoordinates, out Vector2Int localCell)
+        {
+            if (!IsCellWithinBounds(cell))
+            {
+                chunkCoordinates = default;
+                localCell = default;
+                return false;
+            }
+
+            chunkCoordinates = Vector2Int.zero;
+            localCell = cell;
+            return true;
+        }
 
         /// <summary>
         /// True when the grid should be rebuilt before being used.

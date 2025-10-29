@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Util;
 using World;
+using NPC.Navigation;
 
 namespace NPC
 {
@@ -110,6 +111,10 @@ namespace NPC
             }
         }
 
+        [Header("Streaming")]
+        [Tooltip("Optional streaming service used to drop reservations when nav chunks unload.")]
+        [SerializeField] private NavGridStreamingService streamingService;
+
         [Header("Debug")]
         [Tooltip("Enables verbose logging for reservation claims and releases.")]
         [SerializeField] private bool enableDebugLogging;
@@ -123,6 +128,7 @@ namespace NPC
         private int currentTick;
         private bool subscribedToTicker;
         private Coroutine tickerSubscriptionRoutine;
+        private bool streamingServiceSubscribed;
 
         /// <summary>
         /// Current navigation tick processed by the service.
@@ -137,16 +143,19 @@ namespace NPC
         private void OnEnable()
         {
             SubscribeToTicker();
+            EnsureStreamingService();
         }
 
         private void Start()
         {
             SubscribeToTicker();
+            EnsureStreamingService();
         }
 
         private void OnDisable()
         {
             UnsubscribeFromTicker();
+            DetachStreamingService();
         }
 
         private void OnDestroy()
@@ -154,6 +163,7 @@ namespace NPC
             UnsubscribeFromTicker();
             reservations.Clear();
             handlesByMover.Clear();
+            DetachStreamingService();
         }
 
         /// <inheritdoc />
@@ -519,6 +529,128 @@ namespace NPC
                     buffer.Add(new Vector2Int(center.x + dx, center.y + dy));
                 }
             }
+        }
+
+        private void EnsureStreamingService()
+        {
+            if (streamingService != null)
+            {
+                if (!streamingServiceSubscribed)
+                {
+                    streamingService.ChunkUnloaded += HandleChunkUnloaded;
+                    streamingServiceSubscribed = true;
+                }
+
+                return;
+            }
+
+            streamingService = FindFirstObjectByType<NavGridStreamingService>(FindObjectsInactive.Include);
+            if (streamingService != null)
+            {
+                streamingService.ChunkUnloaded += HandleChunkUnloaded;
+                streamingServiceSubscribed = true;
+            }
+        }
+
+        private void DetachStreamingService()
+        {
+            if (streamingService != null && streamingServiceSubscribed)
+            {
+                streamingService.ChunkUnloaded -= HandleChunkUnloaded;
+                streamingServiceSubscribed = false;
+            }
+        }
+
+        private void HandleChunkUnloaded(Vector2Int chunkCoordinates)
+        {
+            if (reservations.Count == 0)
+            {
+                return;
+            }
+
+            Vector2Int chunkSize = streamingService != null ? streamingService.ChunkDimensions : Vector2Int.zero;
+            if (chunkSize.x <= 0 || chunkSize.y <= 0)
+            {
+                return;
+            }
+
+            int minX = chunkCoordinates.x * chunkSize.x;
+            int maxX = minX + chunkSize.x;
+            int minY = chunkCoordinates.y * chunkSize.y;
+            int maxY = minY + chunkSize.y;
+
+            reservationKeySnapshot.Clear();
+            reservationKeySnapshot.AddRange(reservations.Keys);
+
+            bool removed = false;
+            for (int i = 0; i < reservationKeySnapshot.Count; i++)
+            {
+                Vector2Int cell = reservationKeySnapshot[i];
+                if (!IsCellWithinChunk(cell, minX, maxX, minY, maxY))
+                {
+                    continue;
+                }
+
+                reservations.Remove(cell);
+                removed = true;
+            }
+
+            reservationKeySnapshot.Clear();
+
+            if (removed)
+            {
+                ReservationsChanged?.Invoke();
+            }
+
+            if (handlesByMover.Count == 0)
+            {
+                return;
+            }
+
+            handleCleanupBuffer.Clear();
+            foreach (var entry in handlesByMover)
+            {
+                var handle = entry.Value;
+                if (handle == null)
+                {
+                    continue;
+                }
+
+                if (HandleIntersectsChunk(handle, minX, maxX, minY, maxY))
+                {
+                    handleCleanupBuffer.Add(handle);
+                }
+            }
+
+            for (int i = 0; i < handleCleanupBuffer.Count; i++)
+            {
+                ReleaseHandle(handleCleanupBuffer[i]);
+            }
+
+            handleCleanupBuffer.Clear();
+        }
+
+        private static bool HandleIntersectsChunk(ReservationHandle handle, int minX, int maxX, int minY, int maxY)
+        {
+            var footprint = handle.Footprint;
+            for (int i = 0; i < footprint.Count; i++)
+            {
+                var slice = footprint[i];
+                for (int j = 0; j < slice.Count; j++)
+                {
+                    if (IsCellWithinChunk(slice[j], minX, maxX, minY, maxY))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsCellWithinChunk(Vector2Int cell, int minX, int maxX, int minY, int maxY)
+        {
+            return cell.x >= minX && cell.x < maxX && cell.y >= minY && cell.y < maxY;
         }
 
         private void SubscribeToTicker()

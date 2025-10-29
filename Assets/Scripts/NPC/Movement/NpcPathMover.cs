@@ -378,9 +378,9 @@ namespace NPC
         private float ResolveStepDuration(Vector2 start, Vector2 target)
         {
             float baseDuration = Mathf.Max(0.01f, tileTraverseDuration);
-            var grid = pathService != null ? pathService.ActiveGrid : PathfindingService.Instance?.ActiveGrid;
+            var grid = pathService != null ? pathService.ActiveNavData : PathfindingService.Instance?.ActiveNavData;
 
-            if (grid != null && grid.HasGrid)
+            if (grid != null && grid.HasData)
             {
                 if (grid.TryGetCell(start, out var startCell) && grid.TryGetCell(target, out var targetCell))
                 {
@@ -702,13 +702,13 @@ namespace NPC
         /// </summary>
         private bool IsWaypointWalkable(Vector2 waypoint)
         {
-            var grid = pathService != null ? pathService.ActiveGrid : PathfindingService.Instance?.ActiveGrid;
-            if (grid == null)
+            var grid = pathService != null ? pathService.ActiveNavData : PathfindingService.Instance?.ActiveNavData;
+            if (grid == null || !grid.HasData)
             {
                 return true;
             }
 
-            return grid.IsWorldPositionWalkable(waypoint);
+            return grid.TryGetCell(waypoint, out var cell) && grid.IsCellWalkable(cell);
         }
 
         /// <summary>
@@ -716,8 +716,8 @@ namespace NPC
         /// </summary>
         private bool HasClearStopLine(Vector2 origin, Vector2 goal)
         {
-            var grid = pathService != null ? pathService.ActiveGrid : PathfindingService.Instance?.ActiveGrid;
-            if (grid == null || !grid.HasGrid)
+            var grid = pathService != null ? pathService.ActiveNavData : PathfindingService.Instance?.ActiveNavData;
+            if (grid == null || !grid.HasData)
             {
                 return true;
             }
@@ -740,8 +740,8 @@ namespace NPC
         /// <param name="goal">Current waypoint being traversed.</param>
         private bool HasClearStepLine(Vector2 origin, Vector2 goal)
         {
-            var grid = pathService != null ? pathService.ActiveGrid : PathfindingService.Instance?.ActiveGrid;
-            if (grid == null || !grid.HasGrid)
+            var grid = pathService != null ? pathService.ActiveNavData : PathfindingService.Instance?.ActiveNavData;
+            if (grid == null || !grid.HasData)
             {
                 return true;
             }

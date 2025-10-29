@@ -204,8 +204,8 @@ namespace Pets
             lastPlayerPos = playerPos;
             bool playerMoving = playerVel.sqrMagnitude > 0.01f;
 
-            NavGridBuilder activeGrid = PathfindingService.Instance?.ActiveGrid;
-            bool navAvailable = activeGrid != null && activeGrid.HasGrid;
+            var navData = PathfindingService.Instance?.ActiveNavData;
+            bool navAvailable = navData != null && navData.HasData;
 
             if (!useNavigationForFollowing)
             {
