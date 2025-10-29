@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:53c538e5c40eada60b6f71ed8f1ef6fd0f250854 -->
+## 2025-10-29T18:56:09+00:00 — Merge pull request #1524 from aicovergod/codex/implement-scene-loading-validation-in-login-flow
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 35 ++ / 4 --
+- Notes:
+  Validate login scene targets against persistent catalog
+---
+<!-- commit:d37413c65d0cb78c453f2081d639182088f2cb24 -->
+## 2025-10-29T18:55:57+00:00 — Validate login scene against persistent catalog
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Core/Save/SaveManager.cs, Assets/Scripts/UI/Login/LoginFlowController.cs, Assets/Scripts/World/PersistentSceneGate.cs
+- Diff: 35 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:4e20e182e50ed4a80ec7b58aede7c88875d12ca3 -->
 ## 2025-10-29T17:14:30+00:00 — Merge pull request #1523 from aicovergod/codex/add-thieving-skill-to-companion-stats-ui
 
