@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:e0090e1e2ed64e3a7932b37d66669f819983f2a8 -->
+## 2025-10-29T12:14:22+00:00 — Add goblin pickpocket dialogue support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (8): Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue.meta, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/GoblinPickpocketDialogueSet.cs, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/GoblinPickpocketDialogueSet.cs.meta, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueService.cs, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueService.cs.meta, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueSet.cs, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueSet.cs.meta
+- Diff: 283 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9bfca3c185ea93e9df61ab0317e3309207611742 -->
 ## 2025-10-29T12:03:03+00:00 — Merge pull request #1503 from aicovergod/codex/move-skill-level-up-logic-to-levelupsound-class
 
