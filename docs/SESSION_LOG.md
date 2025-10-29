@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d55ecde071aac3929b063819845f09be639a38e1 -->
+## 2025-10-29T12:58:38+00:00 — goblin
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Prefabs/NPCS/Goblin.prefab, Assets/Scripts/Audio/SoundEffects.meta, Assets/Scripts/Audio/SoundEffects/LevelUpSound.cs.meta, Assets/Scripts/Skills/Thieving/Editor.meta, Assets/Scripts/Skills/Thieving/Editor/ThievingNpcDefinitionSimulatorWindow.cs.meta, Assets/Sound/13_Thieving_Level_Up.ogg.meta
+- Diff: 76 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:10339e028935aa7f3e40ccac916b6b0af0d6b900 -->
 ## 2025-10-29T12:53:57+00:00 — Merge pull request #1510 from aicovergod/codex/fix-console-errors-in-npcpickpocketdialogueservice
 
