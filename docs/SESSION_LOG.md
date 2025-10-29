@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5212e21b3ec65ceba993844741f64ea037b4ae8b -->
+## 2025-10-29T21:39:04+00:00 — Adjust farming node auto-move stop distance
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Farming/PickableResourceNode.cs
+- Diff: 5 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:af1ecd7a24da65750801112b1e842ce2f8d88cd0 -->
 ## 2025-10-29T21:21:34+00:00 — Merge pull request #1532 from aicovergod/codex/add-cabbage-field-dialogue-trigger
 
