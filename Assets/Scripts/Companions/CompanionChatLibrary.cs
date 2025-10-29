@@ -6215,6 +6215,12 @@ namespace Companions
             return AreaSpecificAwareDialogue.GetRandomGraveyardAwarenessLine();
         }
 
+        /// <summary>Returns a flavour line for cabbage field awareness.</summary>
+        public static string GetRandomCabbageFieldAwarenessLine()
+        {
+            return AreaSpecificAwareDialogue.GetRandomCabbageFieldAwarenessLine();
+        }
+
         /// <summary>
         /// Returns a random guard mode activation line, falling back gracefully when the pool is empty.
         /// </summary>
