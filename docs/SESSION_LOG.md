@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d86525a6ece57c5710cb5192eef01e993a08a2d1 -->
+## 2025-10-29T12:14:42+00:00 — Merge pull request #1504 from aicovergod/codex/add-npcpickpocketdialogue-folder-and-scripts
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 292 ++ / 0 --
+- Notes:
+  Add goblin pickpocket dialogue integration
+---
+<!-- commit:7d36793146a88176189ee43b7ceeb2008228e17a -->
+## 2025-10-29T12:14:36+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:e0090e1e2ed64e3a7932b37d66669f819983f2a8 -->
 ## 2025-10-29T12:14:22+00:00 — Add goblin pickpocket dialogue support
 
