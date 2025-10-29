@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4d9d5bd7dff5bc8ebc7229ebfbf2ce6a14e95de0 -->
+## 2025-10-29T21:03:04+00:00 — Merge pull request #1528 from aicovergod/codex/adjust-auto-harvest-logic-in-pickableresourcenode
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 22 ++ / 1 --
+- Notes:
+  Fix auto harvest auto-move reset in pickable nodes
+---
+<!-- commit:918348baf0340361731918c3138b36e9a77ba03f -->
+## 2025-10-29T21:03:00+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:94afed6aa1b0d9e5e64f728e3877f63d9e8eef5a -->
 ## 2025-10-29T21:02:48+00:00 — Fix auto harvest reset when auto move cancelled
 
