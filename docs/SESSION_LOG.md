@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:69c764a05a6a30469b15a48175acc53169f8788e -->
+## 2025-10-29T12:21:54+00:00 — Merge pull request #1505 from aicovergod/codex/update-npc-dialogue-positioning
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 31 ++ / 16 --
+- Notes:
+  Show pickpocket dialogue above NPCs
+---
+<!-- commit:760d67c37ace0a642d9b9c5bf25149f75b8f97fa -->
+## 2025-10-29T12:20:22+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:f62b6d659669373cfebc93d979d87a1e6d71b872 -->
 ## 2025-10-29T12:20:06+00:00 — Show pickpocket dialogue as NPC floating text
 
