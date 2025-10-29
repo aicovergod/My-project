@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f59fa5aa9e4c71da9f20e049d3504d6d96273205 -->
+## 2025-10-29T13:32:07+00:00 — Ensure popup text renders above world elements
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/World/PopupText.cs
+- Diff: 35 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d55ecde071aac3929b063819845f09be639a38e1 -->
 ## 2025-10-29T12:58:38+00:00 — goblin
 
