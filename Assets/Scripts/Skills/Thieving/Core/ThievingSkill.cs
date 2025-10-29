@@ -244,9 +244,16 @@ namespace Skills.Thieving.Core
             ThievingNpcDefinition definition = target.Definition;
             if (level < definition.RequiredLevel)
             {
-                GatheringFloatingTextService.TryShowAtAnchor(
-                    $"You need Thieving level {definition.RequiredLevel}.",
+                string message = $"You need Thieving level {definition.RequiredLevel}.";
+                bool displayed = GatheringFloatingTextService.TryShowAtAnchor(
+                    message,
                     floatingTextAnchor);
+                LogFloatingTextAttempt(
+                    "PickpocketLevelRequirementFailed",
+                    message,
+                    floatingTextAnchor,
+                    displayed,
+                    target != null ? target.transform.position : transform.position);
                 return false;
             }
 
@@ -255,7 +262,13 @@ namespace Skills.Thieving.Core
 
             if (!CanAcceptNpcLoot(definition, out string failureMessage))
             {
-                GatheringFloatingTextService.TryShowAtAnchor(failureMessage, floatingTextAnchor);
+                bool displayed = GatheringFloatingTextService.TryShowAtAnchor(failureMessage, floatingTextAnchor);
+                LogFloatingTextAttempt(
+                    "PickpocketInventoryCheckFailed",
+                    failureMessage,
+                    floatingTextAnchor,
+                    displayed,
+                    target != null ? target.transform.position : transform.position);
                 return false;
             }
 
@@ -297,16 +310,31 @@ namespace Skills.Thieving.Core
             var definition = node.Definition;
             if (CurrentLevel < definition.RequiredLevel)
             {
-                GatheringFloatingTextService.TryShowAtAnchor(
-                    $"You need Thieving level {definition.RequiredLevel} to steal from this.",
+                string message = $"You need Thieving level {definition.RequiredLevel} to steal from this.";
+                bool displayed = GatheringFloatingTextService.TryShowAtAnchor(
+                    message,
                     floatingTextAnchor);
+                LogFloatingTextAttempt(
+                    "ObjectLevelRequirementFailed",
+                    message,
+                    floatingTextAnchor,
+                    displayed,
+                    node != null ? node.transform.position : transform.position);
                 return false;
             }
 
             if (!CanAcceptObjectLoot(node, out string failureMessage))
             {
                 if (!string.IsNullOrEmpty(failureMessage))
-                    GatheringFloatingTextService.TryShowAtAnchor(failureMessage, floatingTextAnchor);
+                {
+                    bool displayed = GatheringFloatingTextService.TryShowAtAnchor(failureMessage, floatingTextAnchor);
+                    LogFloatingTextAttempt(
+                        "ObjectInventoryCheckFailed",
+                        failureMessage,
+                        floatingTextAnchor,
+                        displayed,
+                        node != null ? node.transform.position : transform.position);
+                }
                 return false;
             }
 
@@ -443,10 +471,22 @@ namespace Skills.Thieving.Core
             isLocked = true;
 
             bool displayedAtAnchor = GatheringFloatingTextService.TryShowAtAnchor(FailureFloatingText, floatingTextAnchor);
+            LogFloatingTextAttempt(
+                "PickpocketFailure",
+                FailureFloatingText,
+                floatingTextAnchor,
+                displayedAtAnchor,
+                activeNpc != null ? activeNpc.transform.position : transform.position);
 
             if (!displayedAtAnchor)
             {
                 Transform anchorTransform = floatingTextAnchor != null ? floatingTextAnchor : transform;
+                if (EnableDebugLogging)
+                {
+                    Debug.Log(
+                        $"[Thieving] Floating text fallback triggered for failure message. Anchor description: {DescribeAnchor(anchorTransform)}.",
+                        this);
+                }
                 FloatingText.Show(FailureFloatingText, anchorTransform != null ? anchorTransform.position : transform.position);
             }
             ChatService.Instance?.PublishGameMessage("You fail to pick the pocket.");
@@ -565,7 +605,15 @@ namespace Skills.Thieving.Core
                     inventoryBlocked = true;
 
                     if (floatingTextAnchor != null)
-                        GatheringFloatingTextService.TryShowAtAnchor(FailureFloatingText, floatingTextAnchor);
+                    {
+                        bool failureDisplayed = GatheringFloatingTextService.TryShowAtAnchor(FailureFloatingText, floatingTextAnchor);
+                        LogFloatingTextAttempt(
+                            "RewardInventoryFull",
+                            FailureFloatingText,
+                            floatingTextAnchor,
+                            failureDisplayed,
+                            worldPosition);
+                    }
 
                     ChatService.Instance?.PublishGameMessage(FailureFloatingText);
 
@@ -601,11 +649,25 @@ namespace Skills.Thieving.Core
 
                 int previousLevel = skillManager.GetLevel(SkillType.Thieving);
                 int newLevel = skillManager.AddXP(SkillType.Thieving, xp);
+                if (EnableDebugLogging)
+                {
+                    Debug.Log(
+                        $"[Thieving] Queueing XP popup for {xp} XP at anchor {DescribeAnchor(floatingTextAnchor)} with world position {worldPosition}.",
+                        this);
+                }
+
                 GatheringFloatingTextService.QueueDelayedXpPopup(Mathf.RoundToInt(xp), floatingTextAnchor, worldPosition, 1f);
 
                 if (newLevel > previousLevel)
                 {
-                    GatheringFloatingTextService.TryShowAtAnchor($"Thieving level {newLevel}", floatingTextAnchor);
+                    string levelMessage = $"Thieving level {newLevel}";
+                    bool levelDisplayed = GatheringFloatingTextService.TryShowAtAnchor(levelMessage, floatingTextAnchor);
+                    LogFloatingTextAttempt(
+                        "LevelUp",
+                        levelMessage,
+                        floatingTextAnchor,
+                        levelDisplayed,
+                        worldPosition);
                     LevelledUp?.Invoke(newLevel);
                 }
             }
@@ -613,6 +675,30 @@ namespace Skills.Thieving.Core
             {
                 Debug.Log("[Thieving] XP grant skipped because XP value was non-positive or SkillManager was missing.", this);
             }
+        }
+
+        private void LogFloatingTextAttempt(
+            string context,
+            string message,
+            Transform anchor,
+            bool displayed,
+            Vector3 worldPosition)
+        {
+            if (!EnableDebugLogging)
+                return;
+
+            Debug.Log(
+                $"[Thieving] Floating text attempt '{context}' -> message='{message}' displayed={displayed} anchor={DescribeAnchor(anchor)} worldPosition={worldPosition}.",
+                this);
+        }
+
+        private static string DescribeAnchor(Transform anchor)
+        {
+            if (anchor == null)
+                return "null";
+
+            Vector3 position = anchor.position;
+            return $"{anchor.name} (InstanceID {anchor.GetInstanceID()}, position {position})";
         }
 
         private List<(ItemData item, int quantity)> ResolveLootRolls(

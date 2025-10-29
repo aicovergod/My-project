@@ -15,6 +15,7 @@ using Skills.Outfits;
 using Skills.Woodcutting;
 using Skills.Firemaking;
 using Skills.Thieving.Core;
+using Skills.Thieving.NpcPickpocketDialogue;
 using Status;
 using Status.Antifire;
 using Status.Poison;
@@ -295,6 +296,12 @@ namespace Skills
                 () => thievingSkillBehaviour != null,
                 () => thievingSkillBehaviour.EnableDebugLogging,
                 value => thievingSkillBehaviour.EnableDebugLogging = value);
+            bool thievingDialogueDebugLogging = NpcPickpocketDialogueService.EnableDebugLogging;
+            bool requestedThievingDialogueDebugLogging = GUILayout.Toggle(
+                thievingDialogueDebugLogging,
+                "Thieving Dialogue Debug Logging");
+            if (requestedThievingDialogueDebugLogging != thievingDialogueDebugLogging)
+                NpcPickpocketDialogueService.EnableDebugLogging = requestedThievingDialogueDebugLogging;
             DrawSkillDebugToggle(
                 "Cooking Debug Logging",
                 () => cookingSkillBehaviour != null,
