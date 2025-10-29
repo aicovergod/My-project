@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1686322bcc54c6801667f9c12afc883be5cd592e -->
+## 2025-10-29T17:05:58+00:00 — Add admin-toggleable nav grid debug logging
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/NPC/Navigation/NavGridStreamingService.cs, Assets/Scripts/NPC/Navigation/NavGridWorld.cs, Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 87 ++ / 17 --
+- Notes:
+  —
+---
 <!-- commit:c49b702f65917f9bc997619e628cd25e1c2cb94a -->
 ## 2025-10-29T16:53:28+00:00 — Merge pull request #1521 from aicovergod/codex/update-navgridbuilder-gizmo-rendering
 
