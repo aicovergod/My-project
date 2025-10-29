@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:af2c67abd7e809d68da9506f3c3d4fded2f8c787 -->
+## 2025-10-29T16:00:44+00:00 — Merge pull request #1518 from aicovergod/codex/implement-navgridstreamingservice-and-inavgriddata-interface
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1302 ++ / 100 --
+- Notes:
+  Add nav grid streaming service and global nav data pipeline
+---
+<!-- commit:8c85410bbe7960241b4eaaa1b57912381839d86a -->
+## 2025-10-29T16:00:31+00:00 — Implement nav grid streaming service and global nav data
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (15): Assets/Scripts/NPC/Combat/BaseNpcCombat.cs, Assets/Scripts/NPC/Movement/NpcPathMover.cs, Assets/Scripts/NPC/Movement/NpcWanderer.cs, Assets/Scripts/NPC/Navigation/DynamicNavOccupancyService.cs, Assets/Scripts/NPC/Navigation/INavGridData.cs, Assets/Scripts/NPC/Navigation/INavGridData.cs.meta, Assets/Scripts/NPC/Navigation/NavGridBuilder.cs, Assets/Scripts/NPC/Navigation/NavGridStreamingService.cs, Assets/Scripts/NPC/Navigation/NavGridStreamingService.cs.meta, Assets/Scripts/NPC/Navigation/NavGridStreamingZone.cs, Assets/Scripts/NPC/Navigation/NavGridWorld.cs, Assets/Scripts/NPC/Navigation/NavGridWorld.cs.meta, Assets/Scripts/NPC/Navigation/PathfindingService.cs, Assets/Scripts/Pets/PetFollower.cs, Assets/Scripts/Pets/PetPathMover.cs
+- Diff: 1302 ++ / 100 --
+- Notes:
+  —
+---
 <!-- commit:02d09dc4a34e1aecc76d5449c17de66ba2edfe7e -->
 ## 2025-10-29T15:37:16+00:00 — Merge pull request #1517 from aicovergod/codex/add-navgridchunkdefinition-and-navgridchunkbaker
 
