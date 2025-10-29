@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5de204ce72a8328833d9335ea7c1854c2cccdeed -->
+## 2025-10-29T22:42:38+00:00 — Refactor companion skilling controller setup
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/CompanionSkillingControllerBase.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 129 ++ / 117 --
+- Notes:
+  —
+---
 <!-- commit:d744b434a7d5a0a1c0098aeae80c3a5c6f382773 -->
 ## 2025-10-29T22:24:09+00:00 — Merge pull request #1535 from aicovergod/codex/update-companion-cooking-and-follower-logic
 
