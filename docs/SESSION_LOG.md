@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:786c6f6282378f19fb9253b598cc63fb6a4b9b3c -->
+## 2025-10-29T13:32:25+00:00 — Merge pull request #1511 from aicovergod/codex/update-popuptext-sorting-layer-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 35 ++ / 0 --
+- Notes:
+  Ensure popup text renders above world elements
+---
+<!-- commit:f59fa5aa9e4c71da9f20e049d3504d6d96273205 -->
+## 2025-10-29T13:32:07+00:00 — Ensure popup text renders above world elements
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/World/PopupText.cs
+- Diff: 35 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d55ecde071aac3929b063819845f09be639a38e1 -->
 ## 2025-10-29T12:58:38+00:00 — goblin
 
