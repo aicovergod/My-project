@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d8c88f9d5e8e32c01507afb0fd2b1eb2875895fe -->
+## 2025-10-29T20:15:54+00:00 — Enable interact action harvesting for farming nodes
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Farming/PickableResourceNode.cs
+- Diff: 144 ++ / 19 --
+- Notes:
+  —
+---
 <!-- commit:aa92fbf4dfe4d20fd168e115641fca48f6bff3d8 -->
 ## 2025-10-29T19:50:01+00:00 — cabbage object
 
