@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:63f340d3b519462a63e9832fc08a8d2ff4397d54 -->
+## 2025-10-29T14:21:31+00:00 — Merge pull request #1514 from aicovergod/codex/add-npc-reaction-to-failed-pickpocketing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 285 ++ / 0 --
+- Notes:
+  Improve thieving failure feedback and pickpocket approach
+---
+<!-- commit:b9d3323a32d7f69afa367e16fffd91f3999c4286 -->
+## 2025-10-29T14:21:22+00:00 — Improve thieving failure feedback and pickpocket approach
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs, Assets/Scripts/Skills/Thieving/Interaction/NpcThievingTarget.cs
+- Diff: 285 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:1f318dd5c5fb3e5d1f15c40ce1e59d42bd941f99 -->
 ## 2025-10-29T14:02:51+00:00 — Merge pull request #1513 from aicovergod/codex/refactor-popuptext-to-floatingtext
 
