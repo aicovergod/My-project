@@ -479,6 +479,38 @@ namespace NPC
                 SetCombatState(true);
         }
 
+        /// <summary>
+        ///     Determines whether this NPC currently has an active attack coroutine targeting the supplied combatant.
+        /// </summary>
+        /// <param name="target">Combat target to evaluate.</param>
+        public bool IsActivelyAttackingTarget(CombatTarget target)
+        {
+            if (target == null)
+                return false;
+
+            if (combatant != null && !combatant.IsAlive)
+                return false;
+
+            if (target is Object unityTarget && unityTarget == null)
+                return false;
+
+            return activeAttacks.TryGetValue(target, out var routine) && routine != null;
+        }
+
+        /// <summary>
+        ///     Determines whether this NPC is presently attacking the player character.
+        /// </summary>
+        public bool IsActivelyAttackingPlayer()
+        {
+            if (playerTarget == null)
+                playerTarget = FindObjectOfType<PlayerCombatTarget>();
+
+            if (playerTarget == null)
+                return false;
+
+            return IsActivelyAttackingTarget(playerTarget);
+        }
+
         protected virtual IEnumerator AttackRoutine(CombatTarget target)
         {
             // Cache the original target reference and transform up-front so we can clean up even if

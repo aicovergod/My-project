@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Combat;
 using Inventory;
 using Player.Movement;
 using Player;
+using NPC;
 using Skills.Common;
 using Skills.Thieving.Data;
 using Skills.Outfits;
@@ -27,6 +29,7 @@ namespace Skills.Thieving.Core
         private const string CoinsItemId = "Gold Coins";
         private const string FailureFloatingText = "You fail to pick the pocket.";
         private const string OutOfRangeFloatingText = "You can't reach that.";
+        private const string PickpocketCombatBlockedMessage = "You can't pickpocket this NPC while in combat.";
         private const float TileSize = 1f;
         private const float PickpocketRangeTiles = 1f;
         private const float PickpocketStopBufferTiles = 0.1f;
@@ -50,6 +53,9 @@ namespace Skills.Thieving.Core
 
         [SerializeField]
         private SkillManager skillManager;
+
+        [SerializeField, Tooltip("Player combat controller used to determine combat-related pickpocket restrictions.")]
+        private CombatController combatController;
 
         [SerializeField]
         private Transform floatingTextAnchor;
@@ -189,6 +195,10 @@ namespace Skills.Thieving.Core
                 hitpoints = GetComponent<PlayerHitpoints>();
             if (skillManager == null)
                 skillManager = GetComponent<SkillManager>();
+            if (combatController == null)
+                combatController = GetComponent<CombatController>()
+                    ?? GetComponentInParent<CombatController>()
+                    ?? GetComponentInChildren<CombatController>();
             if (floatingTextAnchor == null)
                 floatingTextAnchor = transform;
             if (database == null)
@@ -262,6 +272,16 @@ namespace Skills.Thieving.Core
                 return false;
             if (IsAttemptActive || isLocked)
                 return false;
+
+            if (IsNpcEngagedInCombatWithPlayer(target))
+            {
+                ChatboxUI.PostSystemMessage(PickpocketCombatBlockedMessage);
+                if (EnableDebugLogging)
+                {
+                    Debug.Log($"[Thieving] Blocked pickpocket attempt while in combat with {target.name}.", this);
+                }
+                return false;
+            }
 
             int level = CurrentLevel;
             ThievingNpcDefinition definition = target.Definition;
@@ -1035,6 +1055,34 @@ namespace Skills.Thieving.Core
             int min = range.x <= 0 ? 1 : range.x;
             int max = range.y <= 0 ? min : range.y;
             return Random.Range(min, max + 1);
+        }
+
+        /// <summary>
+        ///     Determines whether the supplied NPC is simultaneously targeted by the player and actively attacking them.
+        ///     When true, pickpocket attempts should be blocked to prevent exploits while in combat.
+        /// </summary>
+        /// <param name="target">NPC thieving target being evaluated.</param>
+        private bool IsNpcEngagedInCombatWithPlayer(NpcThievingTarget target)
+        {
+            if (combatController == null || target == null)
+                return false;
+
+            CombatTarget playerTarget = combatController.CurrentTarget;
+            if (playerTarget == null)
+                return false;
+
+            var npcCombatant = target.GetComponent<NpcCombatant>() ?? target.GetComponentInParent<NpcCombatant>();
+            if (npcCombatant == null || !npcCombatant.IsAlive)
+                return false;
+
+            if (!ReferenceEquals(playerTarget, npcCombatant))
+                return false;
+
+            var npcCombat = npcCombatant.GetComponent<BaseNpcCombat>() ?? npcCombatant.GetComponentInParent<BaseNpcCombat>();
+            if (npcCombat == null)
+                return false;
+
+            return npcCombat.IsActivelyAttackingPlayer();
         }
 
         private bool EvaluateRogueOutfitBonus()
