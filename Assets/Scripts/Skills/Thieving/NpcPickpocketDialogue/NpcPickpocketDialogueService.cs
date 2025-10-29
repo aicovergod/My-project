@@ -65,6 +65,7 @@ namespace Skills.Thieving.NpcPickpocketDialogue
                     if (EnableDebugLogging)
                         Debug.Log($"{LogPrefix} Success roll failed. Dialogue suppressed for '{definition.DisplayName}'.");
                     return;
+                }
 
                 if (!set.TryGetRandomSuccessLine(out string line))
                 {
