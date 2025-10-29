@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0f8c1de69f0440e9aab4ed22789bb48f, type: 3}
   m_Name: ThievingDefinitionDatabase
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   npcDefinitions:
   - {fileID: 11400000, guid: 9bb5ac91f9d34d1faf3ebf7cd23db041, type: 2}
   - {fileID: 11400000, guid: 50cc1328625c4c37bb0cc606c2c89947, type: 2}
@@ -19,6 +19,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0f4bb7520e6344f9963062e49d838df2, type: 2}
   - {fileID: 11400000, guid: 26a53f7f0a694cf39ee5a9366fd0e3e6, type: 2}
   - {fileID: 11400000, guid: 8b567c8a8ab54a0b8d2b346a9d482376, type: 2}
+  - {fileID: 11400000, guid: e1316cf4608efef4d9ce4f42a8acfb3e, type: 2}
   objectDefinitions:
   - {fileID: 11400000, guid: 1b1487cda3cb4a2da6ecfb9fe44e34a9, type: 2}
   - {fileID: 11400000, guid: 9e3bd149d4d7488a80b0665770fc6513, type: 2}

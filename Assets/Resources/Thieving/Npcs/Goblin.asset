@@ -12,15 +12,50 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a5f908c6fb44fcb889f73cf54c5ecbe, type: 3}
   m_Name: Goblin
   m_EditorClassIdentifier: 
-  id: Guard
-  displayName: Guard
-  requiredLevel: 40
-  baseXp: 46.8
-  lowSuccessThreshold: 128
-  highSuccessThreshold: 230
+  id: Goblin
+  displayName: Goblin
+  requiredLevel: 1
+  baseXp: 8
+  lowSuccessThreshold: 180
+  highSuccessThreshold: 240
   post99ThresholdGain: 0
-  coinRange: {x: 30, y: 30}
-  lootTable: []
+  coinRange: {x: 0, y: 0}
+  lootTable:
+  - itemId: Gold Coins
+    quantityRange: {x: 3, y: 15}
+    dropChancePercent: 57
+    guaranteed: 0
+    notedQuantity: 0
+  - itemId: Cabbage
+    quantityRange: {x: 1, y: 1}
+    dropChancePercent: 8
+    guaranteed: 0
+    notedQuantity: 0
+  - itemId: Thread
+    quantityRange: {x: 1, y: 3}
+    dropChancePercent: 8
+    guaranteed: 0
+    notedQuantity: 0
+  - itemId: Copper Ore
+    quantityRange: {x: 1, y: 1}
+    dropChancePercent: 8
+    guaranteed: 0
+    notedQuantity: 0
+  - itemId: Bread Loaf
+    quantityRange: {x: 1, y: 1}
+    dropChancePercent: 8
+    guaranteed: 0
+    notedQuantity: 0
+  - itemId: Bread Roll
+    quantityRange: {x: 1, y: 1}
+    dropChancePercent: 8
+    guaranteed: 0
+    notedQuantity: 0
+  - itemId: Bronze Dagger
+    quantityRange: {x: 1, y: 1}
+    dropChancePercent: 3
+    guaranteed: 0
+    notedQuantity: 0
   baseLootRolls: 1
   rogueOutfitBonusRolls: 0
   damageOnFail: 2
