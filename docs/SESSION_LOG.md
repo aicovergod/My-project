@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a1b727e0f34a5b729277a514702f1a9cb7c0bfa8 -->
+## 2025-10-29T23:01:09+00:00 — Merge pull request #1539 from aicovergod/codex/create-and-integrate-new-command-guard-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 483 ++ / 358 --
+- Notes:
+  Refactor companion skill command guards
+---
+<!-- commit:ea339dc1291cbbd673a823883f73e13bf4ba0ceb -->
+## 2025-10-29T23:01:01+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c0635795b52b07f65be57556d4a746bc65a39fdf -->
 ## 2025-10-29T23:00:46+00:00 — Add companion skill command guard helper
 
