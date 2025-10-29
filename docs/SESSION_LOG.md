@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a625a3f673214842c054d83ec84197f75e2d6209 -->
+## 2025-10-29T12:02:52+00:00 — Refactor level up sound handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Audio/SoundEffects/LevelUpSound.cs, Assets/Scripts/Combat/CombatController.cs
+- Diff: 82 ++ / 33 --
+- Notes:
+  —
+---
 <!-- commit:ff61c9f2e8fd5f242cb215af11f3b812b66a4d4d -->
 ## 2025-10-29T11:55:48+00:00 — Merge pull request #1502 from aicovergod/codex/play-sound-on-thieving-level-up
 
