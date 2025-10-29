@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ff61c9f2e8fd5f242cb215af11f3b812b66a4d4d -->
+## 2025-10-29T11:55:48+00:00 — Merge pull request #1502 from aicovergod/codex/play-sound-on-thieving-level-up
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 0 --
+- Notes:
+  Add thieving level up audio cue
+---
+<!-- commit:4270ea30f784c701499bc9e9260027d0c78b0d02 -->
+## 2025-10-29T11:55:41+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:eb923df7b4271cc58c880b534571d33dbcf7c53e -->
 ## 2025-10-29T11:55:27+00:00 — Add thieving level up audio cue
 
