@@ -188,8 +188,10 @@ namespace NPC.Combat.Mechanics
                 return;
             }
 
-            Vector3 spawnPosition = transform.position;
             var spawner = ResolveGroundItemSpawner();
+            bool companionKill = DetermineCompanionKill(killingPlayer);
+            Vector3 spawnPosition = ResolveFragmentSpawnPosition(killingPlayer, companionKill, spawner);
+
             if (spawner != null)
                 spawner.Spawn(fragment, 1, spawnPosition);
             else
@@ -203,7 +205,6 @@ namespace NPC.Combat.Mechanics
                 CompanionEventType.Loot,
                 CompanionEventMetadata.Create("You", combatant != null ? combatant.name : name, null, spawnPosition));
 
-            bool companionKill = DetermineCompanionKill(killingPlayer);
             TryEmitCompanionDialogue(chat, companionKill);
         }
 
@@ -250,6 +251,38 @@ namespace NPC.Combat.Mechanics
                 sharedGroundItemSpawner = FindObjectOfType<GroundItemSpawner>();
 
             return sharedGroundItemSpawner;
+        }
+
+        /// <summary>
+        /// Determines which world position should receive the Hades fragment drop. When the
+        /// player secures the killing blow the fragment is spawned on the player tile. If the
+        /// companion delivers the final hit the fragment is spawned on the companion tile. The
+        /// NPC position is used as a fallback if neither context is available.
+        /// </summary>
+        private Vector3 ResolveFragmentSpawnPosition(GameObject killingPlayer, bool companionKill, GroundItemSpawner spawner)
+        {
+            Vector3 basePosition = transform.position;
+
+            if (companionKill)
+            {
+                if (CompanionManager.HasActiveCompanion && CompanionManager.ActiveCompanion != null)
+                {
+                    basePosition = CompanionManager.ActiveCompanion.transform.position;
+                }
+                else if (killingPlayer != null)
+                {
+                    basePosition = killingPlayer.transform.position;
+                }
+            }
+            else if (killingPlayer != null)
+            {
+                basePosition = killingPlayer.transform.position;
+            }
+
+            if (spawner != null)
+                return spawner.SnapPositionToTileCenter(basePosition);
+
+            return basePosition;
         }
 
         private bool DetermineCompanionKill(GameObject killingPlayer)
