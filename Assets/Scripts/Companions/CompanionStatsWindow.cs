@@ -45,6 +45,7 @@ namespace Companions
             SkillType.Magic,
             SkillType.Beastmaster,
             SkillType.Fishing,
+            SkillType.Thieving,
             SkillType.Cooking,
             SkillType.Firemaking,
             SkillType.Woodcutting,
@@ -113,7 +114,7 @@ namespace Companions
             var panelImage = panel.AddComponent<Image>();
             panelImage.color = new Color(0f, 0f, 0f, 0.7f);
             var panelRect = panel.GetComponent<RectTransform>();
-            panelRect.sizeDelta = new Vector2(260f, 520f);
+            panelRect.sizeDelta = new Vector2(260f, 560f);
             panelRect.anchoredPosition = Vector2.zero;
 
             CloseButtonBuilder.Build(panel.transform, Close);
