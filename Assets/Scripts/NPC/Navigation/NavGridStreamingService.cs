@@ -66,6 +66,25 @@ namespace NPC.Navigation
         [Tooltip("Writes verbose logging for chunk streaming operations.")]
         [SerializeField] private bool enableDebugLogging;
 
+        private static bool globalEnableDebugLogging;
+
+        /// <summary>
+        /// Globally toggles verbose logging for the streaming service so tooling can
+        /// flip the flag before an instance exists.
+        /// </summary>
+        public static bool EnableDebugLogging
+        {
+            get => Instance != null ? Instance.enableDebugLogging : globalEnableDebugLogging;
+            set
+            {
+                globalEnableDebugLogging = value;
+                if (Instance != null)
+                {
+                    Instance.enableDebugLogging = value;
+                }
+            }
+        }
+
         [Tooltip("Layers considered blocking for streamed navigation data.")]
         [SerializeField] private LayerMask blockingLayerMask;
 
@@ -111,6 +130,14 @@ namespace NPC.Navigation
 
             base.Awake();
             Instance = this;
+
+            if (globalEnableDebugLogging)
+            {
+                enableDebugLogging = true;
+            }
+
+            globalEnableDebugLogging = enableDebugLogging;
+
             worldData = new NavGridWorld(chunkDimensions, tileSize, worldOrigin, blockingLayerMask);
         }
 
@@ -159,10 +186,7 @@ namespace NPC.Navigation
             {
                 activePlayerChunk = chunk;
                 hasActiveChunk = true;
-                if (enableDebugLogging)
-                {
-                    Debug.Log($"NavGridStreamingService active chunk -> {activePlayerChunk}.", this);
-                }
+                Log($"Active chunk -> {activePlayerChunk}.");
             }
 
             RefreshStreamingTargets();
@@ -192,6 +216,7 @@ namespace NPC.Navigation
 
             activeZoneChunks[zoneId] = chunkSet;
             ZoneActivated?.Invoke(zoneId, chunkIds ?? Array.Empty<string>());
+            Log($"Zone '{zoneId}' activated with {chunkSet.Count} chunk(s).");
             RefreshStreamingTargets();
         }
 
@@ -208,6 +233,7 @@ namespace NPC.Navigation
             if (activeZoneChunks.Remove(zoneId))
             {
                 ZoneDeactivated?.Invoke(zoneId);
+                Log($"Zone '{zoneId}' deactivated.");
                 RefreshStreamingTargets();
             }
         }
@@ -305,11 +331,7 @@ namespace NPC.Navigation
             NavGridChunkDefinition chunk = Resources.Load<NavGridChunkDefinition>(resourcePath);
             if (chunk == null)
             {
-                if (enableDebugLogging)
-                {
-                    Debug.LogWarning($"NavGridStreamingService could not locate chunk asset '{resourcePath}'.", this);
-                }
-
+                LogWarning($"Could not locate chunk asset '{resourcePath}'.");
                 return;
             }
 
@@ -319,10 +341,7 @@ namespace NPC.Navigation
             ChunkLoaded?.Invoke(coordinates);
             NavDataChanged?.Invoke(worldData);
 
-            if (enableDebugLogging)
-            {
-                Debug.Log($"Loaded nav chunk {coordinates} from {resourcePath}.", this);
-            }
+            Log($"Loaded nav chunk {coordinates} from {resourcePath}.");
         }
 
         private void UnloadChunk(Vector2Int coordinates)
@@ -342,10 +361,7 @@ namespace NPC.Navigation
                 Resources.UnloadAsset(chunk);
             }
 
-            if (enableDebugLogging)
-            {
-                Debug.Log($"Unloaded nav chunk {coordinates}.", this);
-            }
+            Log($"Unloaded nav chunk {coordinates}.");
         }
 
         private void SynchroniseConfiguration(NavGridChunkDefinition chunk)
@@ -431,6 +447,26 @@ namespace NPC.Navigation
 
             Ticker.Instance.Subscribe(this);
             subscribedToTicker = true;
+        }
+
+        private void Log(string message)
+        {
+            if (!enableDebugLogging)
+            {
+                return;
+            }
+
+            Debug.Log($"[NavGridStreaming] {message}", this);
+        }
+
+        private void LogWarning(string message)
+        {
+            if (!enableDebugLogging)
+            {
+                return;
+            }
+
+            Debug.LogWarning($"[NavGridStreaming] {message}", this);
         }
     }
 }

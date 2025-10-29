@@ -18,6 +18,8 @@ namespace NPC.Navigation
             public Rect WorldBounds;
         }
 
+        private static bool enableDebugLogging;
+
         private readonly Dictionary<Vector2Int, ChunkRecord> chunkLookup = new Dictionary<Vector2Int, ChunkRecord>();
         private LayerMask blockingLayerMask;
         private Vector2Int configuredChunkDimensions;
@@ -34,6 +36,15 @@ namespace NPC.Navigation
             configuredTileSize = Mathf.Max(0.0001f, tileSize);
             configuredWorldOrigin = worldOrigin;
             this.blockingLayerMask = blockingLayerMask;
+        }
+
+        /// <summary>
+        /// Globally toggles verbose logging for navgrid world aggregation.
+        /// </summary>
+        public static bool EnableDebugLogging
+        {
+            get => enableDebugLogging;
+            set => enableDebugLogging = value;
         }
 
         /// <summary>
@@ -67,6 +78,7 @@ namespace NPC.Navigation
             var record = BuildRecord(chunk);
             chunkLookup[chunk.ChunkCoordinates] = record;
             revision++;
+            Log($"Chunk {chunk.ChunkCoordinates} registered. Cell origin {record.CellOrigin}, size {record.Dimensions}.");
         }
 
         /// <summary>
@@ -77,6 +89,7 @@ namespace NPC.Navigation
             if (chunkLookup.Remove(coordinates))
             {
                 revision++;
+                Log($"Chunk {coordinates} removed from world map.");
             }
         }
 
@@ -338,6 +351,16 @@ namespace NPC.Navigation
 
             record = null;
             return false;
+        }
+
+        private static void Log(string message)
+        {
+            if (!enableDebugLogging)
+            {
+                return;
+            }
+
+            Debug.Log($"[NavGridWorld] {message}");
         }
     }
 }

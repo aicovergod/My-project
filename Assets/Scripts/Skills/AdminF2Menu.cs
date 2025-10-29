@@ -6,6 +6,7 @@ using Companions;
 using Beastmaster;
 using Pets;
 using NPC;
+using NPC.Navigation;
 using BankSystem;
 using Inventory.OreBag;
 using Skills.Cooking;
@@ -346,6 +347,16 @@ namespace Skills
             bool requestedSceneInteractableDebugLogging = GUILayout.Toggle(sceneInteractableDebugLogging, "Scene Interactable Arrival Debug Logging");
             if (requestedSceneInteractableDebugLogging != sceneInteractableDebugLogging)
                 SceneInteractableObject.EnableDebugLogging = requestedSceneInteractableDebugLogging;
+
+            bool navStreamingDebugLogging = NavGridStreamingService.EnableDebugLogging;
+            bool requestedNavStreamingDebugLogging = GUILayout.Toggle(navStreamingDebugLogging, "Nav Grid Streaming Debug Logging");
+            if (requestedNavStreamingDebugLogging != navStreamingDebugLogging)
+                NavGridStreamingService.EnableDebugLogging = requestedNavStreamingDebugLogging;
+
+            bool navWorldDebugLogging = NavGridWorld.EnableDebugLogging;
+            bool requestedNavWorldDebugLogging = GUILayout.Toggle(navWorldDebugLogging, "Nav Grid World Debug Logging");
+            if (requestedNavWorldDebugLogging != navWorldDebugLogging)
+                NavGridWorld.EnableDebugLogging = requestedNavWorldDebugLogging;
 
             DrawNpcDamageLoggingControls();
 
