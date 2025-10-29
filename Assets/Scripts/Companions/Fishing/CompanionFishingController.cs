@@ -11,6 +11,7 @@ using UI.Chat;
 using UnityEngine;
 using Util;
 using Companions.Equipment;
+using RuntimeInventory = global::Inventory.Inventory;
 
 namespace Companions
 {
@@ -49,7 +50,7 @@ namespace Companions
         private const float BlockedSpotExpirySeconds = 4f;
 
         private SkillManager skillManager;
-        private Inventory.Inventory inventory;
+        private RuntimeInventory inventory;
         private CompanionEquipment companionEquipment;
         private FishingSkill fishingSkill;
 

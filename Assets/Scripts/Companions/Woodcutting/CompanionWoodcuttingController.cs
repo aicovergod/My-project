@@ -11,6 +11,7 @@ using UI.Chat;
 using UnityEngine;
 using Util;
 using Companions.Equipment;
+using RuntimeInventory = global::Inventory.Inventory;
 
 namespace Companions
 {
@@ -45,7 +46,7 @@ namespace Companions
     public sealed class CompanionWoodcuttingController : CompanionGatheringControllerBase<TreeNode, CompanionWoodcuttingCommandResult>
     {
         private SkillManager skillManager;
-        private Inventory.Inventory inventory;
+        private RuntimeInventory inventory;
         private CompanionEquipment companionEquipment;
         private WoodcuttingSkill woodcuttingSkill;
         private Coroutine woodcuttingRoutine;
