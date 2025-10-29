@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0d24cf89c805fb8247ffb354e3513050b388365e -->
+## 2025-10-29T22:50:10+00:00 — Merge pull request #1538 from aicovergod/codex/update-agents.md-with-latest-updates
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 0 --
+- Notes:
+  Document companion skilling controller guidance
+---
+<!-- commit:b52e82b283787531737d048db295c1b9da0f30a7 -->
+## 2025-10-29T22:50:01+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:5317cff1804b62811f9eed4e416595276fd0c872 -->
 ## 2025-10-29T22:49:46+00:00 — Document companion skilling controller guidance
 
