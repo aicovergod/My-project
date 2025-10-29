@@ -112,7 +112,7 @@ namespace NPC
                     if (!Application.isPlaying)
                         return maskValue;
 
-                    var blockingMask = PathfindingService.Instance?.ActiveGrid?.BlockingLayerMask;
+                    var blockingMask = PathfindingService.Instance?.ActiveNavData?.BlockingLayerMask;
                     if (blockingMask.HasValue)
                         maskValue |= blockingMask.Value.value;
 

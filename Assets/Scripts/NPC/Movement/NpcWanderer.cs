@@ -1,4 +1,5 @@
 using UnityEngine;
+using NPC.Navigation;
 using Util;
 using Combat;
 using System.Collections;
@@ -222,7 +223,7 @@ namespace NPC
 
         /// <summary>
         /// Samples a new patrol destination and, when available, verifies the chosen cell can be
-        /// reached from the wanderer's current nav tile using the active <see cref="NavGridBuilder"/>.
+        /// reached from the wanderer's current nav tile using the active <see cref="INavGridData"/>.
         /// </summary>
         private void ChooseNewTarget()
         {
@@ -230,8 +231,8 @@ namespace NPC
             Vector2 origin = _originInitialized ? _origin : currentPosition;
             Vector2 currentWithinBounds = ClampWithinConfiguredBounds(origin, currentPosition, out float minX, out float maxX, out float minY, out float maxY);
 
-            NavGridBuilder grid = NavValidationEnabled ? PathfindingService.Instance?.ActiveGrid : null;
-            bool canValidate = NavValidationEnabled && grid != null && grid.HasGrid;
+            INavGridData grid = NavValidationEnabled ? PathfindingService.Instance?.ActiveNavData : null;
+            bool canValidate = NavValidationEnabled && grid != null && grid.HasData;
 
             Vector2Int startCell = default;
             if (canValidate)
@@ -763,8 +764,8 @@ namespace NPC
 
             Vector2 clamped = ClampWithinConfiguredBounds(origin, worldPosition, out float minX, out float maxX, out float minY, out float maxY);
 
-            NavGridBuilder grid = PathfindingService.Instance?.ActiveGrid;
-            if (grid == null || !grid.HasGrid)
+            INavGridData grid = PathfindingService.Instance?.ActiveNavData;
+            if (grid == null || !grid.HasData)
             {
                 return clamped;
             }
@@ -839,7 +840,7 @@ namespace NPC
         /// Finds the nearest walkable cell within the patrol bounds using the cached BFS buffers to
         /// remain allocation-free even when invoked multiple times per frame.
         /// </summary>
-        private bool TryFindNearestWalkableCellWithinBounds(Vector2Int seedCell, NavGridBuilder grid, float minX, float maxX, float minY, float maxY, out Vector2Int result)
+        private bool TryFindNearestWalkableCellWithinBounds(Vector2Int seedCell, INavGridData grid, float minX, float maxX, float minY, float maxY, out Vector2Int result)
         {
             Queue<Vector2Int> frontier = _nearestCellFrontier;
             HashSet<Vector2Int> visited = _nearestCellVisited;
@@ -894,7 +895,7 @@ namespace NPC
         /// Validates that a path exists between two nav cells while remaining inside the patrol
         /// bounds, leveraging cached BFS buffers to keep reachability checks allocation-free.
         /// </summary>
-        private bool IsCellReachableWithinBounds(Vector2Int startCell, Vector2Int goalCell, NavGridBuilder grid, float minX, float maxX, float minY, float maxY)
+        private bool IsCellReachableWithinBounds(Vector2Int startCell, Vector2Int goalCell, INavGridData grid, float minX, float maxX, float minY, float maxY)
         {
             if (startCell == goalCell)
             {

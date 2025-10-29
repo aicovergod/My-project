@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Player;
 
 namespace NPC.Navigation
 {
@@ -55,6 +56,51 @@ namespace NPC.Navigation
             }
 
             return chunkIds.Contains(chunkId);
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (!isActiveAndEnabled)
+            {
+                return;
+            }
+
+            if (!IsPlayerCollider(other))
+            {
+                return;
+            }
+
+            NavGridStreamingService.Instance?.ActivateZone(zoneId, chunkIds);
+        }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            if (!isActiveAndEnabled)
+            {
+                return;
+            }
+
+            if (!IsPlayerCollider(other))
+            {
+                return;
+            }
+
+            NavGridStreamingService.Instance?.DeactivateZone(zoneId);
+        }
+
+        private static bool IsPlayerCollider(Collider2D collider)
+        {
+            if (collider == null)
+            {
+                return false;
+            }
+
+            if (collider.CompareTag("Player"))
+            {
+                return true;
+            }
+
+            return collider.GetComponentInParent<PlayerMover>() != null;
         }
 
 #if UNITY_EDITOR

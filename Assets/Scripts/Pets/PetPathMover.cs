@@ -110,8 +110,8 @@ namespace Pets
                     return false;
                 }
 
-                var grid = pathService.ActiveGrid;
-                return grid != null && grid.HasGrid;
+                var grid = pathService.ActiveNavData;
+                return grid != null && grid.HasData;
             }
         }
 
@@ -193,8 +193,8 @@ namespace Pets
                 return false;
             }
 
-            var grid = pathService.ActiveGrid;
-            if (grid == null || !grid.HasGrid)
+            var grid = pathService.ActiveNavData;
+            if (grid == null || !grid.HasData)
             {
                 ResetFollowTracking();
                 return false;
@@ -347,8 +347,8 @@ namespace Pets
                 return false;
             }
 
-            var grid = pathService.ActiveGrid;
-            if (grid == null || !grid.HasGrid)
+            var grid = pathService.ActiveNavData;
+            if (grid == null || !grid.HasData)
             {
                 ResetAttackTracking();
                 return false;
@@ -465,8 +465,8 @@ namespace Pets
                 return false;
             }
 
-            var grid = pathService.ActiveGrid;
-            if (grid == null || !grid.HasGrid)
+            var grid = pathService.ActiveNavData;
+            if (grid == null || !grid.HasData)
             {
                 ResetWanderTracking();
                 return false;
