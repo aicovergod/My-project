@@ -18,6 +18,11 @@ namespace Skills.Thieving.NpcPickpocketDialogue
         private static readonly IReadOnlyList<string> EmptyLines = Array.Empty<string>();
 
         /// <summary>
+        ///     Number of dialogue sets currently registered. Exposed for debugging purposes.
+        /// </summary>
+        internal static int RegisteredSetCount => Registry.Count;
+
+        /// <summary>
         ///     Unique identifier that must match <see cref="Skills.Thieving.Data.ThievingNpcDefinition.Id"/>.
         /// </summary>
         public abstract string NpcId { get; }
