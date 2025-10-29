@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a3e8bfd6b51de22dbe25373fa4680917207f76b0 -->
+## 2025-10-29T20:22:34+00:00 — feat(farming): add auto move harvesting support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Farming/PickableResourceNode.cs
+- Diff: 120 ++ / 17 --
+- Notes:
+  —
+---
 <!-- commit:82fd1e690098104632977603eded7410eae85c30 -->
 ## 2025-10-29T20:16:02+00:00 — Merge pull request #1526 from aicovergod/codex/add-customizable-input-for-pickable-resources
 
