@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7eb35fc752e3d432509de7bb9e43e42d36bfb759 -->
+## 2025-10-29T21:54:59+00:00 — Merge pull request #1534 from aicovergod/codex/spawn-hades-fragment-on-correct-tile
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 44 ++ / 2 --
+- Notes:
+  Spawn ore golem Hades fragments on killer tiles
+---
+<!-- commit:e42ab457b2940ad189aed54ecef19dba7f1227b1 -->
+## 2025-10-29T21:54:47+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0eb5ba1fc0159b178815c654ac5209aa6025c923 -->
 ## 2025-10-29T21:54:34+00:00 — Spawn ore golem fragments on killer tile
 
