@@ -41,6 +41,14 @@ namespace Audio.SoundEffects
                 skillManager = GetComponent<SkillManager>()
                     ?? GetComponentInParent<SkillManager>()
                     ?? GetComponentInChildren<SkillManager>();
+
+                if (skillManager == null)
+                {
+                    // Fallback to a scene-wide lookup so the player manager can still be
+                    // resolved when it lives outside this object's hierarchy (e.g. when the
+                    // audio component is on a persistent object).
+                    skillManager = FindFirstObjectByType<SkillManager>(FindObjectsInactive.Include);
+                }
             }
 
             if (skillManager != null)
