@@ -26,6 +26,10 @@ namespace Skills.Thieving.Core
         private const string RogueOutfitResourcePath = "Skills/Outfits/RogueOutfitDefinition";
         private const string CoinsItemId = "Gold Coins";
         private const string FailureFloatingText = "You fail to pick the pocket.";
+        private const string OutOfRangeFloatingText = "You can't reach that.";
+        private const float TileSize = 1f;
+        private const float PickpocketRangeTiles = 1f;
+        private const float PickpocketStopBufferTiles = 0.1f;
 
         private enum AttemptMode
         {
@@ -68,6 +72,10 @@ namespace Skills.Thieving.Core
         private SkillingOutfitProgress rogueOutfitProgress;
         private ItemData cachedCoinItem;
         private bool unfreezeScheduled;
+        private bool isApproachingPickpocketTarget;
+        private bool awaitingPickpocketApproachArrival;
+        private NpcThievingTarget approachingPickpocketTarget;
+        private float approachingPickpocketRange;
 
         internal Func<int> PickpocketRoll { get; set; } = () => Random.Range(0, 256);
 
@@ -204,6 +212,12 @@ namespace Skills.Thieving.Core
             TrySubscribeToTicker();
         }
 
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            CancelPickpocketApproach(true);
+        }
+
         private void OnDestroy()
         {
             attemptProgress.TickAdvanced -= HandleAttemptProgressAdvanced;
@@ -226,6 +240,15 @@ namespace Skills.Thieving.Core
                 return;
 
             Debug.Log($"[Thieving] Attempt reset for {requiredTicks} ticks.", this);
+        }
+
+        /// <summary>
+        ///     Monitors any active auto-walk towards a pickpocket target so requests are cancelled cleanly when
+        ///     movement is interrupted or the target becomes invalid.
+        /// </summary>
+        private void Update()
+        {
+            UpdatePickpocketApproachState();
         }
 
         /// <summary>
@@ -271,6 +294,15 @@ namespace Skills.Thieving.Core
                     target != null ? target.transform.position : transform.position);
                 return false;
             }
+
+            float interactionRange = ResolvePickpocketInteractionRange(target);
+            if (!IsWithinPickpocketRange(target, interactionRange))
+            {
+                BeginPickpocketApproach(target, interactionRange);
+                return false;
+            }
+
+            CancelPickpocketApproach(false);
 
             attemptMode = AttemptMode.PickpocketNpc;
             activeNpc = target;
@@ -454,8 +486,155 @@ namespace Skills.Thieving.Core
             CleanupAttempt();
         }
 
+        /// <summary>
+        ///     Resolves the interaction range required to begin a pickpocket attempt. Currently fixed to one tile but
+        ///     exposed as a helper so future definitions can override the distance if needed.
+        /// </summary>
+        private float ResolvePickpocketInteractionRange(NpcThievingTarget target)
+        {
+            _ = target;
+            return Mathf.Max(0f, PickpocketRangeTiles * TileSize);
+        }
+
+        /// <summary>
+        ///     Calculates the stop distance fed into the auto-move routine so the player halts just inside the pickpocket
+        ///     interaction radius.
+        /// </summary>
+        private float ResolvePickpocketStopDistance(float interactionRange)
+        {
+            float buffer = Mathf.Max(0f, PickpocketStopBufferTiles * TileSize);
+            return Mathf.Max(0f, interactionRange - buffer);
+        }
+
+        /// <summary>
+        ///     Determines whether the player is currently standing within the supplied pickpocket interaction range.
+        /// </summary>
+        private bool IsWithinPickpocketRange(NpcThievingTarget target, float interactionRange)
+        {
+            if (target == null)
+                return false;
+
+            float distance = Vector3.Distance(transform.position, target.transform.position);
+            return distance <= interactionRange;
+        }
+
+        /// <summary>
+        ///     Starts automatically moving the player towards the NPC so the pickpocket can begin as soon as the
+        ///     interaction range is reached.
+        /// </summary>
+        private void BeginPickpocketApproach(NpcThievingTarget target, float interactionRange)
+        {
+            if (target == null)
+                return;
+
+            if (movement == null)
+            {
+                bool displayed = GatheringFloatingTextService.TryShowAtAnchor(OutOfRangeFloatingText, floatingTextAnchor);
+                LogFloatingTextAttempt(
+                    "PickpocketOutOfRange",
+                    OutOfRangeFloatingText,
+                    floatingTextAnchor,
+                    displayed,
+                    target.transform.position);
+                return;
+            }
+
+            if (!target.CanPickpocket || target.Definition == null)
+                return;
+
+            CancelPickpocketApproach(false);
+
+            isApproachingPickpocketTarget = true;
+            approachingPickpocketTarget = target;
+            approachingPickpocketRange = interactionRange;
+            awaitingPickpocketApproachArrival = true;
+
+            float stopDistance = ResolvePickpocketStopDistance(interactionRange);
+            movement.MoveTo(target.transform, stopDistance, () => HandlePickpocketApproachArrived(target));
+        }
+
+        /// <summary>
+        ///     Invoked once the auto-walk completes. Revalidates the target before either starting the pickpocket or
+        ///     reissuing the approach if the player stopped short.
+        /// </summary>
+        private void HandlePickpocketApproachArrived(NpcThievingTarget target)
+        {
+            awaitingPickpocketApproachArrival = false;
+
+            if (!isApproachingPickpocketTarget || approachingPickpocketTarget != target)
+                return;
+
+            if (target == null || target.Definition == null || !target.CanPickpocket)
+            {
+                CancelPickpocketApproach(false);
+                return;
+            }
+
+            float interactionRange = approachingPickpocketRange;
+            if (!IsWithinPickpocketRange(target, interactionRange))
+            {
+                BeginPickpocketApproach(target, interactionRange);
+                return;
+            }
+
+            CancelPickpocketApproach(false);
+            TryStartPickpocket(target);
+        }
+
+        /// <summary>
+        ///     Clears any pending auto-move towards a pickpocket target and optionally halts the player's movement.
+        /// </summary>
+        private void CancelPickpocketApproach(bool stopMovement)
+        {
+            if (stopMovement && movement != null && movement.IsAutoMoving)
+                movement.StopMovement();
+
+            isApproachingPickpocketTarget = false;
+            awaitingPickpocketApproachArrival = false;
+            approachingPickpocketTarget = null;
+            approachingPickpocketRange = 0f;
+        }
+
+        /// <summary>
+        ///     Evaluates the current pickpocket auto-approach each frame to ensure it cancels when the target becomes
+        ///     invalid or when the player manually interrupts movement.
+        /// </summary>
+        private void UpdatePickpocketApproachState()
+        {
+            if (!isApproachingPickpocketTarget)
+                return;
+
+            if (approachingPickpocketTarget == null || approachingPickpocketTarget.Definition == null || !approachingPickpocketTarget.CanPickpocket)
+            {
+                CancelPickpocketApproach(true);
+                return;
+            }
+
+            if (movement == null)
+            {
+                CancelPickpocketApproach(true);
+                return;
+            }
+
+            if (awaitingPickpocketApproachArrival && !movement.IsAutoMoving)
+            {
+                CancelPickpocketApproach(false);
+                return;
+            }
+
+            if (!awaitingPickpocketApproachArrival && IsWithinPickpocketRange(approachingPickpocketTarget, approachingPickpocketRange))
+            {
+                var target = approachingPickpocketTarget;
+                CancelPickpocketApproach(false);
+                TryStartPickpocket(target);
+            }
+        }
+
         private void HandlePickpocketFailure(ThievingNpcDefinition definition)
         {
+            if (definition.DamageOnFail > 0 && activeNpc != null)
+                activeNpc.TriggerPickpocketCounterAttack(transform);
+
             if (hitpoints != null && definition.DamageOnFail > 0)
                 hitpoints.OnEnemyDealtDamage(definition.DamageOnFail);
 
@@ -517,6 +696,7 @@ namespace Skills.Thieving.Core
             attemptWorldPosition = Vector3.zero;
             attemptProgress.ClearProgress();
             isLocked = false;
+            CancelPickpocketApproach(false);
         }
 
         private void AwardNpcRewards(ThievingNpcDefinition definition, Vector3 worldPosition)
