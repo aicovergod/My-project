@@ -51,6 +51,11 @@ namespace Skills.Farming
         private float interactRange = 1.5f;
 
         [SerializeField]
+        [Min(0f)]
+        [Tooltip("Minimum delay between interaction attempts so chat spam is throttled like other interactables.")]
+        private float interactionCooldownSeconds = 0.2f;
+
+        [SerializeField]
         [Tooltip("Optional transform used when resolving the active player for range checks.")]
         private Transform playerAnchorOverride;
 
@@ -94,6 +99,7 @@ namespace Skills.Farming
         private InputAction interactAction;
         private bool interactActionEnabledByResolver;
         private bool autoHarvestInProgress;
+        private double nextInteractionAllowedTime;
 
         /// <summary>
         ///     Auto-populates the toggle arrays from the current hierarchy so designers can quickly
@@ -132,6 +138,7 @@ namespace Skills.Farming
             quantity = Mathf.Max(1, quantity);
             respawnSeconds = Mathf.Max(0f, respawnSeconds);
             interactRange = Mathf.Max(0.1f, interactRange);
+            interactionCooldownSeconds = Mathf.Max(0f, interactionCooldownSeconds);
             autoMoveStopBuffer = Mathf.Max(0f, autoMoveStopBuffer);
 
             renderersToToggle ??= Array.Empty<SpriteRenderer>();
@@ -272,6 +279,9 @@ namespace Skills.Farming
         {
             _ = screenPosition; // Screen position reserved for future logging/analytics hooks.
 
+            if (Time.timeAsDouble < nextInteractionAllowedTime)
+                return false;
+
             if (isDepleted)
                 return false;
 
@@ -299,6 +309,7 @@ namespace Skills.Farming
                     if (autoMoveIntoRange && TryBeginAutoHarvest())
                         return false;
 
+                    ScheduleInteractionCooldown();
                     PublishChatMessage("You need to get closer to pick that.");
                     return false;
                 }
@@ -548,11 +559,13 @@ namespace Skills.Farming
 
             if (!inventory.CanAddItem(item, quantity) || !inventory.AddItem(item, quantity))
             {
+                ScheduleInteractionCooldown();
                 PublishChatMessage("Your inventory is full");
                 return false;
             }
 
             PublishChatMessage(ComposeChatMessage(item));
+            ScheduleInteractionCooldown();
             BeginRespawnCountdown();
             return true;
         }
@@ -595,6 +608,17 @@ namespace Skills.Farming
         private void ClearAutoHarvestState()
         {
             autoHarvestInProgress = false;
+        }
+
+        /// <summary>
+        ///     Applies the configured cooldown so rapid interaction attempts are throttled like other interactables.
+        /// </summary>
+        private void ScheduleInteractionCooldown()
+        {
+            if (interactionCooldownSeconds <= 0f)
+                return;
+
+            nextInteractionAllowedTime = Time.timeAsDouble + interactionCooldownSeconds;
         }
     }
 }
