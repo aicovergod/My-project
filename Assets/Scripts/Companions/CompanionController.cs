@@ -126,6 +126,30 @@ namespace Companions
         /// <summary>Provides access to the equipment component configured for the companion.</summary>
         public CompanionEquipment Equipment => companionEquipment;
 
+        /// <summary>
+        /// Indicates whether any attached subsystem currently holds the follower disabled so combat
+        /// logic can avoid re-enabling it prematurely.
+        /// </summary>
+        public bool HasActiveFollowerHold()
+        {
+            if (followerDisabledByPickup)
+                return true;
+
+            if (cookingController != null && cookingController.HasActiveFollowerHold)
+                return true;
+
+            if (fishingController != null && fishingController.HasActiveFollowerHold)
+                return true;
+
+            if (miningController != null && miningController.HasActiveFollowerHold)
+                return true;
+
+            if (woodcuttingController != null && woodcuttingController.HasActiveFollowerHold)
+                return true;
+
+            return false;
+        }
+
         /// <summary>Provides access to the cooldown tracker used for skill command throttling.</summary>
         public CompanionSkillCooldownTracker SkillCooldowns => skillCooldownTracker;
 
