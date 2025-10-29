@@ -1086,9 +1086,7 @@ namespace Pets
             if (follower != null)
             {
                 companionController ??= GetComponent<CompanionController>();
-                var miningController = companionController != null ? companionController.MiningController : null;
-
-                if (miningController == null || !miningController.HasActiveFollowerHold)
+                if (companionController == null || !companionController.HasActiveFollowerHold())
                     follower.enabled = true;
             }
         }

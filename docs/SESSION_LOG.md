@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c1eafd641a9fb706a083fc3c2294af5e7d108f99 -->
+## 2025-10-29T22:23:34+00:00 — Guard follower state during companion cooking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 58 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:7eb35fc752e3d432509de7bb9e43e42d36bfb759 -->
 ## 2025-10-29T21:54:59+00:00 — Merge pull request #1534 from aicovergod/codex/spawn-hades-fragment-on-correct-tile
 

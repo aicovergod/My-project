@@ -86,6 +86,12 @@ namespace Companions
         public bool IsCooking => cookingSkill != null && cookingSkill.IsCooking;
 
         /// <summary>
+        /// Exposes whether the cooking controller is currently holding the follower disabled.
+        /// Other systems can consult this to avoid re-enabling the follower prematurely.
+        /// </summary>
+        public bool HasActiveFollowerHold => followerDisableLockCount > 0;
+
+        /// <summary>
         /// Initialises the controller by binding all required components. Invoked by <see cref="CompanionController"/>.
         /// </summary>
         public void Initialise(
@@ -320,6 +326,7 @@ namespace Companions
 
             suppressStopCallback = true;
             cookingSkill?.StopCooking();
+            ResetMovementState();
             EnableFollower();
 
             if (publishMessage)
@@ -408,6 +415,7 @@ namespace Companions
                     stuckTriggered = true;
                     PublishStuckMessage();
                     CompanionSkillCooldownTimers.StartCookingCooldown(cooldownTracker);
+                    ResetMovementState();
                     EnableFollower();
                     yield break;
                 }
@@ -415,9 +423,12 @@ namespace Companions
                 yield return new WaitForFixedUpdate();
             }
 
+            ResetMovementState();
+
             if (station == null || recipe == null)
             {
                 PublishStationUnavailableMessage();
+                ResetMovementState();
                 EnableFollower();
                 yield break;
             }
@@ -429,6 +440,7 @@ namespace Companions
                 if (transferred <= 0)
                 {
                     PublishMissingIngredientMessage();
+                    ResetMovementState();
                     EnableFollower();
                     yield break;
                 }
@@ -446,12 +458,32 @@ namespace Companions
                 else
                     PublishStationUnavailableMessage();
 
+                ResetMovementState();
                 EnableFollower();
                 yield break;
             }
 
             CompanionSkillCooldownTimers.ClearCookingCooldown(cooldownTracker);
             cookingRoutine = null;
+        }
+
+        /// <summary>
+        /// Clears any residual velocity or cached navigation data so the companion remains stationary
+        /// when arriving at a cooking station or aborting a command.
+        /// </summary>
+        private void ResetMovementState()
+        {
+            if (body != null)
+            {
+                body.linearVelocity = Vector2.zero;
+                body.angularVelocity = 0f;
+            }
+
+            if (pathMover != null)
+            {
+                pathMover.ResetAttackTracking();
+                pathMover.ResetCachedVelocity();
+            }
         }
         private bool TryMoveWithNavigation(Vector3 stationPosition, float stopDistance)
         {
@@ -760,6 +792,7 @@ namespace Companions
             if (suppressStopCallback)
                 return;
 
+            ResetMovementState();
             EnableFollower();
             cookingRoutine = null;
             currentStation = null;
