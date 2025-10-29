@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:24490422ccf52e40b780cdd9d5526e5bcea5869a -->
+## 2025-10-29T16:07:11+00:00 — Merge pull request #1519 from aicovergod/codex/fix-console-errors-in-pathfinding-and-pet-follower
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 5 ++ / 4 --
+- Notes:
+  Fix nav grid type usage in pathfinding and pet follower
+---
+<!-- commit:ada1acfb8a5351c6407eeeae30cd8c19550cacee -->
+## 2025-10-29T16:06:56+00:00 — Fix nav grid type usage in pathfinding and pet follower
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Navigation/PathfindingService.cs, Assets/Scripts/Pets/PetFollower.cs
+- Diff: 5 ++ / 4 --
+- Notes:
+  —
+---
 <!-- commit:af2c67abd7e809d68da9506f3c3d4fded2f8c787 -->
 ## 2025-10-29T16:00:44+00:00 — Merge pull request #1518 from aicovergod/codex/implement-navgridstreamingservice-and-inavgriddata-interface
 
