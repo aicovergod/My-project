@@ -281,6 +281,9 @@ namespace Combat
                 case SkillType.Cooking:
                     SoundManager.Instance.PlaySfx(SoundEffect.CookingLevelUp);
                     break;
+                case SkillType.Thieving:
+                    SoundManager.Instance.PlaySfx(SoundEffect.ThievingLevelUp);
+                    break;
                 case SkillType.Beastmaster:
                     SoundManager.Instance.PlaySfx(SoundEffect.BeastmasterLevelUp);
                     break;
