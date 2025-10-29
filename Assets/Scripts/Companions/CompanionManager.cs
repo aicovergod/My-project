@@ -1326,7 +1326,9 @@ namespace Companions
 
             var cooking = controller != null ? controller.CookingController : null;
 
-            return CompanionSkillCommandGuard.TryExecuteSingleTargetCommand(
+            CompanionCookingCommandResult commandOutcome = result;
+
+            bool accepted = CompanionSkillCommandGuard.TryExecuteSingleTargetCommand(
                 controller,
                 cooking,
                 "[Companion] Cannot command cooking: companion controller has not been initialised.",
@@ -1344,7 +1346,7 @@ namespace Companions
                         Debug.Log(message);
                     else
                         Debug.LogWarning(message);
-                    result = commandResult;
+                    commandOutcome = commandResult;
                 },
                 PublishCookingFailureMessage,
                 commandResult =>
@@ -1356,6 +1358,9 @@ namespace Companions
                 TryDepositCompanionInventoryToBank,
                 (CompanionCookingController skillController, out CompanionCookingCommandResult retryResult) =>
                     skillController.TryCommandCook(station, recipe, out retryResult));
+
+            result = commandOutcome;
+            return accepted;
         }
 
         /// <summary>
