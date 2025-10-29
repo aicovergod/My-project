@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3a180a3dee1820f1d9bc3972c2aebae5ad78e192 -->
+## 2025-10-29T13:55:50+00:00 — Merge pull request #1512 from aicovergod/codex/make-thieving-failure-dialogue-text-larger
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 7 ++ / 2 --
+- Notes:
+  Align thieving dialogue popup with player floating text
+---
+<!-- commit:61dc5389ecea02689c61c5f1654e643850b50772 -->
+## 2025-10-29T13:55:38+00:00 — Adjust thieving dialogue popup size
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueService.cs
+- Diff: 7 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:786c6f6282378f19fb9253b598cc63fb6a4b9b3c -->
 ## 2025-10-29T13:32:25+00:00 — Merge pull request #1511 from aicovergod/codex/update-popuptext-sorting-layer-logic
 
