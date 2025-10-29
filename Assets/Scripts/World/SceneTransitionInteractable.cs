@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Core.Input;
 using Skills;
+using UI;
 using UI.Utilities;
 
 namespace World
@@ -121,7 +122,7 @@ namespace World
                 if (inv == null || !inv.HasItem(requiredItemId))
                 {
                     if (!string.IsNullOrEmpty(missingItemMessage))
-                        PopupText.Show(missingItemMessage, player.transform);
+                        FloatingText.ShowAnchored(missingItemMessage, player.transform, new Vector3(0f, 1f, 0f));
                     yield break;
                 }
 
@@ -142,7 +143,7 @@ namespace World
                 int currentLevel = skillManager.GetLevel(requiredSkill);
                 if (currentLevel < requiredLevel)
                 {
-                    PopupText.Show($"You need {requiredLevel} {requiredSkill} to enter", player.transform);
+                    FloatingText.ShowAnchored($"You need {requiredLevel} {requiredSkill} to enter", player.transform, new Vector3(0f, 1f, 0f));
                     yield break;
                 }
             }
