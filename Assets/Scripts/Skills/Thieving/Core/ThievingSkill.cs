@@ -8,6 +8,7 @@ using Skills.Common;
 using Skills.Thieving.Data;
 using Skills.Outfits;
 using Skills.Thieving.NpcPickpocketDialogue;
+using UI;
 using UI.Chat;
 using Util;
 using Random = UnityEngine.Random;
@@ -441,7 +442,13 @@ namespace Skills.Thieving.Core
             Invoke(nameof(ClearStunLock), stunDuration);
             isLocked = true;
 
-            GatheringFloatingTextService.TryShowAtAnchor(FailureFloatingText, floatingTextAnchor);
+            bool displayedAtAnchor = GatheringFloatingTextService.TryShowAtAnchor(FailureFloatingText, floatingTextAnchor);
+
+            if (!displayedAtAnchor)
+            {
+                Transform anchorTransform = floatingTextAnchor != null ? floatingTextAnchor : transform;
+                FloatingText.Show(FailureFloatingText, anchorTransform != null ? anchorTransform.position : transform.position);
+            }
             ChatService.Instance?.PublishGameMessage("You fail to pick the pocket.");
 
             if (EnableDebugLogging)
