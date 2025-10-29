@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:61526b9deb0b5d6ff317c430d07ae38b7a428f13 -->
+## 2025-10-29T17:13:56+00:00 — Add thieving skill to companion stats window
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionStatsWindow.cs
+- Diff: 2 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:d009a4977be2f7d08ea83bec4d77a6557382af05 -->
 ## 2025-10-29T17:09:49+00:00 — chunks
 
