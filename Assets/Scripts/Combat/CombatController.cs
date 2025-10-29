@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Audio;
 using Combat.Ranged;
 using EquipmentSystem;
 using Skills;
@@ -256,38 +255,10 @@ namespace Combat
         {
             PublishPlayerLevelUpMessage(type, level);
 
-            switch (type)
-            {
-                case SkillType.Magic:
-                    // Keep spell damage data in sync and play the corresponding level-up chime.
-                    MagicUI.UpdateStrikeMaxHits(level);
-                    SoundManager.Instance.PlaySfx(SoundEffect.MagicLevelUp);
-                    break;
-                case SkillType.Attack:
-                    SoundManager.Instance.PlaySfx(SoundEffect.AttackLevelUp);
-                    break;
-                case SkillType.Defence:
-                    SoundManager.Instance.PlaySfx(SoundEffect.DefenceLevelUp);
-                    break;
-                case SkillType.Mining:
-                    SoundManager.Instance.PlaySfx(SoundEffect.MiningLevelUp);
-                    break;
-                case SkillType.Woodcutting:
-                    SoundManager.Instance.PlaySfx(SoundEffect.WoodcuttingLevelUp);
-                    break;
-                case SkillType.Fishing:
-                    SoundManager.Instance.PlaySfx(SoundEffect.FishingLevelUp);
-                    break;
-                case SkillType.Cooking:
-                    SoundManager.Instance.PlaySfx(SoundEffect.CookingLevelUp);
-                    break;
-                case SkillType.Thieving:
-                    SoundManager.Instance.PlaySfx(SoundEffect.ThievingLevelUp);
-                    break;
-                case SkillType.Beastmaster:
-                    SoundManager.Instance.PlaySfx(SoundEffect.BeastmasterLevelUp);
-                    break;
-            }
+            // Keep spell damage data in sync with the player's latest Magic level so strike UI
+            // reflects the current max hits. Audio feedback now lives in Audio.SoundEffects.LevelUpSound.
+            if (type == SkillType.Magic)
+                MagicUI.UpdateStrikeMaxHits(level);
         }
 
         /// <summary>
