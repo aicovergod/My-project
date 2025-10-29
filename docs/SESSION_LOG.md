@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:15536f6724644f5d2de2312eea6b17a4b186007e -->
+## 2025-10-29T12:33:36+00:00 — Merge pull request #1507 from aicovergod/codex/add-simulate-loot-rolls-checkbox
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 59 ++ / 12 --
+- Notes:
+  Add loot roll toggle and summary display to Thieving simulator
+---
+<!-- commit:a8398f01b49ab278ff0ee2b661f9a5ccabd1d61b -->
+## 2025-10-29T12:33:26+00:00 — Enhance thieving simulator loot output
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Thieving/Editor/ThievingNpcDefinitionSimulatorWindow.cs
+- Diff: 59 ++ / 12 --
+- Notes:
+  —
+---
 <!-- commit:d54902072ed656434f984e08a4311618d9fddff5 -->
 ## 2025-10-29T12:23:54+00:00 — Merge pull request #1506 from aicovergod/codex/fix-tickcount-namespace-error
 
