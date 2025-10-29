@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4e20e182e50ed4a80ec7b58aede7c88875d12ca3 -->
+## 2025-10-29T17:14:30+00:00 — Merge pull request #1523 from aicovergod/codex/add-thieving-skill-to-companion-stats-ui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 1 --
+- Notes:
+  Add thieving skill to companion stats window
+---
+<!-- commit:5e56c7eb277f5cf06b704971c734387a2922fe7e -->
+## 2025-10-29T17:14:13+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:61526b9deb0b5d6ff317c430d07ae38b7a428f13 -->
 ## 2025-10-29T17:13:56+00:00 — Add thieving skill to companion stats window
 
