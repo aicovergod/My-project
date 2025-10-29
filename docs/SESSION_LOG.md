@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fc0b4a943edf1a1f8d3539257849ea9ee099957e -->
+## 2025-10-29T21:06:48+00:00 — Add cooldown to pickable resource nodes
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Farming/PickableResourceNode.cs
+- Diff: 24 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:4d9d5bd7dff5bc8ebc7229ebfbf2ce6a14e95de0 -->
 ## 2025-10-29T21:03:04+00:00 — Merge pull request #1528 from aicovergod/codex/adjust-auto-harvest-logic-in-pickableresourcenode
 
