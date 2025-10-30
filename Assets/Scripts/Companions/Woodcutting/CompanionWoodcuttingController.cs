@@ -58,7 +58,6 @@ namespace Companions
 
         private WoodcuttingSkill playerWoodcuttingSkill;
         private Transform playerTransform;
-        private CompanionSkillCooldownTracker skillCooldownTracker;
 
         /// <summary>
         /// True while the woodcutting controller has an active routine or the woodcutting skill reports chopping activity.
@@ -80,44 +79,35 @@ namespace Companions
             Transform player,
             CompanionSkillCooldownTracker cooldownTracker)
         {
-            if (ownerController == null && CompanionManager.EnableDebugLogging)
-                Debug.LogWarning("[Companion Woodcutting] Initialise invoked without a companion controller reference.", this);
-
-            if (skills == null && CompanionManager.EnableDebugLogging)
-                Debug.LogWarning("[Companion Woodcutting] Initialise received a null SkillManager reference.", this);
-
             skillManager = skills;
-            inventory = inventoryComponent != null ? inventoryComponent.InventoryComponent : null;
+            RuntimeInventory resolvedInventory;
+            CompanionEquipment resolvedEquipment;
 
-            if (inventory == null && CompanionManager.EnableDebugLogging)
-                Debug.LogWarning("[Companion Woodcutting] No inventory available for tool checks.", this);
+            ConfigureGatheringSkill(
+                ownerController,
+                skills,
+                inventoryComponent,
+                companionEquipment,
+                cooldownTracker,
+                "Companion Woodcutting",
+                skill =>
+                {
+                    woodcuttingSkill = skill;
+                    woodcuttingSkill.OnStopChopping -= HandleWoodcuttingStopped;
+                    woodcuttingSkill.OnStopChopping += HandleWoodcuttingStopped;
+                    woodcuttingSkill.ConfigureCompanionChat(CompanionManager.GetCompanionDisplayName);
+                },
+                () =>
+                {
+                    woodcuttingActive = false;
+                    suppressWoodcuttingStopCallback = false;
+                    playerProtectedSingleLog.Clear();
+                },
+                out resolvedInventory,
+                out resolvedEquipment);
 
-            companionEquipment = ownerController != null ? ownerController.Equipment : null;
-
-            woodcuttingSkill = GetComponent<WoodcuttingSkill>();
-            if (woodcuttingSkill == null)
-                woodcuttingSkill = gameObject.AddComponent<WoodcuttingSkill>();
-
-            if (woodcuttingSkill != null)
-            {
-                woodcuttingSkill.OnStopChopping -= HandleWoodcuttingStopped;
-                woodcuttingSkill.OnStopChopping += HandleWoodcuttingStopped;
-                woodcuttingSkill.ConfigureCompanionChat(CompanionManager.GetCompanionDisplayName);
-            }
-            else if (CompanionManager.EnableDebugLogging)
-            {
-                Debug.LogError("[Companion Woodcutting] Failed to resolve WoodcuttingSkill component.", this);
-            }
-
-            InitialiseMovementComponents();
-            ResetFollowerState();
-
-            woodcuttingActive = false;
-            followerDisabledForGathering = false;
-            areaRoutineActive = false;
-            activeAreaRadius = 0f;
-
-            skillCooldownTracker = cooldownTracker;
+            inventory = resolvedInventory;
+            companionEquipment = resolvedEquipment;
 
             RebindPlayer(player);
         }
