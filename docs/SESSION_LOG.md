@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1b35f16438fb3feb5763ebba5ee1884aaacec7ee -->
+## 2025-10-30T18:52:35+00:00 — Refactor companion fishing stuck recovery
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Fishing/CompanionFishingController.cs
+- Diff: 27 ++ / 25 --
+- Notes:
+  —
+---
 <!-- commit:f2c9663add347ee5c18c83692e60175b849d8cbc -->
 ## 2025-10-30T18:34:48+00:00 — Merge pull request #1566 from aicovergod/codex/add-shared-helper-for-publishing-chat-lines
 
