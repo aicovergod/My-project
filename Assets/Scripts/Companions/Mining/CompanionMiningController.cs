@@ -271,7 +271,6 @@ namespace Companions
         {
             CancelAreaMiningInternal(false);
             CleanupAfterMining(restoreFollower);
-            UnsubscribeFromPlayerMiningSkill();
             BindToPlayerMiningSkill(playerTransform);
             ResetStuckHistory();
         }
@@ -283,7 +282,6 @@ namespace Companions
         public void CancelAreaMining(bool restoreFollower)
         {
             CancelAreaMiningInternal(restoreFollower);
-            UnsubscribeFromPlayerMiningSkill();
             BindToPlayerMiningSkill(playerTransform);
             ResetStuckHistory();
         }
@@ -1056,28 +1054,20 @@ namespace Companions
 
         private void BindToPlayerMiningSkill(Transform player)
         {
-            UnsubscribeFromPlayerMiningSkill();
-
-            if (player == null)
-                return;
-
-            RebindPlayerSkill(player, ref playerMiningSkill);
-            if (playerMiningSkill == null)
-                return;
-
-            playerMiningSkill.OnStartMining += OnPlayerStartMining;
-            playerMiningSkill.OnStopMining += OnPlayerStopMining;
-        }
-
-        private void UnsubscribeFromPlayerMiningSkill()
-        {
-            if (playerMiningSkill == null)
-                return;
-
-            playerMiningSkill.OnStartMining -= OnPlayerStartMining;
-            playerMiningSkill.OnStopMining -= OnPlayerStopMining;
-            playerMiningSkill = null;
-            playerProtectedSingleOre.Clear();
+            BindPlayerSkillEvents(
+                player,
+                ref playerMiningSkill,
+                skill =>
+                {
+                    skill.OnStartMining += OnPlayerStartMining;
+                    skill.OnStopMining += OnPlayerStopMining;
+                },
+                skill =>
+                {
+                    skill.OnStartMining -= OnPlayerStartMining;
+                    skill.OnStopMining -= OnPlayerStopMining;
+                },
+                playerProtectedSingleOre.Clear);
         }
 
         private void OnPlayerStartMining(MineableRock rock)
@@ -1111,7 +1101,7 @@ namespace Companions
         private void OnDisable()
         {
             CancelMining(true);
-            UnsubscribeFromPlayerMiningSkill();
+            BindToPlayerMiningSkill(null);
             blockedNodes.Clear();
             blockedNodePruneBuffer.Clear();
             areaAllCandidatesBlocked = false;
@@ -1124,7 +1114,7 @@ namespace Companions
                 miningSkill.OnStopMining -= HandleMiningStopped;
 
             CancelMining(true);
-            UnsubscribeFromPlayerMiningSkill();
+            BindToPlayerMiningSkill(null);
         }
 
         private void OnDrawGizmosSelected()
