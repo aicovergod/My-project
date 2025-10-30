@@ -825,13 +825,7 @@ namespace Companions
 
         private void PublishStuckApologyMessage()
         {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            chat.PublishCompanionMessage(
-                CompanionManager.GetCompanionDisplayName(),
-                CompanionFishingDialogueLibrary.GetRandomStuckApologyLine());
+            PublishCompanionChatLine(CompanionFishingDialogueLibrary.GetRandomStuckApologyLine);
         }
 
         private void CleanupAfterFishing(bool restoreFollower, bool preserveFollowerLocks = false)
