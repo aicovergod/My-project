@@ -2023,17 +2023,12 @@ namespace Companions.Conversation
                 if (bestEligible == null || definition.Tier > bestEligible.Tier)
                     bestEligible = definition;
 
-                var item = GatheringInventoryHelper.GetItemData(definition.Id, ref pickaxeItemCache);
-                bool owns = inventory != null && item != null && inventory.GetItemCount(item) > 0;
-                bool equippedTool = false;
-
-                if (equipment != null && item != null)
-                {
-                    var entry = equipment.GetEquipped(EquipmentSlot.Weapon);
-                    equippedTool = entry.item == item;
-                }
-
-                if (!owns && !equippedTool)
+                if (!CompanionToolOwnershipUtility.HasTool(
+                        definition.Id,
+                        inventory,
+                        equipment,
+                        ref pickaxeItemCache,
+                        out var equippedTool))
                     continue;
 
                 bestOwned = definition;

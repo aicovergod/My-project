@@ -693,17 +693,12 @@ namespace Companions
                 if (definition.RequiredWoodcuttingLevel > woodcuttingLevel)
                     continue;
 
-                var item = GatheringInventoryHelper.GetItemData(definition.Id, ref itemCache);
-                bool ownsInInventory = inventory != null && item != null && inventory.GetItemCount(item) > 0;
-                bool equippedTool = false;
-
-                if (companionEquipment != null && item != null)
-                {
-                    var entry = companionEquipment.GetEquipped(EquipmentSlot.Weapon);
-                    equippedTool = entry.item == item;
-                }
-
-                if (!ownsInInventory && !equippedTool)
+                if (!CompanionToolOwnershipUtility.HasTool(
+                        definition.Id,
+                        inventory,
+                        companionEquipment,
+                        ref itemCache,
+                        out _))
                     continue;
 
                 return definition;
