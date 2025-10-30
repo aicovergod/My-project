@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:85e5de87014ebd473c36965859399c455248c53b -->
+## 2025-10-30T18:23:54+00:00 — Merge pull request #1565 from aicovergod/codex/refactor-cooking-chat-publishing-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 135 ++ / 53 --
+- Notes:
+  Refactor companion cooking chat publishing
+---
+<!-- commit:1556abbd001519f977f5ac9b0a9b01de4629ecec -->
+## 2025-10-30T18:23:46+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c736a9b639d1f13abe2257d21825e5c7ee4f79b1 -->
 ## 2025-10-30T18:23:32+00:00 — Refactor companion cooking chat publishing
 
