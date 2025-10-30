@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d67ad63ae85cef337c4d8dc6dabfc3a3dce190f7 -->
+## 2025-10-30T16:40:32+00:00 — Refactor companion tool selector registration
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionToolSelectorRegistry.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 188 ++ / 101 --
+- Notes:
+  —
+---
 <!-- commit:f41bb42559709dc86f26da51413b79960d531855 -->
 ## 2025-10-30T16:12:39+00:00 — Merge pull request #1560 from aicovergod/codex/extend-companiongatheringcontrollerbase-with-helpers
 

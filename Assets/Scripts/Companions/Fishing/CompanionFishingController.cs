@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using Inventory;
 using Pets;
 using Skills;
@@ -434,7 +433,7 @@ namespace Companions
             var definitions = FishingToolDefinitionRegistry.GetAllDefinitions();
             if (definitions == null || definitions.Count == 0)
             {
-                RegisterToolsFromSelectors();
+                CompanionToolSelectorRegistry.RegisterFishingToolsFromSelectors();
                 definitions = FishingToolDefinitionRegistry.GetAllDefinitions();
             }
 
@@ -471,24 +470,6 @@ namespace Companions
             }
 
             return null;
-        }
-
-        private void RegisterToolsFromSelectors()
-        {
-            var selectors = FindObjectsOfType<FishingToolToUse>(true);
-            if (selectors == null || selectors.Length == 0)
-                return;
-
-            for (int i = 0; i < selectors.Length; i++)
-            {
-                var selector = selectors[i];
-                if (selector == null)
-                    continue;
-
-                var tools = ReflectionToolBuffer.ClearAndPopulate(selector);
-                if (tools.Count > 0)
-                    FishingToolDefinitionRegistry.RegisterDefinitions(tools);
-            }
         }
 
         private bool HasInventoryCapacityForFishInternal(IReadOnlyList<FishDefinition> fishOptions, bool suppressChat)
@@ -1099,31 +1080,5 @@ namespace Companions
             }
         }
 
-        private static class ReflectionToolBuffer
-        {
-            private static readonly FieldInfo AllToolsField = typeof(FishingToolToUse)
-                .GetField("allTools", BindingFlags.Instance | BindingFlags.NonPublic);
-
-            private static readonly List<FishingToolDefinition> Buffer = new List<FishingToolDefinition>();
-
-            public static List<FishingToolDefinition> ClearAndPopulate(FishingToolToUse selector)
-            {
-                Buffer.Clear();
-
-                if (selector == null || AllToolsField == null)
-                    return Buffer;
-
-                if (AllToolsField.GetValue(selector) is IEnumerable<FishingToolDefinition> tools)
-                {
-                    foreach (var tool in tools)
-                    {
-                        if (tool != null && !Buffer.Contains(tool))
-                            Buffer.Add(tool);
-                    }
-                }
-
-                return Buffer;
-            }
-        }
     }
 }

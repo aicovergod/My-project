@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using Inventory;
 using Pets;
 using Skills;
@@ -677,7 +676,7 @@ namespace Companions
             var definitions = AxeDefinitionRegistry.GetAllDefinitions();
             if (definitions == null || definitions.Count == 0)
             {
-                RegisterAxesFromSelectors();
+                CompanionToolSelectorRegistry.RegisterAxesFromSelectors();
                 definitions = AxeDefinitionRegistry.GetAllDefinitions();
             }
 
@@ -711,51 +710,6 @@ namespace Companions
             }
 
             return null;
-        }
-
-        private void RegisterAxesFromSelectors()
-        {
-            var selectors = FindObjectsOfType<AxeToUse>(true);
-            if (selectors == null || selectors.Length == 0)
-                return;
-
-            for (int i = 0; i < selectors.Length; i++)
-            {
-                var selector = selectors[i];
-                if (selector == null)
-                    continue;
-
-                var axes = ReflectionAxeBuffer.ClearAndPopulate(selector);
-                if (axes.Count > 0)
-                    AxeDefinitionRegistry.RegisterDefinitions(axes);
-            }
-        }
-
-        private static class ReflectionAxeBuffer
-        {
-            private static readonly FieldInfo AllAxesField = typeof(AxeToUse)
-                .GetField("allAxes", BindingFlags.Instance | BindingFlags.NonPublic);
-
-            private static readonly List<AxeDefinition> Buffer = new List<AxeDefinition>();
-
-            public static List<AxeDefinition> ClearAndPopulate(AxeToUse selector)
-            {
-                Buffer.Clear();
-
-                if (selector == null || AllAxesField == null)
-                    return Buffer;
-
-                if (AllAxesField.GetValue(selector) is IEnumerable<AxeDefinition> axes)
-                {
-                    foreach (var axe in axes)
-                    {
-                        if (axe != null && !Buffer.Contains(axe))
-                            Buffer.Add(axe);
-                    }
-                }
-
-                return Buffer;
-            }
         }
 
         /// <summary>
