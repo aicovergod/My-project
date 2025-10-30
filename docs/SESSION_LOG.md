@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:2c9a1a6ffa951ae752f108fbb725be7d0083b6ba -->
+## 2025-10-30T10:50:01+00:00 — Add cooldown before repeating nettle companion dialogue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Environment/WorldObjects/StingingNettleHazard.cs
+- Diff: 27 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:33e843ee7c124d83cf5e33dd65246d3ce5aa8293 -->
 ## 2025-10-30T10:34:59+00:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
 
