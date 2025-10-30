@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:24092f27872eeff51bab9e8961d6f0bd84f0c957 -->
+## 2025-10-30T00:35:56+00:00 — Merge pull request #1547 from aicovergod/codex/add-shift-right-click-dropping-to-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 39 ++ / 110 --
+- Notes:
+  Remove stack split UI and add shift-right drop shortcut
+---
+<!-- commit:a22b66fe40a60c40d09daa9463cb1fbc3a6a21de -->
+## 2025-10-30T00:35:46+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:9fdae5b34990c0315582267d59a88050134dab14 -->
 ## 2025-10-30T00:35:32+00:00 — Remove stack split prompts and enable shift-right drops
 
