@@ -29,6 +29,8 @@ GameObject:
   - component: {fileID: 3099355452794840895}
   - component: {fileID: -3744258465739700549}
   - component: {fileID: 4659069299622069912}
+  - component: {fileID: 8209983591033409917}
+  - component: {fileID: -1988784968532906121}
   m_Layer: 10
   m_Name: Copper Ore Golem
   m_TagString: NPC
@@ -374,9 +376,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shop: {fileID: 0}
-  menuPrefab: {fileID: 0}
   playerInput: {fileID: 0}
   openMenuActionReference: {fileID: 0}
+  interactionOptions: {fileID: 0}
 --- !u!114 &-7034281214918345802
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -632,6 +634,38 @@ MonoBehaviour:
   - finally, the grind pays off.
   - maybe i should buy a lottery ticket next.
   - "oh damn, that shimmer\u2019s pretty."
+--- !u!114 &8209983591033409917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 388f3e544a8e52041abbe9c2a9859d12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcInteractionOptions
+  enableExamine: 1
+  examineDescription: a rocky beast, that drops a copper ore node on death.
+  enableAttack: 1
+  enablePetAttack: 1
+  enableCompanionAttack: 1
+  enableTalk: 1
+  enableTrade: 0
+  enablePickpocket: 0
+--- !u!114 &-1988784968532906121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8077571585701284791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14905cb5a6ab44c795ff41f769ea3326, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.RightClickMenu
 --- !u!1 &8276902036755621917
 GameObject:
   m_ObjectHideFlags: 0

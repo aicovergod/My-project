@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2570647304888056833
+--- !u!1 &5398130589551865611
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,41 +8,41 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1988785070044074425}
-  - component: {fileID: 4020102480020766187}
-  - component: {fileID: 3290052787879714689}
-  - component: {fileID: 2619422766359448805}
-  - component: {fileID: 6359191943417940351}
-  - component: {fileID: -1900703182799471312}
+  - component: {fileID: 8277422922534060723}
+  - component: {fileID: 6812961996431929057}
+  - component: {fileID: 4967004906509094027}
+  - component: {fileID: 5556538217226788847}
+  - component: {fileID: 3532693821960854133}
+  - component: {fileID: 925944610491608634}
   m_Layer: 7
-  m_Name: Cabbage Object
+  m_Name: Wheat Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1988785070044074425
+--- !u!4 &8277422922534060723
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2570647304888056833}
+  m_GameObject: {fileID: 5398130589551865611}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 134.02, y: -29.73, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &4020102480020766187
+--- !u!212 &6812961996431929057
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2570647304888056833}
+  m_GameObject: {fileID: 5398130589551865611}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -83,7 +83,7 @@ SpriteRenderer:
   m_SortingLayerID: -160616933
   m_SortingLayer: 4
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: db8e7a5ac4a7c1d4b9b29649a92f26a9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: abda336c184946047a7c098c98680c9c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -94,13 +94,13 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &3290052787879714689
+--- !u!114 &4967004906509094027
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2570647304888056833}
+  m_GameObject: {fileID: 5398130589551865611}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 76cd1b72de0d4b218ac17b592277af94, type: 3}
@@ -108,13 +108,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Util.SpriteDepth
   offset: -1
   directionOffset: 0
---- !u!58 &2619422766359448805
+--- !u!58 &5556538217226788847
 CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2570647304888056833}
+  m_GameObject: {fileID: 5398130589551865611}
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
@@ -144,37 +144,42 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.4
---- !u!114 &6359191943417940351
+--- !u!114 &3532693821960854133
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2570647304888056833}
+  m_GameObject: {fileID: 5398130589551865611}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a4c6fbbfdd90b5f4bbd734065fe563a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Skills.Farming.PickableResourceNode
-  itemId: Cabbage
+  itemId: Wheat
   quantity: 1
   respawnSeconds: 60
   chatFeedback: You pick up {quantity} x {itemName}.
   interactRange: 1.5
+  interactionCooldownSeconds: 0.2
   playerAnchorOverride: {fileID: 0}
+  playerInput: {fileID: 0}
+  interactActionReference: {fileID: 0}
+  autoMoveIntoRange: 1
+  autoMoveStopBuffer: 0.25
   renderersToToggle:
-  - {fileID: 4020102480020766187}
+  - {fileID: 6812961996431929057}
   collidersToToggle:
-  - {fileID: 2619422766359448805}
+  - {fileID: 5556538217226788847}
   extraObjectsToToggle: []
---- !u!50 &-1900703182799471312
+--- !u!50 &925944610491608634
 Rigidbody2D:
   serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2570647304888056833}
+  m_GameObject: {fileID: 5398130589551865611}
   m_BodyType: 2
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
