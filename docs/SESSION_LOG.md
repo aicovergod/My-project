@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c736a9b639d1f13abe2257d21825e5c7ee4f79b1 -->
+## 2025-10-30T18:23:32+00:00 — Refactor companion cooking chat publishing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs
+- Diff: 126 ++ / 53 --
+- Notes:
+  —
+---
 <!-- commit:da484e4462cd2dd3beb8af3c3f5d71556da59911 -->
 ## 2025-10-30T17:30:45+00:00 — Merge pull request #1564 from aicovergod/codex/introduce-shared-stuck-sequence-utility
 

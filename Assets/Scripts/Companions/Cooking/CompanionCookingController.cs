@@ -67,6 +67,8 @@ namespace Companions
         private bool suppressStopCallback;
         private bool stuckTriggered;
 
+        private bool hasPublishedOutcomeChat;
+
         private Transform playerTransform;
         private CookingSkill playerCookingSkill;
 
@@ -149,6 +151,8 @@ namespace Companions
         public bool TryCommandCook(CookingObject station, CookableRecipe explicitRecipe, out CompanionCookingCommandResult result)
         {
             result = CompanionCookingCommandResult.RequirementsNotMet;
+
+            hasPublishedOutcomeChat = false;
 
             if (CompanionSkillCooldownTimers.ShouldDeclineCookingRequest(cooldownTracker, out result))
             {
@@ -235,6 +239,8 @@ namespace Companions
         public bool TryStartAreaCooking(float radius, out CompanionCookingCommandResult failureReason)
         {
             failureReason = CompanionCookingCommandResult.StationUnavailable;
+
+            hasPublishedOutcomeChat = false;
 
             if (CompanionSkillCooldownTimers.ShouldDeclineCookingRequest(cooldownTracker, out failureReason))
             {
@@ -764,6 +770,7 @@ namespace Companions
         {
             _ = recipe;
             suppressStopCallback = false;
+            PublishCookingCommandStart();
         }
 
         private void HandleCookingStopped()
@@ -825,38 +832,46 @@ namespace Companions
 
         private void PublishInventoryFullMessage()
         {
-            PublishChat(CompanionCookingDialogueLibrary.GetRandomInventoryFullLine());
+            PublishCookingCommandFailure(CompanionCookingCommandResult.InventoryFull);
         }
 
         private void PublishMissingIngredientMessage()
         {
-            PublishChat(CompanionCookingDialogueLibrary.GetRandomMissingIngredientLine());
+            PublishCookingCommandFailure(CompanionCookingCommandResult.MissingIngredients);
         }
 
         private void PublishMissingToolMessage()
         {
-            PublishChat(CompanionCookingDialogueLibrary.GetRandomMissingToolLine());
+            PublishCookingCommandFailure(CompanionCookingCommandResult.MissingTool);
         }
 
         private void PublishPlayerBusyMessage()
         {
-            PublishChat(CompanionCookingDialogueLibrary.GetRandomPlayerBusyLine());
+            PublishCookingCommandFailure(CompanionCookingCommandResult.PlayerBusy);
         }
 
         private void PublishStationUnavailableMessage()
         {
-            PublishChat(CompanionCookingDialogueLibrary.GetRandomStationUnavailableLine());
+            PublishCookingCommandFailure(CompanionCookingCommandResult.StationUnavailable);
         }
 
         private void PublishStuckMessage()
         {
-            PublishChat(CompanionCookingDialogueLibrary.GetRandomStuckLine());
+            if (hasPublishedOutcomeChat)
+                return;
+
+            if (PublishChat(CompanionCookingDialogueLibrary.GetRandomStuckLine()))
+                hasPublishedOutcomeChat = true;
         }
 
         private void PublishLevelRequirementMessage(int requiredLevel)
         {
+            if (hasPublishedOutcomeChat)
+                return;
+
             string line = CompanionCookingDialogueLibrary.GetLevelRequirementLine(requiredLevel);
-            PublishChat(line);
+            if (PublishChat(line))
+                hasPublishedOutcomeChat = true;
         }
 
         private void PublishCooldownMessage(TimeSpan remaining)
@@ -868,16 +883,89 @@ namespace Companions
             string playerName = chat.ActiveUsername;
             int minutes = Mathf.Max(1, Mathf.CeilToInt((float)remaining.TotalMinutes));
             string line = CompanionCookingDialogueLibrary.GetCooldownLine(playerName, minutes);
-            chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), line);
+            if (PublishChat(line))
+                hasPublishedOutcomeChat = true;
         }
 
-        private void PublishChat(string message)
+        public void PublishCookingCommandFailure(CompanionCookingCommandResult reason)
         {
-            if (string.IsNullOrWhiteSpace(message))
+            if (hasPublishedOutcomeChat)
                 return;
 
+            if (PublishCookingFailureLineInternal(reason))
+                hasPublishedOutcomeChat = true;
+        }
+
+        public static void PublishCookingFailureLine(CompanionCookingCommandResult reason)
+        {
+            PublishCookingFailureLineInternal(reason);
+        }
+
+        public void PublishCookingCommandStart()
+        {
+            if (hasPublishedOutcomeChat)
+                return;
+
+            if (PublishCookingStartLineInternal())
+                hasPublishedOutcomeChat = true;
+        }
+
+        public static void PublishCookingStartLine()
+        {
+            PublishCookingStartLineInternal();
+        }
+
+        private static bool PublishCookingFailureLineInternal(CompanionCookingCommandResult reason)
+        {
+            string message = ResolveFailureLine(reason);
+            if (string.IsNullOrWhiteSpace(message))
+                return false;
+
+            return PublishChat(message);
+        }
+
+        private static bool PublishCookingStartLineInternal()
+        {
+            string line = CompanionChatLibrary.GetRandomCompanionCookingStartLine();
+            if (string.IsNullOrWhiteSpace(line))
+                return false;
+
+            return PublishChat(line);
+        }
+
+        private static string ResolveFailureLine(CompanionCookingCommandResult reason)
+        {
+            switch (reason)
+            {
+                case CompanionCookingCommandResult.InventoryFull:
+                    return CompanionCookingDialogueLibrary.GetRandomInventoryFullLine();
+                case CompanionCookingCommandResult.MissingIngredients:
+                    return CompanionCookingDialogueLibrary.GetRandomMissingIngredientLine();
+                case CompanionCookingCommandResult.MissingTool:
+                    return CompanionCookingDialogueLibrary.GetRandomMissingToolLine();
+                case CompanionCookingCommandResult.PlayerBusy:
+                    return CompanionCookingDialogueLibrary.GetRandomPlayerBusyLine();
+                case CompanionCookingCommandResult.StationUnavailable:
+                case CompanionCookingCommandResult.Unreachable:
+                    return CompanionCookingDialogueLibrary.GetRandomStationUnavailableLine();
+                case CompanionCookingCommandResult.StationOccupied:
+                    return CompanionCookingDialogueLibrary.GetRandomStationOccupiedLine();
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private static bool PublishChat(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                return false;
+
             var chat = ChatService.Instance;
-            chat?.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), message);
+            if (chat == null)
+                return false;
+
+            chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), message);
+            return true;
         }
 
         private void NotifyCooldownFromTracker()
