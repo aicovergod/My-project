@@ -24,11 +24,12 @@ namespace Companions
             if (!CompanionManager.HasActiveCompanion)
                 return false;
 
-            var companion = CompanionManager.ActiveCompanion;
-            if (companion == null)
+            var pickupController = CompanionManager.CompanionPickupController;
+            if (pickupController == null)
                 return false;
 
-            companion.CommandPickup(drop);
+            pickupController.CancelActivePickup();
+            pickupController.CommandPickup(drop);
             return true;
         }
     }

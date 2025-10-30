@@ -176,6 +176,9 @@ namespace Companions
         /// <summary>Provides access to the configured equipment wrapper.</summary>
         public static CompanionEquipment CompanionEquipment => controller != null ? controller.Equipment : null;
 
+        /// <summary>Provides access to the directed pickup controller attached to the companion.</summary>
+        public static CompanionPickupController CompanionPickupController => controller != null ? controller.PickupController : null;
+
         /// <summary>Provides access to the configured fishing controller.</summary>
         public static CompanionFishingController CompanionFishingController => controller != null ? controller.FishingController : null;
 

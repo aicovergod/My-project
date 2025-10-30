@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:25f1867eecacd71f3cd49d640faa647cd7b908dc -->
+## 2025-10-30T15:12:31+00:00 — Refactor companion pickup logic into dedicated controller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/ItemPickup/CompanionPickupController.cs, Assets/Scripts/Companions/ItemPickup/CompanionPickupService.cs
+- Diff: 546 ++ / 488 --
+- Notes:
+  —
+---
 <!-- commit:887175ccb30b9326b26b1a23dbb6870f7b1594bd -->
 ## 2025-10-30T14:54:13+00:00 — Merge pull request #1555 from aicovergod/codex/create-companionchatinventoryresponder-script
 
