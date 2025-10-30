@@ -1267,30 +1267,6 @@ namespace Companions
                 out failureReason);
         }
 
-        private static void PublishCookingFailureMessage(CompanionCookingCommandResult reason)
-        {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string message = reason switch
-            {
-                CompanionCookingCommandResult.InventoryFull => CompanionCookingDialogueLibrary.GetRandomInventoryFullLine(),
-                CompanionCookingCommandResult.MissingIngredients => CompanionCookingDialogueLibrary.GetRandomMissingIngredientLine(),
-                CompanionCookingCommandResult.MissingTool => CompanionCookingDialogueLibrary.GetRandomMissingToolLine(),
-                CompanionCookingCommandResult.PlayerBusy => CompanionCookingDialogueLibrary.GetRandomPlayerBusyLine(),
-                CompanionCookingCommandResult.StationUnavailable => CompanionCookingDialogueLibrary.GetRandomStationUnavailableLine(),
-                CompanionCookingCommandResult.StationOccupied => CompanionCookingDialogueLibrary.GetRandomStationOccupiedLine(),
-                CompanionCookingCommandResult.Unreachable => CompanionCookingDialogueLibrary.GetRandomStationUnavailableLine(),
-                _ => string.Empty
-            };
-
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-
-            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
-        }
-
         /// <summary>
         /// Attempts to command the companion to cook at the supplied station.
         /// </summary>
@@ -1301,7 +1277,7 @@ namespace Companions
             if (station == null)
             {
                 Debug.LogWarning("[Companion] Cannot command cooking: station reference was null.");
-                PublishCookingFailureMessage(CompanionCookingCommandResult.StationUnavailable);
+                CompanionCookingController.PublishCookingFailureLine(CompanionCookingCommandResult.StationUnavailable);
                 return false;
             }
 
@@ -1329,11 +1305,22 @@ namespace Companions
                         Debug.LogWarning(message);
                     commandOutcome = commandResult;
                 },
-                PublishCookingFailureMessage,
+                commandResult =>
+                {
+                    if (cooking != null)
+                        cooking.PublishCookingCommandFailure(commandResult);
+                    else
+                        CompanionCookingController.PublishCookingFailureLine(commandResult);
+                },
                 commandResult =>
                 {
                     if (commandResult == CompanionCookingCommandResult.Accepted)
-                        PublishCookingStartMessage();
+                    {
+                        if (cooking != null)
+                            cooking.PublishCookingCommandStart();
+                        else
+                            CompanionCookingController.PublishCookingStartLine();
+                    }
                 },
                 commandResult => commandResult == CompanionCookingCommandResult.InventoryFull,
                 TryDepositCompanionInventoryToBank,
@@ -1397,30 +1384,28 @@ namespace Companions
                         Debug.LogWarning($"[Companion] Area cooking command outcome: success=False, radius={scanRadius}, reason={rejectionDetail}.");
                     }
                 },
-                PublishCookingFailureMessage,
+                result =>
+                {
+                    if (cooking != null)
+                        cooking.PublishCookingCommandFailure(result);
+                    else
+                        CompanionCookingController.PublishCookingFailureLine(result);
+                },
                 resultValue =>
                 {
                     if (resultValue == CompanionCookingCommandResult.Accepted)
-                        PublishCookingStartMessage();
+                    {
+                        if (cooking != null)
+                            cooking.PublishCookingCommandStart();
+                        else
+                            CompanionCookingController.PublishCookingStartLine();
+                    }
                 },
                 out failureReason,
                 result => result == CompanionCookingCommandResult.InventoryFull,
                 TryDepositCompanionInventoryToBank,
                 (CompanionCookingController skillController, float scanRadius, out CompanionCookingCommandResult retryResult) =>
                     skillController.TryStartAreaCooking(scanRadius, out retryResult));
-        }
-
-        private static void PublishCookingStartMessage()
-        {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string line = CompanionChatLibrary.GetRandomCompanionCookingStartLine();
-            if (string.IsNullOrWhiteSpace(line))
-                return;
-
-            chat.PublishCompanionMessage(GetCompanionDisplayName(), line);
         }
 
         /// <summary>
