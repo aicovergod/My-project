@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b10e51f70ea2aa384b95044d2aa48d5a34a2c9ed -->
+## 2025-10-29T23:59:45+00:00 — Merge pull request #1545 from aicovergod/codex/fix-console-bug-in-companionmanager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 7 ++ / 2 --
+- Notes:
+  Fix companion cooking command result capture
+---
+<!-- commit:56eb38f6c7d8ab5dfb2841077e037ab9bbface46 -->
+## 2025-10-29T23:59:30+00:00 — Fix companion cooking command result capture
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 7 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:4bc6df8be67bd9c91a16b2ef9243287c2617ab0b -->
 ## 2025-10-29T23:55:57+00:00 — Merge pull request #1544 from aicovergod/codex/fix-console-errors-in-fishingcontroller-and-manager
 
