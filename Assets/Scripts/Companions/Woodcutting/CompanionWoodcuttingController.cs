@@ -1121,21 +1121,23 @@ namespace Companions
 
         private void OnDisable()
         {
-            CancelWoodcutting(true);
-            BindToPlayerWoodcuttingSkill(null);
-            blockedNodes.Clear();
-            blockedNodePruneBuffer.Clear();
-            areaAllCandidatesBlocked = false;
-            ResetStuckHistory();
+            HandleDisable(
+                () => CancelWoodcutting(true),
+                () => BindToPlayerWoodcuttingSkill(null),
+                () => playerProtectedSingleLog.Clear());
         }
 
         private void OnDestroy()
         {
-            if (woodcuttingSkill != null)
-                woodcuttingSkill.OnStopChopping -= HandleWoodcuttingStopped;
-
-            CancelWoodcutting(true);
-            BindToPlayerWoodcuttingSkill(null);
+            HandleDestroy(
+                () => CancelWoodcutting(true),
+                () => BindToPlayerWoodcuttingSkill(null),
+                () =>
+                {
+                    if (woodcuttingSkill != null)
+                        woodcuttingSkill.OnStopChopping -= HandleWoodcuttingStopped;
+                },
+                () => playerProtectedSingleLog.Clear());
         }
 
         private void OnDrawGizmosSelected()

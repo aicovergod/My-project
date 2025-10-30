@@ -1064,21 +1064,23 @@ namespace Companions
 
         private void OnDisable()
         {
-            CancelFishing(true);
-            BindToPlayerFishingSkill(null);
-            blockedNodes.Clear();
-            blockedNodePruneBuffer.Clear();
-            areaAllCandidatesBlocked = false;
-            ResetStuckHistory();
+            HandleDisable(
+                () => CancelFishing(true),
+                () => BindToPlayerFishingSkill(null),
+                () => playerActiveSpot = null);
         }
 
         private void OnDestroy()
         {
-            if (fishingSkill != null)
-                fishingSkill.OnStopFishing -= HandleFishingStopped;
-
-            CancelFishing(true);
-            BindToPlayerFishingSkill(null);
+            HandleDestroy(
+                () => CancelFishing(true),
+                () => BindToPlayerFishingSkill(null),
+                () =>
+                {
+                    if (fishingSkill != null)
+                        fishingSkill.OnStopFishing -= HandleFishingStopped;
+                },
+                () => playerActiveSpot = null);
         }
 
         private void OnDrawGizmosSelected()

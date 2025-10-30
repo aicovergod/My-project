@@ -1100,21 +1100,23 @@ namespace Companions
 
         private void OnDisable()
         {
-            CancelMining(true);
-            BindToPlayerMiningSkill(null);
-            blockedNodes.Clear();
-            blockedNodePruneBuffer.Clear();
-            areaAllCandidatesBlocked = false;
-            ResetStuckHistory();
+            HandleDisable(
+                () => CancelMining(true),
+                () => BindToPlayerMiningSkill(null),
+                () => playerProtectedSingleOre.Clear());
         }
 
         private void OnDestroy()
         {
-            if (miningSkill != null)
-                miningSkill.OnStopMining -= HandleMiningStopped;
-
-            CancelMining(true);
-            BindToPlayerMiningSkill(null);
+            HandleDestroy(
+                () => CancelMining(true),
+                () => BindToPlayerMiningSkill(null),
+                () =>
+                {
+                    if (miningSkill != null)
+                        miningSkill.OnStopMining -= HandleMiningStopped;
+                },
+                () => playerProtectedSingleOre.Clear());
         }
 
         private void OnDrawGizmosSelected()
