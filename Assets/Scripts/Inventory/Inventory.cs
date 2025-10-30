@@ -17,16 +17,6 @@ using Object = UnityEngine.Object;
 namespace Inventory
 {
     /// <summary>
-    /// Indicates how a stack split action should be handled.
-    /// </summary>
-    public enum StackSplitType
-    {
-        Drop,
-        Sell,
-        Split
-    }
-
-    /// <summary>
     /// Runtime inventory UI generator (Screen Space Overlay). The UI is created at scene root,
     /// starts inactive, and shows always-visible slot squares. If a slotFrameSprite is provided, it is used
     /// as the slot frame (set to Sliced).

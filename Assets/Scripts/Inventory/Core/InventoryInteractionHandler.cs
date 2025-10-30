@@ -411,11 +411,6 @@ namespace Inventory.Core
             DropItem(evt.SlotIndex, evt.Quantity);
         }
 
-        private void HandleSplitPromptRequested(InventoryWindowController _, InventoryWindowController.StackSplitPromptEvent evt)
-        {
-            ShowStackSplitPrompt(evt.SlotIndex, evt.SplitType);
-        }
-
         private void HandleSlotClicked(InventoryWindowController _, InventoryWindowController.SlotClickEvent evt)
         {
             controller.DismissContextMenus();
@@ -435,10 +430,16 @@ namespace Inventory.Core
 
             if (HasActiveShop && evt.Button == PointerEventData.InputButton.Left)
             {
+                var entry = model.GetEntry(index);
                 if (evt.ShiftHeld)
-                    ShowStackSplitPrompt(index, StackSplitType.Sell);
+                {
+                    if (entry.item != null)
+                        SellItem(index, entry.count);
+                }
                 else
+                {
                     SellItem(index, 1);
+                }
                 return;
             }
 
@@ -521,8 +522,25 @@ namespace Inventory.Core
 
             if (evt.ShiftHeld)
             {
-                ShowStackSplitPrompt(index, StackSplitType.Drop);
-                return;
+                if (entry.item == null)
+                    return;
+
+                if (IsCompanionOwner)
+                {
+                    // Companion inventories use shift-right click as a quick transfer into the player inventory.
+                    if (TryTransferToPlayerInventory(index))
+                    {
+                        controller.DismissTooltip();
+                        return;
+                    }
+                }
+                else
+                {
+                    // Player inventories use shift-right click to instantly drop the full stack.
+                    DropItem(index, entry.count);
+                    controller.DismissTooltip();
+                    return;
+                }
             }
 
             if (entry.item == null)
@@ -719,10 +737,7 @@ namespace Inventory.Core
                     if (!CanDropItems)
                         break;
 
-                    if (entry.count > 1)
-                        controller.ShowDropMenu(slotIndex, evt.PointerPosition);
-                    else
-                        DropItem(slotIndex, 1);
+                    DropItem(slotIndex, entry.count);
                     break;
 
                 case InventoryItemContextAction.Transfer:
@@ -1151,40 +1166,6 @@ namespace Inventory.Core
             controller.DismissTooltip();
         }
 
-        private void ShowStackSplitPrompt(int slotIndex, StackSplitType type)
-        {
-            if (slotIndex < 0 || slotIndex >= model.Size)
-                return;
-
-            var entry = model.GetEntry(slotIndex);
-            if (entry.item == null || entry.count <= 1)
-                return;
-
-            if (type == StackSplitType.Drop && entry.item.isUndroppable)
-            {
-                PublishUndroppableItemMessage();
-                return;
-            }
-
-            controller.DismissContextMenus();
-            StackSplitDialog.Show(controller.UiRoot.transform, entry.count, amount =>
-            {
-                amount = Mathf.Clamp(amount, 1, entry.count);
-                switch (type)
-                {
-                    case StackSplitType.Drop:
-                        DropItem(slotIndex, amount);
-                        break;
-                    case StackSplitType.Sell:
-                        SellItem(slotIndex, amount);
-                        break;
-                    case StackSplitType.Split:
-                        model.SplitStack(slotIndex, amount);
-                        break;
-                }
-            });
-        }
-
         private void SpawnGroundItem(ItemData item, int amount)
         {
             if (item == null || amount <= 0)
@@ -1378,7 +1359,6 @@ namespace Inventory.Core
 
             controller.SlotClicked += HandleSlotClicked;
             controller.DropRequested += HandleDropRequested;
-            controller.SplitPromptRequested += HandleSplitPromptRequested;
             controller.DragDropRequested += HandleDragDropRequested;
             controller.DragCancelled += HandleDragCancelled;
             controller.ContextActionSelected += HandleContextActionSelected;
@@ -1392,7 +1372,6 @@ namespace Inventory.Core
 
             controller.SlotClicked -= HandleSlotClicked;
             controller.DropRequested -= HandleDropRequested;
-            controller.SplitPromptRequested -= HandleSplitPromptRequested;
             controller.DragDropRequested -= HandleDragDropRequested;
             controller.DragCancelled -= HandleDragCancelled;
             controller.ContextActionSelected -= HandleContextActionSelected;

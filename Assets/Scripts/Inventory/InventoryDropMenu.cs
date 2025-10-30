@@ -56,7 +56,6 @@ namespace Inventory
 
             CreateButton("Drop 1", () => OnSelection(DropMenuSelection.DropOne));
             CreateButton("Drop All", () => OnSelection(DropMenuSelection.DropAll));
-            CreateButton("Drop X", () => OnSelection(DropMenuSelection.DropX));
         }
 
         private void CreateButton(string label, UnityAction onClick)
