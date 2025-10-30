@@ -57,7 +57,6 @@ namespace Companions
 
         private MiningSkill playerMiningSkill;
         private Transform playerTransform;
-        private CompanionSkillCooldownTracker skillCooldownTracker;
 
         /// <summary>
         /// True while the mining controller has an active mining routine or the underlying skill reports mining activity.
@@ -79,44 +78,35 @@ namespace Companions
             Transform player,
             CompanionSkillCooldownTracker cooldownTracker)
         {
-            if (ownerController == null && CompanionManager.EnableDebugLogging)
-                Debug.LogWarning("[Companion Mining] Initialise invoked without a companion controller reference.", this);
-
-            if (skills == null && CompanionManager.EnableDebugLogging)
-                Debug.LogWarning("[Companion Mining] Initialise received a null SkillManager reference.", this);
-
             skillManager = skills;
-            inventory = inventoryComponent != null ? inventoryComponent.InventoryComponent : null;
+            RuntimeInventory resolvedInventory;
+            CompanionEquipment resolvedEquipment;
 
-            if (inventory == null && CompanionManager.EnableDebugLogging)
-                Debug.LogWarning("[Companion Mining] No inventory available for tool checks.", this);
+            ConfigureGatheringSkill(
+                ownerController,
+                skills,
+                inventoryComponent,
+                companionEquipment,
+                cooldownTracker,
+                "Companion Mining",
+                skill =>
+                {
+                    miningSkill = skill;
+                    miningSkill.OnStopMining -= HandleMiningStopped;
+                    miningSkill.OnStopMining += HandleMiningStopped;
+                    miningSkill.ConfigureCompanionChat(CompanionManager.GetCompanionDisplayName);
+                },
+                () =>
+                {
+                    miningActive = false;
+                    suppressMiningStopCallback = false;
+                    playerProtectedSingleOre.Clear();
+                },
+                out resolvedInventory,
+                out resolvedEquipment);
 
-            companionEquipment = ownerController != null ? ownerController.Equipment : null;
-
-            miningSkill = GetComponent<MiningSkill>();
-            if (miningSkill == null)
-                miningSkill = gameObject.AddComponent<MiningSkill>();
-
-            if (miningSkill != null)
-            {
-                miningSkill.OnStopMining -= HandleMiningStopped;
-                miningSkill.OnStopMining += HandleMiningStopped;
-                miningSkill.ConfigureCompanionChat(CompanionManager.GetCompanionDisplayName);
-            }
-            else if (CompanionManager.EnableDebugLogging)
-            {
-                Debug.LogError("[Companion Mining] Failed to resolve MiningSkill component.", this);
-            }
-
-            InitialiseMovementComponents();
-            ResetFollowerState();
-
-            miningActive = false;
-            followerDisabledForGathering = false;
-            areaRoutineActive = false;
-            activeAreaRadius = 0f;
-
-            skillCooldownTracker = cooldownTracker;
+            inventory = resolvedInventory;
+            companionEquipment = resolvedEquipment;
 
             RebindPlayer(player);
         }

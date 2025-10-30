@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Companions.Equipment;
+using Skills;
 using UnityEngine;
 using Util;
+using RuntimeInventory = global::Inventory.Inventory;
 
 namespace Companions
 {
@@ -63,6 +66,9 @@ namespace Companions
 
         /// <summary>Indicates whether this controller currently owns the follower hold.</summary>
         protected bool followerDisabledForGathering;
+
+        /// <summary>Cooldown tracker shared across the gathering controllers.</summary>
+        protected CompanionSkillCooldownTracker skillCooldownTracker;
 
         /// <summary>Last node that triggered the stuck handler.</summary>
         protected TNode lastStuckNode;
@@ -222,6 +228,74 @@ namespace Companions
             followerDisabledForGathering = true;
             followerHoldToggledFollower = toggledFollower;
             return new FollowerHold(this);
+        }
+
+        /// <summary>
+        /// Consolidates the shared gathering skill initialisation sequence so fishing, mining, and woodcutting
+        /// controllers only provide skill-specific wiring.
+        /// </summary>
+        /// <typeparam name="TSkill">Concrete skill component that should be bound to the controller.</typeparam>
+        /// <param name="ownerController">Controller that owns this component.</param>
+        /// <param name="skills">Skill manager used for level validations.</param>
+        /// <param name="inventoryComponent">Inventory wrapper exposing the companion backpack.</param>
+        /// <param name="equipmentComponent">Equipment window associated with the companion.</param>
+        /// <param name="cooldownTracker">Shared cooldown tracker used to coordinate gathering requests.</param>
+        /// <param name="debugLabel">Label appended to debug output.</param>
+        /// <param name="configureSkill">Invoked with the resolved skill to wire events and chat hooks.</param>
+        /// <param name="resetSkillSpecificFlags">Callback that resets derived-class state after the shared reset.</param>
+        /// <param name="resolvedInventory">Outputs the resolved runtime inventory.</param>
+        /// <param name="resolvedEquipment">Outputs the resolved companion equipment reference.</param>
+        /// <returns>The resolved skill component or <c>null</c> when it could not be created.</returns>
+        protected TSkill ConfigureGatheringSkill<TSkill>(
+            CompanionController ownerController,
+            SkillManager skills,
+            CompanionInventory inventoryComponent,
+            CompanionEquipment equipmentComponent,
+            CompanionSkillCooldownTracker cooldownTracker,
+            string debugLabel,
+            Action<TSkill> configureSkill,
+            Action resetSkillSpecificFlags,
+            out RuntimeInventory resolvedInventory,
+            out CompanionEquipment resolvedEquipment)
+            where TSkill : Component
+        {
+            if (ownerController == null && CompanionManager.EnableDebugLogging)
+                Debug.LogWarning($"[{debugLabel}] Initialise invoked without a companion controller reference.", this);
+
+            if (skills == null && CompanionManager.EnableDebugLogging)
+                Debug.LogWarning($"[{debugLabel}] Initialise received a null SkillManager reference.", this);
+
+            resolvedInventory = inventoryComponent != null ? inventoryComponent.InventoryComponent : null;
+            if (resolvedInventory == null && CompanionManager.EnableDebugLogging)
+                Debug.LogWarning($"[{debugLabel}] No inventory available for tool checks.", this);
+
+            resolvedEquipment = equipmentComponent ?? ownerController?.Equipment;
+
+            var skill = GetComponent<TSkill>() ?? gameObject.AddComponent<TSkill>();
+
+            if (skill != null)
+            {
+                configureSkill?.Invoke(skill);
+            }
+            else if (CompanionManager.EnableDebugLogging)
+            {
+                Debug.LogError($"[{debugLabel}] Failed to resolve {typeof(TSkill).Name} component.", this);
+            }
+
+            InitialiseMovementComponents();
+            ResetFollowerState();
+            ResetStuckHistoryInternal();
+
+            areaRoutineActive = false;
+            followerDisabledForGathering = false;
+            areaAllCandidatesBlocked = false;
+            activeAreaRadius = 0f;
+
+            skillCooldownTracker = cooldownTracker;
+
+            resetSkillSpecificFlags?.Invoke();
+
+            return skill;
         }
 
         /// <summary>

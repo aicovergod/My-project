@@ -66,7 +66,6 @@ namespace Companions
         private Transform playerTransform;
         private FishingSkill playerFishingSkill;
         private FishableSpot playerActiveSpot;
-        private CompanionSkillCooldownTracker skillCooldownTracker;
 
         /// <summary>
         /// True while the fishing controller has an active routine or the underlying skill reports fishing activity.
@@ -88,46 +87,35 @@ namespace Companions
             Transform player,
             CompanionSkillCooldownTracker cooldownTracker)
         {
-            if (ownerController == null && CompanionManager.EnableDebugLogging)
-                Debug.LogWarning("[Companion Fishing] Initialise invoked without a companion controller reference.", this);
-
-            if (skills == null && CompanionManager.EnableDebugLogging)
-                Debug.LogWarning("[Companion Fishing] Initialise received a null SkillManager reference.", this);
-
             skillManager = skills;
-            inventory = inventoryComponent != null ? inventoryComponent.InventoryComponent : null;
+            RuntimeInventory resolvedInventory;
+            CompanionEquipment resolvedEquipment;
 
-            if (inventory == null && CompanionManager.EnableDebugLogging)
-                Debug.LogWarning("[Companion Fishing] No inventory available for tool checks.", this);
+            ConfigureGatheringSkill(
+                ownerController,
+                skills,
+                inventoryComponent,
+                companionEquipment,
+                cooldownTracker,
+                "Companion Fishing",
+                skill =>
+                {
+                    fishingSkill = skill;
+                    fishingSkill.OnStopFishing -= HandleFishingStopped;
+                    fishingSkill.OnStopFishing += HandleFishingStopped;
+                    fishingSkill.ConfigureCompanionChat(CompanionManager.GetCompanionDisplayName);
+                },
+                () =>
+                {
+                    fishingActive = false;
+                    suppressFishingStopCallback = false;
+                    itemCache = new Dictionary<string, ItemData>();
+                },
+                out resolvedInventory,
+                out resolvedEquipment);
 
-            companionEquipment = ownerController != null ? ownerController.Equipment : null;
-
-            fishingSkill = GetComponent<FishingSkill>();
-            if (fishingSkill == null)
-                fishingSkill = gameObject.AddComponent<FishingSkill>();
-
-            if (fishingSkill != null)
-            {
-                fishingSkill.OnStopFishing -= HandleFishingStopped;
-                fishingSkill.OnStopFishing += HandleFishingStopped;
-                fishingSkill.ConfigureCompanionChat(CompanionManager.GetCompanionDisplayName);
-            }
-            else if (CompanionManager.EnableDebugLogging)
-            {
-                Debug.LogError("[Companion Fishing] Failed to resolve FishingSkill component.", this);
-            }
-
-            InitialiseMovementComponents();
-            ResetFollowerState();
-
-            fishingActive = false;
-            areaRoutineActive = false;
-            followerDisabledForGathering = false;
-            areaAllCandidatesBlocked = false;
-            activeAreaRadius = 0f;
-            itemCache = new Dictionary<string, ItemData>();
-
-            skillCooldownTracker = cooldownTracker;
+            inventory = resolvedInventory;
+            companionEquipment = resolvedEquipment;
 
             RebindPlayer(player);
         }
