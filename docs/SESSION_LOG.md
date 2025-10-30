@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c3a2f7ca626f0e5733a59e372067033b261ce326 -->
+## 2025-10-30T17:00:57+00:00 — Add companion tool ownership utility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Companions/Common/CompanionToolOwnershipUtility.cs, Assets/Scripts/Companions/Common/CompanionToolOwnershipUtility.cs.meta, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 94 ++ / 44 --
+- Notes:
+  —
+---
 <!-- commit:f15f6817099653c1715bc5a61e2e4afb4b3061db -->
 ## 2025-10-30T16:41:02+00:00 — Merge pull request #1561 from aicovergod/codex/create-companion-tool-selector-helper
 
