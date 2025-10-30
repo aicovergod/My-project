@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Companions;
 using Player;
 using UI.Chat;
@@ -37,7 +38,6 @@ namespace Environment.WorldObjects
         private PlayerHitpoints playerHitpoints;
         private Collider2D playerCollider;
 
-        private int contactTickCounter;
         private bool playerInsideArea;
         private bool tickerSubscribed;
         private bool nettleDialogueTriggered;
@@ -93,6 +93,7 @@ namespace Environment.WorldObjects
         /// <inheritdoc />
         public void OnTick()
         {
+            StingingNettleContactCoordinator.BeginTick();
             TickGlobalDialogueCooldown();
             UpdateNettleDialogueCooldown();
 
@@ -118,7 +119,6 @@ namespace Environment.WorldObjects
             if (!playerInsideArea)
             {
                 playerInsideArea = true;
-                contactTickCounter = 0;
                 TryEmitCompanionDialogue();
                 if (enableDebugLogging)
                 {
@@ -126,14 +126,13 @@ namespace Environment.WorldObjects
                 }
             }
 
-            contactTickCounter++;
-            if (contactTickCounter < ticksBetweenDamage)
-            {
-                return;
-            }
+            StingingNettleContactCoordinator.RegisterContact(this, ticksBetweenDamage);
+            StingingNettleContactCoordinator.MarkContactActiveThisTick(this);
 
-            contactTickCounter = 0;
-            ApplyDamage();
+            if (StingingNettleContactCoordinator.ShouldApplyDamage(this))
+            {
+                ApplyDamage();
+            }
         }
 
         private void ApplyDamage()
@@ -214,8 +213,197 @@ namespace Environment.WorldObjects
 
         private void ResetContactState()
         {
+            if (playerInsideArea && enableDebugLogging)
+            {
+                Debug.Log($"{DebugLogPrefix} Player exited hazard tile.", this);
+            }
+
             playerInsideArea = false;
-            contactTickCounter = 0;
+            StingingNettleContactCoordinator.UnregisterContact(this);
+        }
+
+        /// <summary>
+        /// Centralises the player's contact state across every nettle hazard so damage ticks
+        /// are shared instead of stacking per overlapping instance.
+        /// </summary>
+        private static class StingingNettleContactCoordinator
+        {
+            private static readonly Dictionary<StingingNettleHazard, int> ActiveHazards = new Dictionary<StingingNettleHazard, int>();
+
+            private static readonly TickListener SharedTickListener = new TickListener();
+
+            private static int sharedContactTickCounter;
+            private static int currentTickId;
+            private static int lastProcessedTickId = -1;
+            private static int lastContactIncrementTickId = -1;
+            private static int pendingClearTickId = -1;
+            private static bool damageAppliedThisTick;
+            private static bool tickListenerSubscribed;
+            private static Ticker cachedTicker;
+
+            /// <summary>
+            /// Ensures the shared tick listener is registered before hazards subscribe so we can track tick boundaries reliably.
+            /// </summary>
+            public static void EnsureTickListener()
+            {
+                Ticker ticker = Ticker.Instance;
+                if (ticker == null)
+                {
+                    tickListenerSubscribed = false;
+                    cachedTicker = null;
+                    sharedContactTickCounter = 0;
+                    currentTickId = 0;
+                    lastProcessedTickId = -1;
+                    lastContactIncrementTickId = -1;
+                    pendingClearTickId = -1;
+                    damageAppliedThisTick = false;
+                    return;
+                }
+
+                if (cachedTicker != ticker)
+                {
+                    cachedTicker = ticker;
+                    tickListenerSubscribed = false;
+                    currentTickId = 0;
+                    lastProcessedTickId = -1;
+                    lastContactIncrementTickId = -1;
+                    pendingClearTickId = -1;
+                    damageAppliedThisTick = false;
+                    sharedContactTickCounter = 0;
+                }
+
+                if (!tickListenerSubscribed)
+                {
+                    ticker.Subscribe(SharedTickListener);
+                    tickListenerSubscribed = true;
+                }
+            }
+
+            /// <summary>
+            /// Prepares the coordinator for a new tick and ensures per-tick flags reset only once.
+            /// </summary>
+            public static void BeginTick()
+            {
+                EnsureTickListener();
+
+                if (currentTickId == lastProcessedTickId)
+                {
+                    return;
+                }
+
+                lastProcessedTickId = currentTickId;
+                damageAppliedThisTick = false;
+
+                if (pendingClearTickId >= 0 && currentTickId > pendingClearTickId)
+                {
+                    sharedContactTickCounter = 0;
+                    lastContactIncrementTickId = -1;
+                    pendingClearTickId = -1;
+                }
+                else if (ActiveHazards.Count == 0)
+                {
+                    sharedContactTickCounter = 0;
+                    lastContactIncrementTickId = -1;
+                }
+            }
+
+            /// <summary>
+            /// Registers or refreshes a hazard that currently overlaps the player.
+            /// </summary>
+            public static void RegisterContact(StingingNettleHazard hazard, int ticksBetweenDamage)
+            {
+                ActiveHazards[hazard] = Mathf.Max(1, ticksBetweenDamage);
+                pendingClearTickId = -1;
+            }
+
+            /// <summary>
+            /// Records that at least one hazard touched the player during the current tick and advances the shared counter.
+            /// </summary>
+            public static void MarkContactActiveThisTick(StingingNettleHazard hazard)
+            {
+                if (!ActiveHazards.ContainsKey(hazard) || ActiveHazards.Count == 0)
+                {
+                    return;
+                }
+
+                if (lastContactIncrementTickId == currentTickId)
+                {
+                    return;
+                }
+
+                lastContactIncrementTickId = currentTickId;
+                sharedContactTickCounter++;
+            }
+
+            /// <summary>
+            /// Removes a hazard from the contact set when the player exits or the hazard disables.
+            /// </summary>
+            public static void UnregisterContact(StingingNettleHazard hazard)
+            {
+                if (!ActiveHazards.Remove(hazard))
+                {
+                    return;
+                }
+
+                if (ActiveHazards.Count == 0)
+                {
+                    pendingClearTickId = currentTickId;
+                }
+            }
+
+            /// <summary>
+            /// Determines whether this hazard should apply damage on the current tick.
+            /// Only one hazard will succeed each tick even if multiple overlap the player.
+            /// </summary>
+            public static bool ShouldApplyDamage(StingingNettleHazard hazard)
+            {
+                if (!ActiveHazards.ContainsKey(hazard))
+                {
+                    return false;
+                }
+
+                if (ActiveHazards.Count == 0)
+                {
+                    return false;
+                }
+
+                int requiredTicks = int.MaxValue;
+                foreach (var kvp in ActiveHazards)
+                {
+                    if (kvp.Value < requiredTicks)
+                    {
+                        requiredTicks = kvp.Value;
+                    }
+                }
+
+                requiredTicks = Mathf.Max(1, requiredTicks);
+
+                if (sharedContactTickCounter < requiredTicks)
+                {
+                    return false;
+                }
+
+                if (damageAppliedThisTick)
+                {
+                    return false;
+                }
+
+                damageAppliedThisTick = true;
+                sharedContactTickCounter = 0;
+                lastContactIncrementTickId = currentTickId;
+                return true;
+            }
+
+            /// <summary>
+            /// Simple ticker proxy that increments the shared tick identifier once per OSRS tick.
+            /// </summary>
+            private sealed class TickListener : ITickable
+            {
+                public void OnTick()
+                {
+                    currentTickId++;
+                }
+            }
         }
 
         private void TryEmitCompanionDialogue()
@@ -314,6 +502,7 @@ namespace Environment.WorldObjects
                 return;
             }
 
+            StingingNettleContactCoordinator.EnsureTickListener();
             Ticker.Instance.Subscribe(this);
             tickerSubscribed = true;
         }
