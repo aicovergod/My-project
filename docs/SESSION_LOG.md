@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0691592483a6576db3d7167bb5f2564270cf5845 -->
+## 2025-10-30T10:34:26+00:00 — Merge pull request #1549 from aicovergod/codex/add-stinging-nettle-script-to-worldobjects
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 355 ++ / 0 --
+- Notes:
+  Add stinging nettle hazard damage handling
+---
+<!-- commit:084ca39bc2aab2115249d549a6f6c472c1946dba -->
+## 2025-10-30T10:32:09+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:a14303ed9ef70fb987630de433985e8e5bae630d -->
 ## 2025-10-30T10:31:55+00:00 — Add stinging nettle hazard damage system
 
