@@ -383,54 +383,30 @@ namespace Companions
 
         private void HandleWoodcuttingStuck(TreeNode tree)
         {
-            if (CompanionManager.EnableDebugLogging)
+            ExecuteGatheringStuckRecovery(new GatheringStuckRecoveryParameters
             {
-                string treeName = tree != null ? tree.name : "<null>";
-                Debug.Log($"[Companion Woodcutting] Detected a stuck state while targeting {treeName}.", this);
-            }
-
-            float now = Time.time;
-            if (tree != null)
-                MarkNodeBlocked(tree, now + stuckTimeoutSeconds);
-
-            if (woodcuttingSkill != null && woodcuttingSkill.IsChopping)
-            {
-                suppressWoodcuttingStopCallback = true;
-                woodcuttingSkill.StopChopping();
-                suppressWoodcuttingStopCallback = false;
-            }
-
-            CleanupAfterWoodcutting(true);
-            woodcuttingRoutine = null;
-            woodcuttingActive = false;
-
-            pathMover?.ResetFollowTracking();
-
-            if (petFollower != null && playerTransform != null)
-                petFollower.SetPlayer(playerTransform);
-
-            if (tree != null)
-            {
-                if (tree == lastStuckNode)
+                Node = tree,
+                DebugLabel = "Companion Woodcutting",
+                BuildDebugMessage = target =>
                 {
-                    consecutiveStuckNodeCount++;
-                }
-                else
+                    string treeName = target != null ? target.name : "<null>";
+                    return $"[Companion Woodcutting] Detected a stuck state while targeting {treeName}.";
+                },
+                ShouldStopSkill = () => woodcuttingSkill != null && woodcuttingSkill.IsChopping,
+                SetStopCallbackSuppressed = value => suppressWoodcuttingStopCallback = value,
+                StopSkill = () =>
                 {
-                    lastStuckNode = tree;
-                    consecutiveStuckNodeCount = 1;
-                }
-            }
-            else
-            {
-                lastStuckNode = null;
-                consecutiveStuckNodeCount = 0;
-            }
-
-            if (consecutiveStuckNodeCount >= ConsecutiveStuckCancelThreshold)
-            {
-                CancelWoodcuttingDueToStuck();
-            }
+                    if (woodcuttingSkill != null)
+                        woodcuttingSkill.StopChopping();
+                },
+                CleanupCallback = () => CleanupAfterWoodcutting(true),
+                AdditionalStateReset = () =>
+                {
+                    woodcuttingRoutine = null;
+                    woodcuttingActive = false;
+                },
+                OnThresholdReached = (_, __) => CancelWoodcuttingDueToStuck(),
+            });
         }
 
         private bool TryPrepareWoodcuttingCommand(

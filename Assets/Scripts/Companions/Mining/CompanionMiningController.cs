@@ -383,54 +383,30 @@ namespace Companions
 
         private void HandleMiningStuck(MineableRock rock)
         {
-            if (CompanionManager.EnableDebugLogging)
+            ExecuteGatheringStuckRecovery(new GatheringStuckRecoveryParameters
             {
-                string rockName = rock != null ? rock.name : "<null>";
-                Debug.Log($"[Companion Mining] Detected a stuck state while targeting {rockName}.", this);
-            }
-
-            float now = Time.time;
-            if (rock != null)
-                MarkNodeBlocked(rock, now + stuckTimeoutSeconds);
-
-            if (miningSkill != null && miningSkill.IsMining)
-            {
-                suppressMiningStopCallback = true;
-                miningSkill.StopMining();
-                suppressMiningStopCallback = false;
-            }
-
-            CleanupAfterMining(true);
-            miningRoutine = null;
-            miningActive = false;
-
-            pathMover?.ResetFollowTracking();
-
-            if (petFollower != null && playerTransform != null)
-                petFollower.SetPlayer(playerTransform);
-
-            if (rock != null)
-            {
-                if (rock == lastStuckNode)
+                Node = rock,
+                DebugLabel = "Companion Mining",
+                BuildDebugMessage = target =>
                 {
-                    consecutiveStuckNodeCount++;
-                }
-                else
+                    string rockName = target != null ? target.name : "<null>";
+                    return $"[Companion Mining] Detected a stuck state while targeting {rockName}.";
+                },
+                ShouldStopSkill = () => miningSkill != null && miningSkill.IsMining,
+                SetStopCallbackSuppressed = value => suppressMiningStopCallback = value,
+                StopSkill = () =>
                 {
-                    lastStuckNode = rock;
-                    consecutiveStuckNodeCount = 1;
-                }
-            }
-            else
-            {
-                lastStuckNode = null;
-                consecutiveStuckNodeCount = 0;
-            }
-
-            if (consecutiveStuckNodeCount >= ConsecutiveStuckCancelThreshold)
-            {
-                CancelMiningDueToStuck();
-            }
+                    if (miningSkill != null)
+                        miningSkill.StopMining();
+                },
+                CleanupCallback = () => CleanupAfterMining(true),
+                AdditionalStateReset = () =>
+                {
+                    miningRoutine = null;
+                    miningActive = false;
+                },
+                OnThresholdReached = (_, __) => CancelMiningDueToStuck(),
+            });
         }
 
         private bool TryPrepareMiningCommand(
