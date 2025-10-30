@@ -260,8 +260,7 @@ namespace Inventory.UI
         }
 
         /// <summary>
-        /// Raised when the player selects a drop quantity without using the stack
-        /// split dialog (Drop 1 / Drop All).
+        /// Raised when the player selects a drop quantity using the legacy drop menu.
         /// </summary>
         public readonly struct DropRequestEvent
         {
@@ -275,23 +274,6 @@ namespace Inventory.UI
             public InventoryWindowController Controller { get; }
             public int SlotIndex { get; }
             public int Quantity { get; }
-        }
-
-        /// <summary>
-        /// Raised when the UI needs the gameplay layer to open a stack split dialog.
-        /// </summary>
-        public readonly struct StackSplitPromptEvent
-        {
-            public StackSplitPromptEvent(InventoryWindowController controller, int slotIndex, StackSplitType splitType)
-            {
-                Controller = controller;
-                SlotIndex = slotIndex;
-                SplitType = splitType;
-            }
-
-            public InventoryWindowController Controller { get; }
-            public int SlotIndex { get; }
-            public StackSplitType SplitType { get; }
         }
 
         /// <summary>
@@ -338,7 +320,6 @@ namespace Inventory.UI
 
         public event Action<InventoryWindowController, SlotClickEvent> SlotClicked;
         public event Action<InventoryWindowController, DropRequestEvent> DropRequested;
-        public event Action<InventoryWindowController, StackSplitPromptEvent> SplitPromptRequested;
         public event Action<InventoryWindowController, DragDropEvent> DragDropRequested;
         public event Action<InventoryWindowController> DragCancelled;
         public event Action<InventoryWindowController> CloseRequested;
@@ -356,7 +337,6 @@ namespace Inventory.UI
         private GameObject tooltip;
         private Text tooltipNameText;
         private Text tooltipDescriptionText;
-        private InventoryDropMenu dropMenu;
         private InventoryItemContextMenu itemContextMenu;
         private Vector2 lastContextMenuPointerPosition;
 
@@ -672,9 +652,6 @@ namespace Inventory.UI
                     var entry = model.GetEntry(slotIndex);
                     DropRequested?.Invoke(this, new DropRequestEvent(this, slotIndex, entry.count));
                     break;
-                case DropMenuSelection.DropX:
-                    SplitPromptRequested?.Invoke(this, new StackSplitPromptEvent(this, slotIndex, StackSplitType.Drop));
-                    break;
             }
         }
 
@@ -692,27 +669,16 @@ namespace Inventory.UI
             ContextActionSelected?.Invoke(this, new ItemContextActionEvent(this, slotIndex, action, pointerPosition));
         }
 
-        private void HideDropMenu()
-        {
-            if (dropMenu != null)
-                dropMenu.Hide();
-        }
-
         internal void HideItemContextMenu()
         {
             if (itemContextMenu != null)
                 itemContextMenu.Hide();
         }
 
-        public void DismissDropMenu()
-        {
-            HideDropMenu();
-        }
-
         public void DismissContextMenus()
         {
-            HideDropMenu();
             HideItemContextMenu();
+            lastContextMenuPointerPosition = Vector2.zero;
         }
 
         private void ShowTooltip(int slotIndex, RectTransform slotRect)
@@ -793,17 +759,6 @@ namespace Inventory.UI
         public void DismissTooltip()
         {
             HideTooltip();
-        }
-
-        internal void ShowDropMenu(int slotIndex, Vector2 position)
-        {
-            if (dropMenu == null)
-                return;
-
-            HideTooltip();
-            HideItemContextMenu();
-            lastContextMenuPointerPosition = position;
-            dropMenu.Show(this, slotIndex, position);
         }
 
         internal void ShowItemContextMenu(
@@ -1036,7 +991,6 @@ namespace Inventory.UI
             tooltip.SetActive(false);
 
             Font menuFont = config.StackCountFont != null ? config.StackCountFont : config.DefaultFont;
-            dropMenu = InventoryDropMenu.Create(uiRoot.transform, menuFont);
             itemContextMenu = InventoryItemContextMenu.Create(uiRoot.transform, menuFont);
             if (itemContextMenu != null)
                 itemContextMenu.SelectionRequested += HandleItemContextMenuSelection;
@@ -1065,7 +1019,6 @@ namespace Inventory.UI
             tooltip = null;
             tooltipNameText = null;
             tooltipDescriptionText = null;
-            dropMenu = null;
         }
 
         private void CreateDragIcon(InventoryEntry entry)
@@ -1194,7 +1147,6 @@ namespace Inventory.UI
     public enum DropMenuSelection
     {
         DropOne,
-        DropAll,
-        DropX
+        DropAll
     }
 }
