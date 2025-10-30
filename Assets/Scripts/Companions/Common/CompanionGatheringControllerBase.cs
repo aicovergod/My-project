@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Util;
 
 namespace Companions
 {
@@ -120,6 +121,77 @@ namespace Companions
             public void Dispose()
             {
             }
+        }
+
+        /// <summary>
+        /// Determines the appropriate movement speed when advancing toward a gathering node. Falls back to a
+        /// sensible default when the follower component is not available so manual controllers remain responsive.
+        /// </summary>
+        /// <returns>The speed, in Unity units per second, that should be applied to the navigation routine.</returns>
+        protected float ResolveMoveSpeed()
+        {
+            return petFollower != null ? Mathf.Max(0.1f, petFollower.moveSpeed) : 5f;
+        }
+
+        /// <summary>
+        /// Applies the supplied movement step to the rigidbody (when present) and keeps the companion visuals in sync
+        /// with the last displacement so sprite facing and idle orientation remain consistent across gathering skills.
+        /// </summary>
+        /// <param name="nextPosition">Target world position for the current step.</param>
+        /// <param name="velocity">Velocity that should be assigned to the rigidbody when advancing toward the step.</param>
+        /// <param name="teleported">When true, the rigidbody is repositioned without velocity to avoid interpolation spikes.</param>
+        protected void ApplyMovement(Vector3 nextPosition, Vector2 velocity, bool teleported)
+        {
+            Vector3 currentPosition = body != null ? (Vector3)body.position : transform.position;
+            Vector2 displacement = (Vector2)(nextPosition - currentPosition);
+            Vector2 appliedVelocity = teleported ? Vector2.zero : velocity;
+
+            if (body != null)
+            {
+                if (teleported)
+                {
+                    body.position = nextPosition;
+                    body.linearVelocity = Vector2.zero;
+                }
+                else
+                {
+                    body.MovePosition(nextPosition);
+                    body.linearVelocity = appliedVelocity;
+                }
+            }
+            else
+            {
+                transform.position = nextPosition;
+            }
+
+            UpdateMovementVisuals(displacement, appliedVelocity);
+        }
+
+        /// <summary>
+        /// Updates the sprite orientation and animation vector so the companion continues to face its movement direction,
+        /// even when the step length is extremely small (common when approaching a node).
+        /// </summary>
+        /// <param name="displacement">Raw displacement applied during this step.</param>
+        /// <param name="appliedVelocity">Velocity forwarded to the rigidbody when advancing toward the step.</param>
+        protected void UpdateMovementVisuals(Vector2 displacement, Vector2 appliedVelocity)
+        {
+            Vector2 visualVector = displacement.sqrMagnitude > FacingDeadzoneSqrMagnitude
+                ? displacement
+                : appliedVelocity;
+
+            if (visualVector.sqrMagnitude > FacingDeadzoneSqrMagnitude)
+                lastFacing = Direction8Utility.FromVector(visualVector, allowDiagonals: true, fallback: lastFacing);
+
+            if (petSpriteAnimator != null)
+            {
+                petSpriteAnimator.UpdateVisuals(visualVector);
+                return;
+            }
+
+            if (fallbackSpriteRenderer == null)
+                return;
+
+            fallbackSpriteRenderer.flipX = Direction8Utility.IsFacingLeft(lastFacing);
         }
 
         /// <summary>

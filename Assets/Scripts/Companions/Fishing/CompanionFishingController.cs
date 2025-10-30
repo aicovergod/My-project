@@ -9,7 +9,6 @@ using Skills.Common;
 using Skills.Fishing;
 using UI.Chat;
 using UnityEngine;
-using Util;
 using Companions.Equipment;
 using RuntimeInventory = global::Inventory.Inventory;
 
@@ -1014,59 +1013,6 @@ namespace Companions
             chat.PublishCompanionMessage(
                 CompanionManager.GetCompanionDisplayName(),
                 CompanionFishingDialogueLibrary.GetRandomStuckApologyLine());
-        }
-
-        private float ResolveMoveSpeed()
-        {
-            return petFollower != null ? Mathf.Max(0.1f, petFollower.moveSpeed) : 5f;
-        }
-
-        private void ApplyMovement(Vector3 nextPosition, Vector2 velocity, bool teleported)
-        {
-            Vector3 currentPosition = body != null ? (Vector3)body.position : transform.position;
-            Vector2 displacement = (Vector2)(nextPosition - currentPosition);
-            Vector2 appliedVelocity = teleported ? Vector2.zero : velocity;
-
-            if (body != null)
-            {
-                if (teleported)
-                {
-                    body.position = nextPosition;
-                    body.linearVelocity = Vector2.zero;
-                }
-                else
-                {
-                    body.MovePosition(nextPosition);
-                    body.linearVelocity = appliedVelocity;
-                }
-            }
-            else
-            {
-                transform.position = nextPosition;
-            }
-
-            UpdateMovementVisuals(displacement, appliedVelocity);
-        }
-
-        private void UpdateMovementVisuals(Vector2 displacement, Vector2 appliedVelocity)
-        {
-            Vector2 visualVector = displacement.sqrMagnitude > FacingDeadzoneSqrMagnitude
-                ? displacement
-                : appliedVelocity;
-
-            if (visualVector.sqrMagnitude > FacingDeadzoneSqrMagnitude)
-                lastFacing = Direction8Utility.FromVector(visualVector, allowDiagonals: true, fallback: lastFacing);
-
-            if (petSpriteAnimator != null)
-            {
-                petSpriteAnimator.UpdateVisuals(visualVector);
-                return;
-            }
-
-            if (fallbackSpriteRenderer == null)
-                return;
-
-            fallbackSpriteRenderer.flipX = Direction8Utility.IsFacingLeft(lastFacing);
         }
 
         private void CleanupAfterFishing(bool restoreFollower, bool preserveFollowerLocks = false)
