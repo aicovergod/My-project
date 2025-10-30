@@ -112,18 +112,8 @@ namespace Companions
         /// <summary>Tracks whether verbose companion debug logging is enabled.</summary>
         private static bool enableDebugLogging;
 
-        /// <summary>True once the chat service subscription for inventory full reactions is active.</summary>
-        private static bool chatSubscribed;
-
-        /// <summary>Normalised comparison string for detecting the standard full inventory game message.</summary>
-        private const string PlayerInventoryFullGameMessage = "your inventory is full";
-
-        /// <summary>Normalised comparison string for the combined player and companion inventory message.</summary>
-        private const string PlayerAndCompanionInventoryFullGameMessage =
-            "your inventory and your companion's inventory are full";
-
-        /// <summary>Throttle key used for inventory full chatter.</summary>
-        private const string InventoryFullChatThrottleKey = "InventoryFullMessage";
+        /// <summary>Handles chat-based inventory reactions for the active companion.</summary>
+        private static CompanionChatInventoryResponder chatInventoryResponder;
 
         /// <summary>
         /// Toggle that allows QA to enable or disable verbose companion debug logging from the AdminF2 menu.
@@ -365,7 +355,7 @@ namespace Companions
                     else
                     {
                         EnsureHud();
-                        EnsureChatSubscription();
+                        EnsureChatResponderInitialised();
                         return;
                     }
                 }
@@ -402,7 +392,7 @@ namespace Companions
 
             UpdateCombatLevel();
             EnsureHud();
-            EnsureChatSubscription();
+            EnsureChatResponderInitialised();
             UpdateEquipmentVisibility(false);
             if (!suppressManualSpawnGreeting)
                 PublishRandomManualSpawnMessage();
@@ -465,7 +455,7 @@ namespace Companions
             controller = null;
             companionObject = null;
 
-            RemoveChatSubscription();
+            DisposeChatResponder();
 
             guardModeEnabled = false;
             guardModeLockedByCombatCooldown = false;
@@ -524,36 +514,24 @@ namespace Companions
         }
 
         /// <summary>
-        /// Ensures the chat service is subscribed so the companion can react to full inventory messages.
-        /// Safe to invoke repeatedly as duplicate subscriptions are ignored.
+        /// Ensures the chat responder exists and is ready to process incoming messages.
         /// </summary>
-        private static void EnsureChatSubscription()
+        private static void EnsureChatResponderInitialised()
         {
-            if (chatSubscribed)
-                return;
-
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            chat.MessageReceived -= HandleChatMessageReceived;
-            chat.MessageReceived += HandleChatMessageReceived;
-            chatSubscribed = true;
+            chatInventoryResponder ??= new CompanionChatInventoryResponder();
+            chatInventoryResponder.Initialise();
         }
 
         /// <summary>
-        /// Removes the chat subscription when the companion is despawned so no stray callbacks fire.
+        /// Disposes of the chat responder so no callbacks fire while the companion is inactive.
         /// </summary>
-        private static void RemoveChatSubscription()
+        private static void DisposeChatResponder()
         {
-            if (!chatSubscribed)
+            if (chatInventoryResponder == null)
                 return;
 
-            var chat = ChatService.Instance;
-            if (chat != null)
-                chat.MessageReceived -= HandleChatMessageReceived;
-
-            chatSubscribed = false;
+            chatInventoryResponder.Dispose();
+            chatInventoryResponder = null;
         }
 
         /// <summary>
@@ -568,7 +546,7 @@ namespace Companions
 
             if (controller.gameObject.activeSelf)
             {
-                EnsureChatSubscription();
+                EnsureChatResponderInitialised();
                 return HasActiveCompanion;
             }
 
@@ -577,7 +555,7 @@ namespace Companions
             controller.Equipment?.ForceClosed();
 
             EnsureHud();
-            EnsureChatSubscription();
+            EnsureChatResponderInitialised();
             RefreshMenusAfterRestore();
 
             bool active = HasActiveCompanion;
@@ -1627,107 +1605,6 @@ namespace Companions
         }
 
         /// <summary>
-        /// Reacts to system chat messages so the companion acknowledges when the player's inventory is full.
-        /// Ensures the companion only responds when active and applies a small cooldown to prevent spam.
-        /// </summary>
-        /// <param name="message">Chat message emitted by the game channel.</param>
-        private static void HandleChatMessageReceived(ChatMessage message)
-        {
-            // Default struct instances represent unusable chat lines; guard so we ignore placeholder payloads.
-            if (message.Equals(default))
-                return;
-
-            if (message.Channel == ChatChannel.Game)
-            {
-                HandleGameChatMessage(message);
-                return;
-            }
-
-            if (!message.IsLocalPlayerAuthor)
-                return;
-
-            if (message.Channel != ChatChannel.Companion && message.Channel != ChatChannel.Public)
-                return;
-
-            TryHandleStopChatCommand(message.Text);
-        }
-
-        /// <summary>
-        /// Processes game-channel messages so the companion can acknowledge shared inventory events.
-        /// </summary>
-        private static void HandleGameChatMessage(ChatMessage message)
-        {
-            if (!HasActiveCompanion)
-                return;
-
-            if (string.IsNullOrWhiteSpace(message.Text))
-                return;
-
-            string trimmed = message.Text.Trim();
-            if (trimmed.Length == 0)
-                return;
-
-            string normalised = trimmed.ToLowerInvariant();
-            bool playerInventoryFull = string.Equals(normalised, PlayerInventoryFullGameMessage, StringComparison.Ordinal);
-            bool combinedInventoryFull = string.Equals(normalised, PlayerAndCompanionInventoryFullGameMessage, StringComparison.Ordinal);
-
-            if (!playerInventoryFull && !combinedInventoryFull)
-                return;
-
-            if (!CompanionDialogueThrottle.TryConsume(
-                    InventoryFullChatThrottleKey,
-                    CompanionDialogueThrottle.DefaultDelaySeconds))
-                return;
-
-            string companionLine = combinedInventoryFull
-                ? CompanionChatLibrary.GetRandomPlayerAndCompanionInventoryFullLine()
-                : CompanionChatLibrary.GetRandomPlayerInventoryFullLine();
-            if (string.IsNullOrWhiteSpace(companionLine))
-                return;
-
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string companionName = GetCompanionDisplayName();
-            chat.PublishCompanionMessage(companionName, companionLine);
-
-            if (enableDebugLogging)
-            {
-                string context = combinedInventoryFull ? "(player+companion)" : "(player)";
-                Debug.Log($"[Companion] Reacted to full inventory message {context} with: {companionLine}");
-            }
-        }
-
-        /// <summary>
-        /// Evaluates local-player chat to determine whether a stop command should cancel the active companion action.
-        /// </summary>
-        private static void TryHandleStopChatCommand(string rawText)
-        {
-            if (string.IsNullOrWhiteSpace(rawText))
-                return;
-
-            if (!HasActiveCompanion)
-                return;
-
-            var action = GetActiveAction();
-            if (action == CompanionActiveAction.None)
-                return;
-
-            if (!CompanionChatCommandProcessor.TryHandleStopCommand(action, rawText))
-                return;
-
-            if (!TryCancelCurrentAction())
-                return;
-
-            if (enableDebugLogging)
-            {
-                string trimmed = string.IsNullOrWhiteSpace(rawText) ? string.Empty : rawText.Trim();
-                Debug.Log($"[Companion] Stop command '{trimmed}' cancelled active {action}.");
-            }
-        }
-
-        /// <summary>
         /// Resolves the companion name used for chat output, falling back to a generic label when
         /// no runtime definition is available.
         /// </summary>
@@ -1786,7 +1663,7 @@ namespace Companions
             controller.Despawned -= HandleControllerDespawned;
             controller = null;
             companionObject = null;
-            RemoveChatSubscription();
+            DisposeChatResponder();
             activeDefinition = null;
             inventoryVisible = false;
             storedByPet = false;

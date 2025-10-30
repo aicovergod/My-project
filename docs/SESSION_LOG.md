@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:26fb5ff8b5c84cea0d170647dce4e72742c2aa50 -->
+## 2025-10-30T14:53:40+00:00 — Refactor companion chat inventory responder
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Chat/CompanionChatInventoryResponder.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 182 ++ / 140 --
+- Notes:
+  —
+---
 <!-- commit:5027a0a5b3ef7a2f9e0c3062754655f69a058373 -->
 ## 2025-10-30T14:46:28+00:00 — Merge pull request #1554 from aicovergod/codex/refactor-movement-methods-in-companions
 
