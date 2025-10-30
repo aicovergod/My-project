@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:9fdae5b34990c0315582267d59a88050134dab14 -->
+## 2025-10-30T00:35:32+00:00 — Remove stack split prompts and enable shift-right drops
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Inventory/InventoryDropMenu.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs
+- Diff: 30 ++ / 110 --
+- Notes:
+  —
+---
 <!-- commit:e96c894349b3d94ab4d6bb1914d8f78b9294dc0c -->
 ## 2025-10-30T00:15:30+00:00 — Merge pull request #1546 from aicovergod/codex/refactor-skill-acceptance-logic
 
