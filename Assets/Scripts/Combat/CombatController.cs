@@ -952,52 +952,13 @@ namespace Combat
 
         private void AwardXp(int damage, CombatStyle style, DamageType type)
         {
-            if (damage <= 0)
-                return;
-            hitpoints?.GainHitpointsXP(damage * 1.33f);
-            if (type == DamageType.Magic)
+            var config = new CombatXpDistributor.CombatXpDistributionConfig
             {
-                skills?.AddXP(SkillType.Magic, 4 * damage);
-                return;
-            }
-            if (type == DamageType.Ranged)
-            {
-                float total = 4f * damage;
-                switch (style)
-                {
-                    case CombatStyle.Defensive:
-                    case CombatStyle.Controlled:
-                    case CombatStyle.Longrange:
-                        float split = total * 0.5f;
-                        skills?.AddXP(SkillType.Ranged, split);
-                        skills?.AddXP(SkillType.Defence, split);
-                        break;
-                    default:
-                        skills?.AddXP(SkillType.Ranged, total);
-                        break;
-                }
-                return;
-            }
-            switch (style)
-            {
-                case CombatStyle.Accurate:
-                    skills?.AddXP(SkillType.Attack, 4 * damage);
-                    break;
-                case CombatStyle.Aggressive:
-                    skills?.AddXP(SkillType.Strength, 4 * damage);
-                    break;
-                case CombatStyle.Defensive:
-                    skills?.AddXP(SkillType.Defence, 4 * damage);
-                    break;
-                case CombatStyle.Controlled:
-                    float total = 4f * damage;
-                    int share = Mathf.FloorToInt(total / 3f);
-                    int remainder = Mathf.RoundToInt(total - share * 3);
-                    skills?.AddXP(SkillType.Attack, share);
-                    skills?.AddXP(SkillType.Strength, share);
-                    skills?.AddXP(SkillType.Defence, share + remainder);
-                    break;
-            }
+                AwardHitpointsXp = xp => hitpoints?.GainHitpointsXP(xp),
+                AwardSkillXp = (skill, xp) => skills?.AddXP(skill, xp)
+            };
+
+            CombatXpDistributor.AwardXp(damage, style, type, config);
         }
 
         [ContextMenu("Test/Do Dummy Swing vs Target")]
