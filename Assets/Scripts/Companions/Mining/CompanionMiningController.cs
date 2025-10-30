@@ -323,190 +323,45 @@ namespace Companions
 
         private IEnumerator MineRoutine(MineableRock rock, PickaxeDefinition pickaxe)
         {
-            var followerHold = EnterTemporaryFollowerHold();
-            bool stuckTriggered = false;
-            MineableRock stuckRock = null;
-            float noProgressTimer = 0f;
-            float lastRecordedDistance = 0f;
-            float cumulativeDistanceClosed = 0f;
-            bool hasDistanceSample = false;
-            try
-            {
-                pathMover?.ResetAttackTracking();
+            GatheringMovementRoutineResult routineResult = default;
 
-                while (rock != null && !rock.IsDepleted)
+            yield return CompanionGatheringMovementRoutine(new GatheringMovementRoutineParameters
+            {
+                GetTargetNode = () => rock,
+                IsCommandActive = () => miningActive && currentRock != null && currentRock == rock,
+                IsNodeValid = node => node != null && !node.IsDepleted,
+                GetTargetPosition = node => node.transform.position,
+                IsSkillActive = () => miningSkill != null && miningSkill.IsMining,
+                StartSkill = node =>
                 {
-                    if (!isActiveAndEnabled)
-                        break;
+                    if (!miningActive || currentRock == null || currentRock != node || miningSkill == null)
+                        return;
 
-                    if (!miningActive || currentRock == null || currentRock != rock)
-                        break;
+                    miningSkill.StartMining(node, pickaxe);
+                },
+                StopSkill = () =>
+                {
+                    if (miningSkill != null)
+                        miningSkill.StopMining();
+                },
+                OnProgressStalled = node =>
+                {
+                    if (CompanionManager.EnableDebugLogging)
+                        Debug.Log("[Companion Mining] Movement stalled while approaching the rock.", this);
+                },
+                OnGoalUnreachableDetected = node =>
+                {
+                    if (CompanionManager.EnableDebugLogging)
+                        Debug.Log("[Companion Mining] Navigation reported the rock as unreachable.", this);
+                },
+                OnGoalUnreachable = HandleMiningStuck,
+                OnStuck = HandleMiningStuck,
+                OutOfRangeSkillStopMultiplier = 1.2f,
+                OnRoutineComplete = result => routineResult = result,
+            });
 
-                    Vector3 rockPosition = rock.transform.position;
-                    float distance = Vector2.Distance(transform.position, rockPosition);
-
-                    if (!hasDistanceSample)
-                    {
-                        hasDistanceSample = true;
-                        lastRecordedDistance = distance;
-                        cumulativeDistanceClosed = 0f;
-                        noProgressTimer = 0f;
-                    }
-                    else
-                    {
-                        float delta = lastRecordedDistance - distance;
-                        if (delta > 0f)
-                        {
-                            cumulativeDistanceClosed += delta;
-                        }
-                        else if (delta < 0f)
-                        {
-                            cumulativeDistanceClosed = 0f;
-                        }
-
-                        bool closedGap = cumulativeDistanceClosed >= ProgressResetThreshold;
-                        bool effectivelyClose = distance <= GatheringRange * CloseEnoughDistanceMultiplier;
-                        bool activelyMining = miningSkill != null && miningSkill.IsMining;
-
-                        if (closedGap || effectivelyClose || activelyMining)
-                        {
-                            noProgressTimer = 0f;
-                            cumulativeDistanceClosed = 0f;
-                        }
-                        else
-                        {
-                            noProgressTimer += Time.deltaTime;
-                        }
-
-                        lastRecordedDistance = distance;
-                    }
-
-                    if (noProgressTimer >= stuckTimeoutSeconds)
-                    {
-                        if (CompanionManager.EnableDebugLogging)
-                        {
-                            Debug.Log("[Companion Mining] Movement stalled while approaching the rock.", this);
-                        }
-
-                        stuckTriggered = true;
-                        stuckRock = rock;
-                        break;
-                    }
-
-                    if (distance > GatheringRange)
-                    {
-                        float moveSpeed = ResolveMoveSpeed();
-                        float deltaTime = body != null
-                            ? Mathf.Max(Time.fixedDeltaTime, Mathf.Epsilon)
-                            : Mathf.Max(Time.deltaTime, Mathf.Epsilon);
-
-                        bool navigationStepTaken = false;
-                        bool navigationUnavailable = true;
-
-                        if (pathMover != null && pathMover.isActiveAndEnabled)
-                        {
-                            navigationUnavailable = !pathMover.HasActiveNavigationGrid;
-
-                            if (!navigationUnavailable)
-                            {
-                                Vector2 nextPosition;
-                                Vector2 navVelocity;
-                                bool teleported;
-                                bool goalUnreachable;
-                                // Use an infinite teleport detection threshold so distant rocks never trigger the
-                                // teleport branch inside PetPathMover. This keeps the companion on its path and
-                                // prevents accidental snaps across the nav grid when scanning large radii.
-                                float teleportDetectionDistance = float.PositiveInfinity;
-
-                                navigationStepTaken = pathMover.TryStepAttack(
-                                    deltaTime,
-                                    moveSpeed,
-                                    GatheringRange,
-                                    WaypointTolerance,
-                                    () => rock != null ? (Vector2)rock.transform.position : (Vector2)transform.position,
-                                    ReplanDistance,
-                                    teleportDetectionDistance,
-                                    out nextPosition,
-                                    out navVelocity,
-                                    out teleported,
-                                    out goalUnreachable);
-
-                                if (goalUnreachable)
-                                {
-                                    if (CompanionManager.EnableDebugLogging)
-                                        Debug.Log("[Companion Mining] Navigation reported the rock as unreachable.", this);
-                                    stuckTriggered = true;
-                                    stuckRock = rock;
-                                    break;
-                                }
-
-                                if (navigationStepTaken)
-                                    ApplyMovement(nextPosition, navVelocity, teleported);
-                            }
-                        }
-
-                        if (stuckTriggered)
-                            break;
-
-                        if (!navigationStepTaken)
-                        {
-                            if (navigationUnavailable)
-                            {
-                                Vector3 startPosition = transform.position;
-                                Vector3 nextPosition = Vector3.MoveTowards(startPosition, rockPosition, moveSpeed * deltaTime);
-                                Vector2 velocity = deltaTime > Mathf.Epsilon
-                                    ? (Vector2)((nextPosition - startPosition) / deltaTime)
-                                    : Vector2.zero;
-                                ApplyMovement(nextPosition, velocity, false);
-                            }
-                            else if (body != null)
-                            {
-                                body.linearVelocity = Vector2.zero;
-                            }
-                        }
-
-                        if (miningSkill.IsMining && distance > GatheringRange * 1.2f)
-                            miningSkill.StopMining();
-                    }
-                    else
-                    {
-                        if (body != null)
-                            body.linearVelocity = Vector2.zero;
-
-                        if (!miningActive || currentRock == null || currentRock != rock)
-                            break;
-
-                        if (!miningSkill.IsMining)
-                        {
-                            if (!miningActive || currentRock == null || currentRock != rock)
-                                break;
-
-                            miningSkill.StartMining(rock, pickaxe);
-                        }
-
-                        if (!miningActive || currentRock == null || currentRock != rock)
-                            break;
-
-                        if (!miningSkill.IsMining)
-                            break;
-                    }
-
-                    if (rock == null || rock.IsDepleted)
-                        break;
-
-                    yield return null;
-                }
-            }
-            finally
-            {
-                followerHold.Dispose();
-            }
-
-            if (stuckTriggered)
-            {
-                HandleMiningStuck(stuckRock);
+            if (routineResult.Stuck)
                 yield break;
-            }
 
             miningRoutine = null;
             miningActive = false;

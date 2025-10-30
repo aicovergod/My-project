@@ -526,186 +526,45 @@ namespace Companions
 
         private IEnumerator FishingRoutine(FishableSpot spot, FishingToolDefinition tool)
         {
-            var followerHold = EnterTemporaryFollowerHold();
-            bool stuckTriggered = false;
-            FishableSpot stuckSpot = null;
-            float noProgressTimer = 0f;
-            float lastRecordedDistance = 0f;
-            float cumulativeDistanceClosed = 0f;
-            bool hasDistanceSample = false;
+            GatheringMovementRoutineResult routineResult = default;
 
-            try
+            yield return CompanionGatheringMovementRoutine(new GatheringMovementRoutineParameters
             {
-                pathMover?.ResetAttackTracking();
-
-                while (spot != null && !spot.IsDepleted)
+                GetTargetNode = () => spot,
+                IsCommandActive = () => fishingActive && currentSpot != null && currentSpot == spot,
+                IsNodeValid = node => node != null && !node.IsDepleted,
+                GetTargetPosition = node => node.transform.position,
+                IsSkillActive = () => fishingSkill != null && fishingSkill.IsFishing,
+                StartSkill = node =>
                 {
-                    if (!isActiveAndEnabled)
-                        break;
+                    if (!fishingActive || currentSpot == null || currentSpot != node || fishingSkill == null)
+                        return;
 
-                    if (!fishingActive || currentSpot == null || currentSpot != spot)
-                        break;
+                    fishingSkill.StartFishing(node, tool);
+                },
+                StopSkill = () =>
+                {
+                    if (fishingSkill != null)
+                        fishingSkill.StopFishing();
+                },
+                OnProgressStalled = node =>
+                {
+                    if (CompanionManager.EnableDebugLogging)
+                        Debug.Log("[Companion Fishing] Movement stalled while approaching the spot.", this);
+                },
+                OnGoalUnreachableDetected = node =>
+                {
+                    if (CompanionManager.EnableDebugLogging)
+                        Debug.Log("[Companion Fishing] Navigation reported the spot as unreachable.", this);
+                },
+                OnGoalUnreachable = HandleFishingStuck,
+                OnStuck = HandleFishingStuck,
+                OutOfRangeSkillStopMultiplier = 1.2f,
+                OnRoutineComplete = result => routineResult = result,
+            });
 
-                    Vector3 targetPosition = spot.transform.position;
-                    float distance = Vector2.Distance(transform.position, targetPosition);
-
-                    if (!hasDistanceSample)
-                    {
-                        hasDistanceSample = true;
-                        lastRecordedDistance = distance;
-                        cumulativeDistanceClosed = 0f;
-                        noProgressTimer = 0f;
-                    }
-                    else
-                    {
-                        float delta = lastRecordedDistance - distance;
-                        if (delta > 0f)
-                        {
-                            cumulativeDistanceClosed += delta;
-                        }
-                        else if (delta < 0f)
-                        {
-                            cumulativeDistanceClosed = 0f;
-                        }
-
-                        bool closedGap = cumulativeDistanceClosed >= ProgressResetThreshold;
-                        bool effectivelyClose = distance <= GatheringRange * CloseEnoughDistanceMultiplier;
-                        bool activelyFishing = fishingSkill != null && fishingSkill.IsFishing;
-
-                        if (closedGap || effectivelyClose || activelyFishing)
-                        {
-                            noProgressTimer = 0f;
-                            cumulativeDistanceClosed = 0f;
-                        }
-                        else
-                        {
-                            noProgressTimer += Time.deltaTime;
-                        }
-
-                        lastRecordedDistance = distance;
-                    }
-
-                    if (noProgressTimer >= stuckTimeoutSeconds)
-                    {
-                        if (CompanionManager.EnableDebugLogging)
-                            Debug.Log("[Companion Fishing] Movement stalled while approaching the spot.", this);
-
-                        stuckTriggered = true;
-                        stuckSpot = spot;
-                        break;
-                    }
-
-                    if (distance > GatheringRange)
-                    {
-                        float moveSpeed = ResolveMoveSpeed();
-                        float deltaTime = body != null
-                            ? Mathf.Max(Time.fixedDeltaTime, Mathf.Epsilon)
-                            : Mathf.Max(Time.deltaTime, Mathf.Epsilon);
-
-                        bool navigationStepTaken = false;
-                        bool navigationUnavailable = true;
-
-                        if (pathMover != null && pathMover.isActiveAndEnabled)
-                        {
-                            navigationUnavailable = !pathMover.HasActiveNavigationGrid;
-
-                            if (!navigationUnavailable)
-                            {
-                                Vector2 nextPosition;
-                                Vector2 navVelocity;
-                                bool teleported;
-                                bool goalUnreachable;
-                                float teleportDetectionDistance = float.PositiveInfinity;
-
-                                navigationStepTaken = pathMover.TryStepAttack(
-                                    deltaTime,
-                                    moveSpeed,
-                                    GatheringRange,
-                                    WaypointTolerance,
-                                    () => spot != null ? (Vector2)spot.transform.position : (Vector2)transform.position,
-                                    ReplanDistance,
-                                    teleportDetectionDistance,
-                                    out nextPosition,
-                                    out navVelocity,
-                                    out teleported,
-                                    out goalUnreachable);
-
-                                if (goalUnreachable)
-                                {
-                                    if (CompanionManager.EnableDebugLogging)
-                                        Debug.Log("[Companion Fishing] Navigation reported the spot as unreachable.", this);
-                                    stuckTriggered = true;
-                                    stuckSpot = spot;
-                                    break;
-                                }
-
-                                if (navigationStepTaken)
-                                    ApplyMovement(nextPosition, navVelocity, teleported);
-                            }
-                        }
-
-                        if (stuckTriggered)
-                            break;
-
-                        if (!navigationStepTaken)
-                        {
-                            if (navigationUnavailable)
-                            {
-                                Vector3 startPosition = transform.position;
-                                Vector3 nextPosition = Vector3.MoveTowards(startPosition, targetPosition, moveSpeed * deltaTime);
-                                Vector2 velocity = deltaTime > Mathf.Epsilon
-                                    ? (Vector2)((nextPosition - startPosition) / deltaTime)
-                                    : Vector2.zero;
-                                ApplyMovement(nextPosition, velocity, false);
-                            }
-                            else if (body != null)
-                            {
-                                body.linearVelocity = Vector2.zero;
-                            }
-                        }
-
-                        if (fishingSkill.IsFishing && distance > GatheringRange * 1.2f)
-                            fishingSkill.StopFishing();
-                    }
-                    else
-                    {
-                        if (body != null)
-                            body.linearVelocity = Vector2.zero;
-
-                        if (!fishingActive || currentSpot == null || currentSpot != spot)
-                            break;
-
-                        if (!fishingSkill.IsFishing)
-                        {
-                            if (!fishingActive || currentSpot == null || currentSpot != spot)
-                                break;
-
-                            fishingSkill.StartFishing(spot, tool);
-                        }
-
-                        if (!fishingActive || currentSpot == null || currentSpot != spot)
-                            break;
-
-                        if (!fishingSkill.IsFishing)
-                            break;
-                    }
-
-                    if (spot == null || spot.IsDepleted)
-                        break;
-
-                    yield return null;
-                }
-            }
-            finally
-            {
-                followerHold.Dispose();
-            }
-
-            if (stuckTriggered)
-            {
-                HandleFishingStuck(stuckSpot);
+            if (routineResult.Stuck)
                 yield break;
-            }
 
             fishingRoutine = null;
             fishingActive = false;
@@ -717,9 +576,7 @@ namespace Companions
             ResetStuckHistory();
 
             if (areaRoutineActive)
-            {
                 yield break;
-            }
 
             CancelAreaFishingInternal(false);
         }

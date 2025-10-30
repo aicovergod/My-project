@@ -201,6 +201,305 @@ namespace Companions
         }
 
         /// <summary>
+        /// Encapsulates the callbacks required to drive the shared gathering movement routine. The
+        /// delegates supplied here allow skill-specific controllers (fishing, mining, woodcutting)
+        /// to inject their bespoke start/stop hooks while reusing the common navigation loop.
+        /// </summary>
+        protected struct GatheringMovementRoutineParameters
+        {
+            /// <summary>Accessor that returns the node currently targeted by the routine.</summary>
+            public Func<TNode> GetTargetNode;
+
+            /// <summary>Determines whether the command should continue executing.</summary>
+            public Func<bool> IsCommandActive;
+
+            /// <summary>Validates whether the supplied node remains interactable.</summary>
+            public Func<TNode, bool> IsNodeValid;
+
+            /// <summary>Resolves the world position the companion should approach.</summary>
+            public Func<TNode, Vector3> GetTargetPosition;
+
+            /// <summary>Indicates whether the bound skill is currently performing its gather action.</summary>
+            public Func<bool> IsSkillActive;
+
+            /// <summary>Invoked when the companion reaches the gather range and must begin the skill.</summary>
+            public Action<TNode> StartSkill;
+
+            /// <summary>Stops the bound skill when the companion moves out of range.</summary>
+            public Action StopSkill;
+
+            /// <summary>Invoked when progress stalls while approaching the node.</summary>
+            public Action<TNode> OnProgressStalled;
+
+            /// <summary>Invoked immediately when navigation reports an unreachable goal.</summary>
+            public Action<TNode> OnGoalUnreachableDetected;
+
+            /// <summary>Invoked when the navigation stack reports an unreachable goal.</summary>
+            public Action<TNode> OnGoalUnreachable;
+
+            /// <summary>Invoked when the stuck timer expires.</summary>
+            public Action<TNode> OnStuck;
+
+            /// <summary>Receives the final routine result after cleanup completes.</summary>
+            public Action<GatheringMovementRoutineResult> OnRoutineComplete;
+
+            /// <summary>Multiplier used when deciding to stop the active skill due to distance.</summary>
+            public float OutOfRangeSkillStopMultiplier;
+        }
+
+        /// <summary>
+        /// Communicates the outcome of the shared gathering movement routine to the calling
+        /// controller so it can perform any follow-up cleanup or area gathering book-keeping.
+        /// </summary>
+        protected struct GatheringMovementRoutineResult
+        {
+            /// <summary>True when the companion declared a stuck state.</summary>
+            public bool Stuck;
+
+            /// <summary>True when the navigation layer reported the goal as unreachable.</summary>
+            public bool GoalUnreachable;
+
+            /// <summary>The node associated with the final state (stuck or successful completion).</summary>
+            public TNode Node;
+        }
+
+        /// <summary>
+        /// Drives the shared navigation, stuck detection, and follower hold logic used by all
+        /// gathering-focused companion controllers. Concrete skills supply the delegates required
+        /// to start/stop their skill actions while this helper keeps the movement loop consistent.
+        /// </summary>
+        /// <param name="parameters">Callbacks and configuration describing the active command.</param>
+        /// <returns>Enumerator consumed by Unity's coroutine scheduler.</returns>
+        protected IEnumerator CompanionGatheringMovementRoutine(GatheringMovementRoutineParameters parameters)
+        {
+            var followerHold = EnterTemporaryFollowerHold();
+            bool stuckTriggered = false;
+            bool goalUnreachable = false;
+            TNode stuckNode = null;
+            float noProgressTimer = 0f;
+            float lastRecordedDistance = 0f;
+            float cumulativeDistanceClosed = 0f;
+            bool hasDistanceSample = false;
+
+            try
+            {
+                pathMover?.ResetAttackTracking();
+
+                while (true)
+                {
+                    if (!isActiveAndEnabled)
+                        break;
+
+                    if (parameters.IsCommandActive != null && !parameters.IsCommandActive())
+                        break;
+
+                    TNode targetNode = parameters.GetTargetNode != null ? parameters.GetTargetNode() : null;
+                    if (targetNode == null)
+                        break;
+
+                    if (parameters.IsNodeValid != null && !parameters.IsNodeValid(targetNode))
+                        break;
+
+                    Vector3 targetPosition = parameters.GetTargetPosition != null
+                        ? parameters.GetTargetPosition(targetNode)
+                        : targetNode.transform.position;
+
+                    float distance = Vector2.Distance(transform.position, targetPosition);
+
+                    if (!hasDistanceSample)
+                    {
+                        hasDistanceSample = true;
+                        lastRecordedDistance = distance;
+                        cumulativeDistanceClosed = 0f;
+                        noProgressTimer = 0f;
+                    }
+                    else
+                    {
+                        float delta = lastRecordedDistance - distance;
+                        if (delta > 0f)
+                        {
+                            cumulativeDistanceClosed += delta;
+                        }
+                        else if (delta < 0f)
+                        {
+                            cumulativeDistanceClosed = 0f;
+                        }
+
+                        bool closedGap = cumulativeDistanceClosed >= ProgressResetThreshold;
+                        bool effectivelyClose = distance <= GatheringRange * CloseEnoughDistanceMultiplier;
+                        bool activelyGathering = parameters.IsSkillActive != null && parameters.IsSkillActive();
+
+                        if (closedGap || effectivelyClose || activelyGathering)
+                        {
+                            noProgressTimer = 0f;
+                            cumulativeDistanceClosed = 0f;
+                        }
+                        else
+                        {
+                            noProgressTimer += Time.deltaTime;
+                        }
+
+                        lastRecordedDistance = distance;
+                    }
+
+                    if (noProgressTimer >= stuckTimeoutSeconds)
+                    {
+                        parameters.OnProgressStalled?.Invoke(targetNode);
+
+                        stuckTriggered = true;
+                        stuckNode = targetNode;
+                        break;
+                    }
+
+                    if (distance > GatheringRange)
+                    {
+                        float moveSpeed = ResolveMoveSpeed();
+                        float deltaTime = body != null
+                            ? Mathf.Max(Time.fixedDeltaTime, Mathf.Epsilon)
+                            : Mathf.Max(Time.deltaTime, Mathf.Epsilon);
+
+                        bool navigationStepTaken = false;
+                        bool navigationUnavailable = true;
+
+                        if (pathMover != null && pathMover.isActiveAndEnabled)
+                        {
+                            navigationUnavailable = !pathMover.HasActiveNavigationGrid;
+
+                            if (!navigationUnavailable)
+                            {
+                                Vector2 nextPosition;
+                                Vector2 navVelocity;
+                                bool teleported;
+                                bool unreachable;
+                                float teleportDetectionDistance = float.PositiveInfinity;
+
+                                navigationStepTaken = pathMover.TryStepAttack(
+                                    deltaTime,
+                                    moveSpeed,
+                                    GatheringRange,
+                                    WaypointTolerance,
+                                    () =>
+                                    {
+                                        var refreshedNode = parameters.GetTargetNode != null ? parameters.GetTargetNode() : null;
+                                        if (refreshedNode == null)
+                                            return (Vector2)transform.position;
+
+                                        Vector3 refreshedPosition = parameters.GetTargetPosition != null
+                                            ? parameters.GetTargetPosition(refreshedNode)
+                                            : refreshedNode.transform.position;
+                                        return (Vector2)refreshedPosition;
+                                    },
+                                    ReplanDistance,
+                                    teleportDetectionDistance,
+                                    out nextPosition,
+                                    out navVelocity,
+                                    out teleported,
+                                    out unreachable);
+
+                                if (unreachable)
+                                {
+                                    parameters.OnGoalUnreachableDetected?.Invoke(targetNode);
+
+                                    stuckTriggered = true;
+                                    goalUnreachable = true;
+                                    stuckNode = targetNode;
+                                    break;
+                                }
+
+                                if (navigationStepTaken)
+                                    ApplyMovement(nextPosition, navVelocity, teleported);
+                            }
+                        }
+
+                        if (stuckTriggered)
+                            break;
+
+                        if (!navigationStepTaken)
+                        {
+                            if (navigationUnavailable)
+                            {
+                                Vector3 startPosition = transform.position;
+                                Vector3 nextPosition = Vector3.MoveTowards(startPosition, targetPosition, moveSpeed * deltaTime);
+                                Vector2 velocity = deltaTime > Mathf.Epsilon
+                                    ? (Vector2)((nextPosition - startPosition) / deltaTime)
+                                    : Vector2.zero;
+                                ApplyMovement(nextPosition, velocity, false);
+                            }
+                            else if (body != null)
+                            {
+                                body.linearVelocity = Vector2.zero;
+                            }
+                        }
+
+                        if (parameters.IsSkillActive != null && parameters.IsSkillActive())
+                        {
+                            float stopMultiplier = parameters.OutOfRangeSkillStopMultiplier <= 0f
+                                ? 1.2f
+                                : parameters.OutOfRangeSkillStopMultiplier;
+
+                            if (distance > GatheringRange * stopMultiplier)
+                                parameters.StopSkill?.Invoke();
+                        }
+                    }
+                    else
+                    {
+                        if (body != null)
+                            body.linearVelocity = Vector2.zero;
+
+                        if (parameters.IsCommandActive != null && !parameters.IsCommandActive())
+                            break;
+
+                        if (parameters.IsSkillActive == null || !parameters.IsSkillActive())
+                        {
+                            if (parameters.IsCommandActive != null && !parameters.IsCommandActive())
+                                break;
+
+                            parameters.StartSkill?.Invoke(targetNode);
+                        }
+
+                        if (parameters.IsCommandActive != null && !parameters.IsCommandActive())
+                            break;
+
+                        if (parameters.IsSkillActive != null && !parameters.IsSkillActive())
+                            break;
+                    }
+
+                    if (parameters.IsNodeValid != null && !parameters.IsNodeValid(targetNode))
+                        break;
+
+                    yield return null;
+                }
+            }
+            finally
+            {
+                followerHold.Dispose();
+            }
+
+            var result = new GatheringMovementRoutineResult
+            {
+                Stuck = stuckTriggered,
+                GoalUnreachable = goalUnreachable,
+                Node = stuckNode != null
+                    ? stuckNode
+                    : parameters.GetTargetNode != null ? parameters.GetTargetNode() : null,
+            };
+
+            if (stuckTriggered)
+            {
+                if (goalUnreachable && parameters.OnGoalUnreachable != null)
+                {
+                    parameters.OnGoalUnreachable(stuckNode);
+                }
+                else
+                {
+                    parameters.OnStuck?.Invoke(stuckNode);
+                }
+            }
+
+            parameters.OnRoutineComplete?.Invoke(result);
+        }
+
+        /// <summary>
         /// Handles the shared player-skill subscription workflow for gathering controllers. Ensures existing
         /// subscriptions are removed, invokes any cleanup callbacks, rebinds the cached skill reference against
         /// the supplied player transform, and finally wires the provided subscribe delegate when a skill is
