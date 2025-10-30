@@ -338,6 +338,7 @@ namespace Inventory.UI
         private Text tooltipNameText;
         private Text tooltipDescriptionText;
         private InventoryItemContextMenu itemContextMenu;
+        private InventoryDropMenu dropMenu;
         private Vector2 lastContextMenuPointerPosition;
 
         private static InventoryWindowController activeDragController;
@@ -675,10 +676,29 @@ namespace Inventory.UI
                 itemContextMenu.Hide();
         }
 
+        /// <summary>
+        /// Hides any active context menus so the inventory can process follow-up interactions cleanly.
+        /// </summary>
         public void DismissContextMenus()
         {
             HideItemContextMenu();
+            HideDropMenu();
             lastContextMenuPointerPosition = Vector2.zero;
+        }
+
+        /// <summary>
+        /// Displays the legacy drop quantity menu anchored to the supplied pointer position.
+        /// </summary>
+        /// <param name="slotIndex">Slot index owning the drop request.</param>
+        /// <param name="pointerPosition">Screen position of the pointer when the menu was requested.</param>
+        internal void ShowDropMenu(int slotIndex, Vector2 pointerPosition)
+        {
+            if (dropMenu == null)
+                return;
+
+            HideItemContextMenu();
+            HideTooltip();
+            dropMenu.Show(this, slotIndex, pointerPosition);
         }
 
         private void ShowTooltip(int slotIndex, RectTransform slotRect)
@@ -754,6 +774,15 @@ namespace Inventory.UI
         {
             if (tooltip != null)
                 tooltip.SetActive(false);
+        }
+
+        /// <summary>
+        /// Hides the drop menu when it is visible so duplicate menus do not linger on screen.
+        /// </summary>
+        private void HideDropMenu()
+        {
+            if (dropMenu != null)
+                dropMenu.Hide();
         }
 
         public void DismissTooltip()
@@ -995,6 +1024,8 @@ namespace Inventory.UI
             if (itemContextMenu != null)
                 itemContextMenu.SelectionRequested += HandleItemContextMenuSelection;
 
+            dropMenu = InventoryDropMenu.Create(uiRoot.transform, menuFont);
+
             if (config.UseSharedRoot)
                 SharedCanvasRoot = uiRoot.transform;
         }
@@ -1012,6 +1043,8 @@ namespace Inventory.UI
                 itemContextMenu.SelectionRequested -= HandleItemContextMenuSelection;
                 itemContextMenu = null;
             }
+
+            dropMenu = null;
 
             slotImages = null;
             slotCountTexts = null;
