@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c4e3ae7833f242053d8f2df56e7270164cfeeafc -->
+## 2025-10-30T16:05:03+00:00 — Refactor companion skill bindings
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 92 ++ / 78 --
+- Notes:
+  —
+---
 <!-- commit:86cb9b1eabeb4bf8eb5a8f8ec1df34afe72b93d1 -->
 ## 2025-10-30T15:32:14+00:00 — Merge pull request #1558 from aicovergod/codex/add-reusable-xp-distribution-helper
 

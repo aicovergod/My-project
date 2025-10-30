@@ -265,7 +265,6 @@ namespace Companions
             CancelAreaFishingInternal(false);
             StopActiveFishingRoutine();
             CleanupAfterFishing(restoreFollower);
-            UnsubscribeFromPlayerFishingSkill();
             BindToPlayerFishingSkill(playerTransform);
             ResetStuckHistory();
         }
@@ -277,7 +276,6 @@ namespace Companions
         public void CancelAreaFishing(bool restoreFollower)
         {
             CancelAreaFishingInternal(restoreFollower);
-            UnsubscribeFromPlayerFishingSkill();
             BindToPlayerFishingSkill(playerTransform);
             ResetStuckHistory();
         }
@@ -1029,28 +1027,20 @@ namespace Companions
 
         private void BindToPlayerFishingSkill(Transform player)
         {
-            UnsubscribeFromPlayerFishingSkill();
-
-            if (player == null)
-                return;
-
-            RebindPlayerSkill(player, ref playerFishingSkill);
-            if (playerFishingSkill == null)
-                return;
-
-            playerFishingSkill.OnStartFishing += OnPlayerStartFishing;
-            playerFishingSkill.OnStopFishing += OnPlayerStopFishing;
-        }
-
-        private void UnsubscribeFromPlayerFishingSkill()
-        {
-            if (playerFishingSkill == null)
-                return;
-
-            playerFishingSkill.OnStartFishing -= OnPlayerStartFishing;
-            playerFishingSkill.OnStopFishing -= OnPlayerStopFishing;
-            playerFishingSkill = null;
-            playerActiveSpot = null;
+            BindPlayerSkillEvents(
+                player,
+                ref playerFishingSkill,
+                skill =>
+                {
+                    skill.OnStartFishing += OnPlayerStartFishing;
+                    skill.OnStopFishing += OnPlayerStopFishing;
+                },
+                skill =>
+                {
+                    skill.OnStartFishing -= OnPlayerStartFishing;
+                    skill.OnStopFishing -= OnPlayerStopFishing;
+                },
+                () => playerActiveSpot = null);
         }
 
         private void OnPlayerStartFishing(FishableSpot spot)
@@ -1075,7 +1065,7 @@ namespace Companions
         private void OnDisable()
         {
             CancelFishing(true);
-            UnsubscribeFromPlayerFishingSkill();
+            BindToPlayerFishingSkill(null);
             blockedNodes.Clear();
             blockedNodePruneBuffer.Clear();
             areaAllCandidatesBlocked = false;
@@ -1088,7 +1078,7 @@ namespace Companions
                 fishingSkill.OnStopFishing -= HandleFishingStopped;
 
             CancelFishing(true);
-            UnsubscribeFromPlayerFishingSkill();
+            BindToPlayerFishingSkill(null);
         }
 
         private void OnDrawGizmosSelected()

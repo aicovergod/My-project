@@ -201,6 +201,50 @@ namespace Companions
         }
 
         /// <summary>
+        /// Handles the shared player-skill subscription workflow for gathering controllers. Ensures existing
+        /// subscriptions are removed, invokes any cleanup callbacks, rebinds the cached skill reference against
+        /// the supplied player transform, and finally wires the provided subscribe delegate when a skill is
+        /// discovered.
+        /// </summary>
+        /// <typeparam name="TSkill">Concrete skill component that should be resolved from the player transform.</typeparam>
+        /// <param name="playerTransform">Active player transform supplying the skill component.</param>
+        /// <param name="cachedSkill">Reference that stores the currently bound player skill.</param>
+        /// <param name="subscribe">Delegate invoked once a valid skill instance has been resolved.</param>
+        /// <param name="unsubscribe">Delegate used to detach event handlers from the previously cached skill.</param>
+        /// <param name="onUnbound">Optional callback executed whenever an existing skill binding is removed.</param>
+        /// <param name="onBound">Optional callback executed after a new skill binding has been resolved.</param>
+        protected void BindPlayerSkillEvents<TSkill>(
+            Transform playerTransform,
+            ref TSkill cachedSkill,
+            Action<TSkill> subscribe,
+            Action<TSkill> unsubscribe,
+            Action onUnbound = null,
+            Action<TSkill> onBound = null)
+            where TSkill : Component
+        {
+            TSkill previousSkill = cachedSkill;
+
+            if (previousSkill != null)
+            {
+                unsubscribe?.Invoke(previousSkill);
+                onUnbound?.Invoke();
+            }
+
+            cachedSkill = null;
+
+            if (playerTransform == null)
+                return;
+
+            RebindPlayerSkill(playerTransform, ref cachedSkill);
+
+            if (cachedSkill == null)
+                return;
+
+            onBound?.Invoke(cachedSkill);
+            subscribe?.Invoke(cachedSkill);
+        }
+
+        /// <summary>
         /// Temporarily disables the follower component so the companion remains stationary until gathering resumes.
         /// Dispose the returned handle to release the lock.
         /// </summary>

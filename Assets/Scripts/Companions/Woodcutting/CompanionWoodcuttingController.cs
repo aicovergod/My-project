@@ -272,7 +272,6 @@ namespace Companions
         {
             CancelAreaWoodcuttingInternal(false);
             CleanupAfterWoodcutting(restoreFollower);
-            UnsubscribeFromPlayerWoodcuttingSkill();
             BindToPlayerWoodcuttingSkill(playerTransform);
             ResetStuckHistory();
         }
@@ -284,7 +283,6 @@ namespace Companions
         public void CancelAreaWoodcutting(bool restoreFollower)
         {
             CancelAreaWoodcuttingInternal(restoreFollower);
-            UnsubscribeFromPlayerWoodcuttingSkill();
             BindToPlayerWoodcuttingSkill(playerTransform);
             ResetStuckHistory();
         }
@@ -1077,28 +1075,20 @@ namespace Companions
 
         private void BindToPlayerWoodcuttingSkill(Transform player)
         {
-            UnsubscribeFromPlayerWoodcuttingSkill();
-
-            if (player == null)
-                return;
-
-            RebindPlayerSkill(player, ref playerWoodcuttingSkill);
-            if (playerWoodcuttingSkill == null)
-                return;
-
-            playerWoodcuttingSkill.OnStartChopping += OnPlayerStartChopping;
-            playerWoodcuttingSkill.OnStopChopping += OnPlayerStopChopping;
-        }
-
-        private void UnsubscribeFromPlayerWoodcuttingSkill()
-        {
-            if (playerWoodcuttingSkill == null)
-                return;
-
-            playerWoodcuttingSkill.OnStartChopping -= OnPlayerStartChopping;
-            playerWoodcuttingSkill.OnStopChopping -= OnPlayerStopChopping;
-            playerWoodcuttingSkill = null;
-            playerProtectedSingleLog.Clear();
+            BindPlayerSkillEvents(
+                player,
+                ref playerWoodcuttingSkill,
+                skill =>
+                {
+                    skill.OnStartChopping += OnPlayerStartChopping;
+                    skill.OnStopChopping += OnPlayerStopChopping;
+                },
+                skill =>
+                {
+                    skill.OnStartChopping -= OnPlayerStartChopping;
+                    skill.OnStopChopping -= OnPlayerStopChopping;
+                },
+                playerProtectedSingleLog.Clear);
         }
 
         private void OnPlayerStartChopping(TreeNode tree)
@@ -1132,7 +1122,7 @@ namespace Companions
         private void OnDisable()
         {
             CancelWoodcutting(true);
-            UnsubscribeFromPlayerWoodcuttingSkill();
+            BindToPlayerWoodcuttingSkill(null);
             blockedNodes.Clear();
             blockedNodePruneBuffer.Clear();
             areaAllCandidatesBlocked = false;
@@ -1145,7 +1135,7 @@ namespace Companions
                 woodcuttingSkill.OnStopChopping -= HandleWoodcuttingStopped;
 
             CancelWoodcutting(true);
-            UnsubscribeFromPlayerWoodcuttingSkill();
+            BindToPlayerWoodcuttingSkill(null);
         }
 
         private void OnDrawGizmosSelected()
