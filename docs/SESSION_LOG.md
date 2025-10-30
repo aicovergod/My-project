@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0777ed2c2e59e3a824820e471d3baf6be82e846d -->
+## 2025-10-30T16:12:06+00:00 — Refactor companion gathering cleanup helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 78 ++ / 33 --
+- Notes:
+  —
+---
 <!-- commit:c3638668f591bc918a8bc8b0fcec5fcc35b38759 -->
 ## 2025-10-30T16:05:25+00:00 — Merge pull request #1559 from aicovergod/codex/add-helper-for-skill-event-binding
 
