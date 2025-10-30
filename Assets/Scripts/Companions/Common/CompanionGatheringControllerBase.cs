@@ -781,6 +781,155 @@ namespace Companions
         }
 
         /// <summary>
+        /// Builds the cached area candidate list using the supplied delegates so derived controllers can
+        /// share the standard radius, blocking, and validation flow while still injecting skill-specific
+        /// rules. The helper clears the shared buffers, prunes expired block entries, applies distance
+        /// checks, removes temporarily blocked nodes, sorts the surviving candidates by proximity, and
+        /// caches their tile centres for gizmo rendering.
+        /// </summary>
+        /// <param name="radius">Scan radius used to qualify nearby nodes.</param>
+        /// <param name="retrieveNodes">Delegate that returns the full set of potential gathering nodes.</param>
+        /// <param name="shouldSkipNode">
+        /// Optional predicate used for skill-specific skip logic (busy spots, protected nodes). Return
+        /// <c>true</c> to skip validation for the supplied node.
+        /// </param>
+        /// <param name="tryPrepareCommand">
+        /// Delegate that executes the per-node validation command and returns its outcome.
+        /// </param>
+        /// <param name="acceptedResultFactory">Factory that returns the enum value representing a successful command.</param>
+        /// <param name="defaultFailureResultFactory">
+        /// Factory that returns the enum value used when no specific failure was observed.
+        /// </param>
+        /// <param name="isInventoryFullResult">
+        /// Predicate that identifies the enum value signalling an inventory full state.
+        /// </param>
+        /// <param name="isAcceptedResult">Optional predicate that determines whether a validation result should be treated as accepted.</param>
+        /// <param name="onCandidateAccepted">Optional callback invoked whenever a node survives validation.</param>
+        /// <returns>
+        /// Tuple describing whether at least one candidate was discovered and, when not, the most relevant
+        /// failure reason observed during the scan.
+        /// </returns>
+        protected (bool success, TCommandResult failureReason) BuildAreaCandidates(
+            float radius,
+            Func<TNode[]> retrieveNodes,
+            Func<TNode, bool> shouldSkipNode,
+            Func<TNode, (bool accepted, TCommandResult validationResult)> tryPrepareCommand,
+            Func<TCommandResult> acceptedResultFactory,
+            Func<TCommandResult> defaultFailureResultFactory,
+            Func<TCommandResult, bool> isInventoryFullResult,
+            Func<TCommandResult, bool> isAcceptedResult = null,
+            Action<TNode> onCandidateAccepted = null)
+        {
+            if (retrieveNodes == null)
+                throw new ArgumentNullException(nameof(retrieveNodes));
+            if (tryPrepareCommand == null)
+                throw new ArgumentNullException(nameof(tryPrepareCommand));
+            if (acceptedResultFactory == null)
+                throw new ArgumentNullException(nameof(acceptedResultFactory));
+            if (defaultFailureResultFactory == null)
+                throw new ArgumentNullException(nameof(defaultFailureResultFactory));
+            if (isInventoryFullResult == null)
+                throw new ArgumentNullException(nameof(isInventoryFullResult));
+
+            areaCandidates.Clear();
+            areaCandidateTileCenters.Clear();
+            areaAllCandidatesBlocked = false;
+
+            var nodes = retrieveNodes();
+            var acceptedResult = acceptedResultFactory();
+            var defaultFailure = defaultFailureResultFactory();
+            var acceptsResultPredicate = isAcceptedResult ??
+                (result => EqualityComparer<TCommandResult>.Default.Equals(result, acceptedResult));
+
+            if (nodes == null || nodes.Length == 0)
+                return (false, defaultFailure);
+
+            float radiusSqr = radius * radius;
+            Vector2 controllerPosition2D = (Vector2)transform.position;
+            bool observedNonInventoryFailure = false;
+            TCommandResult lastNonInventoryFailure = defaultFailure;
+            int blockedByStuckCount = 0;
+
+            float now = Time.time;
+            PruneExpiredBlockedNodes();
+
+            for (int i = 0; i < nodes.Length; i++)
+            {
+                var node = nodes[i];
+                if (node == null || IsNodeDepleted(node))
+                    continue;
+
+                Vector2 nodePosition2D = (Vector2)node.transform.position;
+                if ((nodePosition2D - controllerPosition2D).sqrMagnitude > radiusSqr)
+                    continue;
+
+                if (shouldSkipNode != null && shouldSkipNode(node))
+                    continue;
+
+                if (IsNodeTemporarilyBlocked(node, now))
+                {
+                    blockedByStuckCount++;
+                    continue;
+                }
+
+                var attempt = tryPrepareCommand(node);
+                if (!attempt.accepted)
+                {
+                    var validationResult = attempt.validationResult;
+                    if (isInventoryFullResult(validationResult))
+                        return (false, validationResult);
+
+                    if (!acceptsResultPredicate(validationResult))
+                    {
+                        observedNonInventoryFailure = true;
+                        lastNonInventoryFailure = validationResult;
+                    }
+
+                    continue;
+                }
+
+                areaCandidates.Add(node);
+                onCandidateAccepted?.Invoke(node);
+            }
+
+            areaCandidates.Sort((a, b) =>
+            {
+                if (a == null && b == null)
+                    return 0;
+                if (a == null)
+                    return 1;
+                if (b == null)
+                    return -1;
+
+                Vector2 aPosition2D = (Vector2)a.transform.position;
+                Vector2 bPosition2D = (Vector2)b.transform.position;
+                float da = (aPosition2D - controllerPosition2D).sqrMagnitude;
+                float db = (bPosition2D - controllerPosition2D).sqrMagnitude;
+                return da.CompareTo(db);
+            });
+
+            for (int i = 0; i < areaCandidates.Count; i++)
+            {
+                var candidate = areaCandidates[i];
+                if (candidate == null)
+                    continue;
+
+                areaCandidateTileCenters.Add(GetTileCentre(candidate.transform.position));
+            }
+
+            if (areaCandidates.Count == 0)
+            {
+                if (blockedByStuckCount > 0 && !observedNonInventoryFailure)
+                    areaAllCandidatesBlocked = true;
+
+                var failure = observedNonInventoryFailure ? lastNonInventoryFailure : defaultFailure;
+                return (false, failure);
+            }
+
+            return (true, acceptedResult);
+        }
+
+        /// <summary>
         /// Converts a world position to the centre of the tile it belongs to. Used for gizmo rendering.
         /// </summary>
         protected Vector3 GetTileCentre(Vector3 worldPosition)
