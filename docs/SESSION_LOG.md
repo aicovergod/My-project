@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:53ec5864b60e551bc67195ed6538524fd3a63f1a -->
+## 2025-10-30T15:13:04+00:00 — Merge pull request #1556 from aicovergod/codex/add-companionpickupcontroller-and-refactor-components
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 555 ++ / 488 --
+- Notes:
+  Refactor companion pickup orchestration into dedicated controller
+---
+<!-- commit:aa964141ea3514a92b4001c99f30ff3455480656 -->
+## 2025-10-30T15:12:47+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:25f1867eecacd71f3cd49d640faa647cd7b908dc -->
 ## 2025-10-30T15:12:31+00:00 — Refactor companion pickup logic into dedicated controller
 
