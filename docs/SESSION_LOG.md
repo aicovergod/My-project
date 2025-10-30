@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c8415dafa371ede32f50a5ab9643f0a39b95a348 -->
+## 2025-10-30T11:31:18+00:00 — Merge pull request #1553 from aicovergod/codex/fix-player-damage-on-nettle-objects
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 207 ++ / 9 --
+- Notes:
+  Fix stinging nettle hazard damage stacking across overlapping tiles
+---
+<!-- commit:f104524c7e46011cc52830ef6684c7726abccfea -->
+## 2025-10-30T11:30:56+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:25478721d7fc9c2196a56f61217a6020aafec5c6 -->
 ## 2025-10-30T11:30:45+00:00 — Fix stinging nettle hazard damage aggregation
 
