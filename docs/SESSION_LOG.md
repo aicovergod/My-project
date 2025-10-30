@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a14303ed9ef70fb987630de433985e8e5bae630d -->
+## 2025-10-30T10:31:55+00:00 — Add stinging nettle hazard damage system
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Environment/WorldObjects.meta, Assets/Scripts/Environment/WorldObjects/StingingNettleHazard.cs, Assets/Scripts/Environment/WorldObjects/StingingNettleHazard.cs.meta
+- Diff: 346 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:3fc764ca235cb1a6b41dc369fcc5e7b084fdc8c5 -->
 ## 2025-10-30T09:36:29+00:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
 
