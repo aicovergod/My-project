@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f2c62c2554d8e5e481bd5058952f0bbc0f3a7512 -->
+## 2025-10-30T00:15:09+00:00 — Handle mismatched companion skill acceptances
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 49 ++ / 14 --
+- Notes:
+  —
+---
 <!-- commit:b10e51f70ea2aa384b95044d2aa48d5a34a2c9ed -->
 ## 2025-10-29T23:59:45+00:00 — Merge pull request #1545 from aicovergod/codex/fix-console-bug-in-companionmanager
 

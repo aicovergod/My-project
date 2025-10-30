@@ -1416,7 +1416,8 @@ namespace Companions.Conversation
             string statusSegment = string.Empty;
             string companionMood = ResolveCompanionMoodDescriptor();
             string recentEvent = ResolveRecentEventSummary();
-            var context = BuildResponseContext(activeSkillQuestion.TryGetCandidate());
+            SkillQuestionCandidate? activeQuestionCandidate = activeSkillQuestion.TryGetCandidate();
+            var context = BuildResponseContext(activeQuestionCandidate);
             bool skillResponseResolved = false;
 
             for (int i = 0; i < parseResult.Matches.Count; i++)
@@ -1511,26 +1512,60 @@ namespace Companions.Conversation
                     case CompanionDialogueIntent.DeclineSkillPlan:
                     case CompanionDialogueIntent.DeferSkillPlan:
                     case CompanionDialogueIntent.RequestAlternateSkill:
+                    {
+                        int segmentCountBefore = segments.Count;
+                        int followUpCountBefore = followUps.Count;
+                        bool handled = false;
+
+                        if (match.Intent == CompanionDialogueIntent.AcceptSkillPlan)
                         {
-                            int segmentCountBefore = segments.Count;
-                            int followUpCountBefore = followUps.Count;
-                            if (TryHandleSkillPlanIntent(
-                                    match.Intent,
+                            // Analyse the acknowledgement to confirm whether the player repeated the suggested skill
+                            // or pivoted to an entirely different activity.
+                            var proposalAnalysis = AnalyseSkillProposal(parseResult, lastPlayerMessage);
+                            bool hasConflictingSkill = proposalAnalysis.HasConcreteSkill &&
+                                                       (!activeQuestionCandidate.HasValue ||
+                                                        !activeQuestionCandidate.Value.HasSkill ||
+                                                        activeQuestionCandidate.Value.Skill.Value != proposalAnalysis.Skill.Value);
+
+                            if (hasConflictingSkill)
+                            {
+                                // The player accepted but referenced a different skill, so tear down the
+                                // active proactive question and run the standard skill-proposal handling path.
+                                ClearActiveSkillQuestion();
+                                activeQuestionCandidate = null;
+                                context = BuildResponseContext(activeQuestionCandidate);
+                                handled = TryHandlePlayerSkillProposal(
+                                    parseResult,
                                     context,
                                     segments,
                                     followUps,
                                     playerName,
-                                    ref companionMood,
-                                    recentEvent))
-                            {
-                                if (segmentCountBefore > 0)
-                                    segments.RemoveRange(0, segmentCountBefore);
-                                if (followUpCountBefore > 0)
-                                    followUps.RemoveRange(0, followUpCountBefore);
-                                statusSegment = string.Empty;
-                                skillResponseResolved = true;
+                                    ref companionMood);
                             }
                         }
+
+                        if (!handled && TryHandleSkillPlanIntent(
+                                match.Intent,
+                                context,
+                                segments,
+                                followUps,
+                                playerName,
+                                ref companionMood,
+                                recentEvent))
+                        {
+                            handled = true;
+                        }
+
+                        if (handled)
+                        {
+                            if (segmentCountBefore > 0)
+                                segments.RemoveRange(0, segmentCountBefore);
+                            if (followUpCountBefore > 0)
+                                followUps.RemoveRange(0, followUpCountBefore);
+                            statusSegment = string.Empty;
+                            skillResponseResolved = true;
+                        }
+                    }
                         break;
 
                     case CompanionDialogueIntent.CompanionSuggestionRequest:
