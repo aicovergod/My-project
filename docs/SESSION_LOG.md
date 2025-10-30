@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:97186795d8c0f2da79a7a82d1bb41dd7a65586e8 -->
+## 2025-10-30T14:45:59+00:00 — Refactor companion gathering movement helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 72 ++ / 172 --
+- Notes:
+  —
+---
 <!-- commit:c8415dafa371ede32f50a5ab9643f0a39b95a348 -->
 ## 2025-10-30T11:31:18+00:00 — Merge pull request #1553 from aicovergod/codex/fix-player-damage-on-nettle-objects
 
