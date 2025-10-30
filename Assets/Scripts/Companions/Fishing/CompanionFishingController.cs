@@ -583,36 +583,38 @@ namespace Companions
 
         private void HandleFishingStuck(FishableSpot spot)
         {
-            if (CompanionManager.EnableDebugLogging)
+            ExecuteGatheringStuckRecovery(new GatheringStuckRecoveryParameters
             {
-                string spotName = spot != null ? spot.name : "<null>";
-                Debug.Log($"[Companion Fishing] Detected a stuck state while targeting {spotName}.", this);
-            }
-
-            float now = Time.time;
-            if (spot != null)
-                MarkNodeBlocked(spot, now + BlockedSpotExpirySeconds);
-
-            if (fishingSkill != null && fishingSkill.IsFishing)
-                fishingSkill.StopFishing();
-
-            CleanupAfterFishing(true);
-            PublishStuckApologyMessage();
-
-            if (lastStuckNode == spot)
-            {
-                consecutiveStuckNodeCount++;
-                if (consecutiveStuckNodeCount >= ConsecutiveStuckCancelThreshold)
+                Node = spot,
+                DebugLabel = "Companion Fishing",
+                BuildDebugMessage = target =>
+                {
+                    string spotName = target != null ? target.name : "<null>";
+                    return $"[Companion Fishing] Detected a stuck state while targeting {spotName}.";
+                },
+                ShouldStopSkill = () => fishingSkill != null && fishingSkill.IsFishing,
+                SetStopCallbackSuppressed = value => suppressFishingStopCallback = value,
+                StopSkill = () =>
+                {
+                    if (fishingSkill != null)
+                        fishingSkill.StopFishing();
+                },
+                CleanupCallback = () =>
+                {
+                    CleanupAfterFishing(true);
+                    PublishStuckApologyMessage();
+                },
+                AdditionalStateReset = () =>
+                {
+                    fishingRoutine = null;
+                    fishingActive = false;
+                },
+                OnThresholdReached = (_, __) =>
                 {
                     CancelAreaFishingInternal(true);
                     areaAllCandidatesBlocked = true;
                 }
-            }
-            else
-            {
-                lastStuckNode = spot;
-                consecutiveStuckNodeCount = 1;
-            }
+            });
         }
 
         private void ResetStuckHistory()
