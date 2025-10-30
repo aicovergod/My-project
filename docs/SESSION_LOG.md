@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:20c550e6c2317935cf341d20071dadc51fa342d4 -->
+## 2025-10-30T15:21:38+00:00 — Refactor companion gathering initialisation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 155 ++ / 113 --
+- Notes:
+  —
+---
 <!-- commit:53ec5864b60e551bc67195ed6538524fd3a63f1a -->
 ## 2025-10-30T15:13:04+00:00 — Merge pull request #1556 from aicovergod/codex/add-companionpickupcontroller-and-refactor-components
 
