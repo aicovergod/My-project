@@ -41,6 +41,10 @@ namespace Environment.WorldObjects
         private bool playerInsideArea;
         private bool tickerSubscribed;
         private bool nettleDialogueTriggered;
+        private int nettleDialogueCooldownTicksRemaining;
+
+        [Header("Dialogue"), Tooltip("Cooldown in seconds before the companion can comment on the nettles again."), Min(1f)]
+        [SerializeField] private float nettleDialogueCooldownSeconds = 30f;
 
         private void OnValidate()
         {
@@ -62,6 +66,8 @@ namespace Environment.WorldObjects
         {
             UnsubscribeFromTicker();
             ResetContactState();
+            nettleDialogueTriggered = false;
+            nettleDialogueCooldownTicksRemaining = 0;
         }
 
         private void Update()
@@ -75,6 +81,8 @@ namespace Environment.WorldObjects
         /// <inheritdoc />
         public void OnTick()
         {
+            UpdateNettleDialogueCooldown();
+
             if (!EnsurePlayerReference())
             {
                 ResetContactState();
@@ -199,7 +207,7 @@ namespace Environment.WorldObjects
 
         private void TryEmitCompanionDialogue()
         {
-            if (nettleDialogueTriggered)
+            if (nettleDialogueTriggered || nettleDialogueCooldownTicksRemaining > 0)
             {
                 return;
             }
@@ -223,6 +231,24 @@ namespace Environment.WorldObjects
 
             chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), line);
             nettleDialogueTriggered = true;
+            nettleDialogueCooldownTicksRemaining = Mathf.CeilToInt(nettleDialogueCooldownSeconds / Ticker.TickDuration);
+        }
+
+        /// <summary>
+        /// Counts down the nettle dialogue cooldown and re-enables dialogue once the timer completes.
+        /// </summary>
+        private void UpdateNettleDialogueCooldown()
+        {
+            if (nettleDialogueCooldownTicksRemaining <= 0)
+            {
+                return;
+            }
+
+            nettleDialogueCooldownTicksRemaining--;
+            if (nettleDialogueCooldownTicksRemaining <= 0)
+            {
+                nettleDialogueTriggered = false;
+            }
         }
 
         private void TrySubscribeToTicker()
