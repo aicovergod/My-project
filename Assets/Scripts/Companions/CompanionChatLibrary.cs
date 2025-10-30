@@ -287,6 +287,29 @@ namespace Companions
         /// <summary>Fallback message returned when the player inventory full pool is empty.</summary>
         private const string PlayerInventoryFullFallbackLine = "Your bag looks heavier than you right now";
 
+        /// <summary>Pool of quips companions use the first time the player blunders into stinging nettles.</summary>
+        private static readonly string[] StingingNettlePainLines =
+        {
+            "Ouch! Nettles! Bet that’ll leave a mark.",
+            "You okay there, champ? You’re dancing like you sat on a beehive.",
+            "Told you not to touch everything green.",
+            "Stings, doesn’t it? That’s nature teaching manners.",
+            "Careful! Those nettles have anger issues.",
+            "You call that foraging? More like self-harm, mate.",
+            "Ah, the famous nettle slap, a classic move!",
+            "You’ve made the local flora very happy… they got blood this time.",
+            "Oh brilliant, you’ve angered the weeds now.",
+            "Next time, maybe wear gloves instead of hope.",
+            "If it’s green and fuzzy, maybe don’t rub your hand on it.",
+            "I’d heal you, but honestly… you earned that one.",
+            "Is this part of some new training method I don’t know about?",
+            "Careful, keep doing that and you’ll build poison resistance… or die trying.",
+            "You sure you’re not secretly at war with plants?"
+        };
+
+        /// <summary>Fallback quip used when the stinging nettle pool is empty or invalid.</summary>
+        private const string StingingNettlePainFallbackLine = "Careful! Those nettles have anger issues.";
+
         /// <summary>Pool of chat lines used when both the player and companion inventories are full.</summary>
         private static readonly string[] PlayerAndCompanionInventoryFullChatMessages =
         {
@@ -6137,6 +6160,14 @@ namespace Companions
         public static string GetRandomPlayerInventoryFullLine()
         {
             return GetRandomLine(PlayerInventoryFullChatMessages, PlayerInventoryFullFallbackLine);
+        }
+
+        /// <summary>
+        /// Returns a random companion quip when the player first blunders into stinging nettles.
+        /// </summary>
+        public static string GetRandomStingingNettlePainLine()
+        {
+            return GetRandomLine(StingingNettlePainLines, StingingNettlePainFallbackLine);
         }
 
         /// <summary>
