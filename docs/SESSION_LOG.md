@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f46c7bfc303ff879d5a8e8888165fa457cc7dba1 -->
+## 2025-10-30T00:43:43+00:00 — Merge pull request #1548 from aicovergod/codex/fix-console-error-cs0103
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 33 ++ / 0 --
+- Notes:
+  Fix inventory drop menu lifecycle
+---
+<!-- commit:e4465dbef0ebdf5826d81cd673f93eb18e14f9f1 -->
+## 2025-10-30T00:43:35+00:00 — Add inventory drop menu lifecycle management
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/UI/InventoryWindowController.cs
+- Diff: 33 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:24092f27872eeff51bab9e8961d6f0bd84f0c957 -->
 ## 2025-10-30T00:35:56+00:00 — Merge pull request #1547 from aicovergod/codex/add-shift-right-click-dropping-to-inventory
 
