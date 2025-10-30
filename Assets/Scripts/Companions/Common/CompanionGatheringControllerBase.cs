@@ -491,6 +491,45 @@ namespace Companions
         }
 
         /// <summary>
+        /// Handles the standard disable-time cleanup shared across the gathering controllers. Invokes
+        /// the supplied delegates before clearing the cached node state so derived classes only need
+        /// to forward their cancellation and unsubscribe routines.
+        /// </summary>
+        /// <param name="cancel">Routine that cancels the active gathering operation.</param>
+        /// <param name="unsubscribe">Delegate used to release external subscriptions (player skill hooks).</param>
+        /// <param name="additionalCleanup">Optional callback for skill-specific teardown logic.</param>
+        protected void HandleDisable(Action cancel, Action unsubscribe, Action additionalCleanup = null)
+        {
+            cancel?.Invoke();
+            unsubscribe?.Invoke();
+            additionalCleanup?.Invoke();
+
+            blockedNodes.Clear();
+            blockedNodePruneBuffer.Clear();
+            areaAllCandidatesBlocked = false;
+            ResetStuckHistoryInternal();
+        }
+
+        /// <summary>
+        /// Performs destruction-time cleanup for gathering controllers. Ensures skill-specific
+        /// subscriptions are released before running the shared disable flow, guaranteeing that
+        /// cancellation cannot re-trigger callbacks on disposed listeners.
+        /// </summary>
+        /// <param name="cancel">Routine that cancels the active gathering operation.</param>
+        /// <param name="unsubscribe">Delegate used to release external subscriptions (player skill hooks).</param>
+        /// <param name="removeSkillCallback">Optional action that removes skill event handlers.</param>
+        /// <param name="additionalCleanup">Optional callback for skill-specific teardown logic.</param>
+        protected void HandleDestroy(
+            Action cancel,
+            Action unsubscribe,
+            Action removeSkillCallback = null,
+            Action additionalCleanup = null)
+        {
+            removeSkillCallback?.Invoke();
+            HandleDisable(cancel, unsubscribe, additionalCleanup);
+        }
+
+        /// <summary>
         /// Clears the cached stuck history so future attempts treat the next stall as the first occurrence.
         /// </summary>
         protected void ResetStuckHistoryInternal()
