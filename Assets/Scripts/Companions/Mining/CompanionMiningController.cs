@@ -683,14 +683,7 @@ namespace Companions
             var definitions = PickaxeDefinitionRegistry.GetAllDefinitions();
             if (definitions == null || definitions.Count == 0)
             {
-                var selectors = FindObjectsOfType<PickaxeToUse>(true);
-                for (int i = 0; i < selectors.Length; i++)
-                {
-                    var selector = selectors[i];
-                    if (selector != null)
-                        PickaxeDefinitionRegistry.RegisterDefinitions(selector.AllPickaxes);
-                }
-
+                CompanionToolSelectorRegistry.RegisterPickaxesFromSelectors();
                 definitions = PickaxeDefinitionRegistry.GetAllDefinitions();
             }
 
