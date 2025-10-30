@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f41bb42559709dc86f26da51413b79960d531855 -->
+## 2025-10-30T16:12:39+00:00 — Merge pull request #1560 from aicovergod/codex/extend-companiongatheringcontrollerbase-with-helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 87 ++ / 33 --
+- Notes:
+  Refactor companion gathering cleanup helpers
+---
+<!-- commit:59e5c2f85e19c6cb5ffd903ac6ee0e0630392f5b -->
+## 2025-10-30T16:12:19+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0777ed2c2e59e3a824820e471d3baf6be82e846d -->
 ## 2025-10-30T16:12:06+00:00 — Refactor companion gathering cleanup helpers
 
