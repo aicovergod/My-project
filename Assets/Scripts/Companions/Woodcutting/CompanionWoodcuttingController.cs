@@ -323,190 +323,45 @@ namespace Companions
 
         private IEnumerator ChopRoutine(TreeNode tree, AxeDefinition axe)
         {
-            var followerHold = EnterTemporaryFollowerHold();
-            bool stuckTriggered = false;
-            TreeNode stuckTree = null;
-            float noProgressTimer = 0f;
-            float lastRecordedDistance = 0f;
-            float cumulativeDistanceClosed = 0f;
-            bool hasDistanceSample = false;
-            try
-            {
-                pathMover?.ResetAttackTracking();
+            GatheringMovementRoutineResult routineResult = default;
 
-                while (tree != null && !tree.IsDepleted)
+            yield return CompanionGatheringMovementRoutine(new GatheringMovementRoutineParameters
+            {
+                GetTargetNode = () => tree,
+                IsCommandActive = () => woodcuttingActive && currentTree != null && currentTree == tree,
+                IsNodeValid = node => node != null && !node.IsDepleted,
+                GetTargetPosition = node => node.transform.position,
+                IsSkillActive = () => woodcuttingSkill != null && woodcuttingSkill.IsChopping,
+                StartSkill = node =>
                 {
-                    if (!isActiveAndEnabled)
-                        break;
+                    if (!woodcuttingActive || currentTree == null || currentTree != node || woodcuttingSkill == null)
+                        return;
 
-                    if (!woodcuttingActive || currentTree == null || currentTree != tree)
-                        break;
+                    woodcuttingSkill.StartChopping(node, axe);
+                },
+                StopSkill = () =>
+                {
+                    if (woodcuttingSkill != null)
+                        woodcuttingSkill.StopChopping();
+                },
+                OnProgressStalled = node =>
+                {
+                    if (CompanionManager.EnableDebugLogging)
+                        Debug.Log("[Companion Woodcutting] Movement stalled while approaching the tree.", this);
+                },
+                OnGoalUnreachableDetected = node =>
+                {
+                    if (CompanionManager.EnableDebugLogging)
+                        Debug.Log("[Companion Woodcutting] Navigation reported the tree as unreachable.", this);
+                },
+                OnGoalUnreachable = HandleWoodcuttingStuck,
+                OnStuck = HandleWoodcuttingStuck,
+                OutOfRangeSkillStopMultiplier = 1.2f,
+                OnRoutineComplete = result => routineResult = result,
+            });
 
-                    Vector3 rockPosition = tree.transform.position;
-                    float distance = Vector2.Distance(transform.position, rockPosition);
-
-                    if (!hasDistanceSample)
-                    {
-                        hasDistanceSample = true;
-                        lastRecordedDistance = distance;
-                        cumulativeDistanceClosed = 0f;
-                        noProgressTimer = 0f;
-                    }
-                    else
-                    {
-                        float delta = lastRecordedDistance - distance;
-                        if (delta > 0f)
-                        {
-                            cumulativeDistanceClosed += delta;
-                        }
-                        else if (delta < 0f)
-                        {
-                            cumulativeDistanceClosed = 0f;
-                        }
-
-                        bool closedGap = cumulativeDistanceClosed >= ProgressResetThreshold;
-                        bool effectivelyClose = distance <= GatheringRange * CloseEnoughDistanceMultiplier;
-                        bool activelyWoodcutting = woodcuttingSkill != null && woodcuttingSkill.IsChopping;
-
-                        if (closedGap || effectivelyClose || activelyWoodcutting)
-                        {
-                            noProgressTimer = 0f;
-                            cumulativeDistanceClosed = 0f;
-                        }
-                        else
-                        {
-                            noProgressTimer += Time.deltaTime;
-                        }
-
-                        lastRecordedDistance = distance;
-                    }
-
-                    if (noProgressTimer >= stuckTimeoutSeconds)
-                    {
-                        if (CompanionManager.EnableDebugLogging)
-                        {
-                            Debug.Log("[Companion Woodcutting] Movement stalled while approaching the tree.", this);
-                        }
-
-                        stuckTriggered = true;
-                            stuckTree = tree;
-                        break;
-                    }
-
-                    if (distance > GatheringRange)
-                    {
-                        float moveSpeed = ResolveMoveSpeed();
-                        float deltaTime = body != null
-                            ? Mathf.Max(Time.fixedDeltaTime, Mathf.Epsilon)
-                            : Mathf.Max(Time.deltaTime, Mathf.Epsilon);
-
-                        bool navigationStepTaken = false;
-                        bool navigationUnavailable = true;
-
-                        if (pathMover != null && pathMover.isActiveAndEnabled)
-                        {
-                            navigationUnavailable = !pathMover.HasActiveNavigationGrid;
-
-                            if (!navigationUnavailable)
-                            {
-                                Vector2 nextPosition;
-                                Vector2 navVelocity;
-                                bool teleported;
-                                bool goalUnreachable;
-                                // Use an infinite teleport detection threshold so distant rocks never trigger the
-                                // teleport branch inside PetPathMover. This keeps the companion on its path and
-                                // prevents accidental snaps across the nav grid when scanning large radii.
-                                float teleportDetectionDistance = float.PositiveInfinity;
-
-                                navigationStepTaken = pathMover.TryStepAttack(
-                                    deltaTime,
-                                    moveSpeed,
-                                    GatheringRange,
-                                    WaypointTolerance,
-                                    () => tree != null ? (Vector2)tree.transform.position : (Vector2)transform.position,
-                                    ReplanDistance,
-                                    teleportDetectionDistance,
-                                    out nextPosition,
-                                    out navVelocity,
-                                    out teleported,
-                                    out goalUnreachable);
-
-                                if (goalUnreachable)
-                                {
-                                    if (CompanionManager.EnableDebugLogging)
-                                        Debug.Log("[Companion Woodcutting] Navigation reported the tree as unreachable.", this);
-                                    stuckTriggered = true;
-                            stuckTree = tree;
-                                    break;
-                                }
-
-                                if (navigationStepTaken)
-                                    ApplyMovement(nextPosition, navVelocity, teleported);
-                            }
-                        }
-
-                        if (stuckTriggered)
-                            break;
-
-                        if (!navigationStepTaken)
-                        {
-                            if (navigationUnavailable)
-                            {
-                                Vector3 startPosition = transform.position;
-                                Vector3 nextPosition = Vector3.MoveTowards(startPosition, rockPosition, moveSpeed * deltaTime);
-                                Vector2 velocity = deltaTime > Mathf.Epsilon
-                                    ? (Vector2)((nextPosition - startPosition) / deltaTime)
-                                    : Vector2.zero;
-                                ApplyMovement(nextPosition, velocity, false);
-                            }
-                            else if (body != null)
-                            {
-                                body.linearVelocity = Vector2.zero;
-                            }
-                        }
-
-                        if (woodcuttingSkill.IsChopping && distance > GatheringRange * 1.2f)
-                            woodcuttingSkill.StopChopping();
-                    }
-                    else
-                    {
-                        if (body != null)
-                            body.linearVelocity = Vector2.zero;
-
-                        if (!woodcuttingActive || currentTree == null || currentTree != tree)
-                            break;
-
-                        if (!woodcuttingSkill.IsChopping)
-                        {
-                            if (!woodcuttingActive || currentTree == null || currentTree != tree)
-                                break;
-
-                            woodcuttingSkill.StartChopping(tree, axe);
-                        }
-
-                        if (!woodcuttingActive || currentTree == null || currentTree != tree)
-                            break;
-
-                        if (!woodcuttingSkill.IsChopping)
-                            break;
-                    }
-
-                    if (tree == null || tree.IsDepleted)
-                        break;
-
-                    yield return null;
-                }
-            }
-            finally
-            {
-                followerHold.Dispose();
-            }
-
-            if (stuckTriggered)
-            {
-                            HandleWoodcuttingStuck(stuckTree);
+            if (routineResult.Stuck)
                 yield break;
-            }
 
             woodcuttingRoutine = null;
             woodcuttingActive = false;

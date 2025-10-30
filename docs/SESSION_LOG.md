@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:616d43bbf419faa99294cef10e281516c725e7c4 -->
+## 2025-10-30T17:20:57+00:00 — Refactor companion gathering movement into reusable routine
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 401 ++ / 535 --
+- Notes:
+  —
+---
 <!-- commit:41e5f6ee8df0bc6ed30c7c2d11ad0a74b4591c6d -->
 ## 2025-10-30T17:01:14+00:00 — Merge pull request #1562 from aicovergod/codex/add-companiontoolownershiputility
 
