@@ -636,99 +636,28 @@ namespace Companions
 
         private bool BuildAreaCandidateList(float radius, out CompanionWoodcuttingCommandResult failureReason, bool suppressChat = true)
         {
-            areaCandidates.Clear();
-            areaCandidateTileCenters.Clear();
-            areaAllCandidatesBlocked = false;
-
-            var trees = FindObjectsOfType<TreeNode>();
-            float radiusSqr = radius * radius;
-
-            Vector2 controllerPosition2D = (Vector2)transform.position;
-            bool observedNonInventoryFailure = false;
-            CompanionWoodcuttingCommandResult lastNonInventoryFailure = CompanionWoodcuttingCommandResult.Unreachable;
-            int blockedByStuckCount = 0;
-
-            float now = Time.time;
-            PruneExpiredBlockedNodes();
-
-            for (int i = 0; i < trees.Length; i++)
-            {
-                var tree = trees[i];
-                if (tree == null || tree.IsDepleted)
-                    continue;
-
-                Vector2 rockPosition2D = (Vector2)tree.transform.position;
-                if ((rockPosition2D - controllerPosition2D).sqrMagnitude > radiusSqr)
-                    continue;
-
-                if (tree.def != null && tree.def.DepletesAfterOneLog && playerProtectedSingleLog.Contains(tree))
-                    continue;
-
-                if (IsNodeTemporarilyBlocked(tree, now))
+            var outcome = BuildAreaCandidates(
+                radius,
+                retrieveNodes: () => FindObjectsOfType<TreeNode>(),
+                shouldSkipNode: tree =>
                 {
-                    blockedByStuckCount++;
-                    continue;
-                }
+                    if (tree == null)
+                        return true;
 
-                if (!TryPrepareWoodcuttingCommand(tree, out var _, out var validationResult, suppressChat))
+                    return tree.def != null && tree.def.DepletesAfterOneLog && playerProtectedSingleLog.Contains(tree);
+                },
+                tryPrepareCommand: tree =>
                 {
-                    if (validationResult == CompanionWoodcuttingCommandResult.InventoryFull)
-                    {
-                        failureReason = CompanionWoodcuttingCommandResult.InventoryFull;
-                        return false;
-                    }
+                    bool accepted = TryPrepareWoodcuttingCommand(tree, out var _, out var validationResult, suppressChat);
+                    return (accepted, validationResult);
+                },
+                acceptedResultFactory: () => CompanionWoodcuttingCommandResult.Accepted,
+                defaultFailureResultFactory: () => CompanionWoodcuttingCommandResult.Unreachable,
+                isInventoryFullResult: result => result == CompanionWoodcuttingCommandResult.InventoryFull,
+                isAcceptedResult: result => result == CompanionWoodcuttingCommandResult.Accepted);
 
-                    if (validationResult != CompanionWoodcuttingCommandResult.InventoryFull &&
-                        validationResult != CompanionWoodcuttingCommandResult.Accepted)
-                    {
-                        observedNonInventoryFailure = true;
-                        lastNonInventoryFailure = validationResult;
-                    }
-
-                    continue;
-                }
-
-                areaCandidates.Add(tree);
-            }
-
-            areaCandidates.Sort((a, b) =>
-            {
-                if (a == null && b == null)
-                    return 0;
-                if (a == null)
-                    return 1;
-                if (b == null)
-                    return -1;
-
-                Vector2 aPosition2D = (Vector2)a.transform.position;
-                Vector2 bPosition2D = (Vector2)b.transform.position;
-                float da = (aPosition2D - controllerPosition2D).sqrMagnitude;
-                float db = (bPosition2D - controllerPosition2D).sqrMagnitude;
-                return da.CompareTo(db);
-            });
-
-            for (int i = 0; i < areaCandidates.Count; i++)
-            {
-                var candidate = areaCandidates[i];
-                if (candidate == null)
-                    continue;
-
-                areaCandidateTileCenters.Add(GetTileCentre(candidate.transform.position));
-            }
-
-            if (areaCandidates.Count == 0)
-            {
-                if (blockedByStuckCount > 0 && !observedNonInventoryFailure)
-                    areaAllCandidatesBlocked = true;
-
-                failureReason = observedNonInventoryFailure
-                    ? lastNonInventoryFailure
-                    : CompanionWoodcuttingCommandResult.Unreachable;
-                return false;
-            }
-
-            failureReason = CompanionWoodcuttingCommandResult.Accepted;
-            return true;
+            failureReason = outcome.failureReason;
+            return outcome.success;
         }
 
         private void PublishAreaWoodcuttingFailureMessage(CompanionWoodcuttingCommandResult failureReason)

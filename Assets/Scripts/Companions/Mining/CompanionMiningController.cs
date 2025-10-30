@@ -647,99 +647,28 @@ namespace Companions
 
         private bool BuildAreaCandidateList(float radius, out CompanionMiningCommandResult failureReason, bool suppressChat = true)
         {
-            areaCandidates.Clear();
-            areaCandidateTileCenters.Clear();
-            areaAllCandidatesBlocked = false;
-
-            var rocks = FindObjectsOfType<MineableRock>();
-            float radiusSqr = radius * radius;
-
-            Vector2 controllerPosition2D = (Vector2)transform.position;
-            bool observedNonInventoryFailure = false;
-            CompanionMiningCommandResult lastNonInventoryFailure = CompanionMiningCommandResult.Unreachable;
-            int blockedByStuckCount = 0;
-
-            float now = Time.time;
-            PruneExpiredBlockedNodes();
-
-            for (int i = 0; i < rocks.Length; i++)
-            {
-                var rock = rocks[i];
-                if (rock == null || rock.IsDepleted)
-                    continue;
-
-                Vector2 rockPosition2D = (Vector2)rock.transform.position;
-                if ((rockPosition2D - controllerPosition2D).sqrMagnitude > radiusSqr)
-                    continue;
-
-                if (rock.RockDef != null && rock.RockDef.DepleteAfterNOres == 1 && playerProtectedSingleOre.Contains(rock))
-                    continue;
-
-                if (IsNodeTemporarilyBlocked(rock, now))
+            var outcome = BuildAreaCandidates(
+                radius,
+                retrieveNodes: () => FindObjectsOfType<MineableRock>(),
+                shouldSkipNode: rock =>
                 {
-                    blockedByStuckCount++;
-                    continue;
-                }
+                    if (rock == null)
+                        return true;
 
-                if (!TryPrepareMiningCommand(rock, out var _, out var validationResult, suppressChat))
+                    return rock.RockDef != null && rock.RockDef.DepleteAfterNOres == 1 && playerProtectedSingleOre.Contains(rock);
+                },
+                tryPrepareCommand: rock =>
                 {
-                    if (validationResult == CompanionMiningCommandResult.InventoryFull)
-                    {
-                        failureReason = CompanionMiningCommandResult.InventoryFull;
-                        return false;
-                    }
+                    bool accepted = TryPrepareMiningCommand(rock, out var _, out var validationResult, suppressChat);
+                    return (accepted, validationResult);
+                },
+                acceptedResultFactory: () => CompanionMiningCommandResult.Accepted,
+                defaultFailureResultFactory: () => CompanionMiningCommandResult.Unreachable,
+                isInventoryFullResult: result => result == CompanionMiningCommandResult.InventoryFull,
+                isAcceptedResult: result => result == CompanionMiningCommandResult.Accepted);
 
-                    if (validationResult != CompanionMiningCommandResult.InventoryFull &&
-                        validationResult != CompanionMiningCommandResult.Accepted)
-                    {
-                        observedNonInventoryFailure = true;
-                        lastNonInventoryFailure = validationResult;
-                    }
-
-                    continue;
-                }
-
-                areaCandidates.Add(rock);
-            }
-
-            areaCandidates.Sort((a, b) =>
-            {
-                if (a == null && b == null)
-                    return 0;
-                if (a == null)
-                    return 1;
-                if (b == null)
-                    return -1;
-
-                Vector2 aPosition2D = (Vector2)a.transform.position;
-                Vector2 bPosition2D = (Vector2)b.transform.position;
-                float da = (aPosition2D - controllerPosition2D).sqrMagnitude;
-                float db = (bPosition2D - controllerPosition2D).sqrMagnitude;
-                return da.CompareTo(db);
-            });
-
-            for (int i = 0; i < areaCandidates.Count; i++)
-            {
-                var candidate = areaCandidates[i];
-                if (candidate == null)
-                    continue;
-
-                areaCandidateTileCenters.Add(GetTileCentre(candidate.transform.position));
-            }
-
-            if (areaCandidates.Count == 0)
-            {
-                if (blockedByStuckCount > 0 && !observedNonInventoryFailure)
-                    areaAllCandidatesBlocked = true;
-
-                failureReason = observedNonInventoryFailure
-                    ? lastNonInventoryFailure
-                    : CompanionMiningCommandResult.Unreachable;
-                return false;
-            }
-
-            failureReason = CompanionMiningCommandResult.Accepted;
-            return true;
+            failureReason = outcome.failureReason;
+            return outcome.success;
         }
 
         private void PublishAreaMiningFailureMessage(CompanionMiningCommandResult failureReason)
@@ -762,13 +691,6 @@ namespace Companions
                     PublishNoRocksMessage();
                     break;
             }
-        }
-
-        private Vector3 GetTileCentre(Vector3 worldPosition)
-        {
-            float x = Mathf.Round(worldPosition.x);
-            float y = Mathf.Round(worldPosition.y);
-            return new Vector3(x, y, worldPosition.z);
         }
 
         private void CancelMiningDueToStuck()

@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c2c85bea4816dacc39bcbfb1c64f08cb19fa888a -->
+## 2025-10-30T19:21:12+00:00 — Refactor companion gathering candidate building
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 204 ++ / 238 --
+- Notes:
+  —
+---
 <!-- commit:871453b5fa9784d1432b862b0d5c9ab95d34b630 -->
 ## 2025-10-30T18:53:25+00:00 — Merge pull request #1567 from aicovergod/codex/refactor-handlefishingstuck-method
 

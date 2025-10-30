@@ -683,62 +683,28 @@ namespace Companions
 
         private bool BuildAreaCandidateList(float radius, out CompanionFishingCommandResult failureReason, bool suppressChat = true)
         {
-            areaCandidates.Clear();
-            areaCandidateTileCenters.Clear();
-            areaAllCandidatesBlocked = false;
-
-            var allSpots = FindObjectsOfType<FishableSpot>();
-            if (allSpots == null || allSpots.Length == 0)
-            {
-                failureReason = CompanionFishingCommandResult.Unreachable;
-                return false;
-            }
-
-            Vector3 origin = transform.position;
-            float radiusSqr = radius * radius;
-            bool anyReachable = false;
-            CompanionFishingCommandResult lastNonInventoryFailure = CompanionFishingCommandResult.Unreachable;
-
-            for (int i = 0; i < allSpots.Length; i++)
-            {
-                var spot = allSpots[i];
-                if (spot == null || spot.IsDepleted)
-                    continue;
-
-                if (spot.IsBusy || spot == playerActiveSpot)
-                    continue;
-
-                float distanceSqr = (spot.transform.position - origin).sqrMagnitude;
-                if (distanceSqr > radiusSqr)
-                    continue;
-
-                if (!TryPrepareFishingCommand(spot, out var _, out var validationResult, suppressChat))
+            var outcome = BuildAreaCandidates(
+                radius,
+                retrieveNodes: () => FindObjectsOfType<FishableSpot>(),
+                shouldSkipNode: spot =>
                 {
-                    if (validationResult == CompanionFishingCommandResult.InventoryFull)
-                    {
-                        failureReason = CompanionFishingCommandResult.InventoryFull;
-                        return false;
-                    }
+                    if (spot == null)
+                        return true;
 
-                    if (validationResult != CompanionFishingCommandResult.Accepted)
-                        lastNonInventoryFailure = validationResult;
+                    return spot.IsBusy || spot == playerActiveSpot;
+                },
+                tryPrepareCommand: spot =>
+                {
+                    bool accepted = TryPrepareFishingCommand(spot, out var _, out var validationResult, suppressChat);
+                    return (accepted, validationResult);
+                },
+                acceptedResultFactory: () => CompanionFishingCommandResult.Accepted,
+                defaultFailureResultFactory: () => CompanionFishingCommandResult.Unreachable,
+                isInventoryFullResult: result => result == CompanionFishingCommandResult.InventoryFull,
+                isAcceptedResult: result => result == CompanionFishingCommandResult.Accepted);
 
-                    continue;
-                }
-
-                anyReachable = true;
-                areaCandidates.Add(spot);
-                areaCandidateTileCenters.Add(GetTileCentre(spot.transform.position));
-            }
-
-            if (!anyReachable)
-            {
-                failureReason = lastNonInventoryFailure;
-                return false;
-            }
-
-            failureReason = CompanionFishingCommandResult.Accepted;
-            return true;
+            failureReason = outcome.failureReason;
+            return outcome.success;
         }
 
         private void PublishAreaFishingFailureMessage(CompanionFishingCommandResult failureReason)
