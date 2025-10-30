@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:25478721d7fc9c2196a56f61217a6020aafec5c6 -->
+## 2025-10-30T11:30:45+00:00 — Fix stinging nettle hazard damage aggregation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Environment/WorldObjects/StingingNettleHazard.cs
+- Diff: 198 ++ / 9 --
+- Notes:
+  —
+---
 <!-- commit:edc22b07b28e4b3279c933517dcd0e3f5b539072 -->
 ## 2025-10-30T10:56:33+00:00 — Merge pull request #1552 from aicovergod/codex/fix-multiple-chatbox-messages-for-nettle-objects
 
