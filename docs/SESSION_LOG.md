@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c3638668f591bc918a8bc8b0fcec5fcc35b38759 -->
+## 2025-10-30T16:05:25+00:00 — Merge pull request #1559 from aicovergod/codex/add-helper-for-skill-event-binding
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 101 ++ / 78 --
+- Notes:
+  Refactor companion gathering skill bindings
+---
+<!-- commit:b97d58afdd0759e014124534717cf9793ab8236f -->
+## 2025-10-30T16:05:16+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c4e3ae7833f242053d8f2df56e7270164cfeeafc -->
 ## 2025-10-30T16:05:03+00:00 — Refactor companion skill bindings
 
