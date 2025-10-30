@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f2c9663add347ee5c18c83692e60175b849d8cbc -->
+## 2025-10-30T18:34:48+00:00 — Merge pull request #1566 from aicovergod/codex/add-shared-helper-for-publishing-chat-lines
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 47 ++ / 21 --
+- Notes:
+  Refactor companion stuck apology messaging
+---
+<!-- commit:a62ea60358f6e94c3bd4a99ffea9e32d742680d5 -->
+## 2025-10-30T18:34:44+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ade9c3e06f92a358a95119094ebba82bba4e2102 -->
 ## 2025-10-30T18:34:30+00:00 — Refactor companion stuck apology messaging
 
