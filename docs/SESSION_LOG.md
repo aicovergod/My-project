@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1db848ce7313c2e13f91fe17d019f0377b6e8f31 -->
+## 2025-10-30T17:21:27+00:00 — Merge pull request #1563 from aicovergod/codex/add-reusable-helper-for-companion-movement
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 410 ++ / 535 --
+- Notes:
+  Refactor companion gathering routines to share movement helper
+---
+<!-- commit:f7463e27f7e1c5c3b24b77435b4ce93c38181808 -->
+## 2025-10-30T17:21:10+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:616d43bbf419faa99294cef10e281516c725e7c4 -->
 ## 2025-10-30T17:20:57+00:00 — Refactor companion gathering movement into reusable routine
 
