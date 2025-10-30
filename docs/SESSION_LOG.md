@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:86cb9b1eabeb4bf8eb5a8f8ec1df34afe72b93d1 -->
+## 2025-10-30T15:32:14+00:00 — Merge pull request #1558 from aicovergod/codex/add-reusable-xp-distribution-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 200 ++ / 119 --
+- Notes:
+  Refactor combat XP distribution into shared helper
+---
+<!-- commit:e5f715a95c81506baa231f6820d136b11c83ad57 -->
+## 2025-10-30T15:31:43+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:fe545b2e17d40a743b6c2876b14786d7dcde7aca -->
 ## 2025-10-30T15:31:30+00:00 — Refactor combat XP distribution into shared helper
 
