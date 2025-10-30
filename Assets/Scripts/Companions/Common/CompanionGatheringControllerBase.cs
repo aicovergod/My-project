@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Companions.Equipment;
 using Skills;
+using UI.Chat;
 using UnityEngine;
 using Util;
 using RuntimeInventory = global::Inventory.Inventory;
@@ -198,6 +199,40 @@ namespace Companions
                 return;
 
             fallbackSpriteRenderer.flipX = Direction8Utility.IsFacingLeft(lastFacing);
+        }
+
+        /// <summary>
+        /// Publishes a companion chat message by evaluating the provided resolver after confirming the
+        /// chat service is present. This centralises the null checks that every gathering controller
+        /// previously duplicated when emitting skill-specific dialogue lines.
+        /// </summary>
+        /// <param name="lineResolver">Delegate that returns the line which should be spoken.</param>
+        protected void PublishCompanionChatLine(Func<string> lineResolver)
+        {
+            if (lineResolver == null)
+                throw new ArgumentNullException(nameof(lineResolver));
+
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string message = lineResolver();
+            if (string.IsNullOrEmpty(message))
+                return;
+
+            chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), message);
+        }
+
+        /// <summary>
+        /// Publishes the supplied companion chat line when the chat service is available.
+        /// </summary>
+        /// <param name="line">The text that should be broadcast to the chat window.</param>
+        protected void PublishCompanionChatLine(string line)
+        {
+            if (string.IsNullOrEmpty(line))
+                return;
+
+            PublishCompanionChatLine(() => line);
         }
 
         /// <summary>

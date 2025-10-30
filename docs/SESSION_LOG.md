@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ade9c3e06f92a358a95119094ebba82bba4e2102 -->
+## 2025-10-30T18:34:30+00:00 — Refactor companion stuck apology messaging
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 38 ++ / 21 --
+- Notes:
+  —
+---
 <!-- commit:85e5de87014ebd473c36965859399c455248c53b -->
 ## 2025-10-30T18:23:54+00:00 — Merge pull request #1565 from aicovergod/codex/refactor-cooking-chat-publishing-logic
 

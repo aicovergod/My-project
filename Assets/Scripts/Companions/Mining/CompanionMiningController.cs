@@ -784,13 +784,7 @@ namespace Companions
 
         private void PublishStuckApologyMessage()
         {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            chat.PublishCompanionMessage(
-                CompanionManager.GetCompanionDisplayName(),
-                CompanionMiningDialogueLibrary.GetRandomStuckApologyLine());
+            PublishCompanionChatLine(CompanionMiningDialogueLibrary.GetRandomStuckApologyLine);
         }
 
         private void ResetStuckHistory()
