@@ -1,16 +1,12 @@
 /// Feature: Added companion pickup routing through the shared path mover system.
 using System;
-using System.Collections;
-using System.Reflection;
 using Combat;
 using Inventory;
 using Inventory.GroundItems;
 using MyGame.Drops;
 using Pets;
 using Skills;
-using UI.Chat;
 using UnityEngine;
-using Util;
 using Companions.Combat;
 using Companions.Equipment;
 using RuntimeInventory = global::Inventory.Inventory;
@@ -66,34 +62,12 @@ namespace Companions
         /// <summary>Tracks per-skill cooldown timers for gathering command throttling.</summary>
         private CompanionSkillCooldownTracker skillCooldownTracker;
 
-        [Header("Pickup Commands")]
         [SerializeField]
-        [Tooltip("Distance from the target drop before the companion stops to collect it.")]
-        private float pickupStopDistance = 0.35f;
+        [Tooltip("Dedicated component that coordinates directed pickup commands.")]
+        private CompanionPickupController pickupController;
 
-        [SerializeField]
-        [Tooltip("Waypoint tolerance supplied to the path mover while approaching drops.")]
-        private float pickupWaypointTolerance = 0.075f;
-
-        [SerializeField]
-        [Tooltip("Distance change required before the pickup path requests a fresh solution.")]
-        private float pickupRepathDistance = 0.6f;
-
-        [SerializeField]
-        [Tooltip("Multiplier applied to the companion's follow speed while collecting drops.")]
-        private float pickupMoveSpeedMultiplier = 1f;
-
-        [SerializeField]
-        [Tooltip("Seconds without progress before the pickup command gives up as obstructed.")]
-        private float pickupStuckTimeoutSeconds = 2.5f;
-
-        private Coroutine pickupRoutine;
         private PetPathMover pathMover;
         private Rigidbody2D body2D;
-        private PetSpriteAnimator spriteAnimator;
-        private bool followerDisabledByPickup;
-        private WaitForFixedUpdate pickupFixedUpdateYield;
-
         /// <summary>Raised when a skill level changes so the manager can refresh combat level text.</summary>
         public event Action<SkillType, int> SkillLevelChanged;
 
@@ -127,13 +101,16 @@ namespace Companions
         /// <summary>Provides access to the equipment component configured for the companion.</summary>
         public CompanionEquipment Equipment => companionEquipment;
 
+        /// <summary>Provides access to the dedicated pickup controller component.</summary>
+        public CompanionPickupController PickupController => pickupController;
+
         /// <summary>
         /// Indicates whether any attached subsystem currently holds the follower disabled so combat
         /// logic can avoid re-enabling it prematurely.
         /// </summary>
         public bool HasActiveFollowerHold()
         {
-            if (followerDisabledByPickup)
+            if (pickupController != null && pickupController.HasActiveFollowerHold)
                 return true;
 
             if (cookingController != null && cookingController.HasActiveFollowerHold)
@@ -192,7 +169,7 @@ namespace Companions
             ConfigureWoodcutting(player);
             ConfigureCombat();
             combatController?.BindCompanionController(this);
-            ConfigurePickupMovementHelpers();
+            ConfigurePickupController();
             RebindPlayer(player);
         }
 
@@ -275,7 +252,7 @@ namespace Companions
         /// </summary>
         public void CommandAttack(CombatTarget target)
         {
-            CancelActivePickupRoutine();
+            pickupController?.CancelActivePickup();
             // Cancel any active gathering routines so direct attack orders stop ongoing skill behaviour.
             miningController?.CancelMining(true);
             cookingController?.CancelCooking(true);
@@ -297,6 +274,9 @@ namespace Companions
         /// <param name="targetDrop">Drop the companion should attempt to collect.</param>
         public void CommandPickup(WorldDrop targetDrop)
         {
+            if (pickupController == null)
+                return;
+
             if (targetDrop == null)
                 return;
 
@@ -306,18 +286,17 @@ namespace Companions
             if (!targetDrop.IsAvailable)
                 return;
 
-            CancelActivePickupRoutine();
+            pickupController.CancelActivePickup();
             miningController?.CancelMining(true);
             cookingController?.CancelCooking(true);
             woodcuttingController?.CancelWoodcutting(true);
-
-            ConfigurePickupMovementHelpers();
-            pickupRoutine = StartCoroutine(PickupRoutine(targetDrop));
+            pickupController.CommandPickup(targetDrop);
         }
 
         /// <summary>Invoked when the companion should be hidden. Closes UI and disables the object.</summary>
         public void HandleStoreRequest()
         {
+            pickupController?.CancelActivePickup();
             // Persist the companion's runtime inventory before closing any associated UI panels.
             var runtimeInventory = companionInventory?.InventoryComponent;
             if (runtimeInventory != null)
@@ -556,458 +535,18 @@ namespace Companions
         }
 
         /// <summary>
-        /// Resolves the helper components used while issuing directed pickup commands.
+        /// Ensures the dedicated pickup controller exists and is initialised for commands.
         /// </summary>
-        private void ConfigurePickupMovementHelpers()
+        private void ConfigurePickupController()
         {
-            pathMover ??= GetComponent<PetPathMover>();
-            body2D ??= GetComponent<Rigidbody2D>();
-            spriteAnimator ??= GetComponent<PetSpriteAnimator>() ?? GetComponentInChildren<PetSpriteAnimator>();
-        }
+            pickupController = pickupController != null
+                ? pickupController
+                : GetComponent<CompanionPickupController>();
 
-        /// <summary>
-        /// Coroutine that steers the companion toward the requested drop using the shared path mover.
-        /// </summary>
-        private IEnumerator PickupRoutine(WorldDrop targetDrop)
-        {
-            if (targetDrop == null)
-                yield break;
+            if (pickupController == null)
+                pickupController = gameObject.AddComponent<CompanionPickupController>();
 
-            ConfigurePickupMovementHelpers();
-            DisableFollowerForPickup();
-
-            pathMover?.ResetAttackTracking();
-            pathMover?.ResetCachedVelocity();
-
-            float lastProgressSample = Time.unscaledTime;
-            float lastProgressDistance = float.MaxValue;
-            Vector3 lastProgressPosition = body2D != null ? (Vector3)body2D.position : transform.position;
-            // Thresholds used to decide when progress samples should refresh.
-            const float progressPositionThreshold = 0.02f;
-            const float progressDistanceThreshold = 0.01f;
-            float stuckTimeout = Mathf.Max(0.1f, pickupStuckTimeoutSeconds);
-
-            try
-            {
-                while (enabled)
-                {
-                    if (targetDrop == null || !targetDrop.IsAvailable)
-                        break;
-
-                    Transform pickupTransform = targetDrop.PickupTransform;
-                    if (pickupTransform == null)
-                        break;
-
-                    float stopDistance = Mathf.Max(0.05f, pickupStopDistance);
-                    Vector3 targetPosition = pickupTransform.position;
-                    Vector3 currentPosition = body2D != null ? (Vector3)body2D.position : transform.position;
-                    float distance = Vector2.Distance(currentPosition, targetPosition);
-
-                    if (distance <= stopDistance)
-                        break;
-
-                    bool distanceImproved = distance <= lastProgressDistance - progressDistanceThreshold;
-                    if (distanceImproved)
-                    {
-                        lastProgressSample = Time.unscaledTime;
-                        lastProgressDistance = distance;
-                        lastProgressPosition = currentPosition;
-                    }
-                    else
-                    {
-                        float movementDelta = Vector2.Distance(currentPosition, lastProgressPosition);
-                        if (movementDelta >= progressPositionThreshold)
-                        {
-                            lastProgressSample = Time.unscaledTime;
-                            lastProgressPosition = currentPosition;
-                            if (distance < lastProgressDistance)
-                                lastProgressDistance = distance;
-                        }
-                    }
-
-                    bool timedOut = Time.unscaledTime - lastProgressSample >= stuckTimeout;
-                    bool lackingMovement = Vector2.Distance(currentPosition, lastProgressPosition) < progressPositionThreshold;
-                    bool noGoalApproach = distance >= lastProgressDistance - progressDistanceThreshold;
-                    if (timedOut && lackingMovement && noGoalApproach)
-                    {
-                        if (CompanionManager.EnableDebugLogging)
-                        {
-                            Debug.Log("[Companion Pickup] Movement stalled while approaching the drop. Aborting command.", this);
-                        }
-
-                        break;
-                    }
-
-                    Vector3 nextPosition;
-                    Vector2 velocity;
-                    bool teleported;
-
-                    bool navigationProvidedStep = TryStepWithNavigation(targetDrop, stopDistance, out nextPosition, out velocity, out teleported);
-                    if (!navigationProvidedStep)
-                    {
-                        StepDirectlyTowards(targetPosition, ResolvePickupMoveSpeed(), out nextPosition, out velocity);
-                        teleported = false;
-                    }
-                    else
-                    {
-                        lastProgressSample = Time.unscaledTime;
-                        lastProgressPosition = currentPosition;
-                        if (distance < lastProgressDistance)
-                            lastProgressDistance = distance;
-
-                        if ((nextPosition - currentPosition).sqrMagnitude <= 0.0001f && velocity.sqrMagnitude <= 0.0001f)
-                        {
-                            // Navigation is still resolving a path; treat this as progress so the stuck timer does not abort early.
-                            lastProgressSample = Time.unscaledTime;
-                            lastProgressPosition = currentPosition;
-                            if (distance < lastProgressDistance)
-                                lastProgressDistance = distance;
-                        }
-                    }
-
-                    ApplyPickupMovement(nextPosition, velocity, teleported);
-
-                    if (body2D != null)
-                    {
-                        pickupFixedUpdateYield ??= new WaitForFixedUpdate();
-                        yield return pickupFixedUpdateYield;
-                    }
-                    else
-                    {
-                        yield return null;
-                    }
-                }
-
-                if (targetDrop != null && targetDrop.IsAvailable)
-                {
-                    Transform pickupTransform = targetDrop.PickupTransform;
-                    float stopDistance = Mathf.Max(0.05f, pickupStopDistance);
-                    if (pickupTransform != null)
-                    {
-                        Vector3 evaluationPosition = body2D != null ? (Vector3)body2D.position : transform.position;
-                        if (Vector2.Distance(evaluationPosition, pickupTransform.position) <= stopDistance + 0.05f)
-                        {
-                            FacePickup(pickupTransform.position);
-                            TryCollectDrop(targetDrop);
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                ResetPickupMovementState();
-                pickupRoutine = null;
-            }
-        }
-
-        /// <summary>
-        /// Attempts to consume a navigation step via <see cref="PetPathMover"/> while pursuing the drop.
-        /// </summary>
-        private bool TryStepWithNavigation(
-            WorldDrop targetDrop,
-            float stopDistance,
-            out Vector3 nextPosition,
-            out Vector2 velocity,
-            out bool teleported)
-        {
-            nextPosition = transform.position;
-            velocity = Vector2.zero;
-            teleported = false;
-
-            if (pathMover == null || !pathMover.isActiveAndEnabled)
-                return false;
-
-            if (!pathMover.HasActiveNavigationGrid)
-                return false;
-
-            float deltaTime = body2D != null
-                ? Mathf.Max(Time.fixedDeltaTime, Mathf.Epsilon)
-                : Mathf.Max(Time.deltaTime, Mathf.Epsilon);
-
-            Vector2 navNext;
-            Vector2 navVelocity;
-            bool navTeleported;
-            bool goalUnreachable;
-
-            bool stepped = pathMover.TryStepAttack(
-                deltaTime,
-                ResolvePickupMoveSpeed(),
-                stopDistance,
-                Mathf.Max(0.01f, pickupWaypointTolerance),
-                () => targetDrop != null && targetDrop.PickupTransform != null
-                    ? (Vector2)targetDrop.PickupTransform.position
-                    : (Vector2)transform.position,
-                Mathf.Max(stopDistance * 0.75f, pickupRepathDistance),
-                float.PositiveInfinity,
-                out navNext,
-                out navVelocity,
-                out navTeleported,
-                out goalUnreachable);
-
-            if (goalUnreachable)
-            {
-                if (CompanionManager.EnableDebugLogging)
-                {
-                    Debug.Log("[Companion Pickup] Navigation reported the drop as unreachable. Falling back to direct steering.", this);
-                }
-
-                return false;
-            }
-
-            if (stepped)
-            {
-                nextPosition = new Vector3(navNext.x, navNext.y, transform.position.z);
-                velocity = navVelocity;
-                teleported = navTeleported;
-                return true;
-            }
-
-            // Navigation is active but has not produced a waypoint yet (likely waiting for a path response).
-            // Hold position so the coroutine can wait for the navigation data instead of reverting to direct steering.
-            Vector3 currentPosition = body2D != null ? (Vector3)body2D.position : transform.position;
-            nextPosition = new Vector3(currentPosition.x, currentPosition.y, transform.position.z);
-            velocity = Vector2.zero;
-            teleported = false;
-            return true;
-        }
-
-        /// <summary>
-        /// Provides a direct steering fallback when no navigation grid is available.
-        /// </summary>
-        private void StepDirectlyTowards(Vector3 targetPosition, float moveSpeed, out Vector3 nextPosition, out Vector2 velocity)
-        {
-            Vector3 currentPosition = body2D != null ? (Vector3)body2D.position : transform.position;
-            float deltaTime = body2D != null
-                ? Mathf.Max(Time.fixedDeltaTime, Mathf.Epsilon)
-                : Mathf.Max(Time.deltaTime, Mathf.Epsilon);
-
-            nextPosition = Vector3.MoveTowards(currentPosition, targetPosition, moveSpeed * deltaTime);
-            nextPosition.z = currentPosition.z;
-
-            Vector2 displacement = nextPosition - currentPosition;
-            float clampedDelta = Mathf.Max(deltaTime, Mathf.Epsilon);
-            velocity = displacement / clampedDelta;
-        }
-
-        /// <summary>
-        /// Applies the computed movement step and updates sprite feedback.
-        /// </summary>
-        private void ApplyPickupMovement(Vector3 nextPosition, Vector2 velocity, bool teleported)
-        {
-            Vector3 currentPosition = body2D != null ? (Vector3)body2D.position : transform.position;
-            Vector2 displacement = (Vector2)(nextPosition - currentPosition);
-
-            if (body2D != null)
-            {
-                if (teleported)
-                {
-                    body2D.position = nextPosition;
-                    body2D.linearVelocity = Vector2.zero;
-                }
-                else
-                {
-                    body2D.MovePosition(nextPosition);
-                    body2D.linearVelocity = velocity;
-                }
-            }
-            else
-            {
-                transform.position = nextPosition;
-            }
-
-            UpdatePickupMovementVisuals(displacement, teleported ? Vector2.zero : velocity);
-        }
-
-        /// <summary>
-        /// Refreshes sprite-facing feedback while the companion travels toward the drop.
-        /// </summary>
-        private void UpdatePickupMovementVisuals(Vector2 displacement, Vector2 velocity)
-        {
-            if (spriteAnimator != null)
-            {
-                spriteAnimator.UpdateVisuals(velocity);
-            }
-        }
-
-        /// <summary>
-        /// Temporarily disables the follower so the pickup routine can control movement directly.
-        /// </summary>
-        private void DisableFollowerForPickup()
-        {
-            if (follower == null)
-                return;
-
-            if (followerDisabledByPickup)
-                return;
-
-            if (!follower.enabled)
-                return;
-
-            follower.enabled = false;
-            followerDisabledByPickup = true;
-        }
-
-        /// <summary>
-        /// Resets pathing helpers, restores the follower, and clears velocities after a pickup attempt.
-        /// </summary>
-        private void ResetPickupMovementState()
-        {
-            pathMover?.ResetAttackTracking();
-            pathMover?.ResetFollowTracking();
-            pathMover?.ResetCachedVelocity();
-
-            if (body2D != null)
-            {
-                body2D.linearVelocity = Vector2.zero;
-                body2D.angularVelocity = 0f;
-            }
-
-            spriteAnimator?.UpdateVisuals(Vector2.zero);
-
-            transform.rotation = Quaternion.identity;
-
-            if (followerDisabledByPickup && follower != null && !follower.enabled)
-            {
-                follower.enabled = true;
-            }
-
-            followerDisabledByPickup = false;
-        }
-
-        /// <summary>
-        /// Resolves the movement speed used while walking toward drops.
-        /// </summary>
-        private float ResolvePickupMoveSpeed()
-        {
-            float baseSpeed = follower != null ? Mathf.Max(0.1f, follower.moveSpeed) : 5f;
-            float multiplier = Mathf.Max(0.1f, pickupMoveSpeedMultiplier);
-            return Mathf.Max(0.1f, baseSpeed * multiplier);
-        }
-
-        /// <summary>
-        /// Attempts to add the drop to the companion inventory and despawn the pickup.
-        /// </summary>
-        private void TryCollectDrop(WorldDrop drop)
-        {
-            if (drop == null || companionInventory == null)
-                return;
-
-            if (!drop.IsAvailable)
-                return;
-
-            ItemStack stack = drop.Stack;
-            if (!stack.IsValid)
-                return;
-
-            bool added = companionInventory.TryAddItem(stack);
-            if (added)
-            {
-                drop.Despawn();
-                TryPlayPickupAnimation();
-                MaybePostPickupSuccessMessage();
-            }
-            else
-            {
-                PostInventoryFullMessage();
-            }
-        }
-
-        /// <summary>
-        /// Cancels any active pickup coroutine and restores the follower/path mover state.
-        /// </summary>
-        private void CancelActivePickupRoutine()
-        {
-            if (pickupRoutine != null)
-            {
-                StopCoroutine(pickupRoutine);
-                pickupRoutine = null;
-            }
-
-            ResetPickupMovementState();
-        }
-
-        /// <summary>
-        /// Rotates the companion to face the collected item for a natural pickup motion.
-        /// </summary>
-        private void FacePickup(Vector3 worldPosition)
-        {
-            Vector3 direction = worldPosition - transform.position;
-            direction.z = 0f;
-            if (direction.sqrMagnitude <= 0.0001f)
-                return;
-
-            Vector2 planar = new Vector2(direction.x, direction.y);
-            if (spriteAnimator != null)
-            {
-                Direction8 facing = Direction8Utility.FromVector(planar, allowDiagonals: true, fallback: Direction8.Down);
-                spriteAnimator.SetFacing(facing);
-                spriteAnimator.UpdateVisuals(Vector2.zero);
-            }
-
-            transform.rotation = Quaternion.identity;
-        }
-
-        /// <summary>
-        /// Posts a random inventory-full chat line to the chatbox.
-        /// </summary>
-        private void PostInventoryFullMessage()
-        {
-            string message = CompanionPickupDialogueLibrary.GetRandomInventoryFullResponse(ResolveActivePlayerName());
-            if (string.IsNullOrEmpty(message))
-                return;
-
-            ChatboxUI.PostSystemMessage(message);
-        }
-
-        /// <summary>
-        /// Attempts to emit a companion bark after a successful pickup with a 1-in-10 chance.
-        /// </summary>
-        private void MaybePostPickupSuccessMessage()
-        {
-            if (!CompanionPickupDialogueLibrary.TryGetPickupSuccessResponse(ResolveActivePlayerName(), out string message))
-                return;
-
-            var chat = ChatService.Instance;
-            if (chat != null)
-            {
-                string companionName = CompanionManager.GetCompanionDisplayName();
-                if (string.IsNullOrWhiteSpace(companionName))
-                    companionName = "Companion";
-
-                chat.PublishCompanionMessage(companionName, message);
-            }
-            else
-            {
-                ChatboxUI.PostSystemMessage(message);
-            }
-        }
-
-        /// <summary>
-        /// Resolves the active player's username for placeholder substitution in chat lines.
-        /// </summary>
-        private static string ResolveActivePlayerName()
-        {
-            var chat = ChatService.Instance;
-            return chat != null ? chat.ActiveUsername : string.Empty;
-        }
-
-        /// <summary>
-        /// Attempts to trigger the optional pickup animation controller when present.
-        /// </summary>
-        private void TryPlayPickupAnimation()
-        {
-            const string controllerTypeName = "Companions.CompanionAnimationController";
-            Type controllerType = Type.GetType(controllerTypeName) ??
-                                    Type.GetType($"{controllerTypeName}, Assembly-CSharp");
-            if (controllerType == null)
-                return;
-
-            Component component = GetComponent(controllerType) ?? GetComponentInChildren(controllerType, true);
-            if (component == null)
-                return;
-
-            MethodInfo playPickup = controllerType.GetMethod("PlayPickup", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            playPickup?.Invoke(component, null);
+            pickupController.Initialise(this, companionInventory);
         }
 
         private void OnSkillLevelChanged(SkillType type, int level)
@@ -1030,7 +569,7 @@ namespace Companions
 
         private void OnDestroy()
         {
-            CancelActivePickupRoutine();
+            pickupController?.CancelActivePickup();
             miningController?.CancelMining(true);
             woodcuttingController?.CancelWoodcutting(true);
 
@@ -1055,7 +594,7 @@ namespace Companions
 
         private void OnDisable()
         {
-            CancelActivePickupRoutine();
+            pickupController?.CancelActivePickup();
         }
     }
 }
