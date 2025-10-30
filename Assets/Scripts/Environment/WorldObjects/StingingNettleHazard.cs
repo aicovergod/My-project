@@ -43,6 +43,18 @@ namespace Environment.WorldObjects
         private bool nettleDialogueTriggered;
         private int nettleDialogueCooldownTicksRemaining;
 
+        /// <summary>
+        /// Tracks the shared nettle dialogue cooldown across every hazard instance so companions only react once
+        /// regardless of how many nettle tiles the player clips during the same window.
+        /// </summary>
+        private static int globalNettleDialogueCooldownTicksRemaining;
+
+        /// <summary>
+        /// Records the last Unity frame that processed the global nettle cooldown so multiple hazards do not
+        /// accidentally decrement the shared timer more than once per tick.
+        /// </summary>
+        private static int lastGlobalCooldownFrame = -1;
+
         [Header("Dialogue"), Tooltip("Cooldown in seconds before the companion can comment on the nettles again."), Min(1f)]
         [SerializeField] private float nettleDialogueCooldownSeconds = 30f;
 
@@ -81,6 +93,7 @@ namespace Environment.WorldObjects
         /// <inheritdoc />
         public void OnTick()
         {
+            TickGlobalDialogueCooldown();
             UpdateNettleDialogueCooldown();
 
             if (!EnsurePlayerReference())
@@ -212,6 +225,11 @@ namespace Environment.WorldObjects
                 return;
             }
 
+            if (globalNettleDialogueCooldownTicksRemaining > 0)
+            {
+                return;
+            }
+
             if (!CompanionManager.HasActiveCompanion)
             {
                 return;
@@ -231,7 +249,10 @@ namespace Environment.WorldObjects
 
             chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), line);
             nettleDialogueTriggered = true;
-            nettleDialogueCooldownTicksRemaining = Mathf.CeilToInt(nettleDialogueCooldownSeconds / Ticker.TickDuration);
+            int computedCooldownTicks = CalculateDialogueCooldownTicks();
+            nettleDialogueCooldownTicksRemaining = computedCooldownTicks;
+            globalNettleDialogueCooldownTicksRemaining = Mathf.Max(globalNettleDialogueCooldownTicksRemaining, computedCooldownTicks);
+            lastGlobalCooldownFrame = Time.frameCount;
         }
 
         /// <summary>
@@ -249,6 +270,36 @@ namespace Environment.WorldObjects
             {
                 nettleDialogueTriggered = false;
             }
+        }
+
+        /// <summary>
+        /// Converts the configured cooldown seconds into the equivalent number of OSRS ticks, clamped to a minimum of one.
+        /// </summary>
+        private int CalculateDialogueCooldownTicks()
+        {
+            int ticks = Mathf.CeilToInt(nettleDialogueCooldownSeconds / Ticker.TickDuration);
+            return Mathf.Max(1, ticks);
+        }
+
+        /// <summary>
+        /// Updates the shared nettle dialogue cooldown exactly once per Unity frame so multiple hazards do not
+        /// shorten the cooldown unintentionally.
+        /// </summary>
+        private static void TickGlobalDialogueCooldown()
+        {
+            if (globalNettleDialogueCooldownTicksRemaining <= 0)
+            {
+                return;
+            }
+
+            int currentFrame = Time.frameCount;
+            if (currentFrame == lastGlobalCooldownFrame)
+            {
+                return;
+            }
+
+            globalNettleDialogueCooldownTicksRemaining = Mathf.Max(0, globalNettleDialogueCooldownTicksRemaining - 1);
+            lastGlobalCooldownFrame = currentFrame;
         }
 
         private void TrySubscribeToTicker()
