@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b160bbad6ffa5a60cc64d591288a0768f2fef4e9 -->
+## 2025-10-30T19:21:35+00:00 — Merge pull request #1568 from aicovergod/codex/refactor-candidate-list-handling-with-new-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 213 ++ / 238 --
+- Notes:
+  Refactor companion area candidate list generation
+---
+<!-- commit:088762412f942e7920bd2d1d0441962b656fa72a -->
+## 2025-10-30T19:21:24+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c2c85bea4816dacc39bcbfb1c64f08cb19fa888a -->
 ## 2025-10-30T19:21:12+00:00 — Refactor companion gathering candidate building
 
