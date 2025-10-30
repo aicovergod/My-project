@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f15f6817099653c1715bc5a61e2e4afb4b3061db -->
+## 2025-10-30T16:41:02+00:00 — Merge pull request #1561 from aicovergod/codex/create-companion-tool-selector-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 197 ++ / 101 --
+- Notes:
+  Refactor companion tool selector registration
+---
+<!-- commit:f1cfaae2c2dcd13a1bad781d9aa4fa7a30013433 -->
+## 2025-10-30T16:40:46+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d67ad63ae85cef337c4d8dc6dabfc3a3dce190f7 -->
 ## 2025-10-30T16:40:32+00:00 — Refactor companion tool selector registration
 
