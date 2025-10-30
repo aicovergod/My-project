@@ -838,6 +838,139 @@ namespace Companions
         }
 
         /// <summary>
+        /// Encapsulates the shared parameters required to recover from a stuck gathering sequence.
+        /// </summary>
+        protected struct GatheringStuckRecoveryParameters
+        {
+            /// <summary>The node that triggered the stuck handler.</summary>
+            public TNode Node;
+
+            /// <summary>Label appended to debug output when logging is enabled.</summary>
+            public string DebugLabel;
+
+            /// <summary>
+            /// Optional delegate that returns a debug string describing the stuck state. When omitted, a
+            /// standard message using <see cref="DebugLabel"/> and the node name is emitted.
+            /// </summary>
+            public Func<TNode, string> BuildDebugMessage;
+
+            /// <summary>
+            /// Predicate that determines whether the active skill should be stopped. When null the skill is
+            /// always stopped if a stop delegate is provided.
+            /// </summary>
+            public Func<bool> ShouldStopSkill;
+
+            /// <summary>
+            /// Invoked with <c>true</c> before stopping the skill and <c>false</c> afterwards to toggle
+            /// suppression flags in derived controllers. Optional.
+            /// </summary>
+            public Action<bool> SetStopCallbackSuppressed;
+
+            /// <summary>Delegate that stops the active gathering skill.</summary>
+            public Action StopSkill;
+
+            /// <summary>Skill-specific cleanup callback executed after the skill is stopped.</summary>
+            public Action CleanupCallback;
+
+            /// <summary>
+            /// Additional reset invoked after cleanup so derived controllers can clear routine state.
+            /// </summary>
+            public Action AdditionalStateReset;
+
+            /// <summary>
+            /// Invoked when the consecutive stuck threshold is reached. Receives the node and the updated
+            /// consecutive count.
+            /// </summary>
+            public Action<TNode, int> OnThresholdReached;
+        }
+
+        /// <summary>
+        /// Executes the shared stuck recovery sequence used by the individual gathering controllers.
+        /// </summary>
+        /// <param name="parameters">Parameter bundle describing the recovery behaviour.</param>
+        protected void ExecuteGatheringStuckRecovery(GatheringStuckRecoveryParameters parameters)
+        {
+            TNode node = parameters.Node;
+
+            if (CompanionManager.EnableDebugLogging)
+            {
+                string message = null;
+
+                if (parameters.BuildDebugMessage != null)
+                {
+                    message = parameters.BuildDebugMessage(node);
+                }
+                else
+                {
+                    string label = string.IsNullOrEmpty(parameters.DebugLabel) ? "Companion" : parameters.DebugLabel;
+                    string nodeName = node != null ? node.name : "<null>";
+                    message = $"[{label}] Detected a stuck state while targeting {nodeName}.";
+                }
+
+                if (!string.IsNullOrEmpty(message))
+                    Debug.Log(message, this);
+            }
+
+            if (node != null)
+            {
+                float now = Time.time;
+                MarkNodeBlocked(node, now + stuckTimeoutSeconds);
+            }
+
+            bool shouldStopSkill = parameters.ShouldStopSkill == null || parameters.ShouldStopSkill();
+
+            if (parameters.StopSkill != null && shouldStopSkill)
+            {
+                bool suppressionApplied = false;
+
+                if (parameters.SetStopCallbackSuppressed != null)
+                {
+                    parameters.SetStopCallbackSuppressed(true);
+                    suppressionApplied = true;
+                }
+
+                try
+                {
+                    parameters.StopSkill();
+                }
+                finally
+                {
+                    if (suppressionApplied)
+                        parameters.SetStopCallbackSuppressed(false);
+                }
+            }
+
+            parameters.CleanupCallback?.Invoke();
+            parameters.AdditionalStateReset?.Invoke();
+
+            pathMover?.ResetFollowTracking();
+
+            if (petFollower != null && playerTransform != null)
+                petFollower.SetPlayer(playerTransform);
+
+            if (node != null)
+            {
+                if (node == lastStuckNode)
+                {
+                    consecutiveStuckNodeCount++;
+                }
+                else
+                {
+                    lastStuckNode = node;
+                    consecutiveStuckNodeCount = 1;
+                }
+            }
+            else
+            {
+                lastStuckNode = null;
+                consecutiveStuckNodeCount = 0;
+            }
+
+            if (consecutiveStuckNodeCount >= ConsecutiveStuckCancelThreshold)
+                parameters.OnThresholdReached?.Invoke(node, consecutiveStuckNodeCount);
+        }
+
+        /// <summary>
         /// Removes any blocked nodes whose expiry has passed or whose node depleted while on cooldown.
         /// </summary>
         protected void PruneExpiredBlockedNodes()

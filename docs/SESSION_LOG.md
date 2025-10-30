@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3fc7e8e0ec2efffeaf6a9da3cc6a525d7052d7f3 -->
+## 2025-10-30T17:30:26+00:00 — Refactor companion stuck handling into shared helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 175 ++ / 90 --
+- Notes:
+  —
+---
 <!-- commit:1db848ce7313c2e13f91fe17d019f0377b6e8f31 -->
 ## 2025-10-30T17:21:27+00:00 — Merge pull request #1563 from aicovergod/codex/add-reusable-helper-for-companion-movement
 
