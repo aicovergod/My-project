@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fe545b2e17d40a743b6c2876b14786d7dcde7aca -->
+## 2025-10-30T15:31:30+00:00 — Refactor combat XP distribution into shared helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Combat/CombatXpDistributor.cs, Assets/Scripts/Companions/CompanionController.cs
+- Diff: 191 ++ / 119 --
+- Notes:
+  —
+---
 <!-- commit:42817af992ccb425f3f999ca95b8d8c53cdfda88 -->
 ## 2025-10-30T15:22:51+00:00 — Merge pull request #1557 from aicovergod/codex/introduce-shared-helper-for-gathering-skills
 
