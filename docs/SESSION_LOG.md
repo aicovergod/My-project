@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:edc22b07b28e4b3279c933517dcd0e3f5b539072 -->
+## 2025-10-30T10:56:33+00:00 — Merge pull request #1552 from aicovergod/codex/fix-multiple-chatbox-messages-for-nettle-objects
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 52 ++ / 1 --
+- Notes:
+  Prevent duplicate nettle dialogue spam
+---
+<!-- commit:932ccddeeee6531dce40a363783101f9374065d4 -->
+## 2025-10-30T10:56:21+00:00 — Prevent duplicate nettle dialogue spam
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Environment/WorldObjects/StingingNettleHazard.cs
+- Diff: 52 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:8486d1bc1a7c34cb2229d54e809931bf1d2b1359 -->
 ## 2025-10-30T10:50:37+00:00 — Merge pull request #1551 from aicovergod/codex/add-cooldown-logic-for-stinging-nettle-dialogue-dbteel
 
