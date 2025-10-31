@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a7db3279bfc8bbd498deb228119c48c6
+guid: 03d470d442cc7064287a374381b79514
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3246728553201157869
-    second: Tent 1_0
+      213: 6765395975340127214
+    second: Broken Pottery Ground Decoration_64x64_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Tent 1_0
+      name: Broken Pottery Ground Decoration_64x64_0
       rect:
         serializedVersion: 2
-        x: 15
-        y: 24
-        width: 98
-        height: 80
+        x: 6
+        y: 14
+        width: 52
+        height: 36
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: de64cafca62be0d20800000000000000
-      internalID: 3246728553201157869
+      spriteID: ee371038bc383ed50800000000000000
+      internalID: 6765395975340127214
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Tent 1_0: 3246728553201157869
+      Broken Pottery Ground Decoration_64x64_0: 6765395975340127214
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

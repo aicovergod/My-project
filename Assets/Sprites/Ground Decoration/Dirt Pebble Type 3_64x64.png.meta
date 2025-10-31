@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a7db3279bfc8bbd498deb228119c48c6
+guid: 4c073b39b6d501140b29edf75f1dad65
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3246728553201157869
-    second: Tent 1_0
+      213: -6071465799415449314
+    second: Dirt Pebble Type 3_64x64_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Tent 1_0
+      name: Dirt Pebble Type 3_64x64_0
       rect:
         serializedVersion: 2
-        x: 15
-        y: 24
-        width: 98
-        height: 80
+        x: 13
+        y: 18
+        width: 39
+        height: 26
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: de64cafca62be0d20800000000000000
-      internalID: 3246728553201157869
+      spriteID: e19b8eff502ddbba0800000000000000
+      internalID: -6071465799415449314
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Tent 1_0: 3246728553201157869
+      Dirt Pebble Type 3_64x64_0: -6071465799415449314
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
