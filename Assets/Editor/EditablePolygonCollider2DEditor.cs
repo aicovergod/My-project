@@ -314,7 +314,7 @@ public class EditablePolygonCollider2DEditor : UnityEditor.Editor
         Vector2 insertPoint = localPoint;
         float bestDistance = float.MaxValue;
 
-        IList<Vector2> points = collider.Points;
+        IReadOnlyList<Vector2> points = collider.Points;
         for (int i = 0; i < points.Count; i++)
         {
             Vector3 aWorld = transform.localToWorldMatrix.MultiplyPoint3x4(points[i]);
