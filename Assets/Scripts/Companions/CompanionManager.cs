@@ -5,6 +5,7 @@ using BankSystem;
 using Combat;
 using Companions.Chat;
 using Companions.Commands;
+using Companions.Combat;
 using Companions.Equipment;
 using Companions.Inventory;
 using Inventory;
@@ -64,15 +65,6 @@ namespace Companions
         /// <summary>HUD instance bound to the companion entry inside the pet level bar.</summary>
         private static PetLevelBarHUD boundHud;
 
-        /// <summary>Tracks whether guard mode is toggled so the player controller can forward commands.</summary>
-        private static bool guardModeEnabled;
-
-        /// <summary>
-        /// Tracks whether guard mode has been locked by a combat-decline cooldown so activation attempts
-        /// can be suppressed until the timer expires.
-        /// </summary>
-        private static bool guardModeLockedByCombatCooldown;
-
         /// <summary>True while the backpack UI is open so menu labels stay in sync.</summary>
         private static bool inventoryVisible;
 
@@ -124,6 +116,11 @@ namespace Companions
         /// <summary>Tracks whether verbose companion debug logging is enabled.</summary>
         private static bool enableDebugLogging;
 
+        static CompanionManager()
+        {
+            CompanionGuardModeService.GuardModeStateChanged += HandleGuardModeServiceStateChanged;
+        }
+
         /// <summary>Handles chat-based inventory reactions for the active companion.</summary>
         private static CompanionChatInventoryResponder chatInventoryResponder;
 
@@ -171,13 +168,13 @@ namespace Companions
         public static int CombatLevel => combatLevel;
 
         /// <summary>Whether guard mode is currently toggled for the companion.</summary>
-        public static bool GuardModeEnabled => guardModeEnabled;
+        public static bool GuardModeEnabled => CompanionGuardModeService.GuardModeEnabled;
 
         /// <summary>
         /// True when a combat-decline cooldown is preventing guard mode from being enabled.
         /// Exposed for UI surfaces that may wish to grey out the toggle.
         /// </summary>
-        public static bool IsGuardModeLockedByCombatCooldown => guardModeLockedByCombatCooldown;
+        public static bool IsGuardModeLockedByCombatCooldown => CompanionGuardModeService.IsGuardModeLockedByCombatCooldown;
 
         /// <summary>Exposes the bound skill manager used for stats UI integration.</summary>
         public static SkillManager CompanionSkills => controller != null ? controller.SkillManager : null;
@@ -395,9 +392,8 @@ namespace Companions
             if (companionObject.GetComponent<CompanionClickable>() == null)
                 companionObject.AddComponent<CompanionClickable>();
 
+            CompanionGuardModeService.Bind(controller, controller.SkillCooldowns);
             activeDefinition = resolvedDefinition;
-            guardModeEnabled = false;
-            guardModeLockedByCombatCooldown = false;
             inventoryVisible = false;
             equipmentVisible = false;
             storedByPet = false;
@@ -465,16 +461,13 @@ namespace Companions
                 controller.InventoryVisibilityChanged -= HandleInventoryVisibilityChanged;
                 controller.Despawned -= HandleControllerDespawned;
                 controller.HandleStoreRequest();
+                CompanionGuardModeService.Unbind(controller);
             }
 
             controller = null;
             companionObject = null;
 
             DisposeChatResponder();
-
-            guardModeEnabled = false;
-            guardModeLockedByCombatCooldown = false;
-            GuardModeChanged?.Invoke(false);
 
             inventoryVisible = false;
             InventoryVisibilityChanged?.Invoke(false);
@@ -765,22 +758,7 @@ namespace Companions
         /// <param name="target">Combat target selected by the player.</param>
         public static void CommandGuardAttack(CombatTarget target)
         {
-            if (IsCombatCooldownActiveAndUpdateLock(false))
-            {
-                DisableGuardModeForCooldown(false);
-                return;
-            }
-
-            if (!guardModeEnabled || controller == null || target == null)
-                return;
-
-            if (!controller.gameObject.activeSelf)
-                return;
-
-            if (!controller.CanFight)
-                return;
-
-            controller.CommandAttack(target);
+            CompanionGuardModeService.CommandGuardAttack(target);
         }
 
         /// <summary>
@@ -790,20 +768,7 @@ namespace Companions
         /// <returns>True when the companion received the command.</returns>
         public static bool TryCommandAttack(CombatTarget target)
         {
-            if (IsCombatCooldownActiveAndUpdateLock(true))
-                return false;
-
-            if (guardModeEnabled || controller == null || target == null)
-                return false;
-
-            if (!controller.gameObject.activeSelf)
-                return false;
-
-            if (!controller.CanFight)
-                return false;
-
-            controller.CommandAttack(target);
-            return true;
+            return CompanionGuardModeService.TryCommandAttack(target);
         }
 
         /// <summary>
@@ -811,21 +776,7 @@ namespace Companions
         /// </summary>
         public static void ToggleGuardMode()
         {
-            if (!guardModeEnabled)
-            {
-                if (IsCombatCooldownActiveAndUpdateLock(true))
-                    return;
-
-                guardModeEnabled = true;
-                guardModeLockedByCombatCooldown = false;
-                GuardModeChanged?.Invoke(true);
-                PublishRandomGuardModeActivationMessage();
-                return;
-            }
-
-            guardModeEnabled = false;
-            GuardModeChanged?.Invoke(false);
-            PublishRandomGuardModeDeactivationMessage();
+            CompanionGuardModeService.ToggleGuardMode();
         }
 
         /// <summary>
@@ -834,8 +785,7 @@ namespace Companions
         /// </summary>
         public static void HandleCombatDeclineCooldownStarted()
         {
-            guardModeLockedByCombatCooldown = true;
-            DisableGuardModeForCooldown(true);
+            CompanionGuardModeService.HandleCombatDeclineCooldownStarted();
         }
 
         /// <summary>
@@ -844,44 +794,7 @@ namespace Companions
         /// </summary>
         public static void HandleCombatDeclineCooldownCleared()
         {
-            if (!guardModeLockedByCombatCooldown)
-                return;
-
-            guardModeLockedByCombatCooldown = false;
-        }
-
-        /// <summary>
-        /// Disables guard mode due to the combat cooldown and optionally publishes a deactivation line.
-        /// </summary>
-        private static void DisableGuardModeForCooldown(bool publishGuardMessage)
-        {
-            if (!guardModeEnabled)
-                return;
-
-            guardModeEnabled = false;
-            GuardModeChanged?.Invoke(false);
-
-            if (publishGuardMessage)
-                PublishRandomGuardModeDeactivationMessage();
-        }
-
-        /// <summary>
-        /// Evaluates whether the combat-decline cooldown is still active and updates the guard lock flag.
-        /// </summary>
-        private static bool IsCombatCooldownActiveAndUpdateLock(bool publishMessage)
-        {
-            var tracker = CompanionSkillCooldowns;
-            bool active = CompanionSkillCooldownTimers.IsCombatDeclineCooldownActive(tracker, publishMessage);
-            if (active)
-            {
-                guardModeLockedByCombatCooldown = true;
-                return true;
-            }
-
-            if (guardModeLockedByCombatCooldown)
-                guardModeLockedByCombatCooldown = false;
-
-            return false;
+            CompanionGuardModeService.HandleCombatDeclineCooldownCleared();
         }
 
         /// <summary>
@@ -1001,6 +914,24 @@ namespace Companions
             CompanionChatPublisher.TryPublish(
                 CompanionChatLibrary.GetRandomAutoSpawnGreetingLine,
                 requireActiveCompanion: true);
+        }
+
+        /// <summary>
+        /// Forwards guard-mode state updates from the guard service to legacy listeners and handles flavour chat.
+        /// </summary>
+        /// <param name="enabled">New guard-mode enabled state.</param>
+        /// <param name="publishChatLine">True when the transition should emit a companion chat line.</param>
+        private static void HandleGuardModeServiceStateChanged(bool enabled, bool publishChatLine)
+        {
+            GuardModeChanged?.Invoke(enabled);
+
+            if (!publishChatLine)
+                return;
+
+            if (enabled)
+                PublishRandomGuardModeActivationMessage();
+            else
+                PublishRandomGuardModeDeactivationMessage();
         }
 
         /// <summary>
@@ -1366,6 +1297,7 @@ namespace Companions
             controller.InventoryVisibilityChanged -= HandleInventoryVisibilityChanged;
             controller.EquipmentVisibilityChanged -= HandleEquipmentVisibilityChanged;
             controller.Despawned -= HandleControllerDespawned;
+            CompanionGuardModeService.Unbind(controller);
             controller = null;
             companionObject = null;
             DisposeChatResponder();
@@ -1374,12 +1306,9 @@ namespace Companions
             storedByPet = false;
             storedManually = false;
             companionWasActiveBeforePetSpawn = false;
-            guardModeEnabled = false;
-            guardModeLockedByCombatCooldown = false;
             combatLevel = 1;
             InventoryVisibilityChanged?.Invoke(false);
             UpdateEquipmentVisibility(false);
-            GuardModeChanged?.Invoke(false);
             PetLevelBarHUD.DestroyInstance();
             boundHud = null;
             CompanionCommandMenu.Hide();
