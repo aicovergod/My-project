@@ -257,6 +257,7 @@ namespace Companions
             // Cancel any active gathering routines so direct attack orders stop ongoing skill behaviour.
             miningController?.CancelMining(true);
             cookingController?.CancelCooking(true);
+            fishingController?.CancelFishing(true);
             woodcuttingController?.CancelWoodcutting(true);
             combatController?.CommandAttack(target, true);
         }
@@ -290,6 +291,7 @@ namespace Companions
             pickupController.CancelActivePickup();
             miningController?.CancelMining(true);
             cookingController?.CancelCooking(true);
+            fishingController?.CancelFishing(true);
             woodcuttingController?.CancelWoodcutting(true);
             pickupController.CommandPickup(targetDrop);
         }
