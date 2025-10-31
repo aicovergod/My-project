@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:65c7c716b0d5fafe4687f89a4c26d5b6dc199b2b -->
+## 2025-10-31T09:52:32+00:00 — Merge pull request #1569 from aicovergod/codex/add-tool-selection-helper-and-refactor-controllers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 160 ++ / 95 --
+- Notes:
+  Add shared helper for companion tool resolution
+---
+<!-- commit:8397af984cd33fe291a3b22fcb761bfb4b69b359 -->
+## 2025-10-31T09:52:23+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:b9ce3f3fd1cc15b3560dadfb0e06ac7e03abf16c -->
 ## 2025-10-31T09:52:09+00:00 — Refactor companion tool resolution into shared helper
 
