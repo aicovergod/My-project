@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b9ce3f3fd1cc15b3560dadfb0e06ac7e03abf16c -->
+## 2025-10-31T09:52:09+00:00 — Refactor companion tool resolution into shared helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionToolResolver.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 151 ++ / 95 --
+- Notes:
+  —
+---
 <!-- commit:b160bbad6ffa5a60cc64d591288a0768f2fef4e9 -->
 ## 2025-10-30T19:21:35+00:00 — Merge pull request #1568 from aicovergod/codex/refactor-candidate-list-handling-with-new-helper
 
