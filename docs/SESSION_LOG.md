@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:f61769379158de4ae52f71dd313fbe6f336967b4 -->
+## 2025-10-31T15:02:42+00:00 — Align Scenes toolbar menu with play controls
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Editor/ScenesToolbar.cs
+- Diff: 8 ++ / 3 --
+- Notes:
+  —
+---
 <!-- commit:591d61e62a377bce07e5e16db3d43e93c495c187 -->
 ## 2025-10-31T14:57:31+00:00 — toolbar fix
 
