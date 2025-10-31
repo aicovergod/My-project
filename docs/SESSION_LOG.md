@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:075246469daff09b9cb2824ab3e04b2f67ca8214 -->
+## 2025-10-31T13:14:19+00:00 — Merge pull request #1584 from aicovergod/codex/update-cow-milking-script-for-player-input-system
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 160 ++ / 22 --
+- Notes:
+  Integrate cow milking with shared input system
+---
+<!-- commit:a77f891fac86af54764f0f58dfb233ab718fa906 -->
+## 2025-10-31T13:14:06+00:00 — Integrate cow milking with shared input
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): AGENTS.md, Assets/Scripts/NPC/Interaction/CowMilking.cs
+- Diff: 160 ++ / 22 --
+- Notes:
+  —
+---
 <!-- commit:a00730ef8f0e63cb725ecb52c5d52e07d49d3e4d -->
 ## 2025-10-31T12:59:56+00:00 — Merge pull request #1583 from aicovergod/codex/add-cow-milking-script
 
