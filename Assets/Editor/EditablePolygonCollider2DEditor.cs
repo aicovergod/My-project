@@ -8,7 +8,7 @@ using PhysicsTools.TwoD;
 /// Provides draggable handles, grid snapping, undo support, and polygon validation helpers.
 /// </summary>
 [CustomEditor(typeof(EditablePolygonCollider2D))]
-public class EditablePolygonCollider2DEditor : Editor
+public class EditablePolygonCollider2DEditor : UnityEditor.Editor
 {
     private const float HandleScreenScale = 0.06f;
     private const float SelectedHandleScale = 1.35f;
