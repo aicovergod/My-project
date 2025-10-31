@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a3d966fdb8be1570a631331e099feb2bd11a7b44 -->
+## 2025-10-31T10:16:16+00:00 — Merge pull request #1571 from aicovergod/codex/create-companion-skill-command-router-and-services
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 668 ++ / 272 --
+- Notes:
+  Refactor companion skill command routing into services
+---
+<!-- commit:138a480de582da4ea1946971f38169222ff4a9ca -->
+## 2025-10-31T10:16:01+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:3291121734dbbbf78be777a1e33e5b3e559bc808 -->
 ## 2025-10-31T10:15:47+00:00 — Refactor companion skill command routing into services
 
