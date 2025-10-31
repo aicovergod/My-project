@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Companions.Chat;
+using Companions.Commands;
 using Skills;
 using UI.Chat;
 using UnityEngine;
@@ -42,6 +44,22 @@ namespace Companions
         /// <summary>Time span representation of <see cref="CombatDeclineCooldownMinutes"/>.</summary>
         public static readonly TimeSpan CombatDeclineCooldownDuration = TimeSpan.FromMinutes(CombatDeclineCooldownMinutes);
 
+        /// <summary>Lookup of cooldown profiles keyed by <see cref="SkillType"/>.</summary>
+        private static readonly Dictionary<SkillType, CompanionSkillCooldownProfile> CooldownProfiles =
+            new Dictionary<SkillType, CompanionSkillCooldownProfile>
+            {
+                { SkillType.Mining, new CompanionSkillCooldownProfile(SkillType.Mining, MiningCooldownDuration, CompanionChatLibrary.GetRandomMiningDeclineCooldownLine) },
+                { SkillType.Woodcutting, new CompanionSkillCooldownProfile(SkillType.Woodcutting, WoodcuttingCooldownDuration, CompanionChatLibrary.GetRandomWoodcuttingDeclineCooldownLine) },
+                { SkillType.Fishing, new CompanionSkillCooldownProfile(SkillType.Fishing, FishingCooldownDuration, CompanionChatLibrary.GetRandomFishingDeclineCooldownLine) },
+                { SkillType.Cooking, new CompanionSkillCooldownProfile(SkillType.Cooking, CookingCooldownDuration, CompanionCookingDialogueLibrary.GetCooldownLine) },
+                { SkillType.Attack, new CompanionSkillCooldownProfile(SkillType.Attack, CombatDeclineCooldownDuration, CompanionChatLibrary.GetRandomCombatDeclineCooldownLine) },
+                { SkillType.Strength, new CompanionSkillCooldownProfile(SkillType.Strength, CombatDeclineCooldownDuration, CompanionChatLibrary.GetRandomCombatDeclineCooldownLine) },
+                { SkillType.Defence, new CompanionSkillCooldownProfile(SkillType.Defence, CombatDeclineCooldownDuration, CompanionChatLibrary.GetRandomCombatDeclineCooldownLine) },
+                { SkillType.Hitpoints, new CompanionSkillCooldownProfile(SkillType.Hitpoints, CombatDeclineCooldownDuration, CompanionChatLibrary.GetRandomCombatDeclineCooldownLine) },
+                { SkillType.Ranged, new CompanionSkillCooldownProfile(SkillType.Ranged, CombatDeclineCooldownDuration, CompanionChatLibrary.GetRandomCombatDeclineCooldownLine) },
+                { SkillType.Magic, new CompanionSkillCooldownProfile(SkillType.Magic, CombatDeclineCooldownDuration, CompanionChatLibrary.GetRandomCombatDeclineCooldownLine) }
+            };
+
         /// <summary>Skills that are treated as combat disciplines.</summary>
         private static readonly SkillType[] CombatSkills =
         {
@@ -54,198 +72,80 @@ namespace Companions
         };
 
         /// <summary>
-        /// Checks whether a mining command should be rejected because the cooldown is still active.
+        /// Checks whether a skill command should be rejected because the cooldown is still active.
         /// When the cooldown is active a flavour line is published and <paramref name="failureReason"/>
-        /// is set to <see cref="CompanionMiningCommandResult.Declined"/>.
+        /// is set to <paramref name="declinedResult"/>.
         /// </summary>
+        /// <typeparam name="TResult">Result enum reported by the concrete skill controller.</typeparam>
         /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
-        /// <param name="failureReason">Failure reason populated when a decline occurs.</param>
+        /// <param name="skill">Skill associated with the command.</param>
+        /// <param name="acceptedResult">Result that represents an accepted command.</param>
+        /// <param name="declinedResult">Result that represents a cooldown rejection.</param>
+        /// <param name="failureReason">Result populated when a decline occurs.</param>
         /// <returns><c>true</c> when the request should be rejected due to an active cooldown.</returns>
-        public static bool ShouldDeclineMiningRequest(
+        public static bool ShouldDecline<TResult>(
             CompanionSkillCooldownTracker tracker,
-            out CompanionMiningCommandResult failureReason)
+            SkillType skill,
+            TResult acceptedResult,
+            TResult declinedResult,
+            out TResult failureReason)
         {
-            failureReason = CompanionMiningCommandResult.Accepted;
+            failureReason = acceptedResult;
 
-            if (tracker == null)
+            if (!TryGetProfile(skill, out var profile))
                 return false;
 
-            if (!tracker.TryGetRemaining(SkillType.Mining, out var remaining) || remaining <= TimeSpan.Zero)
+            if (!TryGetRemaining(tracker, profile.Skill, out var remaining))
                 return false;
 
-            PublishMiningCooldownMessage(remaining);
-            failureReason = CompanionMiningCommandResult.Declined;
+            PublishCooldownMessage(profile, remaining);
+            failureReason = declinedResult;
             return true;
         }
 
         /// <summary>
-        /// Checks whether a woodcutting command should be rejected because the cooldown is still active.
-        /// When active a flavour line is published and <paramref name="failureReason"/> is set to
-        /// <see cref="CompanionWoodcuttingCommandResult.Declined"/>.
+        /// Starts or refreshes a cooldown using the shared profile duration.
         /// </summary>
         /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
-        /// <param name="failureReason">Failure reason populated when a decline occurs.</param>
-        public static bool ShouldDeclineWoodcuttingRequest(
-            CompanionSkillCooldownTracker tracker,
-            out CompanionWoodcuttingCommandResult failureReason)
+        /// <param name="skill">Skill associated with the cooldown.</param>
+        public static void StartCooldown(CompanionSkillCooldownTracker tracker, SkillType skill)
         {
-            failureReason = CompanionWoodcuttingCommandResult.Accepted;
-
             if (tracker == null)
-                return false;
+                return;
 
-            if (!tracker.TryGetRemaining(SkillType.Woodcutting, out var remaining) || remaining <= TimeSpan.Zero)
-                return false;
+            if (!TryGetProfile(skill, out var profile))
+                return;
 
-            PublishWoodcuttingCooldownMessage(remaining);
-            failureReason = CompanionWoodcuttingCommandResult.Declined;
-            return true;
+            tracker.StartCooldown(profile.Skill, profile.DefaultDuration);
         }
 
         /// <summary>
-        /// Checks whether a fishing command should be rejected because the cooldown is still active.
-        /// When active a flavour line is published and <paramref name="failureReason"/> is set to
-        /// <see cref="CompanionFishingCommandResult.Declined"/>.
+        /// Clears an active cooldown so new commands can be processed immediately.
         /// </summary>
         /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
-        /// <param name="failureReason">Failure reason populated when a decline occurs.</param>
-        public static bool ShouldDeclineFishingRequest(
-            CompanionSkillCooldownTracker tracker,
-            out CompanionFishingCommandResult failureReason)
+        /// <param name="skill">Skill associated with the cooldown.</param>
+        public static void ClearCooldown(CompanionSkillCooldownTracker tracker, SkillType skill)
         {
-            failureReason = CompanionFishingCommandResult.Accepted;
-
             if (tracker == null)
-                return false;
+                return;
 
-            if (!tracker.TryGetRemaining(SkillType.Fishing, out var remaining) || remaining <= TimeSpan.Zero)
-                return false;
+            if (!TryGetProfile(skill, out var profile))
+                return;
 
-            PublishFishingCooldownMessage(remaining);
-            failureReason = CompanionFishingCommandResult.Declined;
-            return true;
+            tracker.ClearCooldown(profile.Skill);
         }
 
         /// <summary>
-        /// Checks whether a cooking command should be rejected because the cooldown is still active.
+        /// Publishes a companion chat line describing how long remains on the supplied skill cooldown.
         /// </summary>
-        public static bool ShouldDeclineCookingRequest(
-            CompanionSkillCooldownTracker tracker,
-            out CompanionCookingCommandResult failureReason)
+        /// <param name="skill">Skill associated with the cooldown.</param>
+        /// <param name="remaining">Remaining cooldown duration.</param>
+        public static void PublishCooldownMessage(SkillType skill, TimeSpan remaining)
         {
-            failureReason = CompanionCookingCommandResult.Accepted;
+            if (!TryGetProfile(skill, out var profile))
+                return;
 
-            if (tracker == null)
-                return false;
-
-            if (!tracker.TryGetRemaining(SkillType.Cooking, out var remaining) || remaining <= TimeSpan.Zero)
-                return false;
-
-            PublishCookingCooldownMessage(remaining);
-            failureReason = CompanionCookingCommandResult.Declined;
-            return true;
-        }
-
-        /// <summary>
-        /// Starts or refreshes the mining cooldown using the shared default duration.
-        /// </summary>
-        /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
-        public static void StartMiningCooldown(CompanionSkillCooldownTracker tracker)
-        {
-            tracker?.StartCooldown(SkillType.Mining, MiningCooldownDuration);
-        }
-
-        /// <summary>
-        /// Starts or refreshes the woodcutting cooldown using the shared default duration.
-        /// </summary>
-        /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
-        public static void StartWoodcuttingCooldown(CompanionSkillCooldownTracker tracker)
-        {
-            tracker?.StartCooldown(SkillType.Woodcutting, WoodcuttingCooldownDuration);
-        }
-
-        /// <summary>
-        /// Starts or refreshes the fishing cooldown using the shared default duration.
-        /// </summary>
-        /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
-        public static void StartFishingCooldown(CompanionSkillCooldownTracker tracker)
-        {
-            tracker?.StartCooldown(SkillType.Fishing, FishingCooldownDuration);
-        }
-
-        /// <summary>
-        /// Starts or refreshes the cooking cooldown using the shared default duration.
-        /// </summary>
-        public static void StartCookingCooldown(CompanionSkillCooldownTracker tracker)
-        {
-            tracker?.StartCooldown(SkillType.Cooking, CookingCooldownDuration);
-        }
-
-        /// <summary>
-        /// Clears any active mining cooldown so new commands can be processed immediately.
-        /// </summary>
-        /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
-        public static void ClearMiningCooldown(CompanionSkillCooldownTracker tracker)
-        {
-            tracker?.ClearCooldown(SkillType.Mining);
-        }
-
-        /// <summary>
-        /// Clears any active woodcutting cooldown so new commands can be processed immediately.
-        /// </summary>
-        /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
-        public static void ClearWoodcuttingCooldown(CompanionSkillCooldownTracker tracker)
-        {
-            tracker?.ClearCooldown(SkillType.Woodcutting);
-        }
-
-        /// <summary>
-        /// Clears any active fishing cooldown so new commands can be processed immediately.
-        /// </summary>
-        /// <param name="tracker">Cooldown tracker bound to the active companion.</param>
-        public static void ClearFishingCooldown(CompanionSkillCooldownTracker tracker)
-        {
-            tracker?.ClearCooldown(SkillType.Fishing);
-        }
-
-        /// <summary>
-        /// Clears any active cooking cooldown so new commands can be processed immediately.
-        /// </summary>
-        public static void ClearCookingCooldown(CompanionSkillCooldownTracker tracker)
-        {
-            tracker?.ClearCooldown(SkillType.Cooking);
-        }
-
-        /// <summary>
-        /// Publishes a companion chat line describing how long remains on the mining cooldown.
-        /// </summary>
-        private static void PublishMiningCooldownMessage(TimeSpan remaining)
-        {
-            PublishSkillCooldownMessage(remaining, CompanionChatLibrary.GetRandomMiningDeclineCooldownLine);
-        }
-
-        /// <summary>
-        /// Publishes a companion chat line describing how long remains on the woodcutting cooldown.
-        /// </summary>
-        private static void PublishWoodcuttingCooldownMessage(TimeSpan remaining)
-        {
-            PublishSkillCooldownMessage(remaining, CompanionChatLibrary.GetRandomWoodcuttingDeclineCooldownLine);
-        }
-
-        /// <summary>
-        /// Publishes a companion chat line describing how long remains on the fishing cooldown.
-        /// </summary>
-        private static void PublishFishingCooldownMessage(TimeSpan remaining)
-        {
-            PublishSkillCooldownMessage(remaining, CompanionChatLibrary.GetRandomFishingDeclineCooldownLine);
-        }
-
-        /// <summary>
-        /// Publishes a companion chat line describing how long remains on the cooking cooldown.
-        /// </summary>
-        private static void PublishCookingCooldownMessage(TimeSpan remaining)
-        {
-            PublishSkillCooldownMessage(remaining, CompanionCookingDialogueLibrary.GetCooldownLine);
+            PublishCooldownMessage(profile, remaining);
         }
 
         /// <summary>
@@ -264,7 +164,7 @@ namespace Companions
             if (tracker == null)
                 return false;
 
-            if (!tracker.TryGetRemaining(requestedSkill, out var remaining) || remaining <= TimeSpan.Zero)
+            if (!TryGetRemaining(tracker, requestedSkill, out var remaining))
                 return false;
 
             PublishCombatCooldownMessage(remaining);
@@ -308,7 +208,7 @@ namespace Companions
                 return;
 
             for (int i = 0; i < CombatSkills.Length; i++)
-                tracker.StartCooldown(CombatSkills[i], CombatDeclineCooldownDuration);
+                StartCooldown(tracker, CombatSkills[i]);
 
             CompanionManager.HandleCombatDeclineCooldownStarted();
         }
@@ -322,7 +222,7 @@ namespace Companions
             if (tracker != null)
             {
                 for (int i = 0; i < CombatSkills.Length; i++)
-                    tracker.ClearCooldown(CombatSkills[i]);
+                    ClearCooldown(tracker, CombatSkills[i]);
             }
 
             CompanionManager.HandleCombatDeclineCooldownCleared();
@@ -333,7 +233,17 @@ namespace Companions
         /// </summary>
         private static void PublishCombatCooldownMessage(TimeSpan remaining)
         {
-            PublishSkillCooldownMessage(remaining, CompanionChatLibrary.GetRandomCombatDeclineCooldownLine);
+            PublishCooldownMessage(SkillType.Attack, remaining);
+        }
+
+        /// <summary>
+        /// Publishes a companion chat line using the supplied cooldown profile.
+        /// </summary>
+        /// <param name="profile">Cooldown profile that supplies the chat line factory.</param>
+        /// <param name="remaining">Remaining cooldown duration.</param>
+        private static void PublishCooldownMessage(CompanionSkillCooldownProfile profile, TimeSpan remaining)
+        {
+            PublishSkillCooldownMessage(remaining, profile.ChatLineFactory);
         }
 
         /// <summary>
@@ -393,7 +303,7 @@ namespace Companions
 
             for (int i = 0; i < CombatSkills.Length; i++)
             {
-                if (!tracker.TryGetRemaining(CombatSkills[i], out var skillRemaining) || skillRemaining <= TimeSpan.Zero)
+                if (!TryGetRemaining(tracker, CombatSkills[i], out var skillRemaining))
                     continue;
 
                 if (skillRemaining > longest)
@@ -406,6 +316,40 @@ namespace Companions
                 return false;
 
             remaining = longest;
+            return true;
+        }
+
+        /// <summary>
+        /// Attempts to resolve the cooldown profile bound to the supplied skill.
+        /// </summary>
+        private static bool TryGetProfile(
+            SkillType skill,
+            out CompanionSkillCooldownProfile profile)
+        {
+            if (CooldownProfiles.TryGetValue(skill, out profile))
+                return true;
+
+            profile = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Attempts to resolve the remaining time for the supplied skill cooldown.
+        /// </summary>
+        private static bool TryGetRemaining(
+            CompanionSkillCooldownTracker tracker,
+            SkillType skill,
+            out TimeSpan remaining)
+        {
+            remaining = TimeSpan.Zero;
+
+            if (tracker == null)
+                return false;
+
+            if (!tracker.TryGetRemaining(skill, out var candidate) || candidate <= TimeSpan.Zero)
+                return false;
+
+            remaining = candidate;
             return true;
         }
     }

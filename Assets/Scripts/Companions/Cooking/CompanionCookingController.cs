@@ -152,7 +152,12 @@ namespace Companions
 
             hasPublishedOutcomeChat = false;
 
-            if (CompanionSkillCooldownTimers.ShouldDeclineCookingRequest(cooldownTracker, out result))
+            if (CompanionSkillCooldownTimers.ShouldDecline(
+                cooldownTracker,
+                SkillType.Cooking,
+                CompanionCookingCommandResult.Accepted,
+                CompanionCookingCommandResult.Declined,
+                out result))
             {
                 NotifyCooldownFromTracker();
                 return false;
@@ -240,7 +245,12 @@ namespace Companions
 
             hasPublishedOutcomeChat = false;
 
-            if (CompanionSkillCooldownTimers.ShouldDeclineCookingRequest(cooldownTracker, out failureReason))
+            if (CompanionSkillCooldownTimers.ShouldDecline(
+                cooldownTracker,
+                SkillType.Cooking,
+                CompanionCookingCommandResult.Accepted,
+                CompanionCookingCommandResult.Declined,
+                out failureReason))
             {
                 NotifyCooldownFromTracker();
                 return false;
@@ -397,7 +407,7 @@ namespace Companions
                 {
                     stuckTriggered = true;
                     PublishStuckMessage();
-                    CompanionSkillCooldownTimers.StartCookingCooldown(cooldownTracker);
+                    CompanionSkillCooldownTimers.StartCooldown(cooldownTracker, SkillType.Cooking);
                     ResetMovementState();
                     EnableFollower();
                     yield break;
@@ -446,7 +456,7 @@ namespace Companions
                 yield break;
             }
 
-            CompanionSkillCooldownTimers.ClearCookingCooldown(cooldownTracker);
+            CompanionSkillCooldownTimers.ClearCooldown(cooldownTracker, SkillType.Cooking);
             cookingRoutine = null;
         }
 

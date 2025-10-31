@@ -184,7 +184,12 @@ namespace Companions
                 Result = CompanionWoodcuttingCommandResult.RequirementsNotMet
             };
 
-            if (CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest(skillCooldownTracker, out var cooldownResult))
+            if (CompanionSkillCooldownTimers.ShouldDecline(
+                skillCooldownTracker,
+                SkillType.Woodcutting,
+                CompanionWoodcuttingCommandResult.Accepted,
+                CompanionWoodcuttingCommandResult.Declined,
+                out var cooldownResult))
             {
                 attempt.Result = cooldownResult;
                 return attempt;
@@ -202,7 +207,7 @@ namespace Companions
 
             attempt.Accepted = true;
             attempt.Result = CompanionWoodcuttingCommandResult.Accepted;
-            CompanionSkillCooldownTimers.ClearWoodcuttingCooldown(skillCooldownTracker);
+            CompanionSkillCooldownTimers.ClearCooldown(skillCooldownTracker, SkillType.Woodcutting);
             return attempt;
         }
 
@@ -241,7 +246,12 @@ namespace Companions
             if (!isActiveAndEnabled || woodcuttingSkill == null || skillManager == null)
                 return false;
 
-            if (CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest(skillCooldownTracker, out failureReason))
+            if (CompanionSkillCooldownTimers.ShouldDecline(
+                skillCooldownTracker,
+                SkillType.Woodcutting,
+                CompanionWoodcuttingCommandResult.Accepted,
+                CompanionWoodcuttingCommandResult.Declined,
+                out failureReason))
                 return false;
 
             bool started = TryStartAreaGathering(
@@ -255,7 +265,7 @@ namespace Companions
                 },
                 PublishAreaWoodcuttingFailureMessage,
                 AreaWoodcuttingRoutine,
-                () => CompanionSkillCooldownTimers.ClearWoodcuttingCooldown(skillCooldownTracker),
+                () => CompanionSkillCooldownTimers.ClearCooldown(skillCooldownTracker, SkillType.Woodcutting),
                 "Companion Woodcutting",
                 StopActiveWoodcuttingRoutine,
                 preserveFollowerLocks: false);
