@@ -511,42 +511,19 @@ namespace Companions
             if (rockDef == null)
                 return null;
 
-            var definitions = PickaxeDefinitionRegistry.GetAllDefinitions();
-            if (definitions == null || definitions.Count == 0)
-            {
-                CompanionToolSelectorRegistry.RegisterPickaxesFromSelectors();
-                definitions = PickaxeDefinitionRegistry.GetAllDefinitions();
-            }
-
-            if (definitions == null || definitions.Count == 0)
-                return null;
-
             int requiredTier = rockDef.RequiresToolTier;
-            int miningLevel = miningSkill.Level;
+            int miningLevel = miningSkill != null ? miningSkill.Level : 1;
 
-            foreach (var definition in definitions)
-            {
-                if (definition == null)
-                    continue;
-
-                if (definition.LevelRequirement > miningLevel)
-                    continue;
-
-                if (definition.Tier < requiredTier)
-                    continue;
-
-                if (!CompanionToolOwnershipUtility.HasTool(
-                        definition.Id,
-                        inventory,
-                        companionEquipment,
-                        ref itemCache,
-                        out _))
-                    continue;
-
-                return definition;
-            }
-
-            return null;
+            return CompanionToolResolver.ResolveBestTool(
+                PickaxeDefinitionRegistry.GetAllDefinitions,
+                CompanionToolSelectorRegistry.RegisterPickaxesFromSelectors,
+                inventory,
+                companionEquipment,
+                ref itemCache,
+                definition => definition?.Id,
+                definition => definition != null && definition.LevelRequirement <= miningLevel,
+                null,
+                definition => definition != null && definition.Tier >= requiredTier);
         }
 
         /// <summary>

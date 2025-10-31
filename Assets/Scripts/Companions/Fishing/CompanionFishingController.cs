@@ -430,41 +430,26 @@ namespace Companions
             if (spotDef == null)
                 return null;
 
-            var definitions = FishingToolDefinitionRegistry.GetAllDefinitions();
-            if (definitions == null || definitions.Count == 0)
-            {
-                CompanionToolSelectorRegistry.RegisterFishingToolsFromSelectors();
-                definitions = FishingToolDefinitionRegistry.GetAllDefinitions();
-            }
-
-            if (definitions == null || definitions.Count == 0)
-                return null;
-
             int fishingLevel = fishingSkill != null ? fishingSkill.Level : 1;
 
-            foreach (var definition in definitions)
-            {
-                if (definition == null)
-                    continue;
+            return CompanionToolResolver.ResolveBestTool(
+                FishingToolDefinitionRegistry.GetAllDefinitions,
+                CompanionToolSelectorRegistry.RegisterFishingToolsFromSelectors,
+                inventory,
+                companionEquipment,
+                ref itemCache,
+                definition => definition?.Id,
+                definition => definition != null && definition.RequiredLevel <= fishingLevel,
+                definition =>
+                {
+                    if (definition == null)
+                        return false;
 
-                if (spotDef.AllowedTools != null && spotDef.AllowedTools.Count > 0 && !spotDef.AllowedTools.Contains(definition))
-                    continue;
+                    if (spotDef.AllowedTools == null || spotDef.AllowedTools.Count == 0)
+                        return true;
 
-                if (definition.RequiredLevel > fishingLevel)
-                    continue;
-
-                if (!CompanionToolOwnershipUtility.HasTool(
-                        definition.Id,
-                        inventory,
-                        companionEquipment,
-                        ref itemCache,
-                        out _))
-                    continue;
-
-                return definition;
-            }
-
-            return null;
+                    return spotDef.AllowedTools.Contains(definition);
+                });
         }
 
         private bool HasInventoryCapacityForFishInternal(IReadOnlyList<FishDefinition> fishOptions, bool suppressChat)
