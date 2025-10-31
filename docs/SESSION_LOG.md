@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:0efef8bb43bd85bcd3028883822fb4a7d3c7606a -->
+## 2025-10-31T10:00:11+00:00 — Refactor companion movement helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/CompanionSkillingControllerBase.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs
+- Diff: 68 ++ / 113 --
+- Notes:
+  —
+---
 <!-- commit:65c7c716b0d5fafe4687f89a4c26d5b6dc199b2b -->
 ## 2025-10-31T09:52:32+00:00 — Merge pull request #1569 from aicovergod/codex/add-tool-selection-helper-and-refactor-controllers
 
