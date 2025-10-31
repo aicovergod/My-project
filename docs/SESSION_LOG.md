@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:5ead1841a90f0fb2ea9cedce037e9b693ca5ba50 -->
+## 2025-10-31T11:19:21+00:00 — Merge pull request #1578 from aicovergod/codex/fix-compilation-errors-in-console
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 20 ++ / 16 --
+- Notes:
+  Fix companion gathering configuration compilation errors
+---
+<!-- commit:6e341f07855fd0e65a37dbc5ae00fc5ca1ab1f53 -->
+## 2025-10-31T11:19:09+00:00 — Fix companion gathering configuration compilation errors
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (9): Assets/Scripts/Companions/Commands/CompanionCookingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionFishingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionMiningCommandService.cs, Assets/Scripts/Companions/Commands/CompanionWoodcuttingCommandService.cs, Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Common/CompanionToolSelectorRegistry.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 20 ++ / 16 --
+- Notes:
+  —
+---
 <!-- commit:44bbbbbfef56c285f17f0e6c1d58420529ab1281 -->
 ## 2025-10-31T11:14:00+00:00 — Merge pull request #1577 from aicovergod/codex/introduce-reusable-helper-for-commands
 
