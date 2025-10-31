@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:bcc12c336d0d4ac6d16f362e4f5ca8029d82e564 -->
+## 2025-10-31T12:23:49+00:00 — Merge pull request #1582 from aicovergod/codex/refactor-companionskillcooldowntimers-structure
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 266 ++ / 201 --
+- Notes:
+  Refactor companion cooldown utilities
+---
+<!-- commit:5aaf655325ab25783f9a7d26dc126d8c5d029eba -->
+## 2025-10-31T12:23:31+00:00 — Merge branch 'main' into codex/refactor-companionskillcooldowntimers-structure
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:3f0122bffb4cd197c7b09a38bb7fd5d12e055fee -->
 ## 2025-10-31T12:19:39+00:00 — Refactor companion skill cooldown handling
 
