@@ -504,38 +504,16 @@ namespace Companions
             if (treeDef == null)
                 return null;
 
-            var definitions = AxeDefinitionRegistry.GetAllDefinitions();
-            if (definitions == null || definitions.Count == 0)
-            {
-                CompanionToolSelectorRegistry.RegisterAxesFromSelectors();
-                definitions = AxeDefinitionRegistry.GetAllDefinitions();
-            }
-
-            if (definitions == null || definitions.Count == 0)
-                return null;
-
             int woodcuttingLevel = woodcuttingSkill != null ? woodcuttingSkill.Level : 1;
 
-            foreach (var definition in definitions)
-            {
-                if (definition == null)
-                    continue;
-
-                if (definition.RequiredWoodcuttingLevel > woodcuttingLevel)
-                    continue;
-
-                if (!CompanionToolOwnershipUtility.HasTool(
-                        definition.Id,
-                        inventory,
-                        companionEquipment,
-                        ref itemCache,
-                        out _))
-                    continue;
-
-                return definition;
-            }
-
-            return null;
+            return CompanionToolResolver.ResolveBestTool(
+                AxeDefinitionRegistry.GetAllDefinitions,
+                CompanionToolSelectorRegistry.RegisterAxesFromSelectors,
+                inventory,
+                companionEquipment,
+                ref itemCache,
+                definition => definition?.Id,
+                definition => definition != null && definition.RequiredWoodcuttingLevel <= woodcuttingLevel);
         }
 
         /// <summary>
