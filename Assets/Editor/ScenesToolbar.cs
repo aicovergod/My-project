@@ -88,10 +88,14 @@ public static class ScenesToolbar
             targetZone = root.Q(ToolbarZoneRightAlign, className: "ToolbarZone") ?? root;
         }
 
+        // Target the inner row that contains the transport controls so our button sits on the same horizontal line.
+        VisualElement insertionTarget = targetZone.Q<VisualElement>(className: "unity-toolbar__row") ?? targetZone;
+
         // Prevent duplicate menus if the domain reloads while the toolbar persists.
-        if (targetZone.Q<ToolbarMenu>(ToolbarMenuName) != null)
+        ToolbarMenu existingMenu = insertionTarget.Q<ToolbarMenu>(ToolbarMenuName) ?? targetZone.Q<ToolbarMenu>(ToolbarMenuName);
+        if (existingMenu != null)
         {
-            toolbarMenu = targetZone.Q<ToolbarMenu>(ToolbarMenuName);
+            toolbarMenu = existingMenu;
             RebuildMenu();
             EditorApplication.update -= TryInstallToolbarButton;
             return;
@@ -108,9 +112,10 @@ public static class ScenesToolbar
         // Keep the button compact so it mirrors Unity's existing toolbar styling.
         toolbarMenu.style.flexShrink = 0;
         toolbarMenu.style.flexGrow = 0;
+        toolbarMenu.style.alignSelf = Align.Center;
 
         // Insert directly after the play controls so it feels native.
-        targetZone.Add(toolbarMenu);
+        insertionTarget.Add(toolbarMenu);
 
         RebuildMenu();
 
