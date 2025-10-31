@@ -8,6 +8,7 @@ using Pets;
 using Skills;
 using UnityEngine;
 using Companions.Combat;
+using Companions.Common;
 using Companions.Equipment;
 using RuntimeInventory = global::Inventory.Inventory;
 
@@ -428,42 +429,34 @@ namespace Companions
 
         private void ConfigureMining(Transform player)
         {
-            miningController = miningController != null
-                ? miningController
-                : GetComponent<CompanionMiningController>();
-            if (miningController == null)
-                miningController = gameObject.AddComponent<CompanionMiningController>();
-            miningController.Initialise(this, skillManager, companionInventory, player, skillCooldownTracker);
+            CompanionSubsystemBootstrapper.EnsureSubsystem(
+                this,
+                ref miningController,
+                controller => controller.Initialise(this, skillManager, companionInventory, player, skillCooldownTracker));
         }
 
         private void ConfigureFishing(Transform player)
         {
-            fishingController = fishingController != null
-                ? fishingController
-                : GetComponent<CompanionFishingController>();
-            if (fishingController == null)
-                fishingController = gameObject.AddComponent<CompanionFishingController>();
-            fishingController.Initialise(this, skillManager, companionInventory, player, skillCooldownTracker);
+            CompanionSubsystemBootstrapper.EnsureSubsystem(
+                this,
+                ref fishingController,
+                controller => controller.Initialise(this, skillManager, companionInventory, player, skillCooldownTracker));
         }
 
         private void ConfigureCooking(Transform player)
         {
-            cookingController = cookingController != null
-                ? cookingController
-                : GetComponent<CompanionCookingController>();
-            if (cookingController == null)
-                cookingController = gameObject.AddComponent<CompanionCookingController>();
-            cookingController.Initialise(this, skillManager, companionInventory, companionEquipment, player, skillCooldownTracker);
+            CompanionSubsystemBootstrapper.EnsureSubsystem(
+                this,
+                ref cookingController,
+                controller => controller.Initialise(this, skillManager, companionInventory, companionEquipment, player, skillCooldownTracker));
         }
 
         private void ConfigureWoodcutting(Transform player)
         {
-            woodcuttingController = woodcuttingController != null
-                ? woodcuttingController
-                : GetComponent<CompanionWoodcuttingController>();
-            if (woodcuttingController == null)
-                woodcuttingController = gameObject.AddComponent<CompanionWoodcuttingController>();
-            woodcuttingController.Initialise(this, skillManager, companionInventory, player, skillCooldownTracker);
+            CompanionSubsystemBootstrapper.EnsureSubsystem(
+                this,
+                ref woodcuttingController,
+                controller => controller.Initialise(this, skillManager, companionInventory, player, skillCooldownTracker));
         }
 
         private void ConfigureCombat()
@@ -483,14 +476,10 @@ namespace Companions
         /// </summary>
         private void ConfigurePickupController()
         {
-            pickupController = pickupController != null
-                ? pickupController
-                : GetComponent<CompanionPickupController>();
-
-            if (pickupController == null)
-                pickupController = gameObject.AddComponent<CompanionPickupController>();
-
-            pickupController.Initialise(this, companionInventory);
+            CompanionSubsystemBootstrapper.EnsureSubsystem(
+                this,
+                ref pickupController,
+                controller => controller.Initialise(this, companionInventory));
         }
 
         private void OnSkillLevelChanged(SkillType type, int level)
