@@ -1,8 +1,11 @@
 using Inventory;
 using Player;
+using Core.Input;
 using UI;
+using UI.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using Util;
 
 namespace NPC
@@ -15,6 +18,15 @@ namespace NPC
     [RequireComponent(typeof(Collider2D))]
     public sealed class CowMilking : MonoBehaviour, IPointerClickHandler, ITickable
     {
+        [Header("Input")]
+        [SerializeField]
+        [Tooltip("Player input component providing the interaction action map. Auto-resolved when empty.")]
+        private PlayerInput playerInput;
+
+        [SerializeField]
+        [Tooltip("Optional override for the Interact action used to trigger milking via the shared input system.")]
+        private InputActionReference interactActionReference;
+
         [Header("Item Configuration")]
         [SerializeField]
         [Tooltip("Inventory identifier for the empty bucket item that must be used on the cow.")]
@@ -91,11 +103,16 @@ namespace NPC
         private bool reportedMissingMover;
         private bool reportedMissingEmptyBucket;
         private bool reportedMissingFilledBucket;
+        private bool reportedMissingPlayerInput;
+        private bool reportedMissingCamera;
 
         private bool milkingActive;
         private bool subscribedToTicker;
         private int ticksRemaining;
         private int preferredBucketSlot = -1;
+
+        private InputAction interactAction;
+        private bool interactActionEnabledByResolver;
 
         /// <summary>
         ///     Handle left-clicks on the cow and begin the milking routine when the player has a bucket selected.
@@ -109,28 +126,8 @@ namespace NPC
             if (eventData == null || eventData.button != PointerEventData.InputButton.Left)
                 return;
 
-            if (!TryResolvePlayerComponents())
-                return;
-
-            if (!ValidateItemDefinitions())
-                return;
-
-            if (!TryValidateSelectedBucket(out int selectedSlot))
-            {
-                // Provide gentle feedback when the player clicks without preparing the correct item.
-                ShowFloatingText(missingBucketMessage);
-                return;
-            }
-
-            if (!IsPlayerWithinStartRange())
-            {
-                ShowFloatingText(outOfRangeMessage);
-                return;
-            }
-
-            preferredBucketSlot = selectedSlot;
-            BeginMilking();
-            eventData.Use();
+            if (TryBeginMilkingFromPointer(eventData.position, requireRaycastConfirmation: false))
+                eventData.Use();
         }
 
         /// <summary>
@@ -199,10 +196,12 @@ namespace NPC
         private void OnEnable()
         {
             itemCacheDirty = true;
+            SubscribeToInteractAction();
         }
 
         private void OnDisable()
         {
+            UnsubscribeFromInteractAction();
             StopMilking(false);
         }
 
@@ -595,6 +594,144 @@ namespace NPC
                 return;
 
             Debug.Log($"[CowMilking] {message}", this);
+        }
+
+        /// <summary>
+        ///     Attempts to start milking using shared pointer validation so both clicks and the Interact action behave the same.
+        /// </summary>
+        /// <param name="screenPosition">Screen-space coordinates of the triggering pointer.</param>
+        /// <param name="requireRaycastConfirmation">
+        ///     True to require that a Physics2D raycast confirms the pointer is targeting this cow.
+        /// </param>
+        private bool TryBeginMilkingFromPointer(Vector2 screenPosition, bool requireRaycastConfirmation)
+        {
+            if (PointerRaycastUtility.IsPointerOverBlockingUI(screenPosition))
+                return false;
+
+            if (requireRaycastConfirmation && !RaycastConfirmsThisCow(screenPosition))
+                return false;
+
+            return TryBeginMilkingInteraction();
+        }
+
+        /// <summary>
+        ///     Shared milking start logic used by both pointer events and input actions.
+        /// </summary>
+        private bool TryBeginMilkingInteraction()
+        {
+            if (!TryResolvePlayerComponents())
+                return false;
+
+            if (!ValidateItemDefinitions())
+                return false;
+
+            if (!TryValidateSelectedBucket(out int selectedSlot))
+            {
+                ShowFloatingText(missingBucketMessage);
+                return false;
+            }
+
+            if (!IsPlayerWithinStartRange())
+            {
+                ShowFloatingText(outOfRangeMessage);
+                return false;
+            }
+
+            preferredBucketSlot = selectedSlot;
+            BeginMilking();
+            return true;
+        }
+
+        /// <summary>
+        ///     Resolves the Interact input action so controller and keyboard input can trigger milking.
+        /// </summary>
+        private void SubscribeToInteractAction()
+        {
+            UnsubscribeFromInteractAction();
+
+            if (playerInput == null)
+            {
+                playerInput = GetComponent<PlayerInput>();
+                if (playerInput == null)
+                    playerInput = GetComponentInParent<PlayerInput>();
+                if (playerInput == null)
+                    playerInput = FindObjectOfType<PlayerInput>();
+            }
+
+            interactAction = InputActionResolver.Resolve(playerInput, interactActionReference, "Interact", out interactActionEnabledByResolver);
+            if (interactAction != null)
+            {
+                interactAction.performed += HandleInteractAction;
+                reportedMissingPlayerInput = false;
+            }
+            else if (!reportedMissingPlayerInput)
+            {
+                Debug.LogWarning("CowMilking could not locate the Interact action. Assign a PlayerInput or InputActionReference.", this);
+                reportedMissingPlayerInput = true;
+            }
+        }
+
+        /// <summary>
+        ///     Tears down the interact action subscription and disables any actions owned by the resolver.
+        /// </summary>
+        private void UnsubscribeFromInteractAction()
+        {
+            if (interactAction != null)
+            {
+                interactAction.performed -= HandleInteractAction;
+                if (interactActionEnabledByResolver)
+                    interactAction.Disable();
+
+                interactAction = null;
+                interactActionEnabledByResolver = false;
+            }
+        }
+
+        /// <summary>
+        ///     Handles interact action callbacks from the shared player input system.
+        /// </summary>
+        private void HandleInteractAction(InputAction.CallbackContext context)
+        {
+            if (!context.performed)
+                return;
+
+            if (!isActiveAndEnabled)
+                return;
+
+            Vector2 pointerPosition = InputActionResolver.GetPointerScreenPosition(new Vector2(Screen.width * 0.5f, Screen.height * 0.5f));
+
+            TryBeginMilkingFromPointer(pointerPosition, requireRaycastConfirmation: true);
+        }
+
+        /// <summary>
+        ///     Confirms whether the provided pointer position targets this cow using a Physics2D raycast.
+        /// </summary>
+        private bool RaycastConfirmsThisCow(Vector2 screenPosition)
+        {
+            var activeCamera = Camera.main;
+            if (activeCamera == null)
+            {
+                if (!reportedMissingCamera)
+                {
+                    Debug.LogWarning("CowMilking could not locate the active camera to validate interact input.", this);
+                    reportedMissingCamera = true;
+                }
+
+                return false;
+            }
+
+            reportedMissingCamera = false;
+
+            var ray = activeCamera.ScreenPointToRay(screenPosition);
+            float maxDistance = Mathf.Max(activeCamera.farClipPlane, 0f);
+            if (maxDistance <= 0f)
+                maxDistance = float.PositiveInfinity;
+
+            var hit = Physics2D.GetRayIntersection(ray, maxDistance);
+            if (hit.collider == null)
+                return false;
+
+            return hit.collider.transform == transform || hit.collider.transform.IsChildOf(transform);
         }
     }
 }
