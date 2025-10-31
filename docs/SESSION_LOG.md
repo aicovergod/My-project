@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:828e971adba9c3c55fd2cc9b052d573e66b97d10 -->
+## 2025-10-31T21:25:16+00:00 — Allow SpriteDepth to use custom sorting anchor
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Util/SpriteDepth.cs
+- Diff: 19 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:2a15ac6162c0d57e6adcb7ca0003a6746cf1cf81 -->
 ## 2025-10-31T20:07:06+00:00 — sprites
 

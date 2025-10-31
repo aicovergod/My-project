@@ -8,6 +8,9 @@ namespace Util
     [RequireComponent(typeof(SpriteRenderer))]
     public class SpriteDepth : MonoBehaviour
     {
+        [SerializeField]
+        private Transform sortingAnchor; // optional override for the transform whose Y drives sorting
+
         public int offset;            // small positive/negative tweak if needed
         public int directionOffset;   // magnitude for direction-based tweak
 
@@ -16,6 +19,7 @@ namespace Util
 
         void Awake()
         {
+            EnsureAnchorReference();
             sr = GetComponent<SpriteRenderer>();
             movementController = FindObjectOfType<PlayerMovementController>();
             if (movementController == null)
@@ -24,6 +28,11 @@ namespace Util
                 if (mover != null)
                     movementController = mover.MovementController;
             }
+        }
+
+        void OnValidate()
+        {
+            EnsureAnchorReference();
         }
 
         void LateUpdate()
@@ -39,7 +48,16 @@ namespace Util
             }
 
             // Larger (more negative) Y => lower sorting order => appears behind
-            sr.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100f) + offset + dir;
+            // Default to this component's transform when no custom anchor is provided.
+            float anchorPositionY = (sortingAnchor != null ? sortingAnchor : transform).position.y;
+            sr.sortingOrder = Mathf.RoundToInt(-anchorPositionY * 100f) + offset + dir;
+        }
+
+        private void EnsureAnchorReference()
+        {
+            // Guarantee the anchor defaults to this component so inspector overrides remain optional.
+            if (sortingAnchor == null)
+                sortingAnchor = transform;
         }
     }
 }
