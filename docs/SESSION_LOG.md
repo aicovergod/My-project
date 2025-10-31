@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3f0122bffb4cd197c7b09a38bb7fd5d12e055fee -->
+## 2025-10-31T12:19:39+00:00 — Refactor companion skill cooldown handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (11): Assets/Scripts/Companions/Commands/CompanionCookingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionFishingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionMiningCommandService.cs, Assets/Scripts/Companions/Commands/CompanionSkillCooldownProfile.cs, Assets/Scripts/Companions/Commands/CompanionWoodcuttingCommandService.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 262 ++ / 188 --
+- Notes:
+  —
+---
 <!-- commit:b99aef5b1b82bf9ee353e412d069617c2e8c0f9a -->
 ## 2025-10-31T11:54:03+00:00 — Merge pull request #1580 from aicovergod/codex/add-fishing-cancellation-in-commands
 
