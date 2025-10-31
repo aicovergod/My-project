@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:809b3e91d759f13d687895c39df686167c63a137 -->
+## 2025-10-31T10:00:30+00:00 — Merge pull request #1570 from aicovergod/codex/refactor-movement-methods-in-controllers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 77 ++ / 113 --
+- Notes:
+  Refactor companion movement helpers
+---
+<!-- commit:c42f2cb4c87bbda0edbb995f763ae1424c7cf6df -->
+## 2025-10-31T10:00:25+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:0efef8bb43bd85bcd3028883822fb4a7d3c7606a -->
 ## 2025-10-31T10:00:11+00:00 — Refactor companion movement helpers
 
