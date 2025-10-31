@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c8a90b8374b98f0330f7d9398d3ca1bc40ec8053 -->
+## 2025-10-31T10:54:11+00:00 — Refactor companion cooldown chat publishing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs
+- Diff: 19 ++ / 65 --
+- Notes:
+  —
+---
 <!-- commit:8e522f22e522840cbc6739e759b40442bc96b1d2 -->
 ## 2025-10-31T10:50:54+00:00 — Merge pull request #1574 from aicovergod/codex/add-companionguardmodeservice-class
 
