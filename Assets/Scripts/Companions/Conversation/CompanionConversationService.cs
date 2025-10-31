@@ -2179,13 +2179,13 @@ namespace Companions.Conversation
             lastProactiveQuestionUtc = DateTime.UtcNow;
 
             if (analysis.Skill == SkillType.Mining)
-                CompanionSkillCooldownTimers.StartMiningCooldown(CompanionManager.CompanionSkillCooldowns);
+                CompanionSkillCooldownTimers.StartCooldown(CompanionManager.CompanionSkillCooldowns, SkillType.Mining);
 
             if (analysis.Skill == SkillType.Woodcutting)
-                CompanionSkillCooldownTimers.StartWoodcuttingCooldown(CompanionManager.CompanionSkillCooldowns);
+                CompanionSkillCooldownTimers.StartCooldown(CompanionManager.CompanionSkillCooldowns, SkillType.Woodcutting);
 
             if (analysis.Skill == SkillType.Fishing)
-                CompanionSkillCooldownTimers.StartFishingCooldown(CompanionManager.CompanionSkillCooldowns);
+                CompanionSkillCooldownTimers.StartCooldown(CompanionManager.CompanionSkillCooldowns, SkillType.Fishing);
 
             if (declinedCombat)
             {

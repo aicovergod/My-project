@@ -184,7 +184,12 @@ namespace Companions
                 Result = CompanionMiningCommandResult.RequirementsNotMet
             };
 
-            if (CompanionSkillCooldownTimers.ShouldDeclineMiningRequest(skillCooldownTracker, out var cooldownResult))
+            if (CompanionSkillCooldownTimers.ShouldDecline(
+                skillCooldownTracker,
+                SkillType.Mining,
+                CompanionMiningCommandResult.Accepted,
+                CompanionMiningCommandResult.Declined,
+                out var cooldownResult))
             {
                 attempt.Result = cooldownResult;
                 return attempt;
@@ -202,7 +207,7 @@ namespace Companions
 
             attempt.Accepted = true;
             attempt.Result = CompanionMiningCommandResult.Accepted;
-            CompanionSkillCooldownTimers.ClearMiningCooldown(skillCooldownTracker);
+            CompanionSkillCooldownTimers.ClearCooldown(skillCooldownTracker, SkillType.Mining);
             return attempt;
         }
 
@@ -241,7 +246,12 @@ namespace Companions
             if (!isActiveAndEnabled || miningSkill == null || skillManager == null)
                 return false;
 
-            if (CompanionSkillCooldownTimers.ShouldDeclineMiningRequest(skillCooldownTracker, out failureReason))
+            if (CompanionSkillCooldownTimers.ShouldDecline(
+                skillCooldownTracker,
+                SkillType.Mining,
+                CompanionMiningCommandResult.Accepted,
+                CompanionMiningCommandResult.Declined,
+                out failureReason))
                 return false;
 
             bool started = TryStartAreaGathering(
@@ -255,7 +265,7 @@ namespace Companions
                 },
                 PublishAreaMiningFailureMessage,
                 AreaMiningRoutine,
-                () => CompanionSkillCooldownTimers.ClearMiningCooldown(skillCooldownTracker),
+                () => CompanionSkillCooldownTimers.ClearCooldown(skillCooldownTracker, SkillType.Mining),
                 "Companion Mining",
                 StopActiveMiningRoutine,
                 preserveFollowerLocks: false);

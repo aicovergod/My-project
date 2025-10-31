@@ -1,4 +1,5 @@
 using System;
+using Skills;
 using Skills.Cooking;
 using UnityEngine;
 
@@ -48,7 +49,13 @@ namespace Companions.Commands
             {
                 SkillName = SkillName,
                 LogPrefix = LogPrefix,
-                CooldownCheck = CompanionSkillCooldownTimers.ShouldDeclineCookingRequest,
+                CooldownCheck = (CompanionSkillCooldownTracker tracker, out CompanionCookingCommandResult commandResult) =>
+                    CompanionSkillCooldownTimers.ShouldDecline(
+                        tracker,
+                        SkillType.Cooking,
+                        CompanionCookingCommandResult.Accepted,
+                        CompanionCookingCommandResult.Declined,
+                        out commandResult),
                 CommandExecutor = (CompanionCookingController controller, out CompanionCookingCommandResult commandResult) => controller.TryCommandCook(station, recipe, out commandResult),
                 TreatResultAsSuccess = commandResult => commandResult == CompanionCookingCommandResult.InventoryFull,
                 CooldownMessageBuilder = commandResult => $"{LogPrefix} Cooking command outcome: accepted=False (result={commandResult}).",
@@ -102,7 +109,13 @@ namespace Companions.Commands
                 SkillName = SkillName,
                 LogPrefix = LogPrefix,
                 GuardRejectionResult = CompanionCookingCommandResult.RequirementsNotMet,
-                CooldownCheck = CompanionSkillCooldownTimers.ShouldDeclineCookingRequest,
+                CooldownCheck = (CompanionSkillCooldownTracker tracker, out CompanionCookingCommandResult result) =>
+                    CompanionSkillCooldownTimers.ShouldDecline(
+                        tracker,
+                        SkillType.Cooking,
+                        CompanionCookingCommandResult.Accepted,
+                        CompanionCookingCommandResult.Declined,
+                        out result),
                 CommandExecutor = (CompanionCookingController controller, float scanRadius, out CompanionCookingCommandResult result) => controller.TryStartAreaCooking(scanRadius, out result),
                 TreatFailureAsSuccess = result => result == CompanionCookingCommandResult.InventoryFull,
                 CooldownMessageBuilder = (scanRadius, result) => $"{LogPrefix} Area cooking command outcome: success=False, radius={scanRadius}, reason=Cooldown active.",

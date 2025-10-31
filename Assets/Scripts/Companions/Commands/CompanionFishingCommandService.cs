@@ -1,3 +1,4 @@
+using Skills;
 using Skills.Fishing;
 using UnityEngine;
 
@@ -30,7 +31,13 @@ namespace Companions.Commands
             }
 
             var request = CreateSingleTargetRequest<CompanionFishingController, CompanionFishingCommandResult>(
-                CompanionSkillCooldownTimers.ShouldDeclineFishingRequest,
+                (CompanionSkillCooldownTracker tracker, out CompanionFishingCommandResult result) =>
+                    CompanionSkillCooldownTimers.ShouldDecline(
+                        tracker,
+                        SkillType.Fishing,
+                        CompanionFishingCommandResult.Accepted,
+                        CompanionFishingCommandResult.Declined,
+                        out result),
                 (CompanionFishingController controller, out CompanionFishingCommandResult result) => controller.TryCommandFish(spot, out result),
                 result => result == CompanionFishingCommandResult.InventoryFull,
                 result => $"{LogPrefix} Fishing command outcome: accepted=False (result={result}).",
@@ -50,7 +57,13 @@ namespace Companions.Commands
         {
             var request = CreateAreaCommandRequest<CompanionFishingController, CompanionFishingCommandResult>(
                 CompanionFishingCommandResult.RequirementsNotMet,
-                CompanionSkillCooldownTimers.ShouldDeclineFishingRequest,
+                (CompanionSkillCooldownTracker tracker, out CompanionFishingCommandResult result) =>
+                    CompanionSkillCooldownTimers.ShouldDecline(
+                        tracker,
+                        SkillType.Fishing,
+                        CompanionFishingCommandResult.Accepted,
+                        CompanionFishingCommandResult.Declined,
+                        out result),
                 (CompanionFishingController controller, float scanRadius, out CompanionFishingCommandResult result) => controller.TryStartAreaFishing(scanRadius, out result),
                 result => result == CompanionFishingCommandResult.InventoryFull,
                 (scanRadius, result) => $"{LogPrefix} Area fishing command outcome: success=False, radius={scanRadius}, reason=Cooldown active.",

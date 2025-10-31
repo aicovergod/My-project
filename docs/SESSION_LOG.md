@@ -1,21 +1,12 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:f7cf5e7ff28527947a01da8cf04d6d9a424db258 -->
-## 2025-10-31T12:02:11+00:00 — Merge pull request #1581 from aicovergod/codex/create-companiondisplayutility-script
+<!-- commit:3f0122bffb4cd197c7b09a38bb7fd5d12e055fee -->
+## 2025-10-31T12:19:39+00:00 — Refactor companion skill cooldown handling
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (0): —
-- Diff: 125 ++ / 68 --
-- Notes:
-  Extract companion display helpers into reusable utility
----
-<!-- commit:b861bf86ad6fa931a24c459c5848c052c4eeee83 -->
-## 2025-10-31T12:01:58+00:00 — Refactor companion display helpers into shared utility
-
-- Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (8): Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs, Assets/Scripts/Companions/Chat/CompanionChatInventoryResponder.cs, Assets/Scripts/Companions/Chat/CompanionChatPublisher.cs, Assets/Scripts/Companions/Common/CompanionDisplayUtility.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/UI/AdminF4Menu.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs, Assets/Scripts/Pets/PetLevelBarMenu.cs
-- Diff: 125 ++ / 68 --
+- Changed files (11): Assets/Scripts/Companions/Commands/CompanionCookingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionFishingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionMiningCommandService.cs, Assets/Scripts/Companions/Commands/CompanionSkillCooldownProfile.cs, Assets/Scripts/Companions/Commands/CompanionWoodcuttingCommandService.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 262 ++ / 188 --
 - Notes:
   —
 ---

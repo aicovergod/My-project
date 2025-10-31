@@ -1,3 +1,4 @@
+using Skills;
 using Skills.Mining;
 using UnityEngine;
 
@@ -34,7 +35,13 @@ namespace Companions.Commands
             }
 
             var request = CreateSingleTargetRequest<CompanionMiningController, CompanionMiningCommandResult>(
-                CompanionSkillCooldownTimers.ShouldDeclineMiningRequest,
+                (CompanionSkillCooldownTracker tracker, out CompanionMiningCommandResult result) =>
+                    CompanionSkillCooldownTimers.ShouldDecline(
+                        tracker,
+                        SkillType.Mining,
+                        CompanionMiningCommandResult.Accepted,
+                        CompanionMiningCommandResult.Declined,
+                        out result),
                 (CompanionMiningController controller, out CompanionMiningCommandResult result) => controller.TryCommandMine(rock, out result),
                 result => result == CompanionMiningCommandResult.InventoryFull,
                 result => $"{LogPrefix} Mining command outcome: accepted=False (result={result}).",
@@ -59,7 +66,13 @@ namespace Companions.Commands
         {
             var request = CreateAreaCommandRequest<CompanionMiningController, CompanionMiningCommandResult>(
                 CompanionMiningCommandResult.RequirementsNotMet,
-                CompanionSkillCooldownTimers.ShouldDeclineMiningRequest,
+                (CompanionSkillCooldownTracker tracker, out CompanionMiningCommandResult result) =>
+                    CompanionSkillCooldownTimers.ShouldDecline(
+                        tracker,
+                        SkillType.Mining,
+                        CompanionMiningCommandResult.Accepted,
+                        CompanionMiningCommandResult.Declined,
+                        out result),
                 (CompanionMiningController controller, float scanRadius, out CompanionMiningCommandResult result) => controller.TryStartAreaMining(scanRadius, out result),
                 result => result == CompanionMiningCommandResult.InventoryFull,
                 (scanRadius, result) => $"{LogPrefix} Area mining command outcome: success=False, radius={scanRadius}, reason=Cooldown active.",

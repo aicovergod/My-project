@@ -188,7 +188,12 @@ namespace Companions
             if (!isActiveAndEnabled)
                 return attempt;
 
-            if (CompanionSkillCooldownTimers.ShouldDeclineFishingRequest(skillCooldownTracker, out var cooldownResult))
+            if (CompanionSkillCooldownTimers.ShouldDecline(
+                skillCooldownTracker,
+                SkillType.Fishing,
+                CompanionFishingCommandResult.Accepted,
+                CompanionFishingCommandResult.Declined,
+                out var cooldownResult))
             {
                 attempt.Result = cooldownResult;
                 return attempt;
@@ -203,7 +208,7 @@ namespace Companions
             followerDisabledForGathering = preserveFollowerHold ? HasActiveFollowerHold : false;
 
             BeginFishing(spot, tool);
-            CompanionSkillCooldownTimers.ClearFishingCooldown(skillCooldownTracker);
+            CompanionSkillCooldownTimers.ClearCooldown(skillCooldownTracker, SkillType.Fishing);
 
             attempt.Accepted = true;
             attempt.Result = CompanionFishingCommandResult.Accepted;
@@ -235,7 +240,12 @@ namespace Companions
             if (!isActiveAndEnabled || fishingSkill == null || skillManager == null)
                 return false;
 
-            if (CompanionSkillCooldownTimers.ShouldDeclineFishingRequest(skillCooldownTracker, out failureReason))
+            if (CompanionSkillCooldownTimers.ShouldDecline(
+                skillCooldownTracker,
+                SkillType.Fishing,
+                CompanionFishingCommandResult.Accepted,
+                CompanionFishingCommandResult.Declined,
+                out failureReason))
                 return false;
 
             bool started = TryStartAreaGathering(
@@ -249,7 +259,7 @@ namespace Companions
                 },
                 PublishAreaFishingFailureMessage,
                 AreaFishingRoutine,
-                () => CompanionSkillCooldownTimers.ClearFishingCooldown(skillCooldownTracker),
+                () => CompanionSkillCooldownTimers.ClearCooldown(skillCooldownTracker, SkillType.Fishing),
                 "Companion Fishing");
 
             return started;
