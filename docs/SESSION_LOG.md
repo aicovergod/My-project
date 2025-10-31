@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:40632d57715b453ba588bc9900a597863cade451 -->
+## 2025-10-31T10:40:49+00:00 — Refactor companion chat publishing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Chat/CompanionChatPublisher.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Tests/Companions/CompanionChatPublisherTests.cs
+- Diff: 161 ++ / 48 --
+- Notes:
+  —
+---
 <!-- commit:16291f6cf90ff9db428aee2092870aa7a6ed9c21 -->
 ## 2025-10-31T10:29:29+00:00 — Merge pull request #1572 from aicovergod/codex/add-utility-for-subsystem-management
 
