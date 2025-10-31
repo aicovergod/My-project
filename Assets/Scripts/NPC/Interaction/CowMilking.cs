@@ -1,3 +1,4 @@
+using System.Collections;
 using Inventory;
 using Player;
 using Core.Input;
@@ -49,6 +50,15 @@ namespace NPC
         [SerializeField, Min(0f)]
         [Tooltip("Extra distance tolerated before cancelling so minor jitter does not stop the action immediately.")]
         private float cancelDistanceTolerance = 0.15f;
+
+        [Header("Auto Movement")]
+        [SerializeField]
+        [Tooltip("When enabled the player will automatically walk into range before milking.")]
+        private bool autoMoveIntoRange = true;
+
+        [SerializeField, Min(0f)]
+        [Tooltip("Buffer subtracted from the interaction range when auto moving so the player stops inside the radius.")]
+        private float autoMoveStopBuffer = 0.15f;
 
         [Header("Feedback")]
         [SerializeField]
@@ -110,6 +120,9 @@ namespace NPC
         private bool subscribedToTicker;
         private int ticksRemaining;
         private int preferredBucketSlot = -1;
+
+        private Coroutine autoMoveRoutine;
+        private bool autoMovePending;
 
         private InputAction interactAction;
         private bool interactActionEnabledByResolver;
@@ -202,6 +215,7 @@ namespace NPC
         private void OnDisable()
         {
             UnsubscribeFromInteractAction();
+            StopAutoMoveRoutine(true);
             StopMilking(false);
         }
 
@@ -211,6 +225,7 @@ namespace NPC
             ticksPerMilking = Mathf.Max(1, ticksPerMilking);
             maxInteractionDistance = Mathf.Max(0f, maxInteractionDistance);
             cancelDistanceTolerance = Mathf.Max(0f, cancelDistanceTolerance);
+            autoMoveStopBuffer = Mathf.Max(0f, autoMoveStopBuffer);
             itemCacheDirty = true;
         }
 #endif
@@ -220,6 +235,8 @@ namespace NPC
         /// </summary>
         private void BeginMilking()
         {
+            StopAutoMoveRoutine(false);
+
             if (milkingActive)
             {
                 LogDebug("Milking command ignored because an action is already in progress.");
@@ -266,6 +283,7 @@ namespace NPC
             milkingActive = false;
             ticksRemaining = 0;
             preferredBucketSlot = -1;
+            StopAutoMoveRoutine(false);
             UnsubscribeFromTicker();
 
             string reason = message;
@@ -635,14 +653,37 @@ namespace NPC
                 }
             }
 
+            preferredBucketSlot = selectedSlot;
+
             if (!IsPlayerWithinStartRange())
             {
+                if (TryStartAutoMove())
+                    return true;
+
+                preferredBucketSlot = -1;
                 ShowFloatingText(outOfRangeMessage);
                 return false;
             }
 
-            preferredBucketSlot = selectedSlot;
             BeginMilking();
+            return true;
+        }
+
+        /// <summary>
+        ///     Attempts to walk the player into range so milking can begin automatically upon arrival.
+        /// </summary>
+        private bool TryStartAutoMove()
+        {
+            if (!autoMoveIntoRange)
+                return false;
+
+            if (!TryResolvePlayerComponents())
+                return false;
+
+            if (playerMover == null)
+                return false;
+
+            StartAutoMoveRoutine();
             return true;
         }
 
@@ -736,6 +777,119 @@ namespace NPC
                 return false;
 
             return hit.collider.transform == transform || hit.collider.transform.IsChildOf(transform);
+        }
+
+        /// <summary>
+        ///     Begins monitoring the player's automatic movement towards the cow.
+        /// </summary>
+        private void StartAutoMoveRoutine()
+        {
+            StopAutoMoveRoutine(false);
+
+            autoMoveRoutine = StartCoroutine(AutoMoveIntoRangeCoroutine());
+        }
+
+        /// <summary>
+        ///     Stops any pending automatic movement routine, optionally halting the player immediately.
+        /// </summary>
+        private void StopAutoMoveRoutine(bool stopMovement)
+        {
+            if (autoMoveRoutine != null)
+            {
+                StopCoroutine(autoMoveRoutine);
+                autoMoveRoutine = null;
+            }
+
+            autoMovePending = false;
+
+            if (stopMovement && playerMover != null)
+                playerMover.StopMovement();
+        }
+
+        /// <summary>
+        ///     Calculates the stop distance used when auto moving into range so the player does not overshoot the cow.
+        /// </summary>
+        private float CalculateAutoMoveStopDistance()
+        {
+            if (maxInteractionDistance <= 0f)
+                return 0f;
+
+            float stopDistance = maxInteractionDistance - autoMoveStopBuffer;
+            return Mathf.Clamp(stopDistance, 0f, maxInteractionDistance);
+        }
+
+        /// <summary>
+        ///     Coroutine that walks the player into range and starts milking once close enough.
+        /// </summary>
+        private IEnumerator AutoMoveIntoRangeCoroutine()
+        {
+            if (playerMover == null)
+            {
+                yield break;
+            }
+
+            autoMovePending = true;
+
+            int reissueAttempts = 0;
+            float stopDistance = CalculateAutoMoveStopDistance();
+            bool moveCompleted = false;
+
+            void HandleMoveComplete()
+            {
+                moveCompleted = true;
+            }
+
+            playerMover.MoveTo(transform, stopDistance, HandleMoveComplete);
+
+            while (autoMovePending)
+            {
+                if (!isActiveAndEnabled)
+                    break;
+
+                if (!TryResolvePlayerComponents() || playerMover == null)
+                    break;
+
+                if (!ValidateItemDefinitions())
+                    break;
+
+                if (!HasAnyBuckets())
+                {
+                    ShowFloatingText(missingBucketMessage);
+                    break;
+                }
+
+                if (IsPlayerWithinStartRange())
+                {
+                    BeginMilking();
+                    yield break;
+                }
+
+                if (!playerMover.IsAutoMoving)
+                {
+                    if (moveCompleted)
+                    {
+                        moveCompleted = false;
+
+                        if (++reissueAttempts >= 3)
+                        {
+                            ShowFloatingText(outOfRangeMessage);
+                            break;
+                        }
+
+                        playerMover.MoveTo(transform, stopDistance, HandleMoveComplete);
+                    }
+                    else
+                    {
+                        // Movement was cancelled or interrupted before the callback fired.
+                        break;
+                    }
+                }
+
+                yield return null;
+            }
+
+            autoMovePending = false;
+            autoMoveRoutine = null;
         }
     }
 }
