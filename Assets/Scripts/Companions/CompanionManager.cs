@@ -998,18 +998,9 @@ namespace Companions
         /// </summary>
         public static void PublishAutoSpawnGreeting()
         {
-            if (!HasActiveCompanion)
-                return;
-
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string message = CompanionChatLibrary.GetRandomAutoSpawnGreetingLine();
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-
-            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
+            CompanionChatPublisher.TryPublish(
+                CompanionChatLibrary.GetRandomAutoSpawnGreetingLine,
+                requireActiveCompanion: true);
         }
 
         /// <summary>
@@ -1018,15 +1009,7 @@ namespace Companions
         /// </summary>
         private static void PublishRandomGuardModeActivationMessage()
         {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string message = CompanionChatLibrary.GetRandomGuardActivationLine();
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-
-            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
+            CompanionChatPublisher.TryPublish(CompanionChatLibrary.GetRandomGuardActivationLine);
         }
 
         /// <summary>
@@ -1035,15 +1018,7 @@ namespace Companions
         /// </summary>
         private static void PublishRandomManualSpawnMessage()
         {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string message = CompanionChatLibrary.GetRandomManualSpawnGreetingLine();
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-
-            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
+            CompanionChatPublisher.TryPublish(CompanionChatLibrary.GetRandomManualSpawnGreetingLine);
         }
 
         /// <summary>
@@ -1052,15 +1027,7 @@ namespace Companions
         /// </summary>
         private static void PublishRandomManualStoreMessage()
         {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string message = CompanionChatLibrary.GetRandomManualStoreLine();
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-
-            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
+            CompanionChatPublisher.TryPublish(CompanionChatLibrary.GetRandomManualStoreLine);
         }
 
         /// <summary>
@@ -1069,15 +1036,7 @@ namespace Companions
         /// </summary>
         private static void PublishRandomGuardModeDeactivationMessage()
         {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string message = CompanionChatLibrary.GetRandomGuardDeactivationLine();
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-
-            chat.PublishCompanionMessage(GetCompanionDisplayName(), message);
+            CompanionChatPublisher.TryPublish(CompanionChatLibrary.GetRandomGuardDeactivationLine);
         }
 
         /// <summary>
