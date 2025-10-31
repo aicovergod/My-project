@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fa2ef1e6176668914ddd3099fc376bfef60a3758 -->
+## 2025-10-31T13:21:29+00:00 — Merge pull request #1585 from aicovergod/codex/fix-milking-cow-with-empty-bucket-error
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 6 ++ / 2 --
+- Notes:
+  Allow cow milking without preselecting a bucket
+---
+<!-- commit:89d51034fca8b6e1cc741fd3d50cd1ac08afb2e8 -->
+## 2025-10-31T13:21:17+00:00 — Allow cow milking without preselecting bucket
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Interaction/CowMilking.cs
+- Diff: 6 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:075246469daff09b9cb2824ab3e04b2f67ca8214 -->
 ## 2025-10-31T13:14:19+00:00 — Merge pull request #1584 from aicovergod/codex/update-cow-milking-script-for-player-input-system
 
