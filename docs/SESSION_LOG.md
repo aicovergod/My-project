@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:87deac8fc0b5df2584f46e706b40a66e05d728e7 -->
+## 2025-10-31T14:45:39+00:00 — Remove Tools of Survival quest and update Elder Rowan
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (9): Assets/Dialogue/ElderRowan.asset, Assets/Resources/Quests/Tools Of Survival Quest.asset, Assets/Resources/Quests/Tools Of Survival Quest.asset.meta, Assets/Scripts/Dialogue/ElderRowanDialogueData.cs, Assets/Scripts/NPC/Interaction/ElderRowanNPC.cs, Assets/Scripts/Quests/ToolsOfSurvivalQuest.cs, Assets/Scripts/Quests/ToolsOfSurvivalQuest.cs.meta, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs, Assets/Scripts/Skills/Woodcutting/Core/WoodcuttingSkill.cs
+- Diff: 53 ++ / 195 --
+- Notes:
+  —
+---
 <!-- commit:411f21442c19757125467effa46ace7f078146e6 -->
 ## 2025-10-31T14:35:28+00:00 — Merge pull request #1587 from aicovergod/codex/fix-console-error-cs0234-in-uimanager
 
