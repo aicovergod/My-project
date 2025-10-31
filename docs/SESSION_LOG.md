@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a686022192e674109008d2c596abe8c842f47a9c -->
+## 2025-10-31T11:09:11+00:00 — Merge pull request #1576 from aicovergod/codex/create-companionchateventservice-and-refactor-companionmanag
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 136 ++ / 109 --
+- Notes:
+  Extract companion chat event service
+---
+<!-- commit:f8afb4d07e928985088d60ae8da8af30c3258921 -->
+## 2025-10-31T11:09:02+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c628e9537148ff8820c53cdb5125c3456b218cc9 -->
 ## 2025-10-31T11:08:44+00:00 — Extract companion chat event helpers
 
