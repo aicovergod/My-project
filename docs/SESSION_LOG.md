@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:3291121734dbbbf78be777a1e33e5b3e559bc808 -->
+## 2025-10-31T10:15:47+00:00 — Refactor companion skill command routing into services
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Companions/Commands/CompanionCookingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionFishingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionMiningCommandService.cs, Assets/Scripts/Companions/Commands/CompanionSkillCommandRouter.cs, Assets/Scripts/Companions/Commands/CompanionWoodcuttingCommandService.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 659 ++ / 272 --
+- Notes:
+  —
+---
 <!-- commit:809b3e91d759f13d687895c39df686167c63a137 -->
 ## 2025-10-31T10:00:30+00:00 — Merge pull request #1570 from aicovergod/codex/refactor-movement-methods-in-controllers
 
