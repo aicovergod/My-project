@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:35040a0c31b86b9c2a4567dd3ead4075256cf63d -->
+## 2025-10-31T19:53:17+00:00 — Merge pull request #1594 from aicovergod/codex/create-editablepolygoncollider2d-for-unity
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1271 ++ / 0 --
+- Notes:
+  Add editable polygon collider tooling
+---
+<!-- commit:10b534af4e4edc8143d658d130d81d27aa41acbe -->
+## 2025-10-31T19:52:03+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c404b46a42cdca16047481d9ca573f4ffe8a599f -->
 ## 2025-10-31T19:51:44+00:00 — Add editable polygon collider tooling
 
