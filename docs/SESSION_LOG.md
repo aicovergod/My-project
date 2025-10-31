@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c404b46a42cdca16047481d9ca573f4ffe8a599f -->
+## 2025-10-31T19:51:44+00:00 — Add editable polygon collider tooling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Editor/EditablePolygonCollider2DEditor.cs, Assets/Scripts/Physics2D/EditablePolygonCollider2D.cs
+- Diff: 1262 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:bcba01b915e910b7e1dcc389d8d79848b1893419 -->
 ## 2025-10-31T18:20:24+00:00 — Merge pull request #1593 from aicovergod/codex/fix-cow-clicking-message-and-add-coroutine
 
