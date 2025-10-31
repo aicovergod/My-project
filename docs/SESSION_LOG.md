@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:1e5265ba89df5c9e7e8d920a5a83176551eb2d00 -->
+## 2025-10-31T19:57:10+00:00 — Fix custom physics namespace collision
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Editor/EditablePolygonCollider2DEditor.cs, Assets/Scripts/Physics2D/EditablePolygonCollider2D.cs
+- Diff: 2 ++ / 2 --
+- Notes:
+  —
+---
 <!-- commit:35040a0c31b86b9c2a4567dd3ead4075256cf63d -->
 ## 2025-10-31T19:53:17+00:00 — Merge pull request #1594 from aicovergod/codex/create-editablepolygoncollider2d-for-unity
 
