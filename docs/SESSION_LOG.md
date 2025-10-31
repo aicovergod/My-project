@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:411f21442c19757125467effa46ace7f078146e6 -->
+## 2025-10-31T14:35:28+00:00 — Merge pull request #1587 from aicovergod/codex/fix-console-error-cs0234-in-uimanager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 1 --
+- Notes:
+  Fix quest window resolution in UIManager
+---
+<!-- commit:f2dafffef3b355a95db7ccb301d6b4b9a06b7273 -->
+## 2025-10-31T14:35:14+00:00 — Fix quest window type resolution in UIManager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/UIManager.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:59167359431c34d2845d62814f744fff16e3c566 -->
 ## 2025-10-31T14:30:45+00:00 — Merge pull request #1586 from aicovergod/codex/implement-new-quest-ui-with-questlist-and-questinfo
 
