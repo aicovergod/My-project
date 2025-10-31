@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:59167359431c34d2845d62814f744fff16e3c566 -->
+## 2025-10-31T14:30:45+00:00 — Merge pull request #1586 from aicovergod/codex/implement-new-quest-ui-with-questlist-and-questinfo
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1318 ++ / 210 --
+- Notes:
+  Refactor quest journal into QuestList/QuestInfo panels
+---
+<!-- commit:cb69be4af2aed58e12e62be069b4f967d9a8ec90 -->
+## 2025-10-31T14:30:36+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ba28bcd77d2a65e5bff4f1f2dbc9e58f360fa190 -->
 ## 2025-10-31T14:30:22+00:00 — Refactor quest journal UI
 
