@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7a83d362b84022161d06ab2187a7a4d8a065126c -->
+## 2025-10-31T20:05:42+00:00 — Fix polygon editor point list type
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Editor/EditablePolygonCollider2DEditor.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:b7edfe54665f33f880b0c4408e3ddf0f89f08aa0 -->
 ## 2025-10-31T20:01:31+00:00 — Merge pull request #1596 from aicovergod/codex/fix-cs0118-error-in-editablepolygoncollider2deditor
 
