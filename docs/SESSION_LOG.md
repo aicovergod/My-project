@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:eeaa8a51ad0a0b8271acc5c536b94e095b7e405d -->
+## 2025-10-31T14:50:18+00:00 — Add editor toolbar dropdown for scene switching
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Editor/ScenesToolbar.cs
+- Diff: 325 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:4eda313c1643a3e4ff3f747a8fe226994ede9b87 -->
 ## 2025-10-31T14:45:51+00:00 — Merge pull request #1588 from aicovergod/codex/remove-toolsofsurvival-quest
 
