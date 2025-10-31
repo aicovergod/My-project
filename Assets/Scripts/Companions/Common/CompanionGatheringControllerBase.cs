@@ -1065,8 +1065,12 @@ namespace Companions
 
             pathMover?.ResetFollowTracking();
 
-            if (petFollower != null && playerTransform != null)
-                petFollower.SetPlayer(playerTransform);
+            if (petFollower != null)
+            {
+                Transform followerPlayer = petFollower.Player;
+                if (followerPlayer != null)
+                    petFollower.SetPlayer(followerPlayer);
+            }
 
             if (node != null)
             {

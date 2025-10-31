@@ -90,7 +90,7 @@ namespace Companions
             RuntimeInventory resolvedInventory;
             CompanionEquipment resolvedEquipment;
 
-            ConfigureGatheringSkill(
+            ConfigureGatheringSkill<FishingSkill>(
                 ownerController,
                 skills,
                 inventoryComponent,

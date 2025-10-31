@@ -31,7 +31,7 @@ namespace Companions.Commands
 
             var request = CreateSingleTargetRequest<CompanionWoodcuttingController, CompanionWoodcuttingCommandResult>(
                 CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest,
-                (controller, out CompanionWoodcuttingCommandResult result) => controller.TryCommandChop(tree, out result),
+                (CompanionWoodcuttingController controller, out CompanionWoodcuttingCommandResult result) => controller.TryCommandChop(tree, out result),
                 result => result == CompanionWoodcuttingCommandResult.InventoryFull,
                 result => $"{LogPrefix} Woodcutting command outcome: accepted=False (result={result}).",
                 (accepted, result) => $"{LogPrefix} Woodcutting command outcome: accepted={accepted} (result={result}).");
@@ -51,7 +51,7 @@ namespace Companions.Commands
             var request = CreateAreaCommandRequest<CompanionWoodcuttingController, CompanionWoodcuttingCommandResult>(
                 CompanionWoodcuttingCommandResult.RequirementsNotMet,
                 CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest,
-                (controller, scanRadius, out CompanionWoodcuttingCommandResult result) => controller.TryStartAreaWoodcutting(scanRadius, out result),
+                (CompanionWoodcuttingController controller, float scanRadius, out CompanionWoodcuttingCommandResult result) => controller.TryStartAreaWoodcutting(scanRadius, out result),
                 result => result == CompanionWoodcuttingCommandResult.InventoryFull,
                 (scanRadius, result) => $"{LogPrefix} Area woodcutting command outcome: success=False, radius={scanRadius}, reason=Cooldown active.",
                 (accepted, result, scanRadius) =>
