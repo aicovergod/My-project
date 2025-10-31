@@ -6,10 +6,17 @@ namespace Companions.Commands
     /// <summary>
     /// Provides woodcutting-specific companion command helpers.
     /// </summary>
-    public sealed class CompanionWoodcuttingCommandService
+    public sealed class CompanionWoodcuttingCommandService : CompanionGatheringCommandServiceBase
     {
-        private const string LogPrefix = "[Companion]";
-        private const string SkillName = "Woodcutting";
+        private const string SkillNameConst = "Woodcutting";
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompanionWoodcuttingCommandService"/> class.
+        /// </summary>
+        public CompanionWoodcuttingCommandService()
+            : base(SkillNameConst)
+        {
+        }
 
         /// <summary>
         /// Attempts to route a woodcutting command to the supplied controllers.
@@ -22,16 +29,12 @@ namespace Companions.Commands
                 return false;
             }
 
-            var request = new CompanionSkillCommandRouter.SingleTargetCommandRequest<CompanionWoodcuttingController, CompanionWoodcuttingCommandResult>
-            {
-                SkillName = SkillName,
-                LogPrefix = LogPrefix,
-                CooldownCheck = CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest,
-                CommandExecutor = (controller, out CompanionWoodcuttingCommandResult result) => controller.TryCommandChop(tree, out result),
-                TreatResultAsSuccess = result => result == CompanionWoodcuttingCommandResult.InventoryFull,
-                CooldownMessageBuilder = result => $"{LogPrefix} Woodcutting command outcome: accepted=False (result={result}).",
-                OutcomeMessageBuilder = (accepted, result) => $"{LogPrefix} Woodcutting command outcome: accepted={accepted} (result={result})."
-            };
+            var request = CreateSingleTargetRequest<CompanionWoodcuttingController, CompanionWoodcuttingCommandResult>(
+                CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest,
+                (controller, out CompanionWoodcuttingCommandResult result) => controller.TryCommandChop(tree, out result),
+                result => result == CompanionWoodcuttingCommandResult.InventoryFull,
+                result => $"{LogPrefix} Woodcutting command outcome: accepted=False (result={result}).",
+                (accepted, result) => $"{LogPrefix} Woodcutting command outcome: accepted={accepted} (result={result}).");
 
             return CompanionSkillCommandRouter.TryExecuteSingleTarget(companionController, woodcuttingController, request);
         }
@@ -45,16 +48,13 @@ namespace Companions.Commands
             float radius,
             out CompanionWoodcuttingCommandResult failureReason)
         {
-            var request = new CompanionSkillCommandRouter.AreaCommandRequest<CompanionWoodcuttingController, CompanionWoodcuttingCommandResult>
-            {
-                SkillName = SkillName,
-                LogPrefix = LogPrefix,
-                GuardRejectionResult = CompanionWoodcuttingCommandResult.RequirementsNotMet,
-                CooldownCheck = CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest,
-                CommandExecutor = (controller, scanRadius, out CompanionWoodcuttingCommandResult result) => controller.TryStartAreaWoodcutting(scanRadius, out result),
-                TreatFailureAsSuccess = result => result == CompanionWoodcuttingCommandResult.InventoryFull,
-                CooldownMessageBuilder = (scanRadius, result) => $"{LogPrefix} Area woodcutting command outcome: success=False, radius={scanRadius}, reason=Cooldown active.",
-                OutcomeMessageBuilder = (accepted, result, scanRadius) =>
+            var request = CreateAreaCommandRequest<CompanionWoodcuttingController, CompanionWoodcuttingCommandResult>(
+                CompanionWoodcuttingCommandResult.RequirementsNotMet,
+                CompanionSkillCooldownTimers.ShouldDeclineWoodcuttingRequest,
+                (controller, scanRadius, out CompanionWoodcuttingCommandResult result) => controller.TryStartAreaWoodcutting(scanRadius, out result),
+                result => result == CompanionWoodcuttingCommandResult.InventoryFull,
+                (scanRadius, result) => $"{LogPrefix} Area woodcutting command outcome: success=False, radius={scanRadius}, reason=Cooldown active.",
+                (accepted, result, scanRadius) =>
                 {
                     if (accepted)
                     {
@@ -66,8 +66,7 @@ namespace Companions.Commands
 
                     string rejectionDetail = $"The woodcutting controller rejected the area woodcutting request ({result}).";
                     return $"{LogPrefix} Area woodcutting command outcome: success=False, radius={scanRadius}, reason={rejectionDetail}";
-                }
-            };
+                });
 
             return CompanionSkillCommandRouter.TryExecuteArea(companionController, woodcuttingController, radius, request, out failureReason);
         }

@@ -6,10 +6,17 @@ namespace Companions.Commands
     /// <summary>
     /// Provides mining-specific companion command helpers so <see cref="CompanionManager"/> stays focused on wiring dependencies.
     /// </summary>
-    public sealed class CompanionMiningCommandService
+    public sealed class CompanionMiningCommandService : CompanionGatheringCommandServiceBase
     {
-        private const string LogPrefix = "[Companion]";
-        private const string SkillName = "Mining";
+        private const string SkillNameConst = "Mining";
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompanionMiningCommandService"/> class.
+        /// </summary>
+        public CompanionMiningCommandService()
+            : base(SkillNameConst)
+        {
+        }
 
         /// <summary>
         /// Attempts to route a mining command to the supplied controllers.
@@ -26,16 +33,12 @@ namespace Companions.Commands
                 return false;
             }
 
-            var request = new CompanionSkillCommandRouter.SingleTargetCommandRequest<CompanionMiningController, CompanionMiningCommandResult>
-            {
-                SkillName = SkillName,
-                LogPrefix = LogPrefix,
-                CooldownCheck = CompanionSkillCooldownTimers.ShouldDeclineMiningRequest,
-                CommandExecutor = (controller, out CompanionMiningCommandResult result) => controller.TryCommandMine(rock, out result),
-                TreatResultAsSuccess = result => result == CompanionMiningCommandResult.InventoryFull,
-                CooldownMessageBuilder = result => $"{LogPrefix} Mining command outcome: accepted=False (result={result}).",
-                OutcomeMessageBuilder = (accepted, result) => $"{LogPrefix} Mining command outcome: accepted={accepted} (result={result})."
-            };
+            var request = CreateSingleTargetRequest<CompanionMiningController, CompanionMiningCommandResult>(
+                CompanionSkillCooldownTimers.ShouldDeclineMiningRequest,
+                (controller, out CompanionMiningCommandResult result) => controller.TryCommandMine(rock, out result),
+                result => result == CompanionMiningCommandResult.InventoryFull,
+                result => $"{LogPrefix} Mining command outcome: accepted=False (result={result}).",
+                (accepted, result) => $"{LogPrefix} Mining command outcome: accepted={accepted} (result={result}).");
 
             return CompanionSkillCommandRouter.TryExecuteSingleTarget(companionController, miningController, request);
         }
@@ -54,16 +57,13 @@ namespace Companions.Commands
             float radius,
             out CompanionMiningCommandResult failureReason)
         {
-            var request = new CompanionSkillCommandRouter.AreaCommandRequest<CompanionMiningController, CompanionMiningCommandResult>
-            {
-                SkillName = SkillName,
-                LogPrefix = LogPrefix,
-                GuardRejectionResult = CompanionMiningCommandResult.RequirementsNotMet,
-                CooldownCheck = CompanionSkillCooldownTimers.ShouldDeclineMiningRequest,
-                CommandExecutor = (controller, scanRadius, out CompanionMiningCommandResult result) => controller.TryStartAreaMining(scanRadius, out result),
-                TreatFailureAsSuccess = result => result == CompanionMiningCommandResult.InventoryFull,
-                CooldownMessageBuilder = (scanRadius, result) => $"{LogPrefix} Area mining command outcome: success=False, radius={scanRadius}, reason=Cooldown active.",
-                OutcomeMessageBuilder = (accepted, result, scanRadius) =>
+            var request = CreateAreaCommandRequest<CompanionMiningController, CompanionMiningCommandResult>(
+                CompanionMiningCommandResult.RequirementsNotMet,
+                CompanionSkillCooldownTimers.ShouldDeclineMiningRequest,
+                (controller, scanRadius, out CompanionMiningCommandResult result) => controller.TryStartAreaMining(scanRadius, out result),
+                result => result == CompanionMiningCommandResult.InventoryFull,
+                (scanRadius, result) => $"{LogPrefix} Area mining command outcome: success=False, radius={scanRadius}, reason=Cooldown active.",
+                (accepted, result, scanRadius) =>
                 {
                     if (accepted)
                     {
@@ -75,8 +75,7 @@ namespace Companions.Commands
 
                     string rejectionDetail = $"The mining controller rejected the area mining request ({result}).";
                     return $"{LogPrefix} Area mining command outcome: success=False, radius={scanRadius}, reason={rejectionDetail}";
-                }
-            };
+                });
 
             return CompanionSkillCommandRouter.TryExecuteArea(companionController, miningController, radius, request, out failureReason);
         }
