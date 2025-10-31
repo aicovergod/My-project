@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Quests;
-
 namespace Dialogue
 {
     /// <summary>
@@ -17,66 +15,55 @@ namespace Dialogue
 
             Nodes = new List<DialogueNode>();
 
-            // 0: initial offer
+            // Node 0: Greeting and branching topics for world flavour.
             Nodes.Add(new DialogueNode
             {
-                Text = "Greetings, traveler. If you want to survive here, you must learn the basics. Chop some logs and mine some ore. Do you accept?",
+                Text = "Greetings, traveler. Violetstown has endured many storms, yet we stand resilient.",
                 Options = new List<DialogueOption>
                 {
                     new DialogueOption
                     {
-                        Text = "Accept",
-                        Action = DialogueAction.StartQuest,
-                        QuestID = "ToolsOfSurvival",
-                        NextNode = -1,
-                        RequiredQuestID = "ToolsOfSurvival",
-                        RequiredState = QuestState.NotStarted
+                        Text = "Tell me about Violetstown.",
+                        NextNode = 1
                     },
                     new DialogueOption
                     {
-                        Text = "Decline",
-                        NextNode = -1,
-                        RequiredQuestID = "ToolsOfSurvival",
-                        RequiredState = QuestState.NotStarted
+                        Text = "Any advice for survival?",
+                        NextNode = 2
+                    },
+                    new DialogueOption
+                    {
+                        Text = "Farewell.",
+                        NextNode = -1
                     }
                 }
             });
 
-            // 1: quest active
+            // Node 1: Town lore explanation.
             Nodes.Add(new DialogueNode
             {
-                Text = "Keep at it, traveler. Chop 3 logs and mine 3 ores, then return to me.",
-                Options = new List<DialogueOption>
-                {
-                    new DialogueOption { Text = "Continue", NextNode = -1, RequiredQuestID = "ToolsOfSurvival", RequiredState = QuestState.Active }
-                }
-            });
-
-            // 2: quest ready to turn in
-            Nodes.Add(new DialogueNode
-            {
-                Text = "Excellent work! You’ve proven yourself capable.",
+                Text = "Our town thrives because every villager shoulders a craft. Woodcutters keep the hearths warm and miners unearth the ores that forge our blades.",
                 Options = new List<DialogueOption>
                 {
                     new DialogueOption
                     {
-                        Text = "Thanks",
-                        Action = DialogueAction.CompleteQuest,
-                        QuestID = "ToolsOfSurvival",
-                        NextNode = -1,
-                        RequiredQuestID = "ToolsOfSurvival",
-                        RequiredState = QuestState.Active
+                        Text = "Thanks for the history.",
+                        NextNode = -1
                     }
                 }
             });
 
-            // 3: quest completed
+            // Node 2: General survival guidance.
             Nodes.Add(new DialogueNode
             {
-                Text = "You’ve mastered the basics. Violetstown is safer with you here.",
+                Text = "Keep your tools sharp, your rations stocked, and your allies close. Preparation is the true secret to surviving the wilds beyond our walls.",
                 Options = new List<DialogueOption>
                 {
-                    new DialogueOption { Text = "Farewell", NextNode = -1, RequiredQuestID = "ToolsOfSurvival", RequiredState = QuestState.Completed }
+                    new DialogueOption
+                    {
+                        Text = "I'll remember that.",
+                        NextNode = -1
+                    }
                 }
             });
         }
