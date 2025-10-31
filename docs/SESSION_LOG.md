@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:98469d36fcce72f800b72572c76fe42e589bb685 -->
+## 2025-10-31T10:54:48+00:00 — Merge pull request #1575 from aicovergod/codex/add-helper-for-skill-cooldown-message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 28 ++ / 65 --
+- Notes:
+  Refactor companion cooldown chat publishing
+---
+<!-- commit:d20db6eb8fc2ce324ca99986f530947f271b3244 -->
+## 2025-10-31T10:54:24+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c8a90b8374b98f0330f7d9398d3ca1bc40ec8053 -->
 ## 2025-10-31T10:54:11+00:00 — Refactor companion cooldown chat publishing
 
