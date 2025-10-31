@@ -75,7 +75,7 @@ namespace UI
             bool isCompanionEquipmentWindow = window is CompanionEquipment;
             bool isBlockedTabWindow =
                 window is Inventory.Equipment ||
-                window is Quests.QuestUI ||
+                window is global::Quests.QuestUI ||
                 window is Skills.SkillsUI ||
                 window is MagicUI ||
                 window is AttackStyleUI;
