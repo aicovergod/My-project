@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:21c8efeeec6979b9e94cf17c72742805b6b24fe1 -->
+## 2025-10-31T14:55:34+00:00 — Fix ScenesToolbar Editor type resolution
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Editor/ScenesToolbar.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:ebed05ce73e33189edf359058c2750ba1089131b -->
 ## 2025-10-31T14:53:15+00:00 — Merge pull request #1590 from aicovergod/codex/fix-error-cs0246-in-scenestoolbar.cs
 
