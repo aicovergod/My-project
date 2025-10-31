@@ -35,7 +35,7 @@ namespace Companions.Commands
 
             var request = CreateSingleTargetRequest<CompanionMiningController, CompanionMiningCommandResult>(
                 CompanionSkillCooldownTimers.ShouldDeclineMiningRequest,
-                (controller, out CompanionMiningCommandResult result) => controller.TryCommandMine(rock, out result),
+                (CompanionMiningController controller, out CompanionMiningCommandResult result) => controller.TryCommandMine(rock, out result),
                 result => result == CompanionMiningCommandResult.InventoryFull,
                 result => $"{LogPrefix} Mining command outcome: accepted=False (result={result}).",
                 (accepted, result) => $"{LogPrefix} Mining command outcome: accepted={accepted} (result={result}).");
@@ -60,7 +60,7 @@ namespace Companions.Commands
             var request = CreateAreaCommandRequest<CompanionMiningController, CompanionMiningCommandResult>(
                 CompanionMiningCommandResult.RequirementsNotMet,
                 CompanionSkillCooldownTimers.ShouldDeclineMiningRequest,
-                (controller, scanRadius, out CompanionMiningCommandResult result) => controller.TryStartAreaMining(scanRadius, out result),
+                (CompanionMiningController controller, float scanRadius, out CompanionMiningCommandResult result) => controller.TryStartAreaMining(scanRadius, out result),
                 result => result == CompanionMiningCommandResult.InventoryFull,
                 (scanRadius, result) => $"{LogPrefix} Area mining command outcome: success=False, radius={scanRadius}, reason=Cooldown active.",
                 (accepted, result, scanRadius) =>

@@ -49,7 +49,7 @@ namespace Companions.Commands
                 SkillName = SkillName,
                 LogPrefix = LogPrefix,
                 CooldownCheck = CompanionSkillCooldownTimers.ShouldDeclineCookingRequest,
-                CommandExecutor = (controller, out CompanionCookingCommandResult commandResult) => controller.TryCommandCook(station, recipe, out commandResult),
+                CommandExecutor = (CompanionCookingController controller, out CompanionCookingCommandResult commandResult) => controller.TryCommandCook(station, recipe, out commandResult),
                 TreatResultAsSuccess = commandResult => commandResult == CompanionCookingCommandResult.InventoryFull,
                 CooldownMessageBuilder = commandResult => $"{LogPrefix} Cooking command outcome: accepted=False (result={commandResult}).",
                 OutcomeMessageBuilder = (accepted, commandResult) => $"{LogPrefix} Cooking command outcome: accepted={accepted} (result={commandResult}).",
@@ -72,7 +72,7 @@ namespace Companions.Commands
                 },
                 ShouldAttemptInventoryFallback = commandResult => commandResult == CompanionCookingCommandResult.InventoryFull,
                 InventoryFallback = inventoryFallback,
-                FallbackExecutor = (controller, out CompanionCookingCommandResult retryResult) => controller.TryCommandCook(station, recipe, out retryResult),
+                FallbackExecutor = (CompanionCookingController controller, out CompanionCookingCommandResult retryResult) => controller.TryCommandCook(station, recipe, out retryResult),
                 ResultObserver = commandResult => capturedResult = commandResult
             };
 
@@ -103,7 +103,7 @@ namespace Companions.Commands
                 LogPrefix = LogPrefix,
                 GuardRejectionResult = CompanionCookingCommandResult.RequirementsNotMet,
                 CooldownCheck = CompanionSkillCooldownTimers.ShouldDeclineCookingRequest,
-                CommandExecutor = (controller, scanRadius, out CompanionCookingCommandResult result) => controller.TryStartAreaCooking(scanRadius, out result),
+                CommandExecutor = (CompanionCookingController controller, float scanRadius, out CompanionCookingCommandResult result) => controller.TryStartAreaCooking(scanRadius, out result),
                 TreatFailureAsSuccess = result => result == CompanionCookingCommandResult.InventoryFull,
                 CooldownMessageBuilder = (scanRadius, result) => $"{LogPrefix} Area cooking command outcome: success=False, radius={scanRadius}, reason=Cooldown active.",
                 OutcomeMessageBuilder = (accepted, result, scanRadius) =>
@@ -138,7 +138,7 @@ namespace Companions.Commands
                 },
                 ShouldAttemptInventoryFallback = result => result == CompanionCookingCommandResult.InventoryFull,
                 InventoryFallback = inventoryFallback,
-                FallbackExecutor = (controller, scanRadius, out CompanionCookingCommandResult retryResult) => controller.TryStartAreaCooking(scanRadius, out retryResult)
+                FallbackExecutor = (CompanionCookingController controller, float scanRadius, out CompanionCookingCommandResult retryResult) => controller.TryStartAreaCooking(scanRadius, out retryResult)
             };
 
             return CompanionSkillCommandRouter.TryExecuteArea(companionController, cookingController, radius, request, out failureReason);

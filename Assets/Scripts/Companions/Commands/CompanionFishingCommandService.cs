@@ -31,7 +31,7 @@ namespace Companions.Commands
 
             var request = CreateSingleTargetRequest<CompanionFishingController, CompanionFishingCommandResult>(
                 CompanionSkillCooldownTimers.ShouldDeclineFishingRequest,
-                (controller, out CompanionFishingCommandResult result) => controller.TryCommandFish(spot, out result),
+                (CompanionFishingController controller, out CompanionFishingCommandResult result) => controller.TryCommandFish(spot, out result),
                 result => result == CompanionFishingCommandResult.InventoryFull,
                 result => $"{LogPrefix} Fishing command outcome: accepted=False (result={result}).",
                 (accepted, result) => $"{LogPrefix} Fishing command outcome: accepted={accepted} (result={result}).");
@@ -51,7 +51,7 @@ namespace Companions.Commands
             var request = CreateAreaCommandRequest<CompanionFishingController, CompanionFishingCommandResult>(
                 CompanionFishingCommandResult.RequirementsNotMet,
                 CompanionSkillCooldownTimers.ShouldDeclineFishingRequest,
-                (controller, scanRadius, out CompanionFishingCommandResult result) => controller.TryStartAreaFishing(scanRadius, out result),
+                (CompanionFishingController controller, float scanRadius, out CompanionFishingCommandResult result) => controller.TryStartAreaFishing(scanRadius, out result),
                 result => result == CompanionFishingCommandResult.InventoryFull,
                 (scanRadius, result) => $"{LogPrefix} Area fishing command outcome: success=False, radius={scanRadius}, reason=Cooldown active.",
                 (accepted, result, scanRadius) =>

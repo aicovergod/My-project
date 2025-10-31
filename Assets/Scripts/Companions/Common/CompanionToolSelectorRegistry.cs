@@ -78,7 +78,7 @@ namespace Companions
             if (registerAction == null)
                 throw new ArgumentNullException(nameof(registerAction));
 
-            var selectors = Object.FindObjectsOfType<TSelector>(true);
+            var selectors = UnityEngine.Object.FindObjectsOfType<TSelector>(true);
             if (selectors == null || selectors.Length == 0)
                 return;
 

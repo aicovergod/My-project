@@ -82,7 +82,7 @@ namespace Companions
             RuntimeInventory resolvedInventory;
             CompanionEquipment resolvedEquipment;
 
-            ConfigureGatheringSkill(
+            ConfigureGatheringSkill<WoodcuttingSkill>(
                 ownerController,
                 skills,
                 inventoryComponent,
