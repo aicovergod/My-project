@@ -14,42 +14,41 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NpcName: Elder Rowan
   Nodes:
-  - Text: Greetings, traveler. If you want to survive here, you must learn the basics.
-      Chop some logs and mine some ore. Do you accept?
+  - Text: Greetings, traveler. Violetstown has endured many storms, yet we stand resilient.
     Options:
-    - Text: Accept
-      NextNode: -1
-      Action: 1
-      QuestID: ToolsOfSurvival
-      RequiredQuestID: ToolsOfSurvival
-      RequiredState: 1
-    - Text: Decline
+    - Text: Tell me about Violetstown.
+      NextNode: 1
+      Action: 0
+      QuestID:
+      RequiredQuestID:
+      RequiredState: 0
+    - Text: Any advice for survival?
+      NextNode: 2
+      Action: 0
+      QuestID:
+      RequiredQuestID:
+      RequiredState: 0
+    - Text: Farewell.
       NextNode: -1
       Action: 0
-      QuestID: 
-      RequiredQuestID: ToolsOfSurvival
-      RequiredState: 1
-  - Text: Keep at it, traveler. Chop 3 logs and mine 3 ores, then return to me.
+      QuestID:
+      RequiredQuestID:
+      RequiredState: 0
+  - Text: Our town thrives because every villager shoulders a craft. Woodcutters keep the hearths
+      warm and miners unearth the ores that forge our blades.
     Options:
-    - Text: Continue
+    - Text: Thanks for the history.
       NextNode: -1
       Action: 0
-      QuestID: 
-      RequiredQuestID: ToolsOfSurvival
-      RequiredState: 2
-  - Text: "Excellent work! You\u2019ve proven yourself capable."
+      QuestID:
+      RequiredQuestID:
+      RequiredState: 0
+  - Text: "Keep your tools sharp, your rations stocked, and your allies close. Preparation is the true
+      secret to surviving the wilds beyond our walls."
     Options:
-    - Text: Thanks
-      NextNode: -1
-      Action: 2
-      QuestID: ToolsOfSurvival
-      RequiredQuestID: ToolsOfSurvival
-      RequiredState: 2
-  - Text: "You\u2019ve mastered the basics. Violetstown is safer with you here."
-    Options:
-    - Text: Farewell
+    - Text: "I'll remember that."
       NextNode: -1
       Action: 0
-      QuestID: 
-      RequiredQuestID: ToolsOfSurvival
-      RequiredState: 3
+      QuestID:
+      RequiredQuestID:
+      RequiredState: 0

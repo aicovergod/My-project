@@ -7,7 +7,6 @@ using UI;
 using Skills;
 using Skills.Common;
 using Pets;
-using Quests;
 using BankSystem;
 using Skills.Outfits;
 using Random = UnityEngine.Random;
@@ -35,7 +34,6 @@ namespace Skills.Woodcutting
         private SkillManager skills;
 
         private Dictionary<string, ItemData> logItems;
-        private int questLogCount;
         private SkillingOutfitProgress woodcuttingOutfit;
         private bool useCompanionChatFormatting;
         private Func<string> companionChatSenderResolver;
@@ -159,18 +157,6 @@ namespace Skills.Woodcutting
                             skills,
                             currentTree != null ? currentTree.transform : transform,
                             petChance);
-
-                        if (QuestManager.Instance != null && QuestManager.Instance.IsQuestActive("ToolsOfSurvival"))
-                        {
-                            var quest = QuestManager.Instance.GetQuest("ToolsOfSurvival");
-                            var step = quest?.Steps.Find(s => s.StepID == "ChopLogs");
-                            if (step != null && !step.IsComplete)
-                            {
-                                questLogCount += result.QuantityAwarded;
-                                if (questLogCount >= 3)
-                                    QuestManager.Instance.UpdateStep("ToolsOfSurvival", "ChopLogs");
-                            }
-                        }
 
                         TryAwardWoodcuttingOutfitPiece();
                     },

@@ -7,7 +7,6 @@ using Skills.Mining;
 using Skills;
 using Skills.Common;
 using Pets;
-using Quests;
 using BankSystem;
 using Skills.Outfits;
 using Random = UnityEngine.Random;
@@ -42,7 +41,6 @@ namespace Skills.Mining
         private SkillManager skills;
         private Dictionary<string, ItemData> oreItems;
         private ItemData cachedHadesFragmentItem;
-        private int questOreCount;
         private SkillingOutfitProgress miningOutfit;
         private bool useCompanionChatFormatting;
         private Func<string> companionChatSenderResolver;
@@ -235,18 +233,6 @@ namespace Skills.Mining
                                 skills,
                                 currentRock != null ? currentRock.transform : transform,
                                 petChance);
-
-                            if (QuestManager.Instance != null && QuestManager.Instance.IsQuestActive("ToolsOfSurvival") && actualOreGranted > 0)
-                            {
-                                var quest = QuestManager.Instance.GetQuest("ToolsOfSurvival");
-                                var step = quest?.Steps.Find(s => s.StepID == "MineOres");
-                                if (step != null && !step.IsComplete)
-                                {
-                                    questOreCount += actualOreGranted;
-                                    if (questOreCount >= 3)
-                                        QuestManager.Instance.UpdateStep("ToolsOfSurvival", "MineOres");
-                                }
-                            }
 
                             TryAwardMiningOutfitPiece();
                         },
