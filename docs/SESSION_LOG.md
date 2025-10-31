@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ebed05ce73e33189edf359058c2750ba1089131b -->
+## 2025-10-31T14:53:15+00:00 — Merge pull request #1590 from aicovergod/codex/fix-error-cs0246-in-scenestoolbar.cs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 0 --
+- Notes:
+  Fix missing ToolbarMenu namespace import
+---
+<!-- commit:b7ab56ba3bb2b6632f1f56479eaef48b41d13012 -->
+## 2025-10-31T14:53:04+00:00 — Fix Scenes toolbar menu type reference
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Editor/ScenesToolbar.cs
+- Diff: 1 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:c1c6fa2dd7c0605742e62d7cd51b6a1305fe5f8c -->
 ## 2025-10-31T14:50:34+00:00 — Merge pull request #1589 from aicovergod/codex/add-custom-scenes-dropdown-in-unity-toolbar
 
