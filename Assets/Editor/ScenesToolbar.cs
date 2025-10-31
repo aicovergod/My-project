@@ -55,7 +55,7 @@ public static class ScenesToolbar
             return;
         }
 
-        Type toolbarType = typeof(Editor).Assembly.GetType("UnityEditor.Toolbar");
+        Type toolbarType = typeof(UnityEditor.Editor).Assembly.GetType("UnityEditor.Toolbar");
         if (toolbarType == null)
         {
             return; // Should never happen but guards older Unity versions.
