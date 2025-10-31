@@ -42,8 +42,6 @@ namespace Companions
         private const float ApproachRange = 1.25f;
         private const float ReplanDistance = ApproachRange * 0.75f;
         private const float WaypointTolerance = 0.1f;
-        private const float FacingDeadzone = 0.0001f;
-
         [Header("Movement")]
         [SerializeField, Tooltip("Grace period before pathing is considered stuck.")]
         private float stuckTimeoutSeconds = 2.5f;
@@ -516,53 +514,6 @@ namespace Companions
             Vector3 next = Vector3.MoveTowards(start, destination, moveSpeed * deltaTime);
             Vector2 velocity = deltaTime > Mathf.Epsilon ? (Vector2)((next - start) / deltaTime) : Vector2.zero;
             ApplyMovement(next, velocity, false);
-        }
-
-        private void ApplyMovement(Vector3 nextPosition, Vector2 velocity, bool teleported)
-        {
-            Vector3 currentPosition = body != null ? (Vector3)body.position : transform.position;
-            Vector2 displacement = (Vector2)(nextPosition - currentPosition);
-            Vector2 appliedVelocity = teleported ? Vector2.zero : velocity;
-
-            if (body != null)
-            {
-                if (teleported)
-                {
-                    body.position = nextPosition;
-                    body.linearVelocity = Vector2.zero;
-                }
-                else
-                {
-                    body.MovePosition(nextPosition);
-                    body.linearVelocity = velocity;
-                }
-            }
-            else
-            {
-                transform.position = nextPosition;
-            }
-
-            UpdateFacing(displacement, appliedVelocity);
-        }
-
-        private void UpdateFacing(Vector2 displacement, Vector2 appliedVelocity)
-        {
-            if (petSpriteAnimator == null && fallbackSpriteRenderer == null)
-                return;
-
-            Vector2 visualVector = displacement.sqrMagnitude > FacingDeadzone ? displacement : appliedVelocity;
-
-            if (visualVector.sqrMagnitude > FacingDeadzone)
-                lastFacing = Direction8Utility.FromVector(visualVector, allowDiagonals: true, fallback: lastFacing);
-
-            if (petSpriteAnimator != null)
-            {
-                petSpriteAnimator.SetFacing(lastFacing);
-                petSpriteAnimator.UpdateVisuals(visualVector);
-            }
-
-            if (fallbackSpriteRenderer != null)
-                fallbackSpriteRenderer.flipX = Direction8Utility.IsFacingLeft(lastFacing);
         }
         private CookingObject FindBestStation(float radius)
         {
