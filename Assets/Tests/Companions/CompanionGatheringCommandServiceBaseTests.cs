@@ -1,4 +1,5 @@
 using System;
+using Companions;
 using Companions.Commands;
 using NUnit.Framework;
 
@@ -118,12 +119,16 @@ namespace Tests.Companions
         {
             var service = new TestableGatheringService("Woodcutting", "[Logs]");
 
-            CompanionSkillCommandGuard.CooldownCheck<DummyResult> cooldownCheck = (tracker, out DummyResult result) =>
+            CompanionSkillCommandGuard.CooldownCheck<DummyResult> cooldownCheck = (
+                CompanionSkillCooldownTracker tracker,
+                out DummyResult result) =>
             {
                 result = DummyResult.Cooldown;
                 return false;
             };
-            CompanionSkillCommandGuard.SingleCommandExecutor<DummyController, DummyResult> executor = (controller, out DummyResult result) =>
+            CompanionSkillCommandGuard.SingleCommandExecutor<DummyController, DummyResult> executor = (
+                DummyController controller,
+                out DummyResult result) =>
             {
                 result = DummyResult.Success;
                 return true;
@@ -135,7 +140,9 @@ namespace Tests.Companions
             Action<DummyResult> onSuccess = _ => { };
             Func<DummyResult, bool> shouldAttemptFallback = _ => true;
             Func<bool> inventoryFallback = () => true;
-            CompanionSkillCommandGuard.SingleCommandExecutor<DummyController, DummyResult> fallbackExecutor = (controller, out DummyResult result) =>
+            CompanionSkillCommandGuard.SingleCommandExecutor<DummyController, DummyResult> fallbackExecutor = (
+                DummyController controller,
+                out DummyResult result) =>
             {
                 result = DummyResult.Success;
                 return true;
@@ -195,12 +202,17 @@ namespace Tests.Companions
         {
             var service = new TestableGatheringService("Fishing", "[Area]");
 
-            CompanionSkillCommandGuard.CooldownCheck<DummyResult> cooldownCheck = (tracker, out DummyResult result) =>
+            CompanionSkillCommandGuard.CooldownCheck<DummyResult> cooldownCheck = (
+                CompanionSkillCooldownTracker tracker,
+                out DummyResult result) =>
             {
                 result = DummyResult.Cooldown;
                 return true;
             };
-            CompanionSkillCommandGuard.AreaCommandExecutor<DummyController, DummyResult> executor = (controller, radius, out DummyResult result) =>
+            CompanionSkillCommandGuard.AreaCommandExecutor<DummyController, DummyResult> executor = (
+                DummyController controller,
+                float radius,
+                out DummyResult result) =>
             {
                 result = DummyResult.Success;
                 return true;
@@ -212,7 +224,10 @@ namespace Tests.Companions
             Action<DummyResult> onSuccess = _ => { };
             Func<DummyResult, bool> shouldAttemptFallback = _ => true;
             Func<bool> inventoryFallback = () => false;
-            CompanionSkillCommandGuard.AreaCommandExecutor<DummyController, DummyResult> fallbackExecutor = (controller, radius, out DummyResult result) =>
+            CompanionSkillCommandGuard.AreaCommandExecutor<DummyController, DummyResult> fallbackExecutor = (
+                DummyController controller,
+                float radius,
+                out DummyResult result) =>
             {
                 result = DummyResult.Success;
                 return true;
