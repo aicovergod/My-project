@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6d23354f841087e2106c583872347a03f793a8d3 -->
+## 2025-10-31T10:49:52+00:00 — Refactor companion guard mode management
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Combat/CompanionGuardModeService.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 259 ++ / 105 --
+- Notes:
+  —
+---
 <!-- commit:fe1d18456c78bb872cf2f792b441b76fc0294e40 -->
 ## 2025-10-31T10:41:17+00:00 — Merge pull request #1573 from aicovergod/codex/add-companionchatpublisher-with-helper-methods
 
