@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b7edfe54665f33f880b0c4408e3ddf0f89f08aa0 -->
+## 2025-10-31T20:01:31+00:00 — Merge pull request #1596 from aicovergod/codex/fix-cs0118-error-in-editablepolygoncollider2deditor
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 1 --
+- Notes:
+  Fix editor base class namespace conflict
+---
+<!-- commit:ae23d5c48dd4a9c8522d5de462971767846da355 -->
+## 2025-10-31T20:01:18+00:00 — Fix editor base class namespace conflict
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Editor/EditablePolygonCollider2DEditor.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:628b2f2337e99f761ec7ae72f322f1070e5a6788 -->
 ## 2025-10-31T19:57:51+00:00 — Merge pull request #1595 from aicovergod/codex/fix-errors-related-to-physics2d-namespace
 
