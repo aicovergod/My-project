@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c628e9537148ff8820c53cdb5125c3456b218cc9 -->
+## 2025-10-31T11:08:44+00:00 — Extract companion chat event helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Chat/CompanionChatEventService.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 127 ++ / 109 --
+- Notes:
+  —
+---
 <!-- commit:98469d36fcce72f800b72572c76fe42e589bb685 -->
 ## 2025-10-31T10:54:48+00:00 — Merge pull request #1575 from aicovergod/codex/add-helper-for-skill-cooldown-message
 
