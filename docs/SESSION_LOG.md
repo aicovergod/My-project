@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b99aef5b1b82bf9ee353e412d069617c2e8c0f9a -->
+## 2025-10-31T11:54:03+00:00 — Merge pull request #1580 from aicovergod/codex/add-fishing-cancellation-in-commands
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2 ++ / 0 --
+- Notes:
+  Stop companion fishing when switching commands
+---
+<!-- commit:3e98f4ccc9009b92986483066cb2cabd5b7464f7 -->
+## 2025-10-31T11:53:48+00:00 — Stop companion fishing when switching commands
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionController.cs
+- Diff: 2 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:ddf21acbe87668407b97bffb69215ac7159ee545 -->
 ## 2025-10-31T11:23:55+00:00 — Merge pull request #1579 from aicovergod/codex/fix-lambda-parameter-usage-bugs
 
