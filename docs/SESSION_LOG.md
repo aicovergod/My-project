@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:b861bf86ad6fa931a24c459c5848c052c4eeee83 -->
+## 2025-10-31T12:01:58+00:00 — Refactor companion display helpers into shared utility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (8): Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs, Assets/Scripts/Companions/Chat/CompanionChatInventoryResponder.cs, Assets/Scripts/Companions/Chat/CompanionChatPublisher.cs, Assets/Scripts/Companions/Common/CompanionDisplayUtility.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/UI/AdminF4Menu.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs, Assets/Scripts/Pets/PetLevelBarMenu.cs
+- Diff: 125 ++ / 68 --
+- Notes:
+  —
+---
 <!-- commit:b99aef5b1b82bf9ee353e412d069617c2e8c0f9a -->
 ## 2025-10-31T11:54:03+00:00 — Merge pull request #1580 from aicovergod/codex/add-fishing-cancellation-in-commands
 
