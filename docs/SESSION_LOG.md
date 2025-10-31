@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8e522f22e522840cbc6739e759b40442bc96b1d2 -->
+## 2025-10-31T10:50:54+00:00 — Merge pull request #1574 from aicovergod/codex/add-companionguardmodeservice-class
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 268 ++ / 105 --
+- Notes:
+  Refactor companion guard mode management
+---
+<!-- commit:2bf685c5ba9661d9927494093e869a096042a676 -->
+## 2025-10-31T10:50:05+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:6d23354f841087e2106c583872347a03f793a8d3 -->
 ## 2025-10-31T10:49:52+00:00 — Refactor companion guard mode management
 
