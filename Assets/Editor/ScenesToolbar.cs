@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEditor.UIElements; // Needed for ToolbarMenu support in modern Unity versions.
 using UnityEngine;
 using UnityEngine.UIElements;
 
