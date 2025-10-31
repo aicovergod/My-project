@@ -15,7 +15,6 @@ using Skills.Cooking;
 using Skills.Fishing;
 using Skills.Mining;
 using Skills.Woodcutting;
-using UI.Chat;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Companions.UI;
@@ -406,7 +405,7 @@ namespace Companions
             EnsureChatResponderInitialised();
             UpdateEquipmentVisibility(false);
             if (!suppressManualSpawnGreeting)
-                PublishRandomManualSpawnMessage();
+                CompanionChatEventService.PublishRandomManualSpawnMessage();
         }
 
         /// <summary>
@@ -658,7 +657,7 @@ namespace Companions
                 storedByPet = triggeredByPet && hadActiveCompanion;
                 storedManually = !triggeredByPet && hadActiveCompanion;
                 if (storedManually)
-                    PublishRandomManualStoreMessage();
+                    CompanionChatEventService.PublishRandomManualStoreMessage();
                 if (!triggeredByPet)
                 {
                     companionWasActiveBeforePetSpawn = false;
@@ -911,9 +910,7 @@ namespace Companions
         /// </summary>
         public static void PublishAutoSpawnGreeting()
         {
-            CompanionChatPublisher.TryPublish(
-                CompanionChatLibrary.GetRandomAutoSpawnGreetingLine,
-                requireActiveCompanion: true);
+            CompanionChatEventService.PublishAutoSpawnGreeting();
         }
 
         /// <summary>
@@ -929,45 +926,9 @@ namespace Companions
                 return;
 
             if (enabled)
-                PublishRandomGuardModeActivationMessage();
+                CompanionChatEventService.PublishRandomGuardModeActivationMessage();
             else
-                PublishRandomGuardModeDeactivationMessage();
-        }
-
-        /// <summary>
-        /// Publishes a random guard mode activation message to the companion chat channel.
-        /// Ensures enabling guard mode feels responsive without spamming when toggled off.
-        /// </summary>
-        private static void PublishRandomGuardModeActivationMessage()
-        {
-            CompanionChatPublisher.TryPublish(CompanionChatLibrary.GetRandomGuardActivationLine);
-        }
-
-        /// <summary>
-        /// Publishes a random chat line whenever the companion is freshly spawned by the player.
-        /// Adds flavour to manual summons triggered by dropping the companion’s charm item.
-        /// </summary>
-        private static void PublishRandomManualSpawnMessage()
-        {
-            CompanionChatPublisher.TryPublish(CompanionChatLibrary.GetRandomManualSpawnGreetingLine);
-        }
-
-        /// <summary>
-        /// Publishes a random farewell line when the player manually stores their companion.
-        /// Keeps the pickup action flavourful so the companion acknowledges being dismissed.
-        /// </summary>
-        private static void PublishRandomManualStoreMessage()
-        {
-            CompanionChatPublisher.TryPublish(CompanionChatLibrary.GetRandomManualStoreLine);
-        }
-
-        /// <summary>
-        /// Publishes a random guard mode deactivation message when the player disables guard mode.
-        /// Keeps flavourful feedback flowing even as the companion relaxes from defence duty.
-        /// </summary>
-        private static void PublishRandomGuardModeDeactivationMessage()
-        {
-            CompanionChatPublisher.TryPublish(CompanionChatLibrary.GetRandomGuardDeactivationLine);
+                CompanionChatEventService.PublishRandomGuardModeDeactivationMessage();
         }
 
         /// <summary>
@@ -1173,71 +1134,7 @@ namespace Companions
         private static void HandleSkillLevelChanged(SkillType skill, int level)
         {
             UpdateCombatLevel();
-            PublishCompanionLevelUpMessage(skill, level);
-        }
-
-        /// <summary>
-        /// Broadcasts a companion-channel chat message whenever the active companion levels a skill.
-        /// </summary>
-        /// <param name="skill">Skill that gained a level.</param>
-        /// <param name="level">Resulting companion level.</param>
-        private static void PublishCompanionLevelUpMessage(SkillType skill, int level)
-        {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string companionName = GetCompanionDisplayName();
-            string message;
-
-            switch (skill)
-            {
-                case SkillType.Hitpoints:
-                    message = CompanionChatLibrary.GetRandomHitpointsLevelUpLine();
-                    break;
-                case SkillType.Defence:
-                    message = CompanionChatLibrary.GetRandomDefenceLevelUpLine();
-                    break;
-                case SkillType.Strength:
-                    message = CompanionChatLibrary.GetRandomStrengthLevelUpLine();
-                    break;
-                case SkillType.Attack:
-                    message = CompanionChatLibrary.GetRandomAttackLevelUpLine();
-                    break;
-                case SkillType.Ranged:
-                    message = CompanionChatLibrary.GetRandomRangedLevelUpLine();
-                    break;
-                case SkillType.Magic:
-                    message = CompanionChatLibrary.GetRandomMagicLevelUpLine();
-                    break;
-                case SkillType.Beastmaster:
-                    message = CompanionChatLibrary.GetRandomBeastmasterLevelUpLine();
-                    break;
-                case SkillType.Fishing:
-                    message = CompanionChatLibrary.GetRandomFishingLevelUpLine();
-                    break;
-                case SkillType.Cooking:
-                    message = CompanionChatLibrary.GetRandomCookingLevelUpLine();
-                    break;
-                case SkillType.Firemaking:
-                    message = CompanionChatLibrary.GetRandomFiremakingLevelUpLine();
-                    break;
-                case SkillType.Woodcutting:
-                    message = CompanionChatLibrary.GetRandomWoodcuttingLevelUpLine();
-                    break;
-                case SkillType.Mining:
-                    message = CompanionChatLibrary.GetRandomMiningLevelUpLine();
-                    break;
-                default:
-                {
-                    string pronoun = ResolveCompanionPronoun();
-                    string skillName = SkillNameUtility.GetSentenceName(skill);
-                    message = CompanionChatLibrary.BuildGenericLevelUpLine(pronoun, skillName, level);
-                    break;
-                }
-            }
-
-            chat.PublishCompanionMessage(companionName, message);
+            CompanionChatEventService.PublishCompanionLevelUpMessage(skill, level, ResolveCompanionPronoun());
         }
 
         /// <summary>
