@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:8cbfc15363985c5c135fdf9f98847d9203a1cf17 -->
+## 2025-10-31T18:15:13+00:00 — Add auto movement when milking cows
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Interaction/CowMilking.cs
+- Diff: 155 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:b5d52579753506aede23be7a3a88cc2014e07bd5 -->
 ## 2025-10-31T15:02:56+00:00 — Merge pull request #1592 from aicovergod/codex/update-scenestoolbar-to-position-toolbarmenu
 
