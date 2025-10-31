@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:16291f6cf90ff9db428aee2092870aa7a6ed9c21 -->
+## 2025-10-31T10:29:29+00:00 — Merge pull request #1572 from aicovergod/codex/add-utility-for-subsystem-management
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 85 ++ / 32 --
+- Notes:
+  Refactor companion subsystem bootstrapping
+---
+<!-- commit:5ad24110506fe450baeb38974ffc1939414a41cb -->
+## 2025-10-31T10:29:09+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:93d5597698b3aa78ea1099a41fcb4b653aa7a85b -->
 ## 2025-10-31T10:28:54+00:00 — Refactor companion subsystem bootstrapping
 
