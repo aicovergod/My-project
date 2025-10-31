@@ -91,6 +91,12 @@ namespace Companions
         }
 
         /// <summary>
+        /// Sqr magnitude threshold that determines when facing changes should be ignored to avoid jitter.
+        /// Derived classes can override this when a different tolerance is required for their animations.
+        /// </summary>
+        protected virtual float FacingDeadzoneSqrMagnitude => 0.0001f;
+
+        /// <summary>
         /// Updates the cached player skill reference when the owning player object respawns or changes scenes.
         /// </summary>
         /// <typeparam name="TSkill">Concrete skill type that should be resolved from the player transform.</typeparam>
@@ -104,6 +110,68 @@ namespace Companions
                 return;
 
             cachedSkill = playerTransform.GetComponent<TSkill>();
+        }
+
+        /// <summary>
+        /// Applies the supplied movement step to the rigidbody (when present) and synchronises sprite
+        /// orientation with the displacement so followers remain visually consistent across companion skills.
+        /// </summary>
+        /// <param name="nextPosition">Target world position for the current step.</param>
+        /// <param name="velocity">Velocity that should be assigned to the rigidbody when advancing toward the step.</param>
+        /// <param name="teleported">When true, the rigidbody is repositioned without velocity to avoid interpolation spikes.</param>
+        protected void ApplyMovement(Vector3 nextPosition, Vector2 velocity, bool teleported)
+        {
+            Vector3 currentPosition = body != null ? (Vector3)body.position : transform.position;
+            Vector2 displacement = (Vector2)(nextPosition - currentPosition);
+            Vector2 appliedVelocity = teleported ? Vector2.zero : velocity;
+
+            if (body != null)
+            {
+                if (teleported)
+                {
+                    body.position = nextPosition;
+                    body.linearVelocity = Vector2.zero;
+                }
+                else
+                {
+                    body.MovePosition(nextPosition);
+                    body.linearVelocity = appliedVelocity;
+                }
+            }
+            else
+            {
+                transform.position = nextPosition;
+            }
+
+            UpdateMovementVisuals(displacement, appliedVelocity);
+        }
+
+        /// <summary>
+        /// Updates the sprite orientation and animation vector so the companion continues to face its movement
+        /// direction, even when movement steps are extremely small (common when approaching interaction targets).
+        /// </summary>
+        /// <param name="displacement">Raw displacement applied during this step.</param>
+        /// <param name="appliedVelocity">Velocity forwarded to the rigidbody when advancing toward the step.</param>
+        protected void UpdateMovementVisuals(Vector2 displacement, Vector2 appliedVelocity)
+        {
+            Vector2 visualVector = displacement.sqrMagnitude > FacingDeadzoneSqrMagnitude
+                ? displacement
+                : appliedVelocity;
+
+            if (visualVector.sqrMagnitude > FacingDeadzoneSqrMagnitude)
+                lastFacing = Direction8Utility.FromVector(visualVector, allowDiagonals: true, fallback: lastFacing);
+
+            if (petSpriteAnimator != null)
+            {
+                petSpriteAnimator.SetFacing(lastFacing);
+                petSpriteAnimator.UpdateVisuals(visualVector);
+                return;
+            }
+
+            if (fallbackSpriteRenderer == null)
+                return;
+
+            fallbackSpriteRenderer.flipX = Direction8Utility.IsFacingLeft(lastFacing);
         }
     }
 }
