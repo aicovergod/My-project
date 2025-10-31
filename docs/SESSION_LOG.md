@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:93d5597698b3aa78ea1099a41fcb4b653aa7a85b -->
+## 2025-10-31T10:28:54+00:00 — Refactor companion subsystem bootstrapping
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Common/CompanionSubsystemBootstrapper.cs, Assets/Scripts/Companions/CompanionController.cs
+- Diff: 76 ++ / 32 --
+- Notes:
+  —
+---
 <!-- commit:a3d966fdb8be1570a631331e099feb2bd11a7b44 -->
 ## 2025-10-31T10:16:16+00:00 — Merge pull request #1571 from aicovergod/codex/create-companion-skill-command-router-and-services
 
