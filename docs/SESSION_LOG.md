@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:a4fd77b68da555211ae0803eec7d095a9a1be380 -->
+## 2025-10-31T21:25:42+00:00 — Merge pull request #1598 from aicovergod/codex/add-sortinganchor-to-spritedepth
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 28 ++ / 1 --
+- Notes:
+  Allow SpriteDepth to use custom sorting anchor
+---
+<!-- commit:7228d4fd73323de5d81c843854a5d52823bb9c28 -->
+## 2025-10-31T21:25:35+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:828e971adba9c3c55fd2cc9b052d573e66b97d10 -->
 ## 2025-10-31T21:25:16+00:00 — Allow SpriteDepth to use custom sorting anchor
 
