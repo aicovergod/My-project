@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fe1d18456c78bb872cf2f792b441b76fc0294e40 -->
+## 2025-10-31T10:41:17+00:00 — Merge pull request #1573 from aicovergod/codex/add-companionchatpublisher-with-helper-methods
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 170 ++ / 48 --
+- Notes:
+  Add companion chat publishing helper
+---
+<!-- commit:1b5d607674bf099ec202571c79235b9a26485496 -->
+## 2025-10-31T10:41:03+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:40632d57715b453ba588bc9900a597863cade451 -->
 ## 2025-10-31T10:40:49+00:00 — Refactor companion chat publishing
 
