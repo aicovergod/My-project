@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ba28bcd77d2a65e5bff4f1f2dbc9e58f360fa190 -->
+## 2025-10-31T14:30:22+00:00 — Refactor quest journal UI
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (16): Assets/Scripts/Quests/QuestUI.cs, Assets/Scripts/UI/Quests.meta, Assets/Scripts/UI/Quests/QuestInfoPanelView.cs, Assets/Scripts/UI/Quests/QuestInfoPanelView.cs.meta, Assets/Scripts/UI/Quests/QuestJournalDataModels.cs, Assets/Scripts/UI/Quests/QuestJournalDataModels.cs.meta, Assets/Scripts/UI/Quests/QuestJournalDataProvider.cs, Assets/Scripts/UI/Quests/QuestJournalDataProvider.cs.meta, Assets/Scripts/UI/Quests/QuestJournalPresenter.cs, Assets/Scripts/UI/Quests/QuestJournalPresenter.cs.meta, Assets/Scripts/UI/Quests/QuestJournalViewBuilder.cs, Assets/Scripts/UI/Quests/QuestJournalViewBuilder.cs.meta, Assets/Scripts/UI/Quests/QuestListEntryView.cs, Assets/Scripts/UI/Quests/QuestListEntryView.cs.meta, Assets/Scripts/UI/Quests/QuestStatusColorUtility.cs, Assets/Scripts/UI/Quests/QuestStatusColorUtility.cs.meta
+- Diff: 1309 ++ / 210 --
+- Notes:
+  —
+---
 <!-- commit:fa2ef1e6176668914ddd3099fc376bfef60a3758 -->
 ## 2025-10-31T13:21:29+00:00 — Merge pull request #1585 from aicovergod/codex/fix-milking-cow-with-empty-bucket-error
 
