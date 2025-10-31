@@ -152,6 +152,7 @@
 
 ## Working With Systems
 - **Input**: Prefer serialized `InputActionReference` fields. Resolve actions through `InputActionResolver.Resolve` so they auto-enable/disable. New interactables should plug into the shared Player action map (`Move`, `Interact`, `Prospect`, `Cancel`, `OpenMenu`).
+- **Click-driven features**: When introducing scripts that react to pointer clicks (NPCs, gathering nodes, modal toggles, etc.) wire them through the shared Player Input system—resolve the relevant action (`Interact`, `OpenMenu`, etc.) with `InputActionResolver` so controller/keyboard inputs remain functional alongside pointer events.
 - **Skills**: Register new skills in `SkillType`, supply XP tables, hook into `SkillManager`, and consider pets/outfits/tick cadence. Leverage shared drop/pet helpers where relevant.
 - **Daily Rolls & Calendar**: Query `DailyGameTimeService.CurrentUtcDay` for the cached day and subscribe to `DailyGameTimeService.DayChanged` when a system needs to refresh on rollover. Compose deterministic RNG with `DailyGameTimeService.ComposeDailySeed`, optionally passing context hashes (player ID, node hash, roll index, etc.) so per-entity rolls stay unique but reset each UTC day.
 - **Saving**: Register/deregister save participants with `SaveManager`. Store unique keys (usually lowercase skill IDs) and ensure loads occur during `Awake/OnEnable` to populate runtime state.
