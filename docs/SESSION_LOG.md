@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:ddf21acbe87668407b97bffb69215ac7159ee545 -->
+## 2025-10-31T11:23:55+00:00 — Merge pull request #1579 from aicovergod/codex/fix-lambda-parameter-usage-bugs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 21 ++ / 6 --
+- Notes:
+  Fix companion gathering command tests lambda declarations
+---
+<!-- commit:837b59c0ec2ddfb47d75676d9bd48af543fca5dd -->
+## 2025-10-31T11:23:44+00:00 — Fix companion gathering command test lambdas
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Tests/Companions/CompanionGatheringCommandServiceBaseTests.cs
+- Diff: 21 ++ / 6 --
+- Notes:
+  —
+---
 <!-- commit:5ead1841a90f0fb2ea9cedce037e9b693ca5ba50 -->
 ## 2025-10-31T11:19:21+00:00 — Merge pull request #1578 from aicovergod/codex/fix-compilation-errors-in-console
 
