@@ -627,8 +627,12 @@ namespace NPC
 
             if (!TryValidateSelectedBucket(out int selectedSlot))
             {
-                ShowFloatingText(missingBucketMessage);
-                return false;
+                // Fallback to locating any empty bucket when the player has one but has not explicitly selected it.
+                if (!TryFindBucketSlot(out selectedSlot, out _))
+                {
+                    ShowFloatingText(missingBucketMessage);
+                    return false;
+                }
             }
 
             if (!IsPlayerWithinStartRange())
