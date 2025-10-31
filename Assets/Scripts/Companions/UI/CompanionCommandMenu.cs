@@ -233,7 +233,7 @@ namespace Companions.UI
             if (!show || stopButtonText == null)
                 return;
 
-            stopButtonText.text = CompanionManager.GetStopActionLabel();
+            stopButtonText.text = CompanionDisplayUtility.GetStopActionLabel(CompanionManager.GetActiveAction());
         }
 
         private void OnStopActionClicked()

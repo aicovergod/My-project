@@ -81,9 +81,9 @@ namespace Companions.UI
             DrawBooleanLabel("Has active companion", CompanionManager.HasActiveCompanion);
 
             var activeAction = CompanionManager.GetActiveAction();
-            GUILayout.Label($"Current action: {CompanionManager.GetActiveActionDisplayName(activeAction)}");
+            GUILayout.Label($"Current action: {CompanionDisplayUtility.GetActionDisplayName(activeAction)}");
             if (CompanionManager.HasActiveAction)
-                GUILayout.Label($"Stop button label: {CompanionManager.GetStopActionLabel(activeAction)}");
+                GUILayout.Label($"Stop button label: {CompanionDisplayUtility.GetStopActionLabel(activeAction)}");
 
             GUILayout.Space(6f);
             GUILayout.Label("Guard and storage state");

@@ -735,7 +735,7 @@ namespace Companions.Chat
 
             if (!CompanionManager.HasActiveCompanion)
             {
-                chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
+                chat.PublishCompanionMessage(CompanionDisplayUtility.GetDisplayName(CompanionManager.ActiveDefinition),
                     CompanionChatLibrary.GetRandomMiningSummonRequiredLine(playerName));
                 return;
             }
@@ -750,7 +750,7 @@ namespace Companions.Chat
                 case CompanionMiningCommandResult.Declined:
                     return; // The mining systems already publish descriptive chat.
                 default:
-                    chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
+                    chat.PublishCompanionMessage(CompanionDisplayUtility.GetDisplayName(CompanionManager.ActiveDefinition),
                         CompanionChatLibrary.GetRandomMiningGenericFailureLine(playerName));
                     break;
             }
@@ -766,7 +766,7 @@ namespace Companions.Chat
 
             if (!CompanionManager.HasActiveCompanion)
             {
-                chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
+                chat.PublishCompanionMessage(CompanionDisplayUtility.GetDisplayName(CompanionManager.ActiveDefinition),
                     CompanionChatLibrary.GetRandomFishingSummonRequiredLine(playerName));
                 return;
             }
@@ -782,11 +782,11 @@ namespace Companions.Chat
                 case CompanionFishingCommandResult.AlreadyFishing:
                     return;
                 case CompanionFishingCommandResult.Unreachable:
-                    chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
+                    chat.PublishCompanionMessage(CompanionDisplayUtility.GetDisplayName(CompanionManager.ActiveDefinition),
                         CompanionFishingDialogueLibrary.GetRandomNoSpotsLine());
                     break;
                 default:
-                    chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
+                    chat.PublishCompanionMessage(CompanionDisplayUtility.GetDisplayName(CompanionManager.ActiveDefinition),
                         CompanionChatLibrary.GetRandomFishingGenericFailureLine(playerName));
                     break;
             }
@@ -802,7 +802,7 @@ namespace Companions.Chat
 
             if (!CompanionManager.HasActiveCompanion)
             {
-                chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
+                chat.PublishCompanionMessage(CompanionDisplayUtility.GetDisplayName(CompanionManager.ActiveDefinition),
                     CompanionChatLibrary.GetRandomWoodcuttingSummonRequiredLine(playerName));
                 return;
             }
@@ -817,7 +817,7 @@ namespace Companions.Chat
                 case CompanionWoodcuttingCommandResult.AlreadyChopping:
                     return;
                 default:
-                    chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
+                    chat.PublishCompanionMessage(CompanionDisplayUtility.GetDisplayName(CompanionManager.ActiveDefinition),
                         CompanionChatLibrary.GetRandomWoodcuttingGenericFailureLine(playerName));
                     break;
             }
@@ -833,7 +833,7 @@ namespace Companions.Chat
 
             if (!CompanionManager.HasActiveCompanion)
             {
-                chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
+                chat.PublishCompanionMessage(CompanionDisplayUtility.GetDisplayName(CompanionManager.ActiveDefinition),
                     CompanionChatLibrary.GetRandomCookingSummonRequiredLine(playerName));
                 return;
             }
@@ -849,7 +849,7 @@ namespace Companions.Chat
                 case CompanionCookingCommandResult.Declined:
                     return; // The cooking systems already published context-specific chatter.
                 default:
-                    chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(),
+                    chat.PublishCompanionMessage(CompanionDisplayUtility.GetDisplayName(CompanionManager.ActiveDefinition),
                         CompanionChatLibrary.GetRandomCookingGenericFailureLine(playerName));
                     break;
             }

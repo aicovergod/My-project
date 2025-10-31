@@ -199,6 +199,9 @@ namespace Companions
         /// <summary>Exposes the spawned companion object for systems that need the instance handle.</summary>
         public static GameObject CompanionObject => companionObject;
 
+        /// <summary>Definition that spawned the active companion, exposed for display helpers.</summary>
+        public static PetDefinition ActiveDefinition => activeDefinition;
+
         /// <summary>Provides access to the cooldown tracker used for throttling companion skill commands.</summary>
         public static CompanionSkillCooldownTracker CompanionSkillCooldowns =>
             controller != null ? controller.SkillCooldowns : null;
@@ -235,38 +238,16 @@ namespace Companions
         public static bool HasActiveAction => GetActiveAction() != CompanionActiveAction.None;
 
         /// <summary>Returns a player-facing label describing the current companion action.</summary>
-        public static string GetActiveActionDisplayName() => GetActiveActionDisplayName(GetActiveAction());
+        public static string GetActiveActionDisplayName() => CompanionDisplayUtility.GetActionDisplayName(GetActiveAction());
 
         /// <summary>Translates an action enum value into a human-readable description.</summary>
-        public static string GetActiveActionDisplayName(CompanionActiveAction action)
-        {
-            return action switch
-            {
-                CompanionActiveAction.Combat => "Combat",
-                CompanionActiveAction.Fishing => "Fishing",
-                CompanionActiveAction.Mining => "Mining",
-                CompanionActiveAction.Cooking => "Cooking",
-                CompanionActiveAction.Woodcutting => "Chopping",
-                _ => "Idle"
-            };
-        }
+        public static string GetActiveActionDisplayName(CompanionActiveAction action) => CompanionDisplayUtility.GetActionDisplayName(action);
 
         /// <summary>Returns the label that should be displayed on stop buttons for the current action.</summary>
-        public static string GetStopActionLabel() => GetStopActionLabel(GetActiveAction());
+        public static string GetStopActionLabel() => CompanionDisplayUtility.GetStopActionLabel(GetActiveAction());
 
         /// <summary>Returns the label that should be displayed on stop buttons for the supplied action.</summary>
-        public static string GetStopActionLabel(CompanionActiveAction action)
-        {
-            return action switch
-            {
-                CompanionActiveAction.Combat => "Stop Combat",
-                CompanionActiveAction.Fishing => "Stop Fishing",
-                CompanionActiveAction.Mining => "Stop Mining",
-                CompanionActiveAction.Cooking => "Stop Cooking",
-                CompanionActiveAction.Woodcutting => "Stop Chopping",
-                _ => "Stop"
-            };
-        }
+        public static string GetStopActionLabel(CompanionActiveAction action) => CompanionDisplayUtility.GetStopActionLabel(action);
 
         /// <summary>Attempts to cancel whichever action the companion is currently performing.</summary>
         public static bool TryCancelCurrentAction()
@@ -934,7 +915,7 @@ namespace Companions
         /// <summary>
         /// Exposes the current display name for chat output and context messages.
         /// </summary>
-        public static string GetCompanionDisplayName() => ResolveCompanionName();
+        public static string GetCompanionDisplayName() => CompanionDisplayUtility.GetDisplayName(activeDefinition);
 
         /// <summary>
         /// Routes a mining command to the active companion when available.
@@ -1134,32 +1115,10 @@ namespace Companions
         private static void HandleSkillLevelChanged(SkillType skill, int level)
         {
             UpdateCombatLevel();
-            CompanionChatEventService.PublishCompanionLevelUpMessage(skill, level, ResolveCompanionPronoun());
-        }
-
-        /// <summary>
-        /// Resolves the companion name used for chat output, falling back to a generic label when
-        /// no runtime definition is available.
-        /// </summary>
-        private static string ResolveCompanionName()
-        {
-            if (activeDefinition != null && !string.IsNullOrWhiteSpace(activeDefinition.displayName))
-                return activeDefinition.displayName;
-
-            return "Companion";
-        }
-
-        /// <summary>
-        /// Determines which possessive pronoun the current companion prefers for chat messaging.
-        /// Defaults to a neutral pronoun so messages remain grammatically correct when definitions
-        /// do not provide explicit data.
-        /// </summary>
-        private static string ResolveCompanionPronoun()
-        {
-            if (activeDefinition != null && !string.IsNullOrWhiteSpace(activeDefinition.possessivePronoun))
-                return activeDefinition.possessivePronoun.ToLowerInvariant();
-
-            return "their";
+            CompanionChatEventService.PublishCompanionLevelUpMessage(
+                skill,
+                level,
+                CompanionDisplayUtility.GetPossessivePronoun(activeDefinition));
         }
 
         /// <summary>

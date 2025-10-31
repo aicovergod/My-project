@@ -279,7 +279,7 @@ namespace Pets
             if (!show || stopActionText == null)
                 return;
 
-            stopActionText.text = CompanionManager.GetStopActionLabel();
+            stopActionText.text = CompanionDisplayUtility.GetStopActionLabel(CompanionManager.GetActiveAction());
         }
 
         private void OnStopActionClicked()
