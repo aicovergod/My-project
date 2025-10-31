@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:eb35a3ec963d0a1169f3d2bcc5899396ccbc5489 -->
+## 2025-10-31T11:13:48+00:00 — Refactor companion gathering command services
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/Commands/CompanionFishingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionGatheringCommandServiceBase.cs, Assets/Scripts/Companions/Commands/CompanionMiningCommandService.cs, Assets/Scripts/Companions/Commands/CompanionWoodcuttingCommandService.cs, Assets/Tests/Companions/CompanionGatheringCommandServiceBaseTests.cs
+- Diff: 493 ++ / 75 --
+- Notes:
+  —
+---
 <!-- commit:a686022192e674109008d2c596abe8c842f47a9c -->
 ## 2025-10-31T11:09:11+00:00 — Merge pull request #1576 from aicovergod/codex/create-companionchateventservice-and-refactor-companionmanag
 
