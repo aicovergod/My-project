@@ -34,7 +34,9 @@ namespace Companions.Chat
             if (string.IsNullOrWhiteSpace(message))
                 return false;
 
-            chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), message);
+            chat.PublishCompanionMessage(
+                CompanionDisplayUtility.GetDisplayName(CompanionManager.ActiveDefinition),
+                message);
             return true;
         }
     }

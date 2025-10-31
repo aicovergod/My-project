@@ -123,7 +123,7 @@ namespace Companions.Chat
             if (chat == null)
                 return;
 
-            string companionName = CompanionManager.GetCompanionDisplayName();
+            string companionName = CompanionDisplayUtility.GetDisplayName(CompanionManager.ActiveDefinition);
             chat.PublishCompanionMessage(companionName, companionLine);
 
             if (CompanionManager.EnableDebugLogging)
