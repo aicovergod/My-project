@@ -1,4 +1,5 @@
 using System;
+using Companions.Chat;
 using Skills;
 using UI.Chat;
 using UnityEngine;
@@ -220,21 +221,7 @@ namespace Companions
         /// </summary>
         private static void PublishMiningCooldownMessage(TimeSpan remaining)
         {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string playerName = chat.ActiveUsername;
-            string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName.Trim();
-
-            double totalMinutes = Math.Max(0d, remaining.TotalMinutes);
-            int minutes = Mathf.Max(1, (int)Math.Ceiling(totalMinutes));
-
-            string message = CompanionChatLibrary.GetRandomMiningDeclineCooldownLine(safePlayerName, minutes);
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-
-            chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), message);
+            PublishSkillCooldownMessage(remaining, CompanionChatLibrary.GetRandomMiningDeclineCooldownLine);
         }
 
         /// <summary>
@@ -242,21 +229,7 @@ namespace Companions
         /// </summary>
         private static void PublishWoodcuttingCooldownMessage(TimeSpan remaining)
         {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string playerName = chat.ActiveUsername;
-            string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName.Trim();
-
-            double totalMinutes = Math.Max(0d, remaining.TotalMinutes);
-            int minutes = Mathf.Max(1, (int)Math.Ceiling(totalMinutes));
-
-            string message = CompanionChatLibrary.GetRandomWoodcuttingDeclineCooldownLine(safePlayerName, minutes);
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-
-            chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), message);
+            PublishSkillCooldownMessage(remaining, CompanionChatLibrary.GetRandomWoodcuttingDeclineCooldownLine);
         }
 
         /// <summary>
@@ -264,21 +237,7 @@ namespace Companions
         /// </summary>
         private static void PublishFishingCooldownMessage(TimeSpan remaining)
         {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string playerName = chat.ActiveUsername;
-            string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName.Trim();
-
-            double totalMinutes = Math.Max(0d, remaining.TotalMinutes);
-            int minutes = Mathf.Max(1, (int)Math.Ceiling(totalMinutes));
-
-            string message = CompanionChatLibrary.GetRandomFishingDeclineCooldownLine(safePlayerName, minutes);
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-
-            chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), message);
+            PublishSkillCooldownMessage(remaining, CompanionChatLibrary.GetRandomFishingDeclineCooldownLine);
         }
 
         /// <summary>
@@ -286,21 +245,7 @@ namespace Companions
         /// </summary>
         private static void PublishCookingCooldownMessage(TimeSpan remaining)
         {
-            var chat = ChatService.Instance;
-            if (chat == null)
-                return;
-
-            string playerName = chat.ActiveUsername;
-            string safePlayerName = string.IsNullOrWhiteSpace(playerName) ? "friend" : playerName.Trim();
-
-            double totalMinutes = Math.Max(0d, remaining.TotalMinutes);
-            int minutes = Mathf.Max(1, (int)Math.Ceiling(totalMinutes));
-
-            string message = CompanionCookingDialogueLibrary.GetCooldownLine(safePlayerName, minutes);
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-
-            chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), message);
+            PublishSkillCooldownMessage(remaining, CompanionCookingDialogueLibrary.GetCooldownLine);
         }
 
         /// <summary>
@@ -388,6 +333,19 @@ namespace Companions
         /// </summary>
         private static void PublishCombatCooldownMessage(TimeSpan remaining)
         {
+            PublishSkillCooldownMessage(remaining, CompanionChatLibrary.GetRandomCombatDeclineCooldownLine);
+        }
+
+        /// <summary>
+        /// Publishes a companion chat cooldown message using the shared sanitisation and rounding rules.
+        /// </summary>
+        /// <param name="remaining">Remaining cooldown duration.</param>
+        /// <param name="lineFactory">Delegate that produces the flavour line using the sanitised player name and rounded minutes.</param>
+        private static void PublishSkillCooldownMessage(TimeSpan remaining, Func<string, int, string> lineFactory)
+        {
+            if (lineFactory == null)
+                throw new ArgumentNullException(nameof(lineFactory));
+
             var chat = ChatService.Instance;
             if (chat == null)
                 return;
@@ -398,11 +356,7 @@ namespace Companions
             double totalMinutes = Math.Max(0d, remaining.TotalMinutes);
             int minutes = Mathf.Max(1, (int)Math.Ceiling(totalMinutes));
 
-            string message = CompanionChatLibrary.GetRandomCombatDeclineCooldownLine(safePlayerName, minutes);
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-
-            chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), message);
+            CompanionChatPublisher.TryPublish(() => lineFactory(safePlayerName, minutes));
         }
 
         /// <summary>
