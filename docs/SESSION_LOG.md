@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:cadd27670a11c0b24c48ca7cd48488c9846aa741 -->
+## 2025-11-01T14:42:30+00:00 — Merge pull request #1603 from aicovergod/codex/add-debug-logs-on-game-startup
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 69 ++ / 1 --
+- Notes:
+  Add login flow diagnostics
+---
+<!-- commit:81c7233dd166e4168c4ba3c77f46a241c57095bd -->
+## 2025-11-01T14:42:07+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:7268cc25006835ddb3f2278489d78432ed00bbb9 -->
 ## 2025-11-01T14:41:52+00:00 — Add login flow diagnostics
 
