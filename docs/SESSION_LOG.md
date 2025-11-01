@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:09cb25af538a7538f5e8daf3317319acd7e23ce2 -->
+## 2025-11-01T10:00:06+00:00 — Merge pull request #1600 from aicovergod/codex/handle-closebutton-sprite-loading-failures
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 85 ++ / 29 --
+- Notes:
+  Fallback close button sprite handling and NPC menu cleanup
+---
+<!-- commit:d5f1e29cd5c06e3fa31c5d80da5996c58c6c680e -->
+## 2025-11-01T09:59:55+00:00 — Handle missing UI sprite and clean NPC right-click setups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Prefabs/NPCS/Copper Ore Golem.prefab, Assets/Prefabs/NPCS/Goblin.prefab, Assets/Scripts/UI/RightClickMenu.cs, Assets/Scripts/UI/Utilities/CloseButtonBuilder.cs
+- Diff: 85 ++ / 29 --
+- Notes:
+  —
+---
 <!-- commit:c0c3fd386473011f0ddfcee3cecee086edba0699 -->
 ## 2025-11-01T09:39:36+00:00 — Merge pull request #1599 from aicovergod/codex/remove-sprite-depth-update
 
