@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:6ef8a0f5da14c55fd69a8fcc268bc375f8d7185a -->
+## 2025-11-01T09:26:15+00:00 — stuff
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (33): Assets/Editor/EditablePolygonCollider2DEditor.cs, Assets/Prefabs/Campground.meta, Assets/Prefabs/Campground/Bedroll.prefab, Assets/Prefabs/Campground/Bedroll.prefab.meta, Assets/Prefabs/Campground/Campfire Stone Ring.prefab, Assets/Prefabs/Campground/Campfire Stone Ring.prefab.meta, Assets/Prefabs/Campground/Crate And Sacks Small.prefab, Assets/Prefabs/Campground/Crate And Sacks Small.prefab.meta, Assets/Prefabs/Campground/Stump Chair 2.prefab, Assets/Prefabs/Campground/Stump Chair 2.prefab.meta, Assets/Prefabs/Campground/Stump Chair.prefab, Assets/Prefabs/Campground/Stump Chair.prefab.meta, Assets/Prefabs/Firemaking/Bonfire.prefab, Assets/Prefabs/Structures/Tent 3.prefab, Assets/Prefabs/Structures/Tent 4.prefab, Assets/Prefabs/Structures/Tent 4.prefab.meta, Assets/Prefabs/Structures/Tent 5.prefab, Assets/Prefabs/Structures/Tent 5.prefab.meta, Assets/Prefabs/Structures/Tent 6.prefab, Assets/Prefabs/Structures/Tent 6.prefab.meta, Assets/Prefabs/Woodcutting Trees/Oak Woodcutting Tree - Level 15.prefab, Assets/Scenes/OverWorld.unity, Assets/Sprites/Buildings/Tents/Tent 6_192x192.png, Assets/Sprites/Buildings/Tents/Tent 6_192x192.png.meta, Assets/Sprites/Campground.meta, Assets/Sprites/Campground/Bedroll_128x128.png, Assets/Sprites/Campground/Bedroll_128x128.png.meta, Assets/Sprites/Campground/Campfire Stone Ring_128x128.png, Assets/Sprites/Campground/Campfire Stone Ring_128x128.png.meta, Assets/Sprites/Campground/Crate And Sack Small_64x64.png, Assets/Sprites/Campground/Crate And Sack Small_64x64.png.meta, Assets/Sprites/Campground/Wooden Log Chairs_256x256.png, Assets/Sprites/Campground/Wooden Log Chairs_256x256.png.meta
+- Diff: 7734 ++ / 243 --
+- Notes:
+  —
+---
 <!-- commit:a4fd77b68da555211ae0803eec7d095a9a1be380 -->
 ## 2025-10-31T21:25:42+00:00 — Merge pull request #1598 from aicovergod/codex/add-sortinganchor-to-spritedepth
 
