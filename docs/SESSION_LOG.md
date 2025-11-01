@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fe5ae9187c18c0bc9158b3347511087c418f0c17 -->
+## 2025-11-01T11:00:41+00:00 — Merge pull request #1602 from aicovergod/codex/update-loginflowcontroller-for-scene-transition
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 30 ++ / 5 --
+- Notes:
+  Refresh login transition manager after scene load
+---
+<!-- commit:1ca7b0ddbb6d4cecd490eec0eed491f65679a4d9 -->
+## 2025-11-01T10:58:13+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:d940ae2fdc9ada1b3f990b9802977dc6b8d086d6 -->
 ## 2025-11-01T10:57:57+00:00 — Fix login flow transition manager refresh
 
