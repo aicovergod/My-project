@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:d940ae2fdc9ada1b3f990b9802977dc6b8d086d6 -->
+## 2025-11-01T10:57:57+00:00 — Fix login flow transition manager refresh
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Login/LoginFlowController.cs
+- Diff: 21 ++ / 5 --
+- Notes:
+  —
+---
 <!-- commit:c5873ba5c3f5ecd3829f762f93755faeb4d6b156 -->
 ## 2025-11-01T10:27:32+00:00 — Merge pull request #1601 from aicovergod/codex/extend-scenetransitionmanager-with-transition-helpers
 
