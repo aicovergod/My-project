@@ -32,6 +32,73 @@ namespace World
         private string _consumedRequiredItemId;
 
         /// <summary>
+        /// Allows external systems to manually start a transition without invoking the
+        /// fade routines. This ensures persistent objects receive their unload callbacks
+        /// before a caller begins loading the next scene.
+        /// </summary>
+        /// <param name="nextScene">
+        /// Scene that will become active after the manual transition completes. The
+        /// scene may be invalid when invoked ahead of the asynchronous load; the manager
+        /// does not require it to be valid.
+        /// </param>
+        public void BeginManualTransition(Scene nextScene)
+        {
+            if (IsTransitioning)
+            {
+                Debug.LogWarning("[SceneTransitionManager] BeginManualTransition called while a transition is already running. Duplicate call ignored.");
+                return;
+            }
+
+            NextSpawnPoint = null;
+            ResetConsumedItemTracking();
+
+            IsTransitioning = true;
+            TransitionStarted?.Invoke();
+
+            RemoveNullPersistentObjects();
+
+            foreach (var obj in _persistentObjects)
+                obj.OnBeforeSceneUnload();
+        }
+
+        /// <summary>
+        /// Completes a manual transition by delivering load callbacks and signalling
+        /// listeners that the transition has finished. Mirrors the regular transition
+        /// flow without triggering fade-in visuals.
+        /// </summary>
+        /// <param name="loadedScene">
+        /// Scene that should be passed into <see cref="IScenePersistent.OnAfterSceneLoad(Scene)"/>.
+        /// If invalid, the currently active scene will be used instead.
+        /// </param>
+        public void CompleteManualTransition(Scene loadedScene)
+        {
+            Scene sceneForCallbacks = loadedScene.IsValid() ? loadedScene : SceneManager.GetActiveScene();
+
+            RemoveNullPersistentObjects();
+
+            foreach (var obj in _persistentObjects)
+                obj.OnAfterSceneLoad(sceneForCallbacks);
+
+            EnsureSingleAudioListener(sceneForCallbacks);
+
+            NextSpawnPoint = null;
+
+            IsTransitioning = false;
+            TransitionCompleted?.Invoke();
+
+            ResetConsumedItemTracking();
+        }
+
+        /// <summary>
+        /// Clears all consumed item tracking so future transitions start clean.
+        /// </summary>
+        private void ResetConsumedItemTracking()
+        {
+            _consumedRequiredItemThisTransition = false;
+            _consumedRequiredItemId = null;
+        }
+
+        /// <summary>
         /// Removes any null references from the persistent object cache so we do
         /// not attempt to invoke callbacks on destroyed entries.
         /// </summary>
@@ -93,8 +160,7 @@ namespace World
                 yield return ScreenFader.Instance.FadeOut();
 
             // Reset tracking before attempting to consume any required key items.
-            _consumedRequiredItemThisTransition = false;
-            _consumedRequiredItemId = null;
+            ResetConsumedItemTracking();
 
             var player = GameObject.FindGameObjectWithTag("Player");
             bool removalRequired = removeItemOnUse && !string.IsNullOrEmpty(requiredItemId);
@@ -205,8 +271,7 @@ namespace World
             TransitionCompleted?.Invoke();
 
             // Ensure we do not carry over key-consumption state between transitions.
-            _consumedRequiredItemThisTransition = false;
-            _consumedRequiredItemId = null;
+            ResetConsumedItemTracking();
         }
 
         private IEnumerator AbortTransitionDueToItemRemovalFailure(string message)
@@ -214,8 +279,7 @@ namespace World
             Debug.LogWarning(message);
 
             NextSpawnPoint = null;
-            _consumedRequiredItemThisTransition = false;
-            _consumedRequiredItemId = null;
+            ResetConsumedItemTracking();
 
             if (ScreenFader.Instance != null)
                 yield return ScreenFader.Instance.FadeIn();
@@ -261,8 +325,7 @@ namespace World
                     Debug.LogWarning("[SceneTransitionManager] Failed to restore required item after transition error because the player GameObject was not found.");
                 }
 
-                _consumedRequiredItemThisTransition = false;
-                _consumedRequiredItemId = null;
+                ResetConsumedItemTracking();
             }
 
             RemoveNullPersistentObjects();
@@ -277,6 +340,8 @@ namespace World
 
             IsTransitioning = false;
             TransitionCompleted?.Invoke();
+
+            ResetConsumedItemTracking();
         }
 
         /// <summary>

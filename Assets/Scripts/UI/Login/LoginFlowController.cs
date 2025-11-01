@@ -80,40 +80,65 @@ namespace UI.Login
                 loginScreen.SetStatus("Loading into VIosla 2D", loginScreen.InfoColour);
             }
 
-            bool loaded = await TryLoadSceneAsync(targetScene);
-            if (!loaded)
+            var transitionManager = SceneTransitionManager.Instance;
+            bool manualTransitionStarted = false;
+            bool manualTransitionCompleted = false;
+
+            try
             {
-                if (!IsFallbackScene(targetScene))
+                if (transitionManager != null)
                 {
-                    NotifyFallback($"Failed to load scene '{targetScene}'. Loading fallback scene '{fallbackSceneName}'.");
-                    targetScene = fallbackSceneName;
-                    targetPosition = fallbackSpawnPosition;
-                    loaded = await TryLoadSceneAsync(targetScene);
+                    Scene pendingScene = SceneManager.GetSceneByName(targetScene);
+                    transitionManager.BeginManualTransition(pendingScene);
+                    manualTransitionStarted = true;
                 }
 
+                bool loaded = await TryLoadSceneAsync(targetScene);
                 if (!loaded)
                 {
-                    ReportError($"Unable to load scene '{targetScene}'.");
+                    if (!IsFallbackScene(targetScene))
+                    {
+                        NotifyFallback($"Failed to load scene '{targetScene}'. Loading fallback scene '{fallbackSceneName}'.");
+                        targetScene = fallbackSceneName;
+                        targetPosition = fallbackSpawnPosition;
+                        loaded = await TryLoadSceneAsync(targetScene);
+                    }
+
+                    if (!loaded)
+                    {
+                        ReportError($"Unable to load scene '{targetScene}'.");
+                        return;
+                    }
+                }
+
+                await Task.Yield();
+
+                GameObject player = await LocatePlayerAsync();
+                if (player == null)
+                {
+                    ReportError($"No Player object was found after loading '{targetScene}'.");
                     return;
                 }
+
+                Vector3 current = player.transform.position;
+                player.transform.position = new Vector3(targetPosition.x, targetPosition.y, current.z);
+
+                EnsureCameraFollow(player);
+
+                if (loginScreen != null)
+                    loginScreen.SetStatus("Entering the world…", loginScreen.SuccessColour);
+
+                if (transitionManager != null && manualTransitionStarted)
+                {
+                    transitionManager.CompleteManualTransition(SceneManager.GetActiveScene());
+                    manualTransitionCompleted = true;
+                }
             }
-
-            await Task.Yield();
-
-            GameObject player = await LocatePlayerAsync();
-            if (player == null)
+            finally
             {
-                ReportError($"No Player object was found after loading '{targetScene}'.");
-                return;
+                if (transitionManager != null && manualTransitionStarted && !manualTransitionCompleted)
+                    transitionManager.CompleteManualTransition(SceneManager.GetActiveScene());
             }
-
-            Vector3 current = player.transform.position;
-            player.transform.position = new Vector3(targetPosition.x, targetPosition.y, current.z);
-
-            EnsureCameraFollow(player);
-
-            if (loginScreen != null)
-                loginScreen.SetStatus("Entering the world…", loginScreen.SuccessColour);
         }
 
         private bool CanLoadScene(string sceneName)

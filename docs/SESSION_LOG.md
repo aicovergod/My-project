@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:01122b42e624fde5cdad1008964e7491f32b7f8e -->
+## 2025-11-01T10:27:14+00:00 — Add manual scene transition hooks for login flow
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/UI/Login/LoginFlowController.cs, Assets/Scripts/World/SceneTransitionManager.cs
+- Diff: 120 ++ / 30 --
+- Notes:
+  —
+---
 <!-- commit:09cb25af538a7538f5e8daf3317319acd7e23ce2 -->
 ## 2025-11-01T10:00:06+00:00 — Merge pull request #1600 from aicovergod/codex/handle-closebutton-sprite-loading-failures
 
