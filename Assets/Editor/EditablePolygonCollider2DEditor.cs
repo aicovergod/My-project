@@ -219,7 +219,7 @@ public class EditablePolygonCollider2DEditor : UnityEditor.Editor
 
             int controlId = GUIUtility.GetControlID(FocusType.Passive);
             EditorGUI.BeginChangeCheck();
-            Vector3 movedLocal = Handles.FreeMoveHandle(controlId, localHandlePosition, Quaternion.identity, displaySize, Vector3.zero, Handles.SphereHandleCap);
+            var fmh_222_89_638975380376645943 = Quaternion.identity; Vector3 movedLocal = Handles.FreeMoveHandle(controlId, localHandlePosition, displaySize, Vector3.zero, Handles.SphereHandleCap);
             if (EditorGUI.EndChangeCheck())
             {
                 ApplyUndo("Move Polygon Vertex");
