@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c0c3fd386473011f0ddfcee3cecee086edba0699 -->
+## 2025-11-01T09:39:36+00:00 — Merge pull request #1599 from aicovergod/codex/remove-sprite-depth-update
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 5 ++ / 50 --
+- Notes:
+  Revert SpriteDepth custom sorting anchor
+---
+<!-- commit:5e4b0ff25ddb3248b7d5f6324305977f7a5cb709 -->
+## 2025-11-01T09:39:25+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:074862dfc7365e6edea46ef9cb96635fa605da37 -->
 ## 2025-11-01T09:39:07+00:00 — Revert SpriteDepth custom anchor
 
