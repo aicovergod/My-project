@@ -150,9 +150,7 @@ namespace UI.Utilities
                 rect.offsetMax = options.OffsetMax.Value;
 
             var image = closeButtonGO.GetComponent<Image>();
-            var backgroundSprite = options.BackgroundSprite != null
-                ? options.BackgroundSprite
-                : Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
+            var backgroundSprite = ResolveBackgroundSprite(options);
             image.sprite = backgroundSprite;
             if (backgroundSprite != null)
             {
@@ -183,6 +181,89 @@ namespace UI.Utilities
             textRect.pivot = new Vector2(0.5f, 0.5f);
 
             return button;
+        }
+
+        /// <summary>
+        /// Attempts to resolve the sprite assigned to the close button background, falling
+        /// back to a procedural sprite when Unity's built-in UI sprite cannot be located.
+        /// </summary>
+        /// <param name="options">Caller supplied options that may contain a custom sprite.</param>
+        /// <returns>A sprite that can be safely assigned to the close button background.</returns>
+        private static Sprite ResolveBackgroundSprite(Options options)
+        {
+            if (options.BackgroundSprite != null)
+                return options.BackgroundSprite;
+
+            Sprite builtinSprite = null;
+            try
+            {
+                builtinSprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
+            }
+            catch (Exception exception)
+            {
+                LogBuiltinLookupFailure(exception);
+            }
+
+            if (builtinSprite != null)
+                return builtinSprite;
+
+            LogBuiltinLookupFailure();
+            return ProceduralSpriteCache.GetFallbackSprite();
+        }
+
+        /// <summary>
+        /// Emits a single warning when the built-in sprite lookup fails so designers know the
+        /// project is relying on a procedural fallback sprite.
+        /// </summary>
+        /// <param name="exception">Optional exception raised by the resource lookup.</param>
+        private static void LogBuiltinLookupFailure(Exception exception = null)
+        {
+            if (ProceduralSpriteCache.HasLoggedLookupFailure)
+                return;
+
+            ProceduralSpriteCache.HasLoggedLookupFailure = true;
+            if (exception != null)
+            {
+                Debug.LogWarning($"CloseButtonBuilder: Failed to load Unity's built-in UISprite. Falling back to a procedural sprite. Exception: {exception}");
+            }
+            else
+            {
+                Debug.LogWarning("CloseButtonBuilder: Built-in UISprite unavailable. Falling back to a procedural sprite.");
+            }
+        }
+
+        /// <summary>
+        ///     Local cache that stores the procedural fallback sprite. The cache ensures we do not
+        ///     allocate a new sprite every time a close button is instantiated while still letting
+        ///     the image tint honour the caller's requested background colour.
+        /// </summary>
+        private static class ProceduralSpriteCache
+        {
+            internal static bool HasLoggedLookupFailure { get; set; }
+
+            /// <summary>
+            /// Returns a cached sprite backed by <see cref="Texture2D.whiteTexture"/>. The caller's
+            /// desired colour is respected via the <see cref="Image.color"/> tint that is already
+            /// applied when the button is configured, mirroring how the built-in UI sprite is used.
+            /// </summary>
+            internal static Sprite GetFallbackSprite()
+            {
+                if (cachedSprite == null)
+                {
+                    var sourceTexture = Texture2D.whiteTexture;
+                    cachedSprite = Sprite.Create(
+                        sourceTexture,
+                        new Rect(0f, 0f, sourceTexture.width, sourceTexture.height),
+                        new Vector2(0.5f, 0.5f),
+                        64f);
+                    cachedSprite.name = "CloseButtonBuilder_FallbackSprite";
+                    cachedSprite.hideFlags = HideFlags.HideAndDontSave;
+                }
+
+                return cachedSprite;
+            }
+
+            private static Sprite cachedSprite;
         }
     }
 }

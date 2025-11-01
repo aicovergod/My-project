@@ -13,6 +13,7 @@ namespace UI
     ///     Buttons are generated at runtime according to the <see cref="NpcInteractionOptions"/>
     ///     attached to the selected NPC.
     /// </summary>
+    [RequireComponent(typeof(RectTransform))]
     public class RightClickMenu : MonoBehaviour
     {
         private const float ButtonSpacing = 4f;

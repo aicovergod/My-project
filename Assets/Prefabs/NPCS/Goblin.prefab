@@ -59,7 +59,6 @@ GameObject:
   - component: {fileID: 1174345271934556159}
   - component: {fileID: 3370003897924781013}
   - component: {fileID: 8209983591033409917}
-  - component: {fileID: 3016150103729284024}
   - component: {fileID: 2620239198351941839}
   m_Layer: 10
   m_Name: Goblin
@@ -625,18 +624,6 @@ MonoBehaviour:
   enableTalk: 1
   enableTrade: 0
   enablePickpocket: 1
---- !u!114 &3016150103729284024
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8077571585701284791}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14905cb5a6ab44c795ff41f769ea3326, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UI.RightClickMenu
 --- !u!114 &2620239198351941839
 MonoBehaviour:
   m_ObjectHideFlags: 0
