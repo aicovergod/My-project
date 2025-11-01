@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:c5873ba5c3f5ecd3829f762f93755faeb4d6b156 -->
+## 2025-11-01T10:27:32+00:00 — Merge pull request #1601 from aicovergod/codex/extend-scenetransitionmanager-with-transition-helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 129 ++ / 30 --
+- Notes:
+  Add manual transition helpers for login scene loading
+---
+<!-- commit:972579082a553955a53789c6a2899371781e3215 -->
+## 2025-11-01T10:27:27+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:01122b42e624fde5cdad1008964e7491f32b7f8e -->
 ## 2025-11-01T10:27:14+00:00 — Add manual scene transition hooks for login flow
 
