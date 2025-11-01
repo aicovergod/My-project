@@ -49,6 +49,7 @@ namespace World
                 return;
             }
 
+            Debug.Log($"[SceneTransitionManager] BeginManualTransition -> Scene:'{nextScene.name}' Valid:{nextScene.IsValid()}.");
             NextSpawnPoint = null;
             ResetConsumedItemTracking();
 
@@ -73,6 +74,8 @@ namespace World
         public void CompleteManualTransition(Scene loadedScene)
         {
             Scene sceneForCallbacks = loadedScene.IsValid() ? loadedScene : SceneManager.GetActiveScene();
+
+            Debug.Log($"[SceneTransitionManager] CompleteManualTransition -> Scene:'{sceneForCallbacks.name}' Valid:{sceneForCallbacks.IsValid()}.");
 
             RemoveNullPersistentObjects();
 
@@ -150,6 +153,7 @@ namespace World
             if (string.IsNullOrEmpty(sceneToLoad))
                 yield break;
 
+            Debug.Log($"[SceneTransitionManager] Transition coroutine invoked. TargetScene='{sceneToLoad}', SpawnPoint='{spawnPointName}', RequiresItem='{requiredItemId}', RemoveOnUse={removeItemOnUse}.");
             IsTransitioning = true;
             TransitionStarted?.Invoke();
 
@@ -186,6 +190,7 @@ namespace World
                     yield break;
                 }
 
+                Debug.Log($"[SceneTransitionManager] Required item '{requiredItemId}' consumed for transition.");
                 _consumedRequiredItemThisTransition = true;
                 _consumedRequiredItemId = requiredItemId;
             }

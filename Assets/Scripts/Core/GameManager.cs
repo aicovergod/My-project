@@ -52,6 +52,7 @@ namespace Core
 
         protected override void Awake()
         {
+            Debug.Log("GameManager: Awake - configuring window mode and caching services.", this);
             ConfigureWindowMode();
 
             if (Instance != null && Instance != this)
@@ -63,6 +64,8 @@ namespace Core
             base.Awake();
 
             Instance = this;
+
+            Debug.Log("GameManager: Instance assigned. Beginning initial service cache.", this);
 
             CacheServices(false);
         }
@@ -83,10 +86,13 @@ namespace Core
             {
                 Screen.SetResolution(width, height, FullScreenMode.Windowed);
             }
+
+            Debug.Log($"GameManager: Window mode configured to {width}x{height} windowed. EditorEnforced={applyResolutionInEditorPlayMode}.", this);
         }
 
         private void Start()
         {
+            Debug.Log("GameManager: Start - refreshing service cache and starting autosave loop.", this);
             CacheServices(true);
 
             ServicesReady?.Invoke();
@@ -125,6 +131,10 @@ namespace Core
             shopUI ??= FindService<ShopUI>(logIfMissing);
             respawnSystem ??= FindService<PlayerRespawnSystem>(logIfMissing);
             bycatchManager ??= FindService<BycatchManager>(logIfMissing);
+
+            Debug.Log(
+                $"GameManager: CacheServices(logIfMissing={logIfMissing}) -> Ticker:{(ticker != null)}, ScreenFader:{(screenFader != null)}, ItemDatabase:{(itemDatabase != null)}, ShopUI:{(shopUI != null)}, PlayerRespawnSystem:{(respawnSystem != null)}, BycatchManager:{(bycatchManager != null)}.",
+                this);
         }
 
         /// <summary>
