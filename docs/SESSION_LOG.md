@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:7268cc25006835ddb3f2278489d78432ed00bbb9 -->
+## 2025-11-01T14:41:52+00:00 — Add login flow diagnostics
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Core/GameManager.cs, Assets/Scripts/UI/Login/LoginFlowController.cs, Assets/Scripts/UI/Login/LoginScreenController.cs, Assets/Scripts/World/SceneTransitionManager.cs
+- Diff: 60 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:fe5ae9187c18c0bc9158b3347511087c418f0c17 -->
 ## 2025-11-01T11:00:41+00:00 — Merge pull request #1602 from aicovergod/codex/update-loginflowcontroller-for-scene-transition
 
