@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:074862dfc7365e6edea46ef9cb96635fa605da37 -->
+## 2025-11-01T09:39:07+00:00 — Revert SpriteDepth custom anchor
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Util/SpriteDepth.cs, docs/SESSION_LOG.md
+- Diff: 1 ++ / 55 --
+- Notes:
+  —
+---
 <!-- commit:2a15ac6162c0d57e6adcb7ca0003a6746cf1cf81 -->
 ## 2025-10-31T20:07:06+00:00 — sprites
 
