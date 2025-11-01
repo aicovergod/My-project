@@ -128,16 +128,32 @@ namespace UI.Login
                 if (loginScreen != null)
                     loginScreen.SetStatus("Entering the world…", loginScreen.SuccessColour);
 
-                if (transitionManager != null && manualTransitionStarted)
+                if (manualTransitionStarted)
                 {
-                    transitionManager.CompleteManualTransition(SceneManager.GetActiveScene());
-                    manualTransitionCompleted = true;
+                    // Re-resolve the transition manager in case the original reference was destroyed or swapped during load.
+                    SceneTransitionManager liveManager = SceneTransitionManager.Instance;
+                    if (liveManager != null)
+                        transitionManager = liveManager;
+
+                    if (transitionManager != null)
+                    {
+                        transitionManager.CompleteManualTransition(SceneManager.GetActiveScene());
+                        manualTransitionCompleted = true;
+                    }
                 }
             }
             finally
             {
-                if (transitionManager != null && manualTransitionStarted && !manualTransitionCompleted)
-                    transitionManager.CompleteManualTransition(SceneManager.GetActiveScene());
+                if (manualTransitionStarted && !manualTransitionCompleted)
+                {
+                    // Repeat the lookup during cleanup so manual transitions do not leak if the manager was replaced.
+                    SceneTransitionManager liveManager = SceneTransitionManager.Instance;
+                    if (liveManager != null)
+                        transitionManager = liveManager;
+
+                    if (transitionManager != null)
+                        transitionManager.CompleteManualTransition(SceneManager.GetActiveScene());
+                }
             }
         }
 
