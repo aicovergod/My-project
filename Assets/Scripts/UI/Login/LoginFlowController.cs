@@ -90,6 +90,26 @@ namespace UI.Login
             bool manualTransitionStarted = false;
             bool manualTransitionCompleted = false;
 
+            bool ControllerAlive()
+            {
+                // Unity overrides the == operator so destroyed objects evaluate to null.
+                return this != null && isActiveAndEnabled;
+            }
+
+            void CompletePendingManualTransition()
+            {
+                if (!manualTransitionStarted || manualTransitionCompleted)
+                    return;
+
+                SceneTransitionManager liveManager = SceneTransitionManager.Instance ?? transitionManager;
+                if (liveManager == null)
+                    return;
+
+                transitionManager = liveManager;
+                liveManager.CompleteManualTransition(SceneManager.GetActiveScene());
+                manualTransitionCompleted = true;
+            }
+
             try
             {
                 if (transitionManager != null)
@@ -105,6 +125,12 @@ namespace UI.Login
                 }
 
                 bool loaded = await TryLoadSceneAsync(targetScene);
+                if (!ControllerAlive())
+                {
+                    CompletePendingManualTransition();
+                    return;
+                }
+
                 if (!loaded)
                 {
                     if (!IsFallbackScene(targetScene))
@@ -113,6 +139,11 @@ namespace UI.Login
                         targetScene = fallbackSceneName;
                         targetPosition = fallbackSpawnPosition;
                         loaded = await TryLoadSceneAsync(targetScene);
+                        if (!ControllerAlive())
+                        {
+                            CompletePendingManualTransition();
+                            return;
+                        }
                         Debug.Log($"LoginFlowController: Retrying load using fallback scene '{targetScene}'.", this);
                     }
 
@@ -124,9 +155,19 @@ namespace UI.Login
                 }
 
                 await Task.Yield();
+                if (!ControllerAlive())
+                {
+                    CompletePendingManualTransition();
+                    return;
+                }
 
                 Debug.Log("LoginFlowController: Scene load reported complete. Searching for player instance.", this);
                 GameObject player = await LocatePlayerAsync();
+                if (!ControllerAlive())
+                {
+                    CompletePendingManualTransition();
+                    return;
+                }
                 if (player == null)
                 {
                     ReportError($"No Player object was found after loading '{targetScene}'.");
@@ -160,7 +201,7 @@ namespace UI.Login
             }
             finally
             {
-                if (manualTransitionStarted && !manualTransitionCompleted)
+                if (manualTransitionStarted && !manualTransitionCompleted && ControllerAlive())
                 {
                     // Repeat the lookup during cleanup so manual transitions do not leak if the manager was replaced.
                     SceneTransitionManager liveManager = SceneTransitionManager.Instance;
@@ -171,6 +212,7 @@ namespace UI.Login
                     {
                         Debug.Log("LoginFlowController: Manual transition cleanup invoked after exception or early exit.", this);
                         transitionManager.CompleteManualTransition(SceneManager.GetActiveScene());
+                        manualTransitionCompleted = true;
                     }
                 }
             }
