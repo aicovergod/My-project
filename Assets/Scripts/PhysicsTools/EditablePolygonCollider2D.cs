@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PhysicsTools.TwoD
+namespace PhysicsTools
 {
     /// <summary>
     /// Editable polygon collider wrapper that exposes a serialized point list and

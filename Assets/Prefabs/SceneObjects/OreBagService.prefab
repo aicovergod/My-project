@@ -45,3 +45,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Inventory.OreBag.OreBagService
   hadesFragmentItemId: Hades Fragment
+  enableDebugLogging: 1

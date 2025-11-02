@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using PhysicsTools.TwoD;
+using PhysicsTools;
 
 /// <summary>
 /// Custom inspector and Scene view tooling for <see cref="EditablePolygonCollider2D"/>.
