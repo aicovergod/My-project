@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:bfce57e985081f422eaab8deff747edab8921c4c -->
+## 2025-11-02T13:54:35+00:00 — Ensure login flow spawns transition manager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Login/LoginFlowController.cs
+- Diff: 61 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:2ed6592f17f903a860c8e169bfa00f9517bb63e1 -->
 ## 2025-11-02T12:43:46+00:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
 

@@ -1,5 +1,6 @@
 // Refactor: OSRS-style login with per-account saves; removed Overworld hop; atomic file IO; PBKDF2.
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core.Save;
 using Player;
@@ -85,7 +86,7 @@ namespace UI.Login
                 loginScreen.SetStatus("Loading into VIosla 2D", loginScreen.InfoColour);
             }
 
-            var transitionManager = SceneTransitionManager.Instance;
+            var transitionManager = EnsureTransitionManagerReady();
             bool manualTransitionStarted = false;
             bool manualTransitionCompleted = false;
 
@@ -284,6 +285,65 @@ namespace UI.Login
         private bool IsFallbackScene(string sceneName)
         {
             return string.Equals(sceneName, fallbackSceneName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Ensures the <see cref="SceneTransitionManager"/> exists before manual transitions begin by
+        /// loading the persistent object catalog and instantiating the prefab that contains the
+        /// manager when necessary.
+        /// </summary>
+        private SceneTransitionManager EnsureTransitionManagerReady()
+        {
+            SceneTransitionManager manager = SceneTransitionManager.Instance;
+            if (manager != null)
+                return manager;
+
+            PersistentObjectCatalog catalog = Resources.Load<PersistentObjectCatalog>(PersistentObjectBootstrap.CatalogResourcePath);
+            if (catalog == null)
+            {
+                Debug.LogWarning("LoginFlowController: PersistentObjectCatalog could not be located. Scene transitions will skip manual safeguards.", this);
+                return null;
+            }
+
+            IReadOnlyList<GameObject> prefabs = catalog.Prefabs;
+            for (int i = 0; i < prefabs.Count; i++)
+            {
+                GameObject prefab = prefabs[i];
+                if (prefab == null)
+                    continue;
+
+                SceneTransitionManager prefabManager = prefab.GetComponentInChildren<SceneTransitionManager>(true);
+                if (prefabManager == null)
+                    continue;
+
+                GameObject instance = Instantiate(prefab);
+                instance.name = prefab.name;
+                DontDestroyOnLoad(instance);
+
+                if (instance.GetComponentInChildren<ScenePersistentObject>(true) == null)
+                {
+                    instance.AddComponent<ScenePersistentObject>();
+                    Debug.LogWarning($"LoginFlowController: Prefab '{prefab.name}' was missing a ScenePersistentObject. One was added automatically.", instance);
+                }
+
+                manager = SceneTransitionManager.Instance;
+                if (manager == null)
+                    manager = instance.GetComponentInChildren<SceneTransitionManager>(true);
+
+                if (manager != null)
+                {
+                    Debug.Log($"LoginFlowController: Instantiated SceneTransitionManager from persistent catalog prefab '{prefab.name}'.", this);
+                }
+                else
+                {
+                    Debug.LogWarning($"LoginFlowController: Prefab '{prefab.name}' did not produce a SceneTransitionManager instance after instantiation.", instance);
+                }
+
+                return manager;
+            }
+
+            Debug.LogWarning("LoginFlowController: Persistent object catalog does not contain a prefab with SceneTransitionManager. Manual transitions cannot be prepared.", this);
+            return null;
         }
     }
 }
