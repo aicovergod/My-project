@@ -81,14 +81,19 @@ namespace UI.Login
 
         private void Awake()
         {
+            // Emit a boot log so we can trace when the login UI has completed its hierarchy setup.
+            Debug.Log("LoginScreenController: Awake - preparing login UI hierarchy and dependencies.", this);
             EnsureUiHierarchy();
 
             if (loginFlowController == null)
                 loginFlowController = GetComponent<LoginFlowController>();
 
             if (loginFlowController != null)
+            {
                 loginFlowController.SetScreen(this);
-
+                Debug.Log("LoginScreenController: Linked LoginFlowController instance.", this);
+            }
+            
             if (usernameField != null)
             {
                 LegacyFontProvider.ApplyTo(usernameField.textComponent);
@@ -113,6 +118,7 @@ namespace UI.Login
 
         private void OnEnable()
         {
+            Debug.Log("LoginScreenController: OnEnable - registering UI event bindings.", this);
             if (loginButton != null)
                 loginButton.onClick.AddListener(HandleLoginClicked);
 
@@ -132,6 +138,7 @@ namespace UI.Login
 
         private void OnDisable()
         {
+            Debug.Log("LoginScreenController: OnDisable - unregistering UI event bindings.", this);
             if (loginButton != null)
                 loginButton.onClick.RemoveListener(HandleLoginClicked);
 
@@ -197,6 +204,7 @@ namespace UI.Login
 
         private async void HandleLoginClicked()
         {
+            Debug.Log("LoginScreenController: Login button clicked. Validating credentials.", this);
             if (loginButton != null)
                 loginButton.interactable = false;
 
@@ -223,6 +231,7 @@ namespace UI.Login
 
             try
             {
+                Debug.Log($"LoginScreenController: Attempting to load account '{trimmedUsername}'.", this);
                 AccountManager.AccountLoadStatus loadStatus = AccountManager.TryLoadAccount(trimmedUsername, out AccountSave save);
 
                 if (loadStatus == AccountManager.AccountLoadStatus.FailedToDeserialize)
@@ -241,6 +250,7 @@ namespace UI.Login
 
                 if (accountExists)
                 {
+                    Debug.Log($"LoginScreenController: Existing account located for '{trimmedUsername}'. Verifying password.", this);
                     if (!AccountManager.VerifyPassword(save, password))
                     {
                         SetStatus("Invalid credentials.", errorColour);
@@ -249,11 +259,13 @@ namespace UI.Login
                     }
 
                     SetStatus($"Welcome back, {save.username}.", successColour);
+                    Debug.Log($"LoginScreenController: Credentials accepted for '{save.username}'.", this);
                 }
                 else
                 {
                     save = AccountManager.CreateNewAccount(trimmedUsername, password);
                     SetStatus($"Created new account for {save.username}.", successColour);
+                    Debug.Log($"LoginScreenController: Created new account '{save.username}'.", this);
                 }
 
                 // Persist the login timestamp explicitly rather than letting autosaves advance it.
@@ -261,10 +273,12 @@ namespace UI.Login
 
                 SaveManager.BindAccount(save, reload: true);
                 await AccountManager.SaveAsync(save);
+                Debug.Log($"LoginScreenController: Account '{save.username}' bound and saved. Triggering login flow.", this);
                 CacheLastUsedAccount(save.username);
 
                 if (loginFlowController != null)
                 {
+                    Debug.Log("LoginScreenController: Starting post-authentication flow.", this);
                     await loginFlowController.BeginLoginFlowAsync(save);
                 }
                 else

@@ -59,18 +59,23 @@ namespace UI.Login
             string targetScene = hasSavedScene ? save.savedSceneName : fallbackSceneName;
             Vector2 targetPosition = hasSavedScene ? new Vector2(save.savedX, save.savedY) : fallbackSpawnPosition;
 
+            Debug.Log($"LoginFlowController: Starting login flow for '{save.username}'. SavedScene='{save.savedSceneName}', TargetScene='{targetScene}', TargetPosition={targetPosition}.", this);
+
             if (hasSavedScene && !PersistentSceneGate.IsSceneAllowed(targetScene))
             {
                 NotifyFallback($"Saved scene '{targetScene}' is excluded by the persistent catalog. Loading fallback scene '{fallbackSceneName}'.");
                 targetScene = fallbackSceneName;
                 targetPosition = fallbackSpawnPosition;
+                Debug.Log($"LoginFlowController: Scene '{save.savedSceneName}' blocked by gate. Switching to fallback scene '{targetScene}'.", this);
             }
 
             if (!CanLoadScene(targetScene))
             {
+                string unavailableScene = targetScene;
                 NotifyFallback($"Saved scene '{targetScene}' is unavailable. Loading fallback scene '{fallbackSceneName}'.");
                 targetScene = fallbackSceneName;
                 targetPosition = fallbackSpawnPosition;
+                Debug.Log($"LoginFlowController: Scene '{unavailableScene}' could not be prevalidated. Falling back to '{fallbackSceneName}'.", this);
             }
 
             if (loginScreen != null)
@@ -91,6 +96,11 @@ namespace UI.Login
                     Scene pendingScene = SceneManager.GetSceneByName(targetScene);
                     transitionManager.BeginManualTransition(pendingScene);
                     manualTransitionStarted = true;
+                    Debug.Log($"LoginFlowController: Manual transition begun for '{targetScene}'.", this);
+                }
+                else
+                {
+                    Debug.LogWarning("LoginFlowController: SceneTransitionManager instance was null. Proceeding without manual transition safeguards.", this);
                 }
 
                 bool loaded = await TryLoadSceneAsync(targetScene);
@@ -102,6 +112,7 @@ namespace UI.Login
                         targetScene = fallbackSceneName;
                         targetPosition = fallbackSpawnPosition;
                         loaded = await TryLoadSceneAsync(targetScene);
+                        Debug.Log($"LoginFlowController: Retrying load using fallback scene '{targetScene}'.", this);
                     }
 
                     if (!loaded)
@@ -113,12 +124,15 @@ namespace UI.Login
 
                 await Task.Yield();
 
+                Debug.Log("LoginFlowController: Scene load reported complete. Searching for player instance.", this);
                 GameObject player = await LocatePlayerAsync();
                 if (player == null)
                 {
                     ReportError($"No Player object was found after loading '{targetScene}'.");
                     return;
                 }
+
+                Debug.Log($"LoginFlowController: Player '{player.name}' located. Moving to target position {targetPosition}.", this);
 
                 Vector3 current = player.transform.position;
                 player.transform.position = new Vector3(targetPosition.x, targetPosition.y, current.z);
@@ -139,6 +153,7 @@ namespace UI.Login
                     {
                         transitionManager.CompleteManualTransition(SceneManager.GetActiveScene());
                         manualTransitionCompleted = true;
+                        Debug.Log($"LoginFlowController: Manual transition completed for scene '{SceneManager.GetActiveScene().name}'.", this);
                     }
                 }
             }
@@ -152,7 +167,10 @@ namespace UI.Login
                         transitionManager = liveManager;
 
                     if (transitionManager != null)
+                    {
+                        Debug.Log("LoginFlowController: Manual transition cleanup invoked after exception or early exit.", this);
                         transitionManager.CompleteManualTransition(SceneManager.GetActiveScene());
+                    }
                 }
             }
         }
@@ -176,6 +194,7 @@ namespace UI.Login
             AsyncOperation operation;
             try
             {
+                Debug.Log($"LoginFlowController: Initiating load for scene '{sceneName}'.", this);
                 operation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
             }
             catch (Exception ex)
@@ -190,25 +209,34 @@ namespace UI.Login
             while (!operation.isDone)
                 await Task.Yield();
 
+            Debug.Log($"LoginFlowController: Scene '{sceneName}' finished loading.", this);
             return true;
         }
 
         private async Task<GameObject> LocatePlayerAsync()
         {
+            Debug.Log("LoginFlowController: Searching for player object after scene load.", this);
             float elapsed = 0f;
 
             while (elapsed < playerSearchTimeout)
             {
                 if (PlayerLocator.TryFindPlayer(out GameObject player) && player != null)
+                {
+                    Debug.Log($"LoginFlowController: Player found after {elapsed:F2}s of searching.", this);
                     return player;
+                }
 
                 await Task.Yield();
                 elapsed += Time.unscaledDeltaTime;
             }
 
             if (PlayerLocator.TryFindPlayer(out GameObject fallback) && fallback != null)
+            {
+                Debug.Log("LoginFlowController: Player resolved on final fallback probe after timeout.", this);
                 return fallback;
+            }
 
+            Debug.LogError("LoginFlowController: Player search timed out with no result.", this);
             return null;
         }
 
@@ -220,6 +248,7 @@ namespace UI.Login
             var followers = FindObjectsOfType<CameraFollow2D>(true);
             for (int i = 0; i < followers.Length; i++)
                 followers[i].target = player.transform;
+            Debug.Log($"LoginFlowController: Assigned {followers.Length} CameraFollow2D targets to the player.", this);
 
             var vcamType = Type.GetType("Cinemachine.CinemachineVirtualCamera, Cinemachine");
             if (vcamType == null)
@@ -232,6 +261,7 @@ namespace UI.Login
 
             for (int i = 0; i < vcams.Length; i++)
                 followProperty.SetValue(vcams[i], player.transform, null);
+            Debug.Log($"LoginFlowController: Assigned player follow target to {vcams.Length} Cinemachine virtual cameras.", this);
         }
 
         private void NotifyFallback(string message)
