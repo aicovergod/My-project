@@ -1,6 +1,15 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:fd0d9a1b305664923f6703ef4bf7d2400793a3a8 -->
+## 2025-11-02T14:36:45+00:00 — Guard login flow against destroyed controller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Login/LoginFlowController.cs
+- Diff: 43 ++ / 1 --
+- Notes:
+  —
+---
 <!-- commit:194da6f98a5dd525dfa994086c83aed2ea5e78f5 -->
 ## 2025-11-02T14:13:15+00:00 — Merge pull request #1604 from aicovergod/codex/add-scenetransitionmanager-setup-in-loginflowcontroller
 
