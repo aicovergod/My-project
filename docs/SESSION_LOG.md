@@ -1,6 +1,24 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
+<!-- commit:4fc97daa4faea7f9264ee1852901ad53c96014e6 -->
+## 2025-11-02T14:37:03+00:00 — Merge pull request #1605 from aicovergod/codex/update-loginflowcontroller-for-cancellation-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 52 ++ / 1 --
+- Notes:
+  Guard login flow against destroyed controller
+---
+<!-- commit:46d179c59693b86456e8024f88f8f0894acaf258 -->
+## 2025-11-02T14:36:57+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
 <!-- commit:fd0d9a1b305664923f6703ef4bf7d2400793a3a8 -->
 ## 2025-11-02T14:36:45+00:00 — Guard login flow against destroyed controller
 
