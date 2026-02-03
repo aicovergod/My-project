@@ -1,3 +1,4 @@
+using UI.ContextMenus;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
@@ -8,7 +9,7 @@ namespace BankSystem
     /// Simple right-click context menu for bank withdrawal options.
     /// Built entirely in code so no prefab is needed.
     /// </summary>
-    public class BankWithdrawMenu : MonoBehaviour
+    public class BankWithdrawMenu : ContextMenuBase
     {
         private BankUI bank;
         private int slotIndex;
@@ -27,21 +28,12 @@ namespace BankSystem
             return menu;
         }
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             rect ??= GetComponent<RectTransform>();
-        }
-
-        private void Update()
-        {
-            if (!gameObject.activeSelf)
-                return;
-
-            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
-            {
-                if (!RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition))
-                    Hide();
-            }
+            AssignCanvas(GetComponentInParent<Canvas>());
+            SetMenuRectTransform(rect);
         }
 
         private void BuildUI()
@@ -101,6 +93,7 @@ namespace BankSystem
             slotIndex = index;
             transform.position = position;
             gameObject.SetActive(true);
+            DeferSafeZoneCheck();
             transform.SetAsLastSibling();
         }
 
@@ -108,6 +101,12 @@ namespace BankSystem
         {
             gameObject.SetActive(false);
             bank = null;
+        }
+
+        /// <inheritdoc />
+        protected override void OnCloseRequested()
+        {
+            Hide();
         }
     }
 }

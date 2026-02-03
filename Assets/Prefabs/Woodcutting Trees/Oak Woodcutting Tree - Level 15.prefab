@@ -11,10 +11,11 @@ GameObject:
   - component: {fileID: 5029190792631439347}
   - component: {fileID: 8236091862416192098}
   - component: {fileID: 1957610996786731413}
-  - component: {fileID: 8560682867254658415}
   - component: {fileID: 3244907390266376697}
   - component: {fileID: 6070147374573012547}
   - component: {fileID: 5826013684839782429}
+  - component: {fileID: 4497094398931349541}
+  - component: {fileID: 6308661850887237062}
   m_Layer: 7
   m_Name: Oak Woodcutting Tree - Level 15
   m_TagString: Untagged
@@ -122,43 +123,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!70 &8560682867254658415
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5912612152994619936}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -1}
-  m_Size: {x: 3, y: 2}
-  m_Direction: 1
 --- !u!61 &3244907390266376697
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -235,5 +199,80 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76cd1b72de0d4b218ac17b592277af94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sortingAnchor: {fileID: 5029190792631439347}
   offset: -1
   directionOffset: 0
+--- !u!60 &4497094398931349541
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5912612152994619936}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 4, y: 4}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: -1.75, y: -1.75}
+      - {x: 1.625, y: -1.75}
+      - {x: 1.375, y: -1.25}
+      - {x: -1.25, y: -1.25}
+  m_UseDelaunayMesh: 0
+--- !u!114 &6308661850887237062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5912612152994619936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb183853935c17745be2d7540a266549, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PhysicsTools.TwoD.EditablePolygonCollider2D
+  points:
+  - {x: -1.75, y: -1.75}
+  - {x: 1.625, y: -1.75}
+  - {x: 1.375, y: -1.25}
+  - {x: -1.25, y: -1.25}
+  showHandles: 1
+  snapToGrid: 1
+  snapSize: 0.125
+  drawIndices: 1
+  convexOnly: 0
+  outputEdgeCollider: 0

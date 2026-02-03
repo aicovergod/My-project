@@ -19,6 +19,9 @@ namespace Skills.Mining
         [SerializeField] private Sprite fullSprite;
         [SerializeField] private Sprite depletedSprite;
 
+        [Header("Collision")]
+        [SerializeField] private Collider2D rockCollider;
+
         private int remainingOre;
         private bool depleted;
         private float respawnTimer;
@@ -31,6 +34,13 @@ namespace Skills.Mining
             remainingOre = rockDef != null && rockDef.DepleteAfterNOres > 0 ? rockDef.DepleteAfterNOres : 0;
             if (spriteRenderer == null)
                 spriteRenderer = GetComponent<SpriteRenderer>();
+
+            // Cache the collider reference so we can safely re-enable it when the rock depletes.
+            if (rockCollider == null)
+                rockCollider = GetComponent<Collider2D>();
+
+            // Ensure the collider starts enabled even if the prefab was misconfigured.
+            EnsureColliderBlocking();
         }
 
         private void Update()
@@ -68,8 +78,7 @@ namespace Skills.Mining
         {
             depleted = true;
             respawnTimer = Random.Range(rockDef.RespawnTimeSecondsMin, rockDef.RespawnTimeSecondsMax);
-            var col = GetComponent<Collider2D>();
-            if (col) col.enabled = false;
+            EnsureColliderBlocking();
             if (spriteRenderer && depletedSprite) spriteRenderer.sprite = depletedSprite;
         }
 
@@ -77,9 +86,21 @@ namespace Skills.Mining
         {
             depleted = false;
             remainingOre = rockDef.DepleteAfterNOres > 0 ? rockDef.DepleteAfterNOres : 0;
-            var col = GetComponent<Collider2D>();
-            if (col) col.enabled = true;
+            EnsureColliderBlocking();
             if (spriteRenderer && fullSprite) spriteRenderer.sprite = fullSprite;
+        }
+
+        /// <summary>
+        /// Guarantees the collider stays enabled so the depleted rock continues to block movement.
+        /// </summary>
+        private void EnsureColliderBlocking()
+        {
+            if (rockCollider == null)
+                return;
+
+            // We never want the collider disabled because players should not clip through depleted nodes.
+            rockCollider.enabled = true;
+            rockCollider.isTrigger = false;
         }
 
         public void Prospect(Transform requester)

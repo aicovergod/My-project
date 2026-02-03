@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using World;
 
 namespace Core.Save
 {
@@ -21,6 +22,27 @@ namespace Core.Save
         private static readonly string GlobalFilePath = Path.Combine(AccountManager.BaseDirectory, "global_state.json");
 
         public static string ActiveProfileId { get; private set; } = string.Empty;
+
+        /// <summary>
+        /// Raised whenever the bound account username changes.
+        /// </summary>
+        public static event Action<string> ActiveAccountUsernameChanged;
+
+        /// <summary>
+        /// Exposes the username of the currently bound account or an empty string when unauthenticated.
+        /// </summary>
+        public static string ActiveAccountUsername
+        {
+            get
+            {
+                var account = boundAccount;
+                if (account == null)
+                    return string.Empty;
+
+                string username = account.username;
+                return string.IsNullOrWhiteSpace(username) ? string.Empty : username.Trim();
+            }
+        }
 
         private static AccountSave boundAccount;
         private static AccountSave.AccountData cache;
@@ -132,6 +154,8 @@ namespace Core.Save
 
             if (reload)
                 LoadAll();
+
+            ActiveAccountUsernameChanged?.Invoke(ActiveAccountUsername);
         }
 
         /// <summary>
@@ -205,6 +229,9 @@ namespace Core.Save
         /// <param name="position">World position that should be recorded.</param>
         internal static void UpdateLastKnownLocation(string scene, Vector3 position)
         {
+            if (!PersistentSceneGate.IsSceneAllowed(scene))
+                return;
+
             lock (flushLock)
             {
                 if (boundAccount == null)

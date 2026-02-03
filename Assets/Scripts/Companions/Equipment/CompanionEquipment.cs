@@ -1,0 +1,1448 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Combat;
+using Core.Save;
+using Inventory;
+using MyGame.Drops;
+using Skills;
+using UI;
+using UI.Chat;
+using UI.Utilities;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using RuntimeInventory = global::Inventory.Inventory;
+
+namespace Companions.Equipment
+{
+    /// <summary>
+    /// Builds and manages a companion-specific equipment window that mirrors the player's OSRS-style layout.
+    /// Handles UI lifecycle integration, persistence, and routing equip requests originating from the player inventory.
+    /// </summary>
+    [DisallowMultipleComponent]
+    public sealed class CompanionEquipment : MonoBehaviour, IUIWindow
+    {
+        private const string SaveKey = "CompanionEquipmentData";
+        private const float UiScale = 2f;
+
+        /// <summary>Number of usable equipment slots (excludes <see cref="EquipmentSlot.None"/>).</summary>
+        private static readonly int EquipmentSlotCount = Enum.GetValues(typeof(EquipmentSlot)).Length - 1;
+
+        /// <summary>Mapping from grid indices to slot definitions so the generated UI mirrors the player layout.</summary>
+        private static readonly Dictionary<int, EquipmentSlot> CellToSlot = new()
+        {
+            {0, EquipmentSlot.Charm},
+            {1, EquipmentSlot.Head},
+            {3, EquipmentSlot.Cape},
+            {4, EquipmentSlot.Amulet},
+            {5, EquipmentSlot.Arrow},
+            {6, EquipmentSlot.Weapon},
+            {7, EquipmentSlot.Body},
+            {8, EquipmentSlot.Shield},
+            {10, EquipmentSlot.Legs},
+            {12, EquipmentSlot.Gloves},
+            {13, EquipmentSlot.Boots},
+            {14, EquipmentSlot.Ring}
+        };
+
+        private readonly InventoryEntry[] equipped = new InventoryEntry[EquipmentSlotCount];
+
+        private CompanionInventory companionInventory;
+        private SkillManager skillManager;
+
+        private GameObject uiRoot;
+        private GameObject tooltip;
+        private Text tooltipNameText;
+        private Text tooltipBonusText;
+
+        private Image[] slotBackgroundImages;
+        private Image[] slotItemImages;
+        private Text[] slotCountTexts;
+        private RectTransform[] slotRects;
+
+        private Text attackBonusText;
+        private Text meleeBonusText;
+        private Text rangeAccuracyBonusText;
+        private Text rangeStrengthBonusText;
+        private Text magicBonusText;
+        private Text meleeDefenceBonusText;
+        private Text rangedDefenceBonusText;
+        private Text magicDefenceBonusText;
+        private Text maxHitText;
+
+        private Vector2 scaledSlotSize;
+
+        private Sprite slotFrameSprite;
+        private Sprite ammoSlotSprite;
+        private Sprite bodySlotSprite;
+        private Sprite capeSlotSprite;
+        private Sprite feetSlotSprite;
+        private Sprite glovesSlotSprite;
+        private Sprite headSlotSprite;
+        private Sprite amuletSlotSprite;
+        private Sprite legsSlotSprite;
+        private Sprite ringSlotSprite;
+        private Sprite shieldSlotSprite;
+        private Sprite weaponSlotSprite;
+        private Sprite charmSlotSprite;
+        private Sprite emptySlotSprite;
+
+        private Color windowColor = new(0.15f, 0.15f, 0.15f, 0.95f);
+        private Color emptySlotColor = Color.black;
+        private Color ammoDefaultColor = Color.white;
+
+        private Vector2 slotSize = new(32f, 32f);
+        private Vector2 slotSpacing = new(4f, 4f);
+        private Vector2 referenceResolution = new(1024f, 768f);
+
+        private Font combatHeaderFont;
+        private Color combatHeaderColor = Color.white;
+        private Font attackFont;
+        private Color attackColor = Color.white;
+        private Font strengthFont;
+        private Color strengthColor = Color.white;
+        private Font rangeFont;
+        private Color rangeColor = Color.white;
+        private Font magicFont;
+        private Color magicColor = Color.white;
+        private Font defenceHeaderFont;
+        private Color defenceHeaderColor = Color.white;
+        private Font meleeDefFont;
+        private Color meleeDefColor = Color.white;
+        private Font rangeDefFont;
+        private Color rangeDefColor = Color.white;
+        private Font magicDefFont;
+        private Color magicDefColor = Color.white;
+        private Font maxHitHeaderFont;
+        private Color maxHitHeaderColor = Color.white;
+        private Font maxHitFont;
+        private Color maxHitColor = Color.white;
+        private Font tooltipNameFont;
+        private Color tooltipNameColor = Color.white;
+        private Font tooltipBonusFont;
+        private Color tooltipBonusColor = Color.white;
+
+        private bool registeredWithUiManager;
+        private bool initialised;
+        private bool isOpen;
+
+        private Transform floatingTextAnchor;
+
+        /// <summary>Raised whenever the window visibility toggles so menus and HUDs can refresh their labels.</summary>
+        public event Action<bool> VisibilityChanged;
+
+        /// <summary>
+        /// Raised whenever a slot changes so dependent systems (combat controllers, UI, etc.) can react to
+        /// equipment updates. The payload includes the affected slot alongside the latest entry stored in
+        /// <see cref="equipped"/> so listeners can query the new state immediately.
+        /// </summary>
+        public event Action<EquipmentSlot, InventoryEntry> EquipmentSlotChanged;
+
+        /// <summary>Exposes whether the window is currently visible.</summary>
+        public bool IsOpen => isOpen;
+
+        private void Awake()
+        {
+            floatingTextAnchor = transform;
+        }
+
+        private void Update()
+        {
+            if (!initialised)
+                return;
+
+            if (!registeredWithUiManager)
+                TryRegisterWithUiManager();
+        }
+
+        private void OnDestroy()
+        {
+            ForceClosed();
+
+            if (registeredWithUiManager)
+            {
+                var uiManager = UIManager.Instance;
+                if (uiManager != null)
+                    uiManager.UnregisterWindow(this);
+                registeredWithUiManager = false;
+            }
+
+            VisibilityChanged = null;
+            EquipmentSlotChanged = null;
+        }
+
+        /// <summary>
+        /// Configures the equipment system, cloning UI styling from the player window and loading persisted state.
+        /// </summary>
+        /// <param name="companionInventory">Inventory wrapper used for overflow when the player bag is full.</param>
+        /// <param name="skills">Skill manager used to validate equip requirements and compute bonus text.</param>
+        public void Initialise(CompanionInventory companionInventory, SkillManager skills)
+        {
+            this.companionInventory = companionInventory;
+            skillManager = skills;
+
+            if (initialised)
+            {
+                UpdateBonuses();
+                return;
+            }
+
+            CopyStylingFromPlayerEquipment();
+            BuildInterface();
+            Load();
+            UpdateBonuses();
+
+            if (uiRoot != null)
+                uiRoot.SetActive(false);
+
+            TryRegisterWithUiManager();
+            initialised = true;
+
+            if (CompanionManager.EnableDebugLogging)
+                Debug.Log("[Companion Equipment] Initialised equipment UI and loaded saved state.", this);
+        }
+
+        /// <summary>
+        /// Toggles the equipment window. Returns true when the window ends up open.
+        /// </summary>
+        public bool ToggleEquipment()
+        {
+            if (!initialised || uiRoot == null)
+                return false;
+
+            if (isOpen)
+            {
+                ForceClosed();
+                return false;
+            }
+
+            var uiManager = UIManager.Instance;
+            if (uiManager != null && !uiManager.TryOpenWindow(this))
+                return false;
+
+            InterfaceTabMutexUtility.CloseAllTabWindowsExcept(this);
+            uiRoot.SetActive(true);
+            isOpen = true;
+            VisibilityChanged?.Invoke(true);
+
+            if (CompanionManager.EnableDebugLogging)
+                Debug.Log("[Companion Equipment] Equipment window opened.", this);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Closes the equipment window without toggling state, raising <see cref="VisibilityChanged"/> when applicable.
+        /// </summary>
+        public void ForceClosed()
+        {
+            if (uiRoot != null)
+            {
+                uiRoot.SetActive(false);
+                HideTooltip();
+            }
+
+            if (!isOpen)
+                return;
+
+            isOpen = false;
+            VisibilityChanged?.Invoke(false);
+
+            if (CompanionManager.EnableDebugLogging)
+                Debug.Log("[Companion Equipment] Equipment window closed.", this);
+        }
+
+        /// <inheritdoc />
+        public void Close()
+        {
+            ForceClosed();
+        }
+
+        /// <summary>
+        /// Retrieves the entry equipped in the requested slot.
+        /// </summary>
+        public InventoryEntry GetEquipped(EquipmentSlot slot)
+        {
+            int index = SlotIndex(slot);
+            if (index < 0 || index >= equipped.Length)
+                return default;
+            return equipped[index];
+        }
+
+        /// <summary>
+        /// Consumes the specified amount from an equipped stack. Returns false when insufficient ammo is available.
+        /// </summary>
+        /// <param name="slot">Equipment slot to consume.</param>
+        /// <param name="amount">Number of items to remove.</param>
+        /// <param name="remaining">Outputs the stack size after consumption.</param>
+        public bool ConsumeEquipped(EquipmentSlot slot, int amount, out int remaining)
+        {
+            remaining = 0;
+            int index = SlotIndex(slot);
+            if (amount <= 0 || index < 0 || index >= equipped.Length)
+                return false;
+
+            var entry = equipped[index];
+            if (entry.item == null || entry.count < amount)
+                return false;
+
+            entry.count -= amount;
+            if (entry.count <= 0)
+            {
+                entry.item = null;
+                entry.count = 0;
+            }
+
+            equipped[index] = entry;
+            UpdateBonuses();
+            Save();
+            UpdateSlotVisual(slot);
+            EquipmentSlotChanged?.Invoke(slot, entry);
+            remaining = entry.count;
+            return true;
+        }
+
+        /// <summary>
+        /// Overrides the ammo slot label so ranged systems can surface LOW/OUT warnings.
+        /// Passing <c>null</c> reverts to the default behaviour that displays the equipped stack size.
+        /// </summary>
+        public void OverrideAmmoLabel(string message, Color? color = null)
+        {
+            int index = SlotIndex(EquipmentSlot.Arrow);
+            if (slotCountTexts == null || index < 0 || index >= slotCountTexts.Length)
+                return;
+
+            var label = slotCountTexts[index];
+            if (label == null)
+                return;
+
+            if (message == null)
+            {
+                var entry = GetEquipped(EquipmentSlot.Arrow);
+                if (entry.item != null && entry.item.stackable && entry.count > 1)
+                    label.text = entry.count.ToString();
+                else
+                    label.text = string.Empty;
+                label.color = ammoDefaultColor;
+                return;
+            }
+
+            label.text = message;
+            label.color = color ?? ammoDefaultColor;
+        }
+
+        /// <summary>
+        /// Routes reclaimed ammo into the companion inventory when possible, falling back to ground spawns.
+        /// </summary>
+        /// <returns>True when the ammo was stored or spawned successfully.</returns>
+        public bool TryStoreRecoveredAmmo(
+            ItemData item,
+            int amount,
+            CompanionInventory companionInventory,
+            GroundItemSpawner itemSpawner,
+            Vector3 spawnPosition,
+            bool spawnAsGroundItem)
+        {
+            if (item == null || amount <= 0)
+                return false;
+
+            var bag = companionInventory != null ? companionInventory.InventoryComponent : null;
+            if (bag != null && bag.AddItem(item, amount))
+                return true;
+
+            if (spawnAsGroundItem && itemSpawner != null)
+            {
+                itemSpawner.Spawn(item, amount, spawnPosition);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Attempts to equip the provided entry using the player inventory as the primary overflow destination.
+        /// </summary>
+        /// <param name="entry">Inventory entry removed from the player bag.</param>
+        /// <param name="playerInventory">Player inventory that supplied the item.</param>
+        /// <returns>
+        /// Result describing whether the equip succeeded, failed for a handled reason, or should fall back to the
+        /// default player equipment flow.
+        /// </returns>
+        public CompanionEquipAttemptResult TryEquipFromPlayerInventory(InventoryEntry entry, RuntimeInventory playerInventory)
+        {
+            if (!initialised || entry.item == null)
+                return CompanionEquipAttemptResult.NotHandled;
+
+            if (!IsOpen)
+                return CompanionEquipAttemptResult.NotHandled;
+
+            var item = entry.item;
+            var slot = item.equipmentSlot;
+            if (slot == EquipmentSlot.None)
+                return CompanionEquipAttemptResult.NotHandled;
+
+            if (!ValidateSkillRequirements(item, playerInventory, entry))
+                return CompanionEquipAttemptResult.RequirementsNotMet;
+
+            int index = SlotIndex(slot);
+            if (index < 0 || index >= equipped.Length)
+            {
+                RestoreEntryToInventory(playerInventory, entry);
+                return CompanionEquipAttemptResult.InvalidSlot;
+            }
+
+            if (!HandleMutuallyExclusiveSlots(slot, playerInventory, entry))
+            {
+                RestoreEntryToInventory(playerInventory, entry);
+                return CompanionEquipAttemptResult.InventoryFull;
+            }
+
+            var current = equipped[index];
+            if (current.item != null && current.item == item && item.stackable)
+            {
+                if (!MergeStackableEquip(entry, playerInventory, slot, index, out var mergeFailure))
+                {
+                    RestoreEntryToInventory(playerInventory, entry);
+                    return mergeFailure;
+                }
+
+                return CompanionEquipAttemptResult.Equipped;
+            }
+
+            if (current.item != null)
+            {
+                if (!TryReturnEntry(current, playerInventory, out _))
+                {
+                    ShowInventoryFullFloatingText();
+                    RestoreEntryToInventory(playerInventory, entry);
+                    return CompanionEquipAttemptResult.InventoryFull;
+                }
+
+                ItemUseResolver.NotifyItemUsed(gameObject, current.item, ItemUseType.Unequipped);
+            }
+
+            equipped[index] = entry;
+            UpdateSlotVisual(slot);
+            UpdateBonuses();
+            Save();
+            ItemUseResolver.NotifyItemUsed(gameObject, item, ItemUseType.Equipped);
+            RaiseEquipmentSlotChanged(slot);
+
+            if (CompanionManager.EnableDebugLogging)
+            {
+                Debug.Log($"[Companion Equipment] Equipped {item.itemName} into {slot}.", this);
+            }
+
+            return CompanionEquipAttemptResult.Equipped;
+        }
+
+        /// <summary>
+        /// Attempts to equip an entry that originated from the companion's own inventory.
+        /// </summary>
+        /// <param name="entry">Inventory entry removed from the companion bag.</param>
+        /// <param name="companionBag">Companion inventory used when returning items on failure.</param>
+        /// <returns>Result describing whether the equip succeeded or why it failed.</returns>
+        public CompanionEquipAttemptResult TryEquipFromCompanionInventory(InventoryEntry entry, RuntimeInventory companionBag)
+        {
+            if (!initialised || entry.item == null)
+                return CompanionEquipAttemptResult.NotHandled;
+
+            var item = entry.item;
+            var slot = item.equipmentSlot;
+            if (slot == EquipmentSlot.None)
+                return CompanionEquipAttemptResult.NotHandled;
+
+            if (!ValidateSkillRequirements(item, companionBag, entry))
+                return CompanionEquipAttemptResult.RequirementsNotMet;
+
+            int index = SlotIndex(slot);
+            if (index < 0 || index >= equipped.Length)
+            {
+                RestoreEntryToInventory(companionBag, entry);
+                return CompanionEquipAttemptResult.InvalidSlot;
+            }
+
+            if (!HandleMutuallyExclusiveSlots(slot, companionBag, entry))
+            {
+                RestoreEntryToInventory(companionBag, entry);
+                return CompanionEquipAttemptResult.InventoryFull;
+            }
+
+            var current = equipped[index];
+            if (current.item != null && current.item == item && item.stackable)
+            {
+                if (!MergeStackableEquip(entry, companionBag, slot, index, out var mergeFailure))
+                {
+                    RestoreEntryToInventory(companionBag, entry);
+                    return mergeFailure;
+                }
+
+                return CompanionEquipAttemptResult.Equipped;
+            }
+
+            if (current.item != null)
+            {
+                if (!TryReturnEntry(current, companionBag, out _))
+                {
+                    ShowInventoryFullFloatingText();
+                    RestoreEntryToInventory(companionBag, entry);
+                    return CompanionEquipAttemptResult.InventoryFull;
+                }
+
+                ItemUseResolver.NotifyItemUsed(gameObject, current.item, ItemUseType.Unequipped);
+            }
+
+            equipped[index] = entry;
+            UpdateSlotVisual(slot);
+            UpdateBonuses();
+            Save();
+            ItemUseResolver.NotifyItemUsed(gameObject, item, ItemUseType.Equipped);
+            RaiseEquipmentSlotChanged(slot);
+
+            if (CompanionManager.EnableDebugLogging)
+            {
+                Debug.Log($"[Companion Equipment] Equipped {item.itemName} into {slot} from companion inventory.", this);
+            }
+
+            return CompanionEquipAttemptResult.Equipped;
+        }
+
+        /// <summary>
+        /// Unequips the requested slot into the provided inventory, falling back to the companion bag when needed.
+        /// </summary>
+        public void UnequipToInventory(EquipmentSlot slot, RuntimeInventory destinationInventory)
+        {
+            int index = SlotIndex(slot);
+            if (index < 0 || index >= equipped.Length)
+                return;
+
+            var entry = equipped[index];
+            if (entry.item == null)
+                return;
+
+            if (!TryReturnEntry(entry, destinationInventory, out _))
+            {
+                ShowInventoryFullFloatingText();
+                return;
+            }
+
+            equipped[index] = default;
+            UpdateSlotVisual(slot);
+            UpdateBonuses();
+            Save();
+            ItemUseResolver.NotifyItemUsed(gameObject, entry.item, ItemUseType.Unequipped);
+            RaiseEquipmentSlotChanged(slot);
+
+            if (CompanionManager.EnableDebugLogging)
+            {
+                Debug.Log($"[Companion Equipment] Unequipped {entry.item.itemName} from {slot}.", this);
+            }
+        }
+
+        /// <summary>
+        /// Displays the tooltip for the specified slot when the pointer hovers over it.
+        /// </summary>
+        private void ShowTooltip(EquipmentSlot slot, RectTransform slotRect)
+        {
+            var entry = GetEquipped(slot);
+            var item = entry.item;
+            if (item == null || tooltip == null || tooltipNameText == null || tooltipBonusText == null)
+            {
+                HideTooltip();
+                return;
+            }
+
+            string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
+            tooltipNameText.text = name;
+            var sb = new StringBuilder();
+
+            void AppendBonus(float value, string label)
+            {
+                if (Mathf.Abs(value) > Mathf.Epsilon)
+                {
+                    if (sb.Length > 0)
+                        sb.AppendLine();
+                    sb.Append($"+{value * 100f:0.##}% {label}");
+                }
+            }
+
+            AppendBonus(item.bycatchChanceBonus, "Bycatch Chance");
+            AppendBonus(item.fishingXpBonusMultiplier, "Fishing XP");
+            AppendBonus(item.woodcuttingXpBonusMultiplier, "Woodcutting XP");
+            AppendBonus(item.miningXpBonusMultiplier, "Mining XP");
+            AppendBonus(item.cookingXpBonusMultiplier, "Cooking XP");
+            AppendBonus(item.firemakingXpBonusMultiplier, "Firemaking XP");
+
+            var tooltipLines = item.EquipmentTooltipLines;
+            if (tooltipLines != null && tooltipLines.Count > 0)
+            {
+                for (int i = 0; i < tooltipLines.Count; i++)
+                {
+                    string line = tooltipLines[i];
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+
+                    if (sb.Length > 0)
+                        sb.AppendLine();
+
+                    sb.Append(line.Trim());
+                }
+            }
+
+            tooltipBonusText.text = sb.ToString();
+
+            var tooltipRect = tooltip.GetComponent<RectTransform>();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
+
+            float tooltipOffsetX = scaledSlotSize.x > 0f ? scaledSlotSize.x : slotSize.x;
+            Vector3 pos = slotRect.position + new Vector3(tooltipOffsetX, 0f, 0f);
+            Vector3[] corners = new Vector3[4];
+            tooltipRect.GetWorldCorners(corners);
+            float width = corners[2].x - corners[0].x;
+            float height = corners[2].y - corners[0].y;
+            pos.x = Mathf.Min(pos.x, Screen.width - width);
+            pos.y = Mathf.Max(pos.y, height);
+            tooltipRect.position = pos;
+
+            tooltip.SetActive(true);
+        }
+
+        /// <summary>
+        /// Hides the tooltip when the pointer exits a slot or the window closes.
+        /// </summary>
+        private void HideTooltip()
+        {
+            if (tooltip != null)
+                tooltip.SetActive(false);
+        }
+
+        private void CopyStylingFromPlayerEquipment()
+        {
+            Font fallbackFont = LegacyFontProvider.GetLegacyFont();
+            ApplyDefaultTextStyling(fallbackFont);
+
+            var playerEquipment = FindObjectOfType<global::Inventory.Equipment>();
+            if (playerEquipment == null)
+            {
+                emptySlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Empty_Slot");
+                charmSlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Charm_Slot");
+                ammoSlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Ammo_Slot");
+                bodySlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Body_Slot");
+                capeSlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Cape_Slot");
+                feetSlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Feet_Slot");
+                glovesSlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Gloves_Slot");
+                headSlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Head_Slot");
+                amuletSlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Amulet_Slot");
+                legsSlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Legs_Slot");
+                ringSlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Ring_Slot");
+                shieldSlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Shield_Slot");
+                weaponSlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Weapon_Slot");
+                return;
+            }
+
+            slotSize = playerEquipment.slotSize;
+            slotSpacing = playerEquipment.slotSpacing;
+            referenceResolution = playerEquipment.referenceResolution;
+            slotFrameSprite = playerEquipment.slotFrameSprite;
+            emptySlotColor = playerEquipment.emptySlotColor;
+            windowColor = playerEquipment.windowColor;
+            ammoSlotSprite = playerEquipment.ammoSlotSprite;
+            bodySlotSprite = playerEquipment.bodySlotSprite;
+            capeSlotSprite = playerEquipment.capeSlotSprite;
+            feetSlotSprite = playerEquipment.feetSlotSprite;
+            glovesSlotSprite = playerEquipment.glovesSlotSprite;
+            headSlotSprite = playerEquipment.headSlotSprite;
+            amuletSlotSprite = playerEquipment.amuletSlotSprite;
+            legsSlotSprite = playerEquipment.legsSlotSprite;
+            ringSlotSprite = playerEquipment.ringSlotSprite;
+            shieldSlotSprite = playerEquipment.shieldSlotSprite;
+            weaponSlotSprite = playerEquipment.weaponSlotSprite;
+            charmSlotSprite = playerEquipment.charmSlotSprite;
+
+            combatHeaderFont = playerEquipment.combatHeaderFont != null ? playerEquipment.combatHeaderFont : fallbackFont;
+            combatHeaderColor = playerEquipment.combatHeaderColor;
+            attackFont = playerEquipment.attackFont != null ? playerEquipment.attackFont : fallbackFont;
+            attackColor = playerEquipment.attackColor;
+            strengthFont = playerEquipment.strengthFont != null ? playerEquipment.strengthFont : fallbackFont;
+            strengthColor = playerEquipment.strengthColor;
+            rangeFont = playerEquipment.rangeFont != null ? playerEquipment.rangeFont : fallbackFont;
+            rangeColor = playerEquipment.rangeColor;
+            magicFont = playerEquipment.magicFont != null ? playerEquipment.magicFont : fallbackFont;
+            magicColor = playerEquipment.magicColor;
+            defenceHeaderFont = playerEquipment.defenceHeaderFont != null ? playerEquipment.defenceHeaderFont : fallbackFont;
+            defenceHeaderColor = playerEquipment.defenceHeaderColor;
+            meleeDefFont = playerEquipment.meleeDefFont != null ? playerEquipment.meleeDefFont : fallbackFont;
+            meleeDefColor = playerEquipment.meleeDefColor;
+            rangeDefFont = playerEquipment.rangeDefFont != null ? playerEquipment.rangeDefFont : fallbackFont;
+            rangeDefColor = playerEquipment.rangeDefColor;
+            magicDefFont = playerEquipment.magicDefFont != null ? playerEquipment.magicDefFont : fallbackFont;
+            magicDefColor = playerEquipment.magicDefColor;
+            maxHitHeaderFont = playerEquipment.maxHitHeaderFont != null ? playerEquipment.maxHitHeaderFont : fallbackFont;
+            maxHitHeaderColor = playerEquipment.maxHitHeaderColor;
+            maxHitFont = playerEquipment.maxHitFont != null ? playerEquipment.maxHitFont : fallbackFont;
+            maxHitColor = playerEquipment.maxHitColor;
+            tooltipNameFont = playerEquipment.tooltipNameFont != null ? playerEquipment.tooltipNameFont : fallbackFont;
+            tooltipNameColor = playerEquipment.tooltipNameColor;
+            tooltipBonusFont = playerEquipment.tooltipBonusFont != null ? playerEquipment.tooltipBonusFont : fallbackFont;
+            tooltipBonusColor = playerEquipment.tooltipBonusColor;
+
+            emptySlotSprite = Resources.Load<Sprite>("Interfaces/Equipment/Empty_Slot");
+        }
+
+        /// <summary>
+        /// Resets the cached text styling to the Legacy font and OSRS white palette so the companion window
+        /// renders correctly even when the player equipment component is unavailable.
+        /// </summary>
+        /// <param name="fallbackFont">Font fetched from <see cref="LegacyFontProvider"/> used as the baseline style.</param>
+        private void ApplyDefaultTextStyling(Font fallbackFont)
+        {
+            combatHeaderFont = fallbackFont;
+            combatHeaderColor = Color.white;
+            attackFont = fallbackFont;
+            attackColor = Color.white;
+            strengthFont = fallbackFont;
+            strengthColor = Color.white;
+            rangeFont = fallbackFont;
+            rangeColor = Color.white;
+            magicFont = fallbackFont;
+            magicColor = Color.white;
+            defenceHeaderFont = fallbackFont;
+            defenceHeaderColor = Color.white;
+            meleeDefFont = fallbackFont;
+            meleeDefColor = Color.white;
+            rangeDefFont = fallbackFont;
+            rangeDefColor = Color.white;
+            magicDefFont = fallbackFont;
+            magicDefColor = Color.white;
+            maxHitHeaderFont = fallbackFont;
+            maxHitHeaderColor = Color.white;
+            maxHitFont = fallbackFont;
+            maxHitColor = Color.white;
+            tooltipNameFont = fallbackFont;
+            tooltipNameColor = Color.white;
+            tooltipBonusFont = fallbackFont;
+            tooltipBonusColor = Color.white;
+        }
+
+        private void BuildInterface()
+        {
+            int uiLayer = LayerMask.NameToLayer("UI");
+            var overlay = OverlayCanvasFactory.CreateOverlayCanvas(
+                "CompanionEquipmentUI",
+                referenceResolution,
+                dontDestroyOnLoad: true,
+                matchWidthOrHeight: 0f,
+                explicitLayer: uiLayer >= 0 ? uiLayer : (int?)null,
+                assignToUiLayer: uiLayer < 0);
+
+            uiRoot = overlay.Root;
+
+            GameObject window = new("Window", typeof(RectTransform), typeof(Image));
+            window.transform.SetParent(uiRoot.transform, false);
+
+            var windowRect = window.GetComponent<RectTransform>();
+            windowRect.anchorMin = new Vector2(0.5f, 0.5f);
+            windowRect.anchorMax = new Vector2(0.5f, 0.5f);
+            windowRect.pivot = new Vector2(0.5f, 0.5f);
+            windowRect.anchoredPosition = Vector2.zero;
+
+            Vector2 scaledSlotSpacing = slotSpacing * UiScale;
+            scaledSlotSize = slotSize * UiScale;
+            var contentSize = new Vector2(scaledSlotSize.x * 3f + scaledSlotSpacing.x * 2f,
+                scaledSlotSize.y * 5f + scaledSlotSpacing.y * 4f);
+            float scaledBonusWidth = 120f * UiScale;
+            Vector2 scaledWindowPadding = new(16f * UiScale, 16f * UiScale);
+            float scaledPanelOffset = 8f * UiScale;
+            windowRect.sizeDelta = new Vector2(contentSize.x + scaledBonusWidth, contentSize.y) + scaledWindowPadding;
+
+            var windowImg = window.GetComponent<Image>();
+            windowImg.color = windowColor;
+
+            BuildCloseButton(window.transform);
+
+            GameObject panel = new("Slots", typeof(RectTransform), typeof(GridLayoutGroup));
+            panel.transform.SetParent(window.transform, false);
+
+            var rect = panel.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0f, 0.5f);
+            rect.anchorMax = new Vector2(0f, 0.5f);
+            rect.pivot = new Vector2(0f, 0.5f);
+            rect.anchoredPosition = new Vector2(scaledPanelOffset, 0f);
+            rect.sizeDelta = contentSize;
+
+            var grid = panel.GetComponent<GridLayoutGroup>();
+            grid.cellSize = scaledSlotSize;
+            grid.spacing = scaledSlotSpacing;
+            grid.childAlignment = TextAnchor.UpperLeft;
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = 3;
+
+            slotBackgroundImages = new Image[equipped.Length];
+            slotItemImages = new Image[equipped.Length];
+            slotCountTexts = new Text[equipped.Length];
+            slotRects = new RectTransform[equipped.Length];
+
+            Font defaultFont = LegacyFontProvider.GetLegacyFont();
+            float scaledLineHeight = 14f * UiScale;
+            int scaledFontSize = Mathf.RoundToInt(scaledLineHeight);
+
+            for (int i = 0; i < 15; i++)
+            {
+                GameObject cell = new($"Cell{i}", typeof(RectTransform));
+                cell.transform.SetParent(panel.transform, false);
+
+                if (CellToSlot.TryGetValue(i, out var slot))
+                {
+                    var img = cell.AddComponent<Image>();
+                    img.sprite = GetSlotSprite(slot);
+                    if (img.sprite == slotFrameSprite && slotFrameSprite != null)
+                        img.type = Image.Type.Sliced;
+                    img.color = emptySlotColor;
+
+                    GameObject itemGO = new("Item", typeof(Image));
+                    itemGO.transform.SetParent(cell.transform, false);
+                    var itemImg = itemGO.GetComponent<Image>();
+                    itemImg.raycastTarget = false;
+                    var itemRect = itemGO.GetComponent<RectTransform>();
+                    itemRect.anchorMin = Vector2.zero;
+                    itemRect.anchorMax = Vector2.one;
+                    itemRect.offsetMin = Vector2.zero;
+                    itemRect.offsetMax = Vector2.zero;
+                    itemImg.color = Color.clear;
+
+                    GameObject countGO = new("Count", typeof(Text));
+                    countGO.transform.SetParent(cell.transform, false);
+                    var countText = countGO.GetComponent<Text>();
+                    if (defaultFont != null)
+                        countText.font = defaultFont;
+                    countText.fontSize = scaledFontSize;
+                    countText.alignment = TextAnchor.LowerRight;
+                    countText.raycastTarget = false;
+                    countText.color = Color.white;
+                    countText.text = string.Empty;
+                    if (slot == EquipmentSlot.Arrow)
+                        ammoDefaultColor = countText.color;
+                    var countRect = countGO.GetComponent<RectTransform>();
+                    countRect.anchorMin = Vector2.zero;
+                    countRect.anchorMax = Vector2.one;
+                    countRect.offsetMin = Vector2.zero;
+                    countRect.offsetMax = Vector2.zero;
+
+                    slotBackgroundImages[SlotIndex(slot)] = img;
+                    slotItemImages[SlotIndex(slot)] = itemImg;
+                    slotCountTexts[SlotIndex(slot)] = countText;
+                    slotRects[SlotIndex(slot)] = cell.GetComponent<RectTransform>();
+
+                    RegisterSlotEvents(cell, slot, slotRects[SlotIndex(slot)]);
+                }
+                else
+                {
+                    var placeholder = cell.AddComponent<Image>();
+                    placeholder.color = Color.clear;
+                }
+            }
+
+            GameObject bonusPanel = new("Bonuses", typeof(RectTransform));
+            bonusPanel.transform.SetParent(window.transform, false);
+            var bonusRect = bonusPanel.GetComponent<RectTransform>();
+            bonusRect.anchorMin = new Vector2(1f, 0.5f);
+            bonusRect.anchorMax = new Vector2(1f, 0.5f);
+            bonusRect.pivot = new Vector2(1f, 0.5f);
+            bonusRect.anchoredPosition = new Vector2(-scaledPanelOffset, 0f);
+            bonusRect.sizeDelta = new Vector2(scaledBonusWidth, contentSize.y);
+
+            Text CreateText(Transform parent, string name, string txt, float y, Font font, Color color)
+            {
+                GameObject go = new(name, typeof(Text));
+                go.transform.SetParent(parent, false);
+                var t = go.GetComponent<Text>();
+                t.font = font != null ? font : defaultFont;
+                t.fontSize = scaledFontSize;
+                t.alignment = TextAnchor.UpperCenter;
+                t.raycastTarget = false;
+                t.color = color;
+                t.text = txt;
+                var rt = t.GetComponent<RectTransform>();
+                rt.anchorMin = new Vector2(0f, 1f);
+                rt.anchorMax = new Vector2(0f, 1f);
+                rt.pivot = new Vector2(0f, 1f);
+                rt.anchoredPosition = new Vector2(0f, y);
+                rt.sizeDelta = new Vector2(scaledBonusWidth, scaledLineHeight);
+                return t;
+            }
+
+            float line = 0f;
+            CreateText(bonusPanel.transform, "CombatHeader", "Combat:", line, combatHeaderFont, combatHeaderColor);
+            attackBonusText = CreateText(bonusPanel.transform, "Attack", "Attack = 0", line -= scaledLineHeight, attackFont, attackColor);
+            rangeAccuracyBonusText = CreateText(bonusPanel.transform, "RangeAccuracy", "Ranged = 0", line -= scaledLineHeight, rangeFont, rangeColor);
+            magicBonusText = CreateText(bonusPanel.transform, "Magic", "Magic = 0", line -= scaledLineHeight, magicFont, magicColor);
+            CreateText(bonusPanel.transform, "DefenceHeader", "Defence:", line -= scaledLineHeight, defenceHeaderFont, defenceHeaderColor);
+            meleeDefenceBonusText = CreateText(bonusPanel.transform, "MeleeDef", "Melee = 0", line -= scaledLineHeight, meleeDefFont, meleeDefColor);
+            rangedDefenceBonusText = CreateText(bonusPanel.transform, "RangeDef", "Range = 0", line -= scaledLineHeight, rangeDefFont, rangeDefColor);
+            magicDefenceBonusText = CreateText(bonusPanel.transform, "MagicDef", "Magic = 0", line -= scaledLineHeight, magicDefFont, magicDefColor);
+            CreateText(bonusPanel.transform, "BonusesHeader", "Bonuses:", line -= scaledLineHeight * 2f, combatHeaderFont, combatHeaderColor);
+            meleeBonusText = CreateText(bonusPanel.transform, "Melee", "Melee = 0", line -= scaledLineHeight, strengthFont, strengthColor);
+            rangeStrengthBonusText = CreateText(bonusPanel.transform, "RangeStrength", "Ranged = 0", line -= scaledLineHeight, rangeFont, rangeColor);
+            CreateText(bonusPanel.transform, "MaxHitHeader", "Max Hit:", line -= scaledLineHeight * 2f, maxHitHeaderFont, maxHitHeaderColor);
+            maxHitText = CreateText(bonusPanel.transform, "MaxHit", "Total = 0", line -= scaledLineHeight, maxHitFont, maxHitColor);
+
+            tooltip = new GameObject("Tooltip", typeof(Image), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
+            tooltip.transform.SetParent(uiRoot.transform, false);
+
+            var tooltipCanvas = tooltip.AddComponent<Canvas>();
+            tooltipCanvas.overrideSorting = true;
+            tooltipCanvas.sortingOrder = 1000;
+            tooltip.AddComponent<GraphicRaycaster>();
+
+            var bg = tooltip.GetComponent<Image>();
+            bg.color = new Color(0f, 0f, 0f, 0.75f);
+            bg.raycastTarget = false;
+
+            var layout = tooltip.GetComponent<VerticalLayoutGroup>();
+            layout.childAlignment = TextAnchor.UpperLeft;
+            layout.childControlWidth = false;
+            layout.childControlHeight = true;
+            layout.childForceExpandWidth = false;
+            layout.childForceExpandHeight = false;
+            int tooltipPadding = Mathf.RoundToInt(4f * UiScale);
+            layout.padding = new RectOffset(tooltipPadding, tooltipPadding, tooltipPadding, tooltipPadding);
+            layout.spacing = 2f * UiScale;
+
+            var fitter = tooltip.GetComponent<ContentSizeFitter>();
+            fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            var nameGO = new GameObject("Name", typeof(Text));
+            nameGO.transform.SetParent(tooltip.transform, false);
+            tooltipNameText = nameGO.GetComponent<Text>();
+            tooltipNameText.font = tooltipNameFont != null ? tooltipNameFont : defaultFont;
+            tooltipNameText.fontSize = scaledFontSize;
+            tooltipNameText.alignment = TextAnchor.UpperLeft;
+            tooltipNameText.color = tooltipNameColor;
+            tooltipNameText.raycastTarget = false;
+            tooltipNameText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            tooltipNameText.verticalOverflow = VerticalWrapMode.Overflow;
+
+            var bonusGO = new GameObject("Bonus", typeof(Text));
+            bonusGO.transform.SetParent(tooltip.transform, false);
+            tooltipBonusText = bonusGO.GetComponent<Text>();
+            tooltipBonusText.font = tooltipBonusFont != null ? tooltipBonusFont : defaultFont;
+            tooltipBonusText.fontSize = scaledFontSize;
+            tooltipBonusText.alignment = TextAnchor.UpperLeft;
+            tooltipBonusText.color = tooltipBonusColor;
+            tooltipBonusText.raycastTarget = false;
+            tooltipBonusText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            tooltipBonusText.verticalOverflow = VerticalWrapMode.Overflow;
+
+            tooltip.SetActive(false);
+        }
+
+        /// <summary>
+        /// Adds an OSRS-style close button to the equipment window so players can dismiss it without
+        /// relying on context menus.
+        /// </summary>
+        /// <param name="windowTransform">Transform that should host the close button.</param>
+        private void BuildCloseButton(Transform windowTransform)
+        {
+            if (windowTransform == null)
+                return;
+
+            var options = new CloseButtonBuilder.Options
+            {
+                Size = new Vector2(16f * UiScale, 16f * UiScale),
+                AnchoredPosition = new Vector2(-4f * UiScale, -4f * UiScale)
+            };
+
+            CloseButtonBuilder.Build(windowTransform, HandleCloseButtonClicked, options);
+        }
+
+        /// <summary>
+        /// Handles close button clicks by hiding the equipment window and broadcasting the visibility change.
+        /// </summary>
+        private void HandleCloseButtonClicked()
+        {
+            ForceClosed();
+        }
+
+        private void RegisterSlotEvents(GameObject cell, EquipmentSlot slot, RectTransform rect)
+        {
+            var trigger = cell.AddComponent<EventTrigger>();
+            trigger.triggers ??= new List<EventTrigger.Entry>();
+
+            void AddEntry(EventTriggerType type, Action<BaseEventData> callback)
+            {
+                var entry = new EventTrigger.Entry { eventID = type };
+                entry.callback.AddListener(evt => callback(evt));
+                trigger.triggers.Add(entry);
+            }
+
+            AddEntry(EventTriggerType.PointerEnter, data =>
+            {
+                ShowTooltip(slot, rect);
+            });
+
+            AddEntry(EventTriggerType.PointerExit, data =>
+            {
+                HideTooltip();
+            });
+
+            AddEntry(EventTriggerType.PointerClick, data =>
+            {
+                if (data is PointerEventData pointer && pointer.button == PointerEventData.InputButton.Left)
+                {
+                    UnequipToInventory(slot, companionInventory != null ? companionInventory.InventoryComponent : null);
+                    HideTooltip();
+                }
+            });
+        }
+
+        private bool ValidateSkillRequirements(ItemData item, RuntimeInventory playerInventory, InventoryEntry entry)
+        {
+            if (item.skillRequirements == null || item.skillRequirements.Length == 0)
+                return true;
+
+            if (skillManager == null)
+                return true;
+
+            List<SkillRequirement> unmet = null;
+            for (int i = 0; i < item.skillRequirements.Length; i++)
+            {
+                var requirement = item.skillRequirements[i];
+                int level = skillManager.GetLevel(requirement.skill);
+                if (level < requirement.level)
+                {
+                    unmet ??= new List<SkillRequirement>();
+                    unmet.Add(requirement);
+                }
+            }
+
+            if (unmet == null || unmet.Count == 0)
+                return true;
+
+            RestoreEntryToInventory(playerInventory, entry);
+
+            var chat = ChatService.Instance;
+            string companionName = CompanionManager.GetCompanionDisplayName();
+            if (chat != null)
+            {
+                string message = unmet.Count == 1
+                    ? CompanionChatLibrary.GetRandomCompanionEquipmentSingleRequirementFailureLine()
+                    : CompanionChatLibrary.GetRandomCompanionEquipmentMultipleRequirementFailureLine();
+                chat.PublishCompanionMessage(companionName, message);
+            }
+
+            ShowRequirementFailureFloatingText(companionName, unmet);
+
+            if (CompanionManager.EnableDebugLogging)
+            {
+                Debug.LogWarning($"[Companion Equipment] Failed to equip {item.itemName} because skill requirements were unmet.", this);
+            }
+
+            return false;
+        }
+
+        private void ShowRequirementFailureFloatingText(string companionName, List<SkillRequirement> unmetRequirements)
+        {
+            if (unmetRequirements == null || unmetRequirements.Count == 0)
+                return;
+
+            var anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
+            var primaryRequirement = unmetRequirements[0];
+            string message = unmetRequirements.Count == 1
+                ? CompanionChatLibrary.GetRandomCompanionEquipmentSingleRequirementFloatingTextLine(
+                    companionName,
+                    primaryRequirement)
+                : CompanionChatLibrary.GetRandomCompanionEquipmentMultipleRequirementFloatingTextLine(companionName);
+            FloatingText.Show(message, anchor.position);
+        }
+
+        private bool HandleMutuallyExclusiveSlots(EquipmentSlot slot, RuntimeInventory playerInventory, InventoryEntry incoming)
+        {
+            if (slot == EquipmentSlot.Weapon && incoming.item != null && incoming.item.isTwoHanded)
+            {
+                int index = SlotIndex(EquipmentSlot.Shield);
+                if (index >= 0 && index < equipped.Length)
+                {
+                    var shieldEntry = equipped[index];
+                    if (shieldEntry.item != null)
+                    {
+                        if (!TryReturnEntry(shieldEntry, playerInventory, out _))
+                        {
+                            ShowInventoryFullFloatingText();
+                            return false;
+                        }
+
+                        equipped[index] = default;
+                        UpdateSlotVisual(EquipmentSlot.Shield);
+                        ItemUseResolver.NotifyItemUsed(gameObject, shieldEntry.item, ItemUseType.Unequipped);
+                    }
+                }
+            }
+            else if (slot == EquipmentSlot.Shield)
+            {
+                int index = SlotIndex(EquipmentSlot.Weapon);
+                if (index >= 0 && index < equipped.Length)
+                {
+                    var weaponEntry = equipped[index];
+                    if (weaponEntry.item != null && weaponEntry.item.isTwoHanded)
+                    {
+                        if (!TryReturnEntry(weaponEntry, playerInventory, out _))
+                        {
+                            ShowInventoryFullFloatingText();
+                            return false;
+                        }
+
+                        equipped[index] = default;
+                        UpdateSlotVisual(EquipmentSlot.Weapon);
+                        ItemUseResolver.NotifyItemUsed(gameObject, weaponEntry.item, ItemUseType.Unequipped);
+                        RaiseEquipmentSlotChanged(EquipmentSlot.Weapon);
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private bool MergeStackableEquip(InventoryEntry entry, RuntimeInventory playerInventory, EquipmentSlot slot, int index, out CompanionEquipAttemptResult failureResult)
+        {
+            failureResult = CompanionEquipAttemptResult.InventoryFull;
+            var current = equipped[index];
+            int maxStack = current.item.MaxStack;
+            int availableSpace = Mathf.Max(0, maxStack - current.count);
+            if (availableSpace <= 0)
+            {
+                ShowStackLimitFloatingText(entry.item);
+                failureResult = CompanionEquipAttemptResult.StackLimitReached;
+                return false;
+            }
+
+            int transferAmount = Mathf.Min(entry.count, availableSpace);
+            if (transferAmount <= 0)
+            {
+                ShowStackLimitFloatingText(entry.item);
+                failureResult = CompanionEquipAttemptResult.StackLimitReached;
+                return false;
+            }
+
+            int overflow = entry.count - transferAmount;
+            if (overflow > 0)
+            {
+                var overflowEntry = new InventoryEntry { item = entry.item, count = overflow };
+                if (!TryReturnEntry(overflowEntry, playerInventory, out _))
+                {
+                    ShowInventoryFullFloatingText();
+                    failureResult = CompanionEquipAttemptResult.InventoryFull;
+                    return false;
+                }
+            }
+
+            current.count += transferAmount;
+            equipped[index] = current;
+            UpdateSlotVisual(slot);
+            UpdateBonuses();
+            Save();
+            ItemUseResolver.NotifyItemUsed(gameObject, entry.item, ItemUseType.Equipped);
+            RaiseEquipmentSlotChanged(slot);
+            failureResult = CompanionEquipAttemptResult.Equipped;
+            return true;
+        }
+
+        /// <summary>
+        /// Broadcasts equipment changes so dependent systems can respond immediately (e.g., cancelling
+        /// combat when a weapon is removed mid-fight).
+        /// </summary>
+        /// <param name="slot">Slot whose state changed.</param>
+        private void RaiseEquipmentSlotChanged(EquipmentSlot slot)
+        {
+            if (slot != EquipmentSlot.Weapon)
+                return;
+
+            int index = SlotIndex(slot);
+            InventoryEntry entry = default;
+            if (index >= 0 && index < equipped.Length)
+                entry = equipped[index];
+
+            EquipmentSlotChanged?.Invoke(slot, entry);
+        }
+
+        private bool TryReturnEntry(InventoryEntry entry, RuntimeInventory primary, out bool storedInPrimary)
+        {
+            storedInPrimary = false;
+            if (entry.item == null || entry.count <= 0)
+                return true;
+
+            if (primary != null)
+            {
+                if (primary.CanAddItem(entry.item, entry.count) && primary.AddItem(entry.item, entry.count))
+                {
+                    storedInPrimary = true;
+                    return true;
+                }
+            }
+
+            var companionBag = companionInventory != null ? companionInventory.InventoryComponent : null;
+            if (companionBag != null)
+            {
+                if (companionBag.CanAddItem(entry.item, entry.count) && companionBag.AddItem(entry.item, entry.count))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void RestoreEntryToInventory(RuntimeInventory playerInventory, InventoryEntry entry)
+        {
+            if (entry.item == null || entry.count <= 0)
+                return;
+
+            if (playerInventory != null)
+                playerInventory.AddItem(entry.item, entry.count);
+        }
+
+        private void UpdateSlotVisual(EquipmentSlot slot)
+        {
+            int index = SlotIndex(slot);
+            if (slotBackgroundImages == null || index < 0 || index >= slotBackgroundImages.Length)
+                return;
+
+            var bg = slotBackgroundImages[index];
+            var itemImg = slotItemImages[index];
+            var text = slotCountTexts[index];
+            var entry = equipped[index];
+            if (entry.item != null)
+            {
+                if (bg != null)
+                {
+                    bg.sprite = emptySlotSprite != null ? emptySlotSprite : GetSlotSprite(slot);
+                    bg.type = Image.Type.Simple;
+                    bg.color = Color.white;
+                }
+                if (itemImg != null)
+                {
+                    Sprite icon = entry.item.GetIconForCount(entry.count);
+                    itemImg.sprite = icon;
+                    itemImg.color = icon != null ? Color.white : Color.clear;
+                }
+                if (text != null)
+                    text.text = entry.item.stackable && entry.count > 1 ? entry.count.ToString() : string.Empty;
+            }
+            else
+            {
+                if (bg != null)
+                {
+                    bg.sprite = GetSlotSprite(slot);
+                    bg.type = bg.sprite == slotFrameSprite && slotFrameSprite != null ? Image.Type.Sliced : Image.Type.Simple;
+                    bg.color = emptySlotColor;
+                }
+                if (itemImg != null)
+                {
+                    itemImg.sprite = null;
+                    itemImg.color = Color.clear;
+                }
+                if (text != null)
+                    text.text = string.Empty;
+            }
+        }
+
+        private void UpdateBonuses()
+        {
+            int attack = 0;
+            int meleeStrength = 0;
+            int rangeAccuracy = 0;
+            int rangeStrength = 0;
+            int magic = 0;
+            int meleeDef = 0, rangeDef = 0, magicDef = 0;
+
+            foreach (var entry in equipped)
+            {
+                if (entry.item == null)
+                    continue;
+
+                var stats = entry.item.combat;
+                attack += stats.Attack;
+                meleeStrength += stats.Strength;
+                rangeAccuracy += stats.Range;
+                rangeStrength += stats.RangeStrength;
+                magic += stats.Magic;
+                meleeDef += stats.MeleeDefence;
+                rangeDef += stats.RangeDefence;
+                magicDef += stats.MagicDefence;
+            }
+
+            if (attackBonusText != null) attackBonusText.text = $"Attack = {attack}";
+            if (rangeAccuracyBonusText != null) rangeAccuracyBonusText.text = $"Ranged = {rangeAccuracy}";
+            if (meleeBonusText != null) meleeBonusText.text = $"Melee = {meleeStrength}";
+
+            int rangedLevel = skillManager != null ? skillManager.GetLevel(SkillType.Ranged) : 1;
+            int rangedStyleBonus = CombatMath.GetEffectiveRangedStrength(rangedLevel, CombatStyle.Accurate) - (rangedLevel + 8);
+            if (rangeStrengthBonusText != null)
+            {
+                string suffix = rangedStyleBonus > 0 ? $" (+{rangedStyleBonus} style)" : string.Empty;
+                rangeStrengthBonusText.text = $"Ranged = {rangeStrength}{suffix}";
+            }
+
+            if (magicBonusText != null) magicBonusText.text = $"Magic = {magic}";
+
+            int strengthLevel = skillManager != null ? skillManager.GetLevel(SkillType.Strength) : 1;
+            int effStr = CombatMath.GetEffectiveStrength(strengthLevel, CombatStyle.Accurate);
+            int maxHit = CombatMath.GetMaxHit(effStr, meleeStrength);
+            if (maxHitText != null) maxHitText.text = $"Total = {maxHit}";
+
+            int defenceLevel = skillManager != null ? skillManager.GetLevel(SkillType.Defence) : 1;
+            int defenceStyleBonus = CombatMath.GetEffectiveDefence(defenceLevel, CombatStyle.Accurate) - (defenceLevel + 8);
+            string defenceSuffix = defenceStyleBonus > 0 ? $" (+{defenceStyleBonus} style)" : string.Empty;
+
+            if (meleeDefenceBonusText != null) meleeDefenceBonusText.text = $"Melee = {meleeDef}{defenceSuffix}";
+            if (rangedDefenceBonusText != null) rangedDefenceBonusText.text = $"Range = {rangeDef}{defenceSuffix}";
+            if (magicDefenceBonusText != null) magicDefenceBonusText.text = $"Magic = {magicDef}{defenceSuffix}";
+        }
+
+        private void ShowInventoryFullFloatingText()
+        {
+            var anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
+            string companionName = CompanionManager.GetCompanionDisplayName();
+            string playerName = ResolveActivePlayerName();
+            string message = CompanionChatLibrary.GetRandomCompanionInventoryFullFloatingTextLine(
+                companionName,
+                playerName);
+            FloatingText.Show(message, anchor.position);
+        }
+
+        private void ShowStackLimitFloatingText(ItemData item)
+        {
+            var anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
+            string companionName = CompanionManager.GetCompanionDisplayName();
+            string playerName = ResolveActivePlayerName();
+            string itemName = ResolveItemDisplayName(item);
+            string message = CompanionChatLibrary.GetRandomCompanionStackLimitFloatingTextLine(
+                companionName,
+                itemName,
+                playerName);
+            FloatingText.Show(message, anchor.position);
+        }
+
+        private static string ResolveActivePlayerName()
+        {
+            var chat = ChatService.Instance;
+            return chat != null ? chat.ActiveUsername : string.Empty;
+        }
+
+        private static string ResolveItemDisplayName(ItemData item)
+        {
+            if (item == null)
+                return string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(item.itemName))
+                return item.itemName.Trim();
+
+            return string.IsNullOrWhiteSpace(item.name) ? string.Empty : item.name;
+        }
+
+        private int SlotIndex(EquipmentSlot slot) => (int)slot - 1;
+
+        private Sprite GetSlotSprite(EquipmentSlot slot)
+        {
+            return slot switch
+            {
+                EquipmentSlot.Arrow => ammoSlotSprite,
+                EquipmentSlot.Body => bodySlotSprite,
+                EquipmentSlot.Cape => capeSlotSprite,
+                EquipmentSlot.Boots => feetSlotSprite,
+                EquipmentSlot.Gloves => glovesSlotSprite,
+                EquipmentSlot.Head => headSlotSprite,
+                EquipmentSlot.Amulet => amuletSlotSprite,
+                EquipmentSlot.Legs => legsSlotSprite,
+                EquipmentSlot.Ring => ringSlotSprite,
+                EquipmentSlot.Shield => shieldSlotSprite,
+                EquipmentSlot.Weapon => weaponSlotSprite,
+                EquipmentSlot.Charm => charmSlotSprite,
+                _ => slotFrameSprite
+            };
+        }
+
+        private void TryRegisterWithUiManager()
+        {
+            if (registeredWithUiManager)
+                return;
+
+            var uiManager = UIManager.Instance;
+            if (uiManager == null)
+                return;
+
+            uiManager.RegisterWindow(this);
+            registeredWithUiManager = true;
+        }
+
+        private void Save()
+        {
+            var data = new EquipmentSaveData
+            {
+                slots = new SlotData[equipped.Length]
+            };
+
+            for (int i = 0; i < equipped.Length; i++)
+            {
+                var entry = equipped[i];
+                data.slots[i] = new SlotData
+                {
+                    id = entry.item != null ? entry.item.id : string.Empty,
+                    count = entry.item != null ? entry.count : 0
+                };
+            }
+
+            SaveManager.Save(SaveKey, data);
+        }
+
+        private void Load()
+        {
+            var data = SaveManager.Load<EquipmentSaveData>(SaveKey);
+            if (data?.slots == null)
+                return;
+
+            int len = Mathf.Min(equipped.Length, data.slots.Length);
+            for (int i = 0; i < len; i++)
+            {
+                // Mirror the player equipment load flow by capturing the previous state before mutating the slot.
+                // InventoryEntry is a struct, so this copy safely preserves the original data for comparisons.
+                var previousEntry = equipped[i];
+
+                var slot = data.slots[i];
+                if (!string.IsNullOrEmpty(slot.id))
+                {
+                    var resolvedItem = ItemDatabase.GetItem(slot.id);
+                    equipped[i].item = resolvedItem;
+                    equipped[i].count = resolvedItem != null ? slot.count : 0;
+                    if (resolvedItem == null && CompanionManager.EnableDebugLogging)
+                    {
+                        Debug.LogWarning($"[Companion Equipment] Saved item '{slot.id}' missing from database. Clearing slot {(EquipmentSlot)(i + 1)}.");
+                    }
+                }
+                else
+                {
+                    equipped[i].item = null;
+                    equipped[i].count = 0;
+                }
+
+                UpdateSlotVisual((EquipmentSlot)(i + 1));
+
+                var currentEntry = equipped[i];
+                if (previousEntry.item != currentEntry.item || previousEntry.count != currentEntry.count)
+                    RaiseEquipmentSlotChanged((EquipmentSlot)(i + 1));
+            }
+        }
+
+        [Serializable]
+        private class EquipmentSaveData
+        {
+            public SlotData[] slots;
+        }
+
+        [Serializable]
+        private class SlotData
+        {
+            public string id;
+            public int count;
+        }
+    }
+}

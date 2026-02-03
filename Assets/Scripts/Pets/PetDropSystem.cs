@@ -6,6 +6,7 @@ using Inventory;
 using Skills;
 using BankSystem;
 using Core.Save;
+using Companions;
 
 namespace Pets
 {
@@ -21,6 +22,26 @@ namespace Pets
         public static PetDefinition ActivePet => activePetDef;
         public static GameObject ActivePetObject => activePetGO;
         public static PetCombatController ActivePetCombat => activePetGO != null ? activePetGO.GetComponent<PetCombatController>() : null;
+
+        /// <summary>
+        ///     Determines whether the supplied definition matches the currently active pet instance.
+        ///     The comparison succeeds when the references are identical or when their IDs match.
+        /// </summary>
+        /// <param name="definition">Definition to evaluate against the active pet.</param>
+        /// <returns>True when <paramref name="definition"/> represents the active pet.</returns>
+        public static bool IsActivePetDefinition(PetDefinition definition)
+        {
+            if (definition == null || activePetDef == null)
+                return false;
+
+            if (ReferenceEquals(activePetDef, definition))
+                return true;
+
+            if (string.IsNullOrEmpty(definition.id) || string.IsNullOrEmpty(activePetDef.id))
+                return false;
+
+            return string.Equals(activePetDef.id, definition.id, StringComparison.Ordinal);
+        }
 
         /// <summary>
         ///     Provides the floating-text controller for the active pet instance when available.
@@ -71,7 +92,10 @@ namespace Pets
             else if (activePetDef != null)
             {
                 Vector3 pos = player != null ? player.transform.position : Vector3.zero;
-                SpawnPetInternal(activePetDef, pos, true);
+                if (activePetDef.spawnAsCompanion)
+                    CompanionManager.TrySpawnCompanion(activePetDef);
+                else
+                    SpawnPetInternal(activePetDef, pos, true);
             }
         }
 
@@ -110,7 +134,10 @@ namespace Pets
 
             var player = GameObject.FindGameObjectWithTag("Player");
             Vector3 pos = player != null ? player.transform.position : Vector3.zero;
-            SpawnPetInternal(pet, pos, true);
+            if (pet.spawnAsCompanion)
+                SpawnCompanionPet(pet, true);
+            else
+                SpawnPetInternal(pet, pos, true);
         }
 
         /// <summary>
@@ -210,7 +237,7 @@ namespace Pets
                         pet = entry.pet;
                         if (activePetGO == null)
                         {
-                            SpawnPetInternal(entry.pet, worldPosition);
+                            SpawnPet(entry.pet, worldPosition);
                         }
                         else
                         {
@@ -250,6 +277,26 @@ namespace Pets
                 activePetDef = null;
                 PetSaveBridge.Clear();
             }
+            else if (activePetDef != null && activePetDef.spawnAsCompanion)
+            {
+                activePetDef = null;
+                PetSaveBridge.Clear();
+            }
+
+            CompanionManager.HandlePetDespawned();
+        }
+
+        /// <summary>
+        /// Clears the tracked companion definition when the player manually stores it in their inventory.
+        /// </summary>
+        public static void HandleCompanionManuallyStored()
+        {
+            if (activePetDef == null || !activePetDef.spawnAsCompanion)
+                return;
+
+            activePetDef = null;
+            PetInventoryVisible = false;
+            PetSaveBridge.Clear();
         }
 
         /// <summary>
@@ -275,11 +322,28 @@ namespace Pets
         /// <summary>
         /// Spawns a pet directly at the given world position.
         /// </summary>
-        public static GameObject SpawnPet(PetDefinition pet, Vector3 position)
+        /// <param name="pet">Definition describing the pet that should manifest.</param>
+        /// <param name="position">World position where the follower should appear.</param>
+        /// <param name="allowAutoRestore">
+        ///     Controls whether a previously active companion should automatically return once the new
+        ///     pet despawns. Pass <c>false</c> when a manual pet summon intentionally replaces the
+        ///     companion so it remains stored until the player calls it back in.
+        /// </param>
+        public static GameObject SpawnPet(PetDefinition pet, Vector3 position, bool allowAutoRestore = true)
         {
             Initialize();
+
+            if (pet != null && pet.spawnAsCompanion)
+            {
+                if (activePetGO != null)
+                    DespawnActive();
+
+                return SpawnCompanionPet(pet, false);
+            }
+
             if (Beastmaster.PetMergeController.Instance != null && Beastmaster.PetMergeController.Instance.IsMerged)
                 return null;
+            CompanionManager.HandlePrePetSpawn(allowAutoRestore);
             return SpawnPetInternal(pet, position);
         }
 
@@ -346,6 +410,12 @@ namespace Pets
             if (pet == null)
                 return;
 
+            // When companions automatically respawn after a login we avoid surfacing a toast.
+            // The login flow already greets the player through the companion chat pipeline,
+            // and the legacy "funny feeling" toast caused duplicate messaging on every load.
+            if (pet.spawnAsCompanion && isRespawnFromSave)
+                return;
+
             if (isRespawnFromSave)
             {
                 PetToastUI.Show("Your pet appears by your side", pet.messageColor);
@@ -364,6 +434,39 @@ namespace Pets
             Initialize();
             itemToPet.TryGetValue(item, out var pet);
             return pet;
+        }
+
+        /// <summary>
+        /// Handles spawning pets that should manifest through the companion pipeline instead of the follower pipeline.
+        /// Persists the selection so reloads restore the same companion.
+        /// </summary>
+        /// <param name="pet">Definition that should become the active companion.</param>
+        /// <param name="isRespawnFromSave">True when restoring after a load, false when triggered from an item drop.</param>
+        private static GameObject SpawnCompanionPet(PetDefinition pet, bool isRespawnFromSave)
+        {
+            if (pet == null)
+            {
+                Debug.LogError("SpawnCompanionPet called with null pet.");
+                return null;
+            }
+
+            bool replacingExisting = activePetDef != null && activePetDef.spawnAsCompanion &&
+                string.Equals(activePetDef.id, pet.id, StringComparison.Ordinal);
+
+            activePetGO = null;
+            activePetDef = pet;
+            PetSaveBridge.Save(pet.id);
+            PetInventoryVisible = false;
+
+            CompanionManager.TrySpawnCompanion(pet, isRespawnFromSave);
+
+            if (isRespawnFromSave)
+                CompanionManager.PublishAutoSpawnGreeting();
+
+            if (!replacingExisting)
+                ShowSpawnToast(pet, isRespawnFromSave);
+
+            return CompanionManager.CompanionObject;
         }
 
         private static void SaveOnQuit()

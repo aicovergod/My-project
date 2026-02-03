@@ -27,7 +27,7 @@ namespace Pets
             if (inventory != null && currentPet != null && currentPet != pet && currentPet.pickupItem != null)
                 inventory.AddItem(currentPet.pickupItem);
 
-            PetDropSystem.SpawnPet(pet, pos);
+            PetDropSystem.SpawnPet(pet, pos, allowAutoRestore: false);
             return true;
         }
     }

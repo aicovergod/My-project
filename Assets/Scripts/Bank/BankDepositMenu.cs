@@ -1,3 +1,4 @@
+using UI.ContextMenus;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
@@ -8,12 +9,13 @@ namespace BankSystem
     /// Simple right-click context menu for bank deposit options.
     /// Built entirely in code so no prefab is needed.
     /// </summary>
-    public class BankDepositMenu : MonoBehaviour
+    public class BankDepositMenu : ContextMenuBase
     {
         private BankUI bank;
         private int slotIndex;
         private Font font;
         private RectTransform rect;
+        private Button transferAllButton;
 
         public static BankDepositMenu Create(Transform parent, Font font)
         {
@@ -27,21 +29,12 @@ namespace BankSystem
             return menu;
         }
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             rect ??= GetComponent<RectTransform>();
-        }
-
-        private void Update()
-        {
-            if (!gameObject.activeSelf)
-                return;
-
-            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
-            {
-                if (!RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition))
-                    Hide();
-            }
+            AssignCanvas(GetComponentInParent<Canvas>());
+            SetMenuRectTransform(rect);
         }
 
         private void BuildUI()
@@ -64,9 +57,12 @@ namespace BankSystem
             CreateButton("Add 10", () => { bank?.DepositFromInventory(slotIndex, 10); Hide(); });
             CreateButton("Add X", () => { bank?.PromptDepositAmount(slotIndex); Hide(); });
             CreateButton("Add All", () => { bank?.DepositAllFromInventory(slotIndex); Hide(); });
+            transferAllButton = CreateButton("Transfer All", HandleTransferAllClicked);
+            if (transferAllButton != null)
+                transferAllButton.gameObject.SetActive(false);
         }
 
-        private void CreateButton(string label, UnityAction onClick)
+        private Button CreateButton(string label, UnityAction onClick)
         {
             var btnGO = new GameObject(label, typeof(Image), typeof(Button));
             btnGO.transform.SetParent(transform, false);
@@ -93,21 +89,40 @@ namespace BankSystem
             txtRect.anchorMax = Vector2.one;
             txtRect.offsetMin = Vector2.zero;
             txtRect.offsetMax = Vector2.zero;
+
+            return btn;
         }
 
-        public void Show(BankUI bank, int index, Vector2 position)
+        public void Show(BankUI bank, int index, Vector2 position, bool showTransferAll)
         {
             this.bank = bank;
             slotIndex = index;
             transform.position = position;
             gameObject.SetActive(true);
+            DeferSafeZoneCheck();
             transform.SetAsLastSibling();
+            if (transferAllButton != null)
+                transferAllButton.gameObject.SetActive(showTransferAll);
         }
 
         public void Hide()
         {
             gameObject.SetActive(false);
             bank = null;
+            if (transferAllButton != null)
+                transferAllButton.gameObject.SetActive(false);
+        }
+
+        /// <inheritdoc />
+        protected override void OnCloseRequested()
+        {
+            Hide();
+        }
+
+        private void HandleTransferAllClicked()
+        {
+            bank?.TransferAllOreFromBag(slotIndex);
+            Hide();
         }
     }
 }

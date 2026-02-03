@@ -1,6 +1,8 @@
+using Inventory.UI;
+using UI.ContextMenus;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace Inventory
 {
@@ -8,18 +10,14 @@ namespace Inventory
     /// Simple right-click context menu for inventory drop options.
     /// Built entirely in code so no prefab is needed.
     /// </summary>
-    public class InventoryDropMenu : MonoBehaviour
+    public class InventoryDropMenu : ContextMenuBase
     {
-        [SerializeField]
-        [Tooltip("Screen-space padding the cursor can move beyond the menu before the popup auto-closes.")]
-        private float closePaddingPixels = 12f;
-
-        private Inventory inventory;
+        private InventoryWindowController controller;
         private int slotIndex;
         private Font font;
         private RectTransform rect;
-        private Canvas menuCanvas;
-        private Camera canvasCamera;
+        private readonly Vector3[] worldCorners = new Vector3[4];
+        private Vector2 pointerScreenPosition;
 
         public static InventoryDropMenu Create(Transform parent, Font font)
         {
@@ -33,69 +31,12 @@ namespace Inventory
             return menu;
         }
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             rect ??= GetComponent<RectTransform>();
-            menuCanvas = GetComponentInParent<Canvas>();
-
-            // Cache the correct camera reference so hover checks work with any canvas render mode.
-            if (menuCanvas != null && menuCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
-            {
-                canvasCamera = menuCanvas.worldCamera;
-            }
-            else
-            {
-                canvasCamera = null;
-            }
-        }
-
-        private void Update()
-        {
-            if (!gameObject.activeSelf)
-                return;
-
-            var isCursorWithinSafeZone = IsCursorWithinSafeZone(out var isCursorOverMenu);
-
-            // Immediately hide the menu when the cursor leaves the padded safe zone to keep the OSRS-style feel.
-            if (!isCursorWithinSafeZone)
-            {
-                Hide();
-                return;
-            }
-
-            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
-            {
-                // Only close on clicks that land outside the strict menu rectangle.
-                if (!isCursorOverMenu)
-                    Hide();
-            }
-        }
-
-        /// <summary>
-        /// Determines if the cursor remains within the menu rectangle plus a tolerance band to prevent accidental closures.
-        /// </summary>
-        private bool IsCursorWithinSafeZone(out bool insideMenu)
-        {
-            insideMenu = RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition, canvasCamera);
-
-            if (closePaddingPixels <= 0f)
-            {
-                return insideMenu;
-            }
-
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, Input.mousePosition, canvasCamera, out var localPoint))
-            {
-                // If the conversion fails, fall back to the strict rectangle check to preserve existing behaviour.
-                return insideMenu;
-            }
-
-            var paddedRect = rect.rect;
-            paddedRect.xMin -= closePaddingPixels;
-            paddedRect.xMax += closePaddingPixels;
-            paddedRect.yMin -= closePaddingPixels;
-            paddedRect.yMax += closePaddingPixels;
-
-            return paddedRect.Contains(localPoint);
+            AssignCanvas(GetComponentInParent<Canvas>());
+            SetMenuRectTransform(rect);
         }
 
         private void BuildUI()
@@ -113,9 +54,8 @@ namespace Inventory
             layout.spacing = 2f;
             layout.padding = new RectOffset(2, 2, 2, 2);
 
-            CreateButton("Drop 1", () => { inventory?.DropItem(slotIndex, 1); Hide(); });
-            CreateButton("Drop All", () => { if (inventory != null) inventory.DropItem(slotIndex, inventory.GetSlot(slotIndex).count); Hide(); });
-            CreateButton("Drop X", () => { inventory?.PromptStackSplit(slotIndex, StackSplitType.Drop); Hide(); });
+            CreateButton("Drop 1", () => OnSelection(DropMenuSelection.DropOne));
+            CreateButton("Drop All", () => OnSelection(DropMenuSelection.DropAll));
         }
 
         private void CreateButton(string label, UnityAction onClick)
@@ -147,19 +87,65 @@ namespace Inventory
             txtRect.offsetMax = Vector2.zero;
         }
 
-        public void Show(Inventory inventory, int index, Vector2 position)
+        public void Show(InventoryWindowController controller, int index, Vector2 position)
         {
-            this.inventory = inventory;
+            this.controller = controller;
             slotIndex = index;
-            transform.position = position;
+            pointerScreenPosition = position;
             gameObject.SetActive(true);
+            PositionMenu();
+            DeferSafeZoneCheck();
             transform.SetAsLastSibling();
         }
 
         public void Hide()
         {
             gameObject.SetActive(false);
-            inventory = null;
+            controller = null;
+        }
+
+        private void OnRectTransformDimensionsChange()
+        {
+            if (!isActiveAndEnabled)
+                return;
+
+            PositionMenu();
+        }
+
+        /// <inheritdoc />
+        protected override void OnCloseRequested()
+        {
+            Hide();
+        }
+
+        private void OnSelection(DropMenuSelection selection)
+        {
+            controller?.HandleDropMenuSelection(slotIndex, selection);
+            Hide();
+        }
+
+        /// <summary>
+        /// Ensures the menu remains inside the visible screen bounds so the player can always reach each option.
+        /// </summary>
+        private void PositionMenu()
+        {
+            if (!gameObject.activeInHierarchy)
+                return;
+
+            var targetRect = rect;
+            if (targetRect == null)
+                return;
+
+            var canvas = MenuCanvas;
+            if (canvas == null)
+                return;
+
+            ContextMenuPositioner.PositionMenu(
+                targetRect,
+                canvas,
+                MenuCanvasCamera,
+                () => pointerScreenPosition,
+                worldCorners);
         }
     }
 }

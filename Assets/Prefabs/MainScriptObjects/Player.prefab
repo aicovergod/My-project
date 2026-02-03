@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 489986967016459151}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -88,6 +88,10 @@ GameObject:
   - component: {fileID: 7826943123202149709}
   - component: {fileID: 5214551407693897022}
   - component: {fileID: 2069911887794511935}
+  - component: {fileID: 1564341770880048146}
+  - component: {fileID: 6045123456789012345}
+  - component: {fileID: 6045123456789012346}
+  - component: {fileID: 3691873968031645550}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -158,15 +162,15 @@ SpriteRenderer:
   m_SortingLayerID: -160616933
   m_SortingLayer: 4
   m_SortingOrder: 0
-  m_Sprite: {fileID: -1447395906653738743, guid: 0f388a5ca87873947b65aa4e52c82acf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d148d16db0c208e4f8ceded751e847eb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 2, y: 2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!50 &5384127360561436123
@@ -280,7 +284,7 @@ MonoBehaviour:
   windowSize: {x: 83, y: 375}
   showCloseButton: 0
   centerOnScreen: 0
-  windowPosition: {x: 480, y: -170}
+  windowPosition: {x: 860, y: -320}
   tooltipNameFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
   tooltipNameColor: {r: 1, g: 1, b: 1, a: 1}
   tooltipDescriptionFont: {fileID: 12800000, guid: 6dc49ea977bb85a49ac4df5338f901f4, type: 3}
@@ -368,8 +372,8 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.71875, y: 0.9375}
-    newSize: {x: 1, y: 1}
+    oldSize: {x: 2, y: 2}
+    newSize: {x: 2, y: 2}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -388,6 +392,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88eddf5b07a13ec43a0dfba7cbd60369, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inventory: {fileID: 491447706204386932}
+  equipment: {fileID: 8439072058276114910}
+  skill: {fileID: 6125646337061022332}
   allPickaxes:
   - {fileID: 11400000, guid: c32ce0b64104bf4409941cb078a3e792, type: 2}
   - {fileID: 11400000, guid: a71a63176f90a4a4da64d3811c7c46f1, type: 2}
@@ -397,9 +404,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c20e17523dc02e848a3f5b15d82aa376, type: 2}
   - {fileID: 11400000, guid: b27f88278183049479c7e478c63df422, type: 2}
   - {fileID: 11400000, guid: 9d813e1f8f833dc408de7bd0181c4e22, type: 2}
-  inventory: {fileID: 491447706204386932}
-  equipment: {fileID: 8439072058276114910}
-  skill: {fileID: 6125646337061022332}
 --- !u!114 &6125646337061022332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -412,10 +416,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e0ea1b551ffcd343800cab44ccf807f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enableDebugLogging: 0
   inventory: {fileID: 491447706204386932}
   equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
-  enableDebugLogging: 0
+  hadesFragmentItemId: Hades Fragment
+  hadesFragmentDropDenominator: 50
   miningOutfitDefinition: {fileID: 11400000, guid: 7fb20f9846b84a7fa9ef024a9b7b21b8, type: 2}
 --- !u!114 &4484345410366226628
 MonoBehaviour:
@@ -429,10 +435,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e009ae6bbcf576459198b27069eeadf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enableDebugLogging: 0
   inventory: {fileID: 491447706204386932}
   equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
-  enableDebugLogging: 0
   woodcuttingOutfitDefinition: {fileID: 11400000, guid: 7338c8c1dc5a4dcab05a4ac881f0d83d, type: 2}
 --- !u!114 &224529023114725345
 MonoBehaviour:
@@ -475,6 +481,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76f0c3d2383adde4e811229f5273660a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inventory: {fileID: 491447706204386932}
+  equipment: {fileID: 8439072058276114910}
+  skill: {fileID: 4484345410366226628}
   allAxes:
   - {fileID: 11400000, guid: 672e09d8671fa8945a0ee9737619bf4e, type: 2}
   - {fileID: 11400000, guid: 19f5985c361231a429d20431720aa0de, type: 2}
@@ -485,9 +494,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 952e4cda1b52796418b8797ded538ddb, type: 2}
   - {fileID: 11400000, guid: 1994f92bad6bed14f9711039a52e743f, type: 2}
   - {fileID: 11400000, guid: b63e6c0d177f6824894c18bd71c63e53, type: 2}
-  inventory: {fileID: 491447706204386932}
-  equipment: {fileID: 8439072058276114910}
-  skill: {fileID: 4484345410366226628}
 --- !u!114 &8439072058276114910
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -627,6 +633,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rangedLevel: 
+  thievingLevel: 
 --- !u!114 &6870303436262208742
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -740,10 +747,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd3b78d5e1484c5981fe06cfaf08763d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enableDebugLogging: 0
   inventory: {fileID: 491447706204386932}
   equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
-  enableDebugLogging: 0
   fishingOutfitDefinition: {fileID: 11400000, guid: 0d1b5c3f6a0b42f0901a1a65573e1c1e, type: 2}
 --- !u!114 &8168772117157042845
 MonoBehaviour:
@@ -787,6 +794,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0fb4a3603de46629f25f1dc0a93d5b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inventory: {fileID: 491447706204386932}
+  equipment: {fileID: 8439072058276114910}
+  skill: {fileID: 1188243290273898710}
   allTools:
   - {fileID: 11400000, guid: c1e73f2ab42195a4d8e3abb3f611177b, type: 2}
   - {fileID: 11400000, guid: b4db4356babbeac48a01baf6ddfede3f, type: 2}
@@ -795,9 +805,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 30a8d8123aa0a7749b98426a2cc3aea4, type: 2}
   - {fileID: 11400000, guid: 8f2ab9007beb33c4ba1b394e300e055a, type: 2}
   - {fileID: 11400000, guid: c08573f61adf4bc5a7a5e768f8b513c7, type: 2}
-  inventory: {fileID: 491447706204386932}
-  equipment: {fileID: 8439072058276114910}
-  skill: {fileID: 1188243290273898710}
 --- !u!114 &3613127701134760555
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -926,10 +933,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 918b72a14a97c1744832a8918202ced8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Skills.Cooking.CookingSkill
+  enableDebugLogging: 0
   inventory: {fileID: 491447706204386932}
   equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
-  enableDebugLogging: 0
   cookingOutfitDefinition: {fileID: 11400000, guid: 1db8f384d0b94f1896f3b11d571c5824, type: 2}
 --- !u!114 &4293722103470127009
 MonoBehaviour:
@@ -943,6 +950,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9861f2bb42041945aaa1d6f2fc692b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Skills.Firemaking.FiremakingSkill
+  enableDebugLogging: 0
   inventory: {fileID: 491447706204386932}
   equipment: {fileID: 8439072058276114910}
   floatingTextAnchor: {fileID: 487381587706843324}
@@ -957,7 +965,6 @@ MonoBehaviour:
   groundItemSpawner: {fileID: 0}
   tinderboxItemId: Tinderbox
   maxIgniteDistance: 1.6
-  enableDebugLogging: 0
   firemakingOutfitDefinition: {fileID: 11400000, guid: 497b3d4ad6b2453bab60ac0b74d447df, type: 2}
   allowTileSnapping: 1
   tileSnapSize: {x: 1, y: 1}
@@ -1327,3 +1334,79 @@ MonoBehaviour:
   ammoUiRefreshInterval: 0.25
   ammoDepletedSoundId: 
   enableDebugLogging: 0
+--- !u!114 &1564341770880048146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3da531c713324a98aa343b54832ec06b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerInput: {fileID: 7000745351061079601}
+  openChatAction: {fileID: 0}
+  submitChatAction: {fileID: 0}
+  cancelChatAction: {fileID: 0}
+  chatHud: {fileID: 0}
+--- !u!114 &6045123456789012345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b13a0a8a5a6b4eb886fa6d7109139dc1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableDebugLogging: 1
+  inventory: {fileID: 491447706204386932}
+  movement: {fileID: 2793536999350240794}
+  hitpoints: {fileID: 6554036775103191577}
+  skillManager: {fileID: 5028650979715864874}
+  combatController: {fileID: 0}
+  floatingTextAnchor: {fileID: 487381587706843324}
+  database: {fileID: 11400000, guid: c8a52b09d0ec4c94a5b63b612a395bc7, type: 2}
+  rogueOutfitDefinition: {fileID: 0}
+--- !u!114 &6045123456789012346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84e43a472edb4bb0a45f3f7e7eb93a5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultInteractRange: 1.5
+  defaultCancelDistance: 3
+  interactionCooldownSeconds: 0.2
+  prospectCooldownSeconds: 3
+  autoMoveIntoRange: 1
+  autoMoveStopBuffer: 0.1
+  playerInput: {fileID: 7000745351061079601}
+  interactActionReference: {fileID: 0}
+  prospectActionReference: {fileID: 0}
+  cancelActionReference: {fileID: 0}
+  skill: {fileID: 6045123456789012345}
+  explicitMovementController: {fileID: 2793536999350240794}
+  worldCamera: {fileID: 0}
+--- !u!114 &3691873968031645550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4297641342699346684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57a472af0c85a784797ad38af2ad846e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Audio.SoundEffects.LevelUpSound
+  skillManager: {fileID: 5028650979715864874}

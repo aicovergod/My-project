@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using NPC.Navigation;
 #if UNITY_EDITOR
 using UnityEditorInternal;
 #endif
@@ -13,7 +14,7 @@ namespace NPC
     /// </summary>
     [ExecuteAlways]
     [DisallowMultipleComponent]
-    public sealed class NavGridBuilder : MonoBehaviour, ISerializationCallbackReceiver
+    public sealed class NavGridBuilder : MonoBehaviour, ISerializationCallbackReceiver, INavGridData
     {
         /// <summary>
         /// Event raised whenever the grid is rebuilt.
@@ -65,6 +66,9 @@ namespace NPC
         [Tooltip("Elevates gizmos slightly so they do not z-fight with sprites in the scene.")]
         [SerializeField] private float gizmoHeightOffset = 0.05f;
 
+        [Tooltip("Maximum number of cells visualised when drawing gizmos. Larger grids fall back to an outline and sparse sampling for walkable tiles while still rendering every blocked cell so designers can spot issues without freezing the editor.")]
+        [SerializeField, Min(16)] private int maxGizmoCells = 4096;
+
         private static readonly HashSet<string> reportedMissingTags = new HashSet<string>();
 
         private bool[,] walkableGrid;
@@ -88,6 +92,12 @@ namespace NPC
         /// </summary>
         public float TileSize => tileSize;
 
+        /// <inheritdoc />
+        LayerMask INavGridData.BlockingLayerMask => blockingLayers;
+
+        /// <inheritdoc />
+        bool INavGridData.HasData => HasGrid;
+
         /// <summary>
         /// Number of tiles along the X/Y axes.
         /// </summary>
@@ -107,6 +117,55 @@ namespace NPC
         /// Indicates whether a valid grid is currently cached.
         /// </summary>
         public bool HasGrid => walkableGrid != null && gridSize.x > 0 && gridSize.y > 0;
+
+        /// <inheritdoc />
+        int INavGridData.Revision => Revision;
+
+        /// <inheritdoc />
+        bool INavGridData.TryGetCell(Vector2 worldPosition, out Vector2Int cell) => TryGetCell(worldPosition, out cell);
+
+        /// <inheritdoc />
+        Vector2Int INavGridData.WorldToCellClamped(Vector2 worldPosition) => WorldToCellClamped(worldPosition);
+
+        /// <inheritdoc />
+        Vector2 INavGridData.GetCellCenter(Vector2Int cell) => GetCellCenter(cell);
+
+        /// <inheritdoc />
+        bool INavGridData.IsCellWalkable(Vector2Int cell) => IsCellWalkable(cell);
+
+        /// <inheritdoc />
+        bool INavGridData.IsCellWithinBounds(Vector2Int cell) => IsCellWithinBounds(cell);
+
+        /// <inheritdoc />
+        bool INavGridData.HasClearLineBetweenCells(Vector2Int origin, Vector2Int goal) => HasClearLineBetweenCells(origin, goal);
+
+        /// <inheritdoc />
+        bool INavGridData.TryResolveChunkForCell(Vector2Int cell, out Vector2Int chunkCoordinates)
+        {
+            if (!IsCellWithinBounds(cell))
+            {
+                chunkCoordinates = default;
+                return false;
+            }
+
+            chunkCoordinates = Vector2Int.zero;
+            return true;
+        }
+
+        /// <inheritdoc />
+        bool INavGridData.TryResolveLocalCell(Vector2Int cell, out Vector2Int chunkCoordinates, out Vector2Int localCell)
+        {
+            if (!IsCellWithinBounds(cell))
+            {
+                chunkCoordinates = default;
+                localCell = default;
+                return false;
+            }
+
+            chunkCoordinates = Vector2Int.zero;
+            localCell = cell;
+            return true;
+        }
 
         /// <summary>
         /// True when the grid should be rebuilt before being used.
@@ -839,6 +898,53 @@ namespace NPC
 
             float z = transform.position.z + gizmoHeightOffset;
             Vector3 size = new Vector3(tileSize, tileSize, 0f);
+            int totalCells = gridSize.x * gridSize.y;
+            if (totalCells <= 0)
+            {
+                return;
+            }
+
+            if (totalCells > maxGizmoCells)
+            {
+                Vector3 boundsCenter = new Vector3(gridOrigin.x + gridWorldSize.x * 0.5f, gridOrigin.y + gridWorldSize.y * 0.5f, z);
+                Vector3 boundsSize = new Vector3(gridWorldSize.x, gridWorldSize.y, Mathf.Max(0.01f, Mathf.Abs(gizmoHeightOffset)));
+                Gizmos.color = blockedColor;
+                Gizmos.DrawWireCube(boundsCenter, boundsSize);
+
+                float ratio = totalCells / (float)Mathf.Max(1, maxGizmoCells);
+                int samplingStride = Mathf.Clamp(Mathf.CeilToInt(Mathf.Sqrt(ratio)), 1, Mathf.Max(gridSize.x, gridSize.y));
+                Vector3 walkableSampleSize = size * 0.5f;
+                Vector3 blockedSampleSize = size * 0.6f;
+
+                // Draw blocked cells at full density so designers can still inspect obstruction placement while
+                // walkable tiles retain the lightweight sparse sampling that keeps editor rendering responsive.
+                for (int y = 0; y < gridSize.y; y++)
+                {
+                    for (int x = 0; x < gridSize.x; x++)
+                    {
+                        bool isWalkable = walkableGrid[x, y];
+                        Vector3 centre = new Vector3(gridOrigin.x + (x + 0.5f) * tileSize, gridOrigin.y + (y + 0.5f) * tileSize, z);
+
+                        if (!isWalkable)
+                        {
+                            Gizmos.color = blockedColor;
+                            Gizmos.DrawCube(centre, blockedSampleSize);
+                            continue;
+                        }
+
+                        if ((x % samplingStride) != 0 || (y % samplingStride) != 0)
+                        {
+                            continue;
+                        }
+
+                        Gizmos.color = walkableColor;
+                        Gizmos.DrawCube(centre, walkableSampleSize);
+                    }
+                }
+
+                return;
+            }
+
             for (int y = 0; y < gridSize.y; y++)
             {
                 for (int x = 0; x < gridSize.x; x++)

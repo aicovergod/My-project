@@ -25,6 +25,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 555555000000000001}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -42,10 +43,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1125ab564ab24ac79d075aee4574a450, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   maxTrackedBuffs: 64
-  logDebugMessages: 0
+  logDebugMessages: 1
 --- !u!114 &555555000000000004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56,14 +57,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dd10074c9d7246dbb411120bde26ef13, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   infoBoxPrefab: {fileID: 377000000000000005, guid: 9ef42ef0a57f4016b22d560d02f33959, type: 3}
   topPadding: 8
   leftPadding: 8
   verticalSpacing: 2
   columns: 3
   horizontalSpacing: 2
-  ordering: []
+  ordering: 
   playExpiryNotification: 1
   expiryClip: {fileID: 0}

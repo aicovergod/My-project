@@ -7,7 +7,6 @@ using UI;
 using Skills;
 using Skills.Common;
 using Pets;
-using Quests;
 using BankSystem;
 using Skills.Outfits;
 using Random = UnityEngine.Random;
@@ -18,13 +17,11 @@ namespace Skills.Woodcutting
     /// Handles XP, level, and woodcutting tick logic.
     /// </summary>
     [DisallowMultipleComponent]
-    public class WoodcuttingSkill : TickedSkillBehaviour
+    public class WoodcuttingSkill : DebuggableTickedSkillBehaviour
     {
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
-        [SerializeField, Tooltip("Enables verbose debug logging for woodcutting actions.")]
-        private bool enableDebugLogging;
         [SerializeField, Tooltip("ScriptableObject containing the Lumberjack outfit configuration.")]
         private SkillingOutfitDefinition woodcuttingOutfitDefinition;
 
@@ -37,8 +34,9 @@ namespace Skills.Woodcutting
         private SkillManager skills;
 
         private Dictionary<string, ItemData> logItems;
-        private int questLogCount;
         private SkillingOutfitProgress woodcuttingOutfit;
+        private bool useCompanionChatFormatting;
+        private Func<string> companionChatSenderResolver;
 
         public event System.Action<TreeNode> OnStartChopping;
         public event System.Action OnStopChopping;
@@ -51,6 +49,8 @@ namespace Skills.Woodcutting
         public TreeNode CurrentTree => currentTree;
         public int CurrentChopIntervalTicks => chopProgressTracker.RequiredTicks;
         public AxeDefinition CurrentAxe => currentAxe;
+        /// <summary>Inventory component used for storing gathered logs.</summary>
+        public Inventory.Inventory InventoryComponent => inventory;
         public float ChopProgressNormalized
         {
             get
@@ -63,15 +63,6 @@ namespace Skills.Woodcutting
             }
         }
 
-        /// <summary>
-        ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
-        /// </summary>
-        public bool EnableDebugLogging
-        {
-            get => enableDebugLogging;
-            set => enableDebugLogging = value;
-        }
-
         private void Awake()
         {
             if (inventory == null)
@@ -81,16 +72,11 @@ namespace Skills.Woodcutting
             skills = GetComponent<SkillManager>();
             chopProgressTracker.TickAdvanced += HandleChopProgressAdvanced;
             PreloadLogItems();
-            if (woodcuttingOutfitDefinition == null)
-                woodcuttingOutfitDefinition = Resources.Load<SkillingOutfitDefinition>(WoodcuttingOutfitResourcePath);
-            if (woodcuttingOutfitDefinition != null)
-            {
-                woodcuttingOutfit = new SkillingOutfitProgress(woodcuttingOutfitDefinition);
-            }
-            else
-            {
-                Debug.LogWarning("WoodcuttingSkill is missing a SkillingOutfitDefinition reference; outfit rewards are disabled.");
-            }
+            woodcuttingOutfit = SkillingOutfitInitializer.InitializeOutfitProgress(
+                ref woodcuttingOutfitDefinition,
+                WoodcuttingOutfitResourcePath,
+                nameof(WoodcuttingSkill),
+                this);
         }
 
         private void OnDestroy()
@@ -98,11 +84,6 @@ namespace Skills.Woodcutting
             SkillingOutfitProgress.Unregister(woodcuttingOutfit);
             woodcuttingOutfit = null;
         }
-
-        /// <summary>
-        ///     Enables ticker logging so we can trace subscription timing during debugging sessions.
-        /// </summary>
-        protected override bool LogTickerSubscription => enableDebugLogging;
 
         protected override void HandleTick()
         {
@@ -163,6 +144,8 @@ namespace Skills.Woodcutting
                     Equipment = equipment,
                     EquipmentXpBonusEvaluator = data => data != null ? data.woodcuttingXpBonusMultiplier : 0f,
                     RewardMessageFormatter = qty => $"+{qty} {logName}",
+                    UseCompanionChatFormatting = useCompanionChatFormatting,
+                    CompanionChatSenderResolver = companionChatSenderResolver,
                     OnItemsGranted = result => OnLogGained?.Invoke(logId, result.QuantityAwarded),
                     OnSuccess = result =>
                     {
@@ -174,18 +157,6 @@ namespace Skills.Woodcutting
                             skills,
                             currentTree != null ? currentTree.transform : transform,
                             petChance);
-
-                        if (QuestManager.Instance != null && QuestManager.Instance.IsQuestActive("ToolsOfSurvival"))
-                        {
-                            var quest = QuestManager.Instance.GetQuest("ToolsOfSurvival");
-                            var step = quest?.Steps.Find(s => s.StepID == "ChopLogs");
-                            if (step != null && !step.IsComplete)
-                            {
-                                questLogCount += result.QuantityAwarded;
-                                if (questLogCount >= 3)
-                                    QuestManager.Instance.UpdateStep("ToolsOfSurvival", "ChopLogs");
-                            }
-                        }
 
                         TryAwardWoodcuttingOutfitPiece();
                     },
@@ -248,6 +219,18 @@ namespace Skills.Woodcutting
                 "Beaver",
                 ref logItems,
                 out _);
+        }
+
+        /// <summary>
+        /// Configures the chat formatting used when the skill is operated by a companion. Providing
+        /// a resolver routes reward messages through the companion chat channel instead of the
+        /// default game channel. Passing null restores player-centric formatting.
+        /// </summary>
+        /// <param name="senderResolver">Resolver that supplies the display name for companion chat output.</param>
+        public void ConfigureCompanionChat(Func<string> senderResolver)
+        {
+            useCompanionChatFormatting = senderResolver != null;
+            companionChatSenderResolver = senderResolver;
         }
 
         /// <summary>

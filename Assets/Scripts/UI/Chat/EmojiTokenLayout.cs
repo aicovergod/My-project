@@ -1,0 +1,377 @@
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace UI.Chat
+{
+    /// <summary>
+    /// Utility component that renders a sequence of <see cref="EmojiMarkupToken"/> instances using pooled Text/Image children.
+    /// </summary>
+    [RequireComponent(typeof(RectTransform))]
+    public sealed class EmojiTokenLayout : MonoBehaviour
+    {
+        [SerializeField] private float spacing = 2f;
+
+        [SerializeField]
+        [Tooltip("When enabled the layout will force all text tokens onto a single line. Disable to allow wrapping.")]
+        private bool enforceSingleLine = true;
+
+        private readonly List<Component> activeComponents = new List<Component>();
+        private readonly Queue<Text> textPool = new Queue<Text>();
+        private readonly Queue<Image> imagePool = new Queue<Image>();
+
+        private HorizontalLayoutGroup layoutGroup;
+        private RectTransform rectTransform;
+
+        private void Awake()
+        {
+            rectTransform = transform as RectTransform;
+
+            layoutGroup = GetComponent<HorizontalLayoutGroup>();
+            if (layoutGroup == null)
+            {
+                layoutGroup = gameObject.AddComponent<HorizontalLayoutGroup>();
+                layoutGroup.childControlWidth = true;
+                layoutGroup.childControlHeight = true;
+                layoutGroup.childForceExpandWidth = false;
+                layoutGroup.childForceExpandHeight = false;
+                layoutGroup.childAlignment = TextAnchor.UpperLeft;
+            }
+
+            layoutGroup.spacing = spacing;
+
+            var fitter = GetComponent<ContentSizeFitter>();
+            if (fitter == null)
+            {
+                fitter = gameObject.AddComponent<ContentSizeFitter>();
+                fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+                fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            }
+        }
+
+        /// <summary>
+        /// Renders the supplied token list.
+        /// </summary>
+        /// <param name="tokens">Token sequence to display.</param>
+        /// <param name="textColor">Color applied to literal text segments.</param>
+        /// <param name="fontSize">Font size used for literal text segments.</param>
+        /// <param name="alignment">Alignment applied to generated text components.</param>
+        public void RenderTokens(IReadOnlyList<EmojiMarkupToken> tokens, Color textColor, int fontSize, TextAnchor alignment)
+        {
+            if (tokens == null)
+            {
+                ClearActiveComponents();
+                return;
+            }
+
+            EnsureLayout();
+
+            if (layoutGroup != null)
+            {
+                // Keep the layout alignment in sync with the caller so floating chat
+                // bubbles can request centred emoji while log rows remain left aligned.
+                layoutGroup.childAlignment = alignment;
+            }
+
+            int activeIndex = 0;
+            for (int i = 0; i < tokens.Count; i++)
+            {
+                var token = tokens[i];
+                var existing = activeIndex < activeComponents.Count ? activeComponents[activeIndex] : null;
+                if (token.IsEmoji)
+                {
+                    if (existing != null && !(existing is Image))
+                    {
+                        ReturnToPool(existing);
+                        activeComponents[activeIndex] = null;
+                        existing = null;
+                    }
+
+                    var image = existing as Image ?? AcquireImage();
+                    PrepareImage(image);
+                    token.Emoji.ApplyTo(image);
+                    Activate(image, ref activeIndex);
+                }
+                else
+                {
+                    if (existing != null && !(existing is Text))
+                    {
+                        ReturnToPool(existing);
+                        activeComponents[activeIndex] = null;
+                        existing = null;
+                    }
+
+                    var text = existing as Text ?? AcquireText();
+                    PrepareText(text);
+                    text.text = token.Text ?? string.Empty;
+                    text.color = textColor;
+                    text.fontSize = fontSize;
+                    text.alignment = ResolveTextAlignment(alignment);
+                    text.horizontalOverflow = ResolveHorizontalWrapMode();
+                    text.verticalOverflow = VerticalWrapMode.Overflow;
+                    text.raycastTarget = false;
+                    Activate(text, ref activeIndex);
+                }
+            }
+
+            TrimExcess(activeIndex);
+            RefreshLayoutSize();
+        }
+
+        /// <summary>
+        ///     Enables or disables the single-line enforcement for rendered text tokens.
+        ///     When disabled, text is allowed to wrap across multiple lines.
+        /// </summary>
+        /// <param name="shouldEnforceSingleLine">Whether tokens should remain on a single line.</param>
+        public void SetSingleLine(bool shouldEnforceSingleLine)
+        {
+            if (enforceSingleLine == shouldEnforceSingleLine)
+                return;
+
+            enforceSingleLine = shouldEnforceSingleLine;
+            ApplyOverflowModeToActiveText();
+            RefreshLayoutSize();
+        }
+
+        private void EnsureLayout()
+        {
+            if (layoutGroup != null)
+                return;
+
+            Awake();
+        }
+
+        /// <summary>
+        /// Forces the layout to update immediately and adjusts the rect transform size when appropriate.
+        /// </summary>
+        private void RefreshLayoutSize()
+        {
+            if (rectTransform == null)
+                rectTransform = transform as RectTransform;
+
+            if (rectTransform == null)
+                return;
+
+            // Unity does not update the preferred dimensions until a layout rebuild occurs. Forcing
+            // the rebuild ensures the preferred size accounts for the latest token content before we
+            // query LayoutUtility.
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
+
+            float preferredWidth = LayoutUtility.GetPreferredWidth(rectTransform);
+            float preferredHeight = LayoutUtility.GetPreferredHeight(rectTransform);
+
+            // Only adjust the axis when the rect is not stretched by its parent. This keeps HUD/chat
+            // rows that fill their parent unaffected while standalone floating text objects can expand
+            // to fit long messages with trailing emoji.
+            if (Mathf.Approximately(rectTransform.anchorMin.x, rectTransform.anchorMax.x))
+            {
+                rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, preferredWidth);
+            }
+
+            if (Mathf.Approximately(rectTransform.anchorMin.y, rectTransform.anchorMax.y))
+            {
+                rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, preferredHeight);
+            }
+        }
+
+        private void Activate(Component component, ref int index)
+        {
+            if (component == null)
+                return;
+
+            if (index < activeComponents.Count)
+            {
+                var existing = activeComponents[index];
+                if (existing != null && existing != component)
+                {
+                    ReturnToPool(existing);
+                }
+            }
+
+            var transformComponent = component.transform;
+            transformComponent.SetParent(transform, false);
+            transformComponent.SetSiblingIndex(index);
+            if (!transformComponent.gameObject.activeSelf)
+                transformComponent.gameObject.SetActive(true);
+
+            if (index < activeComponents.Count)
+                activeComponents[index] = component;
+            else
+                activeComponents.Add(component);
+
+            index++;
+        }
+
+        private void ApplyOverflowModeToActiveText()
+        {
+            if (activeComponents.Count == 0)
+                return;
+
+            var wrapMode = ResolveHorizontalWrapMode();
+            for (int i = 0; i < activeComponents.Count; i++)
+            {
+                if (activeComponents[i] is Text textComponent)
+                {
+                    textComponent.horizontalOverflow = wrapMode;
+                    textComponent.verticalOverflow = VerticalWrapMode.Overflow;
+                }
+            }
+        }
+
+        private HorizontalWrapMode ResolveHorizontalWrapMode()
+        {
+            return enforceSingleLine ? HorizontalWrapMode.Overflow : HorizontalWrapMode.Wrap;
+        }
+
+        private Text AcquireText()
+        {
+            if (textPool.Count > 0)
+            {
+                var pooledText = textPool.Dequeue();
+                ConfigureTextComponent(pooledText);
+                return PrepareText(pooledText);
+            }
+
+            var go = new GameObject("TextToken", typeof(RectTransform), typeof(Text), typeof(LayoutElement));
+            var rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0f, 0f);
+            rect.anchorMax = new Vector2(0f, 1f);
+            rect.pivot = new Vector2(0f, 0.5f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            var layout = go.GetComponent<LayoutElement>();
+            ConfigureLayoutElement(layout);
+
+            var text = go.GetComponent<Text>();
+            ConfigureTextComponent(text);
+
+            return PrepareText(text);
+        }
+
+        private static Text PrepareText(Text text)
+        {
+            if (text == null)
+                return null;
+
+            text.gameObject.SetActive(true);
+            return text;
+        }
+
+        /// <summary>
+        /// Resolves the alignment that should be applied to individual text spans.
+        /// </summary>
+        /// <param name="alignment">Caller-provided anchor describing the overall layout.</param>
+        /// <returns>Alignment that preserves the vertical anchor while forcing the text to be left aligned.</returns>
+        private static TextAnchor ResolveTextAlignment(TextAnchor alignment)
+        {
+            // The floating chat rows can request centred alignment so the overall
+            // bubble anchors correctly, but individual text spans must remain
+            // left aligned so emoji sprites do not overlap the neighbouring text.
+            switch (alignment)
+            {
+                case TextAnchor.UpperLeft:
+                case TextAnchor.UpperCenter:
+                case TextAnchor.UpperRight:
+                    return TextAnchor.UpperLeft;
+                case TextAnchor.MiddleLeft:
+                case TextAnchor.MiddleCenter:
+                case TextAnchor.MiddleRight:
+                    return TextAnchor.MiddleLeft;
+                case TextAnchor.LowerLeft:
+                case TextAnchor.LowerCenter:
+                case TextAnchor.LowerRight:
+                    return TextAnchor.LowerLeft;
+                default:
+                    return TextAnchor.UpperLeft;
+            }
+        }
+
+        private static void ConfigureTextComponent(Text text)
+        {
+            if (text == null)
+                return;
+
+            text.text = string.Empty;
+            text.supportRichText = false;
+            LegacyFontProvider.ApplyTo(text);
+            text.raycastTarget = false;
+
+            ConfigureLayoutElement(text.GetComponent<LayoutElement>());
+        }
+
+        private static void ConfigureLayoutElement(LayoutElement layout)
+        {
+            if (layout == null)
+                return;
+
+            layout.flexibleWidth = 0f;
+            layout.minWidth = 0f;
+            layout.preferredWidth = -1f;
+        }
+
+        private Image AcquireImage()
+        {
+            if (imagePool.Count > 0)
+                return PrepareImage(imagePool.Dequeue());
+
+            var go = new GameObject("EmojiToken", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
+            var rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0f, 0.5f);
+            rect.anchorMax = new Vector2(0f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            var layout = go.GetComponent<LayoutElement>();
+            layout.preferredWidth = 16f;
+            layout.preferredHeight = 16f;
+            layout.minWidth = 16f;
+            layout.minHeight = 16f;
+
+            var image = go.GetComponent<Image>();
+            image.raycastTarget = false;
+
+            return PrepareImage(image);
+        }
+
+        private static Image PrepareImage(Image image)
+        {
+            if (image == null)
+                return null;
+
+            image.gameObject.SetActive(true);
+            return image;
+        }
+
+        private void TrimExcess(int activeCount)
+        {
+            for (int i = activeComponents.Count - 1; i >= activeCount; i--)
+            {
+                var component = activeComponents[i];
+                ReturnToPool(component);
+                activeComponents.RemoveAt(i);
+            }
+        }
+
+        private void ReturnToPool(Component component)
+        {
+            if (component == null)
+                return;
+
+            var go = component.gameObject;
+            go.SetActive(false);
+            go.transform.SetParent(transform, false);
+
+            if (component is Text text)
+                textPool.Enqueue(text);
+            else if (component is Image image)
+                imagePool.Enqueue(image);
+        }
+
+        private void ClearActiveComponents()
+        {
+            TrimExcess(0);
+        }
+    }
+}

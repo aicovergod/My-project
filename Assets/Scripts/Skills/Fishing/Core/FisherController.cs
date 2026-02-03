@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Skills.Common;
+using Companions;
+using Inventory;
 
 namespace Skills.Fishing
 {
@@ -19,6 +22,7 @@ namespace Skills.Fishing
 
         private readonly List<FishDefinition> eligibleFish = new List<FishDefinition>();
         private FishingToolDefinition cachedTool;
+        private Dictionary<string, ItemData> gatheredItemCache;
 
         private FishingSkill FishingSkill => Skill;
 
@@ -64,11 +68,6 @@ namespace Skills.Fishing
         /// Fishing supports the right click prospect action.
         /// </summary>
         protected override bool SupportsProspecting => true;
-
-        /// <summary>
-        /// Fishing should still respond to clicks when the pointer is over UI elements.
-        /// </summary>
-        protected override bool BlockMouseWhilePointerOverUI => false;
 
         /// <inheritdoc />
         protected override bool IsPerformingAction => FishingSkill != null && FishingSkill.IsFishing;
@@ -180,13 +179,28 @@ namespace Skills.Fishing
                 return false;
             }
 
+            bool companionHasCapacityForAny = false;
             foreach (var fish in eligibleFish)
             {
-                if (FishingSkill.CanAddFish(fish))
+                if (fish == null)
+                    continue;
+
+                var capacityResult = GatheringInventoryHelper.EvaluateGatheredItemCapacity(
+                    FishingSkill.InventoryComponent,
+                    fish.ItemId,
+                    "Heron",
+                    ref gatheredItemCache);
+
+                if (capacityResult.PlayerOrPetHasCapacity)
                     return true;
+
+                if (capacityResult.CompanionInventoryHasCapacity)
+                    companionHasCapacityForAny = true;
             }
 
-            failureMessage = "Your inventory is full";
+            failureMessage = companionHasCapacityForAny
+                ? PlayerInventoryFullChatMessage
+                : PlayerAndCompanionInventoryFullChatMessage;
             return false;
         }
 
@@ -219,7 +233,28 @@ namespace Skills.Fishing
         /// <inheritdoc />
         protected override void Prospect(FishableSpot node)
         {
-            node?.Prospect(transform);
+            if (node == null)
+                return;
+
+            bool shiftHeld = false;
+            var keyboard = Keyboard.current;
+            if (keyboard != null)
+            {
+                shiftHeld = (keyboard.leftShiftKey != null && keyboard.leftShiftKey.isPressed)
+                    || (keyboard.rightShiftKey != null && keyboard.rightShiftKey.isPressed);
+            }
+            else
+            {
+                shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            }
+
+            if (shiftHeld)
+            {
+                CompanionManager.TryCommandFish(node);
+                return;
+            }
+
+            node.Prospect(transform);
         }
 
         /// <summary>

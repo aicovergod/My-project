@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using Util;
 using World;
+using NPC.Navigation;
 
 namespace NPC
 {
@@ -265,6 +266,72 @@ namespace NPC
         }
 
         /// <summary>
+        /// Mapping between a navmesh zone identifier and the chunk identifiers that should load when the zone activates.
+        /// </summary>
+        [Serializable]
+        public sealed class NavMeshZoneBinding
+        {
+            [Tooltip("Unique identifier emitted by navmesh zone triggers when the player crosses into the region.")]
+            [SerializeField] private string zoneId;
+
+            [Tooltip("Chunk identifiers (chunk_X_Y) that should be streamed in while this zone is active.")]
+            [SerializeField] private List<string> chunkIds = new List<string>();
+
+            /// <summary>
+            /// Navmesh zone identifier that the binding represents.
+            /// </summary>
+            public string ZoneId => zoneId;
+
+            /// <summary>
+            /// Chunk identifiers associated with the binding.
+            /// </summary>
+            public IReadOnlyList<string> ChunkIds => chunkIds;
+
+            /// <summary>
+            /// Returns <c>true</c> when the supplied identifier matches the binding's zone id.
+            /// </summary>
+            public bool Matches(string candidate)
+            {
+                return !string.IsNullOrEmpty(zoneId) && string.Equals(zoneId, candidate, StringComparison.Ordinal);
+            }
+
+#if UNITY_EDITOR
+            /// <summary>
+            /// Normalises user input so duplicate chunk identifiers and whitespace are stripped from the inspector.
+            /// </summary>
+            public void Sanitize()
+            {
+                zoneId = string.IsNullOrWhiteSpace(zoneId) ? string.Empty : zoneId.Trim();
+                if (chunkIds == null)
+                {
+                    chunkIds = new List<string>();
+                    return;
+                }
+
+                var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                for (int i = chunkIds.Count - 1; i >= 0; i--)
+                {
+                    string entry = chunkIds[i];
+                    if (string.IsNullOrWhiteSpace(entry))
+                    {
+                        chunkIds.RemoveAt(i);
+                        continue;
+                    }
+
+                    string trimmed = entry.Trim();
+                    if (!seen.Add(trimmed))
+                    {
+                        chunkIds.RemoveAt(i);
+                        continue;
+                    }
+
+                    chunkIds[i] = trimmed;
+                }
+            }
+#endif
+        }
+
+        /// <summary>
         /// Tolerance used when comparing f-costs fetched from the heap against the authoritative node record.
         /// Prevents floating point precision drift from flagging fresh entries as stale.
         /// </summary>
@@ -278,8 +345,11 @@ namespace NPC
         private static PathfindingService instance;
 
         [Header("Grid Source")]
-        [Tooltip("Reference grid used for pathfinding. When unset the service will search the scene for a NavGridBuilder.")]
-        [SerializeField] private NavGridBuilder navGrid;
+        [Tooltip("Streaming service that exposes the aggregated navigation data set.")]
+        [SerializeField] private NavGridStreamingService streamingService;
+
+        [Tooltip("Optional fallback grid used when streaming data is unavailable (primarily for tests).")]
+        [SerializeField] private NavGridBuilder fallbackNavGrid;
 
         [Tooltip("Maximum number of nodes expanded per tick. Lower values spread work across more ticks at the cost of latency.")]
         [SerializeField, Range(4, 512)] private int maxNodesPerTick = 128;
@@ -297,6 +367,10 @@ namespace NPC
 
         [Tooltip("Attempts to merge straight corridors whenever a clear line exists between cell endpoints.")]
         [SerializeField] private bool useLineOfSightForSmoothing = true;
+
+        [Header("Streaming")]
+        [Tooltip("Mappings between navmesh zone identifiers and the chunk IDs baked via the NavGridChunkBaker.")]
+        [SerializeField] private List<NavMeshZoneBinding> zoneChunkBindings = new List<NavMeshZoneBinding>();
 
         [Header("Debug")]
         [Tooltip("Writes verbose logging for path requests and failures.")]
@@ -322,6 +396,9 @@ namespace NPC
         private Coroutine tickerSubscriptionRoutine;
         private int nextActiveRequestIndex;
         private bool occupancyServiceSubscribed;
+        private INavGridData navData;
+        private NavGridBuilder registeredFallbackBuilder;
+        private bool streamingServiceSubscribed;
 
         /// <summary>
         /// Active singleton instance.
@@ -331,14 +408,35 @@ namespace NPC
             : BootstrapImmediate();
 
         /// <summary>
-        /// Current grid assigned to the service.
+        /// Current navigation data assigned to the service.
         /// </summary>
-        public NavGridBuilder ActiveGrid => navGrid;
+        public INavGridData ActiveNavData => navData;
 
         /// <summary>
         /// Revision counter for the active grid, incremented every time it is rebuilt.
         /// </summary>
-        public int GridRevision => navGrid != null ? navGrid.Revision : 0;
+        public int GridRevision => navData != null ? navData.Revision : 0;
+
+        /// <summary>
+        /// Zone to chunk bindings configured in the inspector.
+        /// </summary>
+        public IReadOnlyList<NavMeshZoneBinding> ZoneChunkBindings => zoneChunkBindings;
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (zoneChunkBindings == null)
+            {
+                zoneChunkBindings = new List<NavMeshZoneBinding>();
+                return;
+            }
+
+            for (int i = 0; i < zoneChunkBindings.Count; i++)
+            {
+                zoneChunkBindings[i]?.Sanitize();
+            }
+        }
+#endif
 
         protected override void Awake()
         {
@@ -350,8 +448,9 @@ namespace NPC
 
             base.Awake();
             instance = this;
-            EnsureGridReference();
+            EnsureStreamingService();
             EnsureOccupancyService();
+            BindNavData();
         }
 
         private void Start()
@@ -367,7 +466,8 @@ namespace NPC
             }
 
             SubscribeToTicker();
-            EnsureGridReference();
+            EnsureStreamingService();
+            BindNavData();
             EnsureOccupancyService();
         }
 
@@ -375,6 +475,8 @@ namespace NPC
         {
             UnsubscribeFromTicker();
             DetachOccupancyService();
+            DetachStreamingService();
+            DetachFallbackGrid();
         }
 
         private void OnDestroy()
@@ -382,11 +484,9 @@ namespace NPC
             if (instance == this)
             {
                 UnsubscribeFromTicker();
-                if (navGrid != null)
-                {
-                    navGrid.GridRebuilt -= HandleGridRebuilt;
-                }
                 DetachOccupancyService();
+                DetachStreamingService();
+                DetachFallbackGrid();
                 instance = null;
             }
         }
@@ -401,41 +501,94 @@ namespace NPC
                 return;
             }
 
-            if (navGrid == builder)
+            if (registeredFallbackBuilder == builder)
             {
+                EnsureFallbackGridReady(builder);
+                BindNavData();
                 return;
             }
 
-            if (navGrid != null)
+            if (registeredFallbackBuilder != null)
             {
-                navGrid.GridRebuilt -= HandleGridRebuilt;
+                registeredFallbackBuilder.GridRebuilt -= HandleFallbackGridRebuilt;
             }
 
-            navGrid = builder;
-            if (navGrid != null)
+            registeredFallbackBuilder = builder;
+            if (registeredFallbackBuilder != null)
             {
-                navGrid.GridRebuilt += HandleGridRebuilt;
-                if (navGrid.NeedsRebuild)
+                registeredFallbackBuilder.GridRebuilt += HandleFallbackGridRebuilt;
+                EnsureFallbackGridReady(registeredFallbackBuilder);
+            }
+
+            if (enableDebugLogging && registeredFallbackBuilder != null)
+            {
+                Debug.Log($"PathfindingService registered fallback grid '{registeredFallbackBuilder.name}'.", this);
+            }
+
+            BindNavData();
+        }
+
+        /// <summary>
+        /// Attempts to map a zone identifier to the baked chunk identifiers that should be loaded.
+        /// </summary>
+        /// <param name="zoneId">Identifier emitted by a <see cref="NPC.Navigation.NavGridStreamingZone"/> or similar runtime trigger.</param>
+        /// <param name="chunkIds">Populated with the chunk identifiers associated with the zone.</param>
+        /// <returns><c>true</c> when the zone has at least one chunk binding.</returns>
+        public bool TryGetChunkIdsForZone(string zoneId, out IReadOnlyList<string> chunkIds)
+        {
+            chunkIds = Array.Empty<string>();
+
+            if (string.IsNullOrEmpty(zoneId) || zoneChunkBindings == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < zoneChunkBindings.Count; i++)
+            {
+                NavMeshZoneBinding binding = zoneChunkBindings[i];
+                if (binding != null && binding.Matches(zoneId))
                 {
-                    navGrid.BuildGrid();
+                    IReadOnlyList<string> ids = binding.ChunkIds ?? Array.Empty<string>();
+                    chunkIds = ids;
+                    return ids.Count > 0;
                 }
             }
 
-            if (activeRequests.Count > 0)
+            return false;
+        }
+
+        /// <summary>
+        /// Converts the chunk identifiers assigned to a zone into chunk coordinate pairs.
+        /// </summary>
+        /// <param name="zoneId">Identifier emitted by the navmesh zone.</param>
+        /// <param name="results">Buffer that receives the parsed coordinates.</param>
+        /// <returns><c>true</c> when at least one chunk coordinate was parsed successfully.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="results"/> is <c>null</c>.</exception>
+        public bool TryGetChunkCoordinatesForZone(string zoneId, List<Vector2Int> results)
+        {
+            if (results == null)
             {
-                for (int i = 0; i < activeRequests.Count; i++)
+                throw new ArgumentNullException(nameof(results));
+            }
+
+            results.Clear();
+
+            if (!TryGetChunkIdsForZone(zoneId, out IReadOnlyList<string> ids))
+            {
+                return false;
+            }
+
+            bool any = false;
+            for (int i = 0; i < ids.Count; i++)
+            {
+                if (NavGridChunkDefinition.TryParseChunkId(ids[i], out Vector2Int coords))
                 {
-                    RequeueRequest(activeRequests[i]);
+                    results.Add(coords);
+                    any = true;
                 }
-
-                activeRequests.Clear();
-                nextActiveRequestIndex = 0;
             }
 
-            if (enableDebugLogging && navGrid != null)
-            {
-                Debug.Log($"PathfindingService registered grid '{navGrid.name}'.", this);
-            }
+            return any;
         }
 
         /// <summary>
@@ -473,7 +626,7 @@ namespace NPC
             EnsureOccupancyService();
             PromoteDelayedRequests();
 
-            if (!EnsureGridReference())
+            if (!EnsureNavData())
             {
                 if (activeRequests.Count > 0)
                 {
@@ -580,7 +733,7 @@ namespace NPC
 
                 request.WaitingOnOccupancy = false;
                 request.OccupancyResumeTick = 0;
-                request.GridRevisionAtStart = navGrid != null ? navGrid.Revision : 0;
+                request.GridRevisionAtStart = navData != null ? navData.Revision : 0;
                 activeRequests.Add(request);
                 startedAny = true;
             }
@@ -697,14 +850,14 @@ namespace NPC
                 return 0;
             }
 
-            if (navGrid == null)
+            if (navData == null || !navData.HasData)
             {
                 CompleteRequest(request, PathStatus.GridUnavailable, null);
                 outcome = RequestStepOutcome.Completed;
                 return 0;
             }
 
-            if (request.GridRevisionAtStart != navGrid.Revision)
+            if (request.GridRevisionAtStart != navData.Revision)
             {
                 if (enableDebugLogging)
                 {
@@ -722,7 +875,7 @@ namespace NPC
             EnsureOccupancyService();
 
             var search = request.Search;
-            var grid = navGrid;
+            var grid = navData;
 
             if (search.OpenSet.Count == 0)
             {
@@ -1054,12 +1207,16 @@ namespace NPC
         /// </summary>
         private bool PrepareRequest(PathRequest request)
         {
-            if (!EnsureGridReference())
+            if (!EnsureNavData())
             {
                 return false;
             }
 
-            var grid = navGrid;
+            var grid = navData;
+            if (grid == null || !grid.HasData)
+            {
+                return false;
+            }
             Vector2Int startCell = grid.TryGetCell(request.StartWorld, out var tempStart)
                 ? tempStart
                 : grid.WorldToCellClamped(request.StartWorld);
@@ -1104,10 +1261,15 @@ namespace NPC
         /// </summary>
         private Vector2Int ResolveNearestWalkable(Vector2Int desired, Vector2Int start, out bool usedStartFallback)
         {
-            var grid = navGrid;
+            var grid = navData;
             usedStartFallback = false;
             resolveFrontier.Clear();
             resolveVisited.Clear();
+
+            if (grid == null || !grid.HasData)
+            {
+                return start;
+            }
 
             if (grid.IsCellWalkable(desired))
             {
@@ -1185,9 +1347,9 @@ namespace NPC
             }
 
             Vector2 resolvedGoalWorld = request.ResolvedGoalWorld;
-            if (navGrid != null && navGrid.HasGrid)
+            if (navData != null && navData.HasData)
             {
-                resolvedGoalWorld = navGrid.GetCellCenter(request.GoalCell);
+                resolvedGoalWorld = navData.GetCellCenter(request.GoalCell);
             }
             else if (!request.Prepared)
             {
@@ -1219,9 +1381,9 @@ namespace NPC
         /// </summary>
         private static List<Vector2> ConvertCellsToWorld(List<Vector2Int> cells, Vector2Int startCell)
         {
-            var grid = instance?.navGrid;
+            var grid = instance?.navData;
             var path = new List<Vector2>();
-            if (grid == null || cells == null || cells.Count == 0)
+            if (grid == null || !grid.HasData || cells == null || cells.Count == 0)
             {
                 return path;
             }
@@ -1285,7 +1447,7 @@ namespace NPC
         /// <summary>
         /// Verifies that a diagonal traversal between two cells is valid by checking the orthogonal flank cells.
         /// </summary>
-        private static bool HasClearDiagonal(Vector2Int origin, Vector2Int target, NavGridBuilder grid)
+        private static bool HasClearDiagonal(Vector2Int origin, Vector2Int target, INavGridData grid)
         {
             if (!IsDiagonalMove(origin, target))
             {
@@ -1376,7 +1538,7 @@ namespace NPC
                 }
             }
 
-            if (!useLineOfSightForSmoothing || navGrid == null || !navGrid.HasGrid || collapsed.Count <= 2)
+            if (!useLineOfSightForSmoothing || navData == null || !navData.HasData || collapsed.Count <= 2)
             {
                 return collapsed;
             }
@@ -1392,7 +1554,7 @@ namespace NPC
                 int nextIndex = anchorIndex + 1;
                 for (int i = collapsed.Count - 1; i > anchorIndex; i--)
                 {
-                    if (navGrid.HasClearLineBetweenCells(collapsed[anchorIndex], collapsed[i]))
+                    if (navData.HasClearLineBetweenCells(collapsed[anchorIndex], collapsed[i]))
                     {
                         nextIndex = i;
                         break;
@@ -1512,61 +1674,137 @@ namespace NPC
         }
 
         /// <summary>
-        /// Resolves and validates the navigation grid used by the service.
+        /// Resolves the navigation data backing the service.
         /// </summary>
-        private bool EnsureGridReference()
+        private bool EnsureNavData()
         {
-            if (navGrid != null && navGrid.HasGrid)
+            EnsureStreamingService();
+
+            if (navData != null && navData.HasData)
             {
                 return true;
             }
 
-            if (navGrid == null)
-            {
-                navGrid = FindObjectOfType<NavGridBuilder>();
-                if (navGrid != null)
-                {
-                    navGrid.GridRebuilt += HandleGridRebuilt;
-                }
-            }
-
-            if (navGrid == null)
-            {
-                return false;
-            }
-
-            if (navGrid.NeedsRebuild)
-            {
-                navGrid.BuildGrid();
-            }
-
-            return navGrid.HasGrid;
+            BindNavData();
+            return navData != null && navData.HasData;
         }
 
-        /// <summary>
-        /// Handles grid rebuild notifications so outstanding requests can restart against the new data.
-        /// </summary>
-        private void HandleGridRebuilt(NavGridBuilder builder)
+        private void EnsureStreamingService()
         {
-            if (builder != navGrid)
+            if (streamingService != null)
+            {
+                if (!streamingServiceSubscribed)
+                {
+                    streamingService.NavDataChanged += HandleNavDataChanged;
+                    streamingServiceSubscribed = true;
+                }
+
+                return;
+            }
+
+            streamingService = FindFirstObjectByType<NavGridStreamingService>(FindObjectsInactive.Include);
+            if (streamingService != null)
+            {
+                streamingService.NavDataChanged += HandleNavDataChanged;
+                streamingServiceSubscribed = true;
+            }
+        }
+
+        private void DetachStreamingService()
+        {
+            if (streamingService != null && streamingServiceSubscribed)
+            {
+                streamingService.NavDataChanged -= HandleNavDataChanged;
+                streamingServiceSubscribed = false;
+            }
+        }
+
+        private void DetachFallbackGrid()
+        {
+            if (registeredFallbackBuilder != null)
+            {
+                registeredFallbackBuilder.GridRebuilt -= HandleFallbackGridRebuilt;
+                registeredFallbackBuilder = null;
+            }
+        }
+
+        private void BindNavData()
+        {
+            EnsureFallbackGridReady(fallbackNavGrid);
+            EnsureFallbackGridReady(registeredFallbackBuilder);
+
+            INavGridData previous = navData;
+            INavGridData newData = null;
+
+            if (streamingService != null)
+            {
+                newData = streamingService.ActiveData;
+            }
+
+            if ((newData == null || !newData.HasData) && fallbackNavGrid != null && fallbackNavGrid.HasGrid)
+            {
+                newData = fallbackNavGrid;
+            }
+
+            if ((newData == null || !newData.HasData) && registeredFallbackBuilder != null && registeredFallbackBuilder.HasGrid)
+            {
+                newData = registeredFallbackBuilder;
+            }
+
+            navData = newData;
+
+            if (!ReferenceEquals(previous, navData))
+            {
+                ResetActiveRequestsDueToNavChange();
+
+                if (enableDebugLogging && navData != null)
+                {
+                    Debug.Log($"PathfindingService bound nav data (revision {navData.Revision}).", this);
+                }
+            }
+        }
+
+        private void HandleNavDataChanged(INavGridData _)
+        {
+            BindNavData();
+        }
+
+        private void HandleFallbackGridRebuilt(NavGridBuilder builder)
+        {
+            if (builder == null)
             {
                 return;
             }
 
-            if (enableDebugLogging)
+            BindNavData();
+        }
+
+        private void ResetActiveRequestsDueToNavChange()
+        {
+            if (activeRequests.Count == 0)
             {
-                Debug.Log($"Nav grid rebuilt (revision {builder.Revision}).", this);
+                return;
             }
 
-            if (activeRequests.Count > 0)
+            for (int i = 0; i < activeRequests.Count; i++)
             {
-                for (int i = 0; i < activeRequests.Count; i++)
-                {
-                    RequeueRequest(activeRequests[i]);
-                }
+                RequeueRequest(activeRequests[i]);
+            }
 
-                activeRequests.Clear();
-                nextActiveRequestIndex = 0;
+            activeRequests.Clear();
+            nextActiveRequestIndex = 0;
+        }
+
+        private static void EnsureFallbackGridReady(NavGridBuilder builder)
+        {
+            if (builder == null)
+            {
+                return;
+            }
+
+            if (builder.NeedsRebuild)
+            {
+                builder.BuildGrid();
             }
         }
 

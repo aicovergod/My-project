@@ -2,38 +2,20 @@
 using System;
 using UnityEngine;
 using Core.Save;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using ShopSystem;
 using Player;
-using Skills;
 using Skills.Firemaking;
 using Pets;
 using Quests;
 using UI;
-using Books;
+using Inventory.Core;
+using Inventory.UI;
 using Object = UnityEngine.Object;
 
 namespace Inventory
 {
-    public struct InventoryEntry
-    {
-        public ItemData item;
-        public int count;
-    }
-
-    /// <summary>
-    /// Indicates how a stack split action should be handled.
-    /// </summary>
-    public enum StackSplitType
-    {
-        Drop,
-        Sell,
-        Split
-    }
-
     /// <summary>
     /// Runtime inventory UI generator (Screen Space Overlay). The UI is created at scene root,
     /// starts inactive, and shows always-visible slot squares. If a slotFrameSprite is provided, it is used
@@ -116,48 +98,114 @@ namespace Inventory
         [Tooltip("Database of valid item combinations.")]
         public ItemCombinationDatabase combinationDatabase;
 
-        private Image[] slotImages;
-        private Text[] slotCountTexts;
-        private InventoryEntry[] items;
+        private InventoryModel model;
         public int selectedIndex = -1;
-        private Image[] slotHighlights;
-        private Material highlightMaterial;
+        private InventoryWindowController windowController;
+        private InventoryInteractionHandler interactionHandler;
 
-        private GameObject tooltip;
-        private Text tooltipNameText;
-        private Text tooltipDescriptionText;
-        private InventoryDropMenu dropMenu;
+        // Tracks the configuration currently bound to the runtime window so hot reloads
+        // can refresh layout without instantiating a new controller.
+        private InventoryWindowController.WindowConfig? lastAppliedConfig;
+        private int lastAppliedModelSize = -1;
 
-        // Active shop context when interacting with a shop
-        private Shop currentShop;
+        private bool modelEventsSubscribed;
+        private bool controllerEventsSubscribed;
+
+        // Prevents persistence writes when true so bootstrap sequences can
+        // reconfigure the inventory without clobbering saved data.
+        private bool suppressPersistenceNotifications;
 
         private PlayerMover playerMover;
         private Equipment equipment;
         private FiremakingSkill firemakingSkill;
-
-        // Cached quest UI reference to avoid per-frame lookups.
+        private PetStorage petStorage;
         private QuestUI questUi;
-
-        // UI
-        private GameObject uiRoot; // Canvas root
-        private static GameObject sharedUIRoot;
-
-        // Drag & drop
-        private int draggingIndex = -1;
-        private GameObject draggingIcon;
-        private static Inventory draggingInventory;
 
         // Cached default font to avoid repeated builtin lookups that may throw
         private Font defaultFont;
 
         public event Action OnInventoryChanged;
 
-        public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
+        public bool IsOpen => windowController != null && windowController.UiRoot != null && windowController.UiRoot.activeSelf;
 
-        public bool BankOpen { get; set; }
-        public bool InShop => currentShop != null;
+        private bool bankOpen;
+        public bool BankOpen
+        {
+            get => bankOpen;
+            set
+            {
+                bankOpen = value;
+                if (windowController != null)
+                    windowController.IsBankOpen = value;
+                interactionHandler?.RefreshControllerState();
+            }
+        }
+        public bool InShop => interactionHandler != null && interactionHandler.HasActiveShop;
 
-        private bool CanDropItems => playerMover == null || playerMover.CanDrop;
+        internal InventoryModel Model
+        {
+            get
+            {
+                EnsureModelInitialized();
+                SubscribeModelEvents();
+                return model;
+            }
+        }
+
+        internal InventoryWindowController WindowController => windowController;
+
+        /// <summary>
+        /// Ensures the backing <see cref="InventoryModel"/> exists and matches the configured size.
+        /// </summary>
+        private void EnsureModelInitialized()
+        {
+            size = Mathf.Max(1, size);
+
+            if (model == null)
+                model = new InventoryModel(size, EvaluateCanStore, combinationDatabase);
+
+            model.CanStoreRule = EvaluateCanStore;
+            model.SetCombinationDatabase(combinationDatabase);
+            if (model.Size != size)
+                model.Resize(size);
+        }
+
+        /// <summary>
+        /// Propagates model-level inventory changes to persistence and observers.
+        /// </summary>
+        /// <param name="persist">True to write the inventory state before notifying listeners.</param>
+        private void OnModelInventoryChanged(bool persist)
+        {
+            bool shouldPersist = persist && !suppressPersistenceNotifications;
+            NotifyInventoryChanged(shouldPersist);
+        }
+
+        /// <summary>
+        /// Refreshes UI when a slot changes within the backing model.
+        /// </summary>
+        private void OnModelSlotChanged(int index, InventoryEntry entry)
+        {
+            windowController?.RefreshSlot(index);
+        }
+
+        /// <summary>
+        /// Evaluates whether an item can be stored, deferring to the active pet storage component when present.
+        /// </summary>
+        private bool EvaluateCanStore(ItemData item)
+        {
+            var storage = GetPetStorage();
+            return storage == null || storage.CanStore(item);
+        }
+
+        /// <summary>
+        /// Returns and caches the PetStorage component when attached.
+        /// </summary>
+        private PetStorage GetPetStorage()
+        {
+            if (petStorage == null)
+                TryGetComponent(out petStorage);
+            return petStorage;
+        }
 
         /// <summary>
         /// Saves the inventory when requested and informs listeners that the
@@ -173,18 +221,7 @@ namespace Inventory
 
         public void CloseUI()
         {
-            // Prevent the player inventory from closing while trading or banking to avoid inconsistent states.
-            if (BankOpen || InShop)
-                return;
-            if (uiRoot != null)
-                uiRoot.SetActive(false);
-            HideDropMenu();
-            if (playerMover != null)
-            {
-                var pet = PetDropSystem.ActivePetObject;
-                var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
-                storage?.Close();
-            }
+            interactionHandler?.RequestClose();
         }
 
         public void Close()
@@ -194,43 +231,68 @@ namespace Inventory
 
         public void OpenUI()
         {
-            if (!BankOpen && !InShop && useSharedUIRoot)
-            {
-                var uiManager = UIManager.Instance;
-                if (uiManager != null && !uiManager.TryOpenWindow(this))
-                    return;
-            }
-            if (uiRoot != null)
-                uiRoot.SetActive(true);
-            if (playerMover != null)
-            {
-                var pet = PetDropSystem.ActivePetObject;
-                var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
-                if (!BankOpen)
-                {
-                    if (PetDropSystem.PetInventoryVisible)
-                        storage?.Open();
-                    else
-                        storage?.Close();
-                }
-                else
-                    storage?.Close();
-            }
+            interactionHandler?.RequestOpen();
         }
 
         public InventoryEntry GetSlot(int index)
         {
-            return index >= 0 && index < items.Length ? items[index] : default;
+            return Model.GetEntry(index);
         }
 
         public void ClearSlot(int index)
         {
-            if (index < 0 || index >= items.Length)
+            Model.ClearSlot(index);
+        }
+
+        /// <summary>
+        /// Removes all items from the inventory, persisting the change when any slots
+        /// transition from occupied to empty.
+        /// </summary>
+        /// <returns><c>true</c> when one or more slots were cleared; otherwise <c>false</c>.</returns>
+        public bool ClearAllSlots()
+        {
+            EnsureModelInitialized();
+            return Model.ClearAllSlots();
+        }
+
+        /// <summary>
+        /// Executes <paramref name="operation"/> while persistence notifications are suppressed.
+        /// Callers can batch inventory mutations without triggering save writes until the block
+        /// completes. The supplied action receives the backing <see cref="InventoryModel"/> so
+        /// slot adjustments can be applied directly.
+        /// </summary>
+        /// <param name="operation">Callback that performs the inventory mutations.</param>
+        public void RunWithoutPersistence(Action<InventoryModel> operation)
+        {
+            if (operation == null)
                 return;
-            items[index].item = null;
-            items[index].count = 0;
-            UpdateSlotVisual(index);
-            NotifyInventoryChanged();
+
+            EnsureModelInitialized();
+            var targetModel = Model;
+
+            bool previousState = suppressPersistenceNotifications;
+            suppressPersistenceNotifications = true;
+            try
+            {
+                operation(targetModel);
+            }
+            finally
+            {
+                suppressPersistenceNotifications = previousState;
+            }
+        }
+
+        /// <summary>
+        /// Removes all items from the inventory without triggering persistence writes.
+        /// This is used by bootstrap flows that need to reset layout/state before the
+        /// inventory has restored its saved data.
+        /// </summary>
+        /// <returns><c>true</c> when one or more slots were cleared; otherwise <c>false</c>.</returns>
+        public bool ClearAllSlotsWithoutPersistence()
+        {
+            bool cleared = false;
+            RunWithoutPersistence(model => { cleared = model.ClearAllSlots(); });
+            return cleared;
         }
 
         /// <summary>
@@ -238,30 +300,7 @@ namespace Inventory
         /// </summary>
         public bool EquipItem(int index)
         {
-            if (equipment == null)
-                return false;
-            if (index < 0 || index >= items.Length)
-                return false;
-            var entry = items[index];
-            if (entry.item == null || entry.item.equipmentSlot == EquipmentSlot.None)
-                return false;
-
-            // Temporarily free the slot before attempting to equip.
-            items[index] = default;
-            UpdateSlotVisual(index);
-
-            // Try to equip the item.
-            if (equipment.Equip(entry))
-            {
-                NotifyInventoryChanged();
-                return true;
-            }
-
-            // Equipping failed. Restore the original item.
-            items[index] = entry;
-            UpdateSlotVisual(index);
-            NotifyInventoryChanged(false);
-            return false;
+            return interactionHandler != null && interactionHandler.EquipItem(index);
         }
 
         /// <summary>
@@ -270,67 +309,74 @@ namespace Inventory
         /// </summary>
         public bool UseItem(int index)
         {
-            if (index < 0 || index >= items.Length)
-                return false;
+            return interactionHandler != null && interactionHandler.UseItem(index);
+        }
 
-            var entry = items[index];
-            var item = entry.item;
+        /// <summary>
+        /// Clears the current slot selection and hides the highlight.
+        /// </summary>
+        public void ClearSelection()
+        {
+            interactionHandler?.ClearSelection();
+        }
 
-            if (item is BookItemData bookItem && bookItem.book != null)
-            {
-                BookUI.Instance.Open(bookItem.book);
-                return true;
-            }
+        /// <summary>
+        /// Displays the shared inventory tooltip for the supplied item at the provided anchor.
+        /// Used by external systems such as the bank so all UI surfaces share presentation.
+        /// </summary>
+        /// <param name="item">Item to display within the tooltip.</param>
+        /// <param name="slotRect">RectTransform used to anchor the tooltip next to the hovered slot.</param>
+        public void ShowTooltip(ItemData item, RectTransform slotRect)
+        {
+            if (item == null || slotRect == null)
+                return;
 
-            var eater = GetComponent<PlayerEat>();
-            if (eater != null && item != null && item.healAmount > 0)
-            {
-                if (eater.Eat(item))
-                {
-                    if (!string.IsNullOrEmpty(item.replacementItemId))
-                    {
-                        var next = ItemDatabase.GetItem(item.replacementItemId);
-                        items[index].item = next;
-                        items[index].count = next != null ? 1 : 0;
-                    }
-                    else
-                    {
-                        items[index].count--;
-                        if (items[index].count <= 0)
-                            items[index].item = null;
-                    }
-                    UpdateSlotVisual(index);
-                    NotifyInventoryChanged();
-                    ItemUseResolver.NotifyItemUsed(gameObject, item, ItemUseType.Consumed);
-                    return true;
-                }
-            }
+            // Ensure the controller exists and immediately reopen modal windows so bank/shop
+            // hover requests can surface tooltip data without collapsing the helper canvas.
+            EnsureInitialized(allowModalReopen: true);
+            windowController?.ShowTooltipForItem(item, slotRect);
+        }
 
-            return false;
+        /// <summary>
+        /// Hides the currently visible tooltip if one is active.
+        /// </summary>
+        public void HideTooltip()
+        {
+            if (windowController == null)
+                return;
+
+            windowController.DismissTooltip();
         }
 
         private void OnEnable()
         {
             EnsureInitialized();
+            SubscribeModelEvents();
+            SubscribeControllerEvents();
             SaveManager.Register(this);
-            QuestUI.QuestUIOpened += OnQuestUiOpened;
-            QuestUI.QuestUIClosed += OnQuestUiClosed;
-            questUi = QuestUI.Instance;
+            interactionHandler?.OnEnable();
         }
 
         private void OnDisable()
         {
             SaveManager.Unregister(this);
-            QuestUI.QuestUIOpened -= OnQuestUiOpened;
-            QuestUI.QuestUIClosed -= OnQuestUiClosed;
+            interactionHandler?.OnDisable();
+            UnsubscribeControllerEvents();
+            UnsubscribeModelEvents();
         }
 
         /// <summary>
         /// Ensures runtime data structures exist before the inventory participates in save/load.
         /// </summary>
-        private void EnsureInitialized()
+        /// <param name="allowModalReopen">
+        /// True to reopen the inventory window immediately when modal flows such as the bank or
+        /// shop are active so tooltip-only callers do not collapse the hover helper.
+        /// </param>
+        private void EnsureInitialized(bool allowModalReopen = false)
         {
             size = Mathf.Max(1, size);
+
+            bool wasOpen = IsOpen;
 
             if (defaultFont == null)
                 defaultFont = LegacyFontProvider.GetLegacyFont();
@@ -342,46 +388,61 @@ namespace Inventory
                                  defaultFont;
             }
 
-            if (items == null || items.Length != size)
-            {
-                var previous = items;
-                items = new InventoryEntry[size];
-                if (previous != null)
-                {
-                    int copyLength = Mathf.Min(previous.Length, items.Length);
-                    for (int i = 0; i < copyLength; i++)
-                        items[i] = previous[i];
-                }
-            }
+            EnsureModelInitialized();
 
             if (EventSystem.current == null)
                 EnsureEventSystem();
 
-            if (uiRoot == null)
+            var config = BuildWindowConfig();
+
+            if (windowController == null)
             {
-                if (useSharedUIRoot && sharedUIRoot != null)
-                {
-                    uiRoot = sharedUIRoot;
-                }
-                else
-                {
-                    CreateUI();
-                    if (useSharedUIRoot)
-                        sharedUIRoot = uiRoot;
-                }
+                windowController = new InventoryWindowController(Model, config);
+                controllerEventsSubscribed = false;
+                lastAppliedConfig = config;
+                lastAppliedModelSize = model != null ? model.Size : size;
+            }
+            else
+            {
+                ApplyWindowConfigIfNeeded(config);
             }
 
-            if (uiRoot != null)
-            {
-                uiRoot.SetActive(false);
-                if (dropMenu == null)
-                    dropMenu = uiRoot.GetComponentInChildren<InventoryDropMenu>(true);
-            }
+            windowController.Owner = this;
 
             if (playerMover == null)
                 playerMover = GetComponent<PlayerMover>();
             if (equipment == null)
                 equipment = GetComponent<Equipment>();
+            if (firemakingSkill == null)
+                firemakingSkill = GetComponent<FiremakingSkill>();
+            if (questUi == null)
+                questUi = QuestUI.Instance;
+            petStorage = GetPetStorage();
+
+            if (interactionHandler == null)
+                interactionHandler = new InventoryInteractionHandler(this, Model, windowController);
+
+            interactionHandler.UpdateServiceContext(new InventoryInteractionHandler.ServiceContext
+            {
+                Equipment = equipment,
+                PlayerMover = playerMover,
+                FiremakingSkill = firemakingSkill,
+                QuestUi = questUi,
+                PetStorage = petStorage
+            });
+
+            interactionHandler.RefreshControllerState();
+            windowController.SetSelectedIndex(selectedIndex);
+            windowController.RefreshAllSlots();
+            bool shouldReopenForModal = allowModalReopen &&
+                                        (BankOpen || (interactionHandler != null && interactionHandler.HasActiveShop));
+
+            if (wasOpen || shouldReopenForModal)
+                interactionHandler?.RequestOpen();
+            else
+                windowController.Hide();
+            SubscribeControllerEvents();
+            SubscribeModelEvents();
         }
 
         /// <summary>
@@ -393,54 +454,98 @@ namespace Inventory
             if (useSharedUIRoot)
                 return;
 
+            bool wasOpen = IsOpen;
+
             // Ensure backing arrays/fonts are prepared before we touch the UI.
             EnsureInitialized();
 
-            bool shouldRebuild = uiRoot == null || (sharedUIRoot != null && ReferenceEquals(uiRoot, sharedUIRoot));
-            if (!shouldRebuild)
-            {
-                // We already own a dedicated canvas—just make sure slot visuals stay in sync.
-                if (items != null)
-                {
-                    for (int i = 0; i < items.Length; i++)
-                        UpdateSlotVisual(i);
-                }
+            ApplyWindowConfigIfNeeded(BuildWindowConfig());
+
+            windowController?.ForceDedicatedCanvas();
+            windowController?.SetSelectedIndex(selectedIndex);
+            windowController?.RefreshAllSlots();
+
+            if (wasOpen)
+                interactionHandler?.RequestOpen();
+            else
+                windowController?.Hide();
+        }
+
+        /// <summary>
+        /// Reapplies layout configuration so runtime property edits immediately rebuild the UI.
+        /// </summary>
+        public void RefreshWindowLayout()
+        {
+            EnsureInitialized();
+        }
+
+        /// <summary>
+        /// Builds the configuration payload used when instantiating the window controller.
+        /// </summary>
+        private InventoryWindowController.WindowConfig BuildWindowConfig()
+        {
+            return new InventoryWindowController.WindowConfig(
+                slotSize,
+                slotSpacing,
+                windowPadding,
+                windowSize,
+                referenceResolution,
+                windowPosition,
+                windowColor,
+                emptySlotColor,
+                stackColorDefault,
+                stackColor10k,
+                stackColor100k,
+                stackColor10m,
+                stackColor100m,
+                tooltipNameColor,
+                tooltipDescriptionColor,
+                defaultFont,
+                stackCountFont,
+                tooltipNameFont,
+                tooltipDescriptionFont,
+                slotFrameSprite,
+                showCloseButton,
+                centerOnScreen,
+                useSharedUIRoot,
+                columns,
+                stackCountFontSize);
+        }
+
+        /// <summary>
+        /// Applies the supplied configuration when the cached layout no longer matches runtime settings.
+        /// </summary>
+        private void ApplyWindowConfigIfNeeded(InventoryWindowController.WindowConfig config, bool force = false)
+        {
+            if (windowController == null)
                 return;
-            }
 
-            // Remember whether the UI was visible so we can restore the state after rebuilding.
-            bool wasOpen = uiRoot != null && uiRoot.activeSelf;
+            bool configChanged = !lastAppliedConfig.HasValue || !lastAppliedConfig.Value.Equals(config);
+            bool sizeChanged = model != null && model.Size != lastAppliedModelSize;
+            bool uiRootMissing = windowController.UiRoot == null;
 
-            // Clean up any lingering UI state that pointed at the shared root.
-            HideDropMenu();
-            HideTooltip();
-
-            uiRoot = null;
-            dropMenu = null;
-            tooltip = null;
-            tooltipNameText = null;
-            tooltipDescriptionText = null;
-            slotImages = null;
-            slotCountTexts = null;
-            slotHighlights = null;
-
-            // Build a fresh dedicated canvas hierarchy for this inventory instance.
-            CreateUI();
-
-            if (uiRoot != null)
+            if (force || configChanged || sizeChanged || uiRootMissing)
             {
-                // Restore the previous visibility state and make sure runtime helpers are rebound.
-                uiRoot.SetActive(wasOpen);
-                if (dropMenu == null)
-                    dropMenu = uiRoot.GetComponentInChildren<InventoryDropMenu>(true);
-            }
+                bool reopen = IsOpen;
+                windowController.ApplyConfig(config);
+                lastAppliedConfig = config;
+                lastAppliedModelSize = model != null ? model.Size : size;
 
-            // Update every slot so the newly created UI matches the saved inventory contents.
-            if (items != null)
-            {
-                for (int i = 0; i < items.Length; i++)
-                    UpdateSlotVisual(i);
+                if (reopen)
+                    interactionHandler?.RequestOpen();
             }
+            else if (!force)
+            {
+                lastAppliedModelSize = model != null ? model.Size : size;
+            }
+        }
+
+        private void OnWindowCloseRequested(InventoryWindowController controller)
+        {
+            if (controller != windowController)
+                return;
+
+            CloseUI();
         }
 
         private void Start()
@@ -450,971 +555,12 @@ namespace Inventory
         }
 
         /// <summary>
-        /// Creates a Screen Space Overlay canvas and a simple grid of slots.
-        /// Slots sit inside a window with a colored background similar to the shop UI.
-        /// </summary>
-        private void CreateUI()
-        {
-            uiRoot = new GameObject("InventoryUI", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            // Put UI at the SCENE ROOT so it never behaves like a world object
-            uiRoot.transform.SetParent(null, false);
-            DontDestroyOnLoad(uiRoot);
-
-            // Optional: assign UI layer if it exists (no error if it doesn't)
-            int uiLayer = LayerMask.NameToLayer("UI");
-            if (uiLayer >= 0) uiRoot.layer = uiLayer;
-
-            var canvas = uiRoot.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.pixelPerfect = true;
-
-            var scaler = uiRoot.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = referenceResolution;
-            scaler.matchWidthOrHeight = 0f; // match width (nice for 64px tile games)
-
-            GameObject window = new GameObject("Window", typeof(RectTransform), typeof(Image));
-            window.transform.SetParent(uiRoot.transform, false);
-
-            var windowRect = window.GetComponent<RectTransform>();
-            if (centerOnScreen)
-            {
-                windowRect.anchorMin = new Vector2(0.5f, 0.5f);
-                windowRect.anchorMax = new Vector2(0.5f, 0.5f);
-                windowRect.pivot = new Vector2(0.5f, 0.5f);
-                windowRect.anchoredPosition = Vector2.zero;
-            }
-            else
-            {
-                windowRect.anchorMin = new Vector2(0f, 1f);
-                windowRect.anchorMax = new Vector2(0f, 1f);
-                windowRect.pivot = new Vector2(0f, 1f);
-                windowRect.anchoredPosition = windowPosition;
-            }
-
-            var windowImg = window.GetComponent<Image>();
-            windowImg.color = windowColor;
-
-            GameObject panel = new GameObject("Slots", typeof(RectTransform), typeof(GridLayoutGroup));
-            panel.transform.SetParent(window.transform, false);
-
-            var rect = panel.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0f, 1f);
-            rect.anchorMax = new Vector2(0f, 1f);
-            rect.pivot = new Vector2(0f, 1f);
-            rect.anchoredPosition = new Vector2(windowPadding.x, -windowPadding.y);
-
-            var grid = panel.GetComponent<GridLayoutGroup>();
-            grid.cellSize = slotSize;
-            grid.spacing = slotSpacing;
-            grid.childAlignment = TextAnchor.UpperLeft;
-            grid.startCorner = GridLayoutGroup.Corner.UpperLeft;
-            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            grid.constraintCount = Mathf.Max(1, columns);
-
-            // Generate visible slot images
-            slotImages = new Image[size];
-            slotCountTexts = new Text[size];
-            slotHighlights = new Image[size];
-
-            try
-            {
-                for (int i = 0; i < size; i++)
-                {
-                    GameObject slot = new GameObject($"Slot{i}", typeof(Image));
-                    slot.transform.SetParent(panel.transform, false);
-
-                    var img = slot.GetComponent<Image>();
-                    if (slotFrameSprite != null)
-                    {
-                        img.sprite = slotFrameSprite;
-                        img.type = Image.Type.Sliced; // use 9-slice if the sprite supports it
-                        img.color = emptySlotColor;    // tint
-                    }
-                    else
-                    {
-                        // No sprite? Show a simple tinted square.
-                        img.sprite = null;
-                        img.color = emptySlotColor;
-                        // Optional: give it a subtle outline by adding a child Image here if you want.
-                    }
-
-                    // IMPORTANT: keep enabled so you can see the empty slot
-                    img.enabled = true;
-
-                    // Add highlight image
-                    GameObject highlightGO = new GameObject("Highlight", typeof(Image));
-                    highlightGO.transform.SetParent(slot.transform, false);
-                    var highlightImg = highlightGO.GetComponent<Image>();
-                    highlightImg.sprite = null;
-                    // Use full alpha so the outline shader can render properly
-                    highlightImg.color = new Color(1f, 1f, 1f, 1f);
-                    highlightImg.type = Image.Type.Simple;
-                    highlightImg.raycastTarget = false;
-                    if (highlightMaterial == null)
-                    {
-                        var shader = Shader.Find("Custom/SpriteOutline");
-                        if (shader != null)
-                        {
-                            highlightMaterial = new Material(shader);
-                            highlightMaterial.SetColor("_OutlineColor", Color.yellow);
-                        }
-                    }
-                    highlightImg.material = highlightMaterial;
-                    var hlRect = highlightGO.GetComponent<RectTransform>();
-                    hlRect.anchorMin = Vector2.zero;
-                    hlRect.anchorMax = Vector2.one;
-                    hlRect.offsetMin = Vector2.zero;
-                    hlRect.offsetMax = Vector2.zero;
-                    highlightImg.enabled = false;
-                    slotHighlights[i] = highlightImg;
-
-                    // Add quantity text
-                    GameObject countGO = new GameObject("Count", typeof(Text));
-                    countGO.transform.SetParent(slot.transform, false);
-                    var countText = countGO.GetComponent<Text>();
-                    var outline = countGO.AddComponent<Outline>();
-                    outline.effectColor = Color.black;
-                    outline.effectDistance = new Vector2(1f, -1f);
-                    outline.useGraphicAlpha = false;
-                    countText.font = stackCountFont ?? defaultFont;
-                    countText.fontSize = stackCountFontSize;
-                    countText.alignment = TextAnchor.UpperLeft;
-                    countText.raycastTarget = false;
-                    countText.color = Color.white;
-                    countText.horizontalOverflow = HorizontalWrapMode.Overflow;
-                    countText.text = string.Empty;
-                    var countRect = countGO.GetComponent<RectTransform>();
-                    countRect.anchorMin = new Vector2(0f, 1f);
-                    countRect.anchorMax = new Vector2(0f, 1f);
-                    countRect.pivot = new Vector2(0f, 1f);
-                    countRect.offsetMin = new Vector2(2f, -16f);
-                    countRect.offsetMax = new Vector2(16f, -2f);
-
-                    // Add hover handler
-                    var slotComponent = slot.AddComponent<InventorySlot>();
-                    if (slotComponent != null)
-                    {
-                        slotComponent.inventory = this;
-                        slotComponent.index = i;
-                    }
-
-                    slotImages[i] = img;
-                    slotCountTexts[i] = countText;
-                }
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError($"Inventory UI generation failed: {ex}");
-            }
-
-            int rows = Mathf.CeilToInt((float)size / Mathf.Max(1, columns));
-            windowSize = new Vector2(columns * slotSize.x + (columns - 1) * slotSpacing.x + windowPadding.x * 2f,
-                rows * slotSize.y + (rows - 1) * slotSpacing.y + windowPadding.y * 2f);
-            rect.sizeDelta = new Vector2(windowSize.x - windowPadding.x * 2f, windowSize.y - windowPadding.y * 2f);
-
-            // Force a layout rebuild so slots are positioned before the UI is hidden
-            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
-            windowRect.sizeDelta = windowSize;
-
-            if (showCloseButton)
-            {
-                GameObject closeBtn = new GameObject("CloseButton", typeof(RectTransform), typeof(Image), typeof(Button));
-                closeBtn.transform.SetParent(window.transform, false);
-                var cbRect = closeBtn.GetComponent<RectTransform>();
-                cbRect.anchorMin = cbRect.anchorMax = new Vector2(1f, 1f);
-                cbRect.pivot = new Vector2(1f, 1f);
-                cbRect.anchoredPosition = new Vector2(-4f, -4f);
-                cbRect.sizeDelta = new Vector2(16f, 16f);
-                var txtGO = new GameObject("X", typeof(Text));
-                txtGO.transform.SetParent(closeBtn.transform, false);
-                var txt = txtGO.GetComponent<Text>();
-                if (defaultFont != null) txt.font = defaultFont;
-                txt.text = "X";
-                txt.alignment = TextAnchor.MiddleCenter;
-                txt.color = Color.white;
-                txt.raycastTarget = false;
-                var txtRect = txtGO.GetComponent<RectTransform>();
-                txtRect.anchorMin = Vector2.zero;
-                txtRect.anchorMax = Vector2.one;
-                txtRect.offsetMin = Vector2.zero;
-                txtRect.offsetMax = Vector2.zero;
-                closeBtn.GetComponent<Button>().onClick.AddListener(CloseUI);
-            }
-
-            // Tooltip setup
-            tooltip = new GameObject("Tooltip", typeof(Image), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
-            tooltip.transform.SetParent(uiRoot.transform, false);
-
-            // Ensure the tooltip is rendered above other interfaces like the bank
-            var tooltipCanvas = tooltip.AddComponent<Canvas>();
-            tooltipCanvas.overrideSorting = true;
-            tooltipCanvas.sortingOrder = 1000;
-            tooltip.AddComponent<GraphicRaycaster>();
-
-            var bg = tooltip.GetComponent<Image>();
-            bg.color = new Color(0f, 0f, 0f, 0.75f);
-            bg.raycastTarget = false;
-
-            var layout = tooltip.GetComponent<VerticalLayoutGroup>();
-            layout.childAlignment = TextAnchor.UpperLeft;
-            layout.childControlWidth = false;
-            layout.childControlHeight = true;
-            layout.childForceExpandWidth = false;
-            layout.childForceExpandHeight = false;
-            layout.padding = new RectOffset(4, 4, 4, 4);
-            layout.spacing = 2f;
-
-            var fitter = tooltip.GetComponent<ContentSizeFitter>();
-            fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-            var nameGO = new GameObject("Name", typeof(Text));
-            nameGO.transform.SetParent(tooltip.transform, false);
-            tooltipNameText = nameGO.GetComponent<Text>();
-            tooltipNameText.font = tooltipNameFont != null
-                ? tooltipNameFont
-                : defaultFont;
-            tooltipNameText.alignment = TextAnchor.UpperLeft;
-            tooltipNameText.color = tooltipNameColor;
-            tooltipNameText.raycastTarget = false;
-            tooltipNameText.horizontalOverflow = HorizontalWrapMode.Wrap;
-            tooltipNameText.verticalOverflow = VerticalWrapMode.Overflow;
-
-            var descGO = new GameObject("Description", typeof(Text));
-            descGO.transform.SetParent(tooltip.transform, false);
-            tooltipDescriptionText = descGO.GetComponent<Text>();
-            tooltipDescriptionText.font = tooltipDescriptionFont != null
-                ? tooltipDescriptionFont
-                : defaultFont;
-            tooltipDescriptionText.alignment = TextAnchor.UpperLeft;
-            tooltipDescriptionText.color = tooltipDescriptionColor;
-            tooltipDescriptionText.supportRichText = true;
-            tooltipDescriptionText.raycastTarget = false;
-            tooltipDescriptionText.horizontalOverflow = HorizontalWrapMode.Wrap;
-            tooltipDescriptionText.verticalOverflow = VerticalWrapMode.Overflow;
-
-            var tooltipRect = tooltip.GetComponent<RectTransform>();
-            tooltipRect.pivot = new Vector2(0f, 1f);
-
-            tooltip.SetActive(false);
-
-            dropMenu = InventoryDropMenu.Create(uiRoot.transform, stackCountFont);
-        }
-
-        private string FormatStackCount(int count, out Color color)
-        {
-            if (count < 10000)
-            {
-                color = stackColorDefault;
-                return count.ToString();
-            }
-
-            if (count >= 1000000000)
-            {
-                color = stackColor100m;
-                return (count / 1000000000) + "b";
-            }
-
-            if (count >= 100000000)
-            {
-                color = stackColor100m;
-                return (count / 1000000) + "m";
-            }
-
-            if (count >= 10000000)
-            {
-                color = stackColor10m;
-                return (count / 1000000) + "m";
-            }
-
-            if (count >= 1000000)
-            {
-                color = stackColor100k;
-                return (count / 1000000) + "m";
-            }
-
-            if (count >= 100000)
-            {
-                color = stackColor100k;
-                return (count / 1000) + "k";
-            }
-
-            // count between 10,000 and 99,999
-            color = stackColor10k;
-            return (count / 1000) + "k";
-        }
-
-        public void UpdateSlotVisual(int index)
-        {
-            if (slotImages == null || index < 0 || index >= slotImages.Length || slotImages[index] == null)
-                return;
-
-            var entry = items[index];
-            var item = entry.item;
-            if (item != null)
-            {
-                Sprite sprite = item.GetIconForCount(entry.count);
-                if (sprite == null)
-                    sprite = item.icon != null ? item.icon : slotFrameSprite;
-
-                if (sprite == null)
-                    sprite = slotFrameSprite;
-
-                slotImages[index].sprite = sprite;
-                slotImages[index].type = (slotImages[index].sprite == slotFrameSprite && slotFrameSprite != null)
-                    ? Image.Type.Sliced : Image.Type.Simple;
-                slotImages[index].color = Color.white;
-                slotImages[index].enabled = true;
-                if (slotCountTexts != null && slotCountTexts.Length > index && slotCountTexts[index] != null)
-                {
-                    if (entry.count > 1)
-                    {
-                        Color color;
-                        slotCountTexts[index].text = FormatStackCount(entry.count, out color);
-                        slotCountTexts[index].color = color;
-                        slotCountTexts[index].enabled = true;
-                    }
-                    else
-                    {
-                        slotCountTexts[index].text = string.Empty;
-                        slotCountTexts[index].enabled = false;
-                    }
-                }
-            }
-            else
-            {
-                slotImages[index].sprite = slotFrameSprite;
-                slotImages[index].type = (slotFrameSprite != null) ? Image.Type.Sliced : Image.Type.Simple;
-                slotImages[index].color = emptySlotColor;
-                slotImages[index].enabled = true;
-                if (slotCountTexts != null && slotCountTexts.Length > index && slotCountTexts[index] != null)
-                {
-                    slotCountTexts[index].text = string.Empty;
-                    slotCountTexts[index].enabled = false;
-                }
-            }
-
-            if (slotHighlights != null && slotHighlights.Length > index && slotHighlights[index] != null)
-            {
-                var highlight = slotHighlights[index];
-                highlight.sprite = slotImages[index].sprite;
-                highlight.type = Image.Type.Simple;
-                // Ensure the outline image has an opaque color; the outline shader
-                // will handle hiding the fill while keeping the border visible
-                highlight.color = new Color(1f, 1f, 1f, 1f);
-                if (highlightMaterial != null)
-                {
-                    highlight.material = highlightMaterial;
-                    highlightMaterial.SetColor("_OutlineColor", Color.yellow);
-                }
-                highlight.enabled = (selectedIndex == index);
-            }
-        }
-
-        /// <summary>
-        /// Adds an item, stacking when possible. Returns true if the entire
-        /// quantity could be added.
-        /// </summary>
-        public bool AddItem(ItemData item, int quantity = 1)
-        {
-            if (item == null || quantity <= 0)
-                return false;
-
-            var petStorage = GetComponent<PetStorage>();
-            if (petStorage != null && !petStorage.CanStore(item))
-                return false;
-
-            if (!CanAddItem(item, quantity))
-                return false;
-
-            int remaining = quantity;
-
-            if (item.stackable)
-            {
-                for (int i = 0; i < items.Length && remaining > 0; i++)
-                {
-                    if (items[i].item == item && items[i].count < item.MaxStack)
-                    {
-                        int add = Mathf.Min(item.MaxStack - items[i].count, remaining);
-                        items[i].count += add;
-                        remaining -= add;
-                        UpdateSlotVisual(i);
-                    }
-                }
-            }
-
-            for (int i = 0; i < items.Length && remaining > 0; i++)
-            {
-                if (items[i].item == null)
-                {
-                    items[i].item = item;
-                    items[i].count = item.stackable ? Mathf.Min(item.MaxStack, remaining) : 1;
-                    remaining -= items[i].count;
-                    UpdateSlotVisual(i);
-                }
-            }
-
-            bool success = remaining <= 0;
-            if (success)
-                NotifyInventoryChanged();
-            return success;
-        }
-
-        /// <summary>
-        /// Returns the total number of a given item currently in the inventory.
-        /// </summary>
-        public int GetItemCount(ItemData item)
-        {
-            int count = 0;
-            if (item == null) return count;
-            for (int i = 0; i < items.Length; i++)
-            {
-                if (items[i].item == item)
-                    count += items[i].count;
-            }
-            return count;
-        }
-
-        /// <summary>
-        /// Returns true if there is room to add the specified quantity of the
-        /// given item.
-        /// </summary>
-        public bool CanAddItem(ItemData item, int quantity = 1)
-        {
-            if (item == null || quantity <= 0)
-                return false;
-
-            var petStorage = GetComponent<PetStorage>();
-            if (petStorage != null && !petStorage.CanStore(item))
-                return false;
-
-            int space = 0;
-
-            if (item.stackable)
-            {
-                for (int i = 0; i < items.Length; i++)
-                {
-                    if (items[i].item == item)
-                        space += item.MaxStack - items[i].count;
-                    else if (items[i].item == null)
-                        space += item.MaxStack;
-
-                    if (space >= quantity)
-                        return true;
-                }
-            }
-            else
-            {
-                for (int i = 0; i < items.Length; i++)
-                {
-                    if (items[i].item == null)
-                        space++;
-                    if (space >= quantity)
-                        return true;
-                }
-            }
-
-            return space >= quantity;
-        }
-
-        /// <summary>
-        /// Removes up to 'count' of the specified item from the inventory.
-        /// Returns true if the requested amount was removed.
-        /// </summary>
-        public bool RemoveItem(ItemData item, int count)
-        {
-            if (item == null || count <= 0)
-                return false;
-
-            // Ensure the inventory holds enough of the requested item before mutating any slots.
-            if (GetItemCount(item) < count)
-                return false;
-
-            for (int i = 0; i < items.Length && count > 0; i++)
-            {
-                if (items[i].item == item)
-                {
-                    int remove = Mathf.Min(count, items[i].count);
-                    items[i].count -= remove;
-                    count -= remove;
-                    if (items[i].count <= 0)
-                        items[i].item = null;
-                    UpdateSlotVisual(i);
-                }
-            }
-
-            bool success = count <= 0;
-            if (success)
-                NotifyInventoryChanged();
-            return success;
-        }
-
-        /// <summary>
-        /// Checks whether the inventory contains an item by ID.
-        /// </summary>
-        public bool HasItem(string id)
-        {
-            foreach (var entry in items)
-            {
-                if (entry.item != null && entry.item.id == id)
-                    return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Removes the first occurrence of an item with the given ID.
-        /// Returns true if an item was removed.
-        /// </summary>
-        public bool RemoveItem(string id)
-        {
-            for (int i = 0; i < items.Length; i++)
-            {
-                if (items[i].item != null && items[i].item.id == id)
-                {
-                    items[i].count--;
-                    if (items[i].count <= 0)
-                        items[i].item = null;
-                    UpdateSlotVisual(i);
-
-                    NotifyInventoryChanged();
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public bool CombineItems(int srcIndex, int dstIndex, out bool keepSelection)
-        {
-            keepSelection = false;
-            if (srcIndex < 0 || dstIndex < 0 || srcIndex >= items.Length || dstIndex >= items.Length)
-                return false;
-
-            var srcItem = items[srcIndex].item;
-            var dstItem = items[dstIndex].item;
-            if (srcItem == null || dstItem == null)
-                return false;
-
-            if (TryHandleFiremakingCombination(srcIndex, dstIndex, srcItem, dstItem, out keepSelection))
-                return true;
-
-            if (combinationDatabase == null)
-                return false;
-
-            var result = combinationDatabase.GetResult(srcItem, dstItem);
-            if (result == null)
-                return false;
-
-            // Cache the original slot state so we can roll back if we fail to place the result.
-            // This avoids permanently consuming ingredients when the output item cannot fit.
-            InventoryEntry originalSrc = items[srcIndex];
-            InventoryEntry originalDst = items[dstIndex];
-
-            items[srcIndex].count--;
-            if (items[srcIndex].count <= 0)
-                items[srcIndex].item = null;
-            UpdateSlotVisual(srcIndex);
-
-            items[dstIndex].count--;
-            if (items[dstIndex].count <= 0)
-                items[dstIndex].item = null;
-            UpdateSlotVisual(dstIndex);
-
-            bool added = AddItem(result, 1);
-            if (added)
-            {
-                // AddItem already saved the inventory; we fire a non-persisting notification so listeners refresh visuals.
-                NotifyInventoryChanged(false);
-                return true;
-            }
-
-            // Failed to add the result, so restore the decremented ingredient stacks to keep the UI and data consistent.
-            items[srcIndex] = originalSrc;
-            UpdateSlotVisual(srcIndex);
-
-            items[dstIndex] = originalDst;
-            UpdateSlotVisual(dstIndex);
-
-            return false;
-        }
-
-        private FiremakingSkill GetFiremakingSkill()
-        {
-            if (firemakingSkill == null)
-                firemakingSkill = GetComponent<FiremakingSkill>();
-            return firemakingSkill;
-        }
-
-        private bool TryHandleFiremakingCombination(int srcIndex, int dstIndex, ItemData srcItem, ItemData dstItem, out bool keepSelection)
-        {
-            keepSelection = false;
-
-            var firemaking = GetFiremakingSkill();
-            if (firemaking == null)
-                return false;
-
-            string tinderboxId = firemaking.TinderboxItemId;
-            if (string.IsNullOrEmpty(tinderboxId))
-                return false;
-
-            bool srcIsTinderbox = string.Equals(srcItem.id, tinderboxId, StringComparison.Ordinal);
-            bool dstIsTinderbox = string.Equals(dstItem.id, tinderboxId, StringComparison.Ordinal);
-            if (!srcIsTinderbox && !dstIsTinderbox)
-                return false;
-
-            int logSlot = srcIsTinderbox ? dstIndex : srcIndex;
-            ItemData logItem = srcIsTinderbox ? dstItem : srcItem;
-            if (logItem == null)
-                return false;
-
-            if (firemaking.GetDefinitionForItem(logItem.id) == null)
-                return false;
-
-            keepSelection = true;
-            selectedIndex = logSlot;
-
-            if (!firemaking.BeginLightingFromInventory(logSlot, out var failureReason) && !string.IsNullOrEmpty(failureReason))
-            {
-                Vector3 feedbackPosition = transform != null ? transform.position : Vector3.zero;
-                feedbackPosition = firemaking.SnapToIgnitionPoint(feedbackPosition);
-                FloatingText.Show(failureReason, feedbackPosition);
-            }
-
-            return true;
-        }
-
-        public void ClearSelection()
-        {
-            selectedIndex = -1;
-            if (slotHighlights != null)
-            {
-                for (int i = 0; i < slotHighlights.Length; i++)
-                {
-                    if (slotHighlights[i] != null)
-                        slotHighlights[i].enabled = false;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Replaces the item at <paramref name="slotIndex"/> with
-        /// <paramref name="newItem"/> and sets its count. The slot must
-        /// currently contain <paramref name="oldItem"/>. Returns true on
-        /// success.
-        /// </summary>
-        public bool ReplaceItem(int slotIndex, ItemData oldItem, ItemData newItem, int newCount)
-        {
-            if (slotIndex < 0 || slotIndex >= items.Length)
-                return false;
-
-            var entry = items[slotIndex];
-            if (entry.item != oldItem)
-                return false;
-
-            entry.item = newItem;
-            entry.count = newCount;
-            items[slotIndex] = entry;
-            UpdateSlotVisual(slotIndex);
-            NotifyInventoryChanged();
-            return true;
-        }
-
-        /// <summary>
-        /// Drops a quantity of the item from the specified slot.
-        /// </summary>
-        public void DropItem(int slotIndex, int quantity = 1)
-        {
-            if (BankOpen || !CanDropItems) return;
-            if (slotIndex < 0 || slotIndex >= items.Length) return;
-            var entry = items[slotIndex];
-            if (entry.item == null) return;
-            if (entry.item.isUndroppable) return;
-
-            // Cache the item before modifying the slot so we can check for pets.
-            var droppedItem = entry.item;
-            var originalEntry = entry;
-
-            // Prevent dropping or swapping pets while merged with a pet.
-            var pet = PetDropSystem.FindPetByItem(droppedItem);
-            if (pet != null && Beastmaster.PetMergeController.Instance != null &&
-                Beastmaster.PetMergeController.Instance.IsMerged)
-                return;
-
-            int remove = Mathf.Clamp(quantity, 1, entry.count);
-            entry.count -= remove;
-            if (entry.count <= 0)
-                entry.item = null;
-            items[slotIndex] = entry;
-            UpdateSlotVisual(slotIndex);
-            HideTooltip();
-
-            // Attempt to spawn a pet for this item if one exists.
-            if (pet != null)
-            {
-                // If a different pet is already active, return its pickup item to the inventory
-                // before spawning the new one so players don't lose their previous pet item.
-                var currentPet = PetDropSystem.ActivePet;
-                if (currentPet != null && currentPet != pet && currentPet.pickupItem != null)
-                {
-                    bool restored = AddItem(currentPet.pickupItem);
-                    if (!restored)
-                    {
-                        // Fallback: restore the slot and explain why the swap was blocked so the player never loses their pet item.
-                        items[slotIndex] = originalEntry;
-                        UpdateSlotVisual(slotIndex);
-                        NotifyInventoryChanged();
-
-                        var message = "You need inventory space to store your active pet before summoning a new one.";
-                        if (transform != null)
-                            FloatingText.Show(message, transform.position);
-                        Debug.LogWarning($"Blocked pet swap for '{droppedItem.name}' because there was no room to return '{currentPet.pickupItem.name}'.");
-                        return;
-                    }
-                }
-
-                var player = GameObject.FindGameObjectWithTag("Player");
-                Vector3 pos = player != null ? player.transform.position : Vector3.zero;
-                Debug.Log($"Dropping pet item '{droppedItem.name}', spawning pet '{pet.displayName}'.");
-                PetDropSystem.SpawnPet(pet, pos);
-            }
-            // If the dropped item has no associated pet we intentionally do not log to avoid console spam.
-
-            NotifyInventoryChanged();
-        }
-
-        /// <summary>
-        /// Removes a quantity from the specified slot without dropping it in the world.
-        /// </summary>
-        public void RemoveFromSlot(int slotIndex, int quantity)
-        {
-            if (slotIndex < 0 || slotIndex >= items.Length) return;
-            var entry = items[slotIndex];
-            if (entry.item == null) return;
-
-            int remove = Mathf.Clamp(quantity, 1, entry.count);
-            entry.count -= remove;
-            if (entry.count <= 0)
-                entry.item = null;
-            items[slotIndex] = entry;
-            UpdateSlotVisual(slotIndex);
-            HideTooltip();
-            NotifyInventoryChanged();
-        }
-
-        /// <summary>
-        /// Splits a stack within the inventory, moving <paramref name="quantity"/>
-        /// items to a new slot if space is available.
-        /// </summary>
-        public void SplitStack(int slotIndex, int quantity)
-        {
-            if (slotIndex < 0 || slotIndex >= items.Length) return;
-            var entry = items[slotIndex];
-            if (entry.item == null || !entry.item.splittable) return;
-
-            int amount = Mathf.Clamp(quantity, 1, entry.count - 1);
-            if (amount <= 0) return;
-
-            int target = -1;
-            for (int i = 0; i < items.Length; i++)
-            {
-                if (items[i].item == null)
-                {
-                    target = i;
-                    break;
-                }
-            }
-
-            if (target == -1) return; // no space
-
-            entry.count -= amount;
-            items[slotIndex] = entry;
-            items[target].item = entry.item;
-            items[target].count = amount;
-
-            UpdateSlotVisual(slotIndex);
-            UpdateSlotVisual(target);
-            NotifyInventoryChanged();
-        }
-
-        /// <summary>
-        /// Opens the stack split dialog for the specified slot and performs the
-        /// desired action with the chosen amount.
-        /// </summary>
-        public void PromptStackSplit(int slotIndex, StackSplitType type)
-        {
-            if (BankOpen || slotIndex < 0 || slotIndex >= items.Length) return;
-            var entry = items[slotIndex];
-            if (entry.item == null || entry.count <= 1) return;
-            if (!entry.item.splittable) return;
-            if (type == StackSplitType.Drop && !CanDropItems) return;
-
-            StackSplitDialog.Show(uiRoot.transform, entry.count, amount =>
-            {
-                switch (type)
-                {
-                    case StackSplitType.Sell:
-                        if (currentShop != null)
-                            SellItem(slotIndex, amount);
-                        else
-                            SplitStack(slotIndex, amount);
-                        break;
-                    case StackSplitType.Drop:
-                        DropItem(slotIndex, amount);
-                        break;
-                    case StackSplitType.Split:
-                        SplitStack(slotIndex, amount);
-                        break;
-                }
-            });
-        }
-
-        public void ShowTooltip(int slotIndex, RectTransform slotRect)
-        {
-            if (slotIndex < 0 || slotIndex >= items.Length) return;
-            var item = items[slotIndex].item;
-            if (item == null || tooltip == null || tooltipNameText == null || tooltipDescriptionText == null) return;
-
-            if (currentShop != null && currentShop.TryGetSellPrice(item, out int sellPrice))
-            {
-                string currencyName = currentShop.currency != null ? currentShop.currency.itemName : "Coins";
-                tooltipNameText.text = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
-                tooltipDescriptionText.text = $"Sell for {sellPrice} {currencyName}";
-
-                var tooltipRectSell = tooltip.GetComponent<RectTransform>();
-                LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRectSell);
-
-                Vector3 sellPos = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
-                Vector3[] sellCorners = new Vector3[4];
-                tooltipRectSell.GetWorldCorners(sellCorners);
-                float sellWidth = sellCorners[2].x - sellCorners[0].x;
-                float sellHeight = sellCorners[2].y - sellCorners[0].y;
-                sellPos.x = Mathf.Min(sellPos.x, Screen.width - sellWidth);
-                sellPos.y = Mathf.Max(sellPos.y, sellHeight);
-                tooltipRectSell.position = sellPos;
-
-                tooltip.SetActive(true);
-                return;
-            }
-
-            string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
-            tooltipNameText.text = name;
-            tooltipDescriptionText.text = BuildTooltipDescription(item);
-
-            var tooltipRect = tooltip.GetComponent<RectTransform>();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
-
-            Vector3 pos = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
-            Vector3[] corners = new Vector3[4];
-            tooltipRect.GetWorldCorners(corners);
-            float width = corners[2].x - corners[0].x;
-            float height = corners[2].y - corners[0].y;
-            pos.x = Mathf.Min(pos.x, Screen.width - width);
-            pos.y = Mathf.Max(pos.y, height);
-            tooltipRect.position = pos;
-
-            tooltip.SetActive(true);
-        }
-
-        public void ShowTooltip(ItemData item, RectTransform slotRect)
-        {
-            if (item == null || tooltip == null || tooltipNameText == null || tooltipDescriptionText == null) return;
-
-            string name = !string.IsNullOrEmpty(item.itemName) ? item.itemName : item.name;
-            tooltipNameText.text = name;
-            tooltipDescriptionText.text = BuildTooltipDescription(item);
-
-            var tooltipRect = tooltip.GetComponent<RectTransform>();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
-
-            Vector3 pos = slotRect.position + new Vector3(slotSize.x, 0f, 0f);
-            Vector3[] corners = new Vector3[4];
-            tooltipRect.GetWorldCorners(corners);
-            float width = corners[2].x - corners[0].x;
-            float height = corners[2].y - corners[0].y;
-            pos.x = Mathf.Min(pos.x, Screen.width - width);
-            pos.y = Mathf.Max(pos.y, height);
-            tooltipRect.position = pos;
-
-            tooltip.SetActive(true);
-        }
-
-        public void HideTooltip()
-        {
-            if (tooltip != null)
-                tooltip.SetActive(false);
-        }
-
-        /// <summary>
-        /// Builds the tooltip body text for the provided item, overriding the default
-        /// description for consumables that restore hitpoints so players can see the
-        /// precise heal value at a glance.
-        /// </summary>
-        /// <param name="item">Item displayed in the tooltip.</param>
-        /// <returns>Formatted description string for the tooltip body.</returns>
-        private static string BuildTooltipDescription(ItemData item)
-        {
-            if (item == null)
-                return string.Empty;
-
-            // Cooked food and other consumables that heal the player expose their
-            // potency through ItemData.healAmount. Replace the flavour text with an
-            // OSRS-style heal summary so the tooltip communicates how much health is
-            // restored when consumed.
-            if (item.healAmount > 0)
-            {
-                // Unity's legacy Text component supports rich text colour tags. Highlight
-                // the heal amount in red so the restorative value stands out immediately
-                // when comparing food options inside the inventory tooltip.
-                return $"Heals <color=#FF0000>+{item.healAmount}</color> hp";
-            }
-
-            return item.description;
-        }
-
-        public void ShowDropMenu(int slotIndex, Vector2 position)
-        {
-            HideTooltip();
-            var entry = GetSlot(slotIndex);
-            if (entry.item != null && entry.item.isUndroppable)
-                return;
-            dropMenu?.Show(this, slotIndex, position);
-        }
-
-        public void HideDropMenu()
-        {
-            dropMenu?.Hide();
-        }
-
-        /// <summary>
         /// Attempts to sell a quantity of the item at the given slot index to
         /// the current shop.
         /// </summary>
         public void SellItem(int slotIndex, int quantity = 1)
         {
-            if (BankOpen || currentShop == null)
-                return;
-            if (slotIndex < 0 || slotIndex >= items.Length)
-                return;
-            int sold = 0;
-            for (int i = 0; i < quantity; i++)
-            {
-                var item = items[slotIndex].item;
-                if (item == null)
-                    break;
-
-                if (currentShop.Sell(item, this, slotIndex))
-                    sold++;
-                else
-                    break;
-            }
-
-            if (sold > 0)
-            {
-                HideTooltip();
-                NotifyInventoryChanged();
-            }
+            interactionHandler?.SellItem(slotIndex, quantity);
         }
 
         /// <summary>
@@ -1422,221 +568,22 @@ namespace Inventory
         /// </summary>
         public void SetShopContext(Shop shop)
         {
-            currentShop = shop;
-            if (shop != null && uiRoot != null)
-                uiRoot.SetActive(true);
-        }
-
-        public void BeginDrag(int slotIndex)
-        {
-            if (BankOpen || slotIndex < 0 || slotIndex >= items.Length) return;
-            var entry = items[slotIndex];
-            var item = entry.item;
-            if (item == null) return;
-
-            HideTooltip();
-            draggingIndex = slotIndex;
-            draggingInventory = this;
-
-            draggingIcon = new GameObject("DraggingIcon", typeof(Image), typeof(Canvas));
-            var dragCanvas = draggingIcon.GetComponent<Canvas>();
-            dragCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            dragCanvas.overrideSorting = true;
-            dragCanvas.sortingOrder = short.MaxValue;
-            // Ensure the dragged icon renders above all inventory UIs by
-            // reparenting it to the shared root and placing it last.
-            Transform parent = sharedUIRoot != null ? sharedUIRoot.transform : uiRoot.transform;
-            draggingIcon.transform.SetParent(parent, false);
-            draggingIcon.transform.SetAsLastSibling();
-            var img = draggingIcon.GetComponent<Image>();
-            img.raycastTarget = false;
-            Sprite dragSprite = item.GetIconForCount(entry.count);
-            if (dragSprite == null)
-                dragSprite = item.icon != null ? item.icon : slotFrameSprite;
-            if (dragSprite == null)
-                dragSprite = slotFrameSprite;
-            img.sprite = dragSprite;
-            img.color = Color.white;
-            var rect = draggingIcon.GetComponent<RectTransform>();
-            rect.sizeDelta = slotSize;
-
-            if (slotImages != null && slotIndex < slotImages.Length && slotImages[slotIndex] != null)
-                slotImages[slotIndex].enabled = false;
-            if (slotCountTexts != null && slotIndex < slotCountTexts.Length && slotCountTexts[slotIndex] != null)
-                slotCountTexts[slotIndex].enabled = false;
-        }
-
-        public void Drag(PointerEventData eventData)
-        {
-            if (BankOpen) return;
-            if (draggingIcon != null)
-                draggingIcon.transform.position = eventData.position;
-        }
-
-        public void Drop(int slotIndex)
-        {
-            if (BankOpen)
-            {
-                EndDrag();
-                return;
-            }
-            if (draggingInventory != null && draggingInventory != this && draggingInventory.draggingIndex != -1)
-            {
-                var source = draggingInventory;
-                int sourceIndex = source.draggingIndex;
-                if (slotIndex >= 0 && slotIndex < items.Length)
-                {
-                    var petStorage = GetComponent<PetStorage>();
-                    if (petStorage != null &&
-                        (petStorage.definition?.id == "Heron" ||
-                         petStorage.definition?.id == "Beaver" ||
-                         petStorage.definition?.id == "Rock Golem" ||
-                         petStorage.definition?.id == "Mr Frying Pan"))
-                    {
-                        // Skilling pets (Heron, Beaver, Rock Golem, Mr Frying Pan) only accept auto-collected resources from
-                        // their associated skills and cannot receive manual drops.
-                        var entry = source.items[sourceIndex];
-                        if (!petStorage.StoreItem(entry.item, entry.count))
-                        {
-                            source.EndDrag();
-                            return;
-                        }
-                        source.ClearSlot(sourceIndex);
-                        source.EndDrag();
-                        return;
-                    }
-
-                    var temp = items[slotIndex];
-                    items[slotIndex] = source.items[sourceIndex];
-                    source.items[sourceIndex] = temp;
-                    UpdateSlotVisual(slotIndex);
-                    source.UpdateSlotVisual(sourceIndex);
-                    source.EndDrag();
-                    NotifyInventoryChanged();
-                    source.NotifyInventoryChanged();
-                }
-                else
-                {
-                    source.EndDrag();
-                }
-                return;
-            }
-
-            if (draggingIndex == -1)
-            {
-                EndDrag();
-                return;
-            }
-
-            if (slotIndex >= 0 && slotIndex < items.Length)
-            {
-                if (slotIndex != draggingIndex)
-                {
-                    var temp = items[slotIndex];
-                    items[slotIndex] = items[draggingIndex];
-                    items[draggingIndex] = temp;
-                    UpdateSlotVisual(slotIndex);
-                }
-
-                UpdateSlotVisual(draggingIndex);
-            }
-
-            EndDrag();
-            NotifyInventoryChanged();
-        }
-
-        public void EndDrag()
-        {
-            if (BankOpen)
-            {
-                if (draggingIcon != null)
-                    Destroy(draggingIcon);
-                draggingIcon = null;
-                draggingIndex = -1;
-                if (draggingInventory == this)
-                    draggingInventory = null;
-                return;
-            }
-            if (draggingIndex != -1)
-                UpdateSlotVisual(draggingIndex);
-
-            if (draggingIcon != null)
-                Destroy(draggingIcon);
-
-            draggingIcon = null;
-            draggingIndex = -1;
-            if (draggingInventory == this)
-                draggingInventory = null;
-        }
-
-        [Serializable]
-        private class InventorySaveData
-        {
-            public SlotData[] slots;
-        }
-
-        [Serializable]
-        private class SlotData
-        {
-            public string id;
-            public int count;
+            interactionHandler?.SetShopContext(shop);
         }
 
         public void Save()
         {
-            var data = new InventorySaveData
-            {
-                slots = new SlotData[size]
-            };
-
-            for (int i = 0; i < size; i++)
-            {
-                var entry = items[i];
-                data.slots[i] = new SlotData
-                {
-                    id = entry.item != null ? entry.item.id : string.Empty,
-                    count = entry.item != null ? entry.count : 0
-                };
-            }
-
+            EnsureModelInitialized();
+            var data = Model.CaptureState();
             SaveManager.Save(saveKey, data);
         }
 
         public void Load()
         {
-            var data = SaveManager.Load<InventorySaveData>(saveKey);
-            if (data?.slots == null)
-                return;
-
-            int len = Mathf.Min(size, data.slots.Length);
-            for (int i = 0; i < len; i++)
-            {
-                var slot = data.slots[i];
-                if (!string.IsNullOrEmpty(slot.id))
-                {
-                    var item = ItemDatabase.GetItem(slot.id);
-                    if (item == null)
-                    {
-                        // Log the corruption so we can investigate missing or invalid item ids in save data.
-                        Debug.LogWarning($"Inventory.Load: Failed to resolve item id '{slot.id}' for slot {i}. Resetting slot to empty.");
-                        items[i].item = null;
-                        items[i].count = 0;
-                    }
-                    else
-                    {
-                        items[i].item = item;
-                        items[i].count = slot.count;
-                    }
-                }
-                else
-                {
-                    items[i].item = null;
-                    items[i].count = 0;
-                }
-                UpdateSlotVisual(i);
-            }
-
-            NotifyInventoryChanged(false);
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            var data = SaveManager.Load<InventoryModel.InventorySaveData>(saveKey);
+            Model.RestoreState(data);
         }
 
         private void OnApplicationQuit()
@@ -1644,65 +591,16 @@ namespace Inventory
             Save();
         }
 
+        private void OnDestroy()
+        {
+            UnsubscribeControllerEvents();
+            UnsubscribeModelEvents();
+            interactionHandler?.Dispose();
+        }
+
         private void Update()
         {
-            if (playerMover == null)
-                return;
-
-            EnsureQuestUiReference();
-
-            if (questUi != null && questUi.IsOpen)
-            {
-                if (uiRoot != null && uiRoot.activeSelf)
-                    CloseUI();
-                return;
-            }
-            if (currentShop != null)
-            {
-                if (uiRoot != null && !uiRoot.activeSelf)
-                    OpenUI();
-                return;
-            }
-            if (BankOpen)
-            {
-                if (uiRoot != null && !uiRoot.activeSelf)
-                    OpenUI();
-                return;
-            }
-        }
-
-        /// <summary>
-        /// Ensures the cached quest UI reference stays valid without per-frame allocations.
-        /// </summary>
-        private void EnsureQuestUiReference()
-        {
-            if (questUi == null)
-                questUi = QuestUI.Instance;
-        }
-
-        /// <summary>
-        /// Handles quest UI open events so the inventory can immediately react.
-        /// </summary>
-        private void OnQuestUiOpened(QuestUI quest)
-        {
-            questUi = quest ?? QuestUI.Instance;
-
-            if (questUi != null && questUi.IsOpen && uiRoot != null && uiRoot.activeSelf)
-                CloseUI();
-        }
-
-        /// <summary>
-        /// Keeps the cached quest UI reference in sync when the quest window closes or is destroyed.
-        /// </summary>
-        private void OnQuestUiClosed(QuestUI quest)
-        {
-            if (quest == null)
-            {
-                questUi = null;
-                return;
-            }
-
-            questUi = quest;
+            interactionHandler?.Tick();
         }
 
         /// <summary>
@@ -1716,6 +614,164 @@ namespace Inventory
 
             var go = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
             go.transform.SetParent(null, false);
+        }
+
+        private void SubscribeModelEvents()
+        {
+            if (model == null || modelEventsSubscribed)
+                return;
+
+            model.InventoryChanged += OnModelInventoryChanged;
+            model.SlotChanged += OnModelSlotChanged;
+            modelEventsSubscribed = true;
+        }
+
+        private void UnsubscribeModelEvents()
+        {
+            if (model == null || !modelEventsSubscribed)
+                return;
+
+            model.InventoryChanged -= OnModelInventoryChanged;
+            model.SlotChanged -= OnModelSlotChanged;
+            modelEventsSubscribed = false;
+        }
+
+        private void SubscribeControllerEvents()
+        {
+            if (windowController == null || controllerEventsSubscribed)
+                return;
+
+            windowController.CloseRequested += OnWindowCloseRequested;
+            controllerEventsSubscribed = true;
+        }
+
+        private void UnsubscribeControllerEvents()
+        {
+            if (windowController == null || !controllerEventsSubscribed)
+                return;
+
+            windowController.CloseRequested -= OnWindowCloseRequested;
+            controllerEventsSubscribed = false;
+        }
+
+        /// <summary>
+        /// Determines whether the inventory can accommodate the specified item and quantity.
+        /// Delegates to the underlying <see cref="InventoryModel"/> so stacking rules remain centralised.
+        /// </summary>
+        public bool CanAddItem(ItemData item, int quantity = 1)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.CanAddItem(item, quantity);
+        }
+
+        /// <summary>
+        /// Attempts to add an item to the inventory, stacking where possible.
+        /// Returns true when the entire quantity was stored.
+        /// </summary>
+        public bool AddItem(ItemData item, int quantity = 1)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.AddItem(item, quantity);
+        }
+
+        /// <summary>
+        /// Removes up to <paramref name="count"/> of the requested item from the inventory.
+        /// </summary>
+        public bool RemoveItem(ItemData item, int count)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.RemoveItem(item, count);
+        }
+
+        /// <summary>
+        /// Removes a single instance of the item with the given identifier.
+        /// </summary>
+        public bool RemoveItem(string id)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.RemoveItem(id);
+        }
+
+        /// <summary>
+        /// Returns how many of the specified item are stored across all slots.
+        /// </summary>
+        public int GetItemCount(ItemData item)
+        {
+            EnsureModelInitialized();
+            return model.GetItemCount(item);
+        }
+
+        /// <summary>
+        /// Returns true when an item with the provided identifier exists in any slot.
+        /// </summary>
+        public bool HasItem(string id)
+        {
+            EnsureModelInitialized();
+            return model.HasItem(id);
+        }
+
+        /// <summary>
+        /// Removes a quantity directly from the slot without performing additional searches.
+        /// </summary>
+        public void RemoveFromSlot(int slotIndex, int quantity)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            model.RemoveFromSlot(slotIndex, quantity);
+        }
+
+        /// <summary>
+        /// Splits a stack, moving <paramref name="quantity"/> items to a new slot when space is available.
+        /// </summary>
+        public void SplitStack(int slotIndex, int quantity)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            model.SplitStack(slotIndex, quantity);
+        }
+
+        /// <summary>
+        /// Removes and returns the entry stored at the provided index.
+        /// </summary>
+        public InventoryEntry TakeEntry(int slotIndex)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.TakeEntry(slotIndex);
+        }
+
+        /// <summary>
+        /// Replaces the contents of a slot with the supplied entry when storage rules allow.
+        /// </summary>
+        public bool SetEntry(int slotIndex, InventoryEntry entry)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.SetEntry(slotIndex, entry);
+        }
+
+        /// <summary>
+        /// Swaps an item in place when the current slot matches <paramref name="oldItem"/>.
+        /// </summary>
+        public bool ReplaceItem(int slotIndex, ItemData oldItem, ItemData newItem, int newCount)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.ReplaceItem(slotIndex, oldItem, newItem, newCount);
+        }
+
+        /// <summary>
+        /// Attempts to combine two slots using the configured combination database.
+        /// </summary>
+        public bool CombineItems(int srcIndex, int dstIndex, out bool keepSelection)
+        {
+            EnsureModelInitialized();
+            SubscribeModelEvents();
+            return model.CombineItems(srcIndex, dstIndex, out keepSelection);
         }
     }
 }

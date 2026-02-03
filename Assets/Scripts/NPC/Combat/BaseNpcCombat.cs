@@ -36,7 +36,6 @@ namespace NPC
         /// </summary>
         protected float nextAttackTimestamp;
 
-        private static readonly string[] DefaultObstructionLayers = { "Obstacles", "Obstacle", "Physical Objects" };
         private static readonly string[] NonBlockingLineOfSightLayers = { "Interactable", "Player", "Pets", "NPC" };
         private const string AntiMeleeObstacleLayerName = "AntiMeleeObstacle";
 
@@ -102,40 +101,24 @@ namespace NPC
         /// </summary>
         private void EnsureObstructionMaskConfigured()
         {
-            int defaultMask = BuildLayerMask(DefaultObstructionLayers);
+            obstructionMask = LineOfSightUtility.EnsureDefaultObstructionMask(obstructionMask);
 
-            // Preserve any bespoke overrides provided via prefabs/instances while forcing the
-            // default obstacle layers to remain enabled for LOS testing.
-            int configuredMask = obstructionMask.value;
-            if (configuredMask == 0)
-                configuredMask = defaultMask;
-            else
-                configuredMask |= defaultMask;
-
-            obstructionMask = configuredMask;
-
-            // Build the runtime mask used for raycasts. We start from the inspector configuration
-            // and add pathfinding blockers so movement and LOS stay aligned for genuine walls.
-            int runtimeMask = configuredMask;
-            if (Application.isPlaying)
-            {
-                var blockingMask = PathfindingService.Instance?.ActiveGrid?.BlockingLayerMask;
-                if (blockingMask.HasValue)
-                {
-                    runtimeMask |= blockingMask.Value.value;
-                }
-            }
-
-            // Strip out layers that should not prevent melee swings (general interactables,
-            // players, pets, friendly NPCs, etc.). Designers that need a prop to block melee can
-            // place it on the dedicated AntiMeleeObstacle layer or attach a bypass component.
             int nonBlockingMask = GetNonBlockingLineOfSightMask();
-            if (nonBlockingMask != 0)
-            {
-                runtimeMask &= ~nonBlockingMask;
-            }
 
-            runtimeObstructionMask = runtimeMask;
+            runtimeObstructionMask = LineOfSightUtility.BuildRuntimeObstructionMask(
+                obstructionMask,
+                maskValue =>
+                {
+                    if (!Application.isPlaying)
+                        return maskValue;
+
+                    var blockingMask = PathfindingService.Instance?.ActiveNavData?.BlockingLayerMask;
+                    if (blockingMask.HasValue)
+                        maskValue |= blockingMask.Value.value;
+
+                    return maskValue;
+                },
+                nonBlockingMask);
         }
 
         /// <summary>
@@ -146,33 +129,10 @@ namespace NPC
         {
             if (cachedNonBlockingLineOfSightMask == -1)
             {
-                cachedNonBlockingLineOfSightMask = BuildLayerMask(NonBlockingLineOfSightLayers);
+                cachedNonBlockingLineOfSightMask = LineOfSightUtility.BuildLayerMask(NonBlockingLineOfSightLayers);
             }
 
             return cachedNonBlockingLineOfSightMask;
-        }
-
-        /// <summary>
-        /// Builds a mask from the provided layer names, skipping entries that are unset in the
-        /// project to remain editor-safe when optional layers are missing.
-        /// </summary>
-        private static int BuildLayerMask(IEnumerable<string> layerNames)
-        {
-            if (layerNames == null)
-                return 0;
-
-            int mask = 0;
-            foreach (string layerName in layerNames)
-            {
-                if (string.IsNullOrEmpty(layerName))
-                    continue;
-
-                int layer = LayerMask.NameToLayer(layerName);
-                if (layer >= 0)
-                    mask |= 1 << layer;
-            }
-
-            return mask;
         }
 
         /// <summary>
@@ -517,6 +477,38 @@ namespace NPC
             activeAttacks[target] = routine;
             if (activeAttacks.Count == 1)
                 SetCombatState(true);
+        }
+
+        /// <summary>
+        ///     Determines whether this NPC currently has an active attack coroutine targeting the supplied combatant.
+        /// </summary>
+        /// <param name="target">Combat target to evaluate.</param>
+        public bool IsActivelyAttackingTarget(CombatTarget target)
+        {
+            if (target == null)
+                return false;
+
+            if (combatant != null && !combatant.IsAlive)
+                return false;
+
+            if (target is Object unityTarget && unityTarget == null)
+                return false;
+
+            return activeAttacks.TryGetValue(target, out var routine) && routine != null;
+        }
+
+        /// <summary>
+        ///     Determines whether this NPC is presently attacking the player character.
+        /// </summary>
+        public bool IsActivelyAttackingPlayer()
+        {
+            if (playerTarget == null)
+                playerTarget = FindObjectOfType<PlayerCombatTarget>();
+
+            if (playerTarget == null)
+                return false;
+
+            return IsActivelyAttackingTarget(playerTarget);
         }
 
         protected virtual IEnumerator AttackRoutine(CombatTarget target)

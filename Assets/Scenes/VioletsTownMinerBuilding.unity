@@ -1007,6 +1007,7 @@ GameObject:
   - component: {fileID: 338972038}
   - component: {fileID: 338972037}
   - component: {fileID: 338972036}
+  - component: {fileID: 338972040}
   m_Layer: 7
   m_Name: VioletsTownMinerBuildingExit
   m_TagString: Untagged
@@ -1157,6 +1158,20 @@ Transform:
   - {fileID: 183339049}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &338972040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338972035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1decf64eae2fc544eb6e534655aefdfc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::World.SceneInteractableObject
+  isBank: 0
+  isMiningShop: 1
 --- !u!1001 &518063638
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1390,6 +1405,9 @@ GameObject:
   - component: {fileID: 1953886104}
   - component: {fileID: 1953886103}
   - component: {fileID: 1953886105}
+  - component: {fileID: 1953886107}
+  - component: {fileID: 1953886106}
+  - component: {fileID: 1953886108}
   m_Layer: 7
   m_Name: Nolof The Pickaxe Dealer
   m_TagString: NPC
@@ -1628,11 +1646,59 @@ MonoBehaviour:
   m_GameObject: {fileID: 1953886094}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14905cb5a6ab44c795ff41f769ea3326, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.RightClickMenu
+--- !u!114 &1953886106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1953886094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 175847b768e444f5ad8badc3cf9eab03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcInteractable
+  shop: {fileID: 0}
+  playerInput: {fileID: 0}
+  openMenuActionReference: {fileID: 0}
+  interactionOptions: {fileID: 0}
+--- !u!114 &1953886107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1953886094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 388f3e544a8e52041abbe9c2a9859d12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcInteractionOptions
+  enableExamine: 1
+  examineDescription: A dwarf, who sells pickaxes.
+  enableAttack: 0
+  enableTalk: 1
+  enableTrade: 1
+  enablePickpocket: 0
+--- !u!114 &1953886108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1953886094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: adf97df505f4465792ad1b25e702c5df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC.NpcShopOpener
-  shop: {fileID: 1953886103}
-  openDirectly: 1
+  shop: {fileID: 0}
+  openDirectly: 0
+  tradeRangeTiles: 1.5
+  approachStopBufferTiles: 0.1
   playerInput: {fileID: 0}
   openMenuActionReference: {fileID: 0}
 --- !u!1 &2045285959

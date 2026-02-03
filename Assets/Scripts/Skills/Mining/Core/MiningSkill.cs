@@ -7,11 +7,11 @@ using Skills.Mining;
 using Skills;
 using Skills.Common;
 using Pets;
-using Quests;
 using BankSystem;
 using Skills.Outfits;
 using Random = UnityEngine.Random;
 using UI;
+using UI.Chat;
 
 namespace Skills.Mining
 {
@@ -19,13 +19,16 @@ namespace Skills.Mining
     /// Handles XP, level, and mining tick logic.
     /// </summary>
     [DisallowMultipleComponent]
-    public class MiningSkill : TickedSkillBehaviour
+    public class MiningSkill : DebuggableTickedSkillBehaviour
     {
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
-        [SerializeField, Tooltip("Enables verbose debug logging for mining tick processing.")]
-        private bool enableDebugLogging;
+        [Header("Hades Fragment Rewards")]
+        [SerializeField, Tooltip("Unique item identifier for the Hades fragment drop.")]
+        private string hadesFragmentItemId = "Hades Fragment";
+        [SerializeField, Tooltip("Chance denominator for awarding a Hades fragment. A value of 50 represents a 1 in 50 roll.")]
+        private int hadesFragmentDropDenominator = 50;
         [SerializeField, Tooltip("ScriptableObject containing the Prospector outfit configuration.")]
         private SkillingOutfitDefinition miningOutfitDefinition;
 
@@ -37,8 +40,10 @@ namespace Skills.Mining
 
         private SkillManager skills;
         private Dictionary<string, ItemData> oreItems;
-        private int questOreCount;
+        private ItemData cachedHadesFragmentItem;
         private SkillingOutfitProgress miningOutfit;
+        private bool useCompanionChatFormatting;
+        private Func<string> companionChatSenderResolver;
 
         public event System.Action<MineableRock> OnStartMining;
         public event System.Action OnStopMining;
@@ -51,6 +56,8 @@ namespace Skills.Mining
         public MineableRock CurrentRock => currentRock;
         public PickaxeDefinition CurrentPickaxe => currentPickaxe;
         public int CurrentSwingSpeedTicks => currentPickaxe?.SwingSpeedTicks ?? 0;
+        /// <summary>Inventory component used for storing mined ore.</summary>
+        public Inventory.Inventory InventoryComponent => inventory;
         public float SwingProgressNormalized
         {
             get
@@ -63,15 +70,6 @@ namespace Skills.Mining
             }
         }
 
-        /// <summary>
-        ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
-        /// </summary>
-        public bool EnableDebugLogging
-        {
-            get => enableDebugLogging;
-            set => enableDebugLogging = value;
-        }
-
         private void Awake()
         {
             if (inventory == null)
@@ -81,16 +79,11 @@ namespace Skills.Mining
             skills = GetComponent<SkillManager>();
             swingProgressTracker.TickAdvanced += HandleSwingProgressAdvanced;
             PreloadOreItems();
-            if (miningOutfitDefinition == null)
-                miningOutfitDefinition = Resources.Load<SkillingOutfitDefinition>(MiningOutfitResourcePath);
-            if (miningOutfitDefinition != null)
-            {
-                miningOutfit = new SkillingOutfitProgress(miningOutfitDefinition);
-            }
-            else
-            {
-                Debug.LogWarning("MiningSkill is missing a SkillingOutfitDefinition reference; outfit rewards are disabled.");
-            }
+            miningOutfit = SkillingOutfitInitializer.InitializeOutfitProgress(
+                ref miningOutfitDefinition,
+                MiningOutfitResourcePath,
+                nameof(MiningSkill),
+                this);
         }
 
         private void OnDestroy()
@@ -98,11 +91,6 @@ namespace Skills.Mining
             SkillingOutfitProgress.Unregister(miningOutfit);
             miningOutfit = null;
         }
-
-        /// <summary>
-        ///     Enables ticker logging so we can trace subscription timing during debugging sessions.
-        /// </summary>
-        protected override bool LogTickerSubscription => enableDebugLogging;
 
         protected override void HandleTick()
         {
@@ -150,6 +138,61 @@ namespace Skills.Mining
                     if (rockGolemActive && PetDropSystem.ActivePetObject != null)
                         petStorage = PetDropSystem.ActivePetObject.GetComponent<PetStorage>();
                     string oreName = item != null ? item.itemName : ore.DisplayName;
+                    Vector3? resourcePosition = currentRock != null ? currentRock.transform.position : (Vector3?)null;
+
+                    bool hadesInventoryFull;
+                    int hadesFragmentsAwarded = 0;
+                    if (ShouldRollHadesFragment())
+                    {
+                        hadesFragmentsAwarded = TryGrantHadesFragment(resourcePosition, out hadesInventoryFull);
+                        if (hadesFragmentsAwarded > 0)
+                            LogDebug("Awarded a Hades fragment from mining.");
+                        else if (hadesInventoryFull)
+                            LogDebug("Hades fragment roll succeeded but the inventory was full.");
+                    }
+                    else
+                    {
+                        hadesInventoryFull = false;
+                    }
+
+                    bool skipOreDueToHades = false;
+                    if (hadesFragmentsAwarded > 0)
+                    {
+                        if (!GatheringInventoryHelper.CanAcceptGatheredItem(
+                                inventory,
+                                ore.Id,
+                                "Rock Golem",
+                                ref oreItems,
+                                out _))
+                        {
+                            skipOreDueToHades = true;
+                            LogDebug("Skipping ore reward to prioritise Hades fragment due to limited inventory space.");
+                        }
+                    }
+
+                    int actualOreGranted = 0;
+                    bool CustomAddOre(int quantityToAdd)
+                    {
+                        if (quantityToAdd <= 0)
+                            return true;
+
+                        if (skipOreDueToHades)
+                            return true;
+
+                        if (item != null && inventory != null && inventory.AddItem(item, quantityToAdd))
+                        {
+                            actualOreGranted += quantityToAdd;
+                            return true;
+                        }
+
+                        if (item != null && petStorage != null && petStorage.StoreItem(item, quantityToAdd))
+                        {
+                            actualOreGranted += quantityToAdd;
+                            return true;
+                        }
+
+                        return false;
+                    }
 
                     var context = GatheringRewardContextBuilder.BuildContext(new GatheringRewardContextBuilder.ContextArgs
                     {
@@ -162,15 +205,27 @@ namespace Skills.Mining
                         RewardDisplayName = oreName,
                         Quantity = amount,
                         XpPerItem = ore.XpPerOre,
-                    PetAssistExtraQuantity = amount - 1,
-                    FloatingTextAnchor = floatingTextAnchor,
-                    FallbackAnchor = transform,
-                    ResourcePosition = currentRock != null ? currentRock.transform.position : (Vector3?)null,
-                    Equipment = equipment,
-                    EquipmentXpBonusEvaluator = data => data != null ? data.miningXpBonusMultiplier : 0f,
-                    RewardMessageFormatter = qty => $"+{qty} {ore.DisplayName}",
-                        OnItemsGranted = result => OnOreGained?.Invoke(ore.Id, result.QuantityAwarded),
-                        OnSuccess = result =>
+                        PetAssistExtraQuantity = amount - 1,
+                        FloatingTextAnchor = floatingTextAnchor,
+                        FallbackAnchor = transform,
+                        ResourcePosition = resourcePosition,
+                        Equipment = equipment,
+                        EquipmentXpBonusEvaluator = data => data != null ? data.miningXpBonusMultiplier : 0f,
+                        CustomAddItemHandler = CustomAddOre,
+                        RewardMessageFormatter = qty => $"+{qty} {ore.DisplayName}",
+                        InventoryFullMessage = null,
+                        UseCompanionChatFormatting = useCompanionChatFormatting,
+                        CompanionChatSenderResolver = companionChatSenderResolver,
+                        ShowItemFloatingText = false,
+                        OnItemsGranted = _ =>
+                        {
+                            if (actualOreGranted > 0)
+                            {
+                                OnOreGained?.Invoke(ore.Id, actualOreGranted);
+                                PublishOreGatherMessage(actualOreGranted, oreName, resourcePosition);
+                            }
+                        },
+                        OnSuccess = _ =>
                         {
                             int? petChance = ore != null ? ore.PetDropChance : (int?)null;
                             SkillingPetRewarder.TryRollPet(
@@ -178,18 +233,6 @@ namespace Skills.Mining
                                 skills,
                                 currentRock != null ? currentRock.transform : transform,
                                 petChance);
-
-                            if (QuestManager.Instance != null && QuestManager.Instance.IsQuestActive("ToolsOfSurvival"))
-                            {
-                                var quest = QuestManager.Instance.GetQuest("ToolsOfSurvival");
-                                var step = quest?.Steps.Find(s => s.StepID == "MineOres");
-                                if (step != null && !step.IsComplete)
-                                {
-                                    questOreCount += result.QuantityAwarded;
-                                    if (questOreCount >= 3)
-                                        QuestManager.Instance.UpdateStep("ToolsOfSurvival", "MineOres");
-                                }
-                            }
 
                             TryAwardMiningOutfitPiece();
                         },
@@ -202,7 +245,8 @@ namespace Skills.Mining
                     if (!rewardResult.Success)
                         return;
 
-                    LogDebug($"Mined {oreName} x{amount} (chance {chance:P2})");
+                    string hadesSuffix = hadesFragmentsAwarded > 0 ? " + Hades fragment" : string.Empty;
+                    LogDebug($"Mined {oreName} x{actualOreGranted} (chance {chance:P2}){hadesSuffix}");
                 }
 
                 if (currentRock.IsDepleted)
@@ -252,6 +296,18 @@ namespace Skills.Mining
         }
 
         /// <summary>
+        /// Configures the chat formatting used for gathering messages. When provided, the companion
+        /// name resolver routes mining rewards through the Companion chat channel instead of Game.
+        /// Passing a null resolver restores the default player-centric formatting.
+        /// </summary>
+        /// <param name="senderResolver">Resolver that supplies the display name for companion chat output.</param>
+        public void ConfigureCompanionChat(Func<string> senderResolver)
+        {
+            useCompanionChatFormatting = senderResolver != null;
+            companionChatSenderResolver = senderResolver;
+        }
+
+        /// <summary>
         /// Debug helper to directly set the mining level via the SkillManager.
         /// </summary>
         public void DebugSetLevel(int newLevel)
@@ -271,6 +327,157 @@ namespace Skills.Mining
                 "You've received a piece of mining outfit",
                 "A piece of mining outfit has been added to your bank",
                 Level);
+        }
+
+        /// <summary>
+        /// Determines whether the current mining action should grant a Hades fragment.
+        /// Uses a simple 1-in-N roll where the denominator is configurable through the inspector.
+        /// </summary>
+        /// <returns><c>true</c> when the fragment should be granted, otherwise <c>false</c>.</returns>
+        private bool ShouldRollHadesFragment()
+        {
+            if (hadesFragmentDropDenominator <= 0)
+                return false;
+
+            int roll = Random.Range(1, hadesFragmentDropDenominator + 1);
+            bool success = roll == 1;
+            LogDebug($"Hades fragment roll 1/{hadesFragmentDropDenominator} (rolled {roll}) => {(success ? "success" : "no drop")}");
+            return success;
+        }
+
+        /// <summary>
+        /// Resolves and caches the <see cref="ItemData"/> associated with the configured Hades fragment identifier.
+        /// The lookup is cached so repeated mining rewards avoid additional Resources loads.
+        /// </summary>
+        /// <returns>Cached fragment item when available, otherwise <c>null</c>.</returns>
+        private ItemData GetHadesFragmentItem()
+        {
+            if (string.IsNullOrWhiteSpace(hadesFragmentItemId))
+                return null;
+
+            if (cachedHadesFragmentItem != null && cachedHadesFragmentItem.id == hadesFragmentItemId)
+                return cachedHadesFragmentItem;
+
+            cachedHadesFragmentItem = GatheringInventoryHelper.GetItemData(hadesFragmentItemId, ref oreItems);
+            return cachedHadesFragmentItem;
+        }
+
+        /// <summary>
+        /// Attempts to grant a Hades fragment to the active inventory using the shared gathering reward processor.
+        /// </summary>
+        /// <param name="resourcePosition">World position of the mined rock for floating text placement.</param>
+        /// <param name="inventoryFull">Outputs whether the inventory rejected the item due to capacity constraints.</param>
+        /// <returns>The number of fragments successfully awarded (0 or 1).</returns>
+        private int TryGrantHadesFragment(Vector3? resourcePosition, out bool inventoryFull)
+        {
+            inventoryFull = false;
+            var fragmentItem = GetHadesFragmentItem();
+            if (fragmentItem == null || inventory == null)
+                return 0;
+
+            int fragmentsGranted = 0;
+            var context = GatheringRewardContextBuilder.BuildContext(new GatheringRewardContextBuilder.ContextArgs
+            {
+                Runner = this,
+                Skills = skills,
+                SkillType = SkillType.Mining,
+                Inventory = inventory,
+                PetStorage = null,
+                Item = fragmentItem,
+                RewardDisplayName = fragmentItem.itemName,
+                Quantity = 1,
+                XpPerItem = 0f,
+                PetAssistExtraQuantity = 0,
+                FloatingTextAnchor = floatingTextAnchor,
+                FallbackAnchor = transform,
+                ResourcePosition = resourcePosition,
+                Equipment = equipment,
+                EquipmentXpBonusEvaluator = _ => 0f,
+                CustomAddItemHandler = quantity =>
+                {
+                    if (quantity <= 0)
+                        return true;
+
+                    if (inventory.AddItem(fragmentItem, quantity))
+                    {
+                        fragmentsGranted += quantity;
+                        return true;
+                    }
+
+                    return false;
+                },
+                RewardMessageFormatter = qty => $"+{qty} {fragmentItem.itemName}",
+                InventoryFullMessage = "Your inventory is too full to hold the Hades fragment.",
+                UseCompanionChatFormatting = useCompanionChatFormatting,
+                CompanionChatSenderResolver = companionChatSenderResolver,
+                ShowXpPopup = false,
+                OnItemsGranted = _ => { },
+                OnSuccess = _ => { }
+            });
+
+            var result = GatheringRewardProcessor.Process(context);
+            if (!result.Success)
+            {
+                inventoryFull = result.InventoryFull;
+                return 0;
+            }
+
+            inventoryFull = false;
+            return Mathf.Max(0, fragmentsGranted);
+        }
+
+        /// <summary>
+        /// Publishes floating text and chat output describing the ore gathered with the correct quantity.
+        /// This helper mirrors <see cref="GatheringRewardProcessor"/> behaviour while honouring companion chat formatting.
+        /// </summary>
+        /// <param name="quantity">Number of ore items that were successfully stored.</param>
+        /// <param name="displayName">Display name to surface in UI/chat messages.</param>
+        /// <param name="resourcePosition">Optional world position of the mined node for floating text alignment.</param>
+        private void PublishOreGatherMessage(int quantity, string displayName, Vector3? resourcePosition)
+        {
+            if (quantity <= 0 || string.IsNullOrWhiteSpace(displayName))
+                return;
+
+            string message = $"+{quantity} {displayName}";
+            Transform anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
+            if (anchor != null)
+            {
+                bool displayed = false;
+                if (resourcePosition.HasValue)
+                    displayed = GatheringFloatingTextService.TryShowNow(message, anchor, resourcePosition.Value);
+
+                if (!displayed && !resourcePosition.HasValue)
+                    GatheringFloatingTextService.TryShowAtAnchor(message, anchor);
+            }
+
+            PublishGatheringChatMessage(message);
+        }
+
+        /// <summary>
+        /// Emits the supplied message to the appropriate chat channel, respecting companion formatting when active.
+        /// </summary>
+        /// <param name="message">Text that should be published to the chat service.</param>
+        private void PublishGatheringChatMessage(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            var chatService = ChatService.Instance;
+            if (chatService == null)
+                return;
+
+            if (useCompanionChatFormatting)
+            {
+                string sender = companionChatSenderResolver != null ? companionChatSenderResolver.Invoke() : null;
+                if (string.IsNullOrWhiteSpace(sender))
+                    sender = "Companion";
+
+                chatService.PublishCompanionMessage(sender, message);
+            }
+            else
+            {
+                chatService.PublishGameMessage(message);
+            }
         }
 
         private void PreloadOreItems()

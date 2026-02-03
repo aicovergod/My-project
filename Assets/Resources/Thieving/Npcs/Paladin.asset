@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a5f908c6fb44fcb889f73cf54c5ecbe, type: 3}
+  m_Name: Paladin
+  m_EditorClassIdentifier:
+  id: Paladin
+  displayName: Paladin
+  requiredLevel: 70
+  baseXp: 151.8
+  lowSuccessThreshold: 115
+  highSuccessThreshold: 235
+  post99ThresholdGain: 0
+  coinRange: {x: 80, y: 160}
+  lootTable:
+  - itemId: Chaos Rune
+    quantityRange: {x: 1, y: 2}
+    dropChancePercent: 100
+    guaranteed: 0
+    notedQuantity: 0
+  baseLootRolls: 1
+  rogueOutfitBonusRolls: 0
+  damageOnFail: 3
+  stunTicks: 6
+  cooldownTicks: 18
+  failuresBeforeCooldown: 3
+  petRollDenominator: 0
+  interactionTicks: 2

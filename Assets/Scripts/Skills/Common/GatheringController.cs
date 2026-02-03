@@ -1,9 +1,12 @@
+using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using Player;
 using Player.Movement;
 using Core.Input;
+using UI.Chat;
 
 namespace Skills.Common
 {
@@ -19,6 +22,14 @@ namespace Skills.Common
         where TSkill : MonoBehaviour
         where TNode : Component
     {
+        /// <summary>
+        ///     Standardised message emitted whenever the player's inventory cannot accept more gathered items.
+        ///     Shared with <see cref="CompanionManager"/> so the companion can react to the chat event.
+        /// </summary>
+        protected const string PlayerInventoryFullChatMessage = "Your inventory is full";
+        protected const string PlayerAndCompanionInventoryFullChatMessage =
+            "Your inventory and your companion's inventory are full";
+
         [Header("Interaction")]
         [SerializeField]
         [Tooltip("Fallback interaction range used when the node definition does not provide one.")]
@@ -95,8 +106,16 @@ namespace Skills.Common
 
         // Flags queued by input callbacks so pointer interactions are processed from Update.
         private bool pendingInteract;
-        private int pendingPointerId;
+        private Vector2 pendingInteractScreenPosition;
+        private bool pendingInteractSkipUiBlock;
+        private bool pendingInteractHasDirectNode;
+        private TNode pendingInteractDirectNode;
         private bool pendingProspect;
+        private Vector2 pendingProspectScreenPosition;
+        private bool pendingProspectSkipUiBlock;
+
+        // Cached buffer used when raycasting against the UI EventSystem so we avoid per-frame allocations.
+        private readonly List<RaycastResult> pointerRaycastResults = new();
 
         // Automatic movement state used when the player clicks a node from outside the interaction range.
         private bool isApproachingNode;
@@ -109,6 +128,12 @@ namespace Skills.Common
         ///     Cached reference to the skill component so derived classes can access it safely.
         /// </summary>
         protected TSkill Skill => skill;
+
+        /// <summary>
+        ///     Determines whether verbose pointer blocking diagnostics should be emitted.
+        /// </summary>
+        private bool ShouldLogUiDiagnostics =>
+            skill is DebuggableTickedSkillBehaviour debuggable && debuggable.EnableDebugLogging;
 
         /// <summary>
         ///     Cached reference to the movement controller used for cancellation checks.
@@ -270,11 +295,28 @@ namespace Skills.Common
             if (pendingInteract)
             {
                 pendingInteract = false;
-                if (!(BlockMouseWhilePointerOverUI &&
-                      EventSystem.current != null &&
-                      EventSystem.current.IsPointerOverGameObject(pendingPointerId)))
+
+                bool skipUiBlock = pendingInteractSkipUiBlock;
+                bool hasDirectNode = pendingInteractHasDirectNode;
+                TNode directNode = pendingInteractDirectNode;
+                Vector2 screenPosition = pendingInteractScreenPosition;
+
+                pendingInteractSkipUiBlock = false;
+                pendingInteractHasDirectNode = false;
+                pendingInteractDirectNode = null;
+                pendingInteractScreenPosition = default;
+
+                bool pointerBlocked = false;
+                if (!skipUiBlock && BlockMouseWhilePointerOverUI)
                 {
-                    var node = FindNodeUnderCursor();
+                    pointerBlocked = TryRaycastPointerUI(screenPosition, out var uiHits);
+                    if (pointerBlocked)
+                        LogPointerBlocked("Interact", screenPosition, uiHits);
+                }
+
+                if (!pointerBlocked)
+                {
+                    var node = hasDirectNode ? directNode : FindNodeAtScreenPosition(screenPosition);
                     if (node != null && IsInteractionReady())
                         AttemptStart(node);
                 }
@@ -283,11 +325,24 @@ namespace Skills.Common
             if (pendingProspect)
             {
                 pendingProspect = false;
-                if (!(BlockMouseWhilePointerOverUI &&
-                      EventSystem.current != null &&
-                      EventSystem.current.IsPointerOverGameObject(pendingPointerId)))
+
+                bool skipUiBlock = pendingProspectSkipUiBlock;
+                Vector2 screenPosition = pendingProspectScreenPosition;
+
+                pendingProspectSkipUiBlock = false;
+                pendingProspectScreenPosition = default;
+
+                bool pointerBlocked = false;
+                if (!skipUiBlock && BlockMouseWhilePointerOverUI)
                 {
-                    var node = FindNodeUnderCursor();
+                    pointerBlocked = TryRaycastPointerUI(screenPosition, out var uiHits);
+                    if (pointerBlocked)
+                        LogPointerBlocked("Prospect", screenPosition, uiHits);
+                }
+
+                if (!pointerBlocked)
+                {
+                    var node = FindNodeAtScreenPosition(screenPosition);
                     if (node != null)
                     {
                         Prospect(node);
@@ -305,14 +360,13 @@ namespace Skills.Common
             if (!context.performed)
                 return;
 
-            // Pointer devices (mouse, pen, touch) behave like the legacy left click handling.
-            if (context.control != null && context.control.device is Pointer pointer)
+            if (context.control != null && context.control.device is Mouse)
             {
                 if (!IsInteractionReady())
                     return;
 
-                pendingInteract = true;
-                pendingPointerId = pointer.deviceId;
+                Vector2 screenPosition = ResolveMouseScreenPosition();
+                QueuePendingInteractFromPointer(screenPosition, false);
                 return;
             }
 
@@ -323,7 +377,7 @@ namespace Skills.Common
                 return;
 
             if (nearbyNode != null)
-                AttemptStart(nearbyNode);
+                QueuePendingInteractFromQuickAction(nearbyNode);
         }
 
         /// <summary>
@@ -337,14 +391,87 @@ namespace Skills.Common
             if (!SupportsProspecting)
                 return;
 
-            if (context.control == null || !(context.control.device is Pointer pointer))
-                return;
-
             if (Time.time < nextProspectAllowedTime)
                 return;
 
+            Vector2 screenPosition = ResolveMouseScreenPosition();
+            QueuePendingProspectFromPointer(screenPosition, false);
+        }
+
+        /// <summary>
+        ///     Queues pointer-driven interaction presses so they can be resolved from Update once UI checks pass.
+        /// </summary>
+        private void QueuePendingInteractFromPointer(Vector2 screenPosition, bool skipUiBlock)
+        {
+            pendingInteract = true;
+            pendingInteractScreenPosition = screenPosition;
+            pendingInteractSkipUiBlock = skipUiBlock;
+            pendingInteractHasDirectNode = false;
+            pendingInteractDirectNode = null;
+        }
+
+        /// <summary>
+        ///     Queues quick-action requests triggered by keyboard/gamepad confirms so they bypass UI filtering.
+        /// </summary>
+        private void QueuePendingInteractFromQuickAction(TNode node)
+        {
+            pendingInteract = true;
+            pendingInteractScreenPosition = default;
+            pendingInteractSkipUiBlock = true;
+            pendingInteractHasDirectNode = true;
+            pendingInteractDirectNode = node;
+        }
+
+        /// <summary>
+        ///     Queues a pending prospect action using the supplied screen position.
+        /// </summary>
+        private void QueuePendingProspectFromPointer(Vector2 screenPosition, bool skipUiBlock)
+        {
             pendingProspect = true;
-            pendingPointerId = pointer.deviceId;
+            pendingProspectScreenPosition = screenPosition;
+            pendingProspectSkipUiBlock = skipUiBlock;
+        }
+
+        /// <summary>
+        ///     Resolves the current mouse screen position, falling back to the screen centre when unavailable.
+        /// </summary>
+        private static Vector2 ResolveMouseScreenPosition()
+        {
+            Mouse currentMouse = Mouse.current;
+            if (currentMouse != null)
+                return currentMouse.position.ReadValue();
+
+            return new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+        }
+
+        /// <summary>
+        ///     Performs a UI raycast at the specified screen position and returns the cached hit list.
+        /// </summary>
+        private bool TryRaycastPointerUI(Vector2 screenPosition, out List<RaycastResult> hits)
+        {
+            hits = pointerRaycastResults;
+            hits.Clear();
+
+            EventSystem eventSystem = EventSystem.current;
+            if (eventSystem == null)
+                return false;
+
+            var pointerEventData = new PointerEventData(eventSystem)
+            {
+                position = screenPosition
+            };
+
+            eventSystem.RaycastAll(pointerEventData, hits);
+
+            // Ignore physics raycasters because they correspond to world colliders rather than UI elements.
+            for (int i = hits.Count - 1; i >= 0; i--)
+            {
+                BaseRaycaster module = hits[i].module;
+                if (module is PhysicsRaycaster || module is Physics2DRaycaster)
+                    hits.RemoveAt(i);
+            }
+
+            return hits.Count > 0;
         }
 
         /// <summary>
@@ -360,6 +487,84 @@ namespace Skills.Common
 
             CancelAutoApproach(true);
             RequestStopAction();
+        }
+
+        /// <summary>
+        ///     Emits detailed diagnostics for pointer blocks so gathering UI conflicts are easier to troubleshoot.
+        /// </summary>
+        private void LogPointerBlocked(string context, Vector2 screenPosition, List<RaycastResult> uiHits)
+        {
+            if (!ShouldLogUiDiagnostics)
+                return;
+
+            var sb = new StringBuilder();
+            sb.Append('[').Append(GetType().Name).Append("] Pointer blocked during ").Append(context)
+              .Append(" at screen position ").Append(screenPosition).AppendLine(".");
+
+            sb.Append("UI Raycast Hits (").Append(uiHits.Count).AppendLine("):");
+            for (int i = 0; i < uiHits.Count; i++)
+            {
+                RaycastResult hit = uiHits[i];
+                if (hit.gameObject == null)
+                    continue;
+
+                string layerName = FormatLayerName(hit.gameObject.layer);
+                string moduleName = hit.module != null ? hit.module.GetType().Name : "UnknownModule";
+                sb.Append("  ").Append(i + 1).Append(": ")
+                  .Append(hit.gameObject.name)
+                  .Append(" [Layer: ").Append(layerName).Append("] via ")
+                  .Append(moduleName);
+
+                if (hit.module != null && hit.module.eventCamera != null)
+                    sb.Append(" (Camera: ").Append(hit.module.eventCamera.name).Append(')');
+
+                sb.AppendLine();
+            }
+
+            Camera activeCamera = worldCamera != null ? worldCamera : Camera.main;
+            if (activeCamera != null)
+            {
+                Vector3 worldPoint3 = activeCamera.ScreenToWorldPoint(screenPosition);
+                Vector2 worldPoint = new Vector2(worldPoint3.x, worldPoint3.y);
+                sb.Append("Physics2D.OverlapPointAll at world ").Append(worldPoint).AppendLine(":");
+
+                var colliders = Physics2D.OverlapPointAll(worldPoint);
+                if (colliders.Length == 0)
+                {
+                    sb.AppendLine("  (none)");
+                }
+                else
+                {
+                    for (int i = 0; i < colliders.Length; i++)
+                    {
+                        var collider = colliders[i];
+                        if (collider == null)
+                            continue;
+
+                        string layerName = FormatLayerName(collider.gameObject.layer);
+                        sb.Append("  ").Append(i + 1).Append(": ")
+                          .Append(collider.name)
+                          .Append(" [Layer: ").Append(layerName).Append("] ")
+                          .Append(collider.GetType().Name)
+                          .AppendLine();
+                    }
+                }
+            }
+            else
+            {
+                sb.AppendLine("No active world camera available; skipped Physics2D.OverlapPointAll diagnostics.");
+            }
+
+            Debug.Log(sb.ToString(), this);
+        }
+
+        /// <summary>
+        ///     Formats a layer identifier so diagnostics surface both the name and the numeric value when available.
+        /// </summary>
+        private static string FormatLayerName(int layer)
+        {
+            string layerName = LayerMask.LayerToName(layer);
+            return string.IsNullOrEmpty(layerName) ? layer.ToString() : $"{layerName} ({layer})";
         }
 
         /// <summary>
@@ -406,8 +611,18 @@ namespace Skills.Common
             if (worldCamera == null)
                 return null;
 
-            Vector2 fallback = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
-            Vector2 screenPoint = InputActionResolver.GetPointerScreenPosition(fallback);
+            Vector2 screenPoint = ResolveMouseScreenPosition();
+            return FindNodeAtScreenPosition(screenPoint);
+        }
+
+        /// <summary>
+        ///     Converts a screen position into a node reference.
+        /// </summary>
+        private TNode FindNodeAtScreenPosition(Vector2 screenPoint)
+        {
+            if (worldCamera == null)
+                return null;
+
             Vector2 worldPoint = worldCamera.ScreenToWorldPoint(screenPoint);
             return FindNodeAtWorldPosition(worldPoint);
         }
@@ -467,7 +682,10 @@ namespace Skills.Common
                 return false;
 
             if (!HasInventorySpace(node, out failureMessage))
+            {
+                TryPublishInventoryFullChatFeedback(failureMessage);
                 return false;
+            }
 
             return true;
         }
@@ -671,6 +889,39 @@ namespace Skills.Common
 
             if (!displayed && !resourcePosition.HasValue)
                 GatheringFloatingTextService.TryShowAtAnchor(message, anchor);
+        }
+
+        /// <summary>
+        ///     Emits the shared chat notification used when inventory capacity prevents a gathering action.
+        ///     Publishing the message ensures the player receives console feedback and companions can react
+        ///     with their own flavour dialogue.
+        /// </summary>
+        /// <param name="failureMessage">Message returned by the inventory capacity validation.</param>
+        private void TryPublishInventoryFullChatFeedback(string failureMessage)
+        {
+            if (string.IsNullOrWhiteSpace(failureMessage))
+                return;
+
+            string trimmed = failureMessage.Trim();
+            string messageToPublish = null;
+
+            if (string.Equals(trimmed, PlayerInventoryFullChatMessage, System.StringComparison.OrdinalIgnoreCase))
+            {
+                messageToPublish = PlayerInventoryFullChatMessage;
+            }
+            else if (string.Equals(trimmed, PlayerAndCompanionInventoryFullChatMessage, System.StringComparison.OrdinalIgnoreCase))
+            {
+                messageToPublish = PlayerAndCompanionInventoryFullChatMessage;
+            }
+
+            if (string.IsNullOrEmpty(messageToPublish))
+                return;
+
+            var chatService = ChatService.Instance;
+            if (chatService == null)
+                return;
+
+            chatService.PublishGameMessage(messageToPublish);
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 using UnityEngine;
 using Inventory;
 using Pets;
+using Companions.Conversation;
 
 namespace MyGame.Drops
 {
@@ -16,8 +17,14 @@ namespace MyGame.Drops
         /// <summary>Luck multiplier applied to rolls.</summary>
         public float luckMultiplier = 1f;
 
-        /// <summary>Radius for random spawn offset.</summary>
-        public float spawnSpreadRadius = 0.35f;
+        /// <summary>Whether random spawn spread should be applied on top of the snapped tile centre.</summary>
+        [SerializeField]
+        private bool enableSpawnSpread = false;
+
+        /// <summary>Radius for optional random spawn offset. Ignored when <see cref="enableSpawnSpread"/> is false.</summary>
+        [SerializeField]
+        [Min(0f)]
+        private float spawnSpreadRadius = 0.35f;
 
         /// <summary>Whether to spawn at the NPC's feet.</summary>
         public bool spawnAtFeet = true;
@@ -55,6 +62,11 @@ namespace MyGame.Drops
                 basePos = transform.position; // placeholder for future expansion
             }
 
+            if (spawner != null)
+            {
+                basePos = spawner.SnapPositionToTileCenter(basePos);
+            }
+
             var drops = DropResolver.Resolve(dropTable, luckMultiplier);
             if (drops.Count == 0)
             {
@@ -63,19 +75,30 @@ namespace MyGame.Drops
             }
             foreach (var drop in drops)
             {
-                Vector2 offset = UnityEngine.Random.insideUnitCircle * spawnSpreadRadius;
-                Vector3 pos = basePos + (Vector3)offset;
+                Vector3 spawnPos = basePos;
+                if (enableSpawnSpread && spawnSpreadRadius > 0f)
+                {
+                    Vector2 offset = UnityEngine.Random.insideUnitCircle * spawnSpreadRadius;
+                    spawnPos += (Vector3)offset;
+
+                    if (spawner != null)
+                    {
+                        spawnPos = spawner.SnapPositionToTileCenter(spawnPos);
+                    }
+                }
 
                 if (spawner != null)
                 {
-                    Debug.Log($"NpcDropper: Spawning {drop.quantity}x {drop.item?.name} at {pos}.");
-                    spawner.Spawn(drop.item, drop.quantity, pos);
+                    Debug.Log($"NpcDropper: Spawning {drop.quantity}x {drop.item?.name} at {spawnPos}.");
+                    spawner.Spawn(drop.item, drop.quantity, spawnPos);
                 }
                 else
                 {
                     Debug.LogWarning($"NpcDropper: No GroundItemSpawner available; adding {drop.quantity}x {drop.item?.name} to inventory.");
                     InventoryBridge.AddItem(drop.item, drop.quantity);
                 }
+
+                RegisterLootEvent(drop, spawnPos);
             }
         }
 
@@ -85,6 +108,34 @@ namespace MyGame.Drops
         public void OnDeath()
         {
             RollAndSpawn();
+        }
+
+        private void RegisterLootEvent(ResolvedDrop drop, Vector3 position)
+        {
+            if (drop.item == null || drop.quantity <= 0)
+                return;
+
+            string itemName = !string.IsNullOrWhiteSpace(drop.item.itemName)
+                ? drop.item.itemName
+                : drop.item.name;
+
+            if (string.IsNullOrWhiteSpace(itemName))
+                itemName = "loot";
+
+            string summary = drop.quantity == 1
+                ? $"secured {itemName}"
+                : $"secured {drop.quantity} {itemName}";
+
+            string source = dropTable != null && !string.IsNullOrWhiteSpace(dropTable.tableName)
+                ? dropTable.tableName
+                : name;
+
+            var metadata = CompanionEventMetadata.Create(
+                primaryActor: "You",
+                secondaryActor: source,
+                worldPosition: position);
+
+            CompanionConversationService.RegisterEvent(summary, CompanionEventType.Loot, metadata);
         }
 
 #if UNITY_EDITOR

@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Combat;
+using Companions.Conversation;
 using MyGame.Drops;
 using Player;
 using Pets;
@@ -40,11 +42,6 @@ namespace NPC
         [SerializeField, Tooltip("Vertical offset applied when no floating text anchor is present.")]
         private float hitsplatFallbackOffset = 1f;
 
-        /// <summary>
-        /// Shared cached reference so NPCs can automatically use the global hitsplat
-        /// library without paying the cost of repeated Resources lookups.
-        /// </summary>
-        private static HitSplatLibrary sharedHitSplatLibrary;
         private int currentHp;
         private Collider2D collider2D;
         private SpriteRenderer spriteRenderer;
@@ -60,7 +57,6 @@ namespace NPC
         [SerializeField, Tooltip("Tracks whether respawning is temporarily suppressed by external systems (e.g. personal nodes).")]
         private bool respawnSuppressed;
         private Coroutine respawnCoroutine;
-
         /// <summary>
         /// Tracks whether the global NPC combat damage logging override is enabled. When true all
         /// combatants emit verbose logs regardless of their inspector configuration.
@@ -70,6 +66,7 @@ namespace NPC
         public event System.Action<int, int> OnHealthChanged; // current, max
         public event System.Action OnDeath;
         public event System.Action<NpcCombatant, GameObject> OnKilledByPlayer;
+        public event System.Action<object, CombatTarget> OnDamageAttributed;
 
         public bool IsAlive => currentHp > 0;
         public DamageType PreferredDefenceType => profile != null ? profile.AttackType : DamageType.Melee;
@@ -134,7 +131,7 @@ namespace NPC
             ClearDamageContributors("Awake initialisation");
             OnHealthChanged?.Invoke(currentHp, MaxHP);
 
-            EnsureHitSplatLibrary();
+            hitSplatLibrary = HitSplatLibraryResolver.Resolve(hitSplatLibrary);
 
             if (hitSplatLibrary == null)
             {
@@ -250,6 +247,8 @@ namespace NPC
                 combat?.BeginAttacking(combatSource);
             }
 
+            OnDamageAttributed?.Invoke(source, combatSource);
+
             var killedByPlayer = creditedToPlayer;
             if (currentHp <= 0)
             {
@@ -276,7 +275,10 @@ namespace NPC
                     $"{name} recorded recent player damage but has no tracked playerDamage. Ensure ClearDamageContributors is invoked when combat resets.");
 
                 if (killedByPlayer && killingPlayer != null)
+                {
                     OnKilledByPlayer?.Invoke(this, killingPlayer);
+                    CompanionConversationService.RegisterNpcKill(this, killingPlayer);
+                }
 
                 if (killedByPlayer || playerDamage > npcDamage)
                     dropper?.OnDeath();
@@ -390,22 +392,6 @@ namespace NPC
         {
             playerDamage = 0;
             npcDamage = 0;
-        }
-
-        /// <summary>
-        /// Ensure the NPC has access to a hitsplat library, loading the shared asset from
-        /// the Resources folder when no explicit reference is configured in the inspector.
-        /// </summary>
-        private void EnsureHitSplatLibrary()
-        {
-            if (hitSplatLibrary != null)
-                return;
-
-            if (sharedHitSplatLibrary == null)
-                sharedHitSplatLibrary = Resources.Load<HitSplatLibrary>("HitSplatLibrary");
-
-            if (sharedHitSplatLibrary != null)
-                hitSplatLibrary = sharedHitSplatLibrary;
         }
 
         /// <summary>

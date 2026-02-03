@@ -2,22 +2,30 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Player;
+using Companions;
 using Beastmaster;
 using Pets;
 using NPC;
+using NPC.Navigation;
 using BankSystem;
+using Inventory.OreBag;
 using Skills.Cooking;
 using Skills.Fishing;
 using Skills.Mining;
 using Skills.Outfits;
 using Skills.Woodcutting;
 using Skills.Firemaking;
+using Skills.Thieving.Core;
+using Skills.Thieving.NpcPickpocketDialogue;
 using Status;
 using Status.Antifire;
 using Status.Poison;
 using Status.Freeze;
 using World;
 using UI;
+using UI.Chat;
+using Player.Ranks;
+using Environment.Companion;
 
 namespace Skills
 {
@@ -37,7 +45,8 @@ namespace Skills
         public static bool IsVisible => Instance != null && Instance.visible;
 
         private PlayerHitpoints hitpoints;
-        private SkillManager skillManager;
+        private SkillManager playerSkillManager;
+        private SkillManager companionSkillManager;
         private IBeastmasterService beastmasterService;
         private MergeConfig mergeConfig;
         private PoisonController poisonController;
@@ -63,6 +72,9 @@ namespace Skills
         private string woodcuttingLevel = "";
         private string firemakingLevel = "";
         private string fishingLevel = "";
+        [SerializeField]
+        [Tooltip("Serialized so QA can pre-configure Thieving level overrides for spawn rooms when needed.")]
+        private string thievingLevel = "";
         private string cookingLevel = "";
         private string beastmasterLevel = "";
 
@@ -83,6 +95,7 @@ namespace Skills
         private const string MagicLevelControlName = "AdminF2Menu_MagicLevel";
         private const string MiningLevelControlName = "AdminF2Menu_MiningLevel";
         private const string FishingLevelControlName = "AdminF2Menu_FishingLevel";
+        private const string ThievingLevelControlName = "AdminF2Menu_ThievingLevel";
         private const string CookingLevelControlName = "AdminF2Menu_CookingLevel";
         private const string FiremakingLevelControlName = "AdminF2Menu_FiremakingLevel";
         private const string WoodcuttingLevelControlName = "AdminF2Menu_WoodcuttingLevel";
@@ -94,6 +107,7 @@ namespace Skills
         private FiremakingSkill firemakingSkillBehaviour;
         private FishingSkill fishingSkillBehaviour;
         private CookingSkill cookingSkillBehaviour;
+        private ThievingSkill thievingSkillBehaviour;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -119,6 +133,20 @@ namespace Skills
 
         private void Update()
         {
+            bool hasDeveloperAccess = HasDeveloperAccess();
+            if (!hasDeveloperAccess)
+            {
+                if (visible)
+                {
+                    // Immediately hide the menu whenever developer access is revoked so privileged actions remain secure.
+                    visible = false;
+                    showFreezePopup = false;
+                    HasTextInputFocus = false;
+                }
+
+                return;
+            }
+
             if (Input.GetKeyDown(KeyCode.F2))
             {
                 visible = !visible;
@@ -134,8 +162,9 @@ namespace Skills
             // Ensure references are valid in case scenes change
             if (hitpoints == null)
                 hitpoints = FindObjectOfType<PlayerHitpoints>();
-            if (skillManager == null)
-                skillManager = FindObjectOfType<SkillManager>();
+            if (playerSkillManager == null)
+                playerSkillManager = ResolvePlayerSkillManager();
+            companionSkillManager = CompanionManager.CompanionSkills;
             if (poisonController == null && hitpoints != null)
                 poisonController = hitpoints.GetComponent<PoisonController>();
             if (beastmasterService == null)
@@ -159,12 +188,15 @@ namespace Skills
                 fishingSkillBehaviour = FindObjectOfType<FishingSkill>();
             if (cookingSkillBehaviour == null)
                 cookingSkillBehaviour = FindObjectOfType<CookingSkill>();
+            if (thievingSkillBehaviour == null)
+                thievingSkillBehaviour = FindObjectOfType<ThievingSkill>();
         }
 
         private void RefreshFields()
         {
             hitpoints = FindObjectOfType<PlayerHitpoints>();
-            skillManager = FindObjectOfType<SkillManager>();
+            playerSkillManager = ResolvePlayerSkillManager();
+            companionSkillManager = CompanionManager.CompanionSkills;
             poisonController = hitpoints != null ? hitpoints.GetComponent<PoisonController>() : null;
             beastmasterService = null;
             foreach (var mb in FindObjectsOfType<MonoBehaviour>())
@@ -183,19 +215,21 @@ namespace Skills
             firemakingSkillBehaviour = FindObjectOfType<FiremakingSkill>();
             fishingSkillBehaviour = FindObjectOfType<FishingSkill>();
             cookingSkillBehaviour = FindObjectOfType<CookingSkill>();
+            thievingSkillBehaviour = FindObjectOfType<ThievingSkill>();
 
-            hpLevel = skillManager != null ? skillManager.GetLevel(SkillType.Hitpoints).ToString() : "";
-            attackLevel = skillManager != null ? skillManager.GetLevel(SkillType.Attack).ToString() : "";
-            strengthLevel = skillManager != null ? skillManager.GetLevel(SkillType.Strength).ToString() : "";
-            defenceLevel = skillManager != null ? skillManager.GetLevel(SkillType.Defence).ToString() : "";
-            rangedLevel = skillManager != null ? skillManager.GetLevel(SkillType.Ranged).ToString() : "";
-            magicLevel = skillManager != null ? skillManager.GetLevel(SkillType.Magic).ToString() : "";
-            miningLevel = skillManager != null ? skillManager.GetLevel(SkillType.Mining).ToString() : "";
-            woodcuttingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Woodcutting).ToString() : "";
-            firemakingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Firemaking).ToString() : "";
-            fishingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Fishing).ToString() : "";
-            cookingLevel = skillManager != null ? skillManager.GetLevel(SkillType.Cooking).ToString() : "";
-            beastmasterLevel = skillManager != null ? skillManager.GetLevel(SkillType.Beastmaster).ToString() : "";
+            hpLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Hitpoints).ToString() : "";
+            attackLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Attack).ToString() : "";
+            strengthLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Strength).ToString() : "";
+            defenceLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Defence).ToString() : "";
+            rangedLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Ranged).ToString() : "";
+            magicLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Magic).ToString() : "";
+            miningLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Mining).ToString() : "";
+            woodcuttingLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Woodcutting).ToString() : "";
+            firemakingLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Firemaking).ToString() : "";
+            fishingLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Fishing).ToString() : "";
+            thievingLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Thieving).ToString() : "";
+            cookingLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Cooking).ToString() : "";
+            beastmasterLevel = playerSkillManager != null ? playerSkillManager.GetLevel(SkillType.Beastmaster).ToString() : "";
         }
 
         private void OnGUI()
@@ -225,6 +259,7 @@ namespace Skills
             magicLevel = DrawLevelField("Magic Level", MagicLevelControlName, magicLevel);
             miningLevel = DrawLevelField("Mining Level", MiningLevelControlName, miningLevel);
             fishingLevel = DrawLevelField("Fishing Level", FishingLevelControlName, fishingLevel);
+            thievingLevel = DrawLevelField("Thieving Level", ThievingLevelControlName, thievingLevel);
             cookingLevel = DrawLevelField("Cooking Level", CookingLevelControlName, cookingLevel);
             firemakingLevel = DrawLevelField("Firemaking Level", FiremakingLevelControlName, firemakingLevel);
             woodcuttingLevel = DrawLevelField("Woodcutting Level", WoodcuttingLevelControlName, woodcuttingLevel);
@@ -258,15 +293,70 @@ namespace Skills
                 () => fishingSkillBehaviour.EnableDebugLogging,
                 value => fishingSkillBehaviour.EnableDebugLogging = value);
             DrawSkillDebugToggle(
+                "Thieving Debug Logging",
+                () => thievingSkillBehaviour != null,
+                () => thievingSkillBehaviour.EnableDebugLogging,
+                value => thievingSkillBehaviour.EnableDebugLogging = value);
+            bool thievingDialogueDebugLogging = NpcPickpocketDialogueService.EnableDebugLogging;
+            bool requestedThievingDialogueDebugLogging = GUILayout.Toggle(
+                thievingDialogueDebugLogging,
+                "Thieving Dialogue Debug Logging");
+            if (requestedThievingDialogueDebugLogging != thievingDialogueDebugLogging)
+                NpcPickpocketDialogueService.EnableDebugLogging = requestedThievingDialogueDebugLogging;
+            DrawSkillDebugToggle(
                 "Cooking Debug Logging",
                 () => cookingSkillBehaviour != null,
                 () => cookingSkillBehaviour.EnableDebugLogging,
                 value => cookingSkillBehaviour.EnableDebugLogging = value);
             DrawSkillDebugToggle(
+                "Companion Cooking Debug Logging",
+                () => ResolveCompanionCookingSkill() != null,
+                () =>
+                {
+                    var skill = ResolveCompanionCookingSkill();
+                    return skill != null && skill.EnableDebugLogging;
+                },
+                value =>
+                {
+                    var skill = ResolveCompanionCookingSkill();
+                    if (skill != null)
+                        skill.EnableDebugLogging = value;
+                });
+            DrawSkillDebugToggle(
                 "Firemaking Debug Logging",
                 () => firemakingSkillBehaviour != null,
                 () => firemakingSkillBehaviour.EnableDebugLogging,
                 value => firemakingSkillBehaviour.EnableDebugLogging = value);
+
+            bool oreBagDebugLogging = OreBagService.EnableDebugLogging;
+            bool requestedOreBagDebugLogging = GUILayout.Toggle(oreBagDebugLogging, "Ore Bag Debug Logging");
+            if (requestedOreBagDebugLogging != oreBagDebugLogging)
+                OreBagService.EnableDebugLogging = requestedOreBagDebugLogging;
+
+            bool companionDebugLogging = CompanionManager.EnableDebugLogging;
+            bool requestedCompanionDebugLogging = GUILayout.Toggle(companionDebugLogging, "Companion Debug Logging");
+            if (requestedCompanionDebugLogging != companionDebugLogging)
+                CompanionManager.EnableDebugLogging = requestedCompanionDebugLogging;
+
+            bool awarenessZoneDebugLogging = CompanionEnvironmentAwarenessZone.EnableDebugLogging;
+            bool requestedAwarenessZoneDebugLogging = GUILayout.Toggle(awarenessZoneDebugLogging, "Companion Awareness Zone Debug Logging");
+            if (requestedAwarenessZoneDebugLogging != awarenessZoneDebugLogging)
+                CompanionEnvironmentAwarenessZone.EnableDebugLogging = requestedAwarenessZoneDebugLogging;
+
+            bool sceneInteractableDebugLogging = SceneInteractableObject.EnableDebugLogging;
+            bool requestedSceneInteractableDebugLogging = GUILayout.Toggle(sceneInteractableDebugLogging, "Scene Interactable Arrival Debug Logging");
+            if (requestedSceneInteractableDebugLogging != sceneInteractableDebugLogging)
+                SceneInteractableObject.EnableDebugLogging = requestedSceneInteractableDebugLogging;
+
+            bool navStreamingDebugLogging = NavGridStreamingService.EnableDebugLogging;
+            bool requestedNavStreamingDebugLogging = GUILayout.Toggle(navStreamingDebugLogging, "Nav Grid Streaming Debug Logging");
+            if (requestedNavStreamingDebugLogging != navStreamingDebugLogging)
+                NavGridStreamingService.EnableDebugLogging = requestedNavStreamingDebugLogging;
+
+            bool navWorldDebugLogging = NavGridWorld.EnableDebugLogging;
+            bool requestedNavWorldDebugLogging = GUILayout.Toggle(navWorldDebugLogging, "Nav Grid World Debug Logging");
+            if (requestedNavWorldDebugLogging != navWorldDebugLogging)
+                NavGridWorld.EnableDebugLogging = requestedNavWorldDebugLogging;
 
             DrawNpcDamageLoggingControls();
 
@@ -284,49 +374,46 @@ namespace Skills
                 World.Minimap.DebugTeleportOnClickEnabled = requestedTeleportToggle;
             }
 
-            if (GUILayout.Button("Apply"))
+            bool previousGuiEnabled = GUI.enabled;
+            GUI.enabled = playerSkillManager != null;
+            if (GUILayout.Button("Apply To Player"))
             {
-                if (skillManager != null && int.TryParse(hpLevel, out var hp))
-                {
-                    skillManager.DebugSetLevel(SkillType.Hitpoints, hp);
-                    if (hitpoints != null)
-                        hitpoints.DebugSetCurrentHp(Mathf.Min(hitpoints.CurrentHp, hitpoints.MaxHp));
-                }
-                if (skillManager != null && int.TryParse(attackLevel, out var atk))
-                    skillManager.DebugSetLevel(SkillType.Attack, atk);
-                if (skillManager != null && int.TryParse(strengthLevel, out var str))
-                    skillManager.DebugSetLevel(SkillType.Strength, str);
-                if (skillManager != null && int.TryParse(defenceLevel, out var def))
-                    skillManager.DebugSetLevel(SkillType.Defence, def);
-                if (skillManager != null && int.TryParse(rangedLevel, out var rng))
-                    skillManager.DebugSetLevel(SkillType.Ranged, rng);
-                if (skillManager != null && int.TryParse(magicLevel, out var mag))
-                    skillManager.DebugSetLevel(SkillType.Magic, mag);
-                if (skillManager != null && int.TryParse(miningLevel, out var mine))
-                    skillManager.DebugSetLevel(SkillType.Mining, mine);
-                if (skillManager != null && int.TryParse(fishingLevel, out var fish))
-                    skillManager.DebugSetLevel(SkillType.Fishing, fish);
-                if (skillManager != null && int.TryParse(cookingLevel, out var cook))
-                    skillManager.DebugSetLevel(SkillType.Cooking, cook);
-                if (skillManager != null && int.TryParse(firemakingLevel, out var fire))
-                    skillManager.DebugSetLevel(SkillType.Firemaking, fire);
-                if (skillManager != null && int.TryParse(woodcuttingLevel, out var wood))
-                    skillManager.DebugSetLevel(SkillType.Woodcutting, wood);
-                if (skillManager != null && int.TryParse(beastmasterLevel, out var bm))
-                {
-                    skillManager.DebugSetLevel(SkillType.Beastmaster, bm);
-                    beastmasterService?.SetLevel(Mathf.Clamp(bm, 1, 99));
-                }
-
+                ApplySkillOverrides(playerSkillManager, hitpoints, beastmasterService);
                 RefreshFields();
             }
+            if (GUILayout.Button("Reset Stats For Player"))
+            {
+                ResetStatsToBaseline(playerSkillManager, hitpoints, beastmasterService);
+                RefreshFields();
+            }
+            GUI.enabled = previousGuiEnabled;
+
+            previousGuiEnabled = GUI.enabled;
+            GUI.enabled = companionSkillManager != null;
+            if (GUILayout.Button("Apply To Companion"))
+            {
+                ApplySkillOverrides(companionSkillManager, null, null);
+                RefreshFields();
+            }
+            if (GUILayout.Button("Reset Stats For Companion"))
+            {
+                ResetStatsToBaseline(companionSkillManager, null, null);
+                RefreshFields();
+            }
+            GUI.enabled = previousGuiEnabled;
+
+            bool cooldownGuiEnabled = GUI.enabled;
+            GUI.enabled = CompanionManager.CompanionSkillCooldowns != null;
+            if (GUILayout.Button("Clear Companion Cooldown Timers"))
+                ClearCompanionCooldownsFromMenu();
+            GUI.enabled = cooldownGuiEnabled;
 
             if (GUILayout.Button("Max Stats"))
             {
-                if (skillManager != null)
+                if (playerSkillManager != null)
                 {
                     foreach (SkillType type in Enum.GetValues(typeof(SkillType)))
-                        skillManager.DebugSetLevel(type, 99);
+                        playerSkillManager.DebugSetLevel(type, 99);
                     hitpoints?.DebugSetCurrentHp(hitpoints.MaxHp);
                     beastmasterService?.SetLevel(99);
                     RefreshFields();
@@ -604,6 +691,199 @@ namespace Skills
         }
 
         /// <summary>
+        /// Clears all active companion cooldown timers when requested from the debug UI.
+        /// </summary>
+        private void ClearCompanionCooldownsFromMenu()
+        {
+            var tracker = CompanionManager.CompanionSkillCooldowns;
+            if (tracker == null)
+            {
+                PublishAdminMessage("Companion cooldown tracker is not available.");
+                return;
+            }
+
+            int cleared = tracker.ClearAllCooldowns();
+            if (cleared <= 0)
+            {
+                PublishAdminMessage("Companion has no active skill cooldown timers.");
+                return;
+            }
+
+            string message = cleared == 1
+                ? "Cleared 1 companion skill cooldown timer."
+                : $"Cleared {cleared} companion skill cooldown timers.";
+            PublishAdminMessage(message);
+        }
+
+        /// <summary>
+        /// Publishes admin feedback to the in-game chat (falling back to the console when chat is unavailable).
+        /// </summary>
+        private static void PublishAdminMessage(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            var chat = ChatService.Instance;
+            if (chat != null)
+            {
+                chat.PublishGameMessage(message);
+            }
+            else
+            {
+                Debug.Log(message);
+            }
+        }
+
+        /// <summary>
+        /// Resolves the player-controlled <see cref="SkillManager"/> so manual overrides do not impact companions.
+        /// </summary>
+        private SkillManager ResolvePlayerSkillManager()
+        {
+            if (hitpoints != null)
+            {
+                var playerManager = hitpoints.GetComponent<SkillManager>();
+                if (playerManager != null)
+                    return playerManager;
+            }
+
+            var playerHitpoints = FindObjectOfType<PlayerHitpoints>();
+            if (playerHitpoints != null)
+            {
+                hitpoints = playerHitpoints;
+                var playerManager = playerHitpoints.GetComponent<SkillManager>();
+                if (playerManager != null)
+                    return playerManager;
+            }
+
+            var playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject != null)
+            {
+                var playerManager = playerObject.GetComponent<SkillManager>();
+                if (playerManager != null)
+                    return playerManager;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Locates the companion's dedicated <see cref="CookingSkill"/> instance so debug toggles can
+        /// control its logging flag without relying on scene hierarchy assumptions.
+        /// </summary>
+        private static CookingSkill ResolveCompanionCookingSkill()
+        {
+            var cookingController = CompanionManager.CompanionCookingController;
+            if (cookingController == null)
+                return null;
+
+            if (cookingController.TryGetComponent(out CookingSkill skill))
+                return skill;
+
+            skill = cookingController.GetComponentInChildren<CookingSkill>();
+            if (skill != null)
+                return skill;
+
+            // Fallback: if the controller lives on a nested child return any ancestor CookingSkill.
+            return cookingController.GetComponentInParent<CookingSkill>();
+        }
+
+        /// <summary>
+        /// Applies the currently entered skill overrides to the supplied skill manager instance.
+        /// </summary>
+        /// <param name="targetSkillManager">Target skill manager that should receive the overrides.</param>
+        /// <param name="targetHitpoints">Optional hitpoints component used to clamp HP to the new maximum.</param>
+        /// <param name="targetBeastmasterService">Optional beastmaster bridge that mirrors the Beastmaster level.</param>
+        private void ApplySkillOverrides(
+            SkillManager targetSkillManager,
+            PlayerHitpoints targetHitpoints,
+            IBeastmasterService targetBeastmasterService)
+        {
+            if (targetSkillManager == null)
+                return;
+
+            if (int.TryParse(hpLevel, out var hp))
+            {
+                targetSkillManager.DebugSetLevel(SkillType.Hitpoints, hp);
+                if (targetHitpoints != null)
+                    targetHitpoints.DebugSetCurrentHp(Mathf.Min(targetHitpoints.CurrentHp, targetHitpoints.MaxHp));
+            }
+
+            if (int.TryParse(attackLevel, out var atk))
+                targetSkillManager.DebugSetLevel(SkillType.Attack, atk);
+            if (int.TryParse(strengthLevel, out var str))
+                targetSkillManager.DebugSetLevel(SkillType.Strength, str);
+            if (int.TryParse(defenceLevel, out var def))
+                targetSkillManager.DebugSetLevel(SkillType.Defence, def);
+            if (int.TryParse(rangedLevel, out var rng))
+                targetSkillManager.DebugSetLevel(SkillType.Ranged, rng);
+            if (int.TryParse(magicLevel, out var mag))
+                targetSkillManager.DebugSetLevel(SkillType.Magic, mag);
+            if (int.TryParse(miningLevel, out var mine))
+                targetSkillManager.DebugSetLevel(SkillType.Mining, mine);
+            if (int.TryParse(fishingLevel, out var fish))
+                targetSkillManager.DebugSetLevel(SkillType.Fishing, fish);
+            if (int.TryParse(thievingLevel, out var thv))
+                targetSkillManager.DebugSetLevel(SkillType.Thieving, thv);
+            if (int.TryParse(cookingLevel, out var cook))
+                targetSkillManager.DebugSetLevel(SkillType.Cooking, cook);
+            if (int.TryParse(firemakingLevel, out var fire))
+                targetSkillManager.DebugSetLevel(SkillType.Firemaking, fire);
+            if (int.TryParse(woodcuttingLevel, out var wood))
+                targetSkillManager.DebugSetLevel(SkillType.Woodcutting, wood);
+            if (int.TryParse(beastmasterLevel, out var bm))
+            {
+                targetSkillManager.DebugSetLevel(SkillType.Beastmaster, bm);
+                targetBeastmasterService?.SetLevel(Mathf.Clamp(bm, 1, 99));
+            }
+        }
+
+        /// <summary>
+        /// Resets the supplied skill manager to the standard baseline levels used for new characters.
+        /// Hitpoints returns to 10 while all other skills revert to level 1.
+        /// </summary>
+        /// <param name="targetSkillManager">Skill manager to reset.</param>
+        /// <param name="targetHitpoints">Optional hitpoints component so current HP can be clamped to the new maximum.</param>
+        /// <param name="targetBeastmasterService">Optional Beastmaster bridge to keep the Beastmaster service in sync.</param>
+        private void ResetStatsToBaseline(
+            SkillManager targetSkillManager,
+            PlayerHitpoints targetHitpoints,
+            IBeastmasterService targetBeastmasterService)
+        {
+            if (targetSkillManager == null)
+                return;
+
+            foreach (SkillType skill in Enum.GetValues(typeof(SkillType)))
+            {
+                int baselineLevel = GetBaselineLevel(skill);
+                targetSkillManager.DebugSetLevel(skill, baselineLevel);
+
+                if (skill == SkillType.Beastmaster)
+                    targetBeastmasterService?.SetLevel(Mathf.Clamp(baselineLevel, 1, 99));
+            }
+
+            if (targetHitpoints != null)
+                targetHitpoints.DebugSetCurrentHp(targetHitpoints.MaxHp);
+        }
+
+        /// <summary>
+        /// Provides the baseline level that new characters should use for a given skill.
+        /// </summary>
+        /// <param name="skill">Skill type being queried.</param>
+        /// <returns>Level that represents the baseline for the supplied skill.</returns>
+        private static int GetBaselineLevel(SkillType skill)
+        {
+            switch (skill)
+            {
+                case SkillType.Hitpoints:
+                    return 10;
+                case SkillType.Thieving:
+                    return 1;
+                default:
+                    return 1;
+            }
+        }
+
+        /// <summary>
         /// Ensures we are referencing the current player's <see cref="PoisonController"/>.
         /// </summary>
         private PoisonController ResolvePoisonController()
@@ -745,6 +1025,18 @@ namespace Skills
             freezeError = string.Empty;
             GUI.FocusControl(null);
             HasTextInputFocus = false;
+        }
+
+        /// <summary>
+        /// Determines whether the active player currently holds the developer rank required to access the menu.
+        /// </summary>
+        private static bool HasDeveloperAccess()
+        {
+            var rankService = PlayerRankService.Instance;
+            if (rankService == null)
+                return false;
+
+            return rankService.HasPermission(rankService.ActivePlayerRank, PlayerRank.Developer);
         }
     }
 }

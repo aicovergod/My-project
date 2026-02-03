@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Audio;
 using Combat.Ranged;
 using EquipmentSystem;
 using Skills;
@@ -12,10 +11,12 @@ using Player;
 using Player.Movement;
 using NPC;
 using Pets;
+using Companions;
 using UI;
 using Magic;
 using Status;
 using Status.Freeze;
+using UI.Chat;
 using Util;
 
 namespace Combat
@@ -110,6 +111,11 @@ namespace Combat
         private IPlayerMovementController movementController;
         private Coroutine attackRoutine;
         private CombatTarget currentTarget;
+
+        /// <summary>
+        ///     Current combat target the player is actively attacking. Returns null when idle.
+        /// </summary>
+        public CombatTarget CurrentTarget => currentTarget;
         private float nextAttackTime;
         private RangedCombatController rangedController;
 
@@ -120,18 +126,6 @@ namespace Combat
         private float hitsplatFallbackOffset = 1.1f;
 
         [Header("Line of Sight")]
-        private static readonly string[] DefaultObstructionLayers = { "Obstacles", "Obstacle", "Physical Objects" };
-
-        private static readonly string[] RangedWeaponNameKeywords =
-        {
-            "crossbow",
-            "dart",
-            "javelin",
-            "throwing knife",
-            "shortbow",
-            "longbow"
-        };
-
         [SerializeField, Tooltip("Layers considered solid when checking whether swings or spells have a clear path to the target.")]
         private LayerMask obstructionMask;
 
@@ -215,12 +209,7 @@ namespace Combat
         /// </summary>
         private void EnsureObstructionMaskConfigured()
         {
-            int defaultMask = LayerMask.GetMask(DefaultObstructionLayers);
-
-            // Always merge in the default layers so inspector overrides can't accidentally drop
-            // physical blockers like AntiMeleeObstacle colliders from the mask.
-            int combinedMask = obstructionMask.value | defaultMask;
-            obstructionMask = combinedMask;
+            obstructionMask = LineOfSightUtility.EnsureDefaultObstructionMask(obstructionMask);
         }
 
         /// <summary>
@@ -256,6 +245,8 @@ namespace Combat
                 var pet = PetDropSystem.ActivePetCombat;
                 pet?.CommandAttack(target, false);
             }
+            if (CompanionManager.GuardModeEnabled)
+                CompanionManager.CommandGuardAttack(target);
             return true;
         }
 
@@ -267,34 +258,78 @@ namespace Combat
 
         private void OnSkillLevelChanged(SkillType type, int level)
         {
-            switch (type)
+            PublishPlayerLevelUpMessage(type, level);
+
+            // Keep spell damage data in sync with the player's latest Magic level so strike UI
+            // reflects the current max hits. Audio feedback now lives in Audio.SoundEffects.LevelUpSound.
+            if (type == SkillType.Magic)
+                MagicUI.UpdateStrikeMaxHits(level);
+        }
+
+        /// <summary>
+        /// Publishes a game-channel chat message announcing the player's new level so the
+        /// chatbox mirrors the OSRS-style feedback players expect after levelling a skill.
+        /// </summary>
+        /// <param name="type">Skill that increased.</param>
+        /// <param name="level">Resulting level.</param>
+        private static void PublishPlayerLevelUpMessage(SkillType type, int level)
+        {
+            var chat = ChatService.Instance;
+            if (chat == null)
+                return;
+
+            string skillName = SkillNameUtility.GetDisplayName(type);
+            string message = $"You just levelled up your {skillName} to level {level}!";
+            chat.PublishGameMessage(message);
+
+            if (CompanionManager.HasActiveCompanion)
             {
-                case SkillType.Magic:
-                    // Keep spell damage data in sync and play the corresponding level-up chime.
-                    MagicUI.UpdateStrikeMaxHits(level);
-                    SoundManager.Instance.PlaySfx(SoundEffect.MagicLevelUp);
-                    break;
-                case SkillType.Attack:
-                    SoundManager.Instance.PlaySfx(SoundEffect.AttackLevelUp);
-                    break;
-                case SkillType.Defence:
-                    SoundManager.Instance.PlaySfx(SoundEffect.DefenceLevelUp);
-                    break;
-                case SkillType.Mining:
-                    SoundManager.Instance.PlaySfx(SoundEffect.MiningLevelUp);
-                    break;
-                case SkillType.Woodcutting:
-                    SoundManager.Instance.PlaySfx(SoundEffect.WoodcuttingLevelUp);
-                    break;
-                case SkillType.Fishing:
-                    SoundManager.Instance.PlaySfx(SoundEffect.FishingLevelUp);
-                    break;
-                case SkillType.Cooking:
-                    SoundManager.Instance.PlaySfx(SoundEffect.CookingLevelUp);
-                    break;
-                case SkillType.Beastmaster:
-                    SoundManager.Instance.PlaySfx(SoundEffect.BeastmasterLevelUp);
-                    break;
+                string companionLine = null;
+                switch (type)
+                {
+                    case SkillType.Hitpoints:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerHitpointsLevelUpLine();
+                        break;
+                    case SkillType.Attack:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerAttackLevelUpLine();
+                        break;
+                    case SkillType.Strength:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerStrengthLevelUpLine();
+                        break;
+                    case SkillType.Defence:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerDefenceLevelUpLine();
+                        break;
+                    case SkillType.Ranged:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerRangedLevelUpLine();
+                        break;
+                    case SkillType.Magic:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerMagicLevelUpLine();
+                        break;
+                    case SkillType.Beastmaster:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerBeastmasterLevelUpLine();
+                        break;
+                    case SkillType.Fishing:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerFishingLevelUpLine();
+                        break;
+                    case SkillType.Cooking:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerCookingLevelUpLine();
+                        break;
+                    case SkillType.Firemaking:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerFiremakingLevelUpLine();
+                        break;
+                    case SkillType.Woodcutting:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerWoodcuttingLevelUpLine();
+                        break;
+                    case SkillType.Mining:
+                        companionLine = CompanionChatLibrary.GetRandomPlayerMiningLevelUpLine();
+                        break;
+                }
+
+                if (!string.IsNullOrEmpty(companionLine))
+                {
+                    string companionName = CompanionManager.GetCompanionDisplayName();
+                    chat.PublishCompanionMessage(companionName, companionLine);
+                }
             }
         }
 
@@ -344,6 +379,10 @@ namespace Combat
         /// </summary>
         private DamageType DetermineActiveDamageType()
         {
+            var activeSpell = MagicUI.ActiveSpell;
+            if (activeSpell != null)
+                return DamageType.Magic;
+
             CombatantStats stats = null;
             if (combatBinder != null)
                 stats = combatBinder.GetCombatantStats();
@@ -366,14 +405,9 @@ namespace Combat
                     // loadouts). In those cases we trust the weapon's combat stats over
                     // the profile so movement and range checks line up with the equipped
                     // item.
-                    if (weapon.combat.Magic > 0)
-                        return DamageType.Magic;
-
-                    if (WeaponNameIndicatesRanged(weapon))
-                        return DamageType.Ranged;
-
-                    if (weapon.combat.Range > 0 || weapon.combat.RangeStrength > 0)
-                        return DamageType.Ranged;
+                    var resolvedType = WeaponClassificationUtility.ResolveDamageType(weapon);
+                    if (resolvedType != DamageType.Melee)
+                        return resolvedType;
                 }
 
                 // Pet merge profiles that explicitly flag ranged or magic combat types
@@ -382,41 +416,14 @@ namespace Combat
                 return reportedType;
             }
 
-            var activeSpell = MagicUI.ActiveSpell;
-            if (activeSpell != null)
-                return DamageType.Magic;
-
             if (weapon != null)
             {
-                if (weapon.combat.Magic > 0)
-                    return DamageType.Magic;
-
-                if (WeaponNameIndicatesRanged(weapon))
-                    return DamageType.Ranged;
-                if (weapon.combat.Range > 0 || weapon.combat.RangeStrength > 0)
-                    return DamageType.Ranged;
+                var resolvedType = WeaponClassificationUtility.ResolveDamageType(weapon);
+                if (resolvedType != DamageType.Melee)
+                    return resolvedType;
             }
 
             return DamageType.Melee;
-        }
-
-        /// <summary>
-        /// Inspect the equipped weapon's display name to catch ranged weapons that lack
-        /// explicit ranged stat blocks. The lookup is case-insensitive so variations in
-        /// item naming (Longbow vs. longbow) still flag the weapon as ranged.
-        /// </summary>
-        private bool WeaponNameIndicatesRanged(Inventory.ItemData weapon)
-        {
-            if (weapon == null || string.IsNullOrWhiteSpace(weapon.itemName))
-                return false;
-
-            foreach (string keyword in RangedWeaponNameKeywords)
-            {
-                if (weapon.itemName.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
-                    return true;
-            }
-
-            return false;
         }
 
         /// <summary>
@@ -830,6 +837,17 @@ namespace Combat
 
         private void ShowPickaxeRequirementFeedback()
         {
+            if (CompanionManager.HasActiveCompanion)
+            {
+                var chat = ChatService.Instance;
+                if (chat != null)
+                {
+                    string reminder = CompanionChatLibrary.GetRandomPlayerOreGolemPickaxeReminder();
+                    chat.PublishCompanionMessage(CompanionManager.GetCompanionDisplayName(), reminder);
+                    return;
+                }
+            }
+
             var anchor = floatingTextAnchor != null ? floatingTextAnchor : transform;
             if (anchor == null)
                 anchor = transform;
@@ -934,52 +952,13 @@ namespace Combat
 
         private void AwardXp(int damage, CombatStyle style, DamageType type)
         {
-            if (damage <= 0)
-                return;
-            hitpoints?.GainHitpointsXP(damage * 1.33f);
-            if (type == DamageType.Magic)
+            var config = new CombatXpDistributor.CombatXpDistributionConfig
             {
-                skills?.AddXP(SkillType.Magic, 4 * damage);
-                return;
-            }
-            if (type == DamageType.Ranged)
-            {
-                float total = 4f * damage;
-                switch (style)
-                {
-                    case CombatStyle.Defensive:
-                    case CombatStyle.Controlled:
-                    case CombatStyle.Longrange:
-                        float split = total * 0.5f;
-                        skills?.AddXP(SkillType.Ranged, split);
-                        skills?.AddXP(SkillType.Defence, split);
-                        break;
-                    default:
-                        skills?.AddXP(SkillType.Ranged, total);
-                        break;
-                }
-                return;
-            }
-            switch (style)
-            {
-                case CombatStyle.Accurate:
-                    skills?.AddXP(SkillType.Attack, 4 * damage);
-                    break;
-                case CombatStyle.Aggressive:
-                    skills?.AddXP(SkillType.Strength, 4 * damage);
-                    break;
-                case CombatStyle.Defensive:
-                    skills?.AddXP(SkillType.Defence, 4 * damage);
-                    break;
-                case CombatStyle.Controlled:
-                    float total = 4f * damage;
-                    int share = Mathf.FloorToInt(total / 3f);
-                    int remainder = Mathf.RoundToInt(total - share * 3);
-                    skills?.AddXP(SkillType.Attack, share);
-                    skills?.AddXP(SkillType.Strength, share);
-                    skills?.AddXP(SkillType.Defence, share + remainder);
-                    break;
-            }
+                AwardHitpointsXp = xp => hitpoints?.GainHitpointsXP(xp),
+                AwardSkillXp = (skill, xp) => skills?.AddXP(skill, xp)
+            };
+
+            CombatXpDistributor.AwardXp(damage, style, type, config);
         }
 
         [ContextMenu("Test/Do Dummy Swing vs Target")]

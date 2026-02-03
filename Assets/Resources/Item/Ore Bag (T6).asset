@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac2a10e6705c25547af40c9bccea5d90, type: 3}
+  m_Name: Ore Bag (T6)
+  m_EditorClassIdentifier: Assembly-CSharp::Inventory.OreBag.OreBagItemData
+  id: Ore Bag (T6)
+  itemName: Ore Bag (T6)
+  icon: {fileID: 21300000, guid: 6dd7b7b6bf4acd64285ee2fba00786b9, type: 3}
+  stackSpriteOverrides: []
+  description: A bag that stores 250 of any ore
+  equipmentTooltipLines: []
+  stackable: 0
+  maxStack: 1
+  splittable: 0
+  isUndroppable: 1
+  isTwoHanded: 0
+  healAmount: 0
+  replacementItemId: 
+  equipmentSlot: 0
+  bycatchChanceBonus: 0
+  fishingXpBonusMultiplier: 0
+  fishingXpBonusWaterTypes: -1
+  woodcuttingXpBonusMultiplier: 0
+  miningXpBonusMultiplier: 0
+  cookingXpBonusMultiplier: 0
+  firemakingXpBonusMultiplier: 0
+  skillRequirements: []
+  combat:
+    Attack: 0
+    Strength: 0
+    Range: 0
+    RangeStrength: 0
+    Magic: 0
+    MeleeDefence: 0
+    RangeDefence: 0
+    MagicDefence: 0
+    AttackSpeedTicks: 4
+    styleAttackSpeedOverrides: []
+  onHitPoison: {fileID: 0}
+  poisonApplyChance: 0.25
+  poisonRequiresDamage: 1
+  isHalberd: 0
+  aoeRadiusTiles: 0
+  coneAngleDeg: 0
+  aoeMaxTargets: 0
+  aoeMultiplier: 0
+  buffEffects: []
+  tier: 6
+  customCapacity: 0
+  upgradeTarget: {fileID: 0}

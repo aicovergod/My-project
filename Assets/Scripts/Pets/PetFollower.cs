@@ -3,6 +3,7 @@ using Player;
 using Player.Movement;
 using Util;
 using NPC;
+using NPC.Navigation;
 
 namespace Pets
 {
@@ -85,6 +86,29 @@ namespace Pets
         };
 
         public Transform Player => player;
+
+        /// <summary>
+        /// Provides the last meaningful movement heading used by the follower.
+        /// Prefers the current velocity direction and falls back to the cached
+        /// <see cref="lastHeading"/> captured while steering around the player.
+        /// Returns <see cref="Vector2.zero"/> when no heading information is available.
+        /// </summary>
+        public Vector2 LastKnownHeading
+        {
+            get
+            {
+                if (currentVelocity.sqrMagnitude > MovementDeadZoneSqr)
+                {
+                    Vector2 heading = new Vector2(currentVelocity.x, currentVelocity.y);
+                    return heading.sqrMagnitude > 0f ? heading.normalized : Vector2.zero;
+                }
+
+                if (lastHeading.sqrMagnitude > Mathf.Epsilon)
+                    return lastHeading.normalized;
+
+                return Vector2.zero;
+            }
+        }
 
         private void Reset()
         {
@@ -181,8 +205,8 @@ namespace Pets
             lastPlayerPos = playerPos;
             bool playerMoving = playerVel.sqrMagnitude > 0.01f;
 
-            NavGridBuilder activeGrid = PathfindingService.Instance?.ActiveGrid;
-            bool navAvailable = activeGrid != null && activeGrid.HasGrid;
+            var navData = PathfindingService.Instance?.ActiveNavData;
+            bool navAvailable = navData != null && navData.HasData;
 
             if (!useNavigationForFollowing)
             {
@@ -224,7 +248,7 @@ namespace Pets
 
             if (wandering)
             {
-                HandleWander(playerPos, activeGrid, navAvailable);
+                HandleWander(playerPos, navData, navAvailable);
                 return;
             }
 
@@ -352,7 +376,7 @@ namespace Pets
             UpdateVisuals(visualVelocity, playerMoving, navUsed);
         }
 
-        private void HandleWander(Vector3 playerPos, NavGridBuilder grid, bool navAvailable)
+        private void HandleWander(Vector3 playerPos, INavGridData grid, bool navAvailable)
         {
             float deltaTime = Time.fixedDeltaTime;
             Vector3 currentPosition = transform.position;
@@ -459,7 +483,7 @@ namespace Pets
             UpdateVisuals(visualVelocity, playerMoving: false, navUsed);
         }
 
-        private Vector3 SampleWanderTarget(Vector3 playerPos, NavGridBuilder grid)
+        private Vector3 SampleWanderTarget(Vector3 playerPos, INavGridData grid)
         {
             Vector3 origin = transform.position;
             float baseRadius = Mathf.Max(0.1f, wanderRadius);

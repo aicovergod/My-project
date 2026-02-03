@@ -1,12 +1,12567 @@
 # Session Log
 This file is auto-updated by CI on every push. Times shown are Europe/London.
 
-<!-- commit:a59339cc275b6d0a0b8366134c972709df10f4b8 -->
-## 2025-10-12T22:10:58+01:00 — Ensure shop modal flag applied before manager gating
+<!-- commit:4fc97daa4faea7f9264ee1852901ad53c96014e6 -->
+## 2025-11-02T14:37:03+00:00 — Merge pull request #1605 from aicovergod/codex/update-loginflowcontroller-for-cancellation-handling
 
 - Author: aicovergod <lewisshuffle136@gmail.com>
-- Changed files (1): Assets/Scripts/Shop/ShopUI.cs
+- Changed files (0): —
+- Diff: 52 ++ / 1 --
+- Notes:
+  Guard login flow against destroyed controller
+---
+<!-- commit:46d179c59693b86456e8024f88f8f0894acaf258 -->
+## 2025-11-02T14:36:57+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:fd0d9a1b305664923f6703ef4bf7d2400793a3a8 -->
+## 2025-11-02T14:36:45+00:00 — Guard login flow against destroyed controller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Login/LoginFlowController.cs
+- Diff: 43 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:194da6f98a5dd525dfa994086c83aed2ea5e78f5 -->
+## 2025-11-02T14:13:15+00:00 — Merge pull request #1604 from aicovergod/codex/add-scenetransitionmanager-setup-in-loginflowcontroller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 70 ++ / 1 --
+- Notes:
+  Ensure login flow instantiates scene transition manager
+---
+<!-- commit:cf858d53f6285d8e81ab5810f995a9fea8290d01 -->
+## 2025-11-02T13:54:50+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:bfce57e985081f422eaab8deff747edab8921c4c -->
+## 2025-11-02T13:54:35+00:00 — Ensure login flow spawns transition manager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Login/LoginFlowController.cs
+- Diff: 61 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:2ed6592f17f903a860c8e169bfa00f9517bb63e1 -->
+## 2025-11-02T12:43:46+00:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 87 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:cadd27670a11c0b24c48ca7cd48488c9846aa741 -->
+## 2025-11-01T14:42:30+00:00 — Merge pull request #1603 from aicovergod/codex/add-debug-logs-on-game-startup
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 69 ++ / 1 --
+- Notes:
+  Add login flow diagnostics
+---
+<!-- commit:81c7233dd166e4168c4ba3c77f46a241c57095bd -->
+## 2025-11-01T14:42:07+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:7268cc25006835ddb3f2278489d78432ed00bbb9 -->
+## 2025-11-01T14:41:52+00:00 — Add login flow diagnostics
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Core/GameManager.cs, Assets/Scripts/UI/Login/LoginFlowController.cs, Assets/Scripts/UI/Login/LoginScreenController.cs, Assets/Scripts/World/SceneTransitionManager.cs
+- Diff: 60 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:fe5ae9187c18c0bc9158b3347511087c418f0c17 -->
+## 2025-11-01T11:00:41+00:00 — Merge pull request #1602 from aicovergod/codex/update-loginflowcontroller-for-scene-transition
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 30 ++ / 5 --
+- Notes:
+  Refresh login transition manager after scene load
+---
+<!-- commit:1ca7b0ddbb6d4cecd490eec0eed491f65679a4d9 -->
+## 2025-11-01T10:58:13+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d940ae2fdc9ada1b3f990b9802977dc6b8d086d6 -->
+## 2025-11-01T10:57:57+00:00 — Fix login flow transition manager refresh
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Login/LoginFlowController.cs
+- Diff: 21 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:c5873ba5c3f5ecd3829f762f93755faeb4d6b156 -->
+## 2025-11-01T10:27:32+00:00 — Merge pull request #1601 from aicovergod/codex/extend-scenetransitionmanager-with-transition-helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 129 ++ / 30 --
+- Notes:
+  Add manual transition helpers for login scene loading
+---
+<!-- commit:972579082a553955a53789c6a2899371781e3215 -->
+## 2025-11-01T10:27:27+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:01122b42e624fde5cdad1008964e7491f32b7f8e -->
+## 2025-11-01T10:27:14+00:00 — Add manual scene transition hooks for login flow
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/UI/Login/LoginFlowController.cs, Assets/Scripts/World/SceneTransitionManager.cs
+- Diff: 120 ++ / 30 --
+- Notes:
+  —
+---
+<!-- commit:09cb25af538a7538f5e8daf3317319acd7e23ce2 -->
+## 2025-11-01T10:00:06+00:00 — Merge pull request #1600 from aicovergod/codex/handle-closebutton-sprite-loading-failures
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 85 ++ / 29 --
+- Notes:
+  Fallback close button sprite handling and NPC menu cleanup
+---
+<!-- commit:d5f1e29cd5c06e3fa31c5d80da5996c58c6c680e -->
+## 2025-11-01T09:59:55+00:00 — Handle missing UI sprite and clean NPC right-click setups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Prefabs/NPCS/Copper Ore Golem.prefab, Assets/Prefabs/NPCS/Goblin.prefab, Assets/Scripts/UI/RightClickMenu.cs, Assets/Scripts/UI/Utilities/CloseButtonBuilder.cs
+- Diff: 85 ++ / 29 --
+- Notes:
+  —
+---
+<!-- commit:c0c3fd386473011f0ddfcee3cecee086edba0699 -->
+## 2025-11-01T09:39:36+00:00 — Merge pull request #1599 from aicovergod/codex/remove-sprite-depth-update
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 5 ++ / 50 --
+- Notes:
+  Revert SpriteDepth custom sorting anchor
+---
+<!-- commit:5e4b0ff25ddb3248b7d5f6324305977f7a5cb709 -->
+## 2025-11-01T09:39:25+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:074862dfc7365e6edea46ef9cb96635fa605da37 -->
+## 2025-11-01T09:39:07+00:00 — Revert SpriteDepth custom anchor
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Util/SpriteDepth.cs, docs/SESSION_LOG.md
+- Diff: 1 ++ / 55 --
+- Notes:
+  —
+---
+<!-- commit:2a15ac6162c0d57e6adcb7ca0003a6746cf1cf81 -->
+## 2025-10-31T20:07:06+00:00 — sprites
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (64): Assets/Editor/EditablePolygonCollider2DEditor.cs.meta, Assets/Prefabs/Ground Decoration.meta, Assets/Prefabs/Ground Decoration/Cave Bone Decoration 1.prefab, Assets/Prefabs/Ground Decoration/Cave Bone Decoration 1.prefab.meta, Assets/Prefabs/Ground Decoration/Cave Bone Decoration 2.prefab, Assets/Prefabs/Ground Decoration/Cave Bone Decoration 2.prefab.meta, Assets/Prefabs/Ground Decoration/Cave Bone Decoration 3.prefab, Assets/Prefabs/Ground Decoration/Cave Bone Decoration 3.prefab.meta, Assets/Prefabs/Ground Decoration/Cave Broken Pottery.prefab, Assets/Prefabs/Ground Decoration/Cave Broken Pottery.prefab.meta, Assets/Prefabs/Ground Decoration/Dirt Pebbles Type 1.prefab, Assets/Prefabs/Ground Decoration/Dirt Pebbles Type 1.prefab.meta, Assets/Prefabs/Ground Decoration/Dirt Pebbles Type 2.prefab, Assets/Prefabs/Ground Decoration/Dirt Pebbles Type 2.prefab.meta, Assets/Prefabs/Ground Decoration/Dirt Pebbles Type 3.prefab, Assets/Prefabs/Ground Decoration/Dirt Pebbles Type 3.prefab.meta, Assets/Prefabs/Ground Decoration/Dirt Pebbles Type 4.prefab, Assets/Prefabs/Ground Decoration/Dirt Pebbles Type 4.prefab.meta, Assets/Prefabs/Ground Decoration/Dirt Pebbles Type 5.prefab, Assets/Prefabs/Ground Decoration/Dirt Pebbles Type 5.prefab.meta, Assets/Prefabs/Ground Decoration/Green Fern.prefab, Assets/Prefabs/Ground Decoration/Green Fern.prefab.meta, Assets/Prefabs/Ground Decoration/Rope Ground Decoration.prefab, Assets/Prefabs/Ground Decoration/Rope Ground Decoration.prefab.meta, Assets/Prefabs/Structures.meta, Assets/Prefabs/Structures/Tent 3.prefab, Assets/Prefabs/Structures/Tent 3.prefab.meta, Assets/Prefabs/Wall Decoration.meta, Assets/Prefabs/Wall Decoration/Hanging Stinging Nettle.prefab, Assets/Prefabs/Wall Decoration/Hanging Stinging Nettle.prefab.meta, Assets/Scenes/OverWorld.unity, Assets/Scenes/VioletsTownBank.unity, Assets/Scenes/VioletsTownBank.unity.meta, Assets/Scripts/Physics2D.meta, Assets/Scripts/Physics2D/EditablePolygonCollider2D.cs.meta, Assets/Sprites/Buildings/Tents/Tent 1.png.meta, Assets/Sprites/Buildings/Tents/Tent 3_192x192.png, Assets/Sprites/Buildings/Tents/Tent 3_192x192.png.meta, Assets/Sprites/Buildings/Tents/Tent 4_192x192.png, Assets/Sprites/Buildings/Tents/Tent 4_192x192.png.meta, Assets/Sprites/Buildings/Tents/Tent 5_192x192.png, Assets/Sprites/Buildings/Tents/Tent 5_192x192.png.meta, Assets/Sprites/Ground Decoration/Broken Pottery Ground Decoration_64x64.png, Assets/Sprites/Ground Decoration/Broken Pottery Ground Decoration_64x64.png.meta, Assets/Sprites/Ground Decoration/Cave Bone 1 Decoration 1_64x64.png, Assets/Sprites/Ground Decoration/Cave Bone 1 Decoration 1_64x64.png.meta, Assets/Sprites/Ground Decoration/Cave Bone 2 Decoration 2_64x64.png, Assets/Sprites/Ground Decoration/Cave Bone 2 Decoration 2_64x64.png.meta, Assets/Sprites/Ground Decoration/Dirt Pebble Decoration_64x64.png, Assets/Sprites/Ground Decoration/Dirt Pebble Decoration_64x64.png.meta, Assets/Sprites/Ground Decoration/Dirt Pebble Type 2 Decoration_64x64.png, Assets/Sprites/Ground Decoration/Dirt Pebble Type 2 Decoration_64x64.png.meta, Assets/Sprites/Ground Decoration/Dirt Pebble Type 3_64x64.png, Assets/Sprites/Ground Decoration/Dirt Pebble Type 3_64x64.png.meta, Assets/Sprites/Ground Decoration/Dirt Pebble Type 4_64x64.png, Assets/Sprites/Ground Decoration/Dirt Pebble Type 4_64x64.png.meta, Assets/Sprites/Ground Decoration/Dirt Pebble Type 5_64x64.png, Assets/Sprites/Ground Decoration/Dirt Pebble Type 5_64x64.png.meta, Assets/Sprites/Ground Decoration/Green Fern.png, Assets/Sprites/Ground Decoration/Green Fern_64x64.png, Assets/Sprites/Ground Decoration/Green Fern_64x64.png.meta, Assets/Sprites/Ground Decoration/Rope Ground Decoration_64x64.png, Assets/Sprites/Ground Decoration/Rope Ground Decoration_64x64.png.meta, ProjectSettings/EditorBuildSettings.asset
+- Diff: 56952 ++ / 26478 --
+- Notes:
+  —
+---
+<!-- commit:958636dfd5731b4df88acdf968259a4a4d4a38fc -->
+## 2025-10-31T20:05:56+00:00 — Merge pull request #1597 from aicovergod/codex/fix-ireadonlylist-to-ilist-conversion-error
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 1 --
+- Notes:
+  Fix polygon editor point list type
+---
+<!-- commit:7a83d362b84022161d06ab2187a7a4d8a065126c -->
+## 2025-10-31T20:05:42+00:00 — Fix polygon editor point list type
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Editor/EditablePolygonCollider2DEditor.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:b7edfe54665f33f880b0c4408e3ddf0f89f08aa0 -->
+## 2025-10-31T20:01:31+00:00 — Merge pull request #1596 from aicovergod/codex/fix-cs0118-error-in-editablepolygoncollider2deditor
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 1 --
+- Notes:
+  Fix editor base class namespace conflict
+---
+<!-- commit:ae23d5c48dd4a9c8522d5de462971767846da355 -->
+## 2025-10-31T20:01:18+00:00 — Fix editor base class namespace conflict
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Editor/EditablePolygonCollider2DEditor.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:628b2f2337e99f761ec7ae72f322f1070e5a6788 -->
+## 2025-10-31T19:57:51+00:00 — Merge pull request #1595 from aicovergod/codex/fix-errors-related-to-physics2d-namespace
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 2 --
+- Notes:
+  Fix namespace conflict with Unity Physics2D types
+---
+<!-- commit:2c64568f573f7a82a47d6cb3e3762d915ac75d00 -->
+## 2025-10-31T19:57:25+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:1e5265ba89df5c9e7e8d920a5a83176551eb2d00 -->
+## 2025-10-31T19:57:10+00:00 — Fix custom physics namespace collision
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Editor/EditablePolygonCollider2DEditor.cs, Assets/Scripts/Physics2D/EditablePolygonCollider2D.cs
+- Diff: 2 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:35040a0c31b86b9c2a4567dd3ead4075256cf63d -->
+## 2025-10-31T19:53:17+00:00 — Merge pull request #1594 from aicovergod/codex/create-editablepolygoncollider2d-for-unity
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1271 ++ / 0 --
+- Notes:
+  Add editable polygon collider tooling
+---
+<!-- commit:10b534af4e4edc8143d658d130d81d27aa41acbe -->
+## 2025-10-31T19:52:03+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c404b46a42cdca16047481d9ca573f4ffe8a599f -->
+## 2025-10-31T19:51:44+00:00 — Add editable polygon collider tooling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Editor/EditablePolygonCollider2DEditor.cs, Assets/Scripts/Physics2D/EditablePolygonCollider2D.cs
+- Diff: 1262 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:bcba01b915e910b7e1dcc389d8d79848b1893419 -->
+## 2025-10-31T18:20:24+00:00 — Merge pull request #1593 from aicovergod/codex/fix-cow-clicking-message-and-add-coroutine
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 164 ++ / 1 --
+- Notes:
+  Add auto-move support to cow milking interaction
+---
+<!-- commit:693ad172633e50cd94d2b68c8417e63f8e5cb690 -->
+## 2025-10-31T18:16:46+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8cbfc15363985c5c135fdf9f98847d9203a1cf17 -->
+## 2025-10-31T18:15:13+00:00 — Add auto movement when milking cows
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Interaction/CowMilking.cs
+- Diff: 155 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:b5d52579753506aede23be7a3a88cc2014e07bd5 -->
+## 2025-10-31T15:02:56+00:00 — Merge pull request #1592 from aicovergod/codex/update-scenestoolbar-to-position-toolbarmenu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 8 ++ / 3 --
+- Notes:
+  Align Scenes toolbar menu within play controls row
+---
+<!-- commit:f61769379158de4ae52f71dd313fbe6f336967b4 -->
+## 2025-10-31T15:02:42+00:00 — Align Scenes toolbar menu with play controls
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Editor/ScenesToolbar.cs
+- Diff: 8 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:591d61e62a377bce07e5e16db3d43e93c495c187 -->
+## 2025-10-31T14:57:31+00:00 — toolbar fix
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Editor/ScenesToolbar.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:ebed05ce73e33189edf359058c2750ba1089131b -->
+## 2025-10-31T14:53:15+00:00 — Merge pull request #1590 from aicovergod/codex/fix-error-cs0246-in-scenestoolbar.cs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 0 --
+- Notes:
+  Fix missing ToolbarMenu namespace import
+---
+<!-- commit:b7ab56ba3bb2b6632f1f56479eaef48b41d13012 -->
+## 2025-10-31T14:53:04+00:00 — Fix Scenes toolbar menu type reference
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Editor/ScenesToolbar.cs
+- Diff: 1 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c1c6fa2dd7c0605742e62d7cd51b6a1305fe5f8c -->
+## 2025-10-31T14:50:34+00:00 — Merge pull request #1589 from aicovergod/codex/add-custom-scenes-dropdown-in-unity-toolbar
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 325 ++ / 0 --
+- Notes:
+  Add Scenes toolbar dropdown for quick scene switching
+---
+<!-- commit:eeaa8a51ad0a0b8271acc5c536b94e095b7e405d -->
+## 2025-10-31T14:50:18+00:00 — Add editor toolbar dropdown for scene switching
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Editor/ScenesToolbar.cs
+- Diff: 325 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:4eda313c1643a3e4ff3f747a8fe226994ede9b87 -->
+## 2025-10-31T14:45:51+00:00 — Merge pull request #1588 from aicovergod/codex/remove-toolsofsurvival-quest
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 53 ++ / 195 --
+- Notes:
+  Retire Tools of Survival quest
+---
+<!-- commit:87deac8fc0b5df2584f46e706b40a66e05d728e7 -->
+## 2025-10-31T14:45:39+00:00 — Remove Tools of Survival quest and update Elder Rowan
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (9): Assets/Dialogue/ElderRowan.asset, Assets/Resources/Quests/Tools Of Survival Quest.asset, Assets/Resources/Quests/Tools Of Survival Quest.asset.meta, Assets/Scripts/Dialogue/ElderRowanDialogueData.cs, Assets/Scripts/NPC/Interaction/ElderRowanNPC.cs, Assets/Scripts/Quests/ToolsOfSurvivalQuest.cs, Assets/Scripts/Quests/ToolsOfSurvivalQuest.cs.meta, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs, Assets/Scripts/Skills/Woodcutting/Core/WoodcuttingSkill.cs
+- Diff: 53 ++ / 195 --
+- Notes:
+  —
+---
+<!-- commit:411f21442c19757125467effa46ace7f078146e6 -->
+## 2025-10-31T14:35:28+00:00 — Merge pull request #1587 from aicovergod/codex/fix-console-error-cs0234-in-uimanager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 1 --
+- Notes:
+  Fix quest window resolution in UIManager
+---
+<!-- commit:f2dafffef3b355a95db7ccb301d6b4b9a06b7273 -->
+## 2025-10-31T14:35:14+00:00 — Fix quest window type resolution in UIManager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/UIManager.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:59167359431c34d2845d62814f744fff16e3c566 -->
+## 2025-10-31T14:30:45+00:00 — Merge pull request #1586 from aicovergod/codex/implement-new-quest-ui-with-questlist-and-questinfo
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1318 ++ / 210 --
+- Notes:
+  Refactor quest journal into QuestList/QuestInfo panels
+---
+<!-- commit:cb69be4af2aed58e12e62be069b4f967d9a8ec90 -->
+## 2025-10-31T14:30:36+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ba28bcd77d2a65e5bff4f1f2dbc9e58f360fa190 -->
+## 2025-10-31T14:30:22+00:00 — Refactor quest journal UI
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (16): Assets/Scripts/Quests/QuestUI.cs, Assets/Scripts/UI/Quests.meta, Assets/Scripts/UI/Quests/QuestInfoPanelView.cs, Assets/Scripts/UI/Quests/QuestInfoPanelView.cs.meta, Assets/Scripts/UI/Quests/QuestJournalDataModels.cs, Assets/Scripts/UI/Quests/QuestJournalDataModels.cs.meta, Assets/Scripts/UI/Quests/QuestJournalDataProvider.cs, Assets/Scripts/UI/Quests/QuestJournalDataProvider.cs.meta, Assets/Scripts/UI/Quests/QuestJournalPresenter.cs, Assets/Scripts/UI/Quests/QuestJournalPresenter.cs.meta, Assets/Scripts/UI/Quests/QuestJournalViewBuilder.cs, Assets/Scripts/UI/Quests/QuestJournalViewBuilder.cs.meta, Assets/Scripts/UI/Quests/QuestListEntryView.cs, Assets/Scripts/UI/Quests/QuestListEntryView.cs.meta, Assets/Scripts/UI/Quests/QuestStatusColorUtility.cs, Assets/Scripts/UI/Quests/QuestStatusColorUtility.cs.meta
+- Diff: 1309 ++ / 210 --
+- Notes:
+  —
+---
+<!-- commit:fa2ef1e6176668914ddd3099fc376bfef60a3758 -->
+## 2025-10-31T13:21:29+00:00 — Merge pull request #1585 from aicovergod/codex/fix-milking-cow-with-empty-bucket-error
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 6 ++ / 2 --
+- Notes:
+  Allow cow milking without preselecting a bucket
+---
+<!-- commit:89d51034fca8b6e1cc741fd3d50cd1ac08afb2e8 -->
+## 2025-10-31T13:21:17+00:00 — Allow cow milking without preselecting bucket
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Interaction/CowMilking.cs
+- Diff: 6 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:075246469daff09b9cb2824ab3e04b2f67ca8214 -->
+## 2025-10-31T13:14:19+00:00 — Merge pull request #1584 from aicovergod/codex/update-cow-milking-script-for-player-input-system
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 160 ++ / 22 --
+- Notes:
+  Integrate cow milking with shared input system
+---
+<!-- commit:a77f891fac86af54764f0f58dfb233ab718fa906 -->
+## 2025-10-31T13:14:06+00:00 — Integrate cow milking with shared input
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): AGENTS.md, Assets/Scripts/NPC/Interaction/CowMilking.cs
+- Diff: 160 ++ / 22 --
+- Notes:
+  —
+---
+<!-- commit:a00730ef8f0e63cb725ecb52c5d52e07d49d3e4d -->
+## 2025-10-31T12:59:56+00:00 — Merge pull request #1583 from aicovergod/codex/add-cow-milking-script
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 609 ++ / 0 --
+- Notes:
+  Add cow milking NPC interaction
+---
+<!-- commit:1e8b9ef4301c87a847332adb0d89331c7a4c5f45 -->
+## 2025-10-31T12:59:35+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:be3fce774839dafee78d48c807987ea5fa37c00d -->
+## 2025-10-31T12:59:19+00:00 — Add cow milking NPC interaction
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Interaction/CowMilking.cs
+- Diff: 600 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:bcc12c336d0d4ac6d16f362e4f5ca8029d82e564 -->
+## 2025-10-31T12:23:49+00:00 — Merge pull request #1582 from aicovergod/codex/refactor-companionskillcooldowntimers-structure
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 266 ++ / 201 --
+- Notes:
+  Refactor companion cooldown utilities
+---
+<!-- commit:5aaf655325ab25783f9a7d26dc126d8c5d029eba -->
+## 2025-10-31T12:23:31+00:00 — Merge branch 'main' into codex/refactor-companionskillcooldowntimers-structure
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:3f0122bffb4cd197c7b09a38bb7fd5d12e055fee -->
+## 2025-10-31T12:19:39+00:00 — Refactor companion skill cooldown handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (11): Assets/Scripts/Companions/Commands/CompanionCookingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionFishingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionMiningCommandService.cs, Assets/Scripts/Companions/Commands/CompanionSkillCooldownProfile.cs, Assets/Scripts/Companions/Commands/CompanionWoodcuttingCommandService.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 262 ++ / 188 --
+- Notes:
+  —
+---
+<!-- commit:b99aef5b1b82bf9ee353e412d069617c2e8c0f9a -->
+## 2025-10-31T11:54:03+00:00 — Merge pull request #1580 from aicovergod/codex/add-fishing-cancellation-in-commands
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2 ++ / 0 --
+- Notes:
+  Stop companion fishing when switching commands
+---
+<!-- commit:3e98f4ccc9009b92986483066cb2cabd5b7464f7 -->
+## 2025-10-31T11:53:48+00:00 — Stop companion fishing when switching commands
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionController.cs
+- Diff: 2 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ddf21acbe87668407b97bffb69215ac7159ee545 -->
+## 2025-10-31T11:23:55+00:00 — Merge pull request #1579 from aicovergod/codex/fix-lambda-parameter-usage-bugs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 21 ++ / 6 --
+- Notes:
+  Fix companion gathering command tests lambda declarations
+---
+<!-- commit:837b59c0ec2ddfb47d75676d9bd48af543fca5dd -->
+## 2025-10-31T11:23:44+00:00 — Fix companion gathering command test lambdas
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Tests/Companions/CompanionGatheringCommandServiceBaseTests.cs
+- Diff: 21 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:5ead1841a90f0fb2ea9cedce037e9b693ca5ba50 -->
+## 2025-10-31T11:19:21+00:00 — Merge pull request #1578 from aicovergod/codex/fix-compilation-errors-in-console
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 20 ++ / 16 --
+- Notes:
+  Fix companion gathering configuration compilation errors
+---
+<!-- commit:6e341f07855fd0e65a37dbc5ae00fc5ca1ab1f53 -->
+## 2025-10-31T11:19:09+00:00 — Fix companion gathering configuration compilation errors
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (9): Assets/Scripts/Companions/Commands/CompanionCookingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionFishingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionMiningCommandService.cs, Assets/Scripts/Companions/Commands/CompanionWoodcuttingCommandService.cs, Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Common/CompanionToolSelectorRegistry.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 20 ++ / 16 --
+- Notes:
+  —
+---
+<!-- commit:44bbbbbfef56c285f17f0e6c1d58420529ab1281 -->
+## 2025-10-31T11:14:00+00:00 — Merge pull request #1577 from aicovergod/codex/introduce-reusable-helper-for-commands
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 493 ++ / 75 --
+- Notes:
+  Refactor companion gathering command services
+---
+<!-- commit:eb35a3ec963d0a1169f3d2bcc5899396ccbc5489 -->
+## 2025-10-31T11:13:48+00:00 — Refactor companion gathering command services
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/Commands/CompanionFishingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionGatheringCommandServiceBase.cs, Assets/Scripts/Companions/Commands/CompanionMiningCommandService.cs, Assets/Scripts/Companions/Commands/CompanionWoodcuttingCommandService.cs, Assets/Tests/Companions/CompanionGatheringCommandServiceBaseTests.cs
+- Diff: 493 ++ / 75 --
+- Notes:
+  —
+---
+<!-- commit:a686022192e674109008d2c596abe8c842f47a9c -->
+## 2025-10-31T11:09:11+00:00 — Merge pull request #1576 from aicovergod/codex/create-companionchateventservice-and-refactor-companionmanag
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 136 ++ / 109 --
+- Notes:
+  Extract companion chat event service
+---
+<!-- commit:f8afb4d07e928985088d60ae8da8af30c3258921 -->
+## 2025-10-31T11:09:02+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c628e9537148ff8820c53cdb5125c3456b218cc9 -->
+## 2025-10-31T11:08:44+00:00 — Extract companion chat event helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Chat/CompanionChatEventService.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 127 ++ / 109 --
+- Notes:
+  —
+---
+<!-- commit:98469d36fcce72f800b72572c76fe42e589bb685 -->
+## 2025-10-31T10:54:48+00:00 — Merge pull request #1575 from aicovergod/codex/add-helper-for-skill-cooldown-message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 28 ++ / 65 --
+- Notes:
+  Refactor companion cooldown chat publishing
+---
+<!-- commit:d20db6eb8fc2ce324ca99986f530947f271b3244 -->
+## 2025-10-31T10:54:24+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c8a90b8374b98f0330f7d9398d3ca1bc40ec8053 -->
+## 2025-10-31T10:54:11+00:00 — Refactor companion cooldown chat publishing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs
+- Diff: 19 ++ / 65 --
+- Notes:
+  —
+---
+<!-- commit:8e522f22e522840cbc6739e759b40442bc96b1d2 -->
+## 2025-10-31T10:50:54+00:00 — Merge pull request #1574 from aicovergod/codex/add-companionguardmodeservice-class
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 268 ++ / 105 --
+- Notes:
+  Refactor companion guard mode management
+---
+<!-- commit:2bf685c5ba9661d9927494093e869a096042a676 -->
+## 2025-10-31T10:50:05+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6d23354f841087e2106c583872347a03f793a8d3 -->
+## 2025-10-31T10:49:52+00:00 — Refactor companion guard mode management
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Combat/CompanionGuardModeService.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 259 ++ / 105 --
+- Notes:
+  —
+---
+<!-- commit:fe1d18456c78bb872cf2f792b441b76fc0294e40 -->
+## 2025-10-31T10:41:17+00:00 — Merge pull request #1573 from aicovergod/codex/add-companionchatpublisher-with-helper-methods
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 170 ++ / 48 --
+- Notes:
+  Add companion chat publishing helper
+---
+<!-- commit:1b5d607674bf099ec202571c79235b9a26485496 -->
+## 2025-10-31T10:41:03+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:40632d57715b453ba588bc9900a597863cade451 -->
+## 2025-10-31T10:40:49+00:00 — Refactor companion chat publishing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Chat/CompanionChatPublisher.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Tests/Companions/CompanionChatPublisherTests.cs
+- Diff: 161 ++ / 48 --
+- Notes:
+  —
+---
+<!-- commit:16291f6cf90ff9db428aee2092870aa7a6ed9c21 -->
+## 2025-10-31T10:29:29+00:00 — Merge pull request #1572 from aicovergod/codex/add-utility-for-subsystem-management
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 85 ++ / 32 --
+- Notes:
+  Refactor companion subsystem bootstrapping
+---
+<!-- commit:5ad24110506fe450baeb38974ffc1939414a41cb -->
+## 2025-10-31T10:29:09+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:93d5597698b3aa78ea1099a41fcb4b653aa7a85b -->
+## 2025-10-31T10:28:54+00:00 — Refactor companion subsystem bootstrapping
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Common/CompanionSubsystemBootstrapper.cs, Assets/Scripts/Companions/CompanionController.cs
+- Diff: 76 ++ / 32 --
+- Notes:
+  —
+---
+<!-- commit:a3d966fdb8be1570a631331e099feb2bd11a7b44 -->
+## 2025-10-31T10:16:16+00:00 — Merge pull request #1571 from aicovergod/codex/create-companion-skill-command-router-and-services
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 668 ++ / 272 --
+- Notes:
+  Refactor companion skill command routing into services
+---
+<!-- commit:138a480de582da4ea1946971f38169222ff4a9ca -->
+## 2025-10-31T10:16:01+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:3291121734dbbbf78be777a1e33e5b3e559bc808 -->
+## 2025-10-31T10:15:47+00:00 — Refactor companion skill command routing into services
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Companions/Commands/CompanionCookingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionFishingCommandService.cs, Assets/Scripts/Companions/Commands/CompanionMiningCommandService.cs, Assets/Scripts/Companions/Commands/CompanionSkillCommandRouter.cs, Assets/Scripts/Companions/Commands/CompanionWoodcuttingCommandService.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 659 ++ / 272 --
+- Notes:
+  —
+---
+<!-- commit:809b3e91d759f13d687895c39df686167c63a137 -->
+## 2025-10-31T10:00:30+00:00 — Merge pull request #1570 from aicovergod/codex/refactor-movement-methods-in-controllers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 77 ++ / 113 --
+- Notes:
+  Refactor companion movement helpers
+---
+<!-- commit:c42f2cb4c87bbda0edbb995f763ae1424c7cf6df -->
+## 2025-10-31T10:00:25+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0efef8bb43bd85bcd3028883822fb4a7d3c7606a -->
+## 2025-10-31T10:00:11+00:00 — Refactor companion movement helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/CompanionSkillingControllerBase.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs
+- Diff: 68 ++ / 113 --
+- Notes:
+  —
+---
+<!-- commit:65c7c716b0d5fafe4687f89a4c26d5b6dc199b2b -->
+## 2025-10-31T09:52:32+00:00 — Merge pull request #1569 from aicovergod/codex/add-tool-selection-helper-and-refactor-controllers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 160 ++ / 95 --
+- Notes:
+  Add shared helper for companion tool resolution
+---
+<!-- commit:8397af984cd33fe291a3b22fcb761bfb4b69b359 -->
+## 2025-10-31T09:52:23+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b9ce3f3fd1cc15b3560dadfb0e06ac7e03abf16c -->
+## 2025-10-31T09:52:09+00:00 — Refactor companion tool resolution into shared helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionToolResolver.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 151 ++ / 95 --
+- Notes:
+  —
+---
+<!-- commit:b160bbad6ffa5a60cc64d591288a0768f2fef4e9 -->
+## 2025-10-30T19:21:35+00:00 — Merge pull request #1568 from aicovergod/codex/refactor-candidate-list-handling-with-new-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 213 ++ / 238 --
+- Notes:
+  Refactor companion area candidate list generation
+---
+<!-- commit:088762412f942e7920bd2d1d0441962b656fa72a -->
+## 2025-10-30T19:21:24+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c2c85bea4816dacc39bcbfb1c64f08cb19fa888a -->
+## 2025-10-30T19:21:12+00:00 — Refactor companion gathering candidate building
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 204 ++ / 238 --
+- Notes:
+  —
+---
+<!-- commit:871453b5fa9784d1432b862b0d5c9ab95d34b630 -->
+## 2025-10-30T18:53:25+00:00 — Merge pull request #1567 from aicovergod/codex/refactor-handlefishingstuck-method
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 36 ++ / 25 --
+- Notes:
+  Refactor companion fishing stuck recovery
+---
+<!-- commit:c7261791fdf7de5a18a8ce3af08d5a15eda149b8 -->
+## 2025-10-30T18:52:51+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:1b35f16438fb3feb5763ebba5ee1884aaacec7ee -->
+## 2025-10-30T18:52:35+00:00 — Refactor companion fishing stuck recovery
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Fishing/CompanionFishingController.cs
+- Diff: 27 ++ / 25 --
+- Notes:
+  —
+---
+<!-- commit:f2c9663add347ee5c18c83692e60175b849d8cbc -->
+## 2025-10-30T18:34:48+00:00 — Merge pull request #1566 from aicovergod/codex/add-shared-helper-for-publishing-chat-lines
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 47 ++ / 21 --
+- Notes:
+  Refactor companion stuck apology messaging
+---
+<!-- commit:a62ea60358f6e94c3bd4a99ffea9e32d742680d5 -->
+## 2025-10-30T18:34:44+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ade9c3e06f92a358a95119094ebba82bba4e2102 -->
+## 2025-10-30T18:34:30+00:00 — Refactor companion stuck apology messaging
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 38 ++ / 21 --
+- Notes:
+  —
+---
+<!-- commit:85e5de87014ebd473c36965859399c455248c53b -->
+## 2025-10-30T18:23:54+00:00 — Merge pull request #1565 from aicovergod/codex/refactor-cooking-chat-publishing-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 135 ++ / 53 --
+- Notes:
+  Refactor companion cooking chat publishing
+---
+<!-- commit:1556abbd001519f977f5ac9b0a9b01de4629ecec -->
+## 2025-10-30T18:23:46+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c736a9b639d1f13abe2257d21825e5c7ee4f79b1 -->
+## 2025-10-30T18:23:32+00:00 — Refactor companion cooking chat publishing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs
+- Diff: 126 ++ / 53 --
+- Notes:
+  —
+---
+<!-- commit:da484e4462cd2dd3beb8af3c3f5d71556da59911 -->
+## 2025-10-30T17:30:45+00:00 — Merge pull request #1564 from aicovergod/codex/introduce-shared-stuck-sequence-utility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 184 ++ / 90 --
+- Notes:
+  Refine companion stuck recovery logic for gathering companions
+---
+<!-- commit:25dcc1c32132be4cb10a3d57eb6f76499425022c -->
+## 2025-10-30T17:30:40+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:3fc7e8e0ec2efffeaf6a9da3cc6a525d7052d7f3 -->
+## 2025-10-30T17:30:26+00:00 — Refactor companion stuck handling into shared helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 175 ++ / 90 --
+- Notes:
+  —
+---
+<!-- commit:1db848ce7313c2e13f91fe17d019f0377b6e8f31 -->
+## 2025-10-30T17:21:27+00:00 — Merge pull request #1563 from aicovergod/codex/add-reusable-helper-for-companion-movement
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 410 ++ / 535 --
+- Notes:
+  Refactor companion gathering routines to share movement helper
+---
+<!-- commit:f7463e27f7e1c5c3b24b77435b4ce93c38181808 -->
+## 2025-10-30T17:21:10+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:616d43bbf419faa99294cef10e281516c725e7c4 -->
+## 2025-10-30T17:20:57+00:00 — Refactor companion gathering movement into reusable routine
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 401 ++ / 535 --
+- Notes:
+  —
+---
+<!-- commit:41e5f6ee8df0bc6ed30c7c2d11ad0a74b4591c6d -->
+## 2025-10-30T17:01:14+00:00 — Merge pull request #1562 from aicovergod/codex/add-companiontoolownershiputility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 94 ++ / 44 --
+- Notes:
+  Create utility for companion tool ownership checks
+---
+<!-- commit:c3a2f7ca626f0e5733a59e372067033b261ce326 -->
+## 2025-10-30T17:00:57+00:00 — Add companion tool ownership utility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Companions/Common/CompanionToolOwnershipUtility.cs, Assets/Scripts/Companions/Common/CompanionToolOwnershipUtility.cs.meta, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 94 ++ / 44 --
+- Notes:
+  —
+---
+<!-- commit:f15f6817099653c1715bc5a61e2e4afb4b3061db -->
+## 2025-10-30T16:41:02+00:00 — Merge pull request #1561 from aicovergod/codex/create-companion-tool-selector-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 197 ++ / 101 --
+- Notes:
+  Refactor companion tool selector registration
+---
+<!-- commit:f1cfaae2c2dcd13a1bad781d9aa4fa7a30013433 -->
+## 2025-10-30T16:40:46+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d67ad63ae85cef337c4d8dc6dabfc3a3dce190f7 -->
+## 2025-10-30T16:40:32+00:00 — Refactor companion tool selector registration
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionToolSelectorRegistry.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 188 ++ / 101 --
+- Notes:
+  —
+---
+<!-- commit:f41bb42559709dc86f26da51413b79960d531855 -->
+## 2025-10-30T16:12:39+00:00 — Merge pull request #1560 from aicovergod/codex/extend-companiongatheringcontrollerbase-with-helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 87 ++ / 33 --
+- Notes:
+  Refactor companion gathering cleanup helpers
+---
+<!-- commit:59e5c2f85e19c6cb5ffd903ac6ee0e0630392f5b -->
+## 2025-10-30T16:12:19+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0777ed2c2e59e3a824820e471d3baf6be82e846d -->
+## 2025-10-30T16:12:06+00:00 — Refactor companion gathering cleanup helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 78 ++ / 33 --
+- Notes:
+  —
+---
+<!-- commit:c3638668f591bc918a8bc8b0fcec5fcc35b38759 -->
+## 2025-10-30T16:05:25+00:00 — Merge pull request #1559 from aicovergod/codex/add-helper-for-skill-event-binding
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 101 ++ / 78 --
+- Notes:
+  Refactor companion gathering skill bindings
+---
+<!-- commit:b97d58afdd0759e014124534717cf9793ab8236f -->
+## 2025-10-30T16:05:16+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c4e3ae7833f242053d8f2df56e7270164cfeeafc -->
+## 2025-10-30T16:05:03+00:00 — Refactor companion skill bindings
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 92 ++ / 78 --
+- Notes:
+  —
+---
+<!-- commit:86cb9b1eabeb4bf8eb5a8f8ec1df34afe72b93d1 -->
+## 2025-10-30T15:32:14+00:00 — Merge pull request #1558 from aicovergod/codex/add-reusable-xp-distribution-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 200 ++ / 119 --
+- Notes:
+  Refactor combat XP distribution into shared helper
+---
+<!-- commit:e5f715a95c81506baa231f6820d136b11c83ad57 -->
+## 2025-10-30T15:31:43+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:fe545b2e17d40a743b6c2876b14786d7dcde7aca -->
+## 2025-10-30T15:31:30+00:00 — Refactor combat XP distribution into shared helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Combat/CombatXpDistributor.cs, Assets/Scripts/Companions/CompanionController.cs
+- Diff: 191 ++ / 119 --
+- Notes:
+  —
+---
+<!-- commit:42817af992ccb425f3f999ca95b8d8c53cdfda88 -->
+## 2025-10-30T15:22:51+00:00 — Merge pull request #1557 from aicovergod/codex/introduce-shared-helper-for-gathering-skills
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 155 ++ / 113 --
+- Notes:
+  Refactor companion gathering initialisation
+---
+<!-- commit:20c550e6c2317935cf341d20071dadc51fa342d4 -->
+## 2025-10-30T15:21:38+00:00 — Refactor companion gathering initialisation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 155 ++ / 113 --
+- Notes:
+  —
+---
+<!-- commit:53ec5864b60e551bc67195ed6538524fd3a63f1a -->
+## 2025-10-30T15:13:04+00:00 — Merge pull request #1556 from aicovergod/codex/add-companionpickupcontroller-and-refactor-components
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 555 ++ / 488 --
+- Notes:
+  Refactor companion pickup orchestration into dedicated controller
+---
+<!-- commit:aa964141ea3514a92b4001c99f30ff3455480656 -->
+## 2025-10-30T15:12:47+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:25f1867eecacd71f3cd49d640faa647cd7b908dc -->
+## 2025-10-30T15:12:31+00:00 — Refactor companion pickup logic into dedicated controller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/ItemPickup/CompanionPickupController.cs, Assets/Scripts/Companions/ItemPickup/CompanionPickupService.cs
+- Diff: 546 ++ / 488 --
+- Notes:
+  —
+---
+<!-- commit:887175ccb30b9326b26b1a23dbb6870f7b1594bd -->
+## 2025-10-30T14:54:13+00:00 — Merge pull request #1555 from aicovergod/codex/create-companionchatinventoryresponder-script
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 191 ++ / 140 --
+- Notes:
+  Extract companion chat responder component
+---
+<!-- commit:ce3b493d5897a1a4f1fa63db58fba22e84acb472 -->
+## 2025-10-30T14:53:54+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:26fb5ff8b5c84cea0d170647dce4e72742c2aa50 -->
+## 2025-10-30T14:53:40+00:00 — Refactor companion chat inventory responder
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Chat/CompanionChatInventoryResponder.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 182 ++ / 140 --
+- Notes:
+  —
+---
+<!-- commit:5027a0a5b3ef7a2f9e0c3062754655f69a058373 -->
+## 2025-10-30T14:46:28+00:00 — Merge pull request #1554 from aicovergod/codex/refactor-movement-methods-in-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 81 ++ / 172 --
+- Notes:
+  Refactor companion gathering movement helpers
+---
+<!-- commit:830d10c711967001c0c6e8986a33e37ca4474d7b -->
+## 2025-10-30T14:46:14+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:97186795d8c0f2da79a7a82d1bb41dd7a65586e8 -->
+## 2025-10-30T14:45:59+00:00 — Refactor companion gathering movement helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 72 ++ / 172 --
+- Notes:
+  —
+---
+<!-- commit:c8415dafa371ede32f50a5ab9643f0a39b95a348 -->
+## 2025-10-30T11:31:18+00:00 — Merge pull request #1553 from aicovergod/codex/fix-player-damage-on-nettle-objects
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 207 ++ / 9 --
+- Notes:
+  Fix stinging nettle hazard damage stacking across overlapping tiles
+---
+<!-- commit:f104524c7e46011cc52830ef6684c7726abccfea -->
+## 2025-10-30T11:30:56+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:25478721d7fc9c2196a56f61217a6020aafec5c6 -->
+## 2025-10-30T11:30:45+00:00 — Fix stinging nettle hazard damage aggregation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Environment/WorldObjects/StingingNettleHazard.cs
+- Diff: 198 ++ / 9 --
+- Notes:
+  —
+---
+<!-- commit:edc22b07b28e4b3279c933517dcd0e3f5b539072 -->
+## 2025-10-30T10:56:33+00:00 — Merge pull request #1552 from aicovergod/codex/fix-multiple-chatbox-messages-for-nettle-objects
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 52 ++ / 1 --
+- Notes:
+  Prevent duplicate nettle dialogue spam
+---
+<!-- commit:932ccddeeee6531dce40a363783101f9374065d4 -->
+## 2025-10-30T10:56:21+00:00 — Prevent duplicate nettle dialogue spam
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Environment/WorldObjects/StingingNettleHazard.cs
+- Diff: 52 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:8486d1bc1a7c34cb2229d54e809931bf1d2b1359 -->
+## 2025-10-30T10:50:37+00:00 — Merge pull request #1551 from aicovergod/codex/add-cooldown-logic-for-stinging-nettle-dialogue-dbteel
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 36 ++ / 1 --
+- Notes:
+  Add cooldown before repeating nettle companion dialogue
+---
+<!-- commit:a205168b7d8df80af228089ca38271f3eb169432 -->
+## 2025-10-30T10:50:20+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2c9a1a6ffa951ae752f108fbb725be7d0083b6ba -->
+## 2025-10-30T10:50:01+00:00 — Add cooldown before repeating nettle companion dialogue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Environment/WorldObjects/StingingNettleHazard.cs
+- Diff: 27 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:33e843ee7c124d83cf5e33dd65246d3ce5aa8293 -->
+## 2025-10-30T10:34:59+00:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 18 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0691592483a6576db3d7167bb5f2564270cf5845 -->
+## 2025-10-30T10:34:26+00:00 — Merge pull request #1549 from aicovergod/codex/add-stinging-nettle-script-to-worldobjects
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 355 ++ / 0 --
+- Notes:
+  Add stinging nettle hazard damage handling
+---
+<!-- commit:084ca39bc2aab2115249d549a6f6c472c1946dba -->
+## 2025-10-30T10:32:09+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a14303ed9ef70fb987630de433985e8e5bae630d -->
+## 2025-10-30T10:31:55+00:00 — Add stinging nettle hazard damage system
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Environment/WorldObjects.meta, Assets/Scripts/Environment/WorldObjects/StingingNettleHazard.cs, Assets/Scripts/Environment/WorldObjects/StingingNettleHazard.cs.meta
+- Diff: 346 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:3fc764ca235cb1a6b41dc369fcc5e7b084fdc8c5 -->
+## 2025-10-30T09:36:29+00:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 18 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f46c7bfc303ff879d5a8e8888165fa457cc7dba1 -->
+## 2025-10-30T00:43:43+00:00 — Merge pull request #1548 from aicovergod/codex/fix-console-error-cs0103
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 33 ++ / 0 --
+- Notes:
+  Fix inventory drop menu lifecycle
+---
+<!-- commit:e4465dbef0ebdf5826d81cd673f93eb18e14f9f1 -->
+## 2025-10-30T00:43:35+00:00 — Add inventory drop menu lifecycle management
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/UI/InventoryWindowController.cs
+- Diff: 33 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:24092f27872eeff51bab9e8961d6f0bd84f0c957 -->
+## 2025-10-30T00:35:56+00:00 — Merge pull request #1547 from aicovergod/codex/add-shift-right-click-dropping-to-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 39 ++ / 110 --
+- Notes:
+  Remove stack split UI and add shift-right drop shortcut
+---
+<!-- commit:a22b66fe40a60c40d09daa9463cb1fbc3a6a21de -->
+## 2025-10-30T00:35:46+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9fdae5b34990c0315582267d59a88050134dab14 -->
+## 2025-10-30T00:35:32+00:00 — Remove stack split prompts and enable shift-right drops
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Inventory/InventoryDropMenu.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs
+- Diff: 30 ++ / 110 --
+- Notes:
+  —
+---
+<!-- commit:e96c894349b3d94ab4d6bb1914d8f78b9294dc0c -->
+## 2025-10-30T00:15:30+00:00 — Merge pull request #1546 from aicovergod/codex/refactor-skill-acceptance-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 58 ++ / 14 --
+- Notes:
+  Handle mismatched companion skill acceptances
+---
+<!-- commit:ec478ec3699578651b590e42dc4856a07f047d9e -->
+## 2025-10-30T00:15:23+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f2c62c2554d8e5e481bd5058952f0bbc0f3a7512 -->
+## 2025-10-30T00:15:09+00:00 — Handle mismatched companion skill acceptances
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 49 ++ / 14 --
+- Notes:
+  —
+---
+<!-- commit:b10e51f70ea2aa384b95044d2aa48d5a34a2c9ed -->
+## 2025-10-29T23:59:45+00:00 — Merge pull request #1545 from aicovergod/codex/fix-console-bug-in-companionmanager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 7 ++ / 2 --
+- Notes:
+  Fix companion cooking command result capture
+---
+<!-- commit:56eb38f6c7d8ab5dfb2841077e037ab9bbface46 -->
+## 2025-10-29T23:59:30+00:00 — Fix companion cooking command result capture
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 7 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:4bc6df8be67bd9c91a16b2ef9243287c2617ab0b -->
+## 2025-10-29T23:55:57+00:00 — Merge pull request #1544 from aicovergod/codex/fix-console-errors-in-fishingcontroller-and-manager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 25 ++ / 15 --
+- Notes:
+  Fix companion command delegates and fishing range constant
+---
+<!-- commit:8a061d133d573595c23fdb3e75a413e046beeca0 -->
+## 2025-10-29T23:55:41+00:00 — Fix companion command delegates and fishing range constant
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Equipment/CompanionEquipment.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs
+- Diff: 25 ++ / 15 --
+- Notes:
+  —
+---
+<!-- commit:c67bb4eb33f580ea6b86f976ecc437303bc58f34 -->
+## 2025-10-29T23:49:23+00:00 — Merge pull request #1543 from aicovergod/codex/update-agents.md-and-fix-console-bugs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 58 ++ / 37 --
+- Notes:
+  Fix companion inventory namespace references and area guard signature
+---
+<!-- commit:ba9e72a57abd64caea2383ef6580356145660b42 -->
+## 2025-10-29T23:49:18+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:cb76381fc18a90f446c75e55ed9d08ba8efc60a5 -->
+## 2025-10-29T23:49:04+00:00 — Fix companion inventory namespace usage and guard signature
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (11): AGENTS.md, Assets/Scripts/Companions/Commands/CompanionSkillCommandGuard.cs, Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionInventory.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs, Assets/Scripts/Companions/Equipment/CompanionEquipment.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 49 ++ / 37 --
+- Notes:
+  —
+---
+<!-- commit:bf64ec62933bf9f339faab9dd29df057d795e86d -->
+## 2025-10-29T23:37:34+00:00 — Merge pull request #1542 from aicovergod/codex/add-companiongatheringcontrollerbase-script
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 694 ++ / 893 --
+- Notes:
+  Refactor companion gathering controllers into shared base
+---
+<!-- commit:e0b83b68707ed91aa3f464b86d3649e7f47ee59f -->
+## 2025-10-29T23:37:21+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:01e8f59ad9cd848976487cd71312eefcc8bfa50d -->
+## 2025-10-29T23:37:03+00:00 — chore: reset area blocked flag when cancelling routines
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Common/CompanionGatheringControllerBase.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 685 ++ / 893 --
+- Notes:
+  —
+---
+<!-- commit:54d124d555e902577429805f735f9e2e4f37920d -->
+## 2025-10-29T23:11:50+00:00 — Merge pull request #1541 from aicovergod/codex/update-agents.md-with-latest-changes-uvj1em
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2 ++ / 0 --
+- Notes:
+  Document companion skill guard and banking helper in AGENTS
+---
+<!-- commit:f6f5ae9ae4d1812367721c6063a11f6cf38409ab -->
+## 2025-10-29T23:11:39+00:00 — Document companion command guard and banking helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): AGENTS.md
+- Diff: 2 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8adbeb9b81e4a437eeac7085bded794761a2ebee -->
+## 2025-10-29T23:08:31+00:00 — Merge pull request #1540 from aicovergod/codex/add-companionbankdepositservice-and-refactor-companionmanage
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 210 ++ / 150 --
+- Notes:
+  Refactor companion bank deposits into dedicated service
+---
+<!-- commit:53964132dbfc189d94f89cba6c2af91e1a9520af -->
+## 2025-10-29T23:08:22+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b615c75d9bb8c03c8b137089e3bdca3daa201b27 -->
+## 2025-10-29T23:08:09+00:00 — Refactor companion bank deposits into dedicated service
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Inventory/CompanionBankDepositService.cs, Assets/Scripts/Pets/PetLevelBarMenu.cs
+- Diff: 201 ++ / 150 --
+- Notes:
+  —
+---
+<!-- commit:a1b727e0f34a5b729277a514702f1a9cb7c0bfa8 -->
+## 2025-10-29T23:01:09+00:00 — Merge pull request #1539 from aicovergod/codex/create-and-integrate-new-command-guard-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 483 ++ / 358 --
+- Notes:
+  Refactor companion skill command guards
+---
+<!-- commit:ea339dc1291cbbd673a823883f73e13bf4ba0ceb -->
+## 2025-10-29T23:01:01+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c0635795b52b07f65be57556d4a746bc65a39fdf -->
+## 2025-10-29T23:00:46+00:00 — Add companion skill command guard helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Commands/CompanionSkillCommandGuard.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 474 ++ / 358 --
+- Notes:
+  —
+---
+<!-- commit:0d24cf89c805fb8247ffb354e3513050b388365e -->
+## 2025-10-29T22:50:10+00:00 — Merge pull request #1538 from aicovergod/codex/update-agents.md-with-latest-updates
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 0 --
+- Notes:
+  Document companion skilling controller guidance
+---
+<!-- commit:b52e82b283787531737d048db295c1b9da0f30a7 -->
+## 2025-10-29T22:50:01+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:5317cff1804b62811f9eed4e416595276fd0c872 -->
+## 2025-10-29T22:49:46+00:00 — Document companion skilling controller guidance
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): AGENTS.md
+- Diff: 2 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9ba8da22e8e1b88857c94aaedd526fc3457613e7 -->
+## 2025-10-29T22:43:33+00:00 — Merge pull request #1537 from aicovergod/codex/refactor-companions-into-shared-base-class
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 133 ++ / 130 --
+- Notes:
+  Refactor companion skilling controller setup
+---
+<!-- commit:d9e5d4fba6ad70de76e1349aaea20e42317b2b47 -->
+## 2025-10-29T22:43:26+00:00 — Merge branch 'main' into codex/refactor-companions-into-shared-base-class
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:5de204ce72a8328833d9335ea7c1854c2cccdeed -->
+## 2025-10-29T22:42:38+00:00 — Refactor companion skilling controller setup
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/CompanionSkillingControllerBase.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs
+- Diff: 129 ++ / 117 --
+- Notes:
+  —
+---
+<!-- commit:d744b434a7d5a0a1c0098aeae80c3a5c6f382773 -->
+## 2025-10-29T22:24:09+00:00 — Merge pull request #1535 from aicovergod/codex/update-companion-cooking-and-follower-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 67 ++ / 3 --
+- Notes:
+  Prevent companion follower from resuming during cooking holds
+---
+<!-- commit:563375e5e83d11e84029cda2e59fc556b9dab2f7 -->
+## 2025-10-29T22:23:48+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c1eafd641a9fb706a083fc3c2294af5e7d108f99 -->
+## 2025-10-29T22:23:34+00:00 — Guard follower state during companion cooking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 58 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:7eb35fc752e3d432509de7bb9e43e42d36bfb759 -->
+## 2025-10-29T21:54:59+00:00 — Merge pull request #1534 from aicovergod/codex/spawn-hades-fragment-on-correct-tile
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 44 ++ / 2 --
+- Notes:
+  Spawn ore golem Hades fragments on killer tiles
+---
+<!-- commit:e42ab457b2940ad189aed54ecef19dba7f1227b1 -->
+## 2025-10-29T21:54:47+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0eb5ba1fc0159b178815c654ac5209aa6025c923 -->
+## 2025-10-29T21:54:34+00:00 — Spawn ore golem fragments on killer tile
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Combat/Mechanics/OreGolemHadesFragmentDropper.cs
+- Diff: 35 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:94d8960d894f25d7b74bb3d9672243128782a4b6 -->
+## 2025-10-29T21:39:26+00:00 — Merge pull request #1533 from aicovergod/codex/update-auto-harvest-stop-distance
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 1 --
+- Notes:
+  Adjust farming node auto-move stop distance
+---
+<!-- commit:00fc36f64623bde4c0afd4e31380cc0756fc9037 -->
+## 2025-10-29T21:39:19+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:5212e21b3ec65ceba993844741f64ea037b4ae8b -->
+## 2025-10-29T21:39:04+00:00 — Adjust farming node auto-move stop distance
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Farming/PickableResourceNode.cs
+- Diff: 5 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:af1ecd7a24da65750801112b1e842ce2f8d88cd0 -->
+## 2025-10-29T21:21:34+00:00 — Merge pull request #1532 from aicovergod/codex/add-cabbage-field-dialogue-trigger
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 53 ++ / 3 --
+- Notes:
+  Add companion cabbage field awareness dialogue
+---
+<!-- commit:861e29b06c493e00fb878abb8080d5d3d91ef29c -->
+## 2025-10-29T21:21:22+00:00 — Add cabbage field companion awareness dialogue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/Conversation/AreaSpecificAwareDialogue.cs, Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs
+- Diff: 53 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:97cb0c92ed9d7bf5a8e7308e8f66584cbe247e68 -->
+## 2025-10-29T21:18:01+00:00 — Merge pull request #1531 from aicovergod/codex/implement-right-click-menu-behavior
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 122 ++ / 6 --
+- Notes:
+  Improve right-click menu input handling
+---
+<!-- commit:a4ed2c1ca58c561f60fce24c2250e1c6c682db54 -->
+## 2025-10-29T21:17:49+00:00 — Improve right-click menu input handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/RightClickMenu.cs
+- Diff: 122 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:1373a4fd5aa9865799d12d5ae7cafbe03a22df07 -->
+## 2025-10-29T21:14:06+00:00 — Merge pull request #1530 from aicovergod/codex/refactor-eat-method-for-movement-freezing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 15 ++ / 6 --
+- Notes:
+  Fix PlayerEat chained movement freeze handling
+---
+<!-- commit:3e259a901949677de300cd5023c1cb61688d3ae4 -->
+## 2025-10-29T21:13:53+00:00 — Fix PlayerEat movement freeze handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Player/PlayerEat.cs
+- Diff: 15 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:18d7e66716335f92c3862ac9abe367efef1a12b0 -->
+## 2025-10-29T21:07:09+00:00 — Merge pull request #1529 from aicovergod/codex/add-interaction-delay-to-pickable-resource
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 33 ++ / 0 --
+- Notes:
+  Add interaction cooldown to pickable resource nodes
+---
+<!-- commit:8fa2c8fe3e910a4c1e19e37c6939110af2989854 -->
+## 2025-10-29T21:07:02+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:fc0b4a943edf1a1f8d3539257849ea9ee099957e -->
+## 2025-10-29T21:06:48+00:00 — Add cooldown to pickable resource nodes
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Farming/PickableResourceNode.cs
+- Diff: 24 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:4d9d5bd7dff5bc8ebc7229ebfbf2ce6a14e95de0 -->
+## 2025-10-29T21:03:04+00:00 — Merge pull request #1528 from aicovergod/codex/adjust-auto-harvest-logic-in-pickableresourcenode
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 22 ++ / 1 --
+- Notes:
+  Fix auto harvest auto-move reset in pickable nodes
+---
+<!-- commit:918348baf0340361731918c3138b36e9a77ba03f -->
+## 2025-10-29T21:03:00+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:94afed6aa1b0d9e5e64f728e3877f63d9e8eef5a -->
+## 2025-10-29T21:02:48+00:00 — Fix auto harvest reset when auto move cancelled
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Farming/PickableResourceNode.cs
+- Diff: 13 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:716e259001d6bc7eb51a6538c87376355d079d51 -->
+## 2025-10-29T20:23:16+00:00 — Merge pull request #1527 from aicovergod/codex/implement-auto-harvest-features-in-pickableresourcenode
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 129 ++ / 17 --
+- Notes:
+  feat(farming): add auto move harvesting support
+---
+<!-- commit:ba51fde06aa3a62a3a75a459c382101ab0e0ae5b -->
+## 2025-10-29T20:22:51+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a3e8bfd6b51de22dbe25373fa4680917207f76b0 -->
+## 2025-10-29T20:22:34+00:00 — feat(farming): add auto move harvesting support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Farming/PickableResourceNode.cs
+- Diff: 120 ++ / 17 --
+- Notes:
+  —
+---
+<!-- commit:82fd1e690098104632977603eded7410eae85c30 -->
+## 2025-10-29T20:16:02+00:00 — Merge pull request #1526 from aicovergod/codex/add-customizable-input-for-pickable-resources
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 144 ++ / 19 --
+- Notes:
+  Enable interact action harvesting for farming nodes
+---
+<!-- commit:d8c88f9d5e8e32c01507afb0fd2b1eb2875895fe -->
+## 2025-10-29T20:15:54+00:00 — Enable interact action harvesting for farming nodes
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Farming/PickableResourceNode.cs
+- Diff: 144 ++ / 19 --
+- Notes:
+  —
+---
+<!-- commit:aa92fbf4dfe4d20fd168e115641fca48f6bff3d8 -->
+## 2025-10-29T19:50:01+00:00 — cabbage object
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (11): Assets/Prefabs/Farming.meta, Assets/Prefabs/Farming/Cabbage Object.prefab, Assets/Prefabs/Farming/Cabbage Object.prefab.meta, Assets/Prefabs/MainScriptObjects/Player.prefab, Assets/Prefabs/SceneObjects/GameManager.prefab, Assets/Scenes/OverWorld.unity, Assets/Sprites/Farming/Objects.meta, Assets/Sprites/Farming/Objects/Cabbage Object_64x64.png, Assets/Sprites/Farming/Objects/Cabbage Object_64x64.png.meta, Assets/Sprites/Farming/Objects/Wheat Objet_64x64.png, Assets/Sprites/Farming/Objects/Wheat Objet_64x64.png.meta
+- Diff: 120426 ++ / 45698 --
+- Notes:
+  —
+---
+<!-- commit:461b92a6d346a6cb30a4750c30257e9e74308819 -->
+## 2025-10-29T19:33:42+00:00 — Merge pull request #1525 from aicovergod/codex/fix-level-up-sounds-not-playing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 80 ++ / 12 --
+- Notes:
+  Fix level up sound playback for all skills
+---
+<!-- commit:7a74d8e2a050636b0350b3ab59b67fde57b0d8a0 -->
+## 2025-10-29T19:32:03+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:1088fb5d769eacbe357981d32ec04fa477eb531c -->
+## 2025-10-29T19:31:50+00:00 — Fix skill level up sound routing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Audio/SoundEffect.cs, Assets/Scripts/Audio/SoundEffects/LevelUpSound.cs, Assets/Scripts/Audio/SoundManager.cs
+- Diff: 71 ++ / 12 --
+- Notes:
+  —
+---
+<!-- commit:53c538e5c40eada60b6f71ed8f1ef6fd0f250854 -->
+## 2025-10-29T18:56:09+00:00 — Merge pull request #1524 from aicovergod/codex/implement-scene-loading-validation-in-login-flow
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 35 ++ / 4 --
+- Notes:
+  Validate login scene targets against persistent catalog
+---
+<!-- commit:d37413c65d0cb78c453f2081d639182088f2cb24 -->
+## 2025-10-29T18:55:57+00:00 — Validate login scene against persistent catalog
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Core/Save/SaveManager.cs, Assets/Scripts/UI/Login/LoginFlowController.cs, Assets/Scripts/World/PersistentSceneGate.cs
+- Diff: 35 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:4e20e182e50ed4a80ec7b58aede7c88875d12ca3 -->
+## 2025-10-29T17:14:30+00:00 — Merge pull request #1523 from aicovergod/codex/add-thieving-skill-to-companion-stats-ui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 1 --
+- Notes:
+  Add thieving skill to companion stats window
+---
+<!-- commit:5e56c7eb277f5cf06b704971c734387a2922fe7e -->
+## 2025-10-29T17:14:13+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:61526b9deb0b5d6ff317c430d07ae38b7a428f13 -->
+## 2025-10-29T17:13:56+00:00 — Add thieving skill to companion stats window
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionStatsWindow.cs
 - Diff: 2 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:d009a4977be2f7d08ea83bec4d77a6557382af05 -->
+## 2025-10-29T17:09:49+00:00 — chunks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (133): Assets/Prefabs/NPCS/Goblin.prefab, Assets/Prefabs/SceneObjects/NavGridStreamingService.prefab, Assets/Prefabs/SceneObjects/NavGridStreamingService.prefab.meta, Assets/Resources/NavGridChunks/chunk_0_0.asset, Assets/Resources/NavGridChunks/chunk_0_0.asset.meta, Assets/Resources/NavGridChunks/chunk_0_1.asset, Assets/Resources/NavGridChunks/chunk_0_1.asset.meta, Assets/Resources/NavGridChunks/chunk_0_2.asset, Assets/Resources/NavGridChunks/chunk_0_2.asset.meta, Assets/Resources/NavGridChunks/chunk_0_3.asset, Assets/Resources/NavGridChunks/chunk_0_3.asset.meta, Assets/Resources/NavGridChunks/chunk_0_4.asset, Assets/Resources/NavGridChunks/chunk_0_4.asset.meta, Assets/Resources/NavGridChunks/chunk_0_5.asset, Assets/Resources/NavGridChunks/chunk_0_5.asset.meta, Assets/Resources/NavGridChunks/chunk_0_6.asset, Assets/Resources/NavGridChunks/chunk_0_6.asset.meta, Assets/Resources/NavGridChunks/chunk_0_7.asset, Assets/Resources/NavGridChunks/chunk_0_7.asset.meta, Assets/Resources/NavGridChunks/chunk_1_0.asset, Assets/Resources/NavGridChunks/chunk_1_0.asset.meta, Assets/Resources/NavGridChunks/chunk_1_1.asset, Assets/Resources/NavGridChunks/chunk_1_1.asset.meta, Assets/Resources/NavGridChunks/chunk_1_2.asset, Assets/Resources/NavGridChunks/chunk_1_2.asset.meta, Assets/Resources/NavGridChunks/chunk_1_3.asset, Assets/Resources/NavGridChunks/chunk_1_3.asset.meta, Assets/Resources/NavGridChunks/chunk_1_4.asset, Assets/Resources/NavGridChunks/chunk_1_4.asset.meta, Assets/Resources/NavGridChunks/chunk_1_5.asset, Assets/Resources/NavGridChunks/chunk_1_5.asset.meta, Assets/Resources/NavGridChunks/chunk_1_6.asset, Assets/Resources/NavGridChunks/chunk_1_6.asset.meta, Assets/Resources/NavGridChunks/chunk_1_7.asset, Assets/Resources/NavGridChunks/chunk_1_7.asset.meta, Assets/Resources/NavGridChunks/chunk_2_0.asset, Assets/Resources/NavGridChunks/chunk_2_0.asset.meta, Assets/Resources/NavGridChunks/chunk_2_1.asset, Assets/Resources/NavGridChunks/chunk_2_1.asset.meta, Assets/Resources/NavGridChunks/chunk_2_2.asset, Assets/Resources/NavGridChunks/chunk_2_2.asset.meta, Assets/Resources/NavGridChunks/chunk_2_3.asset, Assets/Resources/NavGridChunks/chunk_2_3.asset.meta, Assets/Resources/NavGridChunks/chunk_2_4.asset, Assets/Resources/NavGridChunks/chunk_2_4.asset.meta, Assets/Resources/NavGridChunks/chunk_2_5.asset, Assets/Resources/NavGridChunks/chunk_2_5.asset.meta, Assets/Resources/NavGridChunks/chunk_2_6.asset, Assets/Resources/NavGridChunks/chunk_2_6.asset.meta, Assets/Resources/NavGridChunks/chunk_2_7.asset, Assets/Resources/NavGridChunks/chunk_2_7.asset.meta, Assets/Resources/NavGridChunks/chunk_3_0.asset, Assets/Resources/NavGridChunks/chunk_3_0.asset.meta, Assets/Resources/NavGridChunks/chunk_3_1.asset, Assets/Resources/NavGridChunks/chunk_3_1.asset.meta, Assets/Resources/NavGridChunks/chunk_3_2.asset, Assets/Resources/NavGridChunks/chunk_3_2.asset.meta, Assets/Resources/NavGridChunks/chunk_3_3.asset, Assets/Resources/NavGridChunks/chunk_3_3.asset.meta, Assets/Resources/NavGridChunks/chunk_3_4.asset, Assets/Resources/NavGridChunks/chunk_3_4.asset.meta, Assets/Resources/NavGridChunks/chunk_3_5.asset, Assets/Resources/NavGridChunks/chunk_3_5.asset.meta, Assets/Resources/NavGridChunks/chunk_3_6.asset, Assets/Resources/NavGridChunks/chunk_3_6.asset.meta, Assets/Resources/NavGridChunks/chunk_3_7.asset, Assets/Resources/NavGridChunks/chunk_3_7.asset.meta, Assets/Resources/NavGridChunks/chunk_4_0.asset, Assets/Resources/NavGridChunks/chunk_4_0.asset.meta, Assets/Resources/NavGridChunks/chunk_4_1.asset, Assets/Resources/NavGridChunks/chunk_4_1.asset.meta, Assets/Resources/NavGridChunks/chunk_4_2.asset, Assets/Resources/NavGridChunks/chunk_4_2.asset.meta, Assets/Resources/NavGridChunks/chunk_4_3.asset, Assets/Resources/NavGridChunks/chunk_4_3.asset.meta, Assets/Resources/NavGridChunks/chunk_4_4.asset, Assets/Resources/NavGridChunks/chunk_4_4.asset.meta, Assets/Resources/NavGridChunks/chunk_4_5.asset, Assets/Resources/NavGridChunks/chunk_4_5.asset.meta, Assets/Resources/NavGridChunks/chunk_4_6.asset, Assets/Resources/NavGridChunks/chunk_4_6.asset.meta, Assets/Resources/NavGridChunks/chunk_4_7.asset, Assets/Resources/NavGridChunks/chunk_4_7.asset.meta, Assets/Resources/NavGridChunks/chunk_5_0.asset, Assets/Resources/NavGridChunks/chunk_5_0.asset.meta, Assets/Resources/NavGridChunks/chunk_5_1.asset, Assets/Resources/NavGridChunks/chunk_5_1.asset.meta, Assets/Resources/NavGridChunks/chunk_5_2.asset, Assets/Resources/NavGridChunks/chunk_5_2.asset.meta, Assets/Resources/NavGridChunks/chunk_5_3.asset, Assets/Resources/NavGridChunks/chunk_5_3.asset.meta, Assets/Resources/NavGridChunks/chunk_5_4.asset, Assets/Resources/NavGridChunks/chunk_5_4.asset.meta, Assets/Resources/NavGridChunks/chunk_5_5.asset, Assets/Resources/NavGridChunks/chunk_5_5.asset.meta, Assets/Resources/NavGridChunks/chunk_5_6.asset, Assets/Resources/NavGridChunks/chunk_5_6.asset.meta, Assets/Resources/NavGridChunks/chunk_5_7.asset, Assets/Resources/NavGridChunks/chunk_5_7.asset.meta, Assets/Resources/NavGridChunks/chunk_6_0.asset, Assets/Resources/NavGridChunks/chunk_6_0.asset.meta, Assets/Resources/NavGridChunks/chunk_6_1.asset, Assets/Resources/NavGridChunks/chunk_6_1.asset.meta, Assets/Resources/NavGridChunks/chunk_6_2.asset, Assets/Resources/NavGridChunks/chunk_6_2.asset.meta, Assets/Resources/NavGridChunks/chunk_6_3.asset, Assets/Resources/NavGridChunks/chunk_6_3.asset.meta, Assets/Resources/NavGridChunks/chunk_6_4.asset, Assets/Resources/NavGridChunks/chunk_6_4.asset.meta, Assets/Resources/NavGridChunks/chunk_6_5.asset, Assets/Resources/NavGridChunks/chunk_6_5.asset.meta, Assets/Resources/NavGridChunks/chunk_6_6.asset, Assets/Resources/NavGridChunks/chunk_6_6.asset.meta, Assets/Resources/NavGridChunks/chunk_6_7.asset, Assets/Resources/NavGridChunks/chunk_6_7.asset.meta, Assets/Resources/NavGridChunks/chunk_7_0.asset, Assets/Resources/NavGridChunks/chunk_7_0.asset.meta, Assets/Resources/NavGridChunks/chunk_7_1.asset, Assets/Resources/NavGridChunks/chunk_7_1.asset.meta, Assets/Resources/NavGridChunks/chunk_7_2.asset, Assets/Resources/NavGridChunks/chunk_7_2.asset.meta, Assets/Resources/NavGridChunks/chunk_7_3.asset, Assets/Resources/NavGridChunks/chunk_7_3.asset.meta, Assets/Resources/NavGridChunks/chunk_7_4.asset, Assets/Resources/NavGridChunks/chunk_7_4.asset.meta, Assets/Resources/NavGridChunks/chunk_7_5.asset, Assets/Resources/NavGridChunks/chunk_7_5.asset.meta, Assets/Resources/NavGridChunks/chunk_7_6.asset, Assets/Resources/NavGridChunks/chunk_7_6.asset.meta, Assets/Resources/NavGridChunks/chunk_7_7.asset, Assets/Resources/NavGridChunks/chunk_7_7.asset.meta, Assets/Resources/PersistentObjects.asset, Assets/Scenes/OverWorld.unity
+- Diff: 2932 ++ / 89 --
+- Notes:
+  —
+---
+<!-- commit:18265fc50ce6772176beb6f9e27e7b57c4442c8a -->
+## 2025-10-29T17:06:12+00:00 — Merge pull request #1522 from aicovergod/codex/add-debug-logs-for-navgrid-and-chunking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 87 ++ / 17 --
+- Notes:
+  Add admin toggleable nav grid debug logging
+---
+<!-- commit:1686322bcc54c6801667f9c12afc883be5cd592e -->
+## 2025-10-29T17:05:58+00:00 — Add admin-toggleable nav grid debug logging
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/NPC/Navigation/NavGridStreamingService.cs, Assets/Scripts/NPC/Navigation/NavGridWorld.cs, Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 87 ++ / 17 --
+- Notes:
+  —
+---
+<!-- commit:c49b702f65917f9bc997619e628cd25e1c2cb94a -->
+## 2025-10-29T16:53:28+00:00 — Merge pull request #1521 from aicovergod/codex/update-navgridbuilder-gizmo-rendering
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 32 ++ / 5 --
+- Notes:
+  Ensure blocked nav grid cells render fully in gizmos
+---
+<!-- commit:9389e53f66ba996c849e88006de8f585dd29e53b -->
+## 2025-10-29T16:49:35+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c0c52f479d5a8cdb5dcf0857751437aa74a90629 -->
+## 2025-10-29T16:49:18+00:00 — Improve nav grid gizmo sampling for blocked tiles
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Navigation/NavGridBuilder.cs
+- Diff: 23 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:d1fa3093775a6150ad2a62e92da2d9f456073dd6 -->
+## 2025-10-29T16:36:46+00:00 — Merge pull request #1520 from aicovergod/codex/update-navgridbuilder-for-gizmo-limits
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 41 ++ / 0 --
+- Notes:
+  Limit nav grid gizmo rendering
+---
+<!-- commit:d198b8ea2bdbd9cb4f534ddaab0103145c6c78a4 -->
+## 2025-10-29T16:36:37+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c22764980c70686eb6af4b69da2f1b98321f086d -->
+## 2025-10-29T16:36:25+00:00 — Limit nav grid gizmo rendering
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Navigation/NavGridBuilder.cs
+- Diff: 32 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:24490422ccf52e40b780cdd9d5526e5bcea5869a -->
+## 2025-10-29T16:07:11+00:00 — Merge pull request #1519 from aicovergod/codex/fix-console-errors-in-pathfinding-and-pet-follower
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 5 ++ / 4 --
+- Notes:
+  Fix nav grid type usage in pathfinding and pet follower
+---
+<!-- commit:ada1acfb8a5351c6407eeeae30cd8c19550cacee -->
+## 2025-10-29T16:06:56+00:00 — Fix nav grid type usage in pathfinding and pet follower
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Navigation/PathfindingService.cs, Assets/Scripts/Pets/PetFollower.cs
+- Diff: 5 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:af2c67abd7e809d68da9506f3c3d4fded2f8c787 -->
+## 2025-10-29T16:00:44+00:00 — Merge pull request #1518 from aicovergod/codex/implement-navgridstreamingservice-and-inavgriddata-interface
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1302 ++ / 100 --
+- Notes:
+  Add nav grid streaming service and global nav data pipeline
+---
+<!-- commit:8c85410bbe7960241b4eaaa1b57912381839d86a -->
+## 2025-10-29T16:00:31+00:00 — Implement nav grid streaming service and global nav data
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (15): Assets/Scripts/NPC/Combat/BaseNpcCombat.cs, Assets/Scripts/NPC/Movement/NpcPathMover.cs, Assets/Scripts/NPC/Movement/NpcWanderer.cs, Assets/Scripts/NPC/Navigation/DynamicNavOccupancyService.cs, Assets/Scripts/NPC/Navigation/INavGridData.cs, Assets/Scripts/NPC/Navigation/INavGridData.cs.meta, Assets/Scripts/NPC/Navigation/NavGridBuilder.cs, Assets/Scripts/NPC/Navigation/NavGridStreamingService.cs, Assets/Scripts/NPC/Navigation/NavGridStreamingService.cs.meta, Assets/Scripts/NPC/Navigation/NavGridStreamingZone.cs, Assets/Scripts/NPC/Navigation/NavGridWorld.cs, Assets/Scripts/NPC/Navigation/NavGridWorld.cs.meta, Assets/Scripts/NPC/Navigation/PathfindingService.cs, Assets/Scripts/Pets/PetFollower.cs, Assets/Scripts/Pets/PetPathMover.cs
+- Diff: 1302 ++ / 100 --
+- Notes:
+  —
+---
+<!-- commit:02d09dc4a34e1aecc76d5449c17de66ba2edfe7e -->
+## 2025-10-29T15:37:16+00:00 — Merge pull request #1517 from aicovergod/codex/add-navgridchunkdefinition-and-navgridchunkbaker
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1070 ++ / 0 --
+- Notes:
+  Add nav grid chunk baking pipeline and streaming metadata
+---
+<!-- commit:8a48ee066ef24ec3913c0b4428658f9b299d2b5c -->
+## 2025-10-29T15:36:48+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a6342fbab1a5d86add3e4eeed442e82a641455e8 -->
+## 2025-10-29T15:36:26+00:00 — Add nav grid chunk streaming assets and baker
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (10): Assets/Prefabs/MainScriptObjects/NavGridBuilder.prefab, Assets/Prefabs/SceneObjects/PathfindingService.prefab, Assets/Resources/NavGridChunks.meta, Assets/Scripts/NPC/Navigation/Editor/NavGridChunkBaker.cs, Assets/Scripts/NPC/Navigation/Editor/NavGridChunkBaker.cs.meta, Assets/Scripts/NPC/Navigation/NavGridChunkDefinition.cs, Assets/Scripts/NPC/Navigation/NavGridChunkDefinition.cs.meta, Assets/Scripts/NPC/Navigation/NavGridStreamingZone.cs, Assets/Scripts/NPC/Navigation/NavGridStreamingZone.cs.meta, Assets/Scripts/NPC/Navigation/PathfindingService.cs
+- Diff: 1061 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:561d98fd2d494bd0754543d82f322644380dd364 -->
+## 2025-10-29T15:00:03+00:00 — Merge pull request #1516 from aicovergod/codex/modify-levelupsound-for-skillmanager-fallback
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 17 ++ / 0 --
+- Notes:
+  Add fallback SkillManager lookup for level up sound effects
+---
+<!-- commit:2d7b3b52d7d8216253ecf0420d5d31a3c73a63a5 -->
+## 2025-10-29T14:59:56+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:30cd064350dc09bb19ed1697f3018d94ee22a995 -->
+## 2025-10-29T14:59:42+00:00 — Add scene-wide fallback lookup for level up sound manager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Audio/SoundEffects/LevelUpSound.cs
+- Diff: 8 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:5befe42585a4a496d64bdd4cc6fc93bce0bc5e75 -->
+## 2025-10-29T14:33:51+00:00 — Merge pull request #1515 from aicovergod/codex/add-pickpocket-restriction-in-combat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 85 ++ / 0 --
+- Notes:
+  Block pickpocket attempts while fighting NPCs
+---
+<!-- commit:b063aab0056ec81d8139f6ec989ccd10f435a42c -->
+## 2025-10-29T14:33:40+00:00 — Block combat pickpocket attempts
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/NPC/Combat/BaseNpcCombat.cs, Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs
+- Diff: 85 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:63f340d3b519462a63e9832fc08a8d2ff4397d54 -->
+## 2025-10-29T14:21:31+00:00 — Merge pull request #1514 from aicovergod/codex/add-npc-reaction-to-failed-pickpocketing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 285 ++ / 0 --
+- Notes:
+  Improve thieving failure feedback and pickpocket approach
+---
+<!-- commit:b9d3323a32d7f69afa367e16fffd91f3999c4286 -->
+## 2025-10-29T14:21:22+00:00 — Improve thieving failure feedback and pickpocket approach
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs, Assets/Scripts/Skills/Thieving/Interaction/NpcThievingTarget.cs
+- Diff: 285 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:1f318dd5c5fb3e5d1f15c40ce1e59d42bd941f99 -->
+## 2025-10-29T14:02:51+00:00 — Merge pull request #1513 from aicovergod/codex/refactor-popuptext-to-floatingtext
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 4 ++ / 183 --
+- Notes:
+  Replace PopupText with FloatingText
+---
+<!-- commit:3bc93e96348bf23d23e9cf0dd68343dc4fd970bc -->
+## 2025-10-29T14:02:38+00:00 — Replace PopupText with FloatingText
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): AGENTS.md, Assets/Scripts/World/PopupText.cs, Assets/Scripts/World/PopupText.cs.meta, Assets/Scripts/World/PopupTextPool.cs, Assets/Scripts/World/PopupTextPool.cs.meta, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 4 ++ / 183 --
+- Notes:
+  —
+---
+<!-- commit:3a180a3dee1820f1d9bc3972c2aebae5ad78e192 -->
+## 2025-10-29T13:55:50+00:00 — Merge pull request #1512 from aicovergod/codex/make-thieving-failure-dialogue-text-larger
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 7 ++ / 2 --
+- Notes:
+  Align thieving dialogue popup with player floating text
+---
+<!-- commit:61dc5389ecea02689c61c5f1654e643850b50772 -->
+## 2025-10-29T13:55:38+00:00 — Adjust thieving dialogue popup size
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueService.cs
+- Diff: 7 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:786c6f6282378f19fb9253b598cc63fb6a4b9b3c -->
+## 2025-10-29T13:32:25+00:00 — Merge pull request #1511 from aicovergod/codex/update-popuptext-sorting-layer-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 35 ++ / 0 --
+- Notes:
+  Ensure popup text renders above world elements
+---
+<!-- commit:f59fa5aa9e4c71da9f20e049d3504d6d96273205 -->
+## 2025-10-29T13:32:07+00:00 — Ensure popup text renders above world elements
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/World/PopupText.cs
+- Diff: 35 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d55ecde071aac3929b063819845f09be639a38e1 -->
+## 2025-10-29T12:58:38+00:00 — goblin
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Prefabs/NPCS/Goblin.prefab, Assets/Scripts/Audio/SoundEffects.meta, Assets/Scripts/Audio/SoundEffects/LevelUpSound.cs.meta, Assets/Scripts/Skills/Thieving/Editor.meta, Assets/Scripts/Skills/Thieving/Editor/ThievingNpcDefinitionSimulatorWindow.cs.meta, Assets/Sound/13_Thieving_Level_Up.ogg.meta
+- Diff: 76 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:10339e028935aa7f3e40ccac916b6b0af0d6b900 -->
+## 2025-10-29T12:53:57+00:00 — Merge pull request #1510 from aicovergod/codex/fix-console-errors-in-npcpickpocketdialogueservice
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 0 --
+- Notes:
+  Fix pickpocket dialogue success roll block
+---
+<!-- commit:eb2b380bef0a247ddb9009d537ad93e0be344be9 -->
+## 2025-10-29T12:53:50+00:00 — Fix pickpocket dialogue success roll block
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueService.cs
+- Diff: 1 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:434382547d171647d8423b0e63b59c9178ac75e7 -->
+## 2025-10-29T12:51:46+00:00 — Merge pull request #1509 from aicovergod/codex/add-debug-logs-for-thievingdialogue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 191 ++ / 11 --
+- Notes:
+  Add detailed thieving debug logging and admin toggle
+---
+<!-- commit:53fc443a26cfdbf8f856a50620bc66f3783abe9b -->
+## 2025-10-29T12:51:40+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6e522065aac1edf6329037ec4b6c4d20c91311d1 -->
+## 2025-10-29T12:51:27+00:00 — Add detailed thieving debug logging and admin toggle
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Skills/AdminF2Menu.cs, Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueService.cs, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueSet.cs
+- Diff: 182 ++ / 11 --
+- Notes:
+  —
+---
+<!-- commit:953d54d2b1472bf4231f2c5b38f19462dbf509e6 -->
+## 2025-10-29T12:45:04+00:00 — Merge pull request #1508 from aicovergod/codex/update-pickpocket-failure-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 8 ++ / 1 --
+- Notes:
+  Handle pickpocket failure floating text fallback
+---
+<!-- commit:3667f8cf8e0f3df0b405f591d11450975b8be842 -->
+## 2025-10-29T12:44:54+00:00 — Add fallback floating text for pickpocket failures
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs
+- Diff: 8 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:15536f6724644f5d2de2312eea6b17a4b186007e -->
+## 2025-10-29T12:33:36+00:00 — Merge pull request #1507 from aicovergod/codex/add-simulate-loot-rolls-checkbox
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 59 ++ / 12 --
+- Notes:
+  Add loot roll toggle and summary display to Thieving simulator
+---
+<!-- commit:a8398f01b49ab278ff0ee2b661f9a5ccabd1d61b -->
+## 2025-10-29T12:33:26+00:00 — Enhance thieving simulator loot output
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Thieving/Editor/ThievingNpcDefinitionSimulatorWindow.cs
+- Diff: 59 ++ / 12 --
+- Notes:
+  —
+---
+<!-- commit:d54902072ed656434f984e08a4311618d9fddff5 -->
+## 2025-10-29T12:23:54+00:00 — Merge pull request #1506 from aicovergod/codex/fix-tickcount-namespace-error
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 8 ++ / 14 --
+- Notes:
+  Fix RNG seed initialization in thieving simulator editor window
+---
+<!-- commit:96ad44f46167b59dfabf4f666bef8c9dfabdf052 -->
+## 2025-10-29T12:23:47+00:00 — Merge branch 'main' into codex/fix-tickcount-namespace-error
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:dad4db99e4ef6b65e3ee7758e3aba81c2fac3483 -->
+## 2025-10-29T12:23:20+00:00 — Fix RNG seeding in thieving simulator
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Thieving/Editor/ThievingNpcDefinitionSimulatorWindow.cs
+- Diff: 4 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:f62b6d659669373cfebc93d979d87a1e6d71b872 -->
+## 2025-10-29T12:20:06+00:00 — Show pickpocket dialogue as NPC floating text
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs, Assets/Scripts/Skills/Thieving/Interaction/NpcThievingTarget.cs, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueService.cs
+- Diff: 22 ++ / 16 --
+- Notes:
+  —
+---
+<!-- commit:d86525a6ece57c5710cb5192eef01e993a08a2d1 -->
+## 2025-10-29T12:14:42+00:00 — Merge pull request #1504 from aicovergod/codex/add-npcpickpocketdialogue-folder-and-scripts
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 292 ++ / 0 --
+- Notes:
+  Add goblin pickpocket dialogue integration
+---
+<!-- commit:7d36793146a88176189ee43b7ceeb2008228e17a -->
+## 2025-10-29T12:14:36+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e0090e1e2ed64e3a7932b37d66669f819983f2a8 -->
+## 2025-10-29T12:14:22+00:00 — Add goblin pickpocket dialogue support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (8): Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue.meta, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/GoblinPickpocketDialogueSet.cs, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/GoblinPickpocketDialogueSet.cs.meta, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueService.cs, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueService.cs.meta, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueSet.cs, Assets/Scripts/Skills/Thieving/NpcPickpocketDialogue/NpcPickpocketDialogueSet.cs.meta
+- Diff: 283 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9bfca3c185ea93e9df61ab0317e3309207611742 -->
+## 2025-10-29T12:03:03+00:00 — Merge pull request #1503 from aicovergod/codex/move-skill-level-up-logic-to-levelupsound-class
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 82 ++ / 33 --
+- Notes:
+  Refactor level up sound handling
+---
+<!-- commit:a625a3f673214842c054d83ec84197f75e2d6209 -->
+## 2025-10-29T12:02:52+00:00 — Refactor level up sound handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Audio/SoundEffects/LevelUpSound.cs, Assets/Scripts/Combat/CombatController.cs
+- Diff: 82 ++ / 33 --
+- Notes:
+  —
+---
+<!-- commit:ff61c9f2e8fd5f242cb215af11f3b812b66a4d4d -->
+## 2025-10-29T11:55:48+00:00 — Merge pull request #1502 from aicovergod/codex/play-sound-on-thieving-level-up
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 0 --
+- Notes:
+  Add thieving level up audio cue
+---
+<!-- commit:4270ea30f784c701499bc9e9260027d0c78b0d02 -->
+## 2025-10-29T11:55:41+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:eb923df7b4271cc58c880b534571d33dbcf7c53e -->
+## 2025-10-29T11:55:27+00:00 — Add thieving level up audio cue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Audio/SoundEffect.cs, Assets/Scripts/Audio/SoundManager.cs, Assets/Scripts/Combat/CombatController.cs
+- Diff: 10 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:40a0c0fe3be2e5101f6f3390115bc48c2f8e1c4f -->
+## 2025-10-29T11:51:08+00:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 439 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f79707b301a98035f58cc34922f8c4a24e710351 -->
+## 2025-10-28T20:35:42+00:00 — Merge pull request #1501 from aicovergod/codex/add-thievingnpcdefinition-simulator-window
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 421 ++ / 0 --
+- Notes:
+  Add thieving NPC pickpocket simulator window
+---
+<!-- commit:d987262710132c417f287d8e58498740ad334302 -->
+## 2025-10-28T20:35:14+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0521995aec02ed30ce306875e78614ec5a81ab47 -->
+## 2025-10-28T20:35:00+00:00 — Add thieving NPC pickpocket simulator window
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Thieving/Editor/ThievingNpcDefinitionSimulatorWindow.cs
+- Diff: 412 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:cd0261f25fe28c6e1187fa99bbefb814a4097445 -->
+## 2025-10-28T17:07:47+00:00 — Merge pull request #1500 from aicovergod/codex/update-thieving-loot-system-for-drop-chances
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 135 ++ / 55 --
+- Notes:
+  Switch Thieving loot tables to percentage-based drops
+---
+<!-- commit:5c82d928e9782abd3c7b6a09ab6498dc1000ce0f -->
+## 2025-10-28T17:07:21+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:7a33bef912c74485bc27b4565f477ecf82593182 -->
+## 2025-10-28T17:07:06+00:00 — Refine thieving loot rolls to use percentage chances
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (14): Assets/Resources/Thieving/Npcs/Hero.asset, Assets/Resources/Thieving/Npcs/KnightOfArdougne.asset, Assets/Resources/Thieving/Npcs/MasterFarmer.asset, Assets/Resources/Thieving/Npcs/Paladin.asset, Assets/Resources/Thieving/Objects/BakersStall.asset, Assets/Resources/Thieving/Objects/FurStall.asset, Assets/Resources/Thieving/Objects/GemStall.asset, Assets/Resources/Thieving/Objects/SilkStall.asset, Assets/Resources/Thieving/Objects/SilverStall.asset, Assets/Resources/Thieving/Objects/TeaStall.asset, Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs, Assets/Scripts/Skills/Thieving/Data/ThievingLootTableEntry.cs, Assets/Scripts/Skills/Thieving/Data/ThievingNpcDefinition.cs, Assets/Scripts/Skills/Thieving/Data/ThievingObjectDefinition.cs
+- Diff: 126 ++ / 55 --
+- Notes:
+  —
+---
+<!-- commit:e8f73e01c746c8b5c11148340eb5ca99b2d4e223 -->
+## 2025-10-28T16:50:38+00:00 — thieve
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (44): Assets/Prefabs/MainScriptObjects/Player.prefab, Assets/Prefabs/NPCS/Goblin.prefab, Assets/Resources/Item/Cabbage.asset, Assets/Resources/Item/Cabbage.asset.meta, Assets/Resources/Item/String.asset, Assets/Resources/Item/String.asset.meta, Assets/Resources/Item/Thread.asset, Assets/Resources/Item/Thread.asset.meta, Assets/Resources/Item/Wheat.asset, Assets/Resources/Item/Wheat.asset.meta, Assets/Resources/Item/Wool.asset, Assets/Resources/Item/Wool.asset.meta, Assets/Resources/Thieving/Npcs/Goblin.asset, Assets/Resources/Thieving/Npcs/Goblin.asset.meta, Assets/Resources/Thieving/Npcs/Guard.asset, Assets/Scenes/VioletsTownMinerBuilding.unity, Assets/Scripts/NPC/Interaction/NpcExamine.cs.meta, Assets/Scripts/Skills/Farming.meta, Assets/Scripts/Skills/Farming/PickableResourceNode.cs.meta, Assets/Sprites/Cooked Food Items.meta, Assets/Sprites/Cooking.meta, Assets/Sprites/Cooking/Cooked Food Items.meta, Assets/Sprites/Cooking/Cooked Food Items/Bread Loaf_64x64.png, Assets/Sprites/Cooking/Cooked Food Items/Bread Loaf_64x64.png.meta, Assets/Sprites/Cooking/Cooked Food Items/Bread Roll_64x64.png, Assets/Sprites/Cooking/Cooked Food Items/Bread Roll_64x64.png.meta, Assets/Sprites/Cooking/CookingObjects.meta, Assets/Sprites/Cooking/CookingObjects/Cooking Range_64x64.png, Assets/Sprites/Cooking/CookingObjects/Cooking Range_64x64.png.meta, Assets/Sprites/Cooking/Raw Food Items.meta, Assets/Sprites/Cooking/Raw Food Items/Cabbage_64x64.png, Assets/Sprites/Cooking/Raw Food Items/Cabbage_64x64.png.meta, Assets/Sprites/Cooking/Raw Food Items/Wheat_64x64.png, Assets/Sprites/Cooking/Raw Food Items/Wheat_64x64.png.meta, Assets/Sprites/Crafting.meta, Assets/Sprites/Crafting/Materials.meta, Assets/Sprites/Crafting/Materials/String_64x64.png, Assets/Sprites/Crafting/Materials/String_64x64.png.meta, Assets/Sprites/Crafting/Materials/Thread_64x64.png, Assets/Sprites/Crafting/Materials/Thread_64x64.png.meta, Assets/Sprites/Crafting/Materials/Wool_64x64.png, Assets/Sprites/Crafting/Materials/Wool_64x64.png.meta, Assets/Sprites/Farming.meta, Assets/Sprites/Raw Food Items.meta
+- Diff: 1663 ++ / 8 --
+- Notes:
+  —
+---
+<!-- commit:921b4d755973db85af1afbd6316d3f4e452629ce -->
+## 2025-10-28T16:45:07+00:00 — Merge pull request #1499 from aicovergod/codex/tighten-isperformingaction-logic-in-thievingcontroller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 1 --
+- Notes:
+  Adjust thieving action detection
+---
+<!-- commit:a55f4dae0b911dd7f4f8fad6afe303e08bafbbaa -->
+## 2025-10-28T16:44:57+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e564e0a53f81ad84dca377ee6156b6ead55e9ca3 -->
+## 2025-10-28T16:44:41+00:00 — Tighten thieving action detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Thieving/Core/ThievingController.cs
+- Diff: 2 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:e64884bccc79cd4035ddd1f96064d5ce7f4ca9ab -->
+## 2025-10-28T16:08:35+00:00 — Merge pull request #1498 from aicovergod/codex/create-pickableresourcenode-script-for-unity
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 369 ++ / 0 --
+- Notes:
+  Add pickable farming resource node behaviour
+---
+<!-- commit:2f96f9462efbf53231d31e1895883e4b4f5d90a4 -->
+## 2025-10-28T16:06:56+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f774da04b51bfe589a751090e184628d673c96d3 -->
+## 2025-10-28T16:06:37+00:00 — Add farming pickable resource node
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Farming/PickableResourceNode.cs
+- Diff: 360 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0377320a7310487c10432760c62fa5f3829a6a89 -->
+## 2025-10-28T14:23:47+00:00 — Merge pull request #1497 from aicovergod/codex/add-attack-options-to-npcinteractionoptions-script
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 77 ++ / 2 --
+- Notes:
+  Expose attack toggles for NPC context menus
+---
+<!-- commit:86a229119740580121455ffe977e0af91b09f133 -->
+## 2025-10-28T14:23:35+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6f310aa76e27811d23baa27cee1bdab8fd078287 -->
+## 2025-10-28T14:23:20+00:00 — Expose attack toggles for NPC context menus
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/NPC/Interaction/NpcExamine.cs, Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/NPC/Interaction/NpcInteractionOptions.cs
+- Diff: 68 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:79fb1bbb839ffe70b02c4df7f955e200fcc31922 -->
+## 2025-10-28T14:06:42+00:00 — Merge pull request #1496 from aicovergod/codex/add-attack-button-to-right-click-menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 232 ++ / 51 --
+- Notes:
+  Add attack options to NPC right-click menu
+---
+<!-- commit:464f838473b59489098b7fd4024b9a7763656204 -->
+## 2025-10-28T14:06:23+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:dabc2e9d2512345a86aa6f0f5b178dcdd0cd7375 -->
+## 2025-10-28T14:06:08+00:00 — Add attack options to NPC right-click menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/NPC/Combat/NpcAttackOnClick.cs, Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/NPC/Interaction/NpcInteractionOptions.cs, Assets/Scripts/UI/RightClickMenu.cs
+- Diff: 223 ++ / 51 --
+- Notes:
+  —
+---
+<!-- commit:83fdbecbdc2eebcfe198a783d34bcd317e0010cf -->
+## 2025-10-28T13:43:57+00:00 — Merge pull request #1495 from aicovergod/codex/ensure-right-click-trade-button-shares-shop-flow
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 22 ++ / 1 --
+- Notes:
+  Clarify trade context menu shop delegation
+---
+<!-- commit:337b2713457665e8f3454636bcc37f64ff103683 -->
+## 2025-10-28T13:43:52+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:82749d09c677f46921c299e2f18aaa2a24663164 -->
+## 2025-10-28T13:43:40+00:00 — Clarify trade context menu shop delegation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/UI/RightClickMenu.cs
+- Diff: 13 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:501d4b8d98fb048b9a4fc32cec9322123a5515e0 -->
+## 2025-10-28T13:37:08+00:00 — Merge pull request #1494 from aicovergod/codex/update-rightclickmenu-show-method
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 13 ++ / 1 --
+- Notes:
+  Fix right-click menu positioning
+---
+<!-- commit:c686305c0c2b6c79386d580cdf5a6f577a2748d5 -->
+## 2025-10-28T13:36:53+00:00 — Fix right-click menu positioning
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/RightClickMenu.cs
+- Diff: 13 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:d66bd0fb7300eba8c45c324c47bc2d6e1c8ffaa2 -->
+## 2025-10-28T13:29:17+00:00 — Merge pull request #1493 from aicovergod/codex/add-player-movement-towards-npc-on-trade
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 178 ++ / 5 --
+- Notes:
+  Auto-walk player into NPC trade range
+---
+<!-- commit:8ab68a076839c99243e456fca2fd15a699d02e08 -->
+## 2025-10-28T13:29:10+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:613b9b5c1aa0e7d97da6e8a42d791dab116c2140 -->
+## 2025-10-28T13:28:56+00:00 — Auto-walk player into trade range before opening shops
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/NPC/Interaction/NpcShopOpener.cs
+- Diff: 169 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:b7abf2fd13f70770c76e3bd75ff4483eab59aec0 -->
+## 2025-10-28T13:19:54+00:00 — Merge pull request #1492 from aicovergod/codex/add-examine-field-to-npc-interaction
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 141 ++ / 12 --
+- Notes:
+  Add configurable NPC examine messaging
+---
+<!-- commit:8deea0cf9fa1ded1ef7753100b43a42f5d6c3d0b -->
+## 2025-10-28T13:19:42+00:00 — Add configurable NPC examine messaging
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/NPC/Interaction/NpcExamine.cs, Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/NPC/Interaction/NpcInteractionOptions.cs
+- Diff: 141 ++ / 12 --
+- Notes:
+  —
+---
+<!-- commit:50770bf700fd79e2f5e99e9977e594a9c6596d63 -->
+## 2025-10-28T13:09:05+00:00 — Merge pull request #1491 from aicovergod/codex/update-rightclickmenu-for-dependency-injection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 16 ++ / 1 --
+- Notes:
+  Ensure RightClickMenu factory pre-installs required UI components
+---
+<!-- commit:d4ab295989952bbdadf1d7b68b686864f60e3d14 -->
+## 2025-10-28T13:08:55+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2d857223430377de5da1e525e97deafcac1183e8 -->
+## 2025-10-28T13:08:41+00:00 — Ensure RightClickMenu factory prebuilds UI components
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/RightClickMenu.cs
+- Diff: 7 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:446db1f24d149b598377a9c4528b74ed74cca4e6 -->
+## 2025-10-28T12:58:34+00:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 18 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:83e984470cd3f915180c8f4a542c58fc74fb43fd -->
+## 2025-10-28T12:50:35+00:00 — Merge pull request #1490 from aicovergod/codex/fix-console-errors-in-thieving-scripts
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 12 ++ / 2 --
+- Notes:
+  Fix thieving chat messaging and namespace references
+---
+<!-- commit:ea7fcabca98b9dff78e4dca7150ac099696d107b -->
+## 2025-10-28T12:50:28+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2532c901e006180af392ec0e86948959619fce8f -->
+## 2025-10-28T12:50:16+00:00 — Fix thieving chat messaging and namespace references
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs, Assets/Scripts/Skills/Thieving/Interaction/NpcThievingTarget.cs
+- Diff: 3 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:e8afd8edcae56800293bdbb37279aebcd164a113 -->
+## 2025-10-28T12:47:08+00:00 — Merge pull request #1489 from aicovergod/codex/fix-console-errors-in-thievingsuccesscalculatortests
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 5 ++ / 9 --
+- Notes:
+  Fix thieving success tests to use standard NUnit
+---
+<!-- commit:bab4c58a12a2ee6371478f0986cb8317170798f6 -->
+## 2025-10-28T12:46:57+00:00 — Simplify thieving tests to standard NUnit
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Tests/EditMode/Skills/Thieving/ThievingSuccessCalculatorTests.cs
+- Diff: 5 ++ / 9 --
+- Notes:
+  —
+---
+<!-- commit:35f9fa1c898a302c14a77e5e2df59797076329b9 -->
+## 2025-10-28T12:38:18+00:00 — Merge pull request #1488 from aicovergod/codex/fix-merge-conflict-errors-in-companionenvironmentawarenesszo
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 6 --
+- Notes:
+  Resolve merge conflict in companion awareness zone
+---
+<!-- commit:fb772fca8c0382ee1fe04cee60a32752026eb9ab -->
+## 2025-10-28T12:38:07+00:00 — Resolve merge conflict in companion awareness zone
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs
+- Diff: 1 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:e0b9bba0a8d9cdfa8c649f03171046ca85ef5771 -->
+## 2025-10-28T12:35:53+00:00 — Merge pull request #1487 from aicovergod/codex/create-utility-class-for-menu-positioning
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 190 ++ / 97 --
+- Notes:
+  Refactor context menu positioning into shared helper
+---
+<!-- commit:7cbd0da0b1e195a25b37746138ea83266d78fcb6 -->
+## 2025-10-28T12:35:41+00:00 — Merge branch 'main' into codex/create-utility-class-for-menu-positioning
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2202 ++ / 900 --
+- Notes:
+  —
+---
+<!-- commit:74640295a09f720764eb7a3813086ebd63657be5 -->
+## 2025-10-28T12:33:44+00:00 — Refactor context menu positioning into shared helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs, Assets/Scripts/Inventory/InventoryDropMenu.cs, Assets/Scripts/Inventory/UI/InventoryItemContextMenu.cs, Assets/Scripts/UI/ContextMenus/ContextMenuPositioner.cs
+- Diff: 186 ++ / 93 --
+- Notes:
+  —
+---
+<!-- commit:90bdaa75ab22daea0348c9ef4e59afa16c623381 -->
+## 2025-10-28T12:05:46+00:00 — Merge pull request #1486 from aicovergod/codex/update-processrewards-for-item-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 86 ++ / 2 --
+- Notes:
+  Route thieving rewards through gathering processor
+---
+<!-- commit:234448428aa11d23e19c22f96980b0b7214aeae7 -->
+## 2025-10-28T12:05:33+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:323c08358430a92e22bf2b67df4960422a6c073a -->
+## 2025-10-28T12:05:21+00:00 — Route thieving rewards through gathering processor
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs
+- Diff: 77 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:d5be6edd4ed2dff7f2575abbe706635ad629e084 -->
+## 2025-10-28T11:11:46+00:00 — Merge pull request #1485 from aicovergod/codex/implement-thieving-skill-with-pickpocketing-and-theft
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2702 ++ / 2 --
+- Notes:
+  Add thieving skill with pickpocketing and stall theft
+---
+<!-- commit:9429edce19bf1071f6ed2463bf3d2e19cb044ada -->
+## 2025-10-28T11:11:38+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:76312d4a63d9a1858bd6efde76edbe75bac6b992 -->
+## 2025-10-28T11:11:22+00:00 — Allow edit mode tests to access thieving internals
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (63): Assets/Prefabs/MainScriptObjects/Player.prefab, Assets/Resources/Thieving.meta, Assets/Resources/Thieving/Npcs.meta, Assets/Resources/Thieving/Npcs/Guard.asset, Assets/Resources/Thieving/Npcs/Guard.asset.meta, Assets/Resources/Thieving/Npcs/Hero.asset, Assets/Resources/Thieving/Npcs/Hero.asset.meta, Assets/Resources/Thieving/Npcs/KnightOfArdougne.asset, Assets/Resources/Thieving/Npcs/KnightOfArdougne.asset.meta, Assets/Resources/Thieving/Npcs/ManWoman.asset, Assets/Resources/Thieving/Npcs/ManWoman.asset.meta, Assets/Resources/Thieving/Npcs/MasterFarmer.asset, Assets/Resources/Thieving/Npcs/MasterFarmer.asset.meta, Assets/Resources/Thieving/Npcs/Paladin.asset, Assets/Resources/Thieving/Npcs/Paladin.asset.meta, Assets/Resources/Thieving/Objects.meta, Assets/Resources/Thieving/Objects/BakersStall.asset, Assets/Resources/Thieving/Objects/BakersStall.asset.meta, Assets/Resources/Thieving/Objects/FurStall.asset, Assets/Resources/Thieving/Objects/FurStall.asset.meta, Assets/Resources/Thieving/Objects/GemStall.asset, Assets/Resources/Thieving/Objects/GemStall.asset.meta, Assets/Resources/Thieving/Objects/SilkStall.asset, Assets/Resources/Thieving/Objects/SilkStall.asset.meta, Assets/Resources/Thieving/Objects/SilverStall.asset, Assets/Resources/Thieving/Objects/SilverStall.asset.meta, Assets/Resources/Thieving/Objects/TeaStall.asset, Assets/Resources/Thieving/Objects/TeaStall.asset.meta, Assets/Resources/Thieving/ThievingDefinitionDatabase.asset, Assets/Resources/Thieving/ThievingDefinitionDatabase.asset.meta, Assets/Scripts/AssemblyInfo.cs, Assets/Scripts/AssemblyInfo.cs.meta, Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/NPC/Interaction/NpcInteractionOptions.cs, Assets/Scripts/Skills/AdminF2Menu.cs, Assets/Scripts/Skills/SkillType.cs, Assets/Scripts/Skills/SkillsUI.cs, Assets/Scripts/Skills/Thieving.meta, Assets/Scripts/Skills/Thieving/Core.meta, Assets/Scripts/Skills/Thieving/Core/ThievingController.cs, Assets/Scripts/Skills/Thieving/Core/ThievingController.cs.meta, Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs, Assets/Scripts/Skills/Thieving/Core/ThievingSkill.cs.meta, Assets/Scripts/Skills/Thieving/Data.meta, Assets/Scripts/Skills/Thieving/Data/ThievingDefinitionDatabase.cs, Assets/Scripts/Skills/Thieving/Data/ThievingDefinitionDatabase.cs.meta, Assets/Scripts/Skills/Thieving/Data/ThievingLootTableEntry.cs, Assets/Scripts/Skills/Thieving/Data/ThievingLootTableEntry.cs.meta, Assets/Scripts/Skills/Thieving/Data/ThievingNpcDefinition.cs, Assets/Scripts/Skills/Thieving/Data/ThievingNpcDefinition.cs.meta, Assets/Scripts/Skills/Thieving/Data/ThievingObjectDefinition.cs, Assets/Scripts/Skills/Thieving/Data/ThievingObjectDefinition.cs.meta, Assets/Scripts/Skills/Thieving/Interaction.meta, Assets/Scripts/Skills/Thieving/Interaction/NpcThievingTarget.cs, Assets/Scripts/Skills/Thieving/Interaction/NpcThievingTarget.cs.meta, Assets/Scripts/Skills/Thieving/Interaction/ThievingObjectNode.cs, Assets/Scripts/Skills/Thieving/Interaction/ThievingObjectNode.cs.meta, Assets/Scripts/Skills/Thieving/UI.meta, Assets/Scripts/Skills/Thieving/UI/ThievingHud.cs, Assets/Scripts/Skills/Thieving/UI/ThievingHud.cs.meta, Assets/Tests/EditMode/Skills/Thieving.meta, Assets/Tests/EditMode/Skills/Thieving/ThievingSuccessCalculatorTests.cs, Assets/Tests/EditMode/Skills/Thieving/ThievingSuccessCalculatorTests.cs.meta
+- Diff: 2693 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:f83420ff5e2aa721477b87d4588f871c19c1707c -->
+## 2025-10-28T10:22:28+00:00 — Merge pull request #1484 from aicovergod/codex/fix-companion-behavior-while-cooking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 7 ++ / 24 --
+- Notes:
+  Fix companion follower enabling during cooking
+---
+<!-- commit:68c2f65ad754a47cf18c7ef222c5ca1dc3ae83dd -->
+## 2025-10-28T10:22:13+00:00 — Merge branch 'main' into codex/fix-companion-behavior-while-cooking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 283 ++ / 182 --
+- Notes:
+  —
+---
+<!-- commit:78a893076219402ac8766800f5e9bccca20368e7 -->
+## 2025-10-28T10:21:14+00:00 — Fix companion follower enabling during cooking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Cooking/CompanionCookingController.cs
+- Diff: 3 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:24965232a2b25459adc26f3dcf7ba26fc03bc1a7 -->
+## 2025-10-27T22:08:24+00:00 — Merge pull request #1482 from aicovergod/codex/fix-companion-awareness-zone-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 103 ++ / 8 --
+- Notes:
+  Fix companion awareness directional entry fallback
+---
+<!-- commit:c1bc41fb1638cefaaf21ce27dab5ca04de3001a3 -->
+## 2025-10-27T22:08:13+00:00 — Improve companion directional entry detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs, Assets/Scripts/Pets/PetFollower.cs
+- Diff: 103 ++ / 8 --
+- Notes:
+  —
+---
+<!-- commit:6393fec0fbe2b92b6e87d0f18bf745511545c119 -->
+## 2025-10-27T21:58:34+00:00 — Merge pull request #1481 from aicovergod/codex/add-logic-for-companion-dialogue-on-scene-load
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 316 ++ / 0 --
+- Notes:
+  Add companion dialogue chance for scene interactables
+---
+<!-- commit:e622cf4c47fef1354e459167c864b7b76fee8ad0 -->
+## 2025-10-27T21:58:20+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:38947639ffa3edc4dbf99c0395794021ab526f81 -->
+## 2025-10-27T21:58:08+00:00 — Add companion dialogue chance for scene interactables
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/AdminF2Menu.cs, Assets/Scripts/World/SceneInteractableObject.cs
+- Diff: 307 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:adb8de007e2b7742c8d47f2455912ca36734b70f -->
+## 2025-10-27T21:39:04+00:00 — Merge pull request #1480 from aicovergod/codex/extend-companionenvironmentawarenesszone-functionality
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 125 ++ / 0 --
+- Notes:
+  Add directional gating to companion awareness zones
+---
+<!-- commit:5a34777e951d3880a74ffacdddb29b6ff4178773 -->
+## 2025-10-27T21:38:48+00:00 — Add directional gating to companion awareness zones
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs
+- Diff: 125 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:3aeee37204271b17db17d3e4df42c37ce461f368 -->
+## 2025-10-27T21:24:12+00:00 — Merge pull request #1479 from aicovergod/codex/add-debug-logs-for-companion-triggers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 65 ++ / 4 --
+- Notes:
+  Add companion awareness zone debug logging toggle
+---
+<!-- commit:7daba58c12fad3f5449fe72970146bb73a503302 -->
+## 2025-10-27T21:24:02+00:00 — Add awareness zone debug logging and admin toggle
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs, Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 65 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:4c5c818b92b8565015d6addac94a64c3e6f8b59d -->
+## 2025-10-27T21:00:01+00:00 — Merge pull request #1478 from aicovergod/codex/add-hades-fragment-drop-message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 70 ++ / 1 --
+- Notes:
+  Add game chat messaging for Hades fragment drops
+---
+<!-- commit:743c377c6c62f752ce8b10fa5be23f0319e54850 -->
+## 2025-10-27T20:59:49+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:1f9cd79f136ab9975e493b6247cfde633ce9b1ee -->
+## 2025-10-27T20:59:35+00:00 — Add game chat message for ore golem Hades fragment drops
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Combat/Mechanics/OreGolemHadesFragmentDropper.cs
+- Diff: 61 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:30be779c18e386425ef339672b12366b114326fd -->
+## 2025-10-27T19:58:41+00:00 — Merge pull request #1477 from aicovergod/codex/add-oregolemhadesfragmentdropper-script
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 404 ++ / 236 --
+- Notes:
+  Extract ore golem fragment drop into dedicated component
+---
+<!-- commit:07b3b3463b3585458f42f23001f9c5002618ff3c -->
+## 2025-10-27T19:58:34+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:18a04b3f4dcd63f4796dbdd745e598a526c6ffb6 -->
+## 2025-10-27T19:58:17+00:00 — Refactor ore golem fragment drop handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Prefabs/NPCS/COPPER_ORE_GOLEM.prefab, Assets/Scripts/NPC/Combat/Mechanics/OreGolemHadesFragmentDropper.cs, Assets/Scripts/NPC/Combat/Mechanics/OreGolemHadesFragmentDropper.cs.meta, Assets/Scripts/NPC/Combat/NpcCombatant.cs
+- Diff: 395 ++ / 236 --
+- Notes:
+  —
+---
+<!-- commit:7ec0dcfeed7a2025a753114274908a48dc6c30ac -->
+## 2025-10-27T15:37:23+00:00 — Merge pull request #1476 from aicovergod/codex/add-hades-fragment-drop-mechanics
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 246 ++ / 3 --
+- Notes:
+  Add ore golem Hades fragment drops
+---
+<!-- commit:39c9d77082af1d81865d286a02c5dbe669a78cc8 -->
+## 2025-10-27T15:37:01+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:924f31bc0951df2ca6ed3a405e80c49f3144a25d -->
+## 2025-10-27T15:36:43+00:00 — Add Hades fragment drops for ore golems
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Combat/NpcCombatant.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs
+- Diff: 237 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:21195dd3b54aafd7542b07e73aaec69ab978c29b -->
+## 2025-10-27T15:23:26+00:00 — Merge pull request #1475 from aicovergod/codex/add-message-for-undroppable-items
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 26 ++ / 2 --
+- Notes:
+  Add undroppable item feedback in inventory
+---
+<!-- commit:0b0f43c598e0ca2e5feb8b4995638cf8420b473d -->
+## 2025-10-27T15:23:15+00:00 — Add chat feedback for undroppable item drops
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 26 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:f331bb21e54ff2347df021f79c390ca211d5fd8b -->
+## 2025-10-27T15:10:12+00:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:cbd8527f28e4de05bae9bd29d1958931bb350b48 -->
+## 2025-10-27T15:08:54+00:00 — Merge pull request #1474 from aicovergod/codex/add-hades-fragment-drop-on-ore-mine
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 236 ++ / 15 --
+- Notes:
+  feat: add hades fragment drops to mining
+---
+<!-- commit:e5dae75a0f5347abd12e3b6c6b12abf74becfb72 -->
+## 2025-10-27T14:50:04+00:00 — Merge pull request #1473 from aicovergod/codex/add-close-button-to-companion-inventory-ui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 18 ++ / 1 --
+- Notes:
+  Add close button to companion inventory UI
+---
+<!-- commit:7420f7252ae55005a5272f3baaad18992cd14e99 -->
+## 2025-10-27T14:49:56+00:00 — Add close button support to companion inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionInventory.cs
+- Diff: 18 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:3df45970c56426041c180416f9c395fcbef8da53 -->
+## 2025-10-27T14:35:22+00:00 — Merge pull request #1472 from aicovergod/codex/add-early-return-check-in-conversation-methods
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 23 ++ / 0 --
+- Notes:
+  Guard companion chat scheduling when no follower is present
+---
+<!-- commit:735edd3172faf7cf85df248fd38a06d2e1254406 -->
+## 2025-10-27T14:32:59+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ca5e6d518646f90349d2c3259d6422b83c2bdcce -->
+## 2025-10-27T14:32:32+00:00 — Guard companion dialogue scheduling when no companion is active
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 14 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d161a4803e6a7867b7f4e5d4d67284be3dee35ae -->
+## 2025-10-27T14:07:02+00:00 — Merge pull request #1471 from aicovergod/codex/add-position-helper-to-inventoryitemcontextmenu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 79 ++ / 1 --
+- Notes:
+  Refine inventory context menu positioning
+---
+<!-- commit:c7714cf1bc29361860245da9d20a11b33589035d -->
+## 2025-10-27T14:00:45+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c7bbae03d1e08a6766edd525328d6ecc48f76a86 -->
+## 2025-10-27T14:00:27+00:00 — Refine inventory context menu positioning
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/UI/InventoryItemContextMenu.cs
+- Diff: 70 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:7b4a37dd1645c0849392c865a4dbd28acc53bd67 -->
+## 2025-10-27T13:36:30+00:00 — Merge pull request #1470 from aicovergod/codex/move-miningdatabase-to-resources
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 1 --
+- Notes:
+  Move mining database assets into Resources
+---
+<!-- commit:722ce6d54edf2ad7cc80a382d944fbdb9333719d -->
+## 2025-10-27T13:36:18+00:00 — Move mining database assets into Resources
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (71): Assets/Editor/CreateMiningDatabase.cs, Assets/Resources/MiningDatabase.meta, Assets/Resources/MiningDatabase/Adamant Pickaxe.asset, Assets/Resources/MiningDatabase/Adamant Pickaxe.asset.meta, Assets/Resources/MiningDatabase/Adamantite Ore.asset, Assets/Resources/MiningDatabase/Adamantite Ore.asset.meta, Assets/Resources/MiningDatabase/Adamantite Rock.asset, Assets/Resources/MiningDatabase/Adamantite Rock.asset.meta, Assets/Resources/MiningDatabase/Black Pickaxe.asset, Assets/Resources/MiningDatabase/Black Pickaxe.asset.meta, Assets/Resources/MiningDatabase/Bronze Pickaxe.asset, Assets/Resources/MiningDatabase/Bronze Pickaxe.asset.meta, Assets/Resources/MiningDatabase/Coal Ore.asset, Assets/Resources/MiningDatabase/Coal Ore.asset.meta, Assets/Resources/MiningDatabase/Coal Rock.asset, Assets/Resources/MiningDatabase/Coal Rock.asset.meta, Assets/Resources/MiningDatabase/Copper Ore.asset, Assets/Resources/MiningDatabase/Copper Ore.asset.meta, Assets/Resources/MiningDatabase/Copper Rock.asset, Assets/Resources/MiningDatabase/Copper Rock.asset.meta, Assets/Resources/MiningDatabase/Dragon Pickaxe.asset, Assets/Resources/MiningDatabase/Dragon Pickaxe.asset.meta, Assets/Resources/MiningDatabase/Iron Ore.asset, Assets/Resources/MiningDatabase/Iron Ore.asset.meta, Assets/Resources/MiningDatabase/Iron Pickaxe.asset, Assets/Resources/MiningDatabase/Iron Pickaxe.asset.meta, Assets/Resources/MiningDatabase/Iron Rock.asset, Assets/Resources/MiningDatabase/Iron Rock.asset.meta, Assets/Resources/MiningDatabase/MiningXpTable.asset, Assets/Resources/MiningDatabase/MiningXpTable.asset.meta, Assets/Resources/MiningDatabase/Mithril Ore.asset, Assets/Resources/MiningDatabase/Mithril Ore.asset.meta, Assets/Resources/MiningDatabase/Mithril Pickaxe.asset, Assets/Resources/MiningDatabase/Mithril Pickaxe.asset.meta, Assets/Resources/MiningDatabase/Mithril Rock.asset, Assets/Resources/MiningDatabase/Mithril Rock.asset.meta, Assets/Resources/MiningDatabase/Orichalcum Ore.asset, Assets/Resources/MiningDatabase/Orichalcum Ore.asset.meta, Assets/Resources/MiningDatabase/Orichalcum Pickaxe.asset, Assets/Resources/MiningDatabase/Orichalcum Pickaxe.asset.meta, Assets/Resources/MiningDatabase/Orichalcum Rock.asset, Assets/Resources/MiningDatabase/Orichalcum Rock.asset.meta, Assets/Resources/MiningDatabase/PersonalNodes.meta, Assets/Resources/MiningDatabase/PersonalNodes/Personal Adamantite Node.asset, Assets/Resources/MiningDatabase/PersonalNodes/Personal Adamantite Node.asset.meta, Assets/Resources/MiningDatabase/PersonalNodes/Personal Coal Node.asset, Assets/Resources/MiningDatabase/PersonalNodes/Personal Coal Node.asset.meta, Assets/Resources/MiningDatabase/PersonalNodes/Personal Copper Node.asset, Assets/Resources/MiningDatabase/PersonalNodes/Personal Copper Node.asset.meta, Assets/Resources/MiningDatabase/PersonalNodes/Personal Iron Node.asset, Assets/Resources/MiningDatabase/PersonalNodes/Personal Iron Node.asset.meta, Assets/Resources/MiningDatabase/PersonalNodes/Personal Mithril Node.asset, Assets/Resources/MiningDatabase/PersonalNodes/Personal Mithril Node.asset.meta, Assets/Resources/MiningDatabase/PersonalNodes/Personal Orichalcum Node.asset, Assets/Resources/MiningDatabase/PersonalNodes/Personal Orichalcum Node.asset.meta, Assets/Resources/MiningDatabase/PersonalNodes/Personal Runite Node.asset, Assets/Resources/MiningDatabase/PersonalNodes/Personal Runite Node.asset.meta, Assets/Resources/MiningDatabase/PersonalNodes/Personal Tin Node.asset, Assets/Resources/MiningDatabase/PersonalNodes/Personal Tin Node.asset.meta, Assets/Resources/MiningDatabase/Rune Pickaxe.asset, Assets/Resources/MiningDatabase/Rune Pickaxe.asset.meta, Assets/Resources/MiningDatabase/Runite Ore.asset, Assets/Resources/MiningDatabase/Runite Ore.asset.meta, Assets/Resources/MiningDatabase/Runite Rock.asset, Assets/Resources/MiningDatabase/Runite Rock.asset.meta, Assets/Resources/MiningDatabase/Steel Pickaxe.asset, Assets/Resources/MiningDatabase/Steel Pickaxe.asset.meta, Assets/Resources/MiningDatabase/Tin Ore.asset, Assets/Resources/MiningDatabase/Tin Ore.asset.meta, Assets/Resources/MiningDatabase/Tin Rock.asset, Assets/Resources/MiningDatabase/Tin Rock.asset.meta
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:8270eb48022c3d812a169b5ed34461a898493254 -->
+## 2025-10-27T13:31:54+00:00 — Merge pull request #1469 from aicovergod/codex/refactor-inventorydropmenu-position-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 22 ++ / 32 --
+- Notes:
+  Align drop menu positioning with tooltip logic
+---
+<!-- commit:e63b13fc0d0f7dbd7b13fc4b219a9b119619a179 -->
+## 2025-10-27T13:31:43+00:00 — Align drop menu positioning with tooltip logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/InventoryDropMenu.cs
+- Diff: 22 ++ / 32 --
+- Notes:
+  —
+---
+<!-- commit:34c4757888e73ebd5dadd9a75cd44912b5e4dc6b -->
+## 2025-10-27T13:16:00+00:00 — Merge pull request #1468 from aicovergod/codex/fix-ore-bag-companion-messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 89 ++ / 1 --
+- Notes:
+  Adjust companion ore bag feedback
+---
+<!-- commit:411d297d241110ece2046d1f838f926c90303302 -->
+## 2025-10-27T13:15:47+00:00 — Improve companion ore bag messaging
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 89 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:ff9e77070328e1c53ed338f9b300b925354d90ba -->
+## 2025-10-27T13:04:29+00:00 — Merge pull request #1467 from aicovergod/codex/fix-inventory-right-click-menu-position
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 32 ++ / 12 --
+- Notes:
+  Clamp inventory drop menu to canvas bounds
+---
+<!-- commit:d683cd7742f407d059fb475424b29a12b011a70b -->
+## 2025-10-27T11:49:40+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0dcc63aaa8f997fa7fd2434ec03f1d18ab4de107 -->
+## 2025-10-27T11:49:22+00:00 — Clamp inventory drop menu to canvas bounds
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/InventoryDropMenu.cs
+- Diff: 23 ++ / 12 --
+- Notes:
+  —
+---
+<!-- commit:a9f8c4c3dc79a5004302b3d0affbf0710703cd8b -->
+## 2025-10-27T11:34:14+00:00 — Merge pull request #1466 from aicovergod/codex/fix-inventory-menu-popup-positioning
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 79 ++ / 1 --
+- Notes:
+  Fix inventory drop menu clamping and ore bag item interactions
+---
+<!-- commit:172f4124a2095bfc017a7e7654694a3f154383e8 -->
+## 2025-10-27T11:34:02+00:00 — Fix inventory context menu positioning and ore bag interactions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Inventory/InventoryDropMenu.cs
+- Diff: 79 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:8574e86d2f41eb73c614b78c74ed6365444ca932 -->
+## 2025-10-27T11:24:05+00:00 — Merge pull request #1465 from aicovergod/codex/add-developer-commands-for-setspeed-and-resetaccount
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 140 ++ / 1 --
+- Notes:
+  Add ::setspeed developer command and secure account reset
+---
+<!-- commit:c37cfddda76ad3f9e7668305d76e9ea8c9c017de -->
+## 2025-10-27T11:22:04+00:00 — Merge pull request #1463 from aicovergod/codex/toggle-ore-bag-debug-logs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 47 ++ / 43 --
+- Notes:
+  Make ore bag debug logging optional
+---
+<!-- commit:3cf245ca5365516e228d7bd0b8452badc6d0500b -->
+## 2025-10-27T11:21:56+00:00 — Merge branch 'main' into codex/toggle-ore-bag-debug-logs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 54 ++ / 10 --
+- Notes:
+  —
+---
+<!-- commit:caa5c7c504a3e39042bf707037da0bcc04679715 -->
+## 2025-10-27T11:06:37+00:00 — Make ore bag debug logging optional
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 43 ++ / 30 --
+- Notes:
+  —
+---
+<!-- commit:9879d44540aa2d7ecb546c4891750685bcbc39af -->
+## 2025-10-27T10:56:46+00:00 — Merge pull request #1462 from aicovergod/codex/update-orebagservice-for-inventory-initialization
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 45 ++ / 25 --
+- Notes:
+  Ensure ore bag inventory sets its save key before activation
+---
+<!-- commit:995f93489492625c6bb83373346096601eed4da9 -->
+## 2025-10-27T10:56:35+00:00 — Guard ore bag inventory configuration from default save key
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 45 ++ / 25 --
+- Notes:
+  —
+---
+<!-- commit:1ffe563470a6771108b3dd6588b495d16a43df1a -->
+## 2025-10-27T10:22:05+00:00 — Merge pull request #1461 from aicovergod/codex/set-ore-bag-debugs-always-active
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 33 ++ / 37 --
+- Notes:
+  Force ore bag debug logging to stay enabled
+---
+<!-- commit:1c066e79958f86a95985c9559b1216c027f06fed -->
+## 2025-10-27T10:21:53+00:00 — Force ore bag debug logging to stay enabled
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 33 ++ / 37 --
+- Notes:
+  —
+---
+<!-- commit:6d51aa5430607ae4d883b47bfd432c2b89f071df -->
+## 2025-10-27T10:18:06+00:00 — Merge pull request #1460 from aicovergod/codex/add-debug-logs-for-ore-bag-issue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 303 ++ / 5 --
+- Notes:
+  Add verbose ore bag logging and admin toggle
+---
+<!-- commit:13e137e5d5d4ad55bb569afd00765f8a70e0ffc4 -->
+## 2025-10-27T10:17:53+00:00 — Add verbose ore bag logging and admin toggle
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs, Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 303 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:14f3a6681a553d34d3392a32e361df7af6085cf9 -->
+## 2025-10-27T09:55:28+00:00 — Merge pull request #1459 from aicovergod/codex/update-orebagservice-clear-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 78 ++ / 23 --
+- Notes:
+  Guard ore bag bootstrap from clearing saved inventories
+---
+<!-- commit:2f868209c6c74cab31e7856f20c9384f5c54da08 -->
+## 2025-10-27T09:48:36+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:7086e4c269874864a0d76bd7b30eb2e220f9e67f -->
+## 2025-10-27T09:48:18+00:00 — Guard ore bag bootstrap clear with save presence
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 69 ++ / 23 --
+- Notes:
+  —
+---
+<!-- commit:f9cb1d4f50a6b0703a8641af333c9b55c4a0dfd9 -->
+## 2025-10-27T09:32:37+00:00 — Merge pull request #1458 from aicovergod/codex/update-orebagservice-to-preserve-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 25 ++ / 1 --
+- Notes:
+  Guard ore bag bootstrap clearing
+---
+<!-- commit:f39cf2eef965acfcdb3672f88ac735c648edf12b -->
+## 2025-10-27T09:32:23+00:00 — Guard ore bag bootstrap clearing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 25 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:20b2ab1e714c7f77f8ae893ce1fc883d4269310c -->
+## 2025-10-27T09:07:49+00:00 — Merge pull request #1457 from aicovergod/codex/augment-ondisable-to-save-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 15 ++ / 0 --
+- Notes:
+  Ensure ore bag inventory persists before teardown
+---
+<!-- commit:d5f19833fbf61da3017594044e580ddeca2e62b6 -->
+## 2025-10-27T09:07:33+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:59df3ec81103cca9e6b88852d2a59f56d4e73b97 -->
+## 2025-10-27T09:07:05+00:00 — Ensure ore bag saves state before teardown
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs
+- Diff: 6 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:4a49ba9e1d4f9e45b71437cf1aed345d4886ee21 -->
+## 2025-10-27T09:00:44+00:00 — Merge pull request #1456 from aicovergod/codex/update-handlestorerequest-to-save-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 0 --
+- Notes:
+  Ensure companion inventory saves before storing
+---
+<!-- commit:644fbd8f41b2470908d148b675e624065bae6622 -->
+## 2025-10-27T09:00:36+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a3abc796ee5e7d4383d7dc37eea273c855b6a93c -->
+## 2025-10-27T09:00:16+00:00 — Ensure companion inventory saves before storing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionController.cs
+- Diff: 5 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:bd8ded1145d2c8fdd90f653a2f5b9b87eda74fe8 -->
+## 2025-10-27T08:24:24+00:00 — ore bag data
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (35): Assets/Prefabs/SceneObjects/OreBagService.prefab, Assets/Prefabs/SceneObjects/OreBagService.prefab.meta, Assets/Resources/Item/Hades Fragment.asset, Assets/Resources/Item/Hades Fragment.asset.meta, Assets/Resources/Item/Ore Bag (T1).asset, Assets/Resources/Item/Ore Bag (T1).asset.meta, Assets/Resources/Item/Ore Bag (T2).asset, Assets/Resources/Item/Ore Bag (T2).asset.meta, Assets/Resources/Item/Ore Bag (T3).asset, Assets/Resources/Item/Ore Bag (T3).asset.meta, Assets/Resources/Item/Ore Bag (T4).asset, Assets/Resources/Item/Ore Bag (T4).asset.meta, Assets/Resources/Item/Ore Bag (T5).asset, Assets/Resources/Item/Ore Bag (T5).asset.meta, Assets/Resources/Item/Ore Bag (T6).asset, Assets/Resources/Item/Ore Bag (T6).asset.meta, Assets/Resources/PersistentObjects.asset, Assets/Scripts/Companions/Combat.meta, Assets/Scripts/Companions/CompanionDialogueRandomProvider.cs.meta, Assets/Scripts/Companions/Conversation/AreaSpecificAwareDialogue.cs.meta, Assets/Scripts/Companions/Conversation/CompanionApologyDialogueLibrary.cs.meta, Assets/Scripts/Companions/Cooking.meta, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs.meta, Assets/Scripts/Companions/Cooking/CompanionCookingDialogueLibrary.cs.meta, Assets/Scripts/Companions/Equipment.meta, Assets/Scripts/Companions/Mining/CompanionMiningDialogueLibrary.cs.meta, Assets/Scripts/Environment/Companion.meta, Assets/Scripts/Inventory/OreBag.meta, Assets/Scripts/Inventory/OreBag/OreBagInventory.cs.meta, Assets/Scripts/Inventory/OreBag/OreBagItemData.cs.meta, Assets/Scripts/Inventory/OreBag/OreBagService.cs.meta, Assets/Scripts/Skills/Cooking/UI/CompanionCookingHUD.cs.meta, Assets/Sprites/Ore BAgs.meta, Assets/Sprites/Ore BAgs/Ore Bag_64x64.png, Assets/Sprites/Ore BAgs/Ore Bag_64x64.png.meta
+- Diff: 721 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:557e18c8d5d5a46e128930cd7e8f8f408d33f971 -->
+## 2025-10-27T08:01:55+00:00 — Merge pull request #1455 from aicovergod/codex/add-reset-account-command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 156 ++ / 0 --
+- Notes:
+  Add reset account player command
+---
+<!-- commit:51326c5a24d7696ecd09a822e729616c7c5388f4 -->
+## 2025-10-27T07:59:30+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0cb9dc9b0a91a54c29a273ccdb324923fe132f94 -->
+## 2025-10-27T07:59:10+00:00 — Add reset account player command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Player/Commands/PlayerCommandService.cs, Assets/Scripts/Player/Commands/ResetAccountCommand.cs, Assets/Scripts/Player/Commands/ResetAccountCommand.cs.meta
+- Diff: 147 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2f6bce33c04b928db488c3b85b38c2ffba1108ee -->
+## 2025-10-26T22:52:32+00:00 — Merge pull request #1454 from aicovergod/codex/update-orebagservice-instance-management
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 27 ++ / 10 --
+- Notes:
+  Ensure ore bag inventory save key is applied before enabling runtime inventory
+---
+<!-- commit:a4647f00b22964e7a6e83532e85fedfabaee4e76 -->
+## 2025-10-26T22:52:20+00:00 — Ensure ore bag inventory config runs before enable
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 27 ++ / 10 --
+- Notes:
+  —
+---
+<!-- commit:bf3f7a39706ab0a66477e76bd3352ce58789b070 -->
+## 2025-10-26T22:26:47+00:00 — Merge pull request #1453 from aicovergod/codex/fix-ore-whitelisting-for-sanitizer
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 38 ++ / 1 --
+- Notes:
+  Fix ore bag fallback ore detection
+---
+<!-- commit:44fd3957fdd617a65ad2cfac3253010ff66cd12c -->
+## 2025-10-26T22:26:39+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:be9cdb69796b6eb51759524e6734a20d0326c832 -->
+## 2025-10-26T22:26:20+00:00 — Fix ore bag fallback ore detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs
+- Diff: 29 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:1134a88d9c22449909dc97593f5d54d6f0981778 -->
+## 2025-10-26T22:08:52+00:00 — Merge pull request #1452 from aicovergod/codex/add-inventory-cleaning-and-update-routines
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 121 ++ / 6 --
+- Notes:
+  Sanitize ore bag save data on load
+---
+<!-- commit:60e21f88f1900ecd1880807e38d3f60087599f8f -->
+## 2025-10-26T22:08:40+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9c7ee0cc90236a60cfec506e050e77760f3389e7 -->
+## 2025-10-26T22:08:20+00:00 — Sanitize ore bag save data on load
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Inventory/OreBag/OreBagInventory.cs
+- Diff: 112 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:bdabf28d7032d4a3a1f6b88eb88d75d0bd530716 -->
+## 2025-10-26T21:38:23+00:00 — Merge pull request #1451 from aicovergod/codex/update-orebagservice-to-prevent-inventory-wipe
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 31 ++ / 4 --
+- Notes:
+  Prevent ore bag bootstrap from wiping saved slots
+---
+<!-- commit:d91fe5ff093a36bc308cee523b4fde58b4163523 -->
+## 2025-10-26T21:38:13+00:00 — Prevent ore bag bootstrap from wiping saved slots
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 31 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:2765e1358e581b8c4fecbd65545119bca409808a -->
+## 2025-10-26T21:23:32+00:00 — Merge pull request #1450 from aicovergod/codex/update-orebagservice-to-manage-runtimeinventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 33 ++ / 5 --
+- Notes:
+  Fix ore bag runtime inventory initialization
+---
+<!-- commit:3c5bfd1e703fe356fc220141a3059c8826b2ea62 -->
+## 2025-10-26T21:23:17+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c99825c09a7c2464f797326e0d7e382f6c839d7d -->
+## 2025-10-26T21:22:59+00:00 — Fix ore bag runtime inventory initialization
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 24 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:b928187597453dc58f38070580ee3c2a373a648e -->
+## 2025-10-26T21:12:37+00:00 — Merge pull request #1449 from aicovergod/codex/change-overworld-to-viosla-in-messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 7 ++ / 0 --
+- Notes:
+  Map overworld companion dialogue reference to Viosla
+---
+<!-- commit:00d1e457e547565da90f918413ab9d45c58fe9c7 -->
+## 2025-10-26T21:09:13+00:00 — Merge pull request #1448 from aicovergod/codex/replace-overworld-text-with-viosla
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 1 --
+- Notes:
+  Update companion dialogue to reference Viosla
+---
+<!-- commit:46a257b7af430764c439416a13b95eecd6fe39f4 -->
+## 2025-10-26T21:08:59+00:00 — Update companion overworld reference
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionChatLibrary.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:74f88af823e348a0b54c33fce0c5a8906fc3664d -->
+## 2025-10-26T21:05:46+00:00 — Merge pull request #1447 from aicovergod/codex/fix-ore-bag-stacking-issue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 136 ++ / 16 --
+- Notes:
+  Fix ore bag stacking behaviour
+---
+<!-- commit:cad671f0893fc05d5044ecdd9a4e7d0dd4bc31c8 -->
+## 2025-10-26T21:05:32+00:00 — Fix ore bag stacking behaviour
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs
+- Diff: 136 ++ / 16 --
+- Notes:
+  —
+---
+<!-- commit:b217129c0bb4a591c6abd064393f48cff48e4800 -->
+## 2025-10-26T20:57:28+00:00 — Merge pull request #1446 from aicovergod/codex/update-orebagservice-for-component-configuration
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 47 ++ / 2 --
+- Notes:
+  Ensure ore bag inventory configuration occurs before activation
+---
+<!-- commit:a9ea1fb13e50986b7555c0fb9f7c1801deceac55 -->
+## 2025-10-26T20:57:19+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:4dc8e776f66b06cf27f4057694369adb31688c9b -->
+## 2025-10-26T20:56:59+00:00 — Ensure ore bag inventory config precedes activation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 38 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:16e052beef304d5144bd82e7f74fe3e787f91cd6 -->
+## 2025-10-26T20:41:21+00:00 — Merge pull request #1445 from aicovergod/codex/fix-ore-bag-adding-itself-to-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 9 ++ / 2 --
+- Notes:
+  Fix ore bag depositing itself
+---
+<!-- commit:963c33eac7c2513145d928cfc0d79df7fc093b4c -->
+## 2025-10-26T20:41:08+00:00 — Fix ore bag depositing itself
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 9 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:017fda791870da283bf70e6740591f9c70f3aa07 -->
+## 2025-10-26T20:25:32+00:00 — Merge pull request #1444 from aicovergod/codex/fix-inventory-type-errors
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 17 ++ / 15 --
+- Notes:
+  Fix ore bag inventory type references
+---
+<!-- commit:b1aaefb45fe4dcf54f30f9383dec87ade9b220e9 -->
+## 2025-10-26T20:25:18+00:00 — Fix ore bag inventory type references
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/OreBag/OreBagInventory.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 17 ++ / 15 --
+- Notes:
+  —
+---
+<!-- commit:c1ebcc125b8be73fdbf52cc727ab2f64f05bf25a -->
+## 2025-10-26T20:14:30+00:00 — Merge pull request #1443 from aicovergod/codex/add-transfer-all-button-for-ore-bag
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 101 ++ / 3 --
+- Notes:
+  Add ore bag transfer option to bank deposit menu
+---
+<!-- commit:fd04139e124c37f3363d6bd56607e52954c56534 -->
+## 2025-10-26T20:14:14+00:00 — Add ore bag transfer option in bank
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Bank/BankDepositMenu.cs, Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs
+- Diff: 101 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:31918e6698e75116639abaf136441a6930d4f770 -->
+## 2025-10-26T19:12:16+00:00 — Merge pull request #1442 from aicovergod/codex/implement-ore-bag-feature-in-unity
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 774 ++ / 1 --
+- Notes:
+  Add ore bag inventory service and UI hooks
+---
+<!-- commit:98105304782b018b8d6df884731174cb0d2c02da -->
+## 2025-10-26T19:12:06+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6871265161918765107a57bb7bbbe08e07b3543d -->
+## 2025-10-26T19:11:48+00:00 — Implement ore bag inventory feature
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Inventory/OreBag/OreBagInventory.cs, Assets/Scripts/Inventory/OreBag/OreBagItemData.cs, Assets/Scripts/Inventory/OreBag/OreBagService.cs, Assets/Scripts/Inventory/UI/InventoryItemContextMenu.cs, Assets/Scripts/UI/PetLevelBarContextMenuExtender.cs
+- Diff: 765 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:df4761b47c0abd3aea9d437b7713d7c36986a952 -->
+## 2025-10-26T16:54:04+00:00 — Merge pull request #1441 from aicovergod/codex/add-areaisminingshop-feature
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 45 ++ / 2 --
+- Notes:
+  Add mining shop awareness dialogue for companions
+---
+<!-- commit:290ed90523be47eaa4d96906519ec6ef8f3ab5d1 -->
+## 2025-10-26T16:53:52+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6e36f9f6fc82bb288c8f8a9a86146eb793c5f0ef -->
+## 2025-10-26T16:53:33+00:00 — Add mining shop awareness dialogue for companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/Conversation/AreaSpecificAwareDialogue.cs, Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs
+- Diff: 36 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:7f58ddcc9142a351b1d4f266b51510d15417f2c8 -->
+## 2025-10-26T16:16:09+00:00 — Merge pull request #1440 from aicovergod/codex/extract-areaspecificawareness-dialogue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 166 ++ / 90 --
+- Notes:
+  Extract area awareness dialogue into dedicated conversation module
+---
+<!-- commit:141ae61d4c8593ce6a6520601aa2eb2bc45e9146 -->
+## 2025-10-26T16:15:59+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:cac028273664a1525e33084ab37e3253b516282f -->
+## 2025-10-26T16:15:40+00:00 — Refactor area awareness dialogue into dedicated class
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/Conversation/AreaSpecificAwareDialogue.cs
+- Diff: 157 ++ / 90 --
+- Notes:
+  —
+---
+<!-- commit:b232989208edcf51f47b2301a95f673824cddf49 -->
+## 2025-10-26T16:01:24+00:00 — Merge pull request #1439 from aicovergod/codex/add-areaisgraveyard-support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 30 ++ / 3 --
+- Notes:
+  Add graveyard awareness reactions for companions
+---
+<!-- commit:b6704c21a997111c696febb981dad852558f56ce -->
+## 2025-10-26T16:01:06+00:00 — Add graveyard awareness dialogue for companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs
+- Diff: 30 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:5163efab6e2fb86a2298169710bad6e47c2a0ba6 -->
+## 2025-10-26T15:55:52+00:00 — Merge pull request #1438 from aicovergod/codex/add-environmental-awareness-script-for-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 315 ++ / 0 --
+- Notes:
+  Add companion environment awareness zones
+---
+<!-- commit:b2518c1d67c1a6e18e0136b2153afd78e66f80c6 -->
+## 2025-10-26T15:55:41+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:78534a4129f6c00985e0bf369347b7f314a547c7 -->
+## 2025-10-26T15:55:22+00:00 — Add companion environment awareness zones
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs, Assets/Scripts/Environment/Companion/CompanionEnvironmentAwarenessZone.cs.meta
+- Diff: 306 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:219eb5588820af15c8e686928cc0cc120a62411a -->
+## 2025-10-26T15:00:03+00:00 — Merge pull request #1437 from aicovergod/codex/update-formattemplate-for-suggestion-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 116 ++ / 1 --
+- Notes:
+  Ensure companion suggestions reference the correct skill
+---
+<!-- commit:8cf97bdbce52ee439c6f4a4b7d581012cfe046c1 -->
+## 2025-10-26T14:59:55+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:aa106d4a61fbe8835d6246bc4fe06107e66e7e50 -->
+## 2025-10-26T14:59:37+00:00 — Fix companion suggestion skill action fallback
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Tests/Companions/CompanionConversationServiceTests.cs
+- Diff: 107 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:0abcbb3aeee8e0bebf538223d8416c5a89a63f55 -->
+## 2025-10-26T14:54:43+00:00 — Merge pull request #1436 from aicovergod/codex/expose-skill-response-status-and-modify-command-processing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 171 ++ / 0 --
+- Notes:
+  Prevent inclusive skill replies from triggering commands
+---
+<!-- commit:72caeb5afdfeca62f5bddf1a0d3cca740d059d32 -->
+## 2025-10-26T14:54:28+00:00 — Prevent inclusive skill replies from triggering commands
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Tests/Companions/CompanionConversationServiceTests.cs
+- Diff: 171 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2c7164d4c7fb50ce974910dbb7fcb12cf0b7b0ab -->
+## 2025-10-26T14:34:46+00:00 — Merge pull request #1435 from aicovergod/codex/add-shift-right-click-cooking-support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 55 ++ / 0 --
+- Notes:
+  Enable shift-right-click companion cooking
+---
+<!-- commit:c488b5cb3a8bc76cce27698cfae6ce983640fdcc -->
+## 2025-10-26T14:34:37+00:00 — Enable shift-right-click companion cooking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Cooking/Core/CookingController.cs
+- Diff: 55 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9872bd79d4b46a0defe2596712eaa507444e19cb -->
+## 2025-10-26T14:28:53+00:00 — Merge pull request #1434 from aicovergod/codex/remove-pettoast-on-companion-login
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 6 ++ / 0 --
+- Notes:
+  Fix companion login toast duplication
+---
+<!-- commit:2fbd0b6a07b4be9b9c7c6c37b3b80aec8592b90e -->
+## 2025-10-26T14:28:43+00:00 — Fix companion login toast duplication
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetDropSystem.cs
+- Diff: 6 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d8dd3361c84e41054130833eb7c4b689faa13494 -->
+## 2025-10-26T14:25:01+00:00 — Merge pull request #1433 from aicovergod/codex/organize-companion-scripts-into-folders
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 27 ++ / 4 --
+- Notes:
+  Organize companion combat and equipment scripts into dedicated folders
+---
+<!-- commit:72f61b1c3618f67f2d4b3e8576279975a3319504 -->
+## 2025-10-26T14:24:54+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ee657bf6b747f77ba4fe4d30d860ce4ff96b77d0 -->
+## 2025-10-26T14:24:35+00:00 — Refactor companion combat and equipment namespaces
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (19): Assets/Scripts/Companions/Combat/CompanionCombatBridge.cs, Assets/Scripts/Companions/Combat/CompanionCombatBridge.cs.meta, Assets/Scripts/Companions/Combat/CompanionRangedCombatController.cs, Assets/Scripts/Companions/Combat/CompanionRangedCombatController.cs.meta, Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs, Assets/Scripts/Companions/Equipment/CompanionEquipAttemptResult.cs, Assets/Scripts/Companions/Equipment/CompanionEquipAttemptResult.cs.meta, Assets/Scripts/Companions/Equipment/CompanionEquipment.cs, Assets/Scripts/Companions/Equipment/CompanionEquipment.cs.meta, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs, Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Pets/PetCombatController.cs, Assets/Scripts/UI/UIManager.cs, Assets/Scripts/UI/Utilities/InterfaceTabMutexUtility.cs
+- Diff: 18 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:84501500a0e6ad9a9b72305ae8b042e4334e01d7 -->
+## 2025-10-26T14:19:08+00:00 — Merge pull request #1432 from aicovergod/codex/move-scripts-to-companions/itempickup
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 8 ++ / 0 --
+- Notes:
+  Organize companion pickup scripts
+---
+<!-- commit:c23132f782e28721ad333ac318f97c8fc607e1da -->
+## 2025-10-26T14:18:59+00:00 — Organize companion pickup scripts
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/ItemPickup.meta, Assets/Scripts/Companions/ItemPickup/CompanionPickupDialogueLibrary.cs, Assets/Scripts/Companions/ItemPickup/CompanionPickupDialogueLibrary.cs.meta, Assets/Scripts/Companions/ItemPickup/CompanionPickupService.cs, Assets/Scripts/Companions/ItemPickup/CompanionPickupService.cs.meta
+- Diff: 8 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:10fb42d730eaeddd72a73ed68845d13d1e5aac3c -->
+## 2025-10-26T14:15:29+00:00 — Merge pull request #1431 from aicovergod/codex/move-dialogue-libraries-to-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 0 ++ / 0 --
+- Notes:
+  Organize companion dialogue libraries into skill folders
+---
+<!-- commit:596a210e13f08a2ec360082304701d1f694ce14d -->
+## 2025-10-26T14:15:18+00:00 — Organize companion dialogue libraries by skill
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/Cooking/CompanionCookingDialogueLibrary.cs, Assets/Scripts/Companions/Fishing/CompanionFishingDialogueLibrary.cs, Assets/Scripts/Companions/Fishing/CompanionFishingDialogueLibrary.cs.meta, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingDialogueLibrary.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingDialogueLibrary.cs.meta
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:893e157d2e321dfd89491e33e93d0a2ceb6ae78d -->
+## 2025-10-26T14:07:59+00:00 — Merge pull request #1430 from aicovergod/codex/fix-console-errors-in-scripts-jqc9g1
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 35 ++ / 9 --
+- Notes:
+  Fix companion cooking orientation and chat random selection
+---
+<!-- commit:4aa0e04e530e221b3d1a798297f75e8715805b12 -->
+## 2025-10-26T14:07:50+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:88dad635ec1b8231412546ff5a2e1d16b5f1740e -->
+## 2025-10-26T14:07:31+00:00 — Fix companion cooking orientation and chat random selection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs
+- Diff: 26 ++ / 9 --
+- Notes:
+  —
+---
+<!-- commit:698d8db9b4e6da5c3da8dde7929a1db92c3bc9ac -->
+## 2025-10-26T14:03:25+00:00 — Merge pull request #1429 from aicovergod/codex/fix-closebutton-interaction-issue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 25 ++ / 0 --
+- Notes:
+  Fix close button background raycast
+---
+<!-- commit:faedd2504ea9d0c4f31730ae7352f0cdabae2497 -->
+## 2025-10-26T14:03:09+00:00 — Fix close button background raycast
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Utilities/CloseButtonBuilder.cs
+- Diff: 25 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:4d5a5aa554e1f24e787cc10400be72c67151b4d8 -->
+## 2025-10-26T10:36:26+00:00 — Merge pull request #1428 from aicovergod/codex/add-smalltalk-intent-and-response-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 465 ++ / 8 --
+- Notes:
+  Add small talk scheduling to companion conversations
+---
+<!-- commit:ade5dd4537d032b272a2caa753efe194fc8abb52 -->
+## 2025-10-26T10:35:59+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9024c33edd4bf78d7e2c9adb3aa33e86ff690544 -->
+## 2025-10-26T10:35:37+00:00 — Add companion small talk scheduling and memory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs, Assets/Scripts/Companions/Conversation/CompanionResponseContext.cs, Assets/Scripts/Companions/Conversation/CompanionSmallTalkDialogueBlocks.cs, Assets/Scripts/Companions/Conversation/CompanionSmallTalkDialogueBlocks.cs.meta
+- Diff: 456 ++ / 8 --
+- Notes:
+  —
+---
+<!-- commit:270395e947ed12262cb87b3d232d474b6a7d3e2f -->
+## 2025-10-26T10:12:34+00:00 — Merge pull request #1427 from aicovergod/codex/add-empathetic-condolence-lines-and-tone-selector
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 259 ++ / 6 --
+- Notes:
+  Add supportive companion death tone and respawn heuristics
+---
+<!-- commit:2f4d96344052bfc356319307d53ab078430c1831 -->
+## 2025-10-26T10:12:25+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:4a7d11010a432f84df07b7fde7c678421a5e19d0 -->
+## 2025-10-26T10:12:04+00:00 — Add supportive companion death messaging
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Player/PlayerRespawnSystem.cs, Assets/Tests/Companions/CompanionChatLibraryDeathToneTests.cs, Assets/Tests/Companions/CompanionChatLibraryDeathToneTests.cs.meta, Assets/Tests/Player.meta, Assets/Tests/Player/PlayerRespawnSystemToneTests.cs, Assets/Tests/Player/PlayerRespawnSystemToneTests.cs.meta
+- Diff: 250 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:b2575f500897c51eb240c1917bf32a6e45506584 -->
+## 2025-10-26T09:58:42+00:00 — Merge pull request #1426 from aicovergod/codex/add-ammo-and-inventory-dialogue-support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 286 ++ / 8 --
+- Notes:
+  Add companion ammo and equipment dialogue helpers
+---
+<!-- commit:8c7d0812f6b5064cf1bc72739e0ebec99b018e00 -->
+## 2025-10-26T09:58:35+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8528758fecfdd1b8aa6e3f47827c4df83897ff2e -->
+## 2025-10-26T09:58:17+00:00 — Add companion ammo and equipment dialogue helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionEquipment.cs, Assets/Scripts/Companions/CompanionRangedCombatController.cs
+- Diff: 277 ++ / 8 --
+- Notes:
+  —
+---
+<!-- commit:1a304e5dc003e4f80a279ff297996c7487b10455 -->
+## 2025-10-26T09:39:53+00:00 — Merge pull request #1425 from aicovergod/codex/add-level-up-line-helper-method
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 40 ++ / 1 --
+- Notes:
+  Add helper for companion generic level-up chat lines
+---
+<!-- commit:46c43a20bf592cc3d63a987be13746118361dca8 -->
+## 2025-10-26T09:39:48+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d31cd663c9f6f3b01ca08250f15c097c3f4cbf15 -->
+## 2025-10-26T09:39:27+00:00 — Refactor generic companion level-up message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 31 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:8c7cf231d95fe043cb6cda55c850913c2efc8249 -->
+## 2025-10-26T09:34:24+00:00 — Merge pull request #1424 from aicovergod/codex/add-shared-dialogue-helpers-for-tasks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 269 ++ / 16 --
+- Notes:
+  Add shared companion command dialogue helpers
+---
+<!-- commit:b2b746112698c027675073c2c1d09490c09bed5d -->
+## 2025-10-26T09:34:13+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:befc33475ea7eafa7740f122563eb39a9d6224c5 -->
+## 2025-10-26T09:33:53+00:00 — Add shared companion command dialogue helpers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs, Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs
+- Diff: 260 ++ / 16 --
+- Notes:
+  —
+---
+<!-- commit:0817e35d98c890f769cc22d6b036c80be0b9ad4f -->
+## 2025-10-26T09:25:51+00:00 — Merge pull request #1423 from aicovergod/codex/update-companionminingdialoguelibrary-for-rng
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 50 ++ / 8 --
+- Notes:
+  Use shared RNG for companion dialogue lines
+---
+<!-- commit:46a0f37c261fedb2ee545d84a68ffe089964c05b -->
+## 2025-10-26T09:25:40+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0ee51c0fb251476e445a222ec280ae16baed6018 -->
+## 2025-10-26T09:25:20+00:00 — Use shared RNG for companion dialogue lines
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/CompanionCookingDialogueLibrary.cs, Assets/Scripts/Companions/CompanionDialogueRandomProvider.cs, Assets/Scripts/Companions/CompanionFishingDialogueLibrary.cs, Assets/Scripts/Companions/CompanionWoodcuttingDialogueLibrary.cs, Assets/Scripts/Companions/Mining/CompanionMiningDialogueLibrary.cs
+- Diff: 41 ++ / 8 --
+- Notes:
+  —
+---
+<!-- commit:e0a5e37a7dd263a9be17e73a1b1b344ebb54648b -->
+## 2025-10-26T09:19:13+00:00 — Merge pull request #1422 from aicovergod/codex/add-dialogue-helper-for-failure-messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 137 ++ / 4 --
+- Notes:
+  Add helper-driven companion equipment requirement messaging
+---
+<!-- commit:bca377185f12c96b52a51de714031e80b54ccd51 -->
+## 2025-10-26T09:19:04+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:7ab199158d10e520d61550ea57b7f535db94645d -->
+## 2025-10-26T09:18:46+00:00 — Refine companion equipment requirement messaging
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionEquipment.cs
+- Diff: 128 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:13696579454dd4ef4644f8feb05387d67d9358dc -->
+## 2025-10-26T09:13:43+00:00 — Merge pull request #1421 from aicovergod/codex/add-method-to-format-cooking-level-requirement
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 1 --
+- Notes:
+  Add helper for companion cooking level requirements
+---
+<!-- commit:3be106e82b892da414d0f0e5aae6afcb5afbcfd4 -->
+## 2025-10-26T09:13:11+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6d7da0a7b020ad4a102f3f8965ced406f4229a38 -->
+## 2025-10-26T09:12:54+00:00 — Refine companion cooking level requirement dialogue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionCookingDialogueLibrary.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs
+- Diff: 10 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:5f3567d8294f46e2423f1df250c9d52cd5d3e4eb -->
+## 2025-10-26T09:10:07+00:00 — Merge pull request #1420 from aicovergod/codex/add-new-dialogue-helper-for-mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 104 ++ / 4 --
+- Notes:
+  Add mining companion dialogue helper
+---
+<!-- commit:2626ba74deccefebf9ac8c1972ad6217222fd134 -->
+## 2025-10-26T09:09:16+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c9eb934b2cfb3b866e1aaded4128e987a89a8ff1 -->
+## 2025-10-26T09:08:55+00:00 — Refactor mining companion dialogue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/Mining/CompanionMiningDialogueLibrary.cs
+- Diff: 95 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:f9c1e9a6667ab01ff4fa7ab942eb9fb7fbf210e8 -->
+## 2025-10-26T08:58:39+00:00 — Merge pull request #1419 from aicovergod/codex/implement-companion-cooking-system-features
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1711 ++ / 2 --
+- Notes:
+  Add companion cooking integration
+---
+<!-- commit:71f836a82d2a9012f1ba0efc08a778000e25f3d4 -->
+## 2025-10-26T08:58:07+00:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:044dd2afb99d1e939cf6be45d07ec7f29b073e71 -->
+## 2025-10-26T08:57:44+00:00 — Add companion cooking integration
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (10): Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs, Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionCookingDialogueLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/Cooking/CompanionCookingController.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs, Assets/Scripts/Skills/AdminF2Menu.cs, Assets/Scripts/Skills/Cooking/UI/CompanionCookingHUD.cs
+- Diff: 1702 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:45e724948b410bda03f115e03335332e4d77becf -->
+## 2025-10-26T01:06:14+01:00 — Merge pull request #1418 from aicovergod/codex/update-admin-f4-menu-and-agents.md
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 58 ++ / 8 --
+- Notes:
+  Expand Admin F4 menu companion diagnostics
+---
+<!-- commit:9a80ab45f62f5846e0b4ee9dd5fcfd6d6deea417 -->
+## 2025-10-26T01:06:05+01:00 — Expand Admin F4 menu companion diagnostics
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): AGENTS.md, Assets/Scripts/Companions/UI/AdminF4Menu.cs
+- Diff: 58 ++ / 8 --
+- Notes:
+  —
+---
+<!-- commit:bb11992dde96c095970e47a35e929398ba8b4abf -->
+## 2025-10-26T00:57:14+01:00 — Merge pull request #1417 from aicovergod/codex/add-player-apology-support-for-companion
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 191 ++ / 2 --
+- Notes:
+  Add companion apology handling for reminder follow-ups
+---
+<!-- commit:d30e32ba58e3d4261ee2e99ee22f3a81ec358836 -->
+## 2025-10-26T00:57:01+01:00 — Add companion apology handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Conversation/CompanionApologyDialogueLibrary.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 191 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:092c073931b550119d3a852737f25b08df565b71 -->
+## 2025-10-26T00:34:55+01:00 — namespace bug fix
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Chat.meta, Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs, Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs.meta
+- Diff: 10 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:b6cd90449bee3e4f5f72d65fa64f165b188d975f -->
+## 2025-10-26T00:32:31+01:00 — Merge pull request #1416 from aicovergod/codex/add-chatbox-commands-for-companion-control
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 496 ++ / 5 --
+- Notes:
+  Add chat-based companion commands and fishing shift-click order
+---
+<!-- commit:bf7237ce2c789ebfe532538a3235517b62dc5db1 -->
+## 2025-10-26T00:32:15+01:00 — Merge branch 'main' into codex/add-chatbox-commands-for-companion-control
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 79 ++ / 25 --
+- Notes:
+  —
+---
+<!-- commit:659869cd8c1e2f68a89be2a0541064d7dca814c9 -->
+## 2025-10-26T00:31:28+01:00 — Add companion chat commands and fishing shift-click support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Chat/CompanionChatCommandProcessor.cs, Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/Skills/Fishing/Core/FisherController.cs
+- Diff: 492 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:fa908fe92730b8fd521be1d460db0412ff6afeff -->
+## 2025-10-26T00:19:54+01:00 — Merge pull request #1415 from aicovergod/codex/expand-companionskillproposaldialogueblocks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 290 ++ / 35 --
+- Notes:
+  Add woodcutting and fishing companion dialogue coverage
+---
+<!-- commit:f1c09abd87a69368ac3bb3835062e4a0056fd5ee -->
+## 2025-10-26T00:19:40+01:00 — Add woodcutting and fishing companion dialogue coverage
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionSkillProposalDialogueBlocks.cs, Assets/Tests/Companions/CompanionChatLibraryCooldownTests.cs, Assets/Tests/Companions/CompanionChatLibraryCooldownTests.cs.meta
+- Diff: 290 ++ / 35 --
+- Notes:
+  —
+---
+<!-- commit:8ca2104bf1904dd05893b9eb55830183bd3057a7 -->
+## 2025-10-26T00:05:47+01:00 — Merge pull request #1414 from aicovergod/codex/fix-null-comparison-bug-in-companionmanager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2 ++ / 1 --
+- Notes:
+  Fix companion chat handler null guard
+---
+<!-- commit:f389a1515bd411b196b7990256038638335161e6 -->
+## 2025-10-26T00:03:42+01:00 — Merge pull request #1413 from aicovergod/codex/fix-fishing-and-woodcutting-huds
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 580 ++ / 82 --
+- Notes:
+  Allow player and companion fishing/woodcutting HUDs
+---
+<!-- commit:45a1dd848710c37314aa337a56d9cf9998b63e76 -->
+## 2025-10-26T00:03:26+01:00 — Allow player and companion fishing/woodcutting HUDs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (12): Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Skills/Fishing/Core/FishingSkill.cs, Assets/Scripts/Skills/Fishing/UI/CompanionFishingHUD.cs, Assets/Scripts/Skills/Fishing/UI/CompanionFishingHUD.cs.meta, Assets/Scripts/Skills/Fishing/UI/FishingHUD.cs, Assets/Scripts/Skills/Fishing/UI/FishingHudBase.cs, Assets/Scripts/Skills/Fishing/UI/FishingHudBase.cs.meta, Assets/Scripts/Skills/Woodcutting/UI/CompanionWoodcuttingHUD.cs, Assets/Scripts/Skills/Woodcutting/UI/CompanionWoodcuttingHUD.cs.meta, Assets/Scripts/Skills/Woodcutting/UI/WoodcuttingHUD.cs, Assets/Scripts/Skills/Woodcutting/UI/WoodcuttingHudBase.cs, Assets/Scripts/Skills/Woodcutting/UI/WoodcuttingHudBase.cs.meta
+- Diff: 580 ++ / 82 --
+- Notes:
+  —
+---
+<!-- commit:9488e1795f4492ab92065c59616ccce34070dc57 -->
+## 2025-10-25T23:54:34+01:00 — Merge pull request #1412 from aicovergod/codex/add-stop-action-button-to-companion-menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 549 ++ / 10 --
+- Notes:
+  Add stop controls and status reporting for companion actions
+---
+<!-- commit:c2b1cc717724b1a8200667a3ef2296e8faa7c4c1 -->
+## 2025-10-25T23:54:19+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b2637af15faf1c5ecb6e0c57b51f92d3b735d693 -->
+## 2025-10-25T23:54:03+01:00 — Add companion stop controls and chat commands
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (9): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/UI/AdminF4Menu.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs, Assets/Scripts/Pets/PetCombatController.cs, Assets/Scripts/Pets/PetLevelBarMenu.cs
+- Diff: 540 ++ / 10 --
+- Notes:
+  —
+---
+<!-- commit:ff4c29a1008575ff66c0134641c6e3964f525545 -->
+## 2025-10-25T23:31:20+01:00 — Merge pull request #1411 from aicovergod/codex/add-right-click-tree-chopping-support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 42 ++ / 0 --
+- Notes:
+  Enable companion woodcutting commands via tree right-click
+---
+<!-- commit:d4630ec8ab2cecd4d925ad6feaf042dfd8924565 -->
+## 2025-10-25T23:31:07+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0825da0c58a8d249b4dd1b63b9dd5dcdaa26e9e8 -->
+## 2025-10-25T23:30:49+01:00 — Enable companion woodcutting commands via tree right-click
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Woodcutting/Core/WoodcutterController.cs
+- Diff: 33 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a52e0aa7553b1f9356403309a2e287299a316804 -->
+## 2025-10-25T21:25:08+01:00 — Merge pull request #1410 from aicovergod/codex/implement-fishing-feature-in-companioncontroller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1998 ++ / 14 --
+- Notes:
+  Implement companion fishing controller and integrate fishing commands
+---
+<!-- commit:48aecbea82f5739411eb4b2e3296cad8690762e3 -->
+## 2025-10-25T21:24:55+01:00 — Merge branch 'main' into codex/implement-fishing-feature-in-companioncontroller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 16 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:bd9303815bf7969093f9a5790c0f2bc25baa132a -->
+## 2025-10-25T21:23:21+01:00 — Add companion fishing controller and integrate fishing commands
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (12): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionFishingDialogueLibrary.cs, Assets/Scripts/Companions/CompanionFishingDialogueLibrary.cs.meta, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Fishing.meta, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs, Assets/Scripts/Companions/Fishing/CompanionFishingController.cs.meta, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs, Assets/Scripts/Skills/Fishing/Core/FishingToolDefinitionRegistry.cs, Assets/Scripts/Skills/Fishing/Core/FishingToolDefinitionRegistry.cs.meta
+- Diff: 1994 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:6837882b4f68db81c7247248c91d22dccc05a577 -->
+## 2025-10-25T20:23:08+01:00 — Merge pull request #1408 from aicovergod/codex/implement-woodcutting-companion-features
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1984 ++ / 3 --
+- Notes:
+  Add companion woodcutting support
+---
+<!-- commit:dbef1be955b7c4c3231b929342a51b4055e54afc -->
+## 2025-10-25T20:22:53+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:dfc5b82596d908631124f0ba08acc7675a8e60b3 -->
+## 2025-10-25T20:22:35+01:00 — Add companion woodcutting support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (11): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/CompanionWoodcuttingDialogueLibrary.cs, Assets/Scripts/Companions/CompanionWoodcuttingDialogueLibrary.cs.meta, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs, Assets/Scripts/Companions/Woodcutting.meta, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs, Assets/Scripts/Companions/Woodcutting/CompanionWoodcuttingController.cs.meta, Assets/Scripts/Skills/Woodcutting/Core/AxeDefinitionRegistry.cs, Assets/Scripts/Skills/Woodcutting/Core/AxeDefinitionRegistry.cs.meta
+- Diff: 1975 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:15a49b3979ad1d0ff86b6a24c5f3fe286c66e463 -->
+## 2025-10-25T18:04:14+01:00 — Merge pull request #1407 from aicovergod/codex/add-inventory-full-messages-for-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 206 ++ / 29 --
+- Notes:
+  Add companion pickup chatter for inventory full and success cases
+---
+<!-- commit:fdbf537098d39760cb8c28edb7278bac75569902 -->
+## 2025-10-25T18:04:06+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:116b59a8f0068c1326c00256b0d11907d2ab4080 -->
+## 2025-10-25T18:03:46+01:00 — Add companion pickup chatter and new inventory full responses
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionPickupDialogueLibrary.cs, Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 197 ++ / 29 --
+- Notes:
+  —
+---
+<!-- commit:a0caf4f5ef800899b99137eb8ab09d86b6d0af33 -->
+## 2025-10-25T16:13:20+01:00 — Merge pull request #1406 from aicovergod/codex/extend-pickuproutine-and-update-stuck-timeout-branch
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 50 ++ / 8 --
+- Notes:
+  Improve companion pickup progress detection
+---
+<!-- commit:b8e75a6bc020778f14461f2104335c24a4fb5e3c -->
+## 2025-10-25T16:07:25+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:73677534f1a4d51dccd89dbae3838ba51b152f4e -->
+## 2025-10-25T16:07:06+01:00 — Improve companion pickup progress detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionController.cs
+- Diff: 41 ++ / 8 --
+- Notes:
+  —
+---
+<!-- commit:47b4f8c1e28897127662ac7910f244e5f3454937 -->
+## 2025-10-25T15:50:20+01:00 — Merge pull request #1405 from aicovergod/codex/fix-companion-navigation-path-for-pickups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 22 ++ / 5 --
+- Notes:
+  Fix companion drop pickups to respect navigation
+---
+<!-- commit:24ab3b2fa4b1f6d9f279217284a1b60c23692489 -->
+## 2025-10-25T15:50:05+01:00 — Fix companion drop pickups to wait for navigation paths
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionController.cs
+- Diff: 22 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:d8bda8054fe6abf478cdb8655666e27fa286bb80 -->
+## 2025-10-25T15:41:52+01:00 — Merge pull request #1404 from aicovergod/codex/refactor-companion-movement-visuals-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 12 ++ / 5 --
+- Notes:
+  Ensure companions stay upright during pickups
+---
+<!-- commit:722d039e19948b22bf340e2a7e912ab6a40427dc -->
+## 2025-10-25T15:41:43+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:62749ba21dbee76cf1eedfc89d82f26e6f20a621 -->
+## 2025-10-25T15:41:26+01:00 — Keep companion upright during pickup sequences
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionController.cs
+- Diff: 3 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:733f82f03cdaeb96cf8695300bcac9f808e5a090 -->
+## 2025-10-25T15:32:32+01:00 — Merge pull request #1403 from aicovergod/codex/fix-inconsistent-accessibility-error-in-grounditempickupmenu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 1 --
+- Notes:
+  Fix accessibility of ground item menu handler
+---
+<!-- commit:6cd2edcdf5265988cb70daf410832288dde1c9b4 -->
+## 2025-10-25T15:32:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:fe05e7cd7eafa6208491f160954dadfdf9b3bf32 -->
+## 2025-10-25T15:32:04+01:00 — Fix accessibility of ground item menu handler
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs
+- Diff: 5 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:c4cdc79b219cc17b988ebf781101ba59d887322b -->
+## 2025-10-25T15:26:55+01:00 — Merge pull request #1402 from aicovergod/codex/implement-companion-pickup-on-right-click
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 706 ++ / 8 --
+- Notes:
+  Route companion drop pickups through path mover system
+---
+<!-- commit:a536e03f241c462df63f8a3ca2f14c9f77a1dae0 -->
+## 2025-10-25T15:26:42+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0383b9219e97fa8c85bdcf42e627d34989fe863d -->
+## 2025-10-25T15:26:24+01:00 — Refine companion drop pickup pathing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (9): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionInventory.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionPickupService.cs, Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs, Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs, Assets/Scripts/Inventory/GroundItems/WorldDrop.cs, Assets/Scripts/Inventory/ItemStack.cs, Assets/Scripts/UI/Chat/ChatboxUI.cs
+- Diff: 697 ++ / 8 --
+- Notes:
+  —
+---
+<!-- commit:cce0a93ecfcfa3efb064700243d79fa6f7c728bd -->
+## 2025-10-25T14:49:45+01:00 — Merge pull request #1401 from aicovergod/codex/fix-bug-in-codex-github
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 23 ++ / 1 --
+- Notes:
+  Fix companion mining stuck detection
+---
+<!-- commit:bb100544f2962e77c4d175f96a675ee15bd4013a -->
+## 2025-10-25T14:49:36+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ab99c35c470575b3d77b0da4ed2cea77efebe417 -->
+## 2025-10-25T14:49:19+01:00 — Fix companion mining stuck detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 14 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:d7a688ddb313f408a0c994ded42a3049822281e3 -->
+## 2025-10-25T14:42:34+01:00 — Merge pull request #1400 from aicovergod/codex/fix-duplicated-chatbox-message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2 ++ / 2 --
+- Notes:
+  Fix duplicate companion name in equipment requirement chat
+---
+<!-- commit:8df15e5dfd7d60eaf0984844fdcba961b9a3a4d0 -->
+## 2025-10-25T14:42:19+01:00 — Fix duplicate companion name in equipment requirement chat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionEquipment.cs
+- Diff: 2 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:a01b0e892fe6ed44484bf49dc1685f27fad02deb -->
+## 2025-10-25T14:33:06+01:00 — Merge pull request #1399 from aicovergod/codex/update-pet-movement-during-path-replans
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 45 ++ / 12 --
+- Notes:
+  Keep pets moving while awaiting replans
+---
+<!-- commit:6eef792798c99d134cde8cbdaeff9ff2752f3b9c -->
+## 2025-10-25T14:32:04+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f2f2c92e40e51d3c203750b3042a215891f1049a -->
+## 2025-10-25T14:31:47+01:00 — Keep pets moving while awaiting replans
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetPathMover.cs
+- Diff: 36 ++ / 12 --
+- Notes:
+  —
+---
+<!-- commit:94152ed60c05f767060fa50d1c4e59323e36182b -->
+## 2025-10-25T14:07:16+01:00 — Merge pull request #1398 from aicovergod/codex/add-mining-progress-tracking-and-stuck-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 237 ++ / 0 --
+- Notes:
+  Add stuck handling for companion mining
+---
+<!-- commit:e37bfbc36916f690f2d35c8aa6d819a7e21776ed -->
+## 2025-10-25T14:07:07+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:35f66af5cb8a8edadc1832f8377bde99d8d43cee -->
+## 2025-10-25T14:06:49+01:00 — Add stuck handling for companion mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 228 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:bc9c14e7b9fadb7d39390f2270f665786589127e -->
+## 2025-10-25T13:42:38+01:00 — Merge pull request #1397 from aicovergod/codex/improve-companionminingcontroller-behavior
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 52 ++ / 1 --
+- Notes:
+  Improve companion mining movement visuals
+---
+<!-- commit:39e011c6fe7b5babade5703d189973035d6de009 -->
+## 2025-10-25T13:42:20+01:00 — Improve companion mining movement visuals
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 52 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:7d5881ea38bcf7824d276369a5762b77a56d33b9 -->
+## 2025-10-25T13:35:03+01:00 — Merge pull request #1396 from aicovergod/codex/modify-bank-message-for-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 9 ++ / 3 --
+- Notes:
+  Prevent duplicate bank out-of-range notification
+---
+<!-- commit:9794961fd74696a6d5cd3eb8f7bf23e5a71b42b8 -->
+## 2025-10-25T13:34:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:11849c823d78f3bc04c812743868c56314857242 -->
+## 2025-10-25T13:34:38+01:00 — Remove duplicate bank out of range game message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 0 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:834348b9a67a020030773153d1673b70266cecc0 -->
+## 2025-10-25T13:21:24+01:00 — Merge pull request #1395 from aicovergod/codex/enable-transfer-option-for-all-inventories
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 12 ++ / 7 --
+- Notes:
+  Ensure inventory transfer option stays available
+---
+<!-- commit:cf16ef59005d5a4c17234cb8790698b94f9f9f00 -->
+## 2025-10-25T13:21:21+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:57245dd1f02ea834b2d4366e656ba8e30d483663 -->
+## 2025-10-25T13:21:02+01:00 — Ensure inventory transfer option stays available
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 3 ++ / 7 --
+- Notes:
+  —
+---
+<!-- commit:4a11633603815b732748876d21e10a5602bbbfd2 -->
+## 2025-10-25T12:47:54+01:00 — Merge pull request #1394 from aicovergod/codex/add-feedback-for-inventory-transfer-errors
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 54 ++ / 8 --
+- Notes:
+  Add inventory full chat feedback for companion transfers
+---
+<!-- commit:ef1da10c2f0871bedf1f3e86d7b168c41f0aeabf -->
+## 2025-10-25T12:47:18+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:32c69f54f8f9ddf506fa24758c1484bc7ce01381 -->
+## 2025-10-25T12:47:00+01:00 — Add companion transfer inventory full feedback
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 45 ++ / 8 --
+- Notes:
+  —
+---
+<!-- commit:f59c94b03244e13db52ec39296c18ab6501d1402 -->
+## 2025-10-25T12:29:54+01:00 — Merge pull request #1393 from aicovergod/codex/add-transfer-option-for-companion-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 70 ++ / 0 --
+- Notes:
+  Support player-to-companion inventory transfers
+---
+<!-- commit:53deef2021045107d910bd4dec0948eaca279bbb -->
+## 2025-10-25T12:29:09+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:79bd8d76fd2acc11a9d40d4d0ebcba3c87a17f65 -->
+## 2025-10-25T12:28:50+01:00 — Allow transferring items to companion inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 61 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c95553e89a3e839574e109c6ffbb163636fa02e5 -->
+## 2025-10-25T12:03:13+01:00 — Merge pull request #1392 from aicovergod/codex/add-layoutelement-to-inventory-context-menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 8 ++ / 0 --
+- Notes:
+  Ensure inventory context menu options size correctly
+---
+<!-- commit:e51367ce3ab8daf2bcca054603082fd27e631c79 -->
+## 2025-10-25T12:02:59+01:00 — Ensure inventory context menu options size correctly
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/UI/InventoryItemContextMenu.cs
+- Diff: 8 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:63e2e2fb2e36276fa3b51fee44caf8884fd76ecb -->
+## 2025-10-25T11:50:39+01:00 — Merge pull request #1391 from aicovergod/codex/implement-full-featured-inventory-context-menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 722 ++ / 15 --
+- Notes:
+  Add rich inventory item context menus for player and companion
+---
+<!-- commit:48f859bf91a863626869f63d464dc967221a2a8e -->
+## 2025-10-25T11:50:21+01:00 — Add rich inventory item context menus for player and companion
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/CompanionEquipment.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Inventory/UI/InventoryItemContextMenu.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs
+- Diff: 722 ++ / 15 --
+- Notes:
+  —
+---
+<!-- commit:f15fc92a7e3aeb0fda545ecdbf1e1ec242e64f59 -->
+## 2025-10-25T11:12:21+01:00 — Merge pull request #1390 from aicovergod/codex/implement-player-speech-color-prefixes
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 68 ++ / 5 --
+- Notes:
+  Add player speech colour prefix handling
+---
+<!-- commit:eee32ca5ae869c6dcf2950c94698794d5cb31a3e -->
+## 2025-10-25T11:12:13+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:49e491565d7938c5c38f8e2e6c4f81510d1f96ab -->
+## 2025-10-25T11:11:55+01:00 — Implement speech colour prefixes for player chat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Player/Chat/PlayerChatController.cs
+- Diff: 59 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:91a438be999d4df436829032286a297134ed48f0 -->
+## 2025-10-25T11:01:39+01:00 — Merge pull request #1389 from aicovergod/codex/add-random-bank-proximity-messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 52 ++ / 0 --
+- Notes:
+  Add companion bank out-of-range chatter
+---
+<!-- commit:da2ebca7a5ecedc4f832e271376835f728edcba4 -->
+## 2025-10-25T11:01:27+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:fe5d419bd698ad9ee2cd4d2779ddb7bd15df9efd -->
+## 2025-10-25T11:01:10+01:00 — Add companion bank out of range responses
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 43 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:35b86a36b34afdf1245dc941057a06b2408c6783 -->
+## 2025-10-25T10:58:04+01:00 — Merge pull request #1388 from aicovergod/codex/add-random-messages-for-empty-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 73 ++ / 0 --
+- Notes:
+  feat: add companion banter when banking empty inventory
+---
+<!-- commit:853def1961a9ddf26c84beb0ee1e42687fdabfd3 -->
+## 2025-10-25T10:57:44+01:00 — feat: add companion banter when banking empty inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 73 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:79e69a3e22d8f86024a4701012e65bdabb229d0e -->
+## 2025-10-25T10:48:57+01:00 — Merge pull request #1387 from aicovergod/codex/add-helper-for-ranged-combat-controller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 21 ++ / 0 --
+- Notes:
+  Ensure pet ranged combat controller is resolved
+---
+<!-- commit:6c1d358991e2ee6f189bf6c3fe19033aed77a254 -->
+## 2025-10-25T10:48:49+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:153e3f4af6f656ddb85ffa82f42e41d13eb4705b -->
+## 2025-10-25T10:48:29+01:00 — Ensure pet ranged combat controller is resolved
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 12 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0f69ed484fe8224c0d7f7beb74c6725193a11526 -->
+## 2025-10-25T10:18:40+01:00 — Merge pull request #1386 from aicovergod/codex/enhance-equipment-load-with-change-detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 17 ++ / 0 --
+- Notes:
+  Ensure companion equipment load raises weapon change event
+---
+<!-- commit:478ac3035cb86e56ab578d6e1a73a9aac096834e -->
+## 2025-10-25T10:18:29+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0e94c14ba7e6fad16ea575d45d925161714d4f4a -->
+## 2025-10-25T10:18:10+01:00 — Ensure companion equipment load raises weapon change event
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionEquipment.cs
+- Diff: 8 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2732c8461845174a726b87974f308edecee73592 -->
+## 2025-10-25T10:11:02+01:00 — Merge pull request #1385 from aicovergod/codex/update-equipment-load-and-change-detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 0 --
+- Notes:
+  Trigger equipment change events on load
+---
+<!-- commit:5d07a0a20a34238bd550754117fd83dbe3949b54 -->
+## 2025-10-25T10:10:53+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e7f334bf5048c07ceb54f2d55f5edc6f81750b5b -->
+## 2025-10-25T10:10:29+01:00 — Notify equipment change after load
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Equipment.cs
+- Diff: 15 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:65fb9ef2f8f6618558e00b0dfc44326a4d80d888 -->
+## 2025-10-24T20:55:29+01:00 — Merge pull request #1384 from aicovergod/codex/fix-companion-ranged-ammo-consumption
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 31 ++ / 7 --
+- Notes:
+  Fix companion ranged ammo consumption
+---
+<!-- commit:e40de31e1f50bc16e7d6a6a213c31ac782780264 -->
+## 2025-10-24T20:55:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:99fdf91c6d53820be651be9b9657eba8c7cfc517 -->
+## 2025-10-24T20:55:03+01:00 — Fix companion ranged ammo consumption
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionRangedCombatController.cs
+- Diff: 22 ++ / 7 --
+- Notes:
+  —
+---
+<!-- commit:4c1b086e82ae6f2fd429f6ddc40bc2482f60cc02 -->
+## 2025-10-24T19:44:04+01:00 — Merge pull request #1383 from aicovergod/codex/update-consumeequipped-to-save-loadout-changes
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2 ++ / 0 --
+- Notes:
+  Ensure consumed companion ammo updates bonuses and saves
+---
+<!-- commit:53bfa676127ce6c2dac0e4673942981fa82bd79e -->
+## 2025-10-24T19:43:46+01:00 — Ensure consumed companion ammo updates bonuses and saves
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionEquipment.cs
+- Diff: 2 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d004bdc27d373fb8f88b036784e740f3046dfc1c -->
+## 2025-10-24T18:05:37+01:00 — Merge pull request #1382 from aicovergod/codex/fix-potential-error-found-by-codex
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 30 ++ / 0 --
+- Notes:
+  Fix companion ranged and magic combat stat propagation
+---
+<!-- commit:15a824e47cf6404b8e2139b16eda379dd8fcdb2d -->
+## 2025-10-24T18:05:24+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6634fe438b7bf2dd23fb14d5d9d3c672afd0622e -->
+## 2025-10-24T18:04:46+01:00 — Align companion damage stats with ranged and magic overrides
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionCombatBridge.cs
+- Diff: 21 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:43454ed8507af9bdb97c10358cfeae85d0b58e71 -->
+## 2025-10-24T17:53:25+01:00 — Merge pull request #1381 from aicovergod/codex/fix-console-error-cs0246-5qid7r
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 10 ++ / 0 --
+- Notes:
+  Fix missing EquipmentAggregator reference
+---
+<!-- commit:c0db22f31f948301788a2e4a2f6ce38689e232e7 -->
+## 2025-10-24T17:53:16+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2111e48f55fa012e6ec4a97a20ba96942b7238ae -->
+## 2025-10-24T17:52:57+01:00 — Fix missing EquipmentAggregator reference
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionRangedCombatController.cs
+- Diff: 1 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2039299ec97a2ecc97b93cb77f5137ca62990569 -->
+## 2025-10-24T17:49:21+01:00 — Merge pull request #1380 from aicovergod/codex/introduce-companion-ready-ranged-controller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1027 ++ / 62 --
+- Notes:
+  Add companion ranged combat controller for pets
+---
+<!-- commit:e5582ed595c55c54adf1755877d66cd0b28f6624 -->
+## 2025-10-24T17:49:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c4e9191b3a0a4f20f6f107e669c259b3a0270693 -->
+## 2025-10-24T17:48:57+01:00 — Add companion ranged combat adapter and integrate ammo management
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Combat/Ranged/IRangedProjectileOwner.cs, Assets/Scripts/Combat/Ranged/RangedCombatController.cs, Assets/Scripts/Combat/Ranged/RangedProjectile.cs, Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionEquipment.cs, Assets/Scripts/Companions/CompanionRangedCombatController.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 1018 ++ / 62 --
+- Notes:
+  —
+---
+<!-- commit:17a3812a52e600724020aa96d14fd2652358ba6f -->
+## 2025-10-24T17:31:04+01:00 — Merge pull request #1379 from aicovergod/codex/refactor-combat-stats-and-attack-speed-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 278 ++ / 30 --
+- Notes:
+  Improve companion weapon style handling
+---
+<!-- commit:006e0cdfb70fcd8fbbdde3117aad6851d825b00b -->
+## 2025-10-24T17:30:43+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8d1a6ef95f766d5d8e8073ce39f97ee05d4a6a55 -->
+## 2025-10-24T17:30:22+01:00 — Improve companion attack speed and range handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionCombatBridge.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 269 ++ / 30 --
+- Notes:
+  —
+---
+<!-- commit:16f09070efd44bd606fe22d5b73db7595b5e9c73 -->
+## 2025-10-24T17:02:53+01:00 — Merge pull request #1378 from aicovergod/codex/update-companioncombatbridge-for-combat-stats
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 54 ++ / 5 --
+- Notes:
+  Enhance companion combat stat overrides
+---
+<!-- commit:1230061807e94514fd6d128e881f45369b351f83 -->
+## 2025-10-24T17:02:39+01:00 — Enhance companion combat stat overrides
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionCombatBridge.cs
+- Diff: 54 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:320a4031ce0f9c24532046be541ccdfc0ef04349 -->
+## 2025-10-24T16:42:58+01:00 — Merge pull request #1377 from aicovergod/codex/move-dialogue-to-separate-script-file
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 130 ++ / 47 --
+- Notes:
+  Refactor companion suggestion dialogue into dedicated blocks
+---
+<!-- commit:3503c723746d1ae5fd5997953657d40d2c6a941f -->
+## 2025-10-24T16:42:40+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d3bc8258fb95206cacdbaebd5c387bdba39a3f50 -->
+## 2025-10-24T16:42:22+01:00 — Refactor companion suggestion dialogue into dedicated blocks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionSuggestionDialogueBlocks.cs
+- Diff: 121 ++ / 47 --
+- Notes:
+  —
+---
+<!-- commit:61f6411e2b2d5d2fa56e3b517e5a49048b50b1a2 -->
+## 2025-10-24T16:19:41+01:00 — dialogue updates
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (10): Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs.meta, Assets/Scripts/Companions/CompanionSkillCooldownTracker.cs.meta, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs, Assets/Scripts/Companions/Conversation/CompanionIntentDisambiguator.cs.meta, Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs, Assets/Scripts/Companions/Conversation/CompanionSkillProposalDialogueBlocks.cs, Assets/Scripts/Companions/UI/AdminF4Menu.cs.meta, Assets/Scripts/Companions/UI/CompanionCooldownsWindow.cs.meta, Assets/Scripts/Player/Commands/ClearCompanionCooldownTimersCommand.cs.meta, Assets/Tests/Companions/CompanionIntentDisambiguatorTests.cs.meta
+- Diff: 274 ++ / 47 --
+- Notes:
+  —
+---
+<!-- commit:0a350b58cd769c98b1a38deed96c1cb3571c2bc9 -->
+## 2025-10-24T16:18:22+01:00 — Merge pull request #1376 from aicovergod/codex/implement-companion-suggestion-workflow
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 738 ++ / 3 --
+- Notes:
+  Implement companion suggestion workflow
+---
+<!-- commit:050a0ae322dcf15b561878ca7b876be25b7a3996 -->
+## 2025-10-24T16:18:13+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:eb4c3b59acd93fe75523a8c4a4c3566b4c2be867 -->
+## 2025-10-24T16:17:54+01:00 — Add companion suggestion workflow and admin debug view
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs, Assets/Scripts/Companions/UI/AdminF4Menu.cs, Assets/Scripts/NPC/Combat/NpcCombatant.cs
+- Diff: 729 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:405a9b20eca6397609686e96dc85db557beb828e -->
+## 2025-10-24T15:35:15+01:00 — Merge pull request #1375 from aicovergod/codex/update-scheduleskillquestion-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 27 ++ / 6 --
+- Notes:
+  Allow proactive companion questions to reuse fallback templates
+---
+<!-- commit:bf633681e5b8301e9d358d30baf1ebe7ab264209 -->
+## 2025-10-24T15:35:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:025407546060f0f4e71464c2379cbd46ea345a07 -->
+## 2025-10-24T15:34:41+01:00 — Allow proactive questions to reuse fallback templates
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 18 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:848b93a556984ff3c2b28cce61a8335351cf805b -->
+## 2025-10-24T13:29:55+01:00 — Merge pull request #1374 from aicovergod/codex/introduce-intent-suppression-helper-in-companionconversation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 174 ++ / 0 --
+- Notes:
+  Prune greeting compliments lacking praise context
+---
+<!-- commit:9a61cd1b5dc850483e484559b2d882c4e079cfd5 -->
+## 2025-10-24T13:29:46+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:acd98d3adf0dc2978c763b23c64e46f5109920d9 -->
+## 2025-10-24T13:29:27+01:00 — Prune conflicting companion compliments
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionIntentDisambiguator.cs, Assets/Tests/Companions/CompanionIntentDisambiguatorTests.cs
+- Diff: 165 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e2166a051790a59d817c031dd1a0bba350104d1f -->
+## 2025-10-24T13:20:56+01:00 — Merge pull request #1373 from aicovergod/codex/refactor-compliment-patterns-and-add-tests
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 31 ++ / 9 --
+- Notes:
+  Refine companion compliment recognition
+---
+<!-- commit:ad2665921f9d381dd88a0041fcdbb035b7585303 -->
+## 2025-10-24T13:20:46+01:00 — Adjust companion compliment detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs, Assets/Tests/Companions/CompanionDialogueIntentTests.cs
+- Diff: 31 ++ / 9 --
+- Notes:
+  —
+---
+<!-- commit:713de1eb6861bf9c21b8eea9125a5aa72ae922d8 -->
+## 2025-10-24T13:15:38+01:00 — Merge pull request #1372 from aicovergod/codex/update-npcinteractable-to-check-combat-cooldown
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 2 --
+- Notes:
+  Prevent menu during companion cooldown
+---
+<!-- commit:b11fadee5e2dfefbf756f4a2818fef021e647879 -->
+## 2025-10-24T13:15:26+01:00 — Prevent menu during companion cooldown
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Interaction/NpcInteractable.cs
+- Diff: 11 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:895cac6494a122049b83339b1ff918ff40951365 -->
+## 2025-10-24T13:08:02+01:00 — Merge pull request #1371 from aicovergod/codex/add-countdown-timer-for-all-combat-skills
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 63 ++ / 10 --
+- Notes:
+  Fix companion combat decline cooldown timers for all skills
+---
+<!-- commit:d2c4a4005d28935761fd422ed02778caca5dc1c2 -->
+## 2025-10-24T13:07:13+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6ae929f553d3382b6369db9abd3c0b42be914fb5 -->
+## 2025-10-24T13:06:52+01:00 — Fix companion combat cooldown timers for all skills
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs
+- Diff: 54 ++ / 10 --
+- Notes:
+  —
+---
+<!-- commit:1895441b2a2123a988df0aec784143704f9b0856 -->
+## 2025-10-24T12:59:19+01:00 — Merge pull request #1370 from aicovergod/codex/add-combat-skill-decline-restrictions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 130 ++ / 6 --
+- Notes:
+  Lock companion guard mode during combat cooldown
+---
+<!-- commit:ca43b9122eed5d61fe9b9bc94401a787aeecf24d -->
+## 2025-10-24T12:59:11+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:97309c70a8532bc003f001671c568ab7e9f4a9a8 -->
+## 2025-10-24T12:58:53+01:00 — Lock companion guard mode during combat cooldown
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Player/Commands/ClearCompanionCooldownTimersCommand.cs
+- Diff: 121 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:be3614edf9289426ed183789a3fd0bcbec2fc849 -->
+## 2025-10-24T12:50:47+01:00 — Merge pull request #1369 from aicovergod/codex/add-skill-cooldown-checks-and-tests
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 145 ++ / 1 --
+- Notes:
+  Prevent proactive companion prompts during skill cooldowns
+---
+<!-- commit:fb9cd5fb8e835efd457b481716873503a53a464e -->
+## 2025-10-24T12:50:29+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6581059848c7f5887b95304cde0f997a77fb98b9 -->
+## 2025-10-24T12:50:11+01:00 — Guard proactive companion prompts during cooldowns
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Tests/Companions/CompanionConversationServiceTests.cs
+- Diff: 136 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:ee1ac9839aa7080633311c5f35c11a96dc30fef8 -->
+## 2025-10-24T12:34:17+01:00 — Merge pull request #1368 from aicovergod/codex/implement-companion-combat-skill-decline-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 245 ++ / 14 --
+- Notes:
+  Implement combat decline cooldown and tailored companion dialogue
+---
+<!-- commit:76bcd463b70f4f964ec12ae6dfd64a246b41b16f -->
+## 2025-10-24T12:34:08+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c05f8a6f3f4aac170c6c6a9c1a0f0d09152e7bbb -->
+## 2025-10-24T12:33:49+01:00 — Add combat decline cooldown and dialogue variants
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionSkillProposalDialogueBlocks.cs
+- Diff: 236 ++ / 14 --
+- Notes:
+  —
+---
+<!-- commit:e3d83f27359e1d4537cba94d9f716d56202d8114 -->
+## 2025-10-24T12:22:21+01:00 — Merge pull request #1367 from aicovergod/codex/restrict-f1,-f2,-f4-menus-to-developers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 87 ++ / 0 --
+- Notes:
+  Restrict debug menus to developer rank
+---
+<!-- commit:9d2f4f0e75c7045fc5dd8fbbf57fea4b1cf30f22 -->
+## 2025-10-24T12:22:13+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6296c0df7bbb0e03d0d426969377b0372111c5c6 -->
+## 2025-10-24T12:21:55+01:00 — Restrict debug menus to developer rank
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/UI/AdminF4Menu.cs, Assets/Scripts/Inventory/InventoryDebugMenu.cs, Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 78 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ea43286cb6efaee9a66af03fd3b489611d691331 -->
+## 2025-10-24T12:16:39+01:00 — Merge pull request #1366 from aicovergod/codex/add-clearccdt-command-and-admin-ui-updates
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 648 ++ / 12 --
+- Notes:
+  Add companion cooldown reset tools and UI
+---
+<!-- commit:8fb905bbeeffea6061da61474b7815213df709fd -->
+## 2025-10-24T12:16:31+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b9d9522212f1a703a08af15c9252682f3da3cd3f -->
+## 2025-10-24T12:16:13+01:00 — Add companion cooldown reset tools and UI
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): AGENTS.md, Assets/Scripts/Companions/CompanionSkillCooldownTracker.cs, Assets/Scripts/Companions/UI/AdminF4Menu.cs, Assets/Scripts/Companions/UI/CompanionCooldownsWindow.cs, Assets/Scripts/Player/Commands/ClearCompanionCooldownTimersCommand.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs, Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 639 ++ / 12 --
+- Notes:
+  —
+---
+<!-- commit:861ace70ea40567a0d731fcc7c0001e23d410660 -->
+## 2025-10-24T11:58:24+01:00 — Merge pull request #1365 from aicovergod/codex/implement-companion-skill-cooldown-system
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 384 ++ / 3 --
+- Notes:
+  Add companion mining cooldown tracking
+---
+<!-- commit:9daff640c5a8eef52903aa3262429a351badb4f4 -->
+## 2025-10-24T11:57:12+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6f9f774f75dbfc46d04716b3709057a05fba0480 -->
+## 2025-10-24T11:56:52+01:00 — Add companion mining cooldown tracking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (8): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionSkillCooldownTimers.cs, Assets/Scripts/Companions/CompanionSkillCooldownTracker.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs
+- Diff: 375 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:2e8898a8fda49877843eb877dedacf7f56f328c7 -->
+## 2025-10-24T11:27:51+01:00 — Merge pull request #1364 from aicovergod/codex/update-decline-handling-in-skill-proposal
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 20 ++ / 11 --
+- Notes:
+  Adjust skill proposal decline ordering
+---
+<!-- commit:25b9b40054dcf1da3dab5b6671a31970dcf73194 -->
+## 2025-10-24T11:26:28+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c410b14d7448cd3112418baff370e702ba574dc7 -->
+## 2025-10-24T11:26:11+01:00 — Adjust skill proposal decline ordering
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 11 ++ / 11 --
+- Notes:
+  —
+---
+<!-- commit:1074f67ea305c1c7926da400fef77651f5f3306e -->
+## 2025-10-24T11:12:02+01:00 — stuff
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Resources/PersistentObjects.asset, Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs, Assets/Scripts/Companions/Conversation/CompanionSkillProposalDialogueBlocks.cs
+- Diff: 33 ++ / 35 --
+- Notes:
+  —
+---
+<!-- commit:2f5b376d787ce6096d999d7588189570249b62bd -->
+## 2025-10-24T11:10:25+01:00 — Merge pull request #1363 from aicovergod/codex/add-companion-skill-decline-feature
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 205 ++ / 2 --
+- Notes:
+  feat: allow companion to decline player skill requests
+---
+<!-- commit:79c66b7b491c3a784a627c83d8fd2c55435c5974 -->
+## 2025-10-24T11:10:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:fd2129b973942133770680dcc0dcfbdd4a8254a0 -->
+## 2025-10-24T11:09:55+01:00 — feat: allow companion to decline player skill requests
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionSkillProposalDialogueBlocks.cs
+- Diff: 196 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:566327737b002d4d81c0f7c295a1289eba549ff0 -->
+## 2025-10-24T01:18:54+01:00 — Merge pull request #1362 from aicovergod/codex/add-skilllevelquery-functionality
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 419 ++ / 6 --
+- Notes:
+  Add companion skill level query handling
+---
+<!-- commit:d3bc184ef647a297d4476b32a03c6c9ecffb1f63 -->
+## 2025-10-24T01:18:43+01:00 — Add companion skill level query handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs, Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs, Assets/Scripts/Companions/Conversation/CompanionResponseContext.cs
+- Diff: 419 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:35887bcdff7c69cb9ba86d15cd183417d20f1945 -->
+## 2025-10-24T00:54:56+01:00 — Merge pull request #1361 from aicovergod/codex/update-companionconversationservice-for-skill-responses
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 55 ++ / 15 --
+- Notes:
+  Ensure companion skill proposals return isolated responses
+---
+<!-- commit:e5ac2288db0a60d9e4676463c65375e4270e26d7 -->
+## 2025-10-24T00:54:48+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:68752b43e4c6ee2479762e9b71fd0c0c827a83e7 -->
+## 2025-10-24T00:54:30+01:00 — Fix companion skill plan response composition
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 46 ++ / 15 --
+- Notes:
+  —
+---
+<!-- commit:e30aaee624ea69a10584ad323cb19c0eb5ddb580 -->
+## 2025-10-24T00:41:40+01:00 — Merge pull request #1360 from aicovergod/codex/update-follow-up-message-probability
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 4 --
+- Notes:
+  Adjust companion follow-up frequency
+---
+<!-- commit:ad21f673235baced80bf1c85396d8771f9ea4002 -->
+## 2025-10-24T00:41:23+01:00 — Adjust companion follow-up frequency
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 19 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:0310073d5379fdd602770e0069c48fe77fd8df25 -->
+## 2025-10-24T00:37:48+01:00 — uwu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Prefabs/SceneObjects/CompanionConversationMemory.prefab, Assets/Prefabs/SceneObjects/CompanionConversationMemory.prefab.meta, Assets/Scripts/Companions/Conversation/CompanionSkillProposalDialogueBlocks.cs, Assets/Scripts/Companions/Conversation/CompanionSkillProposalDialogueBlocks.cs.meta, Assets/Tests/Companions.meta, Assets/Tests/Companions/CompanionConversationServiceTests.cs.meta, Assets/Tests/Companions/CompanionDialogueIntentTests.cs.meta
+- Diff: 155 ++ / 44 --
+- Notes:
+  —
+---
+<!-- commit:3d6c530d12b16960575f4293a8df5e0120b1eecc -->
+## 2025-10-24T00:18:44+01:00 — Merge pull request #1359 from aicovergod/codex/refactor-dialogue-blocks-into-separate-class-file
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 190 ++ / 131 --
+- Notes:
+  Extract companion skill proposal dialogue templates into dedicated class
+---
+<!-- commit:b3deb181cfced26cea7b8035e774226dcc6329d9 -->
+## 2025-10-24T00:18:37+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8eeb23d1ded1e4ba91efb3016e3845de465bc258 -->
+## 2025-10-24T00:18:14+01:00 — Refactor companion dialogue blocks into dedicated container
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionSkillProposalDialogueBlocks.cs
+- Diff: 181 ++ / 131 --
+- Notes:
+  —
+---
+<!-- commit:0340539c27a5f8a97d82a0d6231e403e9ba845b8 -->
+## 2025-10-24T00:12:55+01:00 — Merge pull request #1358 from aicovergod/codex/rename-player-skill-proposal-identifiers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 18 ++ / 6 --
+- Notes:
+  Scope mining-specific companion proposal lines
+---
+<!-- commit:379ae134db576c8e9611a059ac5486f7f8fb3182 -->
+## 2025-10-24T00:12:44+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6a6765f94b84c07f44d274fb26e2ab6ef80c6d32 -->
+## 2025-10-24T00:12:26+01:00 — Scope mining-specific companion proposal lines
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 9 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:8b23b57359500ffd9d6c31a853f89cb525d3bfb0 -->
+## 2025-10-23T23:57:39+01:00 — Merge pull request #1357 from aicovergod/codex/add-playerskillproposal-intent-and-response-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 901 ++ / 2 --
+- Notes:
+  Handle player skill proposals in companion conversations
+---
+<!-- commit:2e858a30f475368e8bb688cc3db66fb7ef58e62c -->
+## 2025-10-23T23:57:33+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:5813806d3b04098a7294d589195a8f2f5053f440 -->
+## 2025-10-23T23:57:13+01:00 — Handle player skill proposals in companion conversations
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 892 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:bc1006ec29f498a5b37389fe5424113a7229d8f5 -->
+## 2025-10-23T23:22:52+01:00 — Merge pull request #1356 from aicovergod/codex/add-regex-for-sms-status-queries
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 16 ++ / 1 --
+- Notes:
+  Expand status query regex coverage for shorthand
+---
+<!-- commit:f114f35ccbec6c4c4438220d62647722f83b3957 -->
+## 2025-10-23T23:22:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8072bc0ad1970ff08dbea1c08adf36d69c2a4edc -->
+## 2025-10-23T23:22:21+01:00 — Expand status query regex coverage for shorthand
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 7 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:c8fdf1bed9451c6e090eeb2be5f9e656ee5160c6 -->
+## 2025-10-23T23:17:51+01:00 — Merge pull request #1355 from aicovergod/codex/update-synonymbucket-definitions-and-weights
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 20 ++ / 4 --
+- Notes:
+  Expand companion status query synonym coverage
+---
+<!-- commit:5eeca79460724c83336ab62be72e8943f782b619 -->
+## 2025-10-23T23:17:42+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2a3a720adb63ce1762a4122723627e9688668751 -->
+## 2025-10-23T23:17:25+01:00 — Expand status query dialogue synonyms
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 11 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:b8590f0c28aa9f0e9d94b7f603271d6ed4aefdea -->
+## 2025-10-23T23:01:27+01:00 — Merge pull request #1354 from aicovergod/codex/fix-overload-error-in-formattemplate
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 9 ++ / 1 --
+- Notes:
+  Fix proactive skill question template formatting call
+---
+<!-- commit:6ed9c17bb1e0f30157005f95ef4a21ed0407f659 -->
+## 2025-10-23T23:01:23+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0153917d9ff093805f13b199ea300c33a2e7eab5 -->
+## 2025-10-23T23:01:06+01:00 — Fix proactive skill question template formatting call
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 0 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:c0a01b00d8c8a90d3c8f653eb6a512c6a2009592 -->
+## 2025-10-23T22:58:47+01:00 — Merge pull request #1353 from aicovergod/codex/remove-mood/empathy-system
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 29 ++ / 816 --
+- Notes:
+  Remove companion mood empathy system
+---
+<!-- commit:c3e2194e78dc185291a8e5eae697d13ce4d7c296 -->
+## 2025-10-23T22:58:38+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:93aa0a04717a76072fc0c17513f8131acdb70608 -->
+## 2025-10-23T22:58:20+01:00 — Remove companion mood empathy system
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs, Assets/Scripts/Companions/Conversation/CompanionMoodInterpreter.cs, Assets/Scripts/Companions/Conversation/CompanionMoodInterpreter.cs.meta, Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs
+- Diff: 20 ++ / 816 --
+- Notes:
+  —
+---
+<!-- commit:b369a6377b71f166d052409c59560256984a3744 -->
+## 2025-10-23T22:38:46+01:00 — Merge pull request #1352 from aicovergod/codex/update-empathy-guard-in-conversation-service
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 12 ++ / 2 --
+- Notes:
+  Stop appending neutral empathy responses
+---
+<!-- commit:adab7aeb5f2d171e189913e7e7507a9fcb767ab7 -->
+## 2025-10-23T22:38:32+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:25c10568da028dfd3a1cf98e669dd64e1d794ad8 -->
+## 2025-10-23T22:38:11+01:00 — Stop appending empathy for neutral moods
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 3 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:df2a5a3d98bc185dbdf5fb3001c1bfbe750a8143 -->
+## 2025-10-23T22:31:14+01:00 — Merge pull request #1351 from aicovergod/codex/update-resolverecenteventsummary-method
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 73 ++ / 11 --
+- Notes:
+  Prevent greetings from reusing status replies
+---
+<!-- commit:3e91c2ff430b18fc31e60e53ac85d1ee6f1d86c7 -->
+## 2025-10-23T22:30:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:3388ec461a51f8b68040480c3b107b82616d6ec8 -->
+## 2025-10-23T22:30:34+01:00 — Avoid reusing status replies as recent events
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Tests/Companions/CompanionConversationServiceTests.cs
+- Diff: 64 ++ / 11 --
+- Notes:
+  —
+---
+<!-- commit:6287e731c1d3e7850375b1832347f4fc81cadc90 -->
+## 2025-10-23T22:13:23+01:00 — Merge pull request #1350 from aicovergod/codex/fix-redundant-message-response
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 25 ++ / 2 --
+- Notes:
+  Stop companion from repeating stored positive mood message
+---
+<!-- commit:582caf9d2e0d932a75f5403283c0eeb5241eebc8 -->
+## 2025-10-23T22:12:33+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:303b3cb518d40ade8c5c7e74199102800b414045 -->
+## 2025-10-23T22:12:15+01:00 — Prevent companion from repeating stored positive mood line
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 16 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:5f717114f666fd2926de907e8eafe47faaffb26f -->
+## 2025-10-23T21:53:02+01:00 — Merge pull request #1349 from aicovergod/codex/add-test-command-for-developer-questions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 159 ++ / 0 --
+- Notes:
+  Add developer command to force companion questions
+---
+<!-- commit:4e6a0e88bbc8c7247f35ec669379658c73bc8efa -->
+## 2025-10-23T21:52:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:75027284436d05ed090d21bde5cf46e7aaf69578 -->
+## 2025-10-23T21:52:36+01:00 — Add developer command to force companion questions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs, Assets/Scripts/Player/Commands/TestCompanionQuestionCommand.cs, Assets/Scripts/Player/Commands/TestCompanionQuestionCommand.cs.meta
+- Diff: 150 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:4fdef8a1448c99f997fa55397e705deb1acccc3a -->
+## 2025-10-23T21:35:28+01:00 — Merge pull request #1348 from aicovergod/codex/fix-parameterless-struct-constructor-bugs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2 ++ / 2 --
+- Notes:
+  Fix ActiveSkillQuestion struct constructor for C# 9 compatibility
+---
+<!-- commit:9f5ace4f025b247bb28a3cde93eea6beb2c7df37 -->
+## 2025-10-23T21:35:15+01:00 — Fix ActiveSkillQuestion struct initialization
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 2 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:d2f5b603854cabde92afee5ad4f014d6d0b5f54b -->
+## 2025-10-23T21:31:48+01:00 — Merge pull request #1347 from aicovergod/codex/implement-proactive-question-scheduling-and-response-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 882 ++ / 14 --
+- Notes:
+  Add proactive skill questioning flow for companion dialogue
+---
+<!-- commit:af537ac145f3dad8aef432e9551262bede4e502d -->
+## 2025-10-23T21:31:40+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6a2c8cbde0877ced6d409a41df6a4cdf23e529ed -->
+## 2025-10-23T21:31:22+01:00 — Add coverage for skill plan intents and responses
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs, Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs, Assets/Scripts/Companions/Conversation/CompanionResponseContext.cs, Assets/Tests/Companions/CompanionDialogueIntentTests.cs
+- Diff: 873 ++ / 14 --
+- Notes:
+  —
+---
+<!-- commit:5605d046f9679954dc807cd3c46be3afdcbfd768 -->
+## 2025-10-23T20:46:10+01:00 — more dialogue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs
+- Diff: 234 ++ / 31 --
+- Notes:
+  —
+---
+<!-- commit:07774d42747efc6761fd09c2bc7d4d3a39b1ddf1 -->
+## 2025-10-23T19:50:17+01:00 — dialogue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Conversation/CompanionEventEntry.cs.meta, Assets/Scripts/Companions/Conversation/CompanionMoodInterpreter.cs.meta, Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs
+- Diff: 21 ++ / 7 --
+- Notes:
+  —
+---
+<!-- commit:fc7eaf062d96f097d1825c8e19f9710a879c89e8 -->
+## 2025-10-23T19:28:07+01:00 — Merge pull request #1346 from aicovergod/codex/update-companiondialoguepatterns-for-richer-synonyms
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 135 ++ / 36 --
+- Notes:
+  Expand companion dialogue intent coverage
+---
+<!-- commit:a465303865b1bf9b7b96de564b893019070ef10c -->
+## 2025-10-23T19:27:54+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:1010aeda90b2155ac10010b1554334b89d0e3e71 -->
+## 2025-10-23T19:27:34+01:00 — Expand companion dialogue intent coverage
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 126 ++ / 36 --
+- Notes:
+  —
+---
+<!-- commit:2976698fdcc5af0b4256e87be6170db99a83f53f -->
+## 2025-10-23T19:19:11+01:00 — Merge pull request #1345 from aicovergod/codex/expand-ensuredefaults-for-companionresponsecatalog
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 114 ++ / 15 --
+- Notes:
+  Expand companion response catalog with contextual variants
+---
+<!-- commit:b1ea442c6d58d85ce27b9a534cd805b440e35e55 -->
+## 2025-10-23T19:19:07+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:4cdbfcca0144bcc1cd74425425e73a40f06e474b -->
+## 2025-10-23T19:18:47+01:00 — Expand companion response catalog with contextual variants
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs
+- Diff: 105 ++ / 15 --
+- Notes:
+  —
+---
+<!-- commit:22aaa8e223ba8e57a3f5f70b72b6f3d9556b6fcb -->
+## 2025-10-23T19:01:37+01:00 — Merge pull request #1344 from aicovergod/codex/fix-argument-type-error-in-companionconversationservice
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2 ++ / 1 --
+- Notes:
+  Fix companion follow-up mood initialization
+---
+<!-- commit:21c13d1270c9ee44261bde5cd16a236c4da2336a -->
+## 2025-10-23T19:01:20+01:00 — Fix companion follow-up mood initialization
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 2 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:af55ac90f01551256ba0fd0e518842e5d4adae56 -->
+## 2025-10-23T18:57:32+01:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 18 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:626949879b0cbaac7fb64b1ec5c03164af3ff014 -->
+## 2025-10-23T18:56:59+01:00 — Merge pull request #1343 from aicovergod/codex/update-acknowledgerecentevent-pattern-weights
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 3 --
+- Notes:
+  Adjust companion recent event recall weighting
+---
+<!-- commit:03adb1f7e7934606f2c73bf4ac854edb8cc949a3 -->
+## 2025-10-23T18:56:01+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d9aca8dd99e4025530ad3ef2e6b96dd119e74078 -->
+## 2025-10-23T18:55:44+01:00 — Refine recent event recall weights
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 5 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:37b926bdd413c56c91489863c5dc79e9ee0dfc8f -->
+## 2025-10-23T18:52:21+01:00 — Merge pull request #1342 from aicovergod/codex/implement-companionmoodinterpreter-and-refactor-mood-handlin
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 689 ++ / 131 --
+- Notes:
+  Enhance companion mood interpretation and follow-ups
+---
+<!-- commit:dee52ce0e42294edc343a87253a33fa3262f1eb1 -->
+## 2025-10-23T18:52:08+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d9c85d6c1b561e5d5128d68e3b237605899293f5 -->
+## 2025-10-23T18:51:50+01:00 — Enhance companion mood interpretation and follow-ups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionMoodInterpreter.cs
+- Diff: 680 ++ / 131 --
+- Notes:
+  —
+---
+<!-- commit:a3bf5593fe0beca06a2957f58940d5b1f93a42f2 -->
+## 2025-10-23T18:24:53+01:00 — Merge pull request #1341 from aicovergod/codex/extend-companionconversationmemory-for-event-tracking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 489 ++ / 4 --
+- Notes:
+  Add companion event feed and integrate gameplay hooks
+---
+<!-- commit:d0bb3e79d021198f965a62839028c198a36ce0a6 -->
+## 2025-10-23T18:24:33+01:00 — Add companion event feed and integrate gameplay hooks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Companions/CompanionCombatBridge.cs, Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionEventEntry.cs, Assets/Scripts/Drops/NpcDropper.cs, Assets/Scripts/Pets/PetCombatController.cs, Assets/Scripts/Skills/Common/GatheringRewardProcessor.cs
+- Diff: 489 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:ea233dfda036d7625c2d4d99fb3e3bd3d1008a2c -->
+## 2025-10-23T18:04:24+01:00 — Merge pull request #1340 from aicovergod/codex/fix-this-issue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 5 --
+- Notes:
+  Fix single-word companion dialogue intent detection
+---
+<!-- commit:bf2bb33163c45aa69f3ddd959aac47da3f81903b -->
+## 2025-10-23T18:04:16+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ce7b523dcfb4d69b7749f09810ae1a19865f567d -->
+## 2025-10-23T18:03:56+01:00 — Restore single word companion dialogue matches
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs
+- Diff: 15 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:4e0bd52349277ebcbab0e70e60b6bbf854f04cfd -->
+## 2025-10-23T17:54:35+01:00 — Merge pull request #1339 from aicovergod/codex/fix-cs1061-errors-in-companionconversationservice
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 25 ++ / 0 --
+- Notes:
+  Add overload for companion response selection
+---
+<!-- commit:209122929033f59bf4eece9e8e8cddeff3dfa211 -->
+## 2025-10-23T17:54:28+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6fdde1dc05da6f309ea3c7d5c5acf0ad9af9f523 -->
+## 2025-10-23T17:54:09+01:00 — Add overload for companion response selection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionDialogueResponseLibrary.cs
+- Diff: 16 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d49645174255ff08770cc705701881889180b99a -->
+## 2025-10-23T17:46:09+01:00 — Merge pull request #1338 from aicovergod/codex/refactor-companion-response-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 777 ++ / 175 --
+- Notes:
+  Refine companion dialogue with context-aware response catalog
+---
+<!-- commit:8eb882af3ef734ea478e114f5dfc1c5b9ed751f0 -->
+## 2025-10-23T17:45:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:3f68dd32d502d081bf54b705e564ce098b4c3679 -->
+## 2025-10-23T17:45:36+01:00 — Refactor companion dialogue to use context-driven response catalog
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueResponseLibrary.cs, Assets/Scripts/Companions/Conversation/CompanionResponseCatalog.cs, Assets/Scripts/Companions/Conversation/CompanionResponseContext.cs
+- Diff: 768 ++ / 175 --
+- Notes:
+  —
+---
+<!-- commit:9b1ebc79e3fc330aefe5c0c3f7482f61a229938f -->
+## 2025-10-23T17:15:23+01:00 — Merge pull request #1337 from aicovergod/codex/implement-companiondialoguepatterns-and-parser-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 603 ++ / 72 --
+- Notes:
+  Enhance companion dialogue intent scoring
+---
+<!-- commit:d08b481f8a08e050d2370e8cc991f4c5a01f477b -->
+## 2025-10-23T17:14:40+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:40b748559ceebf329ae3034e08aba71fb7220e66 -->
+## 2025-10-23T17:14:21+01:00 — Enhance companion dialogue intent scoring
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueParser.cs, Assets/Scripts/Companions/Conversation/CompanionDialoguePatterns.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueRule.cs
+- Diff: 594 ++ / 72 --
+- Notes:
+  —
+---
+<!-- commit:4478dd18f38813a49997f3771a2ed8a93f250ae4 -->
+## 2025-10-23T16:37:42+01:00 — Merge pull request #1336 from aicovergod/codex/fix-bug-c5f58g
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 75 ++ / 3 --
+- Notes:
+  Ensure companion conversation memory rebinds after load
+---
+<!-- commit:3c76dac8f612d364650e0d3b26e1afc9af764c21 -->
+## 2025-10-23T16:37:34+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c16eee08c232eb87c5fcd83412e8d039547c33bd -->
+## 2025-10-23T16:37:16+01:00 — Ensure companion conversation memory rebinds after load
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs
+- Diff: 66 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:4113de80e66789f6b59ea41717a967e5bb112911 -->
+## 2025-10-23T16:32:33+01:00 — Merge pull request #1335 from aicovergod/codex/fix-chat-subscription-rebind-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 26 ++ / 5 --
+- Notes:
+  Ensure companion conversation memory rebinds chat service after scene changes
+---
+<!-- commit:34dbd894bdd672112135b9bc546d91cfcc96eed3 -->
+## 2025-10-23T16:32:28+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:5cd49598a63bd58159d0ebacee2a96c3e4359d89 -->
+## 2025-10-23T16:32:07+01:00 — Ensure companion chat resubscribes after scene changes
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs
+- Diff: 17 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:fed083962b23e67be78845d636a5b39e2f7f5d16 -->
+## 2025-10-23T16:29:19+01:00 — Merge pull request #1334 from aicovergod/codex/allow-chat-log-messages-to-wrap
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 54 ++ / 4 --
+- Notes:
+  Allow chat log messages to wrap across multiple lines
+---
+<!-- commit:cf17194f0d23f2fd82fb77224fecbc245a39223b -->
+## 2025-10-23T16:28:38+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ba255f12c6123270fc4e84e1ebcdbca4cc78ec9e -->
+## 2025-10-23T16:28:20+01:00 — Allow chat content layouts to wrap messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/UI/Chat/EmojiTokenLayout.cs, Assets/Scripts/UI/FloatingText.cs
+- Diff: 45 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:f90155deeda2b0259af3a0790e01858f5cfb02cc -->
+## 2025-10-23T16:03:42+01:00 — Merge pull request #1333 from aicovergod/codex/add-companion-conversation-service-and-parser
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1323 ++ / 1 --
+- Notes:
+  Add companion conversation service and dialogue parsing
+---
+<!-- commit:eb67048736c6045b97bc6176eac1d69a673109fc -->
+## 2025-10-23T16:03:35+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6cb76e048d703f59b867d573281abd17c187e83c -->
+## 2025-10-23T16:03:15+01:00 — Add companion chat intent parsing and response service
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs, Assets/Scripts/Companions/Conversation/CompanionConversationService.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueIntent.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueParser.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueResponseLibrary.cs, Assets/Scripts/Companions/Conversation/CompanionDialogueRule.cs
+- Diff: 1314 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:729fb8d0e81fa3cf4a87fef71fc60c8096f262de -->
+## 2025-10-23T15:48:03+01:00 — Merge pull request #1332 from aicovergod/codex/implement-companionconversationmemory-class
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 380 ++ / 0 --
+- Notes:
+  Add companion conversation memory persistence
+---
+<!-- commit:e8a2cc4948ee967cd5be3ec6aaeef67dd822b1ae -->
+## 2025-10-23T15:47:50+01:00 — Add companion conversation memory persistence
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs, Assets/Scripts/Companions/Conversation/CompanionConversationMemory.cs.meta
+- Diff: 380 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ea278620b705fa52b64a191216f1aa44f8c4b1ca -->
+## 2025-10-23T15:34:38+01:00 — Merge pull request #1331 from aicovergod/codex/add-channel-switching-and-message-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 286 ++ / 11 --
+- Notes:
+  Add companion chat channel toggles to HUD
+---
+<!-- commit:e81d2e5097fc392b295318cde2e89828f6b5bc0d -->
+## 2025-10-23T15:34:32+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:030704a25b7b59fe87b087baf45a1d5914acae08 -->
+## 2025-10-23T15:34:13+01:00 — Add companion channel toggle and routing for chat HUD
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 277 ++ / 11 --
+- Notes:
+  —
+---
+<!-- commit:99d2033fccd7c53aedd2f3cd9cceec13020aaace -->
+## 2025-10-23T14:43:38+01:00 — Merge pull request #1330 from aicovergod/codex/add-random-responses-for-no-rocks-command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 165 ++ / 1 --
+- Notes:
+  Add random companion responses when no rocks are available
+---
+<!-- commit:1404b0358f22beb3a2ac46af12b94c2026699eef -->
+## 2025-10-23T14:43:31+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b79e05dc90f79cc59c578183febccec516158230 -->
+## 2025-10-23T14:43:12+01:00 — Add varied companion chat when no rocks are available
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 156 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:1bfed6a44a59dca13b3e25e159492921e22c3f83 -->
+## 2025-10-23T14:30:07+01:00 — Merge pull request #1329 from aicovergod/codex/add-random-companion-death-messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 383 ++ / 0 --
+- Notes:
+  Add companion death quips when player dies
+---
+<!-- commit:6273e259431b49ee3f9c13580a3115ec73a4c3e2 -->
+## 2025-10-23T14:29:53+01:00 — Add companion death quips when player dies
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Player/PlayerRespawnSystem.cs
+- Diff: 383 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b59763467be2eecf18799fb417eb685c1e823316 -->
+## 2025-10-23T14:09:39+01:00 — Merge pull request #1328 from aicovergod/codex/add-humorous-messages-for-disarmed-companion
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 244 ++ / 1 --
+- Notes:
+  Add ore golem pickaxe removal chatter
+---
+<!-- commit:713ea23ccb3fa8a75225563cf6c05ddcd23e5ff3 -->
+## 2025-10-23T14:09:27+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ba545360a709e2b6ed2625ce31893f2385175400 -->
+## 2025-10-23T14:09:10+01:00 — Add ore golem pickaxe removal chatter
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 235 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:1da2f35a898ebb9c56fd2adac777ad5f30df46b9 -->
+## 2025-10-23T14:03:05+01:00 — Merge pull request #1327 from aicovergod/codex/add-equipment-slot-change-event
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 135 ++ / 8 --
+- Notes:
+  Stop companion ore golem attacks when pickaxe removed
+---
+<!-- commit:abdd69850eece5fac6e1aaaacdc2f3f68df7c866 -->
+## 2025-10-23T14:02:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:52186d80d2e632ca1e9c11328250e3c206dc3974 -->
+## 2025-10-23T14:02:36+01:00 — Stop companion ore golem attacks when pickaxe removed
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionEquipment.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 126 ++ / 8 --
+- Notes:
+  —
+---
+<!-- commit:b77057565e5a4d443b7172a6b94dddb0a01a1fe6 -->
+## 2025-10-23T13:45:51+01:00 — Merge pull request #1326 from aicovergod/codex/fix-incorrect-inventory-error-message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 101 ++ / 22 --
+- Notes:
+  Handle companion equip requirement failures without inventory full popup
+---
+<!-- commit:9769413c0557265de89602f108e568da991e0c9f -->
+## 2025-10-23T13:45:42+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ff374c0574a3d53b2925b1365d8810c3578e79df -->
+## 2025-10-23T13:45:19+01:00 — Fix companion equip requirement feedback
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionEquipAttemptResult.cs, Assets/Scripts/Companions/CompanionEquipment.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 92 ++ / 22 --
+- Notes:
+  —
+---
+<!-- commit:3a9519228e0f9b42d541d09e63ff35f91332cd95 -->
+## 2025-10-23T13:25:30+01:00 — stuff
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (9): Assets/Game/Items/Isla.asset, Assets/Resources/PlayerRanks/DefaultPlayerRankDatabase.asset, Assets/Scenes/House1Interior.unity, Assets/Scenes/OverWorld.unity, Assets/Scripts/Bank/CompanionBankDepositAnchor.cs.meta, Assets/Scripts/Companions/CompanionChatLibrary.cs.meta, Assets/Scripts/Companions/UI.meta, Assets/Scripts/Player/Commands/ClearCompanionInventoryCommand.cs.meta, Assets/Scripts/Player/Commands/TestMineRocksCommand.cs.meta
+- Diff: 332 ++ / 96 --
+- Notes:
+  —
+---
+<!-- commit:14d078a064cb807bedd8a00449ebca2e6c5837ed -->
+## 2025-10-23T13:23:08+01:00 — Merge pull request #1325 from aicovergod/codex/extend-gathering-inventory-helper-functionality
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 255 ++ / 29 --
+- Notes:
+  Add companion inventory awareness to gathering capacity checks
+---
+<!-- commit:56b404042797b3e52c3c5a275728b8fbba488534 -->
+## 2025-10-23T13:22:51+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:7ad8d4b340aa7a4d12d1f6429ca40314e5080650 -->
+## 2025-10-23T13:22:34+01:00 — Extend gathering capacity checks to companion inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (9): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/Skills/Common/GatheringInventoryHelper.cs, Assets/Scripts/Skills/Fishing/Core/FisherController.cs, Assets/Scripts/Skills/Fishing/Core/FishingSkill.cs, Assets/Scripts/Skills/Mining/Core/MinerController.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs, Assets/Scripts/Skills/Woodcutting/Core/WoodcutterController.cs, Assets/Scripts/Skills/Woodcutting/Core/WoodcuttingSkill.cs
+- Diff: 246 ++ / 29 --
+- Notes:
+  —
+---
+<!-- commit:b53b11868eda7285ba32117d33aaa7d48ab1ba8e -->
+## 2025-10-23T12:14:31+01:00 — Merge pull request #1324 from aicovergod/codex/fix-no-message-on-full-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 31 ++ / 0 --
+- Notes:
+  Ensure gathering controllers broadcast inventory full chat feedback
+---
+<!-- commit:fb25f988a0a523d38903f969400a3db6186f19e9 -->
+## 2025-10-23T12:14:08+01:00 — Ensure gathering inventory failures publish chat feedback
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Common/GatheringController.cs
+- Diff: 31 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:7dd109ed61507ffbe13a1b320575c7b14ed426eb -->
+## 2025-10-23T01:28:14+01:00 — Merge pull request #1323 from aicovergod/codex/fix-chat-dialogue-for-full-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 106 ++ / 0 --
+- Notes:
+  Ensure companion reacts to full inventory game messages
+---
+<!-- commit:391c4d9c226aa3b0611f42adf15e8c928d63ccf4 -->
+## 2025-10-23T01:28:08+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:56cd784070093614b0bf19284142b9cf52d8d349 -->
+## 2025-10-23T01:27:50+01:00 — Fix companion inventory full chat reaction
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 97 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:cc8c7bf2b46304c743411c77896f453f9bdda13e -->
+## 2025-10-23T01:14:40+01:00 — Merge pull request #1322 from aicovergod/codex/send-companion-messages-for-unarmed-mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 311 ++ / 69 --
+- Notes:
+  Add companion ore golem pickaxe reminders
+---
+<!-- commit:29d4a7528d03387866823e0a9ab04ad0d2b33da4 -->
+## 2025-10-23T01:14:11+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:499403e5158356bc0fba83157f4a22b399110d79 -->
+## 2025-10-23T01:13:48+01:00 — Add companion ore golem pickaxe reminders
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 302 ++ / 69 --
+- Notes:
+  —
+---
+<!-- commit:c0537eb7f9549184264a1f3016dbc1d1b5360b52 -->
+## 2025-10-23T01:03:11+01:00 — Merge pull request #1321 from aicovergod/codex/add-chat-messages-for-full-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 348 ++ / 19 --
+- Notes:
+  Add chat messaging for player and companion inventory limits
+---
+<!-- commit:11e3e2aab11198248e0e3ff97bf8ce0fbfff35dc -->
+## 2025-10-23T01:03:04+01:00 — Merge branch 'main' into codex/add-chat-messages-for-full-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:316bd841bd22872c3d4c439fa45268a87e1bce21 -->
+## 2025-10-23T01:01:24+01:00 — Add companion chat variants for player inventory full cases
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Skills/Common/GatheringRewardProcessor.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs
+- Diff: 344 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:5a9d49f81bb21eaffc1078743be4645e607bc153 -->
+## 2025-10-23T00:53:19+01:00 — Refactor companion level up message selection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 45 ++ / 84 --
+- Notes:
+  —
+---
+<!-- commit:2269c2a8efff4e285e41657d61c9cb20c1fe9bc0 -->
+## 2025-10-23T00:50:08+01:00 — Merge pull request #1319 from aicovergod/codex/add-level-up-messages-for-skills-t4fitc
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 790 ++ / 12 --
+- Notes:
+  Add companion chat for gathering skill level-ups
+---
+<!-- commit:9cc71fbfd7e675b660453d9c367c17b73973f7e1 -->
+## 2025-10-23T00:50:02+01:00 — Merge branch 'main' into codex/add-level-up-messages-for-skills-t4fitc
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8867e1825c14e8cf0e4f5d2b4db9c0fc82c6d0bc -->
+## 2025-10-23T00:48:57+01:00 — Add companion chat for player gathering skill level ups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Companions/CompanionChatLibrary.cs
+- Diff: 787 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:27fa11003897659bc161a866f893390d36b5e223 -->
+## 2025-10-23T00:37:28+01:00 — Merge pull request #1316 from aicovergod/codex/add-companion-dialogue-for-level-ups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 609 ++ / 0 --
+- Notes:
+  Add companion chat responses for player combat level-ups
+---
+<!-- commit:3d838656d60c1dcc09f872cf13076087e807ce69 -->
+## 2025-10-23T00:29:29+01:00 — Merge pull request #1315 from aicovergod/codex/add-companion-messages-for-skill-leveling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 336 ++ / 5 --
+- Notes:
+  Add companion woodcutting and mining level-up chatter
+---
+<!-- commit:afd281be680da0117d9dc6549ba4b8251797f8db -->
+## 2025-10-23T00:29:23+01:00 — Merge branch 'main' into codex/add-companion-messages-for-skill-leveling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:5ee11654081cd642be43b17453adaf2bd7aa7981 -->
+## 2025-10-23T00:28:21+01:00 — Add companion woodcutting and mining level-up chat pools
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 331 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:97bfb0083ca01af93e8a8752bf31b260cee7e6cd -->
+## 2025-10-23T00:19:30+01:00 — Merge pull request #1313 from aicovergod/codex/add-chat-messages-for-level-ups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 693 ++ / 0 --
+- Notes:
+  Add companion level-up combat chat dialogue
+---
+<!-- commit:57b3726f0d33015e0b6c18d7462d7f4aff339864 -->
+## 2025-10-23T00:19:20+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:1d72955587931122f2828a0c5b836309687cfc1a -->
+## 2025-10-23T00:19:04+01:00 — Add companion combat level-up chat variants
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 684 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:1502cdb0ada9228f2bd0e3f1bd8460230415b0cc -->
+## 2025-10-23T00:12:37+01:00 — Merge pull request #1312 from aicovergod/codex/update-agents.md-for-companion-chat-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 256 ++ / 153 --
+- Notes:
+  Centralize companion level-up chat handling
+---
+<!-- commit:6eefe750c9f78ed0521e0a7fc0af2c213f2b76b5 -->
+## 2025-10-23T00:12:21+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:752f40ae14ff90ad81f1a7c5cffa7e51905e2eeb -->
+## 2025-10-23T00:12:00+01:00 — Centralize companion level-up chat handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): AGENTS.md, Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 247 ++ / 153 --
+- Notes:
+  —
+---
+<!-- commit:8157f41b447fbf9bf5ac92e1fed7deacef2b889e -->
+## 2025-10-23T00:04:09+01:00 — Merge pull request #1311 from aicovergod/codex/add-companion-messages-for-hitpoints-level-up
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 167 ++ / 0 --
+- Notes:
+  Add randomized hitpoints level-up messages for companions
+---
+<!-- commit:d01114332754ac44a5a8d4119e3f382e97c0a2bf -->
+## 2025-10-23T00:04:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ae75752208bffd19b6f48ebfe6f8ee8272b1f5e8 -->
+## 2025-10-23T00:03:45+01:00 — Add hitpoints level-up chatter for companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 158 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ac7f05307fcd76dd3ac3422301dc7491afd373fc -->
+## 2025-10-22T23:42:52+01:00 — Merge pull request #1310 from aicovergod/codex/add-random-companion-farewell-messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 182 ++ / 0 --
+- Notes:
+  Add companion storage chat flavour lines
+---
+<!-- commit:578b65d845cc8e985a25d9a7dfc32336eee5aa73 -->
+## 2025-10-22T23:42:45+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e723bdac88d9f430343734ee9b56816ee5449bf0 -->
+## 2025-10-22T23:42:27+01:00 — Add companion storage chat flavour lines
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 173 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:522b1223a94669097a6a13614301f9d2691278e1 -->
+## 2025-10-22T23:37:13+01:00 — Merge pull request #1309 from aicovergod/codex/fix-companion-greeting-message-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 5 ++ / 3 --
+- Notes:
+  Fix companion greeting duplication on login
+---
+<!-- commit:348f5653c912fce009814aa17f8b666b9f8ddff0 -->
+## 2025-10-22T23:37:02+01:00 — Fix companion greeting duplication on login
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetDropSystem.cs
+- Diff: 5 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:543b8787396a04942036299c6c2e257b672c290d -->
+## 2025-10-22T23:29:30+01:00 — Merge pull request #1308 from aicovergod/codex/add-random-spawn-messages-for-companion
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 180 ++ / 0 --
+- Notes:
+  Add companion spawn greeting pool
+---
+<!-- commit:411e7b465dccc1f1d8993c1c5426bd6b831b619e -->
+## 2025-10-22T23:29:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:94c1dd5af5dab843ca92e4e9faa697740a2a86a3 -->
+## 2025-10-22T23:28:56+01:00 — Add companion spawn greeting pool
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 171 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:21724454c02a5793b197a3ba684e9edbdabd80c0 -->
+## 2025-10-22T23:24:58+01:00 — Merge pull request #1307 from aicovergod/codex/add-random-welcome-message-from-companion
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 164 ++ / 0 --
+- Notes:
+  Add companion auto-respawn greeting chat line
+---
+<!-- commit:f8e0254eb463cee482d72438a59d98a96ca6ca2e -->
+## 2025-10-22T23:24:30+01:00 — Add companion login greeting chat line
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetDropSystem.cs
+- Diff: 164 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9fd3d4bf1f2da9c1bcbb9e589d47f1a2ff84ef6c -->
+## 2025-10-22T23:18:23+01:00 — Merge pull request #1306 from aicovergod/codex/add-companionchatlibrary-and-refactor-usage
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 399 ++ / 363 --
+- Notes:
+  Refactor companion chat lines into shared library
+---
+<!-- commit:59644110890d8f4c59dc112734413bfdaddf12be -->
+## 2025-10-22T23:18:11+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:77e916a9cc2930a8fadb35095388d56c527528da -->
+## 2025-10-22T23:17:53+01:00 — Refactor companion chat lines into shared library
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/CompanionChatLibrary.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs
+- Diff: 390 ++ / 363 --
+- Notes:
+  —
+---
+<!-- commit:4eb2e76470ea19ee102a2595a19c5ad2c4694a5c -->
+## 2025-10-22T23:07:24+01:00 — Merge pull request #1305 from aicovergod/codex/add-chat-message-for-guard-mode-off
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 151 ++ / 0 --
+- Notes:
+  Add guard mode deactivation chat lines for companions
+---
+<!-- commit:0d07a6b30c66287adfd91023e800b8b1304ebaad -->
+## 2025-10-22T23:07:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e96cd6970411d9740a1d8c81c7ed9960be0954f2 -->
+## 2025-10-22T23:06:55+01:00 — Add companion guard mode deactivation chat lines
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 142 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:050799f871e998d1b6a94d98abe797004533e3d7 -->
+## 2025-10-22T23:02:24+01:00 — Merge pull request #1304 from aicovergod/codex/add-companion-guard-mode-messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 151 ++ / 0 --
+- Notes:
+  Add companion guard mode activation chat feedback
+---
+<!-- commit:965e53ae2813a1ad72f2be7b8ad7eb96d76e43fd -->
+## 2025-10-22T23:01:49+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:64a9a48bc3c227f3108c70c8686a9e37961b7707 -->
+## 2025-10-22T23:01:28+01:00 — Add companion guard mode activation chat feedback
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 142 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:34a825b2178d5f44cded9a10b3170e980c2a5129 -->
+## 2025-10-22T22:47:56+01:00 — Merge pull request #1303 from aicovergod/codex/add-random-chat-messages-for-full-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 70 ++ / 4 --
+- Notes:
+  Add varied companion inventory full chat responses
+---
+<!-- commit:a159475ba81a0739aef49139085e7c9f7e12b265 -->
+## 2025-10-22T22:47:40+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:1566ec18e146dc9eb16454b871c34f86cdd3a29c -->
+## 2025-10-22T22:47:22+01:00 — Add companion inventory full chat variety
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs
+- Diff: 61 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:c5a8be670dfca1f93bc478d8da13c9b5d28ed481 -->
+## 2025-10-22T22:43:49+01:00 — Merge pull request #1302 from aicovergod/codex/add-random-chat-messages-on-deposit
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 79 ++ / 1 --
+- Notes:
+  Add companion bank deposit chat responses
+---
+<!-- commit:074651e3645502e9c20df25e96e8aebdeed477cb -->
+## 2025-10-22T22:43:42+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ce3de7bb1dd65b1c722cb0f1ae5430c8ae7486e4 -->
+## 2025-10-22T22:43:22+01:00 — Add companion bank deposit chat feedback
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 70 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:2e818ca6a2679dfc110ca085fa2f8f878fa8d308 -->
+## 2025-10-22T19:46:56+01:00 — Merge pull request #1301 from aicovergod/codex/implement-companion-bank-deposit-feature
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 229 ++ / 0 --
+- Notes:
+  Add companion bank deposit anchor support and UI access
+---
+<!-- commit:30d84e803a3436ea7c5632d2cbe205dedcee02e2 -->
+## 2025-10-22T19:43:16+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f9d5611e9e05aa0660611b1278efad5c6e4b826e -->
+## 2025-10-22T19:42:56+01:00 — Add companion bank anchor flow and context menu wiring
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Bank/CompanionBankDepositAnchor.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetLevelBarMenu.cs, Assets/Scripts/UI/PetLevelBarContextMenuExtender.cs
+- Diff: 220 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d449ac82ac7b355b729fac3a6cfd950db103ca05 -->
+## 2025-10-22T19:15:07+01:00 — Merge pull request #1300 from aicovergod/codex/fix-github-codex-error
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 18 ++ / 1 --
+- Notes:
+  Ensure pet path mover binds nav service when queried
+---
+<!-- commit:b0c4171ebdb9c7e9b63d0503bca11e18fe557435 -->
+## 2025-10-22T19:14:57+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:00c5348812d215ede206b3c89ec08d8fb7b250ad -->
+## 2025-10-22T19:14:40+01:00 — Ensure pet path mover binds nav service when queried
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetPathMover.cs
+- Diff: 9 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:b6b7ca604740888a30d0e961e4fd964913520bbc -->
+## 2025-10-22T18:27:33+01:00 — Merge pull request #1299 from aicovergod/codex/update-chathudbootstrap-for-scene-evaluation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 65 ++ / 2 --
+- Notes:
+  Gate chat HUD bootstrap to allowed scenes
+---
+<!-- commit:8d3f795a19affda91df4a92ed9786f462169360f -->
+## 2025-10-22T18:27:19+01:00 — Gate chat HUD bootstrap to allowed scenes
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudBootstrap.cs
+- Diff: 65 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:60e79dcd52d26be048392a3ecac4440f9443f445 -->
+## 2025-10-22T18:02:57+01:00 — Merge pull request #1298 from aicovergod/codex/update-agents.md-with-companion-system-details
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 13 ++ / 0 --
+- Notes:
+  Document companion system goals and behavior
+---
+<!-- commit:74d4545d2e3a07799124d1e35889f684d297740a -->
+## 2025-10-22T18:02:45+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ccffdd60717986a071489a73e35edcb7b5f21329 -->
+## 2025-10-22T18:02:27+01:00 — Document companion system goals and behavior
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): AGENTS.md
+- Diff: 4 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:416037d0b1d402f7887f0bcd070adedcc563f091 -->
+## 2025-10-22T17:43:02+01:00 — Merge pull request #1297 from aicovergod/codex/fix-companion-mining-logic-for-full-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 45 ++ / 3 --
+- Notes:
+  Prevent companions auto-mining when inventory is full
+---
+<!-- commit:60d44842bdff8196b2ebdac5ffe5fa6c28c685b0 -->
+## 2025-10-22T17:42:50+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ef8e15d34fe5a7b735b8e12321381d0cad87e24d -->
+## 2025-10-22T17:42:32+01:00 — Prevent companions auto-mining when inventory is full
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 36 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:66917e980bff516b2c5fc2621d37aa6d95e70fd6 -->
+## 2025-10-22T17:19:27+01:00 — Merge pull request #1296 from aicovergod/codex/adjust-teleport-detection-in-miningcontroller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 57 ++ / 31 --
+- Notes:
+  Fix companion mining navigation teleport detection
+---
+<!-- commit:b6b8dd8b3be1630d936ce453183e653a90c2b423 -->
+## 2025-10-22T17:19:16+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e5900b501b7a98ac417a8a88a00fb3f582fa4a2c -->
+## 2025-10-22T17:18:57+01:00 — Fix companion mining navigation teleport detection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 48 ++ / 31 --
+- Notes:
+  —
+---
+<!-- commit:86147174f3a9bdcc0360744233d2682974441092 -->
+## 2025-10-22T16:55:30+01:00 — Merge pull request #1295 from aicovergod/codex/update-companionminingcontroller-for-ore-golem-auto-mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 83 ++ / 7 --
+- Notes:
+  Fix ore golem automation follower hold release
+---
+<!-- commit:19eb0344d5dafe6ff964699a262c9500255b3632 -->
+## 2025-10-22T16:55:17+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:3225cbc9cb9b461ecb16ecd281e15ad43937cb07 -->
+## 2025-10-22T16:54:57+01:00 — Fix ore golem auto-mining follower hand-off
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 74 ++ / 7 --
+- Notes:
+  —
+---
+<!-- commit:381b2f3ea2f1735cfd03dd4773e16e5c12ba4113 -->
+## 2025-10-22T16:26:16+01:00 — Merge pull request #1294 from aicovergod/codex/update-personalorenode-to-check-companion-distance
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 35 ++ / 8 --
+- Notes:
+  Allow companions to keep personal ore nodes active
+---
+<!-- commit:ab54c1ac640cc4de18aee598b34ce5427e5bf155 -->
+## 2025-10-22T16:26:04+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:729553890600b5d0176b174817348394a53a2f54 -->
+## 2025-10-22T16:25:44+01:00 — Keep personal ore nodes alive when companion is nearby
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Mining/Core/PersonalOreNode.cs
+- Diff: 26 ++ / 8 --
+- Notes:
+  —
+---
+<!-- commit:ad54c728b9e1abe7f7633a839c72c2ea883ae49e -->
+## 2025-10-22T15:58:59+01:00 — Merge pull request #1293 from aicovergod/codex/update-follower-state-handling-in-miningcontroller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 34 ++ / 8 --
+- Notes:
+  Fix mining follower hold release tracking
+---
+<!-- commit:a0b3f179f46481ac188e306ee720b86da994e945 -->
+## 2025-10-22T15:58:38+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:fe8f5ae0176bb38e6002df2498eb07e8b28a2166 -->
+## 2025-10-22T15:58:09+01:00 — Fix mining follower hold release tracking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 25 ++ / 8 --
+- Notes:
+  —
+---
+<!-- commit:09f1a49023223bd545fd23508db66b75bf2aa321 -->
+## 2025-10-22T15:46:18+01:00 — Merge pull request #1292 from aicovergod/codex/expose-follower-hold-state-in-mining-controller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 27 ++ / 10 --
+- Notes:
+  Ensure pet follower remains disabled during mining holds
+---
+<!-- commit:52a4f8f2f124588b1e55b17503d02c77bcad3694 -->
+## 2025-10-22T15:46:06+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:53ce05a8a640dc32f9f804ebe087c2ec03c2886d -->
+## 2025-10-22T15:45:46+01:00 — Guard follower reactivation during mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 18 ++ / 10 --
+- Notes:
+  —
+---
+<!-- commit:a06342eb91a5c66de0d55327b735b946d4008c80 -->
+## 2025-10-22T15:30:38+01:00 — Merge pull request #1291 from aicovergod/codex/add-temporary-follower-hold-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 204 ++ / 83 --
+- Notes:
+  Ensure ore golem mining holds follower state
+---
+<!-- commit:fddc146f7a1790138808831ae086fb4c8699a082 -->
+## 2025-10-22T15:29:46+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:31588cd511bec6cc596e3d26c821576d0a8df682 -->
+## 2025-10-22T15:29:23+01:00 — Ensure ore golem mining holds follower state
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 195 ++ / 83 --
+- Notes:
+  —
+---
+<!-- commit:50b5ed3ec735954f377997f058aa7a03321b40ec -->
+## 2025-10-22T15:07:11+01:00 — Merge pull request #1290 from aicovergod/codex/guard-mineroutine-and-handle-cancellation-tmssnt
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 1 --
+- Notes:
+  Ensure companion mining coroutine cancels cleanly
+---
+<!-- commit:800d8f2d386fb5b1b545322c269c8a585e52f0dd -->
+## 2025-10-22T15:07:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9cbb544669c596fd85389a4ab2b7113f163dd5e5 -->
+## 2025-10-22T15:06:36+01:00 — Ensure companion mining coroutine cancels cleanly
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 15 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:dbe43c17be9e4dd579face83aaa7b8f786c78b1d -->
+## 2025-10-22T14:39:20+01:00 — Merge pull request #1288 from aicovergod/codex/add-wait-time-before-companion-mines
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 127 ++ / 0 --
+- Notes:
+  Add delayed companion mining after ore golem kills
+---
+<!-- commit:bca705980687778d4361cb6827110ef979814b88 -->
+## 2025-10-22T14:39:14+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a0d230286dfacdf2eb68007bf8732b0cfbf63e65 -->
+## 2025-10-22T14:38:54+01:00 — Delay companion ore golem harvest before auto-mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 118 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f52faa208ae753202f1941e879cccf0f19571f00 -->
+## 2025-10-22T14:21:53+01:00 — Merge pull request #1287 from aicovergod/codex/update-petcombatcontroller-for-companion-attacks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 4 ++ / 1 --
+- Notes:
+  Fix companion ore golem attack guard
+---
+<!-- commit:e6be52015bef6273e8a2b316151e3ee3e32cb3ef -->
+## 2025-10-22T14:21:40+01:00 — Fix companion ore golem attack guard
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 4 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:968bd6cad59f36bc41b3b09a7e0baa7bd0e94b7a -->
+## 2025-10-22T14:08:09+01:00 — Merge pull request #1286 from aicovergod/codex/fix-ambiguous-reference-for-random
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 1 --
+- Notes:
+  Fix ambiguous Random reference in pet combat controller
+---
+<!-- commit:ca122d334dadd7bc419c1866ca0203584dc3d53a -->
+## 2025-10-22T14:08:01+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:07b74c7091f132d5087f31be7eaa4d11490631c3 -->
+## 2025-10-22T14:07:42+01:00 — Fix ambiguous Random reference in pet combat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 2 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:19f836a11024ce6f9925d923e836764c62cd87f2 -->
+## 2025-10-22T14:05:10+01:00 — Merge pull request #1285 from aicovergod/codex/refactor-petcombatcontroller-for-companion-pickaxe-check
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 111 ++ / 3 --
+- Notes:
+  Ensure companions equip pickaxes before attacking ore golems
+---
+<!-- commit:0ebe74d7fb0dfc58ae36a95806205a3195fb7a7c -->
+## 2025-10-22T14:04:56+01:00 — Require companion pickaxes for ore golem attacks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 111 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:e1f97350130b2f7f78adc193917343608d6e9390 -->
+## 2025-10-22T13:42:04+01:00 — Merge pull request #1284 from aicovergod/codex/fix-duplicate-full-inventory-message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 13 ++ / 1 --
+- Notes:
+  Fix duplicate companion inventory full chat message
+---
+<!-- commit:ec4dd52b8147a2060656211a8c38bf5a81bad762 -->
+## 2025-10-22T13:41:55+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2de03d758c83dee73bfcef02f01d510521cf858f -->
+## 2025-10-22T13:41:36+01:00 — Fix duplicate companion inventory full chat line
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 4 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:3e9a49aad1e59e3736d1b79e37d128543a182d2c -->
+## 2025-10-22T13:28:55+01:00 — Merge pull request #1283 from aicovergod/codex/update-companionminingcontroller-for-failure-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 96 ++ / 21 --
+- Notes:
+  Improve companion mining failure reporting
+---
+<!-- commit:6876a031a685414f87f17c027b39f763c3abc0ba -->
+## 2025-10-22T13:28:31+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:5322cea0fffc797b0077e383e3f3a85c04b06804 -->
+## 2025-10-22T13:28:11+01:00 — Improve companion mining failure reporting
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs
+- Diff: 87 ++ / 21 --
+- Notes:
+  —
+---
+<!-- commit:14713e3709206358c40c6a39b8965a76602be91e -->
+## 2025-10-22T12:33:58+01:00 — Merge pull request #1282 from aicovergod/codex/update-attack-commands-to-clear-mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 0 --
+- Notes:
+  Ensure companion attack orders cancel mining
+---
+<!-- commit:3a4c841c089a0f7cefacaccac2628480a2770116 -->
+## 2025-10-22T12:33:49+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:20617161bb66be2e10971776cedad91c32b4b9c2 -->
+## 2025-10-22T12:33:28+01:00 — Ensure companion attacks cancel mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 5 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d9d38dc4930c3a5b5aeeaa548c35b1801fba2583 -->
+## 2025-10-22T12:22:46+01:00 — Merge pull request #1281 from aicovergod/codex/fix-companion-mining-chat-messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 34 ++ / 3 --
+- Notes:
+  Prevent companion mining inventory full from triggering rock warning
+---
+<!-- commit:b0c8ddebd45843bef30a904a431914298b72856d -->
+## 2025-10-22T12:22:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f13610d8ae46686cb1d7964504b76cd4b18668ea -->
+## 2025-10-22T12:22:19+01:00 — Handle inventory-full mining commands without false rock warning
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 25 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:732a94a4dfb7e051e08db1b03db98fa3deb80ab7 -->
+## 2025-10-22T12:15:47+01:00 — Merge pull request #1280 from aicovergod/codex/fix-menu-conflict-on-action-buttons
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 4 --
+- Notes:
+  Fix companion command menu closing behaviour
+---
+<!-- commit:1d078802bbdb7683037c1bb6c8c98ad42a3d7496 -->
+## 2025-10-22T12:15:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ee1451f340bea6d575476f90779f07ec702bcad8 -->
+## 2025-10-22T12:15:19+01:00 — Fix companion command menu closing behaviour
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/UI/CompanionCommandMenu.cs
+- Diff: 10 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:c49fa2b6f063a979e76981bdd9a30148c4b395a6 -->
+## 2025-10-22T12:12:20+01:00 — Merge pull request #1279 from aicovergod/codex/add-developer-command-clearcompanioninv
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 124 ++ / 0 --
+- Notes:
+  Add developer command to clear companion inventory
+---
+<!-- commit:d74f3aefafc57e6f2a30ee0b4d1e9423f0ee5f47 -->
+## 2025-10-22T12:12:12+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8cbe158c250ce9f232691d0f638ca7cf417d4412 -->
+## 2025-10-22T12:11:53+01:00 — Add command to clear companion inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Commands/ClearCompanionInventoryCommand.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs
+- Diff: 115 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:5479f1892c12e127915c5b4a4a50ae9da7ae3bf8 -->
+## 2025-10-22T12:04:54+01:00 — Merge pull request #1278 from aicovergod/codex/fix-companion-prospecting-on-shift-right-click
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 15 ++ / 1 --
+- Notes:
+  Prevent companion mining command from triggering prospecting
+---
+<!-- commit:32a3225b94a6bde1ebea111eb2e236a0fb9b0f41 -->
+## 2025-10-22T12:04:47+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d7ca0a9ec43212505275a242bc0e6c5464db5fcc -->
+## 2025-10-22T12:04:30+01:00 — Fix shift prospect triggering when commanding companion
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Mining/Core/MinerController.cs
+- Diff: 6 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:b7f811e08532de23e83ed12bcb9e475b081d3fde -->
+## 2025-10-22T12:01:28+01:00 — Merge pull request #1277 from aicovergod/codex/add-containsscreenpoint-helper-in-companioncommandmenu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 32 ++ / 6 --
+- Notes:
+  Prevent pet menu from closing when interacting with companion commands
+---
+<!-- commit:a99652856b6e2320701be04e8ff7b18622eece4c -->
+## 2025-10-22T12:01:24+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f460b24dd8b6d515626e6f41e66c735e314b36ff -->
+## 2025-10-22T12:00:28+01:00 — Adjust companion command menu click handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/UI/CompanionCommandMenu.cs, Assets/Scripts/Pets/PetLevelBarMenu.cs
+- Diff: 23 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:1fe5558a363c8a0d8611357e8acb568496119e8a -->
+## 2025-10-22T11:45:11+01:00 — Merge pull request #1276 from aicovergod/codex/add-testminerocks-command-for-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 53 ++ / 0 --
+- Notes:
+  Add developer command to trigger companion mining
+---
+<!-- commit:d76dc58c5c35bedcb3e41aba19e16755cc313c32 -->
+## 2025-10-22T11:45:02+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:535b861e640e02c34e38727a782a760584304964 -->
+## 2025-10-22T11:44:43+01:00 — Add developer command to trigger companion mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Commands/PlayerCommandService.cs, Assets/Scripts/Player/Commands/TestMineRocksCommand.cs
+- Diff: 44 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d9e923c292e863ff677f82399b9abd5f72b58ae8 -->
+## 2025-10-22T11:34:29+01:00 — Merge pull request #1275 from aicovergod/codex/update-logging-for-mining-commands
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 57 ++ / 13 --
+- Notes:
+  Improve companion mining command logging
+---
+<!-- commit:5cdeb4819ceef323ed2763c196f0a7736cadebdc -->
+## 2025-10-22T11:34:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:477dfc61d616113194dbd78cf594c4fbd61e24c1 -->
+## 2025-10-22T11:34:02+01:00 — Improve companion mining command logging
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs
+- Diff: 48 ++ / 13 --
+- Notes:
+  —
+---
+<!-- commit:9ebe76fd6f9e293032d516c77f34b93bd5387e11 -->
+## 2025-10-22T10:59:45+01:00 — Merge pull request #1274 from aicovergod/codex/update-companion-spawn-and-state-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 89 ++ / 7 --
+- Notes:
+  Fix companion reactivation flow after storing
+---
+<!-- commit:e131d0fc4b97c399d8a8ae8e296b35448daac032 -->
+## 2025-10-22T10:59:32+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:56ce2680a1d90c7894dd60cdf36960a0bcbe0f42 -->
+## 2025-10-22T10:59:13+01:00 — Fix companion reactivation without respawn
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 80 ++ / 7 --
+- Notes:
+  —
+---
+<!-- commit:0a0f55cf3c554d5ce2dc6f9f401709b3b6b7f5c7 -->
+## 2025-10-22T10:23:53+01:00 — Merge pull request #1273 from aicovergod/codex/refactor-mining-controller-for-2d-distance-calculations
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 17 ++ / 3 --
+- Notes:
+  Ignore z offset when selecting companion mining rocks
+---
+<!-- commit:fc1db1e151d4a00e505b81998b9f794a9504fbf2 -->
+## 2025-10-22T10:23:46+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:29141409a73508be12bedaeaa8fb9b2d3cdd7a4a -->
+## 2025-10-22T10:23:22+01:00 — Ignore z offset when selecting companion mining rocks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 8 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:999db0bc65303873462bda3544002d7d58eea628 -->
+## 2025-10-22T10:15:15+01:00 — Merge pull request #1272 from aicovergod/codex/fix-companion-item-duplication-issue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 29 ++ / 0 --
+- Notes:
+  Fix manual companion storage reset bug
+---
+<!-- commit:f3ca4ae494aa112043010ce5114defcda7234854 -->
+## 2025-10-22T10:15:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2a78363c3763650d66d97d7a6c53d0b839d66c09 -->
+## 2025-10-22T10:14:44+01:00 — Fix manual companion store resetting pet state
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetDropSystem.cs
+- Diff: 20 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b5b16271ca954a6160cd49b3330207c364aa6bd0 -->
+## 2025-10-22T01:10:00+01:00 — Merge pull request #1271 from aicovergod/codex/implement-companion-command-workflow
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 870 ++ / 138 --
+- Notes:
+  Add companion command menu and area mining workflow
+---
+<!-- commit:ff1d468e278dd7d99389e976a43f8a188813e37f -->
+## 2025-10-22T01:09:52+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e2e4cdce72b60eecdda71a324759a7abf2daf212 -->
+## 2025-10-22T01:09:36+01:00 — Add companion command menu and area mining workflow
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs, Assets/Scripts/Companions/UI/CompanionCommandMenu.cs.meta, Assets/Scripts/Pets/PetLevelBarMenu.cs, Assets/Scripts/UI/PetLevelBarContextMenuExtender.cs
+- Diff: 861 ++ / 138 --
+- Notes:
+  —
+---
+<!-- commit:5a722be2306330b54becf24bf0a8503398e2da44 -->
+## 2025-10-22T00:43:47+01:00 — Merge pull request #1270 from aicovergod/codex/add-chatbox-message-for-companion-mining
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 0 --
+- Notes:
+  Add companion chat warning when companion lacks pickaxe
+---
+<!-- commit:9169ec7deebcd13cad2d2864e91038df5e975b68 -->
+## 2025-10-22T00:41:24+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:28302cc4dea33c4202bde0b6ef9be45f696de67d -->
+## 2025-10-22T00:41:06+01:00 — Add companion chat warning when missing pickaxe
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 15 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:baf4ca5e0c551c54877a7116b5cda92c9869ce23 -->
+## 2025-10-22T00:37:48+01:00 — Merge pull request #1269 from aicovergod/codex/fix-rightclickmenu-prefab-loading-error
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 198 ++ / 12 --
+- Notes:
+  Add runtime fallback for NPC context menu
+---
+<!-- commit:025b7ab747de85e3ec9df219b6f8051e25dc3508 -->
+## 2025-10-22T00:37:34+01:00 — Add runtime fallback for NPC context menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/UI/RightClickMenu.cs
+- Diff: 198 ++ / 12 --
+- Notes:
+  —
+---
+<!-- commit:1ec9e1fbac86f78c293349e4f75a32c1ff00f410 -->
+## 2025-10-22T00:20:57+01:00 — Merge pull request #1268 from aicovergod/codex/add-font-and-color-fields-in-companionequipment
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 121 ++ / 19 --
+- Notes:
+  Align companion equipment fonts with player equipment settings
+---
+<!-- commit:6cea19b7ad258c7229306e71823a6f5755b38ae5 -->
+## 2025-10-22T00:20:50+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:39d1557aa6ebb1c678991e1515a3598380e87ecf -->
+## 2025-10-22T00:20:28+01:00 — Mirror player equipment text styling on companion UI
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionEquipment.cs
+- Diff: 112 ++ / 19 --
+- Notes:
+  —
+---
+<!-- commit:eae34d0a0b6ff846a51579f8fe7cd9c30307e65d -->
+## 2025-10-22T00:12:49+01:00 — Merge pull request #1267 from aicovergod/codex/force-player-inventory-to-open-with-equipment-tab
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 66 ++ / 0 --
+- Notes:
+  Ensure companion equipment opens player inventory
+---
+<!-- commit:d485fb9a62eac7a369a130122abb0af2a3b3e8cb -->
+## 2025-10-22T00:12:38+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:16c9198fe27a9f6adf8a47125d632f1f6595cf9d -->
+## 2025-10-22T00:12:19+01:00 — Ensure companion equipment opens player inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 57 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:43adbdd2e82cfb83aa0bc05a4710e8b7b4ad11d6 -->
+## 2025-10-22T00:04:30+01:00 — Merge pull request #1266 from aicovergod/codex/fix-companion-equipment-tab-behavior
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 76 ++ / 0 --
+- Notes:
+  Keep player inventory visible while companion equipment tab is open
+---
+<!-- commit:822a7c15a0cd718307bb4e4e7e273a5f7c6db4bb -->
+## 2025-10-22T00:04:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:118da0711266a315ab5da9d1e3c4cb43475a309f -->
+## 2025-10-22T00:04:04+01:00 — Fix companion equipment tab inventory interactions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/CompanionEquipment.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/UI/UIManager.cs, Assets/Scripts/UI/Utilities/InterfaceTabMutexUtility.cs
+- Diff: 67 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:5aeb6bc0318ffb95df31aa5dc666f80677638590 -->
+## 2025-10-21T23:43:20+01:00 — Merge pull request #1265 from aicovergod/codex/add-companion-equipment-system
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1258 ++ / 6 --
+- Notes:
+  Add companion equipment window and integrate UI toggles
+---
+<!-- commit:9d70ac43d8f039c5af746022691b38578292db67 -->
+## 2025-10-21T23:42:48+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:142aa8daa9896d213479af331e8c01b6a411f029 -->
+## 2025-10-21T23:42:30+01:00 — Add companion equipment system and integrate UI
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (8): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionEquipment.cs, Assets/Scripts/Companions/CompanionEquipment.cs.meta, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Pets/PetLevelBarHUD.cs, Assets/Scripts/Pets/PetLevelBarMenu.cs
+- Diff: 1249 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:c37281aa6b11cebcb0121302cead1154480e0d17 -->
+## 2025-10-21T23:00:01+01:00 — Merge pull request #1264 from aicovergod/codex/fix-prospecting-when-companion-inventory-is-full
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 1 --
+- Notes:
+  Prevent companion mining failures from triggering player prospecting
+---
+<!-- commit:7909856d6c3f31fe23b0a0d36c05ae387d6ad9fc -->
+## 2025-10-21T22:59:52+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:3cb42f7cc9b8a283f8b727eaa13fcbabd3fc7b6e -->
+## 2025-10-21T22:59:31+01:00 — Prevent companion mining failures from triggering player prospect
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/Mining/CompanionMiningController.cs
+- Diff: 5 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:d7ee45a5b2f393da71baac86bbc1088058ab1052 -->
+## 2025-10-21T22:54:41+01:00 — Merge pull request #1263 from aicovergod/codex/add-pet-definition-helper-and-update-drop-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 53 ++ / 5 --
+- Notes:
+  Prevent dropping active pets from inventory
+---
+<!-- commit:4ca70dd7e5b45ab28db38c3f080d47b6e8af1e4d -->
+## 2025-10-21T22:54:34+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:74f78b94400ec87aa9f7e1f8a94969e89c8dc2bd -->
+## 2025-10-21T22:54:14+01:00 — Prevent dropping active pets from inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Pets/PetDropSystem.cs
+- Diff: 44 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:1e19c5ad02412ecc9f4142784d8dd4791bfb4cd3 -->
+## 2025-10-21T22:42:41+01:00 — Merge pull request #1262 from aicovergod/codex/fix-companion-drop-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 50 ++ / 1 --
+- Notes:
+  Prevent dropping active companion items
+---
+<!-- commit:2c85caaa3e144279e30aa9f9b347addb51748a65 -->
+## 2025-10-21T22:42:33+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0fdf8978501c511aa77525c30585aba41c25f02c -->
+## 2025-10-21T22:42:14+01:00 — Prevent dropping active companion items
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 41 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:6fa77de1cefbb4a740204edb3a73fa92aead327f -->
+## 2025-10-21T22:33:30+01:00 — Merge pull request #1261 from aicovergod/codex/refactor-hud-logic-into-mininghudbase
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 432 ++ / 147 --
+- Notes:
+  Refactor mining HUD and add companion overlay
+---
+<!-- commit:1515058ef740458b0d15e629141d3eaa38eee1bd -->
+## 2025-10-21T22:33:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:7dfa1afa3df87abae7b03e41022119973604f533 -->
+## 2025-10-21T22:33:02+01:00 — Refactor mining HUD and add companion overlay
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Skills/Mining/UI/CompanionMiningHUD.cs, Assets/Scripts/Skills/Mining/UI/CompanionMiningHUD.cs.meta, Assets/Scripts/Skills/Mining/UI/MiningHudBase.cs, Assets/Scripts/Skills/Mining/UI/MiningHudBase.cs.meta, Assets/Scripts/Skills/Mining/UI/MiningUI.cs
+- Diff: 423 ++ / 147 --
+- Notes:
+  —
+---
+<!-- commit:da3d4a9c5d312287b92eca4c2a4e5b3a6b7eed77 -->
+## 2025-10-21T22:20:40+01:00 — Merge pull request #1260 from aicovergod/codex/fix-pet-inventory-full-message
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 44 ++ / 0 --
+- Notes:
+  Prevent companion mining when inventory is full
+---
+<!-- commit:739422ac04d836c211f60eca061ddcf01b062627 -->
+## 2025-10-21T22:19:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:679b67d2056d228af68207b651e97007788a2e28 -->
+## 2025-10-21T22:18:39+01:00 — Prevent companion mining with full inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs
+- Diff: 35 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:cefcec98a4455c88bf10f6bec925fa9e257878ad -->
+## 2025-10-21T21:53:31+01:00 — Merge pull request #1259 from aicovergod/codex/update-handle-active-account-username-change
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 4 --
+- Notes:
+  Fix companion inventory load when profile pending
+---
+<!-- commit:5b7ec23ee7dfc5944c6b2888b2a76edbbb168f81 -->
+## 2025-10-21T21:53:12+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:7432072b60ae37eda4eed165979fe6a2234738a3 -->
+## 2025-10-21T21:52:53+01:00 — Fix companion inventory load when profile pending
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionInventory.cs
+- Diff: 5 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:fb0f07a4ef65a84379f95fad92c3e2f096a4e5f2 -->
+## 2025-10-21T21:30:43+01:00 — uwu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (18): Assets/Scripts/Companions.meta, Assets/Scripts/Companions/CompanionClickable.cs.meta, Assets/Scripts/Companions/CompanionCombatBridge.cs.meta, Assets/Scripts/Companions/CompanionController.cs.meta, Assets/Scripts/Companions/CompanionInventory.cs.meta, Assets/Scripts/Companions/CompanionManager.cs.meta, Assets/Scripts/Companions/CompanionRuntimeAssets.cs.meta, Assets/Scripts/Companions/CompanionSkillMemorySave.cs.meta, Assets/Scripts/Companions/CompanionStatsWindow.cs.meta, Assets/Scripts/Companions/Mining.meta, Assets/Scripts/Companions/Mining/CompanionMiningController.cs.meta, Assets/Scripts/Player/Commands/CommandsListCommand.cs.meta, Assets/Scripts/Player/Commands/SaveProfileCommand.cs.meta, Assets/Scripts/Skills/Mining/Core/PickaxeDefinitionRegistry.cs.meta, Assets/Scripts/Skills/SkillNameUtility.cs.meta, Assets/Tests/UI/ModIconAtlasTests.cs.meta, Packages/manifest.json, Packages/packages-lock.json
+- Diff: 72 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:da762e1cd5f1d73872314ebbee3b2b61e844dd41 -->
+## 2025-10-21T20:59:15+01:00 — Merge pull request #1258 from aicovergod/codex/refactor-companion-inventory-loading-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 62 ++ / 1 --
+- Notes:
+  Defer companion inventory load until profile active
+---
+<!-- commit:0b1fa8bac7bbeb30b4463f72e633ae6b10a98522 -->
+## 2025-10-21T20:59:05+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:af4aecdfc5da0ec9fb6d9d16a34f0dcb8329d661 -->
+## 2025-10-21T20:58:43+01:00 — Defer companion inventory load until profile active
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionInventory.cs
+- Diff: 53 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:291dae7ce4214c063f404befdad4931d7f6a7bf0 -->
+## 2025-10-21T20:17:10+01:00 — Merge pull request #1257 from aicovergod/codex/add-null-slot-guard-in-restorestate
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 15 ++ / 0 --
+- Notes:
+  Handle null inventory slots during state restoration
+---
+<!-- commit:6c75953fac4724561c5bf25bb0cd3ff559a11871 -->
+## 2025-10-21T20:17:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:35da0a989532489a8029518c6caac6117885fab3 -->
+## 2025-10-21T20:16:43+01:00 — Handle null slots when restoring inventory state
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Core/InventoryModel.cs
+- Diff: 6 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2de7b8268ad1369716262e83b8bc15689c195e38 -->
+## 2025-10-21T20:04:27+01:00 — Merge pull request #1256 from aicovergod/codex/add-save-manager-integration-for-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 164 ++ / 6 --
+- Notes:
+  Persist companion skill and inventory data
+---
+<!-- commit:55ce1c6955394e50ab98b19e35a7e1fd09c9e7c7 -->
+## 2025-10-21T20:04:09+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ec2eb5160cd036b381769fa676d042a7f6034047 -->
+## 2025-10-21T20:03:50+01:00 — Refine companion save handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionInventory.cs, Assets/Scripts/Companions/CompanionSkillMemorySave.cs
+- Diff: 155 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:9bf57eee13c25413934321c03a3f20d850cdab31 -->
+## 2025-10-21T19:40:57+01:00 — Merge pull request #1255 from aicovergod/codex/update-resource-gathering-messages-for-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 50 ++ / 4 --
+- Notes:
+  Route companion gathering messages to companion chat
+---
+<!-- commit:e8d58bd45ef81c2ca6512ea82e66608a753e9870 -->
+## 2025-10-21T19:39:34+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:aad4e89d8caa97b597f3903b8e7f6f68d4b10989 -->
+## 2025-10-21T19:39:16+01:00 — Route companion gathering messages to companion chat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Skills/Common/GatheringRewardContextBuilder.cs, Assets/Scripts/Skills/Common/GatheringRewardProcessor.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs
+- Diff: 41 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:f101fc79d6beed4d2ca83b7e3120c38674b54a4d -->
+## 2025-10-21T19:30:26+01:00 — Merge pull request #1254 from aicovergod/codex/fix-bug-kuy436
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 17 ++ / 0 --
+- Notes:
+  Prevent non-combat companions from intercepting NPC menus
+---
+<!-- commit:1de600b2ea68699df9b2384500882b218a1c41d4 -->
+## 2025-10-21T19:30:20+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:01745b5e279e8239d5d9b24ffa9aaee36946cb7b -->
+## 2025-10-21T19:30:02+01:00 — Prevent non-combat companions from intercepting NPC menus
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 8 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c8a7344c698ce319798cd7403beb881a890a6a17 -->
+## 2025-10-21T19:08:01+01:00 — Merge pull request #1253 from aicovergod/codex/implement-companion-mining-command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 609 ++ / 2 --
+- Notes:
+  Add companion mining command and pickaxe registry
+---
+<!-- commit:02dcaccf4051833ed253a00c8803bc83b82c2653 -->
+## 2025-10-21T19:07:29+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:1b89a461f537ebcf360ad1b5d469dba74c103a47 -->
+## 2025-10-21T19:07:07+01:00 — Add companion mining command and tool registry
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionInventory.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/Mining/CompanionMiningController.cs, Assets/Scripts/Skills/Mining/Core/MinerController.cs, Assets/Scripts/Skills/Mining/Core/PickaxeDefinitionRegistry.cs, Assets/Scripts/Skills/Mining/Core/PickaxeToUse.cs
+- Diff: 600 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:5f970dfe4bd7e60a1f00b763444f16f4087e84e8 -->
+## 2025-10-21T18:35:57+01:00 — Merge pull request #1252 from aicovergod/codex/add-reset-stats-buttons-in-admin-menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 63 ++ / 0 --
+- Notes:
+  Add stat reset controls to Admin F2 menu
+---
+<!-- commit:631546443e3e0f0f954281dd2e0d2e673bfeb958 -->
+## 2025-10-21T18:21:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e958b61ca079bec58337abdbe75b600eb4c59db9 -->
+## 2025-10-21T18:21:20+01:00 — Add stat reset controls to Admin F2 menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 54 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:3833fbf882cacc5d9f936b54603b74838164ac84 -->
+## 2025-10-21T18:04:28+01:00 — Merge pull request #1251 from aicovergod/codex/separate-skill-level-application-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 123 ++ / 50 --
+- Notes:
+  Separate AdminF2 skill overrides for player and companion
+---
+<!-- commit:afb9ffd89f7c217c32474fc2dc8d99c54884a090 -->
+## 2025-10-21T18:04:18+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:cd3de81f7f846f4af1f326bcfce867d9cd77e5e3 -->
+## 2025-10-21T18:04:00+01:00 — Separate AdminF2 skill overrides for player and companion
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 114 ++ / 50 --
+- Notes:
+  —
+---
+<!-- commit:b2c1e348a9555f4422554b505baec3bb94c611bd -->
+## 2025-10-21T17:46:33+01:00 — Merge pull request #1250 from aicovergod/codex/add-skill-level-up-messages-in-chatbox
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 133 ++ / 13 --
+- Notes:
+  Add chat announcements for skill level ups
+---
+<!-- commit:b8b003e8b31062f070cf0834a802ade9532cf074 -->
+## 2025-10-21T17:46:27+01:00 — Merge branch 'main' into codex/add-skill-level-up-messages-in-chatbox
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 0 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:71c96af69139bb41c5c1afb4ffc01998697f4381 -->
+## 2025-10-21T17:45:15+01:00 — feat: announce skill level ups in chat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionRuntimeAssets.cs, Assets/Scripts/Pets/PetDefinition.cs, Assets/Scripts/Skills/SkillNameUtility.cs
+- Diff: 129 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:815c7255c91e9a6f55a2a4e2a062b3014c7890d5 -->
+## 2025-10-21T17:32:44+01:00 — Handle companion manual attack commands
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/NPC/Interaction/NpcInteractable.cs
+- Diff: 21 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:baa6063eae3f0466cbedca9fd785833f4bae4b5a -->
+## 2025-10-21T17:16:09+01:00 — Merge pull request #1248 from aicovergod/codex/add-random-skill-xp-gains-for-companions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 79 ++ / 5 --
+- Notes:
+  Implement companion melee XP randomization and logging toggle
+---
+<!-- commit:230b2567d5ece98b6d17aef80c5ab3431045b287 -->
+## 2025-10-21T17:15:57+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:27b684470fdaea136807e0e3b4e50a59b65002d6 -->
+## 2025-10-21T17:15:39+01:00 — Implement companion melee XP randomization and logging toggle
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Skills/AdminF2Menu.cs
+- Diff: 70 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:52e43693a6c89c678fd03bfbddaa1dc5277ac9a1 -->
+## 2025-10-21T16:51:12+01:00 — Merge pull request #1247 from aicovergod/codex/extend-pet-spawn-with-auto-return-option
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 26 ++ / 5 --
+- Notes:
+  Prevent auto-restoring companions after manual pet summons
+---
+<!-- commit:aa9e092139ab06156729d7afa08c733db48e0cd2 -->
+## 2025-10-21T16:50:28+01:00 — Adjust pet spawning companion restore behaviour
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetDropSystem.cs, Assets/Scripts/Pets/PetUseHandler.cs
+- Diff: 26 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:674387feff925eb001b92a41c6a31218bb8c258c -->
+## 2025-10-21T16:29:54+01:00 — Merge pull request #1246 from aicovergod/codex/update-initialise-method-for-inventory-component
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 1 --
+- Notes:
+  Fix companion inventory initialization reuse when available
+---
+<!-- commit:315f856c1f3f08be6d41c75bce7cfdc5825784bc -->
+## 2025-10-21T16:29:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a871d5391948fa7fce80505e9f3929a61e8caf7b -->
+## 2025-10-21T16:29:18+01:00 — Reuse companion inventory component when available
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionInventory.cs
+- Diff: 15 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:649f4c08a040431d4832cab2ea6382021b8970be -->
+## 2025-10-21T15:56:22+01:00 — Merge pull request #1245 from aicovergod/codex/fix-companion-respawn-petlevelbar-hud
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 12 --
+- Notes:
+  Fix companion HUD teardown handling
+---
+<!-- commit:7e82838462a745de19e10f00c9bed1dc4aaf083d -->
+## 2025-10-21T15:54:43+01:00 — Fix companion HUD teardown handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetLevelBarHUD.cs
+- Diff: 19 ++ / 12 --
+- Notes:
+  —
+---
+<!-- commit:ab23e171f5e99f773ac46483fe3bda3b8c3e51e3 -->
+## 2025-10-21T15:16:31+01:00 — Merge pull request #1244 from aicovergod/codex/fix-pet-level-bar-visibility-on-spawn
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 116 ++ / 1 --
+- Notes:
+  Ensure pet HUD waits for health bar before spawning
+---
+<!-- commit:49fad6ea7a0aeecd4ff79f2276222baab218d235 -->
+## 2025-10-21T15:15:47+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b2cd9074caba5998e8b8f161b6ebb5c98362232f -->
+## 2025-10-21T15:15:29+01:00 — Ensure pet HUD waits for health bar before spawning
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Pets/PetLevelBarHUD.cs, Assets/Scripts/Player/HealthHUD.cs
+- Diff: 107 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:b0ee488b83079882f467b670bdd012b0a30f3a2c -->
+## 2025-10-21T15:05:23+01:00 — Merge pull request #1243 from aicovergod/codex/update-companionmanager-despawn-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 122 ++ / 38 --
+- Notes:
+  Refine companion despawn behaviour for pet swaps
+---
+<!-- commit:d9cca085419f6aeade3d9ea82a7e62ace39ebac1 -->
+## 2025-10-21T15:05:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:7e662e2b3a226fed59bf6ab22b0ad3df55b0cbaf -->
+## 2025-10-21T15:04:54+01:00 — Refine companion despawn flow
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 113 ++ / 38 --
+- Notes:
+  —
+---
+<!-- commit:37284799fa0f048d3824b0a57910f98cac18e348 -->
+## 2025-10-21T14:32:09+01:00 — Merge pull request #1242 from aicovergod/codex/update-handlepetdespawned-to-invoke-ensurehud
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 15 ++ / 0 --
+- Notes:
+  Ensure companion HUD restores after pet despawn
+---
+<!-- commit:f02380dbcfab16a9c47edc1f4a5b22cebd966707 -->
+## 2025-10-21T14:31:36+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:96a3171f55168213c988ab44b127bab0bae18806 -->
+## 2025-10-21T14:31:16+01:00 — Ensure companion HUD restores after pet despawn
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Companions/CompanionManager.cs
+- Diff: 6 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d343c8028d6c917165b42ee5d6334f9e11da598f -->
+## 2025-10-21T14:04:31+01:00 — Merge pull request #1241 from aicovergod/codex/fix-console-errors-in-scripts
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 35 ++ / 10 --
+- Notes:
+  Fix companion player rebinding and pet beastmaster references
+---
+<!-- commit:70397ec86b44726182fb62fecf59fbf5e2575612 -->
+## 2025-10-21T14:04:20+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9c91c35375ac9b558a165f8a74b26f6d673d43bd -->
+## 2025-10-21T14:04:00+01:00 — Fix companion and pet combat owner bindings
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 26 ++ / 10 --
+- Notes:
+  —
+---
+<!-- commit:736c6835ae4650dd74cb3c4c397f678e19b78d7f -->
+## 2025-10-21T13:47:24+01:00 — Merge pull request #1240 from aicovergod/codex/fix-identified-bugs
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 112 ++ / 18 --
+- Notes:
+  Fix companion pet spawning and persistence
+---
+<!-- commit:2c48fc1f411163e074932b4b199d956109fb5722 -->
+## 2025-10-21T13:16:51+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b147704f21f8729f200feb4edd0f0dd835b85e16 -->
+## 2025-10-21T13:16:33+01:00 — Fix companion pet spawning and persistence
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetDropSystem.cs, Assets/Scripts/Pets/PetUseHandler.cs
+- Diff: 103 ++ / 18 --
+- Notes:
+  —
+---
+<!-- commit:2512ea9333679750a138e677d7b16fc2cf0236a4 -->
+## 2025-10-21T12:48:41+01:00 — Merge pull request #1239 from aicovergod/codex/add-companion-button-to-chatbox
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 95 ++ / 2 --
+- Notes:
+  Add companion chat channel between game and public
+---
+<!-- commit:377c35a84f3825e0c3b3438c41e0c069c83bfd9d -->
+## 2025-10-21T12:47:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b38438dc3609a598610073f6317a36bdb540e215 -->
+## 2025-10-21T12:46:58+01:00 — Add companion chat channel to chat HUD
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/UI/Chat/ChatChannel.cs, Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/UI/Chat/ChatService.cs
+- Diff: 86 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:58d0b9f20bd2a7cf8967ce2756c64d28817f964d -->
+## 2025-10-21T12:36:08+01:00 — Merge pull request #1238 from aicovergod/codex/add-companion-spawning-functionality
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 68 ++ / 8 --
+- Notes:
+  Route Isla pet assets through companion pipeline
+---
+<!-- commit:befe05ebee18a5ebf0be5ed6166942ebd311b848 -->
+## 2025-10-21T12:35:59+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:4271c82ee0d7ec4a764269568f85852ab8a3212d -->
+## 2025-10-21T12:35:42+01:00 — Route Isla pet assets through companion pipeline
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Pets/PetDefinition.cs, Assets/Scripts/Pets/PetDropSystem.cs, Assets/Scripts/Pets/PetUseHandler.cs
+- Diff: 59 ++ / 8 --
+- Notes:
+  —
+---
+<!-- commit:81a1816b742b8135c845b09276cf29cc65a10a60 -->
+## 2025-10-21T11:54:22+01:00 — Merge pull request #1237 from aicovergod/codex/add-companion-system-to-pet-architecture
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1478 ++ / 76 --
+- Notes:
+  Add companion system alongside existing pets
+---
+<!-- commit:59b1d2a5bcb56f02be3923c11225646c07f2c239 -->
+## 2025-10-21T11:53:59+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:4753e1154f4c65a9938caa48724b69813c072868 -->
+## 2025-10-21T11:53:17+01:00 — Add companion system alongside existing pets
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (15): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Companions/CompanionClickable.cs, Assets/Scripts/Companions/CompanionCombatBridge.cs, Assets/Scripts/Companions/CompanionController.cs, Assets/Scripts/Companions/CompanionInventory.cs, Assets/Scripts/Companions/CompanionManager.cs, Assets/Scripts/Companions/CompanionRuntimeAssets.cs, Assets/Scripts/Companions/CompanionSkillMemorySave.cs, Assets/Scripts/Companions/CompanionStatsWindow.cs, Assets/Scripts/Pets/PetCombatController.cs, Assets/Scripts/Pets/PetDropSystem.cs, Assets/Scripts/Pets/PetLevelBarHUD.cs, Assets/Scripts/Pets/PetLevelBarMenu.cs, Assets/Scripts/Skills/SkillManager.cs, Assets/Scripts/UI/PetLevelBarContextMenuExtender.cs
+- Diff: 1469 ++ / 76 --
+- Notes:
+  —
+---
+<!-- commit:4a90fbd49c93780630ef13b0e210ff02be731f14 -->
+## 2025-10-21T10:48:14+01:00 — Merge pull request #1236 from aicovergod/codex/fix-operator-error-in-commandslistcommand
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 2 --
+- Notes:
+  Fix command context validation
+---
+<!-- commit:4d5b6e60039d94c8f7f74b25181dce462b2d21c2 -->
+## 2025-10-21T10:48:06+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e0ce6fed6bf20a4287a9e45b469ba315af26bcee -->
+## 2025-10-21T10:47:46+01:00 — Fix command context validation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Player/Commands/CommandsListCommand.cs
+- Diff: 2 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:2ba7eb091ee5e8dc5ace9afc578c1b7e52b413da -->
+## 2025-10-20T15:59:14+01:00 — Merge pull request #1235 from aicovergod/codex/update-bank-deposit-methods-for-inventory-resolution
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 4 --
+- Notes:
+  Ensure bank deposit flows re-resolve player inventory
+---
+<!-- commit:14540276dbf3fe2fbd3fba3039cfec0d8ddc58f8 -->
+## 2025-10-20T15:59:06+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ae0e1c146ce70993c1ea7dcf77c2f15ef69160d7 -->
+## 2025-10-20T15:58:51+01:00 — Ensure bank deposits re-resolve player inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Bank/BankUI.cs
+- Diff: 10 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:a433c5b53909f994db9ef803da9b3d2266188fb4 -->
+## 2025-10-20T15:39:42+01:00 — Merge pull request #1234 from aicovergod/codex/update-depositfrominventory-for-batching-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 13 ++ / 3 --
+- Notes:
+  Batch bank deposit saves
+---
+<!-- commit:b6fbe5565feadaa52b39ea3b82f6148ac9e08773 -->
+## 2025-10-20T15:39:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d50cc7cc997ffdfd1c3b9f67e489e79d077aa315 -->
+## 2025-10-20T15:39:07+01:00 — Adjust bank deposit batching save
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Bank/BankUI.cs
+- Diff: 4 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:28f2a62d1384ad0b4f8ab7c55d88b15675fcf9df -->
+## 2025-10-20T11:27:33+01:00 — Merge pull request #1233 from aicovergod/codex/fix-this
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 36 ++ / 1 --
+- Notes:
+  Guard command registration against uninitialized services
+---
+<!-- commit:ef99a4b1e6078344ef04424bf40f0403823719a5 -->
+## 2025-10-20T11:26:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:dc9a7f2ad266628666dab94177194279f32e61fb -->
+## 2025-10-20T11:26:34+01:00 — Guard commands list command registration
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Player/Commands/PlayerCommandService.cs
+- Diff: 27 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:38f3a7cc91edd3c28f52d8de9b3e566d3da453b2 -->
+## 2025-10-20T00:34:38+01:00 — Merge pull request #1232 from aicovergod/codex/add-saveprofilecommand-for-player-profile-saving
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 52 ++ / 0 --
+- Notes:
+  Add developer save profile command
+---
+<!-- commit:4e4ff457f065f60cd6dc3310a07df511a2f1894c -->
+## 2025-10-20T00:34:25+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d3893b932e1d99d386d3f0b0a8cf0c12a240beb4 -->
+## 2025-10-20T00:34:06+01:00 — Add developer save profile command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Commands/PlayerCommandService.cs, Assets/Scripts/Player/Commands/SaveProfileCommand.cs
+- Diff: 43 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a0223304b692934f9d708547484cc15bdd11827c -->
+## 2025-10-19T23:15:32+01:00 — Merge pull request #1231 from aicovergod/codex/add-commandslistcommand-and-expose-command-list
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 115 ++ / 0 --
+- Notes:
+  Add support command to list available player commands
+---
+<!-- commit:6de19ca3d0a18cfc6e301817cb2dff29538b86c4 -->
+## 2025-10-19T23:15:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f828bb9922992744c49833d9f1821898332a697f -->
+## 2025-10-19T23:15:03+01:00 — Add commands list player chat command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Commands/CommandsListCommand.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs
+- Diff: 106 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f5e69bbdc4f90f33f19158bbddad5d330aa7f82d -->
+## 2025-10-19T16:25:11+01:00 — Merge pull request #1230 from aicovergod/codex/fix-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 39 ++ / 5 --
+- Notes:
+  Prevent moderator icon markup spoofing in chat messages
+---
+<!-- commit:3cef08d7d6b0090db76fc14f669df56549059b34 -->
+## 2025-10-19T16:24:32+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:969380622ff3354d197c4dc131da83e8ebb34d12 -->
+## 2025-10-19T16:24:15+01:00 — Prevent chat messages from rendering mod icon markup
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/UI/Chat/EmojiMarkupParser.cs, Assets/Tests/UI/EmojiMarkupParserTests.cs
+- Diff: 30 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:4d00a8d4e0cec65313369afbbcba73ce7dc8a5e0 -->
+## 2025-10-19T16:18:02+01:00 — Merge pull request #1229 from aicovergod/codex/add-modicons-before-character-name
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 91 ++ / 4 --
+- Notes:
+  Show mod icon beside chat input name
+---
+<!-- commit:399c79a9cd510c3626e74301656518a068906da1 -->
+## 2025-10-19T16:17:53+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e84bd5f350d6f96e1a49045bc2a77f4a98bc1781 -->
+## 2025-10-19T16:17:36+01:00 — Show mod icon beside chat input name
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 82 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:68a99cd58b01173a873032042f87ead76feca668 -->
+## 2025-10-19T16:06:04+01:00 — Merge pull request #1228 from aicovergod/codex/fix-modicon-display-in-chatbox
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 52 ++ / 0 --
+- Notes:
+  Fix mod icon parsing
+---
+<!-- commit:e04c60b4ac062d7597589e725722bfc1d6198e6e -->
+## 2025-10-19T16:04:25+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:1f1fd19142e249102f33021afabafb404c39b2cc -->
+## 2025-10-19T16:04:06+01:00 — Fix mod icon parsing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/UI/Chat/ModIconAtlas.cs, Assets/Tests/UI/ModIconAtlasTests.cs
+- Diff: 43 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a49ddfc6b311c5be3cd253436bda0eb21083f682 -->
+## 2025-10-19T15:57:49+01:00 — emojis and icons
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (19): Assets/Resources/Sprites/Emojis/Emoji_76.png, Assets/Resources/Sprites/Emojis/Emoji_76.png.meta, Assets/Resources/Sprites/ModIcons.meta, Assets/Resources/Sprites/ModIcons/ModIcon_01.png, Assets/Resources/Sprites/ModIcons/ModIcon_01.png.meta, Assets/Resources/Sprites/ModIcons/ModIcon_02.png, Assets/Resources/Sprites/ModIcons/ModIcon_02.png.meta, Assets/Resources/Sprites/ModIcons/ModIcon_03.png, Assets/Resources/Sprites/ModIcons/ModIcon_03.png.meta, Assets/Resources/Sprites/ModIcons/ModIcon_04.png, Assets/Resources/Sprites/ModIcons/ModIcon_04.png.meta, Assets/Scripts/Player/Commands/BankCommand.cs.meta, Assets/Scripts/Player/Commands/ClearBankCommand.cs.meta, Assets/Scripts/Player/Commands/ClearInventoryCommand.cs.meta, Assets/Scripts/Player/Commands/GiveItemCommand.cs.meta, Assets/Scripts/Player/Commands/GiveXpCommand.cs.meta, Assets/Scripts/Player/Commands/MaxStatsCommand.cs.meta, Assets/Scripts/Player/Commands/SetSkillLevelCommand.cs.meta, Assets/Scripts/UI/Chat/ModIconAtlas.cs.meta
+- Diff: 804 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:973adc37d38e8eeaab66d1b5eee9a441d4d74393 -->
+## 2025-10-19T15:56:49+01:00 — Merge pull request #1227 from aicovergod/codex/add-moderator-icons-to-chat-messages
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 295 ++ / 36 --
+- Notes:
+  Add moderator icons to chat HUD prefixes
+---
+<!-- commit:568e5d2fb0903a6de46f8f0b65d0e9c3f8b7424c -->
+## 2025-10-19T15:56:43+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:88ece5ba431ecf03342de6a4d7b89b8e6651fe3b -->
+## 2025-10-19T15:56:26+01:00 — Add moderator icons to chat prefix
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/UI/Chat/EmojiMarkupParser.cs, Assets/Scripts/UI/Chat/ModIconAtlas.cs, Assets/Tests/UI/EmojiMarkupParserTests.cs
+- Diff: 286 ++ / 36 --
+- Notes:
+  —
+---
+<!-- commit:9e5ec16bd2783d5051fb14bd38d79a07d7f13bce -->
+## 2025-10-19T15:37:10+01:00 — Merge pull request #1226 from aicovergod/codex/fix-cs0102-error-in-playercommandresult
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 12 ++ / 3 --
+- Notes:
+  Fix PlayerCommandResult success naming conflict
+---
+<!-- commit:351bfd49d386de556dedb4b9d46cb582e05943df -->
+## 2025-10-19T15:36:36+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c6593d786a4a4ca06618ea4a9653b97e38169b31 -->
+## 2025-10-19T15:36:19+01:00 — Fix PlayerCommandResult success naming conflict
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Commands/PlayerCommandResult.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs
+- Diff: 3 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:8a4e7037369d599ab25df049ca76d168abd996ab -->
+## 2025-10-19T12:07:16+01:00 — Merge pull request #1225 from aicovergod/codex/add-developer-commands-for-player-actions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 255 ++ / 0 --
+- Notes:
+  Add developer chat commands for items and skills
+---
+<!-- commit:93d7a41152afe412f7b9d4f7450cb6b36e6f8735 -->
+## 2025-10-19T12:07:04+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c2216fc7d9680ea1386800128f05a49b50fc2fac -->
+## 2025-10-19T12:06:44+01:00 — Add developer commands for item, level, and XP overrides
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Player/Commands/GiveItemCommand.cs, Assets/Scripts/Player/Commands/GiveXpCommand.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs, Assets/Scripts/Player/Commands/SetSkillLevelCommand.cs
+- Diff: 246 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:bd78ae7d4d6d7eedf6adf5d4d91463363fe0da26 -->
+## 2025-10-19T11:40:28+01:00 — Merge pull request #1224 from aicovergod/codex/add-maxstats-command-for-developers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 120 ++ / 0 --
+- Notes:
+  Add developer maxstats command
+---
+<!-- commit:e600295d37e75cf29c86fad8ce0925ebabdad11a -->
+## 2025-10-19T11:34:46+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ef9250dbb0265d28dafc60b1f75e32ed2d0a1cbd -->
+## 2025-10-19T11:34:25+01:00 — Add developer max stats command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Commands/MaxStatsCommand.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs
+- Diff: 111 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:34ceb954f430372ad87c5ceed0be52aa097d468e -->
+## 2025-10-19T11:26:09+01:00 — Merge pull request #1223 from aicovergod/codex/fix-this-error-gs9rif
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 23 ++ / 0 --
+- Notes:
+  Fix offline inventory clear command slot initialisation
+---
+<!-- commit:0ac484ee3db6b1d7aab3d3fef9227067d834263f -->
+## 2025-10-19T11:26:00+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9b0e41ad057a3ecb24912709bcfa4f38487a8e78 -->
+## 2025-10-19T11:25:42+01:00 — Fix offline inventory clearing slot initialisation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Player/Commands/ClearInventoryCommand.cs
+- Diff: 14 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:530533dfacc7e59c53d53a7ace9726235011ac35 -->
+## 2025-10-19T11:20:58+01:00 — Merge pull request #1222 from aicovergod/codex/add-clearbank-command-functionality
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 305 ++ / 0 --
+- Notes:
+  Add admin command to clear banks
+---
+<!-- commit:181888fc30ef182afdad35f1bddefaa8f8d8f47b -->
+## 2025-10-19T11:20:49+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:bf05a8cc0bf4749461cf95706f2bba3c5d5f5c1d -->
+## 2025-10-19T11:20:29+01:00 — Add admin command to clear banks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Commands/ClearBankCommand.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs
+- Diff: 296 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:4ddc654f43de45d302bd3eeb949652f66a6d5e1d -->
+## 2025-10-19T11:12:22+01:00 — Merge pull request #1221 from aicovergod/codex/add-clearinv-command-for-inventory-clear
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 332 ++ / 0 --
+- Notes:
+  Add ::clearinv admin command
+---
+<!-- commit:d51ad8f1ae2879a93a8e174e4de12e4c3b2051b7 -->
+## 2025-10-19T11:12:14+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:34aba6e08faad1f23154b7e740e26a0a68b12042 -->
+## 2025-10-19T11:11:58+01:00 — Add admin clear inventory command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Inventory/Core/InventoryModel.cs, Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Player/Commands/ClearInventoryCommand.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs
+- Diff: 323 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:494cd89b81e9250f18c4e1fd0530cf3a6a07ae02 -->
+## 2025-10-19T11:00:35+01:00 — Merge pull request #1220 from aicovergod/codex/update-agents.md-with-system-information
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 0 --
+- Notes:
+  Document social systems in AGENTS
+---
+<!-- commit:3b739dc1e3ac576df473581b647695b01becf2dc -->
+## 2025-10-19T10:59:38+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b131acdc031a1ca03c285fc11cbc43cecb727fbe -->
+## 2025-10-19T10:59:21+01:00 — Document social systems in AGENTS
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): AGENTS.md
+- Diff: 5 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:77abb2d9e27f91dfd503e9e00e95de52b1cda4cd -->
+## 2025-10-19T10:55:32+01:00 — Merge pull request #1219 from aicovergod/codex/add-bank-command-for-admins
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 64 ++ / 0 --
+- Notes:
+  Add admin bank chat command
+---
+<!-- commit:a6d8764a0c4d4d16f8cb21c87c7a6be17e3631bd -->
+## 2025-10-19T10:53:08+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0b6639c7f9b22ddc76ab991a6a72965bcb12bd10 -->
+## 2025-10-19T10:52:52+01:00 — Add admin bank chat command
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Commands/BankCommand.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs
+- Diff: 55 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:683b0857b478a4fe5b71d35de6f64eaa01ef7b51 -->
+## 2025-10-19T10:41:18+01:00 — Merge pull request #1218 from aicovergod/codex/create-playercommandservice-and-command-implementations
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1117 ++ / 38 --
+- Notes:
+  Add player command handling and rank services
+---
+<!-- commit:e479f120723ebcf795d7240d41065c529eb45569 -->
+## 2025-10-19T10:41:10+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:eb2ec13adcd8304e2f1935f74c46818b6999ef27 -->
+## 2025-10-19T10:40:53+01:00 — Add player command and rank infrastructure
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (27): Assets/Resources/PlayerRanks.meta, Assets/Resources/PlayerRanks/DefaultPlayerRankDatabase.asset, Assets/Resources/PlayerRanks/DefaultPlayerRankDatabase.asset.meta, Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/Player/Commands.meta, Assets/Scripts/Player/Commands/IPlayerCommand.cs, Assets/Scripts/Player/Commands/IPlayerCommand.cs.meta, Assets/Scripts/Player/Commands/PlayerCommandContext.cs, Assets/Scripts/Player/Commands/PlayerCommandContext.cs.meta, Assets/Scripts/Player/Commands/PlayerCommandHandleResult.cs, Assets/Scripts/Player/Commands/PlayerCommandHandleResult.cs.meta, Assets/Scripts/Player/Commands/PlayerCommandResult.cs, Assets/Scripts/Player/Commands/PlayerCommandResult.cs.meta, Assets/Scripts/Player/Commands/PlayerCommandService.cs, Assets/Scripts/Player/Commands/PlayerCommandService.cs.meta, Assets/Scripts/Player/Commands/TeleportCommand.cs, Assets/Scripts/Player/Commands/TeleportCommand.cs.meta, Assets/Scripts/Player/Movement/PlayerTeleportUtility.cs, Assets/Scripts/Player/Movement/PlayerTeleportUtility.cs.meta, Assets/Scripts/Player/Ranks.meta, Assets/Scripts/Player/Ranks/PlayerRank.cs, Assets/Scripts/Player/Ranks/PlayerRank.cs.meta, Assets/Scripts/Player/Ranks/PlayerRankDatabase.cs, Assets/Scripts/Player/Ranks/PlayerRankDatabase.cs.meta, Assets/Scripts/Player/Ranks/PlayerRankService.cs, Assets/Scripts/Player/Ranks/PlayerRankService.cs.meta, Assets/Scripts/World/Minimap.cs
+- Diff: 1108 ++ / 38 --
+- Notes:
+  —
+---
+<!-- commit:4531a4a0882a455a595f4714168d403666eb1699 -->
+## 2025-10-18T21:28:47+01:00 — Merge pull request #1217 from aicovergod/codex/update-ground-item-spawning-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 60 ++ / 7 --
+- Notes:
+  Snap ground drops to tile centres
+---
+<!-- commit:c796e0123048bcb8fd633ab0d21b00338d3fed54 -->
+## 2025-10-18T21:28:38+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:fa3cd28ab1e282be0271f70cb7efba6c4754ef82 -->
+## 2025-10-18T21:28:20+01:00 — Align ground item spawns to tile centres
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Drops/GroundItemSpawner.cs, Assets/Scripts/Drops/NpcDropper.cs
+- Diff: 51 ++ / 7 --
+- Notes:
+  —
+---
+<!-- commit:c77f9810831dda445f76bc106e43a8d427d2756d -->
+## 2025-10-18T21:10:30+01:00 — Merge pull request #1216 from aicovergod/codex/fix-scroller-issue-in-emoji-window
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 18 ++ / 17 --
+- Notes:
+  Fix emoji picker scroll view content sizing
+---
+<!-- commit:1c44cc45b54ce08c08df224846d6f7a93fdbea53 -->
+## 2025-10-18T21:10:14+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:37846cb9524061c44b8b2a6cf836017afbacf81b -->
+## 2025-10-18T21:09:56+01:00 — Merge branch 'main' into codex/fix-scroller-issue-in-emoji-window
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 78 ++ / 14 --
+- Notes:
+  —
+---
+<!-- commit:b582c36cb675febece648c6ed430a5f5e683e8cf -->
+## 2025-10-18T21:09:21+01:00 — Fix emoji picker scroll content sizing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiPickerPanel.cs
+- Diff: 11 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:2402c9fa3e03b61fd094490f5729b1b50bdb4dd0 -->
+## 2025-10-18T20:55:57+01:00 — Merge pull request #1214 from aicovergod/codex/add-scroller-to-emoji-window
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 74 ++ / 2 --
+- Notes:
+  Add scroll bar to emoji picker for expanded emoji set
+---
+<!-- commit:ac836fd8231b9732891f2d50dca6b8ef43fece16 -->
+## 2025-10-18T20:55:46+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0cec500c8317575fb0d1ac03145a5391024127ba -->
+## 2025-10-18T20:55:23+01:00 — Add scrollbar to emoji picker
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiPickerPanel.cs
+- Diff: 65 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:e8be851e5ae968ec1395c9c11a6ca8ee2fd4acb5 -->
+## 2025-10-18T20:46:57+01:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 158 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:ea7f66f58c33263d668202985843f19aba4e3df6 -->
+## 2025-10-18T20:46:18+01:00 — Merge pull request #1213 from aicovergod/codex/add-input-character-limit-and-emoji-handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 140 ++ / 2 --
+- Notes:
+  Limit chat input to 64 emoji-aware characters
+---
+<!-- commit:79453d258814915efea94d21bcb32259a9f6d2d7 -->
+## 2025-10-18T20:46:09+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b864c1a4a8383557d95d08d795cf9d94efeb13d0 -->
+## 2025-10-18T20:45:51+01:00 — Limit chat input to 64 emoji-aware characters
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 131 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:4c79a9bdf1377f1ebf9cb51057aab6264e12c491 -->
+## 2025-10-18T20:28:07+01:00 — Merge pull request #1212 from aicovergod/codex/add-anchored-floating-text-behavior
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 81 ++ / 4 --
+- Notes:
+  Add anchored floating text support for player chat
+---
+<!-- commit:a1928c60d9dc46d2d10a6c2747c60dc06bfdf8eb -->
+## 2025-10-18T20:27:59+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:7e8b5c9b56bfc6f8e48e5073ac551f3547cc5ee6 -->
+## 2025-10-18T20:27:40+01:00 — Add anchored floating text support for player chat
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/UI/FloatingText.cs
+- Diff: 72 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:3df165681a6bf593baa5c47328e3687158f73431 -->
+## 2025-10-18T20:13:56+01:00 — Merge pull request #1211 from aicovergod/codex/remove-press-enter-to-chat-notification
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 9 ++ / 3 --
+- Notes:
+  Remove chat input enter reminder text
+---
+<!-- commit:b6163c78d0d8613a98ca31afa6d7b01bec63fcfb -->
+## 2025-10-18T20:13:46+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a943344bb83665a9e3a934b48c6b58cb47669867 -->
+## 2025-10-18T20:13:26+01:00 — Remove chat HUD enter reminder
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 0 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:67d81d83b47f995f490898f2f47d60402412eef4 -->
+## 2025-10-18T20:07:25+01:00 — Merge pull request #1210 from aicovergod/codex/fix-emoji-picker-grid-alignment-issue
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 25 ++ / 0 --
+- Notes:
+  Align emoji picker grid with top-left corner
+---
+<!-- commit:51c411c2cd6729ab66343446d7426e238d31594d -->
+## 2025-10-18T20:07:09+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:51fdf454f2fe37bef05a1913a3a4815d926cfeab -->
+## 2025-10-18T20:06:51+01:00 — Anchor emoji grid to top-left in picker
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiPickerPanel.cs
+- Diff: 16 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d82cdd71df7bdaabc16bb256a235040f9e4f437d -->
+## 2025-10-18T19:37:10+01:00 — Merge pull request #1209 from aicovergod/codex/update-emojipickerpanel-masking-and-layout
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 6 --
+- Notes:
+  Adjust emoji picker masking and layout
+---
+<!-- commit:5617281718a553f5ec1ac8103419988d24573432 -->
+## 2025-10-18T19:37:00+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:91b7bb395b06b825f4a03e4869bf5e708fce5340 -->
+## 2025-10-18T19:36:43+01:00 — Adjust emoji picker masking and height
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiPickerPanel.cs
+- Diff: 5 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:8a7e19c25a68b68c0e1993bc18ff0a1009b986e1 -->
+## 2025-10-18T19:21:47+01:00 — Merge pull request #1208 from aicovergod/codex/update-emojipickerpanel-layout-settings
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 12 ++ / 3 --
+- Notes:
+  Adjust emoji picker grid to display six icons per row
+---
+<!-- commit:e3cf237cfbd9678c52d93c9c1de228b4b424cad5 -->
+## 2025-10-18T19:21:41+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:1975ce70b21000c8b6a483b8f34f0e797dd4a32a -->
+## 2025-10-18T19:21:22+01:00 — Adjust emoji grid layout to fit six icons
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiPickerPanel.cs
+- Diff: 3 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:83c2dac314f72f9cdb60cce38fcb7fb766abb71c -->
+## 2025-10-18T19:19:08+01:00 — Merge pull request #1207 from aicovergod/codex/modify-emojispritedefinition-for-configurable-size
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 20 ++ / 6 --
+- Notes:
+  Adjust emoji sprite sizing targets
+---
+<!-- commit:c566980c01156abdc03b3568f73388deffe2f8f9 -->
+## 2025-10-18T19:19:00+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2d9ff4fd6fabab8181653712468a63e3d837979d -->
+## 2025-10-18T19:18:41+01:00 — Adjust emoji sprite sizing targets
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/UI/Chat/EmojiPickerPanel.cs, Assets/Scripts/UI/Chat/EmojiSpriteDefinition.cs
+- Diff: 11 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:f7b9f4157b6ee1ea95de9522742ff35cfd823f17 -->
+## 2025-10-18T19:11:56+01:00 — Merge pull request #1206 from aicovergod/codex/update-extractkey-to-handle-emoji-names
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 37 ++ / 0 --
+- Notes:
+  Fix emoji atlas key extraction for underscore sprite names
+---
+<!-- commit:72be34643f568ab9acb16efb2e8973c1e5433df6 -->
+## 2025-10-18T19:11:47+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8bbb4e3479dacac27b22056c68c8bed2fb6400eb -->
+## 2025-10-18T19:11:27+01:00 — Fix emoji key extraction for underscore sprite names
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiAtlas.cs
+- Diff: 28 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:39107208aaecadfab10f6146422cf343a5bc6c72 -->
+## 2025-10-18T19:01:17+01:00 — Merge pull request #1205 from aicovergod/codex/fix-emoji-popup-rendering-order
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 49 ++ / 1 --
+- Notes:
+  Fix emoji picker layering above chat window
+---
+<!-- commit:89bc2ad95fc17b6e47a81d8e111c43c9ca55e194 -->
+## 2025-10-18T19:00:59+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b0cba2c33eda9a664d562372c8f18564e43d087a -->
+## 2025-10-18T19:00:42+01:00 — Fix emoji picker panel layering
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiPickerPanel.cs
+- Diff: 40 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:1a226e3777b8b9983be1faf49f58916a3cebab83 -->
+## 2025-10-18T18:55:08+01:00 — Merge pull request #1204 from aicovergod/codex/update-emojitokenlayout-for-layout-rebuilds
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 46 ++ / 1 --
+- Notes:
+  Force EmojiTokenLayout to rebuild layout size
+---
+<!-- commit:ed2a7645c969a420323ff18bdb77eb5025f4bee2 -->
+## 2025-10-18T18:54:57+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c47ceb34df20f6e71acfe4cfeb26d3ff6323c976 -->
+## 2025-10-18T18:54:38+01:00 — Adjust EmojiTokenLayout sizing after rebuild
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 37 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:00124a098e9b0b2849e1a0a4d29d3023a2a7e813 -->
+## 2025-10-18T18:39:35+01:00 — Merge pull request #1203 from aicovergod/codex/add-helper-for-textanchor-alignment
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 39 ++ / 1 --
+- Notes:
+  Ensure emoji chat spans align left to prevent overlap
+---
+<!-- commit:69d4424d6e457b8f2ce889200d5e57eb3254283a -->
+## 2025-10-18T18:37:45+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:95c134ae233566623e3afe952bb90b28f257568e -->
+## 2025-10-18T18:37:27+01:00 — Ensure emoji text spans align left
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 30 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:dfae0858b6d7b71da06a6e03dd601a855f414bc3 -->
+## 2025-10-18T18:18:08+01:00 — Merge pull request #1202 from aicovergod/codex/adjust-emoji-token-layout-alignment
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 16 ++ / 0 --
+- Notes:
+  Align emoji layout child alignment with caller
+---
+<!-- commit:27c1e6fe9e3bd5d905f3197efe4c6f6f0d0597a9 -->
+## 2025-10-18T18:18:01+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8e61ccd16373f56b1accd77fe8f91f7c9d6f5364 -->
+## 2025-10-18T18:17:44+01:00 — Align emoji layout child alignment with caller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 7 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:7da28796d58d60ed6d7401cd131b61ad5e0fcbcf -->
+## 2025-10-18T18:03:42+01:00 — Merge pull request #1201 from aicovergod/codex/fix-chatbox-message-text-wrapping
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 13 ++ / 1 --
+- Notes:
+  Fix floating chat bubbles wrapping across lines
+---
+<!-- commit:b3673510f962da741a9df4d444e574199c8183e2 -->
+## 2025-10-18T18:03:34+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f2400cd4b1168efb233b76e66a5eb8b958b84f18 -->
+## 2025-10-18T18:03:17+01:00 — Keep floating chat speech on a single line
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 4 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:9a11d2ad20c7a6810f8516a0970156455f14c3f4 -->
+## 2025-10-18T17:55:10+01:00 — Merge pull request #1200 from aicovergod/codex/update-emojitokenlayout-for-correct-sizing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 10 ++ / 1 --
+- Notes:
+  Fix chat text token flexible width for emoji layout
+---
+<!-- commit:df1a111b5144d78ae0c09e247aec574e70f9ad87 -->
+## 2025-10-18T17:55:02+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:fbf07e36abb345aa4aadab7788781e7eba865286 -->
+## 2025-10-18T17:54:44+01:00 — Adjust emoji token text layout width
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:edce82222a2fe404c3211e7fefa7e06adbb339f8 -->
+## 2025-10-18T17:45:07+01:00 — Merge pull request #1199 from aicovergod/codex/fix-emoji-insertion-position
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 96 ++ / 17 --
+- Notes:
+  Fix chat emoji insertion and deletion behavior
+---
+<!-- commit:68122a211d5a07185bb45794a574b3f093d9521e -->
+## 2025-10-18T17:44:55+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c310773613ca5adaa5024f3d1e303ef0d3f1a699 -->
+## 2025-10-18T17:44:36+01:00 — Fix chat emoji insertion and deletion behavior
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 87 ++ / 17 --
+- Notes:
+  —
+---
+<!-- commit:78eb296e0b0223b7b53a5159a889bea136393279 -->
+## 2025-10-18T17:34:55+01:00 — Merge pull request #1198 from aicovergod/codex/fix-inputfield-stringposition-error
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 12 ++ / 1 --
+- Notes:
+  Fix chat HUD selection collapse for legacy InputField
+---
+<!-- commit:a557c4398268b7a9099a96149834b14f360bbfcf -->
+## 2025-10-18T17:34:47+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:96ad2f548586f2f4c9b3b4c2a0b83404a9934ea2 -->
+## 2025-10-18T17:34:30+01:00 — Fix chat HUD InputField selection collapse
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 3 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:bd4ecf4b02cd129bfd3c0e3d655e0469c69e74b5 -->
+## 2025-10-18T17:30:58+01:00 — Merge pull request #1197 from aicovergod/codex/add-helper-to-manage-input-field-caret
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 30 ++ / 3 --
+- Notes:
+  Fix chat HUD caret collapse after focus changes
+---
+<!-- commit:55c7c6b926107c2ace644bf2fb9a8b14b7686d46 -->
+## 2025-10-18T17:30:50+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f273999218bedf3e0a017716553855a0cc75307c -->
+## 2025-10-18T17:30:31+01:00 — Adjust chat input caret handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 21 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:e02323e230ca0246005a8e8805e84187ca3d9535 -->
+## 2025-10-18T17:24:04+01:00 — Merge pull request #1196 from aicovergod/codex/fix-chatbox-interaction-with-expanded-minimap
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 54 ++ / 0 --
+- Notes:
+  Block chat input when minimap is expanded
+---
+<!-- commit:b0a671410a187100ddf68c793d8c108fe774be14 -->
+## 2025-10-18T17:22:45+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:13e3f84cd8e8aaf0f9b6dd5eb035445c234e9d06 -->
+## 2025-10-18T17:22:27+01:00 — Block chat input when minimap is expanded
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/World/Minimap.cs
+- Diff: 45 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d41dd0e303b483d09fdba51e8487a4184adade6a -->
+## 2025-10-18T17:14:51+01:00 — Merge pull request #1195 from aicovergod/codex/update-chatmessagerow-constructor
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 10 ++ / 1 --
+- Notes:
+  Adjust chat message row layout to limit prefix width
+---
+<!-- commit:380661047c838290eeee5461316c8fab5d092518 -->
+## 2025-10-18T17:14:40+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:5128e31baaf3542d2f88418786a4d328f94f60cb -->
+## 2025-10-18T17:14:21+01:00 — Stop expanding chat prefix width
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:de43762c67f71164f24a788b122a76981c360f70 -->
+## 2025-10-18T16:59:05+01:00 — Merge pull request #1194 from aicovergod/codex/update-chat-message-formatting-and-layout
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 61 ++ / 7 --
+- Notes:
+  Refine chat message prefix rendering
+---
+<!-- commit:28c0b9c4d123290c17de86d981e7e32aef0c1b3b -->
+## 2025-10-18T16:58:48+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c828aaac68c276155370848b715125e247068a31 -->
+## 2025-10-18T16:58:29+01:00 — Refine chat message prefix rendering
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 52 ++ / 7 --
+- Notes:
+  —
+---
+<!-- commit:a4d15311bde1d0c59a4051f1ec14fbb4e7b8bc85 -->
+## 2025-10-18T16:35:59+01:00 — Merge pull request #1193 from aicovergod/codex/set-min-size-for-emoji-button
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 0 --
+- Notes:
+  Prevent Chat HUD emoji button from shrinking below intended size
+---
+<!-- commit:647de7f459f753552378713c2c32ca9ccad6c9cb -->
+## 2025-10-18T16:35:51+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6672104815d7bb3fe001ff5d9ed95f56cc1ccccf -->
+## 2025-10-18T16:35:33+01:00 — Ensure chat emoji button keeps minimum size
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 2 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:247a3dbc4b676ea46c196a969ec6197ce7b309ff -->
+## 2025-10-18T16:23:49+01:00 — Merge pull request #1192 from aicovergod/codex/fix-emojitokenlayout-pooled-children-leak
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 37 ++ / 2 --
+- Notes:
+  Fix EmojiTokenLayout pooling reuse
+---
+<!-- commit:14eefc89dfdf92e1c7e448947a148453a4ff0077 -->
+## 2025-10-18T16:23:12+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:186749e9a6e422dc397b3679ca6ab9f224717b24 -->
+## 2025-10-18T16:22:53+01:00 — Fix EmojiTokenLayout reuse logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 28 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:90b9eac9325d798fbb36581a7b8196026ed7c05d -->
+## 2025-10-18T16:06:26+01:00 — Merge pull request #1191 from aicovergod/codex/update-emojitokenlayout-for-width-calculation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 10 ++ / 1 --
+- Notes:
+  Adjust emoji token layout width handling
+---
+<!-- commit:714c36dfd5deb75ae680a388b449ba605bb0077c -->
+## 2025-10-18T16:06:17+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:3a3ac1e7eaa3d981300472a14f675623352d4ae8 -->
+## 2025-10-18T16:05:59+01:00 — Allow emoji tokens to size to preferred width
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:46cc73f9b4fd4dcc5911f5f355228bb6f05ce4cf -->
+## 2025-10-18T15:56:28+01:00 — Merge pull request #1190 from aicovergod/codex/update-emojitokenlayout-for-text-elements
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 39 ++ / 8 --
+- Notes:
+  Fix pooled chat text layout widths
+---
+<!-- commit:a8fb816a84462b5aa56baf13e14c32b2a7871720 -->
+## 2025-10-18T15:56:21+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:461a068a8bf2419636f605e86169f71da0778891 -->
+## 2025-10-18T15:56:02+01:00 — Fix pooled chat text layout widths
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/EmojiTokenLayout.cs
+- Diff: 30 ++ / 8 --
+- Notes:
+  —
+---
+<!-- commit:c4f17587c7e1b43cb1732715ed6d0260bde2e408 -->
+## 2025-10-18T15:52:56+01:00 — Merge pull request #1189 from aicovergod/codex/update-emoji-preview-on-input-change
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 0 --
+- Notes:
+  Ensure chat emoji preview updates with typing
+---
+<!-- commit:790c3ea7af405cde412eae7504ff9717e6bcc272 -->
+## 2025-10-18T15:52:44+01:00 — Refresh chat input preview on typing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 1 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a46c8610eae080a7fcd742b32f9d64ab3bea6536 -->
+## 2025-10-18T15:43:16+01:00 — Merge pull request #1188 from aicovergod/codex/add-emoji-support-to-chat-ui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1227 ++ / 35 --
+- Notes:
+  Implement emoji-aware chat rendering and picker
+---
+<!-- commit:caa984d0e3bd880254d76a8d062b989acf87fa3a -->
+## 2025-10-18T15:42:43+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8f00eb7550960344c2156daa12ad8883537d0761 -->
+## 2025-10-18T15:42:25+01:00 — Add emoji support to chat and floating text rendering
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (20): Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/UI/Chat/EmojiAtlas.cs, Assets/Scripts/UI/Chat/EmojiAtlas.cs.meta, Assets/Scripts/UI/Chat/EmojiMarkupParser.cs, Assets/Scripts/UI/Chat/EmojiMarkupParser.cs.meta, Assets/Scripts/UI/Chat/EmojiMarkupToken.cs, Assets/Scripts/UI/Chat/EmojiMarkupToken.cs.meta, Assets/Scripts/UI/Chat/EmojiPickerPanel.cs, Assets/Scripts/UI/Chat/EmojiPickerPanel.cs.meta, Assets/Scripts/UI/Chat/EmojiSpriteDefinition.cs, Assets/Scripts/UI/Chat/EmojiSpriteDefinition.cs.meta, Assets/Scripts/UI/Chat/EmojiTokenLayout.cs, Assets/Scripts/UI/Chat/EmojiTokenLayout.cs.meta, Assets/Scripts/UI/Chat/IEmojiAtlas.cs, Assets/Scripts/UI/Chat/IEmojiAtlas.cs.meta, Assets/Scripts/UI/FloatingText.cs, Assets/Tests/UI.meta, Assets/Tests/UI/EmojiMarkupParserTests.cs, Assets/Tests/UI/EmojiMarkupParserTests.cs.meta
+- Diff: 1218 ++ / 35 --
+- Notes:
+  —
+---
+<!-- commit:286b6c07a92b5714f1537fab555a259543765f03 -->
+## 2025-10-18T15:07:44+01:00 — emojis
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (58): Assets/Resources/Sprites/Chatbox.meta, Assets/Resources/Sprites/Chatbox/Button.png, Assets/Resources/Sprites/Chatbox/Smile.png.meta, Assets/Resources/Sprites/Emojis.meta, Assets/Resources/Sprites/Emojis/Emoji_01.png, Assets/Resources/Sprites/Emojis/Emoji_01.png.meta, Assets/Resources/Sprites/Emojis/Emoji_02.png, Assets/Resources/Sprites/Emojis/Emoji_02.png.meta, Assets/Resources/Sprites/Emojis/Emoji_03.png, Assets/Resources/Sprites/Emojis/Emoji_03.png.meta, Assets/Resources/Sprites/Emojis/Emoji_04.png, Assets/Resources/Sprites/Emojis/Emoji_04.png.meta, Assets/Resources/Sprites/Emojis/Emoji_05.png, Assets/Resources/Sprites/Emojis/Emoji_05.png.meta, Assets/Resources/Sprites/Emojis/Emoji_06.png, Assets/Resources/Sprites/Emojis/Emoji_06.png.meta, Assets/Resources/Sprites/Emojis/Emoji_07.png, Assets/Resources/Sprites/Emojis/Emoji_07.png.meta, Assets/Resources/Sprites/Emojis/Emoji_08.png, Assets/Resources/Sprites/Emojis/Emoji_08.png.meta, Assets/Resources/Sprites/Emojis/Emoji_09.png, Assets/Resources/Sprites/Emojis/Emoji_09.png.meta, Assets/Resources/Sprites/Emojis/Emoji_10.png, Assets/Resources/Sprites/Emojis/Emoji_10.png.meta, Assets/Resources/Sprites/Emojis/Emoji_11.png, Assets/Resources/Sprites/Emojis/Emoji_11.png.meta, Assets/Resources/Sprites/Emojis/Emoji_12.png, Assets/Resources/Sprites/Emojis/Emoji_12.png.meta, Assets/Resources/Sprites/Emojis/Emoji_13.png, Assets/Resources/Sprites/Emojis/Emoji_13.png.meta, Assets/Resources/Sprites/Emojis/Emoji_14.png, Assets/Resources/Sprites/Emojis/Emoji_14.png.meta, Assets/Resources/Sprites/Emojis/Emoji_15.png, Assets/Resources/Sprites/Emojis/Emoji_15.png.meta, Assets/Resources/Sprites/Emojis/Emoji_16.png, Assets/Resources/Sprites/Emojis/Emoji_16.png.meta, Assets/Resources/Sprites/Emojis/Emoji_17.png, Assets/Resources/Sprites/Emojis/Emoji_17.png.meta, Assets/Resources/Sprites/Emojis/Emoji_18.png, Assets/Resources/Sprites/Emojis/Emoji_18.png.meta, Assets/Resources/Sprites/Emojis/Emoji_19.png, Assets/Resources/Sprites/Emojis/Emoji_19.png.meta, Assets/Resources/Sprites/Emojis/Emoji_20.png, Assets/Resources/Sprites/Emojis/Emoji_20.png.meta, Assets/Resources/Sprites/Emojis/Emoji_21.png, Assets/Resources/Sprites/Emojis/Emoji_21.png.meta, Assets/Resources/Sprites/Emojis/Emoji_22.png, Assets/Resources/Sprites/Emojis/Emoji_22.png.meta, Assets/Resources/Sprites/Emojis/Emoji_23.png, Assets/Resources/Sprites/Emojis/Emoji_23.png.meta, Assets/Resources/Sprites/Emojis/Emoji_24.png, Assets/Resources/Sprites/Emojis/Emoji_24.png.meta, Assets/Resources/Sprites/Emojis/Emoji_25.png, Assets/Resources/Sprites/Emojis/Emoji_25.png.meta, Assets/Resources/Sprites/Emojis/Emoji_26.png, Assets/Resources/Sprites/Emojis/Emoji_26.png.meta, Assets/Resources/Sprites/Emojis/Emoji_27.png, Assets/Resources/Sprites/Emojis/Emoji_27.png.meta
+- Diff: 4384 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:1942f70bdec65769340cf29571882f0702373cb6 -->
+## 2025-10-18T14:38:03+01:00 — Merge pull request #1187 from aicovergod/codex/fix-chatbox-m-key-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 91 ++ / 5 --
+- Notes:
+  Fix chat focus movement lock and minimap input guard
+---
+<!-- commit:8e3bf4b90258fd1a56d62cccb8577a97360ae641 -->
+## 2025-10-18T14:37:52+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0a76fa9173122f0b8081ef341e5f0df9c5b8fd49 -->
+## 2025-10-18T14:37:35+01:00 — Prevent minimap toggle during chat and freeze movement
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/World/Minimap.cs
+- Diff: 82 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:4a673fac020802a4e889d80ea921e1af23c16d71 -->
+## 2025-10-18T14:27:35+01:00 — Merge pull request #1186 from aicovergod/codex/update-chathudcontroller-layout-properties
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 13 ++ / 3 --
+- Notes:
+  Adjust chat HUD input row sizing
+---
+<!-- commit:1b47d54b7160ee413992efdc9f237691fbcec3c6 -->
+## 2025-10-18T14:27:27+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b95c323aa63d00cc3c2e86367613a04f5f20c8ad -->
+## 2025-10-18T14:27:06+01:00 — Adjust chat input row sizing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 4 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:0f93de2ecb060ca4d33e854ab32831442492e003 -->
+## 2025-10-18T14:11:03+01:00 — Merge pull request #1185 from aicovergod/codex/update-child-control-height-settings
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 1 --
+- Notes:
+  Ensure chat HUD input stack respects child height
+---
+<!-- commit:a7d7c1ad6cf7a0408cd9a1b8839a97d15385b2d5 -->
+## 2025-10-18T14:10:52+01:00 — Adjust chat input stack to respect child height
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:111d5d64559e4d005ed424b85aec3b2b372af271 -->
+## 2025-10-18T14:03:08+01:00 — uwu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Prefabs/MainScriptObjects/Player.prefab, Assets/Resources/Interfaces/Chatbox.meta, Assets/Resources/Interfaces/Chatbox/chat_background.jpg, Assets/Resources/Interfaces/Chatbox/chat_background.jpg.meta
+- Diff: 181 ++ / 18 --
+- Notes:
+  —
+---
+<!-- commit:ea0d9d2d18873315d06a0c69e1e7b979255e8b09 -->
+## 2025-10-18T14:02:37+01:00 — Merge pull request #1184 from aicovergod/codex/refactor-chathudcontroller-input-layout
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 71 ++ / 4 --
+- Notes:
+  Refine chat HUD input layout and focus label behavior
+---
+<!-- commit:41612e7505b95662f4af7e122386079211476aaa -->
+## 2025-10-18T14:02:30+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b35a34f6913ef1b8513b7cb089841efcfad2f3b7 -->
+## 2025-10-18T14:02:12+01:00 — Refine chat input layout and label visibility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 62 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:80171b5e55ce3236cbb9c7a1562d77d1c627d355 -->
+## 2025-10-18T13:44:48+01:00 — Merge pull request #1183 from aicovergod/codex/update-game-and-public-button-size
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 10 ++ / 1 --
+- Notes:
+  Adjust chat channel button dimensions
+---
+<!-- commit:b18dd9d1f84e26054fdbaeaa6062ce1585ad9c5d -->
+## 2025-10-18T13:43:45+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:860959579af7e845fda4f58d4e13a70e3c8422f4 -->
+## 2025-10-18T13:43:27+01:00 — Adjust chat channel toggle size
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:316cd0c91297e79b64df9880e43e49e001ed9754 -->
+## 2025-10-18T13:10:50+01:00 — Merge pull request #1182 from aicovergod/codex/update-chat-username-display-format
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 5 --
+- Notes:
+  Update chat HUD username label formatting
+---
+<!-- commit:d2c4ab66e7fc677cb9317bbb14925631e49827b6 -->
+## 2025-10-18T13:10:43+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d9f8182907b167f33836ee5aa4d8fd8c1f8783e9 -->
+## 2025-10-18T13:10:25+01:00 — Adjust chat input name label formatting
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 2 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:b8d67de85ffaa1691e2b7b86bc01a5887906dea1 -->
+## 2025-10-18T13:01:57+01:00 — Merge pull request #1181 from aicovergod/codex/add-chat-service-binding-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 72 ++ / 11 --
+- Notes:
+  Add retry binding for chat HUD
+---
+<!-- commit:17f0b9c8fdbc87984c4688517c3471e7ac7a1335 -->
+## 2025-10-18T13:01:48+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b010c93762ab3173c063700229cfffc4893f1145 -->
+## 2025-10-18T13:01:30+01:00 — Add retry binding for chat HUD
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 63 ++ / 11 --
+- Notes:
+  —
+---
+<!-- commit:efab5d2c5d40068448186f450286a0b8d4f7c7e4 -->
+## 2025-10-18T12:45:14+01:00 — Merge pull request #1180 from aicovergod/codex/refactor-chathudcontroller-layout-and-events
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 75 ++ / 12 --
+- Notes:
+  Fix chat HUD layout stacking and refresh chat username cache
+---
+<!-- commit:5e46a84ce237c922d5446cfcef42c775de4b52e7 -->
+## 2025-10-18T12:38:13+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:766928a908278d24727c2a223936ba9dbdf92b30 -->
+## 2025-10-18T12:37:57+01:00 — Adjust chat HUD layout and username refresh
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Core/Save/SaveManager.cs, Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/UI/Chat/ChatService.cs
+- Diff: 66 ++ / 12 --
+- Notes:
+  —
+---
+<!-- commit:8cdc6dcee1802ccaf8af75588df93de5a58a5209 -->
+## 2025-10-18T12:15:04+01:00 — Merge pull request #1179 from aicovergod/codex/refactor-chathudcontroller-for-channel-buttons
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 64 ++ / 4 --
+- Notes:
+  Refactor chat HUD layout to separate channel toggles
+---
+<!-- commit:7388a07ce801bb2348e496ef4f200533fd7cd232 -->
+## 2025-10-18T12:14:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f019d4c8b1ff1ed7587b21559623535d20e1f489 -->
+## 2025-10-18T12:14:35+01:00 — Refactor chat HUD channel panel layout
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 55 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:5bf6b95280e126dd38b7c23bb86c7e998d414345 -->
+## 2025-10-18T12:04:47+01:00 — Merge pull request #1178 from aicovergod/codex/update-chathudcontroller-ui-sizing
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 19 ++ / 4 --
+- Notes:
+  Adjust chat channel toggle sizing
+---
+<!-- commit:9ee60e4c77b815640ad5a0d6def9e93a6d269e01 -->
+## 2025-10-18T12:04:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8ac1ab1e9a5359caee63c375187ec712d0a7de61 -->
+## 2025-10-18T12:04:04+01:00 — Shrink chat channel toggles
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 10 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:0a83b506c81d430215c4d0726a93dd5763046e23 -->
+## 2025-10-18T12:00:12+01:00 — Merge pull request #1177 from aicovergod/codex/reorder-ui-elements-in-chathudcontroller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 10 ++ / 1 --
+- Notes:
+  Adjust chat HUD layout ordering
+---
+<!-- commit:c94f62d03798b50d211da287f00cf62bf4d131be -->
+## 2025-10-18T12:00:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0ad1b3bb441902fc20ae2e8c45a28f998c78bea5 -->
+## 2025-10-18T11:59:42+01:00 — Adjust chat HUD layout ordering
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:3c1d3637b74bd8c03af9ef1e9c54c66b60ed0884 -->
+## 2025-10-18T11:09:37+01:00 — Merge pull request #1176 from aicovergod/codex/refactor-chat-ui-layout-to-windowroot
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 30 ++ / 7 --
+- Notes:
+  Refine chat HUD anchoring
+---
+<!-- commit:4921ddb68040acb1c59a87e30bac13ce2f159b3b -->
+## 2025-10-18T11:09:31+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a574be8556c1173da0614c343a37f185bc4bd216 -->
+## 2025-10-18T11:09:13+01:00 — Adjust chat HUD hierarchy
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 21 ++ / 7 --
+- Notes:
+  —
+---
+<!-- commit:185c753d871d7b893d340eaa168749436cdaae53 -->
+## 2025-10-18T10:55:04+01:00 — Merge pull request #1175 from aicovergod/codex/fix-console-errors-in-chathudcontroller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 67 ++ / 2 --
+- Notes:
+  Fix chat HUD focus tracking without deprecated InputField events
+---
+<!-- commit:72d687b10332e366ec48ab0c66dc0c6d1bda227b -->
+## 2025-10-18T10:54:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8d3fa2fd2cb85331b74e29d8f3ad2aed1ab4a122 -->
+## 2025-10-18T10:54:38+01:00 — Fix chat HUD input focus tracking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Chat/ChatHudController.cs
+- Diff: 58 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:b3b6cd79dfa54a715d938a5771206845b1608820 -->
+## 2025-10-18T10:47:59+01:00 — meta
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Prefabs/SceneObjects/GroundItemManager.prefab, Assets/Scripts/Combat/WeaponClassificationUtility.cs.meta, Assets/Scripts/UI/Utilities/CloseButtonBuilder.cs.meta, Assets/Scripts/UI/Utilities/OverlayCanvasFactory.cs.meta, Assets/Scripts/UI/Utilities/PointerRaycastUtility.cs.meta
+- Diff: 9 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:da5af592da884ba5206d3fc302d24fafe9d6fe39 -->
+## 2025-10-17T23:46:04+01:00 — Merge pull request #1174 from aicovergod/codex/implement-slash-to-chat-system
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1491 ++ / 0 --
+- Notes:
+  Add runtime chat HUD and player chat integration
+---
+<!-- commit:a4cb8164f643adfde348639e87c6fa905a527b33 -->
+## 2025-10-17T23:45:29+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:119c4666957bb217db79830d09975b37e1d15336 -->
+## 2025-10-17T23:45:11+01:00 — Add runtime chat HUD and player chat integration
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (18): Assets/InputSystem_Actions.inputactions, Assets/Prefabs/MainScriptObjects/Player.prefab, Assets/Scripts/Core/Save/SaveManager.cs, Assets/Scripts/Player/Chat.meta, Assets/Scripts/Player/Chat/PlayerChatController.cs, Assets/Scripts/Player/Chat/PlayerChatController.cs.meta, Assets/Scripts/Skills/Common/GatheringRewardProcessor.cs, Assets/Scripts/UI/Chat.meta, Assets/Scripts/UI/Chat/ChatChannel.cs, Assets/Scripts/UI/Chat/ChatChannel.cs.meta, Assets/Scripts/UI/Chat/ChatHudBootstrap.cs, Assets/Scripts/UI/Chat/ChatHudBootstrap.cs.meta, Assets/Scripts/UI/Chat/ChatHudController.cs, Assets/Scripts/UI/Chat/ChatHudController.cs.meta, Assets/Scripts/UI/Chat/ChatMessage.cs, Assets/Scripts/UI/Chat/ChatMessage.cs.meta, Assets/Scripts/UI/Chat/ChatService.cs, Assets/Scripts/UI/Chat/ChatService.cs.meta
+- Diff: 1482 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d9e0e8b4f40f0ac969b715f1d484d8755878d348 -->
+## 2025-10-17T23:02:46+01:00 — Merge pull request #1173 from aicovergod/codex/increase-buff-icon-size-by-2.5x
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 97 ++ / 8 --
+- Notes:
+  Enlarge buff HUD icons for readability
+---
+<!-- commit:28a28d270ba3c1e743161774ccc48622a9ba3764 -->
+## 2025-10-17T23:02:37+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:3780a69a1ee5b9a0726ec3eae19ba061a10f33fd -->
+## 2025-10-17T23:02:15+01:00 — Scale buff info boxes for readability
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/HUD/BuffInfoBox.cs
+- Diff: 88 ++ / 8 --
+- Notes:
+  —
+---
+<!-- commit:205c6fb86f65d97085b1c837252032cd329e56ed -->
+## 2025-10-17T22:57:50+01:00 — Merge pull request #1172 from aicovergod/codex/add-outline-to-petlevelbarhud-and-healthhud
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 1 --
+- Notes:
+  Add outlines to HUD text elements for better readability
+---
+<!-- commit:bace9866dd6345932647dbd2785007e2514c6f7a -->
+## 2025-10-17T22:57:35+01:00 — Enhance pet and health HUD text legibility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Pets/PetLevelBarHUD.cs, Assets/Scripts/Player/HealthHUD.cs
+- Diff: 11 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:80c1e4b24a7d8ee7d00a5ea8b437175a350fcb4b -->
+## 2025-10-17T22:50:47+01:00 — Merge pull request #1171 from aicovergod/codex/update-pet-and-health-hud-layouts
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 15 ++ / 11 --
+- Notes:
+  Adjust HUD layout constants for health and pet bars
+---
+<!-- commit:628e6230a84f5a5d492f4a255811b0f98092a41c -->
+## 2025-10-17T22:50:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:4a0ab763253d3b6e2ebdf737aec8e1b6a9d63d69 -->
+## 2025-10-17T22:50:20+01:00 — Adjust player and pet HUD layout
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Pets/PetLevelBarHUD.cs, Assets/Scripts/Player/HealthHUD.cs
+- Diff: 6 ++ / 11 --
+- Notes:
+  —
+---
+<!-- commit:c0676f812f9d32816befb44b977076cd6ce33afa -->
+## 2025-10-17T22:35:35+01:00 — Merge pull request #1170 from aicovergod/codex/update-minimap-size-and-border-constants
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 14 ++ / 5 --
+- Notes:
+  Adjust minimap border dimensions
+---
+<!-- commit:7b121c77472641d74a14d064d3b16bacde7158e8 -->
+## 2025-10-17T22:35:17+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b2c5e80cd100d72fa51430c1ffaa0a775e927f6d -->
+## 2025-10-17T22:35:00+01:00 — Expand minimap border to 300
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/World/Minimap.cs
+- Diff: 5 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:fe96ceeb773a9c0f3c5b71454572755b17b84d18 -->
+## 2025-10-17T21:44:26+01:00 — Merge pull request #1169 from aicovergod/codex/fix-cs0103-and-cs1061-errors
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 2 --
+- Notes:
+  Fix shop UI close button spacing and pointer event caching
+---
+<!-- commit:cc34b8ba7d718d9fed211fa39039d93acb82168f -->
+## 2025-10-17T21:44:21+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0973da9a3e3e120d50026ae213065e75d03a4817 -->
+## 2025-10-17T21:43:34+01:00 — Fix shop UI layout references and pointer raycast caching
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Interaction/NpcShopOpener.cs, Assets/Scripts/Shop/ShopUI.cs
+- Diff: 15 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:c521bc90b7d65e408f6658cd5ce01c722598680f -->
+## 2025-10-17T19:49:11+01:00 — Merge pull request #1168 from aicovergod/codex/extend-overlaycanvasfactory-and-update-references
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 139 ++ / 43 --
+- Notes:
+  Refactor UI canvases to use shared factory
+---
+<!-- commit:4c30cc7b7d69f8497b1a8048ad6757d326a79393 -->
+## 2025-10-17T19:28:14+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:6ed546b1bc1f98ec61c8c878d70379bbb83e7ec4 -->
+## 2025-10-17T19:27:54+01:00 — Refactor UI canvases to use shared factory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/NPC/Combat/NpcHealthHUD.cs, Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/Pets/PetLevelBarMenu.cs, Assets/Scripts/UI/MergeHudTimer.cs, Assets/Scripts/UI/Utilities/OverlayCanvasFactory.cs, Assets/Scripts/World/Minimap.cs
+- Diff: 130 ++ / 43 --
+- Notes:
+  —
+---
+<!-- commit:a73c4865282f05a4127f408495511a11bf69ac04 -->
+## 2025-10-17T19:11:17+01:00 — Merge pull request #1165 from aicovergod/codex/create-overlay-canvas-factory-and-refactor-ui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 155 ++ / 97 --
+- Notes:
+  Refactor overlay canvas creation into factory
+---
+<!-- commit:b03c17da4b13b99015339c875393f4f3b73d6927 -->
+## 2025-10-17T19:11:06+01:00 — Merge branch 'main' into codex/create-overlay-canvas-factory-and-refactor-ui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:894f7611956d4591f2b99b7a2f84b973be4f1c3a -->
+## 2025-10-17T18:46:38+01:00 — Merge branch 'main' into codex/create-overlay-canvas-factory-and-refactor-ui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs, Assets/Scripts/Shop/ShopUI.cs
+- Diff: 192 ++ / 70 --
+- Notes:
+  —
+---
+<!-- commit:6058d053613f7112acb229a613f55cc9e514189c -->
+## 2025-10-17T15:25:10+01:00 — Refactor overlay canvas generation into factory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Inventory/Equipment.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs, Assets/Scripts/Shop/ShopUI.cs, Assets/Scripts/UI/Utilities/OverlayCanvasFactory.cs
+- Diff: 147 ++ / 53 --
+- Notes:
+  —
+---
+<!-- commit:f39026f102cbc95f2073d0334e0c84159b247e93 -->
+## 2025-10-17T12:39:14+01:00 — Merge pull request #1164 from aicovergod/codex/update-grounditemmanager-to-validate-player-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 67 ++ / 9 --
+- Notes:
+  Ensure ground item manager rebinds to the active player inventory
+---
+<!-- commit:d28b90e96b7a38c5e1026d3ac0e7cc2293c59e12 -->
+## 2025-10-17T12:38:54+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e77c28263174688cc9a09872eff1cfd7f3909e0a -->
+## 2025-10-17T12:38:42+01:00 — Fix ground item inventory rebinding
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 58 ++ / 9 --
+- Notes:
+  —
+---
+<!-- commit:07671796fa82a3f4715f9e6c86d4d93aca841189 -->
+## 2025-10-16T21:12:32+01:00 — Merge pull request #1163 from aicovergod/codex/update-agents.md-with-ui-pointer-checks-guideline
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 10 ++ / 0 --
+- Notes:
+  Document raycaster filtering requirement for gathering UI checks
+---
+<!-- commit:f9820b8ff585a1d1231dcfcf4fa53274adab1a78 -->
+## 2025-10-16T21:12:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2c3419987edf1396e61c3226f66f1f7152700d32 -->
+## 2025-10-16T21:12:03+01:00 — Document raycaster filtering requirement for gathering UI
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): AGENTS.md
+- Diff: 1 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8c4a99ab9cdd2d8f8c88d6e0e6bfded7134960ef -->
+## 2025-10-16T21:09:04+01:00 — Merge pull request #1159 from aicovergod/codex/update-ui-blocking-behavior-in-controllers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 4 ++ / 90 --
+- Notes:
+  Restore UI blocking for gathering controllers
+---
+<!-- commit:c76da971c454964537a441dbf688427c64af9acc -->
+## 2025-10-16T21:08:48+01:00 — Merge branch 'main' into codex/update-ui-blocking-behavior-in-controllers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 131 ++ / 38 --
+- Notes:
+  —
+---
+<!-- commit:4cb01e525ca5904d4c2d84fa04a86a0cfd7fab44 -->
+## 2025-10-16T20:48:37+01:00 — Restore UI blocking for gathering controllers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Skills/Cooking/Core/CookingController.cs, Assets/Scripts/Skills/Firemaking/Core/FiremakingBonfireController.cs, Assets/Scripts/Skills/Fishing/Core/FisherController.cs
+- Diff: 0 ++ / 14 --
+- Notes:
+  —
+---
+<!-- commit:3599871b1ee31802aec890228e0f113481917ca2 -->
+## 2025-10-16T20:19:52+01:00 — Merge pull request #1158 from aicovergod/codex/update-raycast-filtering-for-ui-interactions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 27 ++ / 0 --
+- Notes:
+  Filter physics raycasters out of UI pointer checks
+---
+<!-- commit:8d0cc91efd250977081f477463f98bb6a5f15883 -->
+## 2025-10-16T20:18:57+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:3abfa68f8688736a7c6084909ced4f75ee0ffae6 -->
+## 2025-10-16T20:18:34+01:00 — Filter physics raycasts from UI blocking checks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/Skills/Common/GatheringController.cs
+- Diff: 18 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:dcd9cff467e42bec2ebd8c598177ce76b982d904 -->
+## 2025-10-16T17:29:56+01:00 — Merge pull request #1157 from aicovergod/codex/add-raycast-helper-and-logging-for-ui-hits
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 258 ++ / 39 --
+- Notes:
+  Improve UI raycast diagnostics for interactions
+---
+<!-- commit:cf77a3910b919f4a58791f90d6f455ec4a15fe7f -->
+## 2025-10-16T17:29:49+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:233148d53d227ff97404568dca20f90574c93ab0 -->
+## 2025-10-16T17:29:36+01:00 — Improve UI raycast diagnostics for interactions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/Skills/Common/GatheringController.cs
+- Diff: 249 ++ / 39 --
+- Notes:
+  —
+---
+<!-- commit:27fa375f1416e325d9a2349fc929c78020c3bbfc -->
+## 2025-10-16T15:59:34+01:00 — Merge pull request #1156 from aicovergod/codex/refactor-input-handling-for-mouse-only-support
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 46 ++ / 334 --
+- Notes:
+  Simplify mouse-only interaction handling
+---
+<!-- commit:d96ef6c184ad0aa48e58641a1680b17a64827215 -->
+## 2025-10-16T15:58:58+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:40dd2e276ef364c79cd461dbfcf098afb067ad12 -->
+## 2025-10-16T15:58:44+01:00 — Simplify gathering and scene interaction input to mouse
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 37 ++ / 334 --
+- Notes:
+  —
+---
+<!-- commit:7773e56040e7cd5e6b134144ab4b876372c051c7 -->
+## 2025-10-16T15:41:17+01:00 — Merge pull request #1155 from aicovergod/codex/fix-pointerid-penpointerid-error
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 174 ++ / 19 --
+- Notes:
+  Handle pen pointer detection without deprecated constant
+---
+<!-- commit:c1bb8c17a666beca54e73a5ac70246b657080b96 -->
+## 2025-10-16T15:41:06+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:800c8663af9cd0049c1620cec46e9ba190185b21 -->
+## 2025-10-16T15:40:53+01:00 — Fix pen pointer handling in UI gating
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 165 ++ / 19 --
+- Notes:
+  —
+---
+<!-- commit:2b2b0623c83c159d09d951ac2224d2af9d62159d -->
+## 2025-10-16T15:31:19+01:00 — Merge pull request #1154 from aicovergod/codex/refactor-interaction-handling-in-gatheringcontroller-and-sce
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 173 ++ / 108 --
+- Notes:
+  Defer UI pointer filtering for gathering and scene transitions
+---
+<!-- commit:52add921b28d64904eefbd2692adad027b04175d -->
+## 2025-10-16T15:30:41+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:4fa338e7dddc398755809ce717a0d682ae89b734 -->
+## 2025-10-16T15:30:27+01:00 — Defer UI pointer checks for gathering and transitions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 164 ++ / 108 --
+- Notes:
+  —
+---
+<!-- commit:801600a000907c703f17c33975c3a0695e7cb1e3 -->
+## 2025-10-16T14:06:27+01:00 — Merge pull request #1153 from aicovergod/codex/replace-mousepointereventsystemid-with-pointerid
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 23 ++ / 12 --
+- Notes:
+  Align pointer hover checks with UIElements pointer ID
+---
+<!-- commit:d5f48c6a9a652dfe8963f3dc3ebfd28a00ee0888 -->
+## 2025-10-16T14:05:57+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:752c38e245858905bddde1ad43051c30801d9c2c -->
+## 2025-10-16T14:05:44+01:00 — Align mouse pointer ID with UIElements constant
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 14 ++ / 12 --
+- Notes:
+  —
+---
+<!-- commit:13ea0c2bc26616369b4376bcd09ab96fa3af5d0b -->
+## 2025-10-16T11:52:32+01:00 — Merge pull request #1152 from aicovergod/codex/fix-console-errors-related-to-pointerid
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 37 ++ / 6 --
+- Notes:
+  Restore mouse pointer ID constants for EventSystem UI checks
+---
+<!-- commit:1e9759b021b47e13acb4aaed414cd25ee43451fc -->
+## 2025-10-16T11:52:20+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:eb85ffc9ce89eae5b7df1ba772626dee6ced7453 -->
+## 2025-10-16T11:52:09+01:00 — Restore mouse pointer ID constants for EventSystem UI checks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 28 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:36bec526101971ab3ddc1e32e6b27a274738de46 -->
+## 2025-10-16T11:47:32+01:00 — Merge pull request #1151 from aicovergod/codex/refactor-input-handling-for-mouse-clicks-t8xhrz
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 121 ++ / 83 --
+- Notes:
+  Simplify mouse pointer handling for interactions
+---
+<!-- commit:69b0fc738168898cccd5eb4c94390c4e15b6decc -->
+## 2025-10-16T11:47:23+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a2a6507dcb9cef3eeb46672266a1a4927d161341 -->
+## 2025-10-16T11:47:04+01:00 — Simplify mouse pointer handling for interactions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): AGENTS.md, Assets/Scripts/NPC/Interaction/NpcInteractable.cs, Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 112 ++ / 83 --
+- Notes:
+  —
+---
+<!-- commit:60b402deb7b76b0b3badcb852a36e7d0fd70a4ef -->
+## 2025-10-16T11:27:57+01:00 — Merge pull request #1150 from aicovergod/codex/adjust-pointer-id-handling-in-interactions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 68 ++ / 15 --
+- Notes:
+  Fix pointer UI gating for scene transitions and gathering
+---
+<!-- commit:336a3c5c3cc812551c99fd4536da11a97b675ce8 -->
+## 2025-10-16T11:27:49+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:503e2dd0b3f843c5866f576380faecbacbb6c5fa -->
+## 2025-10-16T11:27:35+01:00 — Adjust pointer id usage for UI blocking
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Skills/Common/GatheringController.cs, Assets/Scripts/World/SceneTransitionInteractable.cs
+- Diff: 59 ++ / 15 --
+- Notes:
+  —
+---
+<!-- commit:bc56ac149ba17455f27aad0665b7d7b1637a0b8c -->
+## 2025-10-16T11:13:12+01:00 — Merge pull request #1149 from aicovergod/codex/extend-npcinteractable-with-pending-pointer-request
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 124 ++ / 7 --
+- Notes:
+  Handle pointer-driven NPC menu interactions
+---
+<!-- commit:90156ffbc71ac152e7a655af59c3fd15f11705f6 -->
+## 2025-10-16T11:13:04+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:44c4242d0ca7da3bc4355958ee992a5008d7a9e5 -->
+## 2025-10-16T11:12:52+01:00 — Handle pointer-driven NPC menu interactions
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/NPC/Interaction/NpcInteractable.cs
+- Diff: 115 ++ / 7 --
+- Notes:
+  —
+---
+<!-- commit:e81039c6354a05d38b706b12d654686d8e589bef -->
+## 2025-10-16T11:02:24+01:00 — Merge pull request #1148 from aicovergod/codex/fix-item-pickup-not-adding-to-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 30 ++ / 1 --
+- Notes:
+  Fix ground item collection abort handling
+---
+<!-- commit:904e56c536c9cc20ebcfbc4f08be7a6984626fed -->
+## 2025-10-16T11:02:16+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0ad027783748e3fbe73575717d651ca9b32ef3cc -->
+## 2025-10-16T11:02:03+01:00 — Fix ground item collection abort handling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs, Assets/Scripts/Inventory/ItemPickup.cs
+- Diff: 21 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:ac9d2caddd2d5ec93081fa8883d72ff37ac8fb0c -->
+## 2025-10-16T10:43:44+01:00 — Merge pull request #1147 from aicovergod/codex/fix-input-field-click-issue-in-bank-tab
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 79 ++ / 15 --
+- Notes:
+  Fix stack split dialog pointer handling
+---
+<!-- commit:2c350f6e9e85c899bdd543c78e947ac4c10bf45c -->
+## 2025-10-16T10:43:37+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f0f7061b196c7bf7d0b4ce17e087bd63e9c9828e -->
+## 2025-10-16T10:43:22+01:00 — Fix stack split dialog input focus
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/StackSplitDialog.cs
+- Diff: 70 ++ / 15 --
+- Notes:
+  —
+---
+<!-- commit:78db75b2b6bc3bf39dc8feca0e4aa4ea256b82e5 -->
+## 2025-10-16T10:35:35+01:00 — Merge pull request #1146 from aicovergod/codex/fix-collision-for-depleted-ore
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 34 ++ / 4 --
+- Notes:
+  Fix depleted mining rock collision
+---
+<!-- commit:2710c9bbe881ccbfe03d6a70bd2aa53536b1593b -->
+## 2025-10-16T10:35:26+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:013b2290228716fbadd85fb8a65a9287fa5cab6d -->
+## 2025-10-16T10:35:11+01:00 — Fix depleted mining rock collider
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Skills/Mining/Core/MineableRock.cs
+- Diff: 25 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:6af0e90df96f0775d80b257db3c9e0aa57fb007b -->
+## 2025-10-16T10:22:10+01:00 — Merge pull request #1145 from aicovergod/codex/update-restoreforeditmode-method
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 16 ++ / 6 --
+- Notes:
+  Ensure preview camera restores after play mode
+---
+<!-- commit:e8c3a2a326da676b840d7f77bf0ad57f53540af2 -->
+## 2025-10-16T10:22:02+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c99777641b3b9b1105b80ef905671ad9b14e23b5 -->
+## 2025-10-16T10:21:50+01:00 — Ensure preview camera restores after play mode
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/World/EditorOnlyCameraHider.cs
+- Diff: 7 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:d69598f5930831c8cdc72f4e1728ec65a63fca7e -->
+## 2025-10-16T10:05:58+01:00 — Merge pull request #1144 from aicovergod/codex/refactor-editoronlycamerahider-for-performance
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 96 ++ / 10 --
+- Notes:
+  Refine editor-only camera hider runtime toggling
+---
+<!-- commit:643e3bd142e5b3711fa62a5784d5bef1040036b7 -->
+## 2025-10-16T10:05:52+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f60d9a811d1ed237d7eda69bcceb47d792191d96 -->
+## 2025-10-16T10:05:36+01:00 — Refine editor preview camera toggling
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/World/EditorOnlyCameraHider.cs
+- Diff: 87 ++ / 10 --
+- Notes:
+  —
+---
+<!-- commit:e68f9c2f68847a76d4011038695142f9bbdd4471 -->
+## 2025-10-16T00:40:00+01:00 — Merge pull request #1143 from aicovergod/codex/fix-bug-identified-by-github-codex
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 59 ++ / 7 --
+- Notes:
+  Ensure magic damage type updates with spell selection
+---
+<!-- commit:83ffb30c393a017f1a393a71d21ece052c14e9da -->
+## 2025-10-16T00:39:47+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a455dc0b484db3580cf38df1fb325e05f6a8c15b -->
+## 2025-10-16T00:39:35+01:00 — Fix magic damage type updates when swapping spells
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Player/PlayerCombatLoadout.cs, Assets/Scripts/UI/MagicUI.cs
+- Diff: 50 ++ / 7 --
+- Notes:
+  —
+---
+<!-- commit:4fd0dfe1c55c749c77ad1a27e3fec401f0c89ec3 -->
+## 2025-10-16T00:19:23+01:00 — Merge pull request #1142 from aicovergod/codex/add-shared-helper-for-weapon-classification
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 139 ++ / 107 --
+- Notes:
+  Refine weapon classification keyword logic
+---
+<!-- commit:b517775de3d01d9b47e4a42187e244f3468d43a6 -->
+## 2025-10-16T00:19:00+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9bf4618ff3289a1078aefde280bea56cefabd8c9 -->
+## 2025-10-16T00:18:49+01:00 — Refine weapon classification keyword logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Combat/WeaponClassificationUtility.cs, Assets/Scripts/Player/PlayerCombatLoadout.cs
+- Diff: 130 ++ / 107 --
+- Notes:
+  —
+---
+<!-- commit:2172021092e5848585bc79eaf24a4db6808f490f -->
+## 2025-10-15T21:50:18+01:00 — Merge pull request #1141 from aicovergod/codex/update-input-handling-for-item-pickup
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 37 ++ / 10 --
+- Notes:
+  Support right-click menus on ground items
+---
+<!-- commit:1514ff7ebadd5877e9bbf1b68015e67f7239148a -->
+## 2025-10-15T21:50:09+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:3de5a831d54d8712999293c7cfc9b2bc5fe71440 -->
+## 2025-10-15T21:49:56+01:00 — Support right-click menus on ground items
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs, Assets/Scripts/Inventory/ItemPickup.cs
+- Diff: 28 ++ / 10 --
+- Notes:
+  —
+---
+<!-- commit:67d5049a72c48351c2e78007513a4b5911f7ab5f -->
+## 2025-10-15T20:35:41+01:00 — Merge pull request #1140 from aicovergod/codex/update-grounditemmanager-to-sort-pickups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 24 ++ / 1 --
+- Notes:
+  Ensure ground item pickups prioritize newest spawns
+---
+<!-- commit:1e5bf0e3b0935043847ba6341adfa45e466caf7f -->
+## 2025-10-15T20:35:27+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e693a6f09d0c9db7815bcd986dbc0bd6be2d2a9e -->
+## 2025-10-15T20:35:11+01:00 — Sort ground item pickups by newest spawn order
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 15 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:ad9f6f23f3e512bfe87e4f707cbb9d5884e450c8 -->
+## 2025-10-15T20:17:00+01:00 — Merge pull request #1139 from aicovergod/codex/create-shared-base-class-for-context-menus
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 293 ++ / 155 --
+- Notes:
+  Create shared context menu base for inventory and bank menus
+---
+<!-- commit:892a2bb72256db8e8eb93071adb1652f17df1fbd -->
+## 2025-10-15T20:16:38+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9e37ea5b0482b08ba149599d3cb895faad7de133 -->
+## 2025-10-15T20:15:17+01:00 — Refactor context menus to shared base helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Bank/BankDepositMenu.cs, Assets/Scripts/Bank/BankWithdrawMenu.cs, Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs, Assets/Scripts/Inventory/InventoryDropMenu.cs, Assets/Scripts/UI/ContextMenus.meta, Assets/Scripts/UI/ContextMenus/ContextMenuBase.cs, Assets/Scripts/UI/ContextMenus/ContextMenuBase.cs.meta
+- Diff: 284 ++ / 155 --
+- Notes:
+  —
+---
+<!-- commit:4042b82b09305f135da21d19c1062cca70b706e4 -->
+## 2025-10-15T19:59:52+01:00 — Merge pull request #1138 from aicovergod/codex/add-camera-refresh-helper-to-grounditemmanager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 78 ++ / 3 --
+- Notes:
+  Recover ground item manager world camera after scene changes
+---
+<!-- commit:c84ff8c00444fb1ad40fc0aa17457ba87e4c25a9 -->
+## 2025-10-15T19:59:17+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:66f16231c64e39c108a4ae57aaf564ecdc6f2459 -->
+## 2025-10-15T19:59:04+01:00 — Ensure ground item manager refreshes world camera
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 69 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:8e7e7489de0c5846d1998075cb73b8e4955b35f6 -->
+## 2025-10-15T19:24:21+01:00 — Merge pull request #1137 from aicovergod/codex/fix-image-bug
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 11 ++ / 4 --
+- Notes:
+  Fix ground pickup menu compatibility
+---
+<!-- commit:1012deff43c2f6b7cb287378a492aef2c0712d1c -->
+## 2025-10-15T19:24:08+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:1f4dcd394c692af6a84b06218408fe0607a12915 -->
+## 2025-10-15T19:23:55+01:00 — Remove CollectionsMarshal usage in ground item menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs
+- Diff: 2 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:bcea782be1e1845b8f25fc4a9087cf43e8f77678 -->
+## 2025-10-15T14:43:40+01:00 — Merge pull request #1136 from aicovergod/codex/optimize-grounditemmanager-and-menu-methods
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 45 ++ / 9 --
+- Notes:
+  Optimize ground item pickup menu allocations
+---
+<!-- commit:af337c8a8f9690218ebaebfcf2cc861832f469a2 -->
+## 2025-10-15T14:43:27+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:0a12e41b519f16985a4c2ebf68e64f836ab8f7f8 -->
+## 2025-10-15T14:43:13+01:00 — Optimize ground item menu allocations
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs, Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs
+- Diff: 36 ++ / 9 --
+- Notes:
+  —
+---
+<!-- commit:144d81d08b8ec29658e6d9e2a0939321c3a29338 -->
+## 2025-10-15T14:26:28+01:00 — Merge pull request #1135 from aicovergod/codex/add-rebinddependencies-method-in-grounditemmanager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 110 ++ / 35 --
+- Notes:
+  Cache ground item dependencies across scene loads
+---
+<!-- commit:f599dd491d0ca45d460081086c2086a8e2f1e517 -->
+## 2025-10-15T14:26:20+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a01dbc006e08846b187f48f25a38337e7378c4a6 -->
+## 2025-10-15T14:26:07+01:00 — Refine ground item dependency binding
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 101 ++ / 35 --
+- Notes:
+  —
+---
+<!-- commit:f123d7108584492f85cc5371ecaf8001b77ca02f -->
+## 2025-10-15T14:18:44+01:00 — Merge pull request #1134 from aicovergod/codex/fix-codex-bug-found-in-github
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 22 ++ / 0 --
+- Notes:
+  Defer ground item pickup menu safe-zone check until after layout
+---
+<!-- commit:8e016afbde03f1dbf2bc43e8f9f1e16979f2f663 -->
+## 2025-10-15T14:18:19+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:77bb5dc88f8ae208722ade3e7ee8abb364b966de -->
+## 2025-10-15T14:18:06+01:00 — Prevent ground item menu from closing before layout
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs
+- Diff: 13 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:df473fff1b55cc320e04e06685dc4212bed2aa6f -->
+## 2025-10-15T12:13:47+01:00 — Merge pull request #1132 from aicovergod/codex/reduce-size-of-right-click-menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 34 ++ / 2 --
+- Notes:
+  Scale ground item context menu to half size
+---
+<!-- commit:b11564d2cc49aceceb9b6e3850718fa6d14ff802 -->
+## 2025-10-15T12:13:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:05f23376526dd9a6e1e3081e658f33ed32ecce53 -->
+## 2025-10-15T12:13:23+01:00 — Scale ground item context menu to half size
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs
+- Diff: 25 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:7de30d4ef191040750bb9a3742890f9e366a9a34 -->
+## 2025-10-15T09:34:26+01:00 — Merge pull request #1131 from aicovergod/codex/fix-bug-found-in-codex-review
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 25 ++ / 13 --
+- Notes:
+  Respect manual movement when auto-picking ground items
+---
+<!-- commit:d5850b88f1cdde7c03a9297cbde68d0e48ba7df0 -->
+## 2025-10-15T09:34:08+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:93bb9dcab4e69c50cf539c4070e6be5ac53a1d64 -->
+## 2025-10-15T09:33:55+01:00 — Respect manual movement when auto-picking ground items
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 16 ++ / 13 --
+- Notes:
+  —
+---
+<!-- commit:ef777837f870a9c3a200f8e2469359f2ab4b8cfa -->
+## 2025-10-14T21:47:57+01:00 — Merge pull request #1130 from aicovergod/codex/update-pickup-movement-to-item-position
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 29 ++ / 2 --
+- Notes:
+  Retarget ground item auto-walk to live pickup position
+---
+<!-- commit:cd9453493b5dfc51b3739d1b2d11b18f6adff111 -->
+## 2025-10-14T21:47:50+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9c01c61909e6d437a37e53418b1e17eb587e138d -->
+## 2025-10-14T21:47:34+01:00 — Retarget ground item pickup movement
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 20 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:8e0f0a752e454a5549fbba5014d454f03324b97f -->
+## 2025-10-14T21:35:30+01:00 — Merge pull request #1129 from aicovergod/codex/update-grounditemmanager-for-inactive-player-mover
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 37 ++ / 11 --
+- Notes:
+  Handle inactive player mover during ground item pickups
+---
+<!-- commit:7ac68d8a006394907407e2871462e0fc270c1080 -->
+## 2025-10-14T21:35:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:de1e5bb10d9232054f195c01745056691ed510d1 -->
+## 2025-10-14T21:35:07+01:00 — Handle inactive player mover during ground item pickups
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 28 ++ / 11 --
+- Notes:
+  —
+---
+<!-- commit:4090a2e620df0947b3c3a7d4ea046ffff2ecc5e4 -->
+## 2025-10-14T21:26:19+01:00 — Merge pull request #1128 from aicovergod/codex/add-player-mover-resolution-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 34 ++ / 0 --
+- Notes:
+  Ensure GroundItemManager rebinds PlayerMover before pickups
+---
+<!-- commit:f095e49b72834e74fd2d2c4c12ed2c4067771c0f -->
+## 2025-10-14T21:26:12+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:7d29ef8381fc83e760a40f910ed51f9088841018 -->
+## 2025-10-14T21:25:59+01:00 — Ensure ground item pickups rebind PlayerMover
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 25 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:29b61d11b9f9b31e819e640dc542637dd93a1e62 -->
+## 2025-10-14T21:06:12+01:00 — Merge branch 'main' of https://github.com/aicovergod/My-project
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:43844705218fa4628dfdce3de20cc4a28a73e8ca -->
+## 2025-10-14T20:49:49+01:00 — n
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Prefabs/SceneObjects/GroundItemManager.prefab, Assets/Prefabs/SceneObjects/GroundItemManager.prefab.meta, Assets/Prefabs/SceneObjects/ItemPickup.prefab, Assets/Resources/PersistentObjects.asset, Assets/Scripts/Inventory/GroundItems.meta, Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs.meta, Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs.meta
+- Diff: 90 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:704bdfefb9c0649829cfe8838e3131f53c4a4105 -->
+## 2025-10-14T20:40:31+01:00 — Merge pull request #1127 from aicovergod/codex/fix-bug-in-grounditemmanager
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 13 ++ / 4 --
+- Notes:
+  Fix ground item manager inventory reference
+---
+<!-- commit:546220f070236520d2c4b9b45d62c921f35517e4 -->
+## 2025-10-14T20:40:23+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c7b7163dca95a37d36048e25d0eb13e10a9afcf6 -->
+## 2025-10-14T20:40:10+01:00 — Fix ground item manager inventory reference
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs
+- Diff: 4 ++ / 4 --
+- Notes:
+  —
+---
+<!-- commit:a1c873b1916def4632d093e518e7f41ed518aa9a -->
+## 2025-10-14T20:25:23+01:00 — Merge pull request #1126 from aicovergod/codex/implement-osrs-style-item-pickup-behavior
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 925 ++ / 18 --
+- Notes:
+  Add OSRS-style ground item pickup flow
+---
+<!-- commit:08c74b41e5491a51aa3bc0cbc15c05fe0f171377 -->
+## 2025-10-14T20:24:45+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2d3cad2828ac42690672ff4d45efb93e6b55aecf -->
+## 2025-10-14T20:24:32+01:00 — Add ground item pickup manager and menu
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Inventory/GroundItems/GroundItemManager.cs, Assets/Scripts/Inventory/GroundItems/GroundItemPickupMenu.cs, Assets/Scripts/Inventory/ItemPickup.cs
+- Diff: 916 ++ / 18 --
+- Notes:
+  —
+---
+<!-- commit:01b5e92804a5b12d738745fb3c83e8f861f214ed -->
+## 2025-10-14T17:39:02+01:00 — Merge pull request #1125 from aicovergod/codex/adjust-tryopenwindow-for-inventory-logic
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 18 ++ / 0 --
+- Notes:
+  Allow dedicated inventories to coexist with shared inventory
+---
+<!-- commit:8febaeb2f1586c58218f0aca861e16b852512d28 -->
+## 2025-10-14T17:38:53+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:f1feb1d312ab3f3aa12bf70904c2953a5dac1fb3 -->
+## 2025-10-14T17:38:38+01:00 — Allow dedicated inventories to coexist
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/UIManager.cs
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:dede02659799313805a6ccf1ddf0c347b638eb7f -->
+## 2025-10-14T17:28:10+01:00 — Merge pull request #1124 from aicovergod/codex/add-resolveplayerinventory-helper-in-bankui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 61 ++ / 12 --
+- Notes:
+  Improve bank inventory resolution for BankUI
+---
+<!-- commit:850c770df4d6014fb024b000be2914fd554e3a74 -->
+## 2025-10-14T17:28:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:515e286efc9f60e431f226842b584efdaed8d15a -->
+## 2025-10-14T17:27:50+01:00 — Improve bank inventory resolution
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Bank/BankUI.cs
+- Diff: 52 ++ / 12 --
+- Notes:
+  —
+---
+<!-- commit:c1cb43f34851ac7f9a786974b9df66702f4bc90e -->
+## 2025-10-14T16:44:36+01:00 — Merge pull request #1123 from aicovergod/codex/fix-bug-reported-by-codex-2r4bj7
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 45 ++ / 1 --
+- Notes:
+  Fix tab mutex handling with dedicated inventories
+---
+<!-- commit:515f836a6abd7ff2da744d09bee8bf51187eff3e -->
+## 2025-10-14T16:44:26+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:348323e49d03409d8bfef33f8295961e0e00a4ed -->
+## 2025-10-14T16:44:10+01:00 — Fix tab mutex handling with dedicated inventories
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/UI/Utilities/InterfaceTabMutexUtility.cs
+- Diff: 36 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:17db658e614927d56c819e1cb3b6575b5df2e26a -->
+## 2025-10-14T16:39:04+01:00 — Merge pull request #1122 from aicovergod/codex/fix-bug-reported-by-codex
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 21 ++ / 3 --
+- Notes:
+  Fix bank tooltip collapsing inventory UI
+---
+<!-- commit:273cd7a27d2f8f38f59c082897069474da59c6d5 -->
+## 2025-10-14T16:38:46+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:214f419d00df277a99bab71c5e5685746ca9071a -->
+## 2025-10-14T16:38:24+01:00 — Prevent bank tooltip from collapsing inventory helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Inventory.cs
+- Diff: 12 ++ / 3 --
+- Notes:
+  —
+---
+<!-- commit:bc4cc583603cf2e57b6a7b1946c9fe86499c5f7c -->
+## 2025-10-14T12:52:39+01:00 — Merge pull request #1121 from aicovergod/codex/fix-pet-drop-functionality
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 29 ++ / 0 --
+- Notes:
+  Fix pet drops spawning pets
+---
+<!-- commit:5dbd3160154cc87ce21a623c67ccae33004260df -->
+## 2025-10-14T12:52:32+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:5d2b3eaee0e5242f1c4557d5adfb4eb133ea79d3 -->
+## 2025-10-14T12:52:19+01:00 — Fix pet summon when dropping pet items
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 20 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:303deae830b63d5d5148cd2ef76cfa1d75269bac -->
+## 2025-10-14T12:40:14+01:00 — Merge pull request #1120 from aicovergod/codex/guard-shared-ui-access-in-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 23 ++ / 1 --
+- Notes:
+  Allow dedicated inventories to bypass tab mutex
+---
+<!-- commit:074c8d9c41a38a5461b42c9d1c7bc289f1e289e1 -->
+## 2025-10-14T12:40:05+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:298173382a080ed8b0d487140199bec291962f1e -->
+## 2025-10-14T12:39:53+01:00 — Allow dedicated inventories to bypass tab mutex
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/UI/Utilities/InterfaceTabMutexUtility.cs
+- Diff: 14 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:427b22ab90433341387cf9de2afd9c2e590d1464 -->
+## 2025-10-14T12:28:03+01:00 — Merge pull request #1119 from aicovergod/codex/remove-spawngrounditem-invocation-from-dropitem
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 9 ++ / 1 --
+- Notes:
+  Stop spawning ground item pickups when dropping inventory items
+---
+<!-- commit:ba57b4514eab02b577ab69c12dc233666b97100a -->
+## 2025-10-14T12:27:56+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ac4054ef01910405df31583489609c43229d7f48 -->
+## 2025-10-14T12:27:42+01:00 — Remove ground item spawn during inventory drop
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 0 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:8ce45fc8e94cd3cd68c1bbcac049ae1d5721a19e -->
+## 2025-10-14T11:04:39+01:00 — Merge pull request #1118 from aicovergod/codex/update-drag-icon-logic-in-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 22 ++ / 1 --
+- Notes:
+  Fix drag icon parenting on inactive shared canvas
+---
+<!-- commit:b0c76c540edb9a73dd0f65a32b686871f215baea -->
+## 2025-10-14T11:04:33+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2040833f8591dfedf26ebeeb041a64830b11d717 -->
+## 2025-10-14T11:04:16+01:00 — Fix drag icon parenting on inactive shared canvas
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/UI/InventoryWindowController.cs
+- Diff: 13 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:4196ce4e84d422da8e993a365d810858d56c0b96 -->
+## 2025-10-14T10:44:48+01:00 — just some stufff
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (23): Assets/Game/Sprites/Pets/Gorilla/Attack_Down_64x64.png, Assets/Game/Sprites/Pets/Gorilla/Attack_Right_64x64.png, Assets/Game/Sprites/Pets/Gorilla/Attack_Up_64x64.png, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_30_27 PM.png, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_30_27 PM.png.meta, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_31_05 PM.png, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_31_05 PM.png.meta, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_34_10 PM.png, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_34_10 PM.png.meta, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_40_39 PM.png, Assets/Game/Sprites/Pets/Gorilla/ChatGPT Image Oct 13, 2025, 08_40_39 PM.png.meta, Assets/Game/Sprites/Pets/Gorilla/Gorilla_0001.png.meta, Assets/Game/Sprites/Pets/Gorilla/Gorilla_0002.png.meta, Assets/Game/Sprites/Pets/Gorilla/Gorilla_0003.png.meta, Assets/Game/Sprites/Pets/Gorilla/Gorilla_0004.png.meta, Assets/Game/Sprites/Pets/Gorilla/Gorilla_0005.png.meta, Assets/Game/Sprites/Pets/Gorilla/Idle_Down_64x64.png, Assets/Game/Sprites/Pets/Gorilla/Idle_Right_64x64.png, Assets/Game/Sprites/Pets/Gorilla/Idle_Up_64x64.png, Assets/Scripts/Inventory/Core.meta, Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs.meta, Assets/Scripts/Inventory/Core/InventoryModel.cs.meta, docs/bug-review-2024-06-08.md
+- Diff: 851 ++ / 70 --
+- Notes:
+  —
+---
+<!-- commit:8cafd84d7e571ce525cb7a92e11f16f50875469e -->
+## 2025-10-14T10:44:16+01:00 — Merge pull request #1117 from aicovergod/codex/extend-inventorywindowcontroller-with-applyconfig-method
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 165 ++ / 6 --
+- Notes:
+  Ensure inventory UI rebuilds on runtime config changes
+---
+<!-- commit:faca282fa5e6b8d8d4d80bc77d0789b1684b32f4 -->
+## 2025-10-14T10:44:09+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:d28475e7a427d039773914f28e55acc7b34da14b -->
+## 2025-10-14T10:43:56+01:00 — Ensure inventory UI rebuilds on runtime config changes
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs, Assets/Scripts/Pets/PetStorage.cs
+- Diff: 156 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:f240c52b2d783579234e50a59c6c84eafac854b3 -->
+## 2025-10-14T10:19:52+01:00 — Merge pull request #1116 from aicovergod/codex/fix-stack-overflow-on-inventory-close
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 52 ++ / 5 --
+- Notes:
+  Prevent recursive pet storage closes from overflowing stack
+---
+<!-- commit:c3cad8f98dc1a49b2efb36a8eaf062e40baa544b -->
+## 2025-10-14T10:19:44+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b56248a420dc70130d9eeb9592686c6d5981505e -->
+## 2025-10-14T10:19:29+01:00 — Prevent pet storage close recursion
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs
+- Diff: 43 ++ / 5 --
+- Notes:
+  —
+---
+<!-- commit:f1ddfabc68ba55dbde579616434d3e86185c5632 -->
+## 2025-10-14T10:08:20+01:00 — Merge pull request #1115 from aicovergod/codex/fix-missing-showtooltip-and-hidetooltip-methods
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 64 ++ / 7 --
+- Notes:
+  Restore inventory tooltip access for bank UI
+---
+<!-- commit:9ae0a596ce1d8b7ce8dd905e0c1afaeb4005a94d -->
+## 2025-10-14T10:08:06+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b9f43d24c8edb876baff09c92879b5e64915ac32 -->
+## 2025-10-14T10:07:52+01:00 — Restore inventory tooltip access for bank UI
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs
+- Diff: 55 ++ / 7 --
+- Notes:
+  —
+---
+<!-- commit:40ac0981f9e6735b8c9d2b0281acdecfafcf8786 -->
+## 2025-10-14T09:53:00+01:00 — Merge pull request #1114 from aicovergod/codex/fix-inventory-type-errors-after-refactor
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 21 ++ / 10 --
+- Notes:
+  Fix inventory type alias references
+---
+<!-- commit:256f899c0c28ab549562ad4fd3d3206220c7f43c -->
+## 2025-10-14T09:52:52+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ad08b91d5808c051964b5e96e4413a8694355108 -->
+## 2025-10-14T09:52:40+01:00 — Fix inventory handler type references
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs
+- Diff: 12 ++ / 10 --
+- Notes:
+  —
+---
+<!-- commit:173fad1ce73161c1cf6c6bfec9fc5dd4e81cda90 -->
+## 2025-10-14T09:42:30+01:00 — Merge pull request #1113 from aicovergod/codex/fix-bugs-in-codex-connector
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 47 ++ / 11 --
+- Notes:
+  Restore InventoryEntry struct and fix missing Books namespace
+---
+<!-- commit:3b31da4fbb92651a0e0884b3c8d3540905f1db7e -->
+## 2025-10-14T09:42:09+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e9973ab5ba815ec27d8267903760da51e06bcd37 -->
+## 2025-10-14T09:41:55+01:00 — Restore inventory entry struct and fix handler dependencies
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Inventory/Core/InventoryModel.cs, Assets/Scripts/Inventory/InventoryEntry.cs, Assets/Scripts/Inventory/InventoryEntry.cs.meta
+- Diff: 38 ++ / 11 --
+- Notes:
+  —
+---
+<!-- commit:ac40953baed27931428a442e3d3e819f16f211ec -->
+## 2025-10-13T23:18:10+01:00 — Merge pull request #1112 from aicovergod/codex/refactor-inventory-for-new-architecture
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 181 ++ / 6 --
+- Notes:
+  Refine inventory lifecycle bindings
+---
+<!-- commit:4d1cd5fd56ac09b4096b309351447dd3a8353a08 -->
+## 2025-10-13T23:18:01+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c77011e5eddbcf0e360d6dafbc0aaf2a1090a7e8 -->
+## 2025-10-13T23:17:50+01:00 — Refactor inventory bindings to model and controller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Inventory/Inventory.cs
+- Diff: 172 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:f60446c597f8f1ba469e54e009dba89d1cb35243 -->
+## 2025-10-13T22:58:13+01:00 — Merge pull request #1111 from aicovergod/codex/implement-inventoryinteractionhandler-and-refactor-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 859 ++ / 481 --
+- Notes:
+  Improve quest UI resolution in inventory handler
+---
+<!-- commit:95b10944daf21b23cc6c0836123e55c683fddb82 -->
+## 2025-10-13T22:57:58+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:632261022ed6a150c0ed044866635cf195b2af88 -->
+## 2025-10-13T22:57:45+01:00 — Improve quest UI resolution in inventory handler
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Inventory/Core/InventoryInteractionHandler.cs, Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs
+- Diff: 850 ++ / 481 --
+- Notes:
+  —
+---
+<!-- commit:d410e2a54830974fdf7c255614c21294dcc68199 -->
+## 2025-10-13T22:17:46+01:00 — Merge pull request #1110 from aicovergod/codex/add-inventorywindowcontroller-and-refactor-components
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 1362 ++ / 1021 --
+- Notes:
+  Refactor inventory UI into window controller
+---
+<!-- commit:a90c8be7e629bd1c343d86d1b3c6ff9d6bbb207c -->
+## 2025-10-13T22:17:24+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:b9043cf7b35cdab6b12beda6ce88b1f14a445061 -->
+## 2025-10-13T22:17:07+01:00 — Refactor inventory UI into window controller
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Inventory/InventoryDropMenu.cs, Assets/Scripts/Inventory/InventorySlot.cs, Assets/Scripts/Inventory/UI.meta, Assets/Scripts/Inventory/UI/InventoryWindowController.cs, Assets/Scripts/Inventory/UI/InventoryWindowController.cs.meta
+- Diff: 1353 ++ / 1021 --
+- Notes:
+  —
+---
+<!-- commit:641b2df4e4b52a96f5dc767f823d1087ae972fc5 -->
+## 2025-10-13T21:47:33+01:00 — Merge pull request #1109 from aicovergod/codex/implement-inventorymodel-and-integrate-with-inventory
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 730 ++ / 371 --
+- Notes:
+  Refactor inventory logic into shareable model
+---
+<!-- commit:a188e2f83e88330aeb5b668cadd78e5fa16e5798 -->
+## 2025-10-13T21:47:25+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:18ae0030c3e2eaffcc0f5b3a216940a6348b71fa -->
+## 2025-10-13T21:47:13+01:00 — Refactor inventory logic into shareable model
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Inventory/Core/InventoryModel.cs, Assets/Scripts/Inventory/Inventory.cs
+- Diff: 721 ++ / 371 --
+- Notes:
+  —
+---
+<!-- commit:b0850fa9e1a1308e96b9ab43f9f04fec36974d3f -->
+## 2025-10-13T20:29:44+01:00 — zz
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): AGENTS.md, Assets/Game/Sprites/Pets/Gorilla/Gorilla_0001.png, Assets/Game/Sprites/Pets/Gorilla/Gorilla_0002.png, Assets/Game/Sprites/Pets/Gorilla/Gorilla_0003.png, Assets/Game/Sprites/Pets/Gorilla/Gorilla_0004.png, Assets/Game/Sprites/Pets/Gorilla/Gorilla_0005.png
+- Diff: 0 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:079c7d5e6c05ff10620e0b5397aae497c7e6d75d -->
+## 2025-10-13T19:47:40+01:00 — updates
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (10): Assets/Resources/Item/Adamant Dagger.asset, Assets/Resources/Item/Black Dagger.asset, Assets/Resources/Item/Rune Dagger.asset, Assets/Scripts/Combat/HitSplatLibraryResolver.cs.meta, Assets/Scripts/Skills/Common/DebuggableTickedSkillBehaviour.cs.meta, Assets/Scripts/Skills/Common/SkillingOutfitInitializer.cs.meta, Assets/Scripts/Skills/Common/UI/GatheringToolIconResolver.cs.meta, Assets/Scripts/UI/Utilities/PlayerMovementModalLock.cs.meta, Assets/Scripts/Util/LayerUtility.cs.meta, docs/bug-review-2024-06-08.md
+- Diff: 24 ++ / 23 --
+- Notes:
+  —
+---
+<!-- commit:a1698c1ba609783abb117d2d8bd48d9cd3c7a8aa -->
+## 2025-10-13T18:58:46+01:00 — Merge pull request #1108 from aicovergod/codex/add-shared-utility-for-obstruction-layers
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 116 ++ / 62 --
+- Notes:
+  Refactor obstruction mask handling for combat line of sight
+---
+<!-- commit:b392324f52d6569ca451d37f14689f15554e3bc0 -->
+## 2025-10-13T18:58:06+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:3b716267f40f7095d61224974f5921e3edd19e27 -->
+## 2025-10-13T18:57:53+01:00 — Refactor combat obstruction masks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Combat/CombatController.cs, Assets/Scripts/Combat/LineOfSightUtility.cs, Assets/Scripts/NPC/Combat/BaseNpcCombat.cs
+- Diff: 107 ++ / 62 --
+- Notes:
+  —
+---
+<!-- commit:36cc86e29806b3e9a88943778d5014345b403b28 -->
+## 2025-10-13T14:16:53+01:00 — Merge pull request #1107 from aicovergod/codex/create-hitsplatlibraryhelper-and-refactor-usage
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 49 ++ / 44 --
+- Notes:
+  Refactor hitsplat library resolution
+---
+<!-- commit:2b633d3cd91eac34e072e9b34a43eaa97c82a171 -->
+## 2025-10-13T14:16:44+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8e2dd0a6f7c6a91f8fbf2ba6f14df689e9528cb3 -->
+## 2025-10-13T14:16:29+01:00 — Refactor hitsplat library resolution
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/Combat/HitSplatLibraryResolver.cs, Assets/Scripts/NPC/Combat/NpcCombatant.cs, Assets/Scripts/Pets/PetCombatController.cs
+- Diff: 40 ++ / 44 --
+- Notes:
+  —
+---
+<!-- commit:eec97f41aecbb582dd74e8bcc1867bca9f432bd5 -->
+## 2025-10-13T13:58:04+01:00 — Merge pull request #1106 from aicovergod/codex/add-gatheringtooliconresolver-utility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 59 ++ / 6 --
+- Notes:
+  Add shared resolver for gathering tool HUD icons
+---
+<!-- commit:a8bdcd2a54c640f12888ab9de512ea71512cdd5d -->
+## 2025-10-13T13:57:51+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ee0c793fc5f72e5887e3d7132aeed2bdfa1de561 -->
+## 2025-10-13T13:57:38+01:00 — Add cached resolver for gathering tool icons
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): AGENTS.md, Assets/Scripts/Skills/Common/UI/GatheringToolIconResolver.cs, Assets/Scripts/Skills/Fishing/UI/FishingHUD.cs, Assets/Scripts/Skills/Mining/UI/MiningUI.cs, Assets/Scripts/Skills/Woodcutting/UI/WoodcuttingHUD.cs
+- Diff: 50 ++ / 6 --
+- Notes:
+  —
+---
+<!-- commit:9b1d2759c247285ad1580cc223cd7625216d8e59 -->
+## 2025-10-13T11:26:07+01:00 — Merge pull request #1105 from aicovergod/codex/introduce-skillingoutfitinitializer-utility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 100 ++ / 51 --
+- Notes:
+  Refactor skilling outfit initialization across gathering skills
+---
+<!-- commit:ee53815277c65f527f32846753411caedc4cbcfe -->
+## 2025-10-13T11:25:39+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:8c5a6546459225d0d401906995395277e15cdc4f -->
+## 2025-10-13T11:25:28+01:00 — Refactor skilling outfit initialization
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Skills/Common/SkillingOutfitInitializer.cs, Assets/Scripts/Skills/Cooking/Core/CookingSkill.cs, Assets/Scripts/Skills/Firemaking/Core/FiremakingSkill.cs, Assets/Scripts/Skills/Fishing/Core/FishingSkill.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs, Assets/Scripts/Skills/Woodcutting/Core/WoodcuttingSkill.cs
+- Diff: 91 ++ / 51 --
+- Notes:
+  —
+---
+<!-- commit:2b929e0c966fc7fc7f3de68d2b0f4972cfa96990 -->
+## 2025-10-13T11:16:39+01:00 — Merge pull request #1104 from aicovergod/codex/create-debuggabletickedskillbehaviour-class
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 45 ++ / 79 --
+- Notes:
+  Refactor gathering skill debug toggle into shared base
+---
+<!-- commit:67de35c6e633c489b6b1161f070604b81049dd65 -->
+## 2025-10-13T11:16:09+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:772f70bc446c448dabc52e7be4d4ae0adc41f7da -->
+## 2025-10-13T11:15:56+01:00 — Refactor gathering skill debug toggle into shared base
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (6): Assets/Scripts/Skills/Common/DebuggableTickedSkillBehaviour.cs, Assets/Scripts/Skills/Cooking/Core/CookingSkill.cs, Assets/Scripts/Skills/Firemaking/Core/FiremakingSkill.cs, Assets/Scripts/Skills/Fishing/Core/FishingSkill.cs, Assets/Scripts/Skills/Mining/Core/MiningSkill.cs, Assets/Scripts/Skills/Woodcutting/Core/WoodcuttingSkill.cs
+- Diff: 36 ++ / 79 --
+- Notes:
+  —
+---
+<!-- commit:1cccd6a1b2922f6919257f520678539aaef93344 -->
+## 2025-10-13T11:00:27+01:00 — Merge pull request #1103 from aicovergod/codex/add-layerutility-helper-and-update-documentation
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 47 ++ / 41 --
+- Notes:
+  Create shared layer utility and reuse it across UI layers
+---
+<!-- commit:ee4ec326f4070daa12f94d13034ab2bb5cc38076 -->
+## 2025-10-13T11:00:17+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:ec8ee7370b484b20a496a6c465962b19181b1e6c -->
+## 2025-10-13T11:00:02+01:00 — Add shared layer utility helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (5): AGENTS.md, Assets/Scripts/NPC/Combat/NpcHealthHUD.cs, Assets/Scripts/Skills/Mining/Core/PersonalOreNode.cs, Assets/Scripts/Skills/Mining/UI/MiningUI.cs, Assets/Scripts/Util/LayerUtility.cs
+- Diff: 38 ++ / 41 --
+- Notes:
+  —
+---
+<!-- commit:facf6aef73fd1ecc07c781bd0f70d9b97a1b144a -->
+## 2025-10-13T09:30:09+01:00 — Merge pull request #1102 from aicovergod/codex/create-generic-base-class-for-tool-selection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 267 ++ / 131 --
+- Notes:
+  Refactor gathering tool selectors into shared base
+---
+<!-- commit:e28eab088d0dc89cab982af1350876109a55ad9a -->
+## 2025-10-13T09:29:59+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:c2ded995915f8982ce14805a54495dbda4de8d2a -->
+## 2025-10-13T09:29:43+01:00 — Refactor gathering tool selection
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): AGENTS.md, Assets/Scripts/Skills/Common/ToolSelection.meta, Assets/Scripts/Skills/Common/ToolSelection/GatheringToolSelectorBase.cs, Assets/Scripts/Skills/Common/ToolSelection/GatheringToolSelectorBase.cs.meta, Assets/Scripts/Skills/Fishing/Core/FishingToolToUse.cs, Assets/Scripts/Skills/Mining/Core/PickaxeToUse.cs, Assets/Scripts/Skills/Woodcutting/Core/AxeToUse.cs
+- Diff: 258 ++ / 131 --
+- Notes:
+  —
+---
+<!-- commit:c8f35bd7f8f9fb923abb7426eab74f82dc32041d -->
+## 2025-10-13T09:09:29+01:00 — Merge pull request #1101 from aicovergod/codex/add-player-movement-modal-lock-helper
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 119 ++ / 85 --
+- Notes:
+  Refactor modal UI movement locks into shared helper
+---
+<!-- commit:1c5d2a2745d730f2acfd7f7d39c6e7e56f455b1e -->
+## 2025-10-13T09:09:17+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9574a67f6c3e44255592c27f2a49877153a99c34 -->
+## 2025-10-13T09:09:06+01:00 — Add shared player movement modal lock for UI windows
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (4): AGENTS.md, Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Shop/ShopUI.cs, Assets/Scripts/UI/Utilities/PlayerMovementModalLock.cs
+- Diff: 110 ++ / 85 --
+- Notes:
+  —
+---
+<!-- commit:cf92fcfd16d3e7174bc9928b2d554bea2d079dab -->
+## 2025-10-12T23:36:10+01:00 — Merge pull request #1100 from aicovergod/codex/update-agents.md-with-latest-changes-j8idid
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 16 ++ / 0 --
+- Notes:
+  Refresh AGENTS instructions for updated UI gating
+---
+<!-- commit:a04cd44e5f21a4b710f3e842196f7d25468c9cfb -->
+## 2025-10-12T23:36:01+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:4120020129010cc8a74cd19b0c1c329aa8fd10c9 -->
+## 2025-10-12T23:35:47+01:00 — Update project guidelines for new UI and movement locks
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): AGENTS.md
+- Diff: 7 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:e8671fa3203b6fa9b3bf17c7a7a92a2c8fc81abd -->
+## 2025-10-12T23:29:51+01:00 — Merge pull request #1099 from aicovergod/codex/refactor-ui-to-disable-locomotion-input
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 55 ++ / 7 --
+- Notes:
+  Disable movement input when shop and bank UIs open
+---
+<!-- commit:991fef5595d4dc6cfbf566f57aefff51cf4e04e6 -->
+## 2025-10-12T23:29:44+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:a1eeb4060f97263a7ad4fbf6682668dc5b22ed98 -->
+## 2025-10-12T23:29:31+01:00 — Disable movement input when shop and bank UIs open
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (2): Assets/Scripts/Bank/BankUI.cs, Assets/Scripts/Shop/ShopUI.cs
+- Diff: 46 ++ / 7 --
+- Notes:
+  —
+---
+<!-- commit:a3ff22800387367cd6491f0e448985d738ef2f24 -->
+## 2025-10-12T23:17:47+01:00 — updates
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (8): Assets/Scripts/Inventory/Editor.meta, Assets/Scripts/Inventory/Editor/ItemDataEditor.cs.meta, Assets/Scripts/Player/PlayerCombatLoadout.cs, Assets/Scripts/Skills/Common/UI/GatheringProgressBarBuilder.cs.meta, Assets/Scripts/Skills/Common/UI/GatheringToolHudBase.cs.meta, Assets/Scripts/Skills/Common/UI/TickedProgressHudBase.cs.meta, Assets/Scripts/UI/Utilities/ButtonHighlightUtility.cs.meta, Assets/Scripts/UI/Utilities/InterfaceTabMutexUtility.cs.meta
+- Diff: 24 ++ / 2 --
+- Notes:
+  —
+---
+<!-- commit:308f005cf5b5a4a201def5a01f273b708ddec15b -->
+## 2025-10-12T23:09:42+01:00 — Merge pull request #1098 from aicovergod/codex/extend-handleequipmentchanged-for-ranged-weapons
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 34 ++ / 0 --
+- Notes:
+  Improve ranged keyword detection for player combat loadout
+---
+<!-- commit:0e5f6880acec2ca54f57bbd1d9be5232ef053cff -->
+## 2025-10-12T23:09:35+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:7618ef037848a47d0004aab2797612f48359ab72 -->
+## 2025-10-12T23:09:19+01:00 — Adjust ranged detection for player combat loadout
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Player/PlayerCombatLoadout.cs
+- Diff: 25 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:1d16b7b0b377c0e66ea7064f357be79535c2e4d8 -->
+## 2025-10-12T22:55:30+01:00 — Merge pull request #1097 from aicovergod/codex/update-weapon-display-name-resolution
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 27 ++ / 1 --
+- Notes:
+  Adjust magic weapon detection keywords
+---
+<!-- commit:bb7ec0ccd4f1c24c466c8d7c8a5f88cd1e284b36 -->
+## 2025-10-12T22:55:22+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:7956f41c43045dbe0967331ffdaa107679c53f7f -->
+## 2025-10-12T22:55:10+01:00 — Adjust magic weapon detection keywords
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (1): Assets/Scripts/Player/PlayerCombatLoadout.cs
+- Diff: 18 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:24ce00c33300dd636e1f66727e629ed2def6e73a -->
+## 2025-10-12T22:39:16+01:00 — Merge pull request #1096 from aicovergod/codex/add-interfacetabmutexutility-for-tab-management
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 83 ++ / 16 --
+- Notes:
+  Add mutex utility for interface tab windows
+---
+<!-- commit:a7e6e8f1b6c1544cf8929c695c79c49ab6659cb1 -->
+## 2025-10-12T22:37:24+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:2d935ce9360c0f407996fb085ff3bc70bab68895 -->
+## 2025-10-12T22:37:12+01:00 — Add interface tab mutex utility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (7): Assets/Scripts/Inventory/Equipment.cs, Assets/Scripts/Inventory/Inventory.cs, Assets/Scripts/Quests/QuestUI.cs, Assets/Scripts/Skills/SkillsUI.cs, Assets/Scripts/UI/AttackStyleUI.cs, Assets/Scripts/UI/MagicUI.cs, Assets/Scripts/UI/Utilities/InterfaceTabMutexUtility.cs
+- Diff: 74 ++ / 16 --
+- Notes:
+  —
+---
+<!-- commit:e8a0a5f629ba9a01b52ab5da7c9538c5a87318e0 -->
+## 2025-10-12T22:12:21+01:00 — Merge branch 'codex/fix-high-priority-bug-in-shopui-dl0uu8' into main
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 2 ++ / 1 --
+- Notes:
+  —
+---
+<!-- commit:edfe7417286a38a6f2ade1d3ec29293307ec0e29 -->
+## 2025-10-12T22:01:23+01:00 — Merge pull request #1093 from aicovergod/codex/add-buttonhighlightutility-and-refactor-ui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 44 ++ / 28 --
+- Notes:
+  Refactor button highlighting into shared utility
+---
+<!-- commit:b5491fd03ca64d1d0216b3afde97049d80b38100 -->
+## 2025-10-12T22:01:03+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
+- Notes:
+  —
+---
+<!-- commit:9a971fe7f6c23cd4d5e88216dd9e1656cfcd7303 -->
+## 2025-10-12T22:00:51+01:00 — Refactor button highlighting into shared utility
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (3): Assets/Scripts/UI/AttackStyleUI.cs, Assets/Scripts/UI/MagicUI.cs, Assets/Scripts/UI/Utilities/ButtonHighlightUtility.cs
+- Diff: 35 ++ / 28 --
+- Notes:
+  —
+---
+<!-- commit:c8975358265e1e24a1dab6fd40d1bbdffa68efcb -->
+## 2025-10-12T21:56:48+01:00 — Merge pull request #1092 from aicovergod/codex/implement-manageduiwindow-and-refactor-ui
+
+- Author: aicovergod <lewisshuffle136@gmail.com>
+- Changed files (0): —
+- Diff: 521 ++ / 333 --
+- Notes:
+  Refactor shared UI windows
+---
+<!-- commit:1265e09062ec5050c24f157b683c942142edb814 -->
+## 2025-10-12T21:56:15+01:00 — Update SESSION_LOG [ci]
+
+- Author: session-log-bot <actions@github.com>
+- Changed files (1): docs/SESSION_LOG.md
+- Diff: 9 ++ / 0 --
 - Notes:
   —
 ---

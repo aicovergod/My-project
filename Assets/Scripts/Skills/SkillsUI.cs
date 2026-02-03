@@ -31,6 +31,7 @@ namespace Skills
             SkillType.Magic,
             SkillType.Beastmaster,
             SkillType.Fishing,
+            SkillType.Thieving,
             SkillType.Cooking,
             SkillType.Firemaking,
             SkillType.Woodcutting,
@@ -184,12 +185,7 @@ namespace Skills
         protected override void OnBeforeOpen()
         {
             RebindSkillManager();
-            var inv = UnityEngine.Object.FindObjectOfType<Inventory.Inventory>();
-            if (inv != null && inv.IsOpen)
-                inv.CloseUI();
-            var eq = UnityEngine.Object.FindObjectOfType<Inventory.Equipment>();
-            if (eq != null && eq.IsOpen)
-                eq.CloseUI();
+            InterfaceTabMutexUtility.CloseAllTabWindowsExcept(this);
         }
     }
 }

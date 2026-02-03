@@ -1,8 +1,12 @@
 using System;
+using Companions;
+using Companions.Conversation;
 using Inventory;
+using Player;
 using Pets;
 using Skills;
 using UnityEngine;
+using UI.Chat;
 
 namespace Skills.Common
 {
@@ -35,6 +39,8 @@ namespace Skills.Common
         public bool showItemFloatingText;
         public bool showXpPopup;
         public float xpPopupDelayTicks;
+        public bool useCompanionChatFormatting;
+        public Func<string> companionChatSenderResolver;
         public Action<GatheringRewardResult> onItemsGranted;
         public Action<GatheringRewardResult> onXpApplied;
         public Action<GatheringRewardResult> onSuccess;
@@ -105,18 +111,21 @@ namespace Skills.Common
 
             if (!TryAddItems(context, ref result))
             {
-                string fullMessage = string.IsNullOrEmpty(context.inventoryFullMessage)
+                string floatingTextMessage = string.IsNullOrEmpty(context.inventoryFullMessage)
                     ? "Your inventory is full"
                     : context.inventoryFullMessage;
+                string chatMessage = ResolveInventoryFullChatMessage(context, floatingTextMessage);
                 if (anchor != null)
                 {
                     bool displayed = false;
                     if (resourcePosition.HasValue)
-                        displayed = GatheringFloatingTextService.TryShowNow(fullMessage, anchor, resourcePosition.Value);
+                        displayed = GatheringFloatingTextService.TryShowNow(floatingTextMessage, anchor, resourcePosition.Value);
 
                     if (!displayed && !resourcePosition.HasValue)
-                        GatheringFloatingTextService.TryShowAtAnchor(fullMessage, anchor);
+                        GatheringFloatingTextService.TryShowAtAnchor(floatingTextMessage, anchor);
                 }
+
+                PublishChatMessage(chatMessage, context);
                 result.InventoryFull = true;
                 result.NewLevel = result.PreviousLevel;
                 context.onFailure?.Invoke(result);
@@ -142,6 +151,8 @@ namespace Skills.Common
 
                     if (!displayed && !resourcePosition.HasValue)
                         GatheringFloatingTextService.TryShowAtAnchor(rewardMessage, anchor);
+
+                    PublishChatMessage(rewardMessage, context);
                 }
             }
 
@@ -175,6 +186,8 @@ namespace Skills.Common
             context.onXpApplied?.Invoke(result);
             context.onSuccess?.Invoke(result);
 
+            RegisterGatheringEvent(context, result);
+
             return result;
         }
 
@@ -201,6 +214,141 @@ namespace Skills.Common
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Determines the chat line that should be emitted when the player's inventory cannot accept more items.
+        /// Falls back to the supplied message for floating text when no special companion message is required.
+        /// </summary>
+        /// <param name="context">Reward context describing the failed gather attempt.</param>
+        /// <param name="fallbackMessage">Default message to use when no specialised companion line applies.</param>
+        /// <returns>Chat message that should be published to the appropriate channel.</returns>
+        private static string ResolveInventoryFullChatMessage(in GatheringRewardContext context, string fallbackMessage)
+        {
+            if (!string.IsNullOrWhiteSpace(context.inventoryFullMessage))
+                return context.inventoryFullMessage;
+
+            if (context.useCompanionChatFormatting && CompanionManager.HasActiveCompanion)
+            {
+                bool companionInventoryFull = IsCompanionInventoryFullForItem(context);
+                return companionInventoryFull
+                    ? CompanionChatLibrary.GetRandomPlayerAndCompanionInventoryFullLine()
+                    : CompanionChatLibrary.GetRandomPlayerInventoryFullLine();
+            }
+
+            return fallbackMessage;
+        }
+
+        /// <summary>
+        /// Checks whether the active companion's inventory can accept the gathered item.
+        /// </summary>
+        /// <param name="context">Reward context providing the item data to evaluate.</param>
+        /// <returns><c>true</c> when the companion inventory cannot store the item, otherwise <c>false</c>.</returns>
+        private static bool IsCompanionInventoryFullForItem(in GatheringRewardContext context)
+        {
+            if (context.item == null)
+                return false;
+
+            var companionInventoryWrapper = CompanionManager.CompanionInventory;
+            if (companionInventoryWrapper == null)
+                return false;
+
+            var companionInventory = companionInventoryWrapper.InventoryComponent;
+            if (companionInventory == null)
+                return false;
+
+            return !companionInventory.CanAddItem(context.item, 1);
+        }
+
+        private static void PublishChatMessage(string message, in GatheringRewardContext context)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+
+            var chatService = ChatService.Instance;
+            if (chatService == null)
+                return;
+
+            if (context.useCompanionChatFormatting)
+            {
+                string sender = context.companionChatSenderResolver != null
+                    ? context.companionChatSenderResolver.Invoke()
+                    : null;
+                if (string.IsNullOrWhiteSpace(sender))
+                    sender = "Companion";
+
+                chatService.PublishCompanionMessage(sender, message);
+            }
+            else
+            {
+                chatService.PublishGameMessage(message);
+            }
+        }
+
+        /// <summary>
+        /// Registers a structured event describing the successful gathering action so companions can reference it.
+        /// </summary>
+        private static void RegisterGatheringEvent(in GatheringRewardContext context, in GatheringRewardResult result)
+        {
+            if (!result.Success || result.QuantityAwarded <= 0)
+                return;
+
+            string summary = BuildGatheringSummary(result);
+            if (string.IsNullOrEmpty(summary))
+                return;
+
+            string actor = ResolveGatheringActor(context.runner);
+            Vector3? location = result.HasResourcePosition ? result.ResourcePosition : (Vector3?)null;
+            string additional = result.XpGained > 0 ? $"Earned {result.XpGained} XP." : null;
+
+            var metadata = CompanionEventMetadata.Create(
+                primaryActor: actor,
+                worldPosition: location,
+                skill: context.skillType,
+                additionalContext: additional);
+
+            CompanionConversationService.RegisterEvent(summary, CompanionEventType.Gathering, metadata);
+        }
+
+        private static string BuildGatheringSummary(in GatheringRewardResult result)
+        {
+            string name = !string.IsNullOrWhiteSpace(result.DisplayName)
+                ? result.DisplayName.Trim()
+                : result.Item != null ? result.Item.itemName : string.Empty;
+
+            if (string.IsNullOrWhiteSpace(name))
+                name = "resources";
+
+            if (result.QuantityAwarded <= 0)
+                return string.Empty;
+
+            if (result.QuantityAwarded == 1)
+                return $"gathered {name}";
+
+            return $"gathered {result.QuantityAwarded} {name}";
+        }
+
+        private static string ResolveGatheringActor(MonoBehaviour runner)
+        {
+            if (runner == null)
+                return "You";
+
+            var companionController = runner.GetComponentInParent<CompanionController>();
+            if (companionController != null)
+                return CompanionManager.GetCompanionDisplayName();
+
+            var companionMining = runner.GetComponentInParent<CompanionMiningController>();
+            if (companionMining != null)
+                return CompanionManager.GetCompanionDisplayName();
+
+            var playerMover = runner.GetComponentInParent<PlayerMover>();
+            if (playerMover != null)
+                return "You";
+
+            if (runner.CompareTag("Player"))
+                return "You";
+
+            return "You";
         }
 
         private static float CalculateXpBonus(in GatheringRewardContext context)

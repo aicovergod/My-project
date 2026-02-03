@@ -17,6 +17,7 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: b4178ae6d8643374fb1bbdc6bda64ac8, type: 3}
   stackSpriteOverrides: []
   description: Sharp, and pointy
+  equipmentTooltipLines: []
   stackable: 0
   maxStack: 1
   splittable: 0
@@ -45,7 +46,9 @@ MonoBehaviour:
     RangeDefence: 0
     MagicDefence: 1
     AttackSpeedTicks: 4
-    styleAttackSpeedOverrides: []
+    styleAttackSpeedOverrides:
+    - Style: 0
+      AttackSpeedTicks: 1
   onHitPoison: {fileID: 0}
   poisonApplyChance: 0.25
   poisonRequiresDamage: 1

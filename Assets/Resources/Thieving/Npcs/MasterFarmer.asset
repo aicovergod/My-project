@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a5f908c6fb44fcb889f73cf54c5ecbe, type: 3}
+  m_Name: MasterFarmer
+  m_EditorClassIdentifier:
+  id: MasterFarmer
+  displayName: Master Farmer
+  requiredLevel: 38
+  baseXp: 43
+  lowSuccessThreshold: 110
+  highSuccessThreshold: 230
+  post99ThresholdGain: 0
+  coinRange: {x: 0, y: 0}
+  lootTable:
+  - itemId: Potato Seed
+    quantityRange: {x: 1, y: 4}
+    dropChancePercent: 36.36
+    guaranteed: 0
+    notedQuantity: 0
+  - itemId: Onion Seed
+    quantityRange: {x: 1, y: 4}
+    dropChancePercent: 31.82
+    guaranteed: 0
+    notedQuantity: 0
+  - itemId: Sweetcorn Seed
+    quantityRange: {x: 1, y: 2}
+    dropChancePercent: 18.18
+    guaranteed: 0
+    notedQuantity: 0
+  - itemId: Strawberry Seed
+    quantityRange: {x: 1, y: 2}
+    dropChancePercent: 13.64
+    guaranteed: 0
+    notedQuantity: 0
+  baseLootRolls: 1
+  rogueOutfitBonusRolls: 0
+  damageOnFail: 3
+  stunTicks: 5
+  cooldownTicks: 12
+  failuresBeforeCooldown: 3
+  petRollDenominator: 0
+  interactionTicks: 2

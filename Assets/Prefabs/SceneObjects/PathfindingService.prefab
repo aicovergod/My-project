@@ -44,6 +44,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 858d71ecd441de949b969f8350b29bdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC.PathfindingService
-  navGrid: {fileID: 604674411650766202, guid: 7e7f9857c5de333468379150e40380f6, type: 3}
+  streamingService: {fileID: 0}
+  fallbackNavGrid: {fileID: 0}
   maxNodesPerTick: 128
-  enableDebugLogging: 0
+  maxConcurrentRequests: 4
+  occupancyService: {fileID: 0}
+  enablePathSmoothing: 1
+  useLineOfSightForSmoothing: 1
+  zoneChunkBindings:
+  - zoneId: Overworld_Central
+    chunkIds:
+    - chunk_0_0
+    - chunk_0_1
+  enableDebugLogging: 1

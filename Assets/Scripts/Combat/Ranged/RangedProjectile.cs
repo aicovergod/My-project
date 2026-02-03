@@ -13,7 +13,7 @@ namespace Combat.Ranged
         [Tooltip("Seconds before the projectile self-destructs if it cannot find a target.")]
         [SerializeField] private float maxLifetime = 10f;
 
-        private RangedCombatController owner;
+        private IRangedProjectileOwner owner;
         private CombatTarget target;
         private RangedAttackContext context;
         private float speed;
@@ -22,7 +22,7 @@ namespace Combat.Ranged
         /// <summary>
         /// Initialises the projectile for travel towards <paramref name="target"/>.
         /// </summary>
-        public void Initialise(RangedCombatController controller, CombatTarget target, RangedAttackContext ctx, float projectileSpeed)
+        public void Initialise(IRangedProjectileOwner controller, CombatTarget target, RangedAttackContext ctx, float projectileSpeed)
         {
             owner = controller;
             this.target = target;

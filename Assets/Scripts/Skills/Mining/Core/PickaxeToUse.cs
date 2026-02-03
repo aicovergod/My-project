@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
+using Skills.Common.ToolSelection;
 using UnityEngine;
-using Inventory;
 
 namespace Skills.Mining
 {
@@ -9,23 +8,22 @@ namespace Skills.Mining
     /// Chooses the best pickaxe available in the inventory that the player can use.
     /// </summary>
     [DisallowMultipleComponent]
-    public class PickaxeToUse : MonoBehaviour
+    public class PickaxeToUse : GatheringToolSelectorBase<PickaxeDefinition, MiningSkill>
     {
         [SerializeField] private List<PickaxeDefinition> allPickaxes = new List<PickaxeDefinition>();
-        [SerializeField] private Inventory.Inventory inventory;
-        [SerializeField] private Inventory.Equipment equipment;
-        [SerializeField] private MiningSkill skill;
 
-        public PickaxeDefinition Current { get; private set; }
+        public new PickaxeDefinition Current => base.Current;
 
-        private void Awake()
+        /// <summary>
+        /// Provides read-only access to the serialized pickaxe definitions so registries can cache them.
+        /// </summary>
+        public IReadOnlyList<PickaxeDefinition> AllPickaxes => allPickaxes;
+
+        /// <inheritdoc />
+        protected override void Awake()
         {
-            if (inventory == null)
-                inventory = GetComponent<Inventory.Inventory>();
-            if (equipment == null)
-                equipment = GetComponent<Inventory.Equipment>();
-            if (skill == null)
-                skill = GetComponent<MiningSkill>();
+            base.Awake();
+            PickaxeDefinitionRegistry.RegisterDefinitions(allPickaxes);
         }
 
         /// <summary>
@@ -33,8 +31,7 @@ namespace Skills.Mining
         /// </summary>
         public PickaxeDefinition GetBestPickaxe()
         {
-            Refresh();
-            return Current;
+            return base.GetBestTool();
         }
 
         /// <summary>
@@ -42,30 +39,29 @@ namespace Skills.Mining
         /// </summary>
         public void Refresh()
         {
-            Current = null;
-            if (inventory == null || skill == null)
-                return;
+            base.Refresh();
+        }
 
-            foreach (var pick in allPickaxes.OrderByDescending(p => p.Tier))
-            {
-                var item = Resources.Load<ItemData>("Item/" + pick.Id);
-                if (item == null)
-                    continue;
-                if (inventory.GetItemCount(item) > 0 && skill.Level >= pick.LevelRequirement)
-                {
-                    Current = pick;
-                    break;
-                }
-                else if (equipment != null)
-                {
-                    var entry = equipment.GetEquipped(EquipmentSlot.Weapon);
-                    if (entry.item == item && skill.Level >= pick.LevelRequirement)
-                    {
-                        Current = pick;
-                        break;
-                    }
-                }
-            }
+        protected override IReadOnlyList<PickaxeDefinition> OrderedTools => allPickaxes;
+
+        protected override string GetItemId(PickaxeDefinition definition)
+        {
+            return definition != null ? definition.Id : null;
+        }
+
+        protected override float GetSortKey(PickaxeDefinition definition)
+        {
+            return definition != null ? definition.Tier : 0f;
+        }
+
+        protected override int GetRequiredLevel(PickaxeDefinition definition)
+        {
+            return definition != null ? definition.LevelRequirement : int.MaxValue;
+        }
+
+        protected override int GetCurrentSkillLevel()
+        {
+            return SkillComponent != null ? SkillComponent.Level : 0;
         }
     }
 }

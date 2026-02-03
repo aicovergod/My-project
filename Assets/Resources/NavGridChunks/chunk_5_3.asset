@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 825880d6bc224dbc8ca399a7cd010c22, type: 3}
+  m_Name: chunk_5_3
+  m_EditorClassIdentifier: Assembly-CSharp::NPC.Navigation.NavGridChunkDefinition
+  chunkCoordinates: {x: 5, y: 3}
+  chunkId: chunk_5_3
+  chunkOrigin: {x: 64, y: -64}
+  tileSize: 1
+  gridDimensions: {x: 64, y: 64}
+  walkableBitset: fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8ffffffffffffffe0ffffffffffffffe0ffffffffffffffc0ffffffffffffffc3ffffffffffffff83ffffffffffffff8effffffffffffff0effffffffffffff0effffffffffffff0cffffffffffffff0cffffffffffffff0fffffffffffffff1fffffffffffffff1bffffffffffffff13ffffffffffffff13ffffffffffffff17ffffffffffffff1fffffffffffffff07ffffffffffffff87ffffffffffffff8effffffffffffff8effffffffffffff8fffffffffffffff8fffffffffffffff8fffffffffffffff8fffffffffffffff87ffffffffffffff07ffffffffffffff87ffffffffffffff87ffffffffffffff87fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffcffffffffffffffffffffffffffffffffffffffffffffff
+  neighbourChunkCoordinates:
+  - {x: 4, y: 3}
+  - {x: 6, y: 3}
+  - {x: 5, y: 2}
+  - {x: 5, y: 4}
+  - {x: 4, y: 2}
+  - {x: 4, y: 4}
+  - {x: 6, y: 2}
+  - {x: 6, y: 4}
+  neighbourChunkIds:
+  - chunk_4_3
+  - chunk_6_3
+  - chunk_5_2
+  - chunk_5_4
+  - chunk_4_2
+  - chunk_4_4
+  - chunk_6_2
+  - chunk_6_4

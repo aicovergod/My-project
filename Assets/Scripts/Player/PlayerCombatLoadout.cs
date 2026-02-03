@@ -4,6 +4,7 @@ using UnityEngine;
 using Combat;
 using EquipmentSystem;
 using Skills;
+using Magic;
 using Core.Save;
 using UI;
 using Inventory;
@@ -71,6 +72,17 @@ namespace Player
                 equipment.OnEquipmentChanged += HandleEquipmentChanged;
                 HandleEquipmentChanged(EquipmentSlot.Weapon);
             }
+        }
+
+        private void OnEnable()
+        {
+            MagicUI.ActiveSpellChanged += HandleActiveSpellChanged;
+            HandleActiveSpellChanged(MagicUI.ActiveSpell);
+        }
+
+        private void OnDisable()
+        {
+            MagicUI.ActiveSpellChanged -= HandleActiveSpellChanged;
         }
 
         private void OnDestroy()
@@ -196,25 +208,37 @@ namespace Player
                 Destroy(poisonApplier);
             }
 
-            DamageType newType = DamageType.Melee;
-            if (weapon != null)
+            DamageType resolvedType = WeaponClassificationUtility.ResolveDamageType(weapon);
+            bool spellSelected = MagicUI.ActiveSpell != null;
+            DamageType newType = spellSelected ? DamageType.Magic : resolvedType;
+
+            if (!spellSelected)
             {
-                if (weapon.combat.Magic > 0)
-                    newType = DamageType.Magic;
-                else if (weapon.combat.Range > 0 || weapon.combat.RangeStrength > 0)
-                    newType = DamageType.Ranged;
+                if (newType == DamageType.Magic)
+                {
+                    if (MagicUI.ActiveSpell == null)
+                        MagicUI.RestoreLastSpell();
+                }
+                else
+                {
+                    MagicUI.ClearActiveSpell();
+                }
             }
 
-            if (newType == DamageType.Magic)
-            {
-                if (MagicUI.ActiveSpell == null)
-                    MagicUI.RestoreLastSpell();
-            }
-            else if (newType == DamageType.Melee)
-            {
-                MagicUI.ClearActiveSpell();
-            }
+            UpdateDamageType(newType);
+        }
 
+        /// <summary>
+        /// React to spell selection changes so the player's damage type mirrors the currently
+        /// active spell without requiring a weapon swap.
+        /// </summary>
+        /// <param name="spell">The newly selected spell, or <c>null</c> when deselecting.</param>
+        private void HandleActiveSpellChanged(SpellDefinition spell)
+        {
+            var entry = equipment != null ? equipment.GetEquipped(EquipmentSlot.Weapon) : default;
+            var weapon = entry.item;
+            DamageType fallback = WeaponClassificationUtility.ResolveDamageType(weapon);
+            DamageType newType = spell != null ? DamageType.Magic : fallback;
             UpdateDamageType(newType);
         }
     }

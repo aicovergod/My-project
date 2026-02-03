@@ -44,3 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90bc5f973cd14884beff3967ea2e0eb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  osrsWindowedResolution: {x: 1024, y: 768}
+  applyResolutionInEditorPlayMode: 0

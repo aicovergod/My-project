@@ -7,7 +7,9 @@ using BankSystem;
 using ShopSystem;
 using Player;
 using UnityEngine.EventSystems;
-using Pets;
+using Player.Movement;
+using UI.Utilities;
+using UI.Chat;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -136,16 +138,16 @@ namespace World
             if (minimapCanvas != null)
                 return;
 
-            var canvasGO = new GameObject("MinimapCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            canvasGO.transform.SetParent(transform, false);
-            var canvas = canvasGO.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            minimapCanvas = canvas;
-            var scaler = canvasGO.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            var overlay = OverlayCanvasFactory.CreateOverlayCanvas(
+                "MinimapCanvas",
+                new Vector2(1920f, 1080f),
+                parent: transform,
+                assignToUiLayer: true);
+            var canvasGO = overlay.Root;
+            minimapCanvas = overlay.Canvas;
 
-            const int size = 128;
-            const int border = 4;
+            const float smallMapOuterSize = 300f;
+            const float borderThickness = 4f;
 
             smallRoot = new GameObject("Small", typeof(RectTransform));
             smallRoot.transform.SetParent(canvasGO.transform, false);
@@ -164,7 +166,7 @@ namespace World
             borderRect.anchorMin = new Vector2(1f, 1f);
             borderRect.anchorMax = new Vector2(1f, 1f);
             borderRect.pivot = new Vector2(1f, 1f);
-            borderRect.sizeDelta = new Vector2(size + border * 2, size + border * 2);
+            borderRect.sizeDelta = new Vector2(smallMapOuterSize, smallMapOuterSize);
             borderRect.anchoredPosition = new Vector2(-10f, -10f);
 
             var rawGO = new GameObject("Image", typeof(RawImage));
@@ -174,8 +176,8 @@ namespace World
             var rawRect = rawImg.rectTransform;
             rawRect.anchorMin = Vector2.zero;
             rawRect.anchorMax = Vector2.one;
-            rawRect.offsetMin = new Vector2(border, border);
-            rawRect.offsetMax = new Vector2(-border, -border);
+            rawRect.offsetMin = new Vector2(borderThickness, borderThickness);
+            rawRect.offsetMax = new Vector2(-borderThickness, -borderThickness);
             smallMapRect = rawRect;
             const int btnSize = 24;
             const int btnSpacing = 4;
@@ -355,6 +357,10 @@ namespace World
             if (keyboard != null)
                 toggleRequested = keyboard.mKey.wasPressedThisFrame;
 #endif
+
+            var chatHud = ChatHudController.Instance;
+            if (toggleRequested && chatHud != null && chatHud.IsInputFocused)
+                toggleRequested = false;
 
             if (mapCamera != null)
             {
@@ -541,48 +547,18 @@ namespace World
         private void TeleportPlayerTo(Vector3 worldPosition)
         {
             var mover = cachedPlayerMover;
-            if (mover == null)
-            {
-                GameObject playerObj = target != null ? target.gameObject : GameObject.FindGameObjectWithTag("Player");
-                if (playerObj != null)
-                {
-                    // Cache the mover so future teleports do not have to repeat the lookup.
-                    mover = playerObj.GetComponent<PlayerMover>();
-                    target = playerObj.transform;
-                    cachedPlayerMover = mover;
-                }
-            }
+            var playerTransform = target;
 
-            if (mover == null)
+            if (!PlayerTeleportUtility.TryTeleportPlayer(worldPosition, ref mover, ref playerTransform, out string errorMessage))
             {
-                Debug.LogWarning("Minimap debug teleport requested but no PlayerMover could be found.");
+                Debug.LogWarning(string.IsNullOrEmpty(errorMessage)
+                    ? "Minimap debug teleport failed because no PlayerMover could be located."
+                    : $"Minimap debug teleport failed: {errorMessage}");
                 return;
             }
 
-            // Halt any ongoing locomotion so we do not carry momentum into the new position.
-            mover.StopMovement();
-
-            Transform playerTransform = mover.transform;
-            Vector3 currentPosition = playerTransform.position;
-            // Preserve the existing Z value so sprite sorting layers remain correct.
-            Vector3 newPosition = new Vector3(worldPosition.x, worldPosition.y, currentPosition.z);
-            playerTransform.position = newPosition;
-
-            GameObject pet = PetDropSystem.ActivePetObject;
-            if (pet != null)
-            {
-                // Drop the pet alongside the player so it resumes following without a sudden snap.
-                Vector3 petPosition = newPosition + Vector3.right * 0.5f;
-                petPosition.z = pet.transform.position.z;
-                pet.transform.position = petPosition;
-
-                var follower = pet.GetComponent<PetFollower>();
-                if (follower != null)
-                    follower.SetPlayer(playerTransform);
-            }
-
-            // Persist the new location to keep autosaves and relogging in sync with the teleport.
-            mover.SavePosition();
+            cachedPlayerMover = mover;
+            target = playerTransform;
         }
 
         private void ZoomIn()
@@ -632,6 +608,10 @@ namespace World
             expandedRoot.SetActive(opening);
             if (smallRoot != null)
                 smallRoot.SetActive(!opening);
+
+            var chatHud = ChatHudController.Instance;
+            if (chatHud != null)
+                chatHud.SetInputFocusBlocked(opening);
 
             if (!opening)
             {

@@ -3,10 +3,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Inventory;
+using Inventory.OreBag;
 using Core.Save;
 using Pets;
-using Player;
 using UI;
+using UI.Utilities;
 using World;
 
 namespace BankSystem
@@ -73,8 +74,48 @@ namespace BankSystem
 
         public bool IsOpen => uiRoot != null && uiRoot.activeSelf;
         private bool inventoryWasOpen;
-        private PlayerMover playerMover;
-        private bool playerMovementStateCaptured;
+        private readonly PlayerMovementModalLock playerMovementLock = new PlayerMovementModalLock();
+
+        /// <summary>
+        /// Resolves and caches the player's main inventory. This method prioritises the
+        /// inventory on the player object and gracefully ignores pet storage inventories
+        /// so the bank always manipulates the correct container.
+        /// </summary>
+        /// <returns>True if a valid player inventory was found; otherwise false.</returns>
+        private bool ResolvePlayerInventory()
+        {
+            // Unity overrides the == operator for destroyed objects, so this covers both
+            // cached references and cases where the underlying object has been unloaded.
+            if (playerInventory != null)
+                return true;
+
+            // Attempt to fetch the inventory directly from the player GameObject.
+            var playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject != null)
+            {
+                playerInventory = playerObject.GetComponent<Inventory.Inventory>() ??
+                                   playerObject.GetComponentInChildren<Inventory.Inventory>();
+                if (playerInventory != null)
+                    return true;
+            }
+
+            // As a safety net, fall back to scanning every inventory in the scene but skip
+            // any inventories that represent pet storage so we never bind to pet bags.
+            var inventories = FindObjectsOfType<Inventory.Inventory>(true);
+            foreach (var inventory in inventories)
+            {
+                if (inventory == null)
+                    continue;
+
+                if (inventory.GetComponent<PetStorage>() != null)
+                    continue;
+
+                playerInventory = inventory;
+                return true;
+            }
+
+            return false;
+        }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Bootstrap()
@@ -107,18 +148,13 @@ namespace BankSystem
 
         private void CreateUI()
         {
-            uiRoot = new GameObject("BankUI", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            uiRoot.transform.SetParent(null, false);
-            DontDestroyOnLoad(uiRoot);
+            var overlay = OverlayCanvasFactory.CreateOverlayCanvas(
+                "BankUI",
+                referenceResolution,
+                dontDestroyOnLoad: true,
+                matchWidthOrHeight: 0f);
 
-            var canvas = uiRoot.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.pixelPerfect = true;
-
-            var scaler = uiRoot.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = referenceResolution;
-            scaler.matchWidthOrHeight = 0f;
+            uiRoot = overlay.Root;
 
             GameObject window = new GameObject("Window", typeof(RectTransform), typeof(Image));
             window.transform.SetParent(uiRoot.transform, false);
@@ -148,30 +184,15 @@ namespace BankSystem
             titleText.color = Color.white;
             titleText.text = "Bank";
 
-            GameObject closeGO = new GameObject("CloseButton", typeof(RectTransform), typeof(Image), typeof(Button));
-            closeGO.transform.SetParent(window.transform, false);
-            var closeRect = closeGO.GetComponent<RectTransform>();
-            closeRect.anchorMin = new Vector2(1f, 1f);
-            closeRect.anchorMax = new Vector2(1f, 1f);
-            closeRect.pivot = new Vector2(1f, 1f);
-            closeRect.anchoredPosition = new Vector2(-4f, -4f);
-            closeRect.sizeDelta = new Vector2(16f, 16f);
-            var closeImg = closeGO.GetComponent<Image>();
-            closeImg.color = Color.red;
-            var closeBtn = closeGO.GetComponent<Button>();
-            closeBtn.onClick.AddListener(Close);
-            GameObject closeTextGO = new GameObject("Text", typeof(Text));
-            closeTextGO.transform.SetParent(closeGO.transform, false);
-            var closeText = closeTextGO.GetComponent<Text>();
-            closeText.font = defaultFont;
-            closeText.alignment = TextAnchor.MiddleCenter;
-            closeText.color = Color.white;
-            closeText.text = "X";
-            var closeTextRect = closeTextGO.GetComponent<RectTransform>();
-            closeTextRect.anchorMin = Vector2.zero;
-            closeTextRect.anchorMax = Vector2.one;
-            closeTextRect.offsetMin = Vector2.zero;
-            closeTextRect.offsetMax = Vector2.zero;
+            CloseButtonBuilder.Build(
+                window.transform,
+                Close,
+                new CloseButtonBuilder.Options
+                {
+                    Font = defaultFont,
+                    AnchoredPosition = new Vector2(-4f, -4f),
+                    Size = new Vector2(16f, 16f)
+                });
             float searchHeight = 20f;
             float filterSpacing = 4f;
 
@@ -442,9 +463,7 @@ namespace BankSystem
 
         public void ShowTooltip(int bankIndex, RectTransform slotRect)
         {
-            if (playerInventory == null)
-                playerInventory = FindObjectOfType<Inventory.Inventory>();
-            if (playerInventory == null)
+            if (!ResolvePlayerInventory())
                 return;
             if (bankIndex < 0 || bankIndex >= items.Length)
                 return;
@@ -458,9 +477,10 @@ namespace BankSystem
 
         public void HideTooltip()
         {
-            if (playerInventory == null)
-                playerInventory = FindObjectOfType<Inventory.Inventory>();
-            playerInventory?.HideTooltip();
+            if (!ResolvePlayerInventory())
+                return;
+
+            playerInventory.HideTooltip();
         }
 
         public void ShowWithdrawMenu(int bankIndex, Vector2 position)
@@ -470,7 +490,16 @@ namespace BankSystem
 
         public void ShowDepositMenu(int invIndex, Vector2 position)
         {
-            depositMenu?.Show(this, invIndex, position);
+            if (!ResolvePlayerInventory())
+            {
+                depositMenu?.Hide();
+                return;
+            }
+
+            var entry = playerInventory.GetSlot(invIndex);
+            bool showTransferAll = entry.item is OreBagItemData;
+
+            depositMenu?.Show(this, invIndex, position, showTransferAll);
         }
 
         public void PromptWithdrawAmount(int bankIndex)
@@ -485,7 +514,7 @@ namespace BankSystem
 
         public void PromptDepositAmount(int invIndex)
         {
-            if (playerInventory == null)
+            if (!ResolvePlayerInventory())
                 return;
             var entry = playerInventory.GetSlot(invIndex);
             if (entry.item == null)
@@ -578,7 +607,6 @@ namespace BankSystem
             {
                 bankModalActive = false;
                 inventoryWasOpen = false;
-                playerMovementStateCaptured = false;
                 return;
             }
 
@@ -586,13 +614,10 @@ namespace BankSystem
             {
                 bankModalActive = false;
                 inventoryWasOpen = false;
-                playerMovementStateCaptured = false;
                 return;
             }
 
-            if (playerInventory == null)
-                playerInventory = FindObjectOfType<Inventory.Inventory>();
-            if (playerInventory != null)
+            if (ResolvePlayerInventory())
             {
                 inventoryWasOpen = playerInventory.IsOpen;
                 playerInventory.BankOpen = true;
@@ -601,18 +626,13 @@ namespace BankSystem
                 var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
                 storage?.Close();
             }
+            else
+            {
+                inventoryWasOpen = false;
+            }
             // Freeze player movement while banking to mirror shop behaviour and
             // ensure the player cannot walk away with the window open.
-            playerMovementStateCaptured = false;
-            if (playerMover == null)
-                playerMover = FindObjectOfType<PlayerMover>();
-            if (playerMover != null)
-            {
-                playerMovementStateCaptured = true;
-                playerMover.StopMovement();
-                playerMover.SetMovementFrozen(true);
-                playerMover.CanDrop = false;
-            }
+            playerMovementLock.Acquire();
             // Ensure latest saved state is loaded whenever the bank opens
             Load();
             uiRoot.SetActive(true);
@@ -637,24 +657,14 @@ namespace BankSystem
                 else
                     playerInventory.CloseUI();
             }
-            if (playerMover != null)
-            {
-                if (playerMovementStateCaptured)
-                {
-                    // Release the bank's freeze request so overlapping systems such as freeze
-                    // spells maintain authority over the remaining frozen state.
-                    playerMover.SetMovementFrozen(false);
-                }
-                playerMover.CanDrop = true;
-            }
-            playerMovementStateCaptured = false;
+            playerMovementLock.Release();
             bankModalActive = false;
             Save();
         }
 
         public bool DepositFromInventory(int invIndex)
         {
-            if (playerInventory == null)
+            if (!ResolvePlayerInventory())
                 return false;
             var entry = playerInventory.GetSlot(invIndex);
             return DepositFromInventory(invIndex, entry.count);
@@ -662,7 +672,7 @@ namespace BankSystem
 
         public bool DepositAllFromInventory(int invIndex)
         {
-            if (playerInventory == null)
+            if (!ResolvePlayerInventory())
                 return false;
             var entry = playerInventory.GetSlot(invIndex);
             if (entry.item == null)
@@ -671,9 +681,25 @@ namespace BankSystem
             return DepositFromInventory(invIndex, available);
         }
 
+        public void TransferAllOreFromBag(int invIndex)
+        {
+            if (!ResolvePlayerInventory())
+                return;
+
+            var entry = playerInventory.GetSlot(invIndex);
+            if (entry.item is not OreBagItemData)
+                return;
+
+            var service = OreBagService.Instance;
+            if (service == null)
+                return;
+
+            service.TryTransferAllOreToBank(playerInventory, invIndex, this, true, out _);
+        }
+
         public bool DepositFromInventory(int invIndex, int amount)
         {
-            if (playerInventory == null)
+            if (!ResolvePlayerInventory())
                 return false;
 
             var entry = playerInventory.GetSlot(invIndex);
@@ -686,6 +712,7 @@ namespace BankSystem
             int available = playerInventory.GetItemCount(entry.item);
             int totalRequested = Mathf.Min(amount, available);
             int deposited = 0;
+            bool depositedAny = false;
 
             // Deposit from the originally selected slot first so the item the
             // player clicked is removed before searching other slots.
@@ -697,8 +724,8 @@ namespace BankSystem
                     goto FinishDeposit; // bank can no longer accept items
 
                 playerInventory.RemoveFromSlot(invIndex, added);
-                SaveState();
                 deposited += added;
+                depositedAny = true;
                 toDeposit = Mathf.Min(playerInventory.GetSlot(invIndex).count,
                                       totalRequested - deposited);
             }
@@ -721,8 +748,8 @@ namespace BankSystem
                         goto FinishDeposit;
 
                     playerInventory.RemoveFromSlot(i, added);
-                    SaveState();
                     deposited += added;
+                    depositedAny = true;
                     slot = playerInventory.GetSlot(i);
                     toDeposit = Mathf.Min(slot.item == entry.item ? slot.count : 0,
                                            totalRequested - deposited);
@@ -730,7 +757,7 @@ namespace BankSystem
             }
 
         FinishDeposit:
-            if (deposited > 0)
+            if (depositedAny)
                 SaveState();
 
             // Return true only if the full requested amount was deposited.
@@ -754,9 +781,7 @@ namespace BankSystem
 
         public bool Withdraw(int bankIndex, int amount)
         {
-            if (playerInventory == null)
-                playerInventory = FindObjectOfType<Inventory.Inventory>();
-            if (playerInventory == null)
+            if (!ResolvePlayerInventory())
                 return false;
             if (bankIndex < 0 || bankIndex >= items.Length)
                 return false;
@@ -792,6 +817,53 @@ namespace BankSystem
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Deposits every item stored in the supplied inventory into the bank, respecting stack limits.
+        /// </summary>
+        /// <param name="sourceInventory">Inventory that should be drained into the bank.</param>
+        /// <returns>Total number of items moved into the bank.</returns>
+        public int DepositAllFromInventory(Inventory.Inventory sourceInventory)
+        {
+            if (sourceInventory == null)
+                return 0;
+
+            int deposited = 0;
+            bool movedAny = false;
+
+            for (int slotIndex = 0; slotIndex < sourceInventory.size; slotIndex++)
+            {
+                var slot = sourceInventory.GetSlot(slotIndex);
+                if (slot.item == null || slot.count <= 0)
+                    continue;
+
+                var item = slot.item;
+                int remainingInSlot = slot.count;
+
+                while (remainingInSlot > 0)
+                {
+                    int added = AddItem(item, remainingInSlot);
+                    if (added <= 0)
+                        goto FinishDeposit; // bank is full; stop gracefully
+
+                    sourceInventory.RemoveFromSlot(slotIndex, added);
+                    deposited += added;
+                    movedAny = true;
+
+                    var updatedSlot = sourceInventory.GetSlot(slotIndex);
+                    if (updatedSlot.item != item)
+                        break;
+
+                    remainingInSlot = updatedSlot.count;
+                }
+            }
+
+        FinishDeposit:
+            if (movedAny)
+                SaveState();
+
+            return deposited;
         }
 
         public void ClearBank()

@@ -81,14 +81,19 @@ namespace UI.Login
 
         private void Awake()
         {
+            // Emit a boot log so we can trace when the login UI has completed its hierarchy setup.
+            Debug.Log("LoginScreenController: Awake - preparing login UI hierarchy and dependencies.", this);
             EnsureUiHierarchy();
 
             if (loginFlowController == null)
                 loginFlowController = GetComponent<LoginFlowController>();
 
             if (loginFlowController != null)
+            {
                 loginFlowController.SetScreen(this);
-
+                Debug.Log("LoginScreenController: Linked LoginFlowController instance.", this);
+            }
+            
             if (usernameField != null)
             {
                 LegacyFontProvider.ApplyTo(usernameField.textComponent);
@@ -113,6 +118,7 @@ namespace UI.Login
 
         private void OnEnable()
         {
+            Debug.Log("LoginScreenController: OnEnable - registering UI event bindings.", this);
             if (loginButton != null)
                 loginButton.onClick.AddListener(HandleLoginClicked);
 
@@ -132,6 +138,7 @@ namespace UI.Login
 
         private void OnDisable()
         {
+            Debug.Log("LoginScreenController: OnDisable - unregistering UI event bindings.", this);
             if (loginButton != null)
                 loginButton.onClick.RemoveListener(HandleLoginClicked);
 
@@ -173,14 +180,31 @@ namespace UI.Login
             if (loginButton == null)
                 return;
 
-            bool valid = usernameField != null && !string.IsNullOrWhiteSpace(usernameField.text)
-                && passwordField != null && !string.IsNullOrEmpty(passwordField.text);
+            bool validUsername = false;
+            if (usernameField != null)
+            {
+                string entered = usernameField.text ?? string.Empty;
+                string trimmedUsername = entered.Trim();
+                bool lengthValid = trimmedUsername.Length > 0 && trimmedUsername.Length <= AccountManager.MaxUsernameLength;
+                bool hasValidCharacters = !string.IsNullOrEmpty(AccountManager.SanitizeUsername(trimmedUsername));
+                validUsername = lengthValid && hasValidCharacters;
+            }
+
+            bool validPassword = false;
+            if (passwordField != null)
+            {
+                string enteredPassword = passwordField.text ?? string.Empty;
+                validPassword = !string.IsNullOrWhiteSpace(enteredPassword);
+            }
+
+            bool valid = validUsername && validPassword;
 
             loginButton.interactable = valid;
         }
 
         private async void HandleLoginClicked()
         {
+            Debug.Log("LoginScreenController: Login button clicked. Validating credentials.", this);
             if (loginButton != null)
                 loginButton.interactable = false;
 
@@ -189,14 +213,30 @@ namespace UI.Login
 
             string username = usernameField != null ? usernameField.text : string.Empty;
             string password = passwordField != null ? passwordField.text : string.Empty;
+            string trimmedUsername = username.Trim();
+
+            if (trimmedUsername.Length > AccountManager.MaxUsernameLength)
+            {
+                SetStatus($"Usernames must be {AccountManager.MaxUsernameLength} characters or fewer.", errorColour);
+                SetLoginButtonInteractable(true);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(AccountManager.SanitizeUsername(trimmedUsername)))
+            {
+                SetStatus("Username must include at least one letter, number, hyphen, or underscore.", errorColour);
+                SetLoginButtonInteractable(true);
+                return;
+            }
 
             try
             {
-                AccountManager.AccountLoadStatus loadStatus = AccountManager.TryLoadAccount(username, out AccountSave save);
+                Debug.Log($"LoginScreenController: Attempting to load account '{trimmedUsername}'.", this);
+                AccountManager.AccountLoadStatus loadStatus = AccountManager.TryLoadAccount(trimmedUsername, out AccountSave save);
 
                 if (loadStatus == AccountManager.AccountLoadStatus.FailedToDeserialize)
                 {
-                    string accountPath = AccountManager.GetAccountPath(username);
+                    string accountPath = AccountManager.GetAccountPath(trimmedUsername);
                     Debug.LogError($"LoginScreenController: Save file at '{accountPath}' exists but could not be read. Prompting the player to back up and repair the profile.", this);
                     SetStatus($"Your save data appears corrupted. Back up the file at:\n{accountPath}\nand repair or restore it before logging in to avoid losing progress.", errorColour);
                     SetLoginButtonInteractable(true);
@@ -210,6 +250,7 @@ namespace UI.Login
 
                 if (accountExists)
                 {
+                    Debug.Log($"LoginScreenController: Existing account located for '{trimmedUsername}'. Verifying password.", this);
                     if (!AccountManager.VerifyPassword(save, password))
                     {
                         SetStatus("Invalid credentials.", errorColour);
@@ -218,11 +259,13 @@ namespace UI.Login
                     }
 
                     SetStatus($"Welcome back, {save.username}.", successColour);
+                    Debug.Log($"LoginScreenController: Credentials accepted for '{save.username}'.", this);
                 }
                 else
                 {
-                    save = AccountManager.CreateNewAccount(username, password);
+                    save = AccountManager.CreateNewAccount(trimmedUsername, password);
                     SetStatus($"Created new account for {save.username}.", successColour);
+                    Debug.Log($"LoginScreenController: Created new account '{save.username}'.", this);
                 }
 
                 // Persist the login timestamp explicitly rather than letting autosaves advance it.
@@ -230,10 +273,12 @@ namespace UI.Login
 
                 SaveManager.BindAccount(save, reload: true);
                 await AccountManager.SaveAsync(save);
+                Debug.Log($"LoginScreenController: Account '{save.username}' bound and saved. Triggering login flow.", this);
                 CacheLastUsedAccount(save.username);
 
                 if (loginFlowController != null)
                 {
+                    Debug.Log("LoginScreenController: Starting post-authentication flow.", this);
                     await loginFlowController.BeginLoginFlowAsync(save);
                 }
                 else

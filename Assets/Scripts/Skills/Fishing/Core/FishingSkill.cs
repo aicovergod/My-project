@@ -14,7 +14,7 @@ using Skills.Common;
 namespace Skills.Fishing
 {
     [DisallowMultipleComponent]
-    public class FishingSkill : TickedSkillBehaviour
+    public class FishingSkill : DebuggableTickedSkillBehaviour
     {
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
@@ -25,8 +25,6 @@ namespace Skills.Fishing
         private BycatchManager bycatchManager;
         private bool waitingForServices;
 
-        [SerializeField, Tooltip("Enables verbose debug logging for fishing actions.")]
-        private bool enableDebugLogging;
         [SerializeField, Tooltip("ScriptableObject containing the Fisherman outfit configuration.")]
         private SkillingOutfitDefinition fishingOutfitDefinition;
 
@@ -40,6 +38,8 @@ namespace Skills.Fishing
 
         private Dictionary<string, ItemData> fishItems;
         private SkillingOutfitProgress fishingOutfit;
+        private bool useCompanionChatFormatting;
+        private Func<string> companionChatSenderResolver;
 
         public event System.Action<FishableSpot> OnStartFishing;
         public event System.Action OnStopFishing;
@@ -51,6 +51,8 @@ namespace Skills.Fishing
         public bool IsFishing => currentSpot != null;
         public FishableSpot CurrentSpot => currentSpot;
         public FishingToolDefinition CurrentTool => currentTool;
+        /// <summary>Inventory component used for storing caught fish.</summary>
+        public Inventory.Inventory InventoryComponent => inventory;
         public float CatchProgressNormalized
         {
             get
@@ -64,15 +66,6 @@ namespace Skills.Fishing
         }
         public int CurrentCatchIntervalTicks => catchProgressTracker.RequiredTicks;
 
-        /// <summary>
-        ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
-        /// </summary>
-        public bool EnableDebugLogging
-        {
-            get => enableDebugLogging;
-            set => enableDebugLogging = value;
-        }
-
         private SkillManager skills;
 
         private void Awake()
@@ -84,16 +77,11 @@ namespace Skills.Fishing
             skills = GetComponent<SkillManager>();
             catchProgressTracker.TickAdvanced += HandleCatchProgressAdvanced;
             PreloadFishItems();
-            if (fishingOutfitDefinition == null)
-                fishingOutfitDefinition = Resources.Load<SkillingOutfitDefinition>(FishingOutfitResourcePath);
-            if (fishingOutfitDefinition != null)
-            {
-                fishingOutfit = new SkillingOutfitProgress(fishingOutfitDefinition);
-            }
-            else
-            {
-                Debug.LogWarning("FishingSkill is missing a SkillingOutfitDefinition reference; outfit rewards are disabled.");
-            }
+            fishingOutfit = SkillingOutfitInitializer.InitializeOutfitProgress(
+                ref fishingOutfitDefinition,
+                FishingOutfitResourcePath,
+                nameof(FishingSkill),
+                this);
             TryResolveBycatchManager();
             if (bycatchManager == null)
                 SubscribeToServicesReady();
@@ -109,8 +97,6 @@ namespace Skills.Fishing
             SkillingOutfitProgress.Unregister(fishingOutfit);
             fishingOutfit = null;
         }
-
-        protected override bool LogTickerSubscription => enableDebugLogging;
 
         /// <summary>
         /// Attempts to resolve the bycatch manager from the <see cref="GameManager"/> when available
@@ -259,6 +245,8 @@ namespace Skills.Fishing
                             ? data.fishingXpBonusMultiplier
                             : 0f,
                     RewardMessageFormatter = qty => $"+{qty} {fish.DisplayName}",
+                    UseCompanionChatFormatting = useCompanionChatFormatting,
+                    CompanionChatSenderResolver = companionChatSenderResolver,
                     OnItemsGranted = result => OnFishCaught?.Invoke(fish.Id, result.QuantityAwarded),
                     OnSuccess = result =>
                     {
@@ -509,6 +497,18 @@ namespace Skills.Fishing
                 "Heron",
                 ref fishItems,
                 out _);
+        }
+
+        /// <summary>
+        /// Configures the chat formatting used when the skill is operated by a companion. Providing
+        /// a resolver routes reward messages through the companion chat channel instead of the
+        /// default game channel. Passing null restores player-centric formatting.
+        /// </summary>
+        /// <param name="senderResolver">Resolver that supplies the display name for companion chat output.</param>
+        public void ConfigureCompanionChat(Func<string> senderResolver)
+        {
+            useCompanionChatFormatting = senderResolver != null;
+            companionChatSenderResolver = senderResolver;
         }
 
         public void DebugSetLevel(int newLevel)

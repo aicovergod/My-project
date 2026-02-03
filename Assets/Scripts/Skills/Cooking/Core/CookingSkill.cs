@@ -15,13 +15,11 @@ namespace Skills.Cooking
     /// simply removes the raw item.
     /// </summary>
     [DisallowMultipleComponent]
-    public class CookingSkill : TickedSkillBehaviour
+    public class CookingSkill : DebuggableTickedSkillBehaviour
     {
         [SerializeField] private Inventory.Inventory inventory;
         [SerializeField] private Equipment equipment;
         [SerializeField] private Transform floatingTextAnchor;
-        [SerializeField, Tooltip("Enables verbose debug logging for cooking actions.")]
-        private bool enableDebugLogging;
         [SerializeField, Tooltip("ScriptableObject containing the Chef outfit configuration.")]
         private SkillingOutfitDefinition cookingOutfitDefinition;
 
@@ -60,15 +58,6 @@ namespace Skills.Cooking
         /// </summary>
         public int CookTicksPerItem => CookIntervalTicks;
 
-        /// <summary>
-        ///     Gets or sets the runtime flag controlling verbose debug logging for this skill.
-        /// </summary>
-        public bool EnableDebugLogging
-        {
-            get => enableDebugLogging;
-            set => enableDebugLogging = value;
-        }
-
         private void Awake()
         {
             if (inventory == null)
@@ -77,16 +66,11 @@ namespace Skills.Cooking
                 equipment = GetComponent<Equipment>();
             skills = GetComponent<SkillManager>();
             cookProgressTracker.TickAdvanced += HandleCookProgressAdvanced;
-            if (cookingOutfitDefinition == null)
-                cookingOutfitDefinition = Resources.Load<SkillingOutfitDefinition>(CookingOutfitResourcePath);
-            if (cookingOutfitDefinition != null)
-            {
-                cookingOutfit = new SkillingOutfitProgress(cookingOutfitDefinition);
-            }
-            else
-            {
-                Debug.LogWarning("CookingSkill is missing a SkillingOutfitDefinition reference; outfit rewards are disabled.");
-            }
+            cookingOutfit = SkillingOutfitInitializer.InitializeOutfitProgress(
+                ref cookingOutfitDefinition,
+                CookingOutfitResourcePath,
+                nameof(CookingSkill),
+                this);
         }
 
         private void OnDestroy()
@@ -180,8 +164,6 @@ namespace Skills.Cooking
             LogDebug("Stopped cooking");
             OnStopCooking?.Invoke();
         }
-
-        protected override bool LogTickerSubscription => enableDebugLogging;
 
         protected override void HandleTick()
         {

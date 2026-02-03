@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Inventory;
-using Player;
 using NPC;
 using UI;
 using UI.Utilities;
@@ -44,13 +43,12 @@ namespace ShopSystem
         private Text tooltipText;
         private Text shopNameText;
         private Shop currentShop;
-        private PlayerMover playerMover;
         private NpcWanderer npcMover;
         private bool hasLoggedMissingInventory;
         // Tracks the inventory visibility so we can restore the state when leaving the shop.
         private bool inventoryWasOpenBeforeShop;
         private bool inventoryStateCaptured;
-        private bool playerMovementStateCaptured;
+        private readonly PlayerMovementModalLock playerMovementLock = new PlayerMovementModalLock();
 
         private static ShopUI instance;
         public static ShopUI Instance => instance;
@@ -203,16 +201,7 @@ namespace ShopSystem
                 playerInventory.OnInventoryChanged += HandleInventoryChanged;
             }
 
-            playerMovementStateCaptured = false;
-            if (playerMover == null)
-                playerMover = FindObjectOfType<PlayerMover>();
-            if (playerMover != null)
-            {
-                playerMovementStateCaptured = true;
-                playerMover.StopMovement();
-                playerMover.SetMovementFrozen(true);
-                playerMover.CanDrop = false;
-            }
+            playerMovementLock.Acquire();
 
             if (npcMover != null)
                 npcMover.enabled = false;
@@ -259,12 +248,7 @@ namespace ShopSystem
                 }
             }
 
-            if (playerMover != null)
-            {
-                if (playerMovementStateCaptured)
-                    playerMover.SetMovementFrozen(false);
-                playerMover.CanDrop = true;
-            }
+            playerMovementLock.Release();
 
             if (npcMover != null)
             {
@@ -274,7 +258,6 @@ namespace ShopSystem
 
             inventoryStateCaptured = false;
             inventoryWasOpenBeforeShop = false;
-            playerMovementStateCaptured = false;
             shopModalActive = false;
         }
 
@@ -287,20 +270,15 @@ namespace ShopSystem
 
         private void CreateUI()
         {
-            uiRoot = new GameObject("ShopUI", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            uiRoot.transform.SetParent(null, false);
-            DontDestroyOnLoad(uiRoot);
+            var overlay = OverlayCanvasFactory.CreateOverlayCanvas(
+                "ShopUI",
+                referenceResolution,
+                dontDestroyOnLoad: true,
+                matchWidthOrHeight: 0f);
+
+            uiRoot = overlay.Root;
 
             Font runtimeFont = priceFont != null ? priceFont : LegacyFontProvider.GetLegacyFont();
-
-            var canvas = uiRoot.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.pixelPerfect = true;
-
-            var scaler = uiRoot.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = referenceResolution;
-            scaler.matchWidthOrHeight = 0f;
 
             GameObject window = new GameObject("Window", typeof(RectTransform), typeof(Image));
             window.transform.SetParent(uiRoot.transform, false);
@@ -314,31 +292,20 @@ namespace ShopSystem
             var windowImg = window.GetComponent<Image>();
             windowImg.color = windowColor;
 
-            GameObject closeButtonGO = new GameObject("CloseButton", typeof(RectTransform), typeof(Image), typeof(Button));
-            closeButtonGO.transform.SetParent(window.transform, false);
-            var closeRect = closeButtonGO.GetComponent<RectTransform>();
-            closeRect.anchorMin = new Vector2(1f, 1f);
-            closeRect.anchorMax = new Vector2(1f, 1f);
-            closeRect.pivot = new Vector2(1f, 1f);
-            closeRect.anchoredPosition = new Vector2(-4f, -4f);
-            closeRect.sizeDelta = new Vector2(16f, 16f);
-            var closeImg = closeButtonGO.GetComponent<Image>();
-            closeImg.color = Color.red;
-            var closeBtn = closeButtonGO.GetComponent<Button>();
-            closeBtn.onClick.AddListener(Close);
+            var closeButton = CloseButtonBuilder.Build(
+                window.transform,
+                Close,
+                new CloseButtonBuilder.Options
+                {
+                    Font = runtimeFont,
+                    AnchoredPosition = new Vector2(-4f, -4f),
+                    Size = new Vector2(16f, 16f)
+                });
 
-            GameObject closeTextGO = new GameObject("Text", typeof(Text));
-            closeTextGO.transform.SetParent(closeButtonGO.transform, false);
-            var closeText = closeTextGO.GetComponent<Text>();
-            closeText.font = runtimeFont;
-            closeText.text = "X";
-            closeText.alignment = TextAnchor.MiddleCenter;
-            closeText.color = Color.white;
-            var closeTextRect = closeTextGO.GetComponent<RectTransform>();
-            closeTextRect.anchorMin = Vector2.zero;
-            closeTextRect.anchorMax = Vector2.one;
-            closeTextRect.offsetMin = Vector2.zero;
-            closeTextRect.offsetMax = Vector2.zero;
+            // Cache the close button rect so we can reserve horizontal space for it
+            // when laying out the shop name label below. Without this, the label would
+            // overlap the close button when the window resizes for larger inventories.
+            var closeRect = closeButton.GetComponent<RectTransform>();
 
             GameObject panel = new GameObject("Slots", typeof(RectTransform), typeof(GridLayoutGroup));
             panel.transform.SetParent(window.transform, false);

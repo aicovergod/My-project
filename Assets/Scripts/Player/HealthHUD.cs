@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UI;
@@ -12,6 +13,15 @@ namespace Player
         private PlayerHitpoints hitpoints;
         private Image fillImage;
         private Text text;
+
+        /// <summary>Raised whenever a health HUD instance finishes its awake cycle.</summary>
+        public static event Action<HealthHUD> HealthHudCreated;
+
+        /// <summary>Raised when the active health HUD is destroyed so dependants can rebuild.</summary>
+        public static event Action HealthHudDestroyed;
+
+        /// <summary>Provides global access to the active health HUD instance.</summary>
+        public static HealthHUD Instance { get; private set; }
 
         public static HealthHUD CreateUnderMinimap(RectTransform minimapRoot, PlayerHitpoints hp)
         {
@@ -28,15 +38,12 @@ namespace Player
                 new Rect(0f, 0f, 1f, 1f),
                 new Vector2(0.5f, 0.5f));
 
-            const float height = 12f;
-            const float margin = 4f;
-
             var rect = go.GetComponent<RectTransform>();
             rect.anchorMin = new Vector2(1f, 1f);
             rect.anchorMax = new Vector2(1f, 1f);
             rect.pivot = new Vector2(1f, 1f);
-            rect.sizeDelta = new Vector2(minimapRoot.sizeDelta.x, height);
-            rect.anchoredPosition = minimapRoot.anchoredPosition + new Vector2(0f, -(minimapRoot.sizeDelta.y + margin));
+            rect.sizeDelta = new Vector2(300f, 30f);
+            rect.anchoredPosition = new Vector2(-10f, -314f);
 
             var bgGO = new GameObject("Background", typeof(Image));
             bgGO.transform.SetParent(go.transform, false);
@@ -70,7 +77,12 @@ namespace Player
             LegacyFontProvider.ApplyTo(hud.text);
             hud.text.alignment = TextAnchor.MiddleCenter;
             hud.text.color = Color.white;
-            hud.text.fontSize = 11;
+            hud.text.fontSize = 28;
+            // Add an outline to give the health text a crisp black border similar to OSRS UI treatment.
+            var outline = textGO.AddComponent<Outline>();
+            outline.effectColor = Color.black;
+            outline.effectDistance = new Vector2(1f, -1f);
+            outline.useGraphicAlpha = false;
             var textRect = hud.text.rectTransform;
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
@@ -82,6 +94,14 @@ namespace Player
             hud.HandleHealthChanged(hp.CurrentHp, hp.MaxHp);
 
             return hud;
+        }
+
+        private void Awake()
+        {
+            // Publish the instance immediately so late subscribers (pet HUD, companion HUD, etc.)
+            // can anchor to the health bar as soon as it is created.
+            Instance = this;
+            HealthHudCreated?.Invoke(this);
         }
 
         private void HandleHealthChanged(int current, int max)
@@ -103,6 +123,14 @@ namespace Player
             {
                 hitpoints.OnHealthChanged -= HandleHealthChanged;
                 hitpoints.OnHitpointsLevelChanged -= HandleLevelChanged;
+            }
+
+            // Clear the static instance and alert listeners so they can queue a rebuild once the
+            // minimap recreates the HUD in the new scene.
+            if (Instance == this)
+            {
+                Instance = null;
+                HealthHudDestroyed?.Invoke();
             }
         }
     }

@@ -1,5 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Skills.Common;
+using Companions;
+using Inventory;
 
 namespace Skills.Mining
 {
@@ -14,6 +18,7 @@ namespace Skills.Mining
         [SerializeField] private PickaxeToUse pickaxeSelector;
 
         private PickaxeDefinition cachedPickaxe;
+        private Dictionary<string, ItemData> gatheredItemCache;
 
         private MiningSkill MiningSkill => Skill;
 
@@ -104,10 +109,21 @@ namespace Skills.Mining
                 return false;
             }
 
-            if (MiningSkill.CanAddOre(node.RockDef.Ore))
+            var rockDefinition = node.RockDef;
+            var oreDefinition = rockDefinition != null ? rockDefinition.Ore : null;
+
+            var capacityResult = GatheringInventoryHelper.EvaluateGatheredItemCapacity(
+                MiningSkill.InventoryComponent,
+                oreDefinition != null ? oreDefinition.Id : string.Empty,
+                "Rock Golem",
+                ref gatheredItemCache);
+
+            if (capacityResult.PlayerOrPetHasCapacity)
                 return true;
 
-            failureMessage = "Your inventory is full";
+            failureMessage = capacityResult.CompanionInventoryHasCapacity
+                ? PlayerInventoryFullChatMessage
+                : PlayerAndCompanionInventoryFullChatMessage;
             return false;
         }
 
@@ -137,7 +153,32 @@ namespace Skills.Mining
         /// <inheritdoc />
         protected override void Prospect(MineableRock node)
         {
-            node?.Prospect(transform);
+            if (node == null)
+                return;
+
+            bool shiftHeld = false;
+            var keyboard = Keyboard.current;
+            if (keyboard != null)
+            {
+                shiftHeld = (keyboard.leftShiftKey != null && keyboard.leftShiftKey.isPressed)
+                    || (keyboard.rightShiftKey != null && keyboard.rightShiftKey.isPressed);
+            }
+            else
+            {
+                shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            }
+
+            if (shiftHeld)
+            {
+                // Shift-right click is reserved for commanding the companion. Regardless of whether the
+                // companion can accept the order (no pickaxe, out of range, inactive, etc.), we should not
+                // prospect the rock. This prevents the player from prospecting when they intended to issue
+                // a companion order and ensures the feedback from the companion remains the only response.
+                CompanionManager.TryCommandMine(node);
+                return;
+            }
+
+            node.Prospect(transform);
         }
     }
 }

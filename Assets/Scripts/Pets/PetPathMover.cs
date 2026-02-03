@@ -103,7 +103,15 @@ namespace Pets
         {
             get
             {
-                return pathService != null && pathService.ActiveGrid != null && pathService.ActiveGrid.HasGrid;
+                // Always attempt to bind the navigation service when queried so callers can
+                // transition to grid-aware movement as soon as the service becomes available.
+                if (!EnsureServiceReference())
+                {
+                    return false;
+                }
+
+                var grid = pathService.ActiveNavData;
+                return grid != null && grid.HasData;
             }
         }
 
@@ -185,8 +193,8 @@ namespace Pets
                 return false;
             }
 
-            var grid = pathService.ActiveGrid;
-            if (grid == null || !grid.HasGrid)
+            var grid = pathService.ActiveNavData;
+            if (grid == null || !grid.HasData)
             {
                 ResetFollowTracking();
                 return false;
@@ -225,10 +233,7 @@ namespace Pets
                 RequestPath(currentPosition, anchor, Mode.Follow);
             }
 
-            if (awaitingPath)
-            {
-                return false;
-            }
+            bool awaitingWithDestination = awaitingPath && hasResolvedDestination;
 
             if (hasResolvedDestination)
             {
@@ -238,6 +243,17 @@ namespace Pets
                     ClearPathData();
                     return false;
                 }
+            }
+
+            if (awaitingWithDestination)
+            {
+                // Continue advancing toward the last known destination while a refreshed path is in-flight.
+                return StepToward(resolvedDestination, currentPosition, moveSpeed, deltaTime, out nextPosition, out velocity, waypointTolerance, anchor);
+            }
+
+            if (awaitingPath)
+            {
+                return false;
             }
 
             if (waypointQueue.Count == 0)
@@ -331,8 +347,8 @@ namespace Pets
                 return false;
             }
 
-            var grid = pathService.ActiveGrid;
-            if (grid == null || !grid.HasGrid)
+            var grid = pathService.ActiveNavData;
+            if (grid == null || !grid.HasData)
             {
                 ResetAttackTracking();
                 return false;
@@ -371,10 +387,7 @@ namespace Pets
                 RequestPath(currentPosition, target, Mode.Attack);
             }
 
-            if (awaitingPath)
-            {
-                return false;
-            }
+            bool awaitingWithDestination = awaitingPath && hasResolvedDestination;
 
             if (hasResolvedDestination)
             {
@@ -384,6 +397,17 @@ namespace Pets
                     ClearPathData();
                     return false;
                 }
+            }
+
+            if (awaitingWithDestination)
+            {
+                // Continue pursuing the previous destination while the new path request is pending.
+                return StepToward(resolvedDestination, currentPosition, moveSpeed, deltaTime, out nextPosition, out velocity, waypointTolerance, target);
+            }
+
+            if (awaitingPath)
+            {
+                return false;
             }
 
             if (waypointQueue.Count == 0)
@@ -441,8 +465,8 @@ namespace Pets
                 return false;
             }
 
-            var grid = pathService.ActiveGrid;
-            if (grid == null || !grid.HasGrid)
+            var grid = pathService.ActiveNavData;
+            if (grid == null || !grid.HasData)
             {
                 ResetWanderTracking();
                 return false;
@@ -462,10 +486,7 @@ namespace Pets
                 RequestPath(currentPosition, target, Mode.Wander);
             }
 
-            if (awaitingPath)
-            {
-                return false;
-            }
+            bool awaitingWithDestination = awaitingPath && hasResolvedDestination;
 
             if (hasResolvedDestination)
             {
@@ -475,6 +496,17 @@ namespace Pets
                     ClearPathData();
                     return false;
                 }
+            }
+
+            if (awaitingWithDestination)
+            {
+                // Keep drifting toward the last resolved wander destination while awaiting the refreshed path.
+                return StepToward(resolvedDestination, currentPosition, moveSpeed, deltaTime, out nextPosition, out velocity, waypointTolerance, target);
+            }
+
+            if (awaitingPath)
+            {
+                return false;
             }
 
             if (waypointQueue.Count == 0)

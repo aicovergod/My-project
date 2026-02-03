@@ -1,6 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UI;
+using UI.Utilities;
+using Companions;
+using Companions.Inventory;
+using Companions.UI;
 
 namespace Pets
 {
@@ -11,12 +15,42 @@ namespace Pets
     {
         private Button xpButton;
         private Button guardButton;
+
+        /// <summary>Label reflecting the current guard mode state.</summary>
         private Text guardText;
+
         private Button inventoryButton;
+
+        /// <summary>Label reflecting the current inventory visibility state.</summary>
         private Text inventoryText;
+
+        /// <summary>Button that toggles the companion equipment window.</summary>
+        private Button equipmentButton;
+
+        /// <summary>Label reflecting the current equipment visibility state.</summary>
+        private Text equipmentText;
+
+        /// <summary>Button that cancels the companion's current action.</summary>
+        private Button stopActionButton;
+
+        /// <summary>Label that reflects the action-specific stop command.</summary>
+        private Text stopActionText;
+
+        /// <summary>Button that opens the companion stats window.</summary>
+        private Button statsButton;
+
+        /// <summary>Button that allows companions to dump their inventory into the bank.</summary>
+        private Button bankButton;
+
+        [SerializeField]
+        private Button commandButton;
+
+        /// <summary>HUD currently owning the menu so callbacks can target the right entity.</summary>
         private PetLevelBarHUD current;
 
         private static PetLevelBarMenu instance;
+
+        /// <summary>Canvas hosting the floating menu so click detection can reference it.</summary>
         private static Canvas menuCanvas;
 
         public static void Show(PetLevelBarHUD hud, Vector2 position)
@@ -24,31 +58,62 @@ namespace Pets
             if (instance == null)
                 CreateInstance();
             instance.current = hud;
-            instance.guardText.text = PetDropSystem.GuardModeEnabled ? "Guard Mode: On" : "Guard Mode: Off";
-            var pet = PetDropSystem.ActivePetObject;
-            var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
-            var inv = pet != null ? pet.GetComponent<Inventory.Inventory>() : null;
-            bool hasInventory = storage != null && inv != null;
-            instance.inventoryButton.gameObject.SetActive(hasInventory);
-            if (hasInventory)
-                instance.inventoryText.text = PetDropSystem.PetInventoryVisible ? "Inventory: On" : "Inventory: Off";
+            bool isCompanion = hud != null && hud.IsCompanionHud;
+            instance.statsButton.gameObject.SetActive(isCompanion);
+            instance.xpButton.gameObject.SetActive(!isCompanion);
+            if (instance.commandButton != null)
+                instance.commandButton.gameObject.SetActive(isCompanion);
+            if (instance.bankButton != null)
+                instance.bankButton.gameObject.SetActive(isCompanion);
+
+            if (isCompanion)
+            {
+                instance.guardText.text = CompanionManager.GuardModeEnabled ? "Guard Mode: On" : "Guard Mode: Off";
+                instance.inventoryButton.gameObject.SetActive(true);
+                instance.inventoryText.text = CompanionManager.IsInventoryVisible() ? "Inventory: On" : "Inventory: Off";
+                instance.equipmentButton.gameObject.SetActive(true);
+                instance.equipmentText.text = CompanionManager.IsEquipmentVisible() ? "Equipment: On" : "Equipment: Off";
+                instance.UpdateStopActionButton(true);
+            }
+            else
+            {
+                CompanionCommandMenu.Hide();
+                instance.guardText.text = PetDropSystem.GuardModeEnabled ? "Guard Mode: On" : "Guard Mode: Off";
+                var pet = PetDropSystem.ActivePetObject;
+                var storage = pet != null ? pet.GetComponent<PetStorage>() : null;
+                var inv = pet != null ? pet.GetComponent<Inventory.Inventory>() : null;
+                bool hasInventory = storage != null && inv != null;
+                instance.inventoryButton.gameObject.SetActive(hasInventory);
+                if (hasInventory)
+                    instance.inventoryText.text = PetDropSystem.PetInventoryVisible ? "Inventory: On" : "Inventory: Off";
+                instance.equipmentButton.gameObject.SetActive(false);
+                instance.UpdateStopActionButton(false);
+            }
             instance.transform.position = position;
             instance.gameObject.SetActive(true);
             instance.OnMenuShown();
+            instance.UpdateStopActionButton(isCompanion);
         }
 
         private static void CreateInstance()
         {
-            var canvasGO = new GameObject("PetBarMenuCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            menuCanvas = canvasGO.GetComponent<Canvas>();
-            menuCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            // Ensure the context menu canvas renders above other UI elements
-            menuCanvas.overrideSorting = true;
-            menuCanvas.sortingOrder = short.MaxValue;
-            Object.DontDestroyOnLoad(canvasGO);
+            var overlay = OverlayCanvasFactory.CreateOverlayCanvas(
+                "PetBarMenuCanvas",
+                new Vector2(1920f, 1080f),
+                dontDestroyOnLoad: true,
+                assignToUiLayer: true,
+                overrideSorting: true,
+                sortingOrder: short.MaxValue);
 
-            var menuGO = new GameObject("PetLevelBarMenu", typeof(Image), typeof(PetLevelBarMenu), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
-            menuGO.transform.SetParent(canvasGO.transform, false);
+            menuCanvas = overlay.Canvas;
+
+            var menuGO = new GameObject(
+                "PetLevelBarMenu",
+                typeof(Image),
+                typeof(PetLevelBarMenu),
+                typeof(VerticalLayoutGroup),
+                typeof(ContentSizeFitter));
+            menuGO.transform.SetParent(overlay.Root.transform, false);
             var img = menuGO.GetComponent<Image>();
             img.color = new Color(0f, 0f, 0f, 0.8f);
 
@@ -67,6 +132,37 @@ namespace Pets
                 instance.Hide();
             });
 
+            instance.statsButton = CreateButton(menuGO.transform, "Stats");
+            instance.statsButton.onClick.AddListener(() =>
+            {
+                CompanionManager.OpenStats();
+                instance.Hide();
+            });
+
+            instance.commandButton = CreateButton(menuGO.transform, "Command");
+            instance.commandButton.onClick.AddListener(() =>
+            {
+                if (instance.commandButton == null)
+                    return;
+
+                var rect = instance.commandButton.GetComponent<RectTransform>();
+                if (CompanionCommandMenu.IsVisible)
+                {
+                    CompanionCommandMenu.Hide();
+                }
+                else
+                {
+                    CompanionCommandMenu.Show(rect);
+                }
+            });
+
+            instance.stopActionButton = CreateButton(menuGO.transform, "Stop");
+            instance.stopActionText = instance.stopActionButton.GetComponentInChildren<Text>();
+            instance.stopActionButton.onClick.AddListener(() =>
+            {
+                instance.OnStopActionClicked();
+            });
+
             instance.guardButton = CreateButton(menuGO.transform, "Guard Mode");
             instance.guardText = instance.guardButton.GetComponentInChildren<Text>();
             instance.guardButton.onClick.AddListener(() =>
@@ -80,6 +176,24 @@ namespace Pets
             instance.inventoryButton.onClick.AddListener(() =>
             {
                 instance.current?.ToggleInventory();
+                instance.Hide();
+            });
+
+            instance.equipmentButton = CreateButton(menuGO.transform, "Equipment");
+            instance.equipmentText = instance.equipmentButton.GetComponentInChildren<Text>();
+            instance.equipmentButton.onClick.AddListener(() =>
+            {
+                instance.current?.ToggleEquipment();
+                instance.Hide();
+            });
+
+            instance.bankButton = CreateButton(menuGO.transform, "Bank");
+            instance.bankButton.onClick.AddListener(() =>
+            {
+                CompanionBankDepositService.TryDepositCompanionInventoryToBank(
+                    CompanionManager.ActiveCompanion,
+                    CompanionManager.EnableDebugLogging,
+                    CompanionManager.GetCompanionDisplayName());
                 instance.Hide();
             });
 
@@ -117,19 +231,65 @@ namespace Pets
         {
             gameObject.SetActive(false);
             current = null;
+            CompanionCommandMenu.Hide();
+        }
+
+        internal static void HideActiveMenu()
+        {
+            if (instance != null)
+                instance.Hide();
         }
 
         private void Update()
         {
-            if (gameObject.activeSelf && Input.GetMouseButtonDown(0))
-            {
-                var rect = GetComponent<RectTransform>();
-                if (!RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition, menuCanvas != null ? menuCanvas.worldCamera : null))
-                    Hide();
-            }
+            if (!gameObject.activeSelf)
+                return;
+
+            UpdateStopActionButton(current != null && current.IsCompanionHud);
+
+            if (!Input.GetMouseButtonDown(0))
+                return;
+
+            var rect = GetComponent<RectTransform>();
+            var camera = menuCanvas != null ? menuCanvas.worldCamera : null;
+            bool clickInsidePetMenu = RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition, camera);
+            bool clickInsideCommandMenu = CompanionCommandMenu.ContainsScreenPoint(Input.mousePosition);
+
+            if (!clickInsidePetMenu && !clickInsideCommandMenu)
+                Hide();
         }
 
         partial void OnMenuCreated(Transform menuRoot);
         partial void OnMenuShown();
+
+        private void UpdateStopActionButton(bool isCompanionHud)
+        {
+            if (stopActionButton == null)
+                return;
+
+            if (!isCompanionHud)
+            {
+                stopActionButton.gameObject.SetActive(false);
+                return;
+            }
+
+            bool show = CompanionManager.HasActiveAction;
+            stopActionButton.gameObject.SetActive(show);
+
+            if (!show || stopActionText == null)
+                return;
+
+            stopActionText.text = CompanionDisplayUtility.GetStopActionLabel(CompanionManager.GetActiveAction());
+        }
+
+        private void OnStopActionClicked()
+        {
+            bool cancelled = CompanionManager.TryCancelCurrentAction();
+
+            if (CompanionManager.EnableDebugLogging)
+                Debug.Log($"[PetLevelBarMenu] Stop action button clicked. Cancelled={cancelled}.");
+
+            Hide();
+        }
     }
 }

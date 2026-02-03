@@ -15,6 +15,7 @@ namespace Inventory
         private static StackSplitDialog instance;
 
         private InputField inputField;
+        private RectTransform contentRoot;
         private Action<int> onConfirm;
         private int maxAmount;
 
@@ -48,20 +49,66 @@ namespace Inventory
 
         private void BuildUI()
         {
-            var bg = GetComponent<Image>();
-            bg.color = new Color(0f, 0f, 0f, 0.8f);
+            // Configure the full-screen overlay so it captures pointer input and darkens
+            // the backdrop, preventing clicks from leaking through to the bank UI.
+            var overlayImage = GetComponent<Image>();
+            overlayImage.color = new Color(0f, 0f, 0f, 0.75f);
+            overlayImage.raycastTarget = true;
 
-            var rect = GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(160f, 80f);
+            var overlayRect = GetComponent<RectTransform>();
+            overlayRect.anchorMin = Vector2.zero;
+            overlayRect.anchorMax = Vector2.one;
+            overlayRect.offsetMin = Vector2.zero;
+            overlayRect.offsetMax = Vector2.zero;
+            overlayRect.pivot = new Vector2(0.5f, 0.5f);
+
+            // The actual dialog content lives on a dedicated panel so button hitboxes
+            // no longer span the entire overlay. This resolves the issue where clicking
+            // the input field triggered a confirm.
+            contentRoot = BuildPanel();
 
             // Input field
+            BuildInputField(contentRoot);
+
+            // Action buttons
+            CreateButton("Confirm", contentRoot, new Vector2(0.1f, 0.1f), new Vector2(0.45f, 0.35f), Confirm);
+            CreateButton("Cancel", contentRoot, new Vector2(0.55f, 0.1f), new Vector2(0.9f, 0.35f), () => Destroy(gameObject));
+        }
+
+        /// <summary>
+        /// Creates the central dialog panel that contains all interactive controls.
+        /// </summary>
+        private RectTransform BuildPanel()
+        {
+            var panelGO = new GameObject("DialogPanel", typeof(Image));
+            panelGO.transform.SetParent(transform, false);
+
+            var panelImage = panelGO.GetComponent<Image>();
+            panelImage.color = new Color(0.13f, 0.13f, 0.13f, 0.95f);
+
+            var panelRect = panelGO.GetComponent<RectTransform>();
+            panelRect.anchorMin = new Vector2(0.5f, 0.5f);
+            panelRect.anchorMax = new Vector2(0.5f, 0.5f);
+            panelRect.pivot = new Vector2(0.5f, 0.5f);
+            panelRect.sizeDelta = new Vector2(260f, 140f);
+
+            return panelRect;
+        }
+
+        /// <summary>
+        /// Builds and configures the numeric input field where the player enters an amount.
+        /// </summary>
+        private void BuildInputField(RectTransform parent)
+        {
             var fieldGO = new GameObject("InputField", typeof(Image), typeof(InputField));
-            fieldGO.transform.SetParent(transform, false);
+            fieldGO.transform.SetParent(parent, false);
+
             var fieldImage = fieldGO.GetComponent<Image>();
             fieldImage.color = Color.white;
+
             var fieldRect = fieldGO.GetComponent<RectTransform>();
-            fieldRect.anchorMin = new Vector2(0.1f, 0.5f);
-            fieldRect.anchorMax = new Vector2(0.9f, 0.8f);
+            fieldRect.anchorMin = new Vector2(0.1f, 0.55f);
+            fieldRect.anchorMax = new Vector2(0.9f, 0.85f);
             fieldRect.offsetMin = Vector2.zero;
             fieldRect.offsetMax = Vector2.zero;
 
@@ -78,25 +125,32 @@ namespace Inventory
             var placeholder = placeholderGO.GetComponent<Text>();
             placeholder.font = text.font;
             placeholder.alignment = TextAnchor.MiddleLeft;
-            placeholder.text = "1";
-            placeholder.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+            placeholder.text = "Amount";
+            placeholder.color = new Color(0.5f, 0.5f, 0.5f, 0.75f);
 
             inputField = fieldGO.GetComponent<InputField>();
             inputField.textComponent = text;
             inputField.placeholder = placeholder;
             inputField.contentType = InputField.ContentType.IntegerNumber;
             inputField.text = "1";
+            inputField.caretWidth = 1;
+
+            // Disable automatic navigation so pointer clicks do not trigger implicit
+            // submit events when using the new Input System module.
+            var navigation = new Navigation { mode = Navigation.Mode.None };
+            inputField.navigation = navigation;
+
             inputField.Select();
             inputField.ActivateInputField();
-
-            CreateButton("Confirm", new Vector2(0.1f, 0.1f), new Vector2(0.45f, 0.4f), Confirm);
-            CreateButton("Cancel", new Vector2(0.55f, 0.1f), new Vector2(0.9f, 0.4f), () => Destroy(gameObject));
         }
 
-        private void CreateButton(string label, Vector2 anchorMin, Vector2 anchorMax, UnityEngine.Events.UnityAction onClick)
+        /// <summary>
+        /// Creates a legacy-styled button and attaches the supplied click handler.
+        /// </summary>
+        private void CreateButton(string label, RectTransform parent, Vector2 anchorMin, Vector2 anchorMax, UnityEngine.Events.UnityAction onClick)
         {
             var btnGO = new GameObject(label, typeof(Image), typeof(Button));
-            btnGO.transform.SetParent(transform, false);
+            btnGO.transform.SetParent(parent, false);
             var rect = btnGO.GetComponent<RectTransform>();
             rect.anchorMin = anchorMin;
             rect.anchorMax = anchorMax;
@@ -115,6 +169,7 @@ namespace Inventory
 
             var btn = btnGO.GetComponent<Button>();
             btn.onClick.AddListener(onClick);
+            btn.navigation = new Navigation { mode = Navigation.Mode.None };
         }
 
         private void Confirm()
